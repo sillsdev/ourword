@@ -175,12 +175,6 @@ namespace OurWord.Dialogs
             // these localizations are obtained from the strings section.
             Control[] vExclude = { m_lblDefinition, m_lblCreate, m_lblOpen };
             LocDB.Localize(this, vExclude);
-
-            /***
-			m_btnCreate.Text  = DlgProps.Create;
-			m_btnOpen.Text    = DlgProps.Open;
-			m_lblActions.Text = DlgProps.LblActions;
-            ***/
 		}
 		#endregion
 
@@ -218,7 +212,7 @@ namespace OurWord.Dialogs
             ParentDlg.ActivatePage(Translation);
         }
 		#endregion
-		#region Handler: cmdOpen - open an existing front translation settings file
+		#region Handler: cmdOpen - open an existing translation settings file
 		private void cmdOpen(object sender, System.EventArgs e)
 		{
 			// Make sure the user understands that this will remove his current Front

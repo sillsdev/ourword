@@ -2036,9 +2036,12 @@ namespace OurWord.DataModel
 				{
 					string sReference = s_nVerse.ToString();
 
-					string sNonVersePara = StrRes.GetStyleName(LastParagraph.StyleAbbrev);
-					if (0 != sNonVersePara.Length)
-						sReference = sNonVersePara;
+                    if (DSection.ParagraphHasNoReference(LastParagraph))
+                    {
+                        string sNonVersePara = G.GetLoc_StyleName(LastParagraph.Style.DisplayName);
+                        if (0 != sNonVersePara.Length)
+                            sReference = sNonVersePara;
+                    }
 
 					note = new DNote(sReference, bt, NoteType);
 					DText text = LastParagraph.GetOrAddLastDText();
@@ -2573,6 +2576,26 @@ namespace OurWord.DataModel
 			return null;
 		}
 		#endregion
+        #region SMethod: bool ParagraphHasNoReference(DParagraph p)
+        public static bool ParagraphHasNoReference(DParagraph p)
+        {
+            if (p.StyleAbbrev == G.Map.StyleSection)
+                return true;
+            if (p.StyleAbbrev == G.Map.StyleSection2)
+                return true;
+            if (p.StyleAbbrev == G.Map.StyleCrossRef)
+                return true;
+            if (p.StyleAbbrev == G.Map.StyleMainTitle)
+                return true;
+            if (p.StyleAbbrev == G.Map.StyleSubTitle)
+                return true;
+            if (p.StyleAbbrev == G.Map.StyleHeader)
+                return true;
+            if (p.StyleAbbrev == G.Map.StylePicCaption)
+                return true;
+            return false;
+        }
+        #endregion
         #region Method: string GetNoteReference(DNote note)
         public string GetNoteReference(DNote note)
             // Called when inserting a new note, where we want to get the text to display
@@ -2608,9 +2631,12 @@ namespace OurWord.DataModel
                             {
                                 // Some paragraphs (e.g., Section Title) just return the 
                                 // stylename rather than the reference
-                                string sNonVersePara = StrRes.GetStyleName(p.StyleAbbrev);
-                                if (0 != sNonVersePara.Length)
-                                    return sNonVersePara;
+                                if (ParagraphHasNoReference(p))
+                                {
+                                    string sNonVersePara = G.GetLoc_StyleName(p.Style.DisplayName);
+                                    if (0 != sNonVersePara.Length)
+                                        return sNonVersePara;
+                                }
 
                                 // Compute and return the reference
                                 return nVerse.ToString();

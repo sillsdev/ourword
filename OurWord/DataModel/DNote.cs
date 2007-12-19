@@ -809,13 +809,13 @@ namespace OurWord.DataModel
 			// To Do notes: Create a string consisting of the words "To Do: "
 			if (Types.kToDo == type)
 			{
-                return StrRes.NoteDefaultText_ToDoDefault + sSelectionText;
+                return G.GetLoc_Notes("ToDoDefault", "To Do:").Trim() + " " + sSelectionText;
 			}
 
 			// Front notes
 			if (Types.kFront == type)
 			{
-				string sLabel = StrRes.NoteDefaultText_FrontDefault;
+                string sLabel = G.GetLoc_Notes("FrontDefault", "Front:").Trim() + " "; 
 
 				if (null != OurWordMain.Project && null != OurWordMain.Project.FrontTranslation)
 				{
@@ -830,37 +830,37 @@ namespace OurWord.DataModel
 			// Hint for daughter note:
 			if (Types.kHintForDaughter == type)
 			{
-                return StrRes.NoteDefaultText_HintDefault + sSelectionText;
+                return G.GetLoc_Notes("HintDefault", "Hint:").Trim() + " " + sSelectionText;
 			}
 
 			// Back Translation Note
 			if (Types.kBT == type)
 			{
-                return StrRes.NoteDefaultText_BTDefault + sSelectionText;
+                return G.GetLoc_Notes("BackTTranslationDefault", "BT:").Trim() + " " + sSelectionText;
 			}
 
 			// Ask UNS Note
 			if (Types.kAskUns == type)
 			{
-                return StrRes.NoteDefaultText_AskUnsDefault + sSelectionText;
+                return G.GetLoc_Notes("AskUnsDefault", "Ask UNS").Trim() + " " + sSelectionText;
 			}
 
 			// Greek Note
-			if (Types.kExegesis == type)
+			if (Types.kGreek == type)
 			{
-                return StrRes.NoteDefaultText_GreekDefault + sSelectionText;
+                return G.GetLoc_Notes("GreekDefault", "Greek:").Trim() + " " + sSelectionText;
 			}
 
 			// Hebrew Note
-			if (Types.kExegesis == type)
+			if (Types.kHebrew == type)
 			{
-                return StrRes.NoteDefaultText_HebrewDefault + sSelectionText;
+                return G.GetLoc_Notes("HebrewDefault", "Hebrew:").Trim() + " " + sSelectionText;
 			}
 
 			// Exegesis Note
 			if (Types.kExegesis == type)
 			{
-                return StrRes.NoteDefaultText_ExegesisDefault + sSelectionText;
+                return G.GetLoc_Notes("ExegesisDefault", "Exegesis:").Trim() + " " + sSelectionText;
 			}
 
 			// All other notes

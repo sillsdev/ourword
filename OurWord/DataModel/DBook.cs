@@ -2109,14 +2109,15 @@ namespace OurWord.DataModel
         }
         #endregion
 
-		// Read/Write Standard Format --------------------------------------------------------
+        // Read/Write Standard Format --------------------------------------------------------
+        #region SMethod: string GetBookAbbrevInFileNameLanguage(string sBookAbbrev)
         static public string GetBookAbbrevInFileNameLanguage(string sBookAbbrev)
         {
             return G.GetLoc_BookAbbrev(sBookAbbrev);
         }
-
-		#region Method: string ComputePathName()
-		public string ComputePathName()
+        #endregion
+        #region Method: string ComputePathName()
+        public string ComputePathName()
 		{
 			return ComputePathName(Translation.LanguageAbbrev,
 				BookAbbrev, TranslationStage.Abbrev, Version,

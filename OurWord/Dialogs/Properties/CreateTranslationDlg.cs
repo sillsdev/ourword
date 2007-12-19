@@ -427,16 +427,17 @@ namespace OurWord.Dialogs
 		{
 			SaveFileDialog dlg = new SaveFileDialog();
 
-			dlg.Filter = StrRes.FileFilterTranslation;
+            dlg.Filter = G.GetLoc_Files("TranslationFileFilter", 
+                "Our Word Translation File (*.oTrans)|*.oTrans"); 
 			dlg.FilterIndex = 0;
 			dlg.InitialDirectory = G.BrowseDirectory;
 
-			dlg.Title = StrRes.DlgSaveTranslationAs_Title;
+            dlg.Title = G.GetLoc_Files("SaveTranslationAsTitle", "Save Translation Definition As");  
 
-			if (TranslationName.Length > 0)
-				dlg.FileName = TranslationName + ".oTrans";
-			else
-				dlg.FileName = StrRes.DefaultFileName_Translation;
+            if (TranslationName.Length > 0)
+                dlg.FileName = TranslationName + ".oTrans";
+            else
+                dlg.FileName = G.GetLoc_Files("DefaultTranslationFileName", "New Translation.oTrans"); 
 
 			if (DialogResult.OK == dlg.ShowDialog(this))
 			{

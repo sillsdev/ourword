@@ -79,7 +79,7 @@ namespace OurWord.View
         {
             get
             {
-                return G.GetLoc_String("NaturalnessCheckWindowName", "Naturalness Check");
+                return G.GetLoc_GeneralUI("NaturalnessCheckWindowName", "Naturalness Check");
             }
         }
         #endregion
@@ -93,12 +93,17 @@ namespace OurWord.View
                 if (null == OurWordMain.Project.STarget)
                     return "";
 
-                string sBase = G.GetLoc_String("NaturalnessCheckReference", "{0} - {1}");
+                string sBase = G.GetLoc_GeneralUI("NaturalnessCheckReference", "{0} - {1}");
 
                 string sTarget = OurWordMain.Project.TargetTranslation.DisplayName.ToUpper();
                 string sReference = OurWordMain.Project.STarget.ReferenceName;
 
-                return LanguageResources.Insert(sBase, sTarget, sReference);
+                string s = LanguageResources.Insert(sBase, sTarget, sReference);
+
+                if (null != G.FTranslation && null != G.TTranslation && null != G.STarget)
+                    s += (" - " + G.STarget.ReferenceName);
+
+                return s;
             }
         }
         #endregion

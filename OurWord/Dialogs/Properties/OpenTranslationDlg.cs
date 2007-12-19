@@ -80,7 +80,6 @@ namespace OurWord.Dialogs
 		{
 			// Required for Windows Form Designer support
 			InitializeComponent();
-
 		}
 		#endregion
 		#region Method: void Dispose(...) -  Clean up any resources being used.
@@ -266,11 +265,13 @@ namespace OurWord.Dialogs
 			dlg.Multiselect = false;
 
 			// Filter on oTrans files
-			dlg.Filter = StrRes.FileFilterTranslation;
+            dlg.Filter = G.GetLoc_Files("TranslationFileFilter", 
+                "Our Word Translation File (*.oTrans)|*.oTrans"); 
 			dlg.FilterIndex = 0;
 
 			// Retrieve Dialog Title from resources
-			dlg.Title = StrRes.DlgOpenTargetTranslation_Title;
+            dlg.Title = G.GetLoc_Files("OpenTranslationDlgTitle",
+                "Open Translation Definition File"); 
 
 			// Default path
 			dlg.InitialDirectory = G.BrowseDirectory;

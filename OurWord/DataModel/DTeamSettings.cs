@@ -354,7 +354,7 @@ namespace OurWord.DataModel
         {
             get
             {
-                return StrRes.FileFilterTeamSettings;
+                return G.GetLoc_Files("TeamSettingsFileFilter", "Our Word Team Settings File (*.owt)|*.owt");
             }
         }
         #endregion

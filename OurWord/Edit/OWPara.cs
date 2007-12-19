@@ -848,7 +848,8 @@ namespace OurWord.Edit
                 if (IsInsertionIcon)
                 {
                     PaintBackgroundRectangle(clrSelectedBackground);
-                    Draw.String(StrRes.TypeHere, Font, brushSelectedText, Position);
+                    Draw.String(G.GetLoc_String("TypeHere", "[Type Here]"), 
+                        Font, brushSelectedText, Position);
                     return;
                 }
 
@@ -936,7 +937,7 @@ namespace OurWord.Edit
             public override void MeasureWidth(Graphics g)
             {
                 if (IsInsertionIcon)
-                    m_fMeasuredWidth = Draw.Measure(StrRes.TypeHere, Font);
+                    m_fMeasuredWidth = Draw.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);
                 else
                     base.MeasureWidth(g);
             }

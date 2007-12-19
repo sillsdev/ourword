@@ -137,6 +137,9 @@
   <ItemGroup>
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
+    <None Include="Loc.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <Content Include="OurWord.ico" />
     <EmbeddedResource Include="Layouts\NotesTabPage.resx">
       <SubType>Designer</SubType>
@@ -291,7 +294,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
@@ -345,6 +348,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
       <SubType>UserControl</SubType>

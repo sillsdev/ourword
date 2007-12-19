@@ -1056,9 +1056,9 @@ namespace JWTools
             get
             {
                 if (null == m_Messages)
-                    m_Messages = FindGroup(c_Menus);
+                    m_Messages = FindGroup(c_Messages);
 
-                Debug.Assert(null != c_Messages);
+                Debug.Assert(null != m_Messages);
 
                 return m_Messages;
             }

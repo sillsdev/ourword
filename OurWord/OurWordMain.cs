@@ -354,7 +354,7 @@ namespace OurWord
             {
                 MainWindow.Clear();
                 MainWindow.Invalidate();
-                TaskName = StrRes.NoProjectDefined;
+                TaskName = G.GetLoc_GeneralUI("NoProjectDefined", "No Project Defined"); 
                 Passage = "";
                 ShowPadlock = false;
                 if (HasSideWindows)
@@ -988,9 +988,9 @@ namespace OurWord
 			ShowLoadState("Init Configuration System");
 			m_Config = new JW_FileMenuIO(this, this,
 				LanguageResources.AppTitle,
-				StrRes.FileFilterProject,
+                G.GetLoc_Files("ProjectFileFilter", "Our Word! Project Files (*.owp)|*.owp"), 
 				"owp",
-				StrRes.DefaultFileName_Project);
+				G.GetLoc_Files("DefaultProjectFileName","New Project.owp")); 
 
 			// Initialize to a blank project (if there is a recent project
 			// in the MRU, this will get overridden.)
@@ -3912,18 +3912,53 @@ return false;
                 null);
         }
         #endregion
-        #region SMethod: string GetLoc_TranslationStage(sItemID, sEnglish) - "TranslationStages" 
-        static public string GetLoc_TranslationStage(string sItemID, string sEnglish)
+        #region SMethod: string GetLoc_Notes(sItemID, sEnglish) -         "Strings\Notes"
+        static public string GetLoc_Notes(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
                 null,
-                new string[] { "TranslationStages" },
+                new string[] { "Strings", "Notes" },
                 sItemID,
-                sEnglish,
-                G.TeamSettings.FileNameLanguage,
+                sEnglishDefault,
+                null,
                 null);
         }
         #endregion
+        #region SMethod: string GetLoc_Files(sItemID, sEnglish) -         "Strings\Files"
+        static public string GetLoc_Files(string sItemID, string sEnglishDefault)
+        {
+            return LocDB.GetValue(
+                null,
+                new string[] { "Strings", "Files" },
+                sItemID,
+                sEnglishDefault,
+                null,
+                null);
+        }
+        #endregion
+        #region SMethod: string GetLoc_StyleName(sEnglish) -              "Strings\Styles"
+        static public string GetLoc_StyleName(string sEnglish)
+        {
+            // Compute an ItemID from the name of the style by removing all whitespace
+            string sItemID = "";
+            foreach (char ch in sEnglish)
+            {
+                if (!char.IsWhiteSpace(ch))
+                    sItemID += ch;
+            }
+            Debug.Assert(!string.IsNullOrEmpty(sItemID));
+
+            // Retrieve the value
+            return LocDB.GetValue(
+                null,
+                new string[] { "Strings", "Styles" },
+                sItemID,
+                sEnglish,
+                null,
+                null);
+        }
+        #endregion
+
         #region SMethod: string GetLoc_BookAbbrev(string sBookAbbrev) -   "BookAbbrevs"
         static public string GetLoc_BookAbbrev(string sBookAbbrev)
         {
@@ -3984,7 +4019,18 @@ return false;
                 vsInsert);
         }
         #endregion
-
+        #region SMethod: string GetLoc_TranslationStage(sItemID, sEnglish) - "TranslationStages" 
+        static public string GetLoc_TranslationStage(string sItemID, string sEnglish)
+        {
+            return LocDB.GetValue(
+                null,
+                new string[] { "TranslationStages" },
+                sItemID,
+                sEnglish,
+                G.TeamSettings.FileNameLanguage,
+                null);
+        }
+        #endregion
     }
 	#endregion
 

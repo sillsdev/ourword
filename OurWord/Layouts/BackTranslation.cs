@@ -76,7 +76,7 @@ namespace OurWord.View
         {
             get
             {
-                return StrRes.BackTransJobTitle;
+                return G.GetLoc_GeneralUI("BackTranslationWindowName", "Back Translation"); 
             }
         }
         #endregion
@@ -85,7 +85,18 @@ namespace OurWord.View
         {
             get
             {
-                return StrRes.BackTransJobReference;
+                string sBase = G.GetLoc_GeneralUI("BackTranslationReference", "{0}");
+
+                string sTargetName = (null == G.TTranslation) ?
+                   G.GetLoc_GeneralUI("NoTargetDefined", "(no target defined)") :
+                   G.TTranslation.DisplayName.ToUpper();
+
+                string s = LocDB.Insert(sBase, new string[] { sTargetName });
+
+                if (null != G.FTranslation && null != G.TTranslation && null != G.STarget)
+                    s += (" - " + G.STarget.ReferenceName);
+
+                return s;
             }
         }
         #endregion

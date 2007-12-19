@@ -3,7 +3,7 @@
   <Language ID="sp" Name="Español"></Language>
   <Language ID="swh" Name="Kiswahili"></Language>
   <Language ID="th" Name="Thai" Font="Tahoma" Size="16"></Language>
-  <Group ID="Menus" Title="001 - Menus" Des="These are the commands that appear in OurWord's menus. The ampersands (&amp;) indicate the hotkey that is underlined in the menu. You should take care that within a single menu (e.g., the Edit menu), that all ampersands indicate a different letter (that is, that there are no letters used more than once within a given menu.)">
+  <Group ID="m_MenuStrip" Title="001 - Menus" Des="These are the commands that appear in OurWord's menus. The ampersands (&amp;) indicate the hotkey that is underlined in the menu. You should take care that within a single menu (e.g., the Edit menu), that all ampersands indicate a different letter (that is, that there are no letters used more than once within a given menu.)">
     <Item ID="m_menuProject">
       <English>&amp;Project</English>
       <Info>Main menu item for the Project submenu, contains the submenu items of Open Project, New Project, Save Project, etc.</Info>
@@ -344,7 +344,7 @@
       <Alt ID="th" Value="เกี่ยวกับคำของเรา"></Alt>
     </Item>
   </Group>
-  <Group ID="ToolbarText" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button.">
+  <Group ID="m_ToolStrip" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button.">
     <Item ID="m_btnExit" Key="true">
       <English>Exit</English>
       <Tip>Exit Our Word</Tip>
@@ -649,12 +649,6 @@
     </Item>
   </Group>
   <Group ID="Strings" Title="003 - Strings">
-    <Item ID="BrowseForBackupFile">
-      <English>Browse for Backup File</English>
-      <Info>The Browse Button lon the RestoreFromBackup dialog launches a standard Windows-supplied dialog to locate the backup file. The only item we can customize on this form is that dialog’s title.</Info>
-      <Alt ID="inz" Value="Mencari file cadangan"></Alt>
-      <Alt ID="sp" Value="Navegar al Archivo de Respaldo"></Alt>
-    </Item>
     <Item ID="kYes">
       <English>Yes</English>
       <Info>A boolean answer to a Yes/No question, e.g., in the Paragraph Settings, there is the property: 'Keep with Next Paragraph', and the answer is 'Yes' or 'No'</Info>
@@ -662,14 +656,6 @@
     <Item ID="kNo">
       <English>No</English>
       <Info>A boolean answer to a Yes/No question, e.g., in the Paragraph Settings, there is the property: 'Keep with Next Paragraph', and the answer is 'Yes' or 'No'</Info>
-    </Item>
-    <Item ID="NaturalnessCheckWindowName">
-      <English>Naturalness Check</English>
-      <Info>The title of the window pane, so that the user knows which 'job' he is doing.</Info>
-    </Item>
-    <Item ID="NaturalnessCheckReference">
-      <English>{0} - {1}</English>
-      <Info>The Scripture Reference that appears in the Naturalness Check window pane titlebar.  Usually it will appear along the lines of 'Spanish - John 3:16' In the string, {0} refers to the name of the translation (e.g., 'Spanish') and {1} refers to the reference ('John 3:16'). Thus you must make certain that your translation has both the {0} and the {1} (see the English as an example.). The purpose of this is to give you freedom over the word order, and you may use something other than the hyphen to separate them.</Info>
     </Item>
     <Item ID="SetupFT_TargetDefinition">
       <English>The Target Translation is the vernacular translation that you are producing. You use the Front Translation as a source to create the Target. If you are a mother-tongue translator, then the Target Translation is a translation into your own language. </English>
@@ -708,12 +694,201 @@
       <English>Printing Pages...</English>
       <Info>Status bar message while printing.</Info>
     </Item>
-    <Group ID="GeneralUI" Title="Strings: General UI">
-      <Item ID="DraftingPaneName">
+    <Item ID="NewNote">
+      <English>NEW</English>
+      <Info>A temporary reference that is displayed when a new note is inserted; until such time that the Scripture Reference can instead be used. Note that this is all in upper case.</Info>
+      <Alt ID="inz" Value="BARU"></Alt>
+    </Item>
+    <Item ID="TypeHere">
+      <English>[Type Here]</English>
+      <Info>The flashing cursor to show where text will be entered should the user begin typing.</Info>
+      <Alt ID="inz" Value="[Ketik di sini]"></Alt>
+    </Item>
+    <Group ID="GeneralUI" Title="Strings: General UI" Des="These are elements that appear in the main window of the user interface, such as the names of windows.">
+      <Item ID="DraftingWindowName">
         <English>Drafting</English>
+        <Info>The title of the Drafting window pane, so that the user knows which task he is doing.</Info>
         <Alt ID="inz" Value="Susun Konsep"></Alt>
         <Alt ID="sp" Value="Borrador"></Alt>
         <Alt ID="swh" Value="Kuandika insha"></Alt>
+      </Item>
+      <Item ID="DraftingReference">
+        <English>{0} to {1}</English>
+        <Info>The Scripture Reference that appears in the Drafting window pane titlebar.  Usually it will appear along the lines of 'Spanish to English' In the string, {0} refers to the name of the source translation (e.g., 'Spanish') and {1} refers to the vernacular translation (e.g., 'English'.) Thus you must make certain that your translation has both the {0} and the {1}. </Info>
+        <Alt ID="inz" Value="{0} ke {1}"></Alt>
+      </Item>
+      <Item ID="BackTranslationWindowName">
+        <English>Back Translation</English>
+        <Info>The title of the Back Translation window pane, so that the user knows which task he is doing.</Info>
+        <Alt ID="inz" Value="Terjemahan Balik"></Alt>
+        <Alt ID="sp" Value="Traducción Inversa"></Alt>
+        <Alt ID="swh" Value="Tafsiri ya kujirudia"></Alt>
+      </Item>
+      <Item ID="BackTranslationReference">
+        <English>{0}</English>
+        <Info>The Scripture Reference that appears in the Back Translation window pane titlebar.  It will appear along the lines of 'Spanish' In the string, {0} refers to the name of the target translation (e.g., 'Spanish'). </Info>
+      </Item>
+      <Item ID="NaturalnessCheckWindowName">
+        <English>Naturalness Check</English>
+        <Info>The title of the Naturalness Check window pane, so that the user knows which task he is doing.</Info>
+      </Item>
+      <Item ID="NaturalnessCheckReference">
+        <English>{0} - {1}</English>
+        <Info>The Scripture Reference that appears in the Naturalness Check window pane titlebar.  Usually it will appear along the lines of 'Spanish - John 3:16' In the string, {0} refers to the name of the translation (e.g., 'Spanish') and {1} refers to the reference ('John 3:16'). Thus you must make certain that your translation has both the {0} and the {1} (see the English as an example.). The purpose of this is to give you freedom over the word order, and you may use something other than the hyphen to separate them.</Info>
+      </Item>
+      <Item ID="NoProjectDefined">
+        <English>No Project Defined</English>
+        <Info>A message we display (in the Task Bar) when the settings have not yet defined a Project.</Info>
+      </Item>
+      <Item ID="NoFrontDefined">
+        <English>(no front defined)</English>
+        <Info>A message we display when the source translation is not adequately defined in the settings.</Info>
+        <Alt ID="inz" Value="(komputer belum kenal terjemahan induk)"></Alt>
+      </Item>
+      <Item ID="NoTargetDefined">
+        <English>(no target defined)</English>
+        <Info>A message we display when the target translation is not adequately defined in the settings.</Info>
+        <Alt ID="inz" Value="(komputer belum kenal terjemahan sasaran)"></Alt>
+      </Item>
+      <Item ID="NotesWindowName">
+        <English>Notes</English>
+        <Info>The title of the Notes tab in the side-window.</Info>
+        <Alt ID="inz" Value="Catatan"></Alt>
+        <Alt ID="sp" Value="Notas"></Alt>
+        <Alt ID="swh" Value="Noti"></Alt>
+      </Item>
+      <Item ID="TranslationsWindowName">
+        <English>Translations</English>
+        <Info>The title of the Translations tab in the side-window.</Info>
+      </Item>
+      <Item ID="NoDataToDisplay">
+        <English>(There is no data to display. Use the Project-Properties menu item to set up both a Front and a Target translation.)</English>
+        <Info>A message we display when not enough settings have been supplied that we can display anything in the editing window.</Info>
+        <Alt ID="inz" Value="(Tidak ada data yang dapat diperagakan di sini. Gunakanlah daftar File-Ciri-ciri untuk menentukan baik Terjemahan Induk maupun Terjemahan Anak.)"></Alt>
+      </Item>
+      <Item ID="BrowseForBackupFolderDescr">
+        <English>Select the folder where you wish to place your backup files. If possible, this should not be your hard drive. A flash card is ideal; or a floppy drive can also be used.</English>
+        <Info>Instructions that are placed in the Browse For Backup Folder Dialog.</Info>
+        <Alt ID="inz" Value="Tunjukkanlah map untuk simpan file cadangan. Sebaiknya HDD jangan ditunjuk (karena, jika HDD rusak, file cadangan tidak bisa diamankan). Yang paling baik adalah sebuah memori 'flash card'. Floppy (A:\) juga bisa ditunjukkan, tetapi perlu diingat bahwa setiap kali Sabda Kita dipakai, floppy disk yang selalu sama perlu dimasukkan ke dalam floppy drive."></Alt>
+      </Item>
+    </Group>
+    <Group ID="Notes" Title="Notes Support" Des="Currently, these are the text that are inserted for different types of Notes.">
+      <Item ID="ToDoDefault">
+        <English>To Do:</English>
+        <Info>The text that is inserted at the beginning of a To Do note.</Info>
+        <Alt ID="inz" Value="Diperhatikan:"></Alt>
+      </Item>
+      <Item ID="FrontDefault">
+        <English>Front:</English>
+        <Info>The text that is inserted at the beginning of a Front Issue note.</Info>
+        <Alt ID="inz" Value="Terjemahan Induk:"></Alt>
+      </Item>
+      <Item ID="BackTTranslationDefault">
+        <English>BT:</English>
+        <Info>The text that is inserted at the beginning of a Back Translation note.</Info>
+        <Alt ID="inz" Value="TB:"></Alt>
+      </Item>
+      <Item ID="AskUnsDefault">
+        <English>Ask UNS:</English>
+        <Info>The text that is inserted at the beginning of a Ask UNS note.</Info>
+        <Alt ID="inz" Value="Tanya Responden:"></Alt>
+      </Item>
+      <Item ID="HintDefault">
+        <English>Hint:</English>
+        <Info>The text that is inserted at the beginning of a Hint For Daughter note.</Info>
+      </Item>
+      <Item ID="GreekDefault">
+        <English>Greek:</English>
+        <Info>The text that is inserted at the beginning of a Greek exegetical note.</Info>
+      </Item>
+      <Item ID="HebrewDefault">
+        <English>Hebrew:</English>
+        <Info>The text that is inserted at the beginning of a Hebrew Exegetical note.</Info>
+      </Item>
+      <Item ID="ExegesisDefault">
+        <English>Exegesis:</English>
+        <Info>The text that is inserted at the beginning of a Exegeteis note.</Info>
+      </Item>
+    </Group>
+    <Group ID="Files" Title="File Filters and File Operations" Des="These are elements that have to do with opening, browsing, and saving files.">
+      <Item ID="ProjectFileFilter">
+        <English>Our Word! Project Files (*.owp)|*.owp</English>
+        <Info>This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Project with the OWP extension. It is very important that you only change the English words, leave the rest of the text alone.</Info>
+        <Alt ID="inz" Value="Sabda Kita! File Proyek (*.owp)|*.owp"></Alt>
+      </Item>
+      <Item ID="TranslationFileFilter">
+        <English>Our Word Translation File (*.oTrans)|*.oTrans</English>
+        <Info>This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Translation with the OTRANS extension. It is very important that you only change the English words, leave the rest of the text alone.</Info>
+        <Alt ID="inz" Value="abda Kita File Terjemahan (*.oTrans)|*.oTrans"></Alt>
+      </Item>
+      <Item ID="TeamSettingsFileFilter">
+        <English>Our Word Team Settings File (*.owt)|*.owt</English>
+        <Info>This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Team Settings with the OWT extension. It is very important that you only change the English words, leave the rest of the text alone.</Info>
+        <Alt ID="inz" Value="Sabda Kita Setelan Tim (*.owt)|*.owt"></Alt>
+      </Item>
+      <Item ID="DefaultProjectFileName">
+        <English>New Project.owp</English>
+        <Info>On creating a new project, OurWord will propose this file name (which the user can then change.)</Info>
+        <Alt ID="inz" Value="Proyek Baru.owp"></Alt>
+      </Item>
+      <Item ID="DefaultTranslationFileName">
+        <English>New Translation.oTrans</English>
+        <Info>On creating a new translation settings file, OurWord will propose this file name (which the user can then change.)</Info>
+        <Alt ID="inz" Value="Bahasa Baru.oTrans"></Alt>
+      </Item>
+      <Item ID="SaveTranslationAsTitle">
+        <English>Save Translation Definition As</English>
+        <Info>This text will appear in the Title of the Save As dialog, when a new translation settings filename is being supplied.</Info>
+        <Alt ID="inz" Value="Simpan Definisi Terjemahan Sebagai"></Alt>
+      </Item>
+      <Item ID="OpenTranslationDlgTitle">
+        <English>Open Translation Definition File</English>
+        <Info>This text will appear in the Title of the Open dialog, when an existing translation settings filename is being browsed to.</Info>
+        <Alt ID="inz" Value="Buka File Definisi untuk Terjemahan"></Alt>
+      </Item>
+      <Item ID="ExportBookSaveAsDlgTitle">
+        <English>Enter a filename for export</English>
+        <Info>This text will appear in the Title of the Save As dialog, when the user is supplying a filename for the export operation.</Info>
+      </Item>
+      <Item ID="ExportBookFileFilter">
+        <English>Paratext File (*.ptx)|*.ptx</English>
+        <Info>This text is used in the Windows Save As dialog, to choose the type of file to export to. The English indicates which file format(s) are currently supported by OurWord. It is very important that you only change the English words, leave the rest of the text alone.</Info>
+      </Item>
+      <Item ID="BrowseForBackupFile">
+        <English>Browse for Backup File</English>
+        <Info>The Browse Button on the RestoreFromBackup dialog launches a standard Windows-supplied dialog to locate the backup file. The only item we can customize on this form is that dialog’s title.</Info>
+        <Alt ID="inz" Value="Mencari file cadangan"></Alt>
+        <Alt ID="sp" Value="Navegar al Archivo de Respaldo"></Alt>
+      </Item>
+    </Group>
+    <Group ID="Styles" Title="Stylenames" Des="Here you can provide equivalents for various Styles found in the Stylesheet.">
+      <Item ID="SectionTitle">
+        <English>Section Title</English>
+        <Info>The title of a section, corresponds to a \s in USFM.</Info>
+      </Item>
+      <Item ID="SectionTitle2">
+        <English>Section Title 2</English>
+        <Info>An optional subtitle of a section, corresponds to a \s2 in USFM.</Info>
+      </Item>
+      <Item ID="CrossRef">
+        <English>Cross Ref</English>
+        <Info>An optional cross reference of a section, corresponds to a \r in USFM.</Info>
+      </Item>
+      <Item ID="MainTitle">
+        <English>Main Title</English>
+        <Info>The main title of the book, corresponds to a \mt in USFM.</Info>
+      </Item>
+      <Item ID="SubTitle">
+        <English>Sub Title</English>
+        <Info>An optional sub title of the book, corresponds to a \st in USFM.</Info>
+      </Item>
+      <Item ID="Header">
+        <English>Header</English>
+        <Info>The running header of the book, corresponds to \h in USFM.</Info>
+      </Item>
+      <Item ID="Picture">
+        <English>Picture</English>
+        <Info>A picture caption</Info>
       </Item>
     </Group>
   </Group>
@@ -1547,6 +1722,10 @@
     <Item ID="m_btnBrowse">
       <English>Browse...</English>
       <Alt ID="inz" Value="Cari..."></Alt>
+    </Item>
+    <Item ID="m_btnSaveAs">
+      <English>Save As...</English>
+      <Alt ID="inz" Value="Simpan sebagai..."></Alt>
     </Item>
     <Item ID="m_btnOK">
       <English>OK</English>

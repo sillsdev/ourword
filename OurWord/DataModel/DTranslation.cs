@@ -316,7 +316,8 @@ namespace OurWord.DataModel
         {
             get
             {
-                return StrRes.FileFilterTranslation;
+                return G.GetLoc_Files("TranslationFileFilter", 
+                    "Our Word Translation File (*.oTrans)|*.oTrans"); 
             }
         }
         #endregion

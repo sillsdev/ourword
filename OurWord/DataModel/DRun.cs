@@ -1516,7 +1516,9 @@ namespace OurWord.DataModel
             DNote note = GetNoteOfType(type);
             if (null == note)
             {
-                note = new DNote(StrRes.NewNote, new DBasicText(sDefaultNoteText), type);
+                note = new DNote(
+                    G.GetLoc_String("NewNote", "NEW"),  
+                    new DBasicText(sDefaultNoteText), type);
                 Notes.Append(note);
                 note.Reference = Paragraph.Section.GetNoteReference(note);
             }

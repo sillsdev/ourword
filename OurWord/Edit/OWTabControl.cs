@@ -357,7 +357,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return StrRes.NotesPaneTitle;
+                return G.GetLoc_GeneralUI("NotesWindowName", "Notes");
             }
         }
         #endregion
@@ -460,7 +460,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return StrRes.RelatedLanguagesPaneTitle;
+                return G.GetLoc_GeneralUI("TranslationsWindowName", "Translations");
             }
         }
         #endregion

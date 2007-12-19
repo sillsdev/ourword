@@ -1631,15 +1631,25 @@ namespace OurWord.Edit
             if (!IsMainWindow)
                 return;
 
-            string sText = StrRes.NoViewData;
+            string sText = G.GetLoc_GeneralUI("NoDataToDisplay", 
+                "(There is no data to display. Use the Project-Properties menu item to " +
+                "set up both a Front and a Target translation.)"); 
+
             Brush brush = new SolidBrush(Color.Black);
             Font font = SystemFonts.MenuFont;
 
+            Draw.MultilineText(sText, font, brush, ClientRectangle);
+
+            /*** TODO OBS - 18dec07 - Replaced with the line above; I think using the 
+             * ClipRectangle was the reason it was displaying strangly on Mono. Need to 
+             * verify before deleting this code. 
             Rectangle rect = new Rectangle(e.ClipRectangle.X,
                 e.ClipRectangle.Y + (int)ScrollBarPosition,
                 e.ClipRectangle.Width, e.ClipRectangle.Height);
 
             Draw.MultilineText(sText, font, brush, rect);
+            ***/
+
         }
         #endregion
         #region Cmd: OnPaint

@@ -114,13 +114,16 @@ namespace OurWord.Dialogs
         {
             SaveFileDialog dlg = new SaveFileDialog();
 
-            dlg.Filter = StrRes.FileFilterExportBook;
+            dlg.Filter = G.GetLoc_Files("ExportBookFileFilter", 
+                "Paratext File (*.ptx)|*.ptx"); 
+
             dlg.FilterIndex = 0;
             dlg.InitialDirectory = G.BrowseDirectory;
             dlg.FileName = ExportPathName;
             dlg.OverwritePrompt = false;
 
-            dlg.Title = StrRes.DlgBrowseExportBook_Title;
+            dlg.Title = G.GetLoc_Files("ExportBookSaveAsDlgTitle", 
+                "Enter a filename for export"); 
 
             if (DialogResult.OK == dlg.ShowDialog(this))
                 ExportPathName = dlg.FileName;

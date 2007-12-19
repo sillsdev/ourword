@@ -309,7 +309,7 @@ namespace OurWord.Dialogs
 			dlg.Multiselect = false;
 
             // Dialog Title
-            dlg.Title = G.GetLoc_String("BrowseForBackupFile", "Browse for Backup File");
+            dlg.Title = G.GetLoc_Files("BrowseForBackupFile", "Browse for Backup File");
 
 			// Browse directory
 			if (BackupSystem.Enabled)

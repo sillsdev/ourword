@@ -1027,7 +1027,12 @@ namespace OurWord.View
 		static public string BrowseForFolder(string sOriginalFolder)
 		{
 			FolderBrowserDialog dlg = new FolderBrowserDialog();
-			dlg.Description = StrRes.BrowseForFolderDlgDescription;
+
+            dlg.Description = G.GetLoc_Files("BrowseForBackupFolderDescr", 
+                "Select the folder where you wish to place your backup files. If " +
+                "possible, this should not be your hard drive. A flash card is ideal; " +
+                "or a floppy drive can also be used.");  
+
 			dlg.RootFolder  = Environment.SpecialFolder.MyComputer;
 			if (DialogResult.OK == dlg.ShowDialog())
 				return dlg.SelectedPath;

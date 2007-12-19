@@ -79,7 +79,7 @@ namespace OurWord.View
         {
             get
             {
-                return StrRes.DraftingJobTitle;
+                return G.GetLoc_GeneralUI("DraftingWindowName", "Drafting");
             }
         }
         #endregion
@@ -88,7 +88,22 @@ namespace OurWord.View
         {
             get
             {
-                return StrRes.DraftingJobReference;
+                string sBase = G.GetLoc_GeneralUI("DraftingReference", "{0} to {1}");
+
+                string sFrontName = (null == G.FTranslation) ?
+                    G.GetLoc_GeneralUI("NoFrontDefined", "(no front defined)") :
+                    G.FTranslation.DisplayName;
+
+                string sTargetName = (null == G.TTranslation) ?
+                    G.GetLoc_GeneralUI("NoTargetDefined", "(no target defined)") :
+                    G.TTranslation.DisplayName.ToUpper();
+
+                string s = LocDB.Insert(sBase, new string[] { sFrontName , sTargetName });
+
+                if (null != G.FTranslation && null != G.TTranslation && null != G.STarget)
+                    s += ( " - " + G.STarget.ReferenceName );
+
+                return s;
             }
         }
         #endregion
