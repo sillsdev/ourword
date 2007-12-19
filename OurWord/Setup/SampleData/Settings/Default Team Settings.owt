@@ -1,0 +1,366 @@
+<DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
+  <own Name="StyleSheet">
+    <DStyleSheet DisplayName="Default Style Sheet">
+      <ownseq Name="ParaStyles">
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="cap" DisplayName="Picture Caption" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="true" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="3" Alignment="3" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="cft" DisplayName="SeeAlso Footnote Paragraph" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="3" Alignment="3" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="ft" DisplayName="Footnote Paragraph" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="h" DisplayName="Running Header" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="3" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="mr" DisplayName="Major Cross References" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="true" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="12" SpaceAfter="3" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="ms" DisplayName="Major Section Title" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="14" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="9" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="mt" DisplayName="Book Title" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="16" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-0</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-1</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-3</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="3" Alignment="3" FirstLineIndent="-200000" LeftMargin="200000" RightMargin="0" Abbrev="nt" DisplayName="Note" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="3" Alignment="3" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="ntck" DisplayName="Note for Consultant" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="p" DisplayName="Paragraph" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="200000" RightMargin="0" Abbrev="q" DisplayName="Quote Level 1" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="400000" RightMargin="0" Abbrev="q2" DisplayName="Quote Level 2" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="600000" RightMargin="0" Abbrev="q3" DisplayName="Quote Level 3" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="0" FirstLineIndent="0" LeftMargin="200000" RightMargin="200000" Abbrev="qc" DisplayName="Centered Quote" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-0</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-1</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-3</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="200000" RightMargin="0" Abbrev="qm" DisplayName="Quote Level 1m" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="3" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="r" DisplayName="Cross References" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="true" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                  <ref Name="ws">3-WritingSystems-0</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                  <ref Name="ws">3-WritingSystems-1</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                  <ref Name="ws">3-WritingSystems-3</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="-200000" LeftMargin="200000" RightMargin="0" Abbrev="RefTrans" DisplayName="Reference Translation" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="12" SpaceAfter="3" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="s" DisplayName="Section Title" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="12" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="12" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="9" SpaceAfter="3" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="s2" DisplayName="Section Title 2" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="12" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="9" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="st" DisplayName="Book SubTitle" Description="" Keep="true">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="14" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+              </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="uiTitle" DisplayName="UI Title" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="18" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+      </ownseq>
+      <ownseq Name="CharStyles">
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="b" DisplayName="Bold" Description="" Height="10" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-0</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-1</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-3</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="c" DisplayName="Chapter Number" Description="" Height="20" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-0</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-1</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+              <ref Name="ws">2-WritingSystems-3</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+        <JCharacterStyle Super="true" Sub="false" Editable="true" Abbrev="cf" DisplayName="See Also Footnote Character" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Navy">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="d" DisplayName="Dashed" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="true" FontColor="Navy">
+        </JCharacterStyle>
+        <JCharacterStyle Super="true" Sub="false" Editable="true" Abbrev="fn" DisplayName="Footnote Character" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Navy">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-0</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-1</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
+            </JFontForWritingSystem>
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-3</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="i" DisplayName="Italic" Description="" Height="10" Bold="false" Italic="true" Strikeout="false" Underline="false" FontColor="Black">
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="ibtAn" DisplayName="BT - Analysis Line" Description="" Height="8" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="ibtGloss" DisplayName="BT - Glosses" Description="" Height="11" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="L" DisplayName="Label" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Crimson">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+        <JCharacterStyle Super="true" Sub="false" Editable="false" Abbrev="ntc" DisplayName="Note Character" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Navy">
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="u" DisplayName="Underline" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="true" FontColor="Black">
+        </JCharacterStyle>
+        <JCharacterStyle Super="true" Sub="false" Editable="true" Abbrev="v" DisplayName="Verse Number" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Red">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+      </ownseq>
+      <ownseq Name="WritingSystems">
+        <JWritingSystem IdeaGraph="false" Name="Aboriginal" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}">
+        </JWritingSystem>
+        <JWritingSystem IdeaGraph="true" Name="Chinese" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}">
+        </JWritingSystem>
+        <JWritingSystem IdeaGraph="false" Name="Latin" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="21 {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U} {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {eee}" ARResult="21 {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú} {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {Halelujah}">
+        </JWritingSystem>
+        <JWritingSystem IdeaGraph="false" Name="Nigeria" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}">
+        </JWritingSystem>
+      </ownseq>
+    </DStyleSheet>
+  </own>
+  <own Name="Stages">
+    <BookStages NextID="1000">
+      <ownseq Name="Stages">
+        <TranslationStage ID="0" Abbrev="Draft" Name="Draft">
+        </TranslationStage>
+        <TranslationStage ID="1" Abbrev="Team" Name="Team check">
+        </TranslationStage>
+        <TranslationStage ID="2" Abbrev="Adv" Name="Advisor check">
+        </TranslationStage>
+        <TranslationStage ID="3" Abbrev="Comm" Name="Community check">
+        </TranslationStage>
+        <TranslationStage ID="6" Abbrev="BT" Name="Back Translation">
+        </TranslationStage>
+        <TranslationStage ID="4" Abbrev="Consult" Name="Consultant check">
+        </TranslationStage>
+        <TranslationStage ID="5" Abbrev="Final" Name="Final for Printing">
+        </TranslationStage>
+        <TranslationStage ID="7" Abbrev="Rev" Name="Final Revision">
+        </TranslationStage>
+      </ownseq>
+    </BookStages>
+  </own>
+  <ownseq Name="BookGroupings">
+    <DBookGrouping LocKey="Pentateuch" English="Pentateuch" BookAbbrevs="5 {GEN} {EXO} {LEV} {NUM} {DEU}">
+    </DBookGrouping>
+    <DBookGrouping LocKey="Historical" English="Historical" BookAbbrevs="12 {JOS} {JDG} {RUT} {1SA} {2SA} {1KI} {2KI} {1CH} {2CH} {EZR} {NEH} {EST}">
+    </DBookGrouping>
+    <DBookGrouping LocKey="Poetical" English="Poetical" BookAbbrevs="5 {JOB} {PSA} {PRO} {ECC} {SNG}">
+    </DBookGrouping>
+    <DBookGrouping LocKey="Prophetic" English="Prophetic" BookAbbrevs="17 {ISA} {JER} {LAM} {EZK} {DAN} {HOS} {JOL} {AMO} {OBA} {JON} {MIC} {NAM} {HAB} {ZEP} {HAG} {ZEC} {MAL}">
+    </DBookGrouping>
+    <DBookGrouping LocKey="Gospels" English="Gospels" BookAbbrevs="4 {MAT} {MRK} {LUK} {JHN}">
+    </DBookGrouping>
+    <DBookGrouping LocKey="PaulineLetters" English="Pauline Letters" BookAbbrevs="14 {ROM} {1CO} {2CO} {GAL} {EPH} {PHP} {COL} {1TH} {2TH} {1TI} {2TI} {TIT} {PHM} {HEB}">
+    </DBookGrouping>
+    <DBookGrouping LocKey="GeneralLetters" English="General Letters" BookAbbrevs="7 {JAS} {1PE} {2PE} {1JN} {2JN} {3JN} {JUD}">
+    </DBookGrouping>
+  </ownseq>
+  <own Name="SFMapping">
+    <DSFMapping MainTitleBT="btmt" SubTitleBT="btst" ID="id" Header="h" HeaderBT="h" History="hist" ShoeboxRcd="rcrd" MajSect="ms" MajSectCrossRef="mr" Section="s" SectionBT="bts" Chapter="c" Verse="v" CrossRef="r" VerseText="vt" VerseTextBT="btvt" SeeAlso="cf" Footnote="ft" FootnoteBT="btft" FootLetter="fn" Comment="rem" StatusComment="chk" Copyright="cy" StyleMainTitle="mt" StyleSubTitle="st" StyleHeader="h" StyleSection="s" StyleCrossRef="r" StyleChapter="c" StyleVerse="v" StyleSeeAlso="cf" StyleFootLetter="fn" StylePicCaption="cap" StyleNoteLetter="ntc" StyleNotePara="nt">
+    </DSFMapping>
+  </own>
+</DTeamSettings>

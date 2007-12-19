@@ -1,0 +1,9 @@
+﻿<NUnitProject>
+  <Settings activeconfig="Debug" />
+  <Config name="Debug" binpathtype="Auto">
+    <assembly path="bin\Debug\OurWord.exe" />
+    <assembly path="..\JWdb\bin\Debug\JWdb.dll" />
+    <assembly path="..\JWTools\bin\Debug\JWTools.dll" />
+  </Config>
+  <Config name="Release" binpathtype="Auto" />
+</NUnitProject>

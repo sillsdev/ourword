@@ -1,0 +1,550 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>OurWord.ico</ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>OurWord</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>OurWord</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug2|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="JWTools, Version=1.0.2865.24509, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\JWTools\bin\Debug\JWTools.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PalasoUIWindowsForms, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\PalasoUIWindowsForms.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Design">
+      <Name>System.Design</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Drawing.Design">
+      <Name>System.Drawing.Design</Name>
+    </Reference>
+    <Reference Include="System.Web">
+      <Name>System.Web</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+    <ProjectReference Include="..\JWdb\JWdb.csproj">
+      <Name>JWdb</Name>
+      <Project>{CD66A898-A60C-44F7-8731-EAE0E558C639}</Project>
+      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App.ico" />
+    <Content Include="ChangesHistory.html" />
+    <None Include="Localizations.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Content Include="OurWord.ico" />
+    <EmbeddedResource Include="Layouts\NotesTabPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>NotesTabPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Res\FileNew.gif" />
+    <EmbeddedResource Include="Res\FileOpen.gif" />
+    <Content Include="Res\Increment.ico" />
+    <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\DlgProperties.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_Options.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Page_Options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_TeamSettings.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Page_TeamSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Res\JobNaturalness.ico" />
+    <EmbeddedResource Include="Res\JobBT.ico" />
+    <EmbeddedResource Include="Res\JobDrafting.ico" />
+    <Content Include="Res\NoteEdit.ico" />
+    <Content Include="Res\NoteInsert.ico" />
+    <Content Include="Res\NoteMerge.ico" />
+    <None Include="Res\OurWord.png" />
+    <Content Include="Res\ProgressIndicatorBackground.jpg" />
+    <EmbeddedResource Include="Res\SectionFirst.ico" />
+    <EmbeddedResource Include="Res\SectionLast.ico" />
+    <EmbeddedResource Include="Res\Properties.ico" />
+    <EmbeddedResource Include="Dialogs\DlgExportBook.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgExportBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_WritingSystems.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Page_WritingSystems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetFileName.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetStage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_GetStage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_Summary.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_Summary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Res\WizImportFile.gif" />
+    <Compile Include="AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataModel\DBookGrouping.cs" />
+    <Compile Include="DataModel\DFootnote.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DNote.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DParagraph.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DPicture.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DProject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DReference.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DRun.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DSection.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DTeamSettings.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\DTranslation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\SfMapping.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataModel\StdFmtTransform.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Dialogs\CopyBTfromFront.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DlgCopyBTConflict.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DlgCopyBTConflict.Designer.cs">
+      <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DlgExportBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DlgExportBook.Designer.cs">
+      <DependentUpon>DlgExportBook.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DlgFilter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\IncrementBookStatus.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Messages.cs" />
+    <Compile Include="Dialogs\oHelpAbout.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Print.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\CreateTranslationDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Ctrl_AutoReplace.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Ctrl_AutoReplace.Designer.cs">
+      <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\DlgProperties.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
+      <DependentUpon>DlgProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\OpenTranslationDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Options.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Options.Designer.cs">
+      <DependentUpon>Page_Options.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_SetupFT.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_StyleSheet.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_TeamSettings.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_TeamSettings.Designer.cs">
+      <DependentUpon>Page_TeamSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_TranslationStages.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_OtherTranslations.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_WritingSystems.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_WritingSystems.Designer.cs">
+      <DependentUpon>Page_WritingSystems.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Translation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\RepairImportBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\RestoreFromBackup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.Designer.cs">
+      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.Designer.cs">
+      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.Designer.cs">
+      <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.Designer.cs">
+      <DependentUpon>WizPage_GetStage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_Summary.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_Summary.Designer.cs">
+      <DependentUpon>WizPage_Summary.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Edit\OWPara.cs">
+    </Compile>
+    <Compile Include="Edit\OWWindow.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Language.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Layouts\BackTranslation.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Layouts\Drafting.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Layouts\JobConfigure.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Layouts\Naturalness.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Layouts\NotesTabPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Layouts\NotesTabPage.Designer.cs">
+      <DependentUpon>NotesTabPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OurWordMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Edit\OWTabControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Test.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Utilities\ColorComboQ.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <EmbeddedResource Include="DataModel\DBook.resx">
+      <DependentUpon>DBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataModel\DProject.resx">
+      <DependentUpon>DProject.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataModel\DTranslation.resx">
+      <DependentUpon>DTranslation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\CopyBTfromFront.resx">
+      <DependentUpon>CopyBTfromFront.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DlgFilter.resx">
+      <DependentUpon>DlgFilter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\IncrementBookStatus.resx">
+      <DependentUpon>IncrementBookStatus.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\oHelpAbout.resx">
+      <DependentUpon>oHelpAbout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Print.resx">
+      <DependentUpon>Print.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\CreateTranslationDlg.resx">
+      <DependentUpon>CreateTranslationDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\OpenTranslationDlg.resx">
+      <DependentUpon>OpenTranslationDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_AdvancedPrintOptions.resx">
+      <DependentUpon>Page_AdvancedPrintOptions.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_SetupFT.resx">
+      <DependentUpon>Page_SetupFT.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_StyleSheet.resx">
+      <DependentUpon>Page_StyleSheet.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_TranslationStages.resx">
+      <DependentUpon>Page_TranslationStages.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_OtherTranslations.resx">
+      <DependentUpon>Page_OtherTranslations.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_Translation.resx">
+      <DependentUpon>Page_Translation.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\RepairImportBook.resx">
+      <DependentUpon>RepairImportBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\RestoreFromBackup.resx">
+      <DependentUpon>RestoreFromBackup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Layouts\JobConfigure.resx">
+      <DependentUpon>JobConfigure.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="licenses.licx" />
+    <EmbeddedResource Include="OurWordMain.resx">
+      <DependentUpon>OurWordMain.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Res\Character.ico" />
+    <EmbeddedResource Include="Res\Copy.ico" />
+    <EmbeddedResource Include="Res\Cut.ico" />
+    <EmbeddedResource Include="Res\Exit.ico" />
+    <EmbeddedResource Include="Res\FileSave.gif" />
+    <EmbeddedResource Include="Res\GoToBook.ico" />
+    <EmbeddedResource Include="Res\Help.ico" />
+    <EmbeddedResource Include="Res\Italic.ico" />
+    <EmbeddedResource Include="Res\JobConfigure.ico" />
+    <EmbeddedResource Include="Res\MoveDown.ico" />
+    <EmbeddedResource Include="Res\MoveUp.ico" />
+    <EmbeddedResource Include="Res\NoteDelete.ico" />
+    <EmbeddedResource Include="Res\NoteGeneric.ico" />
+    <EmbeddedResource Include="Res\NoteOldVersions.ico" />
+    <EmbeddedResource Include="Res\Notes.ico" />
+    <EmbeddedResource Include="Res\NoteToDo.ico" />
+    <EmbeddedResource Include="Res\Note_AskUns.ico" />
+    <EmbeddedResource Include="Res\Note_BT.ico" />
+    <EmbeddedResource Include="Res\Note_Definition.ico" />
+    <EmbeddedResource Include="Res\Note_Exegesis.ico" />
+    <EmbeddedResource Include="Res\Note_Front.ico" />
+    <EmbeddedResource Include="Res\Note_Greek.ico" />
+    <EmbeddedResource Include="Res\Note_Hebrew.ico" />
+    <EmbeddedResource Include="Res\Note_Hint.ico" />
+    <EmbeddedResource Include="Res\Note_OldVersions.ico" />
+    <EmbeddedResource Include="Res\Note_Reason.ico" />
+    <EmbeddedResource Include="Res\Note_ToDo.ico" />
+    <EmbeddedResource Include="Res\Options.ico" />
+    <EmbeddedResource Include="Res\Padlock.ico" />
+    <EmbeddedResource Include="Res\Paragraph.ico" />
+    <EmbeddedResource Include="Res\Paste.ico" />
+    <EmbeddedResource Include="Res\Print.ico" />
+    <EmbeddedResource Include="Res\SectionNext.ico" />
+    <EmbeddedResource Include="Res\SectionPrevious.ico" />
+    <EmbeddedResource Include="Res\SetUpFeatures.ico" />
+    <EmbeddedResource Include="Res\Tools.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Localizations.db">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>

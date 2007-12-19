@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 7.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWTools", "JWTools.csproj", "{A70FCB84-8A6D-471E-9582-1E2D24415E31}"
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		ConfigName.0 = Debug
+		ConfigName.1 = Release
+	EndGlobalSection
+	GlobalSection(ProjectDependencies) = postSolution
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Debug.ActiveCfg = Debug|.NET
+		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Debug.Build.0 = Debug|.NET
+		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Release.ActiveCfg = Release|.NET
+		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Release.Build.0 = Release|.NET
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

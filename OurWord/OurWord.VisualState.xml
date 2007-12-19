@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
+  <TopNode>[0-1000]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\OurWord.nunit</TopNode>
+  <SelectedNode>[0-1000]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\OurWord.nunit</SelectedNode>
+  <ExcludeCategories>false</ExcludeCategories>
+  <Nodes>
+    <Node UniqueName="[0-1000]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\OurWord.nunit" Expanded="true">
+      <Nodes>
+        <Node UniqueName="[0-1033]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\bin\Debug\OurWord.exe" Expanded="true">
+          <Nodes>
+            <Node UniqueName="[0-1034]OurWord" Expanded="true">
+              <Nodes>
+                <Node UniqueName="[0-1035]OurWord.DataModel" Expanded="true">
+                  <Nodes>
+                    <Node UniqueName="[0-1029]OurWord.DataModel.Test_DBook" Expanded="true">
+                      <Nodes>
+                        <Node UniqueName="[0-1030]OurWord.DataModel.Test_DBook.BookSortKeys" />
+                      </Nodes>
+                    </Node>
+                    <Node UniqueName="[0-1027]OurWord.DataModel.Test_DFootnote" Expanded="true">
+                      <Nodes>
+                        <Node UniqueName="[0-1028]OurWord.DataModel.Test_DFootnote.ParseLabel" />
+                      </Nodes>
+                    </Node>
+                    <Node UniqueName="[0-1001]OurWord.DataModel.Test_DSectionIO" Expanded="true">
+                      <Nodes>
+                        <Node UniqueName="[0-1002]OurWord.DataModel.Test_DSectionIO.IO_DataSet5" />
+                        <Node UniqueName="[0-1003]OurWord.DataModel.Test_DSectionIO.IO_DataSet6" />
+                      </Nodes>
+                    </Node>
+                  </Nodes>
+                </Node>
+                <Node UniqueName="[0-1036]OurWord.Dialogs" Expanded="true">
+                  <Nodes>
+                    <Node UniqueName="[0-1031]OurWord.Dialogs.Test_BookNames" Expanded="true">
+                      <Nodes>
+                        <Node UniqueName="[0-1032]OurWord.Dialogs.Test_BookNames.BookNameRetrieval" />
+                      </Nodes>
+                    </Node>
+                  </Nodes>
+                </Node>
+                <Node UniqueName="[0-1004]OurWord.Test_ScriptureDB" Expanded="true">
+                  <Nodes>
+                    <Node UniqueName="[0-1013]OurWord.Test_ScriptureDB.CombineBTs" />
+                    <Node UniqueName="[0-1022]OurWord.Test_ScriptureDB.ConvertParatext_CompleteDataSets" />
+                    <Node UniqueName="[0-1025]OurWord.Test_ScriptureDB.ConvertParatext_ExportFigures" />
+                    <Node UniqueName="[0-1020]OurWord.Test_ScriptureDB.ConvertParatext_Footnotes" />
+                    <Node UniqueName="[0-1024]OurWord.Test_ScriptureDB.ConvertParatext_ImportFigures" />
+                    <Node UniqueName="[0-1018]OurWord.Test_ScriptureDB.ConvertParatext_SeeAlso" />
+                    <Node UniqueName="[0-1023]OurWord.Test_ScriptureDB.ConvertParatext_VerseBridges" />
+                    <Node UniqueName="[0-1017]OurWord.Test_ScriptureDB.EnsureInitialTitleRecord" />
+                    <Node UniqueName="[0-1009]OurWord.Test_ScriptureDB.EnsureParagraphAfterPicture" />
+                    <Node UniqueName="[0-1016]OurWord.Test_ScriptureDB.EnsureRecordsBeforeAllSections" />
+                    <Node UniqueName="[0-1021]OurWord.Test_ScriptureDB.JoinParatextEmbeddedFields" />
+                    <Node UniqueName="[0-1008]OurWord.Test_ScriptureDB.MoveChaptersIntoParagraphs" />
+                    <Node UniqueName="[0-1014]OurWord.Test_ScriptureDB.MoveMajorSectionParagraphs" />
+                    <Node UniqueName="[0-1019]OurWord.Test_ScriptureDB.MoveParagraphText" />
+                    <Node UniqueName="[0-1012]OurWord.Test_ScriptureDB.MoveTitlesIntoRecord" />
+                    <Node UniqueName="[0-1010]OurWord.Test_ScriptureDB.NormalizedMarkersInventory" />
+                    <Node UniqueName="[0-1006]OurWord.Test_ScriptureDB.NormalizeMarkers" />
+                    <Node UniqueName="[0-1015]OurWord.Test_ScriptureDB.NormalizeVerseText" />
+                    <Node UniqueName="[0-1026]OurWord.Test_ScriptureDB.ParatextRoundTrip" />
+                    <Node UniqueName="[0-1007]OurWord.Test_ScriptureDB.RemoveDiscardedMarkers" />
+                    <Node UniqueName="[0-1005]OurWord.Test_ScriptureDB.RemoveShoeboxSpecialMarkers" />
+                    <Node UniqueName="[0-1011]OurWord.Test_ScriptureDB.UnknownMarkersInventory" />
+                  </Nodes>
+                </Node>
+              </Nodes>
+            </Node>
+          </Nodes>
+        </Node>
+        <Node UniqueName="[0-1040]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\..\JWdb\bin\Debug\JWdb.dll" Expanded="true">
+          <Nodes>
+            <Node UniqueName="[0-1041]JWdb" Expanded="true">
+              <Nodes>
+                <Node UniqueName="[0-1037]JWdb.Test_SfField" Expanded="true">
+                  <Nodes>
+                    <Node UniqueName="[0-1039]JWdb.Test_SfField.Comparison" />
+                    <Node UniqueName="[0-1038]JWdb.Test_SfField.Construction" />
+                  </Nodes>
+                </Node>
+              </Nodes>
+            </Node>
+          </Nodes>
+        </Node>
+        <Node UniqueName="[0-1045]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\JWTools\bin\Debug\JWTools.dll" Expanded="true">
+          <Nodes>
+            <Node UniqueName="[0-1046]JWTools" Expanded="true">
+              <Nodes>
+                <Node UniqueName="[0-1042]JWTools.Test_PathConverter" Expanded="true">
+                  <Nodes>
+                    <Node UniqueName="[0-1044]JWTools.Test_PathConverter.Conversions" />
+                    <Node UniqueName="[0-1043]JWTools.Test_PathConverter.TokenizePath" />
+                  </Nodes>
+                </Node>
+              </Nodes>
+            </Node>
+          </Nodes>
+        </Node>
+      </Nodes>
+    </Node>
+  </Nodes>
+</VisualState>
