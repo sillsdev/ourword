@@ -21,8 +21,6 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-using Elsehemy;
-
 using JWTools;
 using JWdb;
 
@@ -160,7 +158,6 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
-        private SuperToolTip m_SuperToolTip;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -1148,7 +1145,6 @@ namespace OurWord
             this.m_tbTaskName = new System.Windows.Forms.ToolStripLabel();
             this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
             this.m_tbCurrentPassage = new System.Windows.Forms.ToolStripLabel();
-            this.m_SuperToolTip = new Elsehemy.SuperToolTip(this.components);
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
@@ -2274,10 +2270,6 @@ namespace OurWord
             this.m_tbCurrentPassage.Name = "m_tbCurrentPassage";
             this.m_tbCurrentPassage.Size = new System.Drawing.Size(79, 22);
             this.m_tbCurrentPassage.Text = "(passage)";
-            // 
-            // m_SuperToolTip
-            // 
-            this.m_SuperToolTip.FadingInterval = 10;
             // 
             // OurWordMain
             // 

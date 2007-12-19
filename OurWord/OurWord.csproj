@@ -96,17 +96,13 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JWTools, Version=1.0.2865.24509, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="JWTools, Version=1.0.2909.11802, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\JWTools\bin\Debug\JWTools.dll</HintPath>
     </Reference>
     <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="PalasoUIWindowsForms, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\PalasoUIWindowsForms.dll</HintPath>
     </Reference>
     <Reference Include="System">
       <Name>System</Name>
@@ -141,9 +137,6 @@
   <ItemGroup>
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
-    <None Include="Localizations.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Content Include="OurWord.ico" />
     <EmbeddedResource Include="Layouts\NotesTabPage.resx">
       <SubType>Designer</SubType>
@@ -298,7 +291,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
@@ -352,7 +345,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
       <SubType>UserControl</SubType>
@@ -534,11 +526,6 @@
     <EmbeddedResource Include="Res\SectionPrevious.ico" />
     <EmbeddedResource Include="Res\SetUpFeatures.ico" />
     <EmbeddedResource Include="Res\Tools.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Localizations.db">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
