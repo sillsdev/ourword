@@ -1,6 +1,6 @@
-<DProject FileFormat="0" DisplayName="English" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\OurWordSample.owp" RelPath="" Comment="" vdShowNotes="true" vdShowRelLangs="true">
+<DProject FileFormat="0" DisplayName="English" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\OurWordSample.owp" RelPath="" Comment="" vdShowNotes="false" vdShowRelLangs="false">
   <own Name="Team">
-    <DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
+    <DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" FileNameLanguage="English" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
     </DTeamSettings>
   </own>
   <own Name="Front">

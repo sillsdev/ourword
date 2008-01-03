@@ -2341,8 +2341,8 @@ namespace OurWord
             LocDB.Initialize(G.GetApplicationDataFolder());
 
             // Set the resource location (so the splash picture will be visible)
-//            ShowLoadState("Init Resource Location");
-//            JWU.ResourceLocation = "OurWord.Res.";
+            ShowLoadState("Init Resource Location");
+            JWU.ResourceLocation = "OurWord.Res.";
 
             // Retrieve localizations from the Localizations database. (Must be done
             // here so that the Splash window will be localized.

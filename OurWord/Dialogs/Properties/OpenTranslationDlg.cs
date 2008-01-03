@@ -237,7 +237,7 @@ namespace OurWord.Dialogs
 		private void cmdLoad(object sender, System.EventArgs e)
 		{
             // Localization
-            LocDB.Localize(this, null);
+            LocDB.Localize(this, new Control[] { });
 		}
 		#endregion
 		#region Handler: cmdClosing - validate the results

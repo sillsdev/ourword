@@ -241,7 +241,7 @@ namespace OurWord.Dialogs
         private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
-            LocDB.Localize(this, null);
+            LocDB.Localize(this, new Control[] { } );
 
             // The writing systems list
             PopulateList();

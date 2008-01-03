@@ -6,8 +6,6 @@ Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.chm; DestDi
 Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\Table of Contents.hhc; DestDir: {app}\Help
 Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.HHK; DestDir: {app}\Help
 Source: SampleData\*.*; DestDir: {userdocs}\OurWordSample; Flags: recursesubdirs createallsubdirs
-Source: ..\Localizations.db; DestDir: {app}
-Source: ..\Localizations.xml; DestDir: {app}
 Source: ..\Loc\*.*; DestDir: {commonappdata}\OurWord\Loc
 [Registry]
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!; ValueType: string; ValueName: HelpFile; ValueData: {app}\Help\OurWordHelp.chm; Flags: uninsdeletevalue
@@ -21,7 +19,7 @@ Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Options\; ValueType: str
 Name: {app}\Help
 [Setup]
 AppName=Our Word!
-AppVerName=Alpha 0.9g
+AppVerName=Alpha 0.9h
 DefaultDirName={pf}\TSC\Our Word
 AllowUNCPath=false
 AllowNoIcons=true
@@ -30,7 +28,7 @@ ShowLanguageDialog=yes
 PrivilegesRequired=admin
 AlwaysShowDirOnReadyPage=true
 AlwaysShowGroupOnReadyPage=true
-AppVersion=0.9g
+AppVersion=0.9h
 UninstallDisplayIcon=
 UninstallDisplayName=Our Word!
 WindowVisible=true
