@@ -138,12 +138,12 @@ namespace JWTools
             for (int i = iCommon; i < vOriginPath.Length; i++)
                 sResultPath += (".." + Path.DirectorySeparatorChar);
 
-            // Add tje Absolute components
+            // Add the Absolute components
             for (int i = iCommon; i < vAbsolutePath.Length; i++)
             {
                 sResultPath += vAbsolutePath[i];
                 if (i < vAbsolutePath.Length - 1)
-                    sResultPath += (".." + Path.DirectorySeparatorChar);
+                    sResultPath += Path.DirectorySeparatorChar;
             }
 
             return sResultPath;
@@ -202,9 +202,9 @@ namespace JWTools
             for(int i=0; i<vOrigin.Length; i++)
             {
                 Assert.AreEqual( vAbsolute[i],
-                    PathConverter.RelativeToAbsolute(vOrigin[i], vRelative[i]) );
+                    PathConverter.RelativeToAbsolute(vOrigin[i], vRelative[i]), "1:" + i.ToString() );
                 Assert.AreEqual( vRelative[i],
-                    PathConverter.AbsoluteToRelative(vOrigin[i], vAbsolute[i]) );
+                    PathConverter.AbsoluteToRelative(vOrigin[i], vAbsolute[i]), "2:" + i.ToString());
             }
         }
         #endregion

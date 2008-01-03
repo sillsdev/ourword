@@ -8,7 +8,7 @@ Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.HHK; DestDi
 Source: SampleData\*.*; DestDir: {userdocs}\OurWordSample; Flags: recursesubdirs createallsubdirs
 Source: ..\Localizations.db; DestDir: {app}
 Source: ..\Localizations.xml; DestDir: {app}
-Source: ..\bin\Debug\Loc.xml; DestDir: {app}
+Source: ..\Loc\*.*; DestDir: {commonappdata}\OurWord\Loc
 [Registry]
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!; ValueType: string; ValueName: HelpFile; ValueData: {app}\Help\OurWordHelp.chm; Flags: uninsdeletevalue
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: string; ValueName: Folder; ValueData: {userdocs}\OurWordSample\BackupFiles; Flags: uninsdeletevalue

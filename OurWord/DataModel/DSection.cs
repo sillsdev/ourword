@@ -3850,18 +3850,15 @@ namespace OurWord.DataModel
         #region Method: void Setup()
         [SetUp] public void Setup()
         {
-            // Initialize the registry (the Map process needs it)
-            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
+            JWU.NUnit_Setup();
         }
         #endregion
 
         string GetTestPathName(string sBaseName)
         {
-            string sPath = JW_Registry.GetValue("NUnit_LocDbDir",
-                "C:\\Users\\JWimbish\\Documents\\Visual Studio 2005\\Projects\\OurWord\\trunk\\OurWord\\bin\\Debug");
-            sPath += "\\Testing\\";
-            sPath += sBaseName;
-            sPath += ".x";
+            string sPath = JWU.NUnit_TestFileFolder + 
+                Path.DirectorySeparatorChar + sBaseName + ".x";
+
             return sPath;
         }
 

@@ -107,7 +107,11 @@ namespace JWTools
 
         // Filters ---------------------------------------------------------------------------
         const string c_ShowAll = "Show All";
-        const string c_ThoseNeedingAttention = "Those Needing Attention";
+        const string c_ThoseNeedingAttention = "All Needing Attention";
+        const string c_TranslatorItems = "Translator Items";
+        const string c_TranslatorItemsNeedingAttention = "Translator Items Needing Attention";
+        const string c_AdvisorItems = "Advisor Items";
+        const string c_AdvisorItemsNeedingAttention = "Advisor Items Needing Attention";
 
         // Dialog Controls -------------------------------------------------------------------
         #region VAttr{g}: TreeView Tree
@@ -142,11 +146,41 @@ namespace JWTools
         {
             get
             {
-                return m_textYourLanguage.Text;
+                string sIn = m_textYourLanguage.Text;
+                string sOut = "";
+
+                for (int i = 0; i < sIn.Length; )
+                {
+                    if (i < sIn.Length - 3 && sIn.Substring(i, 3) == "{n}")
+                    {
+                        sOut += '\n';
+                        i += 3;
+                    }
+                    else if (sIn[i] == '\n') // Eat any new \n's that were introduced
+                    {
+                        i++;
+                    }
+                    else
+                    {
+                        sOut += sIn[i];
+                        i++;
+                    }
+                }
+
+                return sOut;
             }
             set
             {
-                m_textYourLanguage.Text = value;
+                string s = "";
+
+                foreach (char ch in value)
+                {
+                    if (ch == '\n')
+                        s += "{n}";
+                    else
+                        s += ch;
+                }
+                m_textYourLanguage.Text = s;
             }
         }
         #endregion
@@ -204,21 +238,14 @@ namespace JWTools
         #endregion
 
         // Internal Methods ------------------------------------------------------------------
-        #region Method: bool ItemNeedsAttention(string sLanguageValue)
-        bool ItemNeedsAttention(string sLanguageValue)
-        {
-            if (string.IsNullOrEmpty(sLanguageValue))
-                return true;
-            return false;
-        }
-        #endregion
         #region Method: bool ItemNeedsAttention(LocItem item)
         bool ItemNeedsAttention(LocItem item)
         {
             LocAlternate alt = item.GetAlternate(iLanguage);
             if (null == alt)
                 return true;
-            return ItemNeedsAttention(alt.Value);
+            bool bNeedsAttention = !string.IsNullOrEmpty(alt.NeedsAttention(item));
+            return bNeedsAttention;
         }
         #endregion
         #region Method: bool GroupNeedsAttention(LocGroup group)
@@ -239,11 +266,103 @@ namespace JWTools
             return false;
         }
         #endregion
+        #region Method: bool ShouldDisplayInTree(LocGroup group)
+        bool ShouldDisplayInTree(LocGroup group)
+        {
+            // Filter Option: Show All
+            if (FilterCombo.Text == c_ShowAll)
+                return true;
+
+            // Filter Option: All Needing Attention
+            if (FilterCombo.Text == c_ThoseNeedingAttention)
+                return GroupNeedsAttention(group);
+
+            // Filter Option: Translator Items
+            if (FilterCombo.Text == c_TranslatorItems)
+                return group.TranslatorAudience;
+
+            // Filter Option: Translator Items Needing Attention
+            if (FilterCombo.Text == c_TranslatorItemsNeedingAttention)
+                return group.TranslatorAudience && GroupNeedsAttention(group);
+
+            // Filter Option: Advisor Items
+            if (FilterCombo.Text == c_AdvisorItems)
+                return !group.TranslatorAudience;
+
+            // Filter Option: Advisor Items Needing Attention
+            if (FilterCombo.Text == c_AdvisorItemsNeedingAttention)
+                return !group.TranslatorAudience && GroupNeedsAttention(group);
+
+            // Unknown filter
+            return true;
+        }
+        #endregion
+        #region Method: bool ShouldDisplayInTree(LocItem item)
+        bool ShouldDisplayInTree(LocItem item)
+            // Assume the parent Group has already been filtered
+        {
+            // Filter Option: All Needing Attention
+            if (FilterCombo.Text == c_ThoseNeedingAttention)
+                return ItemNeedsAttention(item);
+
+            // Filter Option: Advisor Items
+            if (FilterCombo.Text == c_TranslatorItemsNeedingAttention)
+                return ItemNeedsAttention(item);
+
+            // Filter Option: Advisor Items Needing Attention
+            if (FilterCombo.Text == c_AdvisorItemsNeedingAttention)
+                return ItemNeedsAttention(item);
+
+            // Unknown filter
+            return true;
+        }
+        #endregion
+        #region Method: void CalculateCounts()
+        int m_cItemsRemaining;
+        int m_cItemsTotal;
+
+        void _CalculateCounts(LocGroup group)
+        {
+            if (!ShouldDisplayInTree(group))
+                return;
+
+            foreach (LocGroup sub in group.Groups)
+                _CalculateCounts(sub);
+
+            foreach (LocItem item in group.Items)
+            {
+                if (!ShouldDisplayInTree(item))
+                    continue;
+
+                ++m_cItemsTotal;
+
+                if (ItemNeedsAttention(item))
+                    ++m_cItemsRemaining;
+            }
+
+        }
+
+        void CalculateCounts()
+        {
+            m_cItemsRemaining = 0;
+            m_cItemsTotal = 0;
+
+            foreach (LocGroup group in DB.Groups)
+                _CalculateCounts(group);
+
+            // Update the status
+            m_lblRemaining.Text = m_cItemsRemaining.ToString() +
+                " Remaining of " +
+                m_cItemsTotal.ToString();
+
+        }
+        #endregion
+
         #region Method: void PopulateTree()
         void _PopulateTree(TreeNodeCollection nodes, LocGroup group)
         {
             // Determine whether this node is needed
-            if (FilterThoseNeedingAttentionOnly && !GroupNeedsAttention(group))
+            if (!ShouldDisplayInTree(group))
                 return;
             
             // Add the node for this group
@@ -251,6 +370,7 @@ namespace JWTools
             node.Name = group.ID;
             node.ToolTipText = group.Title;
             node.Tag = group;
+            node.ForeColor = (GroupNeedsAttention(group) ? Color.Red : Color.Navy);
 
             // Recurse to add any subnodes for the subgroups
             foreach (LocGroup sub in group.Groups)
@@ -259,7 +379,7 @@ namespace JWTools
             // Add the items 
             foreach (LocItem item in group.Items)
             {
-                if (FilterThoseNeedingAttentionOnly && !ItemNeedsAttention(item))
+                if (!ShouldDisplayInTree(item))
                     continue;
 
                 // Create the node with this text
@@ -293,7 +413,7 @@ namespace JWTools
             {
                 _PopulateTree(Tree.Nodes, group);
 
-                if (FilterThoseNeedingAttentionOnly && GroupNeedsAttention(group) && null == FirstGroup)
+                if(ShouldDisplayInTree(group) && null == FirstGroup)
                     FirstGroup = group;
             }
 
@@ -301,6 +421,8 @@ namespace JWTools
                 FirstGroup = DB.Groups[0];
 
             Group = FirstGroup;
+
+            CalculateCounts();
         }
         #endregion
         #region Method: void ClearItemControls()
@@ -308,6 +430,33 @@ namespace JWTools
         {
             m_rtbInfo.Text = "";
             ItemYourLanguage = "";
+        }
+        #endregion
+        #region Method: _TextToRtfBox(string sIn)
+        string _TextToRtfBox(string sIn)
+        {
+            string sOut = "";
+
+            foreach (char ch in sIn)
+            {
+                switch (ch)
+                {
+                    case '\n':
+                        sOut += ("\\" + "{n" + "\\" + "}");
+                        break;
+                    case '{':
+                        sOut += "\\{";
+                        break;
+                    case '}':
+                        sOut += "\\}";
+                        break;
+                    default:
+                        sOut += ch;
+                        break;
+                }
+            }
+
+            return sOut;
         }
         #endregion
         #region Method: void PopulateItemControls()
@@ -351,7 +500,7 @@ namespace JWTools
             // Item in English
             sRTF += "{\\f2\\fs16 }\\par";
             sRTF += "\\pard{\\f2\\fs18 English:  }";
-            sRTF += "{\\f0\\fs28\\b\\cf1 " + Item.English + "}";
+            sRTF += "{\\f0\\fs28\\b\\cf1 " + _TextToRtfBox(Item.English) + "}";
             sRTF += "\\par";
 
             // Item Shortcut Key
@@ -413,6 +562,13 @@ namespace JWTools
                 m_textToolTip.Enabled = false;
                 m_lblToolTip.Enabled = false;
             }
+
+            // Status
+            m_lblRemaining.Text = "";
+
+            // Update controls & status
+            UpdateNeedsAttentionStatus();
+            CalculateCounts();
         }
         #endregion
         #region Method: void HarvestChanges()
@@ -468,6 +624,29 @@ namespace JWTools
             m_labelYourLanguage.Font = font;
         }
         #endregion
+        #region Method: void UpdateNeedsAttentionStatus()
+        void UpdateNeedsAttentionStatus()
+            // Assumes changes have been Harvested to the LocAlternative
+        {
+            if (null == Item)
+                return;
+            LocAlternate alt = new LocAlternate(
+                m_textYourLanguage.Text,
+                m_comboShortcutKey.Text,
+                m_textToolTip.Text);
+
+            // Do the test
+            string sNeedsMessage = alt.NeedsAttention(Item);
+            bool bNeedsAttention = !string.IsNullOrEmpty(sNeedsMessage);
+
+            // Update the tree node
+            if (null != Tree.SelectedNode && null != Tree.SelectedNode.Tag as LocItem)
+                Tree.SelectedNode.ForeColor = (bNeedsAttention ? Color.Red : Color.Navy);
+
+            // Update the message
+            m_labelNeedsAttention.Text = sNeedsMessage;
+        }
+        #endregion
 
         // Command Handlers ------------------------------------------------------------------
         #region Cmd: cmdLoad
@@ -476,6 +655,10 @@ namespace JWTools
             // Populate the Filter Combo
             FilterCombo.Items.Add(c_ShowAll);
             FilterCombo.Items.Add(c_ThoseNeedingAttention);
+            FilterCombo.Items.Add(c_TranslatorItems);
+            FilterCombo.Items.Add(c_TranslatorItemsNeedingAttention);
+            FilterCombo.Items.Add(c_AdvisorItems);
+            FilterCombo.Items.Add(c_AdvisorItemsNeedingAttention);
             FilterCombo.Text = c_ShowAll;
 
             // Populate the Language Combo
@@ -649,12 +832,7 @@ namespace JWTools
         #region Cmd: cmdLanguageValueChanged - update the color of the tree control
         private void cmdLanguageValueChanged(object sender, EventArgs e)
         {
-            // Do we pass the "Needs Attention" text?
-            bool bOK = ItemNeedsAttention(m_textYourLanguage.Text);
-
-            // Get the tree node
-            if (null != Tree.SelectedNode)
-                Tree.SelectedNode.ForeColor = (bOK ? Color.Red : Color.Navy);
+            UpdateNeedsAttentionStatus();
         }
         #endregion
         #region Cmd: cmdProperties - edit the Language properties (name, font, etc.)
@@ -679,6 +857,23 @@ namespace JWTools
             SetFont();
         }
         #endregion
+        #region Cmd: cmdEditDescriptions
+        private void cmdEditDescriptions(object sender, EventArgs e)
+        {
+            HarvestChanges();
 
+            DlgEditDescriptions dlg = new DlgEditDescriptions();
+
+            dlg.GroupDescription = Group.Description;
+            dlg.ItemDescription = Item.Information;
+
+            dlg.ShowDialog(this);
+
+            Group.Description = dlg.GroupDescription;
+            Item.Information = dlg.ItemDescription;
+            PopulateItemControls();
+
+        }
+        #endregion
     }
 }

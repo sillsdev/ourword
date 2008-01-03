@@ -52,6 +52,8 @@ namespace JWTools
             this.m_comboShortcutKey = new System.Windows.Forms.ComboBox();
             this.m_lblToolTip = new System.Windows.Forms.Label();
             this.m_textToolTip = new System.Windows.Forms.TextBox();
+            this.m_lblRemaining = new System.Windows.Forms.ToolStripLabel();
+            this.m_labelNeedsAttention = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -90,7 +92,8 @@ namespace JWTools
             this.m_comboFilter,
             this.toolStripSeparator3,
             this.m_labelLanguage,
-            this.m_comboLanguage});
+            this.m_comboLanguage,
+            this.m_lblRemaining});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(954, 38);
@@ -183,7 +186,7 @@ namespace JWTools
             // m_comboFilter
             // 
             this.m_comboFilter.Name = "m_comboFilter";
-            this.m_comboFilter.Size = new System.Drawing.Size(160, 38);
+            this.m_comboFilter.Size = new System.Drawing.Size(230, 38);
             this.m_comboFilter.ToolTipText = "Use this to limit which items appear in the Groups of Settings tree";
             this.m_comboFilter.SelectedIndexChanged += new System.EventHandler(this.cmdFilterChanged);
             // 
@@ -211,13 +214,14 @@ namespace JWTools
             this.m_rtbInfo.Name = "m_rtbInfo";
             this.m_rtbInfo.ReadOnly = true;
             this.m_rtbInfo.ScrollBars = System.Windows.Forms.RichTextBoxScrollBars.None;
-            this.m_rtbInfo.Size = new System.Drawing.Size(690, 323);
+            this.m_rtbInfo.Size = new System.Drawing.Size(690, 302);
             this.m_rtbInfo.TabIndex = 74;
             this.m_rtbInfo.Text = "(info)";
+            this.m_rtbInfo.DoubleClick += new System.EventHandler(this.cmdEditDescriptions);
             // 
             // m_labelYourLanguage
             // 
-            this.m_labelYourLanguage.Location = new System.Drawing.Point(246, 378);
+            this.m_labelYourLanguage.Location = new System.Drawing.Point(246, 351);
             this.m_labelYourLanguage.Name = "m_labelYourLanguage";
             this.m_labelYourLanguage.Size = new System.Drawing.Size(96, 22);
             this.m_labelYourLanguage.TabIndex = 60;
@@ -228,7 +232,7 @@ namespace JWTools
             // 
             this.m_textYourLanguage.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_textYourLanguage.ForeColor = System.Drawing.Color.Navy;
-            this.m_textYourLanguage.Location = new System.Drawing.Point(348, 375);
+            this.m_textYourLanguage.Location = new System.Drawing.Point(348, 348);
             this.m_textYourLanguage.Multiline = true;
             this.m_textYourLanguage.Name = "m_textYourLanguage";
             this.m_textYourLanguage.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
@@ -239,7 +243,7 @@ namespace JWTools
             // 
             // m_lblShortcutKey
             // 
-            this.m_lblShortcutKey.Location = new System.Drawing.Point(246, 559);
+            this.m_lblShortcutKey.Location = new System.Drawing.Point(246, 532);
             this.m_lblShortcutKey.Name = "m_lblShortcutKey";
             this.m_lblShortcutKey.Size = new System.Drawing.Size(80, 23);
             this.m_lblShortcutKey.TabIndex = 75;
@@ -250,14 +254,14 @@ namespace JWTools
             // 
             this.m_comboShortcutKey.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_comboShortcutKey.FormattingEnabled = true;
-            this.m_comboShortcutKey.Location = new System.Drawing.Point(348, 555);
+            this.m_comboShortcutKey.Location = new System.Drawing.Point(348, 528);
             this.m_comboShortcutKey.Name = "m_comboShortcutKey";
             this.m_comboShortcutKey.Size = new System.Drawing.Size(92, 28);
             this.m_comboShortcutKey.TabIndex = 76;
             // 
             // m_lblToolTip
             // 
-            this.m_lblToolTip.Location = new System.Drawing.Point(246, 589);
+            this.m_lblToolTip.Location = new System.Drawing.Point(246, 562);
             this.m_lblToolTip.Name = "m_lblToolTip";
             this.m_lblToolTip.Size = new System.Drawing.Size(65, 23);
             this.m_lblToolTip.TabIndex = 77;
@@ -267,17 +271,34 @@ namespace JWTools
             // m_textToolTip
             // 
             this.m_textToolTip.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_textToolTip.Location = new System.Drawing.Point(348, 589);
+            this.m_textToolTip.Location = new System.Drawing.Point(348, 562);
             this.m_textToolTip.Multiline = true;
             this.m_textToolTip.Name = "m_textToolTip";
             this.m_textToolTip.Size = new System.Drawing.Size(591, 77);
             this.m_textToolTip.TabIndex = 78;
+            // 
+            // m_lblRemaining
+            // 
+            this.m_lblRemaining.Name = "m_lblRemaining";
+            this.m_lblRemaining.Size = new System.Drawing.Size(72, 35);
+            this.m_lblRemaining.Text = "(Remaining)";
+            // 
+            // m_labelNeedsAttention
+            // 
+            this.m_labelNeedsAttention.ForeColor = System.Drawing.Color.Red;
+            this.m_labelNeedsAttention.Location = new System.Drawing.Point(246, 643);
+            this.m_labelNeedsAttention.Name = "m_labelNeedsAttention";
+            this.m_labelNeedsAttention.Size = new System.Drawing.Size(693, 23);
+            this.m_labelNeedsAttention.TabIndex = 79;
+            this.m_labelNeedsAttention.Text = "(attention needed)";
+            this.m_labelNeedsAttention.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // Localizer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(954, 679);
+            this.Controls.Add(this.m_labelNeedsAttention);
             this.Controls.Add(this.m_textToolTip);
             this.Controls.Add(this.m_lblToolTip);
             this.Controls.Add(this.m_comboShortcutKey);
@@ -326,5 +347,7 @@ namespace JWTools
         private System.Windows.Forms.ComboBox m_comboShortcutKey;
         private System.Windows.Forms.Label m_lblToolTip;
         private System.Windows.Forms.TextBox m_textToolTip;
+        private System.Windows.Forms.ToolStripLabel m_lblRemaining;
+        private System.Windows.Forms.Label m_labelNeedsAttention;
     }
 }

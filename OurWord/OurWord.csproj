@@ -137,9 +137,6 @@
   <ItemGroup>
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
-    <None Include="Loc.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Content Include="OurWord.ico" />
     <EmbeddedResource Include="Layouts\NotesTabPage.resx">
       <SubType>Designer</SubType>

@@ -1,654 +1,327 @@
 ﻿<LocDB>
-  <Language ID="inz" Name="Bahasa Indonesia"></Language>
-  <Language ID="sp" Name="Español"></Language>
-  <Language ID="swh" Name="Kiswahili"></Language>
-  <Language ID="th" Name="Thai" Font="Tahoma" Size="16"></Language>
-  <Group ID="m_MenuStrip" Title="001 - Menus" Des="These are the commands that appear in OurWord's menus. The ampersands (&amp;) indicate the hotkey that is underlined in the menu. You should take care that within a single menu (e.g., the Edit menu), that all ampersands indicate a different letter (that is, that there are no letters used more than once within a given menu.)">
+  <Group ID="m_MenuStrip" Title="001 - Menus" Des="These are the commands that appear in OurWord's menus. The ampersands (&amp;) indicate the hotkey that is underlined in the menu. You should take care that within a single menu (e.g., the Edit menu), that all ampersands indicate a different letter (that is, that there are no letters used more than once within a given menu.)" Translator="true">
     <Item ID="m_menuProject">
       <English>&amp;Project</English>
       <Info>Main menu item for the Project submenu, contains the submenu items of Open Project, New Project, Save Project, etc.</Info>
-      <Alt ID="inz" Value="&amp;Proyek"></Alt>
-      <Alt ID="sp" Value="&amp;Proyecto"></Alt>
-      <Alt ID="swh" Value="&amp;Mradi"></Alt>
-      <Alt ID="th" Value="โครงการ"></Alt>
     </Item>
     <Item ID="m_menuNew" Key="true">
       <English>&amp;New...</English>
       <Info>Menu command to create a new project.</Info>
-      <Alt ID="inz" Value="&amp;Baru..."></Alt>
-      <Alt ID="sp" Value="&amp;Nuevo..."></Alt>
-      <Alt ID="swh" Value="&amp;Mpya..."></Alt>
-      <Alt ID="th" Value="ใหม่"></Alt>
     </Item>
     <Item ID="m_menuOpen" Key="true">
       <English>&amp;Open...</English>
       <Info>Menu command to open an existing project.</Info>
       <Key>Ctrl+O</Key>
-      <Alt ID="inz" Value="B&amp;uka..." Key="Ctrl+B"></Alt>
-      <Alt ID="sp" Value="&amp;Abrir..."></Alt>
-      <Alt ID="swh" Value="&amp;Fungua..."></Alt>
-      <Alt ID="th" Value="เปืด"></Alt>
     </Item>
     <Item ID="m_menuSave" Key="true">
       <English>&amp;Save</English>
       <Info>Menu command to save the Project, all of the settings, and the currently open book.</Info>
       <Key>Ctrl+S</Key>
-      <Alt ID="inz" Value="&amp;Simpan" Key="Ctrl+S"></Alt>
-      <Alt ID="sp" Value="&amp;Guardar"></Alt>
-      <Alt ID="swh" Value="&amp;Hifadhi"></Alt>
-      <Alt ID="th" Value="บันทึก"></Alt>
     </Item>
     <Item ID="m_menuSaveAs" Key="true">
       <English>Save &amp;As...</English>
-      <Alt ID="inz" Value="Simp&amp;an Sebagai..."></Alt>
-      <Alt ID="sp" Value="Guardar &amp;como..."></Alt>
-      <Alt ID="swh" Value="Hifadhi na &amp;jina hili..."></Alt>
-      <Alt ID="th" Value="บันทึกไว้ที่"></Alt>
     </Item>
     <Item ID="m_menuProperties" Key="true">
       <English>P&amp;roperties...</English>
-      <Alt ID="inz" Value="C&amp;iri-ciri..."></Alt>
-      <Alt ID="sp" Value="&amp;Propiedades..."></Alt>
-      <Alt ID="swh" Value="&amp;Sifa..."></Alt>
-      <Alt ID="th" Value="คุณสมบัติ"></Alt>
     </Item>
     <Item ID="m_menuPrint" Key="true">
       <English>&amp;Print...</English>
-      <Alt ID="inz" Value="&amp;Cetak..."></Alt>
-      <Alt ID="sp" Value="&amp;Imprimir..."></Alt>
-      <Alt ID="swh" Value="&amp;Chapisha..."></Alt>
-      <Alt ID="th" Value="พิมพ์"></Alt>
     </Item>
     <Item ID="m_menuExit" Key="true">
       <English>E&amp;xit</English>
-      <Alt ID="inz" Value="&amp;Keluar"></Alt>
-      <Alt ID="sp" Value="&amp;Salir"></Alt>
-      <Alt ID="swh" Value="&amp;Toka"></Alt>
-      <Alt ID="th" Value="ออก"></Alt>
     </Item>
     <Item ID="m_menuEdit">
       <English>&amp;Edit</English>
       <Info>Main menu item for the Edit submenu, contains the submenu items of Cut, Copy, Paste, etc.</Info>
-      <Alt ID="inz" Value="&amp;Ubah"></Alt>
-      <Alt ID="sp" Value="&amp;Edición"></Alt>
-      <Alt ID="swh" Value="&amp;Hariri"></Alt>
-      <Alt ID="th" Value="แกัไข"></Alt>
     </Item>
     <Item ID="m_menuCut" Key="true">
       <English>Cu&amp;t</English>
       <Key>Ctrl+X</Key>
-      <Alt ID="inz" Value="&amp;Gunting" Key="Ctrl+X"></Alt>
-      <Alt ID="sp" Value="C&amp;ortar"></Alt>
-      <Alt ID="swh" Value="&amp;Kata"></Alt>
-      <Alt ID="th" Value="ตัด"></Alt>
     </Item>
     <Item ID="m_menuCopy" Key="true">
       <English>&amp;Copy</English>
       <Key>Ctrl+C</Key>
-      <Alt ID="inz" Value="&amp;Salin" Key="Ctrl+C"></Alt>
-      <Alt ID="sp" Value="Co&amp;piar"></Alt>
-      <Alt ID="swh" Value="&amp;Nakili"></Alt>
-      <Alt ID="th" Value="คัดลอก"></Alt>
     </Item>
     <Item ID="m_menuPaste" Key="true">
       <English>&amp;Paste</English>
       <Key>Ctrl+V</Key>
-      <Alt ID="inz" Value="&amp;Tempel" Key="Ctrl+V"></Alt>
-      <Alt ID="sp" Value="Pegar"></Alt>
-      <Alt ID="swh" Value="&amp;Bandika"></Alt>
-      <Alt ID="th" Value="วาง"></Alt>
     </Item>
     <Item ID="m_menuNotes">
       <English>&amp;Notes</English>
       <Info>Main menu item for the Notes submenu, contains the submenu items of Insert Note, Delete Note, etc.</Info>
-      <Alt ID="inz" Value="&amp;Catatan"></Alt>
-      <Alt ID="sp" Value="&amp;Notas"></Alt>
-      <Alt ID="swh" Value="&amp;Noti"></Alt>
-      <Alt ID="th" Value="หมายเหตุ"></Alt>
     </Item>
     <Item ID="m_menuNoteGeneral" Key="true">
       <English>Insert General &amp;Note</English>
-      <Alt ID="inz" Value="Catatan &amp;Umum"></Alt>
-      <Alt ID="sp" Value="Insertar Nota General"></Alt>
-      <Alt ID="swh" Value="Ingiza noti"></Alt>
-      <Alt ID="th" Value="ใส่หมายเหตุทั่วไป"></Alt>
     </Item>
     <Item ID="m_menuNoteToDo" Key="true">
       <English>Insert &amp;To Do Note</English>
-      <Alt ID="inz" Value="Untuk &amp;Diperhatikan"></Alt>
-      <Alt ID="sp" Value="Insertar Nota A &amp;Hacer"></Alt>
-      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
-      <Alt ID="th" Value="ใส่และหมายเหตุที่จะทำ"></Alt>
     </Item>
     <Item ID="m_menuNoteOldVersion" Key="true">
       <English>Insert Old &amp;Version Note</English>
-      <Alt ID="inz" Value="&amp;Versi Lama"></Alt>
-      <Alt ID="sp" Value="Insertar Nota Rendición &amp;Alternativa"></Alt>
-      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
-      <Alt ID="th" Value="ใส่หมายเหตุเก่า"></Alt>
     </Item>
     <Item ID="m_menuNoteReason" Key="true">
       <English>Insert &amp;Reason Note</English>
-      <Alt ID="inz" Value="Alasan Untuk &amp;Susunan"></Alt>
-      <Alt ID="sp" Value="Insertar Nota &amp;Razonamiento"></Alt>
-      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
-      <Alt ID="th" Value="ใส่และหมายเหตุของเหตุผล"></Alt>
     </Item>
     <Item ID="m_menuNoteFrontIssue" Key="true">
       <English>Insert &amp;Front Issue Note</English>
-      <Alt ID="inz" Value="&amp;Perihal Terjemahan Acuan"></Alt>
-      <Alt ID="sp" Value="Inserta Nota Editar &amp;Fuente"></Alt>
-      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
-      <Alt ID="th" Value="ใส่และหมายเหตุประเด็นด้านหน้า"></Alt>
     </Item>
     <Item ID="m_menuNoteDefinition" Key="true">
       <English>Insert D&amp;efinition Note</English>
-      <Alt ID="inz" Value="&amp;Arti Kata"></Alt>
-      <Alt ID="sp" Value="Insertar Nota &amp;Definición"></Alt>
-      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
-      <Alt ID="th" Value="ใส่นิยามของหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_menuNoteHintForDaughter" Key="true">
       <English>Insert &amp;Hint for Daughter Note</English>
-      <Alt ID="inz" Value="Bantuan untuk Susun &amp;Konsep"></Alt>
-      <Alt ID="sp" Value="Insertar Nota &amp;Sugerencias Borrador"></Alt>
-      <Alt ID="swh" Value="Ingiza maneno yatakayosaidia kutafsiri"></Alt>
-      <Alt ID="th" Value="ใส่และคำแนะนำหมายเหตุลูกสาว"></Alt>
     </Item>
     <Item ID="m_menuNoteBackTranslation" Key="true">
       <English>Insert &amp;Back Translation Note</English>
-      <Alt ID="inz" Value="Perihal Terjemahan &amp;Balik"></Alt>
-      <Alt ID="sp" Value="Insertar Nota Traducción &amp;Inversa"></Alt>
-      <Alt ID="th" Value="ใส่และแปลหมายเหตุย้อนกลับ"></Alt>
     </Item>
     <Item ID="m_menuNoteAskUNS" Key="true">
       <English>Insert &amp;Ask UNS Note</English>
-      <Alt ID="th" Value="ใส่และขอหมายเหตุยูเอ็นเอส"></Alt>
     </Item>
     <Item ID="m_menuDeleteNote" Key="true">
       <English>&amp;Delete Note...</English>
-      <Alt ID="inz" Value="&amp;Hapus Catatan..."></Alt>
-      <Alt ID="sp" Value="&amp;Cortar Nota..."></Alt>
-      <Alt ID="swh" Value="Futa dondoo..."></Alt>
-      <Alt ID="th" Value="ลบหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_menuGoTo">
       <English>&amp;Go To</English>
       <Info>Main menu item for the GoTo submenu, contains the submenu items of First, Previous, etc.</Info>
-      <Alt ID="inz" Value="&amp;Ke"></Alt>
-      <Alt ID="sp" Value="&amp;Ir a"></Alt>
-      <Alt ID="swh" Value="Nenda &amp;kwa"></Alt>
-      <Alt ID="th" Value="ไปที่"></Alt>
     </Item>
     <Item ID="m_menuFirstSection" Key="true">
       <English>&amp;First Section</English>
-      <Alt ID="inz" Value="&amp;Pertama"></Alt>
-      <Alt ID="sp" Value="Sección &amp;Inicial"></Alt>
-      <Alt ID="swh" Value="Aya ya &amp;kwanza"></Alt>
-      <Alt ID="th" Value="ส่วนแรก"></Alt>
     </Item>
     <Item ID="m_menuPreviousSection" Key="true">
       <English>&amp;Previous Section</English>
       <Key>Ctrl+P</Key>
-      <Alt ID="inz" Value="&amp;Dulu" Key="Ctrl+P"></Alt>
-      <Alt ID="sp" Value="Sección &amp;Anterior"></Alt>
-      <Alt ID="swh" Value="Aya &amp;iliyotangulia"></Alt>
-      <Alt ID="th" Value="ส่วนก่อนหน้า"></Alt>
     </Item>
     <Item ID="m_menuNextSection" Key="true">
       <English>&amp;Next Section</English>
       <Key>Ctrl+N</Key>
-      <Alt ID="inz" Value="&amp;Berikut" Key="Ctrl+N"></Alt>
-      <Alt ID="sp" Value="Sección &amp;Próxima"></Alt>
-      <Alt ID="swh" Value="Aya I&amp;jayo"></Alt>
-      <Alt ID="th" Value="ส่วนต่อไป"></Alt>
     </Item>
     <Item ID="m_menuLastSection" Key="true">
       <English>&amp;Last Section</English>
-      <Alt ID="inz" Value="&amp;Terakhir"></Alt>
-      <Alt ID="sp" Value="Sección &amp;Última"></Alt>
-      <Alt ID="swh" Value="Aya ya &amp;mwisho"></Alt>
-      <Alt ID="th" Value="ส่วนสุดท้าย"></Alt>
     </Item>
     <Item ID="m_menuGoToBook">
       <English>&amp;Book</English>
-      <Alt ID="inz" Value="&amp;Buku"></Alt>
-      <Alt ID="sp" Value="&amp;Libro"></Alt>
-      <Alt ID="swh" Value="&amp;Kitabu"></Alt>
-      <Alt ID="th" Value="หนังสีอ"></Alt>
     </Item>
     <Item ID="m_menuWindow">
       <English>&amp;Window</English>
       <Info>Main menu item for the Window submenu, contains the submenu items of Drafting, BT, etc.</Info>
-      <Alt ID="th" Value="หน้าต่าง"></Alt>
     </Item>
     <Item ID="m_menuShowNotesPane" Key="true">
       <English>&amp;Show &amp;Notes Pane</English>
-      <Alt ID="inz" Value="&amp;Lihat Catatan"></Alt>
-      <Alt ID="sp" Value="&amp;Mostrar Panel de Notas"></Alt>
-      <Alt ID="th" Value="แสดงหน้าต่างหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_menuShowOtherTranslationsPane" Key="true">
       <English>Show &amp;Other Translationss Pane</English>
-      <Alt ID="inz" Value="Membuka kotak untuk Terjemahan Bandingan"></Alt>
-      <Alt ID="th" Value="แสดงหน้าต่างการแปลอื่นๆ"></Alt>
     </Item>
     <Item ID="m_menuDrafting" Key="true">
       <English>&amp;Drafting</English>
-      <Alt ID="inz" Value="&amp;Susun Konsep"></Alt>
-      <Alt ID="sp" Value="&amp;Borrador"></Alt>
-      <Alt ID="swh" Value="&amp;Kuandika insha"></Alt>
-      <Alt ID="th" Value="ฉบับร่าง"></Alt>
     </Item>
     <Item ID="m_menuNaturalnessCheck" Key="true">
       <English>&amp;Naturalness Check</English>
-      <Alt ID="inz" Value="Baca untuk &amp;Kewajaran"></Alt>
-      <Alt ID="sp" Value="Traducción &amp;Natural"></Alt>
-      <Alt ID="swh" Value="K&amp;uchunguza tafsiri ihakikishwe ni asilia"></Alt>
-      <Alt ID="th" Value="เช็คประเภทและลักษณะ"></Alt>
     </Item>
     <Item ID="m_menuBackTranslation" Key="true">
       <English>&amp;Back Translation</English>
-      <Alt ID="inz" Value="Terjemahan &amp;Balik"></Alt>
-      <Alt ID="sp" Value="Traducción &amp;Inversa"></Alt>
-      <Alt ID="swh" Value="&amp;Tafsiri ya kujirudia"></Alt>
-      <Alt ID="th" Value="แปลย้อนกลับ"></Alt>
     </Item>
     <Item ID="m_menuTools">
       <English>&amp;Tools</English>
       <Info>Main menu item for the Tools submenu, contains the submenu items of Options, Setup Features, etc.</Info>
-      <Alt ID="inz" Value="&amp;Alat"></Alt>
-      <Alt ID="sp" Value="&amp;Herramientas"></Alt>
-      <Alt ID="swh" Value="&amp;Vifaa"></Alt>
-      <Alt ID="th" Value="เครื่องมือ"></Alt>
     </Item>
     <Item ID="m_menuOptions" Key="true">
       <English>&amp;Options...</English>
-      <Alt ID="inz" Value="&amp;Pilihan..."></Alt>
-      <Alt ID="sp" Value="&amp;Opciones..."></Alt>
-      <Alt ID="swh" Value="&amp;Machaguo..."></Alt>
-      <Alt ID="th" Value="ทางเลือก"></Alt>
     </Item>
     <Item ID="m_menuIncrementBookStatus" Key="true">
       <English>&amp;Increment Book Status...</English>
-      <Alt ID="inz" Value="&amp;Robah nama file..."></Alt>
-      <Alt ID="sp" Value="&amp;Incrementar Estado del Libro..."></Alt>
-      <Alt ID="swh" Value="&amp;Andika hatua ilivyofikishwa katika kufasiri..."></Alt>
-      <Alt ID="th" Value="สภาพการเพิ่มของหนังสือ"></Alt>
     </Item>
     <Item ID="m_menuCopyBTfromFront" Key="true">
       <English>&amp;Copy BT from Front...</English>
-      <Alt ID="inz" Value="&amp;Kopi Terjemahan Balik dari Terj. Acuan..."></Alt>
-      <Alt ID="sp" Value="&amp;Copiar Traducción Inversa de la Fuente..."></Alt>
-      <Alt ID="swh" Value="&amp;Nakalisha tafsiri ya kujirudia toka tafsiri bora..."></Alt>
-      <Alt ID="th" Value="คัดลอก บีที จากด้านหน้า"></Alt>
     </Item>
     <Item ID="m_menuEntireBook" Key="true">
       <English>Entire &amp;Book</English>
-      <Alt ID="th" Value="หนังสือทั้งหมด"></Alt>
     </Item>
     <Item ID="m_menuCurrentSectionOnly" Key="true">
       <English>Current &amp;Section Only</English>
-      <Alt ID="th" Value="ส่วนปัจจุบันเท่านั้น"></Alt>
     </Item>
     <Item ID="m_menuOnlyShowSectionsThat" Key="true">
       <English>Only &amp;Show Sections that...</English>
-      <Alt ID="th" Value="แสดงส่วนนั้นเท่านั้น"></Alt>
     </Item>
     <Item ID="m_menuRestoreFromBackup" Key="true">
       <English>Restore from &amp;Backup...</English>
-      <Alt ID="inz" Value="File Cadangan &amp;Mengganti File yang Rusak..."></Alt>
-      <Alt ID="sp" Value="&amp;Recuperar de la Copia de Seguridad..."></Alt>
-      <Alt ID="swh" Value="&amp;Rejesha mswada ulivyo toka nakala yake..."></Alt>
-      <Alt ID="th" Value="เอากลับคีนมาจากสำเนาสำรอง"></Alt>
     </Item>
     <Item ID="m_menuSetUpFeatures" Key="true">
       <English>Set Up &amp;Features...</English>
-      <Alt ID="inz" Value="&amp;Setel Proyek..."></Alt>
-      <Alt ID="sp" Value="Escoger &amp;Posibilidades..."></Alt>
-      <Alt ID="swh" Value="Machaguo ya &amp;usanidi..."></Alt>
-      <Alt ID="th" Value="ติดตั้งลักษณะเฉพาะ"></Alt>
     </Item>
     <Item ID="m_menuRunDebugTestSuite" Key="true">
       <English>&amp;Debug Testing</English>
-      <Alt ID="th" Value="เครื่องมีอแก้ไข"></Alt>
     </Item>
     <Item ID="m_menuWriteLanguageDB" Key="true">
       <English>&amp;Write Language DB</English>
-      <Alt ID="th" Value="เขียนภาษาดีบี"></Alt>
     </Item>
     <Item ID="m_menuLocalizerTool" Key="true">
       <English>&amp;Localizer Tool...</English>
-      <Alt ID="th" Value="ข้อจำกัดของเครื่องมือ"></Alt>
     </Item>
     <Item ID="m_menuHelp">
       <English>&amp;Help</English>
       <Info>Main menu item for the Help submenu, contains the submenu items of Topics, About, etc.</Info>
-      <Alt ID="inz" Value="&amp;Tolong"></Alt>
-      <Alt ID="sp" Value="&amp;Ayuda"></Alt>
-      <Alt ID="swh" Value="M&amp;saada"></Alt>
-      <Alt ID="th" Value="ความช่วยเหลือ"></Alt>
     </Item>
     <Item ID="m_menuHelpTopics" Key="true">
       <English>Help &amp;Topics...</English>
-      <Alt ID="inz" Value="Tolong &amp;Mengenai..."></Alt>
-      <Alt ID="sp" Value="&amp;Tópicos de Ayuda..."></Alt>
-      <Alt ID="swh" Value="&amp;Vichwa vya Mswada..."></Alt>
-      <Alt ID="th" Value="ความช่วยเหลือและหัวข้อ"></Alt>
     </Item>
     <Item ID="m_menuAboutOurWord" Key="true">
       <English>&amp;About Our Word!...</English>
-      <Alt ID="inz" Value="&amp;Tentang Sabda Kita!..."></Alt>
-      <Alt ID="sp" Value="&amp;Acerca de Palabra Nuestra..."></Alt>
-      <Alt ID="swh" Value="&amp;Habari juu ya 'Neno Letu'..."></Alt>
-      <Alt ID="th" Value="เกี่ยวกับคำของเรา"></Alt>
     </Item>
   </Group>
-  <Group ID="m_ToolStrip" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button.">
+  <Group ID="m_ToolStrip" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button." Translator="true">
     <Item ID="m_btnExit" Key="true">
       <English>Exit</English>
       <Tip>Exit Our Word</Tip>
-      <Alt ID="inz" Value="Keluar"></Alt>
-      <Alt ID="sp" Value="Salir"></Alt>
-      <Alt ID="swh" Value="Toka"></Alt>
-      <Alt ID="th" Value="ออก"></Alt>
     </Item>
     <Item ID="m_btnProjectSave" Key="true">
       <English>Save</English>
       <Key>Ctrl+S</Key>
       <Tip>Save the current edits to disk file</Tip>
-      <Alt ID="inz" Value="Simpan"></Alt>
-      <Alt ID="sp" Value="Guardar"></Alt>
-      <Alt ID="swh" Value="Hifadhi"></Alt>
-      <Alt ID="th" Value="เก็บไว้"></Alt>
     </Item>
     <Item ID="m_btnEditCut" Key="true">
       <English>Cut</English>
       <Key>Ctrl+X</Key>
-      <Alt ID="inz" Value="Gunting"></Alt>
-      <Alt ID="sp" Value="Cortar"></Alt>
-      <Alt ID="swh" Value="Kata"></Alt>
-      <Alt ID="th" Value="ตัด"></Alt>
     </Item>
     <Item ID="m_btnEditCopy" Key="true">
       <English>Copy</English>
       <Key>Ctrl+C</Key>
-      <Alt ID="inz" Value="Salin"></Alt>
-      <Alt ID="sp" Value="Copiar"></Alt>
-      <Alt ID="swh" Value="Nakili"></Alt>
-      <Alt ID="th" Value="คัดลอก"></Alt>
     </Item>
     <Item ID="m_btnEditPaste" Key="true">
       <English>Paste</English>
       <Key>Ctrl+V</Key>
-      <Alt ID="inz" Value="Tempel"></Alt>
-      <Alt ID="sp" Value="Pegar"></Alt>
-      <Alt ID="swh" Value="Bandika"></Alt>
-      <Alt ID="th" Value="วาง"></Alt>
     </Item>
     <Item ID="m_btnItalic" Key="true">
       <English>Italic</English>
-      <Alt ID="inz" Value="Miring"></Alt>
-      <Alt ID="sp" Value="Itálica"></Alt>
-      <Alt ID="swh" Value="Italiki"></Alt>
-      <Alt ID="th" Value="ตัวเอียง"></Alt>
     </Item>
     <Item ID="m_btnPrint" Key="true">
       <English>Print</English>
       <Key>Ctrl+I</Key>
-      <Alt ID="inz" Value="Cetak"></Alt>
-      <Alt ID="sp" Value="Imprimir"></Alt>
-      <Alt ID="swh" Value="Chapisha"></Alt>
-      <Alt ID="th" Value="พิมพ์"></Alt>
     </Item>
-    <Item ID="m_btnGotoFirstSection" Key="true">
+    <Item ID="m_btnGotoFirstSection" Key="true" Tip="true">
       <English>First Section</English>
       <Tip>Go to the First Section in the book</Tip>
-      <Alt ID="inz" Value="Pertama"></Alt>
-      <Alt ID="sp" Value="Sección Inicial"></Alt>
-      <Alt ID="swh" Value="Aya ya kwanza"></Alt>
-      <Alt ID="th" Value="ส่วนแรก"></Alt>
     </Item>
-    <Item ID="m_btnGotoPreviousSection" Key="true">
+    <Item ID="m_btnGotoPreviousSection" Key="true" Tip="true">
       <English>Previous</English>
       <Key>Ctrl+P</Key>
       <Tip>Go to the Previous Section (or use the down-arrow to bring up a list of previous sections)</Tip>
-      <Alt ID="inz" Value="Dulu"></Alt>
-      <Alt ID="sp" Value="Anterior"></Alt>
-      <Alt ID="swh" Value="Itanguliayo"></Alt>
-      <Alt ID="th" Value="ก่อนหน้า"></Alt>
     </Item>
-    <Item ID="m_btnGotoNextSection" Key="true">
+    <Item ID="m_btnGotoNextSection" Key="true" Tip="true">
       <English>Next</English>
       <Key>Ctrl+N</Key>
       <Tip>Go to the Next Section (or use the down-arrow to bring up a list of following sections)</Tip>
-      <Alt ID="inz" Value="Berikut"></Alt>
-      <Alt ID="sp" Value="Próximo"></Alt>
-      <Alt ID="swh" Value="Ijayo"></Alt>
-      <Alt ID="th" Value="ต่อไป"></Alt>
     </Item>
-    <Item ID="m_btnGotoLastSection" Key="true">
+    <Item ID="m_btnGotoLastSection" Key="true" Tip="true">
       <English>Last Section</English>
       <Tip>Go to the Last Section in the book</Tip>
-      <Alt ID="inz" Value="Terakhir"></Alt>
-      <Alt ID="sp" Value="Sección Última"></Alt>
-      <Alt ID="swh" Value="Aya ya mwisho"></Alt>
-      <Alt ID="th" Value="ส่วนสุดท้าย"></Alt>
     </Item>
-    <Item ID="m_btnGoToBook">
+    <Item ID="m_btnGoToBook" Tip="true">
       <English>Book</English>
       <Tip>Go to a different book</Tip>
-      <Alt ID="inz" Value="Buku"></Alt>
-      <Alt ID="sp" Value="Libro"></Alt>
-      <Alt ID="swh" Value="Kitabu"></Alt>
-      <Alt ID="th" Value="หนังสีอ"></Alt>
     </Item>
-    <Item ID="m_btnDrafting" Key="true">
+    <Item ID="m_btnDrafting" Key="true" Tip="true">
       <English>Drafting</English>
       <Tip>Change to the Drafting Job</Tip>
-      <Alt ID="inz" Value="Susun Konsep"></Alt>
-      <Alt ID="sp" Value="Borrador"></Alt>
-      <Alt ID="swh" Value="Kuandika insha"></Alt>
-      <Alt ID="th" Value="ฉบับร่าง"></Alt>
     </Item>
-    <Item ID="m_btnNaturalnessCheck" Key="true">
+    <Item ID="m_btnNaturalnessCheck" Key="true" Tip="true">
       <English>Naturalness Check</English>
       <Tip>Change to the Naturalness Check Job</Tip>
-      <Alt ID="inz" Value="Baca untuk Kewajaran"></Alt>
-      <Alt ID="sp" Value="Traducción Natural"></Alt>
-      <Alt ID="swh" Value="Kuchunguza tafsiri ihakikishwe ni asilia"></Alt>
-      <Alt ID="th" Value="เช็คประเภทและลักษณะ"></Alt>
     </Item>
-    <Item ID="m_btnBackTranslation" Key="true">
+    <Item ID="m_btnBackTranslation" Key="true" Tip="true">
       <English>Back Translation</English>
       <Tip>Change to the Back Translation Job</Tip>
-      <Alt ID="inz" Value="Terjemahan Balik"></Alt>
-      <Alt ID="sp" Value="Traducción Inversa"></Alt>
-      <Alt ID="swh" Value="Tafsiri ya kujirudia"></Alt>
-      <Alt ID="th" Value="แปลย้อนกลับ"></Alt>
     </Item>
     <Item ID="m_btnNotes">
       <English>Notes</English>
-      <Alt ID="inz" Value="Catatan"></Alt>
-      <Alt ID="sp" Value="Notas"></Alt>
-      <Alt ID="swh" Value="Noti"></Alt>
-      <Alt ID="th" Value="หมายเหตุ"></Alt>
     </Item>
     <Item ID="m_bmShowNotesPane" Key="true">
       <English>&amp;Show Notes Pane</English>
-      <Alt ID="inz" Value="&amp;Lihat Catatan"></Alt>
-      <Alt ID="sp" Value="&amp;Mostrar Panel de Notas"></Alt>
-      <Alt ID="th" Value="แสดงหน้าต่างหมายเหตุ"></Alt>
     </Item>
-    <Item ID="m_btnNoteGeneral" Key="true">
+    <Item ID="m_btnNoteGeneral" Key="true" Tip="true">
       <English>General note</English>
       <Tip>Insert a general note</Tip>
-      <Alt ID="inz" Value="Catatan Umum"></Alt>
-      <Alt ID="sp" Value="Nota General" Tip="Insertar Nota General"></Alt>
-      <Alt ID="swh" Value="Ingiza noti"></Alt>
-      <Alt ID="th" Value="หมายเหตุทั่วไป"></Alt>
     </Item>
-    <Item ID="m_bmNoteGeneral" Key="true">
+    <Item ID="m_bmNoteGeneral" Key="true" Tip="true">
       <English>Insert General &amp;Note</English>
       <Tip>Insert a general note</Tip>
-      <Alt ID="inz" Value="Catatan &amp;Umum"></Alt>
-      <Alt ID="sp" Value="Insertar Nota General" Tip="Insertar Nota General"></Alt>
-      <Alt ID="swh" Value="Ingiza noti"></Alt>
-      <Alt ID="th" Value="ใส่หมายเหตุทั่วไป"></Alt>
     </Item>
-    <Item ID="m_btnNoteToDo" Key="true">
+    <Item ID="m_btnNoteToDo" Key="true" Tip="true">
       <English>To Do note</English>
       <Tip>Insert a To Do note</Tip>
-      <Alt ID="inz" Value="Untuk Diperhatikan"></Alt>
-      <Alt ID="sp" Value="Insertar Nota A Hacer"></Alt>
-      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
-      <Alt ID="th" Value="หมายเหตุที่จะทำ"></Alt>
     </Item>
     <Item ID="m_bmNoteToDo" Key="true">
       <English>Insert &amp;To Do Note</English>
-      <Alt ID="inz" Value="Untuk &amp;Diperhatikan"></Alt>
-      <Alt ID="sp" Value="Insertar Nota A &amp;Hacer"></Alt>
-      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
-      <Alt ID="th" Value="ใส่และหมายเหตุที่จะทำ"></Alt>
     </Item>
-    <Item ID="m_btnNoteAskUNS" Key="true">
+    <Item ID="m_btnNoteAskUNS" Key="true" Tip="true">
       <English>Ask The UNS note</English>
       <Tip>Insert an Ask The UNS note</Tip>
-      <Alt ID="th" Value="ขอหมายเหตุยูเอ็นเอส"></Alt>
     </Item>
-    <Item ID="m_bmNoteAskUNS" Key="true">
+    <Item ID="m_bmNoteAskUNS" Key="true" Tip="true">
       <English>&amp;Ask The UNS note</English>
       <Tip>Insert an Ask The UNS note</Tip>
-      <Alt ID="th" Value="ขอหมายเหตุยูเอ็นเอส"></Alt>
     </Item>
-    <Item ID="m_btnNoteDefinition" Key="true">
+    <Item ID="m_btnNoteDefinition" Key="true" Tip="true">
       <English>Definition note</English>
       <Tip>Insert a Definition note</Tip>
-      <Alt ID="inz" Value="Arti Kata"></Alt>
-      <Alt ID="sp" Value="Insertar NotaDefinición" Tip="Insertar Nota &amp;Definición"></Alt>
-      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
-      <Alt ID="th" Value="นิยามของหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_bmNoteDefinition" Key="true">
       <English>Insert D&amp;efinition Note</English>
-      <Alt ID="inz" Value="&amp;Arti Kata"></Alt>
-      <Alt ID="sp" Value="Insertar Nota &amp;Definición"></Alt>
-      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
-      <Alt ID="th" Value="ใส่นิยามของหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_btnNoteOldVersion" Key="true">
       <English>Old Version note</English>
       <Tip>Insert an Old Version note</Tip>
-      <Alt ID="inz" Value="Versi Lama"></Alt>
-      <Alt ID="sp" Value="Nota Rendición Alternativa" Tip="Insertar Nota Rendición Alternativa"></Alt>
-      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
-      <Alt ID="th" Value="หมายเหตุเก่า"></Alt>
     </Item>
     <Item ID="m_bmNoteOldVersion" Key="true">
       <English>Insert Old &amp;Version Note</English>
-      <Alt ID="inz" Value="&amp;Versi Lama"></Alt>
-      <Alt ID="sp" Value="Insertar Nota Rendición &amp;Alternativa"></Alt>
-      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
-      <Alt ID="th" Value="ใส่หมายเหตุเก่า"></Alt>
     </Item>
     <Item ID="m_btnNoteReason" Key="true">
       <English>Reason note</English>
       <Tip>Insert a Reason note</Tip>
-      <Alt ID="inz" Value="Alasan Untuk Susunan"></Alt>
-      <Alt ID="sp" Value="Nota Razonamiento" Tip="Insertar Nota Razonamiento"></Alt>
-      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
-      <Alt ID="th" Value="หมายเหตุของเหตุผล"></Alt>
     </Item>
     <Item ID="m_bmNoteReason" Key="true">
       <English>Insert &amp;Reason Note</English>
-      <Alt ID="inz" Value="Alasan Untuk &amp;Susunan"></Alt>
-      <Alt ID="sp" Value="Insertar Nota &amp;Razonamiento"></Alt>
-      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
-      <Alt ID="th" Value="ใส่หมายเหตุของเหตุผล"></Alt>
     </Item>
-    <Item ID="m_btnNoteFrontIssue" Key="true">
+    <Item ID="m_btnNoteFrontIssue" Key="true" Tip="true">
       <English>Front Issue note</English>
       <Tip>Insert a Front Issue note</Tip>
-      <Alt ID="inz" Value="Perihal Terjemahan Acuan"></Alt>
-      <Alt ID="sp" Value="Nota Editar Fuente" Tip="Inserta Nota Editar Fuente"></Alt>
-      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
-      <Alt ID="th" Value="หมายเหตุประเด็นด้านหน้า"></Alt>
     </Item>
     <Item ID="m_bmNoteFrontIssue" Key="true">
       <English>Insert &amp;Front Issue Note</English>
-      <Alt ID="inz" Value="&amp;Perihal Terjemahan Acuan"></Alt>
-      <Alt ID="sp" Value="Inserta Nota Editar &amp;Fuente"></Alt>
-      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
-      <Alt ID="th" Value="ใส่และหมายเหตุประเด็นด้านหน้า"></Alt>
     </Item>
     <Item ID="m_btnNoteHintForDaughter" Key="true">
       <English>Hint For Daughter note</English>
       <Tip>Insert a Hint For Daughter note</Tip>
-      <Alt ID="th" Value="คำแนะนำหมายเหตุลูกสาว"></Alt>
     </Item>
-    <Item ID="m_btnNoteBackTranslation" Key="true">
+    <Item ID="m_btnNoteBackTranslation" Key="true" Tip="true">
       <English>Back Translation note</English>
       <Tip>Insert a note about the Back Translation</Tip>
-      <Alt ID="th" Value="แปลหมายเหตุย้อนกลับ"></Alt>
     </Item>
     <Item ID="m_btnDeleteNote" Key="true">
       <English>Delete Note</English>
-      <Alt ID="inz" Value="Hapus Catatan"></Alt>
-      <Alt ID="sp" Value="Cortar Nota"></Alt>
-      <Alt ID="swh" Value="Futa dondoo"></Alt>
-      <Alt ID="th" Value="ลบหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_bmDeleteNote" Key="true">
       <English>&amp;Delete Note</English>
-      <Alt ID="inz" Value="&amp;Hapus Catatan..."></Alt>
-      <Alt ID="sp" Value="&amp;Cortar Nota..."></Alt>
-      <Alt ID="swh" Value="Futa dondoo..."></Alt>
-      <Alt ID="th" Value="ลบหมายเหตุ"></Alt>
     </Item>
     <Item ID="m_bmTools">
       <English>Tools</English>
-      <Alt ID="inz" Value="Alat"></Alt>
-      <Alt ID="sp" Value="Herramientas"></Alt>
-      <Alt ID="swh" Value="Vifaa"></Alt>
-      <Alt ID="th" Value="เครื่องมือ"></Alt>
     </Item>
     <Item ID="m_bmOptions" Key="true">
       <English>Options</English>
-      <Alt ID="inz" Value="Pilihan"></Alt>
-      <Alt ID="sp" Value="Opciones"></Alt>
-      <Alt ID="swh" Value="Machaguo"></Alt>
-      <Alt ID="th" Value="ทางเลือก"></Alt>
     </Item>
     <Item ID="m_bmIncrementBookStatus" Key="true">
       <English>Increment Book Status</English>
-      <Alt ID="inz" Value="Robah nama file"></Alt>
-      <Alt ID="sp" Value="Incrementar Estado del Libro"></Alt>
-      <Alt ID="swh" Value="Andika hatua ilivyofikishwa katika kufasiri"></Alt>
-      <Alt ID="th" Value="สภาพการเพิ่มของหนังสือ"></Alt>
     </Item>
     <Item ID="m_bmRestoreFromBackup" Key="true">
       <English>Restore from Backup</English>
-      <Alt ID="inz" Value="File Cadangan Mengganti File yang Rusak"></Alt>
-      <Alt ID="sp" Value="Recuperar de la Copia de Seguridad"></Alt>
-      <Alt ID="swh" Value="Rejesha mswada ulivyo toka nakala yake"></Alt>
-      <Alt ID="th" Value="เอากลับคีนมาจากสำเนาสำรอง"></Alt>
     </Item>
     <Item ID="m_bmSetUpFeatures" Key="true">
       <English>Set Up Features</English>
-      <Alt ID="inz" Value="&amp;Setel Proyek"></Alt>
-      <Alt ID="sp" Value="Escoger Posibilidades"></Alt>
-      <Alt ID="swh" Value="Machaguo ya usanidi"></Alt>
-      <Alt ID="th" Value="ติดตั้งลักษณะเฉพาะ"></Alt>
     </Item>
     <Item ID="m_bmHelp" Key="true">
       <English>Help</English>
-      <Alt ID="inz" Value="Tolong"></Alt>
-      <Alt ID="sp" Value="Ayuda"></Alt>
-      <Alt ID="swh" Value="Msaada"></Alt>
-      <Alt ID="th" Value="ความช่วยเหลือ"></Alt>
     </Item>
   </Group>
-  <Group ID="Strings" Title="003 - Strings">
+  <Group ID="Strings" Title="003 - Strings" Translator="true">
     <Item ID="kYes">
       <English>Yes</English>
       <Info>A boolean answer to a Yes/No question, e.g., in the Paragraph Settings, there is the property: 'Keep with Next Paragraph', and the answer is 'Yes' or 'No'</Info>
@@ -697,32 +370,23 @@
     <Item ID="NewNote">
       <English>NEW</English>
       <Info>A temporary reference that is displayed when a new note is inserted; until such time that the Scripture Reference can instead be used. Note that this is all in upper case.</Info>
-      <Alt ID="inz" Value="BARU"></Alt>
     </Item>
     <Item ID="TypeHere">
       <English>[Type Here]</English>
       <Info>The flashing cursor to show where text will be entered should the user begin typing.</Info>
-      <Alt ID="inz" Value="[Ketik di sini]"></Alt>
     </Item>
-    <Group ID="GeneralUI" Title="Strings: General UI" Des="These are elements that appear in the main window of the user interface, such as the names of windows.">
+    <Group ID="GeneralUI" Title="Strings: General UI" Des="These are elements that appear in the main window of the user interface, such as the names of windows." Translator="true">
       <Item ID="DraftingWindowName">
         <English>Drafting</English>
         <Info>The title of the Drafting window pane, so that the user knows which task he is doing.</Info>
-        <Alt ID="inz" Value="Susun Konsep"></Alt>
-        <Alt ID="sp" Value="Borrador"></Alt>
-        <Alt ID="swh" Value="Kuandika insha"></Alt>
       </Item>
       <Item ID="DraftingReference">
         <English>{0} to {1}</English>
         <Info>The Scripture Reference that appears in the Drafting window pane titlebar.  Usually it will appear along the lines of 'Spanish to English' In the string, {0} refers to the name of the source translation (e.g., 'Spanish') and {1} refers to the vernacular translation (e.g., 'English'.) Thus you must make certain that your translation has both the {0} and the {1}. </Info>
-        <Alt ID="inz" Value="{0} ke {1}"></Alt>
       </Item>
       <Item ID="BackTranslationWindowName">
         <English>Back Translation</English>
         <Info>The title of the Back Translation window pane, so that the user knows which task he is doing.</Info>
-        <Alt ID="inz" Value="Terjemahan Balik"></Alt>
-        <Alt ID="sp" Value="Traducción Inversa"></Alt>
-        <Alt ID="swh" Value="Tafsiri ya kujirudia"></Alt>
       </Item>
       <Item ID="BackTranslationReference">
         <English>{0}</English>
@@ -743,19 +407,14 @@
       <Item ID="NoFrontDefined">
         <English>(no front defined)</English>
         <Info>A message we display when the source translation is not adequately defined in the settings.</Info>
-        <Alt ID="inz" Value="(komputer belum kenal terjemahan induk)"></Alt>
       </Item>
       <Item ID="NoTargetDefined">
         <English>(no target defined)</English>
         <Info>A message we display when the target translation is not adequately defined in the settings.</Info>
-        <Alt ID="inz" Value="(komputer belum kenal terjemahan sasaran)"></Alt>
       </Item>
       <Item ID="NotesWindowName">
         <English>Notes</English>
         <Info>The title of the Notes tab in the side-window.</Info>
-        <Alt ID="inz" Value="Catatan"></Alt>
-        <Alt ID="sp" Value="Notas"></Alt>
-        <Alt ID="swh" Value="Noti"></Alt>
       </Item>
       <Item ID="TranslationsWindowName">
         <English>Translations</English>
@@ -764,34 +423,28 @@
       <Item ID="NoDataToDisplay">
         <English>(There is no data to display. Use the Project-Properties menu item to set up both a Front and a Target translation.)</English>
         <Info>A message we display when not enough settings have been supplied that we can display anything in the editing window.</Info>
-        <Alt ID="inz" Value="(Tidak ada data yang dapat diperagakan di sini. Gunakanlah daftar File-Ciri-ciri untuk menentukan baik Terjemahan Induk maupun Terjemahan Anak.)"></Alt>
       </Item>
       <Item ID="BrowseForBackupFolderDescr">
         <English>Select the folder where you wish to place your backup files. If possible, this should not be your hard drive. A flash card is ideal; or a floppy drive can also be used.</English>
         <Info>Instructions that are placed in the Browse For Backup Folder Dialog.</Info>
-        <Alt ID="inz" Value="Tunjukkanlah map untuk simpan file cadangan. Sebaiknya HDD jangan ditunjuk (karena, jika HDD rusak, file cadangan tidak bisa diamankan). Yang paling baik adalah sebuah memori 'flash card'. Floppy (A:\) juga bisa ditunjukkan, tetapi perlu diingat bahwa setiap kali Sabda Kita dipakai, floppy disk yang selalu sama perlu dimasukkan ke dalam floppy drive."></Alt>
       </Item>
     </Group>
-    <Group ID="Notes" Title="Notes Support" Des="Currently, these are the text that are inserted for different types of Notes.">
+    <Group ID="Notes" Title="Notes Support" Des="Currently, these are the text that are inserted for different types of Notes." Translator="true">
       <Item ID="ToDoDefault">
         <English>To Do:</English>
         <Info>The text that is inserted at the beginning of a To Do note.</Info>
-        <Alt ID="inz" Value="Diperhatikan:"></Alt>
       </Item>
       <Item ID="FrontDefault">
         <English>Front:</English>
         <Info>The text that is inserted at the beginning of a Front Issue note.</Info>
-        <Alt ID="inz" Value="Terjemahan Induk:"></Alt>
       </Item>
       <Item ID="BackTTranslationDefault">
         <English>BT:</English>
         <Info>The text that is inserted at the beginning of a Back Translation note.</Info>
-        <Alt ID="inz" Value="TB:"></Alt>
       </Item>
       <Item ID="AskUnsDefault">
         <English>Ask UNS:</English>
         <Info>The text that is inserted at the beginning of a Ask UNS note.</Info>
-        <Alt ID="inz" Value="Tanya Responden:"></Alt>
       </Item>
       <Item ID="HintDefault">
         <English>Hint:</English>
@@ -810,41 +463,34 @@
         <Info>The text that is inserted at the beginning of a Exegeteis note.</Info>
       </Item>
     </Group>
-    <Group ID="Files" Title="File Filters and File Operations" Des="These are elements that have to do with opening, browsing, and saving files.">
+    <Group ID="Files" Title="File Filters and File Operations" Des="These are elements that have to do with opening, browsing, and saving files." Translator="false">
       <Item ID="ProjectFileFilter">
         <English>Our Word! Project Files (*.owp)|*.owp</English>
         <Info>This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Project with the OWP extension. It is very important that you only change the English words, leave the rest of the text alone.</Info>
-        <Alt ID="inz" Value="Sabda Kita! File Proyek (*.owp)|*.owp"></Alt>
       </Item>
       <Item ID="TranslationFileFilter">
         <English>Our Word Translation File (*.oTrans)|*.oTrans</English>
         <Info>This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Translation with the OTRANS extension. It is very important that you only change the English words, leave the rest of the text alone.</Info>
-        <Alt ID="inz" Value="abda Kita File Terjemahan (*.oTrans)|*.oTrans"></Alt>
       </Item>
       <Item ID="TeamSettingsFileFilter">
         <English>Our Word Team Settings File (*.owt)|*.owt</English>
         <Info>This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Team Settings with the OWT extension. It is very important that you only change the English words, leave the rest of the text alone.</Info>
-        <Alt ID="inz" Value="Sabda Kita Setelan Tim (*.owt)|*.owt"></Alt>
       </Item>
       <Item ID="DefaultProjectFileName">
         <English>New Project.owp</English>
         <Info>On creating a new project, OurWord will propose this file name (which the user can then change.)</Info>
-        <Alt ID="inz" Value="Proyek Baru.owp"></Alt>
       </Item>
       <Item ID="DefaultTranslationFileName">
         <English>New Translation.oTrans</English>
         <Info>On creating a new translation settings file, OurWord will propose this file name (which the user can then change.)</Info>
-        <Alt ID="inz" Value="Bahasa Baru.oTrans"></Alt>
       </Item>
       <Item ID="SaveTranslationAsTitle">
         <English>Save Translation Definition As</English>
         <Info>This text will appear in the Title of the Save As dialog, when a new translation settings filename is being supplied.</Info>
-        <Alt ID="inz" Value="Simpan Definisi Terjemahan Sebagai"></Alt>
       </Item>
       <Item ID="OpenTranslationDlgTitle">
         <English>Open Translation Definition File</English>
         <Info>This text will appear in the Title of the Open dialog, when an existing translation settings filename is being browsed to.</Info>
-        <Alt ID="inz" Value="Buka File Definisi untuk Terjemahan"></Alt>
       </Item>
       <Item ID="ExportBookSaveAsDlgTitle">
         <English>Enter a filename for export</English>
@@ -857,11 +503,9 @@
       <Item ID="BrowseForBackupFile">
         <English>Browse for Backup File</English>
         <Info>The Browse Button on the RestoreFromBackup dialog launches a standard Windows-supplied dialog to locate the backup file. The only item we can customize on this form is that dialog’s title.</Info>
-        <Alt ID="inz" Value="Mencari file cadangan"></Alt>
-        <Alt ID="sp" Value="Navegar al Archivo de Respaldo"></Alt>
       </Item>
     </Group>
-    <Group ID="Styles" Title="Stylenames" Des="Here you can provide equivalents for various Styles found in the Stylesheet.">
+    <Group ID="Styles" Title="Stylenames" Des="Here you can provide equivalents for various Styles found in the Stylesheet." Translator="false">
       <Item ID="SectionTitle">
         <English>Section Title</English>
         <Info>The title of a section, corresponds to a \s in USFM.</Info>
@@ -874,8 +518,8 @@
         <English>Cross Ref</English>
         <Info>An optional cross reference of a section, corresponds to a \r in USFM.</Info>
       </Item>
-      <Item ID="MainTitle">
-        <English>Main Title</English>
+      <Item ID="BookTitle">
+        <English>Book Title</English>
         <Info>The main title of the book, corresponds to a \mt in USFM.</Info>
       </Item>
       <Item ID="SubTitle">
@@ -892,10 +536,9 @@
       </Item>
     </Group>
   </Group>
-  <Group ID="Messages" Title="004 - Messages">
+  <Group ID="Messages" Title="004 - Messages" Des="These are various error messages that OurWord displays. The vast majority occur during setup. If you see anything enclosed by braces (e.g., {n}, {0}, etc., take care to reproduce these exactly in the error message. The {n} represents a new line, so that the error message does not spread across the entire with of the screen. The numbers ({0}, {1}, etc.,) are substitutions. Thus &quot;You do not have permission to write the file {0}&quot; will become, at runtime, &quot;You do not have permission to write the file MyFile.db.&quot; " Translator="false">
     <Item ID="msgBookIsLocked">
       <English>Please discuss suggested changes or improvements with your team advisor. Further changes to {0} cannot be made directly on this computer.</English>
-      <Alt ID="inz" Value="Usul perbaikan atau perobahan harap dibahas dengan pembina tim. {0} tidak bisa lagi dirobah langsung di komputer ini."></Alt>
     </Item>
     <Item ID="msgBookNeedsFolder">
       <English>Please enter a valid Folder for storing this book's data.</English>
@@ -905,25 +548,22 @@
     </Item>
     <Item ID="msgBookNeedsName">
       <English>Please enter a name for the book, e.g., 'Matthew.'</English>
-      <Alt ID="inz" Value="Masukkan nama untuk buku, misalnya, 'Mateos'"></Alt>
     </Item>
     <Item ID="msgCantInsertNoteHere">
       <English>Notes cannot be inserted for book titles, picture captions or footnotes.</English>
-      <Alt ID="inz" Value="Catatan tidak dapat dimasukkan dalam judul buku, judul gambar atau catatan kaki."></Alt>
     </Item>
     <Item ID="msgConfirmChangeFileLanguage">
       <English>Changing the language has the following effects:{n}1. The stage names will be reset to their 'factory' defaults,{n}2. File names of books will change (over time, as they are saved.){n}{n}Are you sure you wish to change to {0}?</English>
     </Item>
     <Item ID="msgConfirmFileOverwrite">
       <English>The file: {n}    {0}{n}already exists on the disk. Are you sure you want to overwrite it?</English>
-      <Alt ID="inz" Value="File: {n}    {0}{n}sudah ada di disk. Apakah anda sungguh-sungguh ingin menghapus dan menggantikannya?"></Alt>
+      <Info>This error will appear during the Import process, should the user give, as a save file name, a file that already exists on the disk.</Info>
     </Item>
     <Item ID="msgConfirmFrontReplace">
       <English>This will replace {0} as your front translation.{n}{n}Are you sure you want to do this?</English>
     </Item>
     <Item ID="msgConfirmNoteDeletion">
       <English>Are you sure you want to delete the note:{n}  {0}?</English>
-      <Alt ID="inz" Value="Yakin ingin menghapus catatan ini{n}  {0}?"></Alt>
     </Item>
     <Item ID="msgConfirmTargetReplace">
       <English>This will replace {0} as your target translation.{n}{n}Are you sure you want to do this?</English>
@@ -939,14 +579,13 @@
     </Item>
     <Item ID="msgDuplicateBookName">
       <English>The name of the book cannot be identical to the name of another book in this translation.</English>
-      <Alt ID="inz" Value="Nama buku ini tidak boleh persis sama dengan nama buku lain dalam terjemahan ini."></Alt>
     </Item>
     <Item ID="msgDuplicateStagesNotAllowed">
       <English>Translation Stages cannot have duplicate names.</English>
     </Item>
     <Item ID="msgInsufficentSpaceForBackup">
       <English>There was not enough space on drive {0} for the backup.</English>
-      <Alt ID="inz" Value="Tempat kosong di drive {0} tidak cukup untuk file cadangan."></Alt>
+      <Info>Unfortunately, the user will have to clear off files to get around this error message.</Info>
     </Item>
     <Item ID="msgMissingChapterRange">
       <English>Please enter the chapter numbers that you wish to print.</English>
@@ -956,54 +595,46 @@
     </Item>
     <Item ID="msgNeedFloppyForBackup">
       <English>Unable to write backup file: {n}{n}     {0}{n}{n}Please make sure there is something in the drive (e.g., a floppy disk, or flash memory; or whatever is appropriate{n}for the type of drive.{n}{n}Press Yes to try again, or No to cancel the backup.</English>
-      <Alt ID="inz" Value="Gagal menulis arsip cadangan: {n}{n}     {0}{n}{n}Pastikan ada sesuatu dalam drive (misalnya disket, flash memory; atau apa saja yang cocok untuk drive.{n}{n}Tekan Ya untuk coba lagi, atau Tidak untuk meniadakan cadangan."></Alt>
+      <Info>On making a backup, this message anticipates that the backup device is missing, and prompts the user to try again. Take care that {n} and {0} are exactly repeated, as they account for line breaks and filename substitutions (see the above description for Messages.)</Info>
     </Item>
     <Item ID="msgNoFilterMatches">
       <English>There were no sections that matched your criteria.</English>
     </Item>
     <Item ID="msgNoPermissionToWriteFile">
       <English>You do not have system permission to write the file: {n}{n}    {0}.</English>
+      <Info>This error occurs when Windows prevents writing the file, which can be for a variety of reasons (e.g., the file is open in another program.)</Info>
     </Item>
     <Item ID="msgProjectHasNoFront">
       <English>You have not defined a Front Translation for this project. Do you want to now?</English>
-      <Alt ID="inz" Value="Terjemahan Induk belum ditetapkan bagi proyek ini. Ingin tetapkan sekarang?"></Alt>
     </Item>
     <Item ID="msgProjectHasNoTarget">
       <English>You have not defined a Target Translation for this project. Do you want to now?</English>
-      <Alt ID="inz" Value="Terjemahan Anak belum ditetapkan bagi proyek ini. Ingin tetapkan sekarang?"></Alt>
     </Item>
     <Item ID="msgTranslationNeedsAbbrev">
       <English>Please enter an abbreviation for the translation, e.g., 'Ama'.{n}{n}This will be used to create the file name. The 3-letter Ethnologue code{n}is normally used for this abbreviation.</English>
-      <Alt ID="inz" Value="Tolong masukkan singkatan untuk nama bahasa, misalnya, 'Ama'.{n}{n}Biasanya pembina yang tentukannya. Singkatan ini diperlukan untuk membedakan{n}terjemahan ini dari terjemahan yang lain. Singkatan ini juga digunakan oleh {n}komputer untuk tentukan nama file. Jika tidak ada singkatan lain, gunakanlah{n}kode 3-huruf dari Ethnologue yang unik bagi bahasa anda."></Alt>
     </Item>
     <Item ID="msgTranslationNeedsPath">
       <English>Please enter a valid File Name for storing the settings for this translation.</English>
-      <Alt ID="inz" Value="Masukkan Nama File untuk menyimpan perangkat-perangkat untuk terjemahan ini. Perlu sesuai peraturan nama file."></Alt>
     </Item>
     <Item ID="msgTranslationNeedsName">
       <English>Please enter a name for the translation, e.g., 'Spanish.'</English>
-      <Alt ID="inz" Value="Masukkan nama untuk terjemahan, misalnya, 'Melayu Kupang'"></Alt>
     </Item>
     <Item ID="msgUnableToSaveFile">
       <English>Unable to save the file: '{0}.'</English>
-      <Alt ID="inz" Value="Tidak dapat simpan arsip: '{0}.'"></Alt>
     </Item>
     <Item ID="msgVerifyRemoveBook">
       <English>Do you want to remove this book from the translation? (This will not delete the file from the disk; it only removes OurWord's awareness that the book exists.)</English>
-      <Alt ID="inz" Value="Apakah buku ini ingin disembunyikan dari kumpulan terjemahan ini? (File tidak akan dihapus dari komputer; hanya disembunyikan agar Sabda Kita tidak melihat buku itu.)"></Alt>
     </Item>
     <Item ID="msgVerifyRemoveTranslation">
       <English>Do you want to remove this translation from the project? (This will not delete the file from the disk.)</English>
-      <Alt ID="inz" Value="Apakah hendak menyembunyikan terjemahan bahasa ini dari proyek? (Terjemahan tersebut tidak akan dihapus dari komputer.)"></Alt>
     </Item>
     <Item ID="msgVerifyRestore">
       <English>Are you sure you want to replace file: {n}     {0}{n}with backup file: {n}     {1}?</English>
-      <Alt ID="inz" Value="Apakah anda sungguh-sungguh ingin mengganti file: {n}     {0}{n}dengan file cadangan: {n}     {1}?"></Alt>
+      <Info>This message is displayed during the Restore From Backup command, to make certain that the user wants to overwrite his current work with the backup.</Info>
     </Item>
     <Item ID="msgMissingParagraphMarker">
       <English>A verse field was encountered but there was no paragraph marker for the verse to go into.</English>
       <Info>Error message that can occur on reading/importing a book.</Info>
-      <Alt ID="inz" Value="Suatu kode nomor ayat ditemukan, tetapi kode alinea induk untuk ayat tersebut tidak ditemukan."></Alt>
     </Item>
     <Item ID="msgMissingVerseNumber">
       <English>A \\v was encountered but there was no verse number beside it.</English>
@@ -1020,7 +651,6 @@
     <Item ID="msgBadChapterNo">
       <English>Unable to open the file due to a bad Chapter Number field.</English>
       <Info>Error message that can occur on reading/importing a book.</Info>
-      <Alt ID="inz" Value="File tidak bisa dibuka karena gangguan di kode Nomor Fasal"></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarkerForCF">
       <English>A cross-reference field (\\cf) was encountered but there was no paragraph marker for the reference to go into.</English>
@@ -1034,7 +664,7 @@
       <English>OurWord is already running.</English>
       <Info>Error message that is displayed should the user attempt to launch multiple copies of OurWord.</Info>
     </Item>
-    <Group ID="FileStructureMessages" Title="005 - File Structure Messages">
+    <Group ID="FileStructureMessages" Title="005 - File Structure Messages" Translator="false">
       <Item ID="paragraphs">
         <English>Paragraph(s)</English>
       </Item>
@@ -1055,342 +685,209 @@
       </Item>
     </Group>
   </Group>
-  <Group ID="BookNames" Title="006 - Book Names">
+  <Group ID="BookNames" Title="006 - Book Names" Translator="false">
     <Item ID="Genesis">
       <English>Genesis</English>
-      <Alt ID="inz" Value="Kejadian"></Alt>
-      <Alt ID="sp" Value="Génesis"></Alt>
     </Item>
     <Item ID="Exodus">
       <English>Exodus</English>
-      <Alt ID="inz" Value="Keluaran"></Alt>
-      <Alt ID="sp" Value="Éxodo"></Alt>
     </Item>
     <Item ID="Leviticus">
       <English>Leviticus</English>
-      <Alt ID="inz" Value="Imamat"></Alt>
-      <Alt ID="sp" Value="Levítico"></Alt>
     </Item>
     <Item ID="Numbers">
       <English>Numbers</English>
-      <Alt ID="inz" Value="Bilangan"></Alt>
-      <Alt ID="sp" Value="Números"></Alt>
     </Item>
     <Item ID="Deuteronomy">
       <English>Deuteronomy</English>
-      <Alt ID="inz" Value="Ulangan"></Alt>
-      <Alt ID="sp" Value="Deuteronomio"></Alt>
     </Item>
     <Item ID="Joshua">
       <English>Joshua</English>
-      <Alt ID="inz" Value="Yosua"></Alt>
-      <Alt ID="sp" Value="Josué"></Alt>
     </Item>
     <Item ID="Judges">
       <English>Judges</English>
-      <Alt ID="inz" Value="Hakim-Hakim"></Alt>
-      <Alt ID="sp" Value="Jueces"></Alt>
     </Item>
     <Item ID="Ruth">
       <English>Ruth</English>
-      <Alt ID="inz" Value="Rut"></Alt>
-      <Alt ID="sp" Value="Rut"></Alt>
     </Item>
     <Item ID="1 Samuel">
       <English>1 Samuel</English>
-      <Alt ID="inz" Value="1 Samuel"></Alt>
-      <Alt ID="sp" Value="1 Samuel"></Alt>
     </Item>
     <Item ID="2 Samuel">
       <English>2 Samuel</English>
-      <Alt ID="inz" Value="2 Samuel"></Alt>
-      <Alt ID="sp" Value="2 Samuel"></Alt>
     </Item>
     <Item ID="1 Kings">
       <English>1 Kings</English>
-      <Alt ID="inz" Value="1 Raja-Raja"></Alt>
-      <Alt ID="sp" Value="1 Reyes"></Alt>
     </Item>
     <Item ID="2 Kings">
       <English>2 Kings</English>
-      <Alt ID="inz" Value="2 Raja-Raja"></Alt>
-      <Alt ID="sp" Value="2 Reyes"></Alt>
     </Item>
     <Item ID="1 Chronicles">
       <English>1 Chronicles</English>
-      <Alt ID="inz" Value="1 Tawarikh"></Alt>
-      <Alt ID="sp" Value="1 Crónicas"></Alt>
     </Item>
     <Item ID="2 Chronicles">
       <English>2 Chronicles</English>
-      <Alt ID="inz" Value="2 Tawarikh"></Alt>
-      <Alt ID="sp" Value="2 Crónicas"></Alt>
     </Item>
     <Item ID="Ezra">
       <English>Ezra</English>
-      <Alt ID="inz" Value="Ezra"></Alt>
-      <Alt ID="sp" Value="Esdras"></Alt>
     </Item>
     <Item ID="Nehemiah">
       <English>Nehemiah</English>
-      <Alt ID="inz" Value="Nehemia"></Alt>
-      <Alt ID="sp" Value="Nehemías"></Alt>
     </Item>
     <Item ID="Esther">
       <English>Esther</English>
-      <Alt ID="inz" Value="Ester"></Alt>
-      <Alt ID="sp" Value="Ester"></Alt>
     </Item>
     <Item ID="Job">
       <English>Job</English>
-      <Alt ID="inz" Value="Ayub"></Alt>
-      <Alt ID="sp" Value="Job"></Alt>
     </Item>
     <Item ID="Psalms">
       <English>Psalms</English>
-      <Alt ID="inz" Value="Mazmur"></Alt>
-      <Alt ID="sp" Value="Salmos"></Alt>
     </Item>
     <Item ID="Proverbs">
       <English>Proverbs</English>
-      <Alt ID="inz" Value="Amsal"></Alt>
-      <Alt ID="sp" Value="Proverbios"></Alt>
     </Item>
     <Item ID="Ecclesiastes">
       <English>Ecclesiastes</English>
-      <Alt ID="inz" Value="Pengkhotbah"></Alt>
-      <Alt ID="sp" Value="Eclesiastés"></Alt>
     </Item>
     <Item ID="Song of Songs">
       <English>Song of Songs</English>
-      <Alt ID="inz" Value="Kidung Agung"></Alt>
-      <Alt ID="sp" Value="Cantares"></Alt>
     </Item>
     <Item ID="Isaiah">
       <English>Isaiah</English>
-      <Alt ID="inz" Value="Yesaya"></Alt>
-      <Alt ID="sp" Value="Isaías"></Alt>
     </Item>
     <Item ID="Jeremiah">
       <English>Jeremiah</English>
-      <Alt ID="inz" Value="Yeremia"></Alt>
-      <Alt ID="sp" Value="Jeremías"></Alt>
     </Item>
     <Item ID="Lamentations">
       <English>Lamentations</English>
-      <Alt ID="inz" Value="Ratapan"></Alt>
-      <Alt ID="sp" Value="Lamentaciones"></Alt>
     </Item>
     <Item ID="Ezekiel">
       <English>Ezekiel</English>
-      <Alt ID="inz" Value="Yehezkiel"></Alt>
-      <Alt ID="sp" Value="Ezequiel"></Alt>
     </Item>
     <Item ID="Daniel">
       <English>Daniel</English>
-      <Alt ID="inz" Value="Daniel"></Alt>
-      <Alt ID="sp" Value="Daniel"></Alt>
     </Item>
     <Item ID="Hosea">
       <English>Hosea</English>
-      <Alt ID="inz" Value="Hosea"></Alt>
-      <Alt ID="sp" Value="Oseas"></Alt>
     </Item>
     <Item ID="Joel">
       <English>Joel</English>
-      <Alt ID="inz" Value="Yoel"></Alt>
-      <Alt ID="sp" Value="Joel"></Alt>
     </Item>
     <Item ID="Amos">
       <English>Amos</English>
-      <Alt ID="inz" Value="Amos"></Alt>
-      <Alt ID="sp" Value="Amós"></Alt>
     </Item>
     <Item ID="Obadiah">
       <English>Obadiah</English>
-      <Alt ID="inz" Value="Obaja"></Alt>
-      <Alt ID="sp" Value="Abdías"></Alt>
     </Item>
     <Item ID="Jonah">
       <English>Jonah</English>
-      <Alt ID="inz" Value="Yunus"></Alt>
-      <Alt ID="sp" Value="Jonás"></Alt>
     </Item>
     <Item ID="Micah">
       <English>Micah</English>
-      <Alt ID="inz" Value="Mikha"></Alt>
-      <Alt ID="sp" Value="Miqueas"></Alt>
     </Item>
     <Item ID="Nahum">
       <English>Nahum</English>
-      <Alt ID="inz" Value="Nahum"></Alt>
-      <Alt ID="sp" Value="Nahum"></Alt>
     </Item>
     <Item ID="Habakkuk">
       <English>Habakkuk</English>
-      <Alt ID="inz" Value="Habakuk"></Alt>
-      <Alt ID="sp" Value="Habacuc"></Alt>
     </Item>
     <Item ID="Zephaniah,">
       <English>Zephaniah,</English>
-      <Alt ID="inz" Value="Zefanyah,"></Alt>
-      <Alt ID="sp" Value="Sofonías"></Alt>
     </Item>
     <Item ID="Haggai">
       <English>Haggai</English>
-      <Alt ID="inz" Value="Hagai"></Alt>
-      <Alt ID="sp" Value="Hágeo"></Alt>
     </Item>
     <Item ID="Zechariah">
       <English>Zechariah</English>
-      <Alt ID="inz" Value="Zakharia"></Alt>
-      <Alt ID="sp" Value="Zacarías"></Alt>
     </Item>
     <Item ID="Malachi">
       <English>Malachi</English>
-      <Alt ID="inz" Value="Maleakhi"></Alt>
-      <Alt ID="sp" Value="Malaquías"></Alt>
     </Item>
     <Item ID="Matthew">
       <English>Matthew</English>
-      <Alt ID="inz" Value="Matius"></Alt>
-      <Alt ID="sp" Value="Mateo"></Alt>
     </Item>
     <Item ID="Mark">
       <English>Mark</English>
-      <Alt ID="inz" Value="Markus"></Alt>
-      <Alt ID="sp" Value="Marcos"></Alt>
     </Item>
     <Item ID="Luke">
       <English>Luke</English>
-      <Alt ID="inz" Value="Lukas"></Alt>
-      <Alt ID="sp" Value="Lucas"></Alt>
     </Item>
     <Item ID="John">
       <English>John</English>
-      <Alt ID="inz" Value="Yohanes"></Alt>
-      <Alt ID="sp" Value="Juan"></Alt>
     </Item>
     <Item ID="Acts">
       <English>Acts</English>
-      <Alt ID="inz" Value="Kisah Para Rasul"></Alt>
-      <Alt ID="sp" Value="Hechos"></Alt>
     </Item>
     <Item ID="Romans">
       <English>Romans</English>
-      <Alt ID="inz" Value="Roma"></Alt>
-      <Alt ID="sp" Value="Romanos"></Alt>
     </Item>
     <Item ID="1 Corinthians">
       <English>1 Corinthians</English>
-      <Alt ID="inz" Value="1 Korintus"></Alt>
-      <Alt ID="sp" Value="1 Corintios"></Alt>
     </Item>
     <Item ID="2 Corinthians">
       <English>2 Corinthians</English>
-      <Alt ID="inz" Value="2 Korintus"></Alt>
-      <Alt ID="sp" Value="2 Corintios"></Alt>
     </Item>
     <Item ID="Galatians">
       <English>Galatians</English>
-      <Alt ID="inz" Value="Galatia"></Alt>
-      <Alt ID="sp" Value="Gálatas"></Alt>
     </Item>
     <Item ID="Ephesians">
       <English>Ephesians</English>
-      <Alt ID="inz" Value="Efesus"></Alt>
-      <Alt ID="sp" Value="Efesios"></Alt>
     </Item>
     <Item ID="Philippians">
       <English>Philippians</English>
-      <Alt ID="inz" Value="Filipi"></Alt>
-      <Alt ID="sp" Value="Filipenses"></Alt>
     </Item>
     <Item ID="Colossians">
       <English>Colossians</English>
-      <Alt ID="inz" Value="Kolose"></Alt>
-      <Alt ID="sp" Value="Colosenses"></Alt>
     </Item>
     <Item ID="1 Thessalonians">
       <English>1 Thessalonians</English>
-      <Alt ID="inz" Value="1 Tesalonika"></Alt>
-      <Alt ID="sp" Value="1 Tesalonicenses"></Alt>
     </Item>
     <Item ID="2 Thessalonians">
       <English>2 Thessalonians</English>
-      <Alt ID="inz" Value="2 Tesalonika"></Alt>
-      <Alt ID="sp" Value="2 Tesalonicenses"></Alt>
     </Item>
     <Item ID="1 Timothy">
       <English>1 Timothy</English>
-      <Alt ID="inz" Value="1 Timotius"></Alt>
-      <Alt ID="sp" Value="1 Timoteo"></Alt>
     </Item>
     <Item ID="2 Timothy">
       <English>2 Timothy</English>
-      <Alt ID="inz" Value="2 Timotius"></Alt>
-      <Alt ID="sp" Value="2 Timoteo"></Alt>
     </Item>
     <Item ID="Titus">
       <English>Titus</English>
-      <Alt ID="inz" Value="Titus"></Alt>
-      <Alt ID="sp" Value="Tito"></Alt>
     </Item>
     <Item ID="Philemon">
       <English>Philemon</English>
-      <Alt ID="inz" Value="Filemon"></Alt>
-      <Alt ID="sp" Value="Filemón"></Alt>
     </Item>
     <Item ID="Hebrews">
       <English>Hebrews</English>
-      <Alt ID="inz" Value="Ibrani"></Alt>
-      <Alt ID="sp" Value="Hebreos"></Alt>
     </Item>
     <Item ID="James">
       <English>James</English>
-      <Alt ID="inz" Value="Yakobus"></Alt>
-      <Alt ID="sp" Value="Santiago"></Alt>
     </Item>
     <Item ID="1 Peter">
       <English>1 Peter</English>
-      <Alt ID="inz" Value="1 Petrus"></Alt>
-      <Alt ID="sp" Value="1 Pedro"></Alt>
     </Item>
     <Item ID="2 Peter">
       <English>2 Peter</English>
-      <Alt ID="inz" Value="2 Petrus"></Alt>
-      <Alt ID="sp" Value="2 Pedro"></Alt>
     </Item>
     <Item ID="1 John">
       <English>1 John</English>
-      <Alt ID="inz" Value="1 Yohanes"></Alt>
-      <Alt ID="sp" Value="1 Juan"></Alt>
     </Item>
     <Item ID="2 John">
       <English>2 John</English>
-      <Alt ID="inz" Value="2 Yohanes"></Alt>
-      <Alt ID="sp" Value="2 Juan"></Alt>
     </Item>
     <Item ID="3 John">
       <English>3 John</English>
-      <Alt ID="inz" Value="3 Yohanes"></Alt>
-      <Alt ID="sp" Value="3 Juan"></Alt>
     </Item>
     <Item ID="Jude">
       <English>Jude</English>
-      <Alt ID="inz" Value="Yudas"></Alt>
-      <Alt ID="sp" Value="Judas"></Alt>
     </Item>
     <Item ID="Revelation">
       <English>Revelation</English>
-      <Alt ID="inz" Value="Wahyu"></Alt>
-      <Alt ID="sp" Value="Apocalipsis"></Alt>
     </Item>
   </Group>
-  <Group ID="BookAbbrevs" Title="007 - Book Abbreviations" Des="Many languages may prefer to skip this section, and just use the English abbreviations; as these are a common publishing standard. Alternatively, if you wish the file names to be more readable in the local language, then you may wish to provide more meaningful language equivalents for them.">
+  <Group ID="BookAbbrevs" Title="007 - Book Abbreviations" Des="Many languages may prefer to skip this section, and just use the English abbreviations; as these are a common publishing standard. Alternatively, if you wish the file names to be more readable in the local language, then you may wish to provide more meaningful language equivalents for them." Translator="false">
     <Item ID="GEN">
       <English>GEN</English>
-      <Alt ID="inz" Value="KEJ"></Alt>
     </Item>
     <Item ID="EXO">
       <English>EXO</English>
@@ -1508,224 +1005,181 @@
     </Item>
     <Item ID="MAT">
       <English>MAT</English>
-      <Alt ID="inz" Value="MAT"></Alt>
     </Item>
     <Item ID="MRK">
       <English>MRK</English>
-      <Alt ID="inz" Value="MRK"></Alt>
     </Item>
     <Item ID="LUK">
       <English>LUK</English>
-      <Alt ID="inz" Value="LUK"></Alt>
     </Item>
     <Item ID="JHN">
       <English>JHN</English>
-      <Alt ID="inz" Value="YOH"></Alt>
     </Item>
     <Item ID="ACT">
       <English>ACT</English>
-      <Alt ID="inz" Value="KIS"></Alt>
     </Item>
     <Item ID="ROM">
       <English>ROM</English>
-      <Alt ID="inz" Value="ROM"></Alt>
     </Item>
     <Item ID="1CO">
       <English>1CO</English>
-      <Alt ID="inz" Value="1KOR"></Alt>
     </Item>
     <Item ID="2CO">
       <English>2CO</English>
-      <Alt ID="inz" Value="2KOR"></Alt>
     </Item>
     <Item ID="GAL">
       <English>GAL</English>
-      <Alt ID="inz" Value="GAL"></Alt>
     </Item>
     <Item ID="EPH">
       <English>EPH</English>
-      <Alt ID="inz" Value="EFS"></Alt>
     </Item>
     <Item ID="PHP">
       <English>PHP</English>
-      <Alt ID="inz" Value="FLP"></Alt>
     </Item>
     <Item ID="COL">
       <English>COL</English>
-      <Alt ID="inz" Value="KOL"></Alt>
     </Item>
     <Item ID="1TH">
       <English>1TH</English>
-      <Alt ID="inz" Value="1TES"></Alt>
     </Item>
     <Item ID="2TH">
       <English>2TH</English>
-      <Alt ID="inz" Value="2TES"></Alt>
     </Item>
     <Item ID="1TI">
       <English>1TI</English>
-      <Alt ID="inz" Value="1TIM"></Alt>
     </Item>
     <Item ID="2TI">
       <English>2TI</English>
-      <Alt ID="inz" Value="2TIM"></Alt>
     </Item>
     <Item ID="TIT">
       <English>TIT</English>
-      <Alt ID="inz" Value="TIT"></Alt>
     </Item>
     <Item ID="PHM">
       <English>PHM</English>
-      <Alt ID="inz" Value="FLM"></Alt>
     </Item>
     <Item ID="HEB">
       <English>HEB</English>
-      <Alt ID="inz" Value="IBR"></Alt>
     </Item>
     <Item ID="JAS">
       <English>JAS</English>
-      <Alt ID="inz" Value="YAK"></Alt>
     </Item>
     <Item ID="1PE">
       <English>1PE</English>
-      <Alt ID="inz" Value="1PTR"></Alt>
     </Item>
     <Item ID="2PE">
       <English>2PE</English>
-      <Alt ID="inz" Value="2PTR"></Alt>
     </Item>
     <Item ID="1JN">
       <English>1JN</English>
-      <Alt ID="inz" Value="1YOH"></Alt>
     </Item>
     <Item ID="2JN">
       <English>2JN</English>
-      <Alt ID="inz" Value="2YOH"></Alt>
     </Item>
     <Item ID="3JN">
       <English>3JN</English>
-      <Alt ID="inz" Value="3YOH"></Alt>
     </Item>
     <Item ID="JUD">
       <English>JUD</English>
-      <Alt ID="inz" Value="YUD"></Alt>
     </Item>
     <Item ID="REV">
       <English>REV</English>
-      <Alt ID="inz" Value="WHY"></Alt>
     </Item>
   </Group>
-  <Group ID="BookGroupings" Title="008 - Book Groupings" Des="When a larger number of books has been entered into a Project, OurWord will collapse the books in the GoTo-Book menu into a tree structure, so that the user is not faced with a scrolling menu of 66 books. You need to provide the names for these groupings.">
+  <Group ID="BookGroupings" Title="008 - Book Groupings" Des="When a larger number of books has been entered into a Project, OurWord will collapse the books in the GoTo-Book menu into a tree structure, so that the user is not faced with a scrolling menu of 66 books. You need to provide the names for these groupings." Translator="true">
     <Item ID="Pentateuch">
       <English>Pentateuch</English>
-      <Alt ID="inz" Value="Taurat"></Alt>
-      <Alt ID="sp" Value="Pentateuco"></Alt>
     </Item>
     <Item ID="Historical">
       <English>Historical</English>
-      <Alt ID="inz" Value="Sejarah"></Alt>
-      <Alt ID="sp" Value="Historia"></Alt>
     </Item>
     <Item ID="Poetical">
       <English>Poetical</English>
-      <Alt ID="inz" Value="Syair"></Alt>
-      <Alt ID="sp" Value="Poesía"></Alt>
     </Item>
     <Item ID="Prophetic">
       <English>Prophetic</English>
-      <Alt ID="inz" Value="Nabi-nabi"></Alt>
-      <Alt ID="sp" Value="Profecía"></Alt>
     </Item>
     <Item ID="Gospels">
       <English>Gospels</English>
-      <Alt ID="inz" Value="Injil"></Alt>
-      <Alt ID="sp" Value="Evangelios"></Alt>
     </Item>
     <Item ID="PaulineLetters">
       <English>Pauline Letters</English>
-      <Alt ID="inz" Value="Surat-surat Paulus"></Alt>
-      <Alt ID="sp" Value="Cartas Paulinas"></Alt>
     </Item>
     <Item ID="GeneralLetters">
       <English>General Letters</English>
-      <Alt ID="inz" Value="Surat-surat lain"></Alt>
-      <Alt ID="sp" Value="Cartas Generales"></Alt>
     </Item>
   </Group>
-  <Group ID="TranslationStages" Title="009 - Translation Stages">
+  <Group ID="TranslationStages" Title="009 - Translation Stages" Des="These are the stages that a typical book paases through as it goes from Draft to final publication. For each one, there is both a full name (e.g., &quot;Team Check&quot;) and an abbreviation (e.g., &quot;Team&quot;.) The full name appears in the user interface; the abbreviation is used to generate file names." Translator="true">
     <Item ID="abbrevDraft">
       <English>Draft</English>
-      <Alt ID="inz" Value="Konsep"></Alt>
+      <Info>Abbreivation for the Drafting stage.</Info>
     </Item>
     <Item ID="abbrevTeamCheck">
       <English>Team</English>
-      <Alt ID="inz" Value="Tim"></Alt>
+      <Info>Abbreivation for the Team Check stage.</Info>
     </Item>
     <Item ID="abbrevAdvisorCheck">
       <English>Adv</English>
-      <Alt ID="inz" Value="Bina"></Alt>
+      <Info>Abbreivation for the Advisor Check stage.</Info>
     </Item>
     <Item ID="abbrevCommunityCheck">
       <English>Comm</English>
-      <Alt ID="inz" Value="Uji"></Alt>
+      <Info>Abbreivation for the Community Check stage.</Info>
     </Item>
     <Item ID="abbrevBackTranslation">
       <English>BT</English>
-      <Alt ID="inz" Value="BT"></Alt>
+      <Info>Abbreivation for the Back Translation stage.</Info>
     </Item>
     <Item ID="abbrevConsultantCheck">
       <English>Consult</English>
-      <Alt ID="inz" Value="Konsul"></Alt>
+      <Info>Abbreivation for the Consultant Check stage.</Info>
     </Item>
     <Item ID="abbrevFinalForPrinting">
       <English>Final</English>
-      <Alt ID="inz" Value="Final"></Alt>
+      <Info>Abbreivation for the Final for Printing stage.</Info>
     </Item>
     <Item ID="abbrevFinalRevisions">
       <English>Rev</English>
-      <Alt ID="inz" Value="Rev"></Alt>
+      <Info>Abbreivation for the Final Revisions stage.</Info>
     </Item>
     <Item ID="Draft">
       <English>Draft</English>
-      <Alt ID="inz" Value="Konsep"></Alt>
+      <Info>Full name for the Drafting stage.</Info>
     </Item>
     <Item ID="TeamCheck">
       <English>Team Check</English>
-      <Alt ID="inz" Value="Revisi Tim"></Alt>
+      <Info>Full name for the Team Check stage.</Info>
     </Item>
     <Item ID="AdvisorCheck">
       <English>Advisor Check</English>
-      <Alt ID="inz" Value="Revisi dengan Pembina"></Alt>
+      <Info>Full name for the Advisor Check stage.</Info>
     </Item>
     <Item ID="CommunityCheck">
       <English>Community Check</English>
-      <Alt ID="inz" Value="Uji Coba"></Alt>
+      <Info>Full name for the Community Check stage.</Info>
     </Item>
     <Item ID="BackTranslation">
       <English>Back Translation</English>
-      <Alt ID="inz" Value="Terjemahan Balik"></Alt>
+      <Info>Full name for the Back Translation stage.</Info>
     </Item>
     <Item ID="ConsultantCheck">
       <English>Consultant Check</English>
-      <Alt ID="inz" Value="Pemeriksaan Konsultan"></Alt>
+      <Info>Full name for the Consultant Check stage.</Info>
     </Item>
     <Item ID="FinalForPrinting">
       <English>Final for Printing</English>
-      <Alt ID="inz" Value="Final untuk Cetak"></Alt>
+      <Info>Full name for the Final For Printing stage.</Info>
     </Item>
     <Item ID="FinalRevisions">
       <English>Final Revisions</English>
-      <Alt ID="inz" Value="Revision"></Alt>
+      <Info>Full name for the Final Revisions stage.</Info>
     </Item>
   </Group>
-  <Group ID="DialogCommon" Title="100 - Dialog: Common" Des="These are common text that appear on numerous dialogs, such as the OK or Cancel buttons.">
+  <Group ID="DialogCommon" Title="100 - Dialog: Common" Des="These are common text that appear on numerous dialogs, such as the OK or Cancel buttons." Translator="true">
     <Item ID="m_btnBrowse">
       <English>Browse...</English>
-      <Alt ID="inz" Value="Cari..."></Alt>
     </Item>
     <Item ID="m_btnSaveAs">
       <English>Save As...</English>
-      <Alt ID="inz" Value="Simpan sebagai..."></Alt>
     </Item>
     <Item ID="m_btnOK">
       <English>OK</English>
@@ -1735,116 +1189,76 @@
     </Item>
     <Item ID="m_btnCancel">
       <English>Cancel</English>
-      <Alt ID="inz" Value="Batal"></Alt>
-      <Alt ID="sp" Value="Cancelar"></Alt>
     </Item>
     <Item ID="m_btnHelp">
       <English>Help...</English>
-      <Alt ID="inz" Value="Tolong..."></Alt>
-      <Alt ID="sp" Value="Ayuda..."></Alt>
     </Item>
     <Item ID="m_lblProgramName">
       <English>Our Word!</English>
       <Info>cThe name of the Our Word software, which will appear in large font in the splash screen.</Info>
-      <Alt ID="inz" Value="Sabda Kita!"></Alt>
-      <Alt ID="sp" Value="Palabra Nuestra"></Alt>
-      <Alt ID="swh" Value="Neno Letu"></Alt>
-      <Alt ID="th" Value="คำของเรา"></Alt>
     </Item>
     <Item ID="m_lblVersion">
       <English>Version {0}</English>
-      <Alt ID="inz" Value="Versi {0}"></Alt>
-      <Alt ID="sp" Value="Versión {0}"></Alt>
-      <Alt ID="th" Value="เรื่องราว {0}"></Alt>
     </Item>
   </Group>
-  <Group ID="DialogRestoreFromBackup" Title="101 - Dialog: Restore From Backup" Des="Guides the user through the task of restoring a file that was previously backed up under the AutoBackup feature. The user is prompted to supply the name of the file to be backed up, and is given a final 'Are You Sure?' chance to cancel. Invoked via 'Tools-Restore From Backup'">
+  <Group ID="DialogRestoreFromBackup" Title="101 - Dialog: Restore From Backup" Des="Guides the user through the task of restoring a file that was previously backed up under the AutoBackup feature. The user is prompted to supply the name of the file to be backed up, and is given a final 'Are You Sure?' chance to cancel. Invoked via 'Tools-Restore From Backup'" Translator="true">
     <Item ID="Title">
       <English>Restore From Backup</English>
       <Info>Serves both as the (1) Dialog Title and (2) as the Tools menu command that invokes the dialog.</Info>
-      <Alt ID="inz" Value="File Cadangan mengganti File yang rusak"></Alt>
-      <Alt ID="sp" Value="Restaurar del Archivo de Respaldo"></Alt>
     </Item>
     <Item ID="m_lblExplanation">
       <English>This will restore a previous version of the book, replacing the current version. It will overwrite the current version, you will no longer have it on your computer.</English>
       <Info>Serves as an explanation of what this command will do. We want to make certain that the user realizes that he will be replacing if more recent work with older work.</Info>
-      <Alt ID="inz" Value="Tindakan ini akan kembali ke versi buku yang sebelumnya. Jika ini dijalankan, file yang sekarang akan dihapus, dan tidak dapat lagi. File yang dipakai merupakan versi sebelumnya."></Alt>
-      <Alt ID="sp" Value="Éste restaura una versión previa del libro, que borra la versión en vigor. La que está en vigor, desaparecerá de su computadora."></Alt>
     </Item>
     <Item ID="m_lblBook">
       <English>Book to be Restored:</English>
       <Info>Shows the name of the book, which is composed of the Language Name and the Book Name.</Info>
-      <Alt ID="inz" Value="Nama buku yang ingin dibereskan:"></Alt>
-      <Alt ID="sp" Value="Libro para Restaurar:"></Alt>
     </Item>
     <Item ID="m_lblFilename">
       <English>Current Filename:</English>
-      <Alt ID="inz" Value="Nama file yang sekarang:"></Alt>
-      <Alt ID="sp" Value="Archivo en Vigor:"></Alt>
     </Item>
     <Item ID="m_lblRestoreFrom">
       <English>Previously Backed-Up File to be Restored:</English>
       <Info>An extra prompt to make certain the user understands this is the file that will replace his current one.</Info>
-      <Alt ID="inz" Value="Nama File Cadangan yang ingin dipakai:"></Alt>
-      <Alt ID="sp" Value="Archivo de Respaldo que se Sustituye para el Archivo en Vigor:"></Alt>
     </Item>
     <Item ID="m_lblBackupFilename">
       <English>Backup Filename:</English>
       <Info>The filename that will be restored.</Info>
-      <Alt ID="inz" Value="Nama file cadangan:"></Alt>
-      <Alt ID="sp" Value="Archivo de Respaldo:"></Alt>
     </Item>
     <Item ID="m_btnOK">
       <English>Restore</English>
-      <Alt ID="inz" Value="Gantilah"></Alt>
     </Item>
   </Group>
-  <Group ID="DialogSetupFeatures" Title="102 - Dialog: SetupFeatures" Des="Supports the ability to turn features on/off in the user interface. in order to customize the experience for the manner in which an individual will use the software.">
+  <Group ID="DialogSetupFeatures" Title="102 - Dialog: SetupFeatures" Des="Supports the ability to turn features on/off in the user interface. in order to customize the experience for the manner in which an individual will use the software." Translator="false">
     <Item ID="Title">
       <English>Setup Features</English>
-      <Alt ID="inz" Value="Setel Proyek"></Alt>
-      <Alt ID="sp" Value="Selección de Habilidades"></Alt>
     </Item>
     <Item ID="m_btnResetDefaults">
       <English>Reset Defaults</English>
     </Item>
     <Item ID="m_btnPasswordProtect">
       <English>&amp;Password Protect...</English>
-      <Alt ID="inz" Value="Diamankan dengan &amp;Password..."></Alt>
-      <Alt ID="sp" Value="&amp;Contraseña para Restringir Acceso..."></Alt>
     </Item>
     <Item ID="m_btnAllOff">
       <English>All O&amp;ff</English>
-      <Alt ID="inz" Value="Semua O&amp;ff"></Alt>
-      <Alt ID="sp" Value="&amp;Eliminar Todas"></Alt>
     </Item>
     <Item ID="m_btnAllOn">
       <English>All &amp;On</English>
-      <Alt ID="inz" Value="Semua &amp;On"></Alt>
-      <Alt ID="sp" Value="&amp;Poner Todas"></Alt>
     </Item>
     <Item ID="m_box">
       <English>Description</English>
-      <Alt ID="inz" Value="Penjelasan"></Alt>
-      <Alt ID="sp" Value="Descripción"></Alt>
     </Item>
     <Item ID="m_lblDescription">
       <English>(description goes here)</English>
     </Item>
     <Item ID="m_lblInstructions">
       <English>Place a check beside the features you want to turn on in the user interface.</English>
-      <Alt ID="inz" Value="Taruh tanda untuk memilih pilihan yang ingin dipakai."></Alt>
-      <Alt ID="sp" Value="Ponga palomita para cada habilidad de que quiere tener uso en la interfaz del usuario."></Alt>
     </Item>
     <Item ID="fJobBT_CheckBox">
       <English>Back Translation Job</English>
-      <Alt ID="inz" Value="Terjemahan Balik Antar Garis"></Alt>
-      <Alt ID="sp" Value="Tarea de Traducción Inversa"></Alt>
     </Item>
     <Item ID="fJobBT_Description">
       <English>A layout where you can do a Back Translation; that is, where you provide a translation  in the language the consultant understands.</English>
-      <Alt ID="inz" Value="Tampilan di mana Terjemahan Balik Antar garis (kata-demi-kata) dapat dikerjakan."></Alt>
-      <Alt ID="sp" Value="Composición que le permite hacer una Traducción Inversa, es decir, una representacion de su traducción hecha en una lengua que el consultante conoce."></Alt>
     </Item>
     <Item ID="fJobNaturalness_CheckBox">
       <English>Naturalness Check Job</English>
@@ -1854,8 +1268,6 @@
     </Item>
     <Item ID="fProject_CheckBox">
       <English>Project New / Open / etc.</English>
-      <Alt ID="inz" Value="Proyek Baru / Buka / dsb"></Alt>
-      <Alt ID="sp" Value="Proyecto Nuevo / Abrir / etc."></Alt>
     </Item>
     <Item ID="fProject_Description">
       <English>Turn this on if you are working with multiple projects.</English>
@@ -1868,41 +1280,27 @@
     </Item>
     <Item ID="fOptions_CheckBox">
       <English>Tools-Options</English>
-      <Alt ID="inz" Value="Alat-Pilihan"></Alt>
-      <Alt ID="sp" Value="Herramientas-Opciones"></Alt>
     </Item>
     <Item ID="fOptions_Description">
       <English>Allows configuration of various program options. Turn this off for a machine where you have already set up the options, and do not want them to be modified.</English>
-      <Alt ID="inz" Value="Memungkinkan berbagai pilihan program. Matikan bagi sebuah komputer yang sudah diatur, dan tidak ingin dirobah."></Alt>
-      <Alt ID="sp" Value="Permite configurar varias opciones del programa. Desactivar si la máquina tiene las opciones puestas correctamente, y Vd. no quiere que sean modificadas."></Alt>
     </Item>
     <Item ID="fPrint_CheckBox">
       <English>Printing</English>
-      <Alt ID="inz" Value="Cetak"></Alt>
-      <Alt ID="sp" Value="Impresión"></Alt>
     </Item>
     <Item ID="fPrint_Description">
       <English>The book can be formatted and printed.</English>
     </Item>
     <Item ID="fAutoReplace_CheckBox">
       <English>Auto-Replace while typing</English>
-      <Alt ID="inz" Value="Pergantian Otomatis ketika mengetik"></Alt>
-      <Alt ID="sp" Value="AutoSubstitución al entrar datos."></Alt>
     </Item>
     <Item ID="fAutoReplace_Description">
       <English>Setups AutoReplace, whereby when characters are typed, they are replaced with an alternative string. Use this for keyboarding special characters, or for shorthand (e.g., type AB and have it expand to 'Abraham.')</English>
-      <Alt ID="inz" Value="Setel Pergantian Otomatis, sehingga huruf yang diketik diganti langsung dengan urutan alternatif. Gunakan ini waktu mengetik huruf khusus, atau gunakan singkatan (seperti ketik AB dan komputer akan perluas menjadi 'Abraham'.)"></Alt>
-      <Alt ID="sp" Value="Activar AutoSubstitución. Cuando entra uno o más caracteres designados, se substituye otro carácter o secuencia de caracteres. Úsese para caracteres especiales, o para extender abreviaciones (como entra JC y aparece Jesucristo)."></Alt>
     </Item>
     <Item ID="fRestoreBackup_CheckBox">
       <English>Restore Backed-up Files</English>
-      <Alt ID="inz" Value="File Cadangan dikembalikan menjadi File Induk"></Alt>
-      <Alt ID="sp" Value="Restaurar archivos de respaldo"></Alt>
     </Item>
     <Item ID="fRestoreBackup_Description">
       <English>Files can be automatically backed up (via the Tools-Options command) to a flash card or other storage device. If you turn on this Restore feature, the Tools menu will provide access to a dialog by which the current file can be replaced by a previously stored backup.</English>
-      <Alt ID="inz" Value="File-file dapat diamankan secara otomat di 'flash card' ataupun drive yang lain (dengan menggunakan perintah Alat-Pilihan). Jika anda memilih kemungkinan 'File Cadangan dikembalikan menjadi File Induk' ini, daftar Alat akan membuka sebuah kotak. Dengan mengisi tanya-jawab di situ, file yang sekarang dapat diganti dengan sebuah file cadangan yang telah disimpan sebelumnya."></Alt>
-      <Alt ID="sp" Value="Se guardan archivos de respaldo en una tarjeta flash o memoria externa (a través de Herramientas-Opciones). Activando la restauración, el menú Herramientas añade un diálogo mediante el cual puede substituir el contenido de un archivo de respaldo por el archivo en vigor."></Alt>
     </Item>
     <Item ID="fCopyBTfromFront_CheckBox">
       <English>Copy the BT from the Front Translation</English>
@@ -1912,61 +1310,43 @@
     </Item>
     <Item ID="fFilter_CheckBox">
       <English>Only show Sections that have (Filter)</English>
-      <Alt ID="sp" Value="Mostrar únicamente Secciones con (Filtro)"></Alt>
     </Item>
     <Item ID="fFilter_Description">
       <English>The 'Go To' Menu (e.g., Next, Previous commands) will only go to those sections which match certain criteria. E.g., they must have a certain word defined, or must have mismatched quotes. This can be a good way to locate errors, or To Do Notes.</English>
-      <Alt ID="sp" Value="En el Menú «Ir a», las instrucciones Próximo y Anterior irán únicamente a las secciones que llenan ciertos requisitos, tales como contener ciertas palabra, o contener comillas no emparejadas. Es una manera útil para localizar errores o Notas a Hacer."></Alt>
     </Item>
     <Item ID="fJustTheBasics_CheckBox">
       <English>Just the Basics</English>
-      <Alt ID="inz" Value="Tugas Dasar Saja"></Alt>
-      <Alt ID="sp" Value="Sólo lo Básico"></Alt>
     </Item>
     <Item ID="fJustTheBasics_Description">
       <English>Designed for newer computer users, this feature sets up the user interface to support a very basic level of work, turning off many of the features. The menu is hidden, and in its place the toolbar buttons show descriptive text in addition to their pictures. Users only need to be familiar with about a dozen commands.</English>
-      <Alt ID="inz" Value="Ciri ini ditujukan kepada pemakai komputer baru. Ini dipilih untuk menyetel komputer agar hanya fungsi-fungsi dasar diperlihatkan untuk menggunakan komputer secara sederhana. Daftar menu disembunyikan. Untuk menggantinya, tombol-tombol besar muncul bersama fungsi masing-masing (dengan gambar bersama kata). Pengguna komputer dasar hanya perlu menguasai sekitar sepuluh fungsi dasar."></Alt>
-      <Alt ID="sp" Value="Para usuarios sin experience con computadoras, PalabraNuestra tiene un interfaz que permite un nivel básico da trabajo. Reemplaza al menú con una serie de botones, con dibujos y texto descriptivo. El principiante no tiene que aprender más de una docena de instrucciones."></Alt>
     </Item>
     <Item ID="m_checkListFeatures">
       <English>Just the Basics</English>
     </Item>
   </Group>
-  <Group ID="DialogPasswordProtect" Title="103 - Dialog: Password Protect">
+  <Group ID="DialogPasswordProtect" Title="103 - Dialog: Password Protect" Translator="false">
     <Item ID="Title">
       <English>Password Protect</English>
-      <Alt ID="inz" Value="Diamankan dengan Password"></Alt>
-      <Alt ID="sp" Value="Proteger con Contraseña"></Alt>
     </Item>
     <Item ID="m_lblHelps">
       <English>(Take care to remember this password. E.g., Upper vs. lower case is significant.)</English>
-      <Alt ID="inz" Value="Hati-hatilah, agar Password yang persis jangan dilupakan (Mis. huruf besar dibedakan dari huruf kecil.)"></Alt>
-      <Alt ID="sp" Value="¡Tenga cuidado de no olvidar toda esta contraseña! (Por ejemplo, mayúsculas y minúsculas se tratan como diferentes.)"></Alt>
     </Item>
     <Item ID="m_lblPassword">
       <English>Enter a password:</English>
-      <Alt ID="inz" Value="Masukkan Password:"></Alt>
-      <Alt ID="sp" Value="Entrar contraseña:"></Alt>
     </Item>
     <Item ID="m_checkProtect">
       <English>Password protect the 'Setup Features' dialog?</English>
-      <Alt ID="inz" Value="Maukah Proyek anda diamankan dengan Password?"></Alt>
-      <Alt ID="sp" Value="Contraseña para Restringir Acceso a la Selección de Habilidades"></Alt>
     </Item>
   </Group>
-  <Group ID="DialogPassword" Title="104 - Dialog: Password">
+  <Group ID="DialogPassword" Title="104 - Dialog: Password" Translator="false">
     <Item ID="Title">
       <English>Password</English>
-      <Alt ID="inz" Value="Password"></Alt>
-      <Alt ID="sp" Value="Contraseña"></Alt>
     </Item>
     <Item ID="m_lblPrompt">
       <English>Please enter your password to access the 'Setup Features' dialog.</English>
-      <Alt ID="inz" Value="Harap mengetik Password anda di sini untuk membuka kotak yang digunakan untuk merobah 'Setel Proyek.'"></Alt>
-      <Alt ID="sp" Value="Entrar su contraseña para Selección de Habilidades."></Alt>
     </Item>
   </Group>
-  <Group ID="DialogBookNames" Title="105 - Dialog: Book Names">
+  <Group ID="DialogBookNames" Title="105 - Dialog: Book Names" Translator="false">
     <Item ID="Title">
       <English>Edit Book Names</English>
     </Item>
@@ -1980,84 +1360,56 @@
       <English>Enter the names of books in your language. These will be used to automatically generate cross references and parallel passage references.</English>
     </Item>
   </Group>
-  <Group ID="DialogPrint" Title="106 - Dialog: Print">
+  <Group ID="DialogPrint" Title="106 - Dialog: Print" Translator="true">
     <Item ID="Title">
       <English>Print</English>
-      <Alt ID="sp" Value="Impresión"></Alt>
-      <Alt ID="th" Value="พิมพ์"></Alt>
+      <Info>The title of the dialog.</Info>
     </Item>
     <Item ID="m_lblPrinter">
       <English>Printer:</English>
-      <Alt ID="sp" Value="Impresora:"></Alt>
-      <Alt ID="th" Value="เครื่องพิมพ์"></Alt>
     </Item>
     <Item ID="m_groupRange">
       <English>Range</English>
-      <Alt ID="sp" Value="Alcance"></Alt>
-      <Alt ID="th" Value="ขอบเขต"></Alt>
     </Item>
     <Item ID="m_radioEntireBook">
       <English>Entire Book</English>
-      <Alt ID="sp" Value="Libro Entero"></Alt>
-      <Alt ID="th" Value="หนังสือทั้งหมด"></Alt>
     </Item>
     <Item ID="m_radioThisSection">
       <English>Current Section</English>
-      <Alt ID="sp" Value="Sección en Vigor"></Alt>
-      <Alt ID="th" Value="ส่วนปัจจุบัน"></Alt>
     </Item>
     <Item ID="m_radioPages">
       <English>Pages:</English>
-      <Alt ID="sp" Value="Páginas:"></Alt>
-      <Alt ID="th" Value="หน้า"></Alt>
     </Item>
     <Item ID="m_labelToPage">
       <English>to</English>
-      <Alt ID="sp" Value="a"></Alt>
-      <Alt ID="th" Value="ถึง"></Alt>
     </Item>
     <Item ID="m_radioChapters">
       <English>Chapters:</English>
-      <Alt ID="sp" Value="Capítulos:"></Alt>
-      <Alt ID="th" Value="บท"></Alt>
     </Item>
     <Item ID="m_labelToChapter">
       <English>to</English>
-      <Alt ID="sp" Value="a"></Alt>
-      <Alt ID="th" Value="ถึง"></Alt>
     </Item>
     <Item ID="m_groupOptions">
       <English>Options</English>
-      <Alt ID="sp" Value="Elecciones"></Alt>
-      <Alt ID="th" Value="ทางเลือก"></Alt>
     </Item>
     <Item ID="m_checkWaterMark">
       <English>Print Background Watermark (e.g., “Draft”)</English>
-      <Alt ID="sp" Value="Imprimir Marca de Agua Sobre el Fondo (p.ej. «Borrador»)"></Alt>
-      <Alt ID="th" Value="พิมพ์ลายน้ำพื้นหลัง"></Alt>
     </Item>
     <Item ID="m_checkReplacements">
       <English>Make substitutions (e.g., &lt;&lt;Hi&gt;&gt; becomes 'Hi') ?</English>
-      <Alt ID="sp" Value="Sustituir (p.ej. &lt;&lt;Saludos&gt;&gt; se convierte en «Saludos»)"></Alt>
-      <Alt ID="th" Value="สร้างตัวแทน"></Alt>
     </Item>
     <Item ID="m_checkPrintPictures">
       <English>Print Pictures?</English>
-      <Alt ID="sp" Value="¿Imprimir Dibujos?"></Alt>
-      <Alt ID="th" Value="พิมพ์รูปภาพ"></Alt>
     </Item>
     <Item ID="m_labelLineSpacing">
       <English>Line Spacing:</English>
-      <Alt ID="sp" Value="Espaciado Interlineal:"></Alt>
-      <Alt ID="th" Value="การเว้นช่องของเส้น"></Alt>
     </Item>
     <Item ID="m_btnOK">
       <English>Print</English>
-      <Alt ID="sp" Value="Impresión"></Alt>
-      <Alt ID="th" Value="พิมพ์"></Alt>
+      <Info>The Print button</Info>
     </Item>
   </Group>
-  <Group ID="DialogOpenTranslation" Title="107 - DialogOpenTranslation">
+  <Group ID="DialogOpenTranslation" Title="107 - Dialog: OpenTranslation" Translator="false">
     <Item ID="Title">
       <English>Open Translation</English>
     </Item>
@@ -2071,7 +1423,7 @@
       <English>Navigate to the file where the settings are stored. The file name usually contains the name of the language, e.g., </English>
     </Item>
   </Group>
-  <Group ID="DialiogCreateTranslation" Title="108 - Dialiog: CreateTranslation">
+  <Group ID="DialiogCreateTranslation" Title="108 - Dialiog: CreateTranslation" Translator="false">
     <Item ID="Title">
       <English>Create Translation</English>
     </Item>
@@ -2097,7 +1449,7 @@
       <English>Translation Name:</English>
     </Item>
   </Group>
-  <Group ID="DialogCopyBTConflict" Title="109 - Dialog: Resolve Conflict on Copy BT From Front">
+  <Group ID="DialogCopyBTConflict" Title="109 - Dialog: Resolve Conflict on Copy BT From Front" Translator="false">
     <Item ID="Title">
       <English>Copying the Back Translation from the Front Translation</English>
     </Item>
@@ -2129,29 +1481,21 @@
       <English>Proposed Back Translation</English>
     </Item>
   </Group>
-  <Group ID="DialogHelpAbout" Title="110 - Dialog: HelpAbout">
+  <Group ID="DialogHelpAbout" Title="110 - Dialog: HelpAbout" Translator="true">
     <Item ID="Title">
       <English>About Our Word!</English>
-      <Alt ID="inz" Value="Tentang Sabda Kita"></Alt>
-      <Alt ID="sp" Value="Acerca de Palabra Nuestra"></Alt>
     </Item>
     <Item ID="m_lblCopyright">
       <English>Copyright © 2004-08 John Wimbish. All rights reserved.</English>
-      <Alt ID="inz" Value="Hak cipta © 2004-08 John Wimbish. Hak cipta dilindungi undang-undang."></Alt>
-      <Alt ID="sp" Value="Derechos reservados conforme a la ley, 2004-08. Se reservan todos los derechos."></Alt>
     </Item>
     <Item ID="m_link">
       <English>Send Email</English>
-      <Alt ID="inz" Value="Kirim Email"></Alt>
-      <Alt ID="sp" Value="Iniciar Correo Electrónico"></Alt>
     </Item>
     <Item ID="m_lblDescription">
       <English>A program which assists Mother-Tongue Bible Translators and their supporting team, who are making use of a quality Front Translation.</English>
-      <Alt ID="inz" Value="Sebuah program yang memberdayakan penerjemah Alkitab di daerah yang menggunakan sebuah Terjemahan Induk yang bermutu, dan mempunyai hubungan dengan seorang pembina yang diakui."></Alt>
-      <Alt ID="sp" Value="Programa que ayuda a los traductores de la Biblia a su propia lengua meterna, y a su equipo de auxiliares, que hacen uso de una Traducción Fuente de alta calidad"></Alt>
     </Item>
   </Group>
-  <Group ID="DialogRepairImportBook" Title="111 - DialogRepairImportBook">
+  <Group ID="DialogRepairImportBook" Title="111 - DialogRepairImportBook" Translator="false">
     <Item ID="Title">
       <English>Error on attempt to read book</English>
     </Item>
@@ -2171,15 +1515,18 @@
       <English>If you do not fix the error, {0} will be removed from the {1} properties.{n}{n} Are you sure you want to cancel reading the book?</English>
     </Item>
   </Group>
-  <Group ID="DialogFilter" Title="112 - DialogFilter">
+  <Group ID="DialogFilter" Title="112 - DialogFilter" Des="The &quot;Only Show Sections That&quot; is the filter dialog, used to restrict the Go To menu to a subset of sections that match the filter criteria." Translator="true">
     <Item ID="Title">
       <English>Only Show Sections That</English>
+      <Info>The title of the dialog, this should be the same as the menu command.</Info>
     </Item>
     <Item ID="m_labelHeading">
       <English>Only show those sections that have....</English>
+      <Info>The header inside the dialog</Info>
     </Item>
     <Item ID="m_groupWordOrPhrase">
       <English>A Word or Phrase</English>
+      <Info>Group title for those filters which compare a text string. Following are the check boxes in this section:</Info>
     </Item>
     <Item ID="m_labelInTheVernacular">
       <English>...In the Vernacular:</English>
@@ -2192,6 +1539,7 @@
     </Item>
     <Item ID="m_groupNote">
       <English>A Note of type:</English>
+      <Info>Group title for those filters which look for sections that have a gven type of note. Check boxes are To Do, and Ask UNS</Info>
     </Item>
     <Item ID="m_checkNoteToDo">
       <English>To Do</English>
@@ -2201,6 +1549,7 @@
     </Item>
     <Item ID="m_groupProblems">
       <English>Possible Problems:</English>
+      <Info>Group title for those filters which look for problem areas. Checkboxes are Untranslated Text, Mismatched Quotes, Punctuation Problem, and Picture Cannot be Located on Disk.</Info>
     </Item>
     <Item ID="m_checkPunctuationProblem">
       <English>Punctuation Problem</English>
@@ -2216,6 +1565,7 @@
     </Item>
     <Item ID="m_groupStructure">
       <English>Structure</English>
+      <Info>Group title for those filters which look at styles, paragraph structure, etc. Check boxes are (1) A Picture with a Caption, and (2) A Quote Paragraph.</Info>
     </Item>
     <Item ID="m_checkPictureWithCaption">
       <English>A picture with a caption</English>
@@ -2225,6 +1575,7 @@
     </Item>
     <Item ID="m_labelQualifies">
       <English>The Section qualifies if:</English>
+      <Info>The label beside the combo box, by which the user chooses options for either being satisfied if just one filter matches, or requiring all checked options to match. Options for the combo are: &quot;Any One of These are True&quot; and &quot;All of These are True.&amp;quot;</Info>
     </Item>
     <Item ID="strAnyOneOfThese">
       <English>Any One of These are True</English>
@@ -2239,10 +1590,9 @@
       <English>Turn Off</English>
     </Item>
   </Group>
-  <Group ID="DialogProperties" Title="113 - Dialog: Properties">
+  <Group ID="DialogProperties" Title="113 - Dialog: Properties" Translator="false">
     <Item ID="Title">
       <English>Project Properties</English>
-      <Alt ID="inz" Value="Ciri-ciri Proyek"></Alt>
     </Item>
     <Item ID="strTitleWithLanguageName">
       <English>{0} Project Properties</English>
@@ -2259,7 +1609,7 @@
     <Item ID="m_btnNavEssentials">
       <English>Essentials</English>
     </Item>
-    <Group ID="DlgProperties_Page_StyleSheet" Title="Properties Dialog: StyleSheet Page" Des="This is the Writing Systems properties page within the Properties dialog. Many of the controls start with 'prop', e.g., 'propFontName'. These are small labels that appear beside the setting to be changed. There is always a corresponding ToolTip in these cases, by which you should provide some additional helpful information to the user.">
+    <Group ID="DialogProperties_Page_StyleSheet" Title="Properties Dialog: StyleSheet Page" Des="This is the Writing Systems properties page within the Properties dialog. Many of the controls start with 'prop', e.g., 'propFontName'. These are small labels that appear beside the setting to be changed. There is always a corresponding ToolTip in these cases, by which you should provide some additional helpful information to the user." Translator="false">
       <Item ID="m_labelStyleSheet">
         <English>Style Sheet:</English>
       </Item>
@@ -2359,7 +1709,7 @@
         <English>Styles</English>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_WritingSystems" Title="Properties Dialog: Writing Systems page" Des="This is the Writing Systems properties page within the Properties dialog. Many of the controls start with 'prop', e.g., 'propFontName'. These are small labels that appear beside the setting to be changed. There is often a corresponding ToolTip, by which you should provide some additional helpful information to the user.">
+    <Group ID="DialogProperties_Page_WritingSystems" Title="Properties Dialog: Writing Systems page" Des="This is the Writing Systems properties page within the Properties dialog. Many of the controls start with 'prop', e.g., 'propFontName'. These are small labels that appear beside the setting to be changed. There is often a corresponding ToolTip, by which you should provide some additional helpful information to the user." Translator="false">
       <Item ID="m_btnRemove">
         <English>Remove...</English>
       </Item>
@@ -2377,7 +1727,6 @@
       </Item>
       <Item ID="m_tabWSAutoReplace">
         <English>AutoReplace</English>
-        <Alt ID="inz" Value="Ganti secara Otomat"></Alt>
       </Item>
       <Item ID="propName">
         <English>Name</English>
@@ -2392,7 +1741,7 @@
         <Tip>A list of punctuation that can occur at the end of a sentence.</Tip>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_AdvancedPrintOptions" Title="Properties Dialog: Advanced Print Options Page">
+    <Group ID="DialogProperties_Page_AdvancedPrintOptions" Title="Properties Dialog: Advanced Print Options Page" Translator="false">
       <Item ID="m_labelTitle">
         <English>Advanced Printing Options</English>
       </Item>
@@ -2405,7 +1754,7 @@
       </Item>
       <Item ID="propOddCenter">
         <English>Center</English>
-        <Tip>>What do you want to print at the bottom center of odd-numbered pages?</Tip>
+        <Tip>What do you want to print at the bottom center of odd-numbered pages?</Tip>
       </Item>
       <Item ID="propOddRight">
         <English>Right</English>
@@ -2449,7 +1798,7 @@
         <English>Language, Stage and Date</English>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_TeamSettings" Title="Properties Dialog: TeamSettings General Page">
+    <Group ID="DialogProperties_Page_TeamSettings" Title="Properties Dialog: TeamSettings General Page" Translator="false">
       <Item ID="m_lblCreateNew">
         <English>Provide the filename under which you wish to store this project's team settings.</English>
       </Item>
@@ -2477,7 +1826,7 @@
         <Info>This is the name of the groupbox (the box drawn arounod all of these controls.)</Info>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_TranslationStages" Title="Properties Dialog: Translation Stages Page">
+    <Group ID="DialogProperties_Page_TranslationStages" Title="Properties Dialog: Translation Stages Page" Translator="false">
       <Item ID="m_labelStagesTitle">
         <English>Stages in the Translation Process:</English>
       </Item>
@@ -2515,7 +1864,7 @@
         <English>Full Name</English>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_OtherTranslations" Title="Properties Dialog: Other Translations Page">
+    <Group ID="DialogProperties_Page_OtherTranslations" Title="Properties Dialog: Other Translations Page" Translator="false">
       <Item ID="m_lblSetup">
         <English>A Reference Translation is another translation that you may want to view during the translation process.</English>
       </Item>
@@ -2544,7 +1893,7 @@
         <English>Remove the selected translation from the list above. This does not remove the settings file from the disk; it only removes it from this project.</English>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_SetupFT" Title="Properties Dialog: SetupFT Page">
+    <Group ID="DialogProperties_Page_SetupFT" Title="Properties Dialog: SetupFT Page" Translator="false">
       <Item ID="m_lblActions">
         <English>Available Actions:</English>
       </Item>
@@ -2555,7 +1904,7 @@
         <English>Create New...</English>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_Translation" Title="Properties Dialog: Individual Translation Page">
+    <Group ID="DialogProperties_Page_Translation" Title="Properties Dialog: Individual Translation Page" Translator="false">
       <Item ID="m_tabGeneral">
         <English>General</English>
       </Item>
@@ -2608,18 +1957,16 @@
       <Item ID="propWSVernacular">
         <English>Writing System for Vernacular Text</English>
         <Tip>The Writing System for the translation, you define these under Team Settings.</Tip>
-        <Alt ID="inz" Value="Untuk Terjemahan"></Alt>
       </Item>
       <Item ID="propWSAdvisor">
         <English>Writing System for Advisor Text</English>
         <Tip>The Writing System for advisor or consultant text (e.g., the back translation), you define these under Team Settings.</Tip>
-        <Alt ID="inz" Value="Bagi Pembina / Kunsultan"></Alt>
       </Item>
       <Item ID="m_listviewBooks_col2">
         <English>Filename</English>
       </Item>
     </Group>
-    <Group ID="DlgProperties_Page_Options" Title="Properties Dialog: Options Page">
+    <Group ID="DialogProperties_Page_Options" Title="Properties Dialog: Options Page" Translator="false">
       <Item ID="propMaximizeWindowOnStartup">
         <English>Maxmimize Window on Startup?</English>
         <Tip>If Yes, OurWord starts up maximized. This may help newer users to have sufficient size on the screen for doing work.</Tip>
@@ -2684,7 +2031,7 @@
       </Item>
     </Group>
   </Group>
-  <Group ID="WizImportBook" Title="200 - Wizard: Import a Book">
+  <Group ID="WizImportBook" Title="200 - Wizard: Import a Book" Translator="false">
     <Item ID="Title">
       <English>Import a Scripture Book</English>
     </Item>
@@ -2697,7 +2044,7 @@
     <Item ID="m_btnNext">
       <English>Next</English>
     </Item>
-    <Group ID="WizImportBook_WizPage_GetFileName" Title="WizImportBook: GetFileName Page">
+    <Group ID="WizImportBook_WizPage_GetFileName" Title="WizImportBook: GetFileName Page" Translator="false">
       <Item ID="strNavTitle">
         <English>Get the Filename</English>
       </Item>
@@ -2735,7 +2082,7 @@
         <English>Choose the file you wish to import</English>
       </Item>
     </Group>
-    <Group ID="WizImportBook_WizPage_GetAbbreviation" Title="WizImportBook: GetAbbreviation Page">
+    <Group ID="WizImportBook_WizPage_GetAbbreviation" Title="WizImportBook: GetAbbreviation Page" Translator="false">
       <Item ID="strNavTitle">
         <English>Identify the Book</English>
       </Item>
@@ -2752,7 +2099,7 @@
         <English>Which book are you importing?</English>
       </Item>
     </Group>
-    <Group ID="WizImportBook_WizPage_GetStage" Title="WizImportBook: GetStage Page">
+    <Group ID="WizImportBook_WizPage_GetStage" Title="WizImportBook: GetStage Page" Translator="false">
       <Item ID="strNavTitle">
         <English>Identify the Stage</English>
       </Item>
@@ -2766,7 +2113,7 @@
         <English>(Note: All of this information is optional; but highly recommended if the book being imported is still in the process of being translated.)</English>
       </Item>
     </Group>
-    <Group ID="WizImportBook_WizPage_GetDestinationFolder" Title="WizImportBook: GetDestinationFolder Page">
+    <Group ID="WizImportBook_WizPage_GetDestinationFolder" Title="WizImportBook: GetDestinationFolder Page" Translator="false">
       <Item ID="strNavTitle">
         <English>Where to Store?</English>
       </Item>
@@ -2780,7 +2127,7 @@
         <English>OurWord will store the book under this filename:</English>
       </Item>
     </Group>
-    <Group ID="WizImportBook_WizPage_Summary" Title="WizImportBook: Summary Page">
+    <Group ID="WizImportBook_WizPage_Summary" Title="WizImportBook: Summary Page" Translator="false">
       <Item ID="strNavTitle">
         <English>Summary</English>
       </Item>
@@ -2807,24 +2154,18 @@
       </Item>
     </Group>
   </Group>
-  <Group ID="SplashScreen" Title="300 - SplashScreen">
+  <Group ID="SplashScreen" Title="300 - SplashScreen" Translator="true">
     <Item ID="Title">
       <English>SplashScreen</English>
-      <Alt ID="th" Value="ฉากเปรอะเปื้อน"></Alt>
     </Item>
     <Item ID="sLoadingOurWord">
       <English>Loading Our Word...</English>
-      <Alt ID="inz" Value="Sementara muat Sabda Kita!..."></Alt>
-      <Alt ID="sp" Value="Cargando Palabra Nuestra..."></Alt>
     </Item>
     <Item ID="sOptionalAdditional">
       <English>-</English>
-      <Alt ID="inz" Value="S alin{n}  A lkitab{n}    B ahasa{n}      D aerah{n}        A nda"></Alt>
     </Item>
     <Item ID="sLoading">
       <English>Loading {0}...</English>
-      <Alt ID="inz" Value="Sementara muat {0}..."></Alt>
-      <Alt ID="sp" Value="Cargando {0}..."></Alt>
     </Item>
   </Group>
 </LocDB>

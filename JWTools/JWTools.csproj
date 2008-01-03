@@ -162,6 +162,12 @@
     <Compile Include="JW_Xml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Localizer\DlgEditDescriptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Localizer\DlgEditDescriptions.Designer.cs">
+      <DependentUpon>DlgEditDescriptions.cs</DependentUpon>
+    </Compile>
     <Compile Include="Localizer\JW_Localization.cs" />
     <Compile Include="Localizer\Localizer.cs">
       <SubType>Form</SubType>
@@ -202,6 +208,10 @@
     <EmbeddedResource Include="JW_Wizard.resx">
       <SubType>Designer</SubType>
       <DependentUpon>JW_Wizard.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Localizer\DlgEditDescriptions.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgEditDescriptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Localizer\Localizer.resx">
       <SubType>Designer</SubType>

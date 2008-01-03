@@ -180,6 +180,82 @@ namespace JWTools
         }
         #endregion
 
+        // NUnit support ---------------------------------------------------------------------
+        #if DEBUG
+        #region SMethod: void NUnit_Setup()
+        static public void NUnit_Setup()
+        {
+            // Initialize the registry (the Map process needs it)
+            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
+
+            // Localization DB
+            LocDB.Initialize(GetApplicationDataFolder("OurWord"));
+        }
+        #endregion
+        #region SAttr{g}: string NUnit_TestFileFolder - returns Path of folder, creates if necessary
+        static public string NUnit_TestFileFolder
+        {
+            get
+            {
+                string sPath = JW_Registry.GetValue("NUnit_LocDbDir",
+                    "C:\\Users\\JWimbish\\Documents\\Visual Studio 2005\\Projects\\" +
+                    "OurWord\\trunk\\OurWord\\bin\\Debug\\Testing");
+
+                if (!Directory.Exists(sPath))
+                    Directory.CreateDirectory(sPath);
+
+                Debug.Assert(Directory.Exists(sPath));
+
+                return sPath;
+            }
+        }
+        #endregion
+        #region SMethod: void NUnit_RemoveTestFileFolder()
+        static public void NUnit_RemoveTestFileFolder()
+        {
+            Directory.Delete(NUnit_TestFileFolder, true);
+        }
+        #endregion
+        #region SMethod: TextWriter NUnit_OpenTextWriter(sFileName)
+        static public TextWriter NUnit_OpenTextWriter(string sFileName)
+        {
+            string sPath = NUnit_TestFileFolder + Path.DirectorySeparatorChar + sFileName;
+            StreamWriter w = new StreamWriter(sPath, false, Encoding.UTF8);
+            TextWriter tw = TextWriter.Synchronized(w);
+            return tw;
+        }
+        #endregion
+        #region SMethod: TextReader NUnit_OpenTextReader(string sFileName)
+        static public TextReader NUnit_OpenTextReader(string sFileName)
+        {
+            string sPath = NUnit_TestFileFolder + Path.DirectorySeparatorChar + sFileName;
+            StreamReader r = new StreamReader(sPath, Encoding.UTF8);
+            TextReader tr = TextReader.Synchronized(r);
+            return tr;
+        }
+        #endregion
+        #endif
+
+        // Retrieves the OS-specific data folder for all users
+        #region SMethod: string GetApplicationDataFolder(string sSubFolder)
+        static public string GetApplicationDataFolder(string sSubFolder)
+        {
+            // Build the path
+            string sBase = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string sPath = sBase + Path.DirectorySeparatorChar + sSubFolder;
+            if (string.IsNullOrEmpty(sBase))
+                return null;
+
+            // If the folder does not exist, then create it
+            if (!Directory.Exists(sPath))
+                Directory.CreateDirectory(sPath);
+            if (!Directory.Exists(sPath))
+                return null;
+
+            return sPath;
+        }
+        #endregion
+
     }
 
 	#region TEST

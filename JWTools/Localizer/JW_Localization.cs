@@ -20,6 +20,8 @@ using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
+
+using NUnit.Framework;
 #endregion
 
 namespace JWTools
@@ -135,6 +137,90 @@ namespace JWTools
             return alt;
         }
         #endregion
+
+        // Determine if Needs Attention ------------------------------------------------------
+        #region Method: bool EndsWithColon(s)
+        bool EndsWithColon(string s)
+        {
+            if (s.Length > 0 && s[s.Length - 1] == ':')
+                return true;
+            return false;
+        }
+        #endregion
+        #region Method: bool EndsWithEllipsis(s)
+        bool EndsWithEllipsis(string s)
+        {
+            if (s.Length < 3)
+                return false;
+
+            if (s.Substring(s.Length - 3) == "...")
+                return true;
+
+            return false;
+        }
+        #endregion
+        #region Method: int ParameterCount(s)
+        int ParameterCount(string s)
+        {
+            int c = 0;
+
+            for (int i = 0; i < s.Length - 2; i++)
+            {
+                char ch1 = s[i];
+                char ch2 = s[i + 1];
+                char ch3 = s[i + 2];
+                if (ch1 == '{' && Char.IsDigit(ch2) && ch3 == '}')
+                    c++;
+            }
+
+            return c;
+        }
+        #endregion
+        #region Method: bool HasAmpersand(string s)
+        bool HasAmpersand(string s)
+        {
+            if (s.IndexOf('&') != -1)
+                return true;
+            return false;
+        }
+        #endregion
+        #region Method: string NeedsAttention(LocItem item)
+        public string NeedsAttention(LocItem item)
+            // Returns empty string if OK, otherwise, a string indicating the problem
+        {
+            // Is there a value?
+            if (string.IsNullOrEmpty(Value))
+                return "There is no Value in this language";
+
+            // Colon handled?
+            if (EndsWithColon(item.English) && !EndsWithColon(Value))
+                return "The Value needs to end with a colon \":\")";
+            if (!EndsWithColon(item.English) && EndsWithColon(Value))
+                return "The Value should not end with a colon \":\")";
+
+            // Ellipsis handled?
+            if (EndsWithEllipsis(item.English) && !EndsWithEllipsis(Value))
+                return "The Value needs to end with a ellipsis \"...\")";
+            if (!EndsWithEllipsis(item.English) && EndsWithEllipsis(Value))
+                return "The Value should not end with a ellipsis \"...\")";
+
+            // Parameter count
+            if (ParameterCount(item.English) != ParameterCount(Value))
+            {
+                return "The English and the Value need to have the same number of " +
+                    "parameters, e.g., {0}, {1}, etc.";
+            }
+
+            // Ampersands
+            if (HasAmpersand(item.English) && !HasAmpersand(Value))
+            {
+                return "This Value needs an ampersand to indicate which letter is the " +
+                    "shortcut within the menu.";
+            }
+
+            return "";
+        }
+        #endregion
     }
     #endregion
 
@@ -215,6 +301,9 @@ namespace JWTools
         {
             get
             {
+                if (!string.IsNullOrEmpty(ToolTip))
+                    return true;
+
                 return m_bCanHaveToolTip;
             }
             set
@@ -384,45 +473,6 @@ namespace JWTools
         }
         #endregion
 
-        // Consistency Tests -----------------------------------------------------------------
-        #region Method: bool EndsWithColon(s)
-        bool EndsWithColon(string s)
-        {
-            if (s.Length > 0 && s[s.Length - 1] == ':')
-                return true;
-            return false;
-        }
-        #endregion
-        #region Method: bool EndsWithEllipsis(s)
-        bool EndsWithEllipsis(string s)
-        {
-            if (s.Length < 3)
-                return false;
-
-            if (s.Substring(s.Length - 3) == "...")
-                return true;
-
-            return false;
-        }
-        #endregion
-        #region Method: int ParameterCount(s)
-        int ParameterCount(string s)
-        {
-            int c = 0;
-
-            for (int i = 0; i < s.Length - 3; i++)
-            {
-                char ch1 = s[i];
-                char ch2 = s[i + 1];
-                char ch3 = s[i + 2];
-                if (ch1 == '{' && Char.IsDigit(ch2) && ch3 == '}')
-                    c++;
-            }
-
-            return c;
-        }
-        #endregion
-
         // I/O -------------------------------------------------------------------------------
         #region DOC
         /* XML Format (eventually I want the Alts in their own file)
@@ -454,6 +504,8 @@ namespace JWTools
             string s = xml.GetAttrString(c_sID, ID);
             if (CanHaveShortcutKey)
                 s += xml.GetAttrString(c_sKey, "true");
+            if (CanHaveToolTip)
+                s += xml.GetAttrString(c_sTip, "true");
             xml.Begin(s);
 
             // Add the English
@@ -471,20 +523,12 @@ namespace JWTools
             if (!string.IsNullOrEmpty(ToolTip))
                 xml.GetDaughterXmlField(c_sTip, true).OneLiner(ToolTip);
 
-            // Add the Language Alternatives
-            foreach (LocLanguage language in LocDB.DB.Languages)
-            {
-                LocAlternate alt = GetAlternate(language.Index);
-                if (null != alt)
-                    alt.WriteXML(xml, language.ID);
-            }
-
             // End Tag </Item>
             xml.End();
         }
         #endregion
-        #region SMethod: LocItem ReadXML(LocDB db, XmlRead xml)
-        static public LocItem ReadXML(LocDB db, XmlRead xml)
+        #region SMethod: LocItem ReadXML(XmlRead xml)
+        static public LocItem ReadXML(XmlRead xml)
         {
             // Collect the ID from the Tag line, and create an item from it
             string sID = xml.GetValue(c_sID);
@@ -495,7 +539,7 @@ namespace JWTools
                 item.CanHaveShortcutKey = true;
 
             string sCanHaveTip = xml.GetValue(c_sTip);
-            if (!string.IsNullOrEmpty(sCanHaveTip) && sCanHaveKey == "true")
+            if (!string.IsNullOrEmpty(sCanHaveTip) && sCanHaveTip == "true")
                 item.CanHaveToolTip = true;
 
             // Loop through the other lines for the remaining data
@@ -512,23 +556,43 @@ namespace JWTools
 
                 if (xml.IsTag(c_sTip))
                     item.ToolTip = xml.GetOneLinerData();
-
-                if (xml.IsTag(LocAlternate.c_sTag))
-                {
-                    string sLanguageID = xml.GetValue(LocAlternate.c_sID);
-                    LocAlternate alt = LocAlternate.ReadXML(xml);
-                    foreach (LocLanguage language in db.Languages)
-                    {
-                        if (language.ID == sLanguageID)
-                        {
-                            item.AddAlternate(language.Index, alt);
-                            break;
-                        }
-                    }
-                }
             }
 
             return item;
+        }
+        #endregion
+        #region Method: void WriteLanguageData(XmlField xmlParent, LocLanguage)
+        public void WriteLanguageData(XmlField xmlParent, LocLanguage lang)
+        {
+            // Initialize the Item field
+            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
+            string s = xml.GetAttrString(c_sID, ID);
+            xml.Begin(s);
+
+            // Write the languge data
+            LocAlternate alt = GetAlternate(lang.Index);
+            if (null != alt)
+                alt.WriteXML(xml, lang.ID);
+
+            // Done
+            xml.End();
+        }
+        #endregion
+        #region Method: void ReadLanguageData(XmlRead, LocLanguage)
+        public void ReadLanguageData(XmlRead xml, LocLanguage lang)
+        {
+            while (xml.ReadNextLineUntilEndTag(c_sTag))
+            {
+                if (xml.IsTag(LocAlternate.c_sTag))
+                {
+                    string sLanguageID = xml.GetValue(LocAlternate.c_sID);
+                    if (sLanguageID != lang.ID)
+                        return;
+
+                    LocAlternate alt = LocAlternate.ReadXML(xml);
+                    AddAlternate(lang.Index, alt);
+                }
+            }
         }
         #endregion
 
@@ -583,6 +647,20 @@ namespace JWTools
             }
         }
         string m_sTitle;
+        #endregion
+        #region Attr{g/s}: bool TranslatorAudience - If F, Advisor is the primary audience for these terms
+        public bool TranslatorAudience
+        {
+            get
+            {
+                return m_bTranslatorAudience;
+            }
+            set
+            {
+                m_bTranslatorAudience = value;
+            }
+        }
+        bool m_bTranslatorAudience;
         #endregion
 
         // Items -----------------------------------------------------------------------------
@@ -697,6 +775,7 @@ namespace JWTools
         public const string c_sID = "ID";
         public const string c_sTitle = "Title";
         public const string c_sDescription = "Des";
+        public const string c_sTranslatorAudience = "Translator";
         #region Method: void WriteXML(XmlField xmlParent)
         public void WriteXML(XmlField xmlParent)
         {
@@ -708,6 +787,9 @@ namespace JWTools
 
             if (!string.IsNullOrEmpty(Description))
                 s += xml.GetAttrString(c_sDescription, Description);
+
+            s += xml.GetAttrString(c_sTranslatorAudience,
+                (TranslatorAudience) ? "true" : "false");
 
             xml.Begin(s);
 
@@ -726,15 +808,17 @@ namespace JWTools
             string sID = xml.GetValue(c_sID);
             string sTitle = xml.GetValue(c_sTitle);
             string sDescription = xml.GetValue(c_sDescription);
+            string sTranslatorAudience = xml.GetValue(c_sTranslatorAudience);
 
             LocGroup group = new LocGroup(sID, sTitle);
             group.Description = sDescription;
+            group.TranslatorAudience = (sTranslatorAudience == "true") ? true : false;
 
             while (xml.ReadNextLineUntilEndTag(c_sTag))
             {
                 if (xml.IsTag(LocItem.c_sTag))
                 {
-                    LocItem item = LocItem.ReadXML(db, xml);
+                    LocItem item = LocItem.ReadXML(xml);
                     group.AppendItem(item);
                 }
 
@@ -746,6 +830,47 @@ namespace JWTools
             }
 
             return group;
+        }
+        #endregion
+        #region Method: void WriteLanguageData(xmlParent, LocLanguage)
+        public void WriteLanguageData(XmlField xmlParent, LocLanguage lang)
+        {
+            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
+
+            string s = xml.GetAttrString(c_sID, ID);
+
+            xml.Begin(s);
+
+            foreach (LocItem item in Items)
+                item.WriteLanguageData(xml, lang);
+
+            foreach (LocGroup sub in Groups)
+                sub.WriteLanguageData(xml, lang);
+
+            xml.End();
+        }
+        #endregion
+        #region Method: void ReadLanguageData(XmlRead, LocLanguage)
+        public void ReadLanguageData(XmlRead xml, LocLanguage lang)
+        {
+            while (xml.ReadNextLineUntilEndTag(c_sTag))
+            {
+                if (xml.IsTag(LocItem.c_sTag))
+                {
+                    string sItemID = xml.GetValue(LocItem.c_sID);
+                    LocItem item = Find(sItemID);
+                    if (null != item)
+                        item.ReadLanguageData(xml, lang);
+                }
+
+                if (xml.IsTag(LocGroup.c_sTag))
+                {
+                    string sGroupID = xml.GetValue(LocGroup.c_sID);
+                    LocGroup group = FindGroup(sGroupID);
+                    if (null != group)
+                        group.ReadLanguageData(xml, lang);
+                }
+            }
         }
         #endregion
 
@@ -860,12 +985,11 @@ namespace JWTools
             xml.OneLiner(s, "");
         }
         #endregion
-        #region SMethod: LocLanguage ReadXML(LocDB db, XmlRead xml)
-        static public LocLanguage ReadXML(LocDB db, XmlRead xml)
+        #region SMethod: LocLanguage ReadXML(iIndex, XmlRead xml)
+        static public LocLanguage ReadXML(int iIndex, XmlRead xml)
         {
             string sID = xml.GetValue(c_sID);
             string sName = xml.GetValue(c_sName);
-            int iIndex = db.Languages.Length;
 
             LocLanguage language = new LocLanguage(sID, sName, iIndex);
 
@@ -1201,6 +1325,17 @@ namespace JWTools
         }
         LocLanguage m_langSecondary = null;
         #endregion
+        #region VAttr{g}: bool PrimaryIsEnglish
+        public bool PrimaryIsEnglish
+        {
+            get
+            {
+                if (PrimaryLanguage == null)
+                    return true;
+                return false;
+            }
+        }
+        #endregion
 
         #region Method: void SetPrimary(string sName)
         public void SetPrimary(string sName)
@@ -1283,40 +1418,36 @@ namespace JWTools
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        #region VAttr{g}: string DataFilePath
-        string DataFilePath
+        #region Attr{g}: string BasePath - the file containing the basic information
+        string BasePath
         {
             get
             {
-                // To support both OurWord and NUnit, we get the path of this DLL file
-                string sAssemblyPathName = Assembly.GetAssembly(typeof(LocDB)).Location;
-                string sFolders = Path.GetDirectoryName(sAssemblyPathName);
-                string sLocalizationsDBPath = sFolders + Path.DirectorySeparatorChar + "Loc.xml";
-
-                // For NUnit, still probably will not find it, so we go to the registry's
-                // "AppDir" value to find out where it is.
-                if (!File.Exists(sLocalizationsDBPath))
-                {
-                    sLocalizationsDBPath = JW_Registry.GetValue("NUnit_LocDbDir", "C:") +
-                        Path.DirectorySeparatorChar + "Localizations.xml";
-                }
-
-                return sLocalizationsDBPath;
+                Debug.Assert(!string.IsNullOrEmpty(s_sBasePath));
+                return s_sBasePath;
             }
         }
+        static string s_sBasePath;
+        #endregion
+        #region Attr{g}: string DataFolder - the folder containing all of the loc files
+        string DataFolder
+        {
+            get
+            {
+                Debug.Assert(!string.IsNullOrEmpty(s_sDataFolder));
+                return s_sDataFolder;
+            }
+        }
+        string s_sDataFolder;
         #endregion
         const string c_sTag = "LocDB";
         #region Method: void WriteXML(XmlField xmlParent)
         public void WriteXML()
         {
-            string sPathName = Path.ChangeExtension(DataFilePath, "xml");
-            TextWriter writer = JW_Util.GetTextWriter(sPathName);
+            TextWriter writer = JW_Util.GetTextWriter(BasePath);
 
             XmlField xml = new XmlField(writer, c_sTag);
             xml.Begin();
-
-            foreach (LocLanguage language in Languages)
-                language.WriteXML(xml);
 
             foreach (LocGroup group in Groups)
                 group.WriteXML(xml);
@@ -1324,24 +1455,22 @@ namespace JWTools
             xml.End();
 
             writer.Close();
+
+            // Write the language alternatives
+            foreach (LocLanguage lang in Languages)
+                WriteLanguageData(lang);
         }
         #endregion
         #region Method: void ReadXML()
         public void ReadXML()
         {
-            string sPathName = DataFilePath;
+            // First, read in the Base data
+            string sPathName = BasePath;
             TextReader reader = JW_Util.GetTextReader(ref sPathName, "*.xml");
             XmlRead xml = new XmlRead(reader);
 
             while (xml.ReadNextLineUntilEndTag(c_sTag))
             {
-                // LocLanguage
-                if (xml.IsTag(LocLanguage.c_sTag))
-                {
-                    LocLanguage language = LocLanguage.ReadXML(this, xml);
-                    AppendLanguage(language);
-                }
-
                 // LocGroup
                 if (xml.IsTag(LocGroup.c_sTag))
                 {
@@ -1351,29 +1480,106 @@ namespace JWTools
             }
 
             reader.Close();
+
+            // Now, read in the languages in the localization folder
+            string[] sPaths = Directory.GetFiles(this.DataFolder, "*.xml", SearchOption.TopDirectoryOnly);
+            foreach (string s in sPaths)
+            {
+                if (s == BasePath)
+                    continue;
+                ReadLanguageData(s);
+            }
+
+        }
+        #endregion
+        #region Method: void WriteLanguageData(LocLanguage lang)
+        void WriteLanguageData(LocLanguage lang)
+        {
+            // Build the language name
+            string sPath = DataFolder + Path.DirectorySeparatorChar + lang.ID + ".xml";
+
+            // Open the xml writer
+            TextWriter w = JW_Util.GetTextWriter(sPath);
+            XmlField xml = new XmlField(w, c_sTag);
+            xml.Begin();
+
+            // Write out the language information
+            lang.WriteXML(xml);
+
+            // Write out the group's data
+            foreach (LocGroup group in Groups)
+                group.WriteLanguageData(xml, lang);
+
+            // Done
+            xml.End();
+            w.Close();
+        }
+        #endregion
+        #region Method: void ReadLanguageData(string sPath)
+        void ReadLanguageData(string sPath)
+        {
+            StreamReader r = new StreamReader(sPath, Encoding.UTF8);
+            TextReader tr = TextReader.Synchronized(r);
+            XmlRead xml = new XmlRead(tr);
+
+            LocLanguage language = null;
+
+            while (xml.ReadNextLineUntilEndTag(c_sTag))
+            {
+                if (xml.IsTag(LocLanguage.c_sTag))
+                {
+                    language = LocLanguage.ReadXML(Languages.Length, xml);
+                    AppendLanguage(language);
+                }
+
+                // LocGroup
+                if (null != language && xml.IsTag(LocGroup.c_sTag))
+                {
+                    string sGroupID = xml.GetValue(LocGroup.c_sID);
+                    LocGroup group = FindGroup(sGroupID);
+                    if (null != group)
+                        group.ReadLanguageData(xml, language);
+                }
+
+            }
+            tr.Close();
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region SAttr{g}: LocDB DB - initializes if needed
+        #region SMethod: void Initialize(string sPathApplicationFolder)
+        static public void Initialize(string sPathApplicationFolder)
+        {
+            if (null == s_LocDB)
+                s_LocDB = new LocDB(sPathApplicationFolder);
+            Debug.Assert(null != s_LocDB);
+        }
+        #endregion
+        #region SAttr{g}: LocDB DB
         static public LocDB DB
         {
             get
             {
-                if (null == s_LocDB)
-                    s_LocDB = new LocDB();
                 Debug.Assert(null != s_LocDB);
                 return s_LocDB;
             }
         }
         static private LocDB s_LocDB = null;
         #endregion
-        #region private Constructor() - do not call (called by the DB attr above
-        private LocDB()
+        #region private Constructor(sPathApplicationFolder) - do not call (called by the Initialize Method above
+        private LocDB(string sPathApplicationFolder)
         {
             // Initialize the vectors
             m_vGroups = new LocGroup[0];
             m_vLanguages = new LocLanguage[0];
+
+            // Folder containing the localization data
+            s_sDataFolder = sPathApplicationFolder + Path.DirectorySeparatorChar + "Loc";
+            if (!Directory.Exists(DataFolder))
+                Directory.CreateDirectory(DataFolder);
+
+            // The main localization file
+            s_sBasePath = DataFolder + Path.DirectorySeparatorChar + "OurWordLocalization.xml";
 
             // Read in the file
             ReadXML();
@@ -1583,17 +1789,19 @@ namespace JWTools
                 vGroupID,
                 sItemID,
                 tsi.Text,
-                tsi.ToolTipText);
+                (DB.PrimaryIsEnglish ? tsi.ToolTipText : null));
 
             // Get its Shortcut key
             ToolStripMenuItem mi = tsi as ToolStripMenuItem;
             if (null != mi)
+            {
                 mi.ShortcutKeys = GetShortcutKey(
                     c_DialogCommon,
                     vGroupID,
                     sItemID,
                     tsi.Text,
-                    mi.ShortcutKeyDisplayString);
+                    (DB.PrimaryIsEnglish ? mi.ShortcutKeyDisplayString : null));
+            }
             
             // Recurse if this is a drop-down item
             ToolStripDropDownItem tsiDropDown = tsi as ToolStripDropDownItem;
@@ -1946,7 +2154,7 @@ namespace JWTools
                 item = group.FindOrAddItem(sItemID, sEnglish);
 
             // Make sure the item has the default English tooltip
-            if (string.IsNullOrEmpty(item.ToolTip))
+            if (string.IsNullOrEmpty(item.ToolTip) & !string.IsNullOrEmpty(sEnglishToolTip))
                 item.ToolTip = sEnglishToolTip;
 
             // Otherwise, we want to retrieve the string according to the Primary and
@@ -1994,7 +2202,7 @@ namespace JWTools
                 item = group.FindOrAddItem(sItemID, sEnglish);
 
             // Make sure the item has the default English Shortcut Key
-            if (string.IsNullOrEmpty(item.ShortcutKey))
+            if (string.IsNullOrEmpty(item.ShortcutKey) && !string.IsNullOrEmpty(sEnglishShortcutKey))
                 item.ShortcutKey = sEnglishShortcutKey;
 
             // Otherwise, we want to retrieve the string according to the Primary and
@@ -2020,5 +2228,153 @@ namespace JWTools
         #endregion
 
     }
+    #endregion
+
+    #region NUnit Test_LocDB
+    #if DEBUG
+    [TestFixture] public class Test_Loc
+    {
+        #region Method: void Setup()
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: IO_LocAlternate
+        [Test] public void IO_LocAlternate()
+        {
+            // Create a LocAlternate
+            string sValue = "Baru";
+            string sKey = "Ctrl+B";
+            string sTip = "Membuku file baru";
+            LocAlternate altOut = new LocAlternate(sValue, sKey, sTip);
+
+            // File Internals
+            string sTag = "Test";
+            string sFileName = "LocAlt.xml";
+
+            // Write it to file
+            TextWriter w = JWU.NUnit_OpenTextWriter(sFileName);
+            XmlField xml = new XmlField(w, sTag);
+            xml.Begin();
+            altOut.WriteXML(xml, "inz");
+            xml.End();
+            w.Close();
+
+            // Read it back in from file
+            TextReader r = JWU.NUnit_OpenTextReader(sFileName);
+            XmlRead xr = new XmlRead(r);
+            LocAlternate altIn = null;
+            while (xr.ReadNextLineUntilEndTag(sTag))
+            {
+                if (xr.IsTag(LocAlternate.c_sTag))
+                    altIn = LocAlternate.ReadXML(xr);
+            }
+            r.Close();
+
+            // Are they the same?
+            Assert.IsNotNull(altIn);
+            Assert.AreEqual(sValue, altIn.Value, "bad Value");
+            Assert.AreEqual(sKey, altIn.ShortcutKey, "bad ShortcutKey");
+            Assert.AreEqual(sTip, altIn.ToolTip, "bad ToolTip");
+        }
+        #endregion
+        #region Test: IO_LocItem
+        [Test] public void IO_LocItem()
+        {
+            // Create a LocAlternate
+            string sID = "idNew";
+            string sEnglish = "&New";
+            string sKey = "Ctrl+N";
+            string sTip = "Open a new file";
+            string sInfo = "This is the menu command to open a new file.";
+            LocItem itemOut = new LocItem(sID);
+            itemOut.English = sEnglish;
+            itemOut.ShortcutKey = sKey;
+            itemOut.ToolTip = sTip;
+            itemOut.Information = sInfo;
+            itemOut.CanHaveShortcutKey = true;
+            itemOut.CanHaveToolTip = true;
+
+            // File Internals
+            string sTag = "Test";
+            string sFileName = "LocItem.xml";
+
+            // Write it to file
+            TextWriter w = JWU.NUnit_OpenTextWriter(sFileName);
+            XmlField xml = new XmlField(w, sTag);
+            xml.Begin();
+            itemOut.WriteXML(xml);
+            xml.End();
+            w.Close();
+
+            // Read it back in from file
+            TextReader r = JWU.NUnit_OpenTextReader(sFileName);
+            XmlRead xr = new XmlRead(r);
+            LocItem itemIn = null;
+            while (xr.ReadNextLineUntilEndTag(sTag))
+            {
+                if (xr.IsTag(LocItem.c_sTag))
+                    itemIn = LocItem.ReadXML(xr);
+            }
+            r.Close();
+
+            // Are they the same?
+            Assert.IsNotNull(itemIn);
+            Assert.AreEqual(sID, itemIn.ID, "bad ID");
+            Assert.AreEqual(sEnglish, itemIn.English, "bad English");
+            Assert.AreEqual(sKey, itemIn.ShortcutKey, "bad ShortcutKey");
+            Assert.AreEqual(sTip, itemIn.ToolTip, "bad ToolTip");
+            Assert.AreEqual(sInfo, itemIn.Information, "bad Information");
+            Assert.AreEqual(true, itemIn.CanHaveShortcutKey, "bad CanHaveShortcutKey");
+            Assert.AreEqual(true, itemIn.CanHaveToolTip, "bad CanHaveToolTip");
+        }
+        #endregion
+        #region Test: IO_LocLanguage
+        [Test] public void IO_LocLanguage()
+        {
+            // Create a LocLanguage
+            string sID = "inz";
+            string sName = "Bahasa Indonesia";
+            string sFontName = "Times New Roman";
+            int nFontSize = 20;
+            LocLanguage langOut = new LocLanguage(sID, sName, 0);
+            langOut.FontName = sFontName;
+            langOut.FontSize = nFontSize;
+
+            // File Internals
+            string sTag = "Test";
+            string sFileName = "LocAlt.xml";
+
+            // Write it to file
+            TextWriter w = JWU.NUnit_OpenTextWriter(sFileName);
+            XmlField xml = new XmlField(w, sTag);
+            xml.Begin();
+            langOut.WriteXML(xml);
+            xml.End();
+            w.Close();
+
+            // Read it back in from file
+            TextReader r = JWU.NUnit_OpenTextReader(sFileName);
+            XmlRead xr = new XmlRead(r);
+            LocLanguage langIn = null;
+            while (xr.ReadNextLineUntilEndTag(sTag))
+            {
+                if (xr.IsTag(LocLanguage.c_sTag))
+                    langIn = LocLanguage.ReadXML(0, xr);
+            }
+            r.Close();
+
+            // Are they the same?
+            Assert.IsNotNull(langIn);
+            Assert.AreEqual(sID, langIn.ID, "bad ID");
+            Assert.AreEqual(sName, langIn.Name, "bad Name");
+            Assert.AreEqual(sFontName, langIn.FontName, "bad FontName");
+            Assert.AreEqual(nFontSize, langIn.FontSize, "bad FontSize");
+        }
+        #endregion
+    }
+    #endif
     #endregion
 }

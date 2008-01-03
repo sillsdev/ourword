@@ -493,7 +493,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuSetUpFeatures;
         private ToolStripSeparator m_separatorDebugItems;
         private ToolStripMenuItem m_menuRunDebugTestSuite;
-        private ToolStripMenuItem m_menuWriteLanguageDB;
         private ToolStripMenuItem m_menuLocalizerTool;
 
         private ToolStripMenuItem m_menuHelp;
@@ -812,13 +811,12 @@ namespace OurWord
             m_bmRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
             m_menuOnlyShowSectionsThat.Visible = (G.IsValidProject && OurWordMain.Features.F_Filter);
             m_menuCopyBTfromFront.Visible = OurWordMain.Features.F_CopyBTfromFront;
+            m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
 
             // Debugging
             bool bShowDebugItems = JW_Registry.GetValue("Debug", false);
             m_separatorDebugItems.Visible = bShowDebugItems;
             m_menuRunDebugTestSuite.Visible = bShowDebugItems;
-            m_menuWriteLanguageDB.Visible = bShowDebugItems;
-            m_menuLocalizerTool.Visible = bShowDebugItems;
 
             // Clear dropdown subitems so we don't attempt to localize them
             m_Config.RemoveMRUItems(m_menuProject);
@@ -1027,7 +1025,6 @@ namespace OurWord
 		/// -----------------------------------------------------------------------------------
 		private void InitializeComponent()
 		{
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
@@ -1079,7 +1076,6 @@ namespace OurWord
             this.m_menuSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorDebugItems = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuRunDebugTestSuite = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuWriteLanguageDB = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuWindow = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowNotesPane = new System.Windows.Forms.ToolStripMenuItem();
@@ -1509,7 +1505,6 @@ namespace OurWord
             this.m_menuSetUpFeatures,
             this.m_separatorDebugItems,
             this.m_menuRunDebugTestSuite,
-            this.m_menuWriteLanguageDB,
             this.m_menuLocalizerTool});
             this.m_menuTools.Name = "m_menuTools";
             this.m_menuTools.Size = new System.Drawing.Size(48, 20);
@@ -1591,13 +1586,6 @@ namespace OurWord
             this.m_menuRunDebugTestSuite.Size = new System.Drawing.Size(211, 22);
             this.m_menuRunDebugTestSuite.Text = "&Run Debug Test Suite";
             this.m_menuRunDebugTestSuite.Click += new System.EventHandler(this.cmdDebugTesting);
-            // 
-            // m_menuWriteLanguageDB
-            // 
-            this.m_menuWriteLanguageDB.Name = "m_menuWriteLanguageDB";
-            this.m_menuWriteLanguageDB.Size = new System.Drawing.Size(211, 22);
-            this.m_menuWriteLanguageDB.Text = "&Write Language DB";
-            this.m_menuWriteLanguageDB.Click += new System.EventHandler(this.cmdWriteLangDB);
             // 
             // m_menuLocalizerTool
             // 
@@ -1701,7 +1689,7 @@ namespace OurWord
             this.m_bmHelp});
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 24);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(721, 25);
+            this.m_ToolStrip.Size = new System.Drawing.Size(690, 25);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -2332,7 +2320,6 @@ namespace OurWord
             return true;
         }
         #endregion
-
         #region Method: static void Main() - main entry point for the application
         [STAThread]
 		static void Main() 
@@ -2349,14 +2336,18 @@ namespace OurWord
             if (!_GrabTokenForThisInstance())
                 return;
 
+            // Initialize the Localizations Database
+            ShowLoadState("Init LocDB");
+            LocDB.Initialize(G.GetApplicationDataFolder());
+
             // Set the resource location (so the splash picture will be visible)
-            ShowLoadState("Init Resource Location");
-            JWU.ResourceLocation = "OurWord.Res.";
+//            ShowLoadState("Init Resource Location");
+//            JWU.ResourceLocation = "OurWord.Res.";
 
             // Retrieve localizations from the Localizations database. (Must be done
             // here so that the Splash window will be localized.
-            ShowLoadState("Init Language Resources");
-            Options.InitLanguageResources();
+//            ShowLoadState("Init Language Resources");
+//            Options.InitLanguageResources();
 
             // Display a splash screen while we're loading
             ShowLoadState("Init Splash Screen");
@@ -2465,7 +2456,16 @@ namespace OurWord
 				}
 			}
 			#endregion
-			#region Attr{g}: bool F_JustTheBasics
+            #region Attr{g}: bool F_Localizer
+            public bool F_Localizer
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fLocalizer.ToString());
+                }
+            }
+            #endregion
+            #region Attr{g}: bool F_JustTheBasics
 			public bool F_JustTheBasics
 			{
 				get
@@ -2517,6 +2517,7 @@ namespace OurWord
                 fCopyBTfromFront,
                 fFilter,
                 fJustTheBasics,
+                fLocalizer,
                 kLast
             };
             #endregion
@@ -2587,6 +2588,12 @@ namespace OurWord
                         "defined, or must have mismatched quotes. This can be a good way to locate " +
                         "errors, or To Do Notes.");
 
+                m_Dlg.Add(ID.fLocalizer.ToString(),
+                    false,
+                    "Localization Dialog",
+                    "This dialog, appearing in the Tools menu, allows you to translate the " +
+                        "user interface of OurWord into another language.");
+
                 m_Dlg.Add(ID.fJustTheBasics.ToString(),    
                     false,
                     "Just the Basics",
@@ -2607,6 +2614,7 @@ namespace OurWord
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fCopyBTfromFront.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fFilter.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fPrint.ToString());
+                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fLocalizer.ToString());
 			}
 			#endregion
 		};
@@ -3529,12 +3537,6 @@ namespace OurWord
 			OnEnterProject();
 		}
 		#endregion
-        #region Cmd: cmdWriteLangDB
-        private void cmdWriteLangDB(Object sender, EventArgs e)
-        {
-            LocDB.DB.WriteXML();
-        }
-        #endregion
         #region Cmd: cmdLocalizer
         private void cmdLocalizer(Object sender, EventArgs e)
         {
@@ -3846,6 +3848,12 @@ return false;
 		}
 		static string s_sBrowseDirectory = "";
 		#endregion
+        #region SMethod: string GetApplicationDataFolder()
+        static public string GetApplicationDataFolder()
+        {
+            return JWU.GetApplicationDataFolder("OurWord");
+        }
+        #endregion
 
         // Misc ------------------------------------------------------------------------------
         #region SAttr{g}: string Today - returns today's date as "2005-08-21" format.

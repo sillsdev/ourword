@@ -83,10 +83,17 @@
             </Node>
           </Nodes>
         </Node>
-        <Node UniqueName="[0-1045]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\JWTools\bin\Debug\JWTools.dll" Expanded="true">
+        <Node UniqueName="[0-1049]C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\..\JWTools\bin\Debug\JWTools.dll" Expanded="true">
           <Nodes>
-            <Node UniqueName="[0-1046]JWTools" Expanded="true">
+            <Node UniqueName="[0-1050]JWTools" Expanded="true">
               <Nodes>
+                <Node UniqueName="[0-1045]JWTools.Test_Loc" Expanded="true">
+                  <Nodes>
+                    <Node UniqueName="[0-1046]JWTools.Test_Loc.IO_LocAlternate" />
+                    <Node UniqueName="[0-1047]JWTools.Test_Loc.IO_LocItem" />
+                    <Node UniqueName="[0-1048]JWTools.Test_Loc.IO_LocLanguage" />
+                  </Nodes>
+                </Node>
                 <Node UniqueName="[0-1042]JWTools.Test_PathConverter" Expanded="true">
                   <Nodes>
                     <Node UniqueName="[0-1044]JWTools.Test_PathConverter.Conversions" />

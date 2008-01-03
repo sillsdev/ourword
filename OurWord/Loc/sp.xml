@@ -1,0 +1,1670 @@
+﻿<LocDB>
+  <Language ID="sp" Name="Español"></Language>
+  <Group ID="m_MenuStrip">
+    <Item ID="m_menuProject">
+      <Alt ID="sp" Value="&amp;Proyecto"></Alt>
+    </Item>
+    <Item ID="m_menuNew">
+      <Alt ID="sp" Value="&amp;Nuevo..."></Alt>
+    </Item>
+    <Item ID="m_menuOpen">
+      <Alt ID="sp" Value="&amp;Abrir..."></Alt>
+    </Item>
+    <Item ID="m_menuSave">
+      <Alt ID="sp" Value="&amp;Guardar"></Alt>
+    </Item>
+    <Item ID="m_menuSaveAs">
+      <Alt ID="sp" Value="Guardar &amp;como..."></Alt>
+    </Item>
+    <Item ID="m_menuProperties">
+      <Alt ID="sp" Value="&amp;Propiedades..."></Alt>
+    </Item>
+    <Item ID="m_menuPrint">
+      <Alt ID="sp" Value="&amp;Imprimir..."></Alt>
+    </Item>
+    <Item ID="m_menuExit">
+      <Alt ID="sp" Value="&amp;Salir"></Alt>
+    </Item>
+    <Item ID="m_menuEdit">
+      <Alt ID="sp" Value="&amp;Edición"></Alt>
+    </Item>
+    <Item ID="m_menuCut">
+      <Alt ID="sp" Value="C&amp;ortar"></Alt>
+    </Item>
+    <Item ID="m_menuCopy">
+      <Alt ID="sp" Value="Co&amp;piar"></Alt>
+    </Item>
+    <Item ID="m_menuPaste">
+      <Alt ID="sp" Value="Pegar"></Alt>
+    </Item>
+    <Item ID="m_menuNotes">
+      <Alt ID="sp" Value="&amp;Notas"></Alt>
+    </Item>
+    <Item ID="m_menuNoteGeneral">
+      <Alt ID="sp" Value="Insertar Nota General"></Alt>
+    </Item>
+    <Item ID="m_menuNoteToDo">
+      <Alt ID="sp" Value="Insertar Nota A &amp;Hacer"></Alt>
+    </Item>
+    <Item ID="m_menuNoteOldVersion">
+      <Alt ID="sp" Value="Insertar Nota Rendición &amp;Alternativa"></Alt>
+    </Item>
+    <Item ID="m_menuNoteReason">
+      <Alt ID="sp" Value="Insertar Nota &amp;Razonamiento"></Alt>
+    </Item>
+    <Item ID="m_menuNoteFrontIssue">
+      <Alt ID="sp" Value="Inserta Nota Editar &amp;Fuente"></Alt>
+    </Item>
+    <Item ID="m_menuNoteDefinition">
+      <Alt ID="sp" Value="Insertar Nota &amp;Definición"></Alt>
+    </Item>
+    <Item ID="m_menuNoteHintForDaughter">
+      <Alt ID="sp" Value="Insertar Nota &amp;Sugerencias Borrador"></Alt>
+    </Item>
+    <Item ID="m_menuNoteBackTranslation">
+      <Alt ID="sp" Value="Insertar Nota Traducción &amp;Inversa"></Alt>
+    </Item>
+    <Item ID="m_menuNoteAskUNS">
+    </Item>
+    <Item ID="m_menuDeleteNote">
+      <Alt ID="sp" Value="&amp;Cortar Nota..."></Alt>
+    </Item>
+    <Item ID="m_menuGoTo">
+      <Alt ID="sp" Value="&amp;Ir a"></Alt>
+    </Item>
+    <Item ID="m_menuFirstSection">
+      <Alt ID="sp" Value="Sección &amp;Inicial"></Alt>
+    </Item>
+    <Item ID="m_menuPreviousSection">
+      <Alt ID="sp" Value="Sección &amp;Anterior"></Alt>
+    </Item>
+    <Item ID="m_menuNextSection">
+      <Alt ID="sp" Value="Sección &amp;Próxima"></Alt>
+    </Item>
+    <Item ID="m_menuLastSection">
+      <Alt ID="sp" Value="Sección &amp;Última"></Alt>
+    </Item>
+    <Item ID="m_menuGoToBook">
+      <Alt ID="sp" Value="&amp;Libro"></Alt>
+    </Item>
+    <Item ID="m_menuWindow">
+    </Item>
+    <Item ID="m_menuShowNotesPane">
+      <Alt ID="sp" Value="&amp;Mostrar Panel de Notas"></Alt>
+    </Item>
+    <Item ID="m_menuShowOtherTranslationsPane">
+    </Item>
+    <Item ID="m_menuDrafting">
+      <Alt ID="sp" Value="&amp;Borrador"></Alt>
+    </Item>
+    <Item ID="m_menuNaturalnessCheck">
+      <Alt ID="sp" Value="Traducción &amp;Natural"></Alt>
+    </Item>
+    <Item ID="m_menuBackTranslation">
+      <Alt ID="sp" Value="Traducción &amp;Inversa"></Alt>
+    </Item>
+    <Item ID="m_menuTools">
+      <Alt ID="sp" Value="&amp;Herramientas"></Alt>
+    </Item>
+    <Item ID="m_menuOptions">
+      <Alt ID="sp" Value="&amp;Opciones..."></Alt>
+    </Item>
+    <Item ID="m_menuIncrementBookStatus">
+      <Alt ID="sp" Value="&amp;Incrementar Estado del Libro..."></Alt>
+    </Item>
+    <Item ID="m_menuCopyBTfromFront">
+      <Alt ID="sp" Value="&amp;Copiar Traducción Inversa de la Fuente..."></Alt>
+    </Item>
+    <Item ID="m_menuEntireBook">
+    </Item>
+    <Item ID="m_menuCurrentSectionOnly">
+    </Item>
+    <Item ID="m_menuOnlyShowSectionsThat">
+    </Item>
+    <Item ID="m_menuRestoreFromBackup">
+      <Alt ID="sp" Value="&amp;Recuperar de la Copia de Seguridad..."></Alt>
+    </Item>
+    <Item ID="m_menuSetUpFeatures">
+      <Alt ID="sp" Value="Escoger &amp;Posibilidades..."></Alt>
+    </Item>
+    <Item ID="m_menuRunDebugTestSuite">
+    </Item>
+    <Item ID="m_menuWriteLanguageDB">
+    </Item>
+    <Item ID="m_menuLocalizerTool">
+    </Item>
+    <Item ID="m_menuHelp">
+      <Alt ID="sp" Value="&amp;Ayuda"></Alt>
+    </Item>
+    <Item ID="m_menuHelpTopics">
+      <Alt ID="sp" Value="&amp;Tópicos de Ayuda..."></Alt>
+    </Item>
+    <Item ID="m_menuAboutOurWord">
+      <Alt ID="sp" Value="&amp;Acerca de Palabra Nuestra..."></Alt>
+    </Item>
+  </Group>
+  <Group ID="m_ToolStrip">
+    <Item ID="m_btnExit">
+      <Alt ID="sp" Value="Salir"></Alt>
+    </Item>
+    <Item ID="m_btnProjectSave">
+      <Alt ID="sp" Value="Guardar"></Alt>
+    </Item>
+    <Item ID="m_btnEditCut">
+      <Alt ID="sp" Value="Cortar"></Alt>
+    </Item>
+    <Item ID="m_btnEditCopy">
+      <Alt ID="sp" Value="Copiar"></Alt>
+    </Item>
+    <Item ID="m_btnEditPaste">
+      <Alt ID="sp" Value="Pegar"></Alt>
+    </Item>
+    <Item ID="m_btnItalic">
+      <Alt ID="sp" Value="Itálica"></Alt>
+    </Item>
+    <Item ID="m_btnPrint">
+      <Alt ID="sp" Value="Imprimir"></Alt>
+    </Item>
+    <Item ID="m_btnGotoFirstSection">
+      <Alt ID="sp" Value="Sección Inicial"></Alt>
+    </Item>
+    <Item ID="m_btnGotoPreviousSection">
+      <Alt ID="sp" Value="Anterior"></Alt>
+    </Item>
+    <Item ID="m_btnGotoNextSection">
+      <Alt ID="sp" Value="Próximo"></Alt>
+    </Item>
+    <Item ID="m_btnGotoLastSection">
+      <Alt ID="sp" Value="Sección Última"></Alt>
+    </Item>
+    <Item ID="m_btnGoToBook">
+      <Alt ID="sp" Value="Libro"></Alt>
+    </Item>
+    <Item ID="m_btnDrafting">
+      <Alt ID="sp" Value="Borrador"></Alt>
+    </Item>
+    <Item ID="m_btnNaturalnessCheck">
+      <Alt ID="sp" Value="Traducción Natural"></Alt>
+    </Item>
+    <Item ID="m_btnBackTranslation">
+      <Alt ID="sp" Value="Traducción Inversa"></Alt>
+    </Item>
+    <Item ID="m_btnNotes">
+      <Alt ID="sp" Value="Notas"></Alt>
+    </Item>
+    <Item ID="m_bmShowNotesPane">
+      <Alt ID="sp" Value="&amp;Mostrar Panel de Notas"></Alt>
+    </Item>
+    <Item ID="m_btnNoteGeneral">
+      <Alt ID="sp" Value="Nota General" Tip="Insertar Nota General"></Alt>
+    </Item>
+    <Item ID="m_bmNoteGeneral">
+      <Alt ID="sp" Value="Insertar Nota General" Tip="Insertar Nota General"></Alt>
+    </Item>
+    <Item ID="m_btnNoteToDo">
+      <Alt ID="sp" Value="Insertar Nota A Hacer"></Alt>
+    </Item>
+    <Item ID="m_bmNoteToDo">
+      <Alt ID="sp" Value="Insertar Nota A &amp;Hacer"></Alt>
+    </Item>
+    <Item ID="m_btnNoteAskUNS">
+    </Item>
+    <Item ID="m_bmNoteAskUNS">
+    </Item>
+    <Item ID="m_btnNoteDefinition">
+      <Alt ID="sp" Value="Insertar NotaDefinición" Tip="Insertar Nota &amp;Definición"></Alt>
+    </Item>
+    <Item ID="m_bmNoteDefinition">
+      <Alt ID="sp" Value="Insertar Nota &amp;Definición"></Alt>
+    </Item>
+    <Item ID="m_btnNoteOldVersion">
+      <Alt ID="sp" Value="Nota Rendición Alternativa" Tip="Insertar Nota Rendición Alternativa"></Alt>
+    </Item>
+    <Item ID="m_bmNoteOldVersion">
+      <Alt ID="sp" Value="Insertar Nota Rendición &amp;Alternativa"></Alt>
+    </Item>
+    <Item ID="m_btnNoteReason">
+      <Alt ID="sp" Value="Nota Razonamiento" Tip="Insertar Nota Razonamiento"></Alt>
+    </Item>
+    <Item ID="m_bmNoteReason">
+      <Alt ID="sp" Value="Insertar Nota &amp;Razonamiento"></Alt>
+    </Item>
+    <Item ID="m_btnNoteFrontIssue">
+      <Alt ID="sp" Value="Nota Editar Fuente" Tip="Inserta Nota Editar Fuente"></Alt>
+    </Item>
+    <Item ID="m_bmNoteFrontIssue">
+      <Alt ID="sp" Value="Inserta Nota Editar &amp;Fuente"></Alt>
+    </Item>
+    <Item ID="m_btnNoteHintForDaughter">
+    </Item>
+    <Item ID="m_btnNoteBackTranslation">
+    </Item>
+    <Item ID="m_btnDeleteNote">
+      <Alt ID="sp" Value="Cortar Nota"></Alt>
+    </Item>
+    <Item ID="m_bmDeleteNote">
+      <Alt ID="sp" Value="&amp;Cortar Nota..."></Alt>
+    </Item>
+    <Item ID="m_bmTools">
+      <Alt ID="sp" Value="Herramientas"></Alt>
+    </Item>
+    <Item ID="m_bmOptions">
+      <Alt ID="sp" Value="Opciones"></Alt>
+    </Item>
+    <Item ID="m_bmIncrementBookStatus">
+      <Alt ID="sp" Value="Incrementar Estado del Libro"></Alt>
+    </Item>
+    <Item ID="m_bmRestoreFromBackup">
+      <Alt ID="sp" Value="Recuperar de la Copia de Seguridad"></Alt>
+    </Item>
+    <Item ID="m_bmSetUpFeatures">
+      <Alt ID="sp" Value="Escoger Posibilidades"></Alt>
+    </Item>
+    <Item ID="m_bmHelp">
+      <Alt ID="sp" Value="Ayuda"></Alt>
+    </Item>
+  </Group>
+  <Group ID="Strings">
+    <Item ID="kYes">
+    </Item>
+    <Item ID="kNo">
+    </Item>
+    <Item ID="SetupFT_TargetDefinition">
+    </Item>
+    <Item ID="SetupFT_TargetCreateExpl">
+    </Item>
+    <Item ID="SetupFT_TargetOpenExpl">
+    </Item>
+    <Item ID="PropDlgTab_StyleSheet">
+    </Item>
+    <Item ID="PropDlgTab_WritingSystems">
+    </Item>
+    <Item ID="PropDlgTab_PrintOptions">
+    </Item>
+    <Item ID="PropDlgTab_TranslationStages">
+      <Alt ID="sp" Value="Etapas de la Traducción"></Alt>
+    </Item>
+    <Item ID="strCalculatingMatchingSections">
+      <Alt ID="sp" Value="Calculando Cuáles Secciones se Conforman con sus Requisitos..."></Alt>
+    </Item>
+    <Item ID="strViewingASubset">
+      <Alt ID="sp" Value="Mirando un subconjunto"></Alt>
+    </Item>
+    <Item ID="strFormattingPages">
+      <Alt ID="sp" Value="Formateando Páginas..."></Alt>
+    </Item>
+    <Item ID="strPrintingPages">
+      <Alt ID="sp" Value="Imprimiendo Páginas..."></Alt>
+    </Item>
+    <Item ID="NewNote">
+    </Item>
+    <Item ID="TypeHere">
+    </Item>
+    <Group ID="GeneralUI">
+      <Item ID="DraftingWindowName">
+        <Alt ID="sp" Value="Borrador"></Alt>
+      </Item>
+      <Item ID="DraftingReference">
+        <Alt ID="sp" Value="{0} a {1}"></Alt>
+      </Item>
+      <Item ID="BackTranslationWindowName">
+        <Alt ID="sp" Value="Traducción Inversa"></Alt>
+      </Item>
+      <Item ID="BackTranslationReference">
+        <Alt ID="sp" Value="{0}"></Alt>
+      </Item>
+      <Item ID="NaturalnessCheckWindowName">
+      </Item>
+      <Item ID="NaturalnessCheckReference">
+        <Alt ID="sp" Value="{0} - {1}"></Alt>
+      </Item>
+      <Item ID="NoProjectDefined">
+      </Item>
+      <Item ID="NoFrontDefined">
+        <Alt ID="sp" Value="(fuente no definida)"></Alt>
+      </Item>
+      <Item ID="NoTargetDefined">
+        <Alt ID="sp" Value="(traducción no definida)"></Alt>
+      </Item>
+      <Item ID="NotesWindowName">
+        <Alt ID="sp" Value="Notas"></Alt>
+      </Item>
+      <Item ID="TranslationsWindowName">
+        <Alt ID="sp" Value="Traducciones "></Alt>
+      </Item>
+      <Item ID="NoDataToDisplay">
+        <Alt ID="sp" Value="(No existen datos para presentar. Use Archivo-Propiedades en el menú para definir la Traducción Fuente y la Traducción a Hacer.)"></Alt>
+      </Item>
+      <Item ID="BrowseForBackupFolderDescr">
+        <Alt ID="sp" Value="Seleccione la carpeta en donde quiere guardar sus archivos de respaldo. Es preferible que no se guarden en el mismo disco duro, sino en una tarjeta flash o una unidad floppy."></Alt>
+      </Item>
+    </Group>
+    <Group ID="Notes">
+      <Item ID="ToDoDefault">
+      </Item>
+      <Item ID="FrontDefault">
+      </Item>
+      <Item ID="BackTTranslationDefault">
+      </Item>
+      <Item ID="AskUnsDefault">
+      </Item>
+      <Item ID="HintDefault">
+      </Item>
+      <Item ID="GreekDefault">
+      </Item>
+      <Item ID="HebrewDefault">
+      </Item>
+      <Item ID="ExegesisDefault">
+      </Item>
+    </Group>
+    <Group ID="Files">
+      <Item ID="ProjectFileFilter">
+        <Alt ID="sp" Value="Archivos de Proyecto PalabraNuestra (*.owp)|*.owp"></Alt>
+      </Item>
+      <Item ID="TranslationFileFilter">
+        <Alt ID="sp" Value="Archivo de Traducción PalabraNuestra (*.oTrans)|*.oTrans"></Alt>
+      </Item>
+      <Item ID="TeamSettingsFileFilter">
+        <Alt ID="sp" Value="Archivo de Elecciones PalabraNuestra (*.owt)|*.owt"></Alt>
+      </Item>
+      <Item ID="DefaultProjectFileName">
+        <Alt ID="sp" Value="Proyecto Nuevo.owp"></Alt>
+      </Item>
+      <Item ID="DefaultTranslationFileName">
+        <Alt ID="sp" Value="Traducción Nuevo.oTrans"></Alt>
+      </Item>
+      <Item ID="SaveTranslationAsTitle">
+      </Item>
+      <Item ID="OpenTranslationDlgTitle">
+        <Alt ID="sp" Value="Abrir Archivo que Define Traducción"></Alt>
+      </Item>
+      <Item ID="ExportBookSaveAsDlgTitle">
+      </Item>
+      <Item ID="ExportBookFileFilter">
+      </Item>
+      <Item ID="BrowseForBackupFile">
+        <Alt ID="sp" Value="Navegar al Archivo de Respaldo"></Alt>
+      </Item>
+    </Group>
+    <Group ID="Styles">
+      <Item ID="SectionTitle">
+      </Item>
+      <Item ID="SectionTitle2">
+      </Item>
+      <Item ID="CrossRef">
+      </Item>
+      <Item ID="BookTitle">
+      </Item>
+      <Item ID="SubTitle">
+      </Item>
+      <Item ID="Header">
+      </Item>
+      <Item ID="Picture">
+      </Item>
+    </Group>
+  </Group>
+  <Group ID="Messages">
+    <Item ID="msgBookIsLocked">
+      <Alt ID="sp" Value="Please discuss suggested changes or improvements with your team advisor. Further changes to {0} cannot be made directly on this computer."></Alt>
+    </Item>
+    <Item ID="msgBookNeedsFolder">
+      <Alt ID="sp" Value="Identifique la Carpeta en que va a guardar los data para este libro."></Alt>
+    </Item>
+    <Item ID="msgBookNeedsImportFilename">
+      <Alt ID="sp" Value="Nombre del archivo para importar."></Alt>
+    </Item>
+    <Item ID="msgBookNeedsName">
+      <Alt ID="sp" Value="Dar el nombre de este libro, por ejemplo «Nü'arisixi»."></Alt>
+    </Item>
+    <Item ID="msgCantInsertNoteHere">
+      <Alt ID="sp" Value="No se puede insertar Notas para títulos de libros, leyendas para dibujos, no notas al pie."></Alt>
+    </Item>
+    <Item ID="msgConfirmChangeFileLanguage">
+      <Alt ID="sp" Value="Al cambiar la lengua de la traducción, aparecen los siguientes efectos:{n}1. Los nombres de Etapas regresarán a los nombres de defectos del programa original,{n}2. Los nombres de los libros cambiarán (con el tiempo, cuando cada libro se guarda)."></Alt>
+    </Item>
+    <Item ID="msgConfirmFileOverwrite">
+      <Alt ID="sp" Value="El archivo {n}    {0}{n}ya existe en el disco. ¿Está seguro que lo quiere reemplacer?"></Alt>
+    </Item>
+    <Item ID="msgConfirmFrontReplace">
+      <Alt ID="sp" Value="Esto reemplacerá {0} como su traducción fuente.{n}{n}¿Está Vd. seguro de que quiere hacer esto?"></Alt>
+    </Item>
+    <Item ID="msgConfirmNoteDeletion">
+      <Alt ID="sp" Value="¿Está seguro de que quiere borrar esta nota:{n}  {0}?"></Alt>
+    </Item>
+    <Item ID="msgConfirmTargetReplace">
+      <Alt ID="sp" Value="Esto reemplacerá {0} como la traducción que Vd. hace.{n}{n}¿Está Vd. seguro de que quiere hacer esto?"></Alt>
+    </Item>
+    <Item ID="msgConfirmRemoveTranslationStage">
+      <Alt ID="sp" Value="Vd. está para borrar una de las Etapas de la Traducción. Si algunos de los {n}libros de su traducción están en esa etapa, de aquí en adelante no llevarán{n} el nombre de etapa correcto."></Alt>
+    </Item>
+    <Item ID="msgConfirmResetStylesToDefaults">
+      <Alt ID="sp" Value="¿Está seguro de que quiere restaurar la hoja de estilo entera a su opción por defecto?"></Alt>
+    </Item>
+    <Item ID="msgConfirmResetTranslationStagesToDefaults">
+      <Alt ID="sp" Value="¿Está seguro de que quiere restaurar las Etapas de la Traducción a su opción por defecto?"></Alt>
+    </Item>
+    <Item ID="msgDuplicateBookName">
+      <Alt ID="sp" Value="El nombre de este libro no puede ser idéntico al de otro libro en la misma traducción."></Alt>
+    </Item>
+    <Item ID="msgDuplicateStagesNotAllowed">
+      <Alt ID="sp" Value="Dos Etapas de la Traducción no pueden llevar el mismo nombre."></Alt>
+    </Item>
+    <Item ID="msgInsufficentSpaceForBackup">
+      <Alt ID="sp" Value="Faltó espacio en la unidad {0} para guardar el archivo de respaldo."></Alt>
+    </Item>
+    <Item ID="msgMissingChapterRange">
+      <Alt ID="sp" Value="Favor de entrar los números inicial y final, separados por un guión, de los capítulos que desea imprimir."></Alt>
+    </Item>
+    <Item ID="msgMissingPageRange">
+      <Alt ID="sp" Value="Favor de entrar los números inicial y final, separados por un guión, de las páginas que desea imprimir."></Alt>
+    </Item>
+    <Item ID="msgNeedFloppyForBackup">
+      <Alt ID="sp" Value="No es posible guardar el archivo de respaldo: {n}{n}     {0}}{n}{n}.Asegúarese de que haya algo en la unidad de disco {n}(floppy, o memoria flash, como sea apropiado).}{n}{n}Oprime Aceptar para volver a guardar, o Cancelar para no guardar el archivo de respaldo."></Alt>
+    </Item>
+    <Item ID="msgNoFilterMatches">
+      <Alt ID="sp" Value="Ninguna sección se encajó con sus criterios."></Alt>
+    </Item>
+    <Item ID="msgNoPermissionToWriteFile">
+      <Alt ID="sp" Value="Usted no tiene permiso para escribir el archivo:{n}{n}    {0}"></Alt>
+    </Item>
+    <Item ID="msgProjectHasNoFront">
+      <Alt ID="sp" Value="No se ha definido la Traducción Fuente para este proyecto. ¿Quiere hacerlo ahora?"></Alt>
+    </Item>
+    <Item ID="msgProjectHasNoTarget">
+      <Alt ID="sp" Value="No se ha definido la traducción que produce este proyecto. ¿Quiere hacerlo ahora?"></Alt>
+    </Item>
+    <Item ID="msgTranslationNeedsAbbrev">
+      <Alt ID="sp" Value="Dar una abreviación para la traducción que va a hacer. Normalment es el código internacional de ethnologue.com, como «hch»."></Alt>
+    </Item>
+    <Item ID="msgTranslationNeedsPath">
+      <Alt ID="sp" Value="Archivo Elecciones"></Alt>
+    </Item>
+    <Item ID="msgTranslationNeedsName">
+      <Alt ID="sp" Value="Dar el nombre de la traducción que va a hacer, como «Huichol»"></Alt>
+    </Item>
+    <Item ID="msgUnableToSaveFile">
+      <Alt ID="sp" Value="No se puede guardar el archivo: '{0}.'"></Alt>
+    </Item>
+    <Item ID="msgVerifyRemoveBook">
+      <Alt ID="sp" Value="¿Desea quitar este libro de la traducción? (Quitar aquí no borra el archivo que está en el disco. Pero PalabraNuestra ya no se dará cuenta que existe.)"></Alt>
+    </Item>
+    <Item ID="msgVerifyRemoveTranslation">
+      <Alt ID="sp" Value="¿Desea quitar esta traducción del proyecto? (Quitar aquí no borra el archivo que está en el disco.)"></Alt>
+    </Item>
+    <Item ID="msgVerifyRestore">
+      <Alt ID="sp" Value="¿Está seguro que quiere reemplazar el archivo:{n}     {0}{n}con el archivo de respaldo:{n}     {1}?"></Alt>
+    </Item>
+    <Item ID="msgMissingParagraphMarker">
+    </Item>
+    <Item ID="msgMissingVerseNumber">
+    </Item>
+    <Item ID="msgMissingParagraphMarkerForNote">
+    </Item>
+    <Item ID="msgChapterNotInParagraph">
+    </Item>
+    <Item ID="msgBadChapterNo">
+    </Item>
+    <Item ID="msgMissingParagraphMarkerForCF">
+    </Item>
+    <Item ID="msgNoVerseInSection">
+    </Item>
+    <Item ID="msgAlreadyRunning">
+    </Item>
+    <Group ID="FileStructureMessages">
+      <Item ID="paragraphs">
+      </Item>
+      <Item ID="picture">
+      </Item>
+      <Item ID="msgStructureMismatch">
+      </Item>
+      <Item ID="diagnosis1">
+      </Item>
+      <Item ID="diagnosis2">
+      </Item>
+      <Item ID="msgSectionMiscount">
+      </Item>
+    </Group>
+  </Group>
+  <Group ID="BookNames">
+    <Item ID="Genesis">
+      <Alt ID="sp" Value="Génesis"></Alt>
+    </Item>
+    <Item ID="Exodus">
+      <Alt ID="sp" Value="Éxodo"></Alt>
+    </Item>
+    <Item ID="Leviticus">
+      <Alt ID="sp" Value="Levítico"></Alt>
+    </Item>
+    <Item ID="Numbers">
+      <Alt ID="sp" Value="Números"></Alt>
+    </Item>
+    <Item ID="Deuteronomy">
+      <Alt ID="sp" Value="Deuteronomio"></Alt>
+    </Item>
+    <Item ID="Joshua">
+      <Alt ID="sp" Value="Josué"></Alt>
+    </Item>
+    <Item ID="Judges">
+      <Alt ID="sp" Value="Jueces"></Alt>
+    </Item>
+    <Item ID="Ruth">
+      <Alt ID="sp" Value="Rut"></Alt>
+    </Item>
+    <Item ID="1 Samuel">
+      <Alt ID="sp" Value="1 Samuel"></Alt>
+    </Item>
+    <Item ID="2 Samuel">
+      <Alt ID="sp" Value="2 Samuel"></Alt>
+    </Item>
+    <Item ID="1 Kings">
+      <Alt ID="sp" Value="1 Reyes"></Alt>
+    </Item>
+    <Item ID="2 Kings">
+      <Alt ID="sp" Value="2 Reyes"></Alt>
+    </Item>
+    <Item ID="1 Chronicles">
+      <Alt ID="sp" Value="1 Crónicas"></Alt>
+    </Item>
+    <Item ID="2 Chronicles">
+      <Alt ID="sp" Value="2 Crónicas"></Alt>
+    </Item>
+    <Item ID="Ezra">
+      <Alt ID="sp" Value="Esdras"></Alt>
+    </Item>
+    <Item ID="Nehemiah">
+      <Alt ID="sp" Value="Nehemías"></Alt>
+    </Item>
+    <Item ID="Esther">
+      <Alt ID="sp" Value="Ester"></Alt>
+    </Item>
+    <Item ID="Job">
+      <Alt ID="sp" Value="Job"></Alt>
+    </Item>
+    <Item ID="Psalms">
+      <Alt ID="sp" Value="Salmos"></Alt>
+    </Item>
+    <Item ID="Proverbs">
+      <Alt ID="sp" Value="Proverbios"></Alt>
+    </Item>
+    <Item ID="Ecclesiastes">
+      <Alt ID="sp" Value="Eclesiastés"></Alt>
+    </Item>
+    <Item ID="Song of Songs">
+      <Alt ID="sp" Value="Cantares"></Alt>
+    </Item>
+    <Item ID="Isaiah">
+      <Alt ID="sp" Value="Isaías"></Alt>
+    </Item>
+    <Item ID="Jeremiah">
+      <Alt ID="sp" Value="Jeremías"></Alt>
+    </Item>
+    <Item ID="Lamentations">
+      <Alt ID="sp" Value="Lamentaciones"></Alt>
+    </Item>
+    <Item ID="Ezekiel">
+      <Alt ID="sp" Value="Ezequiel"></Alt>
+    </Item>
+    <Item ID="Daniel">
+      <Alt ID="sp" Value="Daniel"></Alt>
+    </Item>
+    <Item ID="Hosea">
+      <Alt ID="sp" Value="Oseas"></Alt>
+    </Item>
+    <Item ID="Joel">
+      <Alt ID="sp" Value="Joel"></Alt>
+    </Item>
+    <Item ID="Amos">
+      <Alt ID="sp" Value="Amós"></Alt>
+    </Item>
+    <Item ID="Obadiah">
+      <Alt ID="sp" Value="Abdías"></Alt>
+    </Item>
+    <Item ID="Jonah">
+      <Alt ID="sp" Value="Jonás"></Alt>
+    </Item>
+    <Item ID="Micah">
+      <Alt ID="sp" Value="Miqueas"></Alt>
+    </Item>
+    <Item ID="Nahum">
+      <Alt ID="sp" Value="Nahum"></Alt>
+    </Item>
+    <Item ID="Habakkuk">
+      <Alt ID="sp" Value="Habacuc"></Alt>
+    </Item>
+    <Item ID="Zephaniah,">
+      <Alt ID="sp" Value="Sofonías"></Alt>
+    </Item>
+    <Item ID="Haggai">
+      <Alt ID="sp" Value="Hágeo"></Alt>
+    </Item>
+    <Item ID="Zechariah">
+      <Alt ID="sp" Value="Zacarías"></Alt>
+    </Item>
+    <Item ID="Malachi">
+      <Alt ID="sp" Value="Malaquías"></Alt>
+    </Item>
+    <Item ID="Matthew">
+      <Alt ID="sp" Value="Mateo"></Alt>
+    </Item>
+    <Item ID="Mark">
+      <Alt ID="sp" Value="Marcos"></Alt>
+    </Item>
+    <Item ID="Luke">
+      <Alt ID="sp" Value="Lucas"></Alt>
+    </Item>
+    <Item ID="John">
+      <Alt ID="sp" Value="Juan"></Alt>
+    </Item>
+    <Item ID="Acts">
+      <Alt ID="sp" Value="Hechos"></Alt>
+    </Item>
+    <Item ID="Romans">
+      <Alt ID="sp" Value="Romanos"></Alt>
+    </Item>
+    <Item ID="1 Corinthians">
+      <Alt ID="sp" Value="1 Corintios"></Alt>
+    </Item>
+    <Item ID="2 Corinthians">
+      <Alt ID="sp" Value="2 Corintios"></Alt>
+    </Item>
+    <Item ID="Galatians">
+      <Alt ID="sp" Value="Gálatas"></Alt>
+    </Item>
+    <Item ID="Ephesians">
+      <Alt ID="sp" Value="Efesios"></Alt>
+    </Item>
+    <Item ID="Philippians">
+      <Alt ID="sp" Value="Filipenses"></Alt>
+    </Item>
+    <Item ID="Colossians">
+      <Alt ID="sp" Value="Colosenses"></Alt>
+    </Item>
+    <Item ID="1 Thessalonians">
+      <Alt ID="sp" Value="1 Tesalonicenses"></Alt>
+    </Item>
+    <Item ID="2 Thessalonians">
+      <Alt ID="sp" Value="2 Tesalonicenses"></Alt>
+    </Item>
+    <Item ID="1 Timothy">
+      <Alt ID="sp" Value="1 Timoteo"></Alt>
+    </Item>
+    <Item ID="2 Timothy">
+      <Alt ID="sp" Value="2 Timoteo"></Alt>
+    </Item>
+    <Item ID="Titus">
+      <Alt ID="sp" Value="Tito"></Alt>
+    </Item>
+    <Item ID="Philemon">
+      <Alt ID="sp" Value="Filemón"></Alt>
+    </Item>
+    <Item ID="Hebrews">
+      <Alt ID="sp" Value="Hebreos"></Alt>
+    </Item>
+    <Item ID="James">
+      <Alt ID="sp" Value="Santiago"></Alt>
+    </Item>
+    <Item ID="1 Peter">
+      <Alt ID="sp" Value="1 Pedro"></Alt>
+    </Item>
+    <Item ID="2 Peter">
+      <Alt ID="sp" Value="2 Pedro"></Alt>
+    </Item>
+    <Item ID="1 John">
+      <Alt ID="sp" Value="1 Juan"></Alt>
+    </Item>
+    <Item ID="2 John">
+      <Alt ID="sp" Value="2 Juan"></Alt>
+    </Item>
+    <Item ID="3 John">
+      <Alt ID="sp" Value="3 Juan"></Alt>
+    </Item>
+    <Item ID="Jude">
+      <Alt ID="sp" Value="Judas"></Alt>
+    </Item>
+    <Item ID="Revelation">
+      <Alt ID="sp" Value="Apocalipsis"></Alt>
+    </Item>
+  </Group>
+  <Group ID="BookAbbrevs">
+    <Item ID="GEN">
+    </Item>
+    <Item ID="EXO">
+    </Item>
+    <Item ID="LEV">
+    </Item>
+    <Item ID="NUM">
+    </Item>
+    <Item ID="DEU">
+    </Item>
+    <Item ID="JOS">
+    </Item>
+    <Item ID="JDG">
+    </Item>
+    <Item ID="RUT">
+    </Item>
+    <Item ID="1SA">
+    </Item>
+    <Item ID="2SA">
+    </Item>
+    <Item ID="1KI">
+    </Item>
+    <Item ID="2KI">
+    </Item>
+    <Item ID="1CH">
+    </Item>
+    <Item ID="2CH">
+    </Item>
+    <Item ID="EZR">
+    </Item>
+    <Item ID="NEH">
+    </Item>
+    <Item ID="EST">
+    </Item>
+    <Item ID="JOB">
+    </Item>
+    <Item ID="PSA">
+    </Item>
+    <Item ID="PRO">
+    </Item>
+    <Item ID="ECC">
+    </Item>
+    <Item ID="SNG">
+    </Item>
+    <Item ID="ISA">
+    </Item>
+    <Item ID="JER">
+    </Item>
+    <Item ID="LAM">
+    </Item>
+    <Item ID="EZK">
+    </Item>
+    <Item ID="DAN">
+    </Item>
+    <Item ID="HOS">
+    </Item>
+    <Item ID="JOL">
+    </Item>
+    <Item ID="AMO">
+    </Item>
+    <Item ID="OBA">
+    </Item>
+    <Item ID="JON">
+    </Item>
+    <Item ID="MIC">
+    </Item>
+    <Item ID="NAM">
+    </Item>
+    <Item ID="HAB">
+    </Item>
+    <Item ID="ZEP">
+    </Item>
+    <Item ID="HAG">
+    </Item>
+    <Item ID="ZEC">
+    </Item>
+    <Item ID="MAL">
+    </Item>
+    <Item ID="MAT">
+    </Item>
+    <Item ID="MRK">
+    </Item>
+    <Item ID="LUK">
+    </Item>
+    <Item ID="JHN">
+    </Item>
+    <Item ID="ACT">
+    </Item>
+    <Item ID="ROM">
+    </Item>
+    <Item ID="1CO">
+    </Item>
+    <Item ID="2CO">
+    </Item>
+    <Item ID="GAL">
+    </Item>
+    <Item ID="EPH">
+    </Item>
+    <Item ID="PHP">
+    </Item>
+    <Item ID="COL">
+    </Item>
+    <Item ID="1TH">
+    </Item>
+    <Item ID="2TH">
+    </Item>
+    <Item ID="1TI">
+    </Item>
+    <Item ID="2TI">
+    </Item>
+    <Item ID="TIT">
+    </Item>
+    <Item ID="PHM">
+    </Item>
+    <Item ID="HEB">
+    </Item>
+    <Item ID="JAS">
+    </Item>
+    <Item ID="1PE">
+    </Item>
+    <Item ID="2PE">
+    </Item>
+    <Item ID="1JN">
+    </Item>
+    <Item ID="2JN">
+    </Item>
+    <Item ID="3JN">
+    </Item>
+    <Item ID="JUD">
+    </Item>
+    <Item ID="REV">
+    </Item>
+  </Group>
+  <Group ID="BookGroupings">
+    <Item ID="Pentateuch">
+      <Alt ID="sp" Value="Pentateuco"></Alt>
+    </Item>
+    <Item ID="Historical">
+      <Alt ID="sp" Value="Historia"></Alt>
+    </Item>
+    <Item ID="Poetical">
+      <Alt ID="sp" Value="Poesía"></Alt>
+    </Item>
+    <Item ID="Prophetic">
+      <Alt ID="sp" Value="Profecía"></Alt>
+    </Item>
+    <Item ID="Gospels">
+      <Alt ID="sp" Value="Evangelios"></Alt>
+    </Item>
+    <Item ID="PaulineLetters">
+      <Alt ID="sp" Value="Cartas Paulinas"></Alt>
+    </Item>
+    <Item ID="GeneralLetters">
+      <Alt ID="sp" Value="Cartas Generales"></Alt>
+    </Item>
+  </Group>
+  <Group ID="TranslationStages">
+    <Item ID="abbrevDraft">
+      <Alt ID="sp" Value="Borr"></Alt>
+    </Item>
+    <Item ID="abbrevTeamCheck">
+      <Alt ID="sp" Value="Eqp"></Alt>
+    </Item>
+    <Item ID="abbrevAdvisorCheck">
+      <Alt ID="sp" Value="Coord"></Alt>
+    </Item>
+    <Item ID="abbrevCommunityCheck">
+      <Alt ID="sp" Value="Comu"></Alt>
+    </Item>
+    <Item ID="abbrevBackTranslation">
+      <Alt ID="sp" Value="Trad Inv"></Alt>
+    </Item>
+    <Item ID="abbrevConsultantCheck">
+      <Alt ID="sp" Value="Cons"></Alt>
+    </Item>
+    <Item ID="abbrevFinalForPrinting">
+      <Alt ID="sp" Value="Final"></Alt>
+    </Item>
+    <Item ID="abbrevFinalRevisions">
+      <Alt ID="sp" Value="Redac"></Alt>
+    </Item>
+    <Item ID="Draft">
+      <Alt ID="sp" Value="Borrador"></Alt>
+    </Item>
+    <Item ID="TeamCheck">
+      <Alt ID="sp" Value="Equipo"></Alt>
+    </Item>
+    <Item ID="AdvisorCheck">
+      <Alt ID="sp" Value="Coordinador"></Alt>
+    </Item>
+    <Item ID="CommunityCheck">
+      <Alt ID="sp" Value="Comunidad"></Alt>
+    </Item>
+    <Item ID="BackTranslation">
+      <Alt ID="sp" Value="Traducción Inversa"></Alt>
+    </Item>
+    <Item ID="ConsultantCheck">
+      <Alt ID="sp" Value="Consultante"></Alt>
+    </Item>
+    <Item ID="FinalForPrinting">
+      <Alt ID="sp" Value="Final para Publicar"></Alt>
+    </Item>
+    <Item ID="FinalRevisions">
+      <Alt ID="sp" Value="Redacción Posterior"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogCommon">
+    <Item ID="m_btnBrowse">
+      <Alt ID="sp" Value="Navegar..."></Alt>
+    </Item>
+    <Item ID="m_btnSaveAs">
+    </Item>
+    <Item ID="m_btnOK">
+    </Item>
+    <Item ID="m_btnClose">
+    </Item>
+    <Item ID="m_btnCancel">
+      <Alt ID="sp" Value="Cancelar"></Alt>
+    </Item>
+    <Item ID="m_btnHelp">
+      <Alt ID="sp" Value="Ayuda..."></Alt>
+    </Item>
+    <Item ID="m_lblProgramName">
+      <Alt ID="sp" Value="Palabra Nuestra"></Alt>
+    </Item>
+    <Item ID="m_lblVersion">
+      <Alt ID="sp" Value="Versión {0}"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogRestoreFromBackup">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Restaurar del Archivo de Respaldo"></Alt>
+    </Item>
+    <Item ID="m_lblExplanation">
+      <Alt ID="sp" Value="Éste restaura una versión previa del libro, que borra la versión en vigor. La que está en vigor, desaparecerá de su computadora."></Alt>
+    </Item>
+    <Item ID="m_lblBook">
+      <Alt ID="sp" Value="Libro para Restaurar:"></Alt>
+    </Item>
+    <Item ID="m_lblFilename">
+      <Alt ID="sp" Value="Archivo en Vigor:"></Alt>
+    </Item>
+    <Item ID="m_lblRestoreFrom">
+      <Alt ID="sp" Value="Archivo de Respaldo que se Sustituye para el Archivo en Vigor:"></Alt>
+    </Item>
+    <Item ID="m_lblBackupFilename">
+      <Alt ID="sp" Value="Archivo de Respaldo:"></Alt>
+    </Item>
+    <Item ID="m_btnOK">
+      <Alt ID="sp" Value="Restaurar"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogSetupFeatures">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Selección de Habilidades"></Alt>
+    </Item>
+    <Item ID="m_btnResetDefaults">
+    </Item>
+    <Item ID="m_btnPasswordProtect">
+      <Alt ID="sp" Value="&amp;Contraseña para Restringir Acceso..."></Alt>
+    </Item>
+    <Item ID="m_btnAllOff">
+      <Alt ID="sp" Value="&amp;Eliminar Todas"></Alt>
+    </Item>
+    <Item ID="m_btnAllOn">
+      <Alt ID="sp" Value="&amp;Poner Todas"></Alt>
+    </Item>
+    <Item ID="m_box">
+      <Alt ID="sp" Value="Descripción"></Alt>
+    </Item>
+    <Item ID="m_lblDescription">
+    </Item>
+    <Item ID="m_lblInstructions">
+      <Alt ID="sp" Value="Ponga palomita para cada habilidad de que quiere tener uso en la interfaz del usuario."></Alt>
+    </Item>
+    <Item ID="fJobBT_CheckBox">
+      <Alt ID="sp" Value="Tarea de Traducción Inversa"></Alt>
+    </Item>
+    <Item ID="fJobBT_Description">
+      <Alt ID="sp" Value="Composición que le permite hacer una Traducción Inversa, es decir, una representacion de su traducción hecha en una lengua que el consultante conoce."></Alt>
+    </Item>
+    <Item ID="fJobNaturalness_CheckBox">
+    </Item>
+    <Item ID="fJobNaturalness_Description">
+    </Item>
+    <Item ID="fProject_CheckBox">
+      <Alt ID="sp" Value="Proyecto Nuevo / Abrir / etc."></Alt>
+    </Item>
+    <Item ID="fProject_Description">
+      <Alt ID="sp" Value="Activar si trabaja con proyectos múltiples"></Alt>
+    </Item>
+    <Item ID="fPropertiesDialog_CheckBox">
+      <Alt ID="sp" Value="Propiedades"></Alt>
+    </Item>
+    <Item ID="fPropertiesDialog_Description">
+      <Alt ID="sp" Value="Activar si quiere ajustar las propiedades de un proyecto. "></Alt>
+    </Item>
+    <Item ID="fOptions_CheckBox">
+      <Alt ID="sp" Value="Herramientas-Opciones"></Alt>
+    </Item>
+    <Item ID="fOptions_Description">
+      <Alt ID="sp" Value="Permite configurar varias opciones del programa. Desactivar si la máquina tiene las opciones puestas correctamente, y Vd. no quiere que sean modificadas."></Alt>
+    </Item>
+    <Item ID="fPrint_CheckBox">
+      <Alt ID="sp" Value="Impresión"></Alt>
+    </Item>
+    <Item ID="fPrint_Description">
+    </Item>
+    <Item ID="fAutoReplace_CheckBox">
+      <Alt ID="sp" Value="AutoSubstitución al entrar datos."></Alt>
+    </Item>
+    <Item ID="fAutoReplace_Description">
+      <Alt ID="sp" Value="Activar AutoSubstitución. Cuando entra uno o más caracteres designados, se substituye otro carácter o secuencia de caracteres. Úsese para caracteres especiales, o para extender abreviaciones (como entra JC y aparece Jesucristo)."></Alt>
+    </Item>
+    <Item ID="fRestoreBackup_CheckBox">
+      <Alt ID="sp" Value="Restaurar archivos de respaldo"></Alt>
+    </Item>
+    <Item ID="fRestoreBackup_Description">
+      <Alt ID="sp" Value="Se guardan archivos de respaldo en una tarjeta flash o memoria externa (a través de Herramientas-Opciones). Activando la restauración, el menú Herramientas añade un diálogo mediante el cual puede substituir el contenido de un archivo de respaldo por el archivo en vigor."></Alt>
+    </Item>
+    <Item ID="fCopyBTfromFront_CheckBox">
+    </Item>
+    <Item ID="fCopyBTfromFront_Description">
+    </Item>
+    <Item ID="fFilter_CheckBox">
+      <Alt ID="sp" Value="Mostrar únicamente Secciones con (Filtro)"></Alt>
+    </Item>
+    <Item ID="fFilter_Description">
+      <Alt ID="sp" Value="En el Menú «Ir a», las instrucciones Próximo y Anterior irán únicamente a las secciones que llenan ciertos requisitos, tales como contener ciertas palabra, o contener comillas no emparejadas. Es una manera útil para localizar errores o Notas a Hacer."></Alt>
+    </Item>
+    <Item ID="fJustTheBasics_CheckBox">
+      <Alt ID="sp" Value="Sólo lo Básico"></Alt>
+    </Item>
+    <Item ID="fJustTheBasics_Description">
+      <Alt ID="sp" Value="Para usuarios sin experience con computadoras, PalabraNuestra tiene un interfaz que permite un nivel básico da trabajo. Reemplaza al menú con una serie de botones, con dibujos y texto descriptivo. El principiante no tiene que aprender más de una docena de instrucciones."></Alt>
+    </Item>
+    <Item ID="m_checkListFeatures">
+      <Alt ID="sp" Value="Sólo lo Básico"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogPasswordProtect">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Proteger con Contraseña"></Alt>
+    </Item>
+    <Item ID="m_lblHelps">
+      <Alt ID="sp" Value="¡Tenga cuidado de no olvidar toda esta contraseña! (Por ejemplo, mayúsculas y minúsculas se tratan como diferentes.)"></Alt>
+    </Item>
+    <Item ID="m_lblPassword">
+      <Alt ID="sp" Value="Entrar contraseña:"></Alt>
+    </Item>
+    <Item ID="m_checkProtect">
+      <Alt ID="sp" Value="Contraseña para Restringir Acceso a la Selección de Habilidades"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogPassword">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Contraseña"></Alt>
+    </Item>
+    <Item ID="m_lblPrompt">
+      <Alt ID="sp" Value="Entrar su contraseña para Selección de Habilidades."></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogBookNames">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_lblFrom">
+    </Item>
+    <Item ID="m_btnCopyBookNames">
+    </Item>
+    <Item ID="m_lblInstructions">
+    </Item>
+  </Group>
+  <Group ID="DialogPrint">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Impresión"></Alt>
+    </Item>
+    <Item ID="m_lblPrinter">
+      <Alt ID="sp" Value="Impresora:"></Alt>
+    </Item>
+    <Item ID="m_groupRange">
+      <Alt ID="sp" Value="Alcance"></Alt>
+    </Item>
+    <Item ID="m_radioEntireBook">
+      <Alt ID="sp" Value="Libro Entero"></Alt>
+    </Item>
+    <Item ID="m_radioThisSection">
+      <Alt ID="sp" Value="Sección en Vigor"></Alt>
+    </Item>
+    <Item ID="m_radioPages">
+      <Alt ID="sp" Value="Páginas:"></Alt>
+    </Item>
+    <Item ID="m_labelToPage">
+      <Alt ID="sp" Value="a"></Alt>
+    </Item>
+    <Item ID="m_radioChapters">
+      <Alt ID="sp" Value="Capítulos:"></Alt>
+    </Item>
+    <Item ID="m_labelToChapter">
+      <Alt ID="sp" Value="a"></Alt>
+    </Item>
+    <Item ID="m_groupOptions">
+      <Alt ID="sp" Value="Elecciones"></Alt>
+    </Item>
+    <Item ID="m_checkWaterMark">
+      <Alt ID="sp" Value="Imprimir Marca de Agua Sobre el Fondo (p.ej. «Borrador»)"></Alt>
+    </Item>
+    <Item ID="m_checkReplacements">
+      <Alt ID="sp" Value="Sustituir (p.ej. &lt;&lt;Saludos&gt;&gt; se convierte en «Saludos»)"></Alt>
+    </Item>
+    <Item ID="m_checkPrintPictures">
+      <Alt ID="sp" Value="¿Imprimir Dibujos?"></Alt>
+    </Item>
+    <Item ID="m_labelLineSpacing">
+      <Alt ID="sp" Value="Espaciado Interlineal:"></Alt>
+    </Item>
+    <Item ID="m_btnOK">
+      <Alt ID="sp" Value=" Imprimir"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogOpenTranslation">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_btnSettings">
+    </Item>
+    <Item ID="m_lblSettings">
+    </Item>
+    <Item ID="m_lblSettingsHelp">
+    </Item>
+  </Group>
+  <Group ID="DialiogCreateTranslation">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_lblSettingsHelp">
+    </Item>
+    <Item ID="m_lblAbbrevHelp">
+    </Item>
+    <Item ID="m_lblNameHelp">
+    </Item>
+    <Item ID="m_btnSettings">
+    </Item>
+    <Item ID="m_lblSettings">
+    </Item>
+    <Item ID="m_lblAbbrev">
+    </Item>
+    <Item ID="m_lblName">
+    </Item>
+  </Group>
+  <Group ID="DialogCopyBTConflict">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_labelTargetVernacular">
+    </Item>
+    <Item ID="m_labelTargetBT">
+    </Item>
+    <Item ID="m_checkDoAll">
+    </Item>
+    <Item ID="m_btnAppendFrontToTarget">
+    </Item>
+    <Item ID="m_btnReplaceWithFront">
+    </Item>
+    <Item ID="m_btnKeepTarget">
+    </Item>
+    <Item ID="m_labelFrontVernacular">
+    </Item>
+    <Item ID="m_labelInfo">
+    </Item>
+    <Item ID="m_labelFrontBT">
+    </Item>
+  </Group>
+  <Group ID="DialogHelpAbout">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Acerca de Palabra Nuestra"></Alt>
+    </Item>
+    <Item ID="m_lblCopyright">
+      <Alt ID="sp" Value="Derechos reservados conforme a la ley, 2004-08. Se reservan todos los derechos."></Alt>
+    </Item>
+    <Item ID="m_link">
+      <Alt ID="sp" Value="Iniciar Correo Electrónico"></Alt>
+    </Item>
+    <Item ID="m_lblDescription">
+      <Alt ID="sp" Value="Programa que ayuda a los traductores de la Biblia a su propia lengua meterna, y a su equipo de auxiliares, que hacen uso de una Traducción Fuente de alta calidad"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogRepairImportBook">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Error encontrado al intentar abrir un libro"></Alt>
+    </Item>
+    <Item ID="m_Directions">
+      <Alt ID="sp" Value="Puede rectificar la parte que contiene el error, y hacer clic en el botón Una Vez Más, o puede Cancelar la importación."></Alt>
+    </Item>
+    <Item ID="m_AnErrorOccured">
+      <Alt ID="sp" Value="Error encontrado al intentar importar el libro &lt;&lt;{0}&gt;&amp;gt;"></Alt>
+    </Item>
+    <Item ID="m_btnTryAgain">
+      <Alt ID="sp" Value="Una Vez Más"></Alt>
+    </Item>
+    <Item ID="m_btnCancel">
+      <Alt ID="sp" Value="Cancelar Importación"></Alt>
+    </Item>
+    <Item ID="sRemoveWarning">
+      <Alt ID="sp" Value="Si Vd. no corrige el error, {nombredelibro} se borrará de entre las propiedades de {nombredellenguaje}. ¿Está Vd. seguro de que quere cancelar la importación de este libro?"></Alt>
+    </Item>
+  </Group>
+  <Group ID="DialogFilter">
+    <Item ID="Title">
+      <Alt ID="sp" Value="Mostrar Únicamente Secciones Que"></Alt>
+    </Item>
+    <Item ID="m_labelHeading">
+      <Alt ID="sp" Value="Mostrar Únicamente Secciones Que Tienen"></Alt>
+    </Item>
+    <Item ID="m_groupWordOrPhrase">
+      <Alt ID="sp" Value="Palabra o Frase"></Alt>
+    </Item>
+    <Item ID="m_labelInTheVernacular">
+      <Alt ID="sp" Value="En la Lengua de Traducción"></Alt>
+    </Item>
+    <Item ID="m_labelInTheFront">
+      <Alt ID="sp" Value="En la Versión Fuente"></Alt>
+    </Item>
+    <Item ID="m_labelInTheBackTranslation">
+      <Alt ID="sp" Value="En la Traducción Inversa"></Alt>
+    </Item>
+    <Item ID="m_groupNote">
+      <Alt ID="sp" Value="Nota de Tipo"></Alt>
+    </Item>
+    <Item ID="m_checkNoteToDo">
+      <Alt ID="sp" Value="A Hacer"></Alt>
+    </Item>
+    <Item ID="m_checkNoteAskUNS">
+      <Alt ID="sp" Value="Preguntar a Hablantes Nativos que No Conocen las Escrituras"></Alt>
+    </Item>
+    <Item ID="m_groupProblems">
+      <Alt ID="sp" Value="Problemas Posibles"></Alt>
+    </Item>
+    <Item ID="m_checkPunctuationProblem">
+      <Alt ID="sp" Value="Puntuación Problemática"></Alt>
+    </Item>
+    <Item ID="m_checkMismatchedQuotes">
+      <Alt ID="sp" Value="Comillas No Emparejadas"></Alt>
+    </Item>
+    <Item ID="m_checkUntranslatedText">
+      <Alt ID="sp" Value="Texto No Traducido"></Alt>
+    </Item>
+    <Item ID="m_checkCannotLocatePicture">
+      <Alt ID="sp" Value="Dibujo No Se Encuentra en el Disco"></Alt>
+    </Item>
+    <Item ID="m_groupStructure">
+      <Alt ID="sp" Value="Estructura"></Alt>
+    </Item>
+    <Item ID="m_checkPictureWithCaption">
+      <Alt ID="sp" Value="Cuadro con Leyenda"></Alt>
+    </Item>
+    <Item ID="m_checkQuote">
+      <Alt ID="sp" Value="Párrafo Citado"></Alt>
+    </Item>
+    <Item ID="m_labelQualifies">
+      <Alt ID="sp" Value="Esta Sección Se Permite Si"></Alt>
+    </Item>
+    <Item ID="strAnyOneOfThese">
+      <Alt ID="sp" Value="Cuando Menos Uno es Verdadero"></Alt>
+    </Item>
+    <Item ID="strAllOfThese">
+      <Alt ID="sp" Value="Todos son Verdaderos"></Alt>
+    </Item>
+    <Item ID="m_btnOK">
+    </Item>
+    <Item ID="m_btnCancel">
+    </Item>
+  </Group>
+  <Group ID="DialogProperties">
+    <Item ID="Title">
+    </Item>
+    <Item ID="strTitleWithLanguageName">
+    </Item>
+    <Item ID="m_btnNavTeamSettings">
+    </Item>
+    <Item ID="m_btnNavTranslations">
+    </Item>
+    <Item ID="m_btnNavOptions">
+    </Item>
+    <Item ID="m_btnNavEssentials">
+    </Item>
+    <Group ID="DialogProperties_Page_StyleSheet">
+      <Item ID="m_labelStyleSheet">
+      </Item>
+      <Item ID="m_btnRestoreDefaults">
+      </Item>
+      <Item ID="m_labelInstructions">
+      </Item>
+      <Item ID="propCharacterSettings">
+      </Item>
+      <Item ID="propParagraphSettings">
+      </Item>
+      <Item ID="propForeColor">
+      </Item>
+      <Item ID="propAlignment">
+      </Item>
+      <Item ID="option_kLeft">
+      </Item>
+      <Item ID="option_kRight">
+      </Item>
+      <Item ID="option_kCentered">
+      </Item>
+      <Item ID="option_kJustified">
+      </Item>
+      <Item ID="propKeepWithNext">
+      </Item>
+      <Item ID="propKeepWithNext_0">
+      </Item>
+      <Item ID="propKeepWithNext_1">
+      </Item>
+      <Item ID="propLeftMargin">
+      </Item>
+      <Item ID="propRightMargin">
+      </Item>
+      <Item ID="propFirstLine">
+      </Item>
+      <Item ID="propSpaceBefore">
+      </Item>
+      <Item ID="propSpaceAfter">
+      </Item>
+      <Item ID="propFontName">
+      </Item>
+      <Item ID="propFontHeight">
+      </Item>
+      <Item ID="propBold">
+      </Item>
+      <Item ID="propBold_0">
+      </Item>
+      <Item ID="propBold_1">
+      </Item>
+      <Item ID="propItalic">
+      </Item>
+      <Item ID="propItalic_0">
+      </Item>
+      <Item ID="propItalic_1">
+      </Item>
+      <Item ID="m_listStyles_col0">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_WritingSystems">
+      <Item ID="m_btnRemove">
+      </Item>
+      <Item ID="m_btnAdd">
+      </Item>
+      <Item ID="m_labelInstructions">
+      </Item>
+      <Item ID="m_labelWritingSystems">
+      </Item>
+      <Item ID="m_tabWSGeneral">
+      </Item>
+      <Item ID="m_tabWSAutoReplace">
+      </Item>
+      <Item ID="propName">
+      </Item>
+      <Item ID="propPunctuation">
+      </Item>
+      <Item ID="propEndPunctuation">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_AdvancedPrintOptions">
+      <Item ID="m_labelTitle">
+      </Item>
+      <Item ID="propOddPages">
+      </Item>
+      <Item ID="propOddLeft">
+      </Item>
+      <Item ID="propOddCenter">
+      </Item>
+      <Item ID="propOddRight">
+      </Item>
+      <Item ID="propEvenPages">
+      </Item>
+      <Item ID="propEvenLeft">
+      </Item>
+      <Item ID="propEvenCenter">
+      </Item>
+      <Item ID="propEvenRight">
+      </Item>
+      <Item ID="propCopyrightNotice">
+      </Item>
+      <Item ID="option_kBlank">
+      </Item>
+      <Item ID="option_kCopyrightNotice">
+      </Item>
+      <Item ID="option_kPageNumber">
+      </Item>
+      <Item ID="option_kScriptureReference">
+      </Item>
+      <Item ID="option_kStageAndDate">
+      </Item>
+      <Item ID="option_kLanguageStageAndDate">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_TeamSettings">
+      <Item ID="m_lblCreateNew">
+      </Item>
+      <Item ID="m_btnCreateNew">
+      </Item>
+      <Item ID="m_lblOpenExisting">
+      </Item>
+      <Item ID="m_lblActions">
+      </Item>
+      <Item ID="m_labelInstructions">
+      </Item>
+      <Item ID="m_btnOpenExisting">
+      </Item>
+      <Item ID="m_lblTeamSettingsFile">
+      </Item>
+      <Item ID="m_groupTeamSettingsFile">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_TranslationStages">
+      <Item ID="m_labelStagesTitle">
+      </Item>
+      <Item ID="m_labelLanguage">
+      </Item>
+      <Item ID="m_btnMoveUp">
+      </Item>
+      <Item ID="m_btnMoveDown">
+      </Item>
+      <Item ID="m_btnAdd">
+      </Item>
+      <Item ID="m_btnRemove">
+      </Item>
+      <Item ID="m_btnRestoreDefaults">
+      </Item>
+      <Item ID="m_labelInstructions">
+      </Item>
+      <Item ID="m_groupLanguage">
+      </Item>
+      <Item ID="m_labelLanguageExplanation">
+      </Item>
+      <Item ID="m_listviewStages_col0">
+      </Item>
+      <Item ID="m_listviewStages_col1">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_OtherTranslations">
+      <Item ID="m_lblSetup">
+      </Item>
+      <Item ID="m_lblTranslation">
+      </Item>
+      <Item ID="m_lblActions">
+      </Item>
+      <Item ID="m_btnCreate">
+      </Item>
+      <Item ID="m_lblCreate">
+      </Item>
+      <Item ID="m_btnOpen">
+      </Item>
+      <Item ID="m_lblOpen">
+      </Item>
+      <Item ID="m_btnRemove">
+      </Item>
+      <Item ID="m_lblRemove">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_SetupFT">
+      <Item ID="m_lblActions">
+      </Item>
+      <Item ID="m_btnOpen">
+      </Item>
+      <Item ID="m_btnCreate">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_Translation">
+      <Item ID="m_tabGeneral">
+      </Item>
+      <Item ID="m_tabBooks">
+      </Item>
+      <Item ID="m_tabBookNames">
+      </Item>
+      <Item ID="m_btnRemoveTranslation">
+      </Item>
+      <Item ID="m_lblLanguageName">
+      </Item>
+      <Item ID="m_btnExport">
+      </Item>
+      <Item ID="m_listviewBooks_col0">
+      </Item>
+      <Item ID="m_listviewBooks_col1">
+      </Item>
+      <Item ID="m_btnProperties">
+      </Item>
+      <Item ID="m_btnCreate">
+      </Item>
+      <Item ID="m_btnRemove">
+      </Item>
+      <Item ID="m_btnImportBook">
+      </Item>
+      <Item ID="m_lblFrom">
+      </Item>
+      <Item ID="m_btnCopyBookNames">
+      </Item>
+      <Item ID="propAbbreviation">
+      </Item>
+      <Item ID="Writing Systems">
+      </Item>
+      <Item ID="propWSVernacular">
+      </Item>
+      <Item ID="propWSAdvisor">
+      </Item>
+      <Item ID="m_listviewBooks_col2">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_Options">
+      <Item ID="propMaximizeWindowOnStartup">
+      </Item>
+      <Item ID="propMaximizeWindowOnStartup_0">
+      </Item>
+      <Item ID="propMaximizeWindowOnStartup_1">
+      </Item>
+      <Item ID="propMakeBackups">
+      </Item>
+      <Item ID="propMakeBackups_0">
+      </Item>
+      <Item ID="propMakeBackups_1">
+      </Item>
+      <Item ID="propBackupPath">
+      </Item>
+      <Item ID="propPicturesPath">
+      </Item>
+      <Item ID="propBackgroundColors">
+      </Item>
+      <Item ID="propBackColorDraftingWindow">
+      </Item>
+      <Item ID="propBackColorBackTranslationWindow">
+      </Item>
+      <Item ID="propBackColorNaturalnessCheckWindow">
+      </Item>
+      <Item ID="propBackColorNotesWindow">
+      </Item>
+      <Item ID="propBackColorOtherTranslationsWindow">
+      </Item>
+      <Item ID="propUserInterfaceLanguage">
+      </Item>
+      <Item ID="propPrimaryLanguage">
+      </Item>
+      <Item ID="propSecondaryLanguage">
+      </Item>
+    </Group>
+  </Group>
+  <Group ID="WizImportBook">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_btnFinish">
+    </Item>
+    <Item ID="m_btnPrev">
+    </Item>
+    <Item ID="m_btnNext">
+    </Item>
+    <Group ID="WizImportBook_WizPage_GetFileName">
+      <Item ID="strNavTitle">
+      </Item>
+      <Item ID="m_labelFileStats">
+      </Item>
+      <Item ID="m_labelOverview">
+      </Item>
+      <Item ID="m_labelBrowse">
+      </Item>
+      <Item ID="strPleaseWait">
+      </Item>
+      <Item ID="strUnableToAccessFile">
+      </Item>
+      <Item ID="strNotStandardFormat">
+      </Item>
+      <Item ID="strFileNotInSupportedEncoding">
+      </Item>
+      <Item ID="strMore">
+      </Item>
+      <Item ID="strUnknownMarkers">
+      </Item>
+      <Item ID="strFileStats">
+      </Item>
+      <Item ID="strOpenDialogTitle">
+      </Item>
+    </Group>
+    <Group ID="WizImportBook_WizPage_GetAbbreviation">
+      <Item ID="strNavTitle">
+      </Item>
+      <Item ID="m_labelExplanation">
+      </Item>
+      <Item ID="m_lvBooks_col0">
+      </Item>
+      <Item ID="m_lvBooks_col1">
+      </Item>
+      <Item ID="m_labelWhichBook">
+      </Item>
+    </Group>
+    <Group ID="WizImportBook_WizPage_GetStage">
+      <Item ID="strNavTitle">
+      </Item>
+      <Item ID="m_labelVersion">
+      </Item>
+      <Item ID="m_labelStage">
+      </Item>
+      <Item ID="m_labelExplanation">
+      </Item>
+    </Group>
+    <Group ID="WizImportBook_WizPage_GetDestinationFolder">
+      <Item ID="strNavTitle">
+      </Item>
+      <Item ID="m_labelNote">
+      </Item>
+      <Item ID="m_labelFolderText">
+      </Item>
+      <Item ID="m_labelFileNameText">
+      </Item>
+    </Group>
+    <Group ID="WizImportBook_WizPage_Summary">
+      <Item ID="strNavTitle">
+      </Item>
+      <Item ID="m_labelFormat">
+      </Item>
+      <Item ID="m_labelDestination">
+      </Item>
+      <Item ID="m_labelStage">
+      </Item>
+      <Item ID="m_labelFileName">
+      </Item>
+      <Item ID="m_labelBook">
+      </Item>
+      <Item ID="m_labelReady">
+      </Item>
+      <Item ID="m_labelClickFinish">
+      </Item>
+    </Group>
+  </Group>
+  <Group ID="SplashScreen">
+    <Item ID="Title">
+    </Item>
+    <Item ID="sLoadingOurWord">
+      <Alt ID="sp" Value="Cargando Palabra Nuestra..."></Alt>
+    </Item>
+    <Item ID="sOptionalAdditional">
+    </Item>
+    <Item ID="sLoading">
+      <Alt ID="sp" Value="Cargando {0}..."></Alt>
+    </Item>
+  </Group>
+</LocDB>
