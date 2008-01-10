@@ -2403,10 +2403,8 @@ namespace OurWord.Edit
 
             // Timer -------------------------------------------------------------------------
             // TODO: MSDN says Windows.Form.Timer is in the same thread as the Form, and thus
-            // the better option to use. Test under Mono to see if this works; if so, get
-            // rid of the commented out code.
+            // the better option to use.
             System.Windows.Forms.Timer m_Timer;
-//            System.Timers.Timer m_Timer;
             const int c_nTimerInterval = 600;
             bool m_bFlashOn = false;
             #region Method: OnTimerTick(...)
@@ -2431,13 +2429,8 @@ namespace OurWord.Edit
                 m_Timer = new System.Windows.Forms.Timer();
                 m_Timer.Tick += new EventHandler(OnTimerTick);
 
-//                m_Timer = new System.Timers.Timer();
                 m_Timer.Interval = c_nTimerInterval;
-//                m_Timer.AutoReset = true;
- //               m_Timer.Elapsed += new ElapsedEventHandler(OnTimerTick);
                 m_Timer.Start();
-                /***
-                ***/
             }
             #endregion
 

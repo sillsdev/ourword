@@ -1039,7 +1039,7 @@ namespace OurWord.DataModel
 			// Do the requested tests
 			ArrayList a = new ArrayList();
 
-			// Make sure the paragraphsh are in acceptable condition
+			// Make sure the paragraphs are in acceptable condition
 			foreach(DParagraph p in Paragraphs)
 				p.Cleanup();
 
