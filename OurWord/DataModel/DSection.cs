@@ -2355,11 +2355,17 @@ namespace OurWord.DataModel
 			#endregion
 			#region Method: void WriteSF()
 			public void WriteSF()
+                // 10jan08 - Formerly, I began this method with the code:
+                //
+				//     Deal with spurious spaces the user might have input
+                //     foreach(DParagraph p in Section.Paragraphs)
+                //         p.Cleanup();
+                //
+                // This was causing a crash during autosave, because it removed a space
+                // that the screen thought was needed. So now, I'm content to call
+                // Cleanup during load, and assume that OurWord keeps things in reasonable
+                // shape during its execution, so that a cleanup is not necessary.
 			{
-				// Deal with spurious spaces the user might have input
-				foreach(DParagraph p in Section.Paragraphs)
-					p.Cleanup();
-
 				// The record begins with a record marker
                 DB.Append(new SfField(DB.RecordMkr, 
                     Section.Book.BookAbbrev + " " + Section.ReferenceSpan.ParseableName));

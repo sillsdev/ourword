@@ -947,7 +947,7 @@ namespace OurWord
 		#region Method: void ShowLoadState(string s)
 		static public void ShowLoadState(string s)
 		{
-			bool bShow = true;
+			bool bShow = false;
 			if (bShow)
 			{
 				SplashScreen.SetStatus(s);
@@ -3890,7 +3890,7 @@ return false;
                     v.Minor.ToString() +
                     ((v.Build == 0) ? "" : chBuild.ToString());
 
-                return "Alpha " + sVersionNo;
+                return "Beta " + sVersionNo;
             }
         }
         #endregion

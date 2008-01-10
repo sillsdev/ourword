@@ -1176,7 +1176,7 @@ namespace OurWord.Dialogs
                 if (null == item)
                     vs[i] = English[i];
                 else
-                    vs[i] = item.AltValue;
+                    vs[i] = item.Alternates[iLanguage].Value;
             }
 
             return vs;
@@ -1212,8 +1212,7 @@ namespace OurWord.Dialogs
         [SetUp]
         public void Setup()
         {
-            // Initialize the registry so we can find the Localizations.db file
-            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
+            JWU.NUnit_Setup();
         }
         #endregion
 
