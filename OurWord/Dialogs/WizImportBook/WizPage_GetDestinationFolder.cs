@@ -70,18 +70,13 @@ namespace OurWord.Dialogs.WizImportBook
         public void OnActivate()
         {
             // Calculate and display the the file name
-            string sFileName = DBook.ComputePathName(
-                Wizard.Translation.LanguageAbbrev,
-                Wizard.BookAbbrev,
-                Wizard.Stage,
-                Wizard.Version,
-                "",
-                false);
-            m_labelFileName.Text = sFileName;
+            m_labelFileName.Text = _CalculateStoredFileName();
 
             // Display the current path
             DestinationFolder = Path.GetDirectoryName(ImportFileName);
 
+            // Display the warning message based on wizard settings thus far
+            CheckForFileOverwriteCondition();
         }
         #endregion
         #region Method: bool CanGoToNextPage()
@@ -132,8 +127,56 @@ namespace OurWord.Dialogs.WizImportBook
                 G.BrowseDirectory = dlg.SelectedPath;
             }
 
+            CheckForFileOverwriteCondition();
         }
         #endregion
+
+        #region Method: string _CalculateStoredFileName()
+        string _CalculateStoredFileName()
+        {
+            string sFileName = DBook.ComputePathName(
+               Wizard.Translation.LanguageAbbrev,
+               Wizard.BookAbbrev,
+               Wizard.Stage,
+               Wizard.Version,
+               "",
+               false);
+
+            return sFileName;
+        }
+        #endregion
+
+        void CheckForFileOverwriteCondition()
+        {
+            // Don't bother if no destination folder
+            if (string.IsNullOrEmpty(DestinationFolder))
+            {
+                m_labelWarning.Visible = false;
+                return;
+            }
+
+            // Assemble the full path
+            string sFilename = _CalculateStoredFileName();
+            string sPath = DestinationFolder + 
+                Path.DirectorySeparatorChar +
+                sFilename;
+
+            // Does the file already exist?
+            if (!File.Exists(sPath))
+            {
+                m_labelWarning.Visible = false;
+                return;
+            }
+
+            // Create the error string & display it
+            string sBase = G.GetLoc_Messages("msgWillOverwriteFileWarning", 
+                "Warning: The file '{0}' already exists in this folder. OurWord will " +
+                "overwrite it. If you wish to preserve this file, you should either " +
+                "choose a different folder, or you should move it to another folder.");
+            string sMsg = LocDB.Insert(sBase, new string[] { sFilename });
+            m_labelWarning.Text = sMsg;
+            m_labelWarning.Visible = true;
+        }
 
     }
 }

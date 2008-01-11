@@ -664,6 +664,10 @@
       <English>OurWord is already running.</English>
       <Info>Error message that is displayed should the user attempt to launch multiple copies of OurWord.</Info>
     </Item>
+    <Item ID="msgWillOverwriteFileWarning">
+      <English>Warning: The file '{0}' already exists in this folder. OurWord will overwrite it. If you wish to preserve this file, you should either choose a different folder, or you should move it to another folder.</English>
+      <Info>This warning appears in the Import File wizard. OurWord generates its own file names; thus this warning is to show the user that if they store the file in the chosen folder, the existing file will be overwritten.</Info>
+    </Item>
     <Group ID="FileStructureMessages" Title="005 - File Structure Messages" Translator="false">
       <Item ID="paragraphs">
         <English>Paragraph(s)</English>

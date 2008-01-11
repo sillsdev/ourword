@@ -34,6 +34,7 @@ namespace OurWord.Dialogs.WizImportBook
             this.m_btnBrowse = new System.Windows.Forms.Button();
             this.m_labelFolder = new System.Windows.Forms.Label();
             this.m_labelNote = new System.Windows.Forms.Label();
+            this.m_labelWarning = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // m_labelFileNameText
@@ -91,10 +92,22 @@ namespace OurWord.Dialogs.WizImportBook
             this.m_labelNote.Text = "(OurWord will default to using the same folder that the Import file is in; but yo" +
                 "u can change it here.)";
             // 
+            // m_labelWarning
+            // 
+            this.m_labelWarning.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_labelWarning.ForeColor = System.Drawing.Color.Red;
+            this.m_labelWarning.Location = new System.Drawing.Point(12, 183);
+            this.m_labelWarning.Name = "m_labelWarning";
+            this.m_labelWarning.Size = new System.Drawing.Size(364, 98);
+            this.m_labelWarning.TabIndex = 7;
+            this.m_labelWarning.Text = "(warning)";
+            this.m_labelWarning.Visible = false;
+            // 
             // WizPage_GetDestinationFolder
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.m_labelWarning);
             this.Controls.Add(this.m_labelNote);
             this.Controls.Add(this.m_btnBrowse);
             this.Controls.Add(this.m_labelFolder);
@@ -115,5 +128,6 @@ namespace OurWord.Dialogs.WizImportBook
         private System.Windows.Forms.Button m_btnBrowse;
         private System.Windows.Forms.Label m_labelFolder;
         private System.Windows.Forms.Label m_labelNote;
+        private System.Windows.Forms.Label m_labelWarning;
     }
 }

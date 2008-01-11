@@ -176,13 +176,29 @@ namespace OurWord.DataModel
 		}
 		private string m_sDateStamp = "";
 		#endregion
-		#region Method void DeclareAttrs()
+        #region BAttr{g/s}: string RecordKey - The Toolbox record key
+        public string RecordKey
+            // We preserve whatever was in the import file
+        {
+            get
+            {
+                return m_sRecordKey;
+            }
+            set
+            {
+                SetValue(ref m_sRecordKey, value);
+            }
+        }
+        private string m_sRecordKey = "";
+        #endregion
+        #region Method void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
 			DefineAttr("StatusComment", ref m_sStatusComment);
 			DefineAttr("DateStamp",     ref m_sDateStamp);
-		}
+            DefineAttr("Key",           ref m_sRecordKey);
+        }
 		#endregion
 
         // JAttrs ----------------------------------------------------------------------------
@@ -2261,8 +2277,11 @@ namespace OurWord.DataModel
 			#region Method: void ReadSF()
 			public void ReadSF()
 			{
-				// Make a note of the section's marker
+				// Make a note of the section's marker. We want to preserve it. OurWord
+                // keeps sections in the order as received, but Toolbox relies on the
+                // record marker for sorting; so it is important that we not change this.
 				SfField fSection = DB.GetCurrentField();
+                Section.RecordKey = fSection.Data.Trim();
 
 				// As we come across |fn's in the text, we will first increment this following,
 				// and then use it to create the in-line marker, e.g., "{fn c}".
@@ -2366,9 +2385,14 @@ namespace OurWord.DataModel
                 // Cleanup during load, and assume that OurWord keeps things in reasonable
                 // shape during its execution, so that a cleanup is not necessary.
 			{
-				// The record begins with a record marker
-                DB.Append(new SfField(DB.RecordMkr, 
-                    Section.Book.BookAbbrev + " " + Section.ReferenceSpan.ParseableName));
+				// The record begins with a record marker (See the ReadSF comment for
+                // reason we preserve what was in the import file.)
+                if (string.IsNullOrEmpty(Section.RecordKey))
+                {
+                    Section.RecordKey = Section.Book.BookAbbrev + " " + 
+                        Section.ReferenceSpan.ParseableName;
+                }
+                DB.Append(new SfField(DB.RecordMkr, Section.RecordKey));
 
 				// Checking status (written only if it has content)
 				CheckingStatus_out();
@@ -3860,6 +3884,7 @@ namespace OurWord.DataModel
         }
         #endregion
 
+        #region Method: string GetTestPathName(string sBaseName)
         string GetTestPathName(string sBaseName)
         {
             string sPath = JWU.NUnit_TestFileFolder + 
@@ -3867,6 +3892,7 @@ namespace OurWord.DataModel
 
             return sPath;
         }
+        #endregion
 
         // Test Smarts -----------------------------------------------------------------------
         #region Method: void _WriteToFile(string sPathname, string[] vs)
@@ -4100,7 +4126,7 @@ namespace OurWord.DataModel
 			    "\\st The Gospel Of",
 			    "\\mt Mark",
 			    "\\id Mark",
-			    "\\rcrd MRK 01.01-01.07",
+			    "\\rcrd Mark 1",
 			    "\\c 1",
 			    "\\s Ne he jangu ba mina menema e vili ele boal, ma Tuhang Yesus enang",
 			    "\\r (Matius 26:6-13; Yohanis 12:1-8)",
@@ -4227,7 +4253,6 @@ namespace OurWord.DataModel
 			    "\\ref width:7.0cm;textWrapping:around;horizontalPosition:right",
 			    "\\cap Atuil-atuil tene kas klaa Petrus nol tapang ngas",
 			    "\\btcap The leaders accuse/criticise Petrus and his friends"
-
 		    };
             #endregion
             #region TestData #6: vsSav6
@@ -4240,7 +4265,7 @@ namespace OurWord.DataModel
 			    "\\st The Gospel Of",
 			    "\\mt Mark",
 			    "\\id Mark",
-			    "\\rcrd MRK 01.01-04.04",
+			    "\\rcrd act4.1-4.22",
 			    "\\c 4",
 			    "\\s Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
 			    "\\bts The heads of religion summon Petrus and Yohanis to come appear.before [them]",
@@ -4296,7 +4321,104 @@ namespace OurWord.DataModel
             IO_TestEngine(vsRaw6, vsSav6);
         }
         #endregion
+        #region TEST: DontReorderMarkEndings
+        [Test] public void DontReorderMarkEndings()
+        {
+            #region TestData - RAW
+            string[] vsRaw = new string[] 
+		    {
+			    "\\_sh v3.0 7 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "",
+                "\\rcrd MRK 16.1-16.8",
+                "\\c 16",
+                "\\s Tuhan Yesus idop kambali!",
+                "\\p",
+                "\\v 1",
+                "\\vt Dia pung beso,",
+                "",
+                "\\rcrd MRK 16.9-16.11",
+                "\\s [Tuhan Yesus katumu deng Maria dari Magdala",
+                "\\p",
+                "\\v 9",
+                "\\vt Hari Minggu papagi tu,",
+                "",
+                "\\rcrd MRK 16.12-16.13",
+                "\\s Tuhan Yesus kasi tunju muka sang dua orang lai",
+                "\\p",
+                "\\v 12",
+                "\\vt Abis itu,",
+                "",
+                "\\rcrd MRK 16.14-16.18",
+                "\\s Tuhan Yesus kasi tunju muka sang ana bua dong samua",
+                "\\p",
+                "\\v 14",
+                "\\vt Abis ju",
+                "",
+                "\\rcrd MRK 16.19-16.20",
+                "\\s Tuhan Yesus ta'angka nae pi sorga",
+                "\\p",
+                "\\v 19",
+                "\\vt Abis ba'omong deng Dia",
+                "",
+                "\\rcrd MRK 17.9-17.10",
+                "\\s [MARKUS PUNG TUTU CARITA, IKO TULISAN DOLU-DOLU YANG LAEN",
+                "\\p",
+                "\\v 9",
+                "\\vt Waktu parampuan tiga orang tu,"
+            };
+            #endregion
+            #region TestData = SAV
+            string[] vsSav = new string[] 
+		    {
+			    "\\_sh v3.0 7 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "\\rcrd MRK 16.1-16.8",
+                "\\c 16",
+                "\\s Tuhan Yesus idop kambali!",
+                "\\p",
+                "\\v 1",
+                "\\vt Dia pung beso,",
+                "\\rcrd MRK 16.9-16.11",
+                "\\s [Tuhan Yesus katumu deng Maria dari Magdala",
+                "\\p",
+                "\\v 9",
+                "\\vt Hari Minggu papagi tu,",
+                "\\rcrd MRK 16.12-16.13",
+                "\\s Tuhan Yesus kasi tunju muka sang dua orang lai",
+                "\\p",
+                "\\v 12",
+                "\\vt Abis itu,",
+                "\\rcrd MRK 16.14-16.18",
+                "\\s Tuhan Yesus kasi tunju muka sang ana bua dong samua",
+                "\\p",
+                "\\v 14",
+                "\\vt Abis ju",
+                "\\rcrd MRK 16.19-16.20",
+                "\\s Tuhan Yesus ta'angka nae pi sorga",
+                "\\p",
+                "\\v 19",
+                "\\vt Abis ba'omong deng Dia",
+                "\\rcrd MRK 17.9-17.10",
+                "\\s [MARKUS PUNG TUTU CARITA, IKO TULISAN DOLU-DOLU YANG LAEN",
+                "\\p",
+                "\\v 9",
+                "\\vt Waktu parampuan tiga orang tu,"
+            };
+            #endregion
 
+            IO_TestEngine(vsRaw, vsSav);
+        }
+        #endregion
     }
     #endregion
 }
