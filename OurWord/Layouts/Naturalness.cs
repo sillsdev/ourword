@@ -138,7 +138,10 @@ namespace OurWord.View
                     continue;
 
                 // Add the vernacular paragraph
-                AddParagraph(0, p, false, p.IsUserEditable);
+                OWPara.Flags options = OWPara.Flags.None;
+                if (p.IsUserEditable)
+                    options |= OWPara.Flags.IsEditable;
+                AddParagraph(0, p, options);
             }
 
             // Load the footnotes
@@ -148,7 +151,10 @@ namespace OurWord.View
                 StartNewRow(bFirstFootnote, null);
                 bFirstFootnote = false;
 
-                AddParagraph(0, fn, false, fn.IsUserEditable);
+                OWPara.Flags options = OWPara.Flags.None;
+                if (fn.IsUserEditable)
+                    options |= OWPara.Flags.IsEditable;
+                AddParagraph(0, fn, options);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

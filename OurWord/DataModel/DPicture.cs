@@ -186,7 +186,7 @@ namespace OurWord.DataModel
                 return true;
 
             // Do we have a PictureSearchPath to work with?
-            string sPictureSearchPath = Options.PictureSearchPath;
+            string sPictureSearchPath = G.PictureSearchPath;
             if (string.IsNullOrEmpty(sPictureSearchPath))
                 return false;
 

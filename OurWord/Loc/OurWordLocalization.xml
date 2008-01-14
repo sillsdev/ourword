@@ -124,9 +124,6 @@
       <English>&amp;Tools</English>
       <Info>Main menu item for the Tools submenu, contains the submenu items of Options, Setup Features, etc.</Info>
     </Item>
-    <Item ID="m_menuOptions" Key="true">
-      <English>&amp;Options...</English>
-    </Item>
     <Item ID="m_menuIncrementBookStatus" Key="true">
       <English>&amp;Increment Book Status...</English>
     </Item>
@@ -169,29 +166,33 @@
     </Item>
   </Group>
   <Group ID="m_ToolStrip" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button." Translator="true">
-    <Item ID="m_btnExit" Key="true">
+    <Item ID="m_btnExit" Key="true" Tip="true">
       <English>Exit</English>
       <Tip>Exit Our Word</Tip>
     </Item>
-    <Item ID="m_btnProjectSave" Key="true">
+    <Item ID="m_btnProjectSave" Key="true" Tip="true">
       <English>Save</English>
       <Key>Ctrl+S</Key>
       <Tip>Save the current edits to disk file</Tip>
     </Item>
-    <Item ID="m_btnEditCut" Key="true">
+    <Item ID="m_btnEditCut" Key="true" Tip="true">
       <English>Cut</English>
       <Key>Ctrl+X</Key>
+      <Tip>Cut</Tip>
     </Item>
-    <Item ID="m_btnEditCopy" Key="true">
+    <Item ID="m_btnEditCopy" Key="true" Tip="true">
       <English>Copy</English>
       <Key>Ctrl+C</Key>
+      <Tip>Copy</Tip>
     </Item>
-    <Item ID="m_btnEditPaste" Key="true">
+    <Item ID="m_btnEditPaste" Key="true" Tip="true">
       <English>Paste</English>
       <Key>Ctrl+V</Key>
+      <Tip>Paste</Tip>
     </Item>
-    <Item ID="m_btnItalic" Key="true">
+    <Item ID="m_btnItalic" Key="true" Tip="true">
       <English>Italic</English>
+      <Tip>Italic</Tip>
     </Item>
     <Item ID="m_btnPrint" Key="true">
       <English>Print</English>
@@ -231,8 +232,9 @@
       <English>Back Translation</English>
       <Tip>Change to the Back Translation Job</Tip>
     </Item>
-    <Item ID="m_btnNotes">
+    <Item ID="m_btnNotes" Tip="true">
       <English>Notes</English>
+      <Tip>Notes</Tip>
     </Item>
     <Item ID="m_bmShowNotesPane" Key="true">
       <English>&amp;Show Notes Pane</English>
@@ -267,14 +269,14 @@
     <Item ID="m_bmNoteDefinition" Key="true">
       <English>Insert D&amp;efinition Note</English>
     </Item>
-    <Item ID="m_btnNoteOldVersion" Key="true">
+    <Item ID="m_btnNoteOldVersion" Key="true" Tip="true">
       <English>Old Version note</English>
       <Tip>Insert an Old Version note</Tip>
     </Item>
     <Item ID="m_bmNoteOldVersion" Key="true">
       <English>Insert Old &amp;Version Note</English>
     </Item>
-    <Item ID="m_btnNoteReason" Key="true">
+    <Item ID="m_btnNoteReason" Key="true" Tip="true">
       <English>Reason note</English>
       <Tip>Insert a Reason note</Tip>
     </Item>
@@ -288,7 +290,7 @@
     <Item ID="m_bmNoteFrontIssue" Key="true">
       <English>Insert &amp;Front Issue Note</English>
     </Item>
-    <Item ID="m_btnNoteHintForDaughter" Key="true">
+    <Item ID="m_btnNoteHintForDaughter" Key="true" Tip="true">
       <English>Hint For Daughter note</English>
       <Tip>Insert a Hint For Daughter note</Tip>
     </Item>
@@ -296,17 +298,16 @@
       <English>Back Translation note</English>
       <Tip>Insert a note about the Back Translation</Tip>
     </Item>
-    <Item ID="m_btnDeleteNote" Key="true">
+    <Item ID="m_btnDeleteNote" Key="true" Tip="true">
       <English>Delete Note</English>
+      <Tip>Delete this note.</Tip>
     </Item>
     <Item ID="m_bmDeleteNote" Key="true">
       <English>&amp;Delete Note</English>
     </Item>
-    <Item ID="m_bmTools">
+    <Item ID="m_bmTools" Tip="true">
       <English>Tools</English>
-    </Item>
-    <Item ID="m_bmOptions" Key="true">
-      <English>Options</English>
+      <Tip>Tools</Tip>
     </Item>
     <Item ID="m_bmIncrementBookStatus" Key="true">
       <English>Increment Book Status</English>
@@ -317,8 +318,9 @@
     <Item ID="m_bmSetUpFeatures" Key="true">
       <English>Set Up Features</English>
     </Item>
-    <Item ID="m_bmHelp" Key="true">
+    <Item ID="m_bmHelp" Key="true" Tip="true">
       <English>Help</English>
+      <Tip>Help</Tip>
     </Item>
   </Group>
   <Group ID="Strings" Title="003 - Strings" Translator="true">
@@ -429,6 +431,44 @@
         <Info>Instructions that are placed in the Browse For Backup Folder Dialog.</Info>
       </Item>
     </Group>
+    <Group ID="NoteDefs" Title="Note Definitions" Des="These are the names of the various notes supported in OurWord" Translator="true">
+      <Item ID="kGeneral">
+        <English>General</English>
+      </Item>
+      <Item ID="kHintForDaughter">
+        <English>Hint for Drafting Daughters</English>
+      </Item>
+      <Item ID="kToDo">
+        <English>To Do</English>
+      </Item>
+      <Item ID="kAskUns">
+        <English>Ask UNS</English>
+      </Item>
+      <Item ID="kReason">
+        <English>Reason</English>
+      </Item>
+      <Item ID="kFront">
+        <English>Front Issues</English>
+      </Item>
+      <Item ID="kDefinition">
+        <English>Definitions</English>
+      </Item>
+      <Item ID="kOldVersion">
+        <English>Old Versions</English>
+      </Item>
+      <Item ID="kBT">
+        <English>Back Translation</English>
+      </Item>
+      <Item ID="kGreek">
+        <English>Greek</English>
+      </Item>
+      <Item ID="kHebrew">
+        <English>Hebrew</English>
+      </Item>
+      <Item ID="kExegesis">
+        <English>Exegesis</English>
+      </Item>
+    </Group>
     <Group ID="Notes" Title="Notes Support" Des="Currently, these are the text that are inserted for different types of Notes." Translator="true">
       <Item ID="ToDoDefault">
         <English>To Do:</English>
@@ -533,6 +573,33 @@
       <Item ID="Picture">
         <English>Picture</English>
         <Info>A picture caption</Info>
+      </Item>
+    </Group>
+    <Group ID="DialogCommon" Title="Dialog: Common" Des="These are common text that appear on numerous dialogs, such as the OK or Cancel buttons." Translator="true">
+      <Item ID="m_btnBrowse">
+        <English>Browse...</English>
+      </Item>
+      <Item ID="m_btnSaveAs">
+        <English>Save As...</English>
+      </Item>
+      <Item ID="m_btnOK">
+        <English>OK</English>
+      </Item>
+      <Item ID="m_btnClose">
+        <English>Close</English>
+      </Item>
+      <Item ID="m_btnCancel">
+        <English>Cancel</English>
+      </Item>
+      <Item ID="m_btnHelp">
+        <English>Help...</English>
+      </Item>
+      <Item ID="m_lblProgramName">
+        <English>Our Word!</English>
+        <Info>cThe name of the Our Word software, which will appear in large font in the splash screen.</Info>
+      </Item>
+      <Item ID="m_lblVersion">
+        <English>Version {0}</English>
       </Item>
     </Group>
   </Group>
@@ -1178,33 +1245,6 @@
       <Info>Full name for the Final Revisions stage.</Info>
     </Item>
   </Group>
-  <Group ID="DialogCommon" Title="100 - Dialog: Common" Des="These are common text that appear on numerous dialogs, such as the OK or Cancel buttons." Translator="true">
-    <Item ID="m_btnBrowse">
-      <English>Browse...</English>
-    </Item>
-    <Item ID="m_btnSaveAs">
-      <English>Save As...</English>
-    </Item>
-    <Item ID="m_btnOK">
-      <English>OK</English>
-    </Item>
-    <Item ID="m_btnClose">
-      <English>Close</English>
-    </Item>
-    <Item ID="m_btnCancel">
-      <English>Cancel</English>
-    </Item>
-    <Item ID="m_btnHelp">
-      <English>Help...</English>
-    </Item>
-    <Item ID="m_lblProgramName">
-      <English>Our Word!</English>
-      <Info>cThe name of the Our Word software, which will appear in large font in the splash screen.</Info>
-    </Item>
-    <Item ID="m_lblVersion">
-      <English>Version {0}</English>
-    </Item>
-  </Group>
   <Group ID="DialogRestoreFromBackup" Title="101 - Dialog: Restore From Backup" Des="Guides the user through the task of restoring a file that was previously backed up under the AutoBackup feature. The user is prompted to supply the name of the file to be backed up, and is given a final 'Are You Sure?' chance to cancel. Invoked via 'Tools-Restore From Backup'" Translator="true">
     <Item ID="Title">
       <English>Restore From Backup</English>
@@ -1282,12 +1322,6 @@
     <Item ID="fPropertiesDialog_Description">
       <English>Turn this on if you are want to adjust the properties for a project.</English>
     </Item>
-    <Item ID="fOptions_CheckBox">
-      <English>Tools-Options</English>
-    </Item>
-    <Item ID="fOptions_Description">
-      <English>Allows configuration of various program options. Turn this off for a machine where you have already set up the options, and do not want them to be modified.</English>
-    </Item>
     <Item ID="fPrint_CheckBox">
       <English>Printing</English>
     </Item>
@@ -1323,6 +1357,12 @@
     </Item>
     <Item ID="fJustTheBasics_Description">
       <English>Designed for newer computer users, this feature sets up the user interface to support a very basic level of work, turning off many of the features. The menu is hidden, and in its place the toolbar buttons show descriptive text in addition to their pictures. Users only need to be familiar with about a dozen commands.</English>
+    </Item>
+    <Item ID="fLocalizer_CheckBox">
+      <English>Localization Dialog</English>
+    </Item>
+    <Item ID="fLocalizer_Description">
+      <English>This dialog, appearing in the Tools menu, allows you to translate the user interface of OurWord into another language.</English>
     </Item>
     <Item ID="m_checkListFeatures">
       <English>Just the Basics</English>
@@ -1630,11 +1670,11 @@
       <Item ID="propParagraphSettings">
         <English>Paragraph Settings</English>
       </Item>
-      <Item ID="propForeColor">
+      <Item ID="propForeColor" Tip="true">
         <English>Color</English>
         <Tip>The color of the font text.</Tip>
       </Item>
-      <Item ID="propAlignment">
+      <Item ID="propAlignment" Tip="true">
         <English>Alignment</English>
         <Tip>Specify Centered, Left, Right, or Justified paragraph alignment.</Tip>
       </Item>
@@ -1650,67 +1690,53 @@
       <Item ID="option_kJustified">
         <English>Justified</English>
       </Item>
-      <Item ID="propKeepWithNext">
+      <Item ID="propKeepWithNext" Tip="true">
         <English>Keep with Next Paragraph?</English>
         <Tip>If Yes, there will not be a page break between paragraphs.</Tip>
       </Item>
-      <Item ID="propKeepWithNext_0">
-        <English>Yes</English>
-      </Item>
-      <Item ID="propKeepWithNext_1">
-        <English>No</English>
-      </Item>
-      <Item ID="propLeftMargin">
+      <Item ID="propLeftMargin" Tip="true">
         <English>Left Margin</English>
         <Tip>The Left Margin for the paragraph.</Tip>
       </Item>
-      <Item ID="propRightMargin">
+      <Item ID="propRightMargin" Tip="true">
         <English>Right Margin</English>
         <Tip>The Right Margin for the paragraph.</Tip>
       </Item>
-      <Item ID="propFirstLine">
+      <Item ID="propFirstLine" Tip="true">
         <English>First Line Indent</English>
         <Tip>The First Line Indentation for the paragraph.</Tip>
       </Item>
-      <Item ID="propSpaceBefore">
+      <Item ID="propSpaceBefore" Tip="true">
         <English>Space Before</English>
         <Tip>The points to add before the paragraph.</Tip>
       </Item>
-      <Item ID="propSpaceAfter">
+      <Item ID="propSpaceAfter" Tip="true">
         <English>Space After</English>
         <Tip>The points to add following the paragraph.</Tip>
       </Item>
-      <Item ID="propFontName">
+      <Item ID="propFontName" Tip="true">
         <English>Font Name</English>
         <Info>This is the label that shows up in the settings of the StyleSheet page, indicating to the user that the setting to the right is the name of the font. These labels should all be relatively short.</Info>
         <Tip>The name of the font for displaying the style in this writing system</Tip>
       </Item>
-      <Item ID="propFontHeight">
+      <Item ID="propFontHeight" Tip="true">
         <English>Height</English>
         <Tip>The height of the font.</Tip>
       </Item>
-      <Item ID="propBold">
+      <Item ID="propBold" Tip="true">
         <English>Bold?</English>
         <Tip>If Yes, the font is displayed in boldface.</Tip>
       </Item>
-      <Item ID="propBold_0">
-        <English>Yes</English>
-      </Item>
-      <Item ID="propBold_1">
-        <English>No</English>
-      </Item>
-      <Item ID="propItalic">
+      <Item ID="propItalic" Tip="true">
         <English>Italic?</English>
         <Tip>If Yes, the font is displayed in italics.</Tip>
       </Item>
-      <Item ID="propItalic_0">
-        <English>Yes</English>
-      </Item>
-      <Item ID="propItalic_1">
-        <English>No</English>
-      </Item>
       <Item ID="m_listStyles_col0">
         <English>Styles</English>
+      </Item>
+      <Item ID="propFonts" Tip="true">
+        <English>Latin</English>
+        <Tip>These are the font settings to use for this writing system.</Tip>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems" Title="Properties Dialog: Writing Systems page" Des="This is the Writing Systems properties page within the Properties dialog. Many of the controls start with 'prop', e.g., 'propFontName'. These are small labels that appear beside the setting to be changed. There is often a corresponding ToolTip, by which you should provide some additional helpful information to the user." Translator="false">
@@ -1732,15 +1758,15 @@
       <Item ID="m_tabWSAutoReplace">
         <English>AutoReplace</English>
       </Item>
-      <Item ID="propName">
+      <Item ID="propName" Tip="true">
         <English>Name</English>
         <Tip>Provide a unique name for this Writing System.</Tip>
       </Item>
-      <Item ID="propPunctuation">
+      <Item ID="propPunctuation" Tip="true">
         <English>Punctuation</English>
         <Tip>A list of those letters that are punctuation in this writing system.</Tip>
       </Item>
-      <Item ID="propEndPunctuation">
+      <Item ID="propEndPunctuation" Tip="true">
         <English>End Punctuation</English>
         <Tip>A list of punctuation that can occur at the end of a sentence.</Tip>
       </Item>
@@ -1752,34 +1778,34 @@
       <Item ID="propOddPages">
         <English>At the bottom of ODD Pages</English>
       </Item>
-      <Item ID="propOddLeft">
+      <Item ID="propOddLeft" Tip="true">
         <English>Left</English>
         <Tip>What do you want to print at the bottom left of odd-numbered pages?</Tip>
       </Item>
-      <Item ID="propOddCenter">
+      <Item ID="propOddCenter" Tip="true">
         <English>Center</English>
         <Tip>What do you want to print at the bottom center of odd-numbered pages?</Tip>
       </Item>
-      <Item ID="propOddRight">
+      <Item ID="propOddRight" Tip="true">
         <English>Right</English>
         <Tip>What do you want to print at the bottom right of odd-numbered pages?</Tip>
       </Item>
       <Item ID="propEvenPages">
         <English>At the bottom of EVEN Pages</English>
       </Item>
-      <Item ID="propEvenLeft">
+      <Item ID="propEvenLeft" Tip="true">
         <English>Left</English>
         <Tip>What do you want to print at the bottom left of even-numbered pages?</Tip>
       </Item>
-      <Item ID="propEvenCenter">
+      <Item ID="propEvenCenter" Tip="true">
         <English>Center</English>
         <Tip>What do you want to print at the bottom center of even-numbered pages?</Tip>
       </Item>
-      <Item ID="propEvenRight">
+      <Item ID="propEvenRight" Tip="true">
         <English>Right</English>
         <Tip>What do you want to print at the bottom right of even-numbered pages?</Tip>
       </Item>
-      <Item ID="propCopyrightNotice">
+      <Item ID="propCopyrightNotice" Tip="true">
         <English>Copyright Notice</English>
         <Tip>Team-wide Copyright Notice (you can define a copyright for eachindividual book by using the Book Properties dialog.)</Tip>
       </Item>
@@ -1951,87 +1977,168 @@
       <Item ID="m_btnCopyBookNames">
         <English>Copy Book Names</English>
       </Item>
-      <Item ID="propAbbreviation">
+      <Item ID="propAbbreviation" Tip="true">
         <English>Language Abbreviation</English>
         <Tip>Typically the Ethnoloque Code, a short (e.g., 3-letter) abbreviation of the language name. One of its uses is in composing the filenames.</Tip>
       </Item>
       <Item ID="Writing Systems">
         <English>Writing Systems</English>
       </Item>
-      <Item ID="propWSVernacular">
+      <Item ID="propWSVernacular" Tip="true">
         <English>Writing System for Vernacular Text</English>
         <Tip>The Writing System for the translation, you define these under Team Settings.</Tip>
       </Item>
-      <Item ID="propWSAdvisor">
+      <Item ID="propWSAdvisor" Tip="true">
         <English>Writing System for Advisor Text</English>
         <Tip>The Writing System for advisor or consultant text (e.g., the back translation), you define these under Team Settings.</Tip>
       </Item>
       <Item ID="m_listviewBooks_col2">
         <English>Filename</English>
       </Item>
+      <Item ID="m_editLanguageName">
+        <English>Translation Name</English>
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options" Title="Properties Dialog: Options Page" Translator="false">
-      <Item ID="propMaximizeWindowOnStartup">
+      <Item ID="propMaximizeWindowOnStartup" Tip="true">
         <English>Maxmimize Window on Startup?</English>
         <Tip>If Yes, OurWord starts up maximized. This may help newer users to have sufficient size on the screen for doing work.</Tip>
       </Item>
-      <Item ID="propMaximizeWindowOnStartup_0">
-        <English>Yes</English>
-      </Item>
-      <Item ID="propMaximizeWindowOnStartup_1">
-        <English>No</English>
-      </Item>
-      <Item ID="propMakeBackups">
+      <Item ID="propMakeBackups" Tip="true">
         <English>Make Automatic Backups?</English>
         <Tip>If Yes, OurWord will automatically back up your fields to the folder specified below.</Tip>
       </Item>
-      <Item ID="propMakeBackups_0">
-        <English>Yes</English>
-      </Item>
-      <Item ID="propMakeBackups_1">
-        <English>No</English>
-      </Item>
-      <Item ID="propBackupPath">
+      <Item ID="propBackupPath" Tip="true">
         <English>Folder for Backing up files</English>
         <Tip>Choose a folder in which OurWord will automatically make backups of your files.</Tip>
       </Item>
-      <Item ID="propPicturesPath">
+      <Item ID="propPicturesPath" Tip="true">
         <English>Folder to search for pictures</English>
         <Tip>If a picture cannot be found, OurWord will search in this folder to attempt to locate it.</Tip>
       </Item>
       <Item ID="propBackgroundColors">
         <English>Window Background Colors</English>
       </Item>
-      <Item ID="propBackColorDraftingWindow">
+      <Item ID="propBackColorDraftingWindow" Tip="true">
         <English>Drafting</English>
         <Tip>The color of the Drafting window background.</Tip>
       </Item>
-      <Item ID="propBackColorBackTranslationWindow">
+      <Item ID="propBackColorBackTranslationWindow" Tip="true">
         <English>Back Translation</English>
         <Tip>The color of the Back Translation window background.</Tip>
       </Item>
-      <Item ID="propBackColorNaturalnessCheckWindow">
+      <Item ID="propBackColorNaturalnessCheckWindow" Tip="true">
         <English>Naturalness Check</English>
         <Tip>The color of the Naturalness Check window background</Tip>
       </Item>
-      <Item ID="propBackColorNotesWindow">
+      <Item ID="propBackColorNotesWindow" Tip="true">
         <English>Notes</English>
         <Tip>The color of the Notes window background.</Tip>
       </Item>
-      <Item ID="propBackColorOtherTranslationsWindow">
+      <Item ID="propBackColorOtherTranslationsWindow" Tip="true">
         <English>Other Translations</English>
         <Tip>The color of the Other Translations window background.</Tip>
       </Item>
       <Item ID="propUserInterfaceLanguage">
         <English>User Interface Language</English>
       </Item>
-      <Item ID="propPrimaryLanguage">
+      <Item ID="propPrimaryLanguage" Tip="true">
         <English>Preferred (primary)</English>
         <Tip>Use this language for the User Interface.</Tip>
       </Item>
-      <Item ID="propSecondaryLanguage">
+      <Item ID="propSecondaryLanguage" Tip="true">
         <English>Fallback (secondary)</English>
         <Tip>Use this language for the User Interface if the preferred (primary) language is unavailable</Tip>
+      </Item>
+      <Item ID="propZoomFactor" Tip="true">
+        <English>Zoom Factor</English>
+        <Tip>Text in the windows can be larger (or smaller) by the chosen percentage.</Tip>
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_Notes" Title="DialogProperties_Page_Notes" Translator="false">
+      <Item ID="Show_kGeneral" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the General Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kGeneral" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the General Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kHintForDaughter" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Hint for Drafting Daughters Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kHintForDaughter" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Hint for Drafting Daughters Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="ShowNotesFromFront" Tip="true">
+        <English>Show Hints from the Front Translation?</English>
+        <Tip>If yes, any Hint For Daughter notes that were defined in the Front Translation will be visible.</Tip>
+      </Item>
+      <Item ID="Show_kToDo" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the To Do Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kToDo" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the To Do Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kAskUns" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Ask UNS Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kAskUns" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Ask UNS Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kReason" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Reason Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kReason" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Reason Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kFront" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Front Issues Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kFront" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Front Issues Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kDefinition" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Definitions Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kDefinition" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Definitions Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kOldVersion" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Old Versions Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kOldVersion" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Old Versions Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kBT" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Back Translation Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kBT" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Back Translation Note in the Notes Pane.</Tip>
+      </Item>
+      <Item ID="Show_kExegesis" Tip="true">
+        <English>Show?</English>
+        <Tip>If yes, the Exegesis Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+      </Item>
+      <Item ID="Color_kExegesis" Tip="true">
+        <English>Background Color</English>
+        <Tip>The color for the background of the Exegesis Note in the Notes Pane.</Tip>
       </Item>
     </Group>
   </Group>

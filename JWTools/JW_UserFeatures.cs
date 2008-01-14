@@ -509,7 +509,6 @@ namespace JWTools
 			get 
             {
                 return LocDB.GetValue(
-                    null,
                     new string[] { s_LocGroupName },
                     Name + "_CheckBox",
                     CheckBoxName_EnglishDefault,
@@ -539,7 +538,6 @@ namespace JWTools
             get
             {
                 return LocDB.GetValue(
-                    null,
                     new string[] { s_LocGroupName },
                     Name + "_Description",
                     Description_EnglishDefault,

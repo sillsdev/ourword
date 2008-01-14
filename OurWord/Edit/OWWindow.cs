@@ -803,8 +803,8 @@ namespace OurWord.Edit
             #endregion
 
             // Placing Content into the window -----------------------------------------------
-            #region Method: void AddParagraph(int iColumn, DParagraph paragraph, bUseBT, bEditable)
-            public void AddParagraph(int iColumn, DParagraph paragraph, bool bUseBT, bool bEditable)
+            #region Method: void AddParagraph(int iColumn, DParagraph paragraph, Flags)
+            public void AddParagraph(int iColumn, DParagraph paragraph, OWPara.Flags options)
             {
                 Debug.Assert(iColumn < Window.ColumnCount);
                 Debug.Assert(iColumn >= 0 && iColumn < Piles.Length);
@@ -815,19 +815,21 @@ namespace OurWord.Edit
 
                 // Determine the paragraph's writing system depending upon whether or not
                 // the BT is being displayed.
-                JWritingSystem ws = (bUseBT) ?
+                JWritingSystem ws = 
+                    ((options & OWPara.Flags.ShowBackTranslation) == 
+                        OWPara.Flags.ShowBackTranslation) ?
                     paragraph.Translation.WritingSystemConsultant :
                     paragraph.Translation.WritingSystemVernacular;
 
                 // Create and initialize the new paragraph
-                OWPara p = new OWPara(pile, paragraph, ws, bUseBT, bEditable);
+                OWPara p = new OWPara(pile, paragraph, ws, options);
 
                 // Append the paragraph to the pile
                 pile.AddParagraph(p);
             }
             #endregion
-            #region Method: void AddNote(DNote note, bool bIsEditable)
-            public void AddNote(DNote note, bool bIsEditable)
+            #region Method: void AddNote(DNote note, Flags)
+            public void AddNote(DNote note, OWPara.Flags options)
             {
                 Debug.Assert(Window.ColumnCount == 1);
 
@@ -839,7 +841,7 @@ namespace OurWord.Edit
                 JWritingSystem ws = note.Paragraph.Translation.WritingSystemConsultant;
 
                 // Create and initialize the new note
-                OWPara p = new OWPara(pile, note, ws, bIsEditable);
+                OWPara p = new OWPara(pile, note, ws, options);
 
                 // Append the note to the pile
                 pile.AddParagraph(p);
@@ -859,7 +861,7 @@ namespace OurWord.Edit
                 JWritingSystem ws = translation.WritingSystemVernacular;
 
                 // Create and initialize the new text
-                OWPara p = new OWPara(pile, vRuns, ws, sLabel);
+                OWPara p = new OWPara(pile, vRuns, ws, sLabel, OWPara.Flags.None);
 
                 // Append it to the pile
                 pile.AddParagraph(p);
@@ -1272,8 +1274,8 @@ namespace OurWord.Edit
             m_vRows = v;
         }
         #endregion
-        #region Method: void AddParagraph(int iColumn, DParagraph, bUseBT, bEditable)
-        public void AddParagraph(int iColumn, DParagraph paragraph, bool bUseBT, bool bEditable)
+        #region Method: void AddParagraph(int iColumn, DParagraph, Flags)
+        public void AddParagraph(int iColumn, DParagraph paragraph, OWPara.Flags options)
         {
             // Make sure iColumn is within range
             Debug.Assert(ColumnCount > 0);
@@ -1288,11 +1290,11 @@ namespace OurWord.Edit
             Debug.Assert(null != row);
 
             // Add the paragraph to the desired column
-            row.AddParagraph(iColumn, paragraph, bUseBT, bEditable);
+            row.AddParagraph(iColumn, paragraph, options);
         }
         #endregion
         #region Method: void AddNote(DNote note)
-        public void AddNote(DNote note, bool bIsEditable)
+        public void AddNote(DNote note, OWPara.Flags options)
         {
             // At this time, we are only supporting a NotesWIndow with a single column
             Debug.Assert(ColumnCount == 1);
@@ -1306,7 +1308,7 @@ namespace OurWord.Edit
             Debug.Assert(null != row);
 
             // Add the note
-            row.AddNote(note, bIsEditable);
+            row.AddNote(note, options);
         }
         #endregion
         #region Method: void AddLabeledText(DTranslation, DRun[], sLabel)

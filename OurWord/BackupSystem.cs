@@ -2,9 +2,9 @@
  * Project: Our Word!
  * File:    BackupSystem.cs
  * Author:  John Wimbish
- * Created: 15 Nov 2004
- * Purpose: Supports an automated backup.
- * Legal:   Copyright (c) 2003-04, The Seed Company. All Rights Reserved.  
+ * Created: 13 Aug 2004
+ * Purpose: Modifies / edits the settings for the Drafts layout.
+ * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -21,12 +21,13 @@ using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
 using JWTools;
-using Josiah;
+using JWdb;
 using OurWord.DataModel;
+using OurWord.Edit;
 #endregion
 
 
-namespace OurWord.View
+namespace OurWord
 {
 	public class BackupSystem
 	{
@@ -62,16 +63,6 @@ namespace OurWord.View
 		#endregion
 
 		// Derived Attrs ---------------------------------------------------------------------
-		#region Attr{g}: string Today - returns the day as "2004-05-21" format.
-		string Today
-		{
-			get
-			{
-				DateTime dt = DateTime.Today;
-				return dt.ToString("yyyy-MM-dd");
-			}
-		}
-		#endregion
 		#region Attr{g}: string BackupFolder
 		string BackupFolder
 		{
@@ -87,10 +78,7 @@ namespace OurWord.View
 				{
 					sFolder = BrowseForFolder("");
 					if (0 == sFolder.Length)
-					{
-						sFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-						sFolder += (Path.DirectorySeparatorChar + "OurWordBackups");
-					}
+						sFolder = FallbackBackupFolder;
 					RegistryBackupFolder = sFolder;
 				}
 
@@ -106,13 +94,21 @@ namespace OurWord.View
 				// Get the base name
 				string sName = Path.GetFileNameWithoutExtension(SourcePathName);
 
-				// Append the date to it
-				sName += (" " + Today);
-
 				// Append the extension to it (Note: GetExtension returns the '.')
 				sName += Path.GetExtension(SourcePathName);
 
 				return BackupFolder + Path.DirectorySeparatorChar + sName;
+			}
+		}
+		#endregion
+		#region Attr{g}: FallbackBackupFolder - if all else fails, hopefully we can backup here
+		string FallbackBackupFolder
+		{
+			get
+			{
+				string sFolder = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+				sFolder += (Path.DirectorySeparatorChar + "OurWordBackups");
+				return sFolder;
 			}
 		}
 		#endregion
@@ -126,14 +122,11 @@ namespace OurWord.View
 		#endregion
 
 		// Methods ---------------------------------------------------------------------------
-		#region Method: void MakeBackup()
-		public void MakeBackup()
+		#region Method: bool _EnsureValidDestinationDirectory() - get a place to backup to
+		private bool _EnsureValidDestinationDirectory()
 		{
-			// Don't execute if the feature has been turned off
-			if (!Enabled)
-				return;
-
 			// Does the destination device & path exist?
+			int cAttempts = 3;
 			while (!Directory.Exists(BackupFolder))
 			{
 				// Attempt to create it
@@ -146,21 +139,60 @@ namespace OurWord.View
 				// something about it; a No answer means he is aborting.
 				catch (Exception)
 				{
-					if (! Msg.YN_NeedFloppyForBackup( BackupPathName ) )
-						return;
+					// If we have already tried twice, then we quietly change the
+					// backup folder to a valid place on the data directory. This keeps
+					// the backup happening, without further troubling the user.
+					--cAttempts;
+					if (cAttempts == 0)
+					{
+						RegistryBackupFolder = FallbackBackupFolder;
+					}
+
+					// If even the fallback fails, then we have no choice but to just
+					// forget it; and completely turn off the feature
+					else if (cAttempts < 0)
+					{
+						Enabled = false;
+						return false;
+					}
+
+					// Display the message complaining about the missing flash card, and
+					// offering to try again
+					else if (! Messages.NeedFloppyForBackup( BackupPathName ) )
+						return false;
 				}
 			}
 
 			// Make sure we have enough disk space
-			string sDrive = Directory.GetDirectoryRoot(BackupPathName);
-			long lFreeDiskSpace = JW_Util.GetFreeDiskSpace(sDrive);
-			FileInfo fi = new FileInfo(SourcePathName);
-			long lNeededSpace = fi.Length;
-			if (lNeededSpace + 1000 > lFreeDiskSpace)
+			try
 			{
-				Msg.Warn_InsufficentSpaceForBackup(sDrive);
-				return;
+				string sDrive = Directory.GetDirectoryRoot(BackupPathName);
+				long lFreeDiskSpace = JW_Util.GetFreeDiskSpace(sDrive);
+				FileInfo fi = new FileInfo(SourcePathName);
+				long lNeededSpace = fi.Length;
+				if (lNeededSpace + 1000 > lFreeDiskSpace)
+				{
+					Messages.InsufficentSpaceForBackup(sDrive);
+					return false;
+				}
 			}
+			catch (Exception)
+			{
+			}
+
+			return true;
+		}
+		#endregion
+		#region Method: void MakeBackup()
+		public void MakeBackup()
+		{
+			// Don't execute if the feature has been turned off
+			if (!Enabled)
+				return;
+
+			// Make sure we have a place to write the backup
+			if (!_EnsureValidDestinationDirectory())
+				return;
 
 			// Copy the file to the backup filename
 			try
@@ -169,11 +201,11 @@ namespace OurWord.View
 			}
 			catch (UnauthorizedAccessException)
 			{
-				Msg.Error_NoPermissionToWrite(BackupPathName);
+                Messages.NoPermissionToWriteFile(BackupPathName);
 			}
 			catch (Exception)
 			{
-				Msg.Error_UnableToSaveFile(BackupPathName);
+                Messages.UnableToSaveFile(BackupPathName);
 			}
 
 			// Delete older files if appropriate
@@ -344,9 +376,12 @@ namespace OurWord.View
 		static public string BrowseForFolder(string sOriginalFolder)
 		{
 			FolderBrowserDialog dlg = new FolderBrowserDialog();
-			dlg.Description = "Select the folder where you wish to place your " +
-				"backup files. If possible, this should not be your hard drive." +
-				"A flash card is ideal; or a floppy drive can also be used.";
+
+            dlg.Description = G.GetLoc_Files("BrowseForBackupFolderDescr", 
+                "Select the folder where you wish to place your backup files. If " +
+                "possible, this should not be your hard drive. A flash card is ideal; " +
+                "or a floppy drive can also be used.");  
+
 			dlg.RootFolder  = Environment.SpecialFolder.MyComputer;
 			if (DialogResult.OK == dlg.ShowDialog())
 				return dlg.SelectedPath;
@@ -354,7 +389,6 @@ namespace OurWord.View
 		}
 		#endregion
 	}
-
 
 	#region TEST
 	public class Test_BackupSystem : Test
@@ -443,5 +477,4 @@ namespace OurWord.View
 		#endregion
 	}
 	#endregion
-
 }

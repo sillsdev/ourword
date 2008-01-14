@@ -482,8 +482,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuBackTranslation;
 
         private ToolStripMenuItem m_menuTools;
-        private ToolStripMenuItem m_menuOptions;
-        private ToolStripSeparator toolStripSeparator6;
         private ToolStripMenuItem m_menuIncrementBookStatus;
         private ToolStripMenuItem m_menuRestoreFromBackup;
         private ToolStripMenuItem m_menuOnlyShowSectionsThat;
@@ -539,7 +537,6 @@ namespace OurWord
         private ToolStripSeparator m_bmNotesSeparator1;
         private ToolStripSeparator m_bmNotesSeparator2;
         private ToolStripDropDownButton m_bmTools;
-        private ToolStripMenuItem m_bmOptions;
         private ToolStripMenuItem m_bmIncrementBookStatus;
         private ToolStripMenuItem m_bmRestoreFromBackup;
         private ToolStripMenuItem m_bmSetUpFeatures;
@@ -805,8 +802,6 @@ namespace OurWord
 
             // Tools
             m_bmTools.Visible = bJustTheBasics;
-            m_menuOptions.Visible = OurWordMain.Features.F_Options;
-            m_bmOptions.Visible = OurWordMain.Features.F_Options;
             m_menuRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
             m_bmRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
             m_menuOnlyShowSectionsThat.Visible = (G.IsValidProject && OurWordMain.Features.F_Filter);
@@ -931,17 +926,6 @@ namespace OurWord
 		#endregion
 		private JW_WindowState  m_WindowState;   // Save/restore state on close/launch of app
 		private JW_FileMenuIO   m_Config;	     // Handles I/O of the configuration (project) file
-		#region Attr{g}: Options Options - user options (Registry settings)
-		static public Options Options
-		{
-			get
-			{
-				Debug.Assert(null != s_Options);
-				return s_Options;
-			}
-		}
-		static private Options s_Options = null; //end-user runtime options
-		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Method: void ShowLoadState(string s)
@@ -959,10 +943,6 @@ namespace OurWord
 		public OurWordMain()
 			// Constructor, initializes the application
 		{
-			// Initialize end-user options
-			ShowLoadState("Init Options");
-			s_Options = new Options();
-
 			// Required for Windows Form Designer support
 			ShowLoadState("Init Component");
             this.components = new System.ComponentModel.Container();
@@ -1065,8 +1045,6 @@ namespace OurWord
             this.m_menuNotesSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuDeleteNote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuTools = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuOptions = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOnlyShowSectionsThat = new System.Windows.Forms.ToolStripMenuItem();
@@ -1125,7 +1103,6 @@ namespace OurWord
             this.m_btnNoteBackTranslation = new System.Windows.Forms.ToolStripButton();
             this.m_btnDeleteNote = new System.Windows.Forms.ToolStripButton();
             this.m_bmTools = new System.Windows.Forms.ToolStripDropDownButton();
-            this.m_bmOptions = new System.Windows.Forms.ToolStripMenuItem();
             this.m_bmIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_bmRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_bmSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
@@ -1496,8 +1473,6 @@ namespace OurWord
             // m_menuTools
             // 
             this.m_menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuOptions,
-            this.toolStripSeparator6,
             this.m_menuIncrementBookStatus,
             this.m_menuRestoreFromBackup,
             this.m_menuOnlyShowSectionsThat,
@@ -1509,19 +1484,6 @@ namespace OurWord
             this.m_menuTools.Name = "m_menuTools";
             this.m_menuTools.Size = new System.Drawing.Size(48, 20);
             this.m_menuTools.Text = "&Tools";
-            // 
-            // m_menuOptions
-            // 
-            this.m_menuOptions.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOptions.Image")));
-            this.m_menuOptions.Name = "m_menuOptions";
-            this.m_menuOptions.Size = new System.Drawing.Size(211, 22);
-            this.m_menuOptions.Text = "&Options...";
-            this.m_menuOptions.Click += new System.EventHandler(this.cmdOptions);
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(208, 6);
             // 
             // m_menuIncrementBookStatus
             // 
@@ -1689,7 +1651,7 @@ namespace OurWord
             this.m_bmHelp});
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 24);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(690, 25);
+            this.m_ToolStrip.Size = new System.Drawing.Size(721, 25);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -2086,7 +2048,6 @@ namespace OurWord
             // 
             this.m_bmTools.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.m_bmTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_bmOptions,
             this.m_bmIncrementBookStatus,
             this.m_bmRestoreFromBackup,
             this.m_bmSetUpFeatures});
@@ -2096,14 +2057,6 @@ namespace OurWord
             this.m_bmTools.Size = new System.Drawing.Size(29, 22);
             this.m_bmTools.Text = "Tools";
             this.m_bmTools.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            // 
-            // m_bmOptions
-            // 
-            this.m_bmOptions.Image = ((System.Drawing.Image)(resources.GetObject("m_bmOptions.Image")));
-            this.m_bmOptions.Name = "m_bmOptions";
-            this.m_bmOptions.Size = new System.Drawing.Size(202, 22);
-            this.m_bmOptions.Text = "&Options...";
-            this.m_bmOptions.Click += new System.EventHandler(this.cmdOptions);
             // 
             // m_bmIncrementBookStatus
             // 
@@ -2411,15 +2364,6 @@ namespace OurWord
                 }
             }
             #endregion
-            #region Attr{g}: bool F_Options
-			public bool F_Options
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fOptions.ToString());
-				}
-			}
-			#endregion
 			#region Attr{g}: bool F_Print
 			public bool F_Print
 			{
@@ -2510,7 +2454,6 @@ namespace OurWord
                 fProject,
                 fPropertiesDialog,
                 fPrint,
-                fOptions,
                 fJobBT,
                 fJobNaturalness,
                 fRestoreBackup,
@@ -2551,13 +2494,6 @@ namespace OurWord
                     true,
                     "Project Properties Dialog",
                     "Turn this on if you are want to adjust the properties for a project.");
-
-                m_Dlg.Add(ID.fOptions.ToString(),          
-                    true,
-                    "Tools-Options",
-                    "Allows configuration of various program options. Turn this off for a " +
-                        "machine where you have already set up the options, and do not " +
-                        "want them to be modified.");
 
                 m_Dlg.Add(ID.fPrint.ToString(),            
                     false,
@@ -3281,23 +3217,6 @@ namespace OurWord
         }
         #endregion
 
-		#region Cmd: cmdOptions
-        private void cmdOptions(Object sender, EventArgs e)
-		{
-			OnLeaveSection();
-
-			JobConfigureDlg dlg = new JobConfigureDlg( OurWordMain.Options );
-
-			if( DialogResult.OK == dlg.ShowDialog() )
-			{
-                // The zoom factor may have changed, so we need to recalculate the fonts
-                SetZoomFactor();
-
-                SetupSideWindows();
-				OnEnterSection();
-			}
-		}
-		#endregion
 		#region Can: canIncrementBookStatus
         private bool canIncrementBookStatus
 		{
@@ -3592,6 +3511,49 @@ return false;
 	#region CLASS G - Globals for convenient access
 	public class G
 	{
+        // Options stored in the registry ----------------------------------------------------
+        const string c_sSubKey = "Options";
+        const string c_keyZoom = "Zoom";
+        const string c_keyPictureSearchPath = "PictureSearchPath";
+        #region Attr{g}: float ZoomPercent
+        public static int ZoomPercent
+        {
+            get
+            {
+                s_nZoomPercent = JW_Registry.GetValue(c_sSubKey, c_keyZoom, 100);
+                return s_nZoomPercent;
+            }
+            set
+            {
+                s_nZoomPercent = value;
+                JW_Registry.SetValue(c_sSubKey, c_keyZoom, s_nZoomPercent);
+            }
+        }
+        private static int s_nZoomPercent = -1;
+        #endregion
+        #region VAttr{g}: float ZoomFactor
+        public static float ZoomFactor
+        {
+            get
+            {
+                return ((float)ZoomPercent / 100.0F);
+            }
+        }
+        #endregion
+        #region SAttr{g/s}: string PictureSearchPath
+        static public string PictureSearchPath
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sSubKey, c_keyPictureSearchPath, "");
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sSubKey, c_keyPictureSearchPath, value);
+            }
+        }
+        #endregion
+
 		// Stuff still in OurWordMain
 		#region Attr{g}: DProject Project - the current project we're editing / displaying / etc.
 		static public DProject Project 
@@ -3617,15 +3579,6 @@ return false;
             get
             {
                 return OurWordMain.App;
-            }
-        }
-        #endregion
-        #region Attr{g}: float ZoomFactor
-        public static float ZoomFactor
-        {
-            get
-            {
-                return OurWordMain.Options.ZoomFactor;
             }
         }
         #endregion
@@ -3900,7 +3853,6 @@ return false;
         static public string GetLoc_String(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "Strings" },
                 sItemID,
                 sEnglishDefault,
@@ -3912,7 +3864,6 @@ return false;
         static public string GetLoc_GeneralUI(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "Strings", "GeneralUI" },
                 sItemID, 
                 sEnglishDefault,
@@ -3924,8 +3875,18 @@ return false;
         static public string GetLoc_Notes(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "Strings", "Notes" },
+                sItemID,
+                sEnglishDefault,
+                null,
+                null);
+        }
+        #endregion
+        #region SMethod: string GetLoc_NoteDefs(sItemID, sEnglish) -         "Strings\NoteDefs"
+        static public string GetLoc_NoteDefs(string sItemID, string sEnglishDefault)
+        {
+            return LocDB.GetValue(
+                new string[] { "Strings", "NoteDefs" },
                 sItemID,
                 sEnglishDefault,
                 null,
@@ -3936,7 +3897,6 @@ return false;
         static public string GetLoc_Files(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "Strings", "Files" },
                 sItemID,
                 sEnglishDefault,
@@ -3958,7 +3918,6 @@ return false;
 
             // Retrieve the value
             return LocDB.GetValue(
-                null,
                 new string[] { "Strings", "Styles" },
                 sItemID,
                 sEnglish,
@@ -3966,12 +3925,22 @@ return false;
                 null);
         }
         #endregion
+        #region SMethod: string GetLoc_DialogCommon(sItemID, sEnglish, vsIns) -  "Strings\DialogCommon"
+        static public string GetLoc_DialogCommon(string sItemID, string sEnglish, string[] vsInsert)
+        {
+            return LocDB.GetValue(
+                new string[] { "Strings", "DialogCommon" },
+                sItemID,
+                sEnglish,
+                null,
+                vsInsert);
+        }
+        #endregion
 
         #region SMethod: string GetLoc_BookAbbrev(string sBookAbbrev) -   "BookAbbrevs"
         static public string GetLoc_BookAbbrev(string sBookAbbrev)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "BookAbbrevs" },
                 sBookAbbrev,
                 sBookAbbrev,
@@ -3983,7 +3952,6 @@ return false;
         static public string GetLoc_BookGroupings(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "BookGroupings" },
                 sItemID,
                 sEnglishDefault,
@@ -3995,7 +3963,6 @@ return false;
         static public string GetLoc_Messages(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "Messages" },
                 sItemID,
                 sEnglishDefault,
@@ -4007,7 +3974,6 @@ return false;
         static public string GetLoc_StructureMessages(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "Messages", "FileStructureMessages" },
                 sItemID,
                 sEnglishDefault,
@@ -4015,23 +3981,10 @@ return false;
                 null);
         }
         #endregion
-        #region SMethod: string GetLoc_DialogCommon(sItemID, sEnglish, vsIns) -  "DialogCommon"
-        static public string GetLoc_DialogCommon(string sItemID, string sEnglish, string[] vsInsert)
-        {
-            return LocDB.GetValue(
-                null,
-                new string[] { "DialogCommon" },
-                sItemID,
-                sEnglish,
-                null,
-                vsInsert);
-        }
-        #endregion
         #region SMethod: string GetLoc_TranslationStage(sItemID, sEnglish) - "TranslationStages" 
         static public string GetLoc_TranslationStage(string sItemID, string sEnglish)
         {
             return LocDB.GetValue(
-                null,
                 new string[] { "TranslationStages" },
                 sItemID,
                 sEnglish,

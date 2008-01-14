@@ -106,9 +106,6 @@
     <Item ID="m_menuTools">
       <Alt ID="sp" Value="&amp;Herramientas"></Alt>
     </Item>
-    <Item ID="m_menuOptions">
-      <Alt ID="sp" Value="&amp;Opciones..."></Alt>
-    </Item>
     <Item ID="m_menuIncrementBookStatus">
       <Alt ID="sp" Value="&amp;Incrementar Estado del Libro..."></Alt>
     </Item>
@@ -248,9 +245,6 @@
     <Item ID="m_bmTools">
       <Alt ID="sp" Value="Herramientas"></Alt>
     </Item>
-    <Item ID="m_bmOptions">
-      <Alt ID="sp" Value="Opciones"></Alt>
-    </Item>
     <Item ID="m_bmIncrementBookStatus">
       <Alt ID="sp" Value="Incrementar Estado del Libro"></Alt>
     </Item>
@@ -339,6 +333,32 @@
         <Alt ID="sp" Value="Seleccione la carpeta en donde quiere guardar sus archivos de respaldo. Es preferible que no se guarden en el mismo disco duro, sino en una tarjeta flash o una unidad floppy."></Alt>
       </Item>
     </Group>
+    <Group ID="NoteDefs">
+      <Item ID="kGeneral">
+      </Item>
+      <Item ID="kHintForDaughter">
+      </Item>
+      <Item ID="kToDo">
+      </Item>
+      <Item ID="kAskUns">
+      </Item>
+      <Item ID="kReason">
+      </Item>
+      <Item ID="kFront">
+      </Item>
+      <Item ID="kDefinition">
+      </Item>
+      <Item ID="kOldVersion">
+      </Item>
+      <Item ID="kBT">
+      </Item>
+      <Item ID="kGreek">
+      </Item>
+      <Item ID="kHebrew">
+      </Item>
+      <Item ID="kExegesis">
+      </Item>
+    </Group>
     <Group ID="Notes">
       <Item ID="ToDoDefault">
       </Item>
@@ -400,6 +420,29 @@
       <Item ID="Header">
       </Item>
       <Item ID="Picture">
+      </Item>
+    </Group>
+    <Group ID="DialogCommon">
+      <Item ID="m_btnBrowse">
+        <Alt ID="sp" Value="Navegar..."></Alt>
+      </Item>
+      <Item ID="m_btnSaveAs">
+      </Item>
+      <Item ID="m_btnOK">
+      </Item>
+      <Item ID="m_btnClose">
+      </Item>
+      <Item ID="m_btnCancel">
+        <Alt ID="sp" Value="Cancelar"></Alt>
+      </Item>
+      <Item ID="m_btnHelp">
+        <Alt ID="sp" Value="Ayuda..."></Alt>
+      </Item>
+      <Item ID="m_lblProgramName">
+        <Alt ID="sp" Value="Palabra Nuestra"></Alt>
+      </Item>
+      <Item ID="m_lblVersion">
+        <Alt ID="sp" Value="Versión {0}"></Alt>
       </Item>
     </Group>
   </Group>
@@ -509,6 +552,8 @@
     <Item ID="msgNoVerseInSection">
     </Item>
     <Item ID="msgAlreadyRunning">
+    </Item>
+    <Item ID="msgWillOverwriteFileWarning">
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
@@ -932,29 +977,6 @@
       <Alt ID="sp" Value="Redacción Posterior"></Alt>
     </Item>
   </Group>
-  <Group ID="DialogCommon">
-    <Item ID="m_btnBrowse">
-      <Alt ID="sp" Value="Navegar..."></Alt>
-    </Item>
-    <Item ID="m_btnSaveAs">
-    </Item>
-    <Item ID="m_btnOK">
-    </Item>
-    <Item ID="m_btnClose">
-    </Item>
-    <Item ID="m_btnCancel">
-      <Alt ID="sp" Value="Cancelar"></Alt>
-    </Item>
-    <Item ID="m_btnHelp">
-      <Alt ID="sp" Value="Ayuda..."></Alt>
-    </Item>
-    <Item ID="m_lblProgramName">
-      <Alt ID="sp" Value="Palabra Nuestra"></Alt>
-    </Item>
-    <Item ID="m_lblVersion">
-      <Alt ID="sp" Value="Versión {0}"></Alt>
-    </Item>
-  </Group>
   <Group ID="DialogRestoreFromBackup">
     <Item ID="Title">
       <Alt ID="sp" Value="Restaurar del Archivo de Respaldo"></Alt>
@@ -1023,12 +1045,6 @@
     <Item ID="fPropertiesDialog_Description">
       <Alt ID="sp" Value="Activar si quiere ajustar las propiedades de un proyecto. "></Alt>
     </Item>
-    <Item ID="fOptions_CheckBox">
-      <Alt ID="sp" Value="Herramientas-Opciones"></Alt>
-    </Item>
-    <Item ID="fOptions_Description">
-      <Alt ID="sp" Value="Permite configurar varias opciones del programa. Desactivar si la máquina tiene las opciones puestas correctamente, y Vd. no quiere que sean modificadas."></Alt>
-    </Item>
     <Item ID="fPrint_CheckBox">
       <Alt ID="sp" Value="Impresión"></Alt>
     </Item>
@@ -1061,6 +1077,10 @@
     </Item>
     <Item ID="fJustTheBasics_Description">
       <Alt ID="sp" Value="Para usuarios sin experience con computadoras, PalabraNuestra tiene un interfaz que permite un nivel básico da trabajo. Reemplaza al menú con una serie de botones, con dibujos y texto descriptivo. El principiante no tiene que aprender más de una docena de instrucciones."></Alt>
+    </Item>
+    <Item ID="fLocalizer_CheckBox">
+    </Item>
+    <Item ID="fLocalizer_Description">
     </Item>
     <Item ID="m_checkListFeatures">
       <Alt ID="sp" Value="Sólo lo Básico"></Alt>
@@ -1333,10 +1353,6 @@
       </Item>
       <Item ID="propKeepWithNext">
       </Item>
-      <Item ID="propKeepWithNext_0">
-      </Item>
-      <Item ID="propKeepWithNext_1">
-      </Item>
       <Item ID="propLeftMargin">
       </Item>
       <Item ID="propRightMargin">
@@ -1353,17 +1369,11 @@
       </Item>
       <Item ID="propBold">
       </Item>
-      <Item ID="propBold_0">
-      </Item>
-      <Item ID="propBold_1">
-      </Item>
       <Item ID="propItalic">
       </Item>
-      <Item ID="propItalic_0">
-      </Item>
-      <Item ID="propItalic_1">
-      </Item>
       <Item ID="m_listStyles_col0">
+      </Item>
+      <Item ID="propFonts">
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems">
@@ -1531,19 +1541,13 @@
       </Item>
       <Item ID="m_listviewBooks_col2">
       </Item>
+      <Item ID="m_editLanguageName">
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options">
       <Item ID="propMaximizeWindowOnStartup">
       </Item>
-      <Item ID="propMaximizeWindowOnStartup_0">
-      </Item>
-      <Item ID="propMaximizeWindowOnStartup_1">
-      </Item>
       <Item ID="propMakeBackups">
-      </Item>
-      <Item ID="propMakeBackups_0">
-      </Item>
-      <Item ID="propMakeBackups_1">
       </Item>
       <Item ID="propBackupPath">
       </Item>
@@ -1566,6 +1570,52 @@
       <Item ID="propPrimaryLanguage">
       </Item>
       <Item ID="propSecondaryLanguage">
+      </Item>
+      <Item ID="propZoomFactor">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_Notes">
+      <Item ID="Show_kGeneral">
+      </Item>
+      <Item ID="Color_kGeneral">
+      </Item>
+      <Item ID="Show_kHintForDaughter">
+      </Item>
+      <Item ID="Color_kHintForDaughter">
+      </Item>
+      <Item ID="ShowNotesFromFront">
+      </Item>
+      <Item ID="Show_kToDo">
+      </Item>
+      <Item ID="Color_kToDo">
+      </Item>
+      <Item ID="Show_kAskUns">
+      </Item>
+      <Item ID="Color_kAskUns">
+      </Item>
+      <Item ID="Show_kReason">
+      </Item>
+      <Item ID="Color_kReason">
+      </Item>
+      <Item ID="Show_kFront">
+      </Item>
+      <Item ID="Color_kFront">
+      </Item>
+      <Item ID="Show_kDefinition">
+      </Item>
+      <Item ID="Color_kDefinition">
+      </Item>
+      <Item ID="Show_kOldVersion">
+      </Item>
+      <Item ID="Color_kOldVersion">
+      </Item>
+      <Item ID="Show_kBT">
+      </Item>
+      <Item ID="Color_kBT">
+      </Item>
+      <Item ID="Show_kExegesis">
+      </Item>
+      <Item ID="Color_kExegesis">
       </Item>
     </Group>
   </Group>

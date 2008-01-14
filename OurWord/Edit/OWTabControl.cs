@@ -368,7 +368,8 @@ namespace OurWord.Edit
         {
             // Add the note to its own unique row
             StartNewRow();
-            AddNote(note, bIsEditable);
+            OWPara.Flags options = (bIsEditable) ? OWPara.Flags.IsEditable : OWPara.Flags.None;
+            AddNote(note, options);
         }
         #endregion
         #region Method: override void OnSelectAndScrollToNote(DNote note)

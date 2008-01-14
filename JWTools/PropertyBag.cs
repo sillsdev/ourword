@@ -433,6 +433,62 @@ namespace JWTools
         #endregion
     }
     #endregion
+    #region CLASS: YesNoPropertySpec : PropertySpec - localizes Yes/No from common
+    public class YesNoPropertySpec : PropertySpec
+    {
+        #region Method: bool IsTrue(string sValue) - T if the value matches enum[0]
+        public bool IsTrue(string sValue)
+        {
+            if (sValue == enumValues[0])
+                return true;
+            return false;
+        }
+        #endregion
+        #region Method: bool IsTrue(object objValue) - T if the value matches enum[0]
+        public bool IsTrue(object objValue)
+        {
+            return IsTrue((string)objValue);
+        }
+        #endregion
+
+        #region Method: bool IsFalse(string sValue) - T if the value matches enum[0]
+        public bool IsFalse(string sValue)
+        {
+            if (sValue == enumValues[1])
+                return true;
+            return false;
+        }
+        #endregion
+        #region Method: bool IsFalse(object objValue) - T if the value matches enum[0]
+        public bool IsFalse(object objValue)
+        {
+            return IsFalse((string)objValue);
+        }
+        #endregion
+
+        #region Method: string GetBoolString(b) - returns the enumValues string matching T/F
+        public string GetBoolString(bool b)
+        {
+            return (b) ? enumValues[0] : enumValues[1];
+        }
+        #endregion
+
+        #region Constructor(sID, sName, sCat, sDescr, string[] vsValues, sDefaultValue)
+        public YesNoPropertySpec(
+            string sID,
+            string sName,
+            string sCategory,
+            string sDescription,
+            bool bDefaultYes)
+            : base(sID, sName, typeof(string), sCategory, sDescription, "Yes",
+                (string)null, typeof(PropertyEnumStringConverter))
+        {
+            this.enumValues = new string[2] { "Yes", "No" };
+            this.DefaultValue = (bDefaultYes) ? "Yes" : "No";
+        }
+        #endregion
+    }
+    #endregion
     #region CLASS: EnumPropertySpec : PropertySpec
     public class EnumPropertySpec : PropertySpec
     {
@@ -522,6 +578,59 @@ namespace JWTools
 
             Debug.Assert(vsValues.Length == m_nEnumNumbers.Length);
             Debug.Assert(m_vsEnumIDs.Length == m_nEnumNumbers.Length);
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: ZoomPropertySpec : PropertySpec
+    public class ZoomPropertySpec : PropertySpec
+    {
+        #region Method: string GetZoomString(int n)
+        public string GetZoomString(int n)
+        {
+            return n.ToString() + " %";
+        }
+        #endregion
+        #region Method: GetZoomFactor(string sIn)
+        public int GetZoomFactor(string sIn)
+        {
+            string s = "";
+            foreach (char c in sIn)
+            {
+                if (c == ' ')
+                    break;
+                s += c;
+            }
+            return Convert.ToInt16(s);
+        }
+        #endregion
+        #region Method: int GetZoomFactor(object objIn)
+        public int GetZoomFactor(object objIn)
+        {
+            return GetZoomFactor((string)objIn);
+        }
+        #endregion
+        #region Constructor(sID, sName, sCat, sDescr, string[] vsValues, sDefaultValue)
+        public ZoomPropertySpec(
+            string sID,
+            string sName,
+            string sCategory,
+            string sDescription,
+            int[] vnValues,
+            int nDefaultValue)
+            : base(sID, sName, typeof(string), sCategory, sDescription, "", 
+                (string)null, typeof(PropertyEnumStringConverter))
+        {
+            Debug.Assert(null != vnValues);
+            Debug.Assert(vnValues.Length > 1);
+
+            this.DefaultValue = GetZoomString(nDefaultValue);
+
+            string[] vsValues = new string[vnValues.Length];
+            for(int i=0; i<vnValues.Length; i++)
+                vsValues[i] = GetZoomString(vnValues[i]);
+
+            this.enumValues = vsValues;
         }
         #endregion
     }
@@ -733,14 +842,16 @@ namespace JWTools
     #endregion
 
 
-	/// <summary>
+    #region Delegate: PropertySpecEventHandler
+    /// <summary>
 	/// Represents the method that will handle the GetValue and SetValue events of the
 	/// PropertyBag class.
 	/// </summary>
 	public delegate void PropertySpecEventHandler(object sender, PropertySpecEventArgs e);
+    #endregion
 
-	#region CLASS PropertyBag
-	/// <summary>
+    #region CLASS PropertyBag
+    /// <summary>
 	/// Represents a collection of custom properties that can be selected into a
 	/// PropertyGrid to provide functionality beyond that of the simple reflection
 	/// normally used to query an object's properties.

@@ -414,12 +414,6 @@ namespace OurWord
 			ShowTopic(Topic.kDlgRestoreFromBackup);
 		}
 		#endregion
-		#region Method: void Show_DlgOptions()
-		static public void Show_DlgOptions()
-		{
-			ShowTopic(Topic.kDlgOptions);
-		}
-		#endregion
 		#region Method: void Show_DlgPrint()
 		static public void Show_DlgPrint()
 		{

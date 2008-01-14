@@ -109,9 +109,6 @@
     <Item ID="m_menuTools">
       <Alt ID="th" Value="เครื่องมือ"></Alt>
     </Item>
-    <Item ID="m_menuOptions">
-      <Alt ID="th" Value="ทางเลือก"></Alt>
-    </Item>
     <Item ID="m_menuIncrementBookStatus">
       <Alt ID="th" Value="สภาพการเพิ่มของหนังสือ"></Alt>
     </Item>
@@ -261,9 +258,6 @@
     <Item ID="m_bmTools">
       <Alt ID="th" Value="เครื่องมือ"></Alt>
     </Item>
-    <Item ID="m_bmOptions">
-      <Alt ID="th" Value="ทางเลือก"></Alt>
-    </Item>
     <Item ID="m_bmIncrementBookStatus">
       <Alt ID="th" Value="สภาพการเพิ่มของหนังสือ"></Alt>
     </Item>
@@ -336,6 +330,32 @@
       <Item ID="BrowseForBackupFolderDescr">
       </Item>
     </Group>
+    <Group ID="NoteDefs">
+      <Item ID="kGeneral">
+      </Item>
+      <Item ID="kHintForDaughter">
+      </Item>
+      <Item ID="kToDo">
+      </Item>
+      <Item ID="kAskUns">
+      </Item>
+      <Item ID="kReason">
+      </Item>
+      <Item ID="kFront">
+      </Item>
+      <Item ID="kDefinition">
+      </Item>
+      <Item ID="kOldVersion">
+      </Item>
+      <Item ID="kBT">
+      </Item>
+      <Item ID="kGreek">
+      </Item>
+      <Item ID="kHebrew">
+      </Item>
+      <Item ID="kExegesis">
+      </Item>
+    </Group>
     <Group ID="Notes">
       <Item ID="ToDoDefault">
       </Item>
@@ -390,6 +410,26 @@
       <Item ID="Header">
       </Item>
       <Item ID="Picture">
+      </Item>
+    </Group>
+    <Group ID="DialogCommon">
+      <Item ID="m_btnBrowse">
+      </Item>
+      <Item ID="m_btnSaveAs">
+      </Item>
+      <Item ID="m_btnOK">
+      </Item>
+      <Item ID="m_btnClose">
+      </Item>
+      <Item ID="m_btnCancel">
+      </Item>
+      <Item ID="m_btnHelp">
+      </Item>
+      <Item ID="m_lblProgramName">
+        <Alt ID="th" Value="คำของเรา"></Alt>
+      </Item>
+      <Item ID="m_lblVersion">
+        <Alt ID="th" Value="เรื่องราว {0}"></Alt>
       </Item>
     </Group>
   </Group>
@@ -469,6 +509,8 @@
     <Item ID="msgNoVerseInSection">
     </Item>
     <Item ID="msgAlreadyRunning">
+    </Item>
+    <Item ID="msgWillOverwriteFileWarning">
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
@@ -803,26 +845,6 @@
     <Item ID="FinalRevisions">
     </Item>
   </Group>
-  <Group ID="DialogCommon">
-    <Item ID="m_btnBrowse">
-    </Item>
-    <Item ID="m_btnSaveAs">
-    </Item>
-    <Item ID="m_btnOK">
-    </Item>
-    <Item ID="m_btnClose">
-    </Item>
-    <Item ID="m_btnCancel">
-    </Item>
-    <Item ID="m_btnHelp">
-    </Item>
-    <Item ID="m_lblProgramName">
-      <Alt ID="th" Value="คำของเรา"></Alt>
-    </Item>
-    <Item ID="m_lblVersion">
-      <Alt ID="th" Value="เรื่องราว {0}"></Alt>
-    </Item>
-  </Group>
   <Group ID="DialogRestoreFromBackup">
     <Item ID="Title">
     </Item>
@@ -872,10 +894,6 @@
     </Item>
     <Item ID="fPropertiesDialog_Description">
     </Item>
-    <Item ID="fOptions_CheckBox">
-    </Item>
-    <Item ID="fOptions_Description">
-    </Item>
     <Item ID="fPrint_CheckBox">
     </Item>
     <Item ID="fPrint_Description">
@@ -899,6 +917,10 @@
     <Item ID="fJustTheBasics_CheckBox">
     </Item>
     <Item ID="fJustTheBasics_Description">
+    </Item>
+    <Item ID="fLocalizer_CheckBox">
+    </Item>
+    <Item ID="fLocalizer_Description">
     </Item>
     <Item ID="m_checkListFeatures">
     </Item>
@@ -1134,10 +1156,6 @@
       </Item>
       <Item ID="propKeepWithNext">
       </Item>
-      <Item ID="propKeepWithNext_0">
-      </Item>
-      <Item ID="propKeepWithNext_1">
-      </Item>
       <Item ID="propLeftMargin">
       </Item>
       <Item ID="propRightMargin">
@@ -1154,17 +1172,11 @@
       </Item>
       <Item ID="propBold">
       </Item>
-      <Item ID="propBold_0">
-      </Item>
-      <Item ID="propBold_1">
-      </Item>
       <Item ID="propItalic">
       </Item>
-      <Item ID="propItalic_0">
-      </Item>
-      <Item ID="propItalic_1">
-      </Item>
       <Item ID="m_listStyles_col0">
+      </Item>
+      <Item ID="propFonts">
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems">
@@ -1332,19 +1344,13 @@
       </Item>
       <Item ID="m_listviewBooks_col2">
       </Item>
+      <Item ID="m_editLanguageName">
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options">
       <Item ID="propMaximizeWindowOnStartup">
       </Item>
-      <Item ID="propMaximizeWindowOnStartup_0">
-      </Item>
-      <Item ID="propMaximizeWindowOnStartup_1">
-      </Item>
       <Item ID="propMakeBackups">
-      </Item>
-      <Item ID="propMakeBackups_0">
-      </Item>
-      <Item ID="propMakeBackups_1">
       </Item>
       <Item ID="propBackupPath">
       </Item>
@@ -1367,6 +1373,52 @@
       <Item ID="propPrimaryLanguage">
       </Item>
       <Item ID="propSecondaryLanguage">
+      </Item>
+      <Item ID="propZoomFactor">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_Notes">
+      <Item ID="Show_kGeneral">
+      </Item>
+      <Item ID="Color_kGeneral">
+      </Item>
+      <Item ID="Show_kHintForDaughter">
+      </Item>
+      <Item ID="Color_kHintForDaughter">
+      </Item>
+      <Item ID="ShowNotesFromFront">
+      </Item>
+      <Item ID="Show_kToDo">
+      </Item>
+      <Item ID="Color_kToDo">
+      </Item>
+      <Item ID="Show_kAskUns">
+      </Item>
+      <Item ID="Color_kAskUns">
+      </Item>
+      <Item ID="Show_kReason">
+      </Item>
+      <Item ID="Color_kReason">
+      </Item>
+      <Item ID="Show_kFront">
+      </Item>
+      <Item ID="Color_kFront">
+      </Item>
+      <Item ID="Show_kDefinition">
+      </Item>
+      <Item ID="Color_kDefinition">
+      </Item>
+      <Item ID="Show_kOldVersion">
+      </Item>
+      <Item ID="Color_kOldVersion">
+      </Item>
+      <Item ID="Show_kBT">
+      </Item>
+      <Item ID="Color_kBT">
+      </Item>
+      <Item ID="Show_kExegesis">
+      </Item>
+      <Item ID="Color_kExegesis">
       </Item>
     </Group>
   </Group>

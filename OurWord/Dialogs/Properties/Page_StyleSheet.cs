@@ -325,13 +325,13 @@ namespace OurWord.Dialogs
                 }
                 else if (e.Property.ID == c_sPropBold)
                 {
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
                     e.Value = ps.GetBoolString(FWS.IsBold);
                 }
                 else if (e.Property.ID == c_sPropItalic)
                 {
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
                     e.Value = ps.GetBoolString(FWS.IsItalic);
                 }
@@ -350,15 +350,15 @@ namespace OurWord.Dialogs
                 }
                 else if (e.Property.ID == c_sPropBold)
                 {
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
-                    FWS.IsBold = ps.IsTrue((string)e.Value);
+                    FWS.IsBold = ps.IsTrue(e.Value);
                 }
                 else if (e.Property.ID == c_sPropItalic)
                 {
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
-                    FWS.IsItalic = ps.IsTrue((string)e.Value);
+                    FWS.IsItalic = ps.IsTrue(e.Value);
                 }
             }
             #endregion
@@ -392,22 +392,20 @@ namespace OurWord.Dialogs
                     typeof(FontSizeConverter)
                     ));
 
-                Properties.Add(new BoolPropertySpec(
+                Properties.Add(new YesNoPropertySpec(
                     c_sPropBold,
                     "Bold?",
                     "",
                     "If Yes, the font is displayed in boldface.",
-                    new string[] { "Yes", "No" },
-                    "No"
+                    false
                     ));
 
-                Properties.Add(new BoolPropertySpec(
+                Properties.Add(new YesNoPropertySpec(
                     c_sPropItalic,
                     "Italic?",
                     "",
                     "If Yes, the font is displayed in italics.",
-                    new string[] { "Yes", "No" },
-                    "No"
+                    false
                     ));
 
                 // Listen for the callbacks
@@ -480,7 +478,7 @@ namespace OurWord.Dialogs
                 }
                 else if (e.Property.ID == c_sPropKeepWithNext)
                 {
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
                     e.Value = ps.GetBoolString(PStyle.KeepWithNext);
                 }
@@ -528,9 +526,9 @@ namespace OurWord.Dialogs
                 }
                 else if (e.Property.ID == c_sPropKeepWithNext)
                 {
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
-                    PStyle.KeepWithNext = ps.IsTrue((string)e.Value);
+                    PStyle.KeepWithNext = ps.IsTrue(e.Value);
                 }
                 else if (e.Property.ID == c_sPropLeftMargin)
                 {
@@ -641,13 +639,12 @@ namespace OurWord.Dialogs
                     ));
 
                 // Keep With Next Paragraph
-                Bag.Properties.Add( new BoolPropertySpec(
+                Bag.Properties.Add( new YesNoPropertySpec(
                     c_sPropKeepWithNext,
                     "Keep with Next Paragraph?",
                     c_sPropParagraphSettings,
                     "If Yes, there will not be a page break between paragraphs.",
-                    new string[] {"Yes", "No"},
-                    "No"
+                    false
                     ));
 
                 // Left Margin

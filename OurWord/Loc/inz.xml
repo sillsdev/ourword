@@ -90,7 +90,7 @@
     <Item ID="m_menuWindow">
     </Item>
     <Item ID="m_menuShowNotesPane">
-      <Alt ID="inz" Value="&amp;Lihat Catatan"></Alt>
+      <Alt ID="inz" Value="&amp;Lihat kotak untuk Catatan"></Alt>
     </Item>
     <Item ID="m_menuShowOtherTranslationsPane">
       <Alt ID="inz" Value="Membuka kotak untuk Terjemahan Bandingan"></Alt>
@@ -106,9 +106,6 @@
     </Item>
     <Item ID="m_menuTools">
       <Alt ID="inz" Value="&amp;Alat"></Alt>
-    </Item>
-    <Item ID="m_menuOptions">
-      <Alt ID="inz" Value="&amp;Pilihan..."></Alt>
     </Item>
     <Item ID="m_menuIncrementBookStatus">
       <Alt ID="inz" Value="&amp;Robah nama file..."></Alt>
@@ -249,9 +246,6 @@
     <Item ID="m_bmTools">
       <Alt ID="inz" Value="Alat"></Alt>
     </Item>
-    <Item ID="m_bmOptions">
-      <Alt ID="inz" Value="Pilihan"></Alt>
-    </Item>
     <Item ID="m_bmIncrementBookStatus">
       <Alt ID="inz" Value="Robah nama file"></Alt>
     </Item>
@@ -334,6 +328,40 @@
         <Alt ID="inz" Value="Tunjukkanlah map untuk simpan file cadangan. Sebaiknya HDD jangan ditunjuk (karena, jika HDD rusak, file cadangan tidak bisa diamankan). Yang paling baik adalah sebuah memori 'flash card'. Floppy (A:\) juga bisa ditunjukkan, tetapi perlu diingat bahwa setiap kali Sabda Kita dipakai, floppy disk yang selalu sama perlu dimasukkan ke dalam floppy drive."></Alt>
       </Item>
     </Group>
+    <Group ID="NoteDefs">
+      <Item ID="kGeneral">
+        <Alt ID="inz" Value="Umum"></Alt>
+      </Item>
+      <Item ID="kHintForDaughter">
+      </Item>
+      <Item ID="kToDo">
+        <Alt ID="inz" Value="Untuk Diperhatikan"></Alt>
+      </Item>
+      <Item ID="kAskUns">
+        <Alt ID="inz" Value="Tanya Responden"></Alt>
+      </Item>
+      <Item ID="kReason">
+        <Alt ID="inz" Value="Alasan Untuk Susunan"></Alt>
+      </Item>
+      <Item ID="kFront">
+        <Alt ID="inz" Value="Perihal Induk"></Alt>
+      </Item>
+      <Item ID="kDefinition">
+        <Alt ID="inz" Value="Arti Kata"></Alt>
+      </Item>
+      <Item ID="kOldVersion">
+        <Alt ID="inz" Value="Versi Lama"></Alt>
+      </Item>
+      <Item ID="kBT">
+        <Alt ID="inz" Value="Terjemahan Balik"></Alt>
+      </Item>
+      <Item ID="kGreek">
+      </Item>
+      <Item ID="kHebrew">
+      </Item>
+      <Item ID="kExegesis">
+      </Item>
+    </Group>
     <Group ID="Notes">
       <Item ID="ToDoDefault">
         <Alt ID="inz" Value="Diperhatikan:"></Alt>
@@ -400,6 +428,30 @@
       <Item ID="Header">
       </Item>
       <Item ID="Picture">
+      </Item>
+    </Group>
+    <Group ID="DialogCommon">
+      <Item ID="m_btnBrowse">
+        <Alt ID="inz" Value="Cari..."></Alt>
+      </Item>
+      <Item ID="m_btnSaveAs">
+        <Alt ID="inz" Value="Simpan sebagai..."></Alt>
+      </Item>
+      <Item ID="m_btnOK">
+      </Item>
+      <Item ID="m_btnClose">
+      </Item>
+      <Item ID="m_btnCancel">
+        <Alt ID="inz" Value="Batal"></Alt>
+      </Item>
+      <Item ID="m_btnHelp">
+        <Alt ID="inz" Value="Tolong..."></Alt>
+      </Item>
+      <Item ID="m_lblProgramName">
+        <Alt ID="inz" Value="Sabda Kita!"></Alt>
+      </Item>
+      <Item ID="m_lblVersion">
+        <Alt ID="inz" Value="Versi {0}"></Alt>
       </Item>
     </Group>
   </Group>
@@ -498,6 +550,8 @@
     <Item ID="msgNoVerseInSection">
     </Item>
     <Item ID="msgAlreadyRunning">
+    </Item>
+    <Item ID="msgWillOverwriteFileWarning">
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
@@ -949,30 +1003,6 @@
       <Alt ID="inz" Value="Revision"></Alt>
     </Item>
   </Group>
-  <Group ID="DialogCommon">
-    <Item ID="m_btnBrowse">
-      <Alt ID="inz" Value="Cari..."></Alt>
-    </Item>
-    <Item ID="m_btnSaveAs">
-      <Alt ID="inz" Value="Simpan sebagai..."></Alt>
-    </Item>
-    <Item ID="m_btnOK">
-    </Item>
-    <Item ID="m_btnClose">
-    </Item>
-    <Item ID="m_btnCancel">
-      <Alt ID="inz" Value="Batal"></Alt>
-    </Item>
-    <Item ID="m_btnHelp">
-      <Alt ID="inz" Value="Tolong..."></Alt>
-    </Item>
-    <Item ID="m_lblProgramName">
-      <Alt ID="inz" Value="Sabda Kita!"></Alt>
-    </Item>
-    <Item ID="m_lblVersion">
-      <Alt ID="inz" Value="Versi {0}"></Alt>
-    </Item>
-  </Group>
   <Group ID="DialogRestoreFromBackup">
     <Item ID="Title">
       <Alt ID="inz" Value="File Cadangan mengganti File yang rusak"></Alt>
@@ -1038,12 +1068,6 @@
     </Item>
     <Item ID="fPropertiesDialog_Description">
     </Item>
-    <Item ID="fOptions_CheckBox">
-      <Alt ID="inz" Value="Alat-Pilihan"></Alt>
-    </Item>
-    <Item ID="fOptions_Description">
-      <Alt ID="inz" Value="Memungkinkan berbagai pilihan program. Matikan bagi sebuah komputer yang sudah diatur, dan tidak ingin dirobah."></Alt>
-    </Item>
     <Item ID="fPrint_CheckBox">
       <Alt ID="inz" Value="Cetak"></Alt>
     </Item>
@@ -1074,6 +1098,10 @@
     </Item>
     <Item ID="fJustTheBasics_Description">
       <Alt ID="inz" Value="Ciri ini ditujukan kepada pemakai komputer baru. Ini dipilih untuk menyetel komputer agar hanya fungsi-fungsi dasar diperlihatkan untuk menggunakan komputer secara sederhana. Daftar menu disembunyikan. Untuk menggantinya, tombol-tombol besar muncul bersama fungsi masing-masing (dengan gambar bersama kata). Pengguna komputer dasar hanya perlu menguasai sekitar sepuluh fungsi dasar."></Alt>
+    </Item>
+    <Item ID="fLocalizer_CheckBox">
+    </Item>
+    <Item ID="fLocalizer_Description">
     </Item>
     <Item ID="m_checkListFeatures">
     </Item>
@@ -1305,10 +1333,6 @@
       </Item>
       <Item ID="propKeepWithNext">
       </Item>
-      <Item ID="propKeepWithNext_0">
-      </Item>
-      <Item ID="propKeepWithNext_1">
-      </Item>
       <Item ID="propLeftMargin">
       </Item>
       <Item ID="propRightMargin">
@@ -1325,17 +1349,11 @@
       </Item>
       <Item ID="propBold">
       </Item>
-      <Item ID="propBold_0">
-      </Item>
-      <Item ID="propBold_1">
-      </Item>
       <Item ID="propItalic">
       </Item>
-      <Item ID="propItalic_0">
-      </Item>
-      <Item ID="propItalic_1">
-      </Item>
       <Item ID="m_listStyles_col0">
+      </Item>
+      <Item ID="propFonts">
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems">
@@ -1506,25 +1524,20 @@
       </Item>
       <Item ID="m_listviewBooks_col2">
       </Item>
+      <Item ID="m_editLanguageName">
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options">
       <Item ID="propMaximizeWindowOnStartup">
       </Item>
-      <Item ID="propMaximizeWindowOnStartup_0">
-      </Item>
-      <Item ID="propMaximizeWindowOnStartup_1">
-      </Item>
       <Item ID="propMakeBackups">
-      </Item>
-      <Item ID="propMakeBackups_0">
-      </Item>
-      <Item ID="propMakeBackups_1">
       </Item>
       <Item ID="propBackupPath">
       </Item>
       <Item ID="propPicturesPath">
       </Item>
       <Item ID="propBackgroundColors">
+        <Alt ID="inz" Value="Warna Latar Belakang"></Alt>
       </Item>
       <Item ID="propBackColorDraftingWindow">
       </Item>
@@ -1541,6 +1554,52 @@
       <Item ID="propPrimaryLanguage">
       </Item>
       <Item ID="propSecondaryLanguage">
+      </Item>
+      <Item ID="propZoomFactor">
+      </Item>
+    </Group>
+    <Group ID="DialogProperties_Page_Notes">
+      <Item ID="Show_kGeneral">
+      </Item>
+      <Item ID="Color_kGeneral">
+      </Item>
+      <Item ID="Show_kHintForDaughter">
+      </Item>
+      <Item ID="Color_kHintForDaughter">
+      </Item>
+      <Item ID="ShowNotesFromFront">
+      </Item>
+      <Item ID="Show_kToDo">
+      </Item>
+      <Item ID="Color_kToDo">
+      </Item>
+      <Item ID="Show_kAskUns">
+      </Item>
+      <Item ID="Color_kAskUns">
+      </Item>
+      <Item ID="Show_kReason">
+      </Item>
+      <Item ID="Color_kReason">
+      </Item>
+      <Item ID="Show_kFront">
+      </Item>
+      <Item ID="Color_kFront">
+      </Item>
+      <Item ID="Show_kDefinition">
+      </Item>
+      <Item ID="Color_kDefinition">
+      </Item>
+      <Item ID="Show_kOldVersion">
+      </Item>
+      <Item ID="Color_kOldVersion">
+      </Item>
+      <Item ID="Show_kBT">
+      </Item>
+      <Item ID="Color_kBT">
+      </Item>
+      <Item ID="Show_kExegesis">
+      </Item>
+      <Item ID="Color_kExegesis">
       </Item>
     </Group>
   </Group>

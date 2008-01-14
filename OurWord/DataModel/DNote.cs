@@ -38,16 +38,16 @@ namespace OurWord.DataModel
 		}
 		DNote.Types m_NoteType = DNote.Types.kUnknown;
 		#endregion
-		#region Attr{g}: string Name
-		public string Name
+        #region Attr{g}: string EnglishName
+        public string EnglishName
 		{
 			get
 			{
-				Debug.Assert("" != m_sName);
-				return m_sName;
+                Debug.Assert("" != m_sEnglishName);
+                return m_sEnglishName;
 			}
 		}
-		string m_sName = "";
+        string m_sEnglishName = "";
 		#endregion
 		#region Attr{g}: string Marker
 		public string Marker
@@ -104,7 +104,17 @@ namespace OurWord.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: bool ShowInDraftingLayout
+        #region Attr{g}: bool ShowDefault
+        public bool ShowDefault
+        {
+            get
+            {
+                return m_bShowDefault;
+            }
+        }
+        bool m_bShowDefault = false;
+        #endregion
+        #region Attr{g}: bool ShowInDraftingLayout
 		public bool ShowInDraftingLayout
 		{
 			get
@@ -114,16 +124,14 @@ namespace OurWord.DataModel
 		}
 		bool m_bShowInDraftingLayout = true;
 		#endregion
-		#region Attr{g}: string DisplayName - returns the localized name, via a delegate 
+		#region VAttr{g}: string DisplayName - returns the localized name 
 		public string DisplayName
 		{
 			get
 			{
-				return m_fDisplayName();
+                return G.GetLoc_NoteDefs(NoteType.ToString(), EnglishName);
 			}
 		}
-		public delegate string DisplayNameDelegate();
-		DisplayNameDelegate m_fDisplayName;
 		#endregion
 
 		#region Attr{g}: DNote.Types CombineWithNoteType
@@ -204,17 +212,17 @@ namespace OurWord.DataModel
 		const string c_RegKey = "Notes";
 		const string c_RegKeyBgColor = "Notes\\BgColors";
 		#region Constructor(type, sName, sMarker, sBitmapName, clrBackground)
-		public DNoteDef(DNote.Types type, string sName, string sMarker, 
+        public DNoteDef(DNote.Types type, string sEnglishName, string sMarker, 
 			string sBitmapName, Color clrBackground, bool bShowDefault,
-			bool bShowInDraftingLayout, DisplayNameDelegate del,
+			bool bShowInDraftingLayout, 
 			DNote.Types _CombineWithType)
 		{
 			m_NoteType              = type;
-			m_sName                 = sName;
+            m_sEnglishName          = sEnglishName;
 			m_sMarker               = sMarker;
 			m_sBitmapName           = sBitmapName;
 			m_bShowInDraftingLayout = bShowInDraftingLayout;
-			m_fDisplayName          = del;
+            m_bShowDefault          = bShowDefault;
 			m_CombineWithNoteType   = _CombineWithType;
 
 			// By calling the Registry via Get, if there is no value currently
@@ -367,75 +375,63 @@ namespace OurWord.DataModel
 
 			s_rgNoteDefs = new ArrayList(); 
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kGeneral, "General", "nt", 
-				"NoteGeneric.ico", Color.White, true, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_GeneralNote ),
-				DNote.Types.kUnknown)
+			s_rgNoteDefs.Add( new DNoteDef(Types.kGeneral, 
+                "General", "nt", 
+				"NoteGeneric.ico", Color.White, true, true, DNote.Types.kUnknown)
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kHintForDaughter, "Hint", "ntHint", 
-				"Note_Hint.ico", Color.White, false, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_HintForDaughterNote ),
-				DNote.Types.kUnknown )
+            s_rgNoteDefs.Add(new DNoteDef(Types.kHintForDaughter, 
+                "Hint for Drafting Daughters", "ntHint", 
+				"Note_Hint.ico", Color.White, false, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kToDo, "ToDo", "ntck", 
-				"Note_ToDo.ico", Color.LightYellow, true, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_ToDoNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kToDo, 
+                "To Do", "ntck", 
+				"Note_ToDo.ico", Color.LightYellow, true, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kAskUns, "AskUNS", "ntUns", 
-				"Note_AskUns.ico", Color.LightPink, false, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_AskUnsNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kAskUns, 
+                "Ask UNS", "ntUns", 
+				"Note_AskUns.ico", Color.LightPink, false, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kReason, "Reason", "ntReas", 
-				"Note_Reason.ico", Color.White, false, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_ReasonsNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kReason, 
+                "Reason", "ntReas", 
+				"Note_Reason.ico", Color.White, false, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kFront, "Front", "ntFT", 
-				"Note_Front.ico", Color.Honeydew, true, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_FrontIssuesNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kFront, 
+                "Front Issues", "ntFT", 
+				"Note_Front.ico", Color.Honeydew, true, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kDefinition, "Definition", "ntDef",
-				"Note_Definition.ico", Color.White, true, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_DefinitionsNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kDefinition, 
+                "Definitions", "ntDef",
+				"Note_Definition.ico", Color.White, true, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kOldVersion, "OldVersion", "ov", 
-				"Note_OldVersions.ico", Color.LightCyan, true, true, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_OldVersionNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kOldVersion, 
+                "Old Versions", "ov", 
+				"Note_OldVersions.ico", Color.LightCyan, true, true, DNote.Types.kUnknown )
 				);
 
-			s_rgNoteDefs.Add( new DNoteDef(Types.kBT, "BT", "ntBT", 
-				"Note_BT.ico", Color.LightPink, false, false, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_BTNote ),
-				DNote.Types.kUnknown )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kBT,
+                "Back Translation", "ntBT", 
+				"Note_BT.ico", Color.LightPink, false, false, DNote.Types.kUnknown )
 				);
 
 			// Three types of Exegesis Notes
-			s_rgNoteDefs.Add( new DNoteDef(Types.kGreek, "Greek", "ntgk", 
-				"Note_Greek.ico", Color.PapayaWhip, false, false, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_GreekNote ),
-				DNote.Types.kExegesis )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kGreek, 
+                "Greek", "ntgk", 
+				"Note_Greek.ico", Color.PapayaWhip, false, false, DNote.Types.kExegesis )
 				);
-			s_rgNoteDefs.Add( new DNoteDef(Types.kHebrew, "Hebrew", "nthb", 
-				"Note_Hebrew.ico", Color.PapayaWhip, false, false, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_HebrewNote ),
-				DNote.Types.kExegesis )
+			s_rgNoteDefs.Add( new DNoteDef(Types.kHebrew, 
+                "Hebrew", "nthb", 
+				"Note_Hebrew.ico", Color.PapayaWhip, false, false, DNote.Types.kExegesis )
 				);
-			s_rgNoteDefs.Add( new DNoteDef(Types.kExegesis, "Exegesis", "ntcn", 
-				"Note_Exegesis.ico", Color.PapayaWhip, false, false, 
-				new DNoteDef.DisplayNameDelegate( DlgOptionsRes.GetName_ExegesisNote ),
-				DNote.Types.kUnknown)
+			s_rgNoteDefs.Add( new DNoteDef(Types.kExegesis, 
+                "Exegesis", "ntcn", 
+				"Note_Exegesis.ico", Color.PapayaWhip, false, false, DNote.Types.kUnknown)
 				);
 		}
 		#endregion

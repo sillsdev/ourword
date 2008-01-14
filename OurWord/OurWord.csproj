@@ -96,7 +96,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JWTools, Version=1.0.2909.11802, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="JWTools, Version=1.0.2934.14522, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\JWTools\bin\Debug\JWTools.dll</HintPath>
     </Reference>
@@ -138,6 +138,10 @@
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
     <Content Include="OurWord.ico" />
+    <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>Page_Notes.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Layouts\NotesTabPage.resx">
       <SubType>Designer</SubType>
       <DependentUpon>NotesTabPage.cs</DependentUpon>
@@ -291,7 +295,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
@@ -301,6 +305,12 @@
     </Compile>
     <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Notes.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Notes.Designer.cs">
+      <DependentUpon>Page_Notes.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_Options.cs">
       <SubType>UserControl</SubType>
@@ -391,8 +401,7 @@
     <Compile Include="Layouts\Drafting.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Layouts\JobConfigure.cs">
-      <SubType>Form</SubType>
+    <Compile Include="BackupSystem.cs">
     </Compile>
     <Compile Include="Layouts\Naturalness.cs">
       <SubType>Component</SubType>
@@ -482,9 +491,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Layouts\JobConfigure.resx">
-      <DependentUpon>JobConfigure.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="licenses.licx" />
     <EmbeddedResource Include="OurWordMain.resx">

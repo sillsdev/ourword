@@ -208,6 +208,7 @@ namespace OurWord.Dialogs
         public const string c_tagEssentialsFront   = "Essentials-Front";
         public const string c_tagEssentialsTarget  = "Essentials-Target";
         const string c_tagOptions           = "Options";
+        const string c_tagNotes             = "Notes";
         const string c_tagOtherTranslations = "OtherTranslations";
         const string c_tagTeamSettings      = "TS";
         const string c_tagWritingSystems    = "TS-WritingSystems";
@@ -347,8 +348,13 @@ namespace OurWord.Dialogs
             // Options
             if (sActiveNav == c_navOptions)
             {
+                // General Options
                 AddPage(c_tagOptions,
                     new Page_Options(this));
+
+                // Notes
+                AddPage(c_tagNotes,
+                    new Page_Notes(this));
             }
 
             // TeamSettings

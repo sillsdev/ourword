@@ -3,7 +3,7 @@
  * File:    Page_Options.cs
  * Author:  John Wimbish
  * Created: 21 Sep 2007
- * Purpose: Sets up the members of the Siblings or the Reference translations list.
+ * Purpose: Sets up the general options
  * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
@@ -56,6 +56,7 @@ namespace OurWord.Dialogs
         const string c_sPicturesPath = "propPicturesPath";
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
+        const string c_sZoomFactor = "propZoomFactor";
 
         const string c_sGroup_BackgroundColors = "propBackgroundColors";
         const string c_sColorDrafting = "propBackColorDraftingWindow";
@@ -92,15 +93,21 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sMaximizeWindowOnStartup:
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
                     e.Value = ps.GetBoolString(OurWordMain.App.StartMaximized);
                     break;
 
                 case c_sMakeBackups:
-                    BoolPropertySpec BackupPS = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec BackupPS = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != BackupPS);
                     e.Value = BackupPS.GetBoolString(BackupSystem.Enabled);
+                    break;
+
+                case c_sZoomFactor:
+                    ZoomPropertySpec ZoomPS = e.Property as ZoomPropertySpec;
+                    Debug.Assert(null != ZoomPS);
+                    e.Value = ZoomPS.GetZoomString(G.ZoomPercent);
                     break;
 
                 case c_sBackupPath:
@@ -108,7 +115,7 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sPicturesPath:
-                    e.Value = Options.PictureSearchPath;
+                    e.Value = G.PictureSearchPath;
                     break;
 
                 case c_sColorDrafting:
@@ -142,15 +149,15 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sMaximizeWindowOnStartup:
-                    BoolPropertySpec ps = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
-                    OurWordMain.App.StartMaximized = ps.IsTrue((string)e.Value);
+                    OurWordMain.App.StartMaximized = ps.IsTrue(e.Value);
                     break;
 
                 case c_sMakeBackups:
-                    BoolPropertySpec BackupPS = e.Property as BoolPropertySpec;
+                    YesNoPropertySpec BackupPS = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != BackupPS);
-                    BackupSystem.Enabled = BackupPS.IsTrue((string)e.Value);
+                    BackupSystem.Enabled = BackupPS.IsTrue(e.Value);
                     break;
 
                 case c_sBackupPath:
@@ -158,7 +165,13 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sPicturesPath:
-                    Options.PictureSearchPath = (string)e.Value;
+                    G.PictureSearchPath = (string)e.Value;
+                    break;
+
+                case c_sZoomFactor:
+                    ZoomPropertySpec ZoomPS = e.Property as ZoomPropertySpec;
+                    Debug.Assert(null != ZoomPS);
+                    G.ZoomPercent = ZoomPS.GetZoomFactor(e.Value);
                     break;
 
                 case c_sColorDrafting:
@@ -182,7 +195,7 @@ namespace OurWord.Dialogs
         #region Method: void SetupPropertyGrid()
         void SetupPropertyGrid()
         {
-            // Create the PropertyBag for this style
+            // Create the PropertyBag for this page
             m_bag = new PropertyBag();
             Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
             Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
@@ -208,24 +221,22 @@ namespace OurWord.Dialogs
             Bag.Properties.Add(SecondaryPS);
 
             // Maxmimze window on startup
-            Bag.Properties.Add(new BoolPropertySpec(
+            Bag.Properties.Add(new YesNoPropertySpec(
                 c_sMaximizeWindowOnStartup,
                 "Maxmimize Window on Startup?",
                 "",
                 "If Yes, OurWord starts up maximized. This may help newer users to have sufficient " +
                     "size on the screen for doing work.",
-                new string[] { "Yes", "No" },
-                "Yes"
+                true
                 ));
 
             // Turn on the Backup System
-            Bag.Properties.Add(new BoolPropertySpec(
+            Bag.Properties.Add(new YesNoPropertySpec(
                 c_sMakeBackups,
                 "Make Automatic Backups?",
                 "",
                 "If Yes, OurWord will automatically back up your fields to the folder specified below.",
-                new string[] { "Yes", "No" },
-                "Yes"
+                true
                 ));
 
             // Backups Path
@@ -249,6 +260,18 @@ namespace OurWord.Dialogs
                 "",
                 typeof(PictureFolderBrowseTypeEditor),
                 null));
+
+            // Zoom Factor (displays as a combo, showing, e.g., "120 %")
+            ZoomPropertySpec zps = new ZoomPropertySpec(
+                c_sZoomFactor,
+                "Zoom Factor",
+                "",
+                "Text in the windows can be larger (or smaller) by the chosen percentage.",
+                new int[] { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 },
+                100
+                );
+            zps.DontLocalizeEnums = true;
+            Bag.Properties.Add(zps);
 
             // Window Background Colors
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(

@@ -702,6 +702,26 @@ namespace JWTools
             return null;
         }
         #endregion
+        #region Method: LocItem FindRecursively(string sID)
+        public LocItem FindRecursively(string sID)
+        {
+            // First, look through the items in this group
+            LocItem item = Find(sID);
+            if (null != item)
+                return item;
+
+            // If unsuccessful, look through the groups owned by this group, and so on
+            foreach (LocGroup group in Groups)
+            {
+                item = group.FindRecursively(sID);
+                if (null != item)
+                    return item;
+            }
+
+            // Unsucessful
+            return null;
+        }
+        #endregion
         #region Method: LocItem FindOrAddItem(sItemID, sEnglish)
         public LocItem FindOrAddItem(string sItemID, string sEnglish)
         {
@@ -1110,7 +1130,6 @@ namespace JWTools
 
         // Special Groups --------------------------------------------------------------------
         const string c_Strings = "Strings";
-        const string c_DialogCommon = "DialogCommon";
         const string c_Menus = "Menus";
         const string c_Toolbars = "ToolbarText";
         const string c_Messages = "Messages";
@@ -1128,22 +1147,7 @@ namespace JWTools
             }
         }
         LocGroup m_Strings = null;
-        #endregion
-        #region Attr{g}: LocGroup DialogCommon - the Group that contains the common dialog controls
-        public LocGroup DialogCommon
-        {
-            get
-            {
-                if (null == m_DialogCommon)
-                    m_DialogCommon = FindGroup(c_DialogCommon);
-
-                Debug.Assert(null != m_DialogCommon);
-
-                return m_DialogCommon;
-            }
-        }
-        LocGroup m_DialogCommon;
-        #endregion
+        #endregion      
         #region Attr{g}: LocGroup Menus - the Group that contains the menus
         LocGroup Menus
         {
@@ -1589,7 +1593,7 @@ namespace JWTools
         }
         #endregion
 
-        // Messages --------------------------------------------------------------------------
+        // Messages ----------------------------C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Language.cs----------------------------------------------
         #region Method: string Insert(string sBase, string[] vsInsert)
         static public string Insert(string sBase, string[] v)
         {
@@ -1726,22 +1730,33 @@ namespace JWTools
                 // The Property's string enumerations, if applicable
                 if (null != ps.EnumValues && !ps.DontLocalizeEnums)
                 {
-                    for (int i = 0; i < ps.EnumValues.Length; i++)
+                    // YesNoPropertySpec is located in Common area
+                    if (ps as YesNoPropertySpec != null)
                     {
-                        // Default item is just appended to the property
-                        string sItem = ps.ID + "_" + i.ToString();
+                        ps.EnumValues[0] = GetValue(null, "kYes", "Yes", null, null);
+                        ps.EnumValues[1] = GetValue(null, "kNo", "No", null, null);
+                    }
 
-                        // For an enumeration, we use, e.g., kLeft, kCentered, etc.
-                        EnumPropertySpec eps = ps as EnumPropertySpec;
-                        if (null != eps)
-                            sItem = "option_" + eps.EnumIDs[i];
+                    // All others
+                    else
+                    {
+                        for (int i = 0; i < ps.EnumValues.Length; i++)
+                        {
+                            // Default item is just appended to the property
+                            string sItem = ps.ID + "_" + i.ToString();
 
-                        string sEnumValue = ps.EnumValues[i];
+                            // For an enumeration, we use, e.g., kLeft, kCentered, etc.
+                            EnumPropertySpec eps = ps as EnumPropertySpec;
+                            if (null != eps)
+                                sItem = "option_" + eps.EnumIDs[i];
 
-                        ps.EnumValues[i] = GetValue(uc, sItem, sEnumValue, null);
+                            string sEnumValue = ps.EnumValues[i];
 
-                        if ((string)ps.DefaultValue == sEnumValue)
-                            ps.DefaultValue = GetValue(uc, sItem, sEnumValue, null);
+                            ps.EnumValues[i] = GetValue(uc, sItem, sEnumValue, null);
+
+                            if ((string)ps.DefaultValue == sEnumValue)
+                                ps.DefaultValue = GetValue(uc, sItem, sEnumValue, null);
+                        }
                     }
                 }
 
@@ -1776,7 +1791,6 @@ namespace JWTools
 
             // Get the ToolStripItem's text value
             tsi.Text = GetValue(
-                c_DialogCommon,
                 vGroupID,
                 sItemID,
                 tsi.Text,
@@ -1785,7 +1799,6 @@ namespace JWTools
 
             // Get its tooltip
             tsi.ToolTipText = GetToolTip(
-                c_DialogCommon,
                 vGroupID,
                 sItemID,
                 tsi.Text,
@@ -1796,7 +1809,6 @@ namespace JWTools
             if (null != mi)
             {
                 mi.ShortcutKeys = GetShortcutKey(
-                    c_DialogCommon,
                     vGroupID,
                     sItemID,
                     tsi.Text,
@@ -1824,7 +1836,6 @@ namespace JWTools
             string[] vGroupID = _GetGroupID(col);
 
             col.Text = GetValue(
-                null,
                 vGroupID,
                 sItemID,
                 col.Text,
@@ -1884,7 +1895,6 @@ namespace JWTools
 
             // Get the control's text
             ctrl.Text = GetValue(
-                c_DialogCommon,
                 vGroupID,
                 sItemID,
                 ctrl.Text,
@@ -1905,6 +1915,7 @@ namespace JWTools
         #endregion
 
         // Private helper methods for Localize and Retrieval Methods -------------------------
+        /***
         #region SMethod: LocItem _UseCommonGroupItem(...)
         static LocItem _UseCommonGroupItem(string sCommonGroupID, LocGroup groupMain, string sItemID)
         {
@@ -1914,7 +1925,7 @@ namespace JWTools
 
             // If the Item already exists in the main group, then we don't use the
             // common group, so we return null.
-            if (null != groupMain.Find(sItemID))
+            if (null != groupMain && null != groupMain.Find(sItemID))
                 return null;
 
             // Locate the common group. We expect it to be at the top level (that is,
@@ -1928,6 +1939,8 @@ namespace JWTools
             return itemCommon;
         }
         #endregion
+        ***/
+
         #region SMethod: string[] _GetGroupID(Object obj)
         static string[] _GetGroupID(Object obj)
         {
@@ -2028,16 +2041,50 @@ namespace JWTools
         #endregion
 
         // Retrieval of strings from the proper alternate of the LocItem ---------------------
+        static LocItem GetLocItem(
+            string[] vGroupID, 
+            string sItemID,
+            string sEnglish
+            )
+        {
+            // Default to not being able to find it
+            LocItem item = null;
+
+            // First, see if it is in the vGroupID path
+            LocGroup group = null;
+            if (vGroupID != null)
+            {
+                foreach (string sGroupID in vGroupID)
+                {
+                    if (group == null)
+                        group = DB.FindOrAddGroup(sGroupID);
+                    else
+                        group = group.FindOrAddGroup(sGroupID);
+                }
+                item = group.Find(sItemID);
+            }
+
+            // If not, see if it is defined in the Strings area
+            if (null == item)
+            {
+                LocGroup gStrings = DB.FindGroup(c_Strings);
+                item = gStrings.FindRecursively(sItemID);
+            }
+
+            // If not, add it to the vGroupID group
+            if (null == item && null != group)
+            {
+                item = group.FindOrAddItem(sItemID, sEnglish);
+            }
+
+            return item;
+        }
+
         // Retrieve a Value ------------------------------------------------------------------
         #region SMethod: string GetValue(vGroupID, sItemID, sEnglish, sLanguage, vsInsert) - Workhorse method
         /// <summary>
         /// Looks up the string according to its GroupID/ItemID, and returns its localized value. 
         /// </summary>
-        /// <param name="sCommonGroupID">Allows an optional search in a common group, such as
-        /// a group containing common dialog controls such as OK or Cancel. The logic is that
-        /// if the item exists in the vGroupID, then we use it; otherwise we search in the
-        /// common group; and finally if it is still not found, we insert it into the vGroupID
-        /// group.</param>
         /// <param name="vGroupID">The path to the group containing the localization item</param>
         /// <param name="sItemID">The ID of the localization item</param>
         /// <param name="sEnglish">The English value, should the language value not be found</param>
@@ -2050,21 +2097,28 @@ namespace JWTools
         /// <remarks>This is the workhorse method that other methods (with simplified parameters) 
         /// should call. If the item does not exist in the database, then one is added.</remarks>
         static public string GetValue( 
-            string sCommonGroupID,
             string[] vGroupID, 
             string sItemID, 
             string sEnglish,
             string sLanguage,
             string[] vsInsert)
         {
+            // Find (or add) the item, either in vGroupID, or in the Strings hierarchy
+            LocItem item = GetLocItem(vGroupID, sItemID, sEnglish);
+            Debug.Assert(null != item);
+
+            /***
             // Drill down to locate the desired group, adding it if necessary
             LocGroup group = null;
-            foreach (string sGroupID in vGroupID)
+            if (vGroupID != null)
             {
-                if (group == null)
-                    group = DB.FindOrAddGroup(sGroupID);
-                else
-                    group = group.FindOrAddGroup(sGroupID);
+                foreach (string sGroupID in vGroupID)
+                {
+                    if (group == null)
+                        group = DB.FindOrAddGroup(sGroupID);
+                    else
+                        group = group.FindOrAddGroup(sGroupID);
+                }
             }
 
             // If we have a CommonGroup, then we'll go there if the item is not in the main Group
@@ -2074,6 +2128,7 @@ namespace JWTools
             // target main group.
             if (null == item)
                 item = group.FindOrAddItem(sItemID, sEnglish);
+            ***/
 
             // If a language was specified, then attempt to find it; returning English otherwise.
             // We use this, e.g., for the FileNameLanguage
@@ -2105,7 +2160,6 @@ namespace JWTools
         {
             // Call the workhorse
             return GetValue(
-                null,
                 _GetGroupID(form),
                 sItemID,
                 sEnglish,
@@ -2118,7 +2172,6 @@ namespace JWTools
         {
             // Call the workhorse
             return GetValue(
-                null,
                 _GetGroupID(uc),
                 sItemID,
                 sEnglish,
@@ -2129,12 +2182,16 @@ namespace JWTools
         // Retrieve a ToolTip ----------------------------------------------------------------
         #region SMethod: string GetToolTip(vGroupID, sItemID, sEnglish, sEnglishToolTip) - Workhorse method
         static public string GetToolTip(
-            string sCommonGroupID,
             string[] vGroupID,
             string sItemID,
             string sEnglish,
             string sEnglishToolTip)
         {
+            // Find (or add) the item, either in vGroupID, or in the Strings hierarchy
+            LocItem item = GetLocItem(vGroupID, sItemID, sEnglish);
+            Debug.Assert(null != item);
+
+            /***
             // Drill down to locate the desired group, adding it if necessary
             LocGroup group = null;
             foreach (string sGroupID in vGroupID)
@@ -2152,6 +2209,7 @@ namespace JWTools
             // target main group.
             if (null == item)
                 item = group.FindOrAddItem(sItemID, sEnglish);
+            ***/
 
             // Make sure the item has the default English tooltip
             if (string.IsNullOrEmpty(item.ToolTip) & !string.IsNullOrEmpty(sEnglishToolTip))
@@ -2167,7 +2225,6 @@ namespace JWTools
         {
             // Call the workhorse
             return GetToolTip(
-                c_DialogCommon,
                 _GetGroupID(uc),
                 sItemID,
                 sEnglish,
@@ -2177,12 +2234,16 @@ namespace JWTools
         // Retrieve a ShortcutKey ------------------------------------------------------------
         #region SMethod: Keys GetShortcutKey(vGroupID, sItemID, sEnglish, sEnglishShortcutKey) - Workhorse method
         static public Keys GetShortcutKey(
-            string sCommonGroupID,
             string[] vGroupID,
             string sItemID,
             string sEnglish,
             string sEnglishShortcutKey)
         {
+            // Find (or add) the item, either in vGroupID, or in the Strings hierarchy
+            LocItem item = GetLocItem(vGroupID, sItemID, sEnglish);
+            Debug.Assert(null != item);
+
+            /***
             // Drill down to locate the desired group, adding it if necessary
             LocGroup group = null;
             foreach (string sGroupID in vGroupID)
@@ -2200,6 +2261,7 @@ namespace JWTools
             // target main group.
             if (null == item)
                 item = group.FindOrAddItem(sItemID, sEnglish);
+            ***/
 
             // Make sure the item has the default English Shortcut Key
             if (string.IsNullOrEmpty(item.ShortcutKey) && !string.IsNullOrEmpty(sEnglishShortcutKey))

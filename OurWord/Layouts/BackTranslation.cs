@@ -131,14 +131,17 @@ namespace OurWord.View
                     continue;
 
                 // Add the vernacular paragraph
-                AddParagraph(0, p, false, false);
+                AddParagraph(0, p, OWPara.Flags.None);
 
                 // For certain types of paragraphs, we just display them on the BT side, rather
                 // than back-translating them. These paragraphs are ones we generated from the 
                 // Front, rather than ones the translator will have edited. (E.g., cross
                 // references.)
-                bool bUseBT =  ((p.IsUserEditable) ? true : false);
-                AddParagraph(1, p, bUseBT, true);
+                OWPara.Flags options = OWPara.Flags.None;
+                // If the vernacular was editable, then we want to show the back translation
+                if (p.IsUserEditable)
+                    options = (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable);
+                AddParagraph(1, p, options);
             }
 
             // Load the footnotes
@@ -148,10 +151,12 @@ namespace OurWord.View
                 StartNewRow(bFirstFootnote, null);
                 bFirstFootnote = false;
 
-                AddParagraph(0, fn, false, false);
+                AddParagraph(0, fn, OWPara.Flags.None);
 
-                bool bUseBT = ((fn.IsUserEditable) ? true : false);
-                AddParagraph(1, fn, bUseBT, true);
+                OWPara.Flags options = (fn.IsUserEditable) ?
+                    (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable) :
+                    (OWPara.Flags.None);
+                AddParagraph(1, fn, options);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

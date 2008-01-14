@@ -264,13 +264,13 @@ namespace OurWord.View
                     {
                         DParagraph pFront = G.SFront.Paragraphs[iFront + kF] as DParagraph;
                         _LoadHintsFromFront(pFront);
-                        AddParagraph(0, pFront, false, false);
+                        AddParagraph(0, pFront, OWPara.Flags.None);
                     }
                     for (int kT = 0; kT < cTarget; kT++)
                     {
                         DParagraph pTarget = G.STarget.Paragraphs[iFront + kT] as DParagraph;
                         pTarget.BestGuessAtInsertingTextPositions();
-                        AddParagraph(1, pTarget, false, true);
+                        AddParagraph(1, pTarget, OWPara.Flags.IsEditable);
                     }
                 }
                 else
@@ -298,8 +298,8 @@ namespace OurWord.View
 
                         // Add the left and right paragraphs
                         _LoadHintsFromFront(pFront);
-                        AddParagraph(0, pFront, false, false);
-                        AddParagraph(1, pTarget, false, true);
+                        AddParagraph(0, pFront, OWPara.Flags.None);
+                        AddParagraph(1, pTarget, OWPara.Flags.IsEditable);
                     }
                 }
 
@@ -321,9 +321,9 @@ namespace OurWord.View
             {
                 StartNewRow(true, null);
                 for (int kF = 0; kF < G.SFront.Footnotes.Count; kF++)
-                    AddParagraph(0, G.SFront.Footnotes[kF] as DFootnote, false, false);
+                    AddParagraph(0, G.SFront.Footnotes[kF] as DFootnote, OWPara.Flags.None);
                 for (int kT = 0; kT < G.STarget.Footnotes.Count; kT++)
-                    AddParagraph(1, G.STarget.Footnotes[kT] as DFootnote, false, true);
+                    AddParagraph(1, G.STarget.Footnotes[kT] as DFootnote, OWPara.Flags.IsEditable);
                 return;
             }
 
@@ -336,8 +336,8 @@ namespace OurWord.View
                 DFootnote fTarget = G.STarget.Footnotes[k] as DFootnote;
                 fTarget.SynchRunsToModelParagraph(fFront);
 
-                AddParagraph(0, fFront, false, false);
-                AddParagraph(1, fTarget, false, true);
+                AddParagraph(0, fFront, OWPara.Flags.None);
+                AddParagraph(1, fTarget, OWPara.Flags.IsEditable);
             }
 
         }

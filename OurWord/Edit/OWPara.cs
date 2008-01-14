@@ -25,6 +25,75 @@ namespace OurWord.Edit
 {
     public class OWPara
     {
+        // Paragraph options -----------------------------------------------------------------
+        #region Flags enum - SuppressVerseNumbers, ShowLineNumbers, IsEditable, ShowBackTranslation, etc.
+        [Flags] 
+        public enum Flags { 
+            None = 0,
+            SuppressVerseNumbers = 1,
+            ShowLineNumbers = 2,
+            IsEditable = 4,
+            ShowBackTranslation = 8
+        };
+        #endregion
+        #region Attr{g}: Flags Options
+        Flags Options
+        {
+            get
+            {
+                return m_Options;
+            }
+        }
+        Flags m_Options = Flags.None;
+        #endregion
+        #region VAttr{g/s}: bool Editable - true if the paragraph can be edited
+        public bool Editable
+        {
+            get
+            {
+                return (Options & Flags.IsEditable) == Flags.IsEditable;
+            }
+            set
+            {
+                if (value)
+                {
+                    m_Options |= Flags.IsEditable;
+                }
+                else
+                {
+                    // Suppose we start with..........110101
+                    // Reverse it.....................001010
+                    m_Options = ~m_Options;
+
+                    // Add in the Editable value......___1__
+                    // yields.........................001110
+                    m_Options |= Flags.IsEditable;
+
+                    // Reverse it again...............110001
+                    m_Options = ~m_Options;
+                }
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool DisplayBT
+        public bool DisplayBT
+        {
+            get
+            {
+                return (Options & Flags.ShowBackTranslation) == Flags.ShowBackTranslation;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool SuppressVerseNumbers
+        public bool SuppressVerseNumbers
+        {
+            get
+            {
+                return (Options & Flags.SuppressVerseNumbers) == Flags.SuppressVerseNumbers;
+            }
+        }
+        #endregion
+
         // Ownership Hierarchy ---------------------------------------------------------------
         #region Attr{g}: OWWindow.Row.Pile Pile - the owning pile that this paragraph is in
         public OWWindow.Row.Pile Pile
@@ -1347,7 +1416,8 @@ namespace OurWord.Edit
                 switch (r.GetType().Name)
                 {
                     case "DVerse":
-                        AddBlock(new EVerse(this, r as DVerse));
+                        if (!SuppressVerseNumbers)
+                            AddBlock(new EVerse(this, r as DVerse));
                         break;
                     case "DChapter":
                         AddBlock(new EChapter(this, r as DChapter));
@@ -1383,26 +1453,6 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Attr{g}: bool Editable - true if the paragraph can be edited
-        public bool Editable
-        {
-            get
-            {
-                return m_bEditable;
-            }
-        }
-        bool m_bEditable = true;
-        #endregion
-        #region Attr{g}: bool DisplayBT
-        public bool DisplayBT
-        {
-            get
-            {
-                return m_bDisplayBT;
-            }
-        }
-        bool m_bDisplayBT = false;
-        #endregion
         #region VAttr{g}: bool HideNotesIcons - Surpress Notes, even if they'd otherwise appear
         public bool HideNotesIcons
             // In the Back Translation Job, we need to make sure that we see the Notes icons
@@ -1465,15 +1515,13 @@ namespace OurWord.Edit
             OWWindow.Row.Pile _Pile, 
             JObject _objDataSource,
             JWritingSystem _ws,
-            bool _bDisplayBT,
-            bool _bEditable)
+            Flags _Options)
         {
             // Keep track of the attributes passed in
             m_Pile = _Pile;
             m_objDataSource = _objDataSource;
             m_WritingSystem = _ws;
-            m_bDisplayBT = _bDisplayBT;
-            m_bEditable = _bEditable;
+            m_Options = _Options;
 
             // Initialize the vector of Blocks
             ClearBlocks();
@@ -1482,15 +1530,14 @@ namespace OurWord.Edit
             m_vLines = new Line[0];
         }
         #endregion
-        #region Constructor(Pile, DParagraph, JWritingSystem, bDisplayBT, bool bEditable) - for DParagraph
-        public OWPara(OWWindow.Row.Pile _Pile, DParagraph p, JWritingSystem _ws, 
-            bool _bDisplayBT, bool _bEditable)
-            : this(_Pile, p as JObject, _ws, _bDisplayBT, _bEditable)
+        #region Constructor(Pile, DParagraph, JWritingSystem, bDisplayBT, Flags) - for DParagraph
+        public OWPara(OWWindow.Row.Pile _Pile, DParagraph p, JWritingSystem _ws, Flags _Options)
+            : this(_Pile, p as JObject, _ws, _Options)
         {
             // The paragraph itself may override to make itself uneditable, 
             // even though we received "true" from the _bEditable parameter.
             if (!p.IsUserEditable)
-                m_bEditable = false;
+                Editable = false;
 
             // Store the paragraph's style here, so we don't have to keep
             // looking it up (p.Style does an Find into the stylesheet.)
@@ -1507,14 +1554,14 @@ namespace OurWord.Edit
             m_EditableBackgroundColor = Window.EditableBackgroundColor;
         }
         #endregion
-        #region Constructor(Pile, DNote, JWritingSystem) - for DNote
-        public OWPara(OWWindow.Row.Pile _Pile, DNote note, JWritingSystem _ws, bool _bEditable)
-            : this(_Pile, note as JObject, _ws, false, _bEditable)
+        #region Constructor(Pile, DNote, JWritingSystem, Flags) - for DNote
+        public OWPara(OWWindow.Row.Pile _Pile, DNote note, JWritingSystem _ws, Flags _Options)
+            : this(_Pile, note as JObject, _ws, _Options)
         {
             // The note itself may override <_bEditable> to make itself uneditable, 
             // even though we received "true" from the <_bEditable> parameter.
             if (!note.IsUserEditable)
-                m_bEditable = false;
+                Editable = false;
 
             // Store the paragraph's style here, so we don't have to keep
             // looking it up (p.Style does an Find into the stylesheet.)
@@ -1541,9 +1588,13 @@ namespace OurWord.Edit
             m_EditableBackgroundColor = note.NoteDef.BackgroundColor;
         }
         #endregion
-        #region Constructor(Pile, DRun[], JWritingSystem, sLabel)
-        public OWPara(OWWindow.Row.Pile _Pile, DRun[] vRuns, JWritingSystem _ws, string sLabel)
-            : this(_Pile, vRuns[0].Owner, _ws, false, false)
+        #region Constructor(Pile, DRun[], JWritingSystem, sLabel, Flags)
+        public OWPara(OWWindow.Row.Pile _Pile, 
+            DRun[] vRuns, 
+            JWritingSystem _ws, 
+            string sLabel, 
+            Flags _Options)
+            : this(_Pile, vRuns[0].Owner, _ws, _Options)
             // For the Related Languages window
         {
             // For the style, we'll just use normal
