@@ -141,6 +141,10 @@ namespace OurWord.View
                 OWPara.Flags options = OWPara.Flags.None;
                 if (p.IsUserEditable)
                     options |= OWPara.Flags.IsEditable;
+                if (G.SupressVerseNumbers)
+                    options |= OWPara.Flags.SuppressVerseNumbers;
+                if (G.ShowLineNumbers)
+                    options |= OWPara.Flags.ShowLineNumbers;
                 AddParagraph(0, p, options);
             }
 
@@ -154,6 +158,8 @@ namespace OurWord.View
                 OWPara.Flags options = OWPara.Flags.None;
                 if (fn.IsUserEditable)
                     options |= OWPara.Flags.IsEditable;
+                if (G.ShowLineNumbers)
+                    options |= OWPara.Flags.ShowLineNumbers;
                 AddParagraph(0, fn, options);
             }
 

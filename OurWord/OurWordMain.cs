@@ -3515,12 +3515,15 @@ return false;
         const string c_sSubKey = "Options";
         const string c_keyZoom = "Zoom";
         const string c_keyPictureSearchPath = "PictureSearchPath";
-        #region Attr{g}: float ZoomPercent
+        const string c_keySuppressVerseNumbers = "SuppressVerseNos";
+        const string c_keyShowLineNumbers = "ShowLineNumbers";
+        #region SAttr{g}: float ZoomPercent
         public static int ZoomPercent
         {
             get
             {
-                s_nZoomPercent = JW_Registry.GetValue(c_sSubKey, c_keyZoom, 100);
+                if (-1 == s_nZoomPercent)
+                    s_nZoomPercent = JW_Registry.GetValue(c_sSubKey, c_keyZoom, 100);
                 return s_nZoomPercent;
             }
             set
@@ -3531,7 +3534,7 @@ return false;
         }
         private static int s_nZoomPercent = -1;
         #endregion
-        #region VAttr{g}: float ZoomFactor
+        #region SVAttr{g}: float ZoomFactor
         public static float ZoomFactor
         {
             get
@@ -3553,8 +3556,49 @@ return false;
             }
         }
         #endregion
+        #region SAttr{g/s}: bool SupressVerseNumbers
+        public static bool SupressVerseNumbers
+        {
+            get
+            {
+                if (-1 == s_nSupressVerseNumbers)
+                {
+                    s_nSupressVerseNumbers = JW_Registry.GetValue(c_sSubKey, 
+                        c_keySuppressVerseNumbers, 0);
+                }
+                return (s_nSupressVerseNumbers == 1) ? true : false;
+            }
+            set
+            {
+                s_nSupressVerseNumbers = (value == true) ? 1 : 0;
+                JW_Registry.SetValue(c_sSubKey, c_keySuppressVerseNumbers, s_nSupressVerseNumbers);
+            }
+        }
+        static int s_nSupressVerseNumbers = -1;
+        #endregion
+        #region SAttr{g/s}: bool ShowLineNumbers
+        public static bool ShowLineNumbers
+        {
+            get
+            {
+                if (-1 == s_nShowLineNumbers)
+                {
+                    s_nShowLineNumbers = JW_Registry.GetValue(c_sSubKey,
+                        c_keyShowLineNumbers, 0);
+                }
+                return (s_nShowLineNumbers == 1) ? true : false;
+            }
+            set
+            {
+                s_nShowLineNumbers = (value == true) ? 1 : 0;
+                JW_Registry.SetValue(c_sSubKey, c_keyShowLineNumbers, s_nShowLineNumbers);
+            }
+        }
+        static int s_nShowLineNumbers = -1;
+        #endregion
 
-		// Stuff still in OurWordMain
+
+        // Stuff still in OurWordMain
 		#region Attr{g}: DProject Project - the current project we're editing / displaying / etc.
 		static public DProject Project 
 		{ 

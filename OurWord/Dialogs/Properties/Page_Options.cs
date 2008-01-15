@@ -58,6 +58,10 @@ namespace OurWord.Dialogs
         const string c_sMakeBackups = "propMakeBackups";
         const string c_sZoomFactor = "propZoomFactor";
 
+        const string c_sGroupNaturalnessCheck = "propNaturalnessCheck";
+        const string c_sSuppressVerses = "propNCSuppressVerses";
+        const string c_sShowLineNumbers = "propNCShowLineNumbers";
+
         const string c_sGroup_BackgroundColors = "propBackgroundColors";
         const string c_sColorDrafting = "propBackColorDraftingWindow";
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
@@ -118,6 +122,19 @@ namespace OurWord.Dialogs
                     e.Value = G.PictureSearchPath;
                     break;
 
+                // Naturalness Check view
+                case c_sSuppressVerses:
+                    YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != SuppressPS);
+                    e.Value = SuppressPS.GetBoolString(G.SupressVerseNumbers);
+                    break;
+                case c_sShowLineNumbers:
+                    YesNoPropertySpec ShowLineNumbersPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ShowLineNumbersPS);
+                    e.Value = ShowLineNumbersPS.GetBoolString(G.ShowLineNumbers);
+                    break;
+
+                // Window background colors
                 case c_sColorDrafting:
                     e.Value = WndDrafting.RegistryBackgroundColor;
                     break;
@@ -174,6 +191,19 @@ namespace OurWord.Dialogs
                     G.ZoomPercent = ZoomPS.GetZoomFactor(e.Value);
                     break;
 
+                // Naturalness Check view
+                case c_sSuppressVerses:
+                    YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != SuppressPS);
+                    G.SupressVerseNumbers = SuppressPS.IsTrue(e.Value);
+                    break;
+                case c_sShowLineNumbers:
+                    YesNoPropertySpec ShowLineNumbersPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ShowLineNumbersPS);
+                    G.ShowLineNumbers = ShowLineNumbersPS.IsTrue(e.Value);
+                    break;
+
+                // Window background colors
                 case c_sColorDrafting:
                     WndDrafting.RegistryBackgroundColor = (string)e.Value;
                     break;
@@ -272,6 +302,24 @@ namespace OurWord.Dialogs
                 );
             zps.DontLocalizeEnums = true;
             Bag.Properties.Add(zps);
+
+            // Naturalness Check options
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sSuppressVerses,
+                "Hide verse numbers?",
+                c_sGroupNaturalnessCheck,
+                "If Yes, the verse numbers will not be shown in the Naturalness Check view. This may make " +
+                    "it easier to see how well the discourse flows.",
+                false
+                ));
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sShowLineNumbers,
+                "Show line numbers?",
+                c_sGroupNaturalnessCheck,
+                "If Yes, line numbers are shown in the left margin, so that you can refer to a " +
+                    "specific line as you discuss the text with others.",
+                false
+                ));
 
             // Window Background Colors
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(

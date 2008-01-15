@@ -147,6 +147,10 @@ namespace OurWord.Edit
             // of the correct size.
             Draw = new DrawBuffer(this);
 
+            // Start with a fresh calculation of the font size, window width, etc., for
+            // the LineNumbers column, should it be turned on by the user.
+            m_LineNumberAttrs = new CLineNumberAttrs(Draw.Graphics);
+
             // Measure all of the EBlocks. This is a one-time thing; we only do it again when
             // individual EWords are edited/added/etc.
             foreach (Row row in Rows)
@@ -685,6 +689,12 @@ namespace OurWord.Edit
                 }
                 #endregion
 
+                public void AssignLineNumbers(ref int nLineNo)
+                {
+                    foreach(OWPara p in Paragraphs)
+                        p.AssignLineNumbers(ref nLineNo);
+                }
+
                 // Selection -----------------------------------------------------------------
                 #region Method: bool Select_FirstWord()
                 public bool Select_FirstWord()
@@ -946,46 +956,6 @@ namespace OurWord.Edit
             {
                 MeasuredWidth = Window.Width;
                 _LayoutEngine(xColumns[0], y, xColumns, nColumnWidth);
-
-                #region OBSOLETE ON 3 OCT 2007 - KEEP A WHILE TO MAKE SURE
-                /*** (Replaced by _LayoutEngine)
-                // Remember the top-left position and width
-                Position = new PointF(xColumns[0], y);
-                MeasuredWidth = Window.Width;
-                Height = 0;
-
-                // Allow for the bitmap in "y" when laying out the piles
-                if (null != Bmp)
-                {
-                    // All one pixel room for the line above
-                    y += 1;
-                    // Allow room for the margin between above and below the bitmap
-                    y += c_BitmapMargin * 2;
-                    // Allow room for the bitmap itself
-                    y += Bmp.Height;
-                }
-
-                // Calculate for the tallest pile
-                for (int i = 0; i < Piles.Length; i++)
-                {
-                    Piles[i].DoLayout(new PointF(xColumns[i], y), nColumnWidth);
-                    Height = Math.Max(Piles[i].Height, Height);
-                }
-
-                // Adjust for the bitmap (if there is one)
-                if (null != Bmp)
-                {
-                    // Room for the bitmap
-                    Height += Bmp.Height;
-                    // Room for the line above and below
-                    Height += 2;
-                    // Padding underneath so line draws correction
-                    Height += c_BitmapPadAtBottom;
-                    // Room for the top margin
-                    Height += c_BitmapMargin * 2;
-                }
-                ***/
-                #endregion
             }
             #endregion
             #region Method: void RePosition(float yNew) - Change the y coord of this Row and its children
@@ -1129,6 +1099,12 @@ namespace OurWord.Edit
                     pile.Paint(ClipRectangle);
             }
             #endregion
+
+            public void AssignLineNumbers(ref int[] vnLineNo)
+            {
+                for (int i = 0; i < Piles.Length; i++)
+                    Piles[i].AssignLineNumbers(ref vnLineNo[i]);
+            }
 
             // Selection ---------------------------------------------------------------------
             #region Method: void Select_FirstWord()
@@ -1540,17 +1516,29 @@ namespace OurWord.Edit
         }
         DrawBuffer m_Draw = null;
         #endregion
-        #region Attr{g}: float[] ColumnLinePositions - the x's for the lines between columns
-        float[] ColumnLinePositions
+        #region Attr{g}: float[] ColumnSeparatorPositions - the x's for the lines between columns
+        float[] ColumnSeparatorPositions
         {
             get
             {
-                Debug.Assert(null != m_vfColumnLinePositions);
-                Debug.Assert(m_vfColumnLinePositions.Length == (ColumnCount - 1));
-                return m_vfColumnLinePositions;
+                Debug.Assert(null != m_vfColumnSeparatorPositions);
+                Debug.Assert(m_vfColumnSeparatorPositions.Length == (ColumnCount - 1));
+                return m_vfColumnSeparatorPositions;
             }
         }
-        float[] m_vfColumnLinePositions = null;
+        float[] m_vfColumnSeparatorPositions = null;
+        #endregion
+        #region Attr{g}: float[] ColumnContentPositions - the x's for the column text
+        float[] ColumnContentPositions
+        {
+            get
+            {
+                Debug.Assert(null != m_vfColumnContentPositions);
+                Debug.Assert(m_vfColumnContentPositions.Length == (ColumnCount));
+                return m_vfColumnContentPositions;
+            }
+        }
+        float[] m_vfColumnContentPositions = null;
         #endregion
         #region Attr{g/s}: The background color for words which can be edited. Default is White
         public Color EditableBackgroundColor
@@ -1590,13 +1578,13 @@ namespace OurWord.Edit
             float y = ColumnMargins.Height;
 
             // Calculate the location of each column and the separator lines
-            m_vfColumnLinePositions = new float[ColumnCount - 1];
-            float[] vxColumnContent = new float[ColumnCount];
+            m_vfColumnSeparatorPositions = new float[ColumnCount - 1];
+            m_vfColumnContentPositions = new float[ColumnCount];
             float x = ColumnMargins.Width;
             for (int i = 0; i < ColumnCount; i++)
             {
                 // On entering the loop, we are positioned for the column's content
-                vxColumnContent[i] = x;
+                m_vfColumnContentPositions[i] = x;
 
                 // Add the width of the column
                 x += nColumnWidth;
@@ -1609,7 +1597,7 @@ namespace OurWord.Edit
                 {
                     x += 1;
                     if (i < ColumnCount - 1)
-                        m_vfColumnLinePositions[i] = x;
+                        m_vfColumnSeparatorPositions[i] = x;
                 }
 
                 // Add the margin into the next column
@@ -1619,9 +1607,13 @@ namespace OurWord.Edit
             // Lay out the rows
             foreach (Row row in Rows)
             {
-                row.DoLayout(vxColumnContent, y, nColumnWidth);
+                row.DoLayout(ColumnContentPositions, y, nColumnWidth);
                 y += row.Height;
             }
+
+            // Now that the lines have been defined in the low-level OWPara's,
+            // give each line a line number
+            AssignLineNumbers();
 
             // Set the ScrollBar, adding some (30 pixels) padding at the bottom
             Layout_SetupScrollBar((int)y);
@@ -1681,7 +1673,7 @@ namespace OurWord.Edit
             if (DrawLineBetweenColumns && ColumnCount > 1)
             {
                 Pen pen = new Pen(Color.Black);
-                foreach (float x in ColumnLinePositions)
+                foreach (float x in ColumnSeparatorPositions)
                     Draw.Line(pen, x, 0, x, Height);
             }
 
@@ -1749,6 +1741,9 @@ namespace OurWord.Edit
                 y += row.Height;
             }
 
+            // Recalculate the lines numbers, as they may have changed
+            AssignLineNumbers();
+
             // Change the scrollbar to reflect the new height
             Layout_SetupScrollBar((int)y);
 
@@ -1756,6 +1751,88 @@ namespace OurWord.Edit
             Invalidate();
         }
         #endregion
+
+        // Line Numbers ----------------------------------------------------------------------
+        public class CLineNumberAttrs
+        {
+            #region Attr{g}: float ColumnWidth
+            public float ColumnWidth
+            {
+                get
+                {
+                    Debug.Assert(-1 != m_fLineNumberColumnWidth);
+                    return m_fLineNumberColumnWidth;
+                }
+            }
+            float m_fLineNumberColumnWidth = -1;
+            #endregion
+            #region Attr{g}: Font Font
+            public Font Font
+            {
+                get
+                {
+                    Debug.Assert(null != m_fLineNumberFont);
+                    return m_fLineNumberFont;
+                }
+            }
+            Font m_fLineNumberFont = null;
+            #endregion
+            #region VAttr{g}: Brush Brush
+            public Brush Brush
+            {
+                get
+                {
+                    return Brushes.DarkGray;
+                }
+            }
+            #endregion
+
+            #region Constructor(Graphics)
+            public CLineNumberAttrs(Graphics g)
+            {
+                // We'll use a fixed-space font so that the numbers line up
+                float fSize = 10 * G.ZoomFactor;
+                m_fLineNumberFont = new Font("Courier New", fSize);
+
+                // Calculate the width required for the line number column
+                // We'll measure a fat, 3-digit string plus a trailing space
+                string s = "000 ";
+                StringFormat fmt = StringFormat.GenericTypographic;
+                fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
+                m_fLineNumberColumnWidth = g.MeasureString(s, Font, 1000, fmt).Width;
+            }
+            #endregion
+        }
+        #region Attr{g}: LineNumberAttrs LineNumberAttrs - init'd by LoadData
+        public CLineNumberAttrs LineNumberAttrs
+        {
+            get
+            {
+                Debug.Assert(null != m_LineNumberAttrs);
+                return m_LineNumberAttrs;
+            }
+        }
+        public CLineNumberAttrs m_LineNumberAttrs = null;
+        #endregion
+
+        public void AssignLineNumbers()
+        {
+            // What is the maximum number of columns we have in any row?
+            int cColumns = 0;
+            foreach (Row r in Rows)
+                cColumns = Math.Max(cColumns, r.Piles.Length);
+
+            // Initialize a count for the number of columns we are supporting
+            int[] vnLineNo = new int[cColumns];
+            for (int i = 0; i < cColumns; i++)
+                vnLineNo[i] = 1;
+
+            // Go through each row, numbering the columns
+            foreach (Row r in Rows)
+                r.AssignLineNumbers(ref vnLineNo);
+        }
+
+
 
         // Scroll Bar ------------------------------------------------------------------------
         #region Scroll Bar

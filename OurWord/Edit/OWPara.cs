@@ -93,6 +93,15 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VAttr{g}: bool ShowLineNumbers
+        public bool ShowLineNumbers
+        {
+            get
+            {
+                return (Options & Flags.ShowLineNumbers) == Flags.ShowLineNumbers;
+            }
+        }
+        #endregion
 
         // Ownership Hierarchy ---------------------------------------------------------------
         #region Attr{g}: OWWindow.Row.Pile Pile - the owning pile that this paragraph is in
@@ -570,6 +579,13 @@ namespace OurWord.Edit
             #region Method: override void MeasureWidth(g)
             public override void MeasureWidth(Graphics g)
             {
+                // Do a very-small space if verse numbers have been turned off
+                if (Para.SuppressVerseNumbers)
+                {
+                    m_fMeasuredWidth = 1;
+                    return;
+                }
+
                 string s = Text;
 
                 if (NeedsExtraLeadingSpace)
@@ -608,6 +624,12 @@ namespace OurWord.Edit
                 // The verse size in the stylesheet reflects a normal style; we need to
                 // decrease it for the superscript.
             {
+                // Nothing to do if verse numbers have been turned off
+                if (Para.SuppressVerseNumbers)
+                {
+                    return;
+                }
+               
                 string s = Text;
                 if (NeedsExtraLeadingSpace)
                     s = c_sLeadingSpace + Text;
@@ -1416,8 +1438,7 @@ namespace OurWord.Edit
                 switch (r.GetType().Name)
                 {
                     case "DVerse":
-                        if (!SuppressVerseNumbers)
-                            AddBlock(new EVerse(this, r as DVerse));
+                        AddBlock(new EVerse(this, r as DVerse));
                         break;
                     case "DChapter":
                         AddBlock(new EChapter(this, r as DChapter));
@@ -1796,6 +1817,49 @@ namespace OurWord.Edit
             }
             #endregion
 
+            // Line numbers ------------------------------------------------------------------
+            #region Attr{g}: int LineNo
+            public int LineNo
+            {
+                get
+                {
+                    Debug.Assert(-1 != m_nLineNo);
+                    return m_nLineNo;
+                }
+                set
+                {
+                    m_nLineNo = value;
+                }
+            }
+            int m_nLineNo = -1;
+            #endregion
+
+            public void PaintLineNumber(OWWindow window, OWPara para)
+            {
+                if (Blocks.Length == 0)
+                    return;
+
+                // Get the string we'll draw, including trailing space for a margin
+                string s = LineNo.ToString() + " ";
+
+                // Calculate the width of this number
+                float fWidth = window.Draw.Measure(s, window.LineNumberAttrs.Font);
+
+                // The X coordinate is the x of the column left, 
+                float x = para.Pile.Position.X;
+                // plus the width allocated to columns
+                x += window.LineNumberAttrs.ColumnWidth;
+                // Less the space needed to draw this number
+                x -= fWidth;
+
+                // The Y coordinate is the y of the first block
+                float y = Blocks[0].Position.Y;
+
+                // Draw the line number
+                window.Draw.String(s, window.LineNumberAttrs.Font, 
+                    window.LineNumberAttrs.Brush, new PointF(x, y));
+            }
+
             #region Constructor()
             public Line()
             {
@@ -2082,9 +2146,15 @@ namespace OurWord.Edit
                 if (ln == Lines[Lines.Length - 1])
                     bJustify = false;
 
+                // For Left and Justified paragraphs, the line starts at the ptPos's x value
+                float x = ptPos.X;            // Start of line for Left and Justified
+
+                // The X position must be shifted if the LineNumbers column is turned on.
+                if (ShowLineNumbers)
+                    x += Window.LineNumberAttrs.ColumnWidth;
+
                 // The X position depends upon the paragraph alignment. Note that
                 // the first line has to also allow for the paragraph's FirstLineIndent
-                float x = ptPos.X;           // Default: For Left and Justified
                 if (ln == Lines[0])
                     x += (float)PStyle.FirstLineIndent * g.DpiX;
                 if (PStyle.IsRight)
@@ -2134,6 +2204,10 @@ namespace OurWord.Edit
             // Decrease the width by the paragraph margins
             xMaxWidth -= (float)PStyle.LeftMargin * g.DpiX;
             xMaxWidth -= (float)PStyle.RightMargin * g.DpiX;
+
+            // Decrease the width if line numbers are requested
+            if (ShowLineNumbers)
+                xMaxWidth -= Window.LineNumberAttrs.ColumnWidth;
 
             // We'll use "y" to work through the height of the paragraph. The initial
             // value is what was passed in.
@@ -2278,12 +2352,19 @@ namespace OurWord.Edit
             // Get the height before the layout
             float fHeightGoingIn = Height;
 
+            // Get the line number of the first line (if any) before the layout
+            int nLineNo = -1;
+            if (Lines.Length > 0)
+                nLineNo = Lines[0].LineNo;
+
             // Rework the paragraph: words on each line, justification, etc., etc.
             DoLayout(Position, MeasuredWidth);
 
-            // If the height did not change, then all we need to do is redraw the paragraph.
+            // If the height did not change, then all we need to do is re-do the
+            // line numbers (because we've created new Lines) and redraw the paragraph.
             if (Height == fHeightGoingIn)
             {
+                AssignLineNumbers(ref nLineNo);
                 Window.Draw.Invalidate(Rectangle);
                 return;
             }
@@ -2293,6 +2374,14 @@ namespace OurWord.Edit
             Window.OnParagraphHeightChanged(Row);
         }
         #endregion
+
+        public void AssignLineNumbers(ref int nLineNo)
+        {
+            foreach (Line line in Lines)
+                line.LineNo = nLineNo++;
+        }
+
+
 
         // Painting --------------------------------------------------------------------------
         #region Attr{g}: Color EditableBackgroundColor - shows the user where typing is permitted
@@ -2315,6 +2404,13 @@ namespace OurWord.Edit
             // Paint the contents
             foreach (EBlock block in Blocks)
                 block.Paint();
+
+            // Paint the line numbers, if turned on
+            if (ShowLineNumbers)
+            {
+                foreach (Line line in Lines)
+                    line.PaintLineNumber(Window, this);
+            }
         }
         #endregion
 

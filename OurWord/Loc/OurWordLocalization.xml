@@ -2054,6 +2054,21 @@
         <English>Zoom Factor</English>
         <Tip>Text in the windows can be larger (or smaller) by the chosen percentage.</Tip>
       </Item>
+      <Item ID="propSuppressVerses" Tip="true">
+        <English>Hide verse numbers?</English>
+        <Tip>If Yes, the verse numbers will not be shown in the Naturalness Check view. This may make it easier to see how well the discourse flows.</Tip>
+      </Item>
+      <Item ID="propNaturalnessCheck">
+        <English>Naturalness Check Window</English>
+      </Item>
+      <Item ID="propNCSuppressVerses" Tip="true">
+        <English>Hide verse numbers?</English>
+        <Tip>If Yes, the verse numbers will not be shown in the Naturalness Check view. This may make it easier to see how well the discourse flows.</Tip>
+      </Item>
+      <Item ID="propNCShowLineNumbers" Tip="true">
+        <English>Show line numbers?</English>
+        <Tip>If Yes, line numbers are shown in the left margin, so that you can refer to a specific line as you discuss the text with others.</Tip>
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Notes" Title="DialogProperties_Page_Notes" Translator="false">
       <Item ID="Show_kGeneral" Tip="true">
