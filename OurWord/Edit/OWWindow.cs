@@ -688,12 +688,13 @@ namespace OurWord.Edit
                     Height = fHeight;
                 }
                 #endregion
-
+                #region Method: void AssignLineNumbers(ref int nLineNo)
                 public void AssignLineNumbers(ref int nLineNo)
                 {
                     foreach(OWPara p in Paragraphs)
                         p.AssignLineNumbers(ref nLineNo);
                 }
+                #endregion
 
                 // Selection -----------------------------------------------------------------
                 #region Method: bool Select_FirstWord()
@@ -1099,12 +1100,13 @@ namespace OurWord.Edit
                     pile.Paint(ClipRectangle);
             }
             #endregion
-
+            #region Method: void AssignLineNumbers(ref int[] vnLineNo)
             public void AssignLineNumbers(ref int[] vnLineNo)
             {
                 for (int i = 0; i < Piles.Length; i++)
                     Piles[i].AssignLineNumbers(ref vnLineNo[i]);
             }
+            #endregion
 
             // Selection ---------------------------------------------------------------------
             #region Method: void Select_FirstWord()
@@ -1753,6 +1755,7 @@ namespace OurWord.Edit
         #endregion
 
         // Line Numbers ----------------------------------------------------------------------
+        #region CLASS: CLineNumberAttrs
         public class CLineNumberAttrs
         {
             #region Attr{g}: float ColumnWidth
@@ -1803,6 +1806,7 @@ namespace OurWord.Edit
             }
             #endregion
         }
+        #endregion
         #region Attr{g}: LineNumberAttrs LineNumberAttrs - init'd by LoadData
         public CLineNumberAttrs LineNumberAttrs
         {
@@ -1814,7 +1818,7 @@ namespace OurWord.Edit
         }
         public CLineNumberAttrs m_LineNumberAttrs = null;
         #endregion
-
+        #region Method: void AssignLineNumbers()
         public void AssignLineNumbers()
         {
             // What is the maximum number of columns we have in any row?
@@ -1831,8 +1835,7 @@ namespace OurWord.Edit
             foreach (Row r in Rows)
                 r.AssignLineNumbers(ref vnLineNo);
         }
-
-
+        #endregion
 
         // Scroll Bar ------------------------------------------------------------------------
         #region Scroll Bar

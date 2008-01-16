@@ -1833,7 +1833,7 @@ namespace OurWord.Edit
             }
             int m_nLineNo = -1;
             #endregion
-
+            #region Method: void PaintLineNumber(OWWindow window, OWPara para)
             public void PaintLineNumber(OWWindow window, OWPara para)
             {
                 if (Blocks.Length == 0)
@@ -1859,6 +1859,7 @@ namespace OurWord.Edit
                 window.Draw.String(s, window.LineNumberAttrs.Font, 
                     window.LineNumberAttrs.Brush, new PointF(x, y));
             }
+            #endregion
 
             #region Constructor()
             public Line()
@@ -2374,14 +2375,13 @@ namespace OurWord.Edit
             Window.OnParagraphHeightChanged(Row);
         }
         #endregion
-
+        #region Method: void AssignLineNumbers(ref int nLineNo)
         public void AssignLineNumbers(ref int nLineNo)
         {
             foreach (Line line in Lines)
                 line.LineNo = nLineNo++;
         }
-
-
+        #endregion
 
         // Painting --------------------------------------------------------------------------
         #region Attr{g}: Color EditableBackgroundColor - shows the user where typing is permitted
