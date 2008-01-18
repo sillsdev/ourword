@@ -966,8 +966,8 @@ namespace OurWord.Dialogs
 
             // Attempt to read it in
             Debug.Assert(!book.Loaded);
-            bool bSuccessful = book.Load();
-            if (!bSuccessful)
+            book.Load();
+            if (!book.Loaded)
             {
                 Trans.Books.Remove(book);
                 return;

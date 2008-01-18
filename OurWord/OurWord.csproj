@@ -295,7 +295,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>

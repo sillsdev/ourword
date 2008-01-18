@@ -1,4 +1,4 @@
-<DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
+<DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" SettingsVersion="1" FileNameLanguage="English" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
   <own Name="StyleSheet">
     <DStyleSheet DisplayName="Default Style Sheet">
       <ownseq Name="ParaStyles">
@@ -354,9 +354,9 @@
     </DBookGrouping>
     <DBookGrouping LocKey="Gospels" English="Gospels" BookAbbrevs="4 {MAT} {MRK} {LUK} {JHN}">
     </DBookGrouping>
-    <DBookGrouping LocKey="PaulineLetters" English="Pauline Letters" BookAbbrevs="14 {ROM} {1CO} {2CO} {GAL} {EPH} {PHP} {COL} {1TH} {2TH} {1TI} {2TI} {TIT} {PHM} {HEB}">
+    <DBookGrouping LocKey="PaulineLetters" English="Pauline Letters" BookAbbrevs="13 {ROM} {1CO} {2CO} {GAL} {EPH} {PHP} {COL} {1TH} {2TH} {1TI} {2TI} {TIT} {PHM}">
     </DBookGrouping>
-    <DBookGrouping LocKey="GeneralLetters" English="General Letters" BookAbbrevs="7 {JAS} {1PE} {2PE} {1JN} {2JN} {3JN} {JUD}">
+    <DBookGrouping LocKey="GeneralLetters" English="General Letters" BookAbbrevs="8 {HEB} {JAS} {1PE} {2PE} {1JN} {2JN} {3JN} {JUD}">
     </DBookGrouping>
   </ownseq>
   <own Name="SFMapping">

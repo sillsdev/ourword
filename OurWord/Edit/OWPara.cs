@@ -579,18 +579,25 @@ namespace OurWord.Edit
             #region Method: override void MeasureWidth(g)
             public override void MeasureWidth(Graphics g)
             {
-                // Do a very-small space if verse numbers have been turned off
+                // The text we will measure
+                string s = Text;
+
+                // If we are not doing verse numbers, then we have nothing to measure
                 if (Para.SuppressVerseNumbers)
+                    s = "";
+
+                // Leading space is needed if the verseno is not paragraph initial
+                if (NeedsExtraLeadingSpace)
+                    s = c_sLeadingSpace + s;
+
+                // Don't bother measuring if nothing to measure
+                if (string.IsNullOrEmpty(s))
                 {
-                    m_fMeasuredWidth = 1;
+                    m_fMeasuredWidth = 0;
                     return;
                 }
 
-                string s = Text;
-
-                if (NeedsExtraLeadingSpace)
-                    s = c_sLeadingSpace + Text;
-
+                // Do the measurement
                 StringFormat fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
                 m_fMeasuredWidth = g.MeasureString(s, FontForWS.FontNormalZoom, 1000, fmt).Width;
@@ -624,9 +631,16 @@ namespace OurWord.Edit
                 // The verse size in the stylesheet reflects a normal style; we need to
                 // decrease it for the superscript.
             {
-                // Nothing to do if verse numbers have been turned off
+                // If verse numbers are turned off, we potentially need to paint a white 
+                // background.
                 if (Para.SuppressVerseNumbers)
                 {
+                    if (Para.Editable && !Window.LockedFromEditing)
+                    {
+                        RectangleF r = new RectangleF(Position,
+                            new SizeF(MeasuredWidth, Height));
+                        Draw.FillRectangle(Para.EditableBackgroundColor, r);
+                    }
                     return;
                 }
                

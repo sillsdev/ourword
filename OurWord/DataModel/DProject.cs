@@ -221,7 +221,7 @@ namespace OurWord.DataModel
 			}
 		}
 		#endregion
-
+        #region Attr{g}: DTranslation[] AllTranslations
         public DTranslation[] AllTranslations
         {
             get
@@ -248,8 +248,9 @@ namespace OurWord.DataModel
                 return v;
             }
         }
+        #endregion
 
-		// Navigation ------------------------------------------------------------------------
+        // Navigation ------------------------------------------------------------------------
 		#region EMBEDDED CLASS: Navigation
 		public class Navigation
 		{
@@ -814,9 +815,9 @@ namespace OurWord.DataModel
 		public override void Read(string sLine, TextReader tr)
 		{
 			// Read this DProject as per normal
-            string sAbsolutePathNAme = this.AbsolutePathName;
+            string sAbsolutePathName = this.AbsolutePathName;
 			base.Read(sLine, tr);
-            this.AbsolutePathName = sAbsolutePathNAme;
+            this.AbsolutePathName = sAbsolutePathName;
 
             // Initialize the Team Settings file
             if (string.IsNullOrEmpty(TeamSettings.AbsolutePathName))
@@ -827,15 +828,15 @@ namespace OurWord.DataModel
 			// Read the LoadOnDemand translation objects
 			if (null != FrontTranslation)
 			{
-                bool bLoaded = FrontTranslation.Load();
-				if (!bLoaded)
+                FrontTranslation.Load();
+                if (!FrontTranslation.Loaded)
 					FrontTranslation = null;
 			}
 
 			if (null != TargetTranslation)
 			{
-                bool bLoaded = TargetTranslation.Load();
-				if (!bLoaded)
+                TargetTranslation.Load();
+                if (!TargetTranslation.Loaded)
 					TargetTranslation = null;
 			}
 
@@ -844,9 +845,9 @@ namespace OurWord.DataModel
             {
                 DTranslation t = OtherTranslations[i] as DTranslation;
 
-                bool bLoaded = t.Load();
+                t.Load();
 
-                if (!bLoaded)
+                if (!t.Loaded)
                     OtherTranslations.Remove(t);
                 else
                     i++;

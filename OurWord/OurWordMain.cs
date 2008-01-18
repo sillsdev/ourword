@@ -667,12 +667,12 @@ namespace OurWord
             m_bmDeleteNote.Enabled = bCanDeleteNote;
 
             // Go To menu
-            bool bIsAtFirstSection = Project.Nav.IsAtFirstSection;
+            bool bIsAtFirstSection = bValidProjectWithData && Project.Nav.IsAtFirstSection;
             m_menuFirstSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             m_btnGotoFirstSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             m_menuPreviousSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             m_btnGotoPreviousSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
-            bool bIsAtLastSection = Project.Nav.IsAtLastSection;
+            bool bIsAtLastSection = bValidProjectWithData && Project.Nav.IsAtLastSection;
             m_menuNextSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
             m_btnGotoNextSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
             m_menuLastSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
@@ -828,7 +828,8 @@ namespace OurWord
             // entries into the localization database)
             m_Config.BuildMRUPopupMenu(m_menuProject, cmdMRU, bShowNewOpenEtc);
             SetupNavigationButtons();
-            DBookGrouping.PopulateGotoBookSubmenu(m_menuGoToBook, m_btnGoToBook, cmdGotoBook);
+            DBookGrouping.PopulateGotoBook(m_menuGoToBook, cmdGotoBook);
+            DBookGrouping.PopulateGotoBook(m_btnGoToBook, cmdGotoBook);
 
             // Enabling depends on the current editing context
             EnableMenusAndToolbars();
@@ -2623,30 +2624,21 @@ namespace OurWord
 		}
 		#endregion
 
-		// Interface IFileMenuIO -------------------------------------------------------------
-		#region Method: void TemporaryStyleFix()
-		void TemporaryStyleFix()
+        // Interface IFileMenuIO -------------------------------------------------------------
+        #region Method: void TemporaryFixes()
+        void TemporaryFixes()
 			// Use this to behind-the-scenes upgrade Timor and Manado styles....
 			// remove it for 1.0.
 		{
-            int nCurrentVersion = 5;
+            int nCurrentSettingsVersion = 1;
 
-//			JParagraphStyle ps;
-//			JCharacterStyle cs;
-
-
-			// Get the fix that was done the last time we ran the software
-			int nLastFix = JW_Registry.GetValue("LastFix", 0);
-
-            // Version 9 has such massive StyleSheet changes, that the whole thing must
-            // be reinitialized. Thus I no longer need any of the former upgrade code.
-            if (nLastFix < nCurrentVersion)
+            if (G.TeamSettings.SettingsVersion < nCurrentSettingsVersion)
             {
-                G.StyleSheet.Initialize(true);
+                // Fix Hebrews being associated with the wrong grouping
+                DBookGrouping.InitializeGroupings(G.TeamSettings.BookGroupings);
             }
 
-			// Tell the registry the nature of the most recent fix
-            JW_Registry.SetValue("LastFix", nCurrentVersion);
+            G.TeamSettings.SettingsVersion = nCurrentSettingsVersion;
 		}
 		#endregion
 		#region Attr{g}: string XmlTag - e.g., the "tag" within "<tag>"
@@ -2671,7 +2663,7 @@ namespace OurWord
             Project.AbsolutePathName = sPathName;
             Project.Load();
 
-            TemporaryStyleFix();
+            TemporaryFixes();
 		}
 		#endregion
 		#region Method: void Write(sPathName) - writes configuration to project file
@@ -3596,7 +3588,6 @@ return false;
         }
         static int s_nShowLineNumbers = -1;
         #endregion
-
 
         // Stuff still in OurWordMain
 		#region Attr{g}: DProject Project - the current project we're editing / displaying / etc.

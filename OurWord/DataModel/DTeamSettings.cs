@@ -27,6 +27,21 @@ namespace OurWord.DataModel
 	public class DTeamSettings : JObjectOnDemand
 	{
         // ZAttrs ----------------------------------------------------------------------------
+        #region BAttr{g/s}: int SettingsVersion
+        public int SettingsVersion
+        {
+            get
+            {
+                return m_nSettingsVersion;
+            }
+            set
+            {
+                m_nSettingsVersion = value;
+            }
+        }
+        int m_nSettingsVersion = 0;
+        #endregion
+
         #region BAttr{g/s}: string FileNameLanguage
         public string FileNameLanguage
         {
@@ -184,6 +199,8 @@ namespace OurWord.DataModel
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
+
+            DefineAttr("SettingsVersion", ref m_nSettingsVersion);
 
             DefineAttr("FileNameLanguage", ref m_sFileNameLanguage);
             DefineAttr("FileNameLang", ref m_nOldFileNameLanguage);  // Deprecated

@@ -1915,32 +1915,6 @@ namespace JWTools
         #endregion
 
         // Private helper methods for Localize and Retrieval Methods -------------------------
-        /***
-        #region SMethod: LocItem _UseCommonGroupItem(...)
-        static LocItem _UseCommonGroupItem(string sCommonGroupID, LocGroup groupMain, string sItemID)
-        {
-            // If there is no common group id specified, then we obviously don't use it
-            if (string.IsNullOrEmpty(sCommonGroupID))
-                return null;
-
-            // If the Item already exists in the main group, then we don't use the
-            // common group, so we return null.
-            if (null != groupMain && null != groupMain.Find(sItemID))
-                return null;
-
-            // Locate the common group. We expect it to be at the top level (that is,
-            // owned by the DB.
-            LocGroup gCommon = DB.FindGroup(sCommonGroupID);
-            if (null == gCommon)
-                return null;
-
-            // Locate the Item within the common group
-            LocItem itemCommon = gCommon.Find(sItemID);
-            return itemCommon;
-        }
-        #endregion
-        ***/
-
         #region SMethod: string[] _GetGroupID(Object obj)
         static string[] _GetGroupID(Object obj)
         {
@@ -2041,6 +2015,7 @@ namespace JWTools
         #endregion
 
         // Retrieval of strings from the proper alternate of the LocItem ---------------------
+        #region SMethod: LocItem GetLocItem(vGroupID, sItemID, sEnglish)
         static LocItem GetLocItem(
             string[] vGroupID, 
             string sItemID,
@@ -2079,7 +2054,7 @@ namespace JWTools
 
             return item;
         }
-
+        #endregion
         // Retrieve a Value ------------------------------------------------------------------
         #region SMethod: string GetValue(vGroupID, sItemID, sEnglish, sLanguage, vsInsert) - Workhorse method
         /// <summary>

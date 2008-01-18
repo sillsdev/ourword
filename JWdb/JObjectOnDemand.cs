@@ -303,11 +303,12 @@ namespace JWdb
         }
         #endregion
 
-        #region Method: bool Load()
-        public bool Load()
+        #region Method: void Load()
+        public void Load()
 		{
+            // No point if it is already loaded
             if (Loaded)
-                return true;
+                return;
 
             // The "OriginPath" is the absolute path of the owning SaveObj
             string sOriginPath = "";
@@ -331,8 +332,8 @@ namespace JWdb
             }
             catch (Exception)
             {
-                m_bIsLoaded = false;
-                return false;
+                m_bIsLoaded = false;  // Should still be false, but make certain
+                return;
             }
 
             // We'll consider an object unchanged following a read
@@ -341,8 +342,6 @@ namespace JWdb
             // Store the Absolute and Relative Paths (in case they changed)
             if (sPathName != AbsolutePathName)
                 AbsolutePathName = sPathName;
-
-			return true;
 		}
 		#endregion
         #region Method: void Unload()
