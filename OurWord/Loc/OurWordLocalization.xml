@@ -1364,6 +1364,12 @@
     <Item ID="fLocalizer_Description">
       <English>This dialog, appearing in the Tools menu, allows you to translate the user interface of OurWord into another language.</English>
     </Item>
+    <Item ID="fStructuralEditing_CheckBox">
+      <English>Structural Editing</English>
+    </Item>
+    <Item ID="fStructuralEditing_Description">
+      <English>Enables the translator to split and join paragraphs, or to assign different styles to a paragraph. By doing this the translation will depart from the paragraph structure of the front translation.</English>
+    </Item>
     <Item ID="m_checkListFeatures">
       <English>Just the Basics</English>
     </Item>

@@ -2055,7 +2055,11 @@ namespace OurWord.DataModel
                 {
                     IO io = new IO(this);
                     if (true == io.Read(ref sAbsolutePathName))
+                    {
                         bResult = true;
+                        // We'll consider an object unchanged following a read. 
+                        IsDirty = false;  
+                    }
                     break;
                 }
                 catch (eBookReadException bre)

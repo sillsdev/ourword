@@ -242,7 +242,12 @@ namespace JWTools
 
 			// Write out the data (overwrite any existing file)
 			m_target.Write(FileName);
-		}
+
+            // Make sure the mru is up-to-date, in case the FileName was changed 
+            // since the read was done (I'm struggling to get this to work right
+            // when Rel PAth Names are changed; 30jan08)
+            mru_Update();
+        }
 		#endregion
 		#region Method: void SaveAs() - prompt for file name, then do a save
 		public bool SaveAs(string sDialogTitle)
@@ -416,8 +421,7 @@ namespace JWTools
 		}
 		#endregion
 		#region Method: void     mru_Update() - Maintains the MRU list.
-		public void test_mru_Update() { mru_Update(); }
-		private void mru_Update()
+		public void mru_Update()
 		{
 			// Is the filename already in the array? If so, move it to the front of the
 			// array, shifting everything else back.
@@ -693,7 +697,7 @@ namespace JWTools
 			for(int i = cFiles - 1; i >=0; i--)
 			{
 				f.jw.FileName = rgFileName[i];
-				f.jw.test_mru_Update();
+				f.jw.mru_Update();
 			}
 			f.jw.SaveMRUtoRegistry();
 
@@ -722,13 +726,13 @@ namespace JWTools
 			// It should now be the first filename there
 			string sNewFileName = TempFolder + Path.DirectorySeparatorChar + "FileMenuIO_New.x";
 			f.jw.FileName = sNewFileName;
-			f.jw.test_mru_Update();
+			f.jw.mru_Update();
 			AreSame(sNewFileName, f.jw.PathNames[0]);
 
 			// Now set the filename to the 3rd file
 			// The one we just created should have moved down one slot
 			f.jw.FileName = f.jw.PathNames[2];
-			f.jw.test_mru_Update();
+			f.jw.mru_Update();
 			AreSame(sNewFileName, f.jw.PathNames[1]);
 		}
 		#endregion

@@ -186,25 +186,38 @@ namespace JWTools
             string[] vOrigin = {
                 "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans",
                 "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans",
-                "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans"
+                "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans",
+                "C:\\CCC-Lg\\Rote-Ndao\\Dela\\Other\\My Dela Settings\\Dela.owp",
+                "C:\\Documents and Settings\\Ti'utüvame\\Mis documentos\\OurWord-Huichol\\Parámetros\\Huichol.owp"
             };
             string[] vAbsolute = {
                 "C:\\Users\\JWimbish\\Desktop\\TEST\\Ama-MKR.db",
                 "C:\\Users\\JWimbish\\Ama-MKR.db",
-                "C:\\Users\\JWimbish\\Here\\Tis\\Ama-MKR.db"
+                "C:\\Users\\JWimbish\\Here\\Tis\\Ama-MKR.db",
+                "C:\\CCC-Lg\\Kupang\\Other\\My Kupang Settings\\Kupang.otrans",
+                "C:\\Documents and Settings\\Ti'utüvame\\Mis documentos\\OurWord-Huichol\\Parámetros\\Team Settings.owt"
             };
             string[] vRelative = {
                 "Ama-MKR.db",
                 "..\\..\\Ama-MKR.db",
-                "..\\..\\Here\\Tis\\Ama-MKR.db"
+                "..\\..\\Here\\Tis\\Ama-MKR.db",
+                "..\\..\\..\\..\\Kupang\\Other\\My Kupang Settings\\Kupang.otrans",
+                "Team Settings.owt"
             };
 
             for(int i=0; i<vOrigin.Length; i++)
             {
-                Assert.AreEqual( vAbsolute[i],
-                    PathConverter.RelativeToAbsolute(vOrigin[i], vRelative[i]), "1:" + i.ToString() );
-                Assert.AreEqual( vRelative[i],
-                    PathConverter.AbsoluteToRelative(vOrigin[i], vAbsolute[i]), "2:" + i.ToString());
+                Assert.AreEqual( 
+                    vAbsolute[i],
+                    PathConverter.RelativeToAbsolute(vOrigin[i], vRelative[i]), 
+                    "1:" + i.ToString() );
+
+                Assert.AreEqual( 
+                    vRelative[i],
+                    PathConverter.AbsoluteToRelative(vOrigin[i], vAbsolute[i]), 
+                    "2:" + i.ToString());
+
+//                Console.WriteLine(i.ToString() + ": " + vRelative[i]);
             }
         }
         #endregion

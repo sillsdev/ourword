@@ -852,7 +852,6 @@ namespace OurWord.DataModel
                 else
                     i++;
             }
-
 		}
 		#endregion
 		#region Method: void SaveCurrentBook()

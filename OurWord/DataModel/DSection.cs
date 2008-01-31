@@ -1568,7 +1568,9 @@ namespace OurWord.DataModel
 					// Footnote: add the new run into the array, then loop to the next one
 					if (raw.StyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
 					{
-						vRuns.Add( DFootLetter.Create( chNextFootLetter++, null ) );
+                        DFootLetter foot = DFootLetter.Create(chNextFootLetter++, null);
+                        if (null != foot)  // TODO: Fails if we go beyond 'z'
+						    vRuns.Add( foot );
 						continue;
 					}
 
@@ -2072,7 +2074,7 @@ namespace OurWord.DataModel
 				string sVerseString = "(" + s_nVerse.ToString() + ") ";
 				DPhrase phrase = new DPhrase("i", sVerseString);
 				bt.Phrases.InsertAt(0, phrase);
-				note.NoteText.Append(bt);
+				note.NoteText.Append(bt, true);
 				return true;
 			}
 			#endregion

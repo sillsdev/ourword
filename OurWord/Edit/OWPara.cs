@@ -33,11 +33,12 @@ namespace OurWord.Edit
             SuppressVerseNumbers = 1,
             ShowLineNumbers = 2,
             IsEditable = 4,
-            ShowBackTranslation = 8
+            ShowBackTranslation = 8,
+            CanRestructureParagraphs = 16
         };
         #endregion
         #region Attr{g}: Flags Options
-        Flags Options
+        public Flags Options
         {
             get
             {
@@ -99,6 +100,15 @@ namespace OurWord.Edit
             get
             {
                 return (Options & Flags.ShowLineNumbers) == Flags.ShowLineNumbers;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool CanRestructureParagraphs
+        public bool CanRestructureParagraphs
+        {
+            get
+            {
+                return (Options & Flags.CanRestructureParagraphs) == Flags.CanRestructureParagraphs;
             }
         }
         #endregion
@@ -1190,9 +1200,16 @@ namespace OurWord.Edit
                     if (Para.Blocks[i] as EWord == null)
                         return;
                 }
+                int iChar = GetCharacterIndex(pt);
+
+                // If this is the same position as our previous mouse move, then
+                // do nothing. Seems that Windows keeps feeding these messages even when the
+                // mouse doesn't move, and this prevents the screen from being repainted,
+                // and thus the selection never shows up.
+                if (null != Window.Selection.End && Window.Selection.End.iChar == iChar)
+                    return;
 
                 // Passed the test; so extend the selection to this new End point
-                int iChar = GetCharacterIndex(pt);
                 OWWindow.Sel.SelPoint end = new OWWindow.Sel.SelPoint(iEnd, iChar);
                 Window.Selection = new OWWindow.Sel(Para, Window.Selection.Anchor, end);
             }
@@ -2566,6 +2583,39 @@ namespace OurWord.Edit
         }
         #endregion
 
+        #region Method: bool SelectEditablePositionAt(int iTextPos)
+        /// <summary>
+        /// Makes a selection at the requested position in the paragraph
+        /// </summary>
+        /// <param name="iTextPos">The position of the cursor from the beginning of the
+        /// paragraph, counting only editable text (e.g., skipping over verse numbers).
+        /// A value of "0" would select the very first editable position in the
+        /// paragraph.</param>
+        /// <returns>true if successful, false otherwise</returns>
+        public bool SelectEditablePositionAt(int iTextPos)
+        {
+            if (!Editable)
+                return false;
+
+            int iBlock = 0;
+            for (; iBlock < Blocks.Length; iBlock++)
+            {
+                EWord word = Blocks[iBlock] as EWord;
+                if (null == word)
+                    continue;
+
+                if (word.Text.Length < iTextPos)
+                    iTextPos -= word.Text.Length;
+                else
+                    break;
+            }
+
+            Window.Selection = new OWWindow.Sel(this, new OWWindow.Sel.SelPoint(iBlock, iTextPos));
+            NormalizeSelection();
+            return true;
+        }
+        #endregion
+
         #region Method: void ExtendSelection_CharRight()
         public void ExtendSelection_CharRight()
         {
@@ -2923,6 +2973,27 @@ namespace OurWord.Edit
             // Can't delete unless we have a valid selection that spans at least one character
             if (!sel.IsContentSelection)
             {
+                // Places where a deletion is valid even without selected text
+                if (CanRestructureParagraphs)
+                {
+                    // If a backspace at the beginning of a paragraph, then join with the previous paragraph
+                    if (Window.Selection.IsInsertionPoint_AtParagraphBeginning && mode == DeleteMode.kBackSpace)
+                    {
+                        //Console.WriteLine("JOIN WITH PREVIOUS");
+                        if (JoinParagraphs(this, true))
+                            return;
+                    }
+
+                    // If a delete at the end of a paragraph, then join with the next paragraph
+                    if (Window.Selection.IsInsertionPoint_AtParagraphEnding && mode == DeleteMode.kDelete)
+                    {
+                        //Console.WriteLine("JOIN WITH NEXT");
+                        if (JoinParagraphs(this, false))
+                            return;
+                    }
+                }
+
+                // This context does not allow the deletion
                 OWWindow.TypingErrorBeep();
                 return;
             }
@@ -3096,6 +3167,62 @@ namespace OurWord.Edit
             Debug.Assert(null != sel);
             Window.Selection = sel;
             NormalizeSelection();
+        }
+        #endregion
+
+        #region Method: bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
+        bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
+        {
+            // Remember the scroll bar position so that we can attempt to scroll back to it
+            float fScrollBarPosition = Window.ScrollBarPosition;
+
+            // Obtain the underlying paragraph
+            DParagraph p = para.DataSource as DParagraph;
+            if (null == p)
+                return false;
+
+            // If we want the preceeding paragraph, then we have to set it to the previous
+            // one in the section
+            if (bJoinWithPreviousParagraph)
+            {
+                DSection section = p.Section;
+                int ip = section.Paragraphs.FindObj(p);
+                if (ip <= 0)
+                    return false;
+                p = section.Paragraphs[ip - 1] as DParagraph;
+            }
+
+            // Remember the cursor position so that we can restore back to it. We're storing the
+            // number of editable characters that are in the first paragraph
+            int nCursorPosition = p.EditableTextLength;
+
+            // Join the paragraphs
+            p.JoinToNext();
+
+            // Re-Load the window's data. This is time-consuming, but it is the only way to make paragraphs line
+            // correctly side-by-side.
+            Window.LoadData();
+
+            // Locate the OWParagraph
+            foreach (OWWindow.Row row in Window.Rows)
+            {
+                foreach (OWWindow.Row.Pile pile in row.Piles)
+                {
+                    foreach (OWPara owp in pile.Paragraphs)
+                    {
+                        if (owp.DataSource as DParagraph == p)
+                        {
+                            owp.SelectEditablePositionAt(nCursorPosition);
+                            Window.ScrollBarPosition = fScrollBarPosition;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // Shouldn't get here....it means the paragraph did not make it back into the window
+            Debug.Assert(false);
+            return false;
         }
         #endregion
     }

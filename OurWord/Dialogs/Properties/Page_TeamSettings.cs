@@ -84,11 +84,13 @@ namespace OurWord.Dialogs
         {
             // Choose a filename for these settings
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "Our Word Team Settings File (*.owt)|*.owt";
+            dlg.Filter = G.GetLoc_Files("TeamSettingsFileFilter",
+                "Our Word Team Settings File (*.owt)|*.owt");
             dlg.DefaultExt = "owt";
             dlg.InitialDirectory = Path.GetDirectoryName( G.Project.TeamSettings.AbsolutePathName);
             dlg.FileName = Path.GetFileName(G.Project.TeamSettings.AbsolutePathName);
-            dlg.Title = "Save the Team Settings file as";
+            dlg.Title = G.GetLoc_Files("SaveTeamSettingsDlgTitle",
+                "Save the Team Settings file as");
             if (dlg.ShowDialog() != DialogResult.OK)
                 return;
 

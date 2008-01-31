@@ -228,6 +228,11 @@ namespace OurWord.View
         #region Method: void _LoadParagraphs(...)
         void _LoadParagraphs()
         {
+            // Options for paragraphs that will be on the right-hand, editable side
+            OWPara.Flags DraftingOptions = OWPara.Flags.IsEditable;
+            if (OurWordMain.s_Features.F_StructuralEditing)
+                DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
+
             // We'll work our way through both the Front and the Target paragraphs
             int iFront = 0;
             int iTarget = 0;
@@ -270,7 +275,7 @@ namespace OurWord.View
                     {
                         DParagraph pTarget = G.STarget.Paragraphs[iFront + kT] as DParagraph;
                         pTarget.BestGuessAtInsertingTextPositions();
-                        AddParagraph(1, pTarget, OWPara.Flags.IsEditable);
+                        AddParagraph(1, pTarget, DraftingOptions);
                     }
                 }
                 else
@@ -299,7 +304,7 @@ namespace OurWord.View
                         // Add the left and right paragraphs
                         _LoadHintsFromFront(pFront);
                         AddParagraph(0, pFront, OWPara.Flags.None);
-                        AddParagraph(1, pTarget, OWPara.Flags.IsEditable);
+                        AddParagraph(1, pTarget, DraftingOptions);
                     }
                 }
 

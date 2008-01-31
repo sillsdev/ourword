@@ -638,7 +638,7 @@ namespace OurWord.Dialogs
                     BookNames.GetName(i),
                     typeof(string),
                     null,
-                    "Enter the name of the book in this kanguage for " + BookNames.GetName(i),
+                    "Enter the name of the book in this language for " + BookNames.GetName(i),
                     "",
                     "",
                     null);

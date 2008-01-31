@@ -18,6 +18,8 @@ using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 
+using NUnit.Framework;
+
 using JWTools;
 using JWdb;
 
@@ -368,7 +370,6 @@ namespace OurWord.DataModel
 			DB.Append( new SfField( G.Map.MkrVerse, Text ) );
 		}
 		#endregion
-
 	}
 	#endregion
 	#region Class: DChapter
@@ -1022,6 +1023,31 @@ namespace OurWord.DataModel
         }
         #endregion
 
+        public int PhrasesLength
+        {
+            get
+            {
+                int c = 0;
+
+                foreach (DPhrase phrase in Phrases)
+                    c += phrase.Text.Length;
+
+                return c;
+            }
+        }
+        public int PhrasesBTLength
+        {
+            get
+            {
+                int c = 0;
+
+                foreach (DPhrase phrase in PhrasesBT)
+                    c += phrase.Text.Length;
+
+                return c;
+            }
+        }
+
         // Scaffolding -----------------------------------------------------------------------
 		#region Constructor() - Creates the attributes
 		public  DBasicText()
@@ -1237,18 +1263,21 @@ namespace OurWord.DataModel
 		}
 		#endregion
 		#region Method: void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend)
-		private void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend)
+		private void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend, bool bInsertSpacesBetweenPhrases)
 		{
-			DPhrase LastPhrase = ( osPhrases.Count > 0 ) ? 
-				osPhrases[ osPhrases.Count - 1] : null;
-
+			DPhrase LastPhrase = ( osPhrases.Count > 0 ) ? osPhrases[ osPhrases.Count - 1] : null;
 
 			// Add a space to our last phrase if needed
-			if ( null != LastPhrase && ! LastPhrase.EndsWithSpace &&
-				phrasesToAppend.Count > 0 && ! phrasesToAppend[0].BeginsWithSpace)
-			{
-				osPhrases[ osPhrases.Count - 1].Text += " ";
-			}
+            if (bInsertSpacesBetweenPhrases)
+            {
+                if (null != LastPhrase &&
+                    !LastPhrase.EndsWithSpace &&
+                    phrasesToAppend.Count > 0 &&
+                    !phrasesToAppend[0].BeginsWithSpace)
+                {
+                    osPhrases[osPhrases.Count - 1].Text += " ";
+                }
+            }
 
 			// Add in the phrases
 			while (phrasesToAppend.Count > 0)
@@ -1256,8 +1285,9 @@ namespace OurWord.DataModel
 				DPhrase phrase = phrasesToAppend[0];
 				phrasesToAppend.RemoveAt(0);
 
-				if (null != LastPhrase && 
-					phrase.CharacterStyleAbbrev == LastPhrase.CharacterStyleAbbrev)
+                LastPhrase = (osPhrases.Count > 0) ? osPhrases[osPhrases.Count - 1] : null;
+
+				if (null != LastPhrase && phrase.CharacterStyleAbbrev == LastPhrase.CharacterStyleAbbrev)
 				{
 					LastPhrase.Text += phrase.Text;
 				}
@@ -1269,11 +1299,11 @@ namespace OurWord.DataModel
 		}
 		#endregion
 		#region Method: void Append(DBasicText text)
-		public virtual void Append(DBasicText text)
+        public virtual void Append(DBasicText text, bool bInsertSpacesBetweenPhrases)
 		{
 			// Append the vernacular and BT phrases
-			AppendPhrases( Phrases,   text.Phrases);
-			AppendPhrases( PhrasesBT, text.PhrasesBT);
+            AppendPhrases(Phrases, text.Phrases, bInsertSpacesBetweenPhrases);
+            AppendPhrases(PhrasesBT, text.PhrasesBT, bInsertSpacesBetweenPhrases);
 		}
 		#endregion
 		#region Method: void GetWordOffsetPairs(ref aWords, ref aPositions)
@@ -1433,7 +1463,61 @@ namespace OurWord.DataModel
             #endregion
         }
 		#endregion
-	}
+
+        // Split / Join DBasicTexts ----------------------------------------------------------
+        #region Method: void Split(DPhrase phraseToSplit, int iPos)
+        /// <summary>
+        /// Splits the phrase, iff the position requested is not at a prhase boundary. 
+        /// Otherwise, nothing is done.
+        /// </summary>
+        /// <param name="phraseToSplit">The phrase to be split into two</param>
+        /// <param name="iPos">The position within the phrase. It must be greater than
+        /// zero, and less than the length of the phrase; otherwise no action is taken.</param>
+        public void Split(DPhrase phraseToSplit, int iPos)
+        {
+            if (iPos == 0 || iPos == phraseToSplit.Text.Length)
+                return;
+
+            DPhrase phraseLeft = new DPhrase(phraseToSplit.CharacterStyleAbbrev,
+                phraseToSplit.Text.Substring(0, iPos));
+
+            DPhrase phraseRight = new DPhrase(phraseToSplit.CharacterStyleAbbrev,
+                phraseToSplit.Text.Substring(iPos));
+
+            int iPhrasePosition = Phrases.FindObj(phraseToSplit);
+
+            Phrases.InsertAt(iPhrasePosition, phraseRight);
+            Phrases.InsertAt(iPhrasePosition, phraseLeft);
+            Phrases.Remove(phraseToSplit);
+        }
+        #endregion
+        #region Method: void Join(int iPhraseLeft)
+        /// <summary>
+        /// Joins the phrase as iPhraseLeft with the phrase to its right. The resultant
+        /// phrase keeps the type of the iPhraseLeft
+        /// </summary>
+        /// <param name="iPhraseLeft">The index of the left phrase; it will be joined
+        /// to the one on its right.</param>
+        public void Join(int iPhraseLeft)
+        {
+            // Make certain a Join operation is supported at this position
+            Debug.Assert(iPhraseLeft >= 0);
+            Debug.Assert(iPhraseLeft < Phrases.Count - 1);
+
+            // Point to the two phrases in question
+            DPhrase phraseLeft = Phrases[iPhraseLeft] as DPhrase;
+            DPhrase phraseRight = Phrases[iPhraseLeft + 1] as DPhrase;
+            Debug.Assert(null != phraseLeft);
+            Debug.Assert(null != phraseRight);
+
+            // Move the contents of the Right phrase into the Left
+            phraseLeft.Text += phraseRight.Text;
+
+            // Remove the Right phrase
+            Phrases.Remove(phraseRight);
+        }
+        #endregion
+    }
 	#endregion
 	#region Class: DText
 	public class DText : DBasicText
@@ -1582,13 +1666,13 @@ namespace OurWord.DataModel
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: void Append(DText text)
-		public override void Append(DBasicText basicText)
+		public override void Append(DBasicText basicText, bool bInsertSpacesBetweenPhrases)
 		{
 			DText text = basicText as DText;
 			Debug.Assert(null != text);
 
 			// Append the vernacular and BT phrases
-			base.Append(text);
+            base.Append(text, bInsertSpacesBetweenPhrases);
 
 			// Append the Translator Notes
 			while (text.Notes.Count > 0)
@@ -1608,7 +1692,7 @@ namespace OurWord.DataModel
 				}
 
 				// Otherwise, we must append the note to the text
-				noteHome.NoteText.Append( note.NoteText );
+                noteHome.NoteText.Append(note.NoteText, true);
 				text.Notes.Remove(note);
 			}
 		}
@@ -1887,7 +1971,7 @@ namespace OurWord.DataModel
 	#endregion
 
 	// Tests ---------------------------------------------------------------------------------
-	#region TEST
+	#region Old-Style TESTs
 	public class Test_DRun : Test
 	{
 		// Scaffolding -----------------------------------------------------------------------
@@ -2237,6 +2321,135 @@ namespace OurWord.DataModel
 		#endregion
 	}
 	#endregion
+
+    [TestFixture] public class Test_DBasicText
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+            OurWordMain.Project = new DProject();
+            G.Project.TeamSettings = new DTeamSettings();
+            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.Project.DisplayName = "Project";
+        }
+        #endregion
+
+        [Test] public void PhrasesLength()
+        {
+            string s1 = "For God so loved the ";
+            string s2 = "world ";
+            string s3 = "that he gave his one and only son";
+
+            // Create a multi-phrase text
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, s1));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, s2));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, s3));
+
+            // Test it's length
+            int n = s1.Length + s2.Length + s3.Length;
+            Assert.AreEqual(n, text.PhrasesLength);
+        }
+    }
+
+    #region NUnit Tests
+    [TestFixture] public class Test_DPhrase
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+            OurWordMain.Project = new DProject();
+            G.Project.TeamSettings = new DTeamSettings();
+            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.Project.DisplayName = "Project";
+        }
+        #endregion
+
+        #region Test: SplitPhraseInMiddle
+        [Test] public void SplitPhraseInMiddle()
+        {
+            // Create a test phrase
+            DText text = DText.CreateSimple("This is a phrase.");
+            Assert.AreEqual(1, text.Phrases.Count);
+            DPhrase phrase = text.Phrases[0] as DPhrase;
+            Assert.IsNotNull(phrase);
+            
+            // Do the split
+            text.Split(phrase, 5);
+
+            // Should have two phrases now
+            Assert.AreEqual(2, text.Phrases.Count);
+
+            DPhrase phraseLeft = text.Phrases[0] as DPhrase;
+            Assert.AreEqual("This ", phraseLeft.Text);
+
+            DPhrase phraseRight = text.Phrases[1] as DPhrase;
+            Assert.AreEqual("is a phrase.", phraseRight.Text);
+        }
+        #endregion
+        #region Test: SplitPhraseAtStart
+        [Test] public void SplitPhraseAtStart()
+        {
+            // Create a test phrase
+            DText text = DText.CreateSimple("This is a phrase.");
+            Assert.AreEqual(1, text.Phrases.Count);
+            DPhrase phrase = text.Phrases[0] as DPhrase;
+            Assert.IsNotNull(phrase);
+
+            // Do the split
+            text.Split(phrase, 0);
+
+            // Should have two phrases now
+            Assert.AreEqual(1, text.Phrases.Count);
+            DPhrase phraseLeft = text.Phrases[0] as DPhrase;
+            Assert.AreEqual("This is a phrase.", phraseLeft.Text);
+        }
+        #endregion
+        #region Test: SplitPhraseAtEnd
+        [Test] public void SplitPhraseAtEnd()
+        {
+            // Create a test phrase
+            DText text = DText.CreateSimple("Hello");
+            Assert.AreEqual(1, text.Phrases.Count);
+            DPhrase phrase = text.Phrases[0] as DPhrase;
+            Assert.IsNotNull(phrase);
+
+            // Do the split
+            text.Split(phrase, 5);
+
+            // Should have two phrases now
+            Assert.AreEqual(1, text.Phrases.Count);
+            DPhrase phraseLeft = text.Phrases[0] as DPhrase;
+            Assert.AreEqual("Hello", phraseLeft.Text);
+        }
+        #endregion
+
+        #region Test: JoinPhrases
+        [Test] public void JoinPhrases()
+        {
+            // Start with a single phrase
+            string sText = "This is a phrase";
+            DText text = DText.CreateSimple(sText);
+
+            // Split into two
+            DPhrase phrase = text.Phrases[0] as DPhrase;
+            Assert.IsNotNull(phrase);
+            text.Split(phrase, 5);
+            Assert.AreEqual(2, text.Phrases.Count);
+
+            // Now join back together
+            text.Join(0);
+
+            // Should have a single phrase
+            Assert.AreEqual(1, text.Phrases.Count);
+            Assert.AreEqual(sText, (text.Phrases[0] as DPhrase).Text);
+        }
+        #endregion
+
+    }
+    #endregion
 }
 
 

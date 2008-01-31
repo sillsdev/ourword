@@ -388,7 +388,9 @@ namespace OurWord.Dialogs
 		#endregion
 		#region Handler: cmdTranslationNameEdited - Provide a default Abbreviation
 		private void cmdTranslationNameEdited(object sender, System.EventArgs e)
-		{
+        // Same algorithm as in the WizNew_FrontInfo page; probably should
+        // combine them at some point.
+        {
 			int cAbbrevLength = 3;
 
 			if (TranslationName.Length == 0)

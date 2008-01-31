@@ -2410,6 +2410,15 @@ namespace OurWord
                 }
             }
             #endregion
+            #region Attr{g}: bool F_StructuralEditing
+            public bool F_StructuralEditing
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fStructuralEditing.ToString());
+                }
+            }
+            #endregion
             #region Attr{g}: bool F_JustTheBasics
 			public bool F_JustTheBasics
 			{
@@ -2461,6 +2470,7 @@ namespace OurWord
                 fCopyBTfromFront,
                 fFilter,
                 fJustTheBasics,
+                fStructuralEditing,
                 fLocalizer,
                 kLast
             };
@@ -2531,6 +2541,13 @@ namespace OurWord
                     "This dialog, appearing in the Tools menu, allows you to translate the " +
                         "user interface of OurWord into another language.");
 
+                m_Dlg.Add(ID.fStructuralEditing.ToString(),
+                    false,
+                    "Structural Editing",
+                    "Enables the translator to split and join paragraphs, or to assign different " +
+                        "styles to a paragraph. By doing this the translation will depart from " +
+                        "the paragraph structure of the front translation.");
+
                 m_Dlg.Add(ID.fJustTheBasics.ToString(),    
                     false,
                     "Just the Basics",
@@ -2551,6 +2568,7 @@ namespace OurWord
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fCopyBTfromFront.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fFilter.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fPrint.ToString());
+                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fStructuralEditing.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fLocalizer.ToString());
 			}
 			#endregion
@@ -2662,6 +2680,9 @@ namespace OurWord
             Project = new DProject();
             Project.AbsolutePathName = sPathName;
             Project.Load();
+
+            // Make sure the registry is aware of the new file name, as it might have been changed.
+            sPathName = Project.AbsolutePathName;
 
             TemporaryFixes();
 		}
@@ -2796,7 +2817,70 @@ namespace OurWord
 		#region Cmd: cmdNewProject
         private void cmdNewProject(Object sender, EventArgs e)
 		{
-			// Make sure this project is saved and up-to-date
+            // Walk through the wizard
+            Dialogs.WizNewProject.WizNewProject wiz = new Dialogs.WizNewProject.WizNewProject();
+            if (DialogResult.OK != wiz.ShowDialog())
+                return;
+
+            // Make sure this current project is saved and up-to-date
+            OnLeaveProject();
+
+            // Create and initialize the new project according to the settings
+            DProject project = new DProject();
+            project.DisplayName = wiz.ProjectName;
+            project.AbsolutePathName = wiz.TargetSettingsFolder +
+                Path.DirectorySeparatorChar + project.DisplayName + ".owp";
+
+            DTeamSettings ts = new DTeamSettings();
+            ts.InitializeFactoryStyleSheet();
+            project.TeamSettings = ts;
+            ts.AbsolutePathName = wiz.TeamSettingsPath;
+            if (File.Exists(ts.AbsolutePathName))
+                ts.Load();
+
+            DTranslation tFront = new DTranslation(wiz.FrontName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
+            if (!string.IsNullOrEmpty(wiz.ExistingFrontSettingsFilePath))
+            {
+                tFront.AbsolutePathName = wiz.ExistingFrontSettingsFilePath;
+                tFront.Load();
+                if (tFront.DisplayName != wiz.FrontName ||
+                    tFront.LanguageAbbrev != wiz.FrontAbbreviation ||
+                    Path.GetDirectoryName(tFront.AbsolutePathName) != wiz.FrontSettingsFolder)
+                {
+                    tFront = new DTranslation(wiz.FrontName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
+                }
+            }
+            project.FrontTranslation = tFront;
+            tFront.LanguageAbbrev = wiz.FrontAbbreviation;
+            tFront.AbsolutePathName = wiz.FrontSettingsFolder +
+                Path.DirectorySeparatorChar + wiz.FrontName + ".otrans";
+
+            DTranslation tTarget = new DTranslation(wiz.ProjectName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
+            project.TargetTranslation = tTarget;
+            tTarget.DisplayName = wiz.ProjectName;
+            tTarget.LanguageAbbrev = wiz.TargetAbbreviation;
+            tTarget.AbsolutePathName = wiz.TargetSettingsFolder +
+                Path.DirectorySeparatorChar + wiz.ProjectName + ".otrans";
+
+            Project = project;
+
+            // Save everything, including placing into the MRU
+            m_Config.FileName = Project.AbsolutePathName;
+            m_Config.mru_Update();
+            m_Config.Save();
+
+            // Update the UI, views, etc
+            Project.Nav.GoToFirstAvailableBook();
+            OnEnterProject();
+
+            // Edit properties?
+            if (wiz.LaunchPropertiesDialogWhenDone)
+                cmdProjectProperties(null, null);
+
+
+            /***
+            // OLD
+			// Make sure this current project is saved and up-to-date
 			OnLeaveProject();
 
 			// Set the Config to a new project
@@ -2816,17 +2900,17 @@ namespace OurWord
                 return;
             }
 
-			// Update the UI to the blank project, so the user knows the old one is gone
+			// Update the UI to the new project
 			OnEnterProject();
 
-			// We want to go ahead and edit its properties (thus present
-			// the Properties dialog)
+			// Go ahead and edit its properties (thus present the Properties dialog)
             DialogProperties dlg = new DialogProperties();
             dlg.ShowDialog(this);
 
 			// Update the UI, views, etc.
 			Project.Nav.GoToFirstAvailableBook();
 			OnEnterProject();
+            ***/
 		}
 		#endregion
 		#region Cmd: cmdOpenProject

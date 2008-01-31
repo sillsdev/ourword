@@ -145,7 +145,7 @@ namespace OurWord.Dialogs.WizImportBook
             return sFileName;
         }
         #endregion
-
+        #region Method: void CheckForFileOverwriteCondition()
         void CheckForFileOverwriteCondition()
         {
             // Don't bother if no destination folder
@@ -177,6 +177,6 @@ namespace OurWord.Dialogs.WizImportBook
             m_labelWarning.Text = sMsg;
             m_labelWarning.Visible = true;
         }
-
+        #endregion
     }
 }

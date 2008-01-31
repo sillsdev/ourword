@@ -618,6 +618,27 @@ namespace OurWord.Edit
                     m_vParagraphs = v;
                 }
                 #endregion
+                #region Method: void RemoveParagraph(OWPara p)
+                public void RemoveParagraph(OWPara p)
+                {
+                    // Create a new vector that is one shorted
+                    OWPara[] v = new OWPara[Paragraphs.Length - 1];
+
+                    // Transfer the keeper paragraphs to it
+                    int k = 0;
+                    for (int i = 0; i < Paragraphs.Length; i++)
+                    {
+                        if (Paragraphs[i] != p)
+                        {
+                            v[k] = Paragraphs[i];
+                            k++;
+                        }
+                    }
+
+                    // Set the old to point ot the new
+                    m_vParagraphs = v;
+                }
+                #endregion
 
                 // Layout & Paint ------------------------------------------------------------
                 #region Method: void DoLayout(PointF ptPos, int nColumnWidth)
@@ -1200,7 +1221,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Attr{g}: Row[] Rows
-        protected Row[] Rows
+        public Row[] Rows
         {
             get
             {
@@ -1865,7 +1886,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Attr{g}: int ScrollBarPosition
+        #region Attr{g/s}: int ScrollBarPosition
         public float ScrollBarPosition
         {
             get
@@ -2202,7 +2223,7 @@ namespace OurWord.Edit
                 }
             }
             #endregion
-            #region VAttr{g}: int iParagraph - the index of the OWPara containing this selection
+            #region VAttr{g}: int iParagraph - the index of the OWPara within the Pile, containing this selection
             public int iParagraph
             {
                 get
@@ -2263,6 +2284,65 @@ namespace OurWord.Edit
                             s += Paragraph.Blocks[i].Text;
                     }
                     return s;
+                }
+            }
+            #endregion
+            #region VAttr{g}: bool IsInsertionPoint_AtParagraphBeginning
+            public bool IsInsertionPoint_AtParagraphBeginning
+            {
+                get
+                {
+                    // Must be an insertion point
+                    if (!IsInsertionPoint)
+                        return false;
+
+                    // Must be the first editable block
+                    for (int ib = 0; ib < Paragraph.Blocks.Length; ib++)
+                    {
+                        if (Paragraph.Blocks[ib] as OWPara.EWord != null)
+                        {
+                            if (ib != Anchor.iBlock)
+                                return false;
+                            break;
+                        }
+                    }
+
+                    // Must be the first position in the block
+                    if (Anchor.iChar != 0)
+                        return false;
+
+                    // All tests passed; we're at the beginning
+                    return true;
+                }
+            }
+            #endregion
+            #region VAttr{g}: bool IsInsertionPoint_AtParagraphEnding
+            public bool IsInsertionPoint_AtParagraphEnding
+            {
+                get
+                {
+                    // Must be an insertion point
+                    if (!IsInsertionPoint)
+                        return false;
+
+                    // Must be the last editable block
+                    for (int ib = Paragraph.Blocks.Length - 1; ib >= 0; ib--)
+                    {
+                        if (Paragraph.Blocks[ib] as OWPara.EWord != null)
+                        {
+                            if (ib != Anchor.iBlock)
+                                return false;
+                            break;
+                        }
+                    }
+
+                    // Must be the last position in the block
+                    OWPara.EWord word = Paragraph.Blocks[Anchor.iBlock] as OWPara.EWord;
+                    if (Anchor.iChar != word.Text.Length)
+                        return false;
+
+                    // All tests passed; we're at the beginning
+                    return true;
                 }
             }
             #endregion
@@ -2346,8 +2426,8 @@ namespace OurWord.Edit
             }
             int m_iBlockLast = -1;
             #endregion
-            #region Method: int _DBT_iChar(SelPoint sp)
-            int _DBT_iChar(SelPoint sp)
+            #region Method: int DBT_iChar(SelPoint sp)
+            public int DBT_iChar(SelPoint sp)
             {
                 int iPos = 0;
 
@@ -2368,7 +2448,7 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    return _DBT_iChar(First);
+                    return DBT_iChar(First);
                 }
             }
             #endregion
@@ -2377,7 +2457,7 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    return _DBT_iChar(Last);
+                    return DBT_iChar(Last);
                 }
             }
             #endregion
@@ -2903,7 +2983,7 @@ namespace OurWord.Edit
                     case Keys.Down:   cmdMoveLineDown();      return;
                     case Keys.Delete: cmdDelete();            return;
                     case Keys.Back:   cmdBackspace();         return;
-                    case Keys.Enter:  cmdMoveNextParagraph(); return;
+                    case Keys.Enter:  cmdEnter();             return;
                     case Keys.Tab:    cmdMoveNextBasicText(); return;
                 }
                 e.Handled = false;
@@ -3150,6 +3230,73 @@ namespace OurWord.Edit
 
             // Tell the caller that no further processing should be done
             return true;
+        }
+        #endregion
+        #region Cmd: cmdEnter - react to the Enter key, either split a paragraph, or move to the next paragraph
+        void cmdEnter()
+        {
+            if (null == Selection)
+                return;
+
+            // If paragraph restructuring is turned off, then we just move to the next paragraph
+            if (!Selection.Paragraph.CanRestructureParagraphs)
+            {
+                cmdMoveNextParagraph();
+                return;
+            }
+
+            // Otherwise, we want to make a paragraph break
+            cmdSplitParagraph();
+        }
+        #endregion
+        #region Cmd: cmdSplitParagraph
+        void cmdSplitParagraph()
+        {
+            if (HandleLockedFromEditing())
+                return;
+
+            // If we have a selection, we don't want to erase it. While deleting it is typical 
+            // Microsoft Word behavior, I fear it would be unsettling to the MTT. So instead,
+            // we move to the end of the selection.
+            if (Selection.IsContentSelection)
+                Selection = new Sel(Selection.Paragraph, Selection.Last);
+
+            // Remember the scroll bar position so that we can attempt to scroll back to it
+            float fScrollBarPosition = ScrollBarPosition;
+
+            // Get the position where the split will happen
+            DBasicText text = Selection.DBT;
+            int iPos = Selection.DBT_iChar(Selection.Anchor);
+
+            // Retrieve the underlying paragraph
+            DParagraph para = text.Paragraph;
+            if (null == para)
+                return;
+
+            // Split the underlying paragraph
+            DParagraph paraNew = para.Split(text, iPos);
+
+            // Re-Load the window's data. This is time-consuming, but it is the only way to make paragraphs line
+            // correctly side-by-side.
+            this.LoadData();
+
+            // Select the first thing possible in the new paragraph
+            foreach (Row row in Rows)
+            {
+                foreach (Row.Pile pile in row.Piles)
+                {
+                    foreach (OWPara owp in pile.Paragraphs)
+                    {
+                        if (owp.DataSource as DParagraph == paraNew)
+                        {
+                            owp.Select_BeginningOfFirstWord();
+                            ScrollBarPosition = fScrollBarPosition;
+                            return;
+                        }
+                    }
+                }
+            }
+            Debug.Assert(false);
         }
         #endregion
 
@@ -3476,6 +3623,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
+
         #region Cmd: cmdMoveNextParagraph - e.g., in response to the Enter key
         void cmdMoveNextParagraph()
         {

@@ -43,7 +43,6 @@ namespace JWTools
         // - Return a string that is the title of this page, which we then overlay over
         //    the drawing to the left.
         string PageNavigationTitle();
-
     }
     #endregion
 

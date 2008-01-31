@@ -15,8 +15,12 @@ using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 using System.IO;
+
+using NUnit.Framework;
+
 using JWTools;
 using JWdb;
+
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -438,6 +442,28 @@ namespace OurWord.DataModel
         }
         #endregion
 
+        /// <summary>
+        /// Returns the length of the editable parts of the paragraph.
+        /// </summary>
+        public int EditableTextLength
+        {
+            get
+            {
+                int c = 0;
+
+                foreach (DRun run in Runs)
+                {
+                    DBasicText text = run as DBasicText;
+                    if (null != text)
+                    {
+                        c += text.PhrasesLength;
+                    }
+                }
+
+                return c;
+            }
+        }
+
         // REVISION ===
 
 		#region Method: void AddRun(DRun)
@@ -661,7 +687,7 @@ namespace OurWord.DataModel
 		#endregion
 
 		#region Method: void CombineAdjacentDTexts()
-		public void CombineAdjacentDTexts()
+		public void CombineAdjacentDTexts(bool bInsertSpacesBetweenPhrases)
 			// Combine any adjacent DTexts. These can arise, e.g., when there are 
 			// multiple \vt fields following a single \v field (which can easily happen
 			// in Toolbox when the user combines verses into a verse bridge.
@@ -673,7 +699,7 @@ namespace OurWord.DataModel
 
 				if (null != text1 && null != text2)
 				{
-					text1.Append(text2);
+                    text1.Append(text2, bInsertSpacesBetweenPhrases);
 					Runs.Remove(text2);
 				}
 				else
@@ -705,7 +731,7 @@ namespace OurWord.DataModel
 				else
 					i++;
 			}
-			CombineAdjacentDTexts();
+			CombineAdjacentDTexts(true);
 
 			// Clean up any spaces within individual runs:
 			// - No double (or more) spaces
@@ -713,7 +739,7 @@ namespace OurWord.DataModel
 			// - No "insertion" spaces
 			foreach(DRun run in Runs)
 				run.EliminateSpuriousSpaces();
-			CombineAdjacentDTexts();
+			CombineAdjacentDTexts(true);
 
 			// Set defaults to no leading spaces
 			foreach(DRun run in Runs)
@@ -777,6 +803,129 @@ namespace OurWord.DataModel
 			}
 		}
 		#endregion
+
+        // Split / Join Paragraphs -----------------------------------------------------------
+        #region Method: DParagraph Split(DBasicText textToSplit, int iTextSplitPos)
+        /// <summary>
+        /// Splits the paragraph into two.
+        /// </summary>
+        /// <param name="textToSplit">The DBasicText within the paragraph that will be split.</param>
+        /// <param name="iTextSplitPos">The position within the "textToSplit" where the split will happen.</param>
+        public DParagraph Split(DBasicText textToSplit, int iTextSplitPos)
+        {
+            // Create a new paragraph and insert it to follow the old one
+            DParagraph paraNew = new DParagraph(Translation);
+            paraNew.StyleAbbrev = StyleAbbrev;
+            int iParaNew = Section.Paragraphs.FindObj(this) + 1;
+            Section.Paragraphs.InsertAt(iParaNew, paraNew);
+
+            // Find the phrase and position within, where the split will occur
+            int iPhraseSplitPos = iTextSplitPos;
+            DPhrase phrase = null;
+            foreach (DPhrase p in textToSplit.Phrases)
+            {
+                if (p.Text.Length > iPhraseSplitPos)
+                {
+                    phrase = p;
+                    break;
+                }
+                iPhraseSplitPos -= p.Text.Length;
+            }
+
+            // If we don't have a phrase here, then it means we are asking to split at the
+            // end of a phrase. So add an empty one and point to it.
+            if (null == phrase)
+            {
+                Debug.Assert(textToSplit.Phrases.Count > 0);
+                DPhrase lastPhrase = textToSplit.Phrases[textToSplit.Phrases.Count - 1] as DPhrase;
+                Debug.Assert(null != lastPhrase);
+                phrase = new DPhrase(lastPhrase.CharacterStyleAbbrev, "");
+                textToSplit.Phrases.Append(phrase);
+            }
+
+            // Set indices to our target text and phrase
+            int iText = Runs.FindObj(textToSplit);       // The Run containing this phrase to be moved
+            int iPhrase = textToSplit.Phrases.FindObj(phrase);  // The phrase we will move
+
+            // If we are in the middle of a phrase, then it needs to be split into two phrases.
+            if (iPhraseSplitPos > 0 && iPhraseSplitPos < phrase.Text.Length)
+            {
+                textToSplit.Split(phrase, iPhraseSplitPos);
+                iPhrase++;
+            }
+
+            // If we are in the midst of a DText, then we create a new one
+            // to hold the right-phrase and all phrases after it; otherwise
+            // the entire DText will be moved together
+            if (iPhrase > 0)
+            {
+                DText textRight = new DText();
+                paraNew.Runs.Append(textRight);
+                while (textToSplit.Phrases.Count > iPhrase)
+                {
+                    phrase = textToSplit.Phrases[iPhrase] as DPhrase;
+                    textToSplit.Phrases.Remove(phrase);
+                    textRight.Phrases.Append(phrase);
+                }
+                iText++;
+            }
+
+            // Move all of the remaining DRuns to the new paragraph
+            while (Runs.Count > iText)
+            {
+                DRun run = Runs[iText] as DRun;
+                Runs.Remove(run);
+                paraNew.Runs.Append(run);
+            }
+
+            // Boundary condition: both paragraphs must have a DText
+            bool bFound = false;
+            foreach (DRun r in Runs)
+            {
+                if (r as DBasicText != null)
+                    bFound = true;
+            }
+            if (!bFound)
+                Runs.Append(DText.CreateSimple(""));
+
+            bFound = false;
+            foreach (DRun r in paraNew.Runs)
+            {
+                if (r as DBasicText != null)
+                    bFound = true;
+            }
+            if (!bFound)
+                paraNew.Runs.Append(DText.CreateSimple(""));
+
+            return paraNew;
+        }
+        #endregion
+        #region Method: void JoinToNext()
+        public void JoinToNext()
+        {
+            // Retrieve the following paragraph
+            int iNext = Section.Paragraphs.FindObj(this) + 1;
+            if (iNext >= Section.Paragraphs.Count)
+                return;
+            DParagraph pNext = Section.Paragraphs[iNext] as DParagraph;
+            Debug.Assert(null != pNext);
+
+            // Move its runs into this one
+            while (pNext.Runs.Count > 0)
+            {
+                DRun run = pNext.Runs[0] as DRun;
+                pNext.Runs.Remove(run);
+                this.Runs.Append(run);
+            }
+
+            // Remove it from the owner
+            Section.Paragraphs.Remove(pNext);
+
+            // Get rid of any spurious spaces, etc.
+            CombineAdjacentDTexts(false);  // Need to call this first with "false"
+            Cleanup();
+        }
+        #endregion
 
         // Copy BT From Front ----------------------------------------------------------------
 		#region Method: void CopyBackTranslationsFromFront(DParagraph PFront)
@@ -1037,7 +1186,8 @@ namespace OurWord.DataModel
 		#endregion
 	}
 
-	#region TEST
+    // Tests ---------------------------------------------------------------------------------
+    #region Old-Style TESTs
 	public class Test_DParagraph : Test
 	{
 		// Attrs -----------------------------------------------------------------------------
@@ -1115,7 +1265,7 @@ namespace OurWord.DataModel
 			text.PhrasesBT[0].Text = "Appended BT of a phrase.";
 			p.AddRun(text);
 
-			// This call should now combine the DTexts, and it shohuld insert a space
+			// This call should now combine the DTexts, and it should insert a space
 			// between them.
 			p.Cleanup();
 
@@ -1180,4 +1330,267 @@ namespace OurWord.DataModel
 	}
 	#endregion
 
+    #region NUnit Tests
+    [TestFixture] public class Test_DPara
+    {
+        DSection m_section;
+
+        // Setup/TearDown --------------------------------------------------------------------
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+            OurWordMain.Project = new DProject();
+            G.Project.TeamSettings = new DTeamSettings();
+            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.Project.DisplayName = "Project";
+            G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
+            DBook book = new DBook("MRK", "");
+            G.Project.TargetTranslation.AddBook(book);
+            m_section = new DSection(1);
+            book.Sections.Append(m_section);
+        }
+        #endregion
+        #region TearDown
+        [TearDown] public void TearDown()
+        {
+            OurWordMain.Project = null;
+        }
+        #endregion
+
+        // Splitting & Joinging paragraphs ---------------------------------------------------
+        #region Method: DParagraph SplitParagraphSetup()
+        private DParagraph SplitParagraphSetup()
+        {
+            // Create a paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+
+            // Add various runs
+            p.AddRun( DChapter.Create("3") );
+            p.AddRun(DVerse.Create("16"));
+
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "For God so loved the "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that he gave his one and only son"));
+            p.AddRun(text);
+
+            p.AddRun(DVerse.Create("17"));
+
+            text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that whosoever believes in him "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "but have everlasting life."));
+            p.AddRun(text);
+
+            m_section.Paragraphs.Append(p);
+
+            return p;
+        }
+        #endregion
+        #region Test: SplitAndJoinParas_BetweenWords
+        [Test] public void SplitAndJoinParas_BetweenWords()
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Split it at "For |God"
+            p.Split(p.Runs[2] as DBasicText, 4);
+            Assert.AreEqual(2, m_section.Paragraphs.Count);
+            DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
+            Assert.AreEqual("{c 3}{v 16}For ", 
+                p.DebugString, 
+                "Split Left");
+            Assert.AreEqual("God so loved the |iworld |rthat he gave his one and only son{v 17}that whosoever " +
+                "believes in him |ishall not perish, |rbut have everlasting life.", 
+                pRight.DebugString, 
+                "Split Right");
+
+            // Join it back up
+            p.JoinToNext();
+            Assert.AreEqual(1, m_section.Paragraphs.Count);
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString, 
+                "Join");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+        #region Test: SplitAndJoinParas_WithinWord
+        [Test] public void SplitAndJoinParas_WithinWord()
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Split at "wo|rld"
+            p.Split(p.Runs[2] as DBasicText, 23);
+            Assert.AreEqual(2, m_section.Paragraphs.Count);
+            DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iwo|r",
+                p.DebugString, 
+                "Split Left");
+            Assert.AreEqual("|irld |rthat he gave his one and only son{v 17}that whosoever " +
+                "believes in him |ishall not perish, |rbut have everlasting life.", 
+                pRight.DebugString,
+                "Split Right");
+
+            // Join it back up
+            p.JoinToNext();
+            Assert.AreEqual(1, m_section.Paragraphs.Count);
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString,
+                "Join");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+        #region Test: SplitAndJoinParas_BoundaryBeginning
+        [Test] public void SplitAndJoinParas_BoundaryBeginning()
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Split at "|For God"
+            p.Split(p.Runs[2] as DBasicText, 0);
+            Assert.AreEqual(2, m_section.Paragraphs.Count);
+            DParagraph pLeft = m_section.Paragraphs[0] as DParagraph;
+            DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
+            Assert.AreEqual("{c 3}{v 16}", 
+                pLeft.DebugString,
+                "Split Left");
+            Assert.AreEqual("For God so loved the |iworld |rthat he gave his one and only son{v 17}that whosoever " +
+                "believes in him |ishall not perish, |rbut have everlasting life.", 
+                pRight.DebugString,
+                "Split Right");
+            // Note: we should have a DPhrase in the left paragraph here
+            Assert.AreEqual(3, pLeft.Runs.Count);
+            Assert.IsNotNull(pLeft.Runs[2] as DBasicText);
+
+            // Join it back up
+            p.JoinToNext();
+            Assert.AreEqual(1, m_section.Paragraphs.Count);
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString,
+                "Join");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+        #region Test: SplitAndJoinParas_BoundaryEnding
+        [Test] public void SplitAndJoinParas_BoundaryEnding()
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Split at "life.|"
+            p.Split(p.Runs[4] as DBasicText, 75);
+            Assert.AreEqual(2, m_section.Paragraphs.Count);
+            DParagraph pLeft = m_section.Paragraphs[0] as DParagraph;
+            DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one and only son{v 17}that " +
+                "whosoever believes in him |ishall not perish, |rbut have everlasting life.",
+                pLeft.DebugString,
+                "Split Left");
+            Assert.AreEqual("", 
+                pRight.DebugString,
+                "Split Right");
+            Assert.AreEqual(1, pRight.Runs.Count);
+            Assert.IsNotNull(pRight.Runs[0] as DText);
+
+            // Join it back up
+            p.JoinToNext();
+            Assert.AreEqual(1, m_section.Paragraphs.Count);
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString,
+                "Join");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+        #region Test: SplitAndJoinParas_AfterVerse
+        [Test] public void SplitAndJoinParas_AfterVerse()
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Split after verse 17 (the 17 should go stay with the left (original) paragraph)
+            p.Split(p.Runs[4] as DBasicText, 0);
+            Assert.AreEqual(2, m_section.Paragraphs.Count, "Split Count");
+            DParagraph pLeft = m_section.Paragraphs[0] as DParagraph;
+            DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one and only son{v 17}",
+                pLeft.DebugString,
+                "Split Left");
+            Assert.AreEqual("that whosoever believes in him |ishall not perish, |rbut have everlasting life.",
+                pRight.DebugString,
+                "Split Right");
+
+            // Join it back up
+            p.JoinToNext();
+            Assert.AreEqual(1, m_section.Paragraphs.Count, "Join Count");
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString,
+                "Join");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+        #region Test: SplitAndJoinParas_BeforeVerse
+        [Test] public void SplitAndJoinParas_BeforeVerse()
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Split after verse 17 (the 17 should go stay with the left (original) paragraph)
+            p.Split(p.Runs[2] as DBasicText, 60);
+            Assert.AreEqual(2, m_section.Paragraphs.Count, "Split Count");
+            DParagraph pLeft = m_section.Paragraphs[0] as DParagraph;
+            DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one and only son",
+                pLeft.DebugString,
+                "Split Left");
+            Assert.AreEqual("{v 17}that whosoever believes in him |ishall not perish, |rbut have everlasting life.",
+                pRight.DebugString,
+                "Split Right");
+
+            // Join it back up
+            p.JoinToNext();
+            Assert.AreEqual(1, m_section.Paragraphs.Count, "Join Count");
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString,
+                "Join");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+
+        // Misc ------------------------------------------------------------------------------
+        #region Test: EditableTextLength
+        [Test] public void EditableTextLength()
+        {
+            DParagraph p = SplitParagraphSetup();
+
+            Assert.AreEqual(135, p.EditableTextLength);
+        }
+        #endregion
+    }
+    #endregion
 }

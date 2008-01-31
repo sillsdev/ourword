@@ -73,10 +73,6 @@ namespace JWdb
             {
                 return m_sRelativePathName;
             }
-            set
-            {
-                SetValue(ref m_sRelativePathName, value);
-            }
         }
         private string m_sRelativePathName;
         #endregion
@@ -141,7 +137,11 @@ namespace JWdb
 			}
 			set
 			{
-                m_sAbsolutePathName = value;
+                if (m_sAbsolutePathName != value)
+                {
+                    m_sAbsolutePathName = value;
+                    DeclareDirty();
+                }
 
                 // Update the Relative Pathname if necessary
                 if (null != Owner)
@@ -154,11 +154,21 @@ namespace JWdb
                     // will trigger a file-save of both the object and its owning object.)
                     if (sRelativePathName != RelativePathName)
                     {
-                        RelativePathName = sRelativePathName;
+                        /****
+                        MessageBox.Show("ABSOLUTE -- \n" +
+                            "DisplayName = <" + this.DisplayName + ">\n" +
+                            "Owner's ABS name = <" + Owner.SaveObj.AbsolutePathName + ">\n" +
+                            "This's ABS name  = <" + AbsolutePathName + ">\n" +
+                            "This's REL name  = <" + RelativePathName + ">\n" +
+                            "Proposed REL nam = <" + sRelativePathName + ">", 
+                            "OurWord Temporary Debugging", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        ****/
+
+                        SetValue(ref m_sRelativePathName, sRelativePathName);
 
                         // Se we'll save the relative pathname
                         DeclareDirty();
-                        Owner.SaveObj.DeclareDirty();
                     }
                 }
 			}
@@ -255,6 +265,12 @@ namespace JWdb
             TextReader tr = JW_Util.GetTextReader(ref sAbsolutePathName, FileFilter);
             XmlRead xml = new XmlRead(tr);
 
+            // Store the Absolute and Relative Paths (in case they changed). We MUST do it here,
+            // because ObjOnDemands may embed other ObjOnDemands, and attempts to read these
+            // lower level ones via the Read method below need for this upper-level JObjOnDemand
+            // to have its path name properly set.
+            AbsolutePathName = sAbsolutePathName;
+
             // Read down to the tag
             string sLine = tr.ReadLine();   // Read the <RootObjectBeginMarker> line
             if (null != sLine)
@@ -320,7 +336,7 @@ namespace JWdb
             if (string.IsNullOrEmpty(sPathName))
                 sPathName = AbsolutePathName;
 
-            // If we still have nothing, then build something from the displayname
+            // If we still have nothing, then build something from the display name
             if (string.IsNullOrEmpty(sPathName))
                 sPathName = DisplayName + DefaultFileExtension;
 
@@ -336,12 +352,17 @@ namespace JWdb
                 return;
             }
 
-            // We'll consider an object unchanged following a read
-            IsDirty = false;  
-            
+            // Note that the file, now that it is read in, will be considered "Dirty" and
+            // in need of save. The DBook override of OnLoad clears this; but we don't
+            // do that here because path names may have been changed, and we want to be
+            // certain they get saved. It doesn't take long to save these settings files,
+            // so it really isn't a performance issue.
+           
             // Store the Absolute and Relative Paths (in case they changed)
-            if (sPathName != AbsolutePathName)
-                AbsolutePathName = sPathName;
+            // (Probably no longer needed, now that we do this in the OnLoad method; but
+            // because OnLoad can be overridden in subclasses, I'm leaving it in because
+            // it is important that it be called.)
+            AbsolutePathName = sPathName;
 		}
 		#endregion
         #region Method: void Unload()
