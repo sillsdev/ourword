@@ -735,6 +735,14 @@
       <English>Warning: The file '{0}' already exists in this folder. OurWord will overwrite it. If you wish to preserve this file, you should either choose a different folder, or you should move it to another folder.</English>
       <Info>This warning appears in the Import File wizard. OurWord generates its own file names; thus this warning is to show the user that if they store the file in the chosen folder, the existing file will be overwritten.</Info>
     </Item>
+    <Item ID="msgSectionTitleAlreadyExists">
+      <English>You cannot change this paragraph to a Section Title, because a Section Title already exists in this section.</English>
+      <Info>This warning happens only if Structured Editing is turned on. It happens if the user attempts to create a second section title within a section. OurWord defines sections by the Section Title style, thus only one is permitted.</Info>
+    </Item>
+    <Item ID="msgSectionTitleCannotHaveVerses">
+      <English>You cannot change this paragraph to a Section Title, because a Section Title cannot have verses, chapters or footnotes in it.</English>
+      <Info>This warning happens only if Structured Editing is turned on. It happens if the user attempts to change a paragraph containing verses, chapters, or footnotes into a Section Title.</Info>
+    </Item>
     <Group ID="FileStructureMessages" Title="005 - File Structure Messages" Translator="false">
       <Item ID="paragraphs">
         <English>Paragraph(s)</English>

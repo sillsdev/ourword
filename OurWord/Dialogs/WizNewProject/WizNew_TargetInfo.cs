@@ -74,6 +74,12 @@ namespace OurWord.Dialogs.WizNewProject
             // If there is nothing in the abbreviation, the populate it with the first
             // several letters of the language name
         {
+            m_lblDescription.Text = LocDB.GetValue(
+                this, 
+                m_lblDescription.Name,
+                "We need some additional information about the \'{0}\' language.", 
+                new string[] { Wizard.ProjectName } );
+
             if (string.IsNullOrEmpty(Abbreviation))
             {
                 int nLength = Math.Min(3, Wizard.ProjectName.Length);

@@ -3169,13 +3169,9 @@ namespace OurWord.Edit
             NormalizeSelection();
         }
         #endregion
-
         #region Method: bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
         bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
         {
-            // Remember the scroll bar position so that we can attempt to scroll back to it
-            float fScrollBarPosition = Window.ScrollBarPosition;
-
             // Obtain the underlying paragraph
             DParagraph p = para.DataSource as DParagraph;
             if (null == p)
@@ -3194,7 +3190,7 @@ namespace OurWord.Edit
 
             // Remember the cursor position so that we can restore back to it. We're storing the
             // number of editable characters that are in the first paragraph
-            int nCursorPosition = p.EditableTextLength;
+            PlaceHolder bookmark = new PlaceHolder(Window, p, p.EditableTextLength);
 
             // Join the paragraphs
             p.JoinToNext();
@@ -3203,26 +3199,8 @@ namespace OurWord.Edit
             // correctly side-by-side.
             Window.LoadData();
 
-            // Locate the OWParagraph
-            foreach (OWWindow.Row row in Window.Rows)
-            {
-                foreach (OWWindow.Row.Pile pile in row.Piles)
-                {
-                    foreach (OWPara owp in pile.Paragraphs)
-                    {
-                        if (owp.DataSource as DParagraph == p)
-                        {
-                            owp.SelectEditablePositionAt(nCursorPosition);
-                            Window.ScrollBarPosition = fScrollBarPosition;
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            // Shouldn't get here....it means the paragraph did not make it back into the window
-            Debug.Assert(false);
-            return false;
+            // Restore the selection insertion point
+            return bookmark.RestoreCursorPosition();
         }
         #endregion
     }

@@ -2683,6 +2683,20 @@ namespace OurWord.DataModel
             return "";
         }
         #endregion
+        #region Method: int CountParagraphsWithStyle(string sStyleAbbrev)
+        public int CountParagraphsWithStyle(string sStyleAbbrev)
+        {
+            int c = 0;
+
+            foreach (DParagraph p in Paragraphs)
+            {
+                if (p.StyleAbbrev == sStyleAbbrev)
+                    ++c;
+            }
+
+            return c;
+        }
+        #endregion
 
         // Method: CopyBackTranslationsFromFront ---------------------------------------------
 		#region Method: bool _CopyBT_DoFootnotesMatch(Section SFront)

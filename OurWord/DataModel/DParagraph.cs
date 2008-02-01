@@ -441,7 +441,7 @@ namespace OurWord.DataModel
             }
         }
         #endregion
-
+        #region VAttr{g}: int EditableTextLength
         /// <summary>
         /// Returns the length of the editable parts of the paragraph.
         /// </summary>
@@ -463,6 +463,7 @@ namespace OurWord.DataModel
                 return c;
             }
         }
+        #endregion
 
         // REVISION ===
 
@@ -867,6 +868,7 @@ namespace OurWord.DataModel
                     textToSplit.Phrases.Remove(phrase);
                     textRight.Phrases.Append(phrase);
                 }
+                textRight.PhrasesBT.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, ""));
                 iText++;
             }
 
@@ -1405,6 +1407,8 @@ namespace OurWord.DataModel
                 "believes in him |ishall not perish, |rbut have everlasting life.", 
                 pRight.DebugString, 
                 "Split Right");
+            Assert.AreEqual("316", p.ProseBTAsString);
+            Assert.AreEqual("17", pRight.ProseBTAsString);
 
             // Join it back up
             p.JoinToNext();
@@ -1436,6 +1440,8 @@ namespace OurWord.DataModel
                 "believes in him |ishall not perish, |rbut have everlasting life.", 
                 pRight.DebugString,
                 "Split Right");
+            Assert.AreEqual("316", p.ProseBTAsString);
+            Assert.AreEqual("17", pRight.ProseBTAsString);
 
             // Join it back up
             p.JoinToNext();
@@ -1471,6 +1477,8 @@ namespace OurWord.DataModel
             // Note: we should have a DPhrase in the left paragraph here
             Assert.AreEqual(3, pLeft.Runs.Count);
             Assert.IsNotNull(pLeft.Runs[2] as DBasicText);
+            Assert.AreEqual("316", p.ProseBTAsString);
+            Assert.AreEqual("17", pRight.ProseBTAsString);
 
             // Join it back up
             p.JoinToNext();
@@ -1505,6 +1513,8 @@ namespace OurWord.DataModel
                 "Split Right");
             Assert.AreEqual(1, pRight.Runs.Count);
             Assert.IsNotNull(pRight.Runs[0] as DText);
+            Assert.AreEqual("31617", pLeft.ProseBTAsString);
+            Assert.AreEqual("", pRight.ProseBTAsString);
 
             // Join it back up
             p.JoinToNext();

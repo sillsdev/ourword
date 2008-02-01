@@ -1380,6 +1380,11 @@ namespace OurWord.Edit
 
                 // Set a graphics object to it
                 m_graphics = Graphics.FromImage(DoubleBuffer);
+
+                // Turn off Hinting. This means that, yes, the text will not be as pretty to
+                // read, but it makes the cursor appear in the correct place; and eliminates
+                // the moving around that was happening when selecting text.
+                m_graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
             }
             #endregion
             #region Method: void Dispose() -good to call this manually to free memory
@@ -3261,9 +3266,6 @@ namespace OurWord.Edit
             if (Selection.IsContentSelection)
                 Selection = new Sel(Selection.Paragraph, Selection.Last);
 
-            // Remember the scroll bar position so that we can attempt to scroll back to it
-            float fScrollBarPosition = ScrollBarPosition;
-
             // Get the position where the split will happen
             DBasicText text = Selection.DBT;
             int iPos = Selection.DBT_iChar(Selection.Anchor);
@@ -3276,27 +3278,85 @@ namespace OurWord.Edit
             // Split the underlying paragraph
             DParagraph paraNew = para.Split(text, iPos);
 
-            // Re-Load the window's data. This is time-consuming, but it is the only way to make paragraphs line
-            // correctly side-by-side.
-            this.LoadData();
+            // Remember the cursor position so that we can restore back to it after the re-LoadData.
+            PlaceHolder bookmark = new PlaceHolder(this, paraNew, 0);
 
-            // Select the first thing possible in the new paragraph
-            foreach (Row row in Rows)
+            // Reload the window's data. This is time-consuming, but it is the only way to make paragraphs line
+            // correctly side-by-side.
+            LoadData();
+
+            // Restore the selection insertion point
+            bookmark.RestoreCursorPosition();
+        }
+        #endregion
+        #region Cmd: cmdChangeParagraphTo(sStyleAbbrev)
+        public void cmdChangeParagraphTo(string sStyleAbbrev)
+        {
+            // Retrieve the underlying paragraph
+            DParagraph paragraph = Selection.Paragraph.DataSource as DParagraph;
+            if (null == paragraph)
+                return;
+
+            // Nothing to do if this is already the requested style
+            if (paragraph.StyleAbbrev == sStyleAbbrev)
+                return;
+
+            // If we're requesting a Section Title.... 
+            if (sStyleAbbrev == DStyleSheet.c_StyleSectionTitle)
             {
-                foreach (Row.Pile pile in row.Piles)
+                // ...there must not already be a section title
+                if (paragraph.Section.CountParagraphsWithStyle(DStyleSheet.c_StyleSectionTitle) > 0)
                 {
-                    foreach (OWPara owp in pile.Paragraphs)
-                    {
-                        if (owp.DataSource as DParagraph == paraNew)
-                        {
-                            owp.Select_BeginningOfFirstWord();
-                            ScrollBarPosition = fScrollBarPosition;
-                            return;
-                        }
-                    }
+                    LocDB.Message("msgSectionTitleAlreadyExists", 
+                        "You cannot change this paragraph to a Section Title, because a Section Title " +
+                            "already exists in this section.", 
+                        null, 
+                        LocDB.MessageTypes.Info);
+                    return;
+                }
+                // ...there must not be any Verses, Chapters or Footnotes in it
+                if (paragraph.StructureCodes.Length > 0)
+                {
+                    LocDB.Message("msgSectionTitleCannotHaveVerses",
+                        "You cannot change this paragraph to a Section Title, because a Section Title " +
+                            "cannot have verses, chapters or footnotes in it.",
+                        null,
+                        LocDB.MessageTypes.Info);
+                    return;
                 }
             }
-            Debug.Assert(false);
+
+            // Remember the cursor position so that we can restore back to it after the re-LoadData.
+            PlaceHolder bookmark = new PlaceHolder(this, paragraph, 0);
+
+            // Change the underlying paragraph's style
+            paragraph.StyleAbbrev = sStyleAbbrev;
+
+            // Re-Load the window's data. This is time-consuming, but it is the only way to make paragraphs line
+            // correctly side-by-side.
+            LoadData();
+
+            // Restore the selection insertion point
+            bookmark.RestoreCursorPosition();
+        }
+        #endregion
+        #region Method: string GetCurrentParagraphStyle()
+        public string GetCurrentParagraphStyle()
+        {
+            if (null == Selection)
+                return null;
+
+            OWPara p = Selection.Paragraph;
+
+            DParagraph paragraph = p.DataSource as DParagraph;
+            if (null != paragraph)
+                return paragraph.StyleAbbrev;
+
+            DNote note = p.DataSource as DNote;
+            if (null != note)
+                return note.Style.Abbrev;
+
+            return null;
         }
         #endregion
 
@@ -4005,6 +4065,113 @@ namespace OurWord.Edit
         }
         #endregion
         #endregion
-
     }
+
+    #region CLASS: PlaceHolder - save/restore a cursor position in the window
+    class PlaceHolder
+    {
+        // Content Attrs ---------------------------------------------------------------------
+        #region Attr{g}: OWWindow Window
+        OWWindow Window
+        {
+            get
+            {
+                Debug.Assert(null != m_Window);
+                return m_Window;
+            }
+        }
+        OWWindow m_Window;
+        #endregion
+        #region Attr{g}: JObject DataSource
+        JObject DataSource
+        {
+            get
+            {
+                Debug.Assert(null != m_DataSource);
+                return m_DataSource;
+            }
+        }
+        JObject m_DataSource;
+        #endregion
+        #region Attr{g}: float ScrollBarPosition
+        float ScrollBarPosition
+        {
+            get
+            {
+                return m_fScrollBarPosition;
+            }
+        }
+        float m_fScrollBarPosition;
+        #endregion
+        #region Attr{g}: int PositionInParagraph
+        int PositionInParagraph
+        {
+            get
+            {
+                Debug.Assert(-1 != m_iPositionInParagraph);
+                return m_iPositionInParagraph;
+            }
+        }
+        int m_iPositionInParagraph;
+        #endregion
+
+        // Public Interface ------------------------------------------------------------------
+        #region Constructor(OWWindow window, DParagraph paragraph, int iPositionInParagraph)
+        public PlaceHolder(OWWindow window, DParagraph paragraph, int iPositionInParagraph)
+        {
+            // Store the window
+            m_Window = window;
+
+            // Store the underlying paragraph
+            Debug.Assert(null != paragraph);
+            m_DataSource = paragraph;
+
+            // Store the position in the underlying paragraph
+            m_iPositionInParagraph = iPositionInParagraph;
+
+            // Store the scroll bar position
+            m_fScrollBarPosition = Window.ScrollBarPosition;
+        }
+        #endregion
+        #region Constructor(OWPara p, int iPositionInParagraph)
+        public PlaceHolder(OWPara p, int iPositionInParagraph)
+        {
+            // Store the window
+            m_Window = p.Window;
+
+            // Store the underlying paragraph
+            Debug.Assert(null != p.DataSource);
+            m_DataSource = p.DataSource;
+
+            // Store the position in the underlying paragraph
+            m_iPositionInParagraph = iPositionInParagraph;
+
+            // Store the scroll bar position
+            m_fScrollBarPosition = m_Window.ScrollBarPosition;
+        }
+        #endregion
+        #region Method: void RestoreCursorPosition()
+        public bool RestoreCursorPosition()
+        {
+            // Locate the OWParagraph that has the same data source
+            foreach (OWWindow.Row row in Window.Rows)
+            {
+                foreach (OWWindow.Row.Pile pile in row.Piles)
+                {
+                    foreach (OWPara owp in pile.Paragraphs)
+                    {
+                        if (owp.DataSource == DataSource)
+                        {
+                            owp.SelectEditablePositionAt(PositionInParagraph);
+                            Window.ScrollBarPosition = ScrollBarPosition;
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+        #endregion
+    }
+    #endregion
 }

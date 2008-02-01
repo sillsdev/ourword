@@ -1022,7 +1022,7 @@ namespace OurWord.DataModel
             }
         }
         #endregion
-
+        #region VAttr{g}: int PhrasesLength
         public int PhrasesLength
         {
             get
@@ -1035,6 +1035,8 @@ namespace OurWord.DataModel
                 return c;
             }
         }
+        #endregion
+        #region VAttr{g}: int PhrasesBTLength
         public int PhrasesBTLength
         {
             get
@@ -1047,6 +1049,7 @@ namespace OurWord.DataModel
                 return c;
             }
         }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
 		#region Constructor() - Creates the attributes
@@ -2322,6 +2325,8 @@ namespace OurWord.DataModel
 	}
 	#endregion
 
+    #region NUnit Tests
+    #region Test_DBasicText
     [TestFixture] public class Test_DBasicText
     {
         #region Setup
@@ -2335,6 +2340,7 @@ namespace OurWord.DataModel
         }
         #endregion
 
+        #region Test: PhrasesLength
         [Test] public void PhrasesLength()
         {
             string s1 = "For God so loved the ";
@@ -2351,9 +2357,10 @@ namespace OurWord.DataModel
             int n = s1.Length + s2.Length + s3.Length;
             Assert.AreEqual(n, text.PhrasesLength);
         }
+        #endregion
     }
-
-    #region NUnit Tests
+    #endregion
+    #region Test_DPhrase
     [TestFixture] public class Test_DPhrase
     {
         #region Setup
@@ -2449,6 +2456,7 @@ namespace OurWord.DataModel
         #endregion
 
     }
+    #endregion
     #endregion
 }
 

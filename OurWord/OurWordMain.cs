@@ -158,6 +158,8 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
+        private ToolStripSeparator m_EditMenuSeparator;
+        private ToolStripMenuItem m_menuChangeParagraphStyle;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -553,6 +555,56 @@ namespace OurWord
         private ToolStripButton m_tbPadlock;
         private ToolStripLabel m_tbCurrentPassage;
         #endregion
+        #region Method: void SetupChangeParagraphStyleItems()
+        public void SetupChangeParagraphStyleItems()
+        {
+            // Remove any previous subitems
+            m_menuChangeParagraphStyle.DropDownItems.Clear();
+
+            // Populate
+            /*Paragraphs
+             * Common
+             * - p
+             * - q
+             * - q2
+             * 
+             * Restricted
+             * - book subtitle - only in the first record
+             * - book title - only in the first record
+             * - s - only one per record
+             * 
+             * Rare
+             * - ms (major super-section)
+             * - mr (major super-section corss reference)
+             * - s2 (sub-section header)
+             * - qm (can't remember what this one is, but have seen it occasionally in data)
+             * - q3 (quote/poetry level 3)
+             * - qc (centered quote)
+            */
+            string[] vsAbbrevs = {  
+                DStyleSheet.c_StyleAbbrevNormal,
+                DStyleSheet.c_StyleQuote1,
+                DStyleSheet.c_StyleQuote2,
+                DStyleSheet.c_StyleQuote3,
+                DStyleSheet.c_StyleSectionTitle };
+
+            foreach(string sAbbrev in vsAbbrevs)
+            {
+                JParagraphStyle pstyle = G.StyleSheet.FindParagraphStyle(sAbbrev);
+                if (null == pstyle)
+                    continue;
+
+                ToolStripMenuItem mi = new ToolStripMenuItem(
+                    pstyle.DisplayName, 
+                    null,
+                    cmdChangeParagraphStyle, 
+                    "m_menuChangeParagraphStyle_" + sAbbrev);
+                mi.Tag = sAbbrev;
+
+                m_menuChangeParagraphStyle.DropDownItems.Add(mi);
+            }
+        }
+        #endregion
         #region Method: void SetupNavigationButtons()
         private const int c_cMaxMenuLength = 60; // Keep sub-menus from getting too long
         public void SetupNavigationButtons()
@@ -723,6 +775,12 @@ namespace OurWord
 
             // Print Dialog Visibility
             m_menuPrint.Visible = OurWordMain.Features.F_Print;
+
+            // Edit Menu
+            bool bStructualEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
+            SetupChangeParagraphStyleItems();
+            m_EditMenuSeparator.Visible = bStructualEditing;
+            m_menuChangeParagraphStyle.Visible = bStructualEditing;
 
             // Notes
             #region (Notes Visibility)
@@ -1018,6 +1076,8 @@ namespace OurWord
             this.m_menuCut = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuPaste = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_EditMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
+            this.m_menuChangeParagraphStyle = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuGoTo = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuFirstSection = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuPreviousSection = new System.Windows.Forms.ToolStripMenuItem();
@@ -1183,17 +1243,20 @@ namespace OurWord
             this.m_menuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuCut,
             this.m_menuCopy,
-            this.m_menuPaste});
+            this.m_menuPaste,
+            this.m_EditMenuSeparator,
+            this.m_menuChangeParagraphStyle});
             this.m_menuEdit.Name = "m_menuEdit";
             this.m_menuEdit.Size = new System.Drawing.Size(39, 20);
             this.m_menuEdit.Text = "&Edit";
+            this.m_menuEdit.DropDownOpening += new System.EventHandler(this.cmdEditMenuOpening);
             // 
             // m_menuCut
             // 
             this.m_menuCut.Image = ((System.Drawing.Image)(resources.GetObject("m_menuCut.Image")));
             this.m_menuCut.Name = "m_menuCut";
             this.m_menuCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
-            this.m_menuCut.Size = new System.Drawing.Size(144, 22);
+            this.m_menuCut.Size = new System.Drawing.Size(189, 22);
             this.m_menuCut.Text = "Cu&t";
             this.m_menuCut.Click += new System.EventHandler(this.cmdEditCut);
             // 
@@ -1202,7 +1265,7 @@ namespace OurWord
             this.m_menuCopy.Image = ((System.Drawing.Image)(resources.GetObject("m_menuCopy.Image")));
             this.m_menuCopy.Name = "m_menuCopy";
             this.m_menuCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
-            this.m_menuCopy.Size = new System.Drawing.Size(144, 22);
+            this.m_menuCopy.Size = new System.Drawing.Size(189, 22);
             this.m_menuCopy.Text = "&Copy";
             this.m_menuCopy.Click += new System.EventHandler(this.cmdEditCopy);
             // 
@@ -1211,9 +1274,20 @@ namespace OurWord
             this.m_menuPaste.Image = ((System.Drawing.Image)(resources.GetObject("m_menuPaste.Image")));
             this.m_menuPaste.Name = "m_menuPaste";
             this.m_menuPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
-            this.m_menuPaste.Size = new System.Drawing.Size(144, 22);
+            this.m_menuPaste.Size = new System.Drawing.Size(189, 22);
             this.m_menuPaste.Text = "&Paste";
             this.m_menuPaste.Click += new System.EventHandler(this.cmdEditPaste);
+            // 
+            // m_EditMenuSeparator
+            // 
+            this.m_EditMenuSeparator.Name = "m_EditMenuSeparator";
+            this.m_EditMenuSeparator.Size = new System.Drawing.Size(186, 6);
+            // 
+            // m_menuChangeParagraphStyle
+            // 
+            this.m_menuChangeParagraphStyle.Name = "m_menuChangeParagraphStyle";
+            this.m_menuChangeParagraphStyle.Size = new System.Drawing.Size(189, 22);
+            this.m_menuChangeParagraphStyle.Text = "Change Paragraph To";
             // 
             // m_menuGoTo
             // 
@@ -1652,7 +1726,7 @@ namespace OurWord
             this.m_bmHelp});
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 24);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(721, 25);
+            this.m_ToolStrip.Size = new System.Drawing.Size(690, 25);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -3011,9 +3085,25 @@ namespace OurWord
                 wnd.cmdPaste();
 		}
 		#endregion
+        #region Cmd: cmdChangeParagraphStyle
+        private void cmdChangeParagraphStyle(Object sender, EventArgs e)
+        {
+            ToolStripMenuItem mi = sender as ToolStripMenuItem;
+            if (null == mi)
+                return;
 
-		#region Can: canInsertNote
-		public bool canInsertNote
+            string sStyleAbbrev = mi.Tag as string;
+            if (string.IsNullOrEmpty(sStyleAbbrev))
+                return;
+
+            OWWindow wnd = FocusedWindow;
+            if (null != wnd)
+                wnd.cmdChangeParagraphTo(sStyleAbbrev);
+        }
+        #endregion
+
+        #region Can: canInsertNote
+        public bool canInsertNote
 		{
 			get
 			{
@@ -3581,7 +3671,23 @@ return false;
 ***/
 		}
 		#endregion
+        #region Cmd: cmdEditMenuOpening - place a checkmark beside the current style
+        private void cmdEditMenuOpening(object sender, EventArgs e)
+        {
+            // Get the style of the current paragraph
+            string sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
+
+            // Uncheck all of the subitems
+            foreach (ToolStripMenuItem mi in m_menuChangeParagraphStyle.DropDownItems)
+            {
+                mi.Checked = false;
+
+                if (mi.Tag as string == sAbbrev)
+                    mi.Checked = true;
+            }
+        }
 		#endregion
+        #endregion
     }
 
 	#region CLASS G - Globals for convenient access
@@ -4001,7 +4107,7 @@ return false;
                 null);
         }
         #endregion
-        #region SMethod: string GetLoc_NoteDefs(sItemID, sEnglish) -         "Strings\NoteDefs"
+        #region SMethod: string GetLoc_NoteDefs(sItemID, sEnglish) -      "Strings\NoteDefs"
         static public string GetLoc_NoteDefs(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
