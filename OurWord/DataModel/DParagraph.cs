@@ -807,6 +807,195 @@ namespace OurWord.DataModel
 
         // Split / Join Paragraphs -----------------------------------------------------------
         #region Method: DParagraph Split(DBasicText textToSplit, int iTextSplitPos)
+        #region Implementation Class: SplitParagraphMethod
+        class SplitParagraphMethod
+        {
+            // Helper methods ----------------------------------------------------------------
+            #region Method: DParagraph CreateDestinationParagraph(paraToSplit)
+            DParagraph CreateDestinationParagraph(DParagraph paraToSplit)
+            {
+                DSection section = paraToSplit.Section;
+
+                DParagraph paraNew = new DParagraph(paraToSplit.Translation);
+                paraNew.StyleAbbrev = paraToSplit.StyleAbbrev;
+
+                int iParaNew = section.Paragraphs.FindObj(paraToSplit) + 1;
+                section.Paragraphs.InsertAt(iParaNew, paraNew);
+
+                return paraNew;
+            }
+            #endregion
+            #region Method: DBasicText GetNextBasicText(DBasicText)
+            DBasicText GetNextBasicText(DBasicText text)
+            {
+                bool bFound = false;
+
+                DParagraph paraToSplit = text.Paragraph;
+
+                foreach (DRun run in paraToSplit.Runs)
+                {
+                    if (run as DBasicText != null && bFound)
+                        return run as DBasicText;
+
+                    if (run as DBasicText == text)
+                        bFound = true;
+                }
+                return null;
+            }
+            #endregion
+            #region Method: DPhrase DetermineTargetPhrase(dbtToSplit, int iParaSplitPos)
+            DPhrase DetermineTargetPhrase(DBasicText dbtToSplit, int iParaSplitPos)
+                // We want to split the phrase in two, and thus we'll point to the beginning of a phrase
+                // to be moved. If at a phrase boundary, no action is necessary here.
+            {
+                // Find the phrase and position within, where the split will occur
+                int iPhraseSplitPos = iParaSplitPos;
+                DPhrase phraseToMove = null;
+                foreach (DPhrase p in dbtToSplit.Phrases)
+                {
+                    if (p.Text.Length > iPhraseSplitPos)
+                    {
+                        phraseToMove = p;
+                        break;
+                    }
+                    iPhraseSplitPos -= p.Text.Length;
+                }
+
+                // If we are in the midst of a phrase, then split it
+                if (null != phraseToMove && iPhraseSplitPos > 0 && iPhraseSplitPos < phraseToMove.Text.Length)
+                {
+                    phraseToMove = dbtToSplit.Split(phraseToMove, iPhraseSplitPos);
+                }
+
+                // If we aren't pointing to a phrase, then we must be at the end of one; so 
+                // we need to advance to the next DBT
+                if (null == phraseToMove)
+                {
+                    DBasicText dbtNext = GetNextBasicText(dbtToSplit);
+
+                    if (null == dbtNext)
+                    {
+                        DParagraph para = dbtToSplit.Paragraph;
+                        dbtNext = DText.CreateSimple();
+                        para.Runs.Append(dbtNext);
+                    }
+
+                    phraseToMove = dbtNext.Phrases[0] as DPhrase;
+                }
+
+                Debug.Assert(null != phraseToMove);
+                return phraseToMove;
+            }
+            #endregion
+            #region Method: DBasicText DetermineTargetText(DPhrase phraseToMove)
+            DBasicText DetermineTargetText(DPhrase phraseToMove)
+            {
+                // Retrieve the text that is the parent of the phrase we're moving
+                DBasicText textToSplit = phraseToMove.BasicText;
+                Debug.Assert(null != textToSplit);
+
+                // Retrieve its position within the paragraph
+                DParagraph paraToSplit = textToSplit.Paragraph;
+                int iTextPos = paraToSplit.Runs.FindObj(textToSplit);
+                Debug.Assert(-1 != iTextPos);
+
+                // Retrieve the position of the phrase within the parent text
+                int iPhrasePos = textToSplit.Phrases.FindObj(phraseToMove);
+                Debug.Assert( -1 != iPhrasePos);
+
+                // If it isn't the first position, then we need to split the DText into two
+                if (iPhrasePos != 0)
+                {
+                    DText textRight = new DText();
+                    paraToSplit.Runs.InsertAt(iTextPos + 1, textRight);
+
+                    while (textToSplit.Phrases.Count > iPhrasePos)
+                    {
+                        DPhrase phrase = textToSplit.Phrases[iPhrasePos] as DPhrase;
+                        textToSplit.Phrases.Remove(phrase);
+                        textRight.Phrases.Append(phrase);
+                    }
+
+                    textRight.PhrasesBT.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, ""));
+
+                    textToSplit = textRight;
+                }
+
+                return textToSplit;
+            }
+            #endregion
+            #region Method: bool ParagraphHasText(DParagraph)
+            bool ParagraphHasText(DParagraph para)
+            {
+                foreach (DRun run in para.Runs)
+                {
+                    if (run as DBasicText != null)
+                        return true;
+                }
+                return false;
+            }
+            #endregion
+
+            // Public Interface --------------------------------------------------------------
+            #region Constructor()
+            public SplitParagraphMethod()
+            {
+            }
+            #endregion
+            #region Method: DParagraph Run(DBasicText dbtToSplit, int iParaSplitPos)
+            public DParagraph Run(DBasicText dbtToSplit, int iParaSplitPos)
+            {
+                // Point to the paragraph we're about to split
+                DParagraph paraToSplit = dbtToSplit.Paragraph;
+
+                // Create and insert  a new, empty paragraph to receive the right-side of the split
+                DParagraph paraNew = CreateDestinationParagraph(paraToSplit);
+
+                // Determine the target phrase, including splitting it if we're in the middle of it
+                DPhrase phraseToMove = DetermineTargetPhrase(dbtToSplit, iParaSplitPos);
+
+                // Determine the target DBasicText, including splitting it if we're in the middle of it
+                DBasicText dbtToMove = DetermineTargetText(phraseToMove);
+
+                // Move the phrases to the new paragraph
+                int iMove = paraToSplit.Runs.FindObj(dbtToMove);
+                Debug.Assert(iMove != -1); // Shouldn't be -1 (not found)
+                Debug.Assert(iMove != 0);  // Shouldn't be 0 (the first DBT)
+                while (paraToSplit.Runs.Count > iMove)
+                {
+                    DRun run = paraToSplit.Runs.RemoveAt(iMove) as DRun;
+                    Debug.Assert(null != run);
+                    paraNew.Runs.Append(run);
+                }
+
+                // Boundary condition: if we just moved all of the editable stuff out of the paragraph,
+                // then we need to insert something blank and editable
+                if (!ParagraphHasText(paraToSplit))
+                    paraToSplit.Runs.Append( DText.CreateSimple() );
+
+                // Boundary condition: the new paragraph must have a text as well
+                if (!ParagraphHasText(paraNew))
+                    paraNew.Runs.InsertAt(0, DText.CreateSimple() );
+
+                // Boundary condition: don't let paraToSplit end in Verse or Chapter
+                while (paraToSplit.Runs.Count > 0)
+                {
+                    int i = paraToSplit.Runs.Count - 1;
+                    DRun run = paraToSplit.Runs[i] as DRun;
+                    if (run as DVerse == null && run as DChapter == null)
+                        break;
+
+                    paraToSplit.Runs.Remove(run);
+                    paraNew.Runs.InsertAt(0, run);
+                }
+
+                // Return our new paragraph
+                return paraNew;
+            }
+            #endregion
+        }
+        #endregion
+        #region Method: DParagraph Split(DBasicText textToSplit, int iTextSplitPos)
         /// <summary>
         /// Splits the paragraph into two.
         /// </summary>
@@ -814,7 +1003,12 @@ namespace OurWord.DataModel
         /// <param name="iTextSplitPos">The position within the "textToSplit" where the split will happen.</param>
         public DParagraph Split(DBasicText textToSplit, int iTextSplitPos)
         {
-            // Create a new paragraph and insert it to follow the old one
+            SplitParagraphMethod m = new SplitParagraphMethod();
+            return m.Run(textToSplit, iTextSplitPos);
+
+            #region OBSOLETE SOON - 20feb08 - What I originally wrote in Tepic; replaced by SplitParagraphMethod class
+            /***
+            // Create a new paragraph and insert it in the DSection to follow the old one
             DParagraph paraNew = new DParagraph(Translation);
             paraNew.StyleAbbrev = StyleAbbrev;
             int iParaNew = Section.Paragraphs.FindObj(this) + 1;
@@ -834,14 +1028,30 @@ namespace OurWord.DataModel
             }
 
             // If we don't have a phrase here, then it means we are asking to split at the
-            // end of a phrase. So add an empty one and point to it.
+            // end of a phrase. 
+            // - If we are at the last editable phrase in the paragraph, then we'll want to
+            //     append another DText/DPhrase to the end of the paragraph, so to have 
+            //     something to move to the next paragraph.
+            // - If we are mid-paragraph, then we want to point to the next available
+            //     DPhrase and conduct the split there.
             if (null == phrase)
             {
-                Debug.Assert(textToSplit.Phrases.Count > 0);
-                DPhrase lastPhrase = textToSplit.Phrases[textToSplit.Phrases.Count - 1] as DPhrase;
-                Debug.Assert(null != lastPhrase);
-                phrase = new DPhrase(lastPhrase.CharacterStyleAbbrev, "");
-                textToSplit.Phrases.Append(phrase);
+                DBasicText NextText = paraNew.NextBasicText(textToSplit);
+
+                if (null == NextText)
+                {
+                    Debug.Assert(textToSplit.Phrases.Count > 0);
+                    DPhrase lastPhrase = textToSplit.Phrases[textToSplit.Phrases.Count - 1] as DPhrase;
+                    Debug.Assert(null != lastPhrase);
+                    phrase = new DPhrase(lastPhrase.CharacterStyleAbbrev, "");
+                    textToSplit.Phrases.Append(phrase);
+                }
+                else
+                {
+                    textToSplit = NextText;
+                    phrase = textToSplit.Phrases[0];
+                    iPhraseSplitPos = 0;
+                }
             }
 
             // Set indices to our target text and phrase
@@ -899,8 +1109,23 @@ namespace OurWord.DataModel
             if (!bFound)
                 paraNew.Runs.Append(DText.CreateSimple(""));
 
+            // Boundary Condition: Don't leave a chapter or a verse orphaned at the end of a paragraph
+            while (Runs.Count > 0)
+            {
+                int i = Runs.Count - 1;
+                DRun run = Runs[i] as DRun;
+                if (run as DVerse == null && run as DChapter == null)
+                    break;
+
+                Runs.Remove(run);
+                paraNew.Runs.InsertAt(0, run);
+            }
+
             return paraNew;
+            ***/
+            #endregion
         }
+        #endregion
         #endregion
         #region Method: void JoinToNext()
         public void JoinToNext()
@@ -920,7 +1145,7 @@ namespace OurWord.DataModel
                 this.Runs.Append(run);
             }
 
-            // Remove it from the owner
+            // ctrlRemove it from the owner
             Section.Paragraphs.Remove(pNext);
 
             // Get rid of any spurious spaces, etc.
@@ -965,8 +1190,11 @@ namespace OurWord.DataModel
             }
 
             // If the user said "Do Nothing", then we're done here
-            if (DialogCopyBTConflict.CopyBTAction == DialogCopyBTConflict.Actions.kKeepExisting)
+            if (HasBackTranslationText &&
+                DialogCopyBTConflict.CopyBTAction == DialogCopyBTConflict.Actions.kKeepExisting)
+            {
                 return true;
+            }
 
             // Perform the copy (or append, depending)
 			for(int i = 0; i < Runs.Count; i++)
@@ -1535,15 +1763,15 @@ namespace OurWord.DataModel
             // Create a test paragraph
             DParagraph p = SplitParagraphSetup();
 
-            // Split after verse 17 (the 17 should go stay with the left (original) paragraph)
+            // Split after verse 17 (the 17 should go to the new paragraph)
             p.Split(p.Runs[4] as DBasicText, 0);
             Assert.AreEqual(2, m_section.Paragraphs.Count, "Split Count");
             DParagraph pLeft = m_section.Paragraphs[0] as DParagraph;
             DParagraph pRight = m_section.Paragraphs[1] as DParagraph;
-            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one and only son{v 17}",
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one and only son",
                 pLeft.DebugString,
                 "Split Left");
-            Assert.AreEqual("that whosoever believes in him |ishall not perish, |rbut have everlasting life.",
+            Assert.AreEqual("{v 17}that whosoever believes in him |ishall not perish, |rbut have everlasting life.",
                 pRight.DebugString,
                 "Split Right");
 
@@ -1566,7 +1794,7 @@ namespace OurWord.DataModel
             // Create a test paragraph
             DParagraph p = SplitParagraphSetup();
 
-            // Split after verse 17 (the 17 should go stay with the left (original) paragraph)
+            // Split before verse 17 (the 17 should go with the newly-formed paragraph)
             p.Split(p.Runs[2] as DBasicText, 60);
             Assert.AreEqual(2, m_section.Paragraphs.Count, "Split Count");
             DParagraph pLeft = m_section.Paragraphs[0] as DParagraph;

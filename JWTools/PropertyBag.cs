@@ -28,8 +28,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
-
 using System.Reflection;
+using System.Windows.Forms;
 
 #endregion
 
@@ -836,6 +836,105 @@ namespace JWTools
                 v[i] = FontFamily.Families[i].Name;
 
             return new StandardValuesCollection(v);
+        }
+        #endregion
+    }
+    #endregion
+
+    #region CLASS: PathForPropertyGrid
+    public class PathForPropertyGrid
+    {
+        public string Path;
+        public string Filter = "All | *.*";
+
+        #region Constructor(sPath, sFilter)
+        public PathForPropertyGrid(string path, string filter)
+        {
+            Path = path;
+            Filter = filter;
+        }
+        #endregion
+
+        #region Method: string ToString()
+        public override string ToString()
+        {
+            return GetTruncatedPath(Path);
+        }
+        #endregion
+        #region Method: PathForPropertyGrid Clone()
+        public PathForPropertyGrid Clone()
+        {
+            return new PathForPropertyGrid(Path, Filter);
+        }
+        #endregion
+        #region Method: string GetTruncatedPath(string path)
+        public string GetTruncatedPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return "";
+
+            System.IO.DirectoryInfo dir = new System.IO.DirectoryInfo(path);
+            if (dir != null)
+            {
+                string directParent = string.Empty;
+                string parentParent = string.Empty;
+                string rootDir = string.Empty;
+                string ellipsis = "...";
+                System.IO.DirectoryInfo p = dir.Parent;
+                if ((p != null) && (p.Name != dir.Root.Name))
+                {
+                    directParent = p.Name + @"\";
+                    System.IO.DirectoryInfo pp = p.Parent;
+                    if ((pp != null) && (pp.Name != dir.Root.Name))
+                    {
+                        parentParent = pp.Name + @"\";
+                    }
+                    else
+                    {
+                        ellipsis = string.Empty;
+                    }
+                }
+                else
+                {
+                    ellipsis = string.Empty;
+                }
+                return dir.Root.Name + ellipsis + parentParent + directParent + dir.Name;
+            }
+            return path;
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: FilePathEditor : UITypeEditor
+    public class FilePathEditor : UITypeEditor
+    {
+        #region OMethod: UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+        #endregion
+        #region OMethod: object EditValue(...)
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            PathForPropertyGrid pathWrapper = value as PathForPropertyGrid;
+
+            System.Windows.Forms.OpenFileDialog dialog = new OpenFileDialog();
+            dialog.FileName = pathWrapper.Path;
+
+            dialog.Filter = pathWrapper.Filter;
+
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                //have to make a new object, or the propertyGrid will think we didn't change anything
+                PathForPropertyGrid p = pathWrapper.Clone();
+                p.Path = dialog.FileName;
+                return p;
+            }
+            else
+            {
+                return value;
+            }
         }
         #endregion
     }

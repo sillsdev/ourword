@@ -289,6 +289,7 @@ namespace OurWord.Dialogs
             const string c_sPropFontHeight = "propFontHeight";
             const string c_sPropBold = "propBold";
             const string c_sPropItalic = "propItalic";
+            const string c_sPropStrikeout = "propStrikeout";
 
             #region Attr{g}: JFontForWritingSystem FWS
             public JFontForWritingSystem FWS
@@ -335,6 +336,12 @@ namespace OurWord.Dialogs
                     Debug.Assert(null != ps);
                     e.Value = ps.GetBoolString(FWS.IsItalic);
                 }
+                else if (e.Property.ID == c_sPropStrikeout)
+                {
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ps);
+                    e.Value = ps.GetBoolString(FWS.IsStrikeout);
+                }
             }
             #endregion
             #region Method: void FontPropertyBag_SetValue(...)
@@ -359,6 +366,12 @@ namespace OurWord.Dialogs
                     YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ps);
                     FWS.IsItalic = ps.IsTrue(e.Value);
+                }
+                else if (e.Property.ID == c_sPropStrikeout)
+                {
+                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ps);
+                    FWS.IsStrikeout = ps.IsTrue(e.Value);
                 }
             }
             #endregion
@@ -408,6 +421,14 @@ namespace OurWord.Dialogs
                     false
                     ));
 
+                Properties.Add(new YesNoPropertySpec(
+                   c_sPropStrikeout,
+                   "Strikeout?",
+                   "",
+                   "If Yes, the font is displayed with a line through the middle.",
+                   false
+                   ));
+
                 // Listen for the callbacks
                 GetValue += new PropertySpecEventHandler(FontPropertyBag_GetValue);
                 SetValue += new PropertySpecEventHandler(FontPropertyBag_SetValue);
@@ -436,6 +457,17 @@ namespace OurWord.Dialogs
                 {
                     s += (", ");
                     foreach (char ch in FindPropertySpec(c_sPropItalic).Name)
+                    {
+                        if (!char.IsPunctuation(ch))
+                            s += ch;
+                    }
+                }
+
+                // Add Strikeout if strikeout is true
+                if (FWS.IsStrikeout)
+                {
+                    s += (", ");
+                    foreach (char ch in FindPropertySpec(c_sPropStrikeout).Name)
                     {
                         if (!char.IsPunctuation(ch))
                             s += ch;
@@ -788,7 +820,7 @@ namespace OurWord.Dialogs
         #region Method: void PopulateList()
         private void PopulateList()
         {
-            // Remove any items currently in the list (else we'd be adding duplicates)
+            // ctrlRemove any items currently in the list (else we'd be adding duplicates)
             m_listStyles.Items.Clear();
 
             // Add the paragraph styles

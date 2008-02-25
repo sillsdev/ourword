@@ -104,6 +104,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Palaso.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="PalasoUIWindowsForms, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\PalasoUIWindowsForms.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -166,12 +174,22 @@
       <SubType>Designer</SubType>
       <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dictionary\DictionaryPane.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DictionaryPane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Layouts\NotesTabPage.resx">
       <SubType>Designer</SubType>
       <DependentUpon>NotesTabPage.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Merge\MergePane.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>MergePane.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Res\FileNew.gif" />
     <EmbeddedResource Include="Res\FileOpen.gif" />
+    <EmbeddedResource Include="Res\DeleteMergeFile.ico" />
+    <None Include="Res\editfind.gif" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
       <SubType>Designer</SubType>
@@ -201,6 +219,9 @@
     <EmbeddedResource Include="Res\JobNaturalness.ico" />
     <EmbeddedResource Include="Res\JobBT.ico" />
     <EmbeddedResource Include="Res\JobDrafting.ico" />
+    <None Include="Res\MergeConfigure.bmp" />
+    <None Include="Res\MergePrevDiff.bmp" />
+    <None Include="Res\MergNextDiff.bmp" />
     <Content Include="Res\NoteEdit.ico" />
     <Content Include="Res\NoteInsert.ico" />
     <Content Include="Res\NoteMerge.ico" />
@@ -450,6 +471,12 @@
     <Compile Include="Dialogs\WizNewProject\WizNew_TeamSettings.Designer.cs">
       <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dictionary\DictionaryPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dictionary\DictionaryPane.Designer.cs">
+      <DependentUpon>DictionaryPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="Edit\OWPara.cs">
     </Compile>
     <Compile Include="Edit\OWWindow.cs">
@@ -474,6 +501,14 @@
     </Compile>
     <Compile Include="Layouts\NotesTabPage.Designer.cs">
       <DependentUpon>NotesTabPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Merge\DiffText.cs" />
+    <Compile Include="Merge\DMergeBook.cs" />
+    <Compile Include="Merge\MergePane.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Merge\MergePane.Designer.cs">
+      <DependentUpon>MergePane.cs</DependentUpon>
     </Compile>
     <Compile Include="OurWordMain.cs">
       <SubType>Form</SubType>

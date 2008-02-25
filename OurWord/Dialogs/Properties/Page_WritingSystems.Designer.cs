@@ -75,7 +75,7 @@ namespace OurWord.Dialogs
             this.m_btnRemove.Name = "m_btnRemove";
             this.m_btnRemove.Size = new System.Drawing.Size(69, 23);
             this.m_btnRemove.TabIndex = 8;
-            this.m_btnRemove.Text = "Remove...";
+            this.m_btnRemove.Text = "ctrlRemove...";
             this.m_btnRemove.UseVisualStyleBackColor = true;
             this.m_btnRemove.Click += new System.EventHandler(this.cmdRemoveBtnClicked);
             // 

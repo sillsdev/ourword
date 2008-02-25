@@ -2232,7 +2232,7 @@ namespace OurWord.DataModel
 						HelpSystem.Topic.kErrMissingParagraphMarkerForCF,
 						field.LineNo);
 
-				// Remove any asterix's (*) (an anomaly in the Timor data)
+				// ctrlRemove any asterix's (*) (an anomaly in the Timor data)
 				// TODO: Do we need to parameterize whether or not this action
 				// is executed?
 				string s = "";

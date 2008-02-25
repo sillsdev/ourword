@@ -102,8 +102,10 @@ namespace OurWord.Dialogs
 
         // Property Grid ---------------------------------------------------------------------
         const string c_sPropName = "propName";
+        const string c_sPropAbbrev = "propAbbrev";
         const string c_sPropPunctuation = "propPunctuation";
         const string c_sPropEndPunctuation = "propEndPunctuation";
+        const string c_sPropKeyboard = "propKeyboard";
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
         PropertyBag Bag
         {
@@ -121,6 +123,16 @@ namespace OurWord.Dialogs
             if (e.Property.ID == c_sPropName)
             {
                 e.Value = WritingSystem.Name;
+            }
+
+            else if (e.Property.ID == c_sPropAbbrev)
+            {
+                e.Value = WritingSystem.Abbrev;
+            }
+
+            else if (e.Property.ID == c_sPropKeyboard)
+            {
+                e.Value = WritingSystem.KeyboardName;
             }
 
             else if (e.Property.ID == c_sPropPunctuation)
@@ -166,6 +178,16 @@ namespace OurWord.Dialogs
                 m_listWritingSystems.SelectedItem = WritingSystem.Name;
             }
 
+            // Abbreviation
+            if (e.Property.ID == c_sPropAbbrev)
+            {
+                WritingSystem.Abbrev = (string)e.Value;
+            }
+
+            // Keyboard Name
+            if (e.Property.ID == c_sPropKeyboard)
+                WritingSystem.KeyboardName = (string)e.Value;
+
             // Punctuation
             if (e.Property.ID == c_sPropPunctuation)
             {
@@ -199,6 +221,34 @@ namespace OurWord.Dialogs
                 null);
             if (WritingSystem.Name == DStyleSheet.c_Latin)
                 ps.Attributes = new Attribute[] { ReadOnlyAttribute.Yes };
+            ps.DontLocalizeCategory = true;
+            Bag.Properties.Add(ps);
+
+            // Abbreviation / ID
+            ps = new PropertySpec(
+                c_sPropAbbrev,
+                "Abbreviation / ID",
+                typeof(string),
+                WritingSystem.Name,
+                "A short abbreviation of the Writing System's name. This is used as an " +
+                    "ID for the WeSay dictionary.",
+                "",
+                "",
+                null);
+            ps.DontLocalizeCategory = true;
+            Bag.Properties.Add(ps);
+
+            // Keyboard name
+            ps = new PropertySpec(
+                c_sPropKeyboard,
+                "Keyboard Name",
+                typeof(string),
+                WritingSystem.Name,
+                "The name of the keyboard to use when typing in this writing system " +
+                    "(Windows IME, Keyman, etc.)",
+                "",
+                "",
+                null);
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
 
@@ -304,7 +354,7 @@ namespace OurWord.Dialogs
 
             // TODO: Need an AreYouSure message
             
-            // Remove it from the StyleSheet
+            // ctrlRemove it from the StyleSheet
             G.StyleSheet.WritingSystems.Remove(WritingSystem);
 
             // Rebuild the list and select the first item in it

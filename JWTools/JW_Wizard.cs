@@ -203,7 +203,7 @@ namespace JWTools
             InitializeComponent();
 
             //The Name that the LocDB will use
-            this.Name = "WizImportBook";
+            this.Name = sName;
             this.Text = sEnglishTitle;
 
             // The array of pages

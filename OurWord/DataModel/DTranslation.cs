@@ -39,7 +39,7 @@ using OurWord.Dialogs;
  * - The Title Bar shows the translation name, e.g., "Kupang Properties"; this changes when the 
  *   TranslationName field is edited.
  * 
- * - The Remove button asks the user to verify his intention, then removes the book from
+ * - The ctrlRemove button asks the user to verify his intention, then removes the book from
  *   the list (but not from the disk)
  */
 #endregion

@@ -69,16 +69,78 @@ namespace OurWord.DataModel
 		}
         static private bool m_bVD_ShowTranslationsPane = false;
 		#endregion
-		#region Method void DeclareAttrs()
+        #region BAttr{g/s}: bool ShowMergePane
+        static public bool ShowMergePane
+        {
+            get
+            {
+                return m_bShowMergePane;
+            }
+            set
+            {
+                m_bShowMergePane = value;
+            }
+        }
+        static private bool m_bShowMergePane = false;
+        #endregion
+        #region BAttr{g/s}: bool ShowDictionaryPane
+        static public bool ShowDictionaryPane
+        {
+            get
+            {
+                return m_bShowDictionaryPane;
+            }
+            set
+            {
+                m_bShowDictionaryPane = value;
+            }
+        }
+        static private bool m_bShowDictionaryPane = false;
+        #endregion
+        #region BAttr{g/s}: string PathToDictionaryApp - e.g., where to find WeSay
+        public string PathToDictionaryApp
+        {
+            get
+            {
+                return m_sPathToDictionaryApp;
+            }
+            set
+            {
+                SetValue(ref m_sPathToDictionaryApp, value);
+            }
+        }
+        private string m_sPathToDictionaryApp = "";
+        #endregion
+        #region BAttr{g/s}: string PathToDictionaryData - e.g., where to find WeSay
+        public string PathToDictionaryData
+        {
+            get
+            {
+                return m_sPathToDictionaryData;
+            }
+            set
+            {
+                SetValue(ref m_sPathToDictionaryData, value);
+            }
+        }
+        private string m_sPathToDictionaryData = "";
+        #endregion
+
+        #region Method void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
 
 			DefineAttr("Comment",        ref m_sComment);
 
+            DefineAttr("DictApp", ref m_sPathToDictionaryApp);
+            DefineAttr("DictData", ref m_sPathToDictionaryData);
+
 			DefineAttr("vdShowNotes",    ref m_bVD_ShowNotesPane);
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
-		}
+            DefineAttr("ShowMerge",      ref m_bShowMergePane);
+            DefineAttr("ShowDictionary", ref m_bShowDictionaryPane);
+        }
 		#endregion
 
         // JAttrs: ---------------------------------------------------------------------------
@@ -249,6 +311,18 @@ namespace OurWord.DataModel
             }
         }
         #endregion
+
+        // Dictionary ------------------------------------------------------------------------
+        public OurWord.Edit.Dictionary Dictionary
+        {
+            get
+            {
+                if (null == m_Dictionary)
+                    m_Dictionary = new OurWord.Edit.Dictionary(this);
+                return m_Dictionary;
+            }
+        }
+        OurWord.Edit.Dictionary m_Dictionary = null;
 
         // Navigation ------------------------------------------------------------------------
 		#region EMBEDDED CLASS: Navigation
@@ -765,8 +839,21 @@ namespace OurWord.DataModel
             DisplayName = c_sDefaultProjectName;
 		}
 		#endregion
-		#region Method: void _ConstructAttrs()
-		private void _ConstructAttrs()
+        #region Destructor()
+        ~DProject()
+        {
+            Dispose();
+        }
+        #endregion
+        #region Method: void Dispose()
+        public void Dispose()
+        {
+            if (null != m_Dictionary)
+                m_Dictionary.Dispose();
+        }
+        #endregion
+        #region Method: void _ConstructAttrs()
+        private void _ConstructAttrs()
 		{
             // Team Settings
             j_oTeamSettings = new JOwn("Team", this, typeof(DTeamSettings));

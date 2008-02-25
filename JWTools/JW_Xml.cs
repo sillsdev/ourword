@@ -219,7 +219,15 @@ namespace JWTools
             return " " + sAttr + "=\"" + sData + "\"";
 		}
 		#endregion
-		#region Method: void WriteBlankLine() - desirable sometimes for aesthetic reasons
+        #region Method: string GetAttrString(sAttr, sValue) - produces " amount="10""
+        public string GetAttrString(string sAttr, int nValue)
+        {
+            string sValue = nValue.ToString();
+            string sData = _AmpersandsAndSuch(sValue);
+            return " " + sAttr + "=\"" + sData + "\"";
+        }
+        #endregion
+        #region Method: void WriteBlankLine() - desirable sometimes for aesthetic reasons
 		public void WriteBlankLine()
 		{
 			m_writer.WriteLine("");

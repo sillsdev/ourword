@@ -80,8 +80,8 @@ namespace OurWord.View
             }
         }
         #endregion
-        #region Attr{g}: override string PassageName
-        public override string PassageName
+        #region Attr{g}: override string LanguageInfo
+        public override string LanguageInfo
         {
             get
             {
@@ -92,9 +92,6 @@ namespace OurWord.View
                    G.TTranslation.DisplayName.ToUpper();
 
                 string s = LocDB.Insert(sBase, new string[] { sTargetName });
-
-                if (null != G.FTranslation && null != G.TTranslation && null != G.STarget)
-                    s += (" - " + G.STarget.ReferenceName);
 
                 return s;
             }
@@ -131,7 +128,14 @@ namespace OurWord.View
                     continue;
 
                 // Add the vernacular paragraph
-                AddParagraph(0, p, OWPara.Flags.None);
+                OWPara op = new OWPara(
+                    this,
+                    p.Translation.WritingSystemVernacular,
+                    p.Style,
+                    p,
+                    BackColor,
+                    OWPara.Flags.None);
+                AddParagraph(0, op);
 
                 // For certain types of paragraphs, we just display them on the BT side, rather
                 // than back-translating them. These paragraphs are ones we generated from the 
@@ -140,8 +144,21 @@ namespace OurWord.View
                 OWPara.Flags options = OWPara.Flags.None;
                 // If the vernacular was editable, then we want to show the back translation
                 if (p.IsUserEditable)
+                {
                     options = (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable);
-                AddParagraph(1, p, options);
+                    if (OurWordMain.TargetIsLocked)
+                        options |= OWPara.Flags.IsLocked;
+                }
+
+                // Create and add the display paragraph
+                op = new OWPara(
+                    this,
+                    p.Translation.WritingSystemConsultant,
+                    p.Style,
+                    p,
+                    ((p.IsUserEditable) ? EditableBackgroundColor : BackColor),
+                    options);
+                AddParagraph(1, op);
             }
 
             // Load the footnotes
@@ -151,12 +168,34 @@ namespace OurWord.View
                 StartNewRow(bFirstFootnote, null);
                 bFirstFootnote = false;
 
-                AddParagraph(0, fn, OWPara.Flags.None);
+                // Add the vernacular paragraph
+                OWPara op = new OWPara(
+                    this,
+                    fn.Translation.WritingSystemVernacular,
+                    fn.Style,
+                    fn,
+                    BackColor,
+                    OWPara.Flags.None);
+                AddParagraph(0, op);
 
-                OWPara.Flags options = (fn.IsUserEditable) ?
-                    (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable) :
-                    (OWPara.Flags.None);
-                AddParagraph(1, fn, options);
+                // Options for the display paragraph
+                OWPara.Flags options = OWPara.Flags.None;
+                if (fn.IsUserEditable)
+                {
+                    options = (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable);
+                    if (OurWordMain.TargetIsLocked)
+                        options |= OWPara.Flags.IsLocked;
+                }
+
+                // Create and add the display paragraph
+                op = new OWPara(
+                    this,
+                    fn.Translation.WritingSystemConsultant,
+                    fn.Style,
+                    fn,
+                    ((fn.IsUserEditable) ? EditableBackgroundColor : BackColor),
+                    options);
+                AddParagraph(1, op);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

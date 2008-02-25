@@ -39,10 +39,15 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: void Clear() - remove all TabPages
+        #region Method: void Clear() - remove all TabPages; null's the OWWindows individually
         public void Clear()
         {
             TabPages.Clear();
+
+            m_NotesWindow = null;
+            m_MergePane = null;
+            m_TranslationsWindow = null;
+            m_DictionaryPane = null;
         }
         #endregion
         #region Method: void AddPage(string sKey, string sTitle)
@@ -80,20 +85,24 @@ namespace OurWord.Edit
                 wndMain.RegisterSecondaryWindow(NotesWindow);
             if (HasTranslationsWindow)
                 wndMain.RegisterSecondaryWindow(TranslationsWindow);
-
+            if (HasMergePane)
+                wndMain.RegisterSecondaryWindow(MergePane.WndMerge);
         }
         #endregion
         #region Method: void SetChildrenSizes()
         public void SetChildrenSizes()
         {
             if (HasNotesWindow)
-            {
                 NotesWindow.SetSize(DisplayRectangle.Width, DisplayRectangle.Height);
-            }
+
             if (HasTranslationsWindow)
-            {
                 TranslationsWindow.SetSize(DisplayRectangle.Width, DisplayRectangle.Height);
-            }
+
+            if (HasMergePane)
+                MergePane.SetSize(DisplayRectangle.Size);
+
+            if (HasDictionaryPane)
+                DictionaryPane.SetSize(DisplayRectangle.Size);
         }
         #endregion
         #region Method: void SetZoomFactor(float fZoomFactor)
@@ -114,13 +123,46 @@ namespace OurWord.Edit
                     return NotesWindow;
                 if (HasTranslationsWindow && TranslationsWindow.Focused)
                     return TranslationsWindow;
+                if (HasMergePane && MergePane.WndMerge.Focused)
+                    return MergePane.WndMerge;
                 return null;
+            }
+        }
+        #endregion
+        #region Method: CreateContainerTabPage( ctrl, sInternalName, sDisplayName )
+        void CreateContainerTabPage( Control ctrl, string sInternalName, string sDisplayName )
+        {
+            TabPage page = new TabPage();
+            page.Name = sInternalName;
+            page.Text = sDisplayName;
+            page.Controls.Add(ctrl);
+            TabPages.Add(page);
+        }
+        #endregion
+        #region Method: void ActivatePane(Control ctrl)
+        void ActivatePane(Control ctrl)
+        {
+            foreach (TabPage page in TabPages)
+            {
+                if (page == ctrl)
+                {
+                    SelectTab(page);
+                    return;
+                }
+
+                foreach (Control c in page.Controls)
+                {
+                    if (c == ctrl)
+                    {
+                        SelectTab(page);
+                        return;
+                    }
+                }
             }
         }
         #endregion
 
         // Notes Window ----------------------------------------------------------------------
- //       NotesTabPage m_NotesTabPage;
         #region Attr{g}: NotesWindow NotesWindow
         public NotesWindow NotesWindow
         {
@@ -138,31 +180,7 @@ namespace OurWord.Edit
             // Create a Notes Window
             m_NotesWindow = new NotesWindow();
 
-            // Create a TabPage to contain it
-            TabPage page1 = new TabPage();
-            page1.Name = "Notes";
-            page1.Text = NotesWindow.WindowName;
-            page1.Controls.Add(m_NotesWindow);
-
-            // Add it to the TabControl
-            TabPages.Add(page1);
-
-            // ---NEW--------------------------
-            /***
-
-            // Create the Notes Control
-            NotesTabPage m_NotesTabPage = new NotesTabPage();
-            m_NotesWindow = m_NotesTabPage.NotesWindow;
-
-            // Create a TabPage to contain it
-            TabPage page = new TabPage();
-            page.Name = "Notes";
-            page.Text = NotesWindow.WindowName;
-            page.Controls.Add(m_NotesTabPage);
-
-            // Add it to the TabControl
-            TabPages.Add(page);
-            ***/
+            CreateContainerTabPage(m_NotesWindow, "Notes", NotesWindow.WindowName);
         }
         #endregion
         #region Attr{g}: bool HasNotesWindow
@@ -193,6 +211,11 @@ namespace OurWord.Edit
             // Create a Notes Window
             m_TranslationsWindow = new TranslationsWindow();
 
+            CreateContainerTabPage(m_TranslationsWindow, 
+                "Translations", 
+                TranslationsWindow.WindowName);
+
+            /*** OBSOLETE
             // Create a TabPage to contain it
             TabPage page = new TabPage();
             page.Name = "Translations";
@@ -201,6 +224,7 @@ namespace OurWord.Edit
 
             // Add it to the TabControl
             TabPages.Add(page);
+            ***/
         }
         #endregion
         #region Attr{g}: bool HasTranslationsWindow
@@ -210,6 +234,76 @@ namespace OurWord.Edit
             {
                 return (m_TranslationsWindow != null);
             }
+        }
+        #endregion
+
+        // Merge Window ----------------------------------------------------------------------
+        #region Attr{g}: MergePane MergePane
+        public MergePane MergePane
+        {
+            get
+            {
+                Debug.Assert(null != m_MergePane);
+                return m_MergePane;
+            }
+        }
+        MergePane m_MergePane = null;
+        #endregion
+        #region Method: void CreateMergePane()
+        public void CreateMergePane()
+        {
+            m_MergePane = new MergePane();
+            CreateContainerTabPage(m_MergePane, "Merge", "Merge");
+        }
+        #endregion
+        #region Attr{g}: bool HasMergePane
+        public bool HasMergePane
+        {
+            get
+            {
+                return (m_MergePane != null);
+            }
+        }
+        #endregion
+        #region Method: void ActivateMergePane()
+        public void ActivateMergePane()
+        {
+            ActivatePane(MergePane);
+        }
+        #endregion
+
+        // Dictionary Window -----------------------------------------------------------------
+        #region Attr{g}: DictionaryPane DictionaryPane
+        public DictionaryPane DictionaryPane
+        {
+            get
+            {
+                Debug.Assert(null != m_DictionaryPane);
+                return m_DictionaryPane;
+            }
+        }
+        DictionaryPane m_DictionaryPane = null;
+        #endregion
+        #region Method: void CreateDictionaryPane()
+        public void CreateDictionaryPane()
+        {
+            m_DictionaryPane = new DictionaryPane();
+            CreateContainerTabPage(m_DictionaryPane, "Dictionary", "Dictionary");
+        }
+        #endregion
+        #region Attr{g}: bool HasDictionaryPane
+        public bool HasDictionaryPane
+        {
+            get
+            {
+                return (m_DictionaryPane != null);
+            }
+        }
+        #endregion
+        #region Method: void ActivateDictionaryPane()
+        public void ActivateDictionaryPane()
+        {
+            ActivatePane(DictionaryPane);
         }
         #endregion
 
@@ -366,10 +460,24 @@ namespace OurWord.Edit
         #region Method: override void OnAddNote(DNote note, bool bIsEditable)
         protected override void OnAddNote(DNote note, bool bIsEditable)
         {
-            // Add the note to its own unique row
-            StartNewRow();
+            // Determine the note's writing system
+            JWritingSystem ws = note.Paragraph.Translation.WritingSystemConsultant;
+
+            // Determine the note's background
+            Color clrEditableBackground = note.NoteDef.BackgroundColor;
+
+            // Determine the note's editability
             OWPara.Flags options = (bIsEditable) ? OWPara.Flags.IsEditable : OWPara.Flags.None;
-            AddNote(note, options);
+
+            // Determine the note's style
+            JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyle(DNote.StyleAbbrev);
+
+            // Create a OWParagraph for the note
+            OWPara p = new OWPara(this, ws, PStyle, note, clrEditableBackground, options);
+
+            // Add it to the view
+            StartNewRow();
+            AddParagraph(0, p);
         }
         #endregion
         #region Method: override void OnSelectAndScrollToNote(DNote note)
@@ -390,8 +498,12 @@ namespace OurWord.Edit
                     // any rate, we're done.
                     if (para.DataSource == note)
                     {
-                        if (para.Select_BeginningOfFirstWord())
+                        OWWindow.Sel selection = para.Select_BeginningOfFirstWord();
+                        if (null != selection)
+                        {
+                            Selection = selection;
                             Focus();
+                        }
                         return;
                     }
                 }
@@ -413,6 +525,7 @@ namespace OurWord.Edit
         #region Method: void SelectEndOfNote(DNote note)
         public void SelectEndOfNote(DNote note)
         {
+            // Drill down to find the OWPara that corresponds to the note
             foreach (Row row in Rows)
             {
                 foreach (Row.Pile pile in row.Piles)
@@ -421,7 +534,14 @@ namespace OurWord.Edit
                     {
                         if (para.DataSource == note)
                         {
-                            para.Select_EndOfLastWord();
+                            // Attempt to make a selection at the end of this note
+                            OWWindow.Sel selection = para.Select_EndOfLastWord();
+
+                            // If selection made, set the Window's selection to it
+                            if (null != selection)
+                                Selection = selection;
+
+                            // Either way, we're done here
                             return;
                         }
                     }
@@ -615,13 +735,22 @@ namespace OurWord.Edit
                     vRuns = _GetReferenceLanguageParagraphs(t);
                 if (null == vRuns)
                     continue;
-         
-                // Append the row to the window
-                if (vRuns.Length > 0)
-                {
-                    StartNewRow();
-                    AddLabeledText(t, vRuns, t.DisplayName);
-                }
+                if (vRuns.Length == 0)
+                    continue;
+
+                // Determine the writing system from the translation
+                JWritingSystem ws = t.WritingSystemVernacular;
+
+                // The style for Ref Translation paragraphs
+                JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyleOrNormal(
+                    DStyleSheet.c_StyleReferenceTranslation);
+
+                // Create a OWParagraph for the translation paragraph
+                OWPara p = new OWPara(this, ws, PStyle, vRuns, t.DisplayName, OWPara.Flags.None);
+
+                // Add it to the view
+                StartNewRow();
+                AddParagraph(0, p);
             }
 
             LoadData();

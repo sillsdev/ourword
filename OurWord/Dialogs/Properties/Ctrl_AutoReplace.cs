@@ -122,7 +122,7 @@ namespace OurWord.Dialogs
             // The default text for the Add button is "Add"
             m_btnAdd.Text = "Add";
 
-            // The default state for the Remove button is Disabled
+            // The default state for the ctrlRemove button is Disabled
             m_btnRemove.Enabled = false;
 
             // Scan through the list to see if we're looking at an already-existing Replace item
@@ -215,7 +215,7 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-        #region Cmd: cmdRemove - Remove button pressed
+        #region Cmd: cmdRemove - ctrlRemove button pressed
         private void cmdRemove(object sender, EventArgs e)
         {
             string sReplace = this.m_listview.SelectedItems[0].Text;
@@ -256,7 +256,7 @@ namespace OurWord.Dialogs
             SetupButtons();
         }
         #endregion
-        #region Cmd: cmdWithTextChanged - updates the Add/Remove buttons
+        #region Cmd: cmdWithTextChanged - updates the Add/ctrlRemove buttons
         private void cmdWithTextChanged(object sender, EventArgs e)
         {
             SetupButtons();

@@ -441,6 +441,10 @@ namespace OurWord.DataModel
 		public const string c_StyleAbbrevDashed        = "d";
 		public const string c_StyleAbbrevLabel         = "L";
 
+        // User-Interface Only
+        public const string c_CStyleRevisionDeletion = "del";
+        public const string c_CStyleRevisionAddition = "add";
+
 		// Paragraph Style Abbreviations -----------------------------------------------------
         public const string c_StyleSectionTitle        = "s";
 		public const string c_StyleQuote1              = "q";
@@ -451,6 +455,10 @@ namespace OurWord.DataModel
 
         public const string c_StyleMajorSection = "ms";
         public const string c_StyleMajorSectionCrossRef = "mr";
+
+        // User-Interface Only
+        public const string c_PStyleMergeHeader = "MergeHeader";
+        public const string c_PStyleMergeParagraph = "MergeParagraph";
 
 		#region Method: bool IsQuoteStyle(string sAbbrev)
 		static public bool IsQuoteStyle(string sAbbrev)
@@ -700,8 +708,9 @@ namespace OurWord.DataModel
             }
 		}
 		#endregion
-		#region Method: void _InitializeCharacterStyles()
-		private void _InitializeCharacterStyles()
+
+        #region Method: void _InitializeCharacterStyles()
+        private void _InitializeCharacterStyles()
 		{
 			JCharacterStyle charStyle;
 
@@ -781,25 +790,71 @@ namespace OurWord.DataModel
 				charStyle.IsEditable = false;
 			}
 
-			// Int BT Glosses
-			if (null == FindCharacterStyle("ibtGloss"))
-			{
-				charStyle = AddCharacterStyle("ibtGloss", "BT - Glosses");
-				charStyle.SetFonts(false, 11, true);
-			}
-
-			// Int BT Analysis
-			if (null == FindCharacterStyle("ibtAn"))
-			{
-				charStyle = AddCharacterStyle("ibtAn", "BT - Analysis Line");
-				charStyle.SetFonts(false, 8, true);
-			}
 		}
 		#endregion
+
+        #region Method: void _InitializeUIParagraphStyles()
+        private void _InitializeUIParagraphStyles()
+            // TODO: Move appropriate styles to this section
+        {
+            JParagraphStyle style;
+
+            // Merge Window: Header
+            if (null == FindParagraphStyle(c_PStyleMergeHeader))
+            {
+                style = AddParagraphStyle(c_PStyleMergeHeader, "Merge Window Header");
+                style.SetFonts(false, 12, true);
+                style.SpaceAfter = 0;
+            }
+            // Merge Window: Paragraph
+            if (null == FindParagraphStyle(c_PStyleMergeParagraph))
+            {
+                style = AddParagraphStyle(c_PStyleMergeParagraph, "Merge Window Paragraph");
+                style.SetFonts(true, 10, false);
+                style.Alignment = JParagraphStyle.AlignType.kJustified;
+            }
+        }
+        #endregion
+        #region Method: void _InitializeUICharacterStyles()
+        private void _InitializeUICharacterStyles()
+        {
+            JCharacterStyle charStyle;
+
+            // Revision Deletions
+            if (null == FindCharacterStyle(c_CStyleRevisionDeletion))
+            {
+                charStyle = AddCharacterStyle(c_CStyleRevisionDeletion, "Revision Deletion");
+                charStyle.SetFonts(false, 10, false);
+            }
+
+            // Revision Additions
+            if (null == FindCharacterStyle(c_CStyleRevisionAddition))
+            {
+                charStyle = AddCharacterStyle(c_CStyleRevisionAddition, "Revision Addition");
+                charStyle.SetFonts(false, 10, false);
+            }
+
+            // Int BT Glosses
+            if (null == FindCharacterStyle("ibtGloss"))
+            {
+                charStyle = AddCharacterStyle("ibtGloss", "BT - Glosses");
+                charStyle.SetFonts(false, 11, true);
+            }
+
+            // Int BT Analysis
+            if (null == FindCharacterStyle("ibtAn"))
+            {
+                charStyle = AddCharacterStyle("ibtAn", "BT - Analysis Line");
+                charStyle.SetFonts(false, 8, true);
+            }
+        }
+        #endregion
+
+
 		#region Method: void Initialize(bool bClearOutPrevious)
 		public void Initialize(bool bClearOutPrevious)
 		{
-			// Remove the previous data if asked. (Leave the Writing Systems alone for now,
+			// ctrlRemove the previous data if asked. (Leave the Writing Systems alone for now,
 			// as we have the CurrentWS stuff going on.....and I think I'll just want to
 			// get rid of WS's anyway before too long.)
 			if (bClearOutPrevious)
@@ -811,7 +866,9 @@ namespace OurWord.DataModel
 			// Initialize the various parts of the stylesheet
 			_InitializeWritingSystems();
 			_InitializeParagraphStyles();
+            _InitializeUIParagraphStyles();
 			_InitializeCharacterStyles();
+            _InitializeUICharacterStyles();
 		}
 		#endregion
 	}

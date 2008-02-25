@@ -167,7 +167,7 @@ namespace OurWord.Dialogs
             JParagraphStyle pstyle = G.TeamSettings.StyleSheet.FindParagraphStyleOrNormal(
                 DStyleSheet.c_StyleAbbrevNormal);
             DataFile.Font = pstyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).FontNormal;
+                WritingSystem).DefaultFont;
 
 			// Place the error message into the control
 			ErrorText = BookReadError.UserMessage;
@@ -618,7 +618,7 @@ namespace OurWord.Dialogs
             JParagraphStyle PStyle = G.TeamSettings.StyleSheet.FindParagraphStyleOrNormal(
                 DStyleSheet.c_StyleAbbrevNormal);
             FrontFile.Font = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                G.FTranslation.WritingSystemVernacular).FontNormal;
+                G.FTranslation.WritingSystemVernacular).DefaultFont;
 
 			// Front Path
 			m_FrontPathName.Text = FrontPathName;

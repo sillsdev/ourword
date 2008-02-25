@@ -20,6 +20,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 using OurWord.DataModel;
+using Palaso.UI.WindowsForms.Keyboarding;
 using NUnit.Framework;
 #endregion
 
@@ -69,20 +70,6 @@ namespace OurWord.Edit
             }
         }
         int m_cColumnCount = 0;
-        #endregion
-        #region Attr{g/s}: bool LockedFromEditing - If T, can select, but can't insert/delete
-        public bool LockedFromEditing
-        {
-            get
-            {
-                return m_bLockedFromEditing;
-            }
-            set
-            {
-                m_bLockedFromEditing = value;
-            }
-        }
-        bool m_bLockedFromEditing = false;
         #endregion
         #region Attr{g/s}: float ZoomFactor
         public float ZoomFactor
@@ -362,7 +349,7 @@ namespace OurWord.Edit
                 w.OnSelectAndScrollToNote(note);
         }
         #endregion
-        #region Secondary Window Message: OnselectionChanged
+        #region Secondary Window Message: OnSelectionChanged
         public virtual void OnSelectionChanged(DBasicText dbt)
         {
         }
@@ -445,12 +432,30 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region Attr{g}: string LanguageInfo - e.g., "Kupang to AMARASI"
+        public virtual string LanguageInfo
+        {
+            get
+            {
+                return "";
+            }
+        }
+        #endregion
         #region Attr{g}: virtual string PassageName
         public virtual string PassageName
         {
             get
             {
-                return "Passage";
+                if (!G.IsValidProject)
+                    return "";
+                if (null == OurWordMain.Project.TargetTranslation)
+                    return "";
+                if (null == OurWordMain.Project.FrontTranslation)
+                    return "";
+                if (null == OurWordMain.Project.STarget)
+                    return "";
+
+                return G.STarget.ReferenceName;
             }
         }
         #endregion
@@ -601,7 +606,7 @@ namespace OurWord.Edit
                 #endregion
 
                 // Placing Content into the window -------------------------------------------
-                #region Method: void AddParagraph(OWPara p)
+                #region Method: void AddParagraph(OWPara)
                 public void AddParagraph(OWPara p)
                 {
                     // Create a new vector that is one longer
@@ -616,9 +621,12 @@ namespace OurWord.Edit
 
                     // Set the old to point ot the new
                     m_vParagraphs = v;
+
+                    // The paragraph needs to know about the pile it belongs to
+                    p.Pile = this;
                 }
                 #endregion
-                #region Method: void RemoveParagraph(OWPara p)
+                #region Method: void RemoveParagraph(OWPara)
                 public void RemoveParagraph(OWPara p)
                 {
                     // Create a new vector that is one shorted
@@ -723,8 +731,15 @@ namespace OurWord.Edit
                 {
                     foreach (OWPara p in Paragraphs)
                     {
-                        if (p.Select_BeginningOfFirstWord())
+                        // Attempt to make a selection in this paragraph
+                        OWWindow.Sel selection = p.Select_BeginningOfFirstWord();
+
+                        // If a selection was made, then set the Window to it and we're done
+                        if (null != selection)
+                        {
+                            Window.Selection = selection;
                             return true;
+                        }
                     }
                     return false;
                 }
@@ -733,14 +748,22 @@ namespace OurWord.Edit
                 public bool Select_NextWord(int iParaCandidate, int iWordCandidate)
                 {
                     // Attempt within the candidate paragraph first
-                    if (Paragraphs[iParaCandidate].Select_NextWord(iWordCandidate))
+                    OWWindow.Sel selection = Paragraphs[iParaCandidate].Select_NextWord(iWordCandidate);
+                    if (null != selection)
+                    {
+                        Window.Selection = selection;
                         return true;
+                    }
 
                     // Now attempt with all subsequent paragraphs
                     for (int i = iParaCandidate + 1; i < Paragraphs.Length; i++)
                     {
-                        if (Paragraphs[i].Select_BeginningOfFirstWord())
+                        selection = Paragraphs[i].Select_BeginningOfFirstWord();
+                        if (null != selection)
+                        {
+                            Window.Selection = selection;
                             return true;
+                        }
                     }
 
                     // Unable to find something we could select
@@ -752,8 +775,16 @@ namespace OurWord.Edit
                 {
                     for(int i = Paragraphs.Length - 1; i >=0 ; i--)
                     {
-                        if (Paragraphs[i].Select_EndOfLastWord())
+                        // Attempt to make a selection at the end of this paragraph
+                        OWWindow.Sel selection = Paragraphs[i].Select_EndOfLastWord();
+
+                        // If we suceeded, then set the Window's selection to it, and we're done
+                        // Otherwise we'll keep looping to the previous paragraph
+                        if (null != selection)
+                        {
+                            Window.Selection = selection;
                             return true;
+                        }
                     }
                     return false;
                 }
@@ -762,14 +793,22 @@ namespace OurWord.Edit
                 public bool Select_PreviousWord(int iParaCandidate, int iWordCandidate)
                 {
                     // Attempt within the candidate paragraph first
-                    if (Paragraphs[iParaCandidate].Select_PreviousWord(iWordCandidate))
+                    OWWindow.Sel selection = Paragraphs[iParaCandidate].Select_PreviousWord(iWordCandidate);
+                    if (null != selection)
+                    {
+                        Window.Selection = selection;
                         return true;
+                    }
 
                     // Now attempt with all subsequent paragraphs
                     for (int i = iParaCandidate - 1; i >= 0; i--)
                     {
-                        if (Paragraphs[i].Select_EndOfLastWord())
+                        selection = Paragraphs[i].Select_EndOfLastWord();
+                        if (null != selection)
+                        {
+                            Window.Selection = selection;
                             return true;
+                        }
                     }
 
                     // Unable to find something we could select
@@ -800,7 +839,6 @@ namespace OurWord.Edit
                     return -1;
                 }
                 #endregion
-
             }
             #endregion
             #region Attr{g}: Pile[] Piles - the piles in this row
@@ -835,68 +873,20 @@ namespace OurWord.Edit
             #endregion
 
             // Placing Content into the window -----------------------------------------------
-            #region Method: void AddParagraph(int iColumn, DParagraph paragraph, Flags)
-            public void AddParagraph(int iColumn, DParagraph paragraph, OWPara.Flags options)
+            #region Method: void AddParagraph(iCol, OWPara)
+            public void AddParagraph(int iCol, OWPara para)
             {
-                Debug.Assert(iColumn < Window.ColumnCount);
-                Debug.Assert(iColumn >= 0 && iColumn < Piles.Length);
+                // Acceptable parameters
+                Debug.Assert(iCol < Window.ColumnCount);
+                Debug.Assert(iCol >= 0 && iCol < Piles.Length);
+                Debug.Assert(null != para);
 
                 // Retrieve the requested pile
-                Pile pile = Piles[iColumn];
+                Pile pile = Piles[iCol];
                 Debug.Assert(null != pile);
 
-                // Determine the paragraph's writing system depending upon whether or not
-                // the BT is being displayed.
-                JWritingSystem ws = 
-                    ((options & OWPara.Flags.ShowBackTranslation) == 
-                        OWPara.Flags.ShowBackTranslation) ?
-                    paragraph.Translation.WritingSystemConsultant :
-                    paragraph.Translation.WritingSystemVernacular;
-
-                // Create and initialize the new paragraph
-                OWPara p = new OWPara(pile, paragraph, ws, options);
-
                 // Append the paragraph to the pile
-                pile.AddParagraph(p);
-            }
-            #endregion
-            #region Method: void AddNote(DNote note, Flags)
-            public void AddNote(DNote note, OWPara.Flags options)
-            {
-                Debug.Assert(Window.ColumnCount == 1);
-
-                // Retrieve the first pile
-                Debug.Assert(Piles.Length == 1);
-                Pile pile = Piles[0];
-
-                // Determine the note's writing system
-                JWritingSystem ws = note.Paragraph.Translation.WritingSystemConsultant;
-
-                // Create and initialize the new note
-                OWPara p = new OWPara(pile, note, ws, options);
-
-                // Append the note to the pile
-                pile.AddParagraph(p);
-            }
-            #endregion
-            #region Method: void AddLabeledText(DTranslation, DRun[], sLabel)
-            public void AddLabeledText(DTranslation translation, DRun[] vRuns, string sLabel)
-            {
-                Debug.Assert(Window.ColumnCount == 1);
-
-                // Retrieve the first pile
-                Debug.Assert(Piles.Length == 1);
-                Pile pile = Piles[0];
-
-                // Determine the writing system from the Translation
-                Debug.Assert(vRuns.Length > 0);
-                JWritingSystem ws = translation.WritingSystemVernacular;
-
-                // Create and initialize the new text
-                OWPara p = new OWPara(pile, vRuns, ws, sLabel, OWPara.Flags.None);
-
-                // Append it to the pile
-                pile.AddParagraph(p);
+                pile.AddParagraph(para);
             }
             #endregion
 
@@ -1273,13 +1263,9 @@ namespace OurWord.Edit
             m_vRows = v;
         }
         #endregion
-        #region Method: void AddParagraph(int iColumn, DParagraph, Flags)
-        public void AddParagraph(int iColumn, DParagraph paragraph, OWPara.Flags options)
+        #region Method: void AddParagraph(int iCol, OWPara p)
+        public void AddParagraph(int iCol, OWPara p)
         {
-            // Make sure iColumn is within range
-            Debug.Assert(ColumnCount > 0);
-            Debug.Assert(iColumn >= 0 && iColumn < ColumnCount);
-
             // If we do not have any rows, then add one
             if (Rows.Length == 0)
                 StartNewRow();
@@ -1289,43 +1275,7 @@ namespace OurWord.Edit
             Debug.Assert(null != row);
 
             // Add the paragraph to the desired column
-            row.AddParagraph(iColumn, paragraph, options);
-        }
-        #endregion
-        #region Method: void AddNote(DNote note)
-        public void AddNote(DNote note, OWPara.Flags options)
-        {
-            // At this time, we are only supporting a NotesWIndow with a single column
-            Debug.Assert(ColumnCount == 1);
-
-            // If we do not have any rows, then add one
-            if (Rows.Length == 0)
-                StartNewRow();
-
-            // Retrieve the last row in our vector
-            Row row = Rows[Rows.Length - 1];
-            Debug.Assert(null != row);
-
-            // Add the note
-            row.AddNote(note, options);
-        }
-        #endregion
-        #region Method: void AddLabeledText(DTranslation, DRun[], sLabel)
-        public void AddLabeledText(DTranslation translation, DRun[] vRuns, string sLabel)
-        {
-            // At this time, we are only supporting a NotesWIndow with a single column
-            Debug.Assert(ColumnCount == 1);
-
-            // If we do not have any rows, then add one
-            if (Rows.Length == 0)
-                StartNewRow();
-
-            // Retrieve the last row in our vector
-            Row row = Rows[Rows.Length - 1];
-            Debug.Assert(null != row);
-
-            // Add the Labeled Text
-            row.AddLabeledText(translation, vRuns, sLabel);
+            row.AddParagraph(iCol, p);
         }
         #endregion
 
@@ -1929,7 +1879,7 @@ namespace OurWord.Edit
                 G.TTranslation.WritingSystemVernacular;
 
             float fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                ws).FontNormalZoom.Height;
+                ws).LineHeightZoomed;
             ScrollBar.SmallChange = (int)fLineHeight;
 
             // A large change will scroll 4/5 of the window's height
@@ -2587,11 +2537,10 @@ namespace OurWord.Edit
 
                 // Invalidate the word that contains the insertion point
                 Window.Draw.InvalidateBlock(Anchor.Word);
-
             }
             #endregion
             #region Method: void SetupTimer()
-            void SetupTimer()
+            public void SetupTimer()
             {
                 m_Timer = new System.Windows.Forms.Timer();
                 m_Timer.Tick += new EventHandler(OnTimerTick);
@@ -2705,6 +2654,7 @@ namespace OurWord.Edit
             #endregion
 
             // Scaffolding -------------------------------------------------------------------
+            static string s_KeyboardName = "";
             #region Constructor(OWPara, iBlock, iChar)
             public Sel(OWPara paragraph, int iBlock, int iChar)
                 : this(paragraph, new SelPoint(iBlock, iChar), null)
@@ -2712,8 +2662,8 @@ namespace OurWord.Edit
             }
             #endregion
             #region Constructor(OWPara, SelPoint Anchor)
-            public Sel(OWPara para, SelPoint Anchor)
-                : this(para, Anchor, null)
+            public Sel(OWPara paragraph, SelPoint Anchor)
+                : this(paragraph, Anchor, null)
             {
             }
             #endregion
@@ -2758,6 +2708,17 @@ namespace OurWord.Edit
                     Window.Draw.InvalidateBlock(Anchor.Word);
                 else
                     Window.Draw.InvalidateParagraph(Paragraph);
+
+                // Set the keyboard if necessary (we check the writing system of this
+                // new selection, and switch the keyboard if its name has changed.)
+                if (m_Paragraph.WritingSystem.KeyboardName != s_KeyboardName)
+                {
+                    s_KeyboardName = m_Paragraph.WritingSystem.KeyboardName;
+                    if (string.IsNullOrEmpty(s_KeyboardName))
+                        KeyboardController.DeactivateKeyboard();
+                    else
+                        KeyboardController.ActivateKeyboard(s_KeyboardName);
+                }
 
                 // Create a timer and start the on/off flashing
                 SetupTimer();
@@ -2868,14 +2829,29 @@ namespace OurWord.Edit
         #region Method: bool Select_FirstPositionInParagraph(DParagraph p)
         public bool Select_FirstPositionInParagraph(DParagraph p)
         {
+            // Drill down to find the OWPara whose datasource is p
             foreach (Row row in Rows)
             {
                 foreach (Row.Pile pile in row.Piles)
                 {
                     foreach (OWPara para in pile.Paragraphs)
                     {
+                        // Found it
                         if (para.DataSource == p)
-                            return para.Select_BeginningOfFirstWord();
+                        {
+                            // Attempt to make a selection at the first editable position in the paragraph
+                            OWWindow.Sel selection = para.Select_BeginningOfFirstWord();
+
+                            // If a selection was made, then set the Window's selection to it
+                            if (null != selection)
+                            {
+                                Selection = selection;
+                                return true;
+                            }
+
+                            // A selection was not made
+                            return false;
+                        }
                     }
                 }
             }
@@ -2897,6 +2873,7 @@ namespace OurWord.Edit
 					Keys.Left,
 					Keys.Up,
 					Keys.Down,
+                    Keys.Shift | Keys.Tab,
 					Keys.Shift | Keys.Right,
 					Keys.Shift | Keys.Left,
 					Keys.Shift | Keys.Up,
@@ -3072,7 +3049,7 @@ namespace OurWord.Edit
             if (sClipboard.Length > 500)
                 return;
 
-            // Remove any characters we don't like
+            // ctrlRemove any characters we don't like
             string sInsert = "";
             char chPrev = '\0';
             foreach (char ch in sClipboard)
@@ -3100,10 +3077,15 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: bool HandleLockedFromEditing()
-        bool HandleLockedFromEditing()
+        virtual protected bool HandleLockedFromEditing()
         {
             // If not locked from editing, nothing further is needed
-            if (!LockedFromEditing)
+            if (null == Selection)
+                return false;
+            OWPara SelectedParagraph = Selection.Paragraph;
+            if (null == SelectedParagraph)
+                return false;
+            if (!SelectedParagraph.IsLocked)
                 return false;
 
             // If this is not the main window, then we do nothing. If 
@@ -3504,7 +3486,8 @@ namespace OurWord.Edit
             OWPara.EBlock block = GetBlockAt(pt);
 
             // Let the block handle it
-            block.cmdLeftMouseDoubleClick(pt);
+            if (null != block)
+                block.cmdLeftMouseDoubleClick(pt);
 
             m_MouseState = MouseStates.kNone;
         }
@@ -3714,8 +3697,12 @@ namespace OurWord.Edit
                     // we're done and we exit the method.
                     if (bParaFound)
                     {
-                        if (p.Select_BeginningOfFirstWord())
+                        OWWindow.Sel selection = p.Select_BeginningOfFirstWord();
+                        if (null != selection)
+                        {
+                            Selection = selection;
                             return;
+                        }
                     }
 
                     // Signal that the current paragraph has been found. From
@@ -4000,7 +3987,7 @@ namespace OurWord.Edit
 
             // The paragraph handles this action, because we do not permit a selection to
             // extend beyond conjoining EWords.
-            Selection.Paragraph.ExtendSelection_CharRight();
+            Selection = Selection.Paragraph.ExtendSelection_CharRight(Selection);
         }
         #endregion
         #region Cmd: cmdExtendCharLeft
@@ -4013,7 +4000,7 @@ namespace OurWord.Edit
 
             // The paragraph handles this action, because we do not permit a selection to
             // extend beyond conjoining EWords.
-            Selection.Paragraph.ExtendSelection_CharLeft();
+            Selection = Selection.Paragraph.ExtendSelection_CharLeft(Selection);
         }
         #endregion
         #region Cmd: cmdExtendLineBegin
@@ -4037,7 +4024,10 @@ namespace OurWord.Edit
         {
             if (null == Selection || Selection.IsInsertionIcon)
                 return;
-            Selection.Paragraph.ExtendSelection_WordRight();
+
+            OWPara para = Selection.Paragraph;
+
+            Selection = para.ExtendSelection_WordRight(Selection);
         }
         #endregion
         #region Cmd: cmdExtendWordLeft
@@ -4045,7 +4035,10 @@ namespace OurWord.Edit
         {
             if (null == Selection || Selection.IsInsertionIcon)
                 return;
-            Selection.Paragraph.ExtendSelection_WordLeft();
+
+            OWPara para = Selection.Paragraph;
+
+            Selection = para.ExtendSelection_WordLeft(Selection);
         }
         #endregion
         #region Cmd: cmdExtendFarRight
@@ -4053,7 +4046,8 @@ namespace OurWord.Edit
         {
             if (null == Selection || Selection.IsInsertionIcon)
                 return;
-            Selection.Paragraph.ExtendSelection_FarRight();
+
+            Selection = Selection.Paragraph.ExtendSelection_FarRight(Selection);
         }
         #endregion
         #region Cmd: cmdExtendFarLeft
@@ -4061,7 +4055,8 @@ namespace OurWord.Edit
         {
             if (null == Selection || Selection.IsInsertionIcon)
                 return;
-            Selection.Paragraph.ExtendSelection_FarLeft();
+            
+            Selection = Selection.Paragraph.ExtendSelection_FarLeft(Selection);
         }
         #endregion
         #endregion

@@ -83,11 +83,16 @@ namespace OurWord.View
             }
         }
         #endregion
-        #region Attr{g}: override string PassageName
-        public override string PassageName
+        #region Attr{g}: override string LanguageInfo
+        public override string LanguageInfo
         {
             get
             {
+                if (!G.IsValidProject)
+                    return "";
+                if (null == OurWordMain.Project.TargetTranslation)
+                    return "";
+
                 string sBase = G.GetLoc_GeneralUI("DraftingReference", "{0} to {1}");
 
                 string sFrontName = (null == G.FTranslation) ?
@@ -98,12 +103,7 @@ namespace OurWord.View
                     G.GetLoc_GeneralUI("NoTargetDefined", "(no target defined)") :
                     G.TTranslation.DisplayName.ToUpper();
 
-                string s = LocDB.Insert(sBase, new string[] { sFrontName , sTargetName });
-
-                if (null != G.FTranslation && null != G.TTranslation && null != G.STarget)
-                    s += ( " - " + G.STarget.ReferenceName );
-
-                return s;
+                return LocDB.Insert(sBase, new string[] { sFrontName, sTargetName });
             }
         }
         #endregion
@@ -225,14 +225,61 @@ namespace OurWord.View
             }
         }
         #endregion
-        #region Method: void _LoadParagraphs(...)
+        #region Method: void _LoadFootnotes()
+        void _LoadFootnotes()
+        {
+            // Anything to load?
+            if (G.SFront.Footnotes.Count == 0 && G.STarget.Footnotes.Count == 0)
+                return;
+
+            // Load them all in a single row if we must
+            if (!_CanSideBySideFootnotes())
+            {
+                StartNewRow(true, null);
+                for (int kF = 0; kF < G.SFront.Footnotes.Count; kF++)
+                    AddFrontFootnote(G.SFront.Footnotes[kF] as DFootnote);
+                for (int kT = 0; kT < G.STarget.Footnotes.Count; kT++)
+                    AddTargetFootnote(G.STarget.Footnotes[kT] as DFootnote);
+                return;
+            }
+
+            // Otherwise, they are on individual parallel rows
+            for (int k = 0; k < G.SFront.Footnotes.Count; k++)
+            {
+                StartNewRow( ((k == 0) ? true : false), null );
+
+                DFootnote fFront = G.SFront.Footnotes[k] as DFootnote;
+                DFootnote fTarget = G.STarget.Footnotes[k] as DFootnote;
+                fTarget.SynchRunsToModelParagraph(fFront);
+
+                AddFrontFootnote(fFront);
+                AddTargetFootnote(fTarget);
+            }
+
+        }
+        #endregion
+        #region Method: override void LoadData()
+        public override void LoadData()
+        {
+            // Start with an empty window
+            Clear();
+
+            // Nothing more to do if we don't have a completely-defined project
+            if (!G.Project.HasDataToDisplay)
+                return;
+
+            // Load the paragraphs, then the footnotes
+            _LoadParagraphs();
+            _LoadFootnotes();
+
+            // Tell the superclass to finish loading, which involves laying out the window 
+            // with the data we've just put in, as doing the same for any secondary windows.
+            base.LoadData();
+        }
+        #endregion
+        #region Method: void _LoadParagraphs()
         void _LoadParagraphs()
         {
-            // Options for paragraphs that will be on the right-hand, editable side
-            OWPara.Flags DraftingOptions = OWPara.Flags.IsEditable;
-            if (OurWordMain.s_Features.F_StructuralEditing)
-                DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
-
             // We'll work our way through both the Front and the Target paragraphs
             int iFront = 0;
             int iTarget = 0;
@@ -269,13 +316,13 @@ namespace OurWord.View
                     {
                         DParagraph pFront = G.SFront.Paragraphs[iFront + kF] as DParagraph;
                         _LoadHintsFromFront(pFront);
-                        AddParagraph(0, pFront, OWPara.Flags.None);
+                        AddFrontParagraph(pFront);
                     }
                     for (int kT = 0; kT < cTarget; kT++)
                     {
-                        DParagraph pTarget = G.STarget.Paragraphs[iFront + kT] as DParagraph;
+                        DParagraph pTarget = G.STarget.Paragraphs[iTarget + kT] as DParagraph;
                         pTarget.BestGuessAtInsertingTextPositions();
-                        AddParagraph(1, pTarget, DraftingOptions);
+                        AddTargetParagraph(pTarget);
                     }
                 }
                 else
@@ -303,8 +350,8 @@ namespace OurWord.View
 
                         // Add the left and right paragraphs
                         _LoadHintsFromFront(pFront);
-                        AddParagraph(0, pFront, OWPara.Flags.None);
-                        AddParagraph(1, pTarget, DraftingOptions);
+                        AddFrontParagraph(pFront);
+                        AddTargetParagraph(pTarget);
                     }
                 }
 
@@ -314,58 +361,91 @@ namespace OurWord.View
             }
         }
         #endregion
-        #region Method: void _LoadFootnotes()
-        void _LoadFootnotes()
+
+        // Methods to create and add the display paragraphs ----------------------------------
+        const int c_iColFront = 0;    // The Front translation goes in the first (left) column
+        const int c_iColTarget = 1;   // The Target translation goes in the second (right) column
+        #region Method: void AddFrontParagraph(DParagraph)
+        void AddFrontParagraph(DParagraph pFront)
         {
-            // Anything to load?
-            if (G.SFront.Footnotes.Count == 0 && G.STarget.Footnotes.Count == 0)
-                return;
-
-            // Load them all in a single row if we must
-            if (!_CanSideBySideFootnotes())
-            {
-                StartNewRow(true, null);
-                for (int kF = 0; kF < G.SFront.Footnotes.Count; kF++)
-                    AddParagraph(0, G.SFront.Footnotes[kF] as DFootnote, OWPara.Flags.None);
-                for (int kT = 0; kT < G.STarget.Footnotes.Count; kT++)
-                    AddParagraph(1, G.STarget.Footnotes[kT] as DFootnote, OWPara.Flags.IsEditable);
-                return;
-            }
-
-            // Otherwise, they are on individual parallel rows
-            for (int k = 0; k < G.SFront.Footnotes.Count; k++)
-            {
-                StartNewRow( ((k == 0) ? true : false), null );
-
-                DFootnote fFront = G.SFront.Footnotes[k] as DFootnote;
-                DFootnote fTarget = G.STarget.Footnotes[k] as DFootnote;
-                fTarget.SynchRunsToModelParagraph(fFront);
-
-                AddParagraph(0, fFront, OWPara.Flags.None);
-                AddParagraph(1, fTarget, OWPara.Flags.IsEditable);
-            }
-
+            AddParagraph(c_iColFront, new OWPara(
+                this,
+                pFront.Translation.WritingSystemVernacular,
+                pFront.Style,
+                pFront,
+                BackColor,
+                OWPara.Flags.None));
         }
         #endregion
-        #region Method: override void LoadData()
-        public override void LoadData()
+        #region Method: void AddFrontFootnote(DFootnote)
+        void AddFrontFootnote(DFootnote fnFront)
         {
-            // Start with an empty window
-            Clear();
-
-            // Nothing more to do if we don't have a completely-defined project
-            if (!G.Project.HasDataToDisplay)
-                return;
-
-            // Load the paragraphs, then the footnotes
-            _LoadParagraphs();
-            _LoadFootnotes();
-
-            // Tell the superclass to finish loading, which involves laying out the window 
-            // with the data we've just put in, as doing the same for any secondary windows.
-            base.LoadData();
+            AddParagraph(c_iColFront, new OWPara(
+                this,
+                fnFront.Translation.WritingSystemVernacular,
+                fnFront.Style,
+                fnFront,
+                BackColor,
+                OWPara.Flags.None));
         }
         #endregion
+        #region Method: void AddTargetParagraph(DParagraph)
+        void AddTargetParagraph(DParagraph pTarget)
+        {
+            // Options for paragraphs that will be on the right-hand, editable side
+            OWPara.Flags DraftingOptions = OWPara.Flags.None;
+            if (pTarget.IsUserEditable)
+            {
+                DraftingOptions = OWPara.Flags.IsEditable;
+                if (OurWordMain.s_Features.F_StructuralEditing)
+                    DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
+                if (OurWordMain.TargetIsLocked)
+                    DraftingOptions |= OWPara.Flags.IsLocked;
+            }
+
+            // Background Color
+            Color color = EditableBackgroundColor;
+            if (OurWordMain.TargetIsLocked || !pTarget.IsUserEditable)
+                color = BackColor;
+
+            // Add the paragraph
+            AddParagraph(c_iColTarget, new OWPara(
+                this,
+                pTarget.Translation.WritingSystemVernacular,
+                pTarget.Style,
+                pTarget,
+                color,
+                DraftingOptions));
+        }
+        #endregion
+        #region Method: void AddTargetFootnote(DFootnote)
+        void AddTargetFootnote(DFootnote fnTarget)
+        {
+            // Editing options
+            OWPara.Flags DraftingOptions = OWPara.Flags.None;
+            if (fnTarget.IsUserEditable)
+            {
+                DraftingOptions = OWPara.Flags.IsEditable;
+                if (OurWordMain.TargetIsLocked)
+                    DraftingOptions |= OWPara.Flags.IsLocked;
+            }
+
+            // Background Color
+            Color color = EditableBackgroundColor;
+            if (OurWordMain.TargetIsLocked || !fnTarget.IsUserEditable)
+                color = BackColor;
+
+            // Add the displayable paragraph
+            AddParagraph(c_iColTarget, new OWPara(
+                this,
+                fnTarget.Translation.WritingSystemVernacular,
+                fnTarget.Style,
+                fnTarget,
+                color,
+                DraftingOptions));
+        }
+        #endregion
+
 
     }
 

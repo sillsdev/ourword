@@ -158,8 +158,7 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
-        private ToolStripSeparator m_EditMenuSeparator;
-        private ToolStripMenuItem m_menuChangeParagraphStyle;
+        private ToolStripLabel m_tbLanguageInfo;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -206,7 +205,7 @@ namespace OurWord
         }
         #endregion
 
-        #region VAttr{g}: OWWindow FocusedWindow - the window with current Focus, or null
+        #region VAttr{g}: Control FocusedWindow - the window with current Focus, or null
         OWWindow FocusedWindow
         {
             get
@@ -308,6 +307,12 @@ namespace OurWord
             if (null != G.Project && G.Project.ShowTranslationsPane && MainWindowIsDrafting)
                 SideWindows.CreateTranslationsWindow();
 
+            if (G.IsValidProject && s_Features.F_Merge && DProject.ShowMergePane)
+                SideWindows.CreateMergePane();
+
+            if (G.IsValidProject && s_Features.F_Dictionary && DProject.ShowDictionaryPane)
+                SideWindows.CreateDictionaryPane();
+
             // Tell the system which side windows are being displayed; thereafter events will be 
             // automatically routed to these windows.
             SideWindows.RegisterWindows(MainWindow);
@@ -356,7 +361,8 @@ namespace OurWord
             {
                 MainWindow.Clear();
                 MainWindow.Invalidate();
-                TaskName = G.GetLoc_GeneralUI("NoProjectDefined", "No Project Defined"); 
+                TaskName = G.GetLoc_GeneralUI("NoProjectDefined", "No Project Defined");
+                LanguageInfo = "";
                 Passage = "";
                 ShowPadlock = false;
                 if (HasSideWindows)
@@ -364,14 +370,11 @@ namespace OurWord
                 return;
             }
 
-            // Is the book locked from editing? Meaning that the user can select and add
-            // "ToDo" notes, but nothing else.
-            MainWindow.LockedFromEditing = TargetIsLocked;
-
             // Update the Title Window contents
             TaskName = MainWindow.WindowName;
+            LanguageInfo = MainWindow.LanguageInfo;
             Passage = MainWindow.PassageName;
-            ShowPadlock = MainWindow.LockedFromEditing;
+            ShowPadlock = TargetIsLocked;
 
             // Loading the main window should also load the data in the side windows, as this
             // is generally built as the main window is loaded (or as items there are selected)
@@ -453,6 +456,8 @@ namespace OurWord
         private ToolStripMenuItem m_menuCut;
         private ToolStripMenuItem m_menuCopy;
         private ToolStripMenuItem m_menuPaste;
+        private ToolStripSeparator m_EditMenuSeparator;
+        private ToolStripMenuItem m_menuChangeParagraphStyle;
 
         private ToolStripMenuItem m_menuNotes;
         private ToolStripMenuItem m_menuNoteGeneral;
@@ -475,6 +480,8 @@ namespace OurWord
         private ToolStripMenuItem m_menuGoToBook;
 
         private ToolStripMenuItem m_menuWindow;
+        private ToolStripMenuItem m_menuShowMergePane;
+        private ToolStripMenuItem m_menuShowDictionaryPane;
         private ToolStripMenuItem m_menuShowNotesPane;
         private ToolStripMenuItem m_menuShowOtherTranslationsPane;
         private ToolStripSeparator m_menuSeparatorTasks;
@@ -558,7 +565,7 @@ namespace OurWord
         #region Method: void SetupChangeParagraphStyleItems()
         public void SetupChangeParagraphStyleItems()
         {
-            // Remove any previous subitems
+            // ctrlRemove any previous subitems
             m_menuChangeParagraphStyle.DropDownItems.Clear();
 
             // Populate
@@ -609,7 +616,7 @@ namespace OurWord
         private const int c_cMaxMenuLength = 60; // Keep sub-menus from getting too long
         public void SetupNavigationButtons()
         {
-            // Remove any subitems
+            // ctrlRemove any subitems
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
 
@@ -841,22 +848,35 @@ namespace OurWord
             m_btnGoToBook.Visible = bJustTheBasics;
 
             // Window Menu (show these if more than Drafting is turned on)
+            #region (Window Menu)
             m_menuShowNotesPane.Checked = bNotesPaneIsVisible;
+
             m_menuShowOtherTranslationsPane.Visible = (G.IsValidProject &&
                 (G.Project.OtherTranslations.Count > 0));
             m_menuShowOtherTranslationsPane.Checked = (
                 G.IsValidProject &&
                 (G.Project.OtherTranslations.Count > 0) &&
                 DProject.VD_ShowTranslationsPane);
+
+            m_menuShowMergePane.Visible = s_Features.F_Merge;
+            m_menuShowMergePane.Checked = (G.IsValidProject && DProject.ShowMergePane);
+
+            m_menuShowDictionaryPane.Visible = s_Features.F_Dictionary;
+            m_menuShowDictionaryPane.Checked = (G.IsValidProject && DProject.ShowDictionaryPane);
+
             bool bShowTasks = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             m_menuSeparatorTasks.Visible = bShowTasks;
             m_SeparatorTasks.Visible = bShowTasks;
+
             m_menuDrafting.Visible = bShowTasks;
             m_btnDrafting.Visible = bShowTasks;
+
             m_menuNaturalnessCheck.Visible = (bShowTasks && s_Features.F_JobNaturalness);
             m_btnNaturalnessCheck.Visible = (bShowTasks && s_Features.F_JobNaturalness);
+
             m_menuBackTranslation.Visible = (bShowTasks && s_Features.F_JobBT);
             m_btnBackTranslation.Visible = (bShowTasks && s_Features.F_JobBT);
+            #endregion
 
             // Tools
             m_bmTools.Visible = bJustTheBasics;
@@ -932,7 +952,7 @@ namespace OurWord
         }
         #endregion
         // Taskbar
-        #region Attr{g}: string TaskName - e.g., "Drafting", "Back Translation"
+        #region Attr{g/s}: string TaskName - e.g., "Drafting", "Back Translation"
         public string TaskName
         {
             get
@@ -945,12 +965,24 @@ namespace OurWord
             }
         }
         #endregion
-        #region Attr{g}: string Passage - e.g., "- Kupang to AMARASSI John 3:16"
+        #region Attr{s}: string LanguageInfo - e.g., "Kupang to AMARASI"
+        public string LanguageInfo
+        {
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    m_tbLanguageInfo.Text = "";
+                else
+                    m_tbLanguageInfo.Text = " (" + value + ") ";
+            }
+        }
+        #endregion
+        #region Attr{s}: string Passage - e.g., "John 3:16"
         public string Passage
         {
             set
             {
-                m_tbCurrentPassage.Text = " - " + value;
+                m_tbCurrentPassage.Text = value;
             }
         }
         #endregion
@@ -1119,6 +1151,8 @@ namespace OurWord
             this.m_menuWindow = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowNotesPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowOtherTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuShowMergePane = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSeparatorTasks = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
@@ -1178,6 +1212,7 @@ namespace OurWord
             this.m_Taskbar = new System.Windows.Forms.ToolStrip();
             this.m_tbTaskName = new System.Windows.Forms.ToolStripLabel();
             this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
+            this.m_tbLanguageInfo = new System.Windows.Forms.ToolStripLabel();
             this.m_tbCurrentPassage = new System.Windows.Forms.ToolStripLabel();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -1636,6 +1671,8 @@ namespace OurWord
             this.m_menuWindow.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuShowNotesPane,
             this.m_menuShowOtherTranslationsPane,
+            this.m_menuShowMergePane,
+            this.m_menuShowDictionaryPane,
             this.m_menuSeparatorTasks,
             this.m_menuDrafting,
             this.m_menuNaturalnessCheck,
@@ -1657,6 +1694,20 @@ namespace OurWord
             this.m_menuShowOtherTranslationsPane.Size = new System.Drawing.Size(232, 22);
             this.m_menuShowOtherTranslationsPane.Text = "Show &Other Translations Pane";
             this.m_menuShowOtherTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
+            // 
+            // m_menuShowMergePane
+            // 
+            this.m_menuShowMergePane.Name = "m_menuShowMergePane";
+            this.m_menuShowMergePane.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowMergePane.Text = "Show &Merge Pane";
+            this.m_menuShowMergePane.Click += new System.EventHandler(this.cmdToggleMergePane);
+            // 
+            // m_menuShowDictionaryPane
+            // 
+            this.m_menuShowDictionaryPane.Name = "m_menuShowDictionaryPane";
+            this.m_menuShowDictionaryPane.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowDictionaryPane.Text = "Show &Dictionary Pane";
+            this.m_menuShowDictionaryPane.Click += new System.EventHandler(this.cmdToggleDictionaryPane);
             // 
             // m_menuSeparatorTasks
             // 
@@ -2253,6 +2304,7 @@ namespace OurWord
             this.m_Taskbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_tbTaskName,
             this.m_tbPadlock,
+            this.m_tbLanguageInfo,
             this.m_tbCurrentPassage});
             this.m_Taskbar.Location = new System.Drawing.Point(0, 49);
             this.m_Taskbar.Name = "m_Taskbar";
@@ -2279,12 +2331,20 @@ namespace OurWord
             this.m_tbPadlock.Text = "Locked";
             this.m_tbPadlock.ToolTipText = "This book is locked and cannot be edited.";
             // 
+            // m_tbLanguageInfo
+            // 
+            this.m_tbLanguageInfo.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_tbLanguageInfo.ForeColor = System.Drawing.Color.White;
+            this.m_tbLanguageInfo.Name = "m_tbLanguageInfo";
+            this.m_tbLanguageInfo.Size = new System.Drawing.Size(88, 22);
+            this.m_tbLanguageInfo.Text = "(Language)";
+            // 
             // m_tbCurrentPassage
             // 
-            this.m_tbCurrentPassage.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_tbCurrentPassage.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_tbCurrentPassage.ForeColor = System.Drawing.Color.Wheat;
             this.m_tbCurrentPassage.Name = "m_tbCurrentPassage";
-            this.m_tbCurrentPassage.Size = new System.Drawing.Size(79, 22);
+            this.m_tbCurrentPassage.Size = new System.Drawing.Size(84, 22);
             this.m_tbCurrentPassage.Text = "(passage)";
             // 
             // OurWordMain
@@ -2502,6 +2562,24 @@ namespace OurWord
 				}
 			}
 			#endregion
+            #region Attr{g}: bool F_Merge
+            public bool F_Merge
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fMerge.ToString());
+                }
+            }
+            #endregion
+            #region Attr{g}: bool F_Dictionary
+            public bool F_Dictionary
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fDictionary.ToString());
+                }
+            }
+            #endregion
 
 			// Scaffolding -------------------------------------------------------------------
 			#region Constructor()
@@ -2546,6 +2624,8 @@ namespace OurWord
                 fJustTheBasics,
                 fStructuralEditing,
                 fLocalizer,
+                fMerge,
+                fDictionary,
                 kLast
             };
             #endregion
@@ -2567,7 +2647,7 @@ namespace OurWord
                 m_Dlg.Add(ID.fJobNaturalness.ToString(),           
                     false, 
                     "Naturalness Check Job",
-                    "A layout where only the translation visible, so that you can read through " +
+                    "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
 
                 m_Dlg.Add(ID.fProject.ToString(),  
@@ -2622,6 +2702,19 @@ namespace OurWord
                         "styles to a paragraph. By doing this the translation will depart from " +
                         "the paragraph structure of the front translation.");
 
+                m_Dlg.Add(ID.fMerge.ToString(),
+                    false,
+                    "Merging",
+                    "Enables the Merge Pane, by which you can compare different versions of a book " +
+                        "to see what is different, and to merge changes into the master copy.");
+
+                m_Dlg.Add(ID.fDictionary.ToString(),
+                    false,
+                    "WeSay Dictionary",
+                    "Enables the Dictionary Pane, by which you can access a WeSay dictionary. " +
+                        "You can enter words in the dictionary that are in the translation; and " +
+                        "you can look up definitions when doing a back translation.");
+
                 m_Dlg.Add(ID.fJustTheBasics.ToString(),    
                     false,
                     "Just the Basics",
@@ -2644,6 +2737,8 @@ namespace OurWord
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fPrint.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fStructuralEditing.ToString());
                 m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fLocalizer.ToString());
+                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fMerge.ToString());
+                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fDictionary.ToString());
 			}
 			#endregion
 		};
@@ -2694,6 +2789,9 @@ namespace OurWord
                 m_Config.Save();
                 Cursor = Cursors.Default;
             }
+
+            // Dispose of the Dictionary object if necessary
+            Project.Dispose();
 		}
 		#endregion
 		#region Method: void OnEnterProject()
@@ -2757,6 +2855,9 @@ namespace OurWord
 
             // Make sure the registry is aware of the new file name, as it might have been changed.
             sPathName = Project.AbsolutePathName;
+
+            // Make certain the stylesheet has the latest styles
+            Project.StyleSheet.Initialize(false);
 
             TemporaryFixes();
 		}
@@ -2891,7 +2992,8 @@ namespace OurWord
 		#region Cmd: cmdNewProject
         private void cmdNewProject(Object sender, EventArgs e)
 		{
-            // Walk through the wizard
+            // Walk through the wizard; we do nothing unless the User makes it through
+            // (as signaled by DialogResult.OK).
             Dialogs.WizNewProject.WizNewProject wiz = new Dialogs.WizNewProject.WizNewProject();
             if (DialogResult.OK != wiz.ShowDialog())
                 return;
@@ -2905,6 +3007,7 @@ namespace OurWord
             project.AbsolutePathName = wiz.TargetSettingsFolder +
                 Path.DirectorySeparatorChar + project.DisplayName + ".owp";
 
+            // Team Settings: start with the factory default; load over it if a file already exists
             DTeamSettings ts = new DTeamSettings();
             ts.InitializeFactoryStyleSheet();
             project.TeamSettings = ts;
@@ -2912,6 +3015,7 @@ namespace OurWord
             if (File.Exists(ts.AbsolutePathName))
                 ts.Load();
 
+            // Front translation
             DTranslation tFront = new DTranslation(wiz.FrontName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
             if (!string.IsNullOrEmpty(wiz.ExistingFrontSettingsFilePath))
             {
@@ -2929,6 +3033,7 @@ namespace OurWord
             tFront.AbsolutePathName = wiz.FrontSettingsFolder +
                 Path.DirectorySeparatorChar + wiz.FrontName + ".otrans";
 
+            // Target Translation
             DTranslation tTarget = new DTranslation(wiz.ProjectName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
             project.TargetTranslation = tTarget;
             tTarget.DisplayName = wiz.ProjectName;
@@ -2936,6 +3041,7 @@ namespace OurWord
             tTarget.AbsolutePathName = wiz.TargetSettingsFolder +
                 Path.DirectorySeparatorChar + wiz.ProjectName + ".otrans";
 
+            // Set OW to this project
             Project = project;
 
             // Save everything, including placing into the MRU
@@ -2950,41 +3056,6 @@ namespace OurWord
             // Edit properties?
             if (wiz.LaunchPropertiesDialogWhenDone)
                 cmdProjectProperties(null, null);
-
-
-            /***
-            // OLD
-			// Make sure this current project is saved and up-to-date
-			OnLeaveProject();
-
-			// Set the Config to a new project
-			m_Config.New();
-
-			// Create a new, blank project
-			Project = new DProject();
-
-			// When we go to save the project, we'll default to something meaningful
-			m_Config.DefaultFileName = Project.DisplayName + ".owp";
-
-            // Save the project to disk (otherwise, the Relative Pathnames for further
-            // down objects will not work.
-            if (!m_Config.SaveAs("Enter a filename for this new project"))
-            {
-                OnEnterProject();
-                return;
-            }
-
-			// Update the UI to the new project
-			OnEnterProject();
-
-			// Go ahead and edit its properties (thus present the Properties dialog)
-            DialogProperties dlg = new DialogProperties();
-            dlg.ShowDialog(this);
-
-			// Update the UI, views, etc.
-			Project.Nav.GoToFirstAvailableBook();
-			OnEnterProject();
-            ***/
 		}
 		#endregion
 		#region Cmd: cmdOpenProject
@@ -3214,7 +3285,7 @@ namespace OurWord
             if (false == Messages.ConfirmNoteDeletion(sMsgAddition))
                 return;
 
-            // Remove the note from the paragraph (we delete it from the
+            // ctrlRemove the note from the paragraph (we delete it from the
             // owning DText)
             DText text = note.Text;
             Debug.Assert(null != text);
@@ -3328,11 +3399,10 @@ namespace OurWord
         }
 		#endregion
 
-        #region Cmds: cmdToggleNotesPane, cmdToggleOtherTranslationsPane
         #region Method: void _UpdateSideWindows()
         private void _UpdateSideWindows()
         {
-            // Add/Remove the various pane from the side windows
+            // Add/ctrlRemove the various pane from the side windows
             SetupSideWindows();
 
             // Reset the window contents (1) to populate the Notes window if
@@ -3345,12 +3415,10 @@ namespace OurWord
             SetupMenusAndToolbarsVisibility();
         }
         #endregion
-
         #region Cmd: cmdToggleNotesPane
         private void cmdToggleNotesPane(Object sender, EventArgs e)
 		{
             DProject.VD_ShowNotesPane = !DProject.VD_ShowNotesPane;
-
             _UpdateSideWindows();
 		}
 		#endregion
@@ -3358,10 +3426,26 @@ namespace OurWord
         private void cmdToggleOtherTranslationsPane(Object sender, EventArgs e)
         {
             DProject.VD_ShowTranslationsPane = !DProject.VD_ShowTranslationsPane;
-
             _UpdateSideWindows();
         }
         #endregion
+        #region Cmd: cmdToggleMergePane
+        private void cmdToggleMergePane(object sender, EventArgs e)
+        {
+            DProject.ShowMergePane = !DProject.ShowMergePane;
+            _UpdateSideWindows();
+            if (DProject.ShowMergePane)
+                SideWindows.ActivateMergePane();
+        }
+        #endregion
+        #region Cmd: cmdToggleDictionaryPane
+        private void cmdToggleDictionaryPane(object sender, EventArgs e)
+        {
+            DProject.ShowDictionaryPane = !DProject.ShowDictionaryPane;
+            _UpdateSideWindows();
+            if (DProject.ShowDictionaryPane)
+                SideWindows.ActivateDictionaryPane();
+        }
         #endregion
 
         #region Cmd: cmdJobDrafting
@@ -3674,8 +3758,10 @@ return false;
         #region Cmd: cmdEditMenuOpening - place a checkmark beside the current style
         private void cmdEditMenuOpening(object sender, EventArgs e)
         {
-            // Get the style of the current paragraph
-            string sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
+            // Get the style of the current paragraph, if any
+            string sAbbrev = "";
+            if (null != FocusedWindow)
+                sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
 
             // Uncheck all of the subitems
             foreach (ToolStripMenuItem mi in m_menuChangeParagraphStyle.DropDownItems)
@@ -4144,6 +4230,27 @@ return false;
             // Retrieve the value
             return LocDB.GetValue(
                 new string[] { "Strings", "Styles" },
+                sItemID,
+                sEnglish,
+                null,
+                null);
+        }
+        #endregion
+        #region SMethod: string GetLoc_Merge(sEnglish) -                  "Strings\Merge"
+        static public string GetLoc_Merge(string sEnglish)
+        {
+            // Compute an ItemID from the name of the style by removing all whitespace
+            string sItemID = "";
+            foreach (char ch in sEnglish)
+            {
+                if (!char.IsWhiteSpace(ch))
+                    sItemID += ch;
+            }
+            Debug.Assert(!string.IsNullOrEmpty(sItemID));
+
+            // Retrieve the value
+            return LocDB.GetValue(
+                new string[] { "Strings", "MergeWindow" },
                 sItemID,
                 sEnglish,
                 null,

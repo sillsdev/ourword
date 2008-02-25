@@ -148,6 +148,22 @@
     <Item ID="m_menuAboutOurWord">
       <Alt ID="th" Value="เกี่ยวกับคำของเรา"></Alt>
     </Item>
+    <Item ID="m_menuChangeParagraphStyle">
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_p">
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_q">
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_q2">
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_q3">
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_s">
+    </Item>
+    <Item ID="m_menuShowMergePane">
+    </Item>
+    <Item ID="m_menuShowDictionaryPane">
+    </Item>
   </Group>
   <Group ID="m_ToolStrip">
     <Item ID="m_btnExit">
@@ -395,6 +411,10 @@
       </Item>
       <Item ID="BrowseForBackupFile">
       </Item>
+      <Item ID="OpenTeamSettingsDlgTitle">
+      </Item>
+      <Item ID="SaveTeamSettingsDlgTitle">
+      </Item>
     </Group>
     <Group ID="Styles">
       <Item ID="SectionTitle">
@@ -511,6 +531,10 @@
     <Item ID="msgAlreadyRunning">
     </Item>
     <Item ID="msgWillOverwriteFileWarning">
+    </Item>
+    <Item ID="msgSectionTitleAlreadyExists">
+    </Item>
+    <Item ID="msgSectionTitleCannotHaveVerses">
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
@@ -922,6 +946,18 @@
     </Item>
     <Item ID="fLocalizer_Description">
     </Item>
+    <Item ID="fStructuralEditing_CheckBox">
+    </Item>
+    <Item ID="fStructuralEditing_Description">
+    </Item>
+    <Item ID="fMerge_CheckBox">
+    </Item>
+    <Item ID="fMerge_Description">
+    </Item>
+    <Item ID="fDictionary_CheckBox">
+    </Item>
+    <Item ID="fDictionary_Description">
+    </Item>
     <Item ID="m_checkListFeatures">
     </Item>
   </Group>
@@ -1008,7 +1044,7 @@
     <Item ID="m_lblSettingsHelp">
     </Item>
   </Group>
-  <Group ID="DialiogCreateTranslation">
+  <Group ID="DialogCreateTranslation">
     <Item ID="Title">
     </Item>
     <Item ID="m_lblSettingsHelp">
@@ -1117,6 +1153,8 @@
     </Item>
     <Item ID="m_btnCancel">
     </Item>
+    <Item ID="m_comboQualifies">
+    </Item>
   </Group>
   <Group ID="DialogProperties">
     <Item ID="Title">
@@ -1178,6 +1216,8 @@
       </Item>
       <Item ID="propFonts">
       </Item>
+      <Item ID="propStrikeout">
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems">
       <Item ID="m_btnRemove">
@@ -1194,9 +1234,13 @@
       </Item>
       <Item ID="propName">
       </Item>
+      <Item ID="propAbbrev">
+      </Item>
       <Item ID="propPunctuation">
       </Item>
       <Item ID="propEndPunctuation">
+      </Item>
+      <Item ID="propKeyboard">
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_AdvancedPrintOptions">
@@ -1376,6 +1420,20 @@
       </Item>
       <Item ID="propZoomFactor">
       </Item>
+      <Item ID="propSuppressVerses">
+      </Item>
+      <Item ID="propNaturalnessCheck">
+      </Item>
+      <Item ID="propNCSuppressVerses">
+      </Item>
+      <Item ID="propNCShowLineNumbers">
+      </Item>
+      <Item ID="propDictionary">
+      </Item>
+      <Item ID="propDictApp">
+      </Item>
+      <Item ID="propDictData">
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Notes">
       <Item ID="Show_kGeneral">
@@ -1518,5 +1576,121 @@
     </Item>
     <Item ID="sLoading">
     </Item>
+  </Group>
+  <Group ID="WizNewProject">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_btnFinish">
+    </Item>
+    <Item ID="m_btnPrev">
+    </Item>
+    <Item ID="m_btnNext">
+    </Item>
+    <Group ID="WizNewProject_WizNew_Introduction">
+      <Item ID="m_lblClickNextToStart">
+      </Item>
+      <Item ID="m_lblDescription2">
+      </Item>
+      <Item ID="m_lblDescription1">
+      </Item>
+      <Item ID="strIntroduction">
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_ProjectName">
+      <Item ID="m_lblProjectName">
+      </Item>
+      <Item ID="m_lblExplanation">
+      </Item>
+      <Item ID="m_lblInstruction">
+      </Item>
+      <Item ID="strProjectName">
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_TargetInfo">
+      <Item ID="m_btnSettings">
+      </Item>
+      <Item ID="m_lblSettings">
+      </Item>
+      <Item ID="m_lblSettingsHelp">
+      </Item>
+      <Item ID="m_lblAbbrevHelp">
+      </Item>
+      <Item ID="m_lblAbbrev">
+      </Item>
+      <Item ID="m_lblDescription">
+      </Item>
+      <Item ID="strTargetInfo">
+      </Item>
+      <Item ID="strBrowseTargetFolderDialogTitle">
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_FrontInfo">
+      <Item ID="m_lblInstructions">
+      </Item>
+      <Item ID="m_btnUseExisting">
+      </Item>
+      <Item ID="m_btnSettings">
+      </Item>
+      <Item ID="m_lblSettings">
+      </Item>
+      <Item ID="m_lblAbbrev">
+      </Item>
+      <Item ID="m_lblName">
+      </Item>
+      <Item ID="m_lblBrowseToExistingFront">
+      </Item>
+      <Item ID="strFrontInfo">
+      </Item>
+      <Item ID="strBrowseFrontFolderDialogTitle">
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_TeamSettings">
+      <Item ID="m_textCurrentAction">
+      </Item>
+      <Item ID="m_lblExplDefault">
+      </Item>
+      <Item ID="m_lblExplSaveAs">
+      </Item>
+      <Item ID="m_lblExplUseExisting">
+      </Item>
+      <Item ID="m_btnDefault">
+      </Item>
+      <Item ID="m_btnUseExisting">
+      </Item>
+      <Item ID="m_lblExplanation">
+      </Item>
+      <Item ID="strTeamSettings">
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_Summary">
+      <Item ID="m_checkLaunchProperties">
+      </Item>
+      <Item ID="m_textTeamSettings">
+      </Item>
+      <Item ID="m_lblTeamSettings">
+      </Item>
+      <Item ID="m_textSourceTranslation">
+      </Item>
+      <Item ID="m_lblSourceTranslation">
+      </Item>
+      <Item ID="m_textSettingsFolder">
+      </Item>
+      <Item ID="m_lblSettingsFolder">
+      </Item>
+      <Item ID="m_textAbbreviation">
+      </Item>
+      <Item ID="m_lblAbbreviation">
+      </Item>
+      <Item ID="m_textLanguageName">
+      </Item>
+      <Item ID="m_lblLanguageName">
+      </Item>
+      <Item ID="m_labelClickFinish">
+      </Item>
+      <Item ID="m_labelReady">
+      </Item>
+      <Item ID="strSummaryh">
+      </Item>
+    </Group>
   </Group>
 </LocDB>

@@ -1364,7 +1364,7 @@ namespace OurWord.DataModel
 					aPositions.Add(iPos);
 				}
 
-				// Remove the word from our source string, so the loop will look at the
+				// ctrlRemove the word from our source string, so the loop will look at the
 				// next one.
 				sText = sText.Substring(iPosEnd);
 				iPos += iPosEnd;
@@ -1409,61 +1409,27 @@ namespace OurWord.DataModel
 		{
             DBasicText FrontText = RFront as DBasicText;
 
-            for (int k = 0; k < FrontText.PhrasesBT.Count; k++)
+            // Replace Mode means we get rid of existing BT phrases
+            if (DialogCopyBTConflict.CopyBTAction == DialogCopyBTConflict.Actions.kReplaceTarget)
+                PhrasesBT.Clear();
+
+            // If we have a phrase still in the target (which means we're in kAppendToTarget mode),
+            // then add a space to it.
+            if (PhrasesBT.Count > 0)
             {
-                DPhrase phraseFront = FrontText.PhrasesBT[k] as DPhrase;
-                DPhrase phraseTarget = PhrasesBT[k] as DPhrase;
-
-                // Replace Mode
-                if (DialogCopyBTConflict.CopyBTAction == DialogCopyBTConflict.Actions.kReplaceTarget)
-                {
-                    phraseTarget.Text = phraseFront.Text;
-                }
-
-                // Append Mode
-                if (DialogCopyBTConflict.CopyBTAction == DialogCopyBTConflict.Actions.kAppendToTarget)
-                {
-                    if (!string.IsNullOrEmpty(phraseTarget.Text))
-                        phraseTarget.Text = (phraseFront.Text + " " + phraseTarget.Text);
-                    else
-                        phraseTarget.Text = (phraseFront.Text);
-                }
+                DPhrase phr = PhrasesBT[PhrasesBT.Count - 1];
+                phr.Text += " ";
             }
 
-            #region OBSOLETE - REPLACED 3oct07, following editor rewrite
-            /*** (I think all of this old logic can now be removed)
-			// Remove any blank BT's; these would be insertion spaces
-			for(int k=0; k<PhrasesBT.Count;)
-			{
-				DPhrase pBT = PhrasesBT[k] as DPhrase;
-				pBT.Text = pBT.Text.Trim();
-				if (DPhrase.IsInsertionString(pBT.Text))
-					PhrasesBT.RemoveAt(k);
-				else if (pBT.Text.Length == 0)
-					PhrasesBT.RemoveAt(k);
-				else
-					k++;
-			}
+            // Add the Front phrases
+            foreach (DPhrase phraseFront in FrontText.PhrasesBT)
+            {
+                DPhrase phraseTarget = new DPhrase(phraseFront);
+                PhrasesBT.Append(phraseTarget);
+            }
 
-			// If we already have something in the BT, we want to preserve it. So
-			// we add a space.
-			if (PhrasesBT.Count > 0)
-			{
-				DPhrase phrase = PhrasesBT[0] as DPhrase;
-				if (null != phrase)
-					phrase.Text = " " + phrase.Text;
-			}
-
-			// Copy the BT over
-			DBasicText DFront = RFront as DBasicText;
-			int i = 0;
-			foreach(DPhrase p in DFront.PhrasesBT)
-			{
-				PhrasesBT.InsertAt(i, new DPhrase(null, p.Text) );
-				i++;
-			}
-            ***/
-            #endregion
+            // Eliminate extra spaces this may have created
+            _EliminateSpuriousSpaces(PhrasesBT);
         }
 		#endregion
 
@@ -1476,10 +1442,10 @@ namespace OurWord.DataModel
         /// <param name="phraseToSplit">The phrase to be split into two</param>
         /// <param name="iPos">The position within the phrase. It must be greater than
         /// zero, and less than the length of the phrase; otherwise no action is taken.</param>
-        public void Split(DPhrase phraseToSplit, int iPos)
+        public DPhrase Split(DPhrase phraseToSplit, int iPos)
         {
             if (iPos == 0 || iPos == phraseToSplit.Text.Length)
-                return;
+                return phraseToSplit;
 
             DPhrase phraseLeft = new DPhrase(phraseToSplit.CharacterStyleAbbrev,
                 phraseToSplit.Text.Substring(0, iPos));
@@ -1492,6 +1458,7 @@ namespace OurWord.DataModel
             Phrases.InsertAt(iPhrasePosition, phraseRight);
             Phrases.InsertAt(iPhrasePosition, phraseLeft);
             Phrases.Remove(phraseToSplit);
+            return phraseRight;
         }
         #endregion
         #region Method: void Join(int iPhraseLeft)
@@ -1516,7 +1483,7 @@ namespace OurWord.DataModel
             // Move the contents of the Right phrase into the Left
             phraseLeft.Text += phraseRight.Text;
 
-            // Remove the Right phrase
+            // ctrlRemove the Right phrase
             Phrases.Remove(phraseRight);
         }
         #endregion
@@ -1750,7 +1717,7 @@ namespace OurWord.DataModel
 				m_sCharacterStyleAbbrev = value;
 			}
 		}
-		string m_sCharacterStyleAbbrev = "p";
+		string m_sCharacterStyleAbbrev = DStyleSheet.c_StyleAbbrevNormal;
 		#endregion
 
 		// Derived Attrs ---------------------------------------------------------------------

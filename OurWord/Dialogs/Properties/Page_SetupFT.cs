@@ -197,7 +197,7 @@ namespace OurWord.Dialogs
 
 			// Launch the dialog to prompt for crucial information: Name and
 			// Settings Filename. The user has the option to abort from this dlg.
-			DialiogCreateTranslation dlg = new DialiogCreateTranslation();
+			DialogCreateTranslation dlg = new DialogCreateTranslation();
 			if (DialogResult.OK != dlg.ShowDialog(this))
 				return;
 

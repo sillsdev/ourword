@@ -6,7 +6,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="true" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -17,7 +17,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -28,7 +28,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -39,10 +39,22 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="0" Alignment="0" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="MergeHeader" DisplayName="Merge Window Header" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="12" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+            </JCharacterStyle>
+          </own>
+        </JParagraphStyle>
+        <JParagraphStyle SpaceBefore="0" SpaceAfter="6" Alignment="3" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="MergeParagraph" DisplayName="Merge Window Paragraph" Description="" Keep="false">
+          <own Name="CharStyle">
+            <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
             </JCharacterStyle>
           </own>
         </JParagraphStyle>
@@ -62,16 +74,16 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="16" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-0</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-1</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="16" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-3</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -82,7 +94,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -99,7 +111,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -110,7 +122,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -121,7 +133,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -138,16 +150,16 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-0</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-1</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-3</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -164,16 +176,16 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="true" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true" Strike="false">
                   <ref Name="ws">3-WritingSystems-0</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true" Strike="false">
                   <ref Name="ws">3-WritingSystems-1</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="true" Strike="false">
                   <ref Name="ws">3-WritingSystems-3</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -184,7 +196,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -195,7 +207,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="12" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="12" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="12" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -212,7 +224,7 @@
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="14" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
               <ownseq Name="fws">
-                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false">
+                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false" Strike="false">
                   <ref Name="ws">3-WritingSystems-2</ref>
                 </JFontForWritingSystem>
               </ownseq>
@@ -227,59 +239,63 @@
         </JParagraphStyle>
       </ownseq>
       <ownseq Name="CharStyles">
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="add" DisplayName="Revision Addition" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+        </JCharacterStyle>
         <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="b" DisplayName="Bold" Description="" Height="10" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
           <ownseq Name="fws">
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-0</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-1</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-3</ref>
             </JFontForWritingSystem>
           </ownseq>
         </JCharacterStyle>
         <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="c" DisplayName="Chapter Number" Description="" Height="20" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
           <ownseq Name="fws">
-            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-0</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-1</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="20" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-3</ref>
             </JFontForWritingSystem>
           </ownseq>
         </JCharacterStyle>
         <JCharacterStyle Super="true" Sub="false" Editable="true" Abbrev="cf" DisplayName="See Also Footnote Character" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Navy">
           <ownseq Name="fws">
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
           </ownseq>
         </JCharacterStyle>
         <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="d" DisplayName="Dashed" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="true" FontColor="Navy">
         </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="del" DisplayName="Revision Deletion" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+        </JCharacterStyle>
         <JCharacterStyle Super="true" Sub="false" Editable="true" Abbrev="fn" DisplayName="Footnote Character" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Navy">
           <ownseq Name="fws">
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-0</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-1</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-3</ref>
             </JFontForWritingSystem>
           </ownseq>
@@ -292,7 +308,7 @@
         </JCharacterStyle>
         <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="L" DisplayName="Label" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Crimson">
           <ownseq Name="fws">
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
           </ownseq>
@@ -303,20 +319,20 @@
         </JCharacterStyle>
         <JCharacterStyle Super="true" Sub="false" Editable="true" Abbrev="v" DisplayName="Verse Number" Description="" Height="10" Bold="false" Italic="false" Strikeout="false" Underline="false" FontColor="Red">
           <ownseq Name="fws">
-            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false">
+            <JFontForWritingSystem Name="Arial" Size="10" Bold="false" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
           </ownseq>
         </JCharacterStyle>
       </ownseq>
       <ownseq Name="WritingSystems">
-        <JWritingSystem IdeaGraph="false" Name="Aboriginal" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}">
+        <JWritingSystem IdeaGraph="false" Name="Aboriginal" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}" Keyboard="">
         </JWritingSystem>
-        <JWritingSystem IdeaGraph="true" Name="Chinese" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}">
+        <JWritingSystem IdeaGraph="true" Name="Chinese" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}" Keyboard="">
         </JWritingSystem>
-        <JWritingSystem IdeaGraph="false" Name="Latin" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="21 {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U} {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {eee}" ARResult="21 {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú} {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {Halelujah}">
+        <JWritingSystem IdeaGraph="false" Name="Latin" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="21 {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U} {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {eee}" ARResult="21 {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú} {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {Halelujah}" Keyboard="">
         </JWritingSystem>
-        <JWritingSystem IdeaGraph="false" Name="Nigeria" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}">
+        <JWritingSystem IdeaGraph="false" Name="Nigeria" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}" Keyboard="">
         </JWritingSystem>
       </ownseq>
     </DStyleSheet>

@@ -31,7 +31,7 @@ using OurWord.View;
 
 namespace OurWord.Dialogs
 {
-	public class DialiogCreateTranslation : System.Windows.Forms.Form
+	public class DialogCreateTranslation : System.Windows.Forms.Form
 	{
 		// Attrs -----------------------------------------------------------------------------
 		#region Attr{g/s}: string TranslationName
@@ -107,7 +107,7 @@ namespace OurWord.Dialogs
 		private System.ComponentModel.Container components = null;
 		#endregion
 		#region Constructor()
-		public DialiogCreateTranslation()
+		public DialogCreateTranslation()
 		{
 			// Required for Windows Form Designer support
 			InitializeComponent();
@@ -137,7 +137,7 @@ namespace OurWord.Dialogs
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DialiogCreateTranslation));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DialogCreateTranslation));
             this.m_btnHelp = new System.Windows.Forms.Button();
             this.m_btnOK = new System.Windows.Forms.Button();
             this.m_btnCancel = new System.Windows.Forms.Button();
@@ -267,7 +267,7 @@ namespace OurWord.Dialogs
             this.m_lblSettingsHelp.Text = "Navigate to the folder where you want to store the settings file. The file name u" +
                 "sually contains the name of the language, e.g., \"Spanish.otrans.\"";
             // 
-            // DialiogCreateTranslation
+            // DialogCreateTranslation
             // 
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -290,7 +290,7 @@ namespace OurWord.Dialogs
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "DialiogCreateTranslation";
+            this.Name = "DialogCreateTranslation";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Create Translation";

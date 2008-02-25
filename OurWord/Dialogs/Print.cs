@@ -1387,20 +1387,20 @@ namespace OurWord
             Debug.Assert(null != _CStyle);
 
             // Determine what, if any, mods are requested
-            JFontForWritingSystem.Mods mods = JFontForWritingSystem.Mods.None;
+            FontStyle mods = FontStyle.Regular;
             if (string.IsNullOrEmpty(_CStyle.Abbrev))
             {
                 _CStyle = _PStyle.CharacterStyle;
             }
             else if (_CStyle.Abbrev == DStyleSheet.c_StyleAbbrevItalic)
             {
-                mods = JFontForWritingSystem.Mods.Italic;
+                mods = FontStyle.Italic;
                 Debug.Assert(null != _PStyle);
                 _CStyle = _PStyle.CharacterStyle;
             }
             else if (_CStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
             {
-                mods = JFontForWritingSystem.Mods.Bold;
+                mods = FontStyle.Bold;
                 Debug.Assert(null != _PStyle);
                 _CStyle = _PStyle.CharacterStyle;
             }
@@ -1410,21 +1410,7 @@ namespace OurWord
                 G.TTranslation.WritingSystemVernacular);
 
             // Adjust for any modifications
-            switch (mods)
-            {
-                case JFontForWritingSystem.Mods.Bold:
-                    m_Font = fws.FontBold;
-                    break;
-                case JFontForWritingSystem.Mods.Italic:
-                    m_Font = fws.FontItalic;
-                    break;
-                case JFontForWritingSystem.Mods.BoldItalic:
-                    m_Font = fws.FontBoldItalic;
-                    break;
-                default:
-                    m_Font = fws.FontNormal;
-                    break;
-            }
+            m_Font = fws.FindOrAddFont(false, mods);
 
             // Adjust for superscript
             if (_CStyle.IsSuperScript)
@@ -2157,7 +2143,7 @@ namespace OurWord
 
 			// Measure arbitrary text in that font.
             Font font = ps.CharacterStyle.FindOrAddFontForWritingSystem(
-                G.TTranslation.WritingSystemVernacular).FontNormal;
+                G.TTranslation.WritingSystemVernacular).DefaultFont;
 			float yTextHeight =  g.MeasureString("ABCDE", font).Height;
 
 			// Allow double this line height
@@ -2208,7 +2194,7 @@ namespace OurWord
 			// Retrieve the font for the footer
 			JParagraphStyle ps = G.StyleSheet.FindParagraphStyleOrNormal("h");
             Font font = ps.CharacterStyle.FindOrAddFontForWritingSystem(
-                G.TTranslation.WritingSystemVernacular).FontNormal;
+                G.TTranslation.WritingSystemVernacular).DefaultFont;
 
 			// Left and Right Margins
 			float xLeft  = RectPage.Left;
@@ -2576,7 +2562,7 @@ namespace OurWord
 					int cFn = vFnLines.Length;
 					float fFnHeight = MeasureFootnoteHeight( vFnLines );
 
-					// Remove the count of footnote lines from the end of the array,
+					// ctrlRemove the count of footnote lines from the end of the array,
 					// and increase the y coordinate for the footnote area by the
 					// height of the lines we are removing
 					FootnoteLines.RemoveRange(
@@ -2584,11 +2570,11 @@ namespace OurWord
 						vFnLines.Length);
 					yFootnotes += fFnHeight;
 
-					// Remove any DropCaps associated with this PLine
+					// ctrlRemove any DropCaps associated with this PLine
 					if (null != line.DropCap)
 						DropCaps.Remove(line.DropCap);
 
-					// Remove the body line
+					// ctrlRemove the body line
 					BodyLines.RemoveAt( iBody );
 
 					// Reset the Position object to where it was at the beginning of

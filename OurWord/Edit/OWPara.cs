@@ -32,9 +32,10 @@ namespace OurWord.Edit
             None = 0,
             SuppressVerseNumbers = 1,
             ShowLineNumbers = 2,
-            IsEditable = 4,
-            ShowBackTranslation = 8,
-            CanRestructureParagraphs = 16
+            IsEditable = 4,                  // Can Type, Delete, Select, Copy, Cut, Paste
+            IsLocked = (8 | IsEditable),     // Can only Select & Copy; no changes (requires IsEditable to enable Select/Copy)
+            ShowBackTranslation = 16,
+            CanRestructureParagraphs = 32
         };
         #endregion
         #region Attr{g}: Flags Options
@@ -112,6 +113,15 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VAttr{g}: bool IsLocked
+        public bool IsLocked
+        {
+            get
+            {
+                return (Options & Flags.IsLocked) == Flags.IsLocked;
+            }
+        }
+        #endregion
 
         // Ownership Hierarchy ---------------------------------------------------------------
         #region Attr{g}: OWWindow.Row.Pile Pile - the owning pile that this paragraph is in
@@ -119,8 +129,16 @@ namespace OurWord.Edit
         {
             get
             {
+                // This Pile should have been set during the Pile.AddParagraph method.
+                // The OWPara needs to know the Pile of which it is a member.
                 Debug.Assert(null != m_Pile);
+
                 return m_Pile;
+            }
+            set
+            {
+                Debug.Assert(null != value);
+                m_Pile = value;
             }
         }
         OWWindow.Row.Pile m_Pile = null;
@@ -139,9 +157,11 @@ namespace OurWord.Edit
         {
             get
             {
-                return Pile.Window;
+                Debug.Assert(null != m_wndWindow);
+                return m_wndWindow;
             }
         }
+        OWWindow m_wndWindow = null;
         #endregion
         #region Attr{g}: JObject DataSource - the DParagraph or DNote behind this OWPara
         public JObject DataSource
@@ -156,7 +176,7 @@ namespace OurWord.Edit
         #endregion
 
         // Blocks ----------------------------------------------------------------------------
-        #region Block Operations (Add, Remove, etc)
+        #region Block Operations (Add, ctrlRemove, etc)
         #region Attr{g}: EBlock[] Blocks - the list of displayable elements in this paragraph
         public EBlock[] Blocks
         {
@@ -444,9 +464,10 @@ namespace OurWord.Edit
             #region Method: Font GetSuperscriptFont()
             protected Font GetSuperscriptFont()
             {
-                return new Font(FontForWS.FontNormalZoom.FontFamily,
-                    FontForWS.FontNormalZoom.Size * 0.8F,
-                    FontForWS.FontNormalZoom.Style);
+                Font f = FontForWS.DefaultFontZoomed;
+                return new Font(f.FontFamily,
+                    f.Size * 0.8F,
+                    f.Style);
             }
             #endregion
             #region Method: Brush GetBrush()
@@ -470,7 +491,7 @@ namespace OurWord.Edit
                 // font stored in the CharacterStyle.
                 StringFormat fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-                m_fMeasuredWidth = g.MeasureString(Text, FontForWS.FontNormalZoom, 1000, fmt).Width;
+                m_fMeasuredWidth = g.MeasureString(Text, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
             }
             #endregion
 
@@ -559,10 +580,10 @@ namespace OurWord.Edit
                 float x = Position.X; 
 
                 // Calculate "y" to be centered horizontally
-                float y = Position.Y + (Height / 2) - (FontForWS.FontNormalZoom.Height / 2);
+                float y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
 
                 // Draw the string
-                Draw.String(Text, FontForWS.FontNormalZoom, GetBrush(), new PointF(x, y));
+                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
             }
             #endregion
         }
@@ -610,7 +631,7 @@ namespace OurWord.Edit
                 // Do the measurement
                 StringFormat fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-                m_fMeasuredWidth = g.MeasureString(s, FontForWS.FontNormalZoom, 1000, fmt).Width;
+                m_fMeasuredWidth = g.MeasureString(s, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
             }
             #endregion
 
@@ -645,10 +666,9 @@ namespace OurWord.Edit
                 // background.
                 if (Para.SuppressVerseNumbers)
                 {
-                    if (Para.Editable && !Window.LockedFromEditing)
+                    if (Para.Editable && !Para.IsLocked)
                     {
-                        RectangleF r = new RectangleF(Position,
-                            new SizeF(MeasuredWidth, Height));
+                        RectangleF r = new RectangleF(Position, new SizeF(MeasuredWidth, Height));
                         Draw.FillRectangle(Para.EditableBackgroundColor, r);
                     }
                     return;
@@ -760,23 +780,34 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Attr{g}: bool GlueToNext - Always T for a Label
-            public override bool GlueToNext
+            #region Method: override void Paint()
+            public override void Paint()
             {
-                get
-                {
-                    return true;
-                }
-                set
-                {
-                }
+                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+            }
+            #endregion
+        }
+        #endregion
+        #region CLASS: ELiteral
+        class ELiteral : EBlock
+        {
+            #region Constructor(OWPara, sText)
+            public ELiteral(OWPara para, string sText, string sCharStyleAbbrev)
+                : base(para, sText)
+            {
+                JCharacterStyle cs = para.PStyle.CharacterStyle;
+
+                if (!string.IsNullOrEmpty(sCharStyleAbbrev) && sCharStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
+                    cs = G.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
+
+                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
             }
             #endregion
 
             #region Method: override void Paint()
             public override void Paint()
             {
-                Draw.String(Text, FontForWS.FontNormalZoom, GetBrush(), Position);
+                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
         }
@@ -868,21 +899,16 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    switch (m_mods)
-                    {
-                        case JFontForWritingSystem.Mods.Bold:
-                            return FontForWS.FontBoldZoom;
-                        case JFontForWritingSystem.Mods.Italic:
-                            return FontForWS.FontItalicZoom;
-                        case JFontForWritingSystem.Mods.BoldItalic:
-                            return FontForWS.FontBoldItalicZoom;
-                        default:
-                            return FontForWS.FontNormalZoom;
-                    }
+                    // Optimization
+                    if (m_mods == FontStyle.Regular)
+                        return FontForWS.DefaultFontZoomed;
+
+                    // Generic find-or-create font as needed
+                    return FontForWS.FindOrAddFont(true, m_mods);
                 }
             }
             #endregion
-            JFontForWritingSystem.Mods m_mods;
+            FontStyle m_mods;
 
             // Scaffolding -------------------------------------------------------------------
             #region DPhrase Phrase - the phrase from which this EWord was generated
@@ -897,7 +923,7 @@ namespace OurWord.Edit
             DPhrase m_Phrase = null;
             #endregion
             #region Constructor(OWPara, DPhrase, sText)
-            public EWord(OWPara para, JCharacterStyle style, DPhrase phrase, string sText, JFontForWritingSystem.Mods _mods)
+            public EWord(OWPara para, JCharacterStyle style, DPhrase phrase, string sText, FontStyle _mods)
                 : base(para, sText)
             {
                 // Remember the phrase from which this EWord was generated
@@ -909,7 +935,7 @@ namespace OurWord.Edit
 
                 // Switch to italics (or whatever) if that is what is desired
                 if (phrase.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal &&
-                    m_mods == JFontForWritingSystem.Mods.None)
+                    m_mods == FontStyle.Regular)
                 {
                     cs = G.StyleSheet.FindCharacterStyleOrNormal(phrase.CharacterStyleAbbrev);
                 }
@@ -922,7 +948,7 @@ namespace OurWord.Edit
                 OWPara para, JCharacterStyle style, DPhrase phrase)
             {
                 EWord word = new EWord(para, style, phrase, c_chInsertionSpace.ToString(), 
-                    JFontForWritingSystem.Mods.None);
+                    FontStyle.Regular);
                 return word;
             }
             #endregion
@@ -941,7 +967,7 @@ namespace OurWord.Edit
             {
                 // The white background
                 PaintBackgroundRectangle(
-                    (Para.Editable && !Window.LockedFromEditing) ? 
+                    (Para.Editable && !Para.IsLocked) ? 
                         Para.EditableBackgroundColor : 
                         Window.BackColor );
 
@@ -1004,7 +1030,7 @@ namespace OurWord.Edit
 
                 // Paint the white background, for those portions that are not selected
                 PaintBackgroundRectangle(
-                    Window.LockedFromEditing ? Window.BackColor : Para.EditableBackgroundColor);
+                    Para.IsLocked ? Window.BackColor : Para.EditableBackgroundColor);
 
                 // Paint the selected background
                 RectangleF rectSelected = new RectangleF(xSelLeft, Position.Y, xSelRight - xSelLeft, Height);
@@ -1168,10 +1194,8 @@ namespace OurWord.Edit
 
                 // Create the Selection
                 OWWindow.Sel.SelPoint Anchor = new OWWindow.Sel.SelPoint(iBlock, iChar);
-                Para.Window.Selection = new OWWindow.Sel(Para, Anchor);
-
-                // Deal with those at the end of a word
-                Para.NormalizeSelection();
+                OWWindow.Sel selection = new OWWindow.Sel(Para, Anchor);
+                Para.Window.Selection = Para.NormalizeSelection(selection);
             }
             #endregion
             #region Cmd: cmdMouseMove
@@ -1211,7 +1235,8 @@ namespace OurWord.Edit
 
                 // Passed the test; so extend the selection to this new End point
                 OWWindow.Sel.SelPoint end = new OWWindow.Sel.SelPoint(iEnd, iChar);
-                Window.Selection = new OWWindow.Sel(Para, Window.Selection.Anchor, end);
+                OWWindow.Sel selection = new OWWindow.Sel(Para, Window.Selection.Anchor, end);
+                Window.Selection = Para.NormalizeSelection(selection);
             }
             #endregion
             #region Cmd: cmdLeftMouseDoubleClick
@@ -1311,7 +1336,7 @@ namespace OurWord.Edit
             #region Method: override void Paint()
             public override void Paint()
             {
-                Draw.String(Text, FontForWS.FontNormalZoom, GetBrush(), Position);
+                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
         }
@@ -1337,7 +1362,7 @@ namespace OurWord.Edit
                 // Determine which character style goes with the word. We default to
                 // the "Override" which is passed in, but if this is null, then we
                 // get it from the normal source (the paragraph's style)
-                JFontForWritingSystem.Mods mods = JFontForWritingSystem.Mods.None;
+                FontStyle mods = FontStyle.Regular;
                 JCharacterStyle cs = CStyleOverride;
                 if (null == cs)
                 {
@@ -1345,9 +1370,9 @@ namespace OurWord.Edit
                     if (phrase.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
                     {
                         if (phrase.CharacterStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
-                            mods = JFontForWritingSystem.Mods.Bold;
+                            mods = FontStyle.Bold;
                         else if (phrase.CharacterStyle.Abbrev == DStyleSheet.c_StyleAbbrevItalic)
-                            mods = JFontForWritingSystem.Mods.Italic;
+                            mods = FontStyle.Italic;
                         else
                             cs = phrase.CharacterStyle;
                     }
@@ -1562,17 +1587,19 @@ namespace OurWord.Edit
         float m_fLineHeight = 0;
         #endregion      
 
-        #region private Constructor(...) - the stuff that is in common
+        #region private Constructor(OWWindow, JWS, PStyle, JObject, flags) - the stuff that is in common
         private OWPara(
-            OWWindow.Row.Pile _Pile, 
-            JObject _objDataSource,
+            OWWindow _wnd,
             JWritingSystem _ws,
+            JParagraphStyle _PStyle,
+            JObject _objDataSource,
             Flags _Options)
         {
             // Keep track of the attributes passed in
-            m_Pile = _Pile;
-            m_objDataSource = _objDataSource;
+            m_wndWindow = _wnd;
             m_WritingSystem = _ws;
+            m_pStyle = _PStyle;
+            m_objDataSource = _objDataSource;
             m_Options = _Options;
 
             // Initialize the vector of Blocks
@@ -1582,46 +1609,48 @@ namespace OurWord.Edit
             m_vLines = new Line[0];
         }
         #endregion
-        #region Constructor(Pile, DParagraph, JWritingSystem, bDisplayBT, Flags) - for DParagraph
-        public OWPara(OWWindow.Row.Pile _Pile, DParagraph p, JWritingSystem _ws, Flags _Options)
-            : this(_Pile, p as JObject, _ws, _Options)
+        #region Constructor(wnd, JWS, PStyle, DParagraph, clrEditableBackground, Flags) - for DParagraph
+        public OWPara(OWWindow _wnd, 
+            JWritingSystem _ws, 
+            JParagraphStyle PStyle,
+            DParagraph p,
+            Color clrEditableBackground, 
+            Flags _Options)
+            : this(_wnd, _ws, PStyle, p as JObject, _Options)
         {
             // The paragraph itself may override to make itself uneditable, 
             // even though we received "true" from the _bEditable parameter.
             if (!p.IsUserEditable)
                 Editable = false;
 
-            // Store the paragraph's style here, so we don't have to keep
-            // looking it up (p.Style does an Find into the stylesheet.)
-            m_pStyle = p.Style;
-
             // Line height
             m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).FontNormalZoom.Height;
+                WritingSystem).LineHeightZoomed;
 
             // Interpret the paragraph's contents into our internal data structure
             _Initialize(p);
 
             // Retrieve the background color for editable parts of the paragraph
-            m_EditableBackgroundColor = Window.EditableBackgroundColor;
+            m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion
-        #region Constructor(Pile, DNote, JWritingSystem, Flags) - for DNote
-        public OWPara(OWWindow.Row.Pile _Pile, DNote note, JWritingSystem _ws, Flags _Options)
-            : this(_Pile, note as JObject, _ws, _Options)
+        #region Constructor(wnd, JWS, PStyle, DNote, clrEditableBackground, Flags) - for DNote
+        public OWPara(OWWindow _wnd, 
+            JWritingSystem _ws, 
+            JParagraphStyle PStyle, 
+            DNote note, 
+            Color clrEditableBackground, 
+            Flags _Options)
+            : this(_wnd, _ws, PStyle, note as JObject, _Options)
         {
             // The note itself may override <_bEditable> to make itself uneditable, 
             // even though we received "true" from the <_bEditable> parameter.
             if (!note.IsUserEditable)
                 Editable = false;
 
-            // Store the paragraph's style here, so we don't have to keep
-            // looking it up (p.Style does an Find into the stylesheet.)
-            m_pStyle = G.StyleSheet.FindParagraphStyle(DNote.StyleAbbrev);
-
             // Line height
             m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).FontNormalZoom.Height;
+                WritingSystem).LineHeightZoomed;
 
             // Add the note's bitmap
             ENote nNote = new ENote(this, note);
@@ -1637,27 +1666,26 @@ namespace OurWord.Edit
             _InitializeBasicTextWords(note.NoteText, null);
 
             // Retrieve the background color for editable parts of the note
-            m_EditableBackgroundColor = note.NoteDef.BackgroundColor;
+            m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion
-        #region Constructor(Pile, DRun[], JWritingSystem, sLabel, Flags)
-        public OWPara(OWWindow.Row.Pile _Pile, 
+        #region Constructor(wnd, JWS, PStyle, DRun[], sLabel, Flags)
+        public OWPara(OWWindow _wnd, 
+            JWritingSystem _ws,
+            JParagraphStyle PStyle,
             DRun[] vRuns, 
-            JWritingSystem _ws, 
             string sLabel, 
             Flags _Options)
-            : this(_Pile, vRuns[0].Owner, _ws, _Options)
+            : this(_wnd, _ws, PStyle, vRuns[0].Owner, _Options)
             // For the Related Languages window
         {
-            // For the style, we'll just use normal
-            m_pStyle = G.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_StyleReferenceTranslation);
-
             // Line height
             m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).FontNormalZoom.Height;
+                WritingSystem).LineHeightZoomed;
 
             // We'll add the language name as a BigHeader
-            AddBlock(new EBigHeader(this, WritingSystem, sLabel));
+            if (!string.IsNullOrEmpty(sLabel))
+                AddBlock(new EBigHeader(this, WritingSystem, sLabel));
 
             // Add the text (we only care about verses and text)
             foreach (DRun run in vRuns)
@@ -1686,6 +1714,38 @@ namespace OurWord.Edit
                     continue;
                 if (!word.EndsWithWhiteSpace)
                     word.Text += ' ';
+            }
+        }
+        #endregion
+        #region Constructor(wnd, JWS, PStyle, sLiteralString)
+        public OWPara(OWWindow _wnd, JWritingSystem _ws, JParagraphStyle pStyle, string sLiteralText)
+            : this(_wnd, _ws, pStyle, new DPhrase[] { new DPhrase(null, sLiteralText) })
+        {
+        }
+        #endregion
+        #region Constructor(wnd, JWS, PStyle, DPhrase[] vLiteralPhrases)
+        public OWPara(OWWindow _wnd, JWritingSystem _ws, JParagraphStyle pStyle, DPhrase[] vLiteralPhrases)
+            : this(_wnd, _ws, pStyle, (JObject)null, Flags.None)
+        {
+            // Line height
+            m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
+                WritingSystem).LineHeightZoomed;
+
+            // Each Literal String will potentially have its own character style
+            foreach (DPhrase p in vLiteralPhrases)
+            {
+                // Parse the Literal Test into its parts
+                string[] vs = p.Text.Split(new char[] { ' ' },
+                    StringSplitOptions.RemoveEmptyEntries);
+
+                // Create the literal strings
+                for (int i = 0; i < vs.Length; i++)
+                {
+                    if (i < vs.Length - 1)
+                        vs[i] = vs[i] + " ";
+
+                    AddBlock(new ELiteral(this, vs[i], p.CharacterStyleAbbrev));
+                }
             }
         }
         #endregion
@@ -2415,7 +2475,7 @@ namespace OurWord.Edit
         #endregion
 
         // Painting --------------------------------------------------------------------------
-        #region Attr{g}: Color EditableBackgroundColor - shows the user where typing is permitted
+        #region VAttr{g}: Color EditableBackgroundColor - shows the user where typing is permitted
         Color EditableBackgroundColor
         {
             get
@@ -2466,74 +2526,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: bool Select_BeginningOfFirstWord()
-        public bool Select_BeginningOfFirstWord()
-        {
-            if (!Editable)
-                return false;
-
-            for (int i = 0; i < Blocks.Length; i++)
-            {
-                if (null != Blocks[i] as EWord)
-                {
-                    Window.Selection = new OWWindow.Sel(this, i, 0);
-                    return true;
-                }
-            }
-            return false;
-        }
-        #endregion
-        #region Method: bool Select_NextWord(int iFirstCandidate)
-        public bool Select_NextWord(int iFirstCandidate)
-        {
-            if (!Editable)
-                return false;
-
-            for (int i = iFirstCandidate; i < Blocks.Length; i++)
-            {
-                if (null != Blocks[i] as EWord)
-                {
-                    Window.Selection = new OWWindow.Sel(this, i, 0);
-                    return true;
-                }
-            }
-            return false;
-        }
-        #endregion
-        #region Method: bool Select_EndOfLastWord()
-        public bool Select_EndOfLastWord()
-        {
-            if (!Editable)
-                return false;
-
-            for (int i = Blocks.Length - 1; i >= 0; i--)
-            {
-                if (null != Blocks[i] as EWord)
-                {
-                    Window.Selection = new OWWindow.Sel(this, i, Blocks[i].Text.Length);
-                    return true;
-                }
-            }
-            return false;
-        }
-        #endregion
-        #region Method: bool Select_PreviousWord(int iFirstCandidate)
-        public bool Select_PreviousWord(int iFirstCandidate)
-        {
-            if (!Editable)
-                return false;
-
-            for (int i = iFirstCandidate; i >= 0; i--)
-            {
-                if (null != Blocks[i] as EWord)
-                {
-                    Window.Selection = new OWWindow.Sel(this, i, Blocks[i].Text.Length);
-                    return true;
-                }
-            }
-            return false;
-        }
-        #endregion
         #region Method: void Select_LineBegin()
         public void Select_LineBegin()
         {
@@ -2583,105 +2575,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: bool SelectEditablePositionAt(int iTextPos)
-        /// <summary>
-        /// Makes a selection at the requested position in the paragraph
-        /// </summary>
-        /// <param name="iTextPos">The position of the cursor from the beginning of the
-        /// paragraph, counting only editable text (e.g., skipping over verse numbers).
-        /// A value of "0" would select the very first editable position in the
-        /// paragraph.</param>
-        /// <returns>true if successful, false otherwise</returns>
-        public bool SelectEditablePositionAt(int iTextPos)
-        {
-            if (!Editable)
-                return false;
-
-            int iBlock = 0;
-            for (; iBlock < Blocks.Length; iBlock++)
-            {
-                EWord word = Blocks[iBlock] as EWord;
-                if (null == word)
-                    continue;
-
-                if (word.Text.Length < iTextPos)
-                    iTextPos -= word.Text.Length;
-                else
-                    break;
-            }
-
-            Window.Selection = new OWWindow.Sel(this, new OWWindow.Sel.SelPoint(iBlock, iTextPos));
-            NormalizeSelection();
-            return true;
-        }
-        #endregion
-
-        #region Method: void ExtendSelection_CharRight()
-        public void ExtendSelection_CharRight()
-        {
-            if (!Editable)
-                return;
-
-            // Get the point we are working from
-            OWWindow.Sel.SelPoint pt = Window.Selection.Anchor;
-            if (!Window.Selection.IsInsertionPoint)
-                pt = Window.Selection.End;
-            int iBlock = pt.iBlock;
-            int iChar = pt.iChar;
-
-            // Move one to the right if possible
-            if (iChar < pt.Word.Text.Length)
-                iChar++;
-
-            // Move over into the next word if necessary (and if possible)
-            if (iChar == pt.Word.Text.Length)
-            {
-                if (iBlock < Blocks.Length - 1 && null != Blocks[iBlock+1] as EWord)
-                {
-                    iBlock++;
-                    iChar = 0;
-                }
-            }
-
-            // Create the new, updated selection
-            Window.Selection = new OWWindow.Sel(this, 
-                Window.Selection.Anchor,
-                new OWWindow.Sel.SelPoint(iBlock, iChar));
-        }
-        #endregion
-        #region Method: void ExtendSelection_CharLeft()
-        public void ExtendSelection_CharLeft()
-        {
-            if (!Editable)
-                return;
-
-            // Get the point we are working from
-            OWWindow.Sel.SelPoint pt = Window.Selection.Anchor;
-            if (!Window.Selection.IsInsertionPoint)
-                pt = Window.Selection.End;
-            int iBlock = pt.iBlock;
-            int iChar = pt.iChar;
-
-            // If we are at a word boundary, then move to the end of the preceeding word
-            if (iChar == 0)
-            {
-                if (iBlock > 0 && null != Blocks[iBlock - 1] as EWord)
-                {
-                    iBlock--;
-                    iChar = Blocks[iBlock].Text.Length;
-                }
-            }
-
-            // Move one to the left if possible
-            if (iChar > 0)
-                iChar--;
-
-            // Create the new, updated selection
-            Window.Selection = new OWWindow.Sel(this, 
-                Window.Selection.Anchor,
-                new OWWindow.Sel.SelPoint(iBlock, iChar));
-        }
-        #endregion
         #region Method: void ExtendSelection_Line(bool bEnd)
         public void ExtendSelection_Line(bool bEnd)
             // bEnd - T if extending to the End of the line, 
@@ -2743,30 +2636,30 @@ namespace OurWord.Edit
                 Window.Selection.Anchor :
                 Window.Selection.End;
 
-            // Get the next line down; abort if no-can-do
+            // Retrieve the current line
             Line lineCurrent = LineContainingBlock(sp.Word);
             int iLineCurrent = IndexOfLine(lineCurrent);
+
+            // Get the next line down; abort if no-can-do. This gives us coordinates to look for.
             int iLineTarget = (bDown) ? iLineCurrent + 1 : iLineCurrent - 1;
             if (iLineTarget == Lines.Length || iLineTarget < 0)
                 return;
             Line lineTarget = Lines[iLineTarget];
             PointF pt = new PointF(x, lineTarget.Position.Y);
 
-            // Loop through the blocks on this line, 
-            //    bDown == T: from left-to-right, 
-            //    bDown == F: from right-to-left
-            // to extend  the selection as far as is possible before 
-            // encountering a non-EWord.
-            int iStart = (bDown) ? 0 : lineTarget.Blocks.Length - 1;
-            int iEnd = (bDown) ? lineTarget.Blocks.Length : -1;
-            int i = iStart;
-            while (i != iEnd)
+            // Loop through the blocks, looking for the pt, but don't go beyond the line in question
+            EBlock blockEnd = (bDown) ?
+                lineTarget.Blocks[lineTarget.Blocks.Length - 1] :
+                lineTarget.Blocks[0];
+            int i = IndexOfBlock(sp.Word);
+            int iEnd = IndexOfBlock(blockEnd);
+            do
             {
-                // If we run into a block that is not an EWord, then we can go no further.
-                EWord word = lineTarget.Blocks[i] as EWord;
+                // Iterate to the next block; if it isn't an EWord, then we can go no further.
+                i += (bDown) ? 1 : -1;
+                EWord word = Blocks[i] as EWord;
                 if (null == word)
-                    return;
-                int iBlock = word.PositionWithinPara;
+                    break;
 
                 // If the word contains "x", then we are happily sucessfully done.
                 if (word.ContainsPoint(pt))
@@ -2774,31 +2667,142 @@ namespace OurWord.Edit
                     int iChar = word.GetCharacterIndex(pt);
                     Window.Selection = new OWWindow.Sel(this, 
                         Window.Selection.Anchor,
-                        new OWWindow.Sel.SelPoint(iBlock, iChar));
+                        new OWWindow.Sel.SelPoint(i, iChar));
                     return;
                 }
 
-                // Otherwise, set the selection to the end of this word and loop to
-                // see if the next one works for us.
-                Window.Selection = new OWWindow.Sel(this, 
+                // Otherwise, set the selection to the end of this word; the loop will then
+                // see if the next one will work for us.
+                Window.Selection = new OWWindow.Sel(this,
                     Window.Selection.Anchor,
-                    new OWWindow.Sel.SelPoint(iBlock, ((bDown) ? word.Text.Length : 0)));
+                    new OWWindow.Sel.SelPoint(i, ((bDown) ? word.Text.Length : 0)));
 
-                // Increment to the next block
-                i += (bDown) ? 1 : -1;
-            }
+            } while (i != iEnd);
         }
         #endregion
-        #region Method: void ExtendSelection_WordRight()
-        public void ExtendSelection_WordRight()
+
+        #region Method: bool SelectEditablePositionAt(int iTextPos)
+        /// <summary>
+        /// Makes a selection at the requested position in the paragraph
+        /// </summary>
+        /// <param name="iTextPos">The position of the cursor from the beginning of the
+        /// paragraph, counting only editable text (e.g., skipping over verse numbers).
+        /// A value of "0" would select the very first editable position in the
+        /// paragraph.</param>
+        /// <returns>true if successful, false otherwise</returns>
+        public bool SelectEditablePositionAt(int iTextPos)
         {
             if (!Editable)
-                return;
+                return false;
+
+            int iBlock = 0;
+            for (; iBlock < Blocks.Length; iBlock++)
+            {
+                EWord word = Blocks[iBlock] as EWord;
+                if (null == word)
+                    continue;
+
+                if (word.Text.Length < iTextPos)
+                    iTextPos -= word.Text.Length;
+                else
+                    break;
+            }
+
+            OWWindow.Sel selection = new OWWindow.Sel(this, new OWWindow.Sel.SelPoint(iBlock, iTextPos));
+            Window.Selection = NormalizeSelection(selection);
+            return true;
+        }
+        #endregion
+
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // - Reworked to not manipulateWindow.Selection directly (need to do to all of the 
+        //      OWPara methods)
+        // - Also has Tests Added as I do the rework
+        //////////////////////////////////////////////////////////////////////////////////////
+
+        // Creating InsertionPoint Selections
+        #region Method: Sel Select_NextWord(int iFirstCandidate)
+        /// <summary>
+        /// Selects the beginning of the next selectable word, starting with iFirstCandidate.
+        /// </summary>
+        /// <param name="iFirstCandidate">the EBlock to start the search for a selectable word.</param>
+        /// <returns>null if a selection was not possible, otherwise the new selection</returns>
+        public OWWindow.Sel Select_NextWord(int iFirstCandidate)
+        {
+            if (!Editable)
+                return null;
+
+            for (int i = iFirstCandidate; i < Blocks.Length; i++)
+            {
+                if (null != Blocks[i] as EWord)
+                {
+                    return new OWWindow.Sel(this, i, 0);
+                }
+            }
+            return null;
+        }
+        #endregion
+        #region Method: Sel Select_PreviousWord(int iFirstCandidate)
+        public OWWindow.Sel Select_PreviousWord(int iFirstCandidate)
+        {
+            if (!Editable)
+                return null;
+
+            for (int i = iFirstCandidate; i >= 0; i--)
+            {
+                if (null != Blocks[i] as EWord)
+                {
+                    return new OWWindow.Sel(this, i, Blocks[i].Text.Length);
+                }
+            }
+            return null;
+        }
+        #endregion
+        #region Method: Sel Select_BeginningOfFirstWord()
+        public OWWindow.Sel Select_BeginningOfFirstWord()
+        {
+            if (!Editable)
+                return null;
+
+            for (int i = 0; i < Blocks.Length; i++)
+            {
+                if (null != Blocks[i] as EWord)
+                {
+                    return new OWWindow.Sel(this, i, 0);
+                }
+            }
+            return null;
+        }
+        #endregion
+        #region Method: Sel Select_EndOfLastWord()
+        public OWWindow.Sel Select_EndOfLastWord()
+        {
+            if (!Editable)
+                return null;
+
+            for (int i = Blocks.Length - 1; i >= 0; i--)
+            {
+                if (null != Blocks[i] as EWord)
+                {
+                    return new OWWindow.Sel(this, i, Blocks[i].Text.Length);
+                }
+            }
+            return null;
+        }
+        #endregion
+
+        // Extending Selections
+        #region Method: Sel ExtendSelection_WordRight(Sel) - Creates a selection that includes the next word
+        public OWWindow.Sel ExtendSelection_WordRight(OWWindow.Sel selection)
+        {
+            if (!Editable)
+                return selection;
 
             // Get the point we are working from
-            OWWindow.Sel.SelPoint pt = Window.Selection.Anchor;
-            if (!Window.Selection.IsInsertionPoint)
-                pt = Window.Selection.End;
+            OWWindow.Sel.SelPoint pt = selection.Anchor;
+            if (!selection.IsInsertionPoint)
+                pt = selection.End;
             int iBlock = pt.iBlock;
             int iChar = pt.iChar;
 
@@ -2813,21 +2817,22 @@ namespace OurWord.Edit
                 iChar = pt.Word.Text.Length;
 
             // Create the new, updated selection
-            Window.Selection = new OWWindow.Sel(this, 
-                Window.Selection.Anchor,
+            OWWindow.Sel selectionNew = new OWWindow.Sel(this,
+                selection.Anchor,
                 new OWWindow.Sel.SelPoint(iBlock, iChar));
+            return selectionNew;
         }
         #endregion
-        #region Method: void ExtendSelection_WordLeft()
-        public void ExtendSelection_WordLeft()
+        #region Method: Sel ExtendSelection_WordLeft(Sel) - Creates a selection that includes the previous word
+        public OWWindow.Sel ExtendSelection_WordLeft(OWWindow.Sel selection)
         {
             if (!Editable)
-                return;
+                return selection;
 
             // Get the point we are working from
-            OWWindow.Sel.SelPoint pt = Window.Selection.Anchor;
-            if (!Window.Selection.IsInsertionPoint)
-                pt = Window.Selection.End;
+            OWWindow.Sel.SelPoint pt = selection.Anchor;
+            if (!selection.IsInsertionPoint)
+                pt = selection.End;
             int iBlock = pt.iBlock;
             int iChar = pt.iChar;
 
@@ -2839,21 +2844,22 @@ namespace OurWord.Edit
             iChar = 0;
 
             // Create the new, updated selection
-            Window.Selection = new OWWindow.Sel(this, 
-                Window.Selection.Anchor,
+            OWWindow.Sel selectionNew = new OWWindow.Sel(this, 
+                selection.Anchor,
                 new OWWindow.Sel.SelPoint(iBlock, iChar));
+            return selectionNew;
         }
         #endregion
-        #region Method: void ExtendSelection_FarRight()
-        public void ExtendSelection_FarRight()
+        #region Method: Sel ExtendSelection_FarRight(Sel)- Creates a selection that extends to the end of the DBT
+        public OWWindow.Sel ExtendSelection_FarRight(OWWindow.Sel selection)
         {
             if (!Editable)
-                return;
+                return selection;
 
             // Get the point we are working from
-            OWWindow.Sel.SelPoint pt = Window.Selection.Anchor;
-            if (!Window.Selection.IsInsertionPoint)
-                pt = Window.Selection.End;
+            OWWindow.Sel.SelPoint pt = selection.Anchor;
+            if (!selection.IsInsertionPoint)
+                pt = selection.End;
             int iBlock = pt.iBlock;
             int iChar = pt.iChar;
 
@@ -2863,21 +2869,21 @@ namespace OurWord.Edit
             iChar = Blocks[iBlock].Text.Length;
 
             // Create the new, updated selection
-            Window.Selection = new OWWindow.Sel(this, 
-                Window.Selection.Anchor,
+            return new OWWindow.Sel(this, 
+                selection.Anchor,
                 new OWWindow.Sel.SelPoint(iBlock, iChar));
         }
         #endregion
-        #region Method: void ExtendSelection_FarLeft()
-        public void ExtendSelection_FarLeft()
+        #region Method: Sel ExtendSelection_FarLeft(Sel) - Creates a selection that extends to the DBT's beginning
+        public OWWindow.Sel ExtendSelection_FarLeft(OWWindow.Sel selection)
         {
             if (!Editable)
-                return;
+                return selection;
 
             // Get the point we are working from
-            OWWindow.Sel.SelPoint pt = Window.Selection.Anchor;
-            if (!Window.Selection.IsInsertionPoint)
-                pt = Window.Selection.End;
+            OWWindow.Sel.SelPoint pt = selection.Anchor;
+            if (!selection.IsInsertionPoint)
+                pt = selection.End;
             int iBlock = pt.iBlock;
             int iChar = pt.iChar;
 
@@ -2887,38 +2893,114 @@ namespace OurWord.Edit
             iChar = 0;
 
             // Create the new, updated selection
-            Window.Selection = new OWWindow.Sel(this, 
-                Window.Selection.Anchor,
+            return new OWWindow.Sel(this, 
+                selection.Anchor,
+                new OWWindow.Sel.SelPoint(iBlock, iChar));
+        }
+        #endregion
+        #region Method: Sel ExtendSelection_CharRight(Sel) - Creates a selection that extends a char to the right
+        public OWWindow.Sel ExtendSelection_CharRight(OWWindow.Sel selection)
+        {
+            if (!Editable)
+                return selection;
+
+            // Get the point we are working from
+            OWWindow.Sel.SelPoint pt = selection.Anchor;
+            if (!selection.IsInsertionPoint)
+                pt = selection.End;
+            int iBlock = pt.iBlock;
+            int iChar = pt.iChar;
+
+            // Move one to the right if possible
+            if (iChar < pt.Word.Text.Length)
+                iChar++;
+
+            // Move over into the next word if necessary (and if possible)
+            if (iChar == pt.Word.Text.Length)
+            {
+                if (iBlock < Blocks.Length - 1 && null != Blocks[iBlock+1] as EWord)
+                {
+                    iBlock++;
+                    iChar = 0;
+                }
+            }
+
+            // Create the new, updated selection
+            return new OWWindow.Sel(this, 
+                selection.Anchor,
+                new OWWindow.Sel.SelPoint(iBlock, iChar));
+        }
+        #endregion
+        #region Method: Sel ExtendSelection_CharLeft(Sel) - Creates a selection that extends a char to the left
+        public OWWindow.Sel ExtendSelection_CharLeft(OWWindow.Sel selection)
+        {
+            if (!Editable)
+                return selection;
+
+            // Get the point we are working from
+            OWWindow.Sel.SelPoint pt = selection.Anchor;
+            if (!selection.IsInsertionPoint)
+                pt = selection.End;
+            int iBlock = pt.iBlock;
+            int iChar = pt.iChar;
+
+            // If we are at a word boundary, then move to the end of the preceeding word
+            if (iChar == 0)
+            {
+                if (iBlock > 0 && null != Blocks[iBlock - 1] as EWord)
+                {
+                    iBlock--;
+                    iChar = Blocks[iBlock].Text.Length;
+                }
+            }
+
+            // Move one to the left if possible
+            if (iChar > 0)
+                iChar--;
+
+            // Create the new, updated selection
+            return new OWWindow.Sel(this, 
+                selection.Anchor,
                 new OWWindow.Sel.SelPoint(iBlock, iChar));
         }
         #endregion
 
-        #region Method: void NormalizeSelection()
-        public void NormalizeSelection()
+        // Misc selection support
+        #region Method: Sel NormalizeSelection(sel) - Moves from end of word to beginning of next word
+        public OWWindow.Sel NormalizeSelection(OWWindow.Sel selection)
         {
-            OWWindow.Sel sel = Window.Selection;
-            if (null == sel)
-                return;
-            if (sel.IsInsertionIcon)
-                return;
+            // Do we have something normalizable?
+            if (null == selection || selection.IsInsertionIcon)
+                return selection;
 
             // If we are on an Insertion Point at the end of the word,
             // then move to the beginning of the next word if possible
-            if (sel.IsInsertionPoint)
+            if (selection.IsInsertionPoint)
             {
-                if (sel.Anchor.iChar == sel.Anchor.Word.Text.Length &&
-                    sel.Anchor.Word.IsBesideEWord(true))
+                if (selection.Anchor.iChar == selection.Anchor.Word.Text.Length &&
+                    selection.Anchor.Word.IsBesideEWord(true))
                 {
-                    Select_NextWord(sel.Anchor.iBlock + 1);
+                    return Select_NextWord(selection.Anchor.iBlock + 1);
                 }
-                return;
+
+                return selection;
             }
 
             // If a Selection, then move the End accordingly
-            if (null != sel.End && sel.End.iChar == sel.End.Word.Text.Length)
-                ExtendSelection_WordRight();
+            if (null != selection.End &&
+                selection.End.iChar == selection.End.Word.Text.Length)
+            {
+                return ExtendSelection_WordRight(selection);
+            }
+
+            return selection;
         }
         #endregion
+
+        //////////////////////////////////////////////////////////////////////////////////////
+        // End Rework
+        //////////////////////////////////////////////////////////////////////////////////////
+
         #endregion
 
         // Edit Operations -------------------------------------------------------------------
@@ -2937,7 +3019,7 @@ namespace OurWord.Edit
                 case DeleteMode.kDelete:
                     // Delete: create a "content" selection forward
                     if (Window.Selection.IsInsertionPoint)
-                        ExtendSelection_CharRight();
+                        Window.Selection = ExtendSelection_CharRight(Window.Selection);
                     // Do nothing if an insertion icon
                     if (Window.Selection.IsInsertionIcon)
                         return;
@@ -2958,7 +3040,7 @@ namespace OurWord.Edit
                 case DeleteMode.kBackSpace:
                     // Delete: create a "content" selection backward
                     if (Window.Selection.IsInsertionPoint)
-                        ExtendSelection_CharLeft();
+                        Window.Selection = ExtendSelection_CharLeft(Window.Selection);
                     // Do nothing if an insertion icon
                     if (Window.Selection.IsInsertionIcon)
                         return;
@@ -3074,7 +3156,7 @@ namespace OurWord.Edit
             if (mode == DeleteMode.kCopy)
                 return;
 
-            // Remove the old blocks and replace with new ones
+            // ctrlRemove the old blocks and replace with new ones
             RemoveBlocksAt(sel.DBT_iBlockFirst, sel.DBT_BlockCount);
             EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
             foreach (EWord w in vWords)
@@ -3083,8 +3165,8 @@ namespace OurWord.Edit
             ReLayout();
 
             // Restore a selection at the deletion point
-            Window.Selection = OWWindow.Sel.CreateSel(this, DBT, nRestorePosition); 
-            NormalizeSelection();
+            OWWindow.Sel selection = OWWindow.Sel.CreateSel(this, DBT, nRestorePosition);
+            Window.Selection = NormalizeSelection(selection);
         }
         #endregion
         #region Method: void Insert(sInsert) - All-purpose insertion
@@ -3153,7 +3235,7 @@ namespace OurWord.Edit
                     return;
             }
 
-            // Remove the old blocks and replace with new ones
+            // ctrlRemove the old blocks and replace with new ones
             RemoveBlocksAt(sel.DBT_iBlockFirst, sel.DBT_BlockCount);
             EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
             foreach (EWord w in vWords)
@@ -3163,10 +3245,9 @@ namespace OurWord.Edit
 
             // Restore a selection at the deletion point plus the amount inserted. 
             int iInsertPos = sel.DBT_iCharFirst + sInsert.Length;
-            sel = OWWindow.Sel.CreateSel(this, sel.DBT, iInsertPos);
-            Debug.Assert(null != sel);
-            Window.Selection = sel;
-            NormalizeSelection();
+            OWWindow.Sel selection = OWWindow.Sel.CreateSel(this, sel.DBT, iInsertPos);
+            Debug.Assert(null != selection);
+            Window.Selection = NormalizeSelection(selection);
         }
         #endregion
         #region Method: bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
@@ -3204,4 +3285,389 @@ namespace OurWord.Edit
         }
         #endregion
     }
+
+
+    #region NUnit Tests
+    [TestFixture] public class Test_OWPara
+    {
+        // Attrs from Setup ------------------------------------------------------------------
+        #region Attr{g}: OWWindow Wnd
+        OWWindow Wnd
+        {
+            get
+            {
+                return m_Window;
+            }
+        }
+        OWWindow m_Window;
+        #endregion
+        Form m_Form;
+        DSection m_section;
+        #region VAttr{g}: JWritingSystem WSVernacular
+        JWritingSystem WSVernacular
+        {
+            get
+            {
+                return G.Project.TargetTranslation.WritingSystemVernacular;
+            }
+        }
+        #endregion
+        OWPara op;
+
+        // Data ------------------------------------------------------------------------------
+        #region Method: DParagraph CreateParagraph_John_3_16()
+        private DParagraph CreateParagraph_John_3_16()
+        {
+            // Create a paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            p.StyleAbbrev = "p";
+
+            // Add various runs
+            p.AddRun(DChapter.Create("3"));
+            p.AddRun(DVerse.Create("16"));
+
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "For God so loved the "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that he gave his one and only son"));
+            p.AddRun(text);
+
+            p.AddRun(DVerse.Create("17"));
+
+            text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that whosoever believes in him "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "but have everlasting life."));
+            p.AddRun(text);
+
+            m_section.Paragraphs.Append(p);
+
+            return p;
+        }
+        #endregion
+
+        // Setup/TearDown --------------------------------------------------------------------
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+            OurWordMain.Project = new DProject();
+            G.Project.TeamSettings = new DTeamSettings();
+            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.Project.DisplayName = "Project";
+            G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
+            DBook book = new DBook("MRK", "");
+            G.Project.TargetTranslation.AddBook(book);
+            m_section = new DSection(1);
+            book.Sections.Append(m_section);
+
+            m_Window = new OWWindow("TestWindow", 1);
+
+            m_Form = new Form();
+            m_Form.Name = "TestForm";
+            m_Form.Controls.Add(m_Window);
+
+            // Set up John 3:16
+            DParagraph p = CreateParagraph_John_3_16();
+            op = new OWPara(Wnd, WSVernacular, p.Style, p, Color.Wheat, OWPara.Flags.IsEditable);
+            Wnd.StartNewRow();
+            Wnd.AddParagraph(0, op);
+            Wnd.LoadData();
+        }
+        #endregion
+        #region TearDown
+        [TearDown]
+        public void TearDown()
+        {
+            OurWordMain.Project = null;
+            m_Form.Dispose();
+            m_Form = null;
+        }
+        #endregion
+
+        // Making Selections -----------------------------------------------------------------
+        #region Test: Select_NextWord
+        [Test] public void Select_NextWord()
+        {
+            // Make a selection in the middle of "lo|ved"
+            int iBlock = 5;
+            OWWindow.Sel selection = op.Select_NextWord(iBlock + 1);
+            Assert.AreEqual(6, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
+
+            // Select at the beginning of "son". Should skip "17" and go to "that"
+            iBlock = 15;
+            selection = op.Select_NextWord(iBlock + 1);
+            Assert.AreEqual(17, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+
+            // Select in the final word: Should return null
+            iBlock = 28;
+            selection = op.Select_NextWord(iBlock + 1);
+            Assert.IsNull(selection, "No selection made.");
+        }
+        #endregion
+        #region Test: Select_PreviousWord
+        [Test] public void Select_PreviousWord()
+        {
+            // Request to select the previous word from "loved": Should be the beginning of the current block
+            int iBlock = 5;
+            OWWindow.Sel selection = op.Select_PreviousWord(iBlock - 1);
+            Assert.AreEqual(4, selection.Anchor.iBlock);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
+
+            // Select at the beginning of "that". Should skip "17" and go to "son"
+            iBlock = 17;
+            selection = op.Select_PreviousWord(iBlock - 1 );
+            Assert.AreEqual(15, selection.Anchor.iBlock);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+
+            // Select in the first word: Should return null
+            iBlock = 1;
+            selection = op.Select_PreviousWord(iBlock);
+            Assert.IsNull(selection, "No selection made.");
+        }
+        #endregion
+        #region Test: Select_BeginningOfFirstWord
+        [Test] public void Select_BeginningOfFirstWord()
+        {
+            OWWindow.Sel selection = op.Select_BeginningOfFirstWord();
+            Assert.IsNotNull(selection, "Selection is not null");
+            Assert.AreEqual("For ", selection.Anchor.Word.Text);
+        }
+        #endregion
+        #region Test: Select_EndOfLastWord
+        [Test] public void Select_EndOfLastWord()
+        {
+            OWWindow.Sel selection = op.Select_EndOfLastWord();
+            Assert.IsNotNull(selection, "Selection is not null");
+            Assert.AreEqual("life.", selection.Anchor.Word.Text);
+        }
+        #endregion
+
+        /***
+        public void SelectEditablePositionAt()
+        {
+            OWWindow.Sel selection = op.SelectEditablePositionAt(0);
+            Assert.AreEqual("For ", selection.Anchor.Word.Text);
+
+            selection = op.SelectEditablePositionAt(1);
+            Assert.AreEqual("For ", selection.Anchor.Word.Text);
+
+            selection = op.SelectEditablePositionAt(13);
+            Assert.AreEqual("loved ", selection.Anchor.Word.Text);
+
+            selection = op.SelectEditablePositionAt(60); // Select at end of "son"; first DBT
+            Assert.AreEqual("son ", selection.Anchor.Word.Text);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+        }
+        ***/
+
+        // Extending Selections --------------------------------------------------------------
+        #region Test: ExtendSelection_WordRight
+        [Test] public void ExtendSelection_WordRight()
+        {
+            // Make an Insertion Point in the middle of "lo|ved"
+            int iBlock = 5;
+            int iChar = 2;
+            OWWindow.Sel selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(iBlock, iChar));
+            Assert.AreEqual(iBlock, selection.Anchor.iBlock);
+            Assert.AreEqual(iChar, selection.Anchor.iChar);
+            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
+
+            // Extend to the right...#1  > "ved"
+            selection = op.ExtendSelection_WordRight(selection);
+            Assert.AreEqual("ved ", selection.SelectionString);
+
+            // Extend to the right...#2  > "ved the "
+            selection = op.ExtendSelection_WordRight(selection);
+            Assert.AreEqual("ved the ", selection.SelectionString);
+
+            // Extend to the right...#3  > "ved the world " (moving over italice)
+            selection = op.ExtendSelection_WordRight(selection);
+            Assert.AreEqual("ved the world ", selection.SelectionString);
+
+            // Extend to the right...#4  > "ved the world that " (moving past italics)
+            selection = op.ExtendSelection_WordRight(selection);
+            Assert.AreEqual("ved the world that ", selection.SelectionString);
+
+            // Boundary: Extend lots and lots of times; should stay at end of the DBT
+            for(int i=0; i<100; i++)
+                selection = op.ExtendSelection_WordRight(selection);
+            Assert.AreEqual("ved the world that he gave his one and only son", selection.SelectionString);
+
+            // Select at the end of a DBT: Extend should do nothing
+            selection = new OWWindow.Sel(op, selection.End);
+            selection = op.ExtendSelection_WordRight(selection);
+            Assert.IsTrue(selection.IsInsertionPoint);
+
+            // Select at the beginning of a word: Extend should get the entire word
+            selection = new OWWindow.Sel(op, 5, 0);
+            selection = op.ExtendSelection_WordRight(selection);
+            Assert.AreEqual("loved ", selection.SelectionString);
+        }
+        #endregion
+        #region Test: ExtendSelection_WordLeft
+        [Test] public void ExtendSelection_WordLeft()
+        {
+            // Make an Insertion Point in the middle of "lo|ved"
+            int iBlock = 5;
+            int iChar = 2;
+            OWWindow.Sel selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(iBlock, iChar));
+            Assert.AreEqual(iBlock, selection.Anchor.iBlock);
+            Assert.AreEqual(iChar, selection.Anchor.iChar);
+            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
+
+            // Extend to the left...#1  > "lo"
+            selection = op.ExtendSelection_WordLeft(selection);
+            Assert.AreEqual("lo", selection.SelectionString);
+
+            // Extend to the left...#2  > "so lo"
+            selection = op.ExtendSelection_WordLeft(selection);
+            Assert.AreEqual("so lo", selection.SelectionString);
+
+            // Boundary: Extend lots and lots of times; should stay at beginning of the DBT
+            for (int i = 0; i < 100; i++)
+                selection = op.ExtendSelection_WordLeft(selection);
+            Assert.AreEqual("For God so lo", selection.SelectionString);
+
+            // Select at the beginning of a DBT: Extend should do nothing
+            selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(2,0));
+            selection = op.ExtendSelection_WordLeft(selection);
+            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint at Beginning of DBT");
+        }
+        #endregion
+        #region Test: ExtendSelection_FarRight
+        [Test] public void ExtendSelection_FarRight()
+        {
+            // Make a selection at "lo|ved"
+            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
+
+            // Extend it to the right
+            selection = op.ExtendSelection_FarRight(selection);
+            Assert.AreEqual("ved the world that he gave his one and only son", 
+                selection.SelectionString);
+
+            // Boundary condition: make the selection at the end of a DBT
+            selection = new OWWindow.Sel(op, 15, 3);
+            selection = op.ExtendSelection_FarRight(selection);
+            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
+        }
+        #endregion
+        #region Test: ExtendSelection_FarLeft
+        [Test] public void ExtendSelection_FarLeft()
+        {
+            // Make a selection at "lo|ved"
+            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
+
+            // Extend it to the left
+            selection = op.ExtendSelection_FarLeft(selection);
+            Assert.AreEqual("For God so lo", selection.SelectionString);
+
+            // Boundary condition: make the selection at the beginning of a DBT
+            selection = new OWWindow.Sel(op, 2, 0);
+            selection = op.ExtendSelection_FarLeft(selection);
+            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
+        }
+        #endregion
+        #region Test: ExtendSelection_CharRight
+        [Test] public void ExtendSelection_CharRight()
+        {
+            // Make a selection at "lo|ved"
+            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
+
+            // Extend it to the right several times
+            selection = op.ExtendSelection_CharRight(selection);
+            Assert.AreEqual("v", selection.SelectionString);
+            selection = op.ExtendSelection_CharRight(selection);
+            Assert.AreEqual("ve", selection.SelectionString);
+            selection = op.ExtendSelection_CharRight(selection);
+            Assert.AreEqual("ved", selection.SelectionString);
+            selection = op.ExtendSelection_CharRight(selection);
+            Assert.AreEqual("ved ", selection.SelectionString);
+            selection = op.ExtendSelection_CharRight(selection);
+            Assert.AreEqual("ved t", selection.SelectionString);
+
+            // Boundary: should be able to extend at the end of a DBT
+            // Boundary condition: make the selection at the end of a DBT
+            selection = new OWWindow.Sel(op, 15, 3);
+            selection = op.ExtendSelection_CharRight(selection);
+            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
+        }
+        #endregion
+        #region Test: ExtendSelection_CharLeft
+        [Test] public void ExtendSelection_CharLeft()
+        {
+            // Make a selection at "lo|ved"
+            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
+
+            // Extend it to the right several times
+            selection = op.ExtendSelection_CharLeft(selection);
+            Assert.AreEqual("o", selection.SelectionString);
+            selection = op.ExtendSelection_CharLeft(selection);
+            Assert.AreEqual("lo", selection.SelectionString);
+            selection = op.ExtendSelection_CharLeft(selection);
+            Assert.AreEqual(" lo", selection.SelectionString);
+            selection = op.ExtendSelection_CharLeft(selection);
+            Assert.AreEqual("o lo", selection.SelectionString);
+            selection = op.ExtendSelection_CharLeft(selection);
+            Assert.AreEqual("so lo", selection.SelectionString);
+
+            // Boundary condition: make the selection at the beginning of a DBT
+            selection = new OWWindow.Sel(op, 2, 0);
+            selection = op.ExtendSelection_CharLeft(selection);
+            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
+        }
+        #endregion
+
+        // Misc ------------------------------------------------------------------------------
+        #region Test: NormalizeSelection
+        [Test] public void NormalizeSelection()
+        {
+            // Part 1: Insertion Points
+
+            // Make a selection at the end of "loved"
+            OWWindow.Sel selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(5, 6));
+
+            // Normlizing should move it to the next one
+            selection = op.NormalizeSelection(selection);
+            Assert.AreEqual(6, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+
+            // Normlizing again should have no effect
+            selection = op.NormalizeSelection(selection);
+            Assert.AreEqual(6, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+
+            // Place at the end of a DBT: normalizing should not move it
+            selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(15, 3));
+            selection = op.NormalizeSelection(selection);
+            Assert.AreEqual(15, selection.Anchor.iBlock);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+
+            // Part 2: Extend Selections
+            // Make a selection the latter half of "loved"
+            selection = new OWWindow.Sel(op, 
+                new OWWindow.Sel.SelPoint(5, 3),
+                new OWWindow.Sel.SelPoint(5 ,6));
+            selection = op.NormalizeSelection(selection);
+            Assert.AreEqual(5, selection.Anchor.iBlock);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+            Assert.AreEqual(6, selection.End.iBlock);
+            Assert.AreEqual(0, selection.End.iChar);
+
+            // Normlizing again should have no effect
+            selection = op.NormalizeSelection(selection);
+            Assert.AreEqual(5, selection.Anchor.iBlock);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+            Assert.AreEqual(6, selection.End.iBlock);
+            Assert.AreEqual(0, selection.End.iChar);
+        }
+        #endregion
+    }
+    #endregion
+
+
 }

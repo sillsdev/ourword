@@ -630,6 +630,20 @@ namespace JWdb
         }
         private bool m_bIsItalic = false;
         #endregion
+        #region BAttr{g/s}: bool IsStrikeout - T if the font is strike out
+        public bool IsStrikeout
+        {
+            get
+            {
+                return m_bStrikeout;
+            }
+            set
+            {
+                SetValue(ref m_bStrikeout, value);
+            }
+        }
+        private bool m_bStrikeout = false;
+        #endregion
         #region Method: void DeclareAttrs()
         protected override void DeclareAttrs()
         {
@@ -638,6 +652,7 @@ namespace JWdb
             DefineAttr("Size", ref m_nSize);
             DefineAttr("Bold", ref m_bIsBold);
             DefineAttr("Italic", ref m_bIsItalic);
+            DefineAttr("Strike", ref m_bStrikeout);
         }
         #endregion
 
@@ -680,157 +695,153 @@ namespace JWdb
         }
         #endregion
 
-        // Fonts (created On-Demand) with these settings -------------------------------------
-        #region Enum: Mods {None, Bold, Italic, BoldItalic }
-        public enum Mods
+        // Fonts (created On-Demand) ---------------------------------------------------------
+        #region CLASS: FontZoomed - Adds the Zoomed attribute
+        class FontZoomed
         {
-            None = 0,
-            Bold = 1,
-            Italic = 2,
-            BoldItalic = Bold | Italic
+            #region Attr{g}: bool Zoomed
+            public bool Zoomed
+            {
+                get
+                {
+                    return m_bZoomed;
+                }
+            }
+            bool m_bZoomed = false;
+            #endregion
+            #region Attr{g}: Font Font
+            public Font Font
+            {
+                get
+                {
+                    Debug.Assert(null != m_Font);
+                    return m_Font;
+                }
+            }
+            Font m_Font;
+            #endregion
+
+            #region Constroctor(bZoomed, sFontName, fSize, mods, fZoomFactor)
+            public FontZoomed(bool bZoomed, 
+                string sFontName, 
+                float fSize, 
+                FontStyle mods,
+                float fZoomFactor)
+            {
+                m_bZoomed = bZoomed;
+
+                if (bZoomed)
+                    fSize *= fZoomFactor;
+
+                m_Font = new Font(sFontName, fSize, mods);
+
+            }
+            #endregion
         }
         #endregion
-        // Callers should not store pointers to these Font objects, as they can get
-        // regenerated should settings change.
-        #region Attr{g}: Font FontNormal
-        public Font FontNormal
+        #region Attr{g}: FontZoomed[] Fonts
+        FontZoomed[] Fonts
         {
             get
             {
-                if (null == m_FontNormal)
-                    m_FontNormal = _CreateFont(false, false, false);
-                Debug.Assert(null != m_FontNormal);
-                return m_FontNormal;
+                Debug.Assert(null != m_vFonts);
+                return m_vFonts;
             }
         }
-        Font m_FontNormal = null;
-        #endregion
-        #region Attr{g}: Font FontNormalZoom
-        public Font FontNormalZoom
+        FontZoomed[] m_vFonts;
+        #endregion 
+        #region Method: void ClearFonts()
+        public void ClearFonts()
         {
-            get
-            {
-                if (null == m_FontNormalZoom)
-                    m_FontNormalZoom = _CreateFont(true, false, false);
-                Debug.Assert(null != m_FontNormalZoom);
-                return m_FontNormalZoom;
-            }
+            // Clear the array
+            m_vFonts = new FontZoomed[0];
+
+            // Clear the optimizations
+            m_DefaultFont = null;
+            m_DefaultFontZoomed = null;
         }
-        Font m_FontNormalZoom = null;
-        #endregion
-        #region Attr{g}: Font FontBold
-        public Font FontBold
+        #endregion  
+        #region Method: Font FindOrAddFont(bool bZoom, FontStyle mods)
+        public Font FindOrAddFont(bool bZoom, FontStyle mods)
         {
-            get
+            // Determine the desired mods, as an additive merge between the
+            // font's settings, and the passed-in mods. Thus mods are always
+            // additive; they don't turn off a feature once it has been turned
+            // on in the Style.
+            if (IsBold)
+                mods |= FontStyle.Bold;
+            if (IsItalic)
+                mods |= FontStyle.Italic;
+            if (IsStrikeout)
+                mods |= FontStyle.Strikeout;
+
+            // Return the existing one if it is there
+            foreach (FontZoomed f in Fonts)
             {
-                if (null == m_FontBold)
-                    m_FontBold = _CreateFont(false, true, false);
-                Debug.Assert(null != m_FontBold);
-                return m_FontBold;
+                if (f.Zoomed == bZoom && f.Font.Style == mods)
+                    return f.Font;
             }
+
+            // Otherwise create it
+            FontZoomed fz = new FontZoomed(bZoom, FontName, (float)Size, mods,
+                CharacterStyle.StyleSheet.ZoomFactor);
+
+            // Add it to the vector
+            FontZoomed[] v = new FontZoomed[Fonts.Length + 1];
+            for (int i = 0; i < Fonts.Length; i++)
+                v[i] = Fonts[i];
+            v[Fonts.Length] = fz;
+            m_vFonts = v;
+
+            return fz.Font;
         }
-        Font m_FontBold = null;
-        #endregion
-        #region Attr{g}: Font FontBoldZoom
-        public Font FontBoldZoom
-        {
-            get
-            {
-                if (null == m_FontBoldZoom)
-                    m_FontBoldZoom = _CreateFont(true, true, false);
-                Debug.Assert(null != m_FontBoldZoom);
-                return m_FontBoldZoom;
-            }
-        }
-        Font m_FontBoldZoom = null;
-        #endregion
-        #region Attr{g}: Font FontItalic
-        public Font FontItalic
-        {
-            get
-            {
-                if (null == m_FontItalic)
-                    m_FontItalic = _CreateFont(false, false, true);
-                Debug.Assert(null != m_FontItalic);
-                return m_FontItalic;
-            }
-        }
-        Font m_FontItalic = null;
-        #endregion
-        #region Attr{g}: Font FontItalicZoom
-        public Font FontItalicZoom
-        {
-            get
-            {
-                if (null == m_FontItalicZoom)
-                    m_FontItalicZoom = _CreateFont(true, false, true);
-                Debug.Assert(null != m_FontItalicZoom);
-                return m_FontItalicZoom;
-            }
-        }
-        Font m_FontItalicZoom = null;
-        #endregion
-        #region Attr{g}: Font FontBoldItalic
-        public Font FontBoldItalic
-        {
-            get
-            {
-                if (null == m_FontBoldItalic)
-                    m_FontBoldItalic = _CreateFont(false, true, true);
-                Debug.Assert(null != m_FontBoldItalic);
-                return m_FontBoldItalic;
-            }
-        }
-        Font m_FontBoldItalic = null;
-        #endregion
-        #region Attr{g}: Font FontBoldItalicZoom
-        public Font FontBoldItalicZoom
-        {
-            get
-            {
-                if (null == m_FontBoldItalicZoom)
-                    m_FontBoldItalicZoom = _CreateFont(true, true, true);
-                Debug.Assert(null != m_FontBoldItalicZoom);
-                return m_FontBoldItalicZoom;
-            }
-        }
-        Font m_FontBoldItalicZoom = null;
         #endregion
 
-        #region Method: void _CreateFont(bool bZoom, bool bForceBold, bool bForceItalic)
-        Font _CreateFont(bool bZoom, bool bForceBold, bool bForceItalic)
+        #region VAttr{g}: float LineHeight
+        public float LineHeight
         {
-            // Size
-            float fSize = (float)Size;
-            if (bZoom)
-                fSize *= CharacterStyle.StyleSheet.ZoomFactor;
-
-            // Font Style
-            FontStyle style = FontStyle.Regular;
-            if (bForceBold || IsBold)
-                style |= FontStyle.Bold;
-            if (bForceItalic || IsItalic)
-                style |= FontStyle.Italic;
-
-            // Create the Font
-            return new Font(FontName, fSize, style);
+            get
+            {
+                return (float)FindOrAddFont(false, FontStyle.Regular).Height;
+            }
         }
         #endregion
-        #region Method: void ResetFonts()
-        public void ResetFonts()
+        #region VAttr{g}: float LineHeightZoomed
+        public float LineHeightZoomed
         {
-            m_FontNormal = null;
-            m_FontNormalZoom = null;
-
-            m_FontItalic = null;
-            m_FontItalicZoom = null;
-
-            m_FontBold = null;
-            m_FontBoldZoom = null;
-
-            m_FontBoldItalic = null;
-            m_FontBoldItalicZoom = null;
+            get
+            {
+                int height = FindOrAddFont(true, FontStyle.Regular).Height;
+                if (height == 0)
+                    MessageBox.Show("Height = 0");
+                return (float)height;
+            }
         }
+        #endregion
+
+        #region VAttr{g}: Font DefaultFont - the styled font, without any forced mods
+        public Font DefaultFont
+        {
+            get
+            {
+                if (null == m_DefaultFont)
+                    m_DefaultFont= FindOrAddFont(false, FontStyle.Regular);
+                return m_DefaultFont;
+            }
+        }
+        Font m_DefaultFont = null;
+        #endregion
+        #region VAttr[g}: Font DefaultFontZoomed - the styled font, without any forced mods
+        public Font DefaultFontZoomed
+        {
+            get
+            {
+                if (null == m_DefaultFontZoomed)
+                    m_DefaultFontZoomed = FindOrAddFont(true, FontStyle.Regular);
+                return m_DefaultFontZoomed;
+            }
+        }
+        Font m_DefaultFontZoomed = null;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -838,6 +849,7 @@ namespace JWdb
         public JFontForWritingSystem()
 			: base()
 		{
+            ClearFonts();
             j_refWritingSystem = new JRef("ws", this, typeof(JWritingSystem));
 		}
 		#endregion
@@ -845,6 +857,7 @@ namespace JWdb
         public JFontForWritingSystem(JWritingSystem ws)
             : base()
         {
+            ClearFonts();
             j_refWritingSystem = new JRef("ws", this, typeof(JWritingSystem));
             WritingSystem = ws;
         }
@@ -860,7 +873,8 @@ namespace JWdb
                     FontName + "-" + 
                     Size.ToString() + "-" + 
                     IsBold.ToString() + "-" + 
-                    IsItalic.ToString();
+                    IsItalic.ToString() + "-" +
+                    IsStrikeout.ToString();
             }
         }
         #endregion
@@ -1007,6 +1021,20 @@ namespace JWdb
         }
         private bool m_bIsItalicByDefault = false;
         #endregion
+        #region BAttr{g/s}: bool IsStrikeoutByDefault - T if the font is italic
+        public bool IsStrikeoutByDefault
+        {
+            get
+            {
+                return m_bStrikeoutByDefault;
+            }
+            set
+            {
+                SetValue(ref m_bStrikeoutByDefault, value);
+            }
+        }
+        private bool m_bStrikeoutByDefault = false;
+        #endregion
 
         #region BAttr{g/s}: Color FontColor - color for text; default is black
         public Color FontColor
@@ -1023,20 +1051,7 @@ namespace JWdb
         }
         private string m_sColorName = Color.Black.Name;
         #endregion
-        #region BAttr{g/s}: bool IsStrikeout - T if the font is strikeout
-        public bool IsStrikeout
-        {
-            get
-            {
-                return m_bIsStrikeout;
-            }
-            set
-            {
-                SetValue(ref m_bIsStrikeout, value);
-            }
-        }
-        private bool m_bIsStrikeout = false;
-        #endregion
+
         #region BAttr{g/s}: bool IsUnderline - T if the font is strikeout
         public bool IsUnderline
         {
@@ -1063,10 +1078,10 @@ namespace JWdb
 			DefineAttr("DisplayName", ref m_sDisplayName);
 			DefineAttr("Description", ref m_sDescription);
 
-            DefineAttr("Height", ref m_nSizeByDefault);
-            DefineAttr("Bold", ref m_bIsBoldByDefault);
-            DefineAttr("Italic", ref m_bIsItalicByDefault);
-            DefineAttr("Strikeout", ref m_bIsStrikeout);
+            DefineAttr("Height",    ref m_nSizeByDefault);
+            DefineAttr("Bold",      ref m_bIsBoldByDefault);
+            DefineAttr("Italic",    ref m_bIsItalicByDefault);
+            DefineAttr("Strikeout", ref m_bStrikeoutByDefault);
             DefineAttr("Underline", ref m_bIsUnderline);
             DefineAttr("FontColor", ref m_sColorName);
         }
@@ -1095,6 +1110,7 @@ namespace JWdb
             JFontForWritingSystem newFWS = new JFontForWritingSystem(ws);
             newFWS.IsBold = IsBoldByDefault;
             newFWS.IsItalic = IsItalicByDefault;
+            newFWS.IsStrikeout = IsStrikeoutByDefault;
             newFWS.Size = SizeByDefault;
             FontsForWritingSystems.Append(newFWS);
 
@@ -1114,7 +1130,7 @@ namespace JWdb
         public void ResetFonts()
         {
             foreach (JFontForWritingSystem fws in FontsForWritingSystems)
-                fws.ResetFonts();
+                fws.ClearFonts();
         }
         #endregion
 
@@ -1155,8 +1171,8 @@ namespace JWdb
             m_nSizeByDefault = nSize;
             m_bIsBoldByDefault = bIsBold;
             m_bIsItalicByDefault = bIsItalic;
+            m_bStrikeoutByDefault = bIsStrikeout;
 
-            m_bIsStrikeout = bIsStrikeout;
             m_bIsUnderline = bIsUnderline;
 
             FontColor = colorText;
@@ -1257,7 +1273,21 @@ namespace JWdb
 		}
 		private string m_sName = "";
 		#endregion
-		#region BAttr{g/s}: string PunctuationChars - a list of punctuation characters for this WS
+        #region BAttr{g/s}: string Abbrev - the name of the writing system
+        public string Abbrev
+        {
+            get
+            {
+                return m_sAbbrev;
+            }
+            set
+            {
+                SetValue(ref m_sAbbrev, value);
+            }
+        }
+        private string m_sAbbrev = "";
+        #endregion
+        #region BAttr{g/s}: string PunctuationChars - a list of punctuation characters for this WS
 		public string PunctuationChars
 		{
 			get 
@@ -1315,16 +1345,32 @@ namespace JWdb
 		}
 		private BStringArray m_bsaAutoReplaceResult = null;
 		#endregion
-		#region Method: void DeclareAttrs()
+        #region BAttr{g/s}: string KeyboardName - the name of the keyboard to use with this WS
+        public string KeyboardName
+        {
+            get
+            {
+                return m_sKeyboardName;
+            }
+            set
+            {
+                SetValue(ref m_sKeyboardName, value);
+            }
+        }
+        private string m_sKeyboardName = "";
+        #endregion
+        #region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
 			DefineAttr("IdeaGraph", ref m_bIsIdeaGraph);
 			DefineAttr("Name",      ref m_sName);
-			DefineAttr("Punct",     ref m_sPunctuationChars);
+            DefineAttr("Abbrev",    ref m_sAbbrev);
+            DefineAttr("Punct",     ref m_sPunctuationChars);
 			DefineAttr("EndPunct",  ref m_sEndPunctuationChars);
 			DefineAttr("ARSource",  ref m_bsaAutoReplaceSource);
 			DefineAttr("ARResult",  ref m_bsaAutoReplaceResult);
+            DefineAttr("Keyboard",  ref m_sKeyboardName);
 		}
 		#endregion
 

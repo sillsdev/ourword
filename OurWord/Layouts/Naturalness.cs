@@ -83,27 +83,17 @@ namespace OurWord.View
             }
         }
         #endregion
-        #region Attr{g}: override string PassageName
-        public override string PassageName
+        #region Attr{g}: override string LanguageInfo
+        public override string LanguageInfo
         {
             get
             {
+                if (!G.IsValidProject)
+                    return "";
                 if (null == OurWordMain.Project.TargetTranslation)
                     return "";
-                if (null == OurWordMain.Project.STarget)
-                    return "";
 
-                string sBase = G.GetLoc_GeneralUI("NaturalnessCheckReference", "{0} - {1}");
-
-                string sTarget = OurWordMain.Project.TargetTranslation.DisplayName.ToUpper();
-                string sReference = OurWordMain.Project.STarget.ReferenceName;
-
-                string s = LanguageResources.Insert(sBase, sTarget, sReference);
-
-                if (null != G.FTranslation && null != G.TTranslation && null != G.STarget)
-                    s += (" - " + G.STarget.ReferenceName);
-
-                return s;
+                return OurWordMain.Project.TargetTranslation.DisplayName.ToUpper();
             }
         }
         #endregion
@@ -145,7 +135,18 @@ namespace OurWord.View
                     options |= OWPara.Flags.SuppressVerseNumbers;
                 if (G.ShowLineNumbers)
                     options |= OWPara.Flags.ShowLineNumbers;
-                AddParagraph(0, p, options);
+                if (OurWordMain.TargetIsLocked)
+                    options |= OWPara.Flags.IsLocked;
+
+                // Create and add the paragraph
+                OWPara op = new OWPara(
+                    this,
+                    p.Translation.WritingSystemVernacular,
+                    p.Style,
+                    p,
+                    ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
+                    options);
+                AddParagraph(0, op);
             }
 
             // Load the footnotes
@@ -160,7 +161,17 @@ namespace OurWord.View
                     options |= OWPara.Flags.IsEditable;
                 if (G.ShowLineNumbers)
                     options |= OWPara.Flags.ShowLineNumbers;
-                AddParagraph(0, fn, options);
+                if (OurWordMain.TargetIsLocked)
+                    options |= OWPara.Flags.IsLocked;
+
+                OWPara op = new OWPara(
+                    this,
+                    fn.Translation.WritingSystemVernacular,
+                    fn.Style,
+                    fn,
+                    ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
+                    options);
+                AddParagraph(0, op);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

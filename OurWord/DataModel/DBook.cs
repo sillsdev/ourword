@@ -19,10 +19,11 @@ using JWTools;
 using JWdb;
 using OurWord.Dialogs;
 using OurWord.View;
+using OurWord.Edit;
 using NUnit.Framework;
 #endregion
 #region TODO
-/* - Remove hard-coded standard format; set up in a table somewhere.
+/* - ctrlRemove hard-coded standard format; set up in a table somewhere.
  * - Handle case where a field marker isn't known about here.
  */
 #endregion
@@ -1002,7 +1003,7 @@ namespace OurWord.DataModel
 		#endregion
 
 		// JAttrs ----------------------------------------------------------------------------
-		#region JAttr{g}:   JOwnSeq Sections - the list of sections in this book
+		#region JAttr{g}: JOwnSeq Sections - the list of sections in this book
 		public JOwnSeq Sections
 		{
 			get 
@@ -1012,7 +1013,7 @@ namespace OurWord.DataModel
 		}
 		private JOwnSeq j_osSections = null;
 		#endregion
-		#region JAttr{g}:   JOwnSeq History - seq of paragraphs given notes about translation history
+		#region JAttr{g}: JOwnSeq History - seq of paragraphs given notes about translation history
 		public JOwnSeq History
 		{
 			get 
@@ -1022,7 +1023,7 @@ namespace OurWord.DataModel
 		}
 		private JOwnSeq j_osHistory = null;
 		#endregion
-		#region JAttr{g}:   JOwnSeq Notes - seq of paragraphs given notes about misc notes
+		#region JAttr{g}: JOwnSeq Notes - seq of paragraphs given notes about misc notes
 		public JOwnSeq Notes
 		{
 			get 
@@ -1049,9 +1050,318 @@ namespace OurWord.DataModel
 		bool m_bUserHasSeenLockedMessage = false;
 		#endregion
 
-		// Derived Attributes: ---------------------------------------------------------------
-		#region Attr{g}: DTranslation Translation - returns the translation that owns this book
-		public DTranslation Translation 
+        // Merge Support ---------------------------------------------------------------------
+        #region CLASS MergeDiff
+        public class MergeDiff
+        {
+            #region Attr{g}: int SectionNo
+            public int SectionNo
+            {
+                get
+                {
+                    return m_nSection;
+                }
+            }
+            int m_nSection;
+            #endregion
+            #region Attr{g}: int ParagraphNo
+            public int ParagraphNo
+            {
+                get
+                {
+                    return m_nParagraph;
+                }
+            }
+            int m_nParagraph;
+            #endregion
+            #region Attr{g}: int DBTNo
+            public int DBTNo
+            {
+                get
+                {
+                    return m_nDBT;
+                }
+            }
+            int m_nDBT;
+            #endregion
+
+            #region Constructor(nSection, nParagraph, nDBT)
+            public MergeDiff(int nSection, int nParagraph, int nDBT)
+            {
+                m_nSection = nSection;
+                m_nParagraph = nParagraph;
+                m_nDBT = nDBT;
+            }
+            #endregion
+
+            #region I/O
+            public const string c_sTag = "Diff";
+            const string c_sSection = "Section";
+            const string c_sPara = "Para";
+            const string c_sDBT = "DBT";
+
+            #region Method: void SaveXML(XmlField xmlParent)
+            public void SaveXML(XmlField xmlParent)
+            {
+                string s = xmlParent.GetAttrString(c_sSection, SectionNo);
+                s += xmlParent.GetAttrString(c_sPara, ParagraphNo);
+                s += xmlParent.GetAttrString(c_sDBT, DBTNo);
+                XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
+                xml.OneLiner(s, "");
+            }
+            #endregion
+            #region SMethod: MergeDiff ReadXML(XmlRead xml)
+            static public MergeDiff ReadXML(XmlRead xml)
+            {
+                string sSection = xml.GetValue(c_sSection);
+                string sPara = xml.GetValue(c_sPara);
+                string sDBT = xml.GetValue(c_sDBT);
+
+                try
+                {
+                    int nSection = Convert.ToInt16(sSection);
+                    int nPara = Convert.ToInt16(sPara);
+                    int nDBT = Convert.ToInt16(sDBT);
+
+                    return new MergeDiff(nSection, nPara, nDBT);
+                }
+                catch (Exception)
+                {
+                }
+                return null;
+            }
+            #endregion
+            #endregion
+        }
+        #endregion
+        #region Attr{g}: MergeDiff[] MergeDiffs
+        public MergeDiff[] MergeDiffs
+        {
+            get
+            {
+                Debug.Assert(null != m_vMergeDiffs);
+                return m_vMergeDiffs;
+            }
+        }
+        MergeDiff[] m_vMergeDiffs;
+        #endregion
+        #region Method: void AddMergeDiff(MergeDiff diff)
+        public void AddMergeDiff(MergeDiff diff)
+        {
+            MergeDiff[] v = new MergeDiff[MergeDiffs.Length + 1];
+            for (int i = 0; i < MergeDiffs.Length; i++)
+                v[i] = MergeDiffs[i];
+            v[MergeDiffs.Length] = diff;
+            m_vMergeDiffs = v;
+        }
+        #endregion
+        #region Method: void ClearMergeDiffs()
+        public void ClearMergeDiffs()
+        {
+            m_vMergeDiffs = new MergeDiff[0];
+        }
+        #endregion
+        #region Method: int IsInMergeDiffs(int nSection, int nPara, int nDBT)
+        public int IsInMergeDiffs(int nSection, int nPara, int nDBT)
+        {
+            for(int i=0; i<MergeDiffs.Length; i++)
+            {
+                if (MergeDiffs[i].SectionNo == nSection &&
+                    MergeDiffs[i].ParagraphNo == nPara &&
+                    MergeDiffs[i].DBTNo == nDBT)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+        #endregion
+
+        #region Attr{g}: DMergeBook[] MergeBooks
+        public DMergeBook[] MergeBooks
+        {
+            get
+            {
+                Debug.Assert(null != m_vMergeBooks);
+                return m_vMergeBooks;
+            }
+        }
+        DMergeBook[] m_vMergeBooks;
+        #endregion
+        #region Method: void AddMergeBook(DMergeBook book)
+        public void AddMergeBook(DMergeBook book)
+        {
+            DMergeBook[] v = new DMergeBook[MergeBooks.Length + 1];
+            for (int i = 0; i < MergeBooks.Length; i++)
+                v[i] = MergeBooks[i];
+            v[MergeBooks.Length] = book;
+            m_vMergeBooks = v;
+        }
+        #endregion
+        #region Method: void RemoveMergeBook(DMergeBook book)
+        public void RemoveMergeBook(DMergeBook book)
+        {
+            Debug.Assert(MergeBooks.Length > 0);
+            DMergeBook[] v = new DMergeBook[MergeBooks.Length - 1];
+
+            int k = 0;
+            foreach (DMergeBook b in MergeBooks)
+            {
+                if (b != book)
+                    v[k++] = b;
+            }
+
+            m_vMergeBooks = v;
+        }
+        #endregion
+        #region Method: void ClearMergeBooks()
+        public void ClearMergeBooks()
+        {
+            foreach (DMergeBook book in MergeBooks)
+                book.Unload();
+
+            m_vMergeBooks = new DMergeBook[0];
+
+            ClearMergeDiffs();
+        }
+        #endregion
+        #region Method: void BuildMergeDiffs()
+        public void BuildMergeDiffs()
+        {
+            G.SetWaitCursor();
+
+            ClearMergeDiffs();
+
+            for (int iSection = 0; iSection < Sections.Count; iSection++)
+            {
+                // Retrieve the Master section
+                DSection Section = Sections[iSection] as DSection;
+
+                // Retrieve all of the Merge sections
+                DSection[] vSections = new DSection[MergeBooks.Length];
+                for (int k = 0; k < MergeBooks.Length; k++)
+                    vSections[k] = MergeBooks[k].Sections[iSection] as DSection;
+
+                // Loop to compare the paragraphs
+                for (int iPara = 0; iPara < Section.Paragraphs.Count; iPara++)
+                {
+                    // Retrieve the Master paragraph
+                    DParagraph Paragraph = Section.Paragraphs[iPara] as DParagraph;
+
+                    // Retrieve all of the Merge paragraphs
+                    DParagraph[] vParas = new DParagraph[MergeBooks.Length];
+                    for (int k = 0; k < MergeBooks.Length; k++)
+                        vParas[k] = vSections[k].Paragraphs[iPara] as DParagraph;
+
+                    // Loop to compare the DBTs
+                    for (int iDBT = 0; iDBT < Paragraph.Runs.Count; iDBT++)
+                    {
+                        // Retrieve the master DBT
+                        DBasicText DBT = Paragraph.Runs[iDBT] as DBasicText;
+                        if (null == DBT)
+                            continue;
+
+                        // Compare the Merge DBTs
+                        foreach (DParagraph p in vParas)
+                        {
+                            p.SynchRunsToModelParagraph(Paragraph);
+                            DBasicText dbtMerge = p.Runs[iDBT] as DBasicText;
+                            if (dbtMerge.AsString != DBT.AsString)
+                            {
+                                MergeDiff diff = new MergeDiff(iSection, iPara, iDBT);
+                                AddMergeDiff(diff);
+                                break;
+                            }
+                        }
+
+                    } // endloop DBT
+                } // endloop Para
+            } // endloop Section
+
+            G.SetNormalCursor();
+        }
+        #endregion
+
+        #region MERGE I/O
+        #region VAttr{g}: string MergeSettingsFileName - "*.aux" for "auxiliary"
+        public string MergeSettingsFileName
+        {
+            get
+            {
+                return Path.ChangeExtension(AbsolutePathName, ".aux");
+            }
+        }
+        #endregion
+        const string c_xmlFile = "MergeBooks";
+        const string c_xmlBook = "Book";
+        const string c_xmlNickName = "NickName";
+        const string c_xmlPath = "Path";
+        #region Method: void SaveAuxiliarySettings()
+        public void SaveAuxiliarySettings()
+        {
+            // If there are no Merge Files, then we don't want to store a settings file
+            if (MergeBooks.Length == 0)
+            {
+                if (File.Exists(MergeSettingsFileName))
+                    File.Delete(MergeSettingsFileName);
+                return;
+            }
+
+            // Write the settings out
+            TextWriter writer = JW_Util.GetTextWriter(MergeSettingsFileName);
+            XmlField xmlParent = new XmlField(writer, c_xmlFile);
+            xmlParent.Begin();
+            foreach (DMergeBook book in MergeBooks)
+            {
+                string s = xmlParent.GetAttrString(c_xmlNickName, book.NickName);
+                s += xmlParent.GetAttrString(c_xmlPath, book.AbsolutePathName);
+                XmlField xml = xmlParent.GetDaughterXmlField(c_xmlBook, true);
+                xml.OneLiner(s, "");
+            }
+            foreach (MergeDiff diff in MergeDiffs)
+                diff.SaveXML(xmlParent);
+            xmlParent.End();
+            writer.Close();
+        }
+        #endregion
+        #region Method: void ReadAuxiliarySettings()
+        public void ReadAuxiliarySettings()
+        {
+            // Start with a blank slate
+            ClearMergeBooks();
+
+            // Nothing to do if there is no settings file
+            if (!File.Exists(MergeSettingsFileName))
+                return;
+
+            // Read the file and populate books
+            string sPathName = MergeSettingsFileName;
+            TextReader reader = JW_Util.GetTextReader(ref sPathName, "*.xml");
+            XmlRead xml = new XmlRead(reader);
+            while (xml.ReadNextLineUntilEndTag(c_xmlFile))
+            {
+                if (xml.IsTag(c_xmlBook))
+                {
+                    string sNickName = xml.GetValue(c_xmlNickName);
+                    string sPath = xml.GetValue(c_xmlPath);
+                    DMergeBook book = new DMergeBook(this, sPath, sNickName);
+                    AddMergeBook(book);
+                }
+
+                if (xml.IsTag(MergeDiff.c_sTag))
+                {
+                    MergeDiff diff = MergeDiff.ReadXML(xml);
+                    AddMergeDiff(diff);
+                }
+            }
+            reader.Close();
+        }
+        #endregion
+        #endregion
+
+        // Derived Attributes: ---------------------------------------------------------------
+        #region Attr{g}: DTranslation Translation - returns the translation that owns this book
+        virtual public DTranslation Translation 
 		{
 			get
 			{
@@ -1071,7 +1381,7 @@ namespace OurWord.DataModel
 			}
 		}
 		#endregion
-		#region Attr(g): string SortKey - overridden to enable JOWnSeq Find method support.
+		#region Attr(g): string SortKey - overridden to enable JOwnSeq Find method support.
 		public override string SortKey
 			// In order to support sorting, the subclass must implement a SortKey attribute,
 			// and this SortKey must return something other than an empty string. 
@@ -1326,6 +1636,7 @@ namespace OurWord.DataModel
 			j_osSections   = new JOwnSeq("Sections",  this, typeof(DSection), true, false);
 			j_osHistory    = new JOwnSeq("History",   this, typeof(JParagraph), false, false);
 			j_osNotes      = new JOwnSeq("Notes",     this, typeof(JParagraph), false, false);
+            m_vMergeBooks = new DMergeBook[0];
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -1581,10 +1892,14 @@ namespace OurWord.DataModel
 				if (!bEntireBook && STarget != G.STarget)
 					continue;
 
+                // Do the copy (displaying the Conflicts Dialog if necessary)
 				bool bOK = STarget.CopyBackTranslationsFromFront(SFront);
+
+                // Did the user abort during the Conflicts Dialog?
                 if (DialogCopyBTConflict.Actions.kCancel == DialogCopyBTConflict.CopyBTAction)
                     return;
 
+                // We only show the Mismatched Sections dialog once, if needed
 				if (!bOK && false == bMismatchErrorShown)
 				{
 					MessageBox.Show( Form.ActiveForm, 
@@ -1986,6 +2301,9 @@ namespace OurWord.DataModel
 					Book.UpdateFromFront(Book.FrontBook);
 				}
 
+                // Read any auxiliary info
+                Book.ReadAuxiliarySettings();
+
 				// Done
 				return true;
 			}
@@ -2006,6 +2324,9 @@ namespace OurWord.DataModel
 
 				// Write out the DB
                 bool bSuccessful = DB.Write(Book.AbsolutePathName);
+
+                // Save any auxiliary info
+                Book.SaveAuxiliarySettings();
 
 				// If we failed, restore from our backup
 				if (!bSuccessful)

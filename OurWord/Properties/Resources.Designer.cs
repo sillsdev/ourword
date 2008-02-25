@@ -59,5 +59,33 @@ namespace OurWord.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Bitmap editfind {
+            get {
+                object obj = ResourceManager.GetObject("editfind", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MergeConfigure {
+            get {
+                object obj = ResourceManager.GetObject("MergeConfigure", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MergePrevDiff {
+            get {
+                object obj = ResourceManager.GetObject("MergePrevDiff", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap MergNextDiff {
+            get {
+                object obj = ResourceManager.GetObject("MergNextDiff", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

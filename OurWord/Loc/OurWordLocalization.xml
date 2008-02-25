@@ -164,6 +164,30 @@
     <Item ID="m_menuAboutOurWord" Key="true">
       <English>&amp;About Our Word!...</English>
     </Item>
+    <Item ID="m_menuChangeParagraphStyle">
+      <English>Change Paragraph To</English>
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_p">
+      <English>Paragraph</English>
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_q">
+      <English>Quote Level 1</English>
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_q2">
+      <English>Quote Level 2</English>
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_q3">
+      <English>Quote Level 3</English>
+    </Item>
+    <Item ID="m_menuChangeParagraphStyle_s">
+      <English>Section Title</English>
+    </Item>
+    <Item ID="m_menuShowMergePane">
+      <English>Show &amp;Merge Pane</English>
+    </Item>
+    <Item ID="m_menuShowDictionaryPane">
+      <English>Show &amp;Dictionary Pane</English>
+    </Item>
   </Group>
   <Group ID="m_ToolStrip" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button." Translator="true">
     <Item ID="m_btnExit" Key="true" Tip="true">
@@ -543,6 +567,12 @@
       <Item ID="BrowseForBackupFile">
         <English>Browse for Backup File</English>
         <Info>The Browse Button on the RestoreFromBackup dialog launches a standard Windows-supplied dialog to locate the backup file. The only item we can customize on this form is that dialog’s title.</Info>
+      </Item>
+      <Item ID="OpenTeamSettingsDlgTitle">
+        <English>Use an Existing Team Settings File</English>
+      </Item>
+      <Item ID="SaveTeamSettingsDlgTitle">
+        <English>Save the Team Settings file as</English>
       </Item>
     </Group>
     <Group ID="Styles" Title="Stylenames" Des="Here you can provide equivalents for various Styles found in the Stylesheet." Translator="false">
@@ -1316,7 +1346,7 @@
       <English>Naturalness Check Job</English>
     </Item>
     <Item ID="fJobNaturalness_Description">
-      <English>A layout where only the translation visible, so that you can read through for naturalness, without being influenced by the front translation.</English>
+      <English>A layout where only the translation is visible, so that you can read through for naturalness, without being influenced by the front translation.</English>
     </Item>
     <Item ID="fProject_CheckBox">
       <English>Project New / Open / etc.</English>
@@ -1377,6 +1407,18 @@
     </Item>
     <Item ID="fStructuralEditing_Description">
       <English>Enables the translator to split and join paragraphs, or to assign different styles to a paragraph. By doing this the translation will depart from the paragraph structure of the front translation.</English>
+    </Item>
+    <Item ID="fMerge_CheckBox">
+      <English>Merging</English>
+    </Item>
+    <Item ID="fMerge_Description">
+      <English>Enables the Merge Pane, by which you can compare different versions of a book to see what is different, and to merge changes into the master copy.</English>
+    </Item>
+    <Item ID="fDictionary_CheckBox">
+      <English>WeSay Dictionary</English>
+    </Item>
+    <Item ID="fDictionary_Description">
+      <English>Enables the Dictionary Pane, by which you can access a WeSay dictionary. You can enter words in the dictionary that are in the translation; and you can look up definitions when doing a back translation.</English>
     </Item>
     <Item ID="m_checkListFeatures">
       <English>Just the Basics</English>
@@ -1481,7 +1523,7 @@
       <English>Navigate to the file where the settings are stored. The file name usually contains the name of the language, e.g., </English>
     </Item>
   </Group>
-  <Group ID="DialiogCreateTranslation" Title="108 - Dialiog: CreateTranslation" Translator="false">
+  <Group ID="DialogCreateTranslation" Title="108 - Dialog: CreateTranslation" Translator="false">
     <Item ID="Title">
       <English>Create Translation</English>
     </Item>
@@ -1647,6 +1689,9 @@
     <Item ID="m_btnCancel">
       <English>Turn Off</English>
     </Item>
+    <Item ID="m_comboQualifies">
+      <English>Qualquer Um Destes Serve</English>
+    </Item>
   </Group>
   <Group ID="DialogProperties" Title="113 - Dialog: Properties" Translator="false">
     <Item ID="Title">
@@ -1752,6 +1797,10 @@
         <English>Latin</English>
         <Tip>These are the font settings to use for this writing system.</Tip>
       </Item>
+      <Item ID="propStrikeout" Tip="true">
+        <English>Strikeout?</English>
+        <Tip>If Yes, the font is displayed with a line through the middle.</Tip>
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems" Title="Properties Dialog: Writing Systems page" Des="This is the Writing Systems properties page within the Properties dialog. Many of the controls start with 'prop', e.g., 'propFontName'. These are small labels that appear beside the setting to be changed. There is often a corresponding ToolTip, by which you should provide some additional helpful information to the user." Translator="false">
       <Item ID="m_btnRemove">
@@ -1776,6 +1825,10 @@
         <English>Name</English>
         <Tip>Provide a unique name for this Writing System.</Tip>
       </Item>
+      <Item ID="propAbbrev" Tip="true">
+        <English>Abbreviation / ID</English>
+        <Tip>A short abbreviation of the Writing System's name. This is used as an ID for the WeSay dictionary.</Tip>
+      </Item>
       <Item ID="propPunctuation" Tip="true">
         <English>Punctuation</English>
         <Tip>A list of those letters that are punctuation in this writing system.</Tip>
@@ -1783,6 +1836,10 @@
       <Item ID="propEndPunctuation" Tip="true">
         <English>End Punctuation</English>
         <Tip>A list of punctuation that can occur at the end of a sentence.</Tip>
+      </Item>
+      <Item ID="propKeyboard" Tip="true">
+        <English>Keyboard Name</English>
+        <Tip>The name of the keyboard to use when typing in this writing system (Windows IME, Keyman, etc.)</Tip>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_AdvancedPrintOptions" Title="Properties Dialog: Advanced Print Options Page" Translator="false">
@@ -2083,6 +2140,17 @@
         <English>Show line numbers?</English>
         <Tip>If Yes, line numbers are shown in the left margin, so that you can refer to a specific line as you discuss the text with others.</Tip>
       </Item>
+      <Item ID="propDictionary">
+        <English>WeSay Dictionary</English>
+      </Item>
+      <Item ID="propDictApp" Tip="true">
+        <English>Path to the WeSay App</English>
+        <Tip>The full path to the application that manages the dictionary; currently WeSay.App.Exe is the only one supported.</Tip>
+      </Item>
+      <Item ID="propDictData" Tip="true">
+        <English>Path to the LIFT Dictionary</English>
+        <Tip>The full path to the dictionary data as managed by WeSay, a LIFT format file.</Tip>
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Notes" Title="DialogProperties_Page_Notes" Translator="false">
       <Item ID="Show_kGeneral" Tip="true">
@@ -2307,5 +2375,172 @@
     <Item ID="sLoading">
       <English>Loading {0}...</English>
     </Item>
+  </Group>
+  <Group ID="WizNewProject" Title="WizNewProject" Translator="false">
+    <Item ID="Title">
+      <English>Create a New Project</English>
+    </Item>
+    <Item ID="m_btnFinish">
+      <English>Finish</English>
+    </Item>
+    <Item ID="m_btnPrev">
+      <English>Previous</English>
+    </Item>
+    <Item ID="m_btnNext">
+      <English>Next</English>
+    </Item>
+    <Group ID="WizNewProject_WizNew_Introduction" Title="WizNewProject_WizNew_Introduction" Translator="false">
+      <Item ID="m_lblClickNextToStart">
+        <English>Click 'Next' to get started....</English>
+      </Item>
+      <Item ID="m_lblDescription2">
+        <English>You will be identifying information about the source translation, the language you are translating into, and several other important items.</English>
+      </Item>
+      <Item ID="m_lblDescription1">
+        <English>This wizard will guide you through the process of creating a new project in OurWord. </English>
+      </Item>
+      <Item ID="strIntroduction">
+        <English>Introduction</English>
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_ProjectName" Title="WizNewProject_WizNew_ProjectName" Translator="false">
+      <Item ID="m_lblProjectName">
+        <English>Language Project Name:</English>
+      </Item>
+      <Item ID="m_lblExplanation">
+        <English>This should be the full name of the language you are translating into. It is the name that you and translators use to refer to the language. This name will appear throughout the user interface. (For example, 'Lakota Sioux.')</English>
+      </Item>
+      <Item ID="m_lblInstruction">
+        <English>Please give a name for this language project.</English>
+      </Item>
+      <Item ID="strProjectName">
+        <English>Project Name</English>
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_TargetInfo" Title="WizNewProject_WizNew_TargetInfo" Translator="false">
+      <Item ID="m_btnSettings">
+        <English>Browse...</English>
+      </Item>
+      <Item ID="m_lblSettings">
+        <English>Settings Folder:</English>
+      </Item>
+      <Item ID="m_lblSettingsHelp">
+        <English>2. Navigate to the folder where you want to store the settings files for this language.</English>
+      </Item>
+      <Item ID="m_lblAbbrevHelp">
+        <English>1. A short abbreviation of rhe language name. The Ethnologue offers suitable 3-letter abbreviations for most of the world's languages.</English>
+      </Item>
+      <Item ID="m_lblAbbrev">
+        <English>Abbreviation:</English>
+      </Item>
+      <Item ID="m_lblDescription">
+        <English>We need some additional information about the '{0}' language.</English>
+      </Item>
+      <Item ID="strTargetInfo">
+        <English>Target Information</English>
+      </Item>
+      <Item ID="strBrowseTargetFolderDialogTitle">
+        <English>Choose the folder in which to store settings for this project</English>
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_FrontInfo" Title="WizNewProject_WizNew_FrontInfo" Translator="false">
+      <Item ID="m_lblInstructions">
+        <English>Otherwise, enter the following information for the Front language, in the same manner as you did earler for the Target language:</English>
+      </Item>
+      <Item ID="m_btnUseExisting">
+        <English>Use Existing...</English>
+      </Item>
+      <Item ID="m_btnSettings">
+        <English>Browse...</English>
+      </Item>
+      <Item ID="m_lblSettings">
+        <English>Front Settings Folder:</English>
+      </Item>
+      <Item ID="m_lblAbbrev">
+        <English>Front Abbreviation:</English>
+      </Item>
+      <Item ID="m_lblName">
+        <English>Front Language Name:</English>
+      </Item>
+      <Item ID="m_lblBrowseToExistingFront">
+        <English>Browse to a Front settings file, if it already exists:</English>
+      </Item>
+      <Item ID="strFrontInfo">
+        <English>Front Information</English>
+      </Item>
+      <Item ID="strBrowseFrontFolderDialogTitle">
+        <English>Choose the folder in which to store settings for the Front translation.</English>
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_TeamSettings" Title="WizNewProject_WizNew_TeamSettings" Translator="false">
+      <Item ID="m_textCurrentAction">
+        <English>Current Action: Default</English>
+      </Item>
+      <Item ID="m_lblExplDefault">
+        <English>The default action is that OurWord will create TeamSettings.owt in the settings folder that you identified earlier.</English>
+      </Item>
+      <Item ID="m_lblExplSaveAs">
+        <English>You may specify a folder and file name for a new Team Settings file.</English>
+      </Item>
+      <Item ID="m_lblExplUseExisting">
+        <English>You may choose a Team Settings file that has already been created.</English>
+      </Item>
+      <Item ID="m_btnDefault">
+        <English>Default</English>
+      </Item>
+      <Item ID="m_btnUseExisting">
+        <English>Use Existing...</English>
+      </Item>
+      <Item ID="m_lblExplanation">
+        <English>OurWord keeps certain settings, such as the StyleSheet, in a global settings file where they can be used by multiple languagae projects.</English>
+      </Item>
+      <Item ID="strTeamSettings">
+        <English>Team Settings</English>
+      </Item>
+    </Group>
+    <Group ID="WizNewProject_WizNew_Summary" Title="WizNewProject_WizNew_Summary" Translator="false">
+      <Item ID="m_checkLaunchProperties">
+        <English>Do you want to go ahead and launch the Properties Dialog to enter other settings (such as adding Books to the translations)?</English>
+      </Item>
+      <Item ID="m_textTeamSettings">
+        <English>(Team Settings)</English>
+      </Item>
+      <Item ID="m_lblTeamSettings">
+        <English>Team Settings</English>
+      </Item>
+      <Item ID="m_textSourceTranslation">
+        <English>(Source Translation)</English>
+      </Item>
+      <Item ID="m_lblSourceTranslation">
+        <English>Source Translation:</English>
+      </Item>
+      <Item ID="m_textSettingsFolder">
+        <English>(Settings Folder)</English>
+      </Item>
+      <Item ID="m_lblSettingsFolder">
+        <English>Settings Folder:</English>
+      </Item>
+      <Item ID="m_textAbbreviation">
+        <English>(Abbreviation)</English>
+      </Item>
+      <Item ID="m_lblAbbreviation">
+        <English>Abbreviation:</English>
+      </Item>
+      <Item ID="m_textLanguageName">
+        <English>(Language Name)</English>
+      </Item>
+      <Item ID="m_lblLanguageName">
+        <English>Language Name:</English>
+      </Item>
+      <Item ID="m_labelClickFinish">
+        <English>Click the Finish button to create the new project, or press the Previous button to make changes..</English>
+      </Item>
+      <Item ID="m_labelReady">
+        <English>OurWord is now ready to create the new project:</English>
+      </Item>
+      <Item ID="strSummaryh">
+        <English>Summary</English>
+      </Item>
+    </Group>
   </Group>
 </LocDB>
