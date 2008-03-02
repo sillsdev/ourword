@@ -4063,7 +4063,7 @@ namespace OurWord.Edit
     }
 
     #region CLASS: PlaceHolder - save/restore a cursor position in the window
-    class PlaceHolder
+    public class PlaceHolder
     {
         // Content Attrs ---------------------------------------------------------------------
         #region Attr{g}: OWWindow Window

@@ -158,7 +158,7 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
-        private ToolStripLabel m_tbLanguageInfo;
+        private ToolStripDropDownButton m_btnChapter;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -348,7 +348,7 @@ namespace OurWord
 		}
 		#endregion
         #region Method: void ResetWindowContents() - called whenever content changes (OnEnterSection)
-        void ResetWindowContents()
+        public void ResetWindowContents()
         {
             // Set the TitleBar text
             SetTitleBarText();
@@ -437,120 +437,61 @@ namespace OurWord
         // Toolbar, MenuBar, Taskbar & StatusBar ---------------------------------------------
         #region Toolbar, MenuBar, Taskbar & StatusBar
         #region Menu/Toolbar attributes
-        private SplitContainer m_SplitContainer;
-        private ToolStripContainer m_toolStripContainer;
-        private ToolStrip m_ToolStrip;
-        private MenuStrip m_MenuStrip;
-        private StatusStrip m_StatusStrip;
-
-        private ToolStripMenuItem m_menuProject;
-        private ToolStripMenuItem m_menuNew;
-        private ToolStripMenuItem m_menuOpen;
-        private ToolStripMenuItem m_menuSave;
-        private ToolStripMenuItem m_menuSaveAs;
-        private ToolStripMenuItem m_menuProperties;
-        private ToolStripMenuItem m_menuPrint;
-        private ToolStripMenuItem m_menuExit;
-
-        private ToolStripMenuItem m_menuEdit;
-        private ToolStripMenuItem m_menuCut;
-        private ToolStripMenuItem m_menuCopy;
-        private ToolStripMenuItem m_menuPaste;
-        private ToolStripSeparator m_EditMenuSeparator;
-        private ToolStripMenuItem m_menuChangeParagraphStyle;
-
-        private ToolStripMenuItem m_menuNotes;
-        private ToolStripMenuItem m_menuNoteGeneral;
-        private ToolStripMenuItem m_menuNoteToDo;
-        private ToolStripMenuItem m_menuNoteAskUNS;
-        private ToolStripMenuItem m_menuNoteDefinition;
-        private ToolStripMenuItem m_menuNoteOldVersion;
-        private ToolStripMenuItem m_menuNoteReason;
-        private ToolStripMenuItem m_menuNoteFrontIssue;
-        private ToolStripMenuItem m_menuNoteHintForDaughter;
-        private ToolStripMenuItem m_menuNoteBackTranslation;
-        private ToolStripSeparator m_menuNotesSeparator2;
-        private ToolStripMenuItem m_menuDeleteNote;
-
-        private ToolStripMenuItem m_menuGoTo;
-        private ToolStripMenuItem m_menuFirstSection;
-        private ToolStripMenuItem m_menuPreviousSection;
-        private ToolStripMenuItem m_menuNextSection;
-        private ToolStripMenuItem m_menuLastSection;
-        private ToolStripMenuItem m_menuGoToBook;
-
-        private ToolStripMenuItem m_menuWindow;
-        private ToolStripMenuItem m_menuShowMergePane;
-        private ToolStripMenuItem m_menuShowDictionaryPane;
-        private ToolStripMenuItem m_menuShowNotesPane;
-        private ToolStripMenuItem m_menuShowOtherTranslationsPane;
-        private ToolStripSeparator m_menuSeparatorTasks;
-        private ToolStripSeparator m_SeparatorTasks;
-        private ToolStripMenuItem m_menuDrafting;
-        private ToolStripMenuItem m_menuNaturalnessCheck;
-        private ToolStripMenuItem m_menuBackTranslation;
-
-        private ToolStripMenuItem m_menuTools;
-        private ToolStripMenuItem m_menuIncrementBookStatus;
-        private ToolStripMenuItem m_menuRestoreFromBackup;
-        private ToolStripMenuItem m_menuOnlyShowSectionsThat;
+        private ToolStripDropDownButton m_btnProject;
+        private ToolStripMenuItem m_menuNewProject;
+        private ToolStripMenuItem m_menuOpenProject;
+        private ToolStripMenuItem m_menuSaveProject;
+        private ToolStripMenuItem m_menuSaveProjectAs;
+        private ToolStripButton m_btnPrint;
+        private ToolStripMenuItem m_menuConfigure;
         private ToolStripMenuItem m_menuCopyBTfromFront;
         private ToolStripMenuItem m_menuEntireBook;
         private ToolStripMenuItem m_menuCurrentSectionOnly;
-        private ToolStripMenuItem m_menuSetUpFeatures;
-        private ToolStripSeparator m_separatorDebugItems;
+        private ToolStripSeparator m_separatorDebug;
         private ToolStripMenuItem m_menuRunDebugTestSuite;
+        private ToolStripMenuItem m_menuOnlyShowSectionsThat;
         private ToolStripMenuItem m_menuLocalizerTool;
-
-        private ToolStripMenuItem m_menuHelp;
+        private ToolStripButton m_btnGotoFirstSection;
+        private ToolStripButton m_btnGotoLastSection;
+        private ToolStripDropDownButton m_btnWindow;
+        private ToolStripMenuItem m_menuDrafting;
+        private ToolStripMenuItem m_menuBackTranslation;
+        private ToolStripMenuItem m_menuNaturalnessCheck;
+        private ToolStripSeparator m_separatorWindow;
+        private ToolStripMenuItem m_menuShowNotesPane;
+        private ToolStripMenuItem m_menuShowTranslationsPane;
+        private ToolStripMenuItem m_menuShowMergePane;
+        private ToolStripMenuItem m_menuShowDictionaryPane;
+        private ToolStripDropDownButton m_btnHelp;
         private ToolStripMenuItem m_menuHelpTopics;
-        private ToolStripMenuItem m_menuAboutOurWord;
+        private ToolStripMenuItem m_menuAbout;
+        private ToolStripDropDownButton m_menuEdit;
+        private ToolStripMenuItem m_menuChangeParagraphTo;
+        private ToolStripMenuItem m_menuCut;
+        private ToolStripMenuItem m_menuCopy;
+        private ToolStripMenuItem m_menuPaste;
+        private ToolStripSeparator m_seperatorEdit;
+        private SplitContainer m_SplitContainer;
+        private ToolStripContainer m_toolStripContainer;
+        private ToolStrip m_ToolStrip;
+        private StatusStrip m_StatusStrip;
+        private ToolStripSeparator m_separator3;
 
         private ToolStripButton m_btnExit;
         private ToolStripButton m_btnProjectSave;
-        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator m_separator1;
         private ToolStripButton m_btnEditCut;
         private ToolStripButton m_btnEditCopy;
         private ToolStripButton m_btnEditPaste;
         private ToolStripButton m_btnItalic;
-        private ToolStripButton m_btnGotoFirstSection;
         private ToolStripSplitButton m_btnGotoPreviousSection;
         private ToolStripSplitButton m_btnGotoNextSection;
-        private ToolStripButton m_btnGotoLastSection;
         private ToolStripDropDownButton m_btnGoToBook;
-        private ToolStripButton m_btnDrafting;
-        private ToolStripButton m_btnBackTranslation;
-        private ToolStripButton m_btnNaturalnessCheck;
-        private ToolStripDropDownButton m_btnNotes;
-        private ToolStripMenuItem m_bmShowNotesPane;
-        private ToolStripSeparator m_toolSeparatorNotes;
-        private ToolStripButton m_btnNoteGeneral;
-        private ToolStripMenuItem m_bmNoteGeneral;
-        private ToolStripButton m_btnNoteToDo;
-        private ToolStripMenuItem m_bmNoteToDo;
-        private ToolStripButton m_btnNoteAskUNS;
-        private ToolStripMenuItem m_bmNoteAskUNS;
-        private ToolStripButton m_btnNoteDefinition;
-        private ToolStripMenuItem m_bmNoteDefinition;
-        private ToolStripButton m_btnNoteOldVersion;
-        private ToolStripMenuItem m_bmNoteOldVersion;
-        private ToolStripButton m_btnNoteReason;
-        private ToolStripMenuItem m_bmNoteReason;
-        private ToolStripButton m_btnNoteFrontIssue;
-        private ToolStripMenuItem m_bmNoteFrontIssue;
-        private ToolStripButton m_btnNoteHintForDaughter;
-        private ToolStripButton m_btnNoteBackTranslation;
-        private ToolStripButton m_btnDeleteNote;
-        private ToolStripMenuItem m_bmDeleteNote;
-
-        private ToolStripSeparator m_bmNotesSeparator1;
-        private ToolStripSeparator m_bmNotesSeparator2;
-        private ToolStripDropDownButton m_bmTools;
-        private ToolStripMenuItem m_bmIncrementBookStatus;
-        private ToolStripMenuItem m_bmRestoreFromBackup;
-        private ToolStripMenuItem m_bmSetUpFeatures;
-        private ToolStripSeparator toolStripSeparator7;
-        private ToolStripButton m_bmHelp;
+        private ToolStripDropDownButton m_btnTools;
+        private ToolStripMenuItem m_menuIncrementBookStatus;
+        private ToolStripMenuItem m_menuRestoreFromBackup;
+        private ToolStripMenuItem m_menuSetUpFeatures;
+        private ToolStripSeparator m_separator4;
 
         private ToolStripStatusLabel m_StatusMessage1;
         private ToolStripProgressBar m_ProgressBar;
@@ -560,13 +501,14 @@ namespace OurWord
         private ToolStrip m_Taskbar;
         private ToolStripLabel m_tbTaskName;
         private ToolStripButton m_tbPadlock;
+        private ToolStripLabel m_tbLanguageInfo;
         private ToolStripLabel m_tbCurrentPassage;
         #endregion
         #region Method: void SetupChangeParagraphStyleItems()
         public void SetupChangeParagraphStyleItems()
         {
             // ctrlRemove any previous subitems
-            m_menuChangeParagraphStyle.DropDownItems.Clear();
+            m_menuChangeParagraphTo.DropDownItems.Clear();
 
             // Populate
             /*Paragraphs
@@ -608,7 +550,7 @@ namespace OurWord
                     "m_menuChangeParagraphStyle_" + sAbbrev);
                 mi.Tag = sAbbrev;
 
-                m_menuChangeParagraphStyle.DropDownItems.Add(mi);
+                m_menuChangeParagraphTo.DropDownItems.Add(mi);
             }
         }
         #endregion
@@ -681,62 +623,35 @@ namespace OurWord
             bool bValidProjectWithData = G.IsValidProject &&
                 null != G.SFront && null != G.STarget;
 
+            // Project
+            m_menuSaveProject.Enabled = G.IsValidProject;
+            m_menuSaveProjectAs.Enabled = G.IsValidProject;
+
             // Print
-            m_menuSave.Enabled = G.IsValidProject;
-            m_menuSaveAs.Enabled = G.IsValidProject;
-            m_menuPrint.Enabled = bValidProjectWithData;
+            m_btnPrint.Enabled = bValidProjectWithData;
 
             // Editing
             bool bCanEdit = (MainWindow.Focused && TargetIsLocked) ? false : true;
-            m_menuCut.Enabled = bCanEdit;
             m_btnEditCut.Enabled = bCanEdit;
-            m_menuPaste.Enabled = bCanEdit;
             m_btnEditPaste.Enabled = bCanEdit;
             m_btnItalic.Enabled = canItalic;
+            m_menuCut.Enabled = bCanEdit;
+            m_menuPaste.Enabled = bCanEdit;
+            m_menuChangeParagraphTo.Enabled = bCanEdit;
 
             // Notes
-            bool bCanInsertNote = canInsertNote;
-            bool bCanDeleteNote = canDeleteNote;
-            m_menuNoteGeneral.Enabled = bCanInsertNote;
-            m_btnNoteGeneral.Enabled = m_menuNoteGeneral.Enabled;
-            m_bmNoteGeneral.Enabled = bCanInsertNote;
-            m_menuNoteToDo.Enabled = bCanInsertNote;
-            m_btnNoteToDo.Enabled = m_menuNoteToDo.Enabled;
-            m_bmNoteToDo.Enabled = bCanInsertNote;
-            m_menuNoteAskUNS.Enabled = bCanInsertNote;
-            m_btnNoteAskUNS.Enabled = m_menuNoteAskUNS.Enabled;
-            m_bmNoteAskUNS.Enabled = bCanInsertNote;
-            m_menuNoteDefinition.Enabled = bCanInsertNote;
-            m_btnNoteDefinition.Enabled = m_menuNoteDefinition.Enabled;
-            m_bmNoteDefinition.Enabled = bCanInsertNote;
-            m_menuNoteOldVersion.Enabled = bCanInsertNote;
-            m_btnNoteOldVersion.Enabled = m_menuNoteOldVersion.Enabled;
-            m_bmNoteOldVersion.Enabled = bCanInsertNote;
-            m_menuNoteReason.Enabled = bCanInsertNote;
-            m_btnNoteReason.Enabled = m_menuNoteReason.Enabled;
-            m_bmNoteReason.Enabled = bCanInsertNote;
-            m_menuNoteFrontIssue.Enabled = bCanInsertNote;
-            m_btnNoteFrontIssue.Enabled = m_menuNoteFrontIssue.Enabled;
-            m_bmNoteFrontIssue.Enabled = bCanInsertNote;
-            m_menuNoteHintForDaughter.Enabled = bCanInsertNote;
-            m_btnNoteHintForDaughter.Enabled = m_menuNoteHintForDaughter.Enabled;
-            m_menuNoteBackTranslation.Enabled = bCanInsertNote;
-            m_btnNoteBackTranslation.Enabled = m_menuNoteBackTranslation.Enabled;
-            m_menuDeleteNote.Enabled = bCanDeleteNote;
-            m_bmDeleteNote.Enabled = bCanDeleteNote;
+            if (SideWindows.HasNotesWindow)
+                SideWindows.NotesPane.SetControlsEnabling();
 
             // Go To menu
             bool bIsAtFirstSection = bValidProjectWithData && Project.Nav.IsAtFirstSection;
-            m_menuFirstSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             m_btnGotoFirstSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
-            m_menuPreviousSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             m_btnGotoPreviousSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             bool bIsAtLastSection = bValidProjectWithData && Project.Nav.IsAtLastSection;
-            m_menuNextSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
             m_btnGotoNextSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
-            m_menuLastSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
             m_btnGotoLastSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
-            m_menuGoToBook.Enabled = G.IsValidProject;
+            m_btnChapter.Enabled = G.IsValidProject;
+            m_btnGoToBook.Enabled = G.IsValidProject;
 
             // Tools menu
             m_menuIncrementBookStatus.Enabled = canIncrementBookStatus;
@@ -745,169 +660,105 @@ namespace OurWord
             m_menuDrafting.Checked = MainWindowIsDrafting;
             m_menuNaturalnessCheck.Checked = MainWindowIsNaturalness;
             m_menuBackTranslation.Checked = MainWindowIsBackTranslation;
-            m_btnDrafting.Checked = MainWindowIsDrafting;
-            m_btnNaturalnessCheck.Checked = MainWindowIsNaturalness;
-            m_btnBackTranslation.Checked = MainWindowIsBackTranslation;
         }
         #endregion
         #region Method: void SetupMenusAndToolbarsVisibility()
         void SetupMenusAndToolbarsVisibility()
+            // Turn features on/off according to settings and environment
         {
-            // JustTheBasics mode
-            bool bJustTheBasics = OurWordMain.Features.F_JustTheBasics && G.IsValidProject;
-            m_MenuStrip.Visible = !bJustTheBasics;
-            foreach (ToolStripItem item in m_ToolStrip.Items)
-            {
-                if (item as ToolStripItem != null)
-                {
-                    (item as ToolStripItem).DisplayStyle = bJustTheBasics ?
-                        ToolStripItemDisplayStyle.ImageAndText :
-                        ToolStripItemDisplayStyle.Image;
-                }
-            }
-
-            // NewOpenEtc Visibility - if we have a valid project, we can choose to turn off 
-            //   the menu items. If we don't have a valid project; then we MUST show the menu 
-            //   items so that we can create a valid one.
+            // Project - If we have an invalid project, we turn this on regardless
             bool bShowNewOpenEtc = (!G.IsValidProject || OurWordMain.Features.F_Project);
-            m_menuNew.Visible = bShowNewOpenEtc;
-            m_menuOpen.Visible = bShowNewOpenEtc;
-            m_menuSaveAs.Visible = bShowNewOpenEtc;
-            m_btnExit.Visible = bJustTheBasics;
+            m_btnProject.Visible = bShowNewOpenEtc;
 
-            // ProjectPropertiesDialog Visibility - Same logic asNewOpenEtc. If we have a valid
-            //   project, then it is ok for this to be turned off.
-            bool bShowPropertiesDlg = (!G.IsValidProject || OurWordMain.Features.F_PropertiesDialog);
-            m_menuProperties.Visible = bShowPropertiesDlg;
+            // Print
+            m_btnPrint.Visible = OurWordMain.Features.F_Print;
 
-            // Print Dialog Visibility
-            m_menuPrint.Visible = OurWordMain.Features.F_Print;
+            // Go To First / Last Section
+            m_btnGotoFirstSection.Visible = G.IsValidProject && Features.F_GoTo_FirstLast;
+            m_btnGotoLastSection.Visible = G.IsValidProject && Features.F_GoTo_FirstLast;
 
-            // Edit Menu
-            bool bStructualEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
-            SetupChangeParagraphStyleItems();
-            m_EditMenuSeparator.Visible = bStructualEditing;
-            m_menuChangeParagraphStyle.Visible = bStructualEditing;
+            // Go To Chapter
+            m_btnChapter.Visible = G.IsValidProject && Features.F_GoTo_Chapter;
 
-            // Notes
-            #region (Notes Visibility)
-            bool bNotesPaneIsVisible = DProject.VD_ShowNotesPane;
-            m_bmShowNotesPane.Checked = bNotesPaneIsVisible;
+            // Configure - If we have an invalid project, we turn this on regardless
+            bool bShowConfigureDlg = (!G.IsValidProject || OurWordMain.Features.F_PropertiesDialog);
+            m_menuConfigure.Visible = bShowConfigureDlg;
 
-            m_menuNotes.Visible = bNotesPaneIsVisible;
-            m_bmNotesSeparator1.Visible = bNotesPaneIsVisible;
-
-            m_menuNoteGeneral.Visible = (bNotesPaneIsVisible && DNote.ShowGeneral);
-            m_btnNoteGeneral.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowGeneral);
-            m_bmNoteGeneral.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowGeneral);
-
-            m_menuNoteToDo.Visible = (bNotesPaneIsVisible && DNote.ShowToDo);
-            m_btnNoteToDo.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowToDo);
-            m_bmNoteToDo.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowToDo);
-
-            m_menuNoteAskUNS.Visible = (bNotesPaneIsVisible && DNote.ShowAskUns);
-            m_btnNoteAskUNS.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowAskUns);
-            m_bmNoteAskUNS.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowAskUns);
-
-            m_menuNoteDefinition.Visible = (bNotesPaneIsVisible && DNote.ShowDefinition);
-            m_btnNoteDefinition.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowDefinition);
-            m_bmNoteDefinition.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowDefinition);
-
-            m_menuNoteOldVersion.Visible = (bNotesPaneIsVisible && DNote.ShowOldVersion);
-            m_btnNoteOldVersion.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowOldVersion);
-            m_bmNoteOldVersion.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowOldVersion);
-
-            m_menuNoteReason.Visible = (bNotesPaneIsVisible && DNote.ShowReason);
-            m_btnNoteReason.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowReason);
-            m_bmNoteReason.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowReason);
-
-            m_menuNoteFrontIssue.Visible = (bNotesPaneIsVisible && DNote.ShowFront);
-            m_btnNoteFrontIssue.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowFront);
-            m_bmNoteFrontIssue.Visible = (bJustTheBasics && bNotesPaneIsVisible && DNote.ShowFront);
-
-            m_menuNoteHintForDaughter.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowHintForDaughter);
-            m_btnNoteHintForDaughter.Visible = m_menuNoteHintForDaughter.Visible;
-
-            m_menuNoteBackTranslation.Visible = (!bJustTheBasics && bNotesPaneIsVisible && DNote.ShowBT && 
-                OurWordMain.App.MainWindowIsBackTranslation);
-            m_btnNoteBackTranslation.Visible = m_menuNoteBackTranslation.Visible;
-
-            m_menuNotesSeparator2.Visible = bNotesPaneIsVisible;
-            m_bmNotesSeparator2.Visible = bNotesPaneIsVisible;
-
-            m_menuDeleteNote.Visible = bNotesPaneIsVisible;
-            m_btnDeleteNote.Visible = bNotesPaneIsVisible && !bJustTheBasics;
-            m_bmDeleteNote.Visible = bJustTheBasics && bNotesPaneIsVisible;
-
-            m_btnNotes.Visible = bJustTheBasics;
-            #endregion
-
-            // GoTo Menu
-            m_btnGotoFirstSection.Visible = !bJustTheBasics;
-            m_btnGotoLastSection.Visible = !bJustTheBasics;
-            m_btnGoToBook.Visible = bJustTheBasics;
-
-            // Window Menu (show these if more than Drafting is turned on)
-            #region (Window Menu)
-            m_menuShowNotesPane.Checked = bNotesPaneIsVisible;
-
-            m_menuShowOtherTranslationsPane.Visible = (G.IsValidProject &&
-                (G.Project.OtherTranslations.Count > 0));
-            m_menuShowOtherTranslationsPane.Checked = (
-                G.IsValidProject &&
-                (G.Project.OtherTranslations.Count > 0) &&
-                DProject.VD_ShowTranslationsPane);
-
-            m_menuShowMergePane.Visible = s_Features.F_Merge;
-            m_menuShowMergePane.Checked = (G.IsValidProject && DProject.ShowMergePane);
-
-            m_menuShowDictionaryPane.Visible = s_Features.F_Dictionary;
-            m_menuShowDictionaryPane.Checked = (G.IsValidProject && DProject.ShowDictionaryPane);
-
-            bool bShowTasks = s_Features.F_JobBT || s_Features.F_JobNaturalness;
-            m_menuSeparatorTasks.Visible = bShowTasks;
-            m_SeparatorTasks.Visible = bShowTasks;
-
-            m_menuDrafting.Visible = bShowTasks;
-            m_btnDrafting.Visible = bShowTasks;
-
-            m_menuNaturalnessCheck.Visible = (bShowTasks && s_Features.F_JobNaturalness);
-            m_btnNaturalnessCheck.Visible = (bShowTasks && s_Features.F_JobNaturalness);
-
-            m_menuBackTranslation.Visible = (bShowTasks && s_Features.F_JobBT);
-            m_btnBackTranslation.Visible = (bShowTasks && s_Features.F_JobBT);
-            #endregion
-
-            // Tools
-            m_bmTools.Visible = bJustTheBasics;
+            // Restore from Backup
             m_menuRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
-            m_bmRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
-            m_menuOnlyShowSectionsThat.Visible = (G.IsValidProject && OurWordMain.Features.F_Filter);
-            m_menuCopyBTfromFront.Visible = OurWordMain.Features.F_CopyBTfromFront;
-            m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
 
-            // Debugging
+            // Copy BT from the Front Translation
+            m_menuCopyBTfromFront.Visible = (OurWordMain.Features.F_CopyBTfromFront &&
+                G.App.MainWindowIsBackTranslation);
+
+            // Debug Test Suite
             bool bShowDebugItems = JW_Registry.GetValue("Debug", false);
-            m_separatorDebugItems.Visible = bShowDebugItems;
+            m_separatorDebug.Visible = bShowDebugItems;
             m_menuRunDebugTestSuite.Visible = bShowDebugItems;
 
+            // Filters
+            m_menuOnlyShowSectionsThat.Visible = (G.IsValidProject && OurWordMain.Features.F_Filter);
+
+            // Localizer Tool
+            m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
+
+            // Window Menu in its entirety
+            bool bShowMainWindowSection = s_Features.F_JobBT || 
+                s_Features.F_JobNaturalness;
+            bool bShowNotesPane = DNote.IsShowingAny;
+            bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
+            bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
+            bool bShowMergePane = (s_Features.F_Merge && G.IsValidProject);
+            bool bShowSideWindowsSection = bShowNotesPane || bShowTranslationsPane || 
+                bShowDictionaryPane || bShowMergePane;
+            m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
+
+            // Main Window itesm: Drafting, Naturalness, BT
+            m_menuDrafting.Visible = bShowMainWindowSection;
+            m_menuBackTranslation.Visible = (bShowMainWindowSection && s_Features.F_JobBT);
+            m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && s_Features.F_JobNaturalness);
+            m_separatorWindow.Visible = bShowMainWindowSection && bShowSideWindowsSection;
+
+            // Side Window Items
+            m_menuShowNotesPane.Visible = bShowNotesPane;
+            m_menuShowNotesPane.Checked = DProject.VD_ShowNotesPane;
+            m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
+            m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
+            m_menuShowMergePane.Visible = bShowMergePane;
+            m_menuShowMergePane.Checked = DProject.ShowMergePane;
+            m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
+            m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
+
+            // Edit Menu / Structured Editing
+            bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
+            SetupChangeParagraphStyleItems();
+            m_menuChangeParagraphTo.Visible = bStructuralEditing;
+            m_menuEdit.Visible = bStructuralEditing;
+            m_btnEditCopy.Visible = !bStructuralEditing;
+            m_btnEditCut.Visible = !bStructuralEditing;
+            m_btnEditPaste.Visible = !bStructuralEditing;
+
+            // Notes
+            // TODO: It is possible that the Got/Lost Focus handler in NotesPane makes this
+            // not necessary.
+            if (SideWindows.HasNotesWindow)
+                SideWindows.NotesPane.SetControlsVisibility();
+
             // Clear dropdown subitems so we don't attempt to localize them
-            m_Config.RemoveMRUItems(m_menuProject);
+            m_Config.RemoveMRUItems(m_btnProject);
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
-            m_menuGoToBook.DropDownItems.Clear();
             m_btnGoToBook.DropDownItems.Clear();
 
             // Localization
-            LocDB.Localize(m_MenuStrip); //, "Menus");
-            LocDB.Localize(m_ToolStrip); //, "ToolbarText");
+            LocDB.Localize(m_ToolStrip); 
 
             // Some submenus happen after localization (otherwise, we'd be adding spurious
             // entries into the localization database)
-            m_Config.BuildMRUPopupMenu(m_menuProject, cmdMRU, bShowNewOpenEtc);
+            m_Config.BuildMRUPopupMenu(m_btnProject, cmdMRU, bShowNewOpenEtc);
             SetupNavigationButtons();
-            DBookGrouping.PopulateGotoBook(m_menuGoToBook, cmdGotoBook);
             DBookGrouping.PopulateGotoBook(m_btnGoToBook, cmdGotoBook);
+            m_btnGoToBook.Visible = (m_btnGoToBook.DropDownItems.Count > 1);
 
             // Enabling depends on the current editing context
             EnableMenusAndToolbars();
@@ -1096,113 +947,60 @@ namespace OurWord
 		/// -----------------------------------------------------------------------------------
 		private void InitializeComponent()
 		{
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
-            System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+            System.Windows.Forms.ToolStripSeparator m_separator2;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(OurWordMain));
-            this.m_menuHelp = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuHelpTopics = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuAboutOurWord = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuEdit = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_ToolStrip = new System.Windows.Forms.ToolStrip();
+            this.m_btnExit = new System.Windows.Forms.ToolStripButton();
+            this.m_btnProjectSave = new System.Windows.Forms.ToolStripButton();
+            this.m_btnProject = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_menuNewProject = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuOpenProject = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuSaveProject = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuSaveProjectAs = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_btnPrint = new System.Windows.Forms.ToolStripButton();
+            this.m_separator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.m_btnEditCut = new System.Windows.Forms.ToolStripButton();
+            this.m_btnEditCopy = new System.Windows.Forms.ToolStripButton();
+            this.m_btnEditPaste = new System.Windows.Forms.ToolStripButton();
+            this.m_menuEdit = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuCut = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuPaste = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_EditMenuSeparator = new System.Windows.Forms.ToolStripSeparator();
-            this.m_menuChangeParagraphStyle = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuGoTo = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuFirstSection = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuPreviousSection = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNextSection = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuLastSection = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuGoToBook = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuSave = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_MenuStrip = new System.Windows.Forms.MenuStrip();
-            this.m_menuProject = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNew = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuOpen = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuSaveAs = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuProperties = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuPrint = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNotes = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteGeneral = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteToDo = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteAskUNS = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteDefinition = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteOldVersion = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteReason = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteFrontIssue = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteHintForDaughter = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNoteBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNotesSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_menuDeleteNote = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuTools = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_seperatorEdit = new System.Windows.Forms.ToolStripSeparator();
+            this.m_menuChangeParagraphTo = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_btnItalic = new System.Windows.Forms.ToolStripButton();
+            this.m_btnGotoFirstSection = new System.Windows.Forms.ToolStripButton();
+            this.m_btnGotoPreviousSection = new System.Windows.Forms.ToolStripSplitButton();
+            this.m_btnGotoNextSection = new System.Windows.Forms.ToolStripSplitButton();
+            this.m_btnGotoLastSection = new System.Windows.Forms.ToolStripButton();
+            this.m_btnChapter = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_btnGoToBook = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_separator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.m_btnTools = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOnlyShowSectionsThat = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuCopyBTfromFront = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuEntireBook = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuCurrentSectionOnly = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_separatorDebugItems = new System.Windows.Forms.ToolStripSeparator();
-            this.m_menuRunDebugTestSuite = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuWindow = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_separatorDebug = new System.Windows.Forms.ToolStripSeparator();
+            this.m_menuRunDebugTestSuite = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_btnWindow = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuShowNotesPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuShowOtherTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowMergePane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuSeparatorTasks = new System.Windows.Forms.ToolStripSeparator();
-            this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_ToolStrip = new System.Windows.Forms.ToolStrip();
-            this.m_btnExit = new System.Windows.Forms.ToolStripButton();
-            this.m_btnProjectSave = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_btnEditCut = new System.Windows.Forms.ToolStripButton();
-            this.m_btnEditCopy = new System.Windows.Forms.ToolStripButton();
-            this.m_btnEditPaste = new System.Windows.Forms.ToolStripButton();
-            this.m_btnItalic = new System.Windows.Forms.ToolStripButton();
-            this.m_btnGotoFirstSection = new System.Windows.Forms.ToolStripButton();
-            this.m_btnGotoPreviousSection = new System.Windows.Forms.ToolStripSplitButton();
-            this.m_btnGotoNextSection = new System.Windows.Forms.ToolStripSplitButton();
-            this.m_btnGotoLastSection = new System.Windows.Forms.ToolStripButton();
-            this.m_btnGoToBook = new System.Windows.Forms.ToolStripDropDownButton();
-            this.m_SeparatorTasks = new System.Windows.Forms.ToolStripSeparator();
-            this.m_btnDrafting = new System.Windows.Forms.ToolStripButton();
-            this.m_btnBackTranslation = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNaturalnessCheck = new System.Windows.Forms.ToolStripButton();
-            this.m_toolSeparatorNotes = new System.Windows.Forms.ToolStripSeparator();
-            this.m_btnNotes = new System.Windows.Forms.ToolStripDropDownButton();
-            this.m_bmShowNotesPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNotesSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_bmNoteGeneral = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNoteToDo = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNoteAskUNS = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNoteDefinition = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNoteOldVersion = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNoteReason = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNoteFrontIssue = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmNotesSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_bmDeleteNote = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_btnNoteGeneral = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteToDo = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteAskUNS = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteDefinition = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteOldVersion = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteReason = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteFrontIssue = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteHintForDaughter = new System.Windows.Forms.ToolStripButton();
-            this.m_btnNoteBackTranslation = new System.Windows.Forms.ToolStripButton();
-            this.m_btnDeleteNote = new System.Windows.Forms.ToolStripButton();
-            this.m_bmTools = new System.Windows.Forms.ToolStripDropDownButton();
-            this.m_bmIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_bmSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_bmHelp = new System.Windows.Forms.ToolStripButton();
+            this.m_separator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.m_btnHelp = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_menuHelpTopics = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.m_toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this.m_StatusStrip = new System.Windows.Forms.StatusStrip();
             this.m_StatusMessage1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -1214,11 +1012,7 @@ namespace OurWord
             this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
             this.m_tbLanguageInfo = new System.Windows.Forms.ToolStripLabel();
             this.m_tbCurrentPassage = new System.Windows.Forms.ToolStripLabel();
-            toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
-            toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_MenuStrip.SuspendLayout();
+            m_separator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_ToolStrip.SuspendLayout();
             this.m_toolStripContainer.BottomToolStripPanel.SuspendLayout();
             this.m_toolStripContainer.ContentPanel.SuspendLayout();
@@ -1229,49 +1023,167 @@ namespace OurWord
             this.m_Taskbar.SuspendLayout();
             this.SuspendLayout();
             // 
-            // toolStripSeparator3
+            // m_separator2
             // 
-            toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new System.Drawing.Size(143, 6);
+            m_separator2.Name = "m_separator2";
+            m_separator2.Size = new System.Drawing.Size(6, 38);
             // 
-            // toolStripSeparator4
+            // m_ToolStrip
             // 
-            toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new System.Drawing.Size(143, 6);
+            this.m_ToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.m_ToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.m_ToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_btnExit,
+            this.m_btnProjectSave,
+            this.m_btnProject,
+            this.m_btnPrint,
+            this.m_separator1,
+            this.m_btnEditCut,
+            this.m_btnEditCopy,
+            this.m_btnEditPaste,
+            this.m_menuEdit,
+            this.m_btnItalic,
+            m_separator2,
+            this.m_btnGotoFirstSection,
+            this.m_btnGotoPreviousSection,
+            this.m_btnGotoNextSection,
+            this.m_btnGotoLastSection,
+            this.m_btnChapter,
+            this.m_btnGoToBook,
+            this.m_separator3,
+            this.m_btnTools,
+            this.m_btnWindow,
+            this.m_separator4,
+            this.m_btnHelp});
+            this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
+            this.m_ToolStrip.Location = new System.Drawing.Point(3, 0);
+            this.m_ToolStrip.Name = "m_ToolStrip";
+            this.m_ToolStrip.Size = new System.Drawing.Size(855, 38);
+            this.m_ToolStrip.TabIndex = 1;
             // 
-            // toolStripSeparator5
+            // m_btnExit
             // 
-            toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new System.Drawing.Size(199, 6);
+            this.m_btnExit.Image = ((System.Drawing.Image)(resources.GetObject("m_btnExit.Image")));
+            this.m_btnExit.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnExit.Name = "m_btnExit";
+            this.m_btnExit.Size = new System.Drawing.Size(29, 35);
+            this.m_btnExit.Text = "Exit";
+            this.m_btnExit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnExit.ToolTipText = "Save any changes and then exit OurWord.";
+            this.m_btnExit.Click += new System.EventHandler(this.cmdExit);
             // 
-            // toolStripSeparator2
+            // m_btnProjectSave
             // 
-            toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.m_btnProjectSave.Image = ((System.Drawing.Image)(resources.GetObject("m_btnProjectSave.Image")));
+            this.m_btnProjectSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnProjectSave.Name = "m_btnProjectSave";
+            this.m_btnProjectSave.Size = new System.Drawing.Size(35, 35);
+            this.m_btnProjectSave.Text = "Save";
+            this.m_btnProjectSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnProjectSave.ToolTipText = "Saves your work to disk.";
+            this.m_btnProjectSave.Click += new System.EventHandler(this.cmdSaveProject);
             // 
-            // m_menuHelp
+            // m_btnProject
             // 
-            this.m_menuHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuHelpTopics,
-            this.m_menuAboutOurWord});
-            this.m_menuHelp.Name = "m_menuHelp";
-            this.m_menuHelp.Size = new System.Drawing.Size(44, 20);
-            this.m_menuHelp.Text = "&Help";
+            this.m_btnProject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_menuNewProject,
+            this.m_menuOpenProject,
+            this.m_menuSaveProject,
+            this.m_menuSaveProjectAs});
+            this.m_btnProject.Image = ((System.Drawing.Image)(resources.GetObject("m_btnProject.Image")));
+            this.m_btnProject.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnProject.Name = "m_btnProject";
+            this.m_btnProject.Size = new System.Drawing.Size(57, 35);
+            this.m_btnProject.Text = "Project";
+            this.m_btnProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnProject.ToolTipText = "Shows the menu for working with a project (New, Open, etc.).";
             // 
-            // m_menuHelpTopics
+            // m_menuNewProject
             // 
-            this.m_menuHelpTopics.Image = ((System.Drawing.Image)(resources.GetObject("m_menuHelpTopics.Image")));
-            this.m_menuHelpTopics.Name = "m_menuHelpTopics";
-            this.m_menuHelpTopics.Size = new System.Drawing.Size(162, 22);
-            this.m_menuHelpTopics.Text = "Help &Topics";
-            this.m_menuHelpTopics.Click += new System.EventHandler(this.cmdHelpTopics);
+            this.m_menuNewProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNewProject.Image")));
+            this.m_menuNewProject.Name = "m_menuNewProject";
+            this.m_menuNewProject.Size = new System.Drawing.Size(155, 22);
+            this.m_menuNewProject.Text = "&New...";
+            this.m_menuNewProject.ToolTipText = "Create a brand new project.";
+            this.m_menuNewProject.Click += new System.EventHandler(this.cmdNewProject);
             // 
-            // m_menuAboutOurWord
+            // m_menuOpenProject
             // 
-            this.m_menuAboutOurWord.Name = "m_menuAboutOurWord";
-            this.m_menuAboutOurWord.Size = new System.Drawing.Size(162, 22);
-            this.m_menuAboutOurWord.Text = "&About Our Word";
-            this.m_menuAboutOurWord.Click += new System.EventHandler(this.cmdHelpAbout);
+            this.m_menuOpenProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOpenProject.Image")));
+            this.m_menuOpenProject.Name = "m_menuOpenProject";
+            this.m_menuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
+            this.m_menuOpenProject.Size = new System.Drawing.Size(155, 22);
+            this.m_menuOpenProject.Text = "&Open...";
+            this.m_menuOpenProject.ToolTipText = "Open an existing project.";
+            this.m_menuOpenProject.Click += new System.EventHandler(this.cmdOpenProject);
+            // 
+            // m_menuSaveProject
+            // 
+            this.m_menuSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSaveProject.Image")));
+            this.m_menuSaveProject.Name = "m_menuSaveProject";
+            this.m_menuSaveProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
+            this.m_menuSaveProject.Size = new System.Drawing.Size(155, 22);
+            this.m_menuSaveProject.Text = "&Save";
+            this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
+            this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
+            // 
+            // m_menuSaveProjectAs
+            // 
+            this.m_menuSaveProjectAs.Name = "m_menuSaveProjectAs";
+            this.m_menuSaveProjectAs.Size = new System.Drawing.Size(155, 22);
+            this.m_menuSaveProjectAs.Text = "Save &As...";
+            this.m_menuSaveProjectAs.ToolTipText = "Save this project under a different name.";
+            this.m_menuSaveProjectAs.Click += new System.EventHandler(this.cmdSaveProjectAs);
+            // 
+            // m_btnPrint
+            // 
+            this.m_btnPrint.Image = ((System.Drawing.Image)(resources.GetObject("m_btnPrint.Image")));
+            this.m_btnPrint.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnPrint.Name = "m_btnPrint";
+            this.m_btnPrint.Size = new System.Drawing.Size(45, 35);
+            this.m_btnPrint.Text = "Print...";
+            this.m_btnPrint.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnPrint.ToolTipText = "Print this book (or parts of this book.)";
+            this.m_btnPrint.Click += new System.EventHandler(this.cmdPrint);
+            // 
+            // m_separator1
+            // 
+            this.m_separator1.Name = "m_separator1";
+            this.m_separator1.Size = new System.Drawing.Size(6, 38);
+            // 
+            // m_btnEditCut
+            // 
+            this.m_btnEditCut.Image = ((System.Drawing.Image)(resources.GetObject("m_btnEditCut.Image")));
+            this.m_btnEditCut.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnEditCut.Name = "m_btnEditCut";
+            this.m_btnEditCut.Size = new System.Drawing.Size(30, 35);
+            this.m_btnEditCut.Text = "Cut";
+            this.m_btnEditCut.TextDirection = System.Windows.Forms.ToolStripTextDirection.Horizontal;
+            this.m_btnEditCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnEditCut.ToolTipText = "Removes the selected text and places it on the clipboard.";
+            this.m_btnEditCut.Click += new System.EventHandler(this.cmdEditCut);
+            // 
+            // m_btnEditCopy
+            // 
+            this.m_btnEditCopy.Image = ((System.Drawing.Image)(resources.GetObject("m_btnEditCopy.Image")));
+            this.m_btnEditCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnEditCopy.Name = "m_btnEditCopy";
+            this.m_btnEditCopy.Size = new System.Drawing.Size(39, 35);
+            this.m_btnEditCopy.Text = "Copy";
+            this.m_btnEditCopy.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnEditCopy.ToolTipText = "Copies the selected text to the clipboard.";
+            this.m_btnEditCopy.Click += new System.EventHandler(this.cmdEditCopy);
+            // 
+            // m_btnEditPaste
+            // 
+            this.m_btnEditPaste.Image = ((System.Drawing.Image)(resources.GetObject("m_btnEditPaste.Image")));
+            this.m_btnEditPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnEditPaste.Name = "m_btnEditPaste";
+            this.m_btnEditPaste.Size = new System.Drawing.Size(39, 35);
+            this.m_btnEditPaste.Text = "Paste";
+            this.m_btnEditPaste.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnEditPaste.ToolTipText = "Pastes the text at the clipboard to the cursor.";
+            this.m_btnEditPaste.Click += new System.EventHandler(this.cmdEditPaste);
             // 
             // m_menuEdit
             // 
@@ -1279,12 +1191,16 @@ namespace OurWord
             this.m_menuCut,
             this.m_menuCopy,
             this.m_menuPaste,
-            this.m_EditMenuSeparator,
-            this.m_menuChangeParagraphStyle});
+            this.m_seperatorEdit,
+            this.m_menuChangeParagraphTo});
+            this.m_menuEdit.Image = ((System.Drawing.Image)(resources.GetObject("m_menuEdit.Image")));
+            this.m_menuEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_menuEdit.Name = "m_menuEdit";
-            this.m_menuEdit.Size = new System.Drawing.Size(39, 20);
-            this.m_menuEdit.Text = "&Edit";
-            this.m_menuEdit.DropDownOpening += new System.EventHandler(this.cmdEditMenuOpening);
+            this.m_menuEdit.Size = new System.Drawing.Size(40, 35);
+            this.m_menuEdit.Text = "Edit";
+            this.m_menuEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_menuEdit.ToolTipText = "Displays the Edit menu items.";
+            this.m_menuEdit.DropDownOpening += new System.EventHandler(this.cmdEditDropdownOpening);
             // 
             // m_menuCut
             // 
@@ -1293,6 +1209,7 @@ namespace OurWord
             this.m_menuCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
             this.m_menuCut.Size = new System.Drawing.Size(189, 22);
             this.m_menuCut.Text = "Cu&t";
+            this.m_menuCut.ToolTipText = "Removes the selected text and places it on the clipboard.";
             this.m_menuCut.Click += new System.EventHandler(this.cmdEditCut);
             // 
             // m_menuCopy
@@ -1302,6 +1219,7 @@ namespace OurWord
             this.m_menuCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.m_menuCopy.Size = new System.Drawing.Size(189, 22);
             this.m_menuCopy.Text = "&Copy";
+            this.m_menuCopy.ToolTipText = "Copies the selected text to the clipboard.";
             this.m_menuCopy.Click += new System.EventHandler(this.cmdEditCopy);
             // 
             // m_menuPaste
@@ -1311,295 +1229,129 @@ namespace OurWord
             this.m_menuPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
             this.m_menuPaste.Size = new System.Drawing.Size(189, 22);
             this.m_menuPaste.Text = "&Paste";
+            this.m_menuPaste.ToolTipText = "Pastes the text at the clipboard to the cursor.";
             this.m_menuPaste.Click += new System.EventHandler(this.cmdEditPaste);
             // 
-            // m_EditMenuSeparator
+            // m_seperatorEdit
             // 
-            this.m_EditMenuSeparator.Name = "m_EditMenuSeparator";
-            this.m_EditMenuSeparator.Size = new System.Drawing.Size(186, 6);
+            this.m_seperatorEdit.Name = "m_seperatorEdit";
+            this.m_seperatorEdit.Size = new System.Drawing.Size(186, 6);
             // 
-            // m_menuChangeParagraphStyle
+            // m_menuChangeParagraphTo
             // 
-            this.m_menuChangeParagraphStyle.Name = "m_menuChangeParagraphStyle";
-            this.m_menuChangeParagraphStyle.Size = new System.Drawing.Size(189, 22);
-            this.m_menuChangeParagraphStyle.Text = "Change Paragraph To";
+            this.m_menuChangeParagraphTo.Name = "m_menuChangeParagraphTo";
+            this.m_menuChangeParagraphTo.Size = new System.Drawing.Size(189, 22);
+            this.m_menuChangeParagraphTo.Text = "C&hange Paragraph To";
+            this.m_menuChangeParagraphTo.ToolTipText = "Changes the style of the selected paragraph to another style.";
             // 
-            // m_menuGoTo
+            // m_btnItalic
             // 
-            this.m_menuGoTo.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuFirstSection,
-            this.m_menuPreviousSection,
-            this.m_menuNextSection,
-            this.m_menuLastSection,
-            toolStripSeparator5,
-            this.m_menuGoToBook});
-            this.m_menuGoTo.Name = "m_menuGoTo";
-            this.m_menuGoTo.Size = new System.Drawing.Size(51, 20);
-            this.m_menuGoTo.Text = "&Go To";
+            this.m_btnItalic.Image = ((System.Drawing.Image)(resources.GetObject("m_btnItalic.Image")));
+            this.m_btnItalic.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnItalic.Name = "m_btnItalic";
+            this.m_btnItalic.Size = new System.Drawing.Size(36, 35);
+            this.m_btnItalic.Text = "Italic";
+            this.m_btnItalic.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnItalic.ToolTipText = "Changes the selected text to Italic; this is only enabled if Italic is allowed in" +
+                " the current context.";
+            this.m_btnItalic.Click += new System.EventHandler(this.cmdItalic);
             // 
-            // m_menuFirstSection
+            // m_btnGotoFirstSection
             // 
-            this.m_menuFirstSection.Image = ((System.Drawing.Image)(resources.GetObject("m_menuFirstSection.Image")));
-            this.m_menuFirstSection.Name = "m_menuFirstSection";
-            this.m_menuFirstSection.Size = new System.Drawing.Size(202, 22);
-            this.m_menuFirstSection.Text = "&First Section";
-            this.m_menuFirstSection.Click += new System.EventHandler(this.cmdGoToFirstSection);
+            this.m_btnGotoFirstSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoFirstSection.Image")));
+            this.m_btnGotoFirstSection.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnGotoFirstSection.Name = "m_btnGotoFirstSection";
+            this.m_btnGotoFirstSection.Size = new System.Drawing.Size(33, 35);
+            this.m_btnGotoFirstSection.Text = "First";
+            this.m_btnGotoFirstSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnGotoFirstSection.ToolTipText = "Go to the First section in the book.";
+            this.m_btnGotoFirstSection.Click += new System.EventHandler(this.cmdGoToFirstSection);
             // 
-            // m_menuPreviousSection
+            // m_btnGotoPreviousSection
             // 
-            this.m_menuPreviousSection.Image = ((System.Drawing.Image)(resources.GetObject("m_menuPreviousSection.Image")));
-            this.m_menuPreviousSection.Name = "m_menuPreviousSection";
-            this.m_menuPreviousSection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
-            this.m_menuPreviousSection.Size = new System.Drawing.Size(202, 22);
-            this.m_menuPreviousSection.Text = "&Previous Section";
-            this.m_menuPreviousSection.Click += new System.EventHandler(this.cmdGoToPreviousSection);
+            this.m_btnGotoPreviousSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoPreviousSection.Image")));
+            this.m_btnGotoPreviousSection.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnGotoPreviousSection.Name = "m_btnGotoPreviousSection";
+            this.m_btnGotoPreviousSection.Size = new System.Drawing.Size(68, 35);
+            this.m_btnGotoPreviousSection.Text = "Previous";
+            this.m_btnGotoPreviousSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnGotoPreviousSection.ToolTipText = "Go to the Previous section in the book.";
+            this.m_btnGotoPreviousSection.ButtonClick += new System.EventHandler(this.cmdGoToPreviousSection);
             // 
-            // m_menuNextSection
+            // m_btnGotoNextSection
             // 
-            this.m_menuNextSection.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNextSection.Image")));
-            this.m_menuNextSection.Name = "m_menuNextSection";
-            this.m_menuNextSection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.m_menuNextSection.Size = new System.Drawing.Size(202, 22);
-            this.m_menuNextSection.Text = "&Next Section";
-            this.m_menuNextSection.Click += new System.EventHandler(this.cmdGoToNextSection);
+            this.m_btnGotoNextSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoNextSection.Image")));
+            this.m_btnGotoNextSection.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnGotoNextSection.Name = "m_btnGotoNextSection";
+            this.m_btnGotoNextSection.Size = new System.Drawing.Size(47, 35);
+            this.m_btnGotoNextSection.Text = "Next";
+            this.m_btnGotoNextSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnGotoNextSection.ToolTipText = "Go to the Next section in the book.";
+            this.m_btnGotoNextSection.ButtonClick += new System.EventHandler(this.cmdGoToNextSection);
             // 
-            // m_menuLastSection
+            // m_btnGotoLastSection
             // 
-            this.m_menuLastSection.Image = ((System.Drawing.Image)(resources.GetObject("m_menuLastSection.Image")));
-            this.m_menuLastSection.Name = "m_menuLastSection";
-            this.m_menuLastSection.Size = new System.Drawing.Size(202, 22);
-            this.m_menuLastSection.Text = "&Last Section";
-            this.m_menuLastSection.Click += new System.EventHandler(this.cmdGoToLastSection);
+            this.m_btnGotoLastSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoLastSection.Image")));
+            this.m_btnGotoLastSection.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnGotoLastSection.Name = "m_btnGotoLastSection";
+            this.m_btnGotoLastSection.Size = new System.Drawing.Size(32, 35);
+            this.m_btnGotoLastSection.Text = "Last";
+            this.m_btnGotoLastSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnGotoLastSection.ToolTipText = "Go to the final section in the book.";
+            this.m_btnGotoLastSection.Click += new System.EventHandler(this.cmdGoToLastSection);
             // 
-            // m_menuGoToBook
+            // m_btnChapter
             // 
-            this.m_menuGoToBook.Image = ((System.Drawing.Image)(resources.GetObject("m_menuGoToBook.Image")));
-            this.m_menuGoToBook.Name = "m_menuGoToBook";
-            this.m_menuGoToBook.Size = new System.Drawing.Size(202, 22);
-            this.m_menuGoToBook.Text = "&Book";
+            this.m_btnChapter.Image = ((System.Drawing.Image)(resources.GetObject("m_btnChapter.Image")));
+            this.m_btnChapter.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnChapter.Name = "m_btnChapter";
+            this.m_btnChapter.Size = new System.Drawing.Size(62, 35);
+            this.m_btnChapter.Text = "Chapter";
+            this.m_btnChapter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnChapter.ToolTipText = "Go to a Chapter in the book";
+            this.m_btnChapter.Click += new System.EventHandler(this.cmdGoToChapter);
             // 
-            // m_menuSave
+            // m_btnGoToBook
             // 
-            this.m_menuSave.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSave.Image")));
-            this.m_menuSave.Name = "m_menuSave";
-            this.m_menuSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSave.Size = new System.Drawing.Size(146, 22);
-            this.m_menuSave.Text = "&Save";
-            this.m_menuSave.Click += new System.EventHandler(this.cmdSaveProject);
+            this.m_btnGoToBook.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGoToBook.Image")));
+            this.m_btnGoToBook.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnGoToBook.Name = "m_btnGoToBook";
+            this.m_btnGoToBook.Size = new System.Drawing.Size(47, 35);
+            this.m_btnGoToBook.Text = "Book";
+            this.m_btnGoToBook.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnGoToBook.ToolTipText = "Go to a different book";
             // 
-            // m_MenuStrip
+            // m_separator3
             // 
-            this.m_MenuStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.m_MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuProject,
-            this.m_menuEdit,
-            this.m_menuNotes,
-            this.m_menuGoTo,
-            this.m_menuTools,
-            this.m_menuWindow,
-            this.m_menuHelp});
-            this.m_MenuStrip.Location = new System.Drawing.Point(0, 0);
-            this.m_MenuStrip.Name = "m_MenuStrip";
-            this.m_MenuStrip.Size = new System.Drawing.Size(748, 24);
-            this.m_MenuStrip.TabIndex = 0;
-            this.m_MenuStrip.Text = "menuStrip1";
+            this.m_separator3.Name = "m_separator3";
+            this.m_separator3.Size = new System.Drawing.Size(6, 38);
             // 
-            // m_menuProject
+            // m_btnTools
             // 
-            this.m_menuProject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuNew,
-            this.m_menuOpen,
-            this.m_menuSave,
-            this.m_menuSaveAs,
-            toolStripSeparator3,
-            this.m_menuProperties,
-            this.m_menuPrint,
-            toolStripSeparator4,
-            this.m_menuExit});
-            this.m_menuProject.Name = "m_menuProject";
-            this.m_menuProject.Size = new System.Drawing.Size(56, 20);
-            this.m_menuProject.Text = "&Project";
-            // 
-            // m_menuNew
-            // 
-            this.m_menuNew.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNew.Image")));
-            this.m_menuNew.Name = "m_menuNew";
-            this.m_menuNew.Size = new System.Drawing.Size(146, 22);
-            this.m_menuNew.Text = "&New";
-            this.m_menuNew.Click += new System.EventHandler(this.cmdNewProject);
-            // 
-            // m_menuOpen
-            // 
-            this.m_menuOpen.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOpen.Image")));
-            this.m_menuOpen.Name = "m_menuOpen";
-            this.m_menuOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.m_menuOpen.Size = new System.Drawing.Size(146, 22);
-            this.m_menuOpen.Text = "&Open";
-            this.m_menuOpen.Click += new System.EventHandler(this.cmdOpenProject);
-            // 
-            // m_menuSaveAs
-            // 
-            this.m_menuSaveAs.Name = "m_menuSaveAs";
-            this.m_menuSaveAs.Size = new System.Drawing.Size(146, 22);
-            this.m_menuSaveAs.Text = "Save &As";
-            this.m_menuSaveAs.Click += new System.EventHandler(this.cmdSaveProjectAs);
-            // 
-            // m_menuProperties
-            // 
-            this.m_menuProperties.Image = ((System.Drawing.Image)(resources.GetObject("m_menuProperties.Image")));
-            this.m_menuProperties.Name = "m_menuProperties";
-            this.m_menuProperties.Size = new System.Drawing.Size(146, 22);
-            this.m_menuProperties.Text = "P&roperties";
-            this.m_menuProperties.Click += new System.EventHandler(this.cmdProjectProperties);
-            // 
-            // m_menuPrint
-            // 
-            this.m_menuPrint.Image = ((System.Drawing.Image)(resources.GetObject("m_menuPrint.Image")));
-            this.m_menuPrint.Name = "m_menuPrint";
-            this.m_menuPrint.Size = new System.Drawing.Size(146, 22);
-            this.m_menuPrint.Text = "&Print";
-            this.m_menuPrint.Click += new System.EventHandler(this.cmdPrint);
-            // 
-            // m_menuExit
-            // 
-            this.m_menuExit.Image = ((System.Drawing.Image)(resources.GetObject("m_menuExit.Image")));
-            this.m_menuExit.Name = "m_menuExit";
-            this.m_menuExit.Size = new System.Drawing.Size(146, 22);
-            this.m_menuExit.Text = "E&xit";
-            this.m_menuExit.Click += new System.EventHandler(this.cmdExit);
-            // 
-            // m_menuNotes
-            // 
-            this.m_menuNotes.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuNoteGeneral,
-            this.m_menuNoteToDo,
-            this.m_menuNoteAskUNS,
-            this.m_menuNoteDefinition,
-            this.m_menuNoteOldVersion,
-            this.m_menuNoteReason,
-            this.m_menuNoteFrontIssue,
-            this.m_menuNoteHintForDaughter,
-            this.m_menuNoteBackTranslation,
-            this.m_menuNotesSeparator2,
-            this.m_menuDeleteNote});
-            this.m_menuNotes.Name = "m_menuNotes";
-            this.m_menuNotes.Size = new System.Drawing.Size(50, 20);
-            this.m_menuNotes.Text = "&Notes";
-            // 
-            // m_menuNoteGeneral
-            // 
-            this.m_menuNoteGeneral.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteGeneral.Image")));
-            this.m_menuNoteGeneral.Name = "m_menuNoteGeneral";
-            this.m_menuNoteGeneral.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteGeneral.Tag = "kGeneral";
-            this.m_menuNoteGeneral.Text = "Insert General &Note";
-            this.m_menuNoteGeneral.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteToDo
-            // 
-            this.m_menuNoteToDo.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteToDo.Image")));
-            this.m_menuNoteToDo.Name = "m_menuNoteToDo";
-            this.m_menuNoteToDo.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteToDo.Tag = "kToDo";
-            this.m_menuNoteToDo.Text = "Insert &To Do Note";
-            this.m_menuNoteToDo.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteAskUNS
-            // 
-            this.m_menuNoteAskUNS.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteAskUNS.Image")));
-            this.m_menuNoteAskUNS.Name = "m_menuNoteAskUNS";
-            this.m_menuNoteAskUNS.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteAskUNS.Tag = "kAskUns";
-            this.m_menuNoteAskUNS.Text = "Insert &Ask UNS Note";
-            this.m_menuNoteAskUNS.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteDefinition
-            // 
-            this.m_menuNoteDefinition.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteDefinition.Image")));
-            this.m_menuNoteDefinition.Name = "m_menuNoteDefinition";
-            this.m_menuNoteDefinition.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteDefinition.Tag = "kDefinition";
-            this.m_menuNoteDefinition.Text = "Insert D&efinition Note";
-            this.m_menuNoteDefinition.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteOldVersion
-            // 
-            this.m_menuNoteOldVersion.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteOldVersion.Image")));
-            this.m_menuNoteOldVersion.Name = "m_menuNoteOldVersion";
-            this.m_menuNoteOldVersion.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteOldVersion.Tag = "kOldVersion";
-            this.m_menuNoteOldVersion.Text = "Insert Old &Version Note";
-            this.m_menuNoteOldVersion.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteReason
-            // 
-            this.m_menuNoteReason.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteReason.Image")));
-            this.m_menuNoteReason.Name = "m_menuNoteReason";
-            this.m_menuNoteReason.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteReason.Tag = "kReason";
-            this.m_menuNoteReason.Text = "Insert &Reason Note";
-            this.m_menuNoteReason.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteFrontIssue
-            // 
-            this.m_menuNoteFrontIssue.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteFrontIssue.Image")));
-            this.m_menuNoteFrontIssue.Name = "m_menuNoteFrontIssue";
-            this.m_menuNoteFrontIssue.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteFrontIssue.Tag = "kFront";
-            this.m_menuNoteFrontIssue.Text = "Insert &Front Issue Note";
-            this.m_menuNoteFrontIssue.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteHintForDaughter
-            // 
-            this.m_menuNoteHintForDaughter.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteHintForDaughter.Image")));
-            this.m_menuNoteHintForDaughter.Name = "m_menuNoteHintForDaughter";
-            this.m_menuNoteHintForDaughter.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteHintForDaughter.Tag = "kHintForDaughter";
-            this.m_menuNoteHintForDaughter.Text = "Insert &Hint for Daughter Note";
-            this.m_menuNoteHintForDaughter.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNoteBackTranslation
-            // 
-            this.m_menuNoteBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNoteBackTranslation.Image")));
-            this.m_menuNoteBackTranslation.Name = "m_menuNoteBackTranslation";
-            this.m_menuNoteBackTranslation.Size = new System.Drawing.Size(228, 22);
-            this.m_menuNoteBackTranslation.Tag = "kBT";
-            this.m_menuNoteBackTranslation.Text = "Insert &Back Translation Note";
-            this.m_menuNoteBackTranslation.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_menuNotesSeparator2
-            // 
-            this.m_menuNotesSeparator2.Name = "m_menuNotesSeparator2";
-            this.m_menuNotesSeparator2.Size = new System.Drawing.Size(225, 6);
-            // 
-            // m_menuDeleteNote
-            // 
-            this.m_menuDeleteNote.Image = ((System.Drawing.Image)(resources.GetObject("m_menuDeleteNote.Image")));
-            this.m_menuDeleteNote.Name = "m_menuDeleteNote";
-            this.m_menuDeleteNote.Size = new System.Drawing.Size(228, 22);
-            this.m_menuDeleteNote.Text = "&Delete Note...";
-            this.m_menuDeleteNote.Click += new System.EventHandler(this.cmdDeleteNote);
-            // 
-            // m_menuTools
-            // 
-            this.m_menuTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_btnTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuIncrementBookStatus,
             this.m_menuRestoreFromBackup,
             this.m_menuOnlyShowSectionsThat,
             this.m_menuCopyBTfromFront,
+            this.m_menuConfigure,
             this.m_menuSetUpFeatures,
-            this.m_separatorDebugItems,
-            this.m_menuRunDebugTestSuite,
-            this.m_menuLocalizerTool});
-            this.m_menuTools.Name = "m_menuTools";
-            this.m_menuTools.Size = new System.Drawing.Size(48, 20);
-            this.m_menuTools.Text = "&Tools";
+            this.m_menuLocalizerTool,
+            this.m_separatorDebug,
+            this.m_menuRunDebugTestSuite});
+            this.m_btnTools.Image = ((System.Drawing.Image)(resources.GetObject("m_btnTools.Image")));
+            this.m_btnTools.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnTools.Name = "m_btnTools";
+            this.m_btnTools.Size = new System.Drawing.Size(49, 35);
+            this.m_btnTools.Text = "Tools";
+            this.m_btnTools.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnTools.ToolTipText = "Opens the menu showing the different tools that are available.";
             // 
             // m_menuIncrementBookStatus
             // 
             this.m_menuIncrementBookStatus.Name = "m_menuIncrementBookStatus";
             this.m_menuIncrementBookStatus.Size = new System.Drawing.Size(211, 22);
             this.m_menuIncrementBookStatus.Text = "&Increment Book Status...";
+            this.m_menuIncrementBookStatus.ToolTipText = "Change the book\'s status to the next one in the translation process.";
             this.m_menuIncrementBookStatus.Click += new System.EventHandler(this.cmdIncrementBookStatus);
             // 
             // m_menuRestoreFromBackup
@@ -1607,6 +1359,7 @@ namespace OurWord
             this.m_menuRestoreFromBackup.Name = "m_menuRestoreFromBackup";
             this.m_menuRestoreFromBackup.Size = new System.Drawing.Size(211, 22);
             this.m_menuRestoreFromBackup.Text = "Restore from &Backup...";
+            this.m_menuRestoreFromBackup.ToolTipText = "Restore to a former version of the book.";
             this.m_menuRestoreFromBackup.Click += new System.EventHandler(this.cmdRestoreBackup);
             // 
             // m_menuOnlyShowSectionsThat
@@ -1614,6 +1367,7 @@ namespace OurWord
             this.m_menuOnlyShowSectionsThat.Name = "m_menuOnlyShowSectionsThat";
             this.m_menuOnlyShowSectionsThat.Size = new System.Drawing.Size(211, 22);
             this.m_menuOnlyShowSectionsThat.Text = "Only &Show Sections that...";
+            this.m_menuOnlyShowSectionsThat.ToolTipText = "Filter out the sections which do not conform to a criteria.";
             this.m_menuOnlyShowSectionsThat.Click += new System.EventHandler(this.cmdFilter);
             // 
             // m_menuCopyBTfromFront
@@ -1624,6 +1378,7 @@ namespace OurWord
             this.m_menuCopyBTfromFront.Name = "m_menuCopyBTfromFront";
             this.m_menuCopyBTfromFront.Size = new System.Drawing.Size(211, 22);
             this.m_menuCopyBTfromFront.Text = "&Copy BT from Front";
+            this.m_menuCopyBTfromFront.ToolTipText = "Copy the Back Translation from the Front translation.";
             // 
             // m_menuEntireBook
             // 
@@ -1639,80 +1394,63 @@ namespace OurWord
             this.m_menuCurrentSectionOnly.Text = "Current &Section Only...";
             this.m_menuCurrentSectionOnly.Click += new System.EventHandler(this.cmdCopyBTfromFront_Section);
             // 
+            // m_menuConfigure
+            // 
+            this.m_menuConfigure.Image = ((System.Drawing.Image)(resources.GetObject("m_menuConfigure.Image")));
+            this.m_menuConfigure.Name = "m_menuConfigure";
+            this.m_menuConfigure.Size = new System.Drawing.Size(211, 22);
+            this.m_menuConfigure.Text = "&Configure...";
+            this.m_menuConfigure.ToolTipText = "Edit the settings for OurWord and for the current project.";
+            this.m_menuConfigure.Click += new System.EventHandler(this.cmdProjectProperties);
+            // 
             // m_menuSetUpFeatures
             // 
             this.m_menuSetUpFeatures.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSetUpFeatures.Image")));
             this.m_menuSetUpFeatures.Name = "m_menuSetUpFeatures";
             this.m_menuSetUpFeatures.Size = new System.Drawing.Size(211, 22);
-            this.m_menuSetUpFeatures.Text = "Set Up &Features";
+            this.m_menuSetUpFeatures.Text = "Set Up &Features...";
+            this.m_menuSetUpFeatures.ToolTipText = "Set which features are turned on and off.";
             this.m_menuSetUpFeatures.Click += new System.EventHandler(this.cmdSetUpFeatures);
-            // 
-            // m_separatorDebugItems
-            // 
-            this.m_separatorDebugItems.Name = "m_separatorDebugItems";
-            this.m_separatorDebugItems.Size = new System.Drawing.Size(208, 6);
-            // 
-            // m_menuRunDebugTestSuite
-            // 
-            this.m_menuRunDebugTestSuite.Name = "m_menuRunDebugTestSuite";
-            this.m_menuRunDebugTestSuite.Size = new System.Drawing.Size(211, 22);
-            this.m_menuRunDebugTestSuite.Text = "&Run Debug Test Suite";
-            this.m_menuRunDebugTestSuite.Click += new System.EventHandler(this.cmdDebugTesting);
             // 
             // m_menuLocalizerTool
             // 
             this.m_menuLocalizerTool.Name = "m_menuLocalizerTool";
             this.m_menuLocalizerTool.Size = new System.Drawing.Size(211, 22);
             this.m_menuLocalizerTool.Text = "&Localizer Tool...";
+            this.m_menuLocalizerTool.ToolTipText = "Create a versin of OurWord in another language.";
             this.m_menuLocalizerTool.Click += new System.EventHandler(this.cmdLocalizer);
             // 
-            // m_menuWindow
+            // m_separatorDebug
             // 
-            this.m_menuWindow.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuShowNotesPane,
-            this.m_menuShowOtherTranslationsPane,
-            this.m_menuShowMergePane,
-            this.m_menuShowDictionaryPane,
-            this.m_menuSeparatorTasks,
+            this.m_separatorDebug.Name = "m_separatorDebug";
+            this.m_separatorDebug.Size = new System.Drawing.Size(208, 6);
+            // 
+            // m_menuRunDebugTestSuite
+            // 
+            this.m_menuRunDebugTestSuite.Name = "m_menuRunDebugTestSuite";
+            this.m_menuRunDebugTestSuite.Size = new System.Drawing.Size(211, 22);
+            this.m_menuRunDebugTestSuite.Text = "&Run Debug Test Suite...";
+            this.m_menuRunDebugTestSuite.ToolTipText = "Only programmers will generally see this; you should ignore it!";
+            this.m_menuRunDebugTestSuite.Click += new System.EventHandler(this.cmdDebugTesting);
+            // 
+            // m_btnWindow
+            // 
+            this.m_btnWindow.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuDrafting,
+            this.m_menuBackTranslation,
             this.m_menuNaturalnessCheck,
-            this.m_menuBackTranslation});
-            this.m_menuWindow.Name = "m_menuWindow";
-            this.m_menuWindow.Size = new System.Drawing.Size(63, 20);
-            this.m_menuWindow.Text = "&Window";
-            // 
-            // m_menuShowNotesPane
-            // 
-            this.m_menuShowNotesPane.Name = "m_menuShowNotesPane";
-            this.m_menuShowNotesPane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowNotesPane.Text = "Show &Notes Pane";
-            this.m_menuShowNotesPane.Click += new System.EventHandler(this.cmdToggleNotesPane);
-            // 
-            // m_menuShowOtherTranslationsPane
-            // 
-            this.m_menuShowOtherTranslationsPane.Name = "m_menuShowOtherTranslationsPane";
-            this.m_menuShowOtherTranslationsPane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowOtherTranslationsPane.Text = "Show &Other Translations Pane";
-            this.m_menuShowOtherTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
-            // 
-            // m_menuShowMergePane
-            // 
-            this.m_menuShowMergePane.Name = "m_menuShowMergePane";
-            this.m_menuShowMergePane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowMergePane.Text = "Show &Merge Pane";
-            this.m_menuShowMergePane.Click += new System.EventHandler(this.cmdToggleMergePane);
-            // 
-            // m_menuShowDictionaryPane
-            // 
-            this.m_menuShowDictionaryPane.Name = "m_menuShowDictionaryPane";
-            this.m_menuShowDictionaryPane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowDictionaryPane.Text = "Show &Dictionary Pane";
-            this.m_menuShowDictionaryPane.Click += new System.EventHandler(this.cmdToggleDictionaryPane);
-            // 
-            // m_menuSeparatorTasks
-            // 
-            this.m_menuSeparatorTasks.Name = "m_menuSeparatorTasks";
-            this.m_menuSeparatorTasks.Size = new System.Drawing.Size(229, 6);
+            this.m_separatorWindow,
+            this.m_menuShowNotesPane,
+            this.m_menuShowTranslationsPane,
+            this.m_menuShowMergePane,
+            this.m_menuShowDictionaryPane});
+            this.m_btnWindow.Image = ((System.Drawing.Image)(resources.GetObject("m_btnWindow.Image")));
+            this.m_btnWindow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnWindow.Name = "m_btnWindow";
+            this.m_btnWindow.Size = new System.Drawing.Size(64, 35);
+            this.m_btnWindow.Text = "Window";
+            this.m_btnWindow.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnWindow.ToolTipText = "Shows the various windows you can turn on and off.";
             // 
             // m_menuDrafting
             // 
@@ -1720,15 +1458,8 @@ namespace OurWord
             this.m_menuDrafting.Name = "m_menuDrafting";
             this.m_menuDrafting.Size = new System.Drawing.Size(232, 22);
             this.m_menuDrafting.Text = "&Drafting";
+            this.m_menuDrafting.ToolTipText = "Set the main window to do Drafting.";
             this.m_menuDrafting.Click += new System.EventHandler(this.cmdJobDrafting);
-            // 
-            // m_menuNaturalnessCheck
-            // 
-            this.m_menuNaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNaturalnessCheck.Image")));
-            this.m_menuNaturalnessCheck.Name = "m_menuNaturalnessCheck";
-            this.m_menuNaturalnessCheck.Size = new System.Drawing.Size(232, 22);
-            this.m_menuNaturalnessCheck.Text = "&Naturalness Check";
-            this.m_menuNaturalnessCheck.Click += new System.EventHandler(this.cmdJobNaturalness);
             // 
             // m_menuBackTranslation
             // 
@@ -1736,491 +1467,91 @@ namespace OurWord
             this.m_menuBackTranslation.Name = "m_menuBackTranslation";
             this.m_menuBackTranslation.Size = new System.Drawing.Size(232, 22);
             this.m_menuBackTranslation.Text = "&Back Translation";
+            this.m_menuBackTranslation.ToolTipText = "Set the main window to work on the Back Translation.";
             this.m_menuBackTranslation.Click += new System.EventHandler(this.cmdJobBackTranslation);
             // 
-            // m_ToolStrip
-            // 
-            this.m_ToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.m_ToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.m_ToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_btnExit,
-            this.m_btnProjectSave,
-            this.toolStripSeparator1,
-            this.m_btnEditCut,
-            this.m_btnEditCopy,
-            this.m_btnEditPaste,
-            this.m_btnItalic,
-            toolStripSeparator2,
-            this.m_btnGotoFirstSection,
-            this.m_btnGotoPreviousSection,
-            this.m_btnGotoNextSection,
-            this.m_btnGotoLastSection,
-            this.m_btnGoToBook,
-            this.m_SeparatorTasks,
-            this.m_btnDrafting,
-            this.m_btnBackTranslation,
-            this.m_btnNaturalnessCheck,
-            this.m_toolSeparatorNotes,
-            this.m_btnNotes,
-            this.m_btnNoteGeneral,
-            this.m_btnNoteToDo,
-            this.m_btnNoteAskUNS,
-            this.m_btnNoteDefinition,
-            this.m_btnNoteOldVersion,
-            this.m_btnNoteReason,
-            this.m_btnNoteFrontIssue,
-            this.m_btnNoteHintForDaughter,
-            this.m_btnNoteBackTranslation,
-            this.m_btnDeleteNote,
-            this.m_bmTools,
-            this.toolStripSeparator7,
-            this.m_bmHelp});
-            this.m_ToolStrip.Location = new System.Drawing.Point(3, 24);
-            this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(690, 25);
-            this.m_ToolStrip.TabIndex = 1;
-            // 
-            // m_btnExit
-            // 
-            this.m_btnExit.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnExit.Image = ((System.Drawing.Image)(resources.GetObject("m_btnExit.Image")));
-            this.m_btnExit.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnExit.Name = "m_btnExit";
-            this.m_btnExit.Size = new System.Drawing.Size(23, 22);
-            this.m_btnExit.Text = "Exit";
-            this.m_btnExit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnExit.Click += new System.EventHandler(this.cmdExit);
-            // 
-            // m_btnProjectSave
-            // 
-            this.m_btnProjectSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnProjectSave.Image = ((System.Drawing.Image)(resources.GetObject("m_btnProjectSave.Image")));
-            this.m_btnProjectSave.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnProjectSave.Name = "m_btnProjectSave";
-            this.m_btnProjectSave.Size = new System.Drawing.Size(23, 22);
-            this.m_btnProjectSave.Text = "Save";
-            this.m_btnProjectSave.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnProjectSave.Click += new System.EventHandler(this.cmdSaveProject);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
-            // 
-            // m_btnEditCut
-            // 
-            this.m_btnEditCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnEditCut.Image = ((System.Drawing.Image)(resources.GetObject("m_btnEditCut.Image")));
-            this.m_btnEditCut.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnEditCut.Name = "m_btnEditCut";
-            this.m_btnEditCut.Size = new System.Drawing.Size(23, 22);
-            this.m_btnEditCut.Text = "Cut";
-            this.m_btnEditCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnEditCut.Click += new System.EventHandler(this.cmdEditCut);
-            // 
-            // m_btnEditCopy
-            // 
-            this.m_btnEditCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnEditCopy.Image = ((System.Drawing.Image)(resources.GetObject("m_btnEditCopy.Image")));
-            this.m_btnEditCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnEditCopy.Name = "m_btnEditCopy";
-            this.m_btnEditCopy.Size = new System.Drawing.Size(23, 22);
-            this.m_btnEditCopy.Text = "Copy";
-            this.m_btnEditCopy.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnEditCopy.Click += new System.EventHandler(this.cmdEditCopy);
-            // 
-            // m_btnEditPaste
-            // 
-            this.m_btnEditPaste.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnEditPaste.Image = ((System.Drawing.Image)(resources.GetObject("m_btnEditPaste.Image")));
-            this.m_btnEditPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnEditPaste.Name = "m_btnEditPaste";
-            this.m_btnEditPaste.Size = new System.Drawing.Size(23, 22);
-            this.m_btnEditPaste.Text = "Paste";
-            this.m_btnEditPaste.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnEditPaste.Click += new System.EventHandler(this.cmdEditPaste);
-            // 
-            // m_btnItalic
-            // 
-            this.m_btnItalic.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnItalic.Image = ((System.Drawing.Image)(resources.GetObject("m_btnItalic.Image")));
-            this.m_btnItalic.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnItalic.Name = "m_btnItalic";
-            this.m_btnItalic.Size = new System.Drawing.Size(23, 22);
-            this.m_btnItalic.Text = "Italic";
-            this.m_btnItalic.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnItalic.Click += new System.EventHandler(this.cmdItalic);
-            // 
-            // m_btnGotoFirstSection
-            // 
-            this.m_btnGotoFirstSection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnGotoFirstSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoFirstSection.Image")));
-            this.m_btnGotoFirstSection.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnGotoFirstSection.Name = "m_btnGotoFirstSection";
-            this.m_btnGotoFirstSection.Size = new System.Drawing.Size(23, 22);
-            this.m_btnGotoFirstSection.Text = "First";
-            this.m_btnGotoFirstSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnGotoFirstSection.Click += new System.EventHandler(this.cmdGoToFirstSection);
-            // 
-            // m_btnGotoPreviousSection
-            // 
-            this.m_btnGotoPreviousSection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnGotoPreviousSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoPreviousSection.Image")));
-            this.m_btnGotoPreviousSection.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnGotoPreviousSection.Name = "m_btnGotoPreviousSection";
-            this.m_btnGotoPreviousSection.Size = new System.Drawing.Size(32, 22);
-            this.m_btnGotoPreviousSection.Text = "Previous";
-            this.m_btnGotoPreviousSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnGotoPreviousSection.ButtonClick += new System.EventHandler(this.cmdGoToPreviousSection);
-            // 
-            // m_btnGotoNextSection
-            // 
-            this.m_btnGotoNextSection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnGotoNextSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoNextSection.Image")));
-            this.m_btnGotoNextSection.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnGotoNextSection.Name = "m_btnGotoNextSection";
-            this.m_btnGotoNextSection.Size = new System.Drawing.Size(32, 22);
-            this.m_btnGotoNextSection.Text = "Next";
-            this.m_btnGotoNextSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnGotoNextSection.ButtonClick += new System.EventHandler(this.cmdGoToNextSection);
-            // 
-            // m_btnGotoLastSection
-            // 
-            this.m_btnGotoLastSection.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnGotoLastSection.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGotoLastSection.Image")));
-            this.m_btnGotoLastSection.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnGotoLastSection.Name = "m_btnGotoLastSection";
-            this.m_btnGotoLastSection.Size = new System.Drawing.Size(23, 22);
-            this.m_btnGotoLastSection.Text = "Last";
-            this.m_btnGotoLastSection.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnGotoLastSection.Click += new System.EventHandler(this.cmdGoToLastSection);
-            // 
-            // m_btnGoToBook
-            // 
-            this.m_btnGoToBook.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnGoToBook.Image = ((System.Drawing.Image)(resources.GetObject("m_btnGoToBook.Image")));
-            this.m_btnGoToBook.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnGoToBook.Name = "m_btnGoToBook";
-            this.m_btnGoToBook.Size = new System.Drawing.Size(29, 22);
-            this.m_btnGoToBook.Text = "Book";
-            this.m_btnGoToBook.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnGoToBook.ToolTipText = "Go to a different book";
-            // 
-            // m_SeparatorTasks
-            // 
-            this.m_SeparatorTasks.Name = "m_SeparatorTasks";
-            this.m_SeparatorTasks.Size = new System.Drawing.Size(6, 25);
-            // 
-            // m_btnDrafting
-            // 
-            this.m_btnDrafting.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnDrafting.Image = ((System.Drawing.Image)(resources.GetObject("m_btnDrafting.Image")));
-            this.m_btnDrafting.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnDrafting.Name = "m_btnDrafting";
-            this.m_btnDrafting.Size = new System.Drawing.Size(23, 22);
-            this.m_btnDrafting.Text = "Drafting";
-            this.m_btnDrafting.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnDrafting.Click += new System.EventHandler(this.cmdJobDrafting);
-            // 
-            // m_btnBackTranslation
-            // 
-            this.m_btnBackTranslation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_btnBackTranslation.Image")));
-            this.m_btnBackTranslation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnBackTranslation.Name = "m_btnBackTranslation";
-            this.m_btnBackTranslation.Size = new System.Drawing.Size(23, 22);
-            this.m_btnBackTranslation.Text = "Back Translation";
-            this.m_btnBackTranslation.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnBackTranslation.Click += new System.EventHandler(this.cmdJobBackTranslation);
-            // 
-            // m_btnNaturalnessCheck
-            // 
-            this.m_btnNaturalnessCheck.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNaturalnessCheck.Image")));
-            this.m_btnNaturalnessCheck.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNaturalnessCheck.Name = "m_btnNaturalnessCheck";
-            this.m_btnNaturalnessCheck.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNaturalnessCheck.Text = "Naturalness Check";
-            this.m_btnNaturalnessCheck.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnNaturalnessCheck.Click += new System.EventHandler(this.cmdJobNaturalness);
-            // 
-            // m_toolSeparatorNotes
-            // 
-            this.m_toolSeparatorNotes.Name = "m_toolSeparatorNotes";
-            this.m_toolSeparatorNotes.Size = new System.Drawing.Size(6, 25);
-            // 
-            // m_btnNotes
-            // 
-            this.m_btnNotes.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNotes.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_bmShowNotesPane,
-            this.m_bmNotesSeparator1,
-            this.m_bmNoteGeneral,
-            this.m_bmNoteToDo,
-            this.m_bmNoteAskUNS,
-            this.m_bmNoteDefinition,
-            this.m_bmNoteOldVersion,
-            this.m_bmNoteReason,
-            this.m_bmNoteFrontIssue,
-            this.m_bmNotesSeparator2,
-            this.m_bmDeleteNote});
-            this.m_btnNotes.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNotes.Image")));
-            this.m_btnNotes.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNotes.Name = "m_btnNotes";
-            this.m_btnNotes.Size = new System.Drawing.Size(29, 22);
-            this.m_btnNotes.Text = "Notes";
-            this.m_btnNotes.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            // 
-            // m_bmShowNotesPane
-            // 
-            this.m_bmShowNotesPane.Name = "m_bmShowNotesPane";
-            this.m_bmShowNotesPane.Size = new System.Drawing.Size(196, 22);
-            this.m_bmShowNotesPane.Text = "&Show Notes Pane";
-            this.m_bmShowNotesPane.Click += new System.EventHandler(this.cmdToggleNotesPane);
-            // 
-            // m_bmNotesSeparator1
-            // 
-            this.m_bmNotesSeparator1.Name = "m_bmNotesSeparator1";
-            this.m_bmNotesSeparator1.Size = new System.Drawing.Size(193, 6);
-            // 
-            // m_bmNoteGeneral
-            // 
-            this.m_bmNoteGeneral.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteGeneral.Image")));
-            this.m_bmNoteGeneral.Name = "m_bmNoteGeneral";
-            this.m_bmNoteGeneral.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteGeneral.Tag = "kGeneral";
-            this.m_bmNoteGeneral.Text = "Insert General &Note";
-            this.m_bmNoteGeneral.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNoteToDo
-            // 
-            this.m_bmNoteToDo.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteToDo.Image")));
-            this.m_bmNoteToDo.Name = "m_bmNoteToDo";
-            this.m_bmNoteToDo.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteToDo.Tag = "kToDo";
-            this.m_bmNoteToDo.Text = "Insert &To Do Note";
-            this.m_bmNoteToDo.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNoteAskUNS
-            // 
-            this.m_bmNoteAskUNS.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteAskUNS.Image")));
-            this.m_bmNoteAskUNS.Name = "m_bmNoteAskUNS";
-            this.m_bmNoteAskUNS.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteAskUNS.Tag = "kAskUns";
-            this.m_bmNoteAskUNS.Text = "Insert &Ask UNS Note";
-            this.m_bmNoteAskUNS.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNoteDefinition
-            // 
-            this.m_bmNoteDefinition.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteDefinition.Image")));
-            this.m_bmNoteDefinition.Name = "m_bmNoteDefinition";
-            this.m_bmNoteDefinition.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteDefinition.Tag = "kDefinition";
-            this.m_bmNoteDefinition.Text = "Insert &Definition Note";
-            this.m_bmNoteDefinition.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNoteOldVersion
-            // 
-            this.m_bmNoteOldVersion.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteOldVersion.Image")));
-            this.m_bmNoteOldVersion.Name = "m_bmNoteOldVersion";
-            this.m_bmNoteOldVersion.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteOldVersion.Tag = "kOldVersion";
-            this.m_bmNoteOldVersion.Text = "Insert Old &Version Note";
-            this.m_bmNoteOldVersion.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNoteReason
-            // 
-            this.m_bmNoteReason.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteReason.Image")));
-            this.m_bmNoteReason.Name = "m_bmNoteReason";
-            this.m_bmNoteReason.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteReason.Tag = "kReason";
-            this.m_bmNoteReason.Text = "Insert &Reason Note";
-            this.m_bmNoteReason.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNoteFrontIssue
-            // 
-            this.m_bmNoteFrontIssue.Image = ((System.Drawing.Image)(resources.GetObject("m_bmNoteFrontIssue.Image")));
-            this.m_bmNoteFrontIssue.Name = "m_bmNoteFrontIssue";
-            this.m_bmNoteFrontIssue.Size = new System.Drawing.Size(196, 22);
-            this.m_bmNoteFrontIssue.Tag = "kFront";
-            this.m_bmNoteFrontIssue.Text = "Insert &Front Issue Note";
-            this.m_bmNoteFrontIssue.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_bmNotesSeparator2
-            // 
-            this.m_bmNotesSeparator2.Name = "m_bmNotesSeparator2";
-            this.m_bmNotesSeparator2.Size = new System.Drawing.Size(193, 6);
-            // 
-            // m_bmDeleteNote
-            // 
-            this.m_bmDeleteNote.Image = ((System.Drawing.Image)(resources.GetObject("m_bmDeleteNote.Image")));
-            this.m_bmDeleteNote.Name = "m_bmDeleteNote";
-            this.m_bmDeleteNote.Size = new System.Drawing.Size(196, 22);
-            this.m_bmDeleteNote.Text = "&Delete Note";
-            this.m_bmDeleteNote.Click += new System.EventHandler(this.cmdDeleteNote);
-            // 
-            // m_btnNoteGeneral
-            // 
-            this.m_btnNoteGeneral.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteGeneral.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteGeneral.Image")));
-            this.m_btnNoteGeneral.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteGeneral.Name = "m_btnNoteGeneral";
-            this.m_btnNoteGeneral.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteGeneral.Tag = "kGeneral";
-            this.m_btnNoteGeneral.Text = "General Note";
-            this.m_btnNoteGeneral.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_btnNoteGeneral.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteToDo
-            // 
-            this.m_btnNoteToDo.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteToDo.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteToDo.Image")));
-            this.m_btnNoteToDo.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteToDo.Name = "m_btnNoteToDo";
-            this.m_btnNoteToDo.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteToDo.Tag = "kToDo";
-            this.m_btnNoteToDo.Text = "To Do";
-            this.m_btnNoteToDo.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteAskUNS
-            // 
-            this.m_btnNoteAskUNS.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteAskUNS.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteAskUNS.Image")));
-            this.m_btnNoteAskUNS.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteAskUNS.Name = "m_btnNoteAskUNS";
-            this.m_btnNoteAskUNS.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteAskUNS.Tag = "kAskUns";
-            this.m_btnNoteAskUNS.Text = "Ask UNS";
-            this.m_btnNoteAskUNS.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteDefinition
-            // 
-            this.m_btnNoteDefinition.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteDefinition.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteDefinition.Image")));
-            this.m_btnNoteDefinition.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteDefinition.Name = "m_btnNoteDefinition";
-            this.m_btnNoteDefinition.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteDefinition.Tag = "kDefinition";
-            this.m_btnNoteDefinition.Text = "Definition";
-            this.m_btnNoteDefinition.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteOldVersion
-            // 
-            this.m_btnNoteOldVersion.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteOldVersion.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteOldVersion.Image")));
-            this.m_btnNoteOldVersion.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteOldVersion.Name = "m_btnNoteOldVersion";
-            this.m_btnNoteOldVersion.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteOldVersion.Tag = "kOldVersion";
-            this.m_btnNoteOldVersion.Text = "Old Version";
-            this.m_btnNoteOldVersion.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteReason
-            // 
-            this.m_btnNoteReason.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteReason.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteReason.Image")));
-            this.m_btnNoteReason.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteReason.Name = "m_btnNoteReason";
-            this.m_btnNoteReason.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteReason.Tag = "kReason";
-            this.m_btnNoteReason.Text = "Reason";
-            this.m_btnNoteReason.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteFrontIssue
-            // 
-            this.m_btnNoteFrontIssue.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteFrontIssue.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteFrontIssue.Image")));
-            this.m_btnNoteFrontIssue.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteFrontIssue.Name = "m_btnNoteFrontIssue";
-            this.m_btnNoteFrontIssue.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteFrontIssue.Tag = "kFront";
-            this.m_btnNoteFrontIssue.Text = "Front Issue";
-            this.m_btnNoteFrontIssue.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteHintForDaughter
-            // 
-            this.m_btnNoteHintForDaughter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteHintForDaughter.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteHintForDaughter.Image")));
-            this.m_btnNoteHintForDaughter.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteHintForDaughter.Name = "m_btnNoteHintForDaughter";
-            this.m_btnNoteHintForDaughter.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteHintForDaughter.Tag = "kHintForDaughter";
-            this.m_btnNoteHintForDaughter.Text = "Hint for Daughter";
-            this.m_btnNoteHintForDaughter.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnNoteBackTranslation
-            // 
-            this.m_btnNoteBackTranslation.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnNoteBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_btnNoteBackTranslation.Image")));
-            this.m_btnNoteBackTranslation.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnNoteBackTranslation.Name = "m_btnNoteBackTranslation";
-            this.m_btnNoteBackTranslation.Size = new System.Drawing.Size(23, 22);
-            this.m_btnNoteBackTranslation.Tag = "kBT";
-            this.m_btnNoteBackTranslation.Text = "Back Translation";
-            this.m_btnNoteBackTranslation.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_btnDeleteNote
-            // 
-            this.m_btnDeleteNote.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_btnDeleteNote.Image = ((System.Drawing.Image)(resources.GetObject("m_btnDeleteNote.Image")));
-            this.m_btnDeleteNote.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_btnDeleteNote.Name = "m_btnDeleteNote";
-            this.m_btnDeleteNote.Size = new System.Drawing.Size(23, 22);
-            this.m_btnDeleteNote.Text = "Delete Note";
-            this.m_btnDeleteNote.ToolTipText = "Delete this note.";
-            this.m_btnDeleteNote.Click += new System.EventHandler(this.cmdDeleteNote);
-            // 
-            // m_bmTools
-            // 
-            this.m_bmTools.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_bmTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_bmIncrementBookStatus,
-            this.m_bmRestoreFromBackup,
-            this.m_bmSetUpFeatures});
-            this.m_bmTools.Image = ((System.Drawing.Image)(resources.GetObject("m_bmTools.Image")));
-            this.m_bmTools.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bmTools.Name = "m_bmTools";
-            this.m_bmTools.Size = new System.Drawing.Size(29, 22);
-            this.m_bmTools.Text = "Tools";
-            this.m_bmTools.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            // 
-            // m_bmIncrementBookStatus
-            // 
-            this.m_bmIncrementBookStatus.Name = "m_bmIncrementBookStatus";
-            this.m_bmIncrementBookStatus.Size = new System.Drawing.Size(202, 22);
-            this.m_bmIncrementBookStatus.Text = "&Increment Book Status...";
-            this.m_bmIncrementBookStatus.Click += new System.EventHandler(this.cmdIncrementBookStatus);
-            // 
-            // m_bmRestoreFromBackup
-            // 
-            this.m_bmRestoreFromBackup.Name = "m_bmRestoreFromBackup";
-            this.m_bmRestoreFromBackup.Size = new System.Drawing.Size(202, 22);
-            this.m_bmRestoreFromBackup.Text = "Restore from &Backup...";
-            this.m_bmRestoreFromBackup.Click += new System.EventHandler(this.cmdRestoreBackup);
-            // 
-            // m_bmSetUpFeatures
-            // 
-            this.m_bmSetUpFeatures.Image = ((System.Drawing.Image)(resources.GetObject("m_bmSetUpFeatures.Image")));
-            this.m_bmSetUpFeatures.Name = "m_bmSetUpFeatures";
-            this.m_bmSetUpFeatures.Size = new System.Drawing.Size(202, 22);
-            this.m_bmSetUpFeatures.Text = "Set Up &Features...";
-            this.m_bmSetUpFeatures.Click += new System.EventHandler(this.cmdSetUpFeatures);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 25);
-            // 
-            // m_bmHelp
-            // 
-            this.m_bmHelp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_bmHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_bmHelp.Image")));
-            this.m_bmHelp.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bmHelp.Name = "m_bmHelp";
-            this.m_bmHelp.Size = new System.Drawing.Size(23, 22);
-            this.m_bmHelp.Text = "Help";
-            this.m_bmHelp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_bmHelp.Click += new System.EventHandler(this.cmdHelpTopics);
+            // m_menuNaturalnessCheck
+            // 
+            this.m_menuNaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNaturalnessCheck.Image")));
+            this.m_menuNaturalnessCheck.Name = "m_menuNaturalnessCheck";
+            this.m_menuNaturalnessCheck.Size = new System.Drawing.Size(232, 22);
+            this.m_menuNaturalnessCheck.Text = "&Naturalness Check";
+            this.m_menuNaturalnessCheck.ToolTipText = "Set the main window to do a Naturalness Check (where the Front Translation is not" +
+                " displayed.)";
+            this.m_menuNaturalnessCheck.Click += new System.EventHandler(this.cmdJobNaturalness);
+            // 
+            // m_separatorWindow
+            // 
+            this.m_separatorWindow.Name = "m_separatorWindow";
+            this.m_separatorWindow.Size = new System.Drawing.Size(229, 6);
+            // 
+            // m_menuShowNotesPane
+            // 
+            this.m_menuShowNotesPane.Name = "m_menuShowNotesPane";
+            this.m_menuShowNotesPane.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowNotesPane.Text = "Show &Notes Pane";
+            this.m_menuShowNotesPane.ToolTipText = "Show the Notes pane.";
+            this.m_menuShowNotesPane.Click += new System.EventHandler(this.cmdToggleNotesPane);
+            // 
+            // m_menuShowTranslationsPane
+            // 
+            this.m_menuShowTranslationsPane.Name = "m_menuShowTranslationsPane";
+            this.m_menuShowTranslationsPane.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowTranslationsPane.Text = "Show &Other Translations Pane";
+            this.m_menuShowTranslationsPane.ToolTipText = "Show the Other Translations Pane";
+            this.m_menuShowTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
+            // 
+            // m_menuShowMergePane
+            // 
+            this.m_menuShowMergePane.Name = "m_menuShowMergePane";
+            this.m_menuShowMergePane.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowMergePane.Text = "Show &Merge Pane";
+            this.m_menuShowMergePane.ToolTipText = "Show the pane by which you can merge different versions of a file into a single f" +
+                "ile.";
+            this.m_menuShowMergePane.Click += new System.EventHandler(this.cmdToggleMergePane);
+            // 
+            // m_menuShowDictionaryPane
+            // 
+            this.m_menuShowDictionaryPane.Name = "m_menuShowDictionaryPane";
+            this.m_menuShowDictionaryPane.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowDictionaryPane.Text = "Show &Dictionary Pane";
+            this.m_menuShowDictionaryPane.ToolTipText = "Show the Dictionary Pane.";
+            this.m_menuShowDictionaryPane.Click += new System.EventHandler(this.cmdToggleDictionaryPane);
+            // 
+            // m_separator4
+            // 
+            this.m_separator4.Name = "m_separator4";
+            this.m_separator4.Size = new System.Drawing.Size(6, 38);
+            // 
+            // m_btnHelp
+            // 
+            this.m_btnHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_menuHelpTopics,
+            this.m_menuAbout});
+            this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
+            this.m_btnHelp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnHelp.Name = "m_btnHelp";
+            this.m_btnHelp.Size = new System.Drawing.Size(45, 35);
+            this.m_btnHelp.Text = "Help";
+            this.m_btnHelp.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnHelp.ToolTipText = "Show the Help menu.";
+            // 
+            // m_menuHelpTopics
+            // 
+            this.m_menuHelpTopics.Image = ((System.Drawing.Image)(resources.GetObject("m_menuHelpTopics.Image")));
+            this.m_menuHelpTopics.Name = "m_menuHelpTopics";
+            this.m_menuHelpTopics.Size = new System.Drawing.Size(162, 22);
+            this.m_menuHelpTopics.Text = "Help &Topics";
+            this.m_menuHelpTopics.ToolTipText = "Show the Help window.";
+            this.m_menuHelpTopics.Click += new System.EventHandler(this.cmdHelpTopics);
+            // 
+            // m_menuAbout
+            // 
+            this.m_menuAbout.Name = "m_menuAbout";
+            this.m_menuAbout.Size = new System.Drawing.Size(162, 22);
+            this.m_menuAbout.Text = "&About Our Word";
+            this.m_menuAbout.ToolTipText = "See information about this version of Our Word.";
+            this.m_menuAbout.Click += new System.EventHandler(this.cmdHelpAbout);
             // 
             // m_toolStripContainer
             // 
@@ -2233,19 +1564,18 @@ namespace OurWord
             // 
             this.m_toolStripContainer.ContentPanel.AutoScroll = true;
             this.m_toolStripContainer.ContentPanel.Controls.Add(this.m_SplitContainer);
-            this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(748, 430);
+            this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(912, 441);
             this.m_toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_toolStripContainer.LeftToolStripPanelVisible = false;
             this.m_toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.m_toolStripContainer.Name = "m_toolStripContainer";
             this.m_toolStripContainer.RightToolStripPanelVisible = false;
-            this.m_toolStripContainer.Size = new System.Drawing.Size(748, 526);
+            this.m_toolStripContainer.Size = new System.Drawing.Size(912, 526);
             this.m_toolStripContainer.TabIndex = 2;
             this.m_toolStripContainer.Text = "toolStripContainer1";
             // 
             // m_toolStripContainer.TopToolStripPanel
             // 
-            this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_MenuStrip);
             this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ToolStrip);
             this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_Taskbar);
             // 
@@ -2258,7 +1588,7 @@ namespace OurWord
             this.m_StatusMessage2});
             this.m_StatusStrip.Location = new System.Drawing.Point(0, 0);
             this.m_StatusStrip.Name = "m_StatusStrip";
-            this.m_StatusStrip.Size = new System.Drawing.Size(748, 22);
+            this.m_StatusStrip.Size = new System.Drawing.Size(912, 22);
             this.m_StatusStrip.SizingGrip = false;
             this.m_StatusStrip.TabIndex = 0;
             // 
@@ -2292,8 +1622,8 @@ namespace OurWord
             this.m_SplitContainer.Panel1.Resize += new System.EventHandler(this.onMainWindowResize);
             this.m_SplitContainer.Panel1MinSize = 100;
             this.m_SplitContainer.Panel2MinSize = 100;
-            this.m_SplitContainer.Size = new System.Drawing.Size(748, 430);
-            this.m_SplitContainer.SplitterDistance = 508;
+            this.m_SplitContainer.Size = new System.Drawing.Size(912, 441);
+            this.m_SplitContainer.SplitterDistance = 617;
             this.m_SplitContainer.TabIndex = 0;
             // 
             // m_Taskbar
@@ -2306,9 +1636,9 @@ namespace OurWord
             this.m_tbPadlock,
             this.m_tbLanguageInfo,
             this.m_tbCurrentPassage});
-            this.m_Taskbar.Location = new System.Drawing.Point(0, 49);
+            this.m_Taskbar.Location = new System.Drawing.Point(0, 38);
             this.m_Taskbar.Name = "m_Taskbar";
-            this.m_Taskbar.Size = new System.Drawing.Size(748, 25);
+            this.m_Taskbar.Size = new System.Drawing.Size(912, 25);
             this.m_Taskbar.Stretch = true;
             this.m_Taskbar.TabIndex = 2;
             // 
@@ -2351,15 +1681,13 @@ namespace OurWord
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(748, 526);
+            this.ClientSize = new System.Drawing.Size(912, 526);
             this.Controls.Add(this.m_toolStripContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OurWordMain";
             this.Text = "Our Word!";
             this.Closing += new System.ComponentModel.CancelEventHandler(this.cmd_OnClosing);
             this.Load += new System.EventHandler(this.cmd_OnLoad);
-            this.m_MenuStrip.ResumeLayout(false);
-            this.m_MenuStrip.PerformLayout();
             this.m_ToolStrip.ResumeLayout(false);
             this.m_ToolStrip.PerformLayout();
             this.m_toolStripContainer.BottomToolStripPanel.ResumeLayout(false);
@@ -2553,6 +1881,24 @@ namespace OurWord
                 }
             }
             #endregion
+            #region Attr{g}: bool F_GoTo_FirstLast
+            public bool F_GoTo_FirstLast
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fGoTo_FirstLast.ToString());
+                }
+            }
+            #endregion
+            #region Attr{g}: bool F_GoTo_Chapter
+            public bool F_GoTo_Chapter
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fGoTo_Chapter.ToString());
+                }
+            }
+            #endregion
             #region Attr{g}: bool F_JustTheBasics
 			public bool F_JustTheBasics
 			{
@@ -2562,6 +1908,7 @@ namespace OurWord
 				}
 			}
 			#endregion
+
             #region Attr{g}: bool F_Merge
             public bool F_Merge
             {
@@ -2605,7 +1952,7 @@ namespace OurWord
 
             // Set up the features OW currently supports
             // 1. Define an ID
-            // 2. Add it into the Setup method (don't forget the JustTheBasics dependencies)
+            // 2. Add it into the Setup method
             // 3. Add it to the Localizations database
             // 4. Set up an Attribute above for access elsewhere in the software
             // 5. Typical other areas to code:
@@ -2624,11 +1971,16 @@ namespace OurWord
                 fJustTheBasics,
                 fStructuralEditing,
                 fLocalizer,
+                fGoTo_FirstLast,
+                fGoTo_Chapter,
                 fMerge,
                 fDictionary,
                 kLast
             };
             #endregion
+            const string c_sNodeWindows = "Windows";
+            const string c_sNodeTools = "Tools";
+            const string c_sNodeNavigation = "Navigation";
 			#region Method: void Setup()
 			private void Setup()
 			{
@@ -2640,33 +1992,45 @@ namespace OurWord
                 // Add the various features
                 m_Dlg.Add(ID.fJobBT.ToString(),
                     false,
-                    "Back Translation Job",
+                    false,
+                    c_sNodeWindows,
+                    "Back Translation Window",
                     "A layout where you can do a Back Translation; that is, where you provide " +
                         "a translation  in the language the consultant understands.");
 
                 m_Dlg.Add(ID.fJobNaturalness.ToString(),           
                     false, 
-                    "Naturalness Check Job",
+                    false,
+                    c_sNodeWindows,
+                    "Naturalness Check Window",
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
 
                 m_Dlg.Add(ID.fProject.ToString(),  
                     true, 
+                    false,
+                    "",
                     "Project New / Open / etc.",
                     "Turn this on if you are working with multiple projects.");
 
                 m_Dlg.Add(ID.fPropertiesDialog.ToString(),
                     true,
-                    "Project Properties Dialog",
-                    "Turn this on if you are want to adjust the properties for a project.");
+                    false,
+                    c_sNodeTools,
+                    "Configuration Dialog",
+                    "Turn this on if you are want to adjust the settings for a project.");
 
                 m_Dlg.Add(ID.fPrint.ToString(),            
                     false,
+                    false,
+                    "",
                     "Printing",
                     "The book can be formatted and printed. ");
 
                 m_Dlg.Add(ID.fRestoreBackup.ToString(),    
                     false,
+                    false,
+                    c_sNodeTools,
                     "Restore Backed-up Files",
                     "Files can be automatically backed up (via the Tools-Options command) " +
                         "to a flash card or other storage device. If you turn on this Restore " +
@@ -2675,6 +2039,8 @@ namespace OurWord
 
                 m_Dlg.Add(ID.fCopyBTfromFront.ToString(),  
                     false,
+                    false,
+                    c_sNodeTools,
                     "Copy the BT from the Front Translation",
                     "Copies the back translation from the Front to the Target. This provides " +
                         "a convenient starting place for a back translation which you should then " +
@@ -2683,6 +2049,8 @@ namespace OurWord
 
                 m_Dlg.Add(ID.fFilter.ToString(),           
                     false,
+                    false,
+                    c_sNodeTools,
                     "Only show Sections that have (Filter)",
                     "The \"Go To\" Menu (e.g., Next, Previous commands) will only go to those " +
                         "sections which match certain criteria. E.g., they must have a certain word " +
@@ -2691,12 +2059,16 @@ namespace OurWord
 
                 m_Dlg.Add(ID.fLocalizer.ToString(),
                     false,
+                    false,
+                    c_sNodeTools,
                     "Localization Dialog",
                     "This dialog, appearing in the Tools menu, allows you to translate the " +
                         "user interface of OurWord into another language.");
 
                 m_Dlg.Add(ID.fStructuralEditing.ToString(),
                     false,
+                    false,
+                    "",
                     "Structural Editing",
                     "Enables the translator to split and join paragraphs, or to assign different " +
                         "styles to a paragraph. By doing this the translation will depart from " +
@@ -2704,42 +2076,39 @@ namespace OurWord
 
                 m_Dlg.Add(ID.fMerge.ToString(),
                     false,
+                    false,
+                    c_sNodeWindows,
                     "Merging",
                     "Enables the Merge Pane, by which you can compare different versions of a book " +
                         "to see what is different, and to merge changes into the master copy.");
 
                 m_Dlg.Add(ID.fDictionary.ToString(),
                     false,
+                    false,
+                    c_sNodeWindows,
                     "WeSay Dictionary",
                     "Enables the Dictionary Pane, by which you can access a WeSay dictionary. " +
                         "You can enter words in the dictionary that are in the translation; and " +
                         "you can look up definitions when doing a back translation.");
 
-                m_Dlg.Add(ID.fJustTheBasics.ToString(),    
+                m_Dlg.Add(ID.fGoTo_FirstLast.ToString(),
+                    true,
                     false,
-                    "Just the Basics",
-                    "Designed for newer computer users, this feature sets up the user interface " +
-                        "to support a very basic level of work, turning off many of the features. " +
-                        "The menu is hidden, and in its place the toolbar buttons show descriptive " +
-                        "text in addition to their pictures. Users only need to be familiar with about " +
-                        "a dozen commands.");
+                    c_sNodeNavigation,
+                    "First & Last Buttons",
+                    "Makes the First and Last Buttons visible, by which you can navigate to the " +
+                        "first and last sections in the book. Experienced users may want to have " +
+                        "these buttons visible for easier movement around the book.");
 
-
-				// The JustTheBasics feature cannot be on if any of the following
-				// are on; so when the user clicks JustTheBasics, the dialog
-				// will turn these others off.
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fProject.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fPropertiesDialog.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fJobBT.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fJobNaturalness.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fCopyBTfromFront.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fFilter.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fPrint.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fStructuralEditing.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fLocalizer.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fMerge.ToString());
-                m_Dlg.AddDependency(ID.fJustTheBasics.ToString(), ID.fDictionary.ToString());
-			}
+                m_Dlg.Add(ID.fGoTo_Chapter.ToString(),
+                    true,
+                    false,
+                    c_sNodeNavigation,
+                    "Chapter Button",
+                    "Makes the Chapter button visible, by which you can navigate directly to " +
+                        "the first section in the desired chapter. Experienced users may want " +
+                        "to have this button visible for easier movement around the book.");
+            }
 			#endregion
 		};
 		#endregion
@@ -3173,129 +2542,6 @@ namespace OurWord
         }
         #endregion
 
-        #region Can: canInsertNote
-        public bool canInsertNote
-		{
-			get
-			{
-                // If there is no Notes pane in the side window, then we can't
-                // insert any notes
-                Debug.Assert(null != SideWindows);
-                if (!SideWindows.HasNotesWindow)
-                    return false;
-
-                // If the Main Window is not focused, then we don't have a
-                // context for inserting notes.
-                Debug.Assert(null != MainWindow);
-                if (!MainWindow.Focused)
-                    return false;
-
-                return true;
-			}
-		}
-		#endregion
-		#region Cmd: cmdInsertNote
-        private void cmdInsertNote(Object sender, EventArgs e)
-        {
-            string sNoteType = (string)((sender as ToolStripItem).Tag);
-
-            for (DNote.Types k = 0; k != DNote.Types.kUnknown; k++)
-            {
-                if (k.ToString() == sNoteType)
-                {
-                    _InsertNote(k);
-                    return;
-                }
-            }
-        }
-        private void _InsertNote(DNote.Types type)
-		{
-            // Double-check that we think we can insert. In theory the menu
-            // item would have been disabled and so we would not get here if
-            // canInsertNote returns false.
-            if (!canInsertNote)
-                return;
-
-            // Retrieve the DText to which this note will be attached
-            if (MainWindow.Selection == null)
-                return;
-            DText text = MainWindow.Selection.Anchor.BasicText as DText;
-            if (null == text)
-                return;
-
-            // Insert the note
-            DNote note = text.InsertNote(type, MainWindow.Selection.SelectionString);
-            if (null != note)
-            {
-                // Update the display
-                ResetWindowContents();
-
-                // Select the new note and bring the focus to it
-                SideWindows.NotesWindow.SelectEndOfNote(note);
-                SideWindows.NotesWindow.Focus();
-            }
-		}
-		#endregion
-		#region Can: canDeleteNote
-		public bool canDeleteNote
-		{
-			get
-			{
-                // If there is no Notes pane in the side window, then we can't
-                // delete any notes
-                if (!SideWindows.HasNotesWindow)
-                    return false;
-
-                // If the notes window does not have focus, then we can't
-                // delete notes, because the editing context is not there.
-                //
-                // By implication, if there is focus here, then it means
-                // we have an InsertionPoint, which thus means we have
-                // a Note that can conceivably be deleted.
-                if (!SideWindows.NotesWindow.Focused)
-                    return false;
-
-                // Otherwise, we return a tentative "true", recognizing that the
-                // Delete method will have to do further error condition checking.
-                return true;
-			}
-		}
-		#endregion
-		#region Cmd: cmdDeleteNote
-        private void cmdDeleteNote(Object sender, EventArgs e)
-		{
-            // Double-check that we think we can delete. In theory the menu
-            // item would have been disabled and so we would not get here if
-            // canDeleteNote returns false.
-            if (!canDeleteNote)
-                return;
-
-            // Request the targeted DNote from the NotesWindow
-            Debug.Assert(null != SideWindows);
-            Debug.Assert(null != SideWindows.NotesWindow);
-            DNote note = SideWindows.NotesWindow.GetSelectedNote();
-            if (null == note)
-                return;
-
-            // Give the user the opportunity to change his/her mind
-            string sText = note.NoteText.ContentsAsString;
-            if (sText.Length > 40)
-                sText = sText.Substring(0, 40) + "...";
-            string sMsgAddition = "\n\n\"" + sText + "\"";
-            if (false == Messages.ConfirmNoteDeletion(sMsgAddition))
-                return;
-
-            // ctrlRemove the note from the paragraph (we delete it from the
-            // owning DText)
-            DText text = note.Text;
-            Debug.Assert(null != text);
-            text.Notes.Remove(note);
-
-            // Regenerate the windows
-            ResetWindowContents();
-		}
-		#endregion
-
 		#region Cmd: cmdGoToFirstSection
         private void cmdGoToFirstSection(Object sender, EventArgs e)
 		{
@@ -3383,6 +2629,46 @@ namespace OurWord
 			}
 		}
 		#endregion
+        #region Cmd: cmdGoToChapter
+        private void cmdGoToChapter(object sender, EventArgs e)
+        {
+            // Make sure we have a valid project
+            if (!G.IsValidProject)
+                return;
+
+            // Retrieve the Chapter button
+            ToolStripDropDownButton btn = sender as ToolStripDropDownButton;
+            if (null == btn)
+                return;
+
+            // Determine the location for the popup
+            Point pt = new Point(btn.Bounds.X, btn.Bounds.Y + btn.Size.Height);
+            pt = PointToScreen(pt);
+
+            // What is the current chapter?
+            int nCurrent = G.STarget.ReferenceSpan.Start.Chapter;
+
+            // Create and display the popup
+            ChapterMenu cm = new ChapterMenu(G.TBook, pt, nCurrent);
+            DialogResult result = cm.ShowDialog(this);
+            if (DialogResult.OK != result)
+                return;
+
+            // Nothing to do if the same chapter is requested
+            if (cm.Chapter == nCurrent)
+                return;
+
+            // Retrieve the number of the section we're interested in
+            int iSection = G.TBook.Sections.FindObj(cm.Section);
+            if (-1 == iSection)
+                return;
+
+            // Navigate to that section
+            OnLeaveSection();
+            Project.Nav.GoToSection(iSection);
+            OnEnterSection();
+        }
+        #endregion
 		#region Cmd: cmdGotoBook
         private void cmdGotoBook(Object sender, EventArgs e)
         {
@@ -3755,8 +3041,8 @@ return false;
 ***/
 		}
 		#endregion
-        #region Cmd: cmdEditMenuOpening - place a checkmark beside the current style
-        private void cmdEditMenuOpening(object sender, EventArgs e)
+        #region Cmd: cmdEditDropdownOpening - place a checkmark beside the current style
+        private void cmdEditDropdownOpening(object sender, EventArgs e)
         {
             // Get the style of the current paragraph, if any
             string sAbbrev = "";
@@ -3764,7 +3050,7 @@ return false;
                 sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
 
             // Uncheck all of the subitems
-            foreach (ToolStripMenuItem mi in m_menuChangeParagraphStyle.DropDownItems)
+            foreach (ToolStripMenuItem mi in m_menuChangeParagraphTo.DropDownItems)
             {
                 mi.Checked = false;
 

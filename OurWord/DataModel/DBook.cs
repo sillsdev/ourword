@@ -1870,12 +1870,17 @@ namespace OurWord.DataModel
 		}
 		#endregion
 		#region Method: void CopyBackTranslationFromFront(bool bEntireBook)
+        static bool m_bSternWarningSeen = false;
 		public void CopyBackTranslationFromFront(bool bEntireBook)
 		{
 			// Display a very intense warning to the user.
-			CopyBTfromFront dlg = new CopyBTfromFront(bEntireBook);
-			if (DialogResult.OK != dlg.ShowDialog())
-				return;
+            if (!m_bSternWarningSeen)
+            {
+                CopyBTfromFront dlg = new CopyBTfromFront(bEntireBook);
+                if (DialogResult.OK != dlg.ShowDialog())
+                    return;
+                m_bSternWarningSeen = true;
+            }
 
             // Set the default actions to take
             DialogCopyBTConflict.ApplyToAll = false;

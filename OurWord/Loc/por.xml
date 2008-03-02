@@ -1,23 +1,32 @@
 ﻿<LocDB>
   <Language ID="por" Name="Portuguese"></Language>
-  <Group ID="m_MenuStrip">
-    <Item ID="m_menuProject">
-      <Alt ID="por" Value="&amp;Projeto"></Alt>
+  <Group ID="m_ToolStrip">
+    <Item ID="m_btnExit">
     </Item>
-    <Item ID="m_menuNew">
+    <Item ID="m_btnProjectSave">
+      <Alt ID="por" Value="Salvar "></Alt>
     </Item>
-    <Item ID="m_menuOpen">
+    <Item ID="m_btnProject">
+      <Alt ID="por" Value="Projeto"></Alt>
     </Item>
-    <Item ID="m_menuSave">
-      <Alt ID="por" Value="&amp;Salvar "></Alt>
+    <Item ID="m_menuNewProject">
     </Item>
-    <Item ID="m_menuSaveAs">
+    <Item ID="m_menuOpenProject">
     </Item>
-    <Item ID="m_menuProperties">
+    <Item ID="m_menuSaveProject">
     </Item>
-    <Item ID="m_menuPrint">
+    <Item ID="m_menuSaveProjectAs">
     </Item>
-    <Item ID="m_menuExit">
+    <Item ID="m_btnPrint">
+    </Item>
+    <Item ID="m_btnEditCut">
+      <Alt ID="por" Value="Recortar"></Alt>
+    </Item>
+    <Item ID="m_btnEditCopy">
+      <Alt ID="por" Value="Copiar"></Alt>
+    </Item>
+    <Item ID="m_btnEditPaste">
+      <Alt ID="por" Value="Colar"></Alt>
     </Item>
     <Item ID="m_menuEdit">
       <Alt ID="por" Value="Editar"></Alt>
@@ -31,83 +40,7 @@
     <Item ID="m_menuPaste">
       <Alt ID="por" Value="Colar"></Alt>
     </Item>
-    <Item ID="m_menuNotes">
-    </Item>
-    <Item ID="m_menuNoteGeneral">
-    </Item>
-    <Item ID="m_menuNoteToDo">
-    </Item>
-    <Item ID="m_menuNoteOldVersion">
-    </Item>
-    <Item ID="m_menuNoteReason">
-    </Item>
-    <Item ID="m_menuNoteFrontIssue">
-    </Item>
-    <Item ID="m_menuNoteDefinition">
-    </Item>
-    <Item ID="m_menuNoteHintForDaughter">
-    </Item>
-    <Item ID="m_menuNoteBackTranslation">
-    </Item>
-    <Item ID="m_menuNoteAskUNS">
-    </Item>
-    <Item ID="m_menuDeleteNote">
-    </Item>
-    <Item ID="m_menuGoTo">
-    </Item>
-    <Item ID="m_menuFirstSection">
-    </Item>
-    <Item ID="m_menuPreviousSection">
-    </Item>
-    <Item ID="m_menuNextSection">
-    </Item>
-    <Item ID="m_menuLastSection">
-    </Item>
-    <Item ID="m_menuGoToBook">
-    </Item>
-    <Item ID="m_menuWindow">
-    </Item>
-    <Item ID="m_menuShowNotesPane">
-    </Item>
-    <Item ID="m_menuShowOtherTranslationsPane">
-    </Item>
-    <Item ID="m_menuDrafting">
-    </Item>
-    <Item ID="m_menuNaturalnessCheck">
-    </Item>
-    <Item ID="m_menuBackTranslation">
-    </Item>
-    <Item ID="m_menuTools">
-    </Item>
-    <Item ID="m_menuIncrementBookStatus">
-    </Item>
-    <Item ID="m_menuCopyBTfromFront">
-    </Item>
-    <Item ID="m_menuEntireBook">
-    </Item>
-    <Item ID="m_menuCurrentSectionOnly">
-    </Item>
-    <Item ID="m_menuOnlyShowSectionsThat">
-    </Item>
-    <Item ID="m_menuRestoreFromBackup">
-    </Item>
-    <Item ID="m_menuSetUpFeatures">
-    </Item>
-    <Item ID="m_menuRunDebugTestSuite">
-    </Item>
-    <Item ID="m_menuWriteLanguageDB">
-    </Item>
-    <Item ID="m_menuLocalizerTool">
-    </Item>
-    <Item ID="m_menuHelp">
-      <Alt ID="por" Value="&amp;Ajuda"></Alt>
-    </Item>
-    <Item ID="m_menuHelpTopics">
-    </Item>
-    <Item ID="m_menuAboutOurWord">
-      <Alt ID="por" Value="&amp;Sobre OurWord!"></Alt>
-    </Item>
-    <Item ID="m_menuChangeParagraphStyle">
+    <Item ID="m_menuChangeParagraphTo">
     </Item>
     <Item ID="m_menuChangeParagraphStyle_p">
     </Item>
@@ -119,25 +52,7 @@
     </Item>
     <Item ID="m_menuChangeParagraphStyle_s">
     </Item>
-    <Item ID="m_menuShowMergePane">
-    </Item>
-    <Item ID="m_menuShowDictionaryPane">
-    </Item>
-  </Group>
-  <Group ID="m_ToolStrip">
-    <Item ID="m_btnExit">
-    </Item>
-    <Item ID="m_btnProjectSave">
-    </Item>
-    <Item ID="m_btnEditCut">
-    </Item>
-    <Item ID="m_btnEditCopy">
-    </Item>
-    <Item ID="m_btnEditPaste">
-    </Item>
     <Item ID="m_btnItalic">
-    </Item>
-    <Item ID="m_btnPrint">
     </Item>
     <Item ID="m_btnGotoFirstSection">
     </Item>
@@ -147,63 +62,52 @@
     </Item>
     <Item ID="m_btnGotoLastSection">
     </Item>
+    <Item ID="m_btnChapter">
+    </Item>
     <Item ID="m_btnGoToBook">
     </Item>
-    <Item ID="m_btnDrafting">
+    <Item ID="m_btnTools">
     </Item>
-    <Item ID="m_btnNaturalnessCheck">
+    <Item ID="m_menuIncrementBookStatus">
     </Item>
-    <Item ID="m_btnBackTranslation">
+    <Item ID="m_menuRestoreFromBackup">
     </Item>
-    <Item ID="m_btnNotes">
+    <Item ID="m_menuOnlyShowSectionsThat">
     </Item>
-    <Item ID="m_bmShowNotesPane">
+    <Item ID="m_menuCopyBTfromFront">
     </Item>
-    <Item ID="m_btnNoteGeneral">
+    <Item ID="m_menuEntireBook">
     </Item>
-    <Item ID="m_bmNoteGeneral">
+    <Item ID="m_menuCurrentSectionOnly">
     </Item>
-    <Item ID="m_btnNoteToDo">
+    <Item ID="m_menuConfigure">
     </Item>
-    <Item ID="m_bmNoteToDo">
+    <Item ID="m_menuSetUpFeatures">
     </Item>
-    <Item ID="m_btnNoteAskUNS">
+    <Item ID="m_menuLocalizerTool">
     </Item>
-    <Item ID="m_bmNoteAskUNS">
+    <Item ID="m_menuRunDebugTestSuite">
     </Item>
-    <Item ID="m_btnNoteDefinition">
+    <Item ID="m_btnWindow">
     </Item>
-    <Item ID="m_bmNoteDefinition">
+    <Item ID="m_menuDrafting">
     </Item>
-    <Item ID="m_btnNoteOldVersion">
+    <Item ID="m_menuBackTranslation">
     </Item>
-    <Item ID="m_bmNoteOldVersion">
+    <Item ID="m_menuNaturalnessCheck">
     </Item>
-    <Item ID="m_btnNoteReason">
+    <Item ID="m_menuShowNotesPane">
     </Item>
-    <Item ID="m_bmNoteReason">
+    <Item ID="m_menuShowTranslationsPane">
     </Item>
-    <Item ID="m_btnNoteFrontIssue">
+    <Item ID="m_menuShowMergePane">
     </Item>
-    <Item ID="m_bmNoteFrontIssue">
+    <Item ID="m_menuShowDictionaryPane">
     </Item>
-    <Item ID="m_btnNoteHintForDaughter">
+    <Item ID="m_menuHelpTopics">
     </Item>
-    <Item ID="m_btnNoteBackTranslation">
-    </Item>
-    <Item ID="m_btnDeleteNote">
-    </Item>
-    <Item ID="m_bmDeleteNote">
-    </Item>
-    <Item ID="m_bmTools">
-    </Item>
-    <Item ID="m_bmIncrementBookStatus">
-    </Item>
-    <Item ID="m_bmRestoreFromBackup">
-    </Item>
-    <Item ID="m_bmSetUpFeatures">
-    </Item>
-    <Item ID="m_bmHelp">
+    <Item ID="m_menuAbout">
+      <Alt ID="por" Value="&amp;Sobre OurWord!"></Alt>
     </Item>
   </Group>
   <Group ID="Strings">
@@ -357,6 +261,8 @@
       </Item>
       <Item ID="Picture">
       </Item>
+      <Item ID="CrossReferences">
+      </Item>
     </Group>
     <Group ID="DialogCommon">
       <Item ID="m_btnBrowse">
@@ -481,7 +387,7 @@
         <Alt ID="por" Value="Figura"></Alt>
       </Item>
       <Item ID="msgStructureMismatch">
-        <Alt ID="por" Value="Tem uma estrutura divergente na seção {0}:{n}	{1} tem {2},{n}		{3} tem {4}{n}{n}"></Alt>
+        <Alt ID="por" Value="Tem uma estrutura divergente na seção {0}:{n}"></Alt>
       </Item>
       <Item ID="diagnosis1">
         <Alt ID="por" Value="Os versos saem primeiro na seção {0}."></Alt>
@@ -490,7 +396,7 @@
         <Alt ID="por" Value="{0} tem seções adicionais apensadas no final."></Alt>
       </Item>
       <Item ID="msgSectionMiscount">
-        <Alt ID="por" Value="Os dois livros não têm o mesmo número de seções.{n}		{0} tem {1}; {2} tem {3}.{n}		{4}"></Alt>
+        <Alt ID="por" Value="Os dois livros não têm o mesmo número de seções.{n}	"></Alt>
       </Item>
     </Group>
   </Group>
@@ -922,6 +828,12 @@
     <Item ID="fDictionary_Description">
     </Item>
     <Item ID="m_checkListFeatures">
+    </Item>
+    <Item ID="m_btnJustTheBasics">
+    </Item>
+    <Item ID="fGoTo_Chapter_CheckBox">
+    </Item>
+    <Item ID="fGoTo_FirstLast_CheckBox">
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect">
@@ -1372,7 +1284,7 @@
         <Alt ID="por" Value="Língua"></Alt>
       </Item>
       <Item ID="m_labelLanguageExplanation">
-        <Alt ID="por" Value="Estes Nomes de Estágios são usados{n}			(1) no perfil do usuário e{n}(2) na geração dos nomes de arquivos{n}você deve nomear os arquivos na língua mais conhecida do tradutor."></Alt>
+        <Alt ID="por" Value="Estes Nomes de Estágios são usados{n}			"></Alt>
       </Item>
       <Item ID="m_listviewStages_col0">
         <Alt ID="por" Value="Nome Abreviado"></Alt>
@@ -1496,7 +1408,7 @@
       <Item ID="propSecondaryLanguage">
       </Item>
       <Item ID="propZoomFactor">
-        <Alt ID="por" Value="Ampliar (fator de aumento)"></Alt>
+        <Alt ID="por" Value="Ampliar (fator de aumento)"></Alt>
       </Item>
       <Item ID="propSuppressVerses">
       </Item>

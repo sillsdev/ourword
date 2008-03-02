@@ -44,7 +44,7 @@ namespace OurWord.Edit
         {
             TabPages.Clear();
 
-            m_NotesWindow = null;
+            m_NotesPane = null;
             m_MergePane = null;
             m_TranslationsWindow = null;
             m_DictionaryPane = null;
@@ -82,7 +82,7 @@ namespace OurWord.Edit
             wndMain.ResetSecondaryWindows();
 
             if (HasNotesWindow)
-                wndMain.RegisterSecondaryWindow(NotesWindow);
+                wndMain.RegisterSecondaryWindow(NotesPane.WndNotes);
             if (HasTranslationsWindow)
                 wndMain.RegisterSecondaryWindow(TranslationsWindow);
             if (HasMergePane)
@@ -93,7 +93,7 @@ namespace OurWord.Edit
         public void SetChildrenSizes()
         {
             if (HasNotesWindow)
-                NotesWindow.SetSize(DisplayRectangle.Width, DisplayRectangle.Height);
+                NotesPane.SetSize(DisplayRectangle.Size);
 
             if (HasTranslationsWindow)
                 TranslationsWindow.SetSize(DisplayRectangle.Width, DisplayRectangle.Height);
@@ -109,7 +109,7 @@ namespace OurWord.Edit
         public void SetZoomFactor(float fZoomFactor)
         {
             if (HasNotesWindow)
-                NotesWindow.ZoomFactor = fZoomFactor;
+                NotesPane.WndNotes.ZoomFactor = fZoomFactor;
             if (HasTranslationsWindow)
                 TranslationsWindow.ZoomFactor = fZoomFactor;
         }
@@ -119,8 +119,8 @@ namespace OurWord.Edit
         {
             get
             {
-                if (HasNotesWindow && NotesWindow.Focused)
-                    return NotesWindow;
+                if (HasNotesWindow && NotesPane.WndNotes.Focused)
+                    return NotesPane.WndNotes;
                 if (HasTranslationsWindow && TranslationsWindow.Focused)
                     return TranslationsWindow;
                 if (HasMergePane && MergePane.WndMerge.Focused)
@@ -163,24 +163,24 @@ namespace OurWord.Edit
         #endregion
 
         // Notes Window ----------------------------------------------------------------------
-        #region Attr{g}: NotesWindow NotesWindow
-        public NotesWindow NotesWindow
+        #region Attr{g}: NotesPane NotesPane
+        public NotesPane NotesPane
         {
             get
             {
-                Debug.Assert(null != m_NotesWindow);
-                return m_NotesWindow;
+                Debug.Assert(null != m_NotesPane);
+                return m_NotesPane;
             }
         }
-        NotesWindow m_NotesWindow = null;
+        NotesPane m_NotesPane = null;
         #endregion
         #region Method: void CreateNotesWindow()
         public void CreateNotesWindow()
         {
             // Create a Notes Window
-            m_NotesWindow = new NotesWindow();
+            m_NotesPane = new NotesPane();
 
-            CreateContainerTabPage(m_NotesWindow, "Notes", NotesWindow.WindowName);
+            CreateContainerTabPage(m_NotesPane, "Notes", "Notes");
         }
         #endregion
         #region Attr{g}: bool HasNotesWindow
@@ -188,7 +188,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return (m_NotesWindow != null);
+                return (m_NotesPane != null);
             }
         }
         #endregion

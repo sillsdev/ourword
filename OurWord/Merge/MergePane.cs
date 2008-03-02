@@ -442,7 +442,7 @@ namespace OurWord.Edit
             // Locate the button for ending the settings mode
             m_btnFinished.Location = new Point(c_xControlMargin, y);
 
-            // Sett the Widths of the controls
+            // Set the Widths of the controls
             SetSize(new Size(Width, Height));
         }
         #endregion
@@ -650,7 +650,6 @@ namespace OurWord.Edit
             BuildContents();
         }
         #endregion
-
         #region OMethod: bool HandleLockedFromEditing()
         protected override bool HandleLockedFromEditing()
         {

@@ -430,6 +430,8 @@ namespace JWTools
         {
             m_rtbInfo.Text = "";
             ItemYourLanguage = "";
+            m_comboShortcutKey.Text = "";
+            m_textToolTip.Text = "";
         }
         #endregion
         #region Method: _TextToRtfBox(string sIn)
@@ -462,6 +464,7 @@ namespace JWTools
         #region Method: void PopulateItemControls()
         void PopulateItemControls()
         {
+            // Start with completely empty controls
             ClearItemControls();
 
             if (null == Item)

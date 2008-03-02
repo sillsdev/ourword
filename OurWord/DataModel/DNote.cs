@@ -617,7 +617,26 @@ namespace OurWord.DataModel
 		}
 		#endregion
 
-		// Derived Attrs ---------------------------------------------------------------------
+        #region VAttr{g}: bool IsShowingAny
+        public static bool IsShowingAny
+        {
+            get
+            {
+                foreach (DNoteDef nd in NoteDefs)
+                {
+                    if (nd.Show)
+                        return true;
+                }
+
+                if (ShowHintsFromFront)
+                    return true;
+
+                return false;
+            }
+        }
+        #endregion
+
+        // Derived Attrs ---------------------------------------------------------------------
 		#region Attr{g}: DText Text - the owning DText
 		public DText Text
 		{

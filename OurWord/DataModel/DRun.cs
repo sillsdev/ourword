@@ -1229,11 +1229,25 @@ namespace OurWord.DataModel
 		#region Method: override void EliminateSpuriousSpaces()
 		public override void EliminateSpuriousSpaces()
 		{
-			_EliminateSpuriousSpaces(Phrases);
-			_EliminateSpuriousSpaces(PhrasesBT);
+			EliminateSpuriousSpaces(Phrases);
+			EliminateSpuriousSpaces(PhrasesBT);
 		}
-		private void _EliminateSpuriousSpaces(DPhrases osPhrases)
+        /// <summary>
+        /// Performs various cleanup activities on the sequence of runs: (1) eliminating
+        /// double spaces, eliminating leading or trailing spaces for the DText, and
+        /// (3) eliminating empty DPhrases.
+        /// </summary>
+        /// <param name="osPhrases">The sequence of phrases to clean up.</param>
+        /// <returns>The number of spaces removed. We need this because this method is
+        /// called during the delete command, and the number of spaces helps to determine
+        /// where to place the cursor following the deletion.</returns>
+		public int EliminateSpuriousSpaces(DPhrases osPhrases)
 		{
+            int cSpacesRemoved = 0;
+
+            _RemoveEmptyPhrases(osPhrases);
+            _CombinePhrases(osPhrases);
+
 			// Eliminate where one phrase ends with a space and the next begins with one
 			for(int i = 0; i < osPhrases.Count - 1; i++)
 			{
@@ -1243,10 +1257,10 @@ namespace OurWord.DataModel
 				if (phrase1.Text.Length == 0 || phrase2.Text.Length == 0 )
 					continue;
 
-				if (phrase1.Text[ phrase1.Text.Length - 1] == ' ' && 
-					phrase2.Text[0] == ' ')
+				while (_HasTrailingSpace(phrase1.Text) && _HasLeadingSpace(phrase2.Text))
 				{
-					phrase2.Text = phrase2.Text.TrimStart(null);
+                    phrase2.Text = _RemoveLeadingSpace(phrase2.Text);
+                    cSpacesRemoved++;
 				}
 			}
 
@@ -1254,19 +1268,91 @@ namespace OurWord.DataModel
 			if (osPhrases.Count > 0)
 			{
 				DPhrase phrase = osPhrases[0] as DPhrase;
-				phrase.Text = phrase.Text.TrimStart(null);
+                while (_HasLeadingSpace(phrase.Text))
+                {
+                    phrase.Text = _RemoveLeadingSpace(phrase.Text);
+                    cSpacesRemoved++;
+                }
 			}
 
 			// Make sure the final phrase does not end with a space
 			if (osPhrases.Count > 0)
 			{
 				DPhrase phrase = osPhrases[ osPhrases.Count - 1] as DPhrase;
-				phrase.Text = phrase.Text.TrimEnd(null);
+                while (_HasTrailingSpace(phrase.Text))
+                {
+                    phrase.Text = _RemoveTrailingSpace(phrase.Text);
+                    cSpacesRemoved++;
+                }
 			}
-		}
-		#endregion
-		#region Method: void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend)
-		private void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend, bool bInsertSpacesBetweenPhrases)
+
+            // Make sure there is at least one phrase present
+            if (osPhrases.Count == 0)
+                osPhrases.Append(new DPhrase(null, ""));
+
+            return cSpacesRemoved;
+        }
+        bool _HasLeadingSpace(string s)
+        {
+            if (s.Length > 0 && s[0] == ' ')
+                return true;
+            return false;
+        }
+        bool _HasTrailingSpace(string s)
+        {
+            if (s.Length > 0 && s[s.Length - 1] == ' ')
+                return true;
+            return false;
+        }
+        string _RemoveLeadingSpace(string s)
+        {
+            if (_HasLeadingSpace(s))
+                return s.Substring(1);
+            return s;
+        }
+        string _RemoveTrailingSpace(string s)
+        {
+            if (_HasTrailingSpace(s))
+                return s.Substring(0, s.Length - 1);
+            return s;
+        }
+
+        #region Method: void _RemoveEmptyPhrases(DPhrases osPhrases)
+        void _RemoveEmptyPhrases(DPhrases osPhrases)
+        {
+            for (int i = 0; i < osPhrases.Count; )
+            {
+                DPhrase phrase = osPhrases[i] as DPhrase;
+                if (string.IsNullOrEmpty(phrase.Text))
+                    osPhrases.Remove(phrase);
+                else
+                    i++;
+            }
+        }
+        #endregion
+        #region Method: void _CombinePhrases(DPhrases osPhrases)
+        void _CombinePhrases(DPhrases osPhrases)
+        {
+            for (int i = 0; i < osPhrases.Count - 1; )
+            {
+                DPhrase phrase1 = osPhrases[i] as DPhrase;
+                DPhrase phrase2 = osPhrases[i + 1] as DPhrase;
+
+                if (phrase1.CharacterStyleAbbrev == phrase2.CharacterStyleAbbrev)
+                {
+                    phrase1.Text += phrase2.Text;
+                    osPhrases.Remove(phrase2);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+        }
+        #endregion
+        #endregion
+        #region Method: void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend)
+        private void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend, bool bInsertSpacesBetweenPhrases)
 		{
 			DPhrase LastPhrase = ( osPhrases.Count > 0 ) ? osPhrases[ osPhrases.Count - 1] : null;
 
@@ -1413,6 +1499,13 @@ namespace OurWord.DataModel
             if (DialogCopyBTConflict.CopyBTAction == DialogCopyBTConflict.Actions.kReplaceTarget)
                 PhrasesBT.Clear();
 
+            // Clear everything if it is blank anyway, and if we're sure we have something to copy
+            // (otherwise, we can get stuck with a empty DPhrase at the beginning)
+            // Reference Bug0256.
+// QUITE POSSIBILY OBSOLETE due to changes made to EliminateSpuriousSpaces
+ //           if (string.IsNullOrEmpty(ProseBTAsString) && !string.IsNullOrEmpty(FrontText.ProseBTAsString))
+ //               PhrasesBT.Clear();
+
             // If we have a phrase still in the target (which means we're in kAppendToTarget mode),
             // then add a space to it.
             if (PhrasesBT.Count > 0)
@@ -1429,9 +1522,9 @@ namespace OurWord.DataModel
             }
 
             // Eliminate extra spaces this may have created
-            _EliminateSpuriousSpaces(PhrasesBT);
+            EliminateSpuriousSpaces(PhrasesBT);
         }
-		#endregion
+        #endregion
 
         // Split / Join DBasicTexts ----------------------------------------------------------
         #region Method: void Split(DPhrase phraseToSplit, int iPos)

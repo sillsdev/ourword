@@ -3146,8 +3146,12 @@ namespace OurWord.Edit
                     cCharsToDelete -= cCanDelete;
                 }
                 else
+                {
                     iPhrase++;
+                    n1 = 0;
+                }
             }
+            int cSpacesRemoved = DBT.EliminateSpuriousSpaces(phrases);
 
             // Update the clipboard if appropriate. If we were doing a Copy, then
             // we are finished.
@@ -3165,7 +3169,7 @@ namespace OurWord.Edit
             ReLayout();
 
             // Restore a selection at the deletion point
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(this, DBT, nRestorePosition);
+            OWWindow.Sel selection = OWWindow.Sel.CreateSel(this, DBT, nRestorePosition - cSpacesRemoved);
             Window.Selection = NormalizeSelection(selection);
         }
         #endregion
@@ -3446,24 +3450,6 @@ namespace OurWord.Edit
             Assert.AreEqual("life.", selection.Anchor.Word.Text);
         }
         #endregion
-
-        /***
-        public void SelectEditablePositionAt()
-        {
-            OWWindow.Sel selection = op.SelectEditablePositionAt(0);
-            Assert.AreEqual("For ", selection.Anchor.Word.Text);
-
-            selection = op.SelectEditablePositionAt(1);
-            Assert.AreEqual("For ", selection.Anchor.Word.Text);
-
-            selection = op.SelectEditablePositionAt(13);
-            Assert.AreEqual("loved ", selection.Anchor.Word.Text);
-
-            selection = op.SelectEditablePositionAt(60); // Select at end of "son"; first DBT
-            Assert.AreEqual("son ", selection.Anchor.Word.Text);
-            Assert.AreEqual(3, selection.Anchor.iChar);
-        }
-        ***/
 
         // Extending Selections --------------------------------------------------------------
         #region Test: ExtendSelection_WordRight

@@ -29,6 +29,21 @@ namespace OurWord.Edit
 {
     public partial class DictionaryPane : UserControl
     {
+        #region Attr{g/s}: string CurrentID
+        string CurrentID
+        {
+            get
+            {
+                return m_sCurrentID;
+            }
+            set
+            {
+                m_sCurrentID = value;
+            }
+        }
+        string m_sCurrentID;
+        #endregion
+
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public DictionaryPane()
@@ -37,6 +52,8 @@ namespace OurWord.Edit
 
             SetHtmlText("");
             m_checkExactSearch.Checked = true;
+
+            SetControlVisibility();
         }
         #endregion
         #region Method: void SetSize(Size sz)
@@ -56,16 +73,90 @@ namespace OurWord.Edit
             // The Width of the search box fills the available area
             m_textWord.Width = m_btnSearch.Location.X - m_textWord.Location.X;
 
-            // The Width of the Html control fills the entire area
-            m_Html.Width = Width - (2 * xMargin);
+            // The Open In WeSay button is at the bottom
+            m_btnOpenInWeSay.Top = Height - m_btnOpenInWeSay.Height - xMargin;
 
             // The Height of the Html control fills the entire area
-            m_Html.Height = Height - xMargin - m_Html.Location.Y;
+            m_Html.Height = m_btnOpenInWeSay.Top - xMargin - m_Html.Location.Y;
+
+            // The Width of these boxes fill entire available area
+            int nAvailableWidth = Width - (2 * xMargin);
+            m_Html.Width = nAvailableWidth;
+            m_labelDefinition.Width = nAvailableWidth;
+            m_textDefinition.Width = nAvailableWidth;
+            m_labelExampleSentence.Width = nAvailableWidth;
+            m_textExampleSentence.Width = nAvailableWidth;
+
+            // Center the buttons
+            int nButtonWidth = m_btnAdd.Width;
+            int xButton = (Width - nButtonWidth) / 2;
+            m_btnAdd.Left = xButton;
+            m_btnCancel.Left = xButton;
+            m_btnOpenInWeSay.Left = xButton;
         }
         #endregion
 
+        // Modes and Visibility --------------------------------------------------------------
+        enum Modes { kSearch, kEnterNew };
+        #region Attr{g}: Modes Mode
+        Modes Mode
+        {
+            get
+            {
+                return m_Mode;
+            }
+            set
+            {
+                m_Mode = value;
+            }
+        }
+        Modes m_Mode = Modes.kSearch;
+        #endregion
+        #region Attr{g}: bool IsSearchMode
+        bool IsSearchMode
+        {
+            get
+            {
+                return (Mode == Modes.kSearch);
+            }
+        }
+        #endregion
+        #region Method: void SetControlVisibility()
+        void SetControlVisibility()
+        {
+            // Controls for Search
+            m_Html.Visible = IsSearchMode;
+            m_btnOpenInWeSay.Visible = IsSearchMode;
 
+            // Constrols for EnterNew
+            m_labelDefinition.Visible = !IsSearchMode;
+            m_textDefinition.Visible = !IsSearchMode;
+            m_labelExampleSentence.Visible = !IsSearchMode;
+            m_textExampleSentence.Visible = !IsSearchMode;
+            m_btnAdd.Visible = !IsSearchMode;
+            m_btnCancel.Visible = !IsSearchMode;
 
+            // Enabling (for ones that stay on all the time)
+            m_textWord.Enabled = IsSearchMode;
+            m_checkExactSearch.Enabled = IsSearchMode;
+        }
+        #endregion
+        #region Cmd: cmdAddNewWord
+        void cmdAddNewWord(object sender, EventArgs e)
+        {
+            Mode = Modes.kEnterNew;
+            SetControlVisibility();
+        }
+        #endregion
+        #region Cmd: cmdCancelNewEntry
+        private void cmdCancelNewEntry(object sender, EventArgs e)
+        {
+            Mode = Modes.kSearch;
+            SetControlVisibility();
+        }
+        #endregion
+
+        // Misc ------------------------------------------------------------------------------
         #region Method: void SetHtmlText(string sHtmlEntry)
         void SetHtmlText(string sHtmlEntry)
         {
@@ -95,6 +186,7 @@ namespace OurWord.Edit
         }
         #endregion
 
+        // Dictionary Operations -------------------------------------------------------------
         #region Cmd: cmdLookupWord - response to the Search WeSay button
         private void cmdLookupWord(object sender, EventArgs e)
         {
@@ -109,11 +201,12 @@ namespace OurWord.Edit
             if (m_checkExactSearch.Checked == false)
                 method = FindMethods.DefaultApproximate;
 
-            Dictionary.Item[] vItems = G.Project.Dictionary.GetMatchingEntries("v", sWord, method);
+            Dictionary.Item[] vItems = G.Project.Dictionary.GetMatchingEntries(sWord, method);
 
             ContextMenuStrip menu = new ContextMenuStrip();
 
             ToolStripMenuItem miAdd = new ToolStripMenuItem("Not found; Add this word...");
+            miAdd.Click += new EventHandler(cmdAddNewWord);
             menu.Items.Add(miAdd);
 
             if (vItems.Length > 0)
@@ -151,13 +244,41 @@ namespace OurWord.Edit
                 SetHtmlText("");
                 return;
             }
-            string sID = item.Tag as string;
+            CurrentID = item.Tag as string;
 
             // Make the call to the Dictionary to retrieve the entry
-            string sHtml = G.Project.Dictionary.GetHtmlForEntry(sID);
+            string sHtml = G.Project.Dictionary.GetHtmlForEntry(CurrentID);
 
             // Place it into the Html control
             SetHtmlText(sHtml);
+        }
+        #endregion
+        #region Cmd: cmdAddToDictionary
+        private void cmdAddToDictionary(object sender, EventArgs e)
+        {
+            // Add the word to the Dictionary
+            CurrentID = G.Project.Dictionary.AddEntry(
+                m_textWord.Text,
+                m_textDefinition.Text,
+                m_textExampleSentence.Text);
+
+            // Switch back to Search mode
+            Mode = Modes.kSearch;
+            SetControlVisibility();
+
+            // Make the call to the Dictionary to retrieve the entry in html form
+            string sHtml = G.Project.Dictionary.GetHtmlForEntry(CurrentID);
+
+            // Place it into the Html control
+            SetHtmlText(sHtml);
+        }
+        #endregion
+        #region Cmd: cmdOpenInDictionary
+        private void cmdOpenInDictionary(object sender, EventArgs e)
+            // If the CurrentID is null/empty, WeSay will just open without going
+            // directly to it.
+        {
+            G.Project.Dictionary.JumpToEntry(CurrentID);
         }
         #endregion
     }
@@ -168,7 +289,7 @@ namespace OurWord.Edit
 
     public class Dictionary
     {
-        // Represents a word in the dictionary
+        // Represents a word in the dictionary -----------------------------------------------
         #region CLASS: Item
         public class Item
         {
@@ -225,6 +346,28 @@ namespace OurWord.Edit
         }
         DProject m_Project;
         #endregion
+        #region Attr{g}: string WSVernacular
+        string WSVernacular
+        {
+            get
+            {
+                Debug.Assert(!string.IsNullOrEmpty(m_sVernacular));
+                return m_sVernacular;
+            }
+        }
+        string m_sVernacular;
+        #endregion
+        #region Attr{g}: string WSAnalysis
+        string WSAnalysis
+        {
+            get
+            {
+                Debug.Assert(!string.IsNullOrEmpty(m_sAnalysis));
+                return m_sAnalysis;
+            }
+        }
+        string m_sAnalysis;
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DProject)
@@ -232,6 +375,10 @@ namespace OurWord.Edit
         {
             m_Project = _project;
             Initialize();
+
+            // Kuldge for the time being; we need to get this from the WS object
+            m_sVernacular = "v";
+            m_sAnalysis = "en";
         }
         #endregion
         #region Destructor()
@@ -276,8 +423,8 @@ namespace OurWord.Edit
         #endregion
 
         // WeSay Lookup ----------------------------------------------------------------------
-        #region Method: Item[] GetMatchingEntries(sWS, sForm, FindMethods method)
-        public Item[] GetMatchingEntries(string sWS, string sForm, FindMethods method)
+        #region Method: Item[] GetMatchingEntries(sForm, FindMethods method)
+        public Item[] GetMatchingEntries(string sForm, FindMethods method)
         {
             string[] vForms;
             string[] vIds;
@@ -286,7 +433,8 @@ namespace OurWord.Edit
 
             try
             {
-                DictionaryAccessor.GetMatchingEntries(sWS, 
+                DictionaryAccessor.GetMatchingEntries(
+                    WSVernacular, 
                     sForm, 
                     method,
                     out vIds, 
@@ -325,6 +473,41 @@ namespace OurWord.Edit
 
             Cursor.Current = Cursors.Default;
             return sHtml;
+        }
+        #endregion
+        #region Method: string AddEntry(sLexemeForm, sDefinition, sExample)
+        public string AddEntry(string sLexemeForm, string sDefinition, string sExample)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            string sID = "";
+
+            try
+            {
+                sID = DictionaryAccessor.AddEntry(
+                    WSVernacular, sLexemeForm,
+                    WSAnalysis, sDefinition,
+                    WSVernacular, sExample);
+            }
+            catch (Exception)
+            {
+            }
+
+            Cursor.Current = Cursors.Default;
+            return sID;
+        }
+        #endregion
+        #region Method: void JumpToEntry(string sID)
+        public void JumpToEntry(string sID)
+        {
+            Cursor.Current = Cursors.WaitCursor;
+            try
+            {
+                DictionaryAccessor.JumpToEntry(sID);
+            }
+            catch (Exception)
+            {
+            }
+            Cursor.Current = Cursors.Default;
         }
         #endregion
     }

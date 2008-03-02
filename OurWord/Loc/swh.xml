@@ -1,32 +1,41 @@
 ﻿<LocDB>
   <Language ID="swh" Name="Kiswahili"></Language>
-  <Group ID="m_MenuStrip">
-    <Item ID="m_menuProject">
-      <Alt ID="swh" Value="&amp;Mradi"></Alt>
+  <Group ID="m_ToolStrip">
+    <Item ID="m_btnExit">
+      <Alt ID="swh" Value="Toka"></Alt>
     </Item>
-    <Item ID="m_menuNew">
+    <Item ID="m_btnProjectSave">
+      <Alt ID="swh" Value="Hifadhi"></Alt>
+    </Item>
+    <Item ID="m_btnProject">
+      <Alt ID="swh" Value="Mradi"></Alt>
+    </Item>
+    <Item ID="m_menuNewProject">
       <Alt ID="swh" Value="&amp;Mpya..."></Alt>
     </Item>
-    <Item ID="m_menuOpen">
+    <Item ID="m_menuOpenProject">
       <Alt ID="swh" Value="&amp;Fungua..."></Alt>
     </Item>
-    <Item ID="m_menuSave">
+    <Item ID="m_menuSaveProject">
       <Alt ID="swh" Value="&amp;Hifadhi"></Alt>
     </Item>
-    <Item ID="m_menuSaveAs">
+    <Item ID="m_menuSaveProjectAs">
       <Alt ID="swh" Value="Hifadhi na &amp;jina hili..."></Alt>
     </Item>
-    <Item ID="m_menuProperties">
-      <Alt ID="swh" Value="&amp;Sifa..."></Alt>
+    <Item ID="m_btnPrint">
+      <Alt ID="swh" Value="Chapisha..."></Alt>
     </Item>
-    <Item ID="m_menuPrint">
-      <Alt ID="swh" Value="&amp;Chapisha..."></Alt>
+    <Item ID="m_btnEditCut">
+      <Alt ID="swh" Value="Kata"></Alt>
     </Item>
-    <Item ID="m_menuExit">
-      <Alt ID="swh" Value="&amp;Toka"></Alt>
+    <Item ID="m_btnEditCopy">
+      <Alt ID="swh" Value="Nakili"></Alt>
+    </Item>
+    <Item ID="m_btnEditPaste">
+      <Alt ID="swh" Value="Bandika"></Alt>
     </Item>
     <Item ID="m_menuEdit">
-      <Alt ID="swh" Value="&amp;Hariri"></Alt>
+      <Alt ID="swh" Value="Hariri"></Alt>
     </Item>
     <Item ID="m_menuCut">
       <Alt ID="swh" Value="&amp;Kata"></Alt>
@@ -37,107 +46,7 @@
     <Item ID="m_menuPaste">
       <Alt ID="swh" Value="&amp;Bandika"></Alt>
     </Item>
-    <Item ID="m_menuNotes">
-      <Alt ID="swh" Value="&amp;Noti"></Alt>
-    </Item>
-    <Item ID="m_menuNoteGeneral">
-      <Alt ID="swh" Value="Ingiza noti"></Alt>
-    </Item>
-    <Item ID="m_menuNoteToDo">
-      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
-    </Item>
-    <Item ID="m_menuNoteOldVersion">
-      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
-    </Item>
-    <Item ID="m_menuNoteReason">
-      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
-    </Item>
-    <Item ID="m_menuNoteFrontIssue">
-      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
-    </Item>
-    <Item ID="m_menuNoteDefinition">
-      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
-    </Item>
-    <Item ID="m_menuNoteHintForDaughter">
-      <Alt ID="swh" Value="Ingiza maneno yatakayosaidia kutafsiri"></Alt>
-    </Item>
-    <Item ID="m_menuNoteBackTranslation">
-    </Item>
-    <Item ID="m_menuNoteAskUNS">
-    </Item>
-    <Item ID="m_menuDeleteNote">
-      <Alt ID="swh" Value="Futa dondoo..."></Alt>
-    </Item>
-    <Item ID="m_menuGoTo">
-      <Alt ID="swh" Value="Nenda &amp;kwa"></Alt>
-    </Item>
-    <Item ID="m_menuFirstSection">
-      <Alt ID="swh" Value="Aya ya &amp;kwanza"></Alt>
-    </Item>
-    <Item ID="m_menuPreviousSection">
-      <Alt ID="swh" Value="Aya &amp;iliyotangulia"></Alt>
-    </Item>
-    <Item ID="m_menuNextSection">
-      <Alt ID="swh" Value="Aya I&amp;jayo"></Alt>
-    </Item>
-    <Item ID="m_menuLastSection">
-      <Alt ID="swh" Value="Aya ya &amp;mwisho"></Alt>
-    </Item>
-    <Item ID="m_menuGoToBook">
-      <Alt ID="swh" Value="&amp;Kitabu"></Alt>
-    </Item>
-    <Item ID="m_menuWindow">
-    </Item>
-    <Item ID="m_menuShowNotesPane">
-    </Item>
-    <Item ID="m_menuShowOtherTranslationsPane">
-    </Item>
-    <Item ID="m_menuDrafting">
-      <Alt ID="swh" Value="&amp;Kuandika insha"></Alt>
-    </Item>
-    <Item ID="m_menuNaturalnessCheck">
-      <Alt ID="swh" Value="K&amp;uchunguza tafsiri ihakikishwe ni asilia"></Alt>
-    </Item>
-    <Item ID="m_menuBackTranslation">
-      <Alt ID="swh" Value="&amp;Tafsiri ya kujirudia"></Alt>
-    </Item>
-    <Item ID="m_menuTools">
-      <Alt ID="swh" Value="&amp;Vifaa"></Alt>
-    </Item>
-    <Item ID="m_menuIncrementBookStatus">
-      <Alt ID="swh" Value="&amp;Andika hatua ilivyofikishwa katika kufasiri..."></Alt>
-    </Item>
-    <Item ID="m_menuCopyBTfromFront">
-      <Alt ID="swh" Value="&amp;Nakalisha tafsiri ya kujirudia toka tafsiri bora..."></Alt>
-    </Item>
-    <Item ID="m_menuEntireBook">
-    </Item>
-    <Item ID="m_menuCurrentSectionOnly">
-    </Item>
-    <Item ID="m_menuOnlyShowSectionsThat">
-    </Item>
-    <Item ID="m_menuRestoreFromBackup">
-      <Alt ID="swh" Value="&amp;Rejesha mswada ulivyo toka nakala yake..."></Alt>
-    </Item>
-    <Item ID="m_menuSetUpFeatures">
-      <Alt ID="swh" Value="Machaguo ya &amp;usanidi..."></Alt>
-    </Item>
-    <Item ID="m_menuRunDebugTestSuite">
-    </Item>
-    <Item ID="m_menuWriteLanguageDB">
-    </Item>
-    <Item ID="m_menuLocalizerTool">
-    </Item>
-    <Item ID="m_menuHelp">
-      <Alt ID="swh" Value="M&amp;saada"></Alt>
-    </Item>
-    <Item ID="m_menuHelpTopics">
-      <Alt ID="swh" Value="&amp;Vichwa vya Mswada..."></Alt>
-    </Item>
-    <Item ID="m_menuAboutOurWord">
-      <Alt ID="swh" Value="&amp;Habari juu ya 'Neno Letu'..."></Alt>
-    </Item>
-    <Item ID="m_menuChangeParagraphStyle">
+    <Item ID="m_menuChangeParagraphTo">
     </Item>
     <Item ID="m_menuChangeParagraphStyle_p">
     </Item>
@@ -149,126 +58,78 @@
     </Item>
     <Item ID="m_menuChangeParagraphStyle_s">
     </Item>
-    <Item ID="m_menuShowMergePane">
-    </Item>
-    <Item ID="m_menuShowDictionaryPane">
-    </Item>
-  </Group>
-  <Group ID="m_ToolStrip">
-    <Item ID="m_btnExit">
-      <Alt ID="swh" Value="Toka"></Alt>
-    </Item>
-    <Item ID="m_btnProjectSave">
-      <Alt ID="swh" Value="Hifadhi"></Alt>
-    </Item>
-    <Item ID="m_btnEditCut">
-      <Alt ID="swh" Value="Kata"></Alt>
-    </Item>
-    <Item ID="m_btnEditCopy">
-      <Alt ID="swh" Value="Nakili"></Alt>
-    </Item>
-    <Item ID="m_btnEditPaste">
-      <Alt ID="swh" Value="Bandika"></Alt>
-    </Item>
     <Item ID="m_btnItalic">
       <Alt ID="swh" Value="Italiki"></Alt>
-    </Item>
-    <Item ID="m_btnPrint">
-      <Alt ID="swh" Value="Chapisha"></Alt>
     </Item>
     <Item ID="m_btnGotoFirstSection">
       <Alt ID="swh" Value="Aya ya kwanza"></Alt>
     </Item>
     <Item ID="m_btnGotoPreviousSection">
-      <Alt ID="swh" Value="Itanguliayo"></Alt>
+      <Alt ID="swh" Value="Aya iliyotangulia"></Alt>
     </Item>
     <Item ID="m_btnGotoNextSection">
-      <Alt ID="swh" Value="Ijayo"></Alt>
+      <Alt ID="swh" Value="Aya Ijayo"></Alt>
     </Item>
     <Item ID="m_btnGotoLastSection">
       <Alt ID="swh" Value="Aya ya mwisho"></Alt>
     </Item>
+    <Item ID="m_btnChapter">
+    </Item>
     <Item ID="m_btnGoToBook">
       <Alt ID="swh" Value="Kitabu"></Alt>
     </Item>
-    <Item ID="m_btnDrafting">
-      <Alt ID="swh" Value="Kuandika insha"></Alt>
-    </Item>
-    <Item ID="m_btnNaturalnessCheck">
-      <Alt ID="swh" Value="Kuchunguza tafsiri ihakikishwe ni asilia"></Alt>
-    </Item>
-    <Item ID="m_btnBackTranslation">
-      <Alt ID="swh" Value="Tafsiri ya kujirudia"></Alt>
-    </Item>
-    <Item ID="m_btnNotes">
-      <Alt ID="swh" Value="Noti"></Alt>
-    </Item>
-    <Item ID="m_bmShowNotesPane">
-    </Item>
-    <Item ID="m_btnNoteGeneral">
-      <Alt ID="swh" Value="Ingiza noti"></Alt>
-    </Item>
-    <Item ID="m_bmNoteGeneral">
-      <Alt ID="swh" Value="Ingiza noti"></Alt>
-    </Item>
-    <Item ID="m_btnNoteToDo">
-      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
-    </Item>
-    <Item ID="m_bmNoteToDo">
-      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
-    </Item>
-    <Item ID="m_btnNoteAskUNS">
-    </Item>
-    <Item ID="m_bmNoteAskUNS">
-    </Item>
-    <Item ID="m_btnNoteDefinition">
-      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
-    </Item>
-    <Item ID="m_bmNoteDefinition">
-      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
-    </Item>
-    <Item ID="m_btnNoteOldVersion">
-      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
-    </Item>
-    <Item ID="m_bmNoteOldVersion">
-      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
-    </Item>
-    <Item ID="m_btnNoteReason">
-      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
-    </Item>
-    <Item ID="m_bmNoteReason">
-      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
-    </Item>
-    <Item ID="m_btnNoteFrontIssue">
-      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
-    </Item>
-    <Item ID="m_bmNoteFrontIssue">
-      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
-    </Item>
-    <Item ID="m_btnNoteHintForDaughter">
-    </Item>
-    <Item ID="m_btnNoteBackTranslation">
-    </Item>
-    <Item ID="m_btnDeleteNote">
-      <Alt ID="swh" Value="Futa dondoo"></Alt>
-    </Item>
-    <Item ID="m_bmDeleteNote">
-      <Alt ID="swh" Value="Futa dondoo..."></Alt>
-    </Item>
-    <Item ID="m_bmTools">
+    <Item ID="m_btnTools">
       <Alt ID="swh" Value="Vifaa"></Alt>
     </Item>
-    <Item ID="m_bmIncrementBookStatus">
-      <Alt ID="swh" Value="Andika hatua ilivyofikishwa katika kufasiri"></Alt>
+    <Item ID="m_menuIncrementBookStatus">
+      <Alt ID="swh" Value="&amp;Andika hatua ilivyofikishwa katika kufasiri..."></Alt>
     </Item>
-    <Item ID="m_bmRestoreFromBackup">
-      <Alt ID="swh" Value="Rejesha mswada ulivyo toka nakala yake"></Alt>
+    <Item ID="m_menuRestoreFromBackup">
+      <Alt ID="swh" Value="&amp;Rejesha mswada ulivyo toka nakala yake..."></Alt>
     </Item>
-    <Item ID="m_bmSetUpFeatures">
-      <Alt ID="swh" Value="Machaguo ya usanidi"></Alt>
+    <Item ID="m_menuOnlyShowSectionsThat">
     </Item>
-    <Item ID="m_bmHelp">
-      <Alt ID="swh" Value="Msaada"></Alt>
+    <Item ID="m_menuCopyBTfromFront">
+      <Alt ID="swh" Value="&amp;Nakalisha tafsiri ya kujirudia toka tafsiri bora..."></Alt>
+    </Item>
+    <Item ID="m_menuEntireBook">
+    </Item>
+    <Item ID="m_menuCurrentSectionOnly">
+    </Item>
+    <Item ID="m_menuConfigure">
+      <Alt ID="swh" Value="&amp;Sifa..."></Alt>
+    </Item>
+    <Item ID="m_menuSetUpFeatures">
+      <Alt ID="swh" Value="Machaguo ya &amp;usanidi..."></Alt>
+    </Item>
+    <Item ID="m_menuLocalizerTool">
+    </Item>
+    <Item ID="m_menuRunDebugTestSuite">
+    </Item>
+    <Item ID="m_btnWindow">
+    </Item>
+    <Item ID="m_menuDrafting">
+      <Alt ID="swh" Value="&amp;Kuandika insha"></Alt>
+    </Item>
+    <Item ID="m_menuBackTranslation">
+      <Alt ID="swh" Value="&amp;Tafsiri ya kujirudia"></Alt>
+    </Item>
+    <Item ID="m_menuNaturalnessCheck">
+      <Alt ID="swh" Value="K&amp;uchunguza tafsiri ihakikishwe ni asilia"></Alt>
+    </Item>
+    <Item ID="m_menuShowNotesPane">
+    </Item>
+    <Item ID="m_menuShowTranslationsPane">
+    </Item>
+    <Item ID="m_menuShowMergePane">
+    </Item>
+    <Item ID="m_menuShowDictionaryPane">
+    </Item>
+    <Item ID="m_menuHelpTopics">
+      <Alt ID="swh" Value="&amp;Vichwa vya Mswada..."></Alt>
+    </Item>
+    <Item ID="m_menuAbout">
+      <Alt ID="swh" Value="&amp;Habari juu ya 'Neno Letu'..."></Alt>
     </Item>
   </Group>
   <Group ID="Strings">
@@ -418,6 +279,8 @@
       </Item>
       <Item ID="Picture">
       </Item>
+      <Item ID="CrossReferences">
+      </Item>
     </Group>
     <Group ID="DialogCommon">
       <Item ID="m_btnBrowse">
@@ -431,6 +294,7 @@
       <Item ID="m_btnCancel">
       </Item>
       <Item ID="m_btnHelp">
+        <Alt ID="swh" Value="Msaada"></Alt>
       </Item>
       <Item ID="m_lblProgramName">
         <Alt ID="swh" Value="Neno Letu"></Alt>
@@ -945,6 +809,12 @@
     <Item ID="fDictionary_Description">
     </Item>
     <Item ID="m_checkListFeatures">
+    </Item>
+    <Item ID="m_btnJustTheBasics">
+    </Item>
+    <Item ID="fGoTo_Chapter_CheckBox">
+    </Item>
+    <Item ID="fGoTo_FirstLast_CheckBox">
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect">

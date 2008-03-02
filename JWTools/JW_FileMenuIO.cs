@@ -483,52 +483,52 @@ namespace JWTools
             return menuItem;
 		}
 		#endregion
-        #region Method: void RemoveMRUItems(ToolStripMenuItem menuProject)
-        public void RemoveMRUItems(ToolStripMenuItem menuProject)
+        #region Method: void RemoveMRUItems(ToolStripDropDownButton btnProject)
+        public void RemoveMRUItems(ToolStripDropDownButton btnProject)
         {
-            // Remove everything after the Exit menu item
+            // Remove everything after the Save As menu item
             int iExit = 0;
-            for (; iExit < menuProject.DropDownItems.Count; iExit++)
+            for (; iExit < btnProject.DropDownItems.Count; iExit++)
             {
-                if (menuProject.DropDownItems[iExit].Name == "m_menuExit")
+                if (btnProject.DropDownItems[iExit].Name == "m_menuSaveProjectAs")
                     break;
             }
-            while (menuProject.DropDownItems.Count > iExit + 1)
-                menuProject.DropDownItems.RemoveAt(iExit + 1);
+            while (btnProject.DropDownItems.Count > iExit + 1)
+                btnProject.DropDownItems.RemoveAt(iExit + 1);
         }
         #endregion
-        #region Method: void BuildMRUPopupMenu(ToolStripMenuItem menuProject, onClick, bool bVisible)
-        public void BuildMRUPopupMenu(ToolStripMenuItem menuProject, EventHandler onClick, bool bVisible)
+        #region Method: void BuildMRUPopupMenu(ToolStripDropDownButton btnProject, onClick, bool bVisible)
+        public void BuildMRUPopupMenu(ToolStripDropDownButton btnProject, EventHandler onClick, bool bVisible)
 		{
             // Remove everything after the Exit menu item
             int iExit = 0;
-            for (; iExit < menuProject.DropDownItems.Count; iExit++ )
+            for (; iExit < btnProject.DropDownItems.Count; iExit++)
             {
-                if (menuProject.DropDownItems[iExit].Name == "m_menuExit")
+                if (btnProject.DropDownItems[iExit].Name == "m_menuSaveProjectAs")
                     break;
             }
-            while (menuProject.DropDownItems.Count > iExit + 1)
-                menuProject.DropDownItems.RemoveAt(iExit + 1);
+            while (btnProject.DropDownItems.Count > iExit + 1)
+                btnProject.DropDownItems.RemoveAt(iExit + 1);
 
 			// Is the MRU supposed to be visible? If not, then don't process further
 			if (!bVisible)
 				return;
 
             // Add the separator
-            menuProject.DropDownItems.Add(new ToolStripSeparator());
+            btnProject.DropDownItems.Add(new ToolStripSeparator());
 
 			// Index through the array
 			int i = 0;
 
 			// First, add the MRU on the main file menu
 			for(; i<MaxItemsOnMRU && i<m_rgPathNames.Length; i++)
-                menuProject.DropDownItems.Add(CreateMenuItem(i, onClick));
+                btnProject.DropDownItems.Add(CreateMenuItem(i, onClick));
 
 			// If any pathnames remain, add them to a submenu
 			if (i < m_rgPathNames.Length)
 			{
                 ToolStripMenuItem menuMore = new ToolStripMenuItem(LanguageResources.MRU_More);
-                menuProject.DropDownItems.Add(menuMore);
+                btnProject.DropDownItems.Add(menuMore);
 
 				for(; i< m_rgPathNames.Length; i++)
                     menuMore.DropDownItems.Add(CreateMenuItem(i, onClick));

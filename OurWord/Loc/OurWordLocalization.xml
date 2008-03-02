@@ -1,171 +1,73 @@
 ﻿<LocDB>
-  <Group ID="m_MenuStrip" Title="001 - Menus" Des="These are the commands that appear in OurWord's menus. The ampersands (&amp;) indicate the hotkey that is underlined in the menu. You should take care that within a single menu (e.g., the Edit menu), that all ampersands indicate a different letter (that is, that there are no letters used more than once within a given menu.)" Translator="true">
-    <Item ID="m_menuProject">
-      <English>&amp;Project</English>
-      <Info>Main menu item for the Project submenu, contains the submenu items of Open Project, New Project, Save Project, etc.</Info>
+  <Group ID="m_ToolStrip" Title="001 - m_ToolStrip" Translator="false">
+    <Item ID="m_btnExit" Tip="true">
+      <English>Exit</English>
+      <Tip>Save any changes and then exit OurWord.</Tip>
     </Item>
-    <Item ID="m_menuNew" Key="true">
+    <Item ID="m_btnProjectSave" Tip="true">
+      <English>Save</English>
+      <Tip>Saves your work to disk.</Tip>
+    </Item>
+    <Item ID="m_btnProject" Tip="true">
+      <English>Project</English>
+      <Tip>Shows the menu for working with a project (New, Open, etc.).</Tip>
+    </Item>
+    <Item ID="m_menuNewProject" Tip="true">
       <English>&amp;New...</English>
-      <Info>Menu command to create a new project.</Info>
+      <Tip>Create a brand new project.</Tip>
     </Item>
-    <Item ID="m_menuOpen" Key="true">
+    <Item ID="m_menuOpenProject" Tip="true">
       <English>&amp;Open...</English>
-      <Info>Menu command to open an existing project.</Info>
       <Key>Ctrl+O</Key>
+      <Tip>Open an existing project.</Tip>
     </Item>
-    <Item ID="m_menuSave" Key="true">
+    <Item ID="m_menuSaveProject" Tip="true">
       <English>&amp;Save</English>
-      <Info>Menu command to save the Project, all of the settings, and the currently open book.</Info>
       <Key>Ctrl+S</Key>
+      <Tip>Save this project and any edited books to the disk.</Tip>
     </Item>
-    <Item ID="m_menuSaveAs" Key="true">
+    <Item ID="m_menuSaveProjectAs" Tip="true">
       <English>Save &amp;As...</English>
+      <Tip>Save this project under a different name.</Tip>
     </Item>
-    <Item ID="m_menuProperties" Key="true">
-      <English>P&amp;roperties...</English>
+    <Item ID="m_btnPrint" Tip="true">
+      <English>Print...</English>
+      <Tip>Print this book (or parts of this book.)</Tip>
     </Item>
-    <Item ID="m_menuPrint" Key="true">
-      <English>&amp;Print...</English>
+    <Item ID="m_btnEditCut" Tip="true">
+      <English>Cut</English>
+      <Tip>Removes the selected text and places it on the clipboard.</Tip>
     </Item>
-    <Item ID="m_menuExit" Key="true">
-      <English>E&amp;xit</English>
+    <Item ID="m_btnEditCopy" Tip="true">
+      <English>Copy</English>
+      <Tip>Copies the selected text to the clipboard.</Tip>
     </Item>
-    <Item ID="m_menuEdit">
-      <English>&amp;Edit</English>
-      <Info>Main menu item for the Edit submenu, contains the submenu items of Cut, Copy, Paste, etc.</Info>
+    <Item ID="m_btnEditPaste" Tip="true">
+      <English>Paste</English>
+      <Tip>Pastes the text at the clipboard to the cursor.</Tip>
     </Item>
-    <Item ID="m_menuCut" Key="true">
+    <Item ID="m_menuEdit" Tip="true">
+      <English>Edit</English>
+      <Tip>Displays the Edit menu items.</Tip>
+    </Item>
+    <Item ID="m_menuCut" Tip="true">
       <English>Cu&amp;t</English>
       <Key>Ctrl+X</Key>
+      <Tip>Removes the selected text and places it on the clipboard.</Tip>
     </Item>
-    <Item ID="m_menuCopy" Key="true">
+    <Item ID="m_menuCopy" Tip="true">
       <English>&amp;Copy</English>
       <Key>Ctrl+C</Key>
+      <Tip>Copies the selected text to the clipboard.</Tip>
     </Item>
-    <Item ID="m_menuPaste" Key="true">
+    <Item ID="m_menuPaste" Tip="true">
       <English>&amp;Paste</English>
       <Key>Ctrl+V</Key>
+      <Tip>Pastes the text at the clipboard to the cursor.</Tip>
     </Item>
-    <Item ID="m_menuNotes">
-      <English>&amp;Notes</English>
-      <Info>Main menu item for the Notes submenu, contains the submenu items of Insert Note, Delete Note, etc.</Info>
-    </Item>
-    <Item ID="m_menuNoteGeneral" Key="true">
-      <English>Insert General &amp;Note</English>
-    </Item>
-    <Item ID="m_menuNoteToDo" Key="true">
-      <English>Insert &amp;To Do Note</English>
-    </Item>
-    <Item ID="m_menuNoteOldVersion" Key="true">
-      <English>Insert Old &amp;Version Note</English>
-    </Item>
-    <Item ID="m_menuNoteReason" Key="true">
-      <English>Insert &amp;Reason Note</English>
-    </Item>
-    <Item ID="m_menuNoteFrontIssue" Key="true">
-      <English>Insert &amp;Front Issue Note</English>
-    </Item>
-    <Item ID="m_menuNoteDefinition" Key="true">
-      <English>Insert D&amp;efinition Note</English>
-    </Item>
-    <Item ID="m_menuNoteHintForDaughter" Key="true">
-      <English>Insert &amp;Hint for Daughter Note</English>
-    </Item>
-    <Item ID="m_menuNoteBackTranslation" Key="true">
-      <English>Insert &amp;Back Translation Note</English>
-    </Item>
-    <Item ID="m_menuNoteAskUNS" Key="true">
-      <English>Insert &amp;Ask UNS Note</English>
-    </Item>
-    <Item ID="m_menuDeleteNote" Key="true">
-      <English>&amp;Delete Note...</English>
-    </Item>
-    <Item ID="m_menuGoTo">
-      <English>&amp;Go To</English>
-      <Info>Main menu item for the GoTo submenu, contains the submenu items of First, Previous, etc.</Info>
-    </Item>
-    <Item ID="m_menuFirstSection" Key="true">
-      <English>&amp;First Section</English>
-    </Item>
-    <Item ID="m_menuPreviousSection" Key="true">
-      <English>&amp;Previous Section</English>
-      <Key>Ctrl+P</Key>
-    </Item>
-    <Item ID="m_menuNextSection" Key="true">
-      <English>&amp;Next Section</English>
-      <Key>Ctrl+N</Key>
-    </Item>
-    <Item ID="m_menuLastSection" Key="true">
-      <English>&amp;Last Section</English>
-    </Item>
-    <Item ID="m_menuGoToBook">
-      <English>&amp;Book</English>
-    </Item>
-    <Item ID="m_menuWindow">
-      <English>&amp;Window</English>
-      <Info>Main menu item for the Window submenu, contains the submenu items of Drafting, BT, etc.</Info>
-    </Item>
-    <Item ID="m_menuShowNotesPane" Key="true">
-      <English>&amp;Show &amp;Notes Pane</English>
-    </Item>
-    <Item ID="m_menuShowOtherTranslationsPane" Key="true">
-      <English>Show &amp;Other Translationss Pane</English>
-    </Item>
-    <Item ID="m_menuDrafting" Key="true">
-      <English>&amp;Drafting</English>
-    </Item>
-    <Item ID="m_menuNaturalnessCheck" Key="true">
-      <English>&amp;Naturalness Check</English>
-    </Item>
-    <Item ID="m_menuBackTranslation" Key="true">
-      <English>&amp;Back Translation</English>
-    </Item>
-    <Item ID="m_menuTools">
-      <English>&amp;Tools</English>
-      <Info>Main menu item for the Tools submenu, contains the submenu items of Options, Setup Features, etc.</Info>
-    </Item>
-    <Item ID="m_menuIncrementBookStatus" Key="true">
-      <English>&amp;Increment Book Status...</English>
-    </Item>
-    <Item ID="m_menuCopyBTfromFront" Key="true">
-      <English>&amp;Copy BT from Front...</English>
-    </Item>
-    <Item ID="m_menuEntireBook" Key="true">
-      <English>Entire &amp;Book</English>
-    </Item>
-    <Item ID="m_menuCurrentSectionOnly" Key="true">
-      <English>Current &amp;Section Only</English>
-    </Item>
-    <Item ID="m_menuOnlyShowSectionsThat" Key="true">
-      <English>Only &amp;Show Sections that...</English>
-    </Item>
-    <Item ID="m_menuRestoreFromBackup" Key="true">
-      <English>Restore from &amp;Backup...</English>
-    </Item>
-    <Item ID="m_menuSetUpFeatures" Key="true">
-      <English>Set Up &amp;Features...</English>
-    </Item>
-    <Item ID="m_menuRunDebugTestSuite" Key="true">
-      <English>&amp;Debug Testing</English>
-    </Item>
-    <Item ID="m_menuWriteLanguageDB" Key="true">
-      <English>&amp;Write Language DB</English>
-    </Item>
-    <Item ID="m_menuLocalizerTool" Key="true">
-      <English>&amp;Localizer Tool...</English>
-    </Item>
-    <Item ID="m_menuHelp">
-      <English>&amp;Help</English>
-      <Info>Main menu item for the Help submenu, contains the submenu items of Topics, About, etc.</Info>
-    </Item>
-    <Item ID="m_menuHelpTopics" Key="true">
-      <English>Help &amp;Topics...</English>
-    </Item>
-    <Item ID="m_menuAboutOurWord" Key="true">
-      <English>&amp;About Our Word!...</English>
-    </Item>
-    <Item ID="m_menuChangeParagraphStyle">
-      <English>Change Paragraph To</English>
+    <Item ID="m_menuChangeParagraphTo" Tip="true">
+      <English>C&amp;hange Paragraph To</English>
+      <Tip>Changes the style of the selected paragraph to another style.</Tip>
     </Item>
     <Item ID="m_menuChangeParagraphStyle_p">
       <English>Paragraph</English>
@@ -182,169 +84,115 @@
     <Item ID="m_menuChangeParagraphStyle_s">
       <English>Section Title</English>
     </Item>
-    <Item ID="m_menuShowMergePane">
-      <English>Show &amp;Merge Pane</English>
-    </Item>
-    <Item ID="m_menuShowDictionaryPane">
-      <English>Show &amp;Dictionary Pane</English>
-    </Item>
-  </Group>
-  <Group ID="m_ToolStrip" Title="002 - Toolbar Text" Des="These are the buttons that appear in the 'Just the Basics' toolbar. Since these must fit on a button, you need to be as concise as possible. Where a multi-word phrase is fine for a menu, it will be too long on a toolbar button." Translator="true">
-    <Item ID="m_btnExit" Key="true" Tip="true">
-      <English>Exit</English>
-      <Tip>Exit Our Word</Tip>
-    </Item>
-    <Item ID="m_btnProjectSave" Key="true" Tip="true">
-      <English>Save</English>
-      <Key>Ctrl+S</Key>
-      <Tip>Save the current edits to disk file</Tip>
-    </Item>
-    <Item ID="m_btnEditCut" Key="true" Tip="true">
-      <English>Cut</English>
-      <Key>Ctrl+X</Key>
-      <Tip>Cut</Tip>
-    </Item>
-    <Item ID="m_btnEditCopy" Key="true" Tip="true">
-      <English>Copy</English>
-      <Key>Ctrl+C</Key>
-      <Tip>Copy</Tip>
-    </Item>
-    <Item ID="m_btnEditPaste" Key="true" Tip="true">
-      <English>Paste</English>
-      <Key>Ctrl+V</Key>
-      <Tip>Paste</Tip>
-    </Item>
-    <Item ID="m_btnItalic" Key="true" Tip="true">
+    <Item ID="m_btnItalic" Tip="true">
       <English>Italic</English>
-      <Tip>Italic</Tip>
+      <Tip>Changes the selected text to Italic; this is only enabled if Italic is allowed in the current context.</Tip>
     </Item>
-    <Item ID="m_btnPrint" Key="true">
-      <English>Print</English>
-      <Key>Ctrl+I</Key>
+    <Item ID="m_btnGotoFirstSection" Tip="true">
+      <English>First</English>
+      <Tip>Go to the First section in the book.</Tip>
     </Item>
-    <Item ID="m_btnGotoFirstSection" Key="true" Tip="true">
-      <English>First Section</English>
-      <Tip>Go to the First Section in the book</Tip>
-    </Item>
-    <Item ID="m_btnGotoPreviousSection" Key="true" Tip="true">
+    <Item ID="m_btnGotoPreviousSection" Tip="true">
       <English>Previous</English>
-      <Key>Ctrl+P</Key>
-      <Tip>Go to the Previous Section (or use the down-arrow to bring up a list of previous sections)</Tip>
+      <Tip>Go to the Previous section in the book.</Tip>
     </Item>
-    <Item ID="m_btnGotoNextSection" Key="true" Tip="true">
+    <Item ID="m_btnGotoNextSection" Tip="true">
       <English>Next</English>
-      <Key>Ctrl+N</Key>
-      <Tip>Go to the Next Section (or use the down-arrow to bring up a list of following sections)</Tip>
+      <Tip>Go to the Next section in the book.</Tip>
     </Item>
-    <Item ID="m_btnGotoLastSection" Key="true" Tip="true">
-      <English>Last Section</English>
-      <Tip>Go to the Last Section in the book</Tip>
+    <Item ID="m_btnGotoLastSection" Tip="true">
+      <English>Last</English>
+      <Tip>Go to the final section in the book.</Tip>
+    </Item>
+    <Item ID="m_btnChapter" Tip="true">
+      <English>Chapter</English>
+      <Tip>Go to a Chapter in the book</Tip>
     </Item>
     <Item ID="m_btnGoToBook" Tip="true">
       <English>Book</English>
       <Tip>Go to a different book</Tip>
     </Item>
-    <Item ID="m_btnDrafting" Key="true" Tip="true">
-      <English>Drafting</English>
-      <Tip>Change to the Drafting Job</Tip>
-    </Item>
-    <Item ID="m_btnNaturalnessCheck" Key="true" Tip="true">
-      <English>Naturalness Check</English>
-      <Tip>Change to the Naturalness Check Job</Tip>
-    </Item>
-    <Item ID="m_btnBackTranslation" Key="true" Tip="true">
-      <English>Back Translation</English>
-      <Tip>Change to the Back Translation Job</Tip>
-    </Item>
-    <Item ID="m_btnNotes" Tip="true">
-      <English>Notes</English>
-      <Tip>Notes</Tip>
-    </Item>
-    <Item ID="m_bmShowNotesPane" Key="true">
-      <English>&amp;Show Notes Pane</English>
-    </Item>
-    <Item ID="m_btnNoteGeneral" Key="true" Tip="true">
-      <English>General note</English>
-      <Tip>Insert a general note</Tip>
-    </Item>
-    <Item ID="m_bmNoteGeneral" Key="true" Tip="true">
-      <English>Insert General &amp;Note</English>
-      <Tip>Insert a general note</Tip>
-    </Item>
-    <Item ID="m_btnNoteToDo" Key="true" Tip="true">
-      <English>To Do note</English>
-      <Tip>Insert a To Do note</Tip>
-    </Item>
-    <Item ID="m_bmNoteToDo" Key="true">
-      <English>Insert &amp;To Do Note</English>
-    </Item>
-    <Item ID="m_btnNoteAskUNS" Key="true" Tip="true">
-      <English>Ask The UNS note</English>
-      <Tip>Insert an Ask The UNS note</Tip>
-    </Item>
-    <Item ID="m_bmNoteAskUNS" Key="true" Tip="true">
-      <English>&amp;Ask The UNS note</English>
-      <Tip>Insert an Ask The UNS note</Tip>
-    </Item>
-    <Item ID="m_btnNoteDefinition" Key="true" Tip="true">
-      <English>Definition note</English>
-      <Tip>Insert a Definition note</Tip>
-    </Item>
-    <Item ID="m_bmNoteDefinition" Key="true">
-      <English>Insert D&amp;efinition Note</English>
-    </Item>
-    <Item ID="m_btnNoteOldVersion" Key="true" Tip="true">
-      <English>Old Version note</English>
-      <Tip>Insert an Old Version note</Tip>
-    </Item>
-    <Item ID="m_bmNoteOldVersion" Key="true">
-      <English>Insert Old &amp;Version Note</English>
-    </Item>
-    <Item ID="m_btnNoteReason" Key="true" Tip="true">
-      <English>Reason note</English>
-      <Tip>Insert a Reason note</Tip>
-    </Item>
-    <Item ID="m_bmNoteReason" Key="true">
-      <English>Insert &amp;Reason Note</English>
-    </Item>
-    <Item ID="m_btnNoteFrontIssue" Key="true" Tip="true">
-      <English>Front Issue note</English>
-      <Tip>Insert a Front Issue note</Tip>
-    </Item>
-    <Item ID="m_bmNoteFrontIssue" Key="true">
-      <English>Insert &amp;Front Issue Note</English>
-    </Item>
-    <Item ID="m_btnNoteHintForDaughter" Key="true" Tip="true">
-      <English>Hint For Daughter note</English>
-      <Tip>Insert a Hint For Daughter note</Tip>
-    </Item>
-    <Item ID="m_btnNoteBackTranslation" Key="true" Tip="true">
-      <English>Back Translation note</English>
-      <Tip>Insert a note about the Back Translation</Tip>
-    </Item>
-    <Item ID="m_btnDeleteNote" Key="true" Tip="true">
-      <English>Delete Note</English>
-      <Tip>Delete this note.</Tip>
-    </Item>
-    <Item ID="m_bmDeleteNote" Key="true">
-      <English>&amp;Delete Note</English>
-    </Item>
-    <Item ID="m_bmTools" Tip="true">
+    <Item ID="m_btnTools" Tip="true">
       <English>Tools</English>
-      <Tip>Tools</Tip>
+      <Tip>Opens the menu showing the different tools that are available.</Tip>
     </Item>
-    <Item ID="m_bmIncrementBookStatus" Key="true">
-      <English>Increment Book Status</English>
+    <Item ID="m_menuIncrementBookStatus" Tip="true">
+      <English>&amp;Increment Book Status...</English>
+      <Tip>Change the book's status to the next one in the translation process.</Tip>
     </Item>
-    <Item ID="m_bmRestoreFromBackup" Key="true">
-      <English>Restore from Backup</English>
+    <Item ID="m_menuRestoreFromBackup" Tip="true">
+      <English>Restore from &amp;Backup...</English>
+      <Tip>Restore to a former version of the book.</Tip>
     </Item>
-    <Item ID="m_bmSetUpFeatures" Key="true">
-      <English>Set Up Features</English>
+    <Item ID="m_menuOnlyShowSectionsThat" Tip="true">
+      <English>Only &amp;Show Sections that...</English>
+      <Tip>Filter out the sections which do not conform to a criteria.</Tip>
     </Item>
-    <Item ID="m_bmHelp" Key="true" Tip="true">
-      <English>Help</English>
-      <Tip>Help</Tip>
+    <Item ID="m_menuCopyBTfromFront" Tip="true">
+      <English>&amp;Copy BT from Front</English>
+      <Tip>Copy the Back Translation from the Front translation.</Tip>
+    </Item>
+    <Item ID="m_menuEntireBook">
+      <English>Entire &amp;Book...</English>
+    </Item>
+    <Item ID="m_menuCurrentSectionOnly">
+      <English>Current &amp;Section Only...</English>
+    </Item>
+    <Item ID="m_menuConfigure" Tip="true">
+      <English>&amp;Configure...</English>
+      <Tip>Edit the settings for OurWord and for the current project.</Tip>
+    </Item>
+    <Item ID="m_menuSetUpFeatures" Tip="true">
+      <English>Set Up &amp;Features...</English>
+      <Tip>Set which features are turned on and off.</Tip>
+    </Item>
+    <Item ID="m_menuLocalizerTool" Tip="true">
+      <English>&amp;Localizer Tool...</English>
+      <Tip>Create a versin of OurWord in another language.</Tip>
+    </Item>
+    <Item ID="m_menuRunDebugTestSuite" Tip="true">
+      <English>&amp;Run Debug Test Suite...</English>
+      <Tip>Only programmers will generally see this; you should ignore it!</Tip>
+    </Item>
+    <Item ID="m_btnWindow" Tip="true">
+      <English>Window</English>
+      <Tip>Shows the various windows you can turn on and off.</Tip>
+    </Item>
+    <Item ID="m_menuDrafting" Tip="true">
+      <English>&amp;Drafting</English>
+      <Tip>Set the main window to do Drafting.</Tip>
+    </Item>
+    <Item ID="m_menuBackTranslation" Tip="true">
+      <English>&amp;Back Translation</English>
+      <Tip>Set the main window to work on the Back Translation.</Tip>
+    </Item>
+    <Item ID="m_menuNaturalnessCheck" Tip="true">
+      <English>&amp;Naturalness Check</English>
+      <Tip>Set the main window to do a Naturalness Check (where the Front Translation is not displayed.)</Tip>
+    </Item>
+    <Item ID="m_menuShowNotesPane" Tip="true">
+      <English>Show &amp;Notes Pane</English>
+      <Tip>Show the Notes pane.</Tip>
+    </Item>
+    <Item ID="m_menuShowTranslationsPane" Tip="true">
+      <English>Show &amp;Other Translations Pane</English>
+      <Tip>Show the Other Translations Pane</Tip>
+    </Item>
+    <Item ID="m_menuShowMergePane" Tip="true">
+      <English>Show &amp;Merge Pane</English>
+      <Tip>Show the pane by which you can merge different versions of a file into a single file.</Tip>
+    </Item>
+    <Item ID="m_menuShowDictionaryPane" Tip="true">
+      <English>Show &amp;Dictionary Pane</English>
+      <Tip>Show the Dictionary Pane.</Tip>
+    </Item>
+    <Item ID="m_menuHelpTopics" Tip="true">
+      <English>Help &amp;Topics</English>
+      <Tip>Show the Help window.</Tip>
+    </Item>
+    <Item ID="m_menuAbout" Tip="true">
+      <English>&amp;About Our Word</English>
+      <Tip>See information about this version of Our Word.</Tip>
     </Item>
   </Group>
   <Group ID="Strings" Title="003 - Strings" Translator="true">
@@ -604,6 +452,9 @@
         <English>Picture</English>
         <Info>A picture caption</Info>
       </Item>
+      <Item ID="CrossReferences">
+        <English>Cross References</English>
+      </Item>
     </Group>
     <Group ID="DialogCommon" Title="Dialog: Common" Des="These are common text that appear on numerous dialogs, such as the OK or Cancel buttons." Translator="true">
       <Item ID="m_btnBrowse">
@@ -621,8 +472,9 @@
       <Item ID="m_btnCancel">
         <English>Cancel</English>
       </Item>
-      <Item ID="m_btnHelp">
+      <Item ID="m_btnHelp" Tip="true">
         <English>Help...</English>
+        <Tip>Show the Help menu.</Tip>
       </Item>
       <Item ID="m_lblProgramName">
         <English>Our Word!</English>
@@ -1422,6 +1274,15 @@
     </Item>
     <Item ID="m_checkListFeatures">
       <English>Just the Basics</English>
+    </Item>
+    <Item ID="m_btnJustTheBasics">
+      <English>Just The Basic Features</English>
+    </Item>
+    <Item ID="fGoTo_Chapter_CheckBox">
+      <English>Chapter Button</English>
+    </Item>
+    <Item ID="fGoTo_FirstLast_CheckBox">
+      <English>First &amp; Last Buttons</English>
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect" Title="103 - Dialog: Password Protect" Translator="false">

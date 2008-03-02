@@ -146,6 +146,10 @@
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
     <Content Include="OurWord.ico" />
+    <EmbeddedResource Include="Dialogs\ChapterMenu.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ChapterMenu.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Page_Notes.cs</DependentUpon>
@@ -178,9 +182,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>DictionaryPane.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Layouts\NotesTabPage.resx">
+    <EmbeddedResource Include="Edit\NotesPane.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>NotesTabPage.cs</DependentUpon>
+      <DependentUpon>NotesPane.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Merge\MergePane.resx">
       <SubType>Designer</SubType>
@@ -190,6 +194,8 @@
     <EmbeddedResource Include="Res\FileOpen.gif" />
     <EmbeddedResource Include="Res\DeleteMergeFile.ico" />
     <None Include="Res\editfind.gif" />
+    <EmbeddedResource Include="Res\Edit.ico" />
+    <EmbeddedResource Include="Res\Blank.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
       <SubType>Designer</SubType>
@@ -227,6 +233,7 @@
     <Content Include="Res\NoteMerge.ico" />
     <None Include="Res\OurWord.png" />
     <Content Include="Res\ProgressIndicatorBackground.jpg" />
+    <EmbeddedResource Include="Res\Project.ico" />
     <EmbeddedResource Include="Res\SectionFirst.ico" />
     <EmbeddedResource Include="Res\SectionLast.ico" />
     <EmbeddedResource Include="Res\Properties.ico" />
@@ -301,6 +308,12 @@
     </Compile>
     <Compile Include="DataModel\StdFmtTransform.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ChapterMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ChapterMenu.Designer.cs">
+      <DependentUpon>ChapterMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\CopyBTfromFront.cs">
       <SubType>Form</SubType>
@@ -477,6 +490,12 @@
     <Compile Include="Dictionary\DictionaryPane.Designer.cs">
       <DependentUpon>DictionaryPane.cs</DependentUpon>
     </Compile>
+    <Compile Include="Edit\NotesPane.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Edit\NotesPane.Designer.cs">
+      <DependentUpon>NotesPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="Edit\OWPara.cs">
     </Compile>
     <Compile Include="Edit\OWWindow.cs">
@@ -496,16 +515,10 @@
     <Compile Include="Layouts\Naturalness.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Layouts\NotesTabPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Layouts\NotesTabPage.Designer.cs">
-      <DependentUpon>NotesTabPage.cs</DependentUpon>
-    </Compile>
     <Compile Include="Merge\DiffText.cs" />
     <Compile Include="Merge\DMergeBook.cs" />
     <Compile Include="Merge\MergePane.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Merge\MergePane.Designer.cs">
       <DependentUpon>MergePane.cs</DependentUpon>

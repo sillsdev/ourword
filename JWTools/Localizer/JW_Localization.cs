@@ -1808,6 +1808,18 @@ namespace JWTools
             ToolStripMenuItem mi = tsi as ToolStripMenuItem;
             if (null != mi)
             {
+                // The ShortcutKeyDisplayString does not always work; we'll just fix
+                // the ones that are "Ctrl+"
+                if (mi.ShortcutKeyDisplayString == null && mi.ShortcutKeys != Keys.None)
+                {
+                    if ( (mi.ShortcutKeys & Keys.Control ) == Keys.Control)
+                    {
+                        string s = "Ctrl+";
+                        s += mi.ShortcutKeys.ToString()[0];
+                        mi.ShortcutKeyDisplayString = s;
+                    }
+                }
+
                 mi.ShortcutKeys = GetShortcutKey(
                     vGroupID,
                     sItemID,
@@ -1960,7 +1972,7 @@ namespace JWTools
             if (null != tsi)
             {
                 // Work up the ownership chain while we encounter ToolStripItems
-                if (null != tsi.OwnerItem)
+                if (null != tsi.OwnerItem && (tsi.OwnerItem as ToolStripOverflowButton == null))
                     return _GetGroupID(tsi.OwnerItem);
                 // Once we get here, we should be at the owning ToolStrip
                 Debug.Assert(null != tsi.Owner);
