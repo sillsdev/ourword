@@ -1,0 +1,84 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OurWordTests</RootNamespace>
+    <AssemblyName>OurWordTests</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\OurWord\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="nunit.framework, Version=2.4.3.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataModel\T_DBookGrouping.cs" />
+    <Compile Include="DataModel\T_DBasicText.cs" />
+    <Compile Include="DataModel\T_DBook.cs" />
+    <Compile Include="DataModel\T_DFootnote.cs" />
+    <Compile Include="DataModel\T_DParagraph.cs" />
+    <Compile Include="DataModel\T_DPhrase.cs" />
+    <Compile Include="DataModel\T_DSection.cs" />
+    <Compile Include="DataModel\T_ScriptureDB.cs" />
+    <Compile Include="Dialogs\T_BookNames.cs" />
+    <Compile Include="Edit\EditTestsCommon.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Edit\T_Bookmark.cs" />
+    <Compile Include="Edit\T_OWPara.cs" />
+    <Compile Include="Edit\T_UndoRedo.cs" />
+    <Compile Include="Edit\T_OWWindow.cs">
+    </Compile>
+    <Compile Include="JWdb\T_AutoReplace.cs" />
+    <Compile Include="JWdb\T_SfDB.cs" />
+    <Compile Include="JWTools\T_Localization.cs" />
+    <Compile Include="JWTools\T_PathConverter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JWdb\JWdb.csproj">
+      <Project>{CD66A898-A60C-44F7-8731-EAE0E558C639}</Project>
+      <Name>JWdb</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\JWTools\JWTools.csproj">
+      <Project>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</Project>
+      <Name>JWTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OurWord\OurWord.csproj">
+      <Project>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</Project>
+      <Name>OurWord</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

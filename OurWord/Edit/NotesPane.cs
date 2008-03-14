@@ -23,7 +23,6 @@ using JWdb;
 using OurWord.DataModel;
 using OurWord.View;
 using OurWord.Edit;
-using NUnit.Framework;
 #endregion
 
 namespace OurWord.Edit
@@ -116,9 +115,7 @@ namespace OurWord.Edit
                 return;
 
             // Remember the location
-            PlaceHolder bookmark = new PlaceHolder(
-                G.App.MainWindow.Selection.Paragraph,
-                G.App.MainWindow.Selection.DBT_iCharFirst);
+            OWBookmark bookmark = new OWBookmark(G.App.MainWindow.Selection);
 
             // Insert the note
             DNote note = text.InsertNote(type, G.App.MainWindow.Selection.SelectionString);
@@ -128,7 +125,7 @@ namespace OurWord.Edit
                 G.App.ResetWindowContents();
 
                 // Return the Main Window to where it was
-                bookmark.RestoreCursorPosition();
+                bookmark.RestoreWindowSelectionAndScrollPosition();
 
                 // Select the new note and bring the focus to it
                 WndNotes.SelectEndOfNote(note);
@@ -187,6 +184,12 @@ namespace OurWord.Edit
             G.App.ResetWindowContents();
         }
         #endregion
+        #region Cmd: cmdLoad - Localize the toolstrip
+        private void cmdLoad(object sender, EventArgs e)
+        {
+            LocDB.Localize(m_toolstripNotes);
+        }
+        #endregion
 
         // Visibility and Enabling -----------------------------------------------------------
         #region Method: void SetControlsVisibility()
@@ -230,6 +233,7 @@ namespace OurWord.Edit
             m_btnDeleteNote.Enabled = canDeleteNote;
         }
         #endregion
+
     }
 
     public class NotesWnd : OWWindow

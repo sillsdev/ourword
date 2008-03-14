@@ -171,7 +171,7 @@ namespace OurWord.Dialogs
             this.m_lblActions.Name = "m_lblActions";
             this.m_lblActions.Size = new System.Drawing.Size(445, 23);
             this.m_lblActions.TabIndex = 17;
-            this.m_lblActions.Text = "Available Actions:";
+            this.m_lblActions.Text = "Available UndoStack:";
             this.m_lblActions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // m_btnRemove
@@ -180,7 +180,7 @@ namespace OurWord.Dialogs
             this.m_btnRemove.Name = "m_btnRemove";
             this.m_btnRemove.Size = new System.Drawing.Size(75, 23);
             this.m_btnRemove.TabIndex = 4;
-            this.m_btnRemove.Text = "ctrlRemove...";
+            this.m_btnRemove.Text = "Remove...";
             this.m_btnRemove.Click += new System.EventHandler(this.cmdRemove);
             // 
             // m_btnCreate
@@ -227,7 +227,7 @@ namespace OurWord.Dialogs
             this.m_lblRemove.Name = "m_lblRemove";
             this.m_lblRemove.Size = new System.Drawing.Size(354, 42);
             this.m_lblRemove.TabIndex = 22;
-            this.m_lblRemove.Text = "ctrlRemove the selected translation from the list above. This does not remove the set" +
+            this.m_lblRemove.Text = "Remove the selected translation from the list above. This does not remove the set" +
                 "tings file from the disk; it only removes it from this project.";
             // 
             // Page_OtherTranslations
@@ -416,7 +416,7 @@ namespace OurWord.Dialogs
 			if (!Messages.VerifyRemoveTranslation() )
 				return;
 
-			// ctrlRemove it from the Project
+			// Remove it from the Project
             ParentDlg.HarvestChangesFromCurrentSheet();
             G.Project.OtherTranslations.Remove(SelectedTranslation);
 

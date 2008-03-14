@@ -18,6 +18,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWTools", "JWTools\JWTools.
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OurWordTests", "OurWordTests\OurWordTests.csproj", "{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +49,11 @@ Global
 		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Debug2|Any CPU.Build.0 = Debug2|Any CPU
 		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A70FCB84-8A6D-471E-9582-1E2D24415E31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}.Debug2|Any CPU.ActiveCfg = Debug|Any CPU
+		{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}.Debug2|Any CPU.Build.0 = Debug|Any CPU
+		{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

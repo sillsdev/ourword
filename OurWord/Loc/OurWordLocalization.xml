@@ -1,5 +1,5 @@
 ﻿<LocDB>
-  <Group ID="m_ToolStrip" Title="001 - m_ToolStrip" Translator="false">
+  <Group ID="m_ToolStrip" Title="001 - m_ToolStrip" Translator="true">
     <Item ID="m_btnExit" Tip="true">
       <English>Exit</English>
       <Tip>Save any changes and then exit OurWord.</Tip>
@@ -193,6 +193,63 @@
     <Item ID="m_menuAbout" Tip="true">
       <English>&amp;About Our Word</English>
       <Tip>See information about this version of Our Word.</Tip>
+    </Item>
+    <Item ID="m_menuUndo">
+      <English>&amp;Undo</English>
+      <Key>Ctrl+Z</Key>
+    </Item>
+    <Item ID="m_menuRedo">
+      <English>&amp;Redo</English>
+      <Key>Ctrl+Y</Key>
+    </Item>
+    <Item ID="m_menuPreviousSection">
+      <English>Previous Section</English>
+      <Key>Ctrl+P</Key>
+    </Item>
+    <Item ID="m_menuNextSection">
+      <English>Next Section</English>
+      <Key>Ctrl+N</Key>
+    </Item>
+    <Item ID="m_menuToggleItalics">
+      <English>Toggle Italics</English>
+      <Key>Ctrl+I</Key>
+    </Item>
+  </Group>
+  <Group ID="m_toolstripNotes" Title="002 - m_toolstripNotes" Translator="true">
+    <Item ID="m_btnInsert" Tip="true">
+      <English>Insert</English>
+      <Tip>Insert</Tip>
+    </Item>
+    <Item ID="m_menuInsertGeneral">
+      <English>Insert General &amp;Note</English>
+    </Item>
+    <Item ID="m_menuInsertToDo">
+      <English>Insert &amp;To Do Note</English>
+    </Item>
+    <Item ID="m_menuInsertAskUNS">
+      <English>Insert &amp;Ask UNS Note</English>
+    </Item>
+    <Item ID="m_menuInsertDefinition">
+      <English>Insert &amp;Definition Note</English>
+    </Item>
+    <Item ID="m_menuInsertOldVersion">
+      <English>Insert Old &amp;Version Note</English>
+    </Item>
+    <Item ID="m_menuInsertReason">
+      <English>Insert &amp;Reason Note</English>
+    </Item>
+    <Item ID="m_menuInsertFrontIssue">
+      <English>Insert &amp;Front Issue Note</English>
+    </Item>
+    <Item ID="m_menuInsertHintForDaughter">
+      <English>Insert &amp;Hint for Daughter Note</English>
+    </Item>
+    <Item ID="m_menuInsertBT">
+      <English>Insert &amp;Back Translation Note</English>
+    </Item>
+    <Item ID="m_btnDeleteNote" Tip="true">
+      <English>Delete...</English>
+      <Tip>Delete...</Tip>
     </Item>
   </Group>
   <Group ID="Strings" Title="003 - Strings" Translator="true">
@@ -482,6 +539,62 @@
       </Item>
       <Item ID="m_lblVersion">
         <English>Version {0}</English>
+      </Item>
+    </Group>
+    <Group ID="UndoRedo" Title="UndoRedo" Translator="false">
+      <Item ID="UndoTyping_what">
+        <English>&amp;Undo Typing '{0}'</English>
+      </Item>
+      <Item ID="RedoTyping_what">
+        <English>&amp;Redo Typing '{0}'</English>
+      </Item>
+      <Item ID="UndoBackspace_what">
+        <English>&amp;Undo Backspace '{0}'</English>
+      </Item>
+      <Item ID="RedoBackspace_what">
+        <English>&amp;Redo Backspace '{0}'</English>
+      </Item>
+      <Item ID="UndoDelete_what">
+        <English>&amp;Undo Delete '{0}'</English>
+      </Item>
+      <Item ID="RedoDelete_what">
+        <English>&amp;Redo Delete '{0}'</English>
+      </Item>
+      <Item ID="UndoCut_what">
+        <English>&amp;Undo Cut '{0}'</English>
+      </Item>
+      <Item ID="RedoCut_what">
+        <English>&amp;Redo Cut '{0}'</English>
+      </Item>
+      <Item ID="UndoCopy_what">
+        <English>&amp;Undo Copy '{0}'</English>
+      </Item>
+      <Item ID="RedoCopy_what">
+        <English>&amp;Redo Copy '{0}'</English>
+      </Item>
+      <Item ID="UndoPaste_what">
+        <English>&amp;Undo Paste '{0}'</English>
+      </Item>
+      <Item ID="RedoPaste_what">
+        <English>&amp;Redo Paste '{0}'</English>
+      </Item>
+      <Item ID="UndoSplitParagraph">
+        <English>&amp;Undo Split Paragraph</English>
+      </Item>
+      <Item ID="RedoSplitParagraph">
+        <English>&amp;Redo Split Paragraph</English>
+      </Item>
+      <Item ID="UndoJoinParagraph">
+        <English>&amp;Undo Join Paragraph</English>
+      </Item>
+      <Item ID="RedoJoinParagraph">
+        <English>&amp;Redo Join Paragraph</English>
+      </Item>
+      <Item ID="UndoChangeParagraphStyle_what">
+        <English>&amp;Undo Change Paragraph Style '{0}'</English>
+      </Item>
+      <Item ID="RedoChangeParagraphStyle_what">
+        <English>&amp;Redo Change Paragraph Style '{0}'</English>
       </Item>
     </Group>
   </Group>

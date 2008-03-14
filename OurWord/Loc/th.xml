@@ -140,6 +140,38 @@
       <Alt ID="th" Value="เกี่ยวกับคำของเรา"></Alt>
     </Item>
   </Group>
+  <Group ID="m_toolstripNotes">
+    <Item ID="m_menuInsertGeneral">
+      <Alt ID="th" Value="ใส่หมายเหตุทั่วไป"></Alt>
+    </Item>
+    <Item ID="m_menuInsertToDo">
+      <Alt ID="th" Value="ใส่และหมายเหตุที่จะทำ"></Alt>
+    </Item>
+    <Item ID="m_menuInsertOldVersion">
+      <Alt ID="th" Value="ใส่หมายเหตุเก่า"></Alt>
+    </Item>
+    <Item ID="m_menuInsertReason">
+      <Alt ID="th" Value="ใส่และหมายเหตุของเหตุผล"></Alt>
+    </Item>
+    <Item ID="m_menuInsertFrontIssue">
+      <Alt ID="th" Value="ใส่และหมายเหตุประเด็นด้านหน้า"></Alt>
+    </Item>
+    <Item ID="m_menuInsertDefinition">
+      <Alt ID="th" Value="ใส่นิยามของหมายเหตุ"></Alt>
+    </Item>
+    <Item ID="m_menuInsertHintForDaughter">
+      <Alt ID="th" Value="ใส่และคำแนะนำหมายเหตุลูกสาว"></Alt>
+    </Item>
+    <Item ID="m_menuInsertBT">
+      <Alt ID="th" Value="ใส่และแปลหมายเหตุย้อนกลับ"></Alt>
+    </Item>
+    <Item ID="m_menuInsertAskUNS">
+      <Alt ID="th" Value="ใส่และขอหมายเหตุยูเอ็นเอส"></Alt>
+    </Item>
+    <Item ID="m_btnDeleteNote">
+      <Alt ID="th" Value="ลบหมายเหตุ"></Alt>
+    </Item>
+  </Group>  
   <Group ID="Strings">
     <Item ID="kYes">
     </Item>

@@ -20,10 +20,9 @@ using JWdb;
 using OurWord.Dialogs;
 using OurWord.View;
 using OurWord.Edit;
-using NUnit.Framework;
 #endregion
 #region TODO
-/* - ctrlRemove hard-coded standard format; set up in a table somewhere.
+/* - Remove hard-coded standard format; set up in a table somewhere.
  * - Handle case where a field marker isn't known about here.
  */
 #endregion
@@ -2063,29 +2062,77 @@ namespace OurWord.DataModel
 			ScriptureDB m_db = null;
 			#endregion
 
-			// Progress Indiccator -----------------------------------------------------------
+			// Progress Indiccator (includes threaded splash screen)-------------------------
 			#region Method: void StartProgress(string sAction)
 			private void StartProgress(string sAction, int nCount)
 			{
 				if (null == OurWordMain.App)
 					return;
 
-				string sMessage = sAction + " " + Book.Translation.DisplayName + 
-					":" + Book.DisplayName + "...";
+                string sWhatIsLoading = Book.Translation.DisplayName + ": " + Book.DisplayName;
 
+                // Standard Progress Indicator
+                string sMessage = sAction + " " + sWhatIsLoading + "...";
 				G.ProgressStart(sMessage, nCount);
+
+                // Splash Screen - cross-thread invoke
+                if (SplashScreen.IsShowing)
+                {
+                    if (SplashScreen.Wnd.InvokeRequired)
+                    {
+                        SplashScreen.SetStatus_Callback d = new
+                            SplashScreen.SetStatus_Callback(SplashScreen.Wnd.SetStatus);
+                        G.App.Invoke(d, new object[] { sWhatIsLoading, DB.RecordCount });
+                    }
+                    else
+                    {
+                        SplashScreen.Wnd.SetStatus(sWhatIsLoading, DB.RecordCount);
+                    }
+                }
 			}
 			#endregion
 			#region Method: void StepProgress()
 			void StepProgress()
 			{
-				G.ProgressStep();
+                // Standard Progress Indicator
+                G.ProgressStep();
+
+                // Splash Screen - cross-thread invoke
+                if (SplashScreen.IsShowing)
+                {
+                    if (SplashScreen.Wnd.InvokeRequired)
+                    {
+                        SplashScreen.IncrementProgress_Callback d = new
+                            SplashScreen.IncrementProgress_Callback(SplashScreen.Wnd.IncrementProgress);
+                        G.App.Invoke(d, new object[] { });
+                    }
+                    else
+                    {
+                        SplashScreen.Wnd.IncrementProgress();
+                    }
+                }
 			}
 			#endregion
 			#region Method: void EndProgress()
 			private void EndProgress()
 			{
-				G.ProgressEnd();
+                // Standard Progress Indicator
+                G.ProgressEnd();
+
+                // Splash Screen - cross-thread invoke
+                if (SplashScreen.IsShowing)
+                {
+                    if (SplashScreen.Wnd.InvokeRequired)
+                    {
+                        SplashScreen.ResetProgress_Callback d = new
+                            SplashScreen.ResetProgress_Callback(SplashScreen.Wnd.ResetProgress);
+                        G.App.Invoke(d, new object[] { });
+                    }
+                    else
+                    {
+                        SplashScreen.Wnd.ResetProgress();
+                    }
+                }
 			}
 			#endregion
 
@@ -2242,8 +2289,6 @@ namespace OurWord.DataModel
 
                 // Setuo Progress indicator(s)
                 StartProgress("Reading", DB.RecordCount);
-                SplashScreen.SetProgressBound(DB.RecordCount);
-                SplashScreen.SetStatus(Book.Translation.DisplayName + ": " + Book.DisplayName);
 
 				// Look to read the first record, which is general information about the entire book.
 				DB.AdvanceToFirstRecord();
@@ -2283,8 +2328,7 @@ namespace OurWord.DataModel
 					section.ReadStandardFormat(DB);
 
                     StepProgress();
-					SplashScreen.IncrementProgress();
-				}
+                }
 
 				// Each paragraph needs to know what verses are in it
 				int nChapter = 0;
@@ -2416,8 +2460,20 @@ namespace OurWord.DataModel
 			// Done with progress dialog
         done:
             G.ProgressEnd();
-    		SplashScreen.ResetProgress();
-			return bResult;
+            if (SplashScreen.IsShowing)
+            {
+                if (SplashScreen.Wnd.InvokeRequired)
+                {
+                    SplashScreen.ResetProgress_Callback d = new
+                        SplashScreen.ResetProgress_Callback(SplashScreen.Wnd.ResetProgress);
+                    G.App.Invoke(d, new object[] { });
+                }
+                else
+                {
+                    SplashScreen.Wnd.ResetProgress();
+                }
+            }
+            return bResult;
 		}
 		#endregion
         #region Method: override void OnWrite()
@@ -2713,20 +2769,8 @@ namespace OurWord.DataModel
 		#endregion
 	}
 
+    // TODO: Move to NUnit tests
 	#region TEST
-    // NUnit Tests
-    [TestFixture] public class Test_DBook
-    {
-        #region TEST: BookSortKeys
-        [Test] public void BookSortKeys()
-            // Make certain we have a two-digit sort key, so that, e.g.,
-            // Leviticus follows Exodus rather than Proverbs.
-        {
-            DBook book = new DBook("LEV", "");
-            Assert.AreEqual("02", book.SortKey);
-        }
-        #endregion
-    }
 
     // Built In Tests
 	public class Test_DBookProperties : Test

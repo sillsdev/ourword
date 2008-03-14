@@ -1443,10 +1443,20 @@ namespace JWdb
 		}
 		#endregion
 
-		// AutoReplace -----------------------------------------------------------------------
+        // AutoReplace -----------------------------------------------------------------------
+        #region Attr{g}: TreeRoot AutoReplace
+        public TreeRoot AutoReplace
+        {
+            get
+            {
+                Debug.Assert(null != m_AutoReplace);
+                return m_AutoReplace;
+            }
+        }
 		TreeRoot m_AutoReplace = null;
-		#region Method: void BuildAutoReplace()
-		public void BuildAutoReplace()
+        #endregion
+        #region Method: void BuildAutoReplace()
+        public void BuildAutoReplace()
 		{
 			m_AutoReplace = new TreeRoot();
 			for(int i=0; i<AutoReplaceSource.Length; i++)

@@ -22,7 +22,6 @@ using OurWord.DataModel;
 using OurWord.View;
 using OurWord.Edit;
 using Palaso.Services.Dictionary;
-using NUnit.Framework;
 #endregion
 
 namespace OurWord.Edit

@@ -134,6 +134,37 @@
       <Alt ID="sp" Value="&amp;Acerca de Palabra Nuestra..."></Alt>
     </Item>
   </Group>
+  <Group ID="m_toolstripNotes">
+    <Item ID="m_menuInsertGeneral">
+      <Alt ID="sp" Value="Insertar Nota General"></Alt>
+    </Item>
+    <Item ID="m_menuInsertToDo">
+      <Alt ID="sp" Value="Insertar Nota A &amp;Hacer"></Alt>
+    </Item>
+    <Item ID="m_menuInsertOldVersion">
+      <Alt ID="sp" Value="Insertar Nota Rendición &amp;Alternativa"></Alt>
+    </Item>
+    <Item ID="m_menuInsertReason">
+      <Alt ID="sp" Value="Insertar Nota &amp;Razonamiento"></Alt>
+    </Item>
+    <Item ID="m_menuInsertFrontIssue">
+      <Alt ID="sp" Value="Inserta Nota Editar &amp;Fuente"></Alt>
+    </Item>
+    <Item ID="m_menuInsertDefinition">
+      <Alt ID="sp" Value="Insertar Nota &amp;Definición"></Alt>
+    </Item>
+    <Item ID="m_menuInsertHintForDaughter">
+      <Alt ID="sp" Value="Insertar Nota &amp;Sugerencias Borrador"></Alt>
+    </Item>
+    <Item ID="m_menuInsertBT">
+      <Alt ID="sp" Value="Insertar Nota Traducción &amp;Inversa"></Alt>
+    </Item>
+    <Item ID="m_menuInsertAskUNS">
+    </Item>
+    <Item ID="m_btnDeleteNote">
+      <Alt ID="sp" Value="&amp;Cortar Nota..."></Alt>
+    </Item>
+  </Group>  
   <Group ID="Strings">
     <Item ID="kYes">
     </Item>

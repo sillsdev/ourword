@@ -21,7 +21,6 @@ using JWTools;
 using JWdb;
 using OurWord.DataModel;
 using Palaso.UI.WindowsForms.Keyboarding;
-using NUnit.Framework;
 #endregion
 
 namespace OurWord.Edit
@@ -2014,6 +2013,8 @@ namespace OurWord.Edit
                 #region Constructor(iBlock, iChar)
                 public SelPoint(int iBlock, int iChar)
                 {
+                    Debug.Assert(iChar >= 0);
+
                     m_iBlock = iBlock;
                     m_iChar = iChar;
                 }
@@ -2416,6 +2417,15 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+            #region VAttr{g}: int DBT_iCharCount
+            public int DBT_iCharCount
+            {
+                get
+                {
+                    return DBT_iCharLast - DBT_iCharFirst;
+                }
+            }
+            #endregion
             #region VAttr{g}: int DBT_BlockCount
             public int DBT_BlockCount
             {
@@ -2430,6 +2440,8 @@ namespace OurWord.Edit
                 // Create a SelectionPoint given the DBasicText and a position in it. We assume
                 // that the EWords are already in the paragraph.
             {
+                Debug.Assert(iPos >= 0);
+
                 // We''ll keep track of the EWord we're working on here
                 int iBlock = 0;
                 OWPara.EWord word = null;
@@ -2762,6 +2774,8 @@ namespace OurWord.Edit
 
                 if (null != m_Selection)
                     Secondary_OnSelectionChanged( m_Selection.DBT );
+
+                G.App.EnableItalicsButton();
             }
         }
         Sel m_Selection = null;
@@ -2974,110 +2988,10 @@ namespace OurWord.Edit
             base.OnKeyDown(e);
         }
         #endregion
-        #region Cmd: OnKeyPress - most data entry
-        protected override void OnKeyPress(KeyPressEventArgs e)
-        {
-
-            if (!Char.IsControl(e.KeyChar))
-            {
-                if (!AutoReplace(e.KeyChar))
-                    cmdInsertChar(e.KeyChar);
-                e.Handled = true;
-            }
-
-            base.OnKeyPress(e);
-        }
-        #endregion
 
         // Text Changes ----------------------------------------------------------------------
-        #region Cmd: cmdInsertChar(char)
-        void cmdInsertChar(char ch)
-        {
-            if (HandleLockedFromEditing())
-                return;
-
-            Selection.Paragraph.Insert(ch.ToString());
-        }
-        #endregion
-        #region Cmd: cmdDelete
-        void cmdDelete()
-        {
-            if (HandleLockedFromEditing())
-                return;
-
-            Selection.Paragraph.Delete(OWPara.DeleteMode.kDelete);
-        }
-        #endregion
-        #region Cmd: cmdBackspace
-        void cmdBackspace()
-        {
-            if (HandleLockedFromEditing())
-                return;
-
-            Selection.Paragraph.Delete(OWPara.DeleteMode.kBackSpace);
-        }
-        #endregion
-        #region Cmd: cmdCut
-        public void cmdCut()
-        {
-            if (HandleLockedFromEditing())
-                return;
-
-            Selection.Paragraph.Delete(OWPara.DeleteMode.kCut);
-        }
-        #endregion
-        #region Cmd: cmdCopy
-        public void cmdCopy()
-        {
-            Selection.Paragraph.Delete(OWPara.DeleteMode.kCopy);
-        }
-        #endregion
-        #region Cmd: cmdPaste
-        public void cmdPaste()
-        {
-            if (HandleLockedFromEditing())
-                return;
-
-            if (!Clipboard.ContainsData(DataFormats.UnicodeText))
-                return;
-
-            string sClipboard = Clipboard.GetData(DataFormats.UnicodeText) as string;
-            if (null == sClipboard || sClipboard.Length == 0)
-                return;
-
-            // Don't insert if too big; we figure the user has the wrong stuff on the clipboard!
-            if (sClipboard.Length > 500)
-                return;
-
-            // ctrlRemove any characters we don't like
-            string sInsert = "";
-            char chPrev = '\0';
-            foreach (char ch in sClipboard)
-            {
-                // Avoid inserting, e.g., line feeds, carriage returns
-                if (char.IsControl(ch))
-                    continue;
-
-                // Try to avoid inserting multiple white spaces
-                if (char.IsWhiteSpace(ch))
-                {
-                    if (char.IsWhiteSpace(chPrev))
-                        continue;
-                }
-
-                // If we're here, we've approved the character. 
-                sInsert += ch;
-
-                // Want to rememebr the previous one for the Whitespace test
-                chPrev = ch;
-            }
-
-            // Do the insertion
-            Selection.Paragraph.Insert(sInsert);
-        }
-        #endregion
         #region Method: bool HandleLockedFromEditing()
-        virtual protected bool HandleLockedFromEditing()
+        virtual public bool HandleLockedFromEditing()
         {
             // If not locked from editing, nothing further is needed
             if (null == Selection)
@@ -3110,218 +3024,6 @@ namespace OurWord.Edit
             return true;
         }
         #endregion
-        #region Method: bool AutoReplace(char chKey)
-        bool AutoReplace(char chKey)
-        {
-            // Check for conditions where we do nothing
-            if (null == Selection)
-                return false;
-            if (HandleLockedFromEditing())
-                return false;
-
-            // Get the Writing System that has the autoreplace strings
-            JWritingSystem jws = Selection.Paragraph.WritingSystem;
-
-            // An Insertion Icon is simple, we just check for the chKey, and insert it
-            // if a match
-            if (Selection.IsInsertionIcon)
-            {
-                int c = 0;
-                string sInsert = jws.SearchAutoReplace(chKey.ToString(), ref c);
-                if (null == sInsert || sInsert.Length == 0)
-                    return false;
-                Selection.Paragraph.Insert(sInsert);
-                return true;
-            }
-
-            // We are considering a content selection to be meaningless; thus from
-            // here we are only interested in an Insertion Point.
-            if (!Selection.IsInsertionPoint)
-                return false;
-
-            // Retrieve the string in this DBasicText up to the selection point
-            string sDBT = (Selection.Paragraph.DisplayBT) ?
-                Selection.DBT.ProseBTAsString :
-                Selection.DBT.ContentsAsString;
-            // Begin temporary crash code----The crash we've been struggling with-----
-            if (Selection.DBT_iCharFirst > sDBT.Length)
-            {
-                string sPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) +
-                    Path.DirectorySeparatorChar + "OurWordErrorLog.txt";
-                StreamWriter w = new StreamWriter(sPath, false);
-                w.WriteLine("The Dreaded Edit Problem....");
-                w.WriteLine("Version = " + G.Version);
-                w.WriteLine(DateTime.Today.ToShortDateString());
-                w.WriteLine("");
-                w.WriteLine("In OWWindow.AutoReplace(chKey = \"" + chKey.ToString() + "\") ...");
-                w.WriteLine("- sDBT = \"" + sDBT + "\"");
-                w.WriteLine("- sDBT.Length = \"" + sDBT.Length.ToString() + "\"");
-                w.WriteLine("- DBT_iCharFirst = \"" + Selection.DBT_iCharFirst.ToString() + "\"");
-                w.WriteLine("");
-                w.WriteLine("Selection Info...");
-                w.WriteLine("- iRow = " + Selection.iRow.ToString());
-                w.WriteLine("- iPile = " + Selection.iPile.ToString());
-                w.WriteLine("- iPara = " + Selection.iParagraph.ToString());
-                w.WriteLine("- SelectionString = \"" + Selection.SelectionString + "\" (should be empty)");
-                w.WriteLine("- Anchor.iBlock = " + Selection.Anchor.iBlock.ToString());
-                w.WriteLine("- Anchor.iChar = " + Selection.Anchor.iChar.ToString());
-                w.WriteLine("- Anchor.EWord = \"" + Selection.Anchor.Word.Text + "\"");
-                w.WriteLine("");
-                w.WriteLine("Other Info...");
-                w.WriteLine("- Project = " + G.Project.DisplayName);
-                w.WriteLine("- Translation = " + G.TTranslation.DisplayName);
-                w.WriteLine("- Book = " + G.TBook.DisplayName);
-                w.WriteLine("- SectionNo = " + G.Project.Nav.SectionNo.ToString());
-                w.Close();
-                MessageBox.Show("OurWord is about to crash due to that pesky editing problem.\n\n" +
-                    "The file OurWordErrorLog.txt has been created on your desktop. \n" +
-                    "Please email it to John_Wimbish@tsco.org. \n\n" +
-                    "A screen shot would also be very helpful. After closing this error\n" +
-                    "message, press Alt-PrtScn, then paste the result into your email.\n\n" +
-                    "Finally, please email the books:\n" + 
-                    "  - " + G.TTranslation.DisplayName + ": " + G.TBook.DisplayName + "\n" +
-                    "  - " + G.FTranslation.DisplayName + ": " + G.FBook.DisplayName + "\n\n" +
-                    "Sorry for the inconvenience;...and thanks for your help, -John",
-                    "OurWord", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            // End temporary crash code-------------------------------------------------
-            string sSource = sDBT.Substring(0, Selection.DBT_iCharFirst);
-
-            // Append what was just typied
-            sSource += chKey;
-
-            // Check for a match
-            int cSelectionCount = 0;
-            string sReplace = jws.SearchAutoReplace(sSource, ref cSelectionCount);
-            if (null == sReplace || sReplace.Length == 0)
-                return false;
-            Debug.Assert(cSelectionCount > 0);
-
-            // The number of chars to selection is 1 less than what SearchAutoReplace
-            // returns, because the return value included the key that was just typed.
-            cSelectionCount--;
-
-            // Make a selection so that we can delete the appropriate number of characters
-            if (cSelectionCount > 0)
-            {
-                int i2 = Selection.DBT_iCharFirst;
-                int i1 = i2 - cSelectionCount;
-                Sel sel = Sel.CreateSel(Selection.Paragraph, Selection.DBT, i1, i2);
-                if (null == sel)
-                    return false;
-                Selection = sel;
-            }
-
-            // Do the insertion
-            Selection.Paragraph.Insert(sReplace);
-
-            // Tell the caller that no further processing should be done
-            return true;
-        }
-        #endregion
-        #region Cmd: cmdEnter - react to the Enter key, either split a paragraph, or move to the next paragraph
-        void cmdEnter()
-        {
-            if (null == Selection)
-                return;
-
-            // If paragraph restructuring is turned off, then we just move to the next paragraph
-            if (!Selection.Paragraph.CanRestructureParagraphs)
-            {
-                cmdMoveNextParagraph();
-                return;
-            }
-
-            // Otherwise, we want to make a paragraph break
-            cmdSplitParagraph();
-        }
-        #endregion
-        #region Cmd: cmdSplitParagraph
-        void cmdSplitParagraph()
-        {
-            if (HandleLockedFromEditing())
-                return;
-
-            // If we have a selection, we don't want to erase it. While deleting it is typical 
-            // Microsoft Word behavior, I fear it would be unsettling to the MTT. So instead,
-            // we move to the end of the selection.
-            if (Selection.IsContentSelection)
-                Selection = new Sel(Selection.Paragraph, Selection.Last);
-
-            // Get the position where the split will happen
-            DBasicText text = Selection.DBT;
-            int iPos = Selection.DBT_iChar(Selection.Anchor);
-
-            // Retrieve the underlying paragraph
-            DParagraph para = text.Paragraph;
-            if (null == para)
-                return;
-
-            // Split the underlying paragraph
-            DParagraph paraNew = para.Split(text, iPos);
-
-            // Remember the cursor position so that we can restore back to it after the re-LoadData.
-            PlaceHolder bookmark = new PlaceHolder(this, paraNew, 0);
-
-            // Reload the window's data. This is time-consuming, but it is the only way to make paragraphs line
-            // correctly side-by-side.
-            LoadData();
-
-            // Restore the selection insertion point
-            bookmark.RestoreCursorPosition();
-        }
-        #endregion
-        #region Cmd: cmdChangeParagraphTo(sStyleAbbrev)
-        public void cmdChangeParagraphTo(string sStyleAbbrev)
-        {
-            // Retrieve the underlying paragraph
-            DParagraph paragraph = Selection.Paragraph.DataSource as DParagraph;
-            if (null == paragraph)
-                return;
-
-            // Nothing to do if this is already the requested style
-            if (paragraph.StyleAbbrev == sStyleAbbrev)
-                return;
-
-            // If we're requesting a Section Title.... 
-            if (sStyleAbbrev == DStyleSheet.c_StyleSectionTitle)
-            {
-                // ...there must not already be a section title
-                if (paragraph.Section.CountParagraphsWithStyle(DStyleSheet.c_StyleSectionTitle) > 0)
-                {
-                    LocDB.Message("msgSectionTitleAlreadyExists", 
-                        "You cannot change this paragraph to a Section Title, because a Section Title " +
-                            "already exists in this section.", 
-                        null, 
-                        LocDB.MessageTypes.Info);
-                    return;
-                }
-                // ...there must not be any Verses, Chapters or Footnotes in it
-                if (paragraph.StructureCodes.Length > 0)
-                {
-                    LocDB.Message("msgSectionTitleCannotHaveVerses",
-                        "You cannot change this paragraph to a Section Title, because a Section Title " +
-                            "cannot have verses, chapters or footnotes in it.",
-                        null,
-                        LocDB.MessageTypes.Info);
-                    return;
-                }
-            }
-
-            // Remember the cursor position so that we can restore back to it after the re-LoadData.
-            PlaceHolder bookmark = new PlaceHolder(this, paragraph, 0);
-
-            // Change the underlying paragraph's style
-            paragraph.StyleAbbrev = sStyleAbbrev;
-
-            // Re-Load the window's data. This is time-consuming, but it is the only way to make paragraphs line
-            // correctly side-by-side.
-            LoadData();
-
-            // Restore the selection insertion point
-            bookmark.RestoreCursorPosition();
-        }
-        #endregion
         #region Method: string GetCurrentParagraphStyle()
         public string GetCurrentParagraphStyle()
         {
@@ -3339,6 +3041,122 @@ namespace OurWord.Edit
                 return note.Style.Abbrev;
 
             return null;
+        }
+        #endregion
+        #region Cmd: cmdEnter - react to the Enter key, either split a paragraph, or move to the next paragraph
+        void cmdEnter()
+        {
+            if (null == Selection)
+                return;
+
+            // If paragraph restructuring is turned off, then we just move to the next paragraph
+            if (!Selection.Paragraph.CanRestructureParagraphs)
+            {
+                cmdMoveNextParagraph();
+                return;
+            }
+
+            // Otherwise, we want to make a paragraph break (split the paragraph)
+            cmdSplitParagraph();
+        }
+        #endregion
+
+        // Undo- / Redo-able actions ---------------------------------------------------------
+        // Paragraph Manipulations
+        #region URCmd: cmdSplitParagraph
+        public void cmdSplitParagraph()
+        {
+            (new SplitParagraphAction(this)).Do();
+        }
+        #endregion
+        #region URCmd: cmdChangeParagraphTo(sStyleAbbrev)
+        public void cmdChangeParagraphTo(string sStyleAbbrev)
+        {
+            (new ChangeParagraphStyleAction(this, sStyleAbbrev)).Do();
+        }
+        #endregion
+
+        // Deletions
+        #region URCmd: cmdDelete
+        public void cmdDelete()
+        {
+            if (HandleLockedFromEditing())
+                return;
+
+            if (Selection.Paragraph.JoinParagraph(OWPara.DeleteMode.kDelete))
+                return;
+
+            (new DeleteAction(this, DeleteAction.DeleteMode.kDelete)).Do();
+        }
+        #endregion
+        #region URCmd: cmdBackspace
+        public void cmdBackspace()
+        {
+            if (HandleLockedFromEditing())
+                return;
+
+            if (Selection.Paragraph.JoinParagraph(OWPara.DeleteMode.kBackSpace))
+                return;
+
+            (new DeleteAction(this, DeleteAction.DeleteMode.kBackSpace)).Do();
+        }
+        #endregion
+        #region URCmd: cmdCut
+        public void cmdCut()
+        {
+            if (HandleLockedFromEditing())
+                return;
+
+            (new DeleteAction(this, DeleteAction.DeleteMode.kCut)).Do();
+        }
+        #endregion
+        #region URCmd: cmdCopy
+        public void cmdCopy()
+        {
+            (new DeleteAction(this, DeleteAction.DeleteMode.kCopy)).Do();
+        }
+        #endregion
+
+        // Insertions
+        #region URCmd: OnKeyPress - most data entry
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+
+            if (!Char.IsControl(e.KeyChar))
+            {
+                (new TypingAction(this, e.KeyChar)).Do();
+                e.Handled = true;
+            }
+
+            base.OnKeyPress(e);
+        }
+        #endregion
+        #region URCmd: cmdPaste
+        public void cmdPaste()
+        {
+            (new PasteAction(this)).Do();
+        }
+        #endregion
+
+        // Other Edits
+        #region URCmd: cmdToggleItalics
+        public void cmdToggleItalics()
+        {
+            if (canItalic)
+                (new ItalicsAction(this)).Do();
+        }
+        #endregion
+        #region Can: canItalic
+        public bool canItalic
+        {
+            get
+            {
+                OWWindow.Sel selection = Selection;
+                if (null == selection)
+                    return false;
+
+                return selection.Paragraph.CanItalic;
+            }
         }
         #endregion
 
@@ -3524,7 +3342,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Cmd: cmdMoveCharLeft - move cursor one char to the left
-        void cmdMoveCharLeft()
+        public void cmdMoveCharLeft()
         {
             // If there is no Selection object, then we can't do anything (we are in a
             // wierd state.
@@ -3563,7 +3381,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Cmd: cmdMoveCharRight - move cursor one char to the right
-        void cmdMoveCharRight()
+        public void cmdMoveCharRight()
         {
             // If there is no Selection object, then we can't' do anything (we are in a
             // wierd state.
@@ -4062,111 +3880,4 @@ namespace OurWord.Edit
         #endregion
     }
 
-    #region CLASS: PlaceHolder - save/restore a cursor position in the window
-    public class PlaceHolder
-    {
-        // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
-        #region Attr{g}: JObject DataSource
-        JObject DataSource
-        {
-            get
-            {
-                Debug.Assert(null != m_DataSource);
-                return m_DataSource;
-            }
-        }
-        JObject m_DataSource;
-        #endregion
-        #region Attr{g}: float ScrollBarPosition
-        float ScrollBarPosition
-        {
-            get
-            {
-                return m_fScrollBarPosition;
-            }
-        }
-        float m_fScrollBarPosition;
-        #endregion
-        #region Attr{g}: int PositionInParagraph
-        int PositionInParagraph
-        {
-            get
-            {
-                Debug.Assert(-1 != m_iPositionInParagraph);
-                return m_iPositionInParagraph;
-            }
-        }
-        int m_iPositionInParagraph;
-        #endregion
-
-        // Public Interface ------------------------------------------------------------------
-        #region Constructor(OWWindow window, DParagraph paragraph, int iPositionInParagraph)
-        public PlaceHolder(OWWindow window, DParagraph paragraph, int iPositionInParagraph)
-        {
-            // Store the window
-            m_Window = window;
-
-            // Store the underlying paragraph
-            Debug.Assert(null != paragraph);
-            m_DataSource = paragraph;
-
-            // Store the position in the underlying paragraph
-            m_iPositionInParagraph = iPositionInParagraph;
-
-            // Store the scroll bar position
-            m_fScrollBarPosition = Window.ScrollBarPosition;
-        }
-        #endregion
-        #region Constructor(OWPara p, int iPositionInParagraph)
-        public PlaceHolder(OWPara p, int iPositionInParagraph)
-        {
-            // Store the window
-            m_Window = p.Window;
-
-            // Store the underlying paragraph
-            Debug.Assert(null != p.DataSource);
-            m_DataSource = p.DataSource;
-
-            // Store the position in the underlying paragraph
-            m_iPositionInParagraph = iPositionInParagraph;
-
-            // Store the scroll bar position
-            m_fScrollBarPosition = m_Window.ScrollBarPosition;
-        }
-        #endregion
-        #region Method: void RestoreCursorPosition()
-        public bool RestoreCursorPosition()
-        {
-            // Locate the OWParagraph that has the same data source
-            foreach (OWWindow.Row row in Window.Rows)
-            {
-                foreach (OWWindow.Row.Pile pile in row.Piles)
-                {
-                    foreach (OWPara owp in pile.Paragraphs)
-                    {
-                        if (owp.DataSource == DataSource)
-                        {
-                            owp.SelectEditablePositionAt(PositionInParagraph);
-                            Window.ScrollBarPosition = ScrollBarPosition;
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-        #endregion
-    }
-    #endregion
 }

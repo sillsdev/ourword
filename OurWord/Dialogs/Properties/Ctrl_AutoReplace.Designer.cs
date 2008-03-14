@@ -118,7 +118,7 @@ namespace OurWord.Dialogs
             this.m_btnRemove.Name = "m_btnRemove";
             this.m_btnRemove.Size = new System.Drawing.Size(88, 23);
             this.m_btnRemove.TabIndex = 10;
-            this.m_btnRemove.Text = "ctrlRemove";
+            this.m_btnRemove.Text = "Remove";
             this.m_btnRemove.Click += new System.EventHandler(this.cmdRemove);
             // 
             // Ctrl_AutoReplace

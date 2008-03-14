@@ -33,9 +33,9 @@ namespace OurWord.Dialogs
 {
     public partial class DialogCopyBTConflict : Form
     {
-        // Resolution Actions ----------------------------------------------------------------
+        // Resolution UndoStack ----------------------------------------------------------------
         public enum Actions { kKeepExisting, kReplaceTarget, kAppendToTarget, kCancel };
-        #region SAttr{g/s}: Actions CopyBTAction
+        #region SAttr{g/s}: UndoStack CopyBTAction
         static public Actions CopyBTAction
         {
             get

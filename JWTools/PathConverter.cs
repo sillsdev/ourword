@@ -16,7 +16,6 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using System.Threading;
-using NUnit.Framework;
 #endregion
 
 namespace JWTools
@@ -150,78 +149,5 @@ namespace JWTools
         }
         #endregion
     }
-
-    #region TEST
-    // NUnit Tests
-    [TestFixture] public class Test_PathConverter
-    {
-        #region TEST: TokenizePath
-        [Test] public void TokenizePath()
-        {
-            string[] v = PathConverter.TokenizePath("C:\\Users\\JWimbish\\Desktop\\TEST\\Ama-MRK-Draft-B 2007-07-26.db",
-                true);
-            Assert.AreEqual(6, v.Length);
-            Assert.AreEqual("C:", v[0]);
-            Assert.AreEqual("Users", v[1]);
-            Assert.AreEqual("JWimbish", v[2]);
-            Assert.AreEqual("Desktop", v[3]);
-            Assert.AreEqual("TEST", v[4]);
-            Assert.AreEqual("Ama-MRK-Draft-B 2007-07-26.db", v[5]);
-
-            v = PathConverter.TokenizePath("..\\TEST\\Ama.db", true);
-            Assert.AreEqual(3, v.Length);
-            Assert.AreEqual("..", v[0]);
-            Assert.AreEqual("TEST", v[1]);
-            Assert.AreEqual("Ama.db", v[2]);
-
-            v = PathConverter.TokenizePath("..\\TEST\\Ama.db", false);
-            Assert.AreEqual(2, v.Length);
-            Assert.AreEqual("..", v[0]);
-            Assert.AreEqual("TEST", v[1]);
-        }
-        #endregion
-        #region TEST: Conversions
-        [Test] public void Conversions()
-        {
-            string[] vOrigin = {
-                "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans",
-                "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans",
-                "C:\\Users\\JWimbish\\Desktop\\TEST\\Amarasi.otrans",
-                "C:\\CCC-Lg\\Rote-Ndao\\Dela\\Other\\My Dela Settings\\Dela.owp",
-                "C:\\Documents and Settings\\Ti'utüvame\\Mis documentos\\OurWord-Huichol\\Parámetros\\Huichol.owp"
-            };
-            string[] vAbsolute = {
-                "C:\\Users\\JWimbish\\Desktop\\TEST\\Ama-MKR.db",
-                "C:\\Users\\JWimbish\\Ama-MKR.db",
-                "C:\\Users\\JWimbish\\Here\\Tis\\Ama-MKR.db",
-                "C:\\CCC-Lg\\Kupang\\Other\\My Kupang Settings\\Kupang.otrans",
-                "C:\\Documents and Settings\\Ti'utüvame\\Mis documentos\\OurWord-Huichol\\Parámetros\\Team Settings.owt"
-            };
-            string[] vRelative = {
-                "Ama-MKR.db",
-                "..\\..\\Ama-MKR.db",
-                "..\\..\\Here\\Tis\\Ama-MKR.db",
-                "..\\..\\..\\..\\Kupang\\Other\\My Kupang Settings\\Kupang.otrans",
-                "Team Settings.owt"
-            };
-
-            for(int i=0; i<vOrigin.Length; i++)
-            {
-                Assert.AreEqual( 
-                    vAbsolute[i],
-                    PathConverter.RelativeToAbsolute(vOrigin[i], vRelative[i]), 
-                    "1:" + i.ToString() );
-
-                Assert.AreEqual( 
-                    vRelative[i],
-                    PathConverter.AbsoluteToRelative(vOrigin[i], vAbsolute[i]), 
-                    "2:" + i.ToString());
-
-//                Console.WriteLine(i.ToString() + ": " + vRelative[i]);
-            }
-        }
-        #endregion
-    }
-    #endregion
 
 }

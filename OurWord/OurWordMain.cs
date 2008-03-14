@@ -79,6 +79,17 @@ namespace OurWord
 			}
 		}
 		#endregion
+        #region Attr{g}: UndoRedoStack URStack
+        public UndoRedoStack URStack
+        {
+            get
+            {
+                Debug.Assert(null != m_URStack);
+                return m_URStack;
+            }
+        }
+        UndoRedoStack m_URStack;
+        #endregion
 
         // Client Windows --------------------------------------------------------------------
         #region CLIENT WINDOWS
@@ -158,7 +169,6 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
-        private ToolStripDropDownButton m_btnChapter;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -435,8 +445,15 @@ namespace OurWord
 		#endregion
 
         // Toolbar, MenuBar, Taskbar & StatusBar ---------------------------------------------
-        #region Toolbar, MenuBar, Taskbar & StatusBar
+        #region Toolbar, Taskbar & StatusBar
         #region Menu/Toolbar attributes
+        private ToolStripDropDownButton m_btnChapter;
+        private ToolStripMenuItem m_menuUndo;
+        private ToolStripMenuItem m_menuRedo;
+        private ToolStripSeparator m_separatorUndoRedo;
+        private ToolStripMenuItem m_menuPreviousSection;
+        private ToolStripMenuItem m_menuNextSection;
+        private ToolStripMenuItem m_menuToggleItalics;
         private ToolStripDropDownButton m_btnProject;
         private ToolStripMenuItem m_menuNewProject;
         private ToolStripMenuItem m_menuOpenProject;
@@ -507,7 +524,7 @@ namespace OurWord
         #region Method: void SetupChangeParagraphStyleItems()
         public void SetupChangeParagraphStyleItems()
         {
-            // ctrlRemove any previous subitems
+            // Remove any previous subitems
             m_menuChangeParagraphTo.DropDownItems.Clear();
 
             // Populate
@@ -558,7 +575,7 @@ namespace OurWord
         private const int c_cMaxMenuLength = 60; // Keep sub-menus from getting too long
         public void SetupNavigationButtons()
         {
-            // ctrlRemove any subitems
+            // Remove any subitems
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
 
@@ -617,6 +634,12 @@ namespace OurWord
 
         }
         #endregion
+        #region Method: void EnableItalicsButton() - unique function for faster speed
+        public void EnableItalicsButton()
+        {
+            m_btnItalic.Enabled = canItalic;
+        }
+        #endregion
         #region Method: void EnableMenusAndToolbars()
         public void EnableMenusAndToolbars()
         {
@@ -634,7 +657,7 @@ namespace OurWord
             bool bCanEdit = (MainWindow.Focused && TargetIsLocked) ? false : true;
             m_btnEditCut.Enabled = bCanEdit;
             m_btnEditPaste.Enabled = bCanEdit;
-            m_btnItalic.Enabled = canItalic;
+            EnableItalicsButton();
             m_menuCut.Enabled = bCanEdit;
             m_menuPaste.Enabled = bCanEdit;
             m_menuChangeParagraphTo.Enabled = bCanEdit;
@@ -665,6 +688,11 @@ namespace OurWord
         #region Method: void SetupMenusAndToolbarsVisibility()
         void SetupMenusAndToolbarsVisibility()
             // Turn features on/off according to settings and environment
+            //
+            // Notes:
+            //  - The Tools menu has GotoNext and GotoPrevious items. These are defined as
+            //      NotVisible always. They exist only to provide the ShortcutKey methods
+            //      of quickly going to Next/Previous sections.
         {
             // Project - If we have an invalid project, we turn this on regardless
             bool bShowNewOpenEtc = (!G.IsValidProject || OurWordMain.Features.F_Project);
@@ -731,12 +759,15 @@ namespace OurWord
 
             // Edit Menu / Structured Editing
             bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
+            bool bEditMenuVisible = bStructuralEditing || Features.F_UndoRedo;
             SetupChangeParagraphStyleItems();
             m_menuChangeParagraphTo.Visible = bStructuralEditing;
-            m_menuEdit.Visible = bStructuralEditing;
-            m_btnEditCopy.Visible = !bStructuralEditing;
-            m_btnEditCut.Visible = !bStructuralEditing;
-            m_btnEditPaste.Visible = !bStructuralEditing;
+            m_menuEdit.Visible = bEditMenuVisible;
+            m_menuUndo.Visible = Features.F_UndoRedo;
+            m_menuRedo.Visible = Features.F_UndoRedo;
+            m_btnEditCopy.Visible = !bEditMenuVisible;
+            m_btnEditCut.Visible = !bEditMenuVisible;
+            m_btnEditPaste.Visible = !bEditMenuVisible;
 
             // Notes
             // TODO: It is possible that the Got/Lost Focus handler in NotesPane makes this
@@ -837,7 +868,7 @@ namespace OurWord
             }
         }
         #endregion
-        #region Attr{g}: bool ShowPAdlock - true if the book is locked for editing
+        #region Attr{g}: bool ShowPadlock - true if the book is locked for editing
         bool ShowPadlock
         {
             get
@@ -870,42 +901,30 @@ namespace OurWord
 		private JW_FileMenuIO   m_Config;	     // Handles I/O of the configuration (project) file
 
 		// Scaffolding -----------------------------------------------------------------------
-		#region Method: void ShowLoadState(string s)
-		static public void ShowLoadState(string s)
-		{
-			bool bShow = false;
-			if (bShow)
-			{
-				SplashScreen.SetStatus(s);
-				Console.WriteLine(s);
-			}
-		}
-		#endregion
 		#region Constructor()
 		public OurWordMain()
 			// Constructor, initializes the application
 		{
 			// Required for Windows Form Designer support
-			ShowLoadState("Init Component");
             this.components = new System.ComponentModel.Container();
 			InitializeComponent();
 
             // Initialize the Client Window (do now, to establish proper z-order)
-            ShowLoadState("Init Client Windows");
             CreateClientWindows();
             SetupSideWindows();
 
 			// Initialize the window state mechanism. We'll default to a full screen
 			// the first time we are launched.
-			ShowLoadState("Init Window State");
 			m_WindowState = new JW_WindowState(this, true);
 
 			// Initialize the features we will make available
-			ShowLoadState("Init Features Mgr");
 			s_Features = new FeaturesMgr();
 
+            // Create the Undo/Redo Stack
+            int nUndoRedoMaxDepth = 10;
+            m_URStack = new UndoRedoStack(nUndoRedoMaxDepth, m_menuUndo, m_menuRedo);
+
 			// Initialize the Project File Configuration system
-			ShowLoadState("Init Configuration System");
 			m_Config = new JW_FileMenuIO(this, this,
 				LanguageResources.AppTitle,
                 G.GetLoc_Files("ProjectFileFilter", "Our Word! Project Files (*.owp)|*.owp"), 
@@ -914,9 +933,7 @@ namespace OurWord
 
 			// Initialize to a blank project (if there is a recent project
 			// in the MRU, this will get overridden.)
-			ShowLoadState("Init new project");
 			s_project = new DProject();
-			ShowLoadState("Construction Complete");
 		}
 		#endregion
 		#region Method: void Dispose(...) - cleans up any resources being used
@@ -963,6 +980,9 @@ namespace OurWord
             this.m_btnEditCopy = new System.Windows.Forms.ToolStripButton();
             this.m_btnEditPaste = new System.Windows.Forms.ToolStripButton();
             this.m_menuEdit = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_menuUndo = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuRedo = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_separatorUndoRedo = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuCut = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuPaste = new System.Windows.Forms.ToolStripMenuItem();
@@ -988,6 +1008,9 @@ namespace OurWord
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorDebug = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuRunDebugTestSuite = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuPreviousSection = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuNextSection = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuToggleItalics = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnWindow = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
@@ -1058,7 +1081,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 0);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(855, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(824, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1188,6 +1211,9 @@ namespace OurWord
             // m_menuEdit
             // 
             this.m_menuEdit.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_menuUndo,
+            this.m_menuRedo,
+            this.m_separatorUndoRedo,
             this.m_menuCut,
             this.m_menuCopy,
             this.m_menuPaste,
@@ -1201,6 +1227,29 @@ namespace OurWord
             this.m_menuEdit.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.m_menuEdit.ToolTipText = "Displays the Edit menu items.";
             this.m_menuEdit.DropDownOpening += new System.EventHandler(this.cmdEditDropdownOpening);
+            // 
+            // m_menuUndo
+            // 
+            this.m_menuUndo.Image = ((System.Drawing.Image)(resources.GetObject("m_menuUndo.Image")));
+            this.m_menuUndo.Name = "m_menuUndo";
+            this.m_menuUndo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+            this.m_menuUndo.Size = new System.Drawing.Size(189, 22);
+            this.m_menuUndo.Text = "&Undo";
+            this.m_menuUndo.Click += new System.EventHandler(this.cmdUndo);
+            // 
+            // m_menuRedo
+            // 
+            this.m_menuRedo.Image = ((System.Drawing.Image)(resources.GetObject("m_menuRedo.Image")));
+            this.m_menuRedo.Name = "m_menuRedo";
+            this.m_menuRedo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
+            this.m_menuRedo.Size = new System.Drawing.Size(189, 22);
+            this.m_menuRedo.Text = "&Redo";
+            this.m_menuRedo.Click += new System.EventHandler(this.cmdRedo);
+            // 
+            // m_separatorUndoRedo
+            // 
+            this.m_separatorUndoRedo.Name = "m_separatorUndoRedo";
+            this.m_separatorUndoRedo.Size = new System.Drawing.Size(186, 6);
             // 
             // m_menuCut
             // 
@@ -1337,7 +1386,10 @@ namespace OurWord
             this.m_menuSetUpFeatures,
             this.m_menuLocalizerTool,
             this.m_separatorDebug,
-            this.m_menuRunDebugTestSuite});
+            this.m_menuRunDebugTestSuite,
+            this.m_menuPreviousSection,
+            this.m_menuNextSection,
+            this.m_menuToggleItalics});
             this.m_btnTools.Image = ((System.Drawing.Image)(resources.GetObject("m_btnTools.Image")));
             this.m_btnTools.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_btnTools.Name = "m_btnTools";
@@ -1401,7 +1453,7 @@ namespace OurWord
             this.m_menuConfigure.Size = new System.Drawing.Size(211, 22);
             this.m_menuConfigure.Text = "&Configure...";
             this.m_menuConfigure.ToolTipText = "Edit the settings for OurWord and for the current project.";
-            this.m_menuConfigure.Click += new System.EventHandler(this.cmdProjectProperties);
+            this.m_menuConfigure.Click += new System.EventHandler(this.cmdConfigure);
             // 
             // m_menuSetUpFeatures
             // 
@@ -1432,6 +1484,36 @@ namespace OurWord
             this.m_menuRunDebugTestSuite.Text = "&Run Debug Test Suite...";
             this.m_menuRunDebugTestSuite.ToolTipText = "Only programmers will generally see this; you should ignore it!";
             this.m_menuRunDebugTestSuite.Click += new System.EventHandler(this.cmdDebugTesting);
+            // 
+            // m_menuPreviousSection
+            // 
+            this.m_menuPreviousSection.Image = ((System.Drawing.Image)(resources.GetObject("m_menuPreviousSection.Image")));
+            this.m_menuPreviousSection.Name = "m_menuPreviousSection";
+            this.m_menuPreviousSection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
+            this.m_menuPreviousSection.Size = new System.Drawing.Size(211, 22);
+            this.m_menuPreviousSection.Text = "Previous Section";
+            this.m_menuPreviousSection.Visible = false;
+            this.m_menuPreviousSection.Click += new System.EventHandler(this.cmdGoToPreviousSection);
+            // 
+            // m_menuNextSection
+            // 
+            this.m_menuNextSection.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNextSection.Image")));
+            this.m_menuNextSection.Name = "m_menuNextSection";
+            this.m_menuNextSection.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
+            this.m_menuNextSection.Size = new System.Drawing.Size(211, 22);
+            this.m_menuNextSection.Text = "Next Section";
+            this.m_menuNextSection.Visible = false;
+            this.m_menuNextSection.Click += new System.EventHandler(this.cmdGoToNextSection);
+            // 
+            // m_menuToggleItalics
+            // 
+            this.m_menuToggleItalics.Image = ((System.Drawing.Image)(resources.GetObject("m_menuToggleItalics.Image")));
+            this.m_menuToggleItalics.Name = "m_menuToggleItalics";
+            this.m_menuToggleItalics.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.I)));
+            this.m_menuToggleItalics.Size = new System.Drawing.Size(211, 22);
+            this.m_menuToggleItalics.Text = "Toggle Italics";
+            this.m_menuToggleItalics.Visible = false;
+            this.m_menuToggleItalics.Click += new System.EventHandler(this.cmdItalic);
             // 
             // m_btnWindow
             // 
@@ -1623,8 +1705,9 @@ namespace OurWord
             this.m_SplitContainer.Panel1MinSize = 100;
             this.m_SplitContainer.Panel2MinSize = 100;
             this.m_SplitContainer.Size = new System.Drawing.Size(912, 441);
-            this.m_SplitContainer.SplitterDistance = 617;
+            this.m_SplitContainer.SplitterDistance = 608;
             this.m_SplitContainer.TabIndex = 0;
+            this.m_SplitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.cmdSplitterMoved);
             // 
             // m_Taskbar
             // 
@@ -1713,6 +1796,10 @@ namespace OurWord
 			{
 				return s_App;
 			}
+            set  // Used by NUnit tests; otherwise, stay away!
+            {
+                s_App = value;
+            }
 		}
 		private static OurWordMain s_App = null;
 		#endregion
@@ -1729,7 +1816,6 @@ namespace OurWord
 
             if (!bMutexCreated)
             {
-                LocDB.Message("msgAlreadyRunning", "OurWord is already running.", null, LocDB.MessageTypes.Error);
                 return false;
             }
 
@@ -1748,38 +1834,34 @@ namespace OurWord
 			// Because of the confusion that could reign if we had multiple 
             // instances modifying the Translation and Project settings file, 
             // we elect instead to just have a single instance.
-            ShowLoadState("Check for multiple instances");
             if (!_GrabTokenForThisInstance())
                 return;
 
-            // Initialize the Localizations Database
-            ShowLoadState("Init LocDB");
+            // Initialize the Localizations Database. We need this prior to the
+            // splash screen being activated.
             LocDB.Initialize(G.GetApplicationDataFolder());
 
             // Set the resource location (so the splash picture will be visible)
-            ShowLoadState("Init Resource Location");
             JWU.ResourceLocation = "OurWord.Res.";
 
-            // Retrieve localizations from the Localizations database. (Must be done
-            // here so that the Splash window will be localized.
-//            ShowLoadState("Init Language Resources");
-//            Options.InitLanguageResources();
-
-            // Display a splash screen while we're loading
-            ShowLoadState("Init Splash Screen");
+            // Display a splash screen while we're loading. We want to retrieve everything
+            // needed from the localization database, so that the SplashScreen, which runs
+            // on its own thread, isn't having to go cross-thread to get them.
+            SplashScreen.Additional = G.GetLoc_Splash("sOptionalAdditional", "-");
+            SplashScreen.StatusMessage = G.GetLoc_Splash("sLoadingOurWord", "Loading Our Word...");
+            SplashScreen.Version = G.GetLoc_DialogCommon("m_lblVersion", "Version {0}", 
+                new string[] { G.Version });
+            SplashScreen.ProgramName = G.GetLoc_DialogCommon("m_lblProgramName", "Our Word!", null);
+            SplashScreen.StatusBase = G.GetLoc_Splash("sLoading", "Loading {0}...");
             SplashScreen.Start();
 
             // Now start loading & run the program
-            ShowLoadState("Construct and Run");
             OurWordMain.s_App = new OurWordMain();
             Application.Run(s_App);
 
             // All done, release the Mutex
-            ShowLoadState("Release Mutex");
             if (s_EnsureOneInstanceOnlyMutex != null)
                s_EnsureOneInstanceOnlyMutex.ReleaseMutex();
-           ShowLoadState("Done");
-
         }
 		#endregion
 
@@ -1881,6 +1963,15 @@ namespace OurWord
                 }
             }
             #endregion
+            #region Attr{g}: bool F_UndoRedo
+            public bool F_UndoRedo
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fUndoRedo.ToString());
+                }
+            }
+            #endregion
             #region Attr{g}: bool F_GoTo_FirstLast
             public bool F_GoTo_FirstLast
             {
@@ -1970,6 +2061,7 @@ namespace OurWord
                 fFilter,
                 fJustTheBasics,
                 fStructuralEditing,
+                fUndoRedo,
                 fLocalizer,
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
@@ -1981,6 +2073,7 @@ namespace OurWord
             const string c_sNodeWindows = "Windows";
             const string c_sNodeTools = "Tools";
             const string c_sNodeNavigation = "Navigation";
+            const string c_sNodeEditing = "Editing";
 			#region Method: void Setup()
 			private void Setup()
 			{
@@ -1990,6 +2083,7 @@ namespace OurWord
 				m_Dlg.Clear();
 
                 // Add the various features
+                #region WINDOWS FEATURES
                 m_Dlg.Add(ID.fJobBT.ToString(),
                     false,
                     false,
@@ -2006,27 +2100,43 @@ namespace OurWord
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
 
-                m_Dlg.Add(ID.fProject.ToString(),  
-                    true, 
+                m_Dlg.Add(ID.fMerge.ToString(),
                     false,
-                    "",
-                    "Project New / Open / etc.",
-                    "Turn this on if you are working with multiple projects.");
+                    false,
+                    c_sNodeWindows,
+                    "Merging",
+                    "Enables the Merge Pane, by which you can compare different versions of a book " +
+                        "to see what is different, and to merge changes into the master copy.");
 
-                m_Dlg.Add(ID.fPropertiesDialog.ToString(),
-                    true,
+                m_Dlg.Add(ID.fDictionary.ToString(),
                     false,
-                    c_sNodeTools,
-                    "Configuration Dialog",
-                    "Turn this on if you are want to adjust the settings for a project.");
+                    false,
+                    c_sNodeWindows,
+                    "WeSay Dictionary",
+                    "Enables the Dictionary Pane, by which you can access a WeSay dictionary. " +
+                        "You can enter words in the dictionary that are in the translation; and " +
+                        "you can look up definitions when doing a back translation.");
+                #endregion
+                #region EDITING FEATURES
+                m_Dlg.Add(ID.fStructuralEditing.ToString(),
+                    false,
+                    false,
+                    c_sNodeEditing,
+                    "Structural Editing",
+                    "Enables the translator to split and join paragraphs, or to assign different " +
+                        "styles to a paragraph. By doing this the translation will depart from " +
+                        "the paragraph structure of the front translation.");
 
-                m_Dlg.Add(ID.fPrint.ToString(),            
+                m_Dlg.Add(ID.fUndoRedo.ToString(),
                     false,
                     false,
-                    "",
-                    "Printing",
-                    "The book can be formatted and printed. ");
+                    c_sNodeEditing,
+                    "Undo",
+                    "Enables the Undo and Redo menus, by which you can undo actions such as " +
+                        "typing, deleting, splitting and joining paragraphs, etc.");
 
+                #endregion
+                #region TOOLS FEATURES
                 m_Dlg.Add(ID.fRestoreBackup.ToString(),    
                     false,
                     false,
@@ -2047,6 +2157,13 @@ namespace OurWord
                         "plan on carefully reviewing and editing, so that it accurately matches " +
                         "the actual vernacular translation.");
 
+                m_Dlg.Add(ID.fPropertiesDialog.ToString(),
+                    true,
+                    false,
+                    c_sNodeTools,
+                    "Configuration Dialog",
+                    "Turn this on if you are want to adjust the settings for a project.");
+
                 m_Dlg.Add(ID.fFilter.ToString(),           
                     false,
                     false,
@@ -2064,33 +2181,8 @@ namespace OurWord
                     "Localization Dialog",
                     "This dialog, appearing in the Tools menu, allows you to translate the " +
                         "user interface of OurWord into another language.");
-
-                m_Dlg.Add(ID.fStructuralEditing.ToString(),
-                    false,
-                    false,
-                    "",
-                    "Structural Editing",
-                    "Enables the translator to split and join paragraphs, or to assign different " +
-                        "styles to a paragraph. By doing this the translation will depart from " +
-                        "the paragraph structure of the front translation.");
-
-                m_Dlg.Add(ID.fMerge.ToString(),
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "Merging",
-                    "Enables the Merge Pane, by which you can compare different versions of a book " +
-                        "to see what is different, and to merge changes into the master copy.");
-
-                m_Dlg.Add(ID.fDictionary.ToString(),
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "WeSay Dictionary",
-                    "Enables the Dictionary Pane, by which you can access a WeSay dictionary. " +
-                        "You can enter words in the dictionary that are in the translation; and " +
-                        "you can look up definitions when doing a back translation.");
-
+                #endregion
+                #region NAVIGATION FEATURES
                 m_Dlg.Add(ID.fGoTo_FirstLast.ToString(),
                     true,
                     false,
@@ -2108,6 +2200,22 @@ namespace OurWord
                     "Makes the Chapter button visible, by which you can navigate directly to " +
                         "the first section in the desired chapter. Experienced users may want " +
                         "to have this button visible for easier movement around the book.");
+                #endregion
+
+                m_Dlg.Add(ID.fProject.ToString(),  
+                    true, 
+                    false,
+                    "",
+                    "Project New / Open / etc.",
+                    "Turn this on if you are working with multiple projects.");
+
+                m_Dlg.Add(ID.fPrint.ToString(),            
+                    false,
+                    false,
+                    "",
+                    "Printing",
+                    "The book can be formatted and printed. ");
+
             }
 			#endregion
 		};
@@ -2142,6 +2250,9 @@ namespace OurWord
 			// status (e.g., the Navigation toolbar buttons dropdown contents depends
 			// upon which section is currently being displayed.)
             SetupMenusAndToolbarsVisibility();
+
+            // Clear the Undo stack since we now have new data we're working with
+            G.URStack.Clear();
 		}
 		#endregion
 		#region Method: void OnLeaveProject()
@@ -2249,17 +2360,32 @@ namespace OurWord
 		}
 		#endregion
 
-		// Event Handlers --------------------------------------------------------------------
-		#region Event: cmd_OnLoad(...)    - on loading the app, restore the window state
-		private void cmd_OnLoad(object sender, System.EventArgs e)
+        // Event Handlers --------------------------------------------------------------------
+        #region Event: cmdSplitterMoved
+        float m_fSplitterPercent = 65;
+        private void cmdSplitterMoved(object sender, SplitterEventArgs e)
+            // Set minimum, maximum, and initial positions for the splitter, using a Percent
+            // basis rather than the pixel basis that DotNet provides.
+        {
+            if (!m_SplitContainer.Panel2Collapsed)
+            {
+                m_fSplitterPercent = ((float)m_SplitContainer.SplitterDistance / (float)Width) * 100.0F;
+                m_fSplitterPercent = Math.Max(m_fSplitterPercent, 50);
+                m_fSplitterPercent = Math.Min(m_fSplitterPercent, 80);
+            }
+        }
+        #endregion
+        #region Event: cmd_OnLoad(...)    - on loading the app, restore the window state
+        private void cmd_OnLoad(object sender, System.EventArgs e)
 		{
 			// Init the Help system
-            ShowLoadState("Load Help");
 			HelpSystem.Initialize();
 
 			// Populate the MRU List; read in the project
-			ShowLoadState("Load MRU");
 			m_Config.LoadMRUfromRegistry(true);   // Reads in the most recent project
+
+            // Initial Splitter Position
+            m_SplitContainer.SplitterDistance = (int)((float)m_fSplitterPercent * (float)Width / 100.0F);
 
             // Restore which layout is active
             string sPreferredWindowName = JW_Registry.GetValue("CurrentJob",
@@ -2271,31 +2397,34 @@ namespace OurWord
             if (sPreferredWindowName == WndNaturalness.c_sName)
                 MainWindow = WndNaturalness;
 
-			// Restore to where we last were.
-			ShowLoadState("Load Window Position");
-			Project.Nav.RetrievePositionFromRegistry();
+            // Restore to where we last were.
+            Project.Nav.RetrievePositionFromRegistry();
 
-			// Set up the views, make the initial selection, etc.
-			ShowLoadState("Load Project into windows");
-			OnEnterProject();
+            // Set up the views, make the initial selection, etc.
+            OnEnterProject();
 
 			// Remember the previous placement of the window on the screen (Do this late
 			// in the load sequence so that we avoid a multiple screen redraw.) 
-			ShowLoadState("Load Window State");
 			m_WindowState.RestoreWindowState();
 
 			// Initialize AutoSave Timer
-			ShowLoadState("Load AutoSave");
 			InitializeAutoSave();
 
-			// Loading all done: Close the splash screen
-            ShowLoadState("Close Splash Screen");
-            SplashScreen.Close(this);
+            // Loading all done: Close the splash screen
+            if (SplashScreen.Wnd.InvokeRequired)
+            {
+                SplashScreen.StopSplashScreen_Callback d = 
+                    new SplashScreen.StopSplashScreen_Callback(SplashScreen.Wnd.Stop);
+                this.Invoke(d, new object[] { this });
+            }
+            else
+            {
+                SplashScreen.Wnd.Stop(this);
+            }
 
             // Leave everything in a state where the main window has focus, so that the
             // Text Selection will be appropriately flashing its readiness
             MainWindow.Focus();
-            ShowLoadState("Loading Complete");
         }
 		#endregion
 		#region Event: cmd_OnClosing(...) - on closing the app, save the window state
@@ -2358,9 +2487,32 @@ namespace OurWord
 
         // Commands --------------------------------------------------------------------------
 		#region COMMANDS
+        // Stand-Alone Toolbar Buttons
+		#region Cmd: cmdPrint
+        private void cmdPrint(Object sender, EventArgs e)
+		{
+			OnLeaveSection();
+
+			Print p = new Print();
+			p.Do();
+		}
+		#endregion
+        #region Cmd: cmdExit
+        private void cmdExit(Object sender, EventArgs e)
+		{
+			Application.Exit();		
+		}
+		#endregion
+
+        // Project Dropdown
 		#region Cmd: cmdNewProject
         private void cmdNewProject(Object sender, EventArgs e)
 		{
+            // Don't allow if the menu item is hidden (Microsoft allows a Shortcut key to work,
+            // even though the menu command is hidden!)
+            if (!m_btnProject.Visible)
+                return;
+
             // Walk through the wizard; we do nothing unless the User makes it through
             // (as signaled by DialogResult.OK).
             Dialogs.WizNewProject.WizNewProject wiz = new Dialogs.WizNewProject.WizNewProject();
@@ -2424,12 +2576,17 @@ namespace OurWord
 
             // Edit properties?
             if (wiz.LaunchPropertiesDialogWhenDone)
-                cmdProjectProperties(null, null);
+                cmdConfigure(null, null);
 		}
 		#endregion
 		#region Cmd: cmdOpenProject
         private void cmdOpenProject(Object sender, EventArgs e)
 		{
+            // Don't allow if the menu item is hidden (Microsoft allows a Shortcut key to work,
+            // even though the menu command is hidden!)
+            if (!m_btnProject.Visible)
+                return;
+
 			// Make sure this project is saved and up-to-date
 			OnLeaveProject();
 
@@ -2452,43 +2609,14 @@ namespace OurWord
 		#region Cmd: cmdSaveProjectAs
         private void cmdSaveProjectAs(Object sender, EventArgs e)
 		{
-			OnLeaveSection();
+            // Don't allow if the menu item is hidden (Microsoft allows a Shortcut key to work,
+            // even though the menu command is hidden!)
+            if (!m_btnProject.Visible)
+                return;
+
+            OnLeaveSection();
 			m_Config.InitialDirectory = G.BrowseDirectory;
 			m_Config.SaveAs("Save this Project as");
-		}
-		#endregion
-		#region Cmd: cmdPrint
-        private void cmdPrint(Object sender, EventArgs e)
-		{
-			OnLeaveSection();
-
-			Print p = new Print();
-			p.Do();
-		}
-		#endregion
-		#region Cmd: cmdProjectProperties
-        private void cmdProjectProperties(Object sender, EventArgs e)
-		{
-			// Retrieve data and save the project to disk. We don't know if the
-			// user might remove the book from the project, so we need to make sure
-			// it was saved just in case.
-			OnLeaveProject();
-
-            // Let the user change the properties
-            DialogProperties dlg = new DialogProperties();
-            dlg.ShowDialog(this);
-
-            // The zoom factor may have changed, so we need to recalculate the fonts
-            SetZoomFactor();
-
-            // Re-initialize everything
-			OnEnterProject();
-		}
-		#endregion
-        #region Cmd: cmdExit
-        private void cmdExit(Object sender, EventArgs e)
-		{
-			Application.Exit();		
 		}
 		#endregion
 		#region Cmd: cmdMRU - opens Project from MRU list
@@ -2501,7 +2629,22 @@ namespace OurWord
         }
 		#endregion
 
-		#region Cmd: cmdEditCut
+        // Edit Dropdown
+        #region Cmd: cmdUndo
+        private void cmdUndo(object sender, EventArgs e)
+        {
+            if (Features.F_UndoRedo)
+                URStack.Undo();
+        }
+        #endregion
+        #region Cmd: cmdRedo
+        private void cmdRedo(object sender, EventArgs e)
+        {
+            if (Features.F_UndoRedo)
+                URStack.Redo();
+        }
+        #endregion
+        #region Cmd: cmdEditCut
         private void cmdEditCut(Object sender, EventArgs e)
 		{
             OWWindow wnd = FocusedWindow;
@@ -2541,7 +2684,47 @@ namespace OurWord
                 wnd.cmdChangeParagraphTo(sStyleAbbrev);
         }
         #endregion
+		#region Can: canItalic
+		public bool canItalic
+		{
+			get
+			{
+                OWWindow wnd = FocusedWindow;
+                if (null == wnd)
+                    return false;
 
+                return wnd.canItalic;
+			}
+		}
+		#endregion
+		#region Cmd: cmdItalic
+        private void cmdItalic(Object sender, EventArgs e)
+		{
+            OWWindow wnd = FocusedWindow;
+            if (null != wnd)
+                wnd.cmdToggleItalics();
+		}
+		#endregion
+        #region Cmd: cmdEditDropdownOpening - place a checkmark beside the current style
+        private void cmdEditDropdownOpening(object sender, EventArgs e)
+        {
+            // Get the style of the current paragraph, if any
+            string sAbbrev = "";
+            if (null != FocusedWindow)
+                sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
+
+            // Uncheck all of the subitems
+            foreach (ToolStripMenuItem mi in m_menuChangeParagraphTo.DropDownItems)
+            {
+                mi.Checked = false;
+
+                if (mi.Tag as string == sAbbrev)
+                    mi.Checked = true;
+            }
+        }
+		#endregion
+
+        // Navigation
 		#region Cmd: cmdGoToFirstSection
         private void cmdGoToFirstSection(Object sender, EventArgs e)
 		{
@@ -2685,10 +2868,11 @@ namespace OurWord
         }
 		#endregion
 
+        // Windows
         #region Method: void _UpdateSideWindows()
         private void _UpdateSideWindows()
         {
-            // Add/ctrlRemove the various pane from the side windows
+            // Add/Remove the various pane from the side windows
             SetupSideWindows();
 
             // Reset the window contents (1) to populate the Notes window if
@@ -2738,21 +2922,25 @@ namespace OurWord
         private void cmdJobDrafting(Object sender, EventArgs e)
 		{
             MainWindow = WndDrafting;
+            G.URStack.Clear();
 		}
 		#endregion
 		#region Cmd: cmdJobBackTranslation
         private void cmdJobBackTranslation(Object sender, EventArgs e)
 		{
             MainWindow = WndBackTranslation;
-		}
+            G.URStack.Clear();
+        }
 		#endregion
         #region Cmd: cmdJobNaturalness
         private void cmdJobNaturalness(Object sender, EventArgs e)
         {
             MainWindow = WndNaturalness;
+            G.URStack.Clear();
         }
         #endregion
 
+        // Tools
 		#region Can: canIncrementBookStatus
         private bool canIncrementBookStatus
 		{
@@ -2792,6 +2980,8 @@ namespace OurWord
 
             // Make sure the UI updates to show the correct file name
             ResetWindowContents();
+
+            G.URStack.Clear();
 		}
 		#endregion
 		#region Cmd: cmdRestoreBackup
@@ -2969,7 +3159,25 @@ namespace OurWord
 			OnEnterSection();
 		}
 		#endregion
+		#region Cmd: cmdConfigure
+        private void cmdConfigure(Object sender, EventArgs e)
+		{
+            // Retrieve data and save the project to disk. We don't know if the
+			// user might remove the book from the project, so we need to make sure
+			// it was saved just in case.
+			OnLeaveProject();
 
+            // Let the user change the properties
+            DialogProperties dlg = new DialogProperties();
+            dlg.ShowDialog(this);
+
+            // The zoom factor may have changed, so we need to recalculate the fonts
+            SetZoomFactor();
+
+            // Re-initialize everything
+			OnEnterProject();
+		}
+		#endregion
 		#region Cmd: cmdSetUpFeatures
         private void cmdSetUpFeatures(Object sender, EventArgs e)
 		{
@@ -3003,6 +3211,7 @@ namespace OurWord
         }
         #endregion
 
+        // Help
         #region Cmd: cmdHelpTopics
         private void cmdHelpTopics(Object sender, EventArgs e)
 		{
@@ -3016,50 +3225,8 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
-
-		#region Can: canItalic
-		public bool canItalic
-		{
-			get
-			{
-/***
-				if (null == CurrentLayout)
-					return false;
-				return CurrentLayout.canItalicizeSelection;
-***/
-return false;
-			}
-		}
-		#endregion
-		#region Cmd: cmdItalic
-        private void cmdItalic(Object sender, EventArgs e)
-		{
-/***
-			if (null == CurrentLayout)
-				return;
-			CurrentLayout.cmdItalicizeSelection();
-***/
-		}
-		#endregion
-        #region Cmd: cmdEditDropdownOpening - place a checkmark beside the current style
-        private void cmdEditDropdownOpening(object sender, EventArgs e)
-        {
-            // Get the style of the current paragraph, if any
-            string sAbbrev = "";
-            if (null != FocusedWindow)
-                sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
-
-            // Uncheck all of the subitems
-            foreach (ToolStripMenuItem mi in m_menuChangeParagraphTo.DropDownItems)
-            {
-                mi.Checked = false;
-
-                if (mi.Tag as string == sAbbrev)
-                    mi.Checked = true;
-            }
-        }
-		#endregion
         #endregion
+
     }
 
 	#region CLASS G - Globals for convenient access
@@ -3176,6 +3343,15 @@ return false;
             get
             {
                 return OurWordMain.App;
+            }
+        }
+        #endregion
+        #region SAttr{g}:  UndoRedoStack URStack
+        static public UndoRedoStack URStack
+        {
+            get
+            {
+                return App.URStack;
             }
         }
         #endregion
@@ -3501,6 +3677,17 @@ return false;
                 null);
         }
         #endregion
+        #region SMethod: string GetLoc_UndoRedo(sItemID, sEnglish) -      "Strings\UndoRedo"
+        static public string GetLoc_UndoRedo(string sItemID, string sEnglishDefault)
+        {
+            return LocDB.GetValue(
+                new string[] { "Strings", "UndoRedo" },
+                sItemID,
+                sEnglishDefault,
+                null,
+                null);
+        }
+        #endregion
         #region SMethod: string GetLoc_StyleName(sEnglish) -              "Strings\Styles"
         static public string GetLoc_StyleName(string sEnglish)
         {
@@ -3554,7 +3741,17 @@ return false;
                 vsInsert);
         }
         #endregion
-
+        #region SMethod: string GetLoc_Splash(sItemID, sEnglish) -     "Strings\GeneralUI"
+        static public string GetLoc_Splash(string sItemID, string sEnglishDefault)
+        {
+            return LocDB.GetValue(
+                new string[] { "SplashScreen" },
+                sItemID,
+                sEnglishDefault,
+                null,
+                null);
+        }
+        #endregion
         #region SMethod: string GetLoc_BookAbbrev(string sBookAbbrev) -   "BookAbbrevs"
         static public string GetLoc_BookAbbrev(string sBookAbbrev)
         {

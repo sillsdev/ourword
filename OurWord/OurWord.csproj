@@ -100,10 +100,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\JWTools\bin\Debug\JWTools.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Palaso.Services.dll</HintPath>
@@ -149,6 +145,10 @@
     <EmbeddedResource Include="Dialogs\ChapterMenu.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ChapterMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DlgDebug.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DlgDebug.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <SubType>Designer</SubType>
@@ -324,6 +324,12 @@
     <Compile Include="Dialogs\DlgCopyBTConflict.Designer.cs">
       <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\DlgDebug.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DlgDebug.Designer.cs">
+      <DependentUpon>DlgDebug.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\DlgExportBook.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -490,6 +496,7 @@
     <Compile Include="Dictionary\DictionaryPane.Designer.cs">
       <DependentUpon>DictionaryPane.cs</DependentUpon>
     </Compile>
+    <Compile Include="Edit\Bookmark.cs" />
     <Compile Include="Edit\NotesPane.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -501,6 +508,7 @@
     <Compile Include="Edit\OWWindow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Edit\UndoRedo.cs" />
     <Compile Include="Language.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -518,7 +526,7 @@
     <Compile Include="Merge\DiffText.cs" />
     <Compile Include="Merge\DMergeBook.cs" />
     <Compile Include="Merge\MergePane.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Merge\MergePane.Designer.cs">
       <DependentUpon>MergePane.cs</DependentUpon>

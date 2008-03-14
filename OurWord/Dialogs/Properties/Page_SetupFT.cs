@@ -148,7 +148,7 @@ namespace OurWord.Dialogs
             this.m_lblActions.Name = "m_lblActions";
             this.m_lblActions.Size = new System.Drawing.Size(444, 23);
             this.m_lblActions.TabIndex = 7;
-            this.m_lblActions.Text = "Available Actions:";
+            this.m_lblActions.Text = "Available UndoStack:";
             this.m_lblActions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // Page_SetupFT

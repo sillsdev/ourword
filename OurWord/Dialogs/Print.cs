@@ -2562,7 +2562,7 @@ namespace OurWord
 					int cFn = vFnLines.Length;
 					float fFnHeight = MeasureFootnoteHeight( vFnLines );
 
-					// ctrlRemove the count of footnote lines from the end of the array,
+					// Remove the count of footnote lines from the end of the array,
 					// and increase the y coordinate for the footnote area by the
 					// height of the lines we are removing
 					FootnoteLines.RemoveRange(
@@ -2570,11 +2570,11 @@ namespace OurWord
 						vFnLines.Length);
 					yFootnotes += fFnHeight;
 
-					// ctrlRemove any DropCaps associated with this PLine
+					// Remove any DropCaps associated with this PLine
 					if (null != line.DropCap)
 						DropCaps.Remove(line.DropCap);
 
-					// ctrlRemove the body line
+					// Remove the body line
 					BodyLines.RemoveAt( iBody );
 
 					// Reset the Position object to where it was at the beginning of

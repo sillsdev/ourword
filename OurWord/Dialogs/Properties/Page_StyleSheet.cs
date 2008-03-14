@@ -820,7 +820,7 @@ namespace OurWord.Dialogs
         #region Method: void PopulateList()
         private void PopulateList()
         {
-            // ctrlRemove any items currently in the list (else we'd be adding duplicates)
+            // Remove any items currently in the list (else we'd be adding duplicates)
             m_listStyles.Items.Clear();
 
             // Add the paragraph styles

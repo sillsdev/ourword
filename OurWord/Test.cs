@@ -36,8 +36,9 @@ namespace OurWord
 		const string c_sClassName = "Health";
 		const string c_sStopName  = "System.Windows";
 
-		// Message Stack ---------------------------------------------------------------------
-		class Message
+        // Message Stack ---------------------------------------------------------------------
+        #region EMBEDDED CLASS: Message
+        class Message
 		{
 			// Attrs -------------------------------------------------------------------------
 			bool       m_bIsParam = false;
@@ -114,9 +115,10 @@ namespace OurWord
 				w.WriteLine(m_MethodInfo.Name + ": " + m_sMessage);
 			}
 			#endregion
-		}
-		#region Attr{g}: ArrayList MessageStack
-		static ArrayList MessageStack
+        }
+        #endregion
+        #region Attr{g}: ArrayList MessageStack
+        static ArrayList MessageStack
 		{
 			get
 			{
@@ -127,8 +129,8 @@ namespace OurWord
 		}
 		static ArrayList s_MessageStack = null;
 		#endregion
-
-		public static void Push(string s, bool bIsParam)
+        #region SMethod: void Push(string s, bool bIsParam)
+        public static void Push(string s, bool bIsParam)
 		{
 			// Create the new message
 			Message msg = new Message(s);
@@ -145,27 +147,29 @@ namespace OurWord
 
 			// Add the new message
 			MessageStack.Add( new Message(s, bIsParam) );
-		}
-
-		#region Method: void Push(string sMessage)
-		public static void Push(string s)
+        }
+        #endregion
+        #region SMethod: void Push(string sMessage)
+        public static void Push(string s)
 		{
 			Push(s, false);
 		}
 		#endregion
 
-
-		public static void Param(string sName, int n)
+        #region SMethod: void Param(string sName, int n)
+        public static void Param(string sName, int n)
 		{
 			Push("int " + sName + " : " + n.ToString(), true);
-		}
-		public static void Param(string sName, bool b)
+        }
+        #endregion
+        #region SMethod: void Param(string sName, bool b)
+        public static void Param(string sName, bool b)
 		{
 			Push("bool " + sName + " : " + (b ? "true" : "false"), true);
-		}
+        }
+        #endregion
 
-
-		// Log File --------------------------------------------------------------------------
+        // Log File --------------------------------------------------------------------------
 		static TextWriter w = null;
 		#region Method: void OpenLogFile()
 		static void OpenLogFile()
@@ -389,7 +393,6 @@ namespace OurWord
 				(new Test_DSection()).Run();
 				(new Test_DProject()).Run();
 				(new Test_DTranslation()).Run();
-				(new Test_AutoReplace()).Run();
 				(new Test_Print()).Run();
 				(new Test_BackupSystem()).Run();  // Can temporarily disable to conserve battery
 			}

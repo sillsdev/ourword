@@ -550,7 +550,7 @@ namespace OurWord
 			{
 				string[] res = 
 					{
-						"ctrlRemove",
+						"Remove",
 						"Hapus"
 					};
 				return GetAlternative(res);

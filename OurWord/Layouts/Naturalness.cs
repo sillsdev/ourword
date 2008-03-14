@@ -110,9 +110,14 @@ namespace OurWord.View
             if (!G.Project.HasDataToDisplay)
                 return;
 
+            // Save calculating this over and over
+            bool bAllParagraphsMatchFront = G.STarget.AllParagraphsMatchFront;
+
             // Load the paragraphs
-            foreach (DParagraph p in G.STarget.Paragraphs)
+            for(int ip = 0; ip<G.STarget.Paragraphs.Count; ip++)
             {
+                DParagraph p = G.STarget.Paragraphs[ip] as DParagraph;
+
                 // Retrieve the bitmap, if a picture is involved
                 Bitmap bmp = null;
                 DPicture pict = p as DPicture;
@@ -138,6 +143,16 @@ namespace OurWord.View
                 if (OurWordMain.TargetIsLocked)
                     options |= OWPara.Flags.IsLocked;
 
+                // Italics?
+                if (bAllParagraphsMatchFront)
+                {
+                    DParagraph pFront = G.SFront.Paragraphs[ip] as DParagraph;
+                    if (pFront.HasItalics)
+                        options |= OWPara.Flags.CanItalic;
+                }
+                else
+                    options |= OWPara.Flags.CanItalic;
+
                 // Create and add the paragraph
                 OWPara op = new OWPara(
                     this,
@@ -151,8 +166,10 @@ namespace OurWord.View
 
             // Load the footnotes
             bool bFirstFootnote = true;
-            foreach (DFootnote fn in G.STarget.Footnotes)
+            for(int iFn = 0; iFn < G.STarget.Footnotes.Count; iFn++)
             {
+                DFootnote fn = G.STarget.Footnotes[iFn] as DFootnote;
+
                 StartNewRow(bFirstFootnote, null);
                 bFirstFootnote = false;
 
@@ -163,6 +180,17 @@ namespace OurWord.View
                     options |= OWPara.Flags.ShowLineNumbers;
                 if (OurWordMain.TargetIsLocked)
                     options |= OWPara.Flags.IsLocked;
+
+                // Italics?
+                if (bAllParagraphsMatchFront)
+                {
+                    DFootnote fnFront = G.SFront.Footnotes[iFn] as DFootnote;
+                    if (fnFront.HasItalics)
+                        options |= OWPara.Flags.CanItalic;
+                }
+                else
+                    options |= OWPara.Flags.CanItalic;
+
 
                 OWPara op = new OWPara(
                     this,

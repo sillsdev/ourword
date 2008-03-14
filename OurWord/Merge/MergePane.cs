@@ -21,7 +21,6 @@ using JWdb;
 using OurWord.DataModel;
 using OurWord.View;
 using OurWord.Edit;
-using NUnit.Framework;
 #endregion
 
 namespace OurWord.Edit
@@ -651,7 +650,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region OMethod: bool HandleLockedFromEditing()
-        protected override bool HandleLockedFromEditing()
+        public override bool HandleLockedFromEditing()
         {
             TypingErrorBeep();
             return true;

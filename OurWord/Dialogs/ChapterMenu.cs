@@ -23,7 +23,6 @@ using JWdb;
 using OurWord.DataModel;
 using OurWord.View;
 using OurWord.Edit;
-using NUnit.Framework;
 #endregion
 
 namespace OurWord.Dialogs

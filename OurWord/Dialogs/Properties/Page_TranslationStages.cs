@@ -213,7 +213,7 @@ namespace OurWord.Dialogs
             this.m_btnRemove.Name = "m_btnRemove";
             this.m_btnRemove.Size = new System.Drawing.Size(96, 23);
             this.m_btnRemove.TabIndex = 5;
-            this.m_btnRemove.Text = "ctrlRemove...";
+            this.m_btnRemove.Text = "Remove...";
             this.m_btnRemove.Click += new System.EventHandler(this.cmdRemove);
             // 
             // m_btnMoveUp
@@ -402,7 +402,7 @@ namespace OurWord.Dialogs
 			if (! Messages.ConfirmRemoveTranslationStage( stage.Name ) )
 				return;
 
-			// ctrlRemove the item
+			// Remove the item
 			int i = CurrentSelectionIndex;
 			G.TranslationStages.Remove( stage );
 			PopulateStagesList();
@@ -542,7 +542,7 @@ namespace OurWord.Dialogs
 		#region Method: void PopulateLanguagesCombo()
 		void PopulateLanguagesCombo()
 		{
-			// ctrlRemove anythihng that might have previously been there
+			// Remove anythihng that might have previously been there
 			DefaultLanguage.Items.Clear();
 
 			// Set the text to the current value in TeamSettings (For some reason
@@ -576,7 +576,7 @@ namespace OurWord.Dialogs
 			if (null == stage)
 				return;
 
-			// Disable the ctrlRemove button if Drafting is selection
+			// Disable the Remove button if Drafting is selection
 			if (stage.ID == BookStages.c_idDraft)
 				m_btnRemove.Enabled = false;
 
@@ -984,7 +984,7 @@ namespace OurWord.Dialogs
 			return true;
 		}
 		#endregion
-		#region Method: void ctrlRemove( TranslationStage stage )
+		#region Method: void Remove( TranslationStage stage )
 		public void Remove( TranslationStage stage )
 		{
 			TranslationStages.Remove(stage);

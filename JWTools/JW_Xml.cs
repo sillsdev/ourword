@@ -911,7 +911,7 @@ namespace JWTools
 			ManagementClass mcDriveClass = new ManagementClass("Win32_LogicalDisk");
 
 			// Enumerate all logical drives available
-			Console.WriteLine("GetFreeDiskSpace thread exits here...");
+//			Console.WriteLine("GetFreeDiskSpace thread exits here...");
 			ManagementObjectCollection mocDrives = mcDriveClass.GetInstances();
 			foreach(ManagementObject moDrive in mocDrives)
 			{

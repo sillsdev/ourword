@@ -132,6 +132,36 @@
       <Alt ID="swh" Value="&amp;Habari juu ya 'Neno Letu'..."></Alt>
     </Item>
   </Group>
+  <Group ID="m_toolstripNotes">
+    <Item ID="m_menuInsertGeneral">
+      <Alt ID="swh" Value="Ingiza noti"></Alt>
+    </Item>
+    <Item ID="m_menuInsertToDo">
+      <Alt ID="swh" Value="Ingiza kumbukumbu la kitu cha kufanya"></Alt>
+    </Item>
+    <Item ID="m_menuInsertOldVersion">
+      <Alt ID="swh" Value="Ingiza maneno ya tafsiri yalivyo"></Alt>
+    </Item>
+    <Item ID="m_menuInsertReason">
+      <Alt ID="swh" Value="Ingiza dondoo la kueleza sababu za ufasiri"></Alt>
+    </Item>
+    <Item ID="m_menuInsertFrontIssue">
+      <Alt ID="swh" Value="Ingiza mapendekezo juu ya tafsiri bora"></Alt>
+    </Item>
+    <Item ID="m_menuInsertDefinition">
+      <Alt ID="swh" Value="Ingiza noti la kuelezea maana ya jambo"></Alt>
+    </Item>
+    <Item ID="m_menuInsertHintForDaughter">
+      <Alt ID="swh" Value="Ingiza maneno yatakayosaidia kutafsiri"></Alt>
+    </Item>
+    <Item ID="m_menuInsertBT">
+    </Item>
+    <Item ID="m_menuInsertAskUNS">
+    </Item>
+    <Item ID="m_btnDeleteNote">
+      <Alt ID="swh" Value="Futa dondoo..."></Alt>
+    </Item>
+  </Group>  
   <Group ID="Strings">
     <Item ID="kYes">
     </Item>

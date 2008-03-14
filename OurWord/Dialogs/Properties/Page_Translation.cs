@@ -21,8 +21,6 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 
-using NUnit.Framework;
-
 using JWTools;
 using JWdb;
 using OurWord;
@@ -232,7 +230,7 @@ namespace OurWord.Dialogs
             this.m_btnRemove.Name = "m_btnRemove";
             this.m_btnRemove.Size = new System.Drawing.Size(76, 23);
             this.m_btnRemove.TabIndex = 8;
-            this.m_btnRemove.Text = "ctrlRemove...";
+            this.m_btnRemove.Text = "Remove...";
             this.m_btnRemove.Click += new System.EventHandler(this.cmdRemoveBook);
             // 
             // m_btnCreate
@@ -302,7 +300,7 @@ namespace OurWord.Dialogs
             this.m_btnRemoveTranslation.Name = "m_btnRemoveTranslation";
             this.m_btnRemoveTranslation.Size = new System.Drawing.Size(159, 23);
             this.m_btnRemoveTranslation.TabIndex = 5;
-            this.m_btnRemoveTranslation.Text = "ctrlRemove This Translation...";
+            this.m_btnRemoveTranslation.Text = "Remove This Translation...";
             this.m_btnRemoveTranslation.UseVisualStyleBackColor = true;
             this.m_btnRemoveTranslation.Click += new System.EventHandler(this.cmdRemoveTranslation);
             // 
@@ -881,7 +879,7 @@ namespace OurWord.Dialogs
             ParentDlg.HarvestChangesFromCurrentSheet();
             Trans.Write();
 
-            // ctrlRemove it from the appropriate object in the Properties
+            // Remove it from the appropriate object in the Properties
             bool bWasFront = false;
             bool bWasOther = false;
             if (G.Project.FrontTranslation == Trans)
@@ -912,7 +910,7 @@ namespace OurWord.Dialogs
         #endregion
 
         // Books Page ------------------------------------------------------------------------
-		#region Handler: cmdRemoveBook - ctrlRemove Book button clicked
+		#region Handler: cmdRemoveBook - Remove Book button clicked
 		private void cmdRemoveBook(object sender, System.EventArgs e)
 		{
 			// Get the selection
@@ -924,7 +922,7 @@ namespace OurWord.Dialogs
 			if (!Messages.VerifyRemoveBook())  
 				return;
 
-			// ctrlRemove the book from the translation & refresh the listview
+			// Remove the book from the translation & refresh the listview
 			Trans.Books.Remove(book);
 			_PopulateBookList("");
 		}
@@ -1098,7 +1096,7 @@ namespace OurWord.Dialogs
 
 
     #region CLASS BookNames - E.g., Genesis, Exodus, Leviticus, etc.
-    class BookNames
+    public class BookNames
     {
         // Attrs -----------------------------------------------------------------------------
         #region SAttr{g}: LocGroup LocGroup - the localization group containing the book names (LocItems)
@@ -1200,30 +1198,6 @@ namespace OurWord.Dialogs
 		"Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", 
 		"Jude", "Revelation" 
 	};
-        #endregion
-    }
-    #endregion
-
-    #region NUnit Test_BookNames
-    [TestFixture]
-    public class Test_BookNames
-    {
-        #region Method: void Setup()
-        [SetUp]
-        public void Setup()
-        {
-            JWU.NUnit_Setup();
-        }
-        #endregion
-
-        #region Test: BookNameRetrieval
-        [Test]
-        public void BookNameRetrieval()
-        {
-            string[] vSpanish = BookNames.GetTable("Español");
-
-            Assert.AreEqual("Éxodo", vSpanish[1]);
-        }
         #endregion
     }
     #endregion

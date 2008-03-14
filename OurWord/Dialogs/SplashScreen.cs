@@ -43,13 +43,97 @@ namespace OurWord.Dialogs
         static SplashScreen s_wndSplash = null;
         #endregion
 
+        // Delegates for cross-thread calls -------------------------------------------------
+        public delegate void SetStatus_Callback(string sWhatIsCurrentlyLoading, int cProgressIndicatorCount);
+        public delegate void IncrementProgress_Callback();
+        public delegate void ResetProgress_Callback();
+        public delegate void StopSplashScreen_Callback(Form f);
+
+        // Controls --------------------------------------------------------------------------
+		private Label m_lblProgramName;
+		private Label m_lblVersion;
+		private Label m_lblAdditional;
+		private Label m_lblStatus;
+
+        // Pre-localized data to go into the controls. We set these prior to starting the
+        // thread, so as to avoid the cross-thread issues with LocDB.
+        #region Attr{g/s}: string ProgramName
+        public static string ProgramName
+        {
+            get
+            {
+                return s_sProgramName;
+            }
+            set
+            {
+                s_sProgramName = value;
+            }
+        }
+        static string s_sProgramName;
+        #endregion
+        #region Attr{g/s}: string Version
+        public static string Version
+        {
+            get
+            {
+                return s_sVersion;
+            }
+            set
+            {
+                s_sVersion = value;
+            }
+        }
+        static string s_sVersion;
+        #endregion
+        #region Attr{g/s}: string Additional
+        public static string Additional
+        {
+            get
+            {
+                return s_sAdditional;
+            }
+            set
+            {
+                s_sAdditional = value;
+            }
+        }
+        static string s_sAdditional;
+        #endregion
+        #region Attr{g/s}: string StatusMessage
+        public static string StatusMessage
+        {
+            get
+            {
+                return s_sStatusMessage;
+            }
+            set
+            {
+                s_sStatusMessage = value;
+            }
+        }
+        static string s_sStatusMessage = "";
+        #endregion
+        #region Attr{g/s}: string StatusBase
+        public static string StatusBase
+        {
+            get
+            {
+                return s_sStatusBase;
+            }
+            set
+            {
+                s_sStatusBase = value;
+            }
+        }
+        static string s_sStatusBase = "";
+        #endregion
+
+        static public Form ParentWnd;
+
         // Fade in and out -------------------------------------------------------------------
 		private double m_dblOpacityIncrement = .05;
         private double m_dblOpacityDecrement = .08;
         private System.Timers.Timer m_Timer;
-		private System.Windows.Forms.Label m_lblProgramName;
-		private System.Windows.Forms.Label m_lblVersion;
-		private System.Windows.Forms.Label m_lblAdditional;
 		private const int TIMER_INTERVAL = 50;
 		#region Method: void OnTimerTick(object sender, System.EventArgs e)
 
@@ -60,7 +144,7 @@ namespace OurWord.Dialogs
             if (s_wndSplash.InvokeRequired)
             {
                 OnTimerTick_Callback cb = new OnTimerTick_Callback(OnTimerTick);
-                s_wndSplash.Invoke(cb, new object[] { sender, e});
+                s_wndSplash.Invoke(cb, new object[] { sender, e });
             }
             else
             {
@@ -95,20 +179,24 @@ namespace OurWord.Dialogs
 		#endregion
 
 		// Status Message --------------------------------------------------------------------
-		static private string s_sStatusMessage = "";
-		private Label m_lblStatus;
-        #region Method: void SetStatus(string sWhatIsCurrentlyLoading)
-        static public void SetStatus(string sWhatIsCurrentlyLoading)
+        #region Method: void SetStatus(string sWhatIsCurrentlyLoading, cProgressIndicatorCount)
+        public void SetStatus(string sWhatIsCurrentlyLoading, int cProgressIndicatorCount)
 		{
 			if( s_wndSplash == null )
 				return;
 
-            // Get the base string from the LocDB: "Loading {0}..."
-            string sBase = LocDB.GetValue(s_wndSplash, "sLoading", "Loading {0}...");
+            SetProgressBound(cProgressIndicatorCount);
 
             // Insert the object we're loading
-            s_sStatusMessage = LocDB.Insert(sBase, new string[] { sWhatIsCurrentlyLoading });
+            int iPos = StatusBase.IndexOf("{0}");
+            if (iPos >= 0)
+            {
+                string sFirst = StatusBase.Substring(0, iPos);
+                string sLast = StatusBase.Substring(iPos + 3);
+                s_sStatusMessage = sFirst + sWhatIsCurrentlyLoading + sLast;
+            }
 		}
+
 		#endregion
 
 		// Progress Indicator ----------------------------------------------------------------
@@ -145,8 +233,9 @@ namespace OurWord.Dialogs
 			}		
 		}
 		#endregion
+
 		#region Method: void IncrementProgress()
-		static public void IncrementProgress()
+		public void IncrementProgress()
 		{
 			if (null == s_wndSplash || !IsEnabled)
 				return;
@@ -156,7 +245,7 @@ namespace OurWord.Dialogs
 		}
 		#endregion
 		#region Method: void SetProgressBound(int cAmount)
-		static public void SetProgressBound(int cAmount)
+		static private void SetProgressBound(int cAmount)
 		{
 			if (null == s_wndSplash || !IsEnabled)
 				return;
@@ -164,28 +253,18 @@ namespace OurWord.Dialogs
 		}
 		#endregion
 		#region Method: void ResetProgress()
-
-        delegate void ResetProgress_Callback();
-
-		static public void ResetProgress()
+		public void ResetProgress()
 		{
             if (null == s_wndSplash || !IsEnabled)
                 return;
 
-            if (s_wndSplash.InvokeRequired)
-            {
-                ResetProgress_Callback cb = new ResetProgress_Callback(ResetProgress);
-                s_wndSplash.Invoke(cb, new object[] { });
-            }
-            else
-            {
-                if (null == s_wndSplash)
-                    return;
-                s_wndSplash.m_dblCompletionFraction = 0;
-                s_wndSplash.UpdateProgressBarDisplay();
-                s_wndSplash.Invalidate(s_wndSplash.m_panelStatus.ClientRectangle);
-                s_wndSplash.Refresh();
-            }
+            if (null == s_wndSplash)
+                return;
+
+            s_wndSplash.m_dblCompletionFraction = 0;
+            s_wndSplash.UpdateProgressBarDisplay();
+            s_wndSplash.Invalidate(s_wndSplash.m_panelStatus.ClientRectangle);
+            s_wndSplash.Refresh();
 		}
 		#endregion
 
@@ -213,30 +292,30 @@ namespace OurWord.Dialogs
 			}
 		}
 		#endregion
-		#region Method: void Close(Form wndParent)
 
-        public delegate void Close_Callback();
-
-		static public void Close(Form wndParent)
-		{
+        #region Method: void Stop(Form wndParent)
+        public void Stop(Form wndParent)
+        {
             if (!IsEnabled)
                 return;
 
             if (null != s_wndSplash)
             {
-                // By setting a parent, we avoid the problem of the main form no longer
-                // being on top. (It otherwise has a tendency to dissappear in the Z order.)
-                // TODO: Must do this in a thread-safe manner.
- //TODO               if (null != wndParent)
- //TODO                   s_wndSplash.Owner = wndParent;
-
                 // The timer code will start the fade-out; when the fade is done,
                 // the window will be closed.
                 s_wndSplash.m_dblOpacityIncrement = -s_wndSplash.m_dblOpacityDecrement;
 
+                // By setting a parent, we avoid the problem of the main form no longer
+                // being on top. (It otherwise has a tendency to dissappear in the Z order.)
+                // Update the owner a thread safe fashion!
+// TODO: Must do this in a thread-safe manner.
+// Doing the CheckForIllegalCrossThreadCalls thing in the constructor for now, if Mono will let me get away with it
+               if (null != wndParent)
+                   s_wndSplash.Owner = wndParent;
+
             }
         }
-		#endregion
+        #endregion
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
@@ -245,8 +324,7 @@ namespace OurWord.Dialogs
 			// Required for Windows Form Designer support
 			InitializeComponent();
 
-            // Initial status message
-            s_sStatusMessage = LocDB.GetValue(this, "sLoadingOurWord", "Loading Our Word...");
+            Control.CheckForIllegalCrossThreadCalls = false;
 
 			// By having the client resize to the background image, we can use
 			// different images without having to programmatically worry about
@@ -287,7 +365,7 @@ namespace OurWord.Dialogs
 		}
 		#endregion
 		#region Windows Form Designer generated code
-		private System.ComponentModel.IContainer components;
+		private System.ComponentModel.IContainer components = null;
 
 		/// <summary>
 		/// Required method for Designer support - do not modify
@@ -390,20 +468,13 @@ namespace OurWord.Dialogs
         private void cmdLoad(object sender, EventArgs e)
             // Handle Localization
         {
-            // Localize the easy stuff
-            Control[] vExclude = { m_lblVersion, m_lblAdditional, m_lblStatus, m_panelStatus };
-            LocDB.Localize(this, vExclude);
+            // Place already-localized values into their labels
+            m_lblVersion.Text = Version;
 
-            // The version information is built at runtime
-            m_lblVersion.Text = G.GetLoc_DialogCommon(
-                m_lblVersion.Name,
-                "Version {0}",
-                new string[] { G.Version });
+            if ("-" != Additional)
+                m_lblAdditional.Text = Additional;
 
-            // Optional Additional Information
-            string sAdditional = LocDB.GetValue(this, "sOptionalAdditional", "-");
-            if ("-" != sAdditional)
-                m_lblAdditional.Text = sAdditional;
+            m_lblProgramName.Text = ProgramName;
         }
         #endregion
     }

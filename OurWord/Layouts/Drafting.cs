@@ -239,7 +239,7 @@ namespace OurWord.View
                 for (int kF = 0; kF < G.SFront.Footnotes.Count; kF++)
                     AddFrontFootnote(G.SFront.Footnotes[kF] as DFootnote);
                 for (int kT = 0; kT < G.STarget.Footnotes.Count; kT++)
-                    AddTargetFootnote(G.STarget.Footnotes[kT] as DFootnote);
+                    AddTargetFootnote(G.STarget.Footnotes[kT] as DFootnote, true);
                 return;
             }
 
@@ -253,7 +253,7 @@ namespace OurWord.View
                 fTarget.SynchRunsToModelParagraph(fFront);
 
                 AddFrontFootnote(fFront);
-                AddTargetFootnote(fTarget);
+                AddTargetFootnote(fTarget, fFront.HasItalics);
             }
 
         }
@@ -322,7 +322,7 @@ namespace OurWord.View
                     {
                         DParagraph pTarget = G.STarget.Paragraphs[iTarget + kT] as DParagraph;
                         pTarget.BestGuessAtInsertingTextPositions();
-                        AddTargetParagraph(pTarget);
+                        AddTargetParagraph(pTarget, true);
                     }
                 }
                 else
@@ -351,7 +351,7 @@ namespace OurWord.View
                         // Add the left and right paragraphs
                         _LoadHintsFromFront(pFront);
                         AddFrontParagraph(pFront);
-                        AddTargetParagraph(pTarget);
+                        AddTargetParagraph(pTarget, pFront.HasItalics);
                     }
                 }
 
@@ -389,8 +389,8 @@ namespace OurWord.View
                 OWPara.Flags.None));
         }
         #endregion
-        #region Method: void AddTargetParagraph(DParagraph)
-        void AddTargetParagraph(DParagraph pTarget)
+        #region Method: void AddTargetParagraph(DParagraph, bool AllowItalics)
+        void AddTargetParagraph(DParagraph pTarget, bool AllowItalics)
         {
             // Options for paragraphs that will be on the right-hand, editable side
             OWPara.Flags DraftingOptions = OWPara.Flags.None;
@@ -401,6 +401,8 @@ namespace OurWord.View
                     DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
                 if (OurWordMain.TargetIsLocked)
                     DraftingOptions |= OWPara.Flags.IsLocked;
+                if (AllowItalics)
+                    DraftingOptions |= OWPara.Flags.CanItalic;
             }
 
             // Background Color
@@ -418,8 +420,8 @@ namespace OurWord.View
                 DraftingOptions));
         }
         #endregion
-        #region Method: void AddTargetFootnote(DFootnote)
-        void AddTargetFootnote(DFootnote fnTarget)
+        #region Method: void AddTargetFootnote(DFootnote, bAllowItalics)
+        void AddTargetFootnote(DFootnote fnTarget, bool AllowItalics)
         {
             // Editing options
             OWPara.Flags DraftingOptions = OWPara.Flags.None;
@@ -428,6 +430,8 @@ namespace OurWord.View
                 DraftingOptions = OWPara.Flags.IsEditable;
                 if (OurWordMain.TargetIsLocked)
                     DraftingOptions |= OWPara.Flags.IsLocked;
+                if (AllowItalics)
+                    DraftingOptions |= OWPara.Flags.CanItalic;
             }
 
             // Background Color

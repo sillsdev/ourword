@@ -174,6 +174,7 @@ namespace OurWord.Edit
             this.Controls.Add(this.m_toolstripNotes);
             this.Name = "NotesPane";
             this.Size = new System.Drawing.Size(224, 470);
+            this.Load += new System.EventHandler(this.cmdLoad);
             this.m_toolstripNotes.ResumeLayout(false);
             this.m_toolstripNotes.PerformLayout();
             this.ResumeLayout(false);

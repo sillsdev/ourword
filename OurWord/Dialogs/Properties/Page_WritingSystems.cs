@@ -354,7 +354,7 @@ namespace OurWord.Dialogs
 
             // TODO: Need an AreYouSure message
             
-            // ctrlRemove it from the StyleSheet
+            // Remove it from the StyleSheet
             G.StyleSheet.WritingSystems.Remove(WritingSystem);
 
             // Rebuild the list and select the first item in it

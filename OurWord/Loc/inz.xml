@@ -2,164 +2,239 @@
   <Language ID="inz" Name="Bahasa Indonesia"></Language>
   <Group ID="m_ToolStrip">
     <Item ID="m_btnExit">
-      <Alt ID="inz" Value="Keluar"></Alt>
+      <Alt ID="inz" Value="Keluar" Tip="Simpan perubahan dan keluar dari Sabda Kita"></Alt>
     </Item>
     <Item ID="m_btnProjectSave">
-      <Alt ID="inz" Value="Simpan"></Alt>
+      <Alt ID="inz" Value="Simpan" Tip="Simpan data anda di hardisk."></Alt>
     </Item>
     <Item ID="m_btnProject">
-      <Alt ID="inz" Value="Proyek"></Alt>
+      <Alt ID="inz" Value="Proyek" Tip="Tunjukkan menu untuk pilih proyek (Baru, Buka, bahasa2, dll.)"></Alt>
     </Item>
     <Item ID="m_menuNewProject">
-      <Alt ID="inz" Value="&amp;Baru..."></Alt>
+      <Alt ID="inz" Value="&amp;Baru..." Tip="Ciptakan proyek baru"></Alt>
     </Item>
     <Item ID="m_menuOpenProject">
-      <Alt ID="inz" Value="B&amp;uka..."></Alt>
+      <Alt ID="inz" Value="B&amp;uka..." Tip="Buka proyek yang pernah dikerjakan"></Alt>
     </Item>
     <Item ID="m_menuSaveProject">
-      <Alt ID="inz" Value="&amp;Simpan"></Alt>
+      <Alt ID="inz" Value="&amp;Simpan" Tip="Amankan proyek dengan buku-buku yang baru diubah"></Alt>
     </Item>
     <Item ID="m_menuSaveProjectAs">
-      <Alt ID="inz" Value="Simp&amp;an Sebagai..."></Alt>
+      <Alt ID="inz" Value="Simp&amp;an Sebagai..." Tip="Simpan proyek ini dengan nama lain"></Alt>
     </Item>
     <Item ID="m_btnPrint">
-      <Alt ID="inz" Value="Cetak"></Alt>
+      <Alt ID="inz" Value="Cetak..." Tip="Print buku ini (atau bagian-bagian dari buku ini)"></Alt>
     </Item>
     <Item ID="m_btnEditCut">
-      <Alt ID="inz" Value="Gunting"></Alt>
+      <Alt ID="inz" Value="Gunting" Tip="Potong teks yang dipilih dan tempatkan pada clipboard"></Alt>
     </Item>
     <Item ID="m_btnEditCopy">
-      <Alt ID="inz" Value="Salin"></Alt>
+      <Alt ID="inz" Value="Salin" Tip="Salin teks yang dipilih pada clipboard"></Alt>
     </Item>
     <Item ID="m_btnEditPaste">
-      <Alt ID="inz" Value="Tempel"></Alt>
+      <Alt ID="inz" Value="Tempel" Tip="Tempel teks dari clipboard ke tempat cursor"></Alt>
     </Item>
     <Item ID="m_menuEdit">
-      <Alt ID="inz" Value="Ubah"></Alt>
+      <Alt ID="inz" Value="Ubah" Tip="Tunjukkan fungsi-fungsi untuk edit teks"></Alt>
     </Item>
     <Item ID="m_menuCut">
-      <Alt ID="inz" Value="&amp;Gunting" Key="Ctrl+X"></Alt>
+      <Alt ID="inz" Value="&amp;Gunting" Tip="Potong teks yang dipilih dan tempatkan pada clipboard"></Alt>
     </Item>
     <Item ID="m_menuCopy">
-      <Alt ID="inz" Value="&amp;Salin" Key="Ctrl+C"></Alt>
+      <Alt ID="inz" Value="&amp;Salin" Tip="Salin teks yang dipilih pada clipboard"></Alt>
     </Item>
     <Item ID="m_menuPaste">
-      <Alt ID="inz" Value="&amp;Tempel"></Alt>
+      <Alt ID="inz" Value="&amp;Tempel" Tip="Tempel teks dari clipboard ke tempat cursor"></Alt>
     </Item>
     <Item ID="m_menuChangeParagraphTo">
+      <Alt ID="inz" Value="&amp;Ubah model alinea" Tip="Ubah model dari alinea yang dipilih ke model yang lain"></Alt>
     </Item>
     <Item ID="m_menuChangeParagraphStyle_p">
+      <Alt ID="inz" Value="Alinea biasa"></Alt>
     </Item>
     <Item ID="m_menuChangeParagraphStyle_q">
+      <Alt ID="inz" Value="Puisi tingkat 1"></Alt>
     </Item>
     <Item ID="m_menuChangeParagraphStyle_q2">
+      <Alt ID="inz" Value="Puisi tingkat 2"></Alt>
     </Item>
     <Item ID="m_menuChangeParagraphStyle_q3">
+      <Alt ID="inz" Value="Puisi tingkat 3"></Alt>
     </Item>
     <Item ID="m_menuChangeParagraphStyle_s">
+      <Alt ID="inz" Value="Judul perikop"></Alt>
     </Item>
     <Item ID="m_btnItalic">
-      <Alt ID="inz" Value="Miring"></Alt>
+      <Alt ID="inz" Value="Miring" Tip="Ubah teks yang dipilih ke huruf miring; ini hanya dibolehkan apabila ada huruf miring dalam Terjemahan Acuan di situ"></Alt>
     </Item>
     <Item ID="m_btnGotoFirstSection">
-      <Alt ID="inz" Value="Pertama"></Alt>
+      <Alt ID="inz" Value="Pertama" Tip="Ke bagian awal buku ini"></Alt>
     </Item>
     <Item ID="m_btnGotoPreviousSection">
-      <Alt ID="inz" Value="Dulu"></Alt>
+      <Alt ID="inz" Value="Dulu" Tip="Ke bagian sebelumnya dalam buku ini"></Alt>
     </Item>
     <Item ID="m_btnGotoNextSection">
-      <Alt ID="inz" Value="Berikut"></Alt>
+      <Alt ID="inz" Value="Berikut" Tip="Ke bagian selanjutnya dalam buku ini"></Alt>
     </Item>
     <Item ID="m_btnGotoLastSection">
-      <Alt ID="inz" Value="Terakhir"></Alt>
+      <Alt ID="inz" Value="Terakhir" Tip="Ke bagian akhir buku ini"></Alt>
     </Item>
     <Item ID="m_btnChapter">
+      <Alt ID="inz" Value="Pasal" Tip="Cari pasal tertentu dalam buku ini"></Alt>
     </Item>
     <Item ID="m_btnGoToBook">
-      <Alt ID="inz" Value="Buku"></Alt>
+      <Alt ID="inz" Value="Buku" Tip="Cari buku yang lain"></Alt>
     </Item>
     <Item ID="m_btnTools">
-      <Alt ID="inz" Value="Alat"></Alt>
+      <Alt ID="inz" Value="Alat" Tip="Tunjukkan menu dengan berbagai fungsi yang tersedia"></Alt>
     </Item>
     <Item ID="m_menuIncrementBookStatus">
-      <Alt ID="inz" Value="&amp;Robah nama file..."></Alt>
+      <Alt ID="inz" Value="&amp;Robah tahap buku..." Tip="Ubah status buku ke tahap berikut dalam proses penerjemahan"></Alt>
     </Item>
     <Item ID="m_menuRestoreFromBackup">
-      <Alt ID="inz" Value="File Cadangan &amp;Mengganti File yang Rusak..."></Alt>
+      <Alt ID="inz" Value="&amp;File Rusak digantikan dengan File Cadangan..." Tip="Mengganti dari file lama"></Alt>
     </Item>
     <Item ID="m_menuOnlyShowSectionsThat">
+      <Alt ID="inz" Value="Hanya tampilkan &amp;bagian yang..." Tip="Saringan yang hanya tampilkan bagian-bagian yang dipilih"></Alt>
     </Item>
     <Item ID="m_menuCopyBTfromFront">
-      <Alt ID="inz" Value="&amp;Kopi Terjemahan Balik dari Terj. Acuan..."></Alt>
+      <Alt ID="inz" Value="&amp;Kopi Terjemahan Balik dari Terj. Acuan" Tip="Masukkan Terjemahan Balik dari Terjemahan Acuan"></Alt>
     </Item>
     <Item ID="m_menuEntireBook">
+      <Alt ID="inz" Value="S&amp;eluruh Buku..."></Alt>
     </Item>
     <Item ID="m_menuCurrentSectionOnly">
+      <Alt ID="inz" Value="Hanya bag&amp;ian ini..."></Alt>
     </Item>
     <Item ID="m_menuConfigure">
-      <Alt ID="inz" Value="C&amp;iri-ciri..."></Alt>
+      <Alt ID="inz" Value="C&amp;iri-ciri..." Tip="Atur fungsi-fungsi untuk Sabda Kita dan untuk proyek ini"></Alt>
     </Item>
     <Item ID="m_menuSetUpFeatures">
-      <Alt ID="inz" Value="&amp;Setel Proyek..."></Alt>
+      <Alt ID="inz" Value="Setel Pro&amp;yek..." Tip="Atur fungsi-fungsi yang bisa digunakan"></Alt>
     </Item>
     <Item ID="m_menuLocalizerTool">
+      <Alt ID="inz" Value="Bahasa &amp;Pengantar untuk Sabda Kita..." Tip="Ciptakan antarmuka untuk Sabda Kita dalam Bahasa Pengantarlain"></Alt>
     </Item>
     <Item ID="m_menuRunDebugTestSuite">
+      <Alt ID="inz" Value="&amp;Cek Error Program..." Tip="Ini hanya untuk pemrogram komputer; Abaikan saja!"></Alt>
     </Item>
     <Item ID="m_btnWindow">
+      <Alt ID="inz" Value="Jendela" Tip="Tunjukkan berbagai window yang bisa diaktifkan"></Alt>
     </Item>
     <Item ID="m_menuDrafting">
-      <Alt ID="inz" Value="&amp;Susun Konsep"></Alt>
+      <Alt ID="inz" Value="Susun dan Revisi &amp;Konsep" Tip="Jendela untuk isi konsep kasar dan revisi bahan lama"></Alt>
     </Item>
     <Item ID="m_menuBackTranslation">
-      <Alt ID="inz" Value="Terjemahan &amp;Balik"></Alt>
+      <Alt ID="inz" Value="Terjemahan &amp;Balik" Tip="Jendela untuk menyusun Terjemahan Balik bagi konsultan"></Alt>
     </Item>
     <Item ID="m_menuNaturalnessCheck">
-      <Alt ID="inz" Value="Baca untuk &amp;Kewajaran"></Alt>
+      <Alt ID="inz" Value="Ke&amp;wajaran" Tip="Jendela untuk membaca terjemahan dalam bahasa sasaran, agar mengecek apakah bahasanya jelas dan wajar, atau tidak"></Alt>
     </Item>
     <Item ID="m_menuShowNotesPane">
-      <Alt ID="inz" Value="&amp;Lihat kotak untuk Catatan"></Alt>
+      <Alt ID="inz" Value="Buka Kotak &amp;Catatan" Tip="Buka kotak untuk lihat catatan"></Alt>
     </Item>
     <Item ID="m_menuShowTranslationsPane">
-      <Alt ID="inz" Value="Membuka kotak untuk Terjemahan Bandingan"></Alt>
+      <Alt ID="inz" Value="Buka Kotak Ter&amp;jemahan Bandingan" Tip="Buka kotak untuk lihat Terjemahan Bandingan dalam bahasa lain"></Alt>
     </Item>
     <Item ID="m_menuShowMergePane">
+      <Alt ID="inz" Value="Buka Kotak &amp;Gabung" Tip="Buka kotak untuk menggabungkan file-file yang berbeda dari satu buku menjadi satu file"></Alt>
     </Item>
     <Item ID="m_menuShowDictionaryPane">
+      <Alt ID="inz" Value="Buka Kotak Ka&amp;mus" Tip="Buka kotak untuk melihat dan mengisi makna kata dalam kamus bahasa anda"></Alt>
     </Item>
     <Item ID="m_menuHelpTopics">
-      <Alt ID="inz" Value="Tolong &amp;Mengenai..."></Alt>
+      <Alt ID="inz" Value="&amp;Tolong" Tip="Tunjukkan jendela Helps untuk cari bantuan"></Alt>
     </Item>
     <Item ID="m_menuAbout">
-      <Alt ID="inz" Value="&amp;Tentang Sabda Kita!..."></Alt>
+      <Alt ID="inz" Value="Mengenai &amp;Sabda Kita!" Tip="Lihat informasi tentang versi Sabda Kita ini"></Alt>
+    </Item>
+    <Item ID="m_menuUndo">
+      <Alt ID="inz" Value="Kerja Mun&amp;dur"></Alt>
+    </Item>
+    <Item ID="m_menuRedo">
+      <Alt ID="inz" Value="Kerja &amp;Ulang"></Alt>
+    </Item>
+    <Item ID="m_menuPreviousSection">
+      <Alt ID="inz" Value="Bagian sebelumnya"></Alt>
+    </Item>
+    <Item ID="m_menuNextSection">
+      <Alt ID="inz" Value="Bagian Berikut"></Alt>
+    </Item>
+  </Group>
+  <Group ID="m_toolstripNotes">
+    <Item ID="m_btnInsert">
+      <Alt ID="inz" Value="Masukkan" Tip="Masukkan"></Alt>
+    </Item>
+    <Item ID="m_menuInsertGeneral">
+      <Alt ID="inz" Value="Catatan &amp;Umum"></Alt>
+    </Item>
+    <Item ID="m_menuInsertToDo">
+      <Alt ID="inz" Value="Untuk &amp;Diperhatikan"></Alt>
+    </Item>
+    <Item ID="m_menuInsertAskUNS">
+      <Alt ID="inz" Value="Masukkan Catatan &amp;Tanya Pembaca"></Alt>
+    </Item>
+    <Item ID="m_menuInsertDefinition">
+      <Alt ID="inz" Value="&amp;Arti Kata"></Alt>
+    </Item>
+    <Item ID="m_menuInsertOldVersion">
+      <Alt ID="inz" Value="&amp;Versi Lama"></Alt>
+    </Item>
+    <Item ID="m_menuInsertReason">
+      <Alt ID="inz" Value="Alasan Untuk &amp;Susunan"></Alt>
+    </Item>
+    <Item ID="m_menuInsertFrontIssue">
+      <Alt ID="inz" Value="&amp;Perihal Terjemahan Acuan"></Alt>
+    </Item>
+    <Item ID="m_menuInsertHintForDaughter">
+      <Alt ID="inz" Value="Bantuan untuk Susun &amp;Konsep"></Alt>
+    </Item>
+    <Item ID="m_menuInsertBT">
+      <Alt ID="inz" Value="Perihal Terjemahan &amp;Balik"></Alt>
+    </Item>
+    <Item ID="m_btnDeleteNote">
+      <Alt ID="inz" Value="&amp;Hapus Catatan..."></Alt>
     </Item>
   </Group>
   <Group ID="Strings">
     <Item ID="kYes">
+      <Alt ID="inz" Value="Ya"></Alt>
     </Item>
     <Item ID="kNo">
+      <Alt ID="inz" Value="Tidak"></Alt>
     </Item>
     <Item ID="SetupFT_TargetDefinition">
+      <Alt ID="inz" Value="Terjemahan Sasaran adalah terjemahan bahasa sehari-hari yang anda karjakan. Anda menggunakan Terjemahan Acuan sebagai satu sumber untuk menciptakan Terjemahan Sasaran. Jika anda penerjemah penutur asli, maka Terjemahan Sasaran merupakan terjemahan ke dalam bahasa anda sendiri."></Alt>
     </Item>
     <Item ID="SetupFT_TargetCreateExpl">
+      <Alt ID="inz" Value="Mulai dari awal untuk menciptakan pengaturan bagi Terjemahan Sasaran. Tempat-tempat kosong akan ditampilkan kepada anda, supaya anda bisa memasukkan nama terjemahan, buku-buku, dll."></Alt>
     </Item>
     <Item ID="SetupFT_TargetOpenExpl">
+      <Alt ID="inz" Value="Gunakan pengaturan yang sudah ada untuk Terjemahan Sasaran anda. Jika pengaturan yang anda ingin pakai telah ditentukan bagi proyek yang lain, maka anda dapat menggunakannya di sini juga. Dengan demikian anda tidak perlu memasukkan ulang semua informasi."></Alt>
     </Item>
     <Item ID="PropDlgTab_StyleSheet">
+      <Alt ID="inz" Value="Pedoman Gaya (stylesheet)"></Alt>
     </Item>
     <Item ID="PropDlgTab_WritingSystems">
+      <Alt ID="inz" Value="Sistem Tulisan"></Alt>
     </Item>
     <Item ID="PropDlgTab_PrintOptions">
+      <Alt ID="inz" Value="Pilihan Cetak"></Alt>
     </Item>
     <Item ID="PropDlgTab_TranslationStages">
+      <Alt ID="inz" Value="Langkah terjemahan"></Alt>
     </Item>
     <Item ID="strCalculatingMatchingSections">
+      <Alt ID="inz" Value="Sementara cari bagian-bagian yang cocok..."></Alt>
     </Item>
     <Item ID="strViewingASubset">
+      <Alt ID="inz" Value="Hanya tampilkan bagian-bagian yang cocok "></Alt>
     </Item>
     <Item ID="strFormattingPages">
+      <Alt ID="inz" Value="Sementara mengatur halaman (format)..."></Alt>
     </Item>
     <Item ID="strPrintingPages">
+      <Alt ID="inz" Value="Sementara cetak halaman..."></Alt>
     </Item>
     <Item ID="NewNote">
       <Alt ID="inz" Value="BARU"></Alt>
@@ -169,7 +244,7 @@
     </Item>
     <Group ID="GeneralUI">
       <Item ID="DraftingWindowName">
-        <Alt ID="inz" Value="Susun Konsep"></Alt>
+        <Alt ID="inz" Value="Susun dan Revisi Konsep"></Alt>
       </Item>
       <Item ID="DraftingReference">
         <Alt ID="inz" Value="{0} ke {1}"></Alt>
@@ -178,29 +253,34 @@
         <Alt ID="inz" Value="Terjemahan Balik"></Alt>
       </Item>
       <Item ID="BackTranslationReference">
+        <Alt ID="inz" Value="{0}"></Alt>
       </Item>
       <Item ID="NaturalnessCheckWindowName">
+        <Alt ID="inz" Value="Kewajaran"></Alt>
       </Item>
       <Item ID="NaturalnessCheckReference">
+        <Alt ID="inz" Value="{0} - {1}"></Alt>
       </Item>
       <Item ID="NoProjectDefined">
+        <Alt ID="inz" Value="Ciri-ciri proyek ini belum lengkap"></Alt>
       </Item>
       <Item ID="NoFrontDefined">
-        <Alt ID="inz" Value="(komputer belum kenal terjemahan induk)"></Alt>
+        <Alt ID="inz" Value="(terjemahan acuan belum ditentukan)"></Alt>
       </Item>
       <Item ID="NoTargetDefined">
-        <Alt ID="inz" Value="(komputer belum kenal terjemahan sasaran)"></Alt>
+        <Alt ID="inz" Value="(terjemahan sasaran belum ditentukan)"></Alt>
       </Item>
       <Item ID="NotesWindowName">
         <Alt ID="inz" Value="Catatan"></Alt>
       </Item>
       <Item ID="TranslationsWindowName">
+        <Alt ID="inz" Value="Terjemahan-terjemahan"></Alt>
       </Item>
       <Item ID="NoDataToDisplay">
-        <Alt ID="inz" Value="(Tidak ada data yang dapat diperagakan di sini. Gunakanlah daftar File-Ciri-ciri untuk menentukan baik Terjemahan Induk maupun Terjemahan Anak.)"></Alt>
+        <Alt ID="inz" Value="(Belum ada data yang dapat ditampillkan di sini. Gunakanlah daftar Proyek [Baru, Buka, dll.] untuk menentukan baik Terjemahan Acuan maupun Terjemahan Sasaran)"></Alt>
       </Item>
       <Item ID="BrowseForBackupFolderDescr">
-        <Alt ID="inz" Value="Tunjukkanlah map untuk simpan file cadangan. Sebaiknya HDD jangan ditunjuk (karena, jika HDD rusak, file cadangan tidak bisa diamankan). Yang paling baik adalah sebuah memori 'flash card'. Floppy (A:\) juga bisa ditunjukkan, tetapi perlu diingat bahwa setiap kali Sabda Kita dipakai, floppy disk yang selalu sama perlu dimasukkan ke dalam floppy drive."></Alt>
+        <Alt ID="inz" Value="Pilihlah map untuk simpan file cadangan. Sebaiknya HDD jangan dipilih (karena, jika HDD rusak, file cadangan tidak bisa diamankan). Yang paling baik adalah sebuah memori 'flash card'. Floppy (A:\) juga bisa dipilih, tetapi perlu diingat bahwa setiap kali Sabda Kita dipakai, floppy disk yang selalu sama perlu dimasukkan ke dalam floppy drive."></Alt>
       </Item>
     </Group>
     <Group ID="NoteDefs">
@@ -208,18 +288,19 @@
         <Alt ID="inz" Value="Umum"></Alt>
       </Item>
       <Item ID="kHintForDaughter">
+        <Alt ID="inz" Value="Usulan bagi Terjemahan Sasaran"></Alt>
       </Item>
       <Item ID="kToDo">
         <Alt ID="inz" Value="Untuk Diperhatikan"></Alt>
       </Item>
       <Item ID="kAskUns">
-        <Alt ID="inz" Value="Tanya Responden"></Alt>
+        <Alt ID="inz" Value="Tanya Pembaca Kaum Awam"></Alt>
       </Item>
       <Item ID="kReason">
-        <Alt ID="inz" Value="Alasan Untuk Susunan"></Alt>
+        <Alt ID="inz" Value="Alasan untuk susunan"></Alt>
       </Item>
       <Item ID="kFront">
-        <Alt ID="inz" Value="Perihal Induk"></Alt>
+        <Alt ID="inz" Value="Masalah dengan Terjemahan Acuan"></Alt>
       </Item>
       <Item ID="kDefinition">
         <Alt ID="inz" Value="Arti Kata"></Alt>
@@ -231,43 +312,50 @@
         <Alt ID="inz" Value="Terjemahan Balik"></Alt>
       </Item>
       <Item ID="kGreek">
+        <Alt ID="inz" Value="Bhs Yunani"></Alt>
       </Item>
       <Item ID="kHebrew">
+        <Alt ID="inz" Value="Bhs Ibrani"></Alt>
       </Item>
       <Item ID="kExegesis">
+        <Alt ID="inz" Value="Tafsiran"></Alt>
       </Item>
     </Group>
     <Group ID="Notes">
       <Item ID="ToDoDefault">
-        <Alt ID="inz" Value="Diperhatikan:"></Alt>
+        <Alt ID="inz" Value="Untuk Diperhatikan:"></Alt>
       </Item>
       <Item ID="FrontDefault">
-        <Alt ID="inz" Value="Terjemahan Induk:"></Alt>
+        <Alt ID="inz" Value="Terjemahan Acuan:"></Alt>
       </Item>
       <Item ID="BackTTranslationDefault">
-        <Alt ID="inz" Value="TB:"></Alt>
+        <Alt ID="inz" Value="Terjemahan Balik:"></Alt>
       </Item>
       <Item ID="AskUnsDefault">
-        <Alt ID="inz" Value="Tanya Responden:"></Alt>
+        <Alt ID="inz" Value="Tanya Pembaca Kaum Awam:"></Alt>
       </Item>
       <Item ID="HintDefault">
+        <Alt ID="inz" Value="Usulan:"></Alt>
       </Item>
       <Item ID="GreekDefault">
+        <Alt ID="inz" Value="Bhs Yunani:"></Alt>
       </Item>
       <Item ID="HebrewDefault">
+        <Alt ID="inz" Value="Bhs Ibrani:"></Alt>
       </Item>
       <Item ID="ExegesisDefault">
+        <Alt ID="inz" Value="Tafsiran:"></Alt>
       </Item>
     </Group>
     <Group ID="Files">
       <Item ID="ProjectFileFilter">
-        <Alt ID="inz" Value="Sabda Kita! File Proyek (*.owp)|*.owp"></Alt>
+        <Alt ID="inz" Value="File Proyek Sabda Kita (*.owp)|*.owp"></Alt>
       </Item>
       <Item ID="TranslationFileFilter">
-        <Alt ID="inz" Value="abda Kita File Terjemahan (*.oTrans)|*.oTrans"></Alt>
+        <Alt ID="inz" Value="File Terjemahan Sabda Kita (*.oTrans)|*.oTrans"></Alt>
       </Item>
       <Item ID="TeamSettingsFileFilter">
-        <Alt ID="inz" Value="Sabda Kita Setelan Tim (*.owt)|*.owt"></Alt>
+        <Alt ID="inz" Value="File yang mengatur Sabda Kita untuk seluruh Tim (*.owt)|*.owt"></Alt>
       </Item>
       <Item ID="DefaultProjectFileName">
         <Alt ID="inz" Value="Proyek Baru.owp"></Alt>
@@ -276,39 +364,51 @@
         <Alt ID="inz" Value="Bahasa Baru.oTrans"></Alt>
       </Item>
       <Item ID="SaveTranslationAsTitle">
-        <Alt ID="inz" Value="Simpan Definisi Terjemahan Sebagai"></Alt>
+        <Alt ID="inz" Value="Simpan Pengaturan Terjemahan ini sebagai"></Alt>
       </Item>
       <Item ID="OpenTranslationDlgTitle">
-        <Alt ID="inz" Value="Buka File Definisi untuk Terjemahan"></Alt>
+        <Alt ID="inz" Value="Buka File Pengaturan untuk Terjemahan ini"></Alt>
       </Item>
       <Item ID="ExportBookSaveAsDlgTitle">
+        <Alt ID="inz" Value="Masukkan nama file untuk diekspor"></Alt>
       </Item>
       <Item ID="ExportBookFileFilter">
+        <Alt ID="inz" Value="File untuk program Paratext (*.ptx)|*.ptx"></Alt>
       </Item>
       <Item ID="BrowseForBackupFile">
-        <Alt ID="inz" Value="Mencari file cadangan"></Alt>
+        <Alt ID="inz" Value="Cari File Cadangan"></Alt>
       </Item>
       <Item ID="OpenTeamSettingsDlgTitle">
+        <Alt ID="inz" Value="Gunakan File Pengaturan yang sudah ada untuk Tim anda"></Alt>
       </Item>
       <Item ID="SaveTeamSettingsDlgTitle">
+        <Alt ID="inz" Value="Simpan File Pengaturan Tim anda sebagai"></Alt>
       </Item>
     </Group>
     <Group ID="Styles">
       <Item ID="SectionTitle">
+        <Alt ID="inz" Value="Judul Perikop"></Alt>
       </Item>
       <Item ID="SectionTitle2">
+        <Alt ID="inz" Value="Judul Perikop (tingkat 2)"></Alt>
       </Item>
       <Item ID="CrossRef">
+        <Alt ID="inz" Value="Ayat Sejajar"></Alt>
       </Item>
       <Item ID="BookTitle">
+        <Alt ID="inz" Value="Judul Buku"></Alt>
       </Item>
       <Item ID="SubTitle">
+        <Alt ID="inz" Value="Subjudul Buku"></Alt>
       </Item>
       <Item ID="Header">
+        <Alt ID="inz" Value="Kop halaman"></Alt>
       </Item>
       <Item ID="Picture">
+        <Alt ID="inz" Value="Gambar"></Alt>
       </Item>
       <Item ID="CrossReferences">
+        <Alt ID="inz" Value="Ayat Bandingan"></Alt>
       </Item>
     </Group>
     <Group ID="DialogCommon">
@@ -319,8 +419,10 @@
         <Alt ID="inz" Value="Simpan sebagai..."></Alt>
       </Item>
       <Item ID="m_btnOK">
+        <Alt ID="inz" Value="OK"></Alt>
       </Item>
       <Item ID="m_btnClose">
+        <Alt ID="inz" Value="Tutup"></Alt>
       </Item>
       <Item ID="m_btnCancel">
         <Alt ID="inz" Value="Batal"></Alt>
@@ -335,123 +437,205 @@
         <Alt ID="inz" Value="Versi {0}"></Alt>
       </Item>
     </Group>
+    <Group ID="UndoRedo">
+      <Item ID="UndoTyping_what">
+        <Alt ID="inz" Value="Ketik &amp;Mundur ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoTyping_what">
+        <Alt ID="inz" Value="Ketik &amp;Ulang ‘{0}’"></Alt>
+      </Item>
+      <Item ID="UndoBackspace_what">
+        <Alt ID="inz" Value="&amp;Mundur Hapus Kiri ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoBackspace_what">
+        <Alt ID="inz" Value="Hapus Kiri &amp;Ulang ‘{0}’"></Alt>
+      </Item>
+      <Item ID="UndoDelete_what">
+        <Alt ID="inz" Value="&amp;Mundur Hapus  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoDelete_what">
+        <Alt ID="inz" Value="Hapus &amp;Ulang  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="UndoCut_what">
+        <Alt ID="inz" Value="Potong &amp;Mundur  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoCut_what">
+        <Alt ID="inz" Value="Pootng &amp;Ulang  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="UndoCopy_what">
+        <Alt ID="inz" Value="Kopi &amp;Mundur  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoCopy_what">
+        <Alt ID="inz" Value="Kopi &amp;Ulang  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="UndoPaste_what">
+        <Alt ID="inz" Value="Tempel &amp;Mundur  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoPaste_what">
+        <Alt ID="inz" Value="Tempel &amp;Ulang  ‘{0}’"></Alt>
+      </Item>
+      <Item ID="UndoSplitParagraph">
+        <Alt ID="inz" Value="Sambung Ke&amp;mbali Alinea"></Alt>
+      </Item>
+      <Item ID="RedoSplitParagraph">
+        <Alt ID="inz" Value="Bagi Alinea &amp;Ulang"></Alt>
+      </Item>
+      <Item ID="UndoJoinParagraph">
+        <Alt ID="inz" Value="Bagi Ke&amp;mbali Alinea"></Alt>
+      </Item>
+      <Item ID="RedoJoinParagraph">
+        <Alt ID="inz" Value="Sambung &amp;Ulang Alinea"></Alt>
+      </Item>
+      <Item ID="UndoChangeParagraphStyle_what">
+        <Alt ID="inz" Value="&amp;Mundur dari Ubah Gaya Alinea ‘{0}’"></Alt>
+      </Item>
+      <Item ID="RedoChangeParagraphStyle_what">
+        <Alt ID="inz" Value="Ubah Gaya Alinea &amp;Ulang ‘{0}’"></Alt>
+      </Item>
+    </Group>
   </Group>
   <Group ID="Messages">
     <Item ID="msgBookIsLocked">
-      <Alt ID="inz" Value="Usul perbaikan atau perobahan harap dibahas dengan pembina tim. {0} tidak bisa lagi dirobah langsung di komputer ini."></Alt>
+      <Alt ID="inz" Value="Usul perbaikan atau perobahan harap dibahas dengan pembina tim anda. {0} tidak bisa lagi dirobah langsung di komputer ini."></Alt>
     </Item>
     <Item ID="msgBookNeedsFolder">
       <Alt ID="inz" Value="Masukan nama Folder untuk menyimpan data buku ini."></Alt>
     </Item>
     <Item ID="msgBookNeedsImportFilename">
-      <Alt ID="inz" Value="Masukan nama file yang hendak anda"></Alt>
+      <Alt ID="inz" Value="Masukkan nama file yang ingin diimpor."></Alt>
     </Item>
     <Item ID="msgBookNeedsName">
-      <Alt ID="inz" Value="Masukkan nama untuk buku, misalnya, 'Mateos'"></Alt>
+      <Alt ID="inz" Value="Masukkan nama untuk buku, misalnya, ‘Mateos’."></Alt>
     </Item>
     <Item ID="msgCantInsertNoteHere">
       <Alt ID="inz" Value="Catatan tidak dapat dimasukkan dalam judul buku, judul gambar atau catatan kaki."></Alt>
     </Item>
     <Item ID="msgConfirmChangeFileLanguage">
+      <Alt ID="inz" Value="Merobah bahasa di sini mempunyai dampak sebagai berikut:{n}1. Nama langkah terjemahan akan kembali ke name pertama (‘factory defaults’).{n}2. Nama file-file akan dirobah nanti kalau disimpan.{n}{n}Apakah anda yakin untuk merobah semua ke {0}?"></Alt>
     </Item>
     <Item ID="msgConfirmFileOverwrite">
-      <Alt ID="inz" Value="File: {n}    {0}{n}sudah ada di disk. Apakah anda sungguh-sungguh ingin menghapus dan menggantikannya?"></Alt>
+      <Alt ID="inz" Value="File yang bernama: {n}     {0}{n}sudah ada di disk. Apakah anda sungguh-sungguh ingin menghapus dan menggantikannya?"></Alt>
     </Item>
     <Item ID="msgConfirmFrontReplace">
+      <Alt ID="inz" Value="Terjemahan ini akan mengganti {0}  sebagai Terjemahan Acuan untuk bahasa ini.{n}{n}Apakah anda yakin untuk melakukan ini?"></Alt>
     </Item>
     <Item ID="msgConfirmNoteDeletion">
-      <Alt ID="inz" Value="Yakin ingin menghapus catatan ini{n}  {0}?"></Alt>
+      <Alt ID="inz" Value="Apakah betul anda ingin menghapus catatan ini:{n}  {0}?"></Alt>
     </Item>
     <Item ID="msgConfirmTargetReplace">
+      <Alt ID="inz" Value="Terjemahan ini akan mengganti {0} sebagai Terjemahan Sasaran.{n}{n}Apakah anda yakin untuk melakukan ini?"></Alt>
     </Item>
     <Item ID="msgConfirmRemoveTranslationStage">
+      <Alt ID="inz" Value="Anda akan menghapus salah satu Langkah Terjemahan. Jika ada buku-buku{n} di dalam terjemahan anda pada Langkah tersebut, informasi Langkah yang betul{n}tidak lagi akan termasuk dalam file.{n}{n}Apakah anda betul-betul ingin menghapus ‘{0}’?"></Alt>
     </Item>
     <Item ID="msgConfirmResetStylesToDefaults">
+      <Alt ID="inz" Value="Apakah anda betul-betul ingin kembalikan seluruh Pedoman Gaya (stylesheet){n} ke keadaan awal (default values)?"></Alt>
     </Item>
     <Item ID="msgConfirmResetTranslationStagesToDefaults">
+      <Alt ID="inz" Value="Apakah anda betul-betul ingin kembalikan Langkah-Langkah Terjemahan ke{n}keadaan awal (default values)?"></Alt>
     </Item>
     <Item ID="msgDuplicateBookName">
       <Alt ID="inz" Value="Nama buku ini tidak boleh persis sama dengan nama buku lain dalam terjemahan ini."></Alt>
     </Item>
     <Item ID="msgDuplicateStagesNotAllowed">
+      <Alt ID="inz" Value="Dua Langkah Terjemahan yang berbeda tidak boleh mempunyai nama yang sama."></Alt>
     </Item>
     <Item ID="msgInsufficentSpaceForBackup">
       <Alt ID="inz" Value="Tempat kosong di drive {0} tidak cukup untuk file cadangan."></Alt>
     </Item>
     <Item ID="msgMissingChapterRange">
+      <Alt ID="inz" Value="Tolong isi angka untuk pasal-pasal (bab) yang ingin dicetak."></Alt>
     </Item>
     <Item ID="msgMissingPageRange">
+      <Alt ID="inz" Value="Tolong isi angka untuk halaman-halaman yang ingin dicetak."></Alt>
     </Item>
     <Item ID="msgNeedFloppyForBackup">
-      <Alt ID="inz" Value="Gagal menulis arsip cadangan: {n}{n}     {0}{n}{n}Pastikan ada sesuatu dalam drive (misalnya disket, flash memory; atau apa saja yang cocok untuk drive.{n}{n}Tekan Ya untuk coba lagi, atau Tidak untuk meniadakan cadangan."></Alt>
+      <Alt ID="inz" Value="Gagal simpan file cadangan: {n}{n}     {0}{n}{n}Pastikan ada sesuatu dalam drive (misalnya disket, flash memory; atau apa saja yang cocok untuk drive.{n}{n}Tekan ‘Ya’ untuk coba lagi, atau ‘Tidak’ untuk batalkan."></Alt>
     </Item>
     <Item ID="msgNoFilterMatches">
+      <Alt ID="inz" Value="Tidak ada bagian yang cocok dengan permohonan anda."></Alt>
     </Item>
     <Item ID="msgNoPermissionToWriteFile">
+      <Alt ID="inz" Value="Anda tidak mempunyai izin untuk merobah file: {n}{n}     {0}."></Alt>
     </Item>
     <Item ID="msgProjectHasNoFront">
-      <Alt ID="inz" Value="Terjemahan Induk belum ditetapkan bagi proyek ini. Ingin tetapkan sekarang?"></Alt>
+      <Alt ID="inz" Value="Terjemahan Acuan belum ditentukan untuk proyek ini. Ingin tentukan sekarang?"></Alt>
     </Item>
     <Item ID="msgProjectHasNoTarget">
-      <Alt ID="inz" Value="Terjemahan Anak belum ditetapkan bagi proyek ini. Ingin tetapkan sekarang?"></Alt>
+      <Alt ID="inz" Value="Terjemahan Sasaran belum ditentukan untuk proyek ini. Ingin tentukan sekarang?"></Alt>
     </Item>
     <Item ID="msgTranslationNeedsAbbrev">
-      <Alt ID="inz" Value="Tolong masukkan singkatan untuk nama bahasa, misalnya, 'Ama'.{n}{n}Biasanya pembina yang tentukannya. Singkatan ini diperlukan untuk membedakan{n}terjemahan ini dari terjemahan yang lain. Singkatan ini juga digunakan oleh {n}komputer untuk tentukan nama file. Jika tidak ada singkatan lain, gunakanlah{n}kode 3-huruf dari Ethnologue yang unik bagi bahasa anda."></Alt>
+      <Alt ID="inz" Value="Tolong masukkan singkatan untuk nama bahasa, misalnya, ‘Ama’.{n}{n}Biasanya pembina yang tentukannya. Singkatan ini diperlukan untuk membedakan{n}terjemahan ini dari terjemahan yang lain. Singkatan ini juga digunakan oleh {n}komputer untuk tentukan nama file. Jika tidak ada singkatan lain, gunakanlah{n}kode 3-huruf dari Ethnologue yang unik bagi bahasa anda."></Alt>
     </Item>
     <Item ID="msgTranslationNeedsPath">
-      <Alt ID="inz" Value="Masukkan Nama File untuk menyimpan perangkat-perangkat untuk terjemahan ini. Perlu sesuai peraturan nama file."></Alt>
+      <Alt ID="inz" Value="Tolong masukkan nama File Pengaturan untuk terjemahan ini."></Alt>
     </Item>
     <Item ID="msgTranslationNeedsName">
-      <Alt ID="inz" Value="Masukkan nama untuk terjemahan, misalnya, 'Melayu Kupang'"></Alt>
+      <Alt ID="inz" Value="Tolong masukkan nama bahasa untuk terjemahan ini, misalnya, ‘Sawila’."></Alt>
     </Item>
     <Item ID="msgUnableToSaveFile">
-      <Alt ID="inz" Value="Tidak dapat simpan arsip: '{0}.'"></Alt>
+      <Alt ID="inz" Value="Gagal simpan file: '{0}.'"></Alt>
     </Item>
     <Item ID="msgVerifyRemoveBook">
-      <Alt ID="inz" Value="Apakah buku ini ingin disembunyikan dari kumpulan terjemahan ini? (File tidak akan dihapus dari komputer; hanya disembunyikan agar Sabda Kita tidak melihat buku itu.)"></Alt>
+      <Alt ID="inz" Value="Apakah buku ini ingin disembunyikan dari kumpulan terjemahan ini? (File tidak akan dihapus dari komputer; hanya disembunyikan agar Sabda Kita tidak lagi melihat buku itu.)"></Alt>
     </Item>
     <Item ID="msgVerifyRemoveTranslation">
-      <Alt ID="inz" Value="Apakah hendak menyembunyikan terjemahan bahasa ini dari proyek? (Terjemahan tersebut tidak akan dihapus dari komputer.)"></Alt>
+      <Alt ID="inz" Value="Apakah anda betul-betul ingin sembunyikan terjemahan bahasa ini? (Terjemahan tersebut tidak akan dihapus dari komputer, hanya disembunyikan saja.)"></Alt>
     </Item>
     <Item ID="msgVerifyRestore">
       <Alt ID="inz" Value="Apakah anda sungguh-sungguh ingin mengganti file: {n}     {0}{n}dengan file cadangan: {n}     {1}?"></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarker">
-      <Alt ID="inz" Value="Suatu kode nomor ayat ditemukan, tetapi kode alinea induk untuk ayat tersebut tidak ditemukan."></Alt>
+      <Alt ID="inz" Value="Suatu kode nomor ayat ditemukan (\v), tetapi kode alinea induk untuk ayat tersebut tidak ditemukan."></Alt>
     </Item>
     <Item ID="msgMissingVerseNumber">
+      <Alt ID="inz" Value="Suatu kode nomor ayat ditemukan (\v), tetapi tidak ada angka disampingnya."></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarkerForNote">
+      <Alt ID="inz" Value="Sebuah kode untuk Catatan ditemukan, tetapi tidak ada kode alinea untuk memuat Catatan tersebut."></Alt>
     </Item>
     <Item ID="msgChapterNotInParagraph">
+      <Alt ID="inz" Value="Sebuah kode pasal (\c) ditemukan, tetapi kode alinea induk untuk memuat \c tersebut tidak ditemukan."></Alt>
     </Item>
     <Item ID="msgBadChapterNo">
-      <Alt ID="inz" Value="File tidak bisa dibuka karena gangguan di kode Nomor Fasal"></Alt>
+      <Alt ID="inz" Value="File tidak bisa dibuka karena gangguan di kode nomor fasal (\c)"></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarkerForCF">
+      <Alt ID="inz" Value="Sebuah kode untuk ayat bandingan (\cf) ditemukan, tetapi tidak ada alinea induk untuk memuat ayat bandingan tersebut."></Alt>
     </Item>
     <Item ID="msgNoVerseInSection">
+      <Alt ID="inz" Value="Sebuah kode Judul Perikop (\s) ditemukan yang tidak diikuti dengan kode ayat (\v)."></Alt>
     </Item>
     <Item ID="msgAlreadyRunning">
+      <Alt ID="inz" Value="Sabda Kita sudah dijalankan."></Alt>
     </Item>
     <Item ID="msgWillOverwriteFileWarning">
+      <Alt ID="inz" Value="Peringatan: file ‘{0}’ sudah ada dalam arsip ini. Sabda Kita akan mengganti file lama dengan file baru. Jika anda ingin amankan file lama, sebaiknya file baru disimpan dalam arsip yang lain, atau file lama dipindahkan ke arsip yang lain."></Alt>
     </Item>
     <Item ID="msgSectionTitleAlreadyExists">
+      <Alt ID="inz" Value="Alinea ini tidak bisa dirobah menjadi Judul Perikop (\s), oleh karena sebuah Judul Perikop sudah ada. Terbatas satu Judul Perikop dalam satu perikop."></Alt>
     </Item>
     <Item ID="msgSectionTitleCannotHaveVerses">
+      <Alt ID="inz" Value="Alinea ini tidak bisa dirobah menjadi Judul Perikop (\s), oleh karena sebuah Judul Perikop tidak bisa mempunyai ayat, pasal, atau catatan kaki di dalamnya."></Alt>
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
+        <Alt ID="inz" Value="Alinea"></Alt>
       </Item>
       <Item ID="picture">
+        <Alt ID="inz" Value="Gambar"></Alt>
       </Item>
       <Item ID="msgStructureMismatch">
+        <Alt ID="inz" Value="Ada ketidakcocokan struktur di bagian {0}:{n}     {1} mempunyai {2},{n}     {3} mempunyai {4}.{n}{n}"></Alt>
       </Item>
       <Item ID="diagnosis1">
+        <Alt ID="inz" Value="Ayat-ayat mulai berbeda di Bagian {0}."></Alt>
       </Item>
       <Item ID="diagnosis2">
+        <Alt ID="inz" Value="{0} mempunyai bagian tambahan pada bagian akhir file."></Alt>
       </Item>
       <Item ID="msgSectionMiscount">
+        <Alt ID="inz" Value="Buku dalam kedua bahasa mempunyai jumlah bagian yang berbeda.{n}     {0} mempunyai {1}; {2} rupanya mempunyai {3}.{n}{4}"></Alt>
       </Item>
     </Group>
   </Group>
@@ -562,7 +746,7 @@
       <Alt ID="inz" Value="Habakuk"></Alt>
     </Item>
     <Item ID="Zephaniah,">
-      <Alt ID="inz" Value="Zefanyah,"></Alt>
+      <Alt ID="inz" Value="Zefanyah"></Alt>
     </Item>
     <Item ID="Haggai">
       <Alt ID="inz" Value="Hagai"></Alt>
@@ -660,80 +844,118 @@
       <Alt ID="inz" Value="KEJ"></Alt>
     </Item>
     <Item ID="EXO">
+      <Alt ID="inz" Value="KEL"></Alt>
     </Item>
     <Item ID="LEV">
+      <Alt ID="inz" Value="IMAM"></Alt>
     </Item>
     <Item ID="NUM">
+      <Alt ID="inz" Value="BIL"></Alt>
     </Item>
     <Item ID="DEU">
+      <Alt ID="inz" Value="ULG"></Alt>
     </Item>
     <Item ID="JOS">
+      <Alt ID="inz" Value="YOS"></Alt>
     </Item>
     <Item ID="JDG">
+      <Alt ID="inz" Value="HAK"></Alt>
     </Item>
     <Item ID="RUT">
+      <Alt ID="inz" Value="RUT"></Alt>
     </Item>
     <Item ID="1SA">
+      <Alt ID="inz" Value="1SAM"></Alt>
     </Item>
     <Item ID="2SA">
+      <Alt ID="inz" Value="2SAM"></Alt>
     </Item>
     <Item ID="1KI">
+      <Alt ID="inz" Value="1RAJ"></Alt>
     </Item>
     <Item ID="2KI">
+      <Alt ID="inz" Value="2RAJ"></Alt>
     </Item>
     <Item ID="1CH">
+      <Alt ID="inz" Value="1TAW"></Alt>
     </Item>
     <Item ID="2CH">
+      <Alt ID="inz" Value="2TAW"></Alt>
     </Item>
     <Item ID="EZR">
+      <Alt ID="inz" Value="EZR"></Alt>
     </Item>
     <Item ID="NEH">
+      <Alt ID="inz" Value="NEH"></Alt>
     </Item>
     <Item ID="EST">
+      <Alt ID="inz" Value="EST"></Alt>
     </Item>
     <Item ID="JOB">
+      <Alt ID="inz" Value="AYUB"></Alt>
     </Item>
     <Item ID="PSA">
+      <Alt ID="inz" Value="MZM"></Alt>
     </Item>
     <Item ID="PRO">
+      <Alt ID="inz" Value="AMSL"></Alt>
     </Item>
     <Item ID="ECC">
+      <Alt ID="inz" Value="PKHT"></Alt>
     </Item>
     <Item ID="SNG">
+      <Alt ID="inz" Value="KDAG"></Alt>
     </Item>
     <Item ID="ISA">
+      <Alt ID="inz" Value="YES"></Alt>
     </Item>
     <Item ID="JER">
+      <Alt ID="inz" Value="YER"></Alt>
     </Item>
     <Item ID="LAM">
+      <Alt ID="inz" Value="RAT"></Alt>
     </Item>
     <Item ID="EZK">
+      <Alt ID="inz" Value="YEZK"></Alt>
     </Item>
     <Item ID="DAN">
+      <Alt ID="inz" Value="DAN"></Alt>
     </Item>
     <Item ID="HOS">
+      <Alt ID="inz" Value="HOS"></Alt>
     </Item>
     <Item ID="JOL">
+      <Alt ID="inz" Value="YOEL"></Alt>
     </Item>
     <Item ID="AMO">
+      <Alt ID="inz" Value="AMOS"></Alt>
     </Item>
     <Item ID="OBA">
+      <Alt ID="inz" Value="OBA"></Alt>
     </Item>
     <Item ID="JON">
+      <Alt ID="inz" Value="YNS"></Alt>
     </Item>
     <Item ID="MIC">
+      <Alt ID="inz" Value="MIK"></Alt>
     </Item>
     <Item ID="NAM">
+      <Alt ID="inz" Value="NHUM"></Alt>
     </Item>
     <Item ID="HAB">
+      <Alt ID="inz" Value="HAB"></Alt>
     </Item>
     <Item ID="ZEP">
+      <Alt ID="inz" Value="ZEF"></Alt>
     </Item>
     <Item ID="HAG">
+      <Alt ID="inz" Value="HAG"></Alt>
     </Item>
     <Item ID="ZEC">
+      <Alt ID="inz" Value="ZAK"></Alt>
     </Item>
     <Item ID="MAL">
+      <Alt ID="inz" Value="MAL"></Alt>
     </Item>
     <Item ID="MAT">
       <Alt ID="inz" Value="MAT"></Alt>
@@ -837,7 +1059,7 @@
       <Alt ID="inz" Value="Surat-surat Paulus"></Alt>
     </Item>
     <Item ID="GeneralLetters">
-      <Alt ID="inz" Value="Surat-surat lain"></Alt>
+      <Alt ID="inz" Value="Surat-surat Umum"></Alt>
     </Item>
   </Group>
   <Group ID="TranslationStages">
@@ -887,7 +1109,7 @@
       <Alt ID="inz" Value="Final untuk Cetak"></Alt>
     </Item>
     <Item ID="FinalRevisions">
-      <Alt ID="inz" Value="Revision"></Alt>
+      <Alt ID="inz" Value="Revisi Lanjutan"></Alt>
     </Item>
   </Group>
   <Group ID="DialogRestoreFromBackup">
@@ -895,7 +1117,7 @@
       <Alt ID="inz" Value="File Cadangan mengganti File yang rusak"></Alt>
     </Item>
     <Item ID="m_lblExplanation">
-      <Alt ID="inz" Value="Tindakan ini akan kembali ke versi buku yang sebelumnya. Jika ini dijalankan, file yang sekarang akan dihapus, dan tidak dapat lagi. File yang dipakai merupakan versi sebelumnya."></Alt>
+      <Alt ID="inz" Value="Tindakan ini akan kembali ke versi buku yang sebelumnya. Jika ini dijalankan, file yang sekarang akan dihapus, dan tidak ada lagi di komputer anda. File yang dipakai merupakan versi sebelumnya."></Alt>
     </Item>
     <Item ID="m_lblBook">
       <Alt ID="inz" Value="Nama buku yang ingin dibereskan:"></Alt>
@@ -910,7 +1132,7 @@
       <Alt ID="inz" Value="Nama file cadangan:"></Alt>
     </Item>
     <Item ID="m_btnOK">
-      <Alt ID="inz" Value="Gantilah"></Alt>
+      <Alt ID="inz" Value="Ganti"></Alt>
     </Item>
   </Group>
   <Group ID="DialogSetupFeatures">
@@ -918,6 +1140,7 @@
       <Alt ID="inz" Value="Setel Proyek"></Alt>
     </Item>
     <Item ID="m_btnResetDefaults">
+      <Alt ID="inz" Value="Kembali ke Pengaturan Asli"></Alt>
     </Item>
     <Item ID="m_btnPasswordProtect">
       <Alt ID="inz" Value="Diamankan dengan &amp;Password..."></Alt>
@@ -932,53 +1155,64 @@
       <Alt ID="inz" Value="Penjelasan"></Alt>
     </Item>
     <Item ID="m_lblDescription">
+      <Alt ID="inz" Value="(penjelasan masuk di sini)"></Alt>
     </Item>
     <Item ID="m_lblInstructions">
-      <Alt ID="inz" Value="Taruh tanda untuk memilih pilihan yang ingin dipakai."></Alt>
+      <Alt ID="inz" Value="Taruh tanda untuk memilih fungsi yang ingin dipakai di antarmuka."></Alt>
     </Item>
     <Item ID="fJobBT_CheckBox">
-      <Alt ID="inz" Value="Terjemahan Balik Antar Garis"></Alt>
+      <Alt ID="inz" Value="Terjemahan Balik"></Alt>
     </Item>
     <Item ID="fJobBT_Description">
-      <Alt ID="inz" Value="Tampilan di mana Terjemahan Balik Antar garis (kata-demi-kata) dapat dikerjakan."></Alt>
+      <Alt ID="inz" Value="Tampilan untuk kerjakan Terjemahan Balik dalam bahasa yang dikuasai konsultan, agar dia bisa periksa Terjemahan Sasaran."></Alt>
     </Item>
     <Item ID="fJobNaturalness_CheckBox">
+      <Alt ID="inz" Value="Baca untuk Kewajaran"></Alt>
     </Item>
     <Item ID="fJobNaturalness_Description">
+      <Alt ID="inz" Value="Tampilan untuk hanya melihat Terjemahan Sasaran. Dengan demikian, tim anda bisa membaca untuk mengecek apakah susunan yang ada menggunakan bahasa yang jelas dan wajar, dengan tidak memandang pada Terjemahan Acuan."></Alt>
     </Item>
     <Item ID="fProject_CheckBox">
       <Alt ID="inz" Value="Proyek Baru / Buka / dsb"></Alt>
     </Item>
     <Item ID="fProject_Description">
+      <Alt ID="inz" Value="Jalankan fungsi ini jika anda bekerja dengan beberapa bahasa di komputer ini."></Alt>
     </Item>
     <Item ID="fPropertiesDialog_CheckBox">
+      <Alt ID="inz" Value="Ciri-ciri Proyek"></Alt>
     </Item>
     <Item ID="fPropertiesDialog_Description">
+      <Alt ID="inz" Value="Jalankan fungsi ini jika anda ingin merobah pengaturan untuk suatu proyek."></Alt>
     </Item>
     <Item ID="fPrint_CheckBox">
       <Alt ID="inz" Value="Cetak"></Alt>
     </Item>
     <Item ID="fPrint_Description">
+      <Alt ID="inz" Value="Buku diformat dan dicetak."></Alt>
     </Item>
     <Item ID="fAutoReplace_CheckBox">
       <Alt ID="inz" Value="Pergantian Otomatis ketika mengetik"></Alt>
     </Item>
     <Item ID="fAutoReplace_Description">
-      <Alt ID="inz" Value="Setel Pergantian Otomatis, sehingga huruf yang diketik diganti langsung dengan urutan alternatif. Gunakan ini waktu mengetik huruf khusus, atau gunakan singkatan (seperti ketik AB dan komputer akan perluas menjadi 'Abraham'.)"></Alt>
+      <Alt ID="inz" Value="Setel Pergantian Otomatis, sehingga huruf yang diketik diganti langsung dengan urutan alternatif. Gunakan ini waktu mengetik huruf khusus (misalnya, `e menjadi è), atau gunakan singkatan (misalnya, ketik ‘AB’ dan komputer akan perluas menjadi ‘Abraham’.)"></Alt>
     </Item>
     <Item ID="fRestoreBackup_CheckBox">
       <Alt ID="inz" Value="File Cadangan dikembalikan menjadi File Induk"></Alt>
     </Item>
     <Item ID="fRestoreBackup_Description">
-      <Alt ID="inz" Value="File-file dapat diamankan secara otomat di 'flash card' ataupun drive yang lain (dengan menggunakan perintah Alat-Pilihan). Jika anda memilih kemungkinan 'File Cadangan dikembalikan menjadi File Induk' ini, daftar Alat akan membuka sebuah kotak. Dengan mengisi tanya-jawab di situ, file yang sekarang dapat diganti dengan sebuah file cadangan yang telah disimpan sebelumnya."></Alt>
+      <Alt ID="inz" Value="File-file dapat diamankan secara otomat di ‘flash card’ ataupun drive yang lain (dengan menggunakan perintah Alat-Pilihan). Jika anda memilih kemungkinan ‘File Cadangan dikembalikan menjadi File Induk’ ini, daftar Alat akan membuka sebuah kotak. Dengan mengisi tanya-jawab di situ, file yang sekarang dapat diganti dengan sebuah file cadangan yang telah disimpan sebelumnya."></Alt>
     </Item>
     <Item ID="fCopyBTfromFront_CheckBox">
+      <Alt ID="inz" Value="Kopi Terjemahan Balik dari Terjemahan Acuan"></Alt>
     </Item>
     <Item ID="fCopyBTfromFront_Description">
+      <Alt ID="inz" Value="Kopi Terjemahan Balik dari Terjemahan Acuan ke Terjemahan Sasaran. Walaupun gampang dan menghemat waktu, namum perlu ditinjau kembali secara teliti agar perbedaan di dalam Terjemahan Sasaran dicerminkan secara jujur dan lengkap bagi konsultan."></Alt>
     </Item>
     <Item ID="fFilter_CheckBox">
+      <Alt ID="inz" Value="Hanya tampilkan bagian yang... (Saringan)"></Alt>
     </Item>
     <Item ID="fFilter_Description">
+      <Alt ID="inz" Value="Dengan fungsi ini, daftar menu ‘Ke’ (misalnya, Dulu, Berikut, dsb.) terbatas ke bagian yang memenuhi syarat yang telah ditentukan. Misalnya, yang mempunyai gambar, yang muat kata-kata tertentu, dll. Dengan demikian, anda bisa temukan istilah yang ingin dirobah, jenis catatan tertentu, dsb."></Alt>
     </Item>
     <Item ID="fJustTheBasics_CheckBox">
       <Alt ID="inz" Value="Tugas Dasar Saja"></Alt>
@@ -987,28 +1221,40 @@
       <Alt ID="inz" Value="Ciri ini ditujukan kepada pemakai komputer baru. Ini dipilih untuk menyetel komputer agar hanya fungsi-fungsi dasar diperlihatkan untuk menggunakan komputer secara sederhana. Daftar menu disembunyikan. Untuk menggantinya, tombol-tombol besar muncul bersama fungsi masing-masing (dengan gambar bersama kata). Pengguna komputer dasar hanya perlu menguasai sekitar sepuluh fungsi dasar."></Alt>
     </Item>
     <Item ID="fLocalizer_CheckBox">
+      <Alt ID="inz" Value="Atur Bahasa Pengantar"></Alt>
     </Item>
     <Item ID="fLocalizer_Description">
+      <Alt ID="inz" Value="Dialog ini, yang ditampilkan di daftar Alat, membuka kesempatan menerjemahkan antarmuka untuk Sabda Kita ke dalam Bahasa Pengantar yang lain."></Alt>
     </Item>
     <Item ID="fStructuralEditing_CheckBox">
+      <Alt ID="inz" Value="Ubah Struktur Alinea"></Alt>
     </Item>
     <Item ID="fStructuralEditing_Description">
+      <Alt ID="inz" Value="Memungkinkan alinea bisa digabung atau dipisahkan. Juga bisa merobah gaya alinea. Dengan membuat demikian, Terjemahan Sasaran bisa diberi struktur yang berbeda dari Terjemahan Acuan."></Alt>
     </Item>
     <Item ID="fMerge_CheckBox">
+      <Alt ID="inz" Value="Gabung file"></Alt>
     </Item>
     <Item ID="fMerge_Description">
+      <Alt ID="inz" Value="Membuka Kotak Gabung. Dengan demikian, dua file dari buku yang sama bisa diperiksa untuk membanding hal-hal yang berbeda, lalu digabung dalam satu file yang lengkap."></Alt>
     </Item>
     <Item ID="fDictionary_CheckBox">
+      <Alt ID="inz" Value="Kamus WeSay"></Alt>
     </Item>
     <Item ID="fDictionary_Description">
+      <Alt ID="inz" Value="Memungkinkan Kotak Kamus. Di situ anda bisa 1) melihat kata yang sudah ada dalam sebuah kamus ‘WeSay’; 2) masukkan kata dan makna dari istilah yang belum ada dalam kamus, tetapi ada dalam Terjemahan Sasaran serta dalam Catatan; 3) cari makna yang ada dalam kamus waktu kerjakan Terjemahan Balik."></Alt>
     </Item>
     <Item ID="m_checkListFeatures">
+      <Alt ID="inz" Value="Tugas Dasar Saja"></Alt>
     </Item>
     <Item ID="m_btnJustTheBasics">
+      <Alt ID="inz" Value="Pilihan untuk Tugas Dasar"></Alt>
     </Item>
     <Item ID="fGoTo_Chapter_CheckBox">
+      <Alt ID="inz" Value="Tombol Pasal"></Alt>
     </Item>
     <Item ID="fGoTo_FirstLast_CheckBox">
+      <Alt ID="inz" Value="Tombol Awal &amp; Akhir"></Alt>
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect">
@@ -1016,13 +1262,13 @@
       <Alt ID="inz" Value="Diamankan dengan Password"></Alt>
     </Item>
     <Item ID="m_lblHelps">
-      <Alt ID="inz" Value="Hati-hatilah, agar Password yang persis jangan dilupakan (Mis. huruf besar dibedakan dari huruf kecil.)"></Alt>
+      <Alt ID="inz" Value="(Hati-hatilah, agar password yang persis jangan dilupakan. Misalnya, huruf besar dibedakan dari huruf kecil.)"></Alt>
     </Item>
     <Item ID="m_lblPassword">
-      <Alt ID="inz" Value="Masukkan Password:"></Alt>
+      <Alt ID="inz" Value="Masukkan password:"></Alt>
     </Item>
     <Item ID="m_checkProtect">
-      <Alt ID="inz" Value="Maukah Proyek anda diamankan dengan Password?"></Alt>
+      <Alt ID="inz" Value="Maukah Proyek anda diamankan dengan password?"></Alt>
     </Item>
   </Group>
   <Group ID="DialogPassword">
@@ -1030,99 +1276,140 @@
       <Alt ID="inz" Value="Password"></Alt>
     </Item>
     <Item ID="m_lblPrompt">
-      <Alt ID="inz" Value="Harap mengetik Password anda di sini untuk membuka kotak yang digunakan untuk merobah 'Setel Proyek.'"></Alt>
+      <Alt ID="inz" Value="Harap mengetik password anda di sini untuk membuka kotak supaya bisa merobah ‘Setel Proyek’."></Alt>
     </Item>
   </Group>
   <Group ID="DialogBookNames">
     <Item ID="Title">
+      <Alt ID="inz" Value="Ubah Nama Buku"></Alt>
     </Item>
     <Item ID="m_lblFrom">
+      <Alt ID="inz" Value="dari"></Alt>
     </Item>
     <Item ID="m_btnCopyBookNames">
+      <Alt ID="inz" Value="Kopi Nama Buku"></Alt>
     </Item>
     <Item ID="m_lblInstructions">
+      <Alt ID="inz" Value="Masukkan nama-nama buku Alkitab dalam bahasa anda. Nama-nama buku tersebut akan digunakan secara otomatis untuk ayat bandingan dan ayat sejajar."></Alt>
     </Item>
   </Group>
   <Group ID="DialogPrint">
     <Item ID="Title">
+      <Alt ID="inz" Value="Cetak"></Alt>
     </Item>
     <Item ID="m_lblPrinter">
+      <Alt ID="inz" Value="Alat cetak:"></Alt>
     </Item>
     <Item ID="m_groupRange">
+      <Alt ID="inz" Value="Mulai dari"></Alt>
     </Item>
     <Item ID="m_radioEntireBook">
+      <Alt ID="inz" Value="Seluruh buku"></Alt>
     </Item>
     <Item ID="m_radioThisSection">
+      <Alt ID="inz" Value="Bagian ini saja"></Alt>
     </Item>
     <Item ID="m_radioPages">
+      <Alt ID="inz" Value="Halaman:"></Alt>
     </Item>
     <Item ID="m_labelToPage">
+      <Alt ID="inz" Value="ke"></Alt>
     </Item>
     <Item ID="m_radioChapters">
+      <Alt ID="inz" Value="Pasal:"></Alt>
     </Item>
     <Item ID="m_labelToChapter">
+      <Alt ID="inz" Value="ke"></Alt>
     </Item>
     <Item ID="m_groupOptions">
+      <Alt ID="inz" Value="Pilihan-pilihan"></Alt>
     </Item>
     <Item ID="m_checkWaterMark">
+      <Alt ID="inz" Value="Cetak cap air pada latar belakang (contoh: Konsep)"></Alt>
     </Item>
     <Item ID="m_checkReplacements">
+      <Alt ID="inz" Value="Membuat penggantian (contoh: &lt;&lt;Pak guru!&gt;&gt; menjadi “Pak guru!”) ?"></Alt>
     </Item>
     <Item ID="m_checkPrintPictures">
+      <Alt ID="inz" Value="Cetak dengan gambar?"></Alt>
     </Item>
     <Item ID="m_labelLineSpacing">
+      <Alt ID="inz" Value="Jarak baris:"></Alt>
     </Item>
     <Item ID="m_btnOK">
+      <Alt ID="inz" Value="Cetak"></Alt>
     </Item>
   </Group>
   <Group ID="DialogOpenTranslation">
     <Item ID="Title">
+      <Alt ID="inz" Value="Buka Terjemahan"></Alt>
     </Item>
     <Item ID="m_btnSettings">
+      <Alt ID="inz" Value="Cari..."></Alt>
     </Item>
     <Item ID="m_lblSettings">
+      <Alt ID="inz" Value="Nama File Pengaturan:"></Alt>
     </Item>
     <Item ID="m_lblSettingsHelp">
+      <Alt ID="inz" Value="Cari arsip yang memuat File Pengaturan. Nama filenya biasanya termasuk nama bahasa yang dipakai dalam Terjemahan, misalnya, ‘Hawu.owp’."></Alt>
     </Item>
   </Group>
   <Group ID="DialogCreateTranslation">
     <Item ID="Title">
+      <Alt ID="inz" Value="Ciptakan Terjemahan"></Alt>
     </Item>
     <Item ID="m_lblSettingsHelp">
+      <Alt ID="inz" Value="Cari arsip yang tepat untuk simpan File Pengaturan. Nama filenya biasanya termasuk nama bahasa yang dipakai dalam Terjemahan, misalnya, ‘Dhao.otrans’."></Alt>
     </Item>
     <Item ID="m_lblAbbrevHelp">
+      <Alt ID="inz" Value="Singkatan pendek untuk bahasa tersebut. Ingat bahwa Ethnologue telah tentukan suatu kode 3-huruf yang unik bagi bahasa anda. Kode tersebut membadakan bahasa anda dari semua bahasa lain di dunia. Carilah di www.ethnologue.com. "></Alt>
     </Item>
     <Item ID="m_lblNameHelp">
+      <Alt ID="inz" Value="Masukkan nama bahasa. Misalnya, ‘Kula’, ‘Amarasi’, ‘Huichol’, dll."></Alt>
     </Item>
     <Item ID="m_btnSettings">
+      <Alt ID="inz" Value="Cari..."></Alt>
     </Item>
     <Item ID="m_lblSettings">
+      <Alt ID="inz" Value="File Pengaturan:"></Alt>
     </Item>
     <Item ID="m_lblAbbrev">
+      <Alt ID="inz" Value="Singkatan:"></Alt>
     </Item>
     <Item ID="m_lblName">
+      <Alt ID="inz" Value="Nama Terjemahan ini:"></Alt>
     </Item>
   </Group>
   <Group ID="DialogCopyBTConflict">
     <Item ID="Title">
+      <Alt ID="inz" Value="Sementara mengkopi Terjemahan Balik dari Terjemahan Acuan"></Alt>
     </Item>
     <Item ID="m_labelTargetVernacular">
+      <Alt ID="inz" Value="Bahasa Lokal"></Alt>
     </Item>
     <Item ID="m_labelTargetBT">
+      <Alt ID="inz" Value="Terjemahan Balik sudah ada di sini"></Alt>
     </Item>
     <Item ID="m_checkDoAll">
+      <Alt ID="inz" Value="Laksanakan tindakan yang sama untuk semua tabrakan yang masih sisa."></Alt>
     </Item>
     <Item ID="m_btnAppendFrontToTarget">
+      <Alt ID="inz" Value="Tambah Terjemahan Balik dari Terjemahan Acuan pada Terjemahan Balik yang sudah ada di Terjemahan Sasaran"></Alt>
     </Item>
     <Item ID="m_btnReplaceWithFront">
+      <Alt ID="inz" Value="Ganti Terjemahan Balik di Terjemahan Sasaran dengan Terjemahan Balik dari Terjemahan Acuan"></Alt>
     </Item>
     <Item ID="m_btnKeepTarget">
+      <Alt ID="inz" Value="Jangan buat apa-apa (pertahankan Terjemahan Balik yang ada)"></Alt>
     </Item>
     <Item ID="m_labelFrontVernacular">
+      <Alt ID="inz" Value="Bahasa Lokal"></Alt>
     </Item>
     <Item ID="m_labelInfo">
+      <Alt ID="inz" Value="Terjemahan Balik sudah ada untuk alinea ini."></Alt>
     </Item>
     <Item ID="m_labelFrontBT">
+      <Alt ID="inz" Value="Terjemahan Balik yang diinginkan"></Alt>
     </Item>
   </Group>
   <Group ID="DialogHelpAbout">
@@ -1136,69 +1423,98 @@
       <Alt ID="inz" Value="Kirim Email"></Alt>
     </Item>
     <Item ID="m_lblDescription">
-      <Alt ID="inz" Value="Sebuah program yang memberdayakan penerjemah Alkitab di daerah yang menggunakan sebuah Terjemahan Induk yang bermutu, dan mempunyai hubungan dengan seorang pembina yang diakui."></Alt>
+      <Alt ID="inz" Value="Sebuah program yang memberdayakan penerjemah Alkitab di daerah yang menggunakan sebuah Terjemahan Acuan yang bermutu, dan mempunyai hubungan dengan seorang pembina yang diakui."></Alt>
     </Item>
   </Group>
   <Group ID="DialogRepairImportBook">
     <Item ID="Title">
+      <Alt ID="inz" Value="Masalah ditemukan waktu berusaha membaca buku ini"></Alt>
     </Item>
     <Item ID="m_Directions">
+      <Alt ID="inz" Value="Masalah bisa diperbaiki, lalu klik di tombol ‘Coba Ulang’ di bawah ini. Atau bisa saja ‘Batal Impor’."></Alt>
     </Item>
     <Item ID="m_AnErrorOccured">
+      <Alt ID="inz" Value="Masalah ditemukan waktu berusaha memasukkan buku “{0}”:"></Alt>
     </Item>
     <Item ID="m_btnTryAgain">
+      <Alt ID="inz" Value="Coba ulang"></Alt>
     </Item>
     <Item ID="m_btnCancel">
+      <Alt ID="inz" Value="Batal Impor"></Alt>
     </Item>
     <Item ID="sRemoveWarning">
+      <Alt ID="inz" Value="Jika anda tidak memperbaiki masalah, {0} akan dihilangkan dari ciri-ciri {1}.{n}{n}Apakah betul anda ingin batal proses ini, sehingga buku tidak lagi diimpor sekarang?"></Alt>
     </Item>
   </Group>
   <Group ID="DialogFilter">
     <Item ID="Title">
+      <Alt ID="inz" Value="Hanya tunjukan bagian-bagian yang"></Alt>
     </Item>
     <Item ID="m_labelHeading">
+      <Alt ID="inz" Value="Hanya tunjukkan bagian-bagian yang mempunyai ..."></Alt>
     </Item>
     <Item ID="m_groupWordOrPhrase">
+      <Alt ID="inz" Value="Satu kata atau ungkapan"></Alt>
     </Item>
     <Item ID="m_labelInTheVernacular">
+      <Alt ID="inz" Value="...dalam bahasa daerah/lokal:"></Alt>
     </Item>
     <Item ID="m_labelInTheFront">
+      <Alt ID="inz" Value="...dalam Terjemahan Acuan:"></Alt>
     </Item>
     <Item ID="m_labelInTheBackTranslation">
+      <Alt ID="inz" Value="...dalam Terjemahan Balik:"></Alt>
     </Item>
     <Item ID="m_groupNote">
+      <Alt ID="inz" Value="Catatan dari jenis:"></Alt>
     </Item>
     <Item ID="m_checkNoteToDo">
+      <Alt ID="inz" Value="Untuk diperhatikan"></Alt>
     </Item>
     <Item ID="m_checkNoteAskUNS">
+      <Alt ID="inz" Value="Tanya pembaca kaum awam"></Alt>
     </Item>
     <Item ID="m_groupProblems">
+      <Alt ID="inz" Value="Jenis masalah:"></Alt>
     </Item>
     <Item ID="m_checkPunctuationProblem">
+      <Alt ID="inz" Value="Masalah tanda-tanda baca"></Alt>
     </Item>
     <Item ID="m_checkMismatchedQuotes">
+      <Alt ID="inz" Value="Bentuk puisi yang tidak cocok"></Alt>
     </Item>
     <Item ID="m_checkUntranslatedText">
+      <Alt ID="inz" Value="Teks yang belum diterjemahkan"></Alt>
     </Item>
     <Item ID="m_checkCannotLocatePicture">
+      <Alt ID="inz" Value="Gambar tidak ada di disk"></Alt>
     </Item>
     <Item ID="m_groupStructure">
+      <Alt ID="inz" Value="Struktur"></Alt>
     </Item>
     <Item ID="m_checkPictureWithCaption">
+      <Alt ID="inz" Value="Gambar dengan judulnya"></Alt>
     </Item>
     <Item ID="m_checkQuote">
+      <Alt ID="inz" Value="Alinea Puisi"></Alt>
     </Item>
     <Item ID="m_labelQualifies">
+      <Alt ID="inz" Value="Bagian ini memenuhi syarat jika:"></Alt>
     </Item>
     <Item ID="strAnyOneOfThese">
+      <Alt ID="inz" Value="Salah satu dari syarat ini benar"></Alt>
     </Item>
     <Item ID="strAllOfThese">
+      <Alt ID="inz" Value="Semua syarat ini benar"></Alt>
     </Item>
     <Item ID="m_btnOK">
+      <Alt ID="inz" Value="Hidupkan"></Alt>
     </Item>
     <Item ID="m_btnCancel">
+      <Alt ID="inz" Value="Matikan"></Alt>
     </Item>
     <Item ID="m_comboQualifies">
+      <Alt ID="inz" Value="Yang masih perlu dikerjakan"></Alt>
     </Item>
   </Group>
   <Group ID="DialogProperties">
@@ -1206,103 +1522,103 @@
       <Alt ID="inz" Value="Ciri-ciri Proyek"></Alt>
     </Item>
     <Item ID="strTitleWithLanguageName">
-      <Alt ID="inz" Value="{0} ciri-ciri proyek"></Alt>
+      <Alt ID="inz" Value="{0} Ciri-ciri Proyek"></Alt>
     </Item>
     <Item ID="m_btnNavTeamSettings">
-      <Alt ID="inz" Value="Pengaturan tim"></Alt>
+      <Alt ID="inz" Value="Pengaturan Tim"></Alt>
     </Item>
     <Item ID="m_btnNavTranslations">
-      <Alt ID="inz" Value="Rujukan"></Alt>
+      <Alt ID="inz" Value="Bandingan"></Alt>
     </Item>
     <Item ID="m_btnNavOptions">
       <Alt ID="inz" Value="Pilihan-pilihan"></Alt>
     </Item>
     <Item ID="m_btnNavEssentials">
-      <Alt ID="inz" Value="Hal-hal yang dasar"></Alt>
+      <Alt ID="inz" Value="Hal-hal Dasar"></Alt>
     </Item>
     <Group ID="DialogProperties_Page_StyleSheet">
       <Item ID="m_labelStyleSheet">
-        <Alt ID="inz" Value="Model halaman"></Alt>
+        <Alt ID="inz" Value="Pedoman Gaya (stylesheet):"></Alt>
       </Item>
       <Item ID="m_btnRestoreDefaults">
-        <Alt ID="inz" Value="Kembalikan nilai-nilai semula"></Alt>
+        <Alt ID="inz" Value="Kembali ke Pengaturan Asli..."></Alt>
       </Item>
       <Item ID="m_labelInstructions">
-        <Alt ID="inz" Value="Pilih salah satu model dari daftar sebelah kiri, kemudian ubah pengaturan-pengaturan di bawah ini. Bebrapa pengaturan meminta anda untuk klik pada tanda + untuk mengubah pengaturannya."></Alt>
+        <Alt ID="inz" Value="Pilih salah satu model/gaya dari daftar sebelah kiri, kemudian ubah pengaturan-pengaturan di bawah ini. Beberapa pengaturan minta anda klik pada tanda plus (+) untuk mengubah pengaturannya."></Alt>
       </Item>
       <Item ID="propCharacterSettings">
-        <Alt ID="inz" Value="Pengaturan huruf"></Alt>
+        <Alt ID="inz" Value="Pengaturan Huruf"></Alt>
       </Item>
       <Item ID="propParagraphSettings">
-        <Alt ID="inz" Value="Pengaturan alinea"></Alt>
+        <Alt ID="inz" Value="Pengaturan Alinea"></Alt>
       </Item>
       <Item ID="propForeColor">
-        <Alt ID="inz" Value="Warna" Tip="Warna dari huruf dalam teks"></Alt>
+        <Alt ID="inz" Value="Warna" Tip="Warna huruf dalam teks."></Alt>
       </Item>
       <Item ID="propAlignment">
-        <Alt ID="inz" Value="Tata batas" Tip="Tentukan tata batas alinea di tengah, kiri (saja), kanan (saja) atau rata kiri kanan."></Alt>
+        <Alt ID="inz" Value="Tata batas" Tip="Tentukan tata batas alinea di tengah, rata kiri (saja), rata kanan (saja) atau rata kiri-kanan."></Alt>
       </Item>
       <Item ID="option_kLeft">
-        <Alt ID="inz" Value="Di kiri (saja)"></Alt>
+        <Alt ID="inz" Value="Rata Kiri"></Alt>
       </Item>
       <Item ID="option_kRight">
-        <Alt ID="inz" Value="Di tengah"></Alt>
+        <Alt ID="inz" Value="Di Tengah"></Alt>
       </Item>
       <Item ID="option_kCentered">
-        <Alt ID="inz" Value="Di kanan (saja)"></Alt>
+        <Alt ID="inz" Value="Rata Kanan"></Alt>
       </Item>
       <Item ID="option_kJustified">
-        <Alt ID="inz" Value="Rata di kiri dan kanan"></Alt>
+        <Alt ID="inz" Value="Rata Kiri-Kanan"></Alt>
       </Item>
       <Item ID="propKeepWithNext">
-        <Alt ID="inz" Value="Sama dengan alinea berikut?" Tip="Jika ya, tidak ada pemisahan antara alinea satu dengan yang lainnya."></Alt>
+        <Alt ID="inz" Value="Dihubungkan dengan alinea berikut?" Tip="Jika ‘Ya’, tidak ada pemisahan halaman antara alinea yang pertama dengan yang berikutnya."></Alt>
       </Item>
       <Item ID="propLeftMargin">
         <Alt ID="inz" Value="Batas kiri" Tip="Batas kiri untuk alinea"></Alt>
       </Item>
       <Item ID="propRightMargin">
-        <Alt ID="inz" Value="Batas kanan" Tip="Batas kanan untuk alinea."></Alt>
+        <Alt ID="inz" Value="Batas kanan" Tip="Batas kanan untuk alinea"></Alt>
       </Item>
       <Item ID="propFirstLine">
         <Alt ID="inz" Value="Batas mulai baris pertama" Tip="Batas mulai baris pertama dari alinea."></Alt>
       </Item>
       <Item ID="propSpaceBefore">
-        <Alt ID="inz" Value="Jarak sebelum alinea" Tip="Batas jarak sebelum satu alinea."></Alt>
+        <Alt ID="inz" Value="Jarak sebelum alinea" Tip="Jarak spasi sebelum satu alinea"></Alt>
       </Item>
       <Item ID="propSpaceAfter">
-        <Alt ID="inz" Value="Jarak sesudah alinea" Tip="Batas jarak sesudah satu alinea."></Alt>
+        <Alt ID="inz" Value="Jarak sesudah alinea" Tip="Jarak spasi sesudah satu alinea"></Alt>
       </Item>
       <Item ID="propFontName">
-        <Alt ID="inz" Value="Nama Huruf" Tip="Nama huruf untuk menampilkan model tertentu dalam sistim tulisan ini."></Alt>
+        <Alt ID="inz" Value="Nama Font" Tip="Nama Font untuk menampilkan gaya tertentu dalam sistem tulisan ini."></Alt>
       </Item>
       <Item ID="propFontHeight">
-        <Alt ID="inz" Value="Tinggi" Tip="Tinggi huruf"></Alt>
+        <Alt ID="inz" Value="Tinggi" Tip="Tinggi (besarnya) huruf"></Alt>
       </Item>
       <Item ID="propBold">
-        <Alt ID="inz" Value="Tebal?" Tip="Jika ya, huruf akan ditampilkan tebal."></Alt>
+        <Alt ID="inz" Value="Tebal?" Tip="Jika ‘Ya’, huruf akan ditampilkan tebal (bold)."></Alt>
       </Item>
       <Item ID="propItalic">
-        <Alt ID="inz" Value="Miring?" Tip="Jika ya, huruf akan ditampilkan miring."></Alt>
+        <Alt ID="inz" Value="Miring?" Tip="Jika ‘Ya’, huruf akan ditampilkan miring (Italic)."></Alt>
       </Item>
       <Item ID="m_listStyles_col0">
-        <Alt ID="inz" Value="Model"></Alt>
+        <Alt ID="inz" Value="Gaya"></Alt>
       </Item>
       <Item ID="propFonts">
-        <Alt ID="inz" Value="Latin" Tip="Pengaturan huruf ini akan digunakan dalam sistem tulisan ini."></Alt>
+        <Alt ID="inz" Value="Latin" Tip="Font ini akan digunakan dalam sistem tulisan ini."></Alt>
       </Item>
       <Item ID="propStrikeout">
-        <Alt ID="inz" Value="Coretan?" Tip="Jika ya, huruf akan ditampilkan dengan sebuah garis coteran di tengah."></Alt>
+        <Alt ID="inz" Value="Coretan?" Tip="Jika ‘Ya’, huruf akan ditampilkan dengan sebuah garis coretan di tengah."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems">
       <Item ID="m_btnRemove">
-        <Alt ID="inz" Value="Pindahkan keluar"></Alt>
+        <Alt ID="inz" Value="Hilangkan..."></Alt>
       </Item>
       <Item ID="m_btnAdd">
         <Alt ID="inz" Value="Tambah"></Alt>
       </Item>
       <Item ID="m_labelInstructions">
-        <Alt ID="inz" Value="Pilih sistim tulisan dari daftar, lalu ubah pengaturannya di bawah ini."></Alt>
+        <Alt ID="inz" Value="Pilih sistem tulisan dari daftar, lalu ubah pengaturannya di bawah ini."></Alt>
       </Item>
       <Item ID="m_labelWritingSystems">
         <Alt ID="inz" Value="Sistem Tulisan:"></Alt>
@@ -1314,66 +1630,66 @@
         <Alt ID="inz" Value="Ganti secara Otomat"></Alt>
       </Item>
       <Item ID="propName">
-        <Alt ID="inz" Value="Nama" Tip="Menyediakan satu nama yang khas untuk sistem tulisan ini."></Alt>
+        <Alt ID="inz" Value="Nama" Tip="Tentukan nama yang khas untuk Sistem Tulisan ini."></Alt>
       </Item>
       <Item ID="propAbbrev">
-        <Alt ID="inz" Value="Singkatan/ ID" Tip="Satu nama singkatan dari nama sisim tulisan. Ini dipakai sebagai ID untuk kamus WeSay."></Alt>
+        <Alt ID="inz" Value="Singkatan / ID" Tip="Satu nama singkatan dari nama Sistem Tulisan. Ini dipakai sebagai ID untuk kamus WeSay."></Alt>
       </Item>
       <Item ID="propPunctuation">
-        <Alt ID="inz" Value="Tanda-tanda baca" Tip="Sebuah daftar dari huruf-huruf yang merupakan tanda-tanda baca dalam sistem tulisan ini."></Alt>
+        <Alt ID="inz" Value="Tanda-tanda baca" Tip="Daftar huruf-huruf yang merupakan tanda-tanda baca dalam sistem tulisan ini. (Misalnya, ,.!?“”‘’, dll.)"></Alt>
       </Item>
       <Item ID="propEndPunctuation">
-        <Alt ID="inz" Value="Tanda baca akhir" Tip="Daftar tanda baca yang bisa muncul di bagian akhir dari sebuah kalimat."></Alt>
+        <Alt ID="inz" Value="Tanda akhir kalimat" Tip="Daftar tanda baca yang bisa muncul di bagian akhir dari sebuah kalimat."></Alt>
       </Item>
       <Item ID="propKeyboard">
-        <Alt ID="inz" Value="Nama papan tombol jari" Tip="Nama papan tombol jari untuk dipakai ketika mengetik dalam sistim tulisan ini (Windows IME, Keyman, dll)"></Alt>
+        <Alt ID="inz" Value="Nama papan tombol jari" Tip="Nama papan tombol jari (keyboard) untuk dipakai ketika mengetik dalam Sistem Tulisan ini (dari Windows IME, Keyman, dll.)"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_AdvancedPrintOptions">
       <Item ID="m_labelTitle">
-        <Alt ID="inz" Value="Pilihan-pilihan lanjutan mencentak"></Alt>
+        <Alt ID="inz" Value="Pilihan-pilihan Cetak (tambahan)"></Alt>
       </Item>
       <Item ID="propOddPages">
-        <Alt ID="inz" Value="Di bagian bawah dari halaman-halaman ganjil"></Alt>
+        <Alt ID="inz" Value="Di kaki halaman-halaman GANJIL"></Alt>
       </Item>
       <Item ID="propOddLeft">
-        <Alt ID="inz" Value="Kiri" Tip="Apa yang mau anda cetak pada bagian kiri bawah dari halaman-halaman yang ganjil?"></Alt>
+        <Alt ID="inz" Value="Kiri" Tip="Apa yang ingin dicetak pada bagian kiri bawah dari halaman-halaman ganjil?"></Alt>
       </Item>
       <Item ID="propOddCenter">
-        <Alt ID="inz" Value="Tengah" Tip="Apa yang mau anda cetak pada bagian tengah bawah dari halaman-halaman yang ganjil?"></Alt>
+        <Alt ID="inz" Value="Tengah" Tip="Apa yang ingin dicetak pada bagian tengah bawah dari halaman-halaman ganjil?"></Alt>
       </Item>
       <Item ID="propOddRight">
-        <Alt ID="inz" Value="Kanan" Tip="Apa yang mau anda cetak pada bagian kanan bawah dari halaman-halaman yang ganjil?"></Alt>
+        <Alt ID="inz" Value="Kanan" Tip="Apa yang ingin dicetak pada bagian kanan bawah dari halaman-halaman ganjil?"></Alt>
       </Item>
       <Item ID="propEvenPages">
-        <Alt ID="inz" Value="Di bagian bawah dari halaman-halaman genap"></Alt>
+        <Alt ID="inz" Value="Di kaki halaman-halaman GENAP"></Alt>
       </Item>
       <Item ID="propEvenLeft">
-        <Alt ID="inz" Value="Kiri" Tip="Apa yang mau anda cetak pada bagian kiri bawah dari halaman-halaman yang genap?"></Alt>
+        <Alt ID="inz" Value="Kiri" Tip="Apa yang ingin dicetak pada bagian kiri bawah dari halaman-halaman genap?"></Alt>
       </Item>
       <Item ID="propEvenCenter">
-        <Alt ID="inz" Value="Tengah" Tip="Apa yang mau anda cetak pada bagian tengah bawah dari halaman-halaman yang genap?"></Alt>
+        <Alt ID="inz" Value="Tengah" Tip="Apa yang ingin dicetak pada bagian tengah bawah dari halaman-halaman genap?"></Alt>
       </Item>
       <Item ID="propEvenRight">
-        <Alt ID="inz" Value="Kanan" Tip="Apa yang mau anda cetak pada bagian kanan bawah dari halaman-halaman yang genap?"></Alt>
+        <Alt ID="inz" Value="Kanan" Tip="Apa yang ingin dicetak pada bagian kanan bawah dari halaman-halaman genap?"></Alt>
       </Item>
       <Item ID="propCopyrightNotice">
-        <Alt ID="inz" Value="Peringatan hak cipta" Tip="Peringatan hak cipta bagi semua tim yang bekerja di daerah tertentu (anda bisa menentukan sebuah hak cipta bagi masing-masing buku dengan menggunakan dialog Ciri-ciri Buku.)"></Alt>
+        <Alt ID="inz" Value="Peringatan Hak Cipta" Tip="Peringatan Hak Cipta bagi semua tim yang bekerja di daerah tertentu (anda bisa menentukan hak cipta yang berbeda bagi masing-masing buku dengan menggunakan dialog Ciri-ciri Buku.)"></Alt>
       </Item>
       <Item ID="option_kBlank">
         <Alt ID="inz" Value="(tinggalkan kosong)"></Alt>
       </Item>
       <Item ID="option_kCopyrightNotice">
-        <Alt ID="inz" Value="Peringatan hak cipta"></Alt>
+        <Alt ID="inz" Value="Peringatan Hak Cipta"></Alt>
       </Item>
       <Item ID="option_kPageNumber">
         <Alt ID="inz" Value="Nomer halaman"></Alt>
       </Item>
       <Item ID="option_kScriptureReference">
-        <Alt ID="inz" Value="Rujukan text Alkitab"></Alt>
+        <Alt ID="inz" Value="Rujukan text Alkitab (alamat)"></Alt>
       </Item>
       <Item ID="option_kStageAndDate">
-        <Alt ID="inz" Value="Langkah dan tanggal"></Alt>
+        <Alt ID="inz" Value="Langkah dan Tanggal"></Alt>
       </Item>
       <Item ID="option_kLanguageStageAndDate">
         <Alt ID="inz" Value="Bahasa, Langkah dan Tanggal"></Alt>
@@ -1381,36 +1697,36 @@
     </Group>
     <Group ID="DialogProperties_Page_TeamSettings">
       <Item ID="m_lblCreateNew">
-        <Alt ID="inz" Value="Menyiapkan sebuah nama file yang anda inginkan untuk menyimpan proyek pengaturan tim ini."></Alt>
+        <Alt ID="inz" Value="Memberi nama file yang anda inginkan untuk simpan proyek pengaturan tim ini."></Alt>
       </Item>
       <Item ID="m_btnCreateNew">
-        <Alt ID="inz" Value="Buat baru"></Alt>
+        <Alt ID="inz" Value="Ciptakan Baru..."></Alt>
       </Item>
       <Item ID="m_lblOpenExisting">
         <Alt ID="inz" Value="Buka file pengaturan tim yang sudah ada (yaitu, gunakan pengaturan tim yang sudah diciptakan sebelumnya.)"></Alt>
       </Item>
       <Item ID="m_lblActions">
-        <Alt ID="inz" Value="Aksi-aksi yang tersedia:"></Alt>
+        <Alt ID="inz" Value="Tindakan yang tersedia:"></Alt>
       </Item>
       <Item ID="m_labelInstructions">
-        <Alt ID="inz" Value="Pengaturan tim disimpan di sebuah file yang tyeroisah, sehingga anda mempunyai beberapa proyek dalam satu kelompok, semua proyek bisa memakai pengaturan tim yang sama. Sehingga anda bisa ubah mereka di sini, dan kemudian mereka akan berlaku pada semua proyek lain yang menggunakannya."></Alt>
+        <Alt ID="inz" Value="Pengaturan tim disimpan di satu file yang terpisah, sehingga jika anda punya beberapa proyek dalam satu kelompok, semua proyek bisa memakai pengaturan tim yang sama. Kemudian anda bisa ubah mereka di sini, dan akan berlaku pada semua proyek lain yang menggunakannya."></Alt>
       </Item>
       <Item ID="m_btnOpenExisting">
-        <Alt ID="inz" Value="Buka yang sudah ada"></Alt>
+        <Alt ID="inz" Value="Buka file yang sudah ada..."></Alt>
       </Item>
       <Item ID="m_lblTeamSettingsFile">
-        <Alt ID="inz" Value="File pengaturan tim:"></Alt>
+        <Alt ID="inz" Value="File Pengaturan Tim:"></Alt>
       </Item>
       <Item ID="m_groupTeamSettingsFile">
-        <Alt ID="inz" Value="File pengaturan tim"></Alt>
+        <Alt ID="inz" Value="File Pengaturan Tim"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_TranslationStages">
       <Item ID="m_labelStagesTitle">
-        <Alt ID="inz" Value="Langkah dalam proses terjemahan:"></Alt>
+        <Alt ID="inz" Value="Langkah dalam Proses Penerjemahan:"></Alt>
       </Item>
       <Item ID="m_labelLanguage">
-        <Alt ID="inz" Value="Bahasa"></Alt>
+        <Alt ID="inz" Value="Bahasa Pengantar (default):"></Alt>
       </Item>
       <Item ID="m_btnMoveUp">
         <Alt ID="inz" Value="Pindah ke atas"></Alt>
@@ -1422,19 +1738,19 @@
         <Alt ID="inz" Value="Tambah"></Alt>
       </Item>
       <Item ID="m_btnRemove">
-        <Alt ID="inz" Value="Pindahkan keluar"></Alt>
+        <Alt ID="inz" Value="Hilangkan..."></Alt>
       </Item>
       <Item ID="m_btnRestoreDefaults">
-        <Alt ID="inz" Value="Kembalikan nilai-nilai semula"></Alt>
+        <Alt ID="inz" Value="Kembali ke Pengaturan Asli..."></Alt>
       </Item>
       <Item ID="m_labelInstructions">
-        <Alt ID="inz" Value="Klik dua kali, perlahan-lahan, pada nama file untuk mengubahnya."></Alt>
+        <Alt ID="inz" Value="Klik dua kali, perlahan-lahan, pada nama untuk mengubahnya."></Alt>
       </Item>
       <Item ID="m_groupLanguage">
         <Alt ID="inz" Value="Bahasa"></Alt>
       </Item>
       <Item ID="m_labelLanguageExplanation">
-        <Alt ID="inz" Value="Langkah nama ini digunakan dalam User Interface dan menghasilkan nama-nama file; anda harus memasukkan mereka dalam bahasa yang paling berguna untuk penerjemah."></Alt>
+        <Alt ID="inz" Value="Nama Langkah ini digunakan dalam antarmuka serta untuk menberikan nama-nama file; sebaiknya anda memasukkan Nama Langkah dalam bahasa yang paling berguna bagi penerjemah."></Alt>
       </Item>
       <Item ID="m_listviewStages_col0">
         <Alt ID="inz" Value="Nama pendek"></Alt>
@@ -1445,42 +1761,42 @@
     </Group>
     <Group ID="DialogProperties_Page_OtherTranslations">
       <Item ID="m_lblSetup">
-        <Alt ID="inz" Value="Sebuah terjemahan rujukan adalah terjemahan lain yang mungkin ada mau untuk lihat sepanjang proses penerjemahan."></Alt>
+        <Alt ID="inz" Value="Sebuah Terjemahan Bandingan adalah terjemahan lain yang mungkin anda mau lihat sepanjang proses penerjemahan."></Alt>
       </Item>
       <Item ID="m_lblTranslation">
-        <Alt ID="inz" Value="Terjemahan-terjemahan rujukan yang sedang dipakai:"></Alt>
+        <Alt ID="inz" Value="Terjemahan-terjemahan Bandingan yang sedang dipakai:"></Alt>
       </Item>
       <Item ID="m_lblActions">
-        <Alt ID="inz" Value="Aksi-aksi yang tersedia:"></Alt>
+        <Alt ID="inz" Value="Tindakan yang tersedia:"></Alt>
       </Item>
       <Item ID="m_btnCreate">
-        <Alt ID="inz" Value="Buat"></Alt>
+        <Alt ID="inz" Value="Ciptakan..."></Alt>
       </Item>
       <Item ID="m_lblCreate">
-        <Alt ID="inz" Value="Mulai dari bahan-bahan dasar untuk mengajukan pengaturan-pengaturan bagi sebuah terjemahan rujukan. Anda akan diberi satu blangko kosong, dan anda harus memasukkan nama terjemahan, buku-bukunya, dll."></Alt>
+        <Alt ID="inz" Value="Mulai dari awal untuk mengaturan satu Terjemahan Bandingan. Anda akan diberi tempat untuk memasukkan nama terjemahan, buku-bukunya, dll."></Alt>
       </Item>
       <Item ID="m_btnOpen">
-        <Alt ID="inz" Value="Buka"></Alt>
+        <Alt ID="inz" Value="Buka..."></Alt>
       </Item>
       <Item ID="m_lblOpen">
-        <Alt ID="inz" Value="Gunakan pengaturan terjemahan rujukan yang sudah ada. Jika anda sudah menentukan terjemahan itu di proyek yang lain, anda dapat juga menggunakannya kembali di sini, daripada harus memasukkan ulang semua informasi."></Alt>
+        <Alt ID="inz" Value="Gunakan pengaturan untuk Terjemahan Bandingan yang sudah tersedia. Jika anda sudah menentukan terjemahan itu di proyek yang lain, anda dapat juga menggunakannya kembali di sini, daripada harus memasukkan ulang semua informasi."></Alt>
       </Item>
       <Item ID="m_btnRemove">
-        <Alt ID="inz" Value="Pindahkan keluar"></Alt>
+        <Alt ID="inz" Value="Hilangkan..."></Alt>
       </Item>
       <Item ID="m_lblRemove">
-        <Alt ID="inz" Value="Pindahkan keluar terjemahan yang dipilih dari daftar di bawah ini. Ini tidak memindahkan keluar semua pengaturan file dari disk; hanya memindahkan keluar dari proyek ini."></Alt>
+        <Alt ID="inz" Value="Hilangkan terjemahan yang dipilih dari daftar di bawah ini. Ini tidak menghapus semua pengaturan file dari disk; hanya menghilangkan terjemahan tersebut dari proyek ini."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_SetupFT">
       <Item ID="m_lblActions">
-        <Alt ID="inz" Value="Aksi-aksi yang tersedia:"></Alt>
+        <Alt ID="inz" Value="Tindakan yang tersedia:"></Alt>
       </Item>
       <Item ID="m_btnOpen">
-        <Alt ID="inz" Value="Buka yang sudah ada"></Alt>
+        <Alt ID="inz" Value="Buka file yang sudah ada..."></Alt>
       </Item>
       <Item ID="m_btnCreate">
-        <Alt ID="inz" Value="Buat baru"></Alt>
+        <Alt ID="inz" Value="Ciptakan Baru..."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_Translation">
@@ -1494,13 +1810,13 @@
         <Alt ID="inz" Value="Nama-nama buku"></Alt>
       </Item>
       <Item ID="m_btnRemoveTranslation">
-        <Alt ID="inz" Value="Pindahkan keluar terjemahan ini"></Alt>
+        <Alt ID="inz" Value="Hilangkan terjemahan ini..."></Alt>
       </Item>
       <Item ID="m_lblLanguageName">
         <Alt ID="inz" Value="Nama bahasa:"></Alt>
       </Item>
       <Item ID="m_btnExport">
-        <Alt ID="inz" Value="Kirim dengan format yang berbeda"></Alt>
+        <Alt ID="inz" Value="Ekspor..."></Alt>
       </Item>
       <Item ID="m_listviewBooks_col0">
         <Alt ID="inz" Value="Singkatan"></Alt>
@@ -1509,16 +1825,16 @@
         <Alt ID="inz" Value="Nama buku"></Alt>
       </Item>
       <Item ID="m_btnProperties">
-        <Alt ID="inz" Value="Ciri-ciri"></Alt>
+        <Alt ID="inz" Value="Ciri-ciri..."></Alt>
       </Item>
       <Item ID="m_btnCreate">
-        <Alt ID="inz" Value="Membuat"></Alt>
+        <Alt ID="inz" Value="Ciptakan..."></Alt>
       </Item>
       <Item ID="m_btnRemove">
-        <Alt ID="inz" Value="Pindahkan keluar"></Alt>
+        <Alt ID="inz" Value="Hilangkan..."></Alt>
       </Item>
       <Item ID="m_btnImportBook">
-        <Alt ID="inz" Value="Memasukkan"></Alt>
+        <Alt ID="inz" Value="Impor..."></Alt>
       </Item>
       <Item ID="m_lblFrom">
         <Alt ID="inz" Value="dari"></Alt>
@@ -1527,138 +1843,158 @@
         <Alt ID="inz" Value="Kopi nama-nama buku"></Alt>
       </Item>
       <Item ID="propAbbreviation">
-        <Alt ID="inz" Value="Singkatan bahasa" Tip="Secara khusus kode Ethnologue menawarkan 3-huruf singkatan nama bahasa. Salah satu kegunaannya ialah untuk menciptakan nama file."></Alt>
+        <Alt ID="inz" Value="Singkatan bahasa" Tip="Jika tidak tahu singkatan yang ingin dipakai, perlu diketahui bahwa Ethnologue telah tentukan kode 3-huruf yang unik bagi setiap bahasa di dunia. Salah satu kegunaannya ialah untuk menciptakan nama file di Sabda Kita."></Alt>
       </Item>
       <Item ID="Writing Systems">
-        <Alt ID="inz" Value="Sistim tulisan"></Alt>
+        <Alt ID="inz" Value="Sistem Tulisan"></Alt>
       </Item>
       <Item ID="propWSVernacular">
-        <Alt ID="inz" Value="Untuk Terjemahan"></Alt>
+        <Alt ID="inz" Value="Sistem Tulisan untuk Bahasa Lokal" Tip="Sistem Tulisan untuk Terjemahan Sasaran dalam bahasa lokal; disetel di Pengaturan Tim."></Alt>
       </Item>
       <Item ID="propWSAdvisor">
-        <Alt ID="inz" Value="Bagi Pembina / Kunsultan"></Alt>
+        <Alt ID="inz" Value="Sistem Tulisan bagi Pembina / Konsultan" Tip="Sistem Tulisan bagi Pembina atau Konsultan (misalnya, untuk Terjemahan Balik); disetel di Pengaturan Tim."></Alt>
       </Item>
       <Item ID="m_listviewBooks_col2">
         <Alt ID="inz" Value="Nama file"></Alt>
       </Item>
       <Item ID="m_editLanguageName">
-        <Alt ID="inz" Value="Nama penerjemah"></Alt>
+        <Alt ID="inz" Value="Nama Terjemahan"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options">
       <Item ID="propMaximizeWindowOnStartup">
-        <Alt ID="inz" Value="Memaksimalkan Window pada Startup?" Tip="Jika ya, SabdaKita akan dimaksimalkan ukurannya. Ini akan menolong pemakai baru memiliki ukuran yang cukup pada layar untuk bekerja."></Alt>
+        <Alt ID="inz" Value="Perbesar jendela waktu buka Sabda Kita?" Tip="Jika ‘Ya’, Sabda Kita akan perbesar ukurannya sesuai dengan layar komputer. Ini akan menolong pemakai baru mendapat ruang yang cukup pada layar untuk bekerja. Fungsi ini direkomendasi."></Alt>
       </Item>
       <Item ID="propMakeBackups">
-        <Alt ID="inz" Value="Buat kopi otomatis?" Tip="Jika ya, SabdaKita secara otomatis akan mengkopi semua file anda ke dalam folder yang ditentukan berikut ini."></Alt>
+        <Alt ID="inz" Value="Buat File Cadangan secara otomatis?" Tip="Jika ‘Ya’, Sabda Kita akan mengkopi secara otomatis semua file yang anda kerjakan ke dalam arsip yang ditentukan di bawah ini."></Alt>
       </Item>
       <Item ID="propBackupPath">
-        <Alt ID="inz" Value="Folder untuk file-file kopi" Tip="Pilih sebuah folder bagi SabdaKita untuk secara otomatis membuat kopi dari file-file anda."></Alt>
+        <Alt ID="inz" Value="Arsip untuk file-file cadangan" Tip="Pilih sebuah arsip bagi Sabda Kita untuk membuat kopi secara otomatis dari file-file anda."></Alt>
       </Item>
       <Item ID="propPicturesPath">
-        <Alt ID="inz" Value="Folder untuk mencari gambar" Tip="Jik sebuah gambar tidak ditemukan, SabdaKita akan mencari dalam folder ini untuk  mencoba menemukannya."></Alt>
+        <Alt ID="inz" Value="Arsip untuk mencari gambar" Tip="Jika sebuah gambar tidak ditemukan, Sabda Kita akan mencari dalam arsip ini untuk  mencoba menemukannya."></Alt>
       </Item>
       <Item ID="propBackgroundColors">
         <Alt ID="inz" Value="Warna Latar Belakang"></Alt>
       </Item>
       <Item ID="propBackColorDraftingWindow">
-        <Alt ID="inz" Value="Membuat konsep" Tip="Warna dasar dari jendela konsep."></Alt>
+        <Alt ID="inz" Value="Susun Konsep dan Revisi" Tip="Warna latar belakang dari jendela Konsep dan Revisi."></Alt>
       </Item>
       <Item ID="propBackColorBackTranslationWindow">
-        <Alt ID="inz" Value="Terjemahan Balik" Tip="Warna dasar dari jendela terjemahan balik"></Alt>
+        <Alt ID="inz" Value="Terjemahan Balik" Tip="Warna latar belakang dari jendela Terjemahan Balik"></Alt>
       </Item>
       <Item ID="propBackColorNaturalnessCheckWindow">
-        <Alt ID="inz" Value="Cek kewajaran" Tip="Warna dasar dari jendela cek kewajaran"></Alt>
+        <Alt ID="inz" Value="Kewajaran" Tip="Warna latar belakang dari jendela Kewajaran"></Alt>
       </Item>
       <Item ID="propBackColorNotesWindow">
-        <Alt ID="inz" Value="Catatan" Tip="Warna dasar dari jendela catatan"></Alt>
+        <Alt ID="inz" Value="Catatan" Tip="Warna latar belakang dari kotak Catatan"></Alt>
       </Item>
       <Item ID="propBackColorOtherTranslationsWindow">
-        <Alt ID="inz" Value="Terjemahan-terjemahan lain" Tip="Warna dasar dari jendela terjemahan-terjemahan lain."></Alt>
+        <Alt ID="inz" Value="Terjemahan-terjemahan Lain" Tip="Warna latar belakang dari jendela Terjemahan-terjemahan Lain."></Alt>
       </Item>
       <Item ID="propUserInterfaceLanguage">
-        <Alt ID="inz" Value="Bahasa User Interface"></Alt>
+        <Alt ID="inz" Value="Bahasa Pengantar"></Alt>
       </Item>
       <Item ID="propPrimaryLanguage">
-        <Alt ID="inz" Value="Lebih disukai (pokok)" Tip="Pakai bahasa ini untuk User Interface."></Alt>
+        <Alt ID="inz" Value="Lebih disukai (pokok)" Tip="Pakai bahasa ini sebagai Bahasa Pengantar (jika petunjuk ada)."></Alt>
       </Item>
       <Item ID="propSecondaryLanguage">
-        <Alt ID="inz" Value="Pengganti (tambahan)" Tip="Gunakan bahasa ini untuk User Interface jika bahasa yang lebih disukai (pokok) tidak tersedia."></Alt>
+        <Alt ID="inz" Value="Pengganti (cadangan)" Tip="Gunakan bahasa ini sebagai Bahasa Pengantar jika petunjuk dalam bahasa yang lebih disukai (pokok) tidak tersedia."></Alt>
       </Item>
       <Item ID="propZoomFactor">
-        <Alt ID="inz" Value="Unsur besaran" Tip="Teks pada jendela bisa diperbesar atau diperkecil dengan memilih angka persen."></Alt>
+        <Alt ID="inz" Value="Besarnya huruf (zoom)" Tip="Teks pada jendela bisa diperbesar atau diperkecil dengan memilih angka persen."></Alt>
       </Item>
       <Item ID="propSuppressVerses">
-        <Alt ID="inz" Value="Sembunyikan nomor ayat?" Tip="Jika ya, nomor ayat tidak akan muncul pada tampilan untuk cek kewajaran. Hal ini bisa membuat lebih gampang untuk melihat bagaimana aliran cerita tertentu."></Alt>
+        <Alt ID="inz" Value="Sembunyikan nomor ayat?" Tip="Jika ‘Ya’, nomor ayat tidak akan muncul pada tampilan Kewajaran. Hal ini bisa mempermudah bacaan agar mengecek susunan bahasa dalam terjemahan jelas dan wajar menurut bahasa sasaran."></Alt>
       </Item>
       <Item ID="propNaturalnessCheck">
-        <Alt ID="inz" Value="Jendela cek kewajaran"></Alt>
+        <Alt ID="inz" Value="Jendela Kewajaran"></Alt>
       </Item>
       <Item ID="propNCSuppressVerses">
-        <Alt ID="inz" Value="Sembunyikan nomor ayat?" Tip="Jika ya, nomor ayat tidak akan muncul pada tampilan untuk cek kewajaran. Hal ini bisa membuat lebih gampang untuk melihat bagaimana aliran cerita tertentu."></Alt>
+        <Alt ID="inz" Value="Sembunyikan nomor ayat?" Tip="Jika ‘Ya’, nomor ayat tidak akan muncul pada tampilan Kewajaran. Hal ini bisa mempermudah bacaan agar mengecek susunan bahasa dalam terjemahan jelas dan wajar menurut bahasa sasaran."></Alt>
       </Item>
       <Item ID="propNCShowLineNumbers">
-        <Alt ID="inz" Value="Tunjukkan nomor baris?" Tip="Jika ya, nomor baris akan muncul pada sisi kiri, sehingga anda akan merujuk pada baris tertentu ketika anda mendiskusikan teks dengan yang lain."></Alt>
+        <Alt ID="inz" Value="Tunjukkan nomor baris?" Tip="Jika ‘Ya’, nomor baris akan muncul pada sisi kiri, sehingga anda akan merujuk pada baris tertentu ketika anda mebahas teks dengan orang lain."></Alt>
       </Item>
       <Item ID="propDictionary">
         <Alt ID="inz" Value="Kamus WeSay"></Alt>
       </Item>
       <Item ID="propDictApp">
-        <Alt ID="inz" Value="Rute ke WeSay App" Tip="Rute penuh ke applikasi yang mengatur kamus; sekarang hanya WeSay.App.Exe satu-satunya yang didukung."></Alt>
+        <Alt ID="inz" Value="Rute ke WeSay App" Tip="Rute penuh ke applikasi yang mengatur kamus; sekarang hanya WeSay.App.Exe saja yang didukung."></Alt>
       </Item>
       <Item ID="propDictData">
-        <Alt ID="inz" Value="Rute ke kamus LIFT" Tip="Rute penuh ke data kamus sebagaimana diatur oleh WeSay, file format LIFT"></Alt>
+        <Alt ID="inz" Value="Rute ke kamus LIFT" Tip="Rute penuh ke data kamus sebagaimana diatur oleh WeSay, dalam file format LIFT"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_Notes">
       <Item ID="Show_kGeneral">
-        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ya, catatan umum akan terlihat ketika lembaran catatan aktif; catatan umum akan muncul baik dalam lembaran catatan dan sebagai gambar di layar komputer pada tekx."></Alt>
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Umum akan terlihat ketika Kotak Catatan aktif; catatan umum akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kGeneral">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Umum dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kHintForDaughter">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Usulan bagi Terjemahan Anak akan terlihat ketika Kotak Catatan aktif; Usulan bagi Terjemahan Anak akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kHintForDaughter">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Usulan bagi Terjemahan Anak dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="ShowNotesFromFront">
+        <Alt ID="inz" Value="Tunjukkan usulan dari Terjemahan Acuan?" Tip="Jika ‘Ya’, semua Usulan bagi Terjamahan Anak (Sasaran) akan terlihat."></Alt>
       </Item>
       <Item ID="Show_kToDo">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Untuk Diperhatikan akan terlihat ketika Kotak Catatan aktif; Untuk Diperhatikan akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kToDo">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Untuk Diperhatikan dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kAskUns">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Tanya Pembaca Kaum Awam akan terlihat ketika Kotak Catatan aktif; Tanya Pembaca Kaum Awam akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kAskUns">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Tanya Pembaca Kaum Awam dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kReason">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Alasan untuk Terjemahan akan terlihat ketika Kotak Catatan aktif; Alasan untuk Terjemahan akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kReason">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Alasan untuk Terjemahan dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kFront">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Masalah dengan Terjemahan Acuan akan terlihat ketika Kotak Catatan aktif; Masalah dengan Terjemahan Acuan akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kFront">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Masalah dengan Terjemahan Acuan dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kDefinition">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Makna Kata akan terlihat ketika Kotak Catatan aktif; Makna Kata akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kDefinition">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Makna Kata dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kOldVersion">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Versi Lama akan terlihat ketika Kotak Catatan aktif; Versi Lama akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kOldVersion">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Versi Lama dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kBT">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Terjemahan Balik akan terlihat ketika Kotak Catatan aktif; Terjemahan Balik akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kBT">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Terjemahan Balik dalam Kotak Catatan."></Alt>
       </Item>
       <Item ID="Show_kExegesis">
+        <Alt ID="inz" Value="Tunjukkan?" Tip="Jika ‘Ya’, Catatan Dasar Tafsiran akan terlihat ketika Kotak Catatan aktif; Dasar Tafsiran akan muncul baik dalam Kotak Catatan maupun sebagai gambar icon pada teks terjemahan."></Alt>
       </Item>
       <Item ID="Color_kExegesis">
+        <Alt ID="inz" Value="Warna latar belakang" Tip="Warna latar belakang untuk Catatan Dasar Tafsiran dalam Kotak Catatan."></Alt>
       </Item>
     </Group>
   </Group>
   <Group ID="WizImportBook">
     <Item ID="Title">
-      <Alt ID="inz" Value="Memasukkan sebuah buku Alkitab"></Alt>
+      <Alt ID="inz" Value="Impor sebuah buku Alkitab yang sudah ada"></Alt>
     </Item>
     <Item ID="m_btnFinish">
       <Alt ID="inz" Value="Selesai"></Alt>
@@ -1667,32 +2003,32 @@
       <Alt ID="inz" Value="Sebelumnya"></Alt>
     </Item>
     <Item ID="m_btnNext">
-      <Alt ID="inz" Value="Selanjutnya"></Alt>
+      <Alt ID="inz" Value="Berikut"></Alt>
     </Item>
     <Group ID="WizImportBook_WizPage_GetFileName">
       <Item ID="strNavTitle">
-        <Alt ID="inz" Value="Temukan nama file"></Alt>
+        <Alt ID="inz" Value="Cari Nama File"></Alt>
       </Item>
       <Item ID="m_labelFileStats">
-        <Alt ID="inz" Value="Mohon menunggu sementara Sabdakita memeriksa file ini..."></Alt>
+        <Alt ID="inz" Value="Mohon tunggu sementara Sabda Kita memeriksa file ini..."></Alt>
       </Item>
       <Item ID="m_labelOverview">
-        <Alt ID="inz" Value="Alat otomatis ini akan menuntun anda melalui suatu proses memasukkan sebuah Text Alkitab yang telah ada ke dalam SabdaKita."></Alt>
+        <Alt ID="inz" Value="Alat otomatis ini (wizard) akan menuntun anda melalui suatu proses memasukkan (impor) file dari sebuah buku Alkitab yang sudah ada ke dalam Sabda Kita."></Alt>
       </Item>
       <Item ID="m_labelBrowse">
-        <Alt ID="inz" Value="Cari file yang anda ingin masukkan:"></Alt>
+        <Alt ID="inz" Value="Cari file yang anda ingin masukkan (impor):"></Alt>
       </Item>
       <Item ID="strPleaseWait">
-        <Alt ID="inz" Value="Mohon menunggu sementara Sabdakita memeriksa file ini..."></Alt>
+        <Alt ID="inz" Value="Mohon tunggu sementara Sabda Kita memeriksa file ini..."></Alt>
       </Item>
       <Item ID="strUnableToAccessFile">
-        <Alt ID="inz" Value="Tidak dapat memasuki file '{0}."></Alt>
+        <Alt ID="inz" Value="Komputer tidak temukan file ‘{0}’."></Alt>
       </Item>
       <Item ID="strNotStandardFormat">
-        <Alt ID="inz" Value="File '{0} tidak muncul sebagai sebuah file Standard Format. File ini tidak dimulai dengan karakter backslash ( \ )"></Alt>
+        <Alt ID="inz" Value="Rupanya file ‘{0}’ bukan file Standard Format. File ini tidak dimulai dengan huruf backslash ( \ )"></Alt>
       </Item>
       <Item ID="strFileNotInSupportedEncoding">
-        <Alt ID="inz" Value="File {0} tidak ada di dalam sebuah kode bantuan. File ini haruslah ASCII atau UTF*"></Alt>
+        <Alt ID="inz" Value="File ‘{0}’ tidak menggunakan kode huruf yang diakui. File ini haruslah dalam ASCII atau UTF8 (Unicode)."></Alt>
       </Item>
       <Item ID="strMore">
         <Alt ID="inz" Value="(lanjut)"></Alt>
@@ -1701,18 +2037,18 @@
         <Alt ID="inz" Value="Tanda-tanda yang tidak diketahui: {0}"></Alt>
       </Item>
       <Item ID="strFileStats">
-        <Alt ID="inz" Value="File : {0} {n} Kode: {1}{0}Format: {2}{n}{3}"></Alt>
+        <Alt ID="inz" Value="File: {0}{n}Kode huruf: {1}{n}Format: {2}{n}{3}"></Alt>
       </Item>
       <Item ID="strOpenDialogTitle">
-        <Alt ID="inz" Value="Pilih file yang ingin anda masukkan"></Alt>
+        <Alt ID="inz" Value="Pilih file yang ingin anda masukkan (impor)"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_GetAbbreviation">
       <Item ID="strNavTitle">
-        <Alt ID="inz" Value="Mengenali buku dimaksud"></Alt>
+        <Alt ID="inz" Value="Tunjukkan Buku dimaksud"></Alt>
       </Item>
       <Item ID="m_labelExplanation">
-        <Alt ID="inz" Value="Catatan: hanya buku-buku yang tampil di daftar ini yang bisa dimasukkan. Karena itu sebagai contoh, buku-buku yang telah dimasukkan tidak terdaftar di sini."></Alt>
+        <Alt ID="inz" Value="Catatan: hanya buku-buku yang tampil di daftar ini yang masih bisa dimasukkan. Karena  buku-buku yang telah dimasukkan tidak muncul dalam daftar di sini."></Alt>
       </Item>
       <Item ID="m_lvBooks_col0">
         <Alt ID="inz" Value="Singkatan"></Alt>
@@ -1726,35 +2062,35 @@
     </Group>
     <Group ID="WizImportBook_WizPage_GetStage">
       <Item ID="strNavTitle">
-        <Alt ID="inz" Value="Mengenali langkah"></Alt>
+        <Alt ID="inz" Value="Tunjukkan Langkah Terjemahan"></Alt>
       </Item>
       <Item ID="m_labelVersion">
-        <Alt ID="inz" Value="Anda bisa memilih untuk memasukan sebuah versi pada langkah ini, misalnya: 'A', 'B', dll"></Alt>
+        <Alt ID="inz" Value="Anda juga bisa tanda versi pada langkah ini, misalnya: 'A', 'B', dll."></Alt>
       </Item>
       <Item ID="m_labelStage">
-        <Alt ID="inz" Value="Pada langkah apa terjemahan buku ini?"></Alt>
+        <Alt ID="inz" Value="Buku ini berada pada Langkah Terjemahan yang mana?"></Alt>
       </Item>
       <Item ID="m_labelExplanation">
-        <Alt ID="inz" Value="(Catatan: Semua informasi ini adalah pilihan; tetapi sangat direkomendasikan jika buku yang dimasukkan masih dalam proses penerjemahan.)"></Alt>
+        <Alt ID="inz" Value="(Catatan: Semua informasi ini adalah pilihan; tetapi sangat direkomendasikan jika buku yang dimasukkan di sini masih dalam proses penerjemahan.)"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_GetDestinationFolder">
       <Item ID="strNavTitle">
-        <Alt ID="inz" Value="Dimana harus menyimpan?"></Alt>
+        <Alt ID="inz" Value="Disimpan di mana?"></Alt>
       </Item>
       <Item ID="m_labelNote">
-        <Alt ID="inz" Value="(SabdaKita akan secara otomatis menggunakan folder yang sama dengan file yang dimasukkan; tetapi anda bisa mengubahnya kalau diinginkan.)"></Alt>
+        <Alt ID="inz" Value="(Sabda Kita akan secara otomatis menggunakan arsip yang sama dengan file yang dimasukkan; tetapi anda bisa mengubahnya kalau diinginkan.)"></Alt>
       </Item>
       <Item ID="m_labelFolderText">
-        <Alt ID="inz" Value="Mohon untuk menunjukkan Folder yang mana yang akan dipakai untuk menyimpan file:"></Alt>
+        <Alt ID="inz" Value="Mohon tunjukkan Arsip yang tepat untuk simpan file ini:"></Alt>
       </Item>
       <Item ID="m_labelFileNameText">
-        <Alt ID="inz" Value="SabdaKita akan menyimpan buku dimaksud dengan nama file:"></Alt>
+        <Alt ID="inz" Value="Sabda Kita akan simpan buku dengan nama file ini:"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_Summary">
       <Item ID="strNavTitle">
-        <Alt ID="inz" Value="Kesimpulan"></Alt>
+        <Alt ID="inz" Value="Ringkasan"></Alt>
       </Item>
       <Item ID="m_labelFormat">
         <Alt ID="inz" Value="Format:"></Alt>
@@ -1766,25 +2102,25 @@
         <Alt ID="inz" Value="Langkah, Versi:"></Alt>
       </Item>
       <Item ID="m_labelFileName">
-        <Alt ID="inz" Value="File :"></Alt>
+        <Alt ID="inz" Value="File:"></Alt>
       </Item>
       <Item ID="m_labelBook">
         <Alt ID="inz" Value="Buku:"></Alt>
       </Item>
       <Item ID="m_labelReady">
-        <Alt ID="inz" Value="SabdaKita siap untuk memasukkan:"></Alt>
+        <Alt ID="inz" Value="Sabda Kita sudah siap untuk memasukkan:"></Alt>
       </Item>
       <Item ID="m_labelClickFinish">
-        <Alt ID="inz" Value="Klik tombol Selesai untuk memasukkan buku ini ke dalam SabdaKita, atau tekan tombol Sebelumnya untuk membuat perubahan .."></Alt>
+        <Alt ID="inz" Value="Klik tombol ‘Selesai’ untuk memasukkan buku ini ke dalam Sabda Kita, atau tekan tombol ‘Sebelumnya’ untuk mengubah pilihan anda."></Alt>
       </Item>
     </Group>
   </Group>
   <Group ID="SplashScreen">
     <Item ID="Title">
-      <Alt ID="inz" Value="Layar yang muncul sementara"></Alt>
+      <Alt ID="inz" Value="Layar yang muncul sementara waktu buka program"></Alt>
     </Item>
     <Item ID="sLoadingOurWord">
-      <Alt ID="inz" Value="Sementara muat Sabda Kita!..."></Alt>
+      <Alt ID="inz" Value="Sementara muat Sabda Kita..."></Alt>
     </Item>
     <Item ID="sOptionalAdditional">
       <Alt ID="inz" Value="S alin{n}  A lkitab{n}    B ahasa{n}      D aerah{n}        A nda"></Alt>
@@ -1795,7 +2131,7 @@
   </Group>
   <Group ID="WizNewProject">
     <Item ID="Title">
-      <Alt ID="inz" Value="Membuat proyek yang baru"></Alt>
+      <Alt ID="inz" Value="Ciptakan Proyek Baru"></Alt>
     </Item>
     <Item ID="m_btnFinish">
       <Alt ID="inz" Value="Selesai"></Alt>
@@ -1804,17 +2140,17 @@
       <Alt ID="inz" Value="Sebelumnya"></Alt>
     </Item>
     <Item ID="m_btnNext">
-      <Alt ID="inz" Value="Selanjutnya"></Alt>
+      <Alt ID="inz" Value="Berikut"></Alt>
     </Item>
     <Group ID="WizNewProject_WizNew_Introduction">
       <Item ID="m_lblClickNextToStart">
-        <Alt ID="inz" Value="Klik &quot;selanjutnya' untuk memulai"></Alt>
+        <Alt ID="inz" Value="Klik ‘Berikut’ untuk mulai..."></Alt>
       </Item>
       <Item ID="m_lblDescription2">
-        <Alt ID="inz" Value="Anda akan mengenali informasi tentang sumber terjemahan, bahasa yang ke dalamnya anda akan menerjemahkan, dan beberapa hal penting lainnya."></Alt>
+        <Alt ID="inz" Value="Anda akan memberi informasi tentang Terjemahan Acuan, bahasa yang anda akan pakai dalam Terjemahan Sasaran, dan beberapa hal penting lainnya."></Alt>
       </Item>
       <Item ID="m_lblDescription1">
-        <Alt ID="inz" Value="Alat otomatis ini akan menuntun anda melewati proses untuk membuat sebuah proyek baru dalam SabdaKita."></Alt>
+        <Alt ID="inz" Value="Alat otomatis ini akan menuntun anda melewati proses menciptaka sebuah proyek baru dalam Sabda Kita."></Alt>
       </Item>
       <Item ID="strIntroduction">
         <Alt ID="inz" Value="Pengantar"></Alt>
@@ -1822,13 +2158,13 @@
     </Group>
     <Group ID="WizNewProject_WizNew_ProjectName">
       <Item ID="m_lblProjectName">
-        <Alt ID="inz" Value="Nama proyek bahasa:"></Alt>
+        <Alt ID="inz" Value="Nama bahasa proyek:"></Alt>
       </Item>
       <Item ID="m_lblExplanation">
-        <Alt ID="inz" Value="Ini akan menjadi nama bahasa yang ke dalamnya akan anda terjemahkan. Nama ini yang anda dan para penerjemah gunakan untuk merujuk kepada bahasa dimaksud. Nama ini akan muncul sepanjang interaksi pemakai dengan program."></Alt>
+        <Alt ID="inz" Value="Sebaiknya nama bahasa di sini merupakan nama lengkap dari bahasa yang anda pakai dalam Terjemahan Sasaran ini. Nama ini yang biasa digunakan untuk merujuk kepada bahasa dimaksud, (dan membedakannya dari bahasa yang berdekatan). Nama ini akan muncul di antarmuka Sabda Kita. (Misalnya, ‘Uab Meto-Mollo’.)"></Alt>
       </Item>
       <Item ID="m_lblInstruction">
-        <Alt ID="inz" Value="Berilah nama kepada proyek bahasa ini."></Alt>
+        <Alt ID="inz" Value="Harap memberi nama pada proyek untuk bahasa ini."></Alt>
       </Item>
       <Item ID="strProjectName">
         <Alt ID="inz" Value="Nama Proyek"></Alt>
@@ -1836,106 +2172,106 @@
     </Group>
     <Group ID="WizNewProject_WizNew_TargetInfo">
       <Item ID="m_btnSettings">
-        <Alt ID="inz" Value="Cari ..."></Alt>
+        <Alt ID="inz" Value="Cari..."></Alt>
       </Item>
       <Item ID="m_lblSettings">
-        <Alt ID="inz" Value="Pengaturan Folder:"></Alt>
+        <Alt ID="inz" Value="Arsip Pengaturan:"></Alt>
       </Item>
       <Item ID="m_lblSettingsHelp">
-        <Alt ID="inz" Value="2. Mengarahkan anda kepada forlder yang anda akan pakai untuk menyimpan pengaturan file-file untuk bahasa ini."></Alt>
+        <Alt ID="inz" Value="2. Cari arsip yang anda akan pakai untuk simpan file-file pengaturan bagi bahasa ini."></Alt>
       </Item>
       <Item ID="m_lblAbbrevHelp">
-        <Alt ID="inz" Value="1. Nama singkatan dari nama bahasa. Ethnologue menawarkan 3-huruf singkatan yang cocok bagi hampir semua nama bahasa di dunia."></Alt>
+        <Alt ID="inz" Value="1. Nama singkat untuk nama bahasa. Ethnologue menawarkan singkatan 3-huruf yang unik bagi hampir semua bahasa di dunia."></Alt>
       </Item>
       <Item ID="m_lblAbbrev">
         <Alt ID="inz" Value="Singkatan:"></Alt>
       </Item>
       <Item ID="m_lblDescription">
-        <Alt ID="inz" Value="Kita membutuhkan beberapa informasi tambahan tentang bahasa '{0}'."></Alt>
+        <Alt ID="inz" Value="Sabda Kita membutuhkan beberapa informasi tambahan tentang bahasa '{0}'."></Alt>
       </Item>
       <Item ID="strTargetInfo">
-        <Alt ID="inz" Value="Informasi sasaran"></Alt>
+        <Alt ID="inz" Value="Informasi mengenai Sasaran"></Alt>
       </Item>
       <Item ID="strBrowseTargetFolderDialogTitle">
-        <Alt ID="inz" Value="Pilih folder untuk menyimpan pengaturan-pengaturan untuk proyek ini"></Alt>
+        <Alt ID="inz" Value="Pilih arsip untuk simpan pengaturan-pengaturan bagi proyek ini"></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_FrontInfo">
       <Item ID="m_lblInstructions">
-        <Alt ID="inz" Value="Kalau tidak, masukkan informasi berikut untuk bahasa Acuan, seperti yang telah anda lakukan pada bahasa Sasaran:"></Alt>
+        <Alt ID="inz" Value="Kalau tidak, masukkan informasi berikut untuk bahasa Terjemahan Acuan, seperti yang telah anda lakukan pada bahasa Terjemahan Sasaran:"></Alt>
       </Item>
       <Item ID="m_btnUseExisting">
-        <Alt ID="inz" Value="Pakai yang ada"></Alt>
+        <Alt ID="inz" Value="Pakai yang sudah ada..."></Alt>
       </Item>
       <Item ID="m_btnSettings">
         <Alt ID="inz" Value="Cari..."></Alt>
       </Item>
       <Item ID="m_lblSettings">
-        <Alt ID="inz" Value="Folder pengaturan-pengaturan Acuan: "></Alt>
+        <Alt ID="inz" Value="Arsip untuk pengaturan-pengaturan Terjemahan Acuan:"></Alt>
       </Item>
       <Item ID="m_lblAbbrev">
-        <Alt ID="inz" Value="Singkatan-singkatan Acuan:"></Alt>
+        <Alt ID="inz" Value="Singkatan untuk Terjemahan Acuan:"></Alt>
       </Item>
       <Item ID="m_lblName">
-        <Alt ID="inz" Value="Nama bahasa Acuan:"></Alt>
+        <Alt ID="inz" Value="Nama bahasa Terjemahan Acuan:"></Alt>
       </Item>
       <Item ID="m_lblBrowseToExistingFront">
-        <Alt ID="inz" Value="Cari file pengaturan Acuan, jika sudah ada:"></Alt>
+        <Alt ID="inz" Value="Cari file pengaturan Terjemahan Acuan, jika sudah ada:"></Alt>
       </Item>
       <Item ID="strFrontInfo">
-        <Alt ID="inz" Value="Informasi Acuan:"></Alt>
+        <Alt ID="inz" Value="Mengenai Terjemahan Acuan"></Alt>
       </Item>
       <Item ID="strBrowseFrontFolderDialogTitle">
-        <Alt ID="inz" Value="Pilih folder dimana anda akan menyimpan pengaturan-pengaturan untuk terjemahan Acuan."></Alt>
+        <Alt ID="inz" Value="Pilih arsip untuk simpan pengaturan-pengaturan bagi Terjemahan Acuan."></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_TeamSettings">
       <Item ID="m_textCurrentAction">
-        <Alt ID="inz" Value="Aksi sekarang: Kalau tidak memilih, maka"></Alt>
+        <Alt ID="inz" Value="Tindakan sekarang: Kalau tidak disetel... (default)"></Alt>
       </Item>
       <Item ID="m_lblExplDefault">
-        <Alt ID="inz" Value="Aksi yang akan terjadi adalah SabdaKita akan membuat TeamSettings.owt dalam folder pengaturan yang telah anda tentukan sebelumnya."></Alt>
+        <Alt ID="inz" Value="Sabda Kita akan menciptakan ‘TeamSettings.owt’ (file ‘PengaturanTim.owt’) dalam arsip pengaturan yang telah anda tentukan sebelumnya."></Alt>
       </Item>
       <Item ID="m_lblExplSaveAs">
-        <Alt ID="inz" Value="Pilih folder dan nama file baru."></Alt>
+        <Alt ID="inz" Value="Pilih arsip yang tepat dan nama file baru untuk Pengaturan Tim."></Alt>
       </Item>
       <Item ID="m_lblExplUseExisting">
-        <Alt ID="inz" Value="Pilih file TeamSettings yang ada"></Alt>
+        <Alt ID="inz" Value="Cari file Pengaturan Tim yang sudah ada."></Alt>
       </Item>
       <Item ID="m_btnDefault">
-        <Alt ID="inz" Value="Kalau tidak memilih"></Alt>
+        <Alt ID="inz" Value="Kalau tidak disetel... (default)"></Alt>
       </Item>
       <Item ID="m_btnUseExisting">
-        <Alt ID="inz" Value="Gunakan yang ada"></Alt>
+        <Alt ID="inz" Value="Gunakan yang sudah ada..."></Alt>
       </Item>
       <Item ID="m_lblExplanation">
-        <Alt ID="inz" Value="SabdaKita memelihara beberapa pengaturan tertentu, seperti pengaturan halaman, dalam sebuah file pengaturan yang umum di mana mereka bisa dipakai oleh berbagai proyek bahasa."></Alt>
+        <Alt ID="inz" Value="Sabda Kita mempertahankan beberapa pengaturan tertentu, (seperti Pedoman Gaya [stylesheet]), dalam sebuah file pengaturan umum yang dapat berguna oleh beberapa proyek bahasa dalam satu tim yang luas."></Alt>
       </Item>
       <Item ID="strTeamSettings">
-        <Alt ID="inz" Value="Pengaturan-pengaturan Tim"></Alt>
+        <Alt ID="inz" Value="Pengaturan Tim"></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_Summary">
       <Item ID="m_checkLaunchProperties">
-        <Alt ID="inz" Value="Apakah anda mau melanjutkan dan meluncurkan dialog properti untuk memasukkan pengaturan-pengaturan yang lain (seperti menambah buku-buku kepada terjemahan)?"></Alt>
+        <Alt ID="inz" Value="Apakah anda mau buka kotak Ciri-ciri untuk memasukkan pengaturan-pengaturan yang lain (seperti tambah buku-buku yang ingin dikerjakan dalam terjemahan)?"></Alt>
       </Item>
       <Item ID="m_textTeamSettings">
-        <Alt ID="inz" Value="(Pengaturan-pengaturan Tim)"></Alt>
+        <Alt ID="inz" Value="(Pengaturan Tim)"></Alt>
       </Item>
       <Item ID="m_lblTeamSettings">
-        <Alt ID="inz" Value="Pengaturan-pengaturan Tim"></Alt>
+        <Alt ID="inz" Value="Pengaturan Tim"></Alt>
       </Item>
       <Item ID="m_textSourceTranslation">
-        <Alt ID="inz" Value="(Terjemahan Sumber)"></Alt>
+        <Alt ID="inz" Value="(Terjemahan Acuan)"></Alt>
       </Item>
       <Item ID="m_lblSourceTranslation">
-        <Alt ID="inz" Value="Terjemahan Sumber:"></Alt>
+        <Alt ID="inz" Value="Terjemahan Acuan:"></Alt>
       </Item>
       <Item ID="m_textSettingsFolder">
-        <Alt ID="inz" Value="(Pengaturan Folder)"></Alt>
+        <Alt ID="inz" Value="(Arsip Pengaturan)"></Alt>
       </Item>
       <Item ID="m_lblSettingsFolder">
-        <Alt ID="inz" Value="Pengaturan Folder:"></Alt>
+        <Alt ID="inz" Value="Arsip Pengaturan:"></Alt>
       </Item>
       <Item ID="m_textAbbreviation">
         <Alt ID="inz" Value="(Singkatan)"></Alt>
@@ -1950,13 +2286,13 @@
         <Alt ID="inz" Value="Nama Bahasa:"></Alt>
       </Item>
       <Item ID="m_labelClickFinish">
-        <Alt ID="inz" Value="Klik tombol selesai untuk membuat proyek yang baru, atau tekan tombol sebelumnya untuk melakukan perubahan-perubahan .."></Alt>
+        <Alt ID="inz" Value="Klik tombol ‘Selesai’ untuk ciptakan proyek baru, atau tekan tombol ‘Sebelumnya’ untuk mengubah pengaturan tadi."></Alt>
       </Item>
       <Item ID="m_labelReady">
-        <Alt ID="inz" Value="SabdaKita siap untuk membut proyek yang baru:"></Alt>
+        <Alt ID="inz" Value="Sabda Kita sudah siap untuk ciptakan proyek baru:"></Alt>
       </Item>
       <Item ID="strSummaryh">
-        <Alt ID="inz" Value="Kesimpulan"></Alt>
+        <Alt ID="inz" Value="Ringkasan"></Alt>
       </Item>
     </Group>
   </Group>

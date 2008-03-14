@@ -127,7 +127,7 @@ namespace OurWord.View
                 if (p.SimpleText.Length == 0 && p.SimpleTextBT.Length == 0)
                     continue;
 
-                // Add the vernacular paragraph
+                // Add the vernacular paragraph to the left; we don't edit it
                 OWPara op = new OWPara(
                     this,
                     p.Translation.WritingSystemVernacular,
@@ -145,7 +145,10 @@ namespace OurWord.View
                 // If the vernacular was editable, then we want to show the back translation
                 if (p.IsUserEditable)
                 {
-                    options = (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable);
+                    options = (
+                        OWPara.Flags.ShowBackTranslation | 
+                        OWPara.Flags.IsEditable |
+                        OWPara.Flags.CanItalic);
                     if (OurWordMain.TargetIsLocked)
                         options |= OWPara.Flags.IsLocked;
                 }
@@ -168,7 +171,7 @@ namespace OurWord.View
                 StartNewRow(bFirstFootnote, null);
                 bFirstFootnote = false;
 
-                // Add the vernacular paragraph
+                // Add the vernacular paragraph to the left side
                 OWPara op = new OWPara(
                     this,
                     fn.Translation.WritingSystemVernacular,
@@ -182,7 +185,10 @@ namespace OurWord.View
                 OWPara.Flags options = OWPara.Flags.None;
                 if (fn.IsUserEditable)
                 {
-                    options = (OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable);
+                    options = (
+                        OWPara.Flags.ShowBackTranslation |
+                        OWPara.Flags.IsEditable |
+                        OWPara.Flags.CanItalic);
                     if (OurWordMain.TargetIsLocked)
                         options |= OWPara.Flags.IsLocked;
                 }

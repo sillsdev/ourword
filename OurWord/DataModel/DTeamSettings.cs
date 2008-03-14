@@ -430,16 +430,19 @@ namespace OurWord.DataModel
 		#endregion
 
 		// Character Style Abbreviations -----------------------------------------------------
-		public const string c_StyleAbbrevNormal        = "p";
-		public const string c_StyleAbbrevVerse         = "v";
-		public const string c_StyleAbbrevChapter       = "c";
-		public const string c_StyleAbbrevFootLetter    = "fn";
-		public const string c_StyleAbbrevSeeAlsoLetter = "cf";
-		public const string c_StyleAbbrevItalic        = "i";
-		public const string c_StyleAbbrevBold          = "b";
-		public const string c_StyleAbbrevUnderline     = "u";
-		public const string c_StyleAbbrevDashed        = "d";
-		public const string c_StyleAbbrevLabel         = "L";
+		public const string c_StyleAbbrevNormal         = "p";
+		public const string c_StyleAbbrevVerse          = "v";
+		public const string c_StyleAbbrevChapter        = "c";
+		public const string c_StyleAbbrevFootLetter     = "fn";
+		public const string c_StyleAbbrevSeeAlsoLetter  = "cf";
+		public const string c_StyleAbbrevItalic         = "i";
+		public const string c_StyleAbbrevBold           = "b";
+		public const string c_StyleAbbrevUnderline      = "u";
+		public const string c_StyleAbbrevDashed         = "d";
+		public const string c_StyleAbbrevLabel          = "L";
+        public const string c_StyleAbbrevPictureCaption = "cap";
+        public const string c_StyleNote                 = "nt";
+        public const string c_StyleFootnote             = "ft";
 
         // User-Interface Only
         public const string c_CStyleRevisionDeletion = "del";
@@ -654,9 +657,9 @@ namespace OurWord.DataModel
 			}
 
 			// Footnote paragraph (ft)
-			if (null == FindParagraphStyle("ft"))
+            if (null == FindParagraphStyle(c_StyleFootnote))
 			{
-				style = AddParagraphStyle("ft", "Footnote Paragraph");
+                style = AddParagraphStyle(c_StyleFootnote, "Footnote Paragraph");
 				style.SetFonts(true, 10, false);
 				style.IsJustified = true;
                 style.SpaceAfter = 3;
@@ -672,9 +675,9 @@ namespace OurWord.DataModel
             }
 
 			// Note paragraph
-			if (null == FindParagraphStyle("nt"))
+            if (null == FindParagraphStyle(c_StyleNote))
 			{
-				style = AddParagraphStyle("nt", "Note");
+                style = AddParagraphStyle(c_StyleNote, "Note");
 				style.IsJustified = true;
 				style.FirstLineIndent = -0.20;
 				style.LeftMargin = 0.20;
@@ -690,9 +693,9 @@ namespace OurWord.DataModel
             }
 
 			// Picture caption (cap)
-			if (null == FindParagraphStyle("cap"))
+            if (null == FindParagraphStyle(c_StyleAbbrevPictureCaption))
 			{
-				style = AddParagraphStyle("cap", "Picture Caption");
+                style = AddParagraphStyle(c_StyleAbbrevPictureCaption, "Picture Caption");
 				style.SetFonts(true, 10, false, true, false, false, Color.Black);
 				style.IsCentered = true;
 			}
@@ -850,11 +853,10 @@ namespace OurWord.DataModel
         }
         #endregion
 
-
 		#region Method: void Initialize(bool bClearOutPrevious)
 		public void Initialize(bool bClearOutPrevious)
 		{
-			// ctrlRemove the previous data if asked. (Leave the Writing Systems alone for now,
+			// Remove the previous data if asked. (Leave the Writing Systems alone for now,
 			// as we have the CurrentWS stuff going on.....and I think I'll just want to
 			// get rid of WS's anyway before too long.)
 			if (bClearOutPrevious)

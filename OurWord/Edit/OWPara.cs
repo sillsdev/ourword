@@ -18,7 +18,6 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 using OurWord.DataModel;
-using NUnit.Framework;
 #endregion
 
 namespace OurWord.Edit
@@ -35,7 +34,8 @@ namespace OurWord.Edit
             IsEditable = 4,                  // Can Type, Delete, Select, Copy, Cut, Paste
             IsLocked = (8 | IsEditable),     // Can only Select & Copy; no changes (requires IsEditable to enable Select/Copy)
             ShowBackTranslation = 16,
-            CanRestructureParagraphs = 32
+            CanRestructureParagraphs = 32,
+            CanItalic = 64                   // Italics are permitted in thie paragraph
         };
         #endregion
         #region Attr{g}: Flags Options
@@ -122,6 +122,15 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VAttr{g}: bool CanItalic - true if italics are permitted in this paragraph
+        public bool CanItalic
+        {
+            get
+            {
+                return (Options & Flags.CanItalic) == Flags.CanItalic;
+            }
+        }
+        #endregion
 
         // Ownership Hierarchy ---------------------------------------------------------------
         #region Attr{g}: OWWindow.Row.Pile Pile - the owning pile that this paragraph is in
@@ -176,7 +185,7 @@ namespace OurWord.Edit
         #endregion
 
         // Blocks ----------------------------------------------------------------------------
-        #region Block Operations (Add, ctrlRemove, etc)
+        #region Block Operations (Add, Remove, etc)
         #region Attr{g}: EBlock[] Blocks - the list of displayable elements in this paragraph
         public EBlock[] Blocks
         {
@@ -2681,40 +2690,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: bool SelectEditablePositionAt(int iTextPos)
-        /// <summary>
-        /// Makes a selection at the requested position in the paragraph
-        /// </summary>
-        /// <param name="iTextPos">The position of the cursor from the beginning of the
-        /// paragraph, counting only editable text (e.g., skipping over verse numbers).
-        /// A value of "0" would select the very first editable position in the
-        /// paragraph.</param>
-        /// <returns>true if successful, false otherwise</returns>
-        public bool SelectEditablePositionAt(int iTextPos)
-        {
-            if (!Editable)
-                return false;
-
-            int iBlock = 0;
-            for (; iBlock < Blocks.Length; iBlock++)
-            {
-                EWord word = Blocks[iBlock] as EWord;
-                if (null == word)
-                    continue;
-
-                if (word.Text.Length < iTextPos)
-                    iTextPos -= word.Text.Length;
-                else
-                    break;
-            }
-
-            OWWindow.Sel selection = new OWWindow.Sel(this, new OWWindow.Sel.SelPoint(iBlock, iTextPos));
-            Window.Selection = NormalizeSelection(selection);
-            return true;
-        }
-        #endregion
-
-
         //////////////////////////////////////////////////////////////////////////////////////
         // - Reworked to not manipulateWindow.Selection directly (need to do to all of the 
         //      OWPara methods)
@@ -3005,655 +2980,52 @@ namespace OurWord.Edit
 
         // Edit Operations -------------------------------------------------------------------
         public enum DeleteMode { kDelete, kCut, kCopy, kBackSpace };
-        #region Method: void Delete(DeleteMode) - All-purpose deletion
-        public void Delete(DeleteMode mode)
+        #region Method: bool JoinParagraph(DeleteMode mode)
+        public bool JoinParagraph(DeleteMode mode)
         {
-            // Do nothing if the paragraph is uneditable (we shouldn't be able
-            // to get a selection here in the first place!)
+            // Do nothing if the paragraph is uneditable
             if (!Editable)
-                return;
+                return false;
 
-            // Setup based on the DeleteMode
-            switch (mode)
+            // Must be an insertion point
+            if (Window.Selection.IsInsertionPoint)
             {
-                case DeleteMode.kDelete:
-                    // Delete: create a "content" selection forward
-                    if (Window.Selection.IsInsertionPoint)
-                        Window.Selection = ExtendSelection_CharRight(Window.Selection);
-                    // Do nothing if an insertion icon
-                    if (Window.Selection.IsInsertionIcon)
-                        return;
-                    break;
-
-                case DeleteMode.kCut:
-                    // Cut: Must have a "content" selection
-                    if (Window.Selection.IsInsertionPoint || Window.Selection.IsInsertionIcon)
-                        return;
-                    break;
-
-                case DeleteMode.kCopy:
-                    // Copy: Must have a "content" selection
-                    if (Window.Selection.IsInsertionPoint || Window.Selection.IsInsertionIcon)
-                        return;
-                    break;
-
-                case DeleteMode.kBackSpace:
-                    // Delete: create a "content" selection backward
-                    if (Window.Selection.IsInsertionPoint)
-                        Window.Selection = ExtendSelection_CharLeft(Window.Selection);
-                    // Do nothing if an insertion icon
-                    if (Window.Selection.IsInsertionIcon)
-                        return;
-                    break;
-            }
-
-            // Shorthand
-            OWWindow.Sel sel = Window.Selection;
-            if (null == sel)
-                return;
-
-            // Can't delete unless we have a valid selection that spans at least one character
-            if (!sel.IsContentSelection)
-            {
-                // Places where a deletion is valid even without selected text
                 if (CanRestructureParagraphs)
                 {
-                    // If a backspace at the beginning of a paragraph, then join with the previous paragraph
-                    if (Window.Selection.IsInsertionPoint_AtParagraphBeginning && mode == DeleteMode.kBackSpace)
-                    {
-                        //Console.WriteLine("JOIN WITH PREVIOUS");
-                        if (JoinParagraphs(this, true))
-                            return;
-                    }
-
                     // If a delete at the end of a paragraph, then join with the next paragraph
                     if (Window.Selection.IsInsertionPoint_AtParagraphEnding && mode == DeleteMode.kDelete)
                     {
-                        //Console.WriteLine("JOIN WITH NEXT");
-                        if (JoinParagraphs(this, false))
-                            return;
+                        Window.cmdMoveCharRight();
+                        mode = DeleteMode.kBackSpace;
+                    }
+
+                    if (Window.Selection.IsInsertionPoint_AtParagraphBeginning && mode == DeleteMode.kBackSpace)
+                    {
+                        if ((new JoinParagraphAction(this.Window)).Do())
+                            return true;
                     }
                 }
-
-                // This context does not allow the deletion
-                OWWindow.TypingErrorBeep();
-                return;
             }
 
-            // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
-            DBasicText DBT = sel.DBT; 
-            DBasicText.DPhrases phrases = (DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            // Did not join paragraphs
+            return false;
+        }
+        #endregion
 
-            // Get the iBlocks that correspond to the DBasicText that contains the selection
-            int iBlockFirst = sel.DBT_iBlockFirst;
-
-            // Get the offsets into the DBasicText of the selection
-            int n1 = sel.DBT_iCharFirst;
-            int n2 = sel.DBT_iCharLast;
-            int cCharsToDelete = n2 - n1;
-            int nRestorePosition = n1;
-
-            // If the deletion would result in two whitespaces together, then we
-            // will need to delete an additional character. (We don't do this with 
-            // the Copy command, because we want the Clipboard to reflect exactly
-            // what was copied.
-            string sDBT = (DisplayBT) ? DBT.ProseBTAsString : DBT.AsString;
-            if (mode != DeleteMode.kCopy && 
-                n1 > 0 && WritingSystem.IsWhiteSpace(sDBT[n1-1]) &&
-                n2 < sDBT.Length && WritingSystem.IsWhiteSpace(sDBT[n2]))
-            {
-                cCharsToDelete++;
-                n1--;
-                if (mode == DeleteMode.kBackSpace)   // Backspace moves left, Delete, cut, etc move right
-                    nRestorePosition--;
-            }
-
-            // We'll keep track of which DPhrase we're currently processing here
-            int iPhrase = 0;
-
-            // Increment past any DPhrases that are prior to the deletion point
-            DPhrase phr = null;
-            while (true)
-            {
-                phr = phrases[iPhrase];
-
-                if (phr.Text.Length > n1)     // Originally '>=', changed 17oct07 for bug when Backspace to right of Italics
-                    break;
-
-                n1 -= phr.Text.Length;
-                iPhrase++;
-            }
-
-            // We'll build a string of the characters that are getting deleted; so we can
-            // place them on the clipboard if requested.
-            string sClipboard = "";
-
-            // Delete the requested number of characters, moving into following DPhrases
-            // as needed.
-            while (cCharsToDelete > 0)
-            {
-                phr = phrases[iPhrase];
-
-                int cCanDelete = Math.Min(phr.Text.Length - n1, cCharsToDelete);
-
-                if (cCanDelete > 0)
-                {
-                    sClipboard += phr.Text.Substring(n1, cCanDelete);
-
-                    if (mode != DeleteMode.kCopy)
-                        phr.Text = phr.Text.Remove(n1, cCanDelete);
-
-                    cCharsToDelete -= cCanDelete;
-                }
-                else
-                {
-                    iPhrase++;
-                    n1 = 0;
-                }
-            }
-            int cSpacesRemoved = DBT.EliminateSpuriousSpaces(phrases);
-
-            // Update the clipboard if appropriate. If we were doing a Copy, then
-            // we are finished.
-            if (mode == DeleteMode.kCut || mode == DeleteMode.kCopy)
-                Clipboard.SetText(sClipboard, TextDataFormat.UnicodeText);
-            if (mode == DeleteMode.kCopy)
-                return;
-
-            // ctrlRemove the old blocks and replace with new ones
-            RemoveBlocksAt(sel.DBT_iBlockFirst, sel.DBT_BlockCount);
+        #region Method: void ReplaceBlocksWithNewDBT(OWWindow.Sel selection, DBasicText DBT)
+        public void ReplaceBlocksWithNewDBT(OWWindow.Sel selection, DBasicText DBT)
+        {
+            int iBlockFirst = selection.DBT_iBlockFirst;
+            RemoveBlocksAt(selection.DBT_iBlockFirst, selection.DBT_BlockCount);
             EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
             foreach (EWord w in vWords)
                 w.MeasureWidth(Window.Draw.Graphics);
             InsertBlocks(iBlockFirst, vWords);
             ReLayout();
-
-            // Restore a selection at the deletion point
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(this, DBT, nRestorePosition - cSpacesRemoved);
-            Window.Selection = NormalizeSelection(selection);
         }
         #endregion
-        #region Method: void Insert(sInsert) - All-purpose insertion
-        public void Insert(string sInsert)
-        {
-            // Do nothing if the paragraph is uneditable (we shouldn't be able
-            // to get a selection here in the first place!)
-            if (!Editable)
-                return;
 
-            // If we have an InsertionIcon, replace it with a space, so that the normal
-            // mechanism can deal with it (deleting the space, then doing the insertion.)
-            if (Window.Selection.IsInsertionIcon)
-            {
-                Window.Selection.Anchor.Word.Text = " ";
-                Window.Selection = new OWWindow.Sel(Window.Selection.Paragraph,
-                    Window.Selection.Anchor);
-            }
 
-            // If we have a selection, we must delete the data that is there
-            if (Window.Selection.IsContentSelection)
-                Delete(DeleteMode.kDelete);
-
-            // Get the iBlocks that correspond to the DBasicText
-            OWWindow.Sel sel = Window.Selection;
-            int iBlockFirst = sel.DBT_iBlockFirst;
-
-            // Get the offset into the DBasicText
-            int n = Window.Selection.DBT_iCharFirst;
-
-            // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
-            DBasicText DBT = sel.DBT;
-            DBasicText.DPhrases phrases = (DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
-
-            // We'll keep track of which DPhrase we're currently processing here
-            int iPhrase = 0;
-
-            // Increment past any DPhrases that are prior to the insertion point
-            DPhrase phr = null;
-            while (true)
-            {
-                phr = phrases[iPhrase];
-
-                if (phr.Text.Length >= n)
-                    break;
-
-                n -= phr.Text.Length;
-                iPhrase++;
-            }
-
-            // We now have the DPhrase insertion point
-            DPhrase phrase = phrases[iPhrase];
-            int iPos = n;
-
-            // Insert the text. Note that the phrase.Text removes spurious spaces, so if the result
-            // of the insertion is that we have what we started with, then we need proceed no further.
-            string sBeforeInsert = phrase.Text;
-            phrase.Text = phrase.Text.Insert(n, sInsert);
-            if (sBeforeInsert == phrase.Text)
-            {
-                // The test is for a cursor right before a space, e.g., "Hello| World." In this case,
-                // we want the cursor to advance, as if the user hit right arrow, thus "Hello |World."
-                // So for all other cases, we return here and do nothing, but in this one special
-                // case, we want to continue through the method so that the cursor advances.
-                if (!(n < phrase.Text.Length && phrase.Text[n] == ' ' && sInsert == " "))
-                    return;
-            }
-
-            // ctrlRemove the old blocks and replace with new ones
-            RemoveBlocksAt(sel.DBT_iBlockFirst, sel.DBT_BlockCount);
-            EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
-            foreach (EWord w in vWords)
-                w.MeasureWidth(Window.Draw.Graphics);
-            InsertBlocks(iBlockFirst, vWords);
-            ReLayout();
-
-            // Restore a selection at the deletion point plus the amount inserted. 
-            int iInsertPos = sel.DBT_iCharFirst + sInsert.Length;
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(this, sel.DBT, iInsertPos);
-            Debug.Assert(null != selection);
-            Window.Selection = NormalizeSelection(selection);
-        }
-        #endregion
-        #region Method: bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
-        bool JoinParagraphs(OWPara para, bool bJoinWithPreviousParagraph)
-        {
-            // Obtain the underlying paragraph
-            DParagraph p = para.DataSource as DParagraph;
-            if (null == p)
-                return false;
-
-            // If we want the preceeding paragraph, then we have to set it to the previous
-            // one in the section
-            if (bJoinWithPreviousParagraph)
-            {
-                DSection section = p.Section;
-                int ip = section.Paragraphs.FindObj(p);
-                if (ip <= 0)
-                    return false;
-                p = section.Paragraphs[ip - 1] as DParagraph;
-            }
-
-            // Remember the cursor position so that we can restore back to it. We're storing the
-            // number of editable characters that are in the first paragraph
-            PlaceHolder bookmark = new PlaceHolder(Window, p, p.EditableTextLength);
-
-            // Join the paragraphs
-            p.JoinToNext();
-
-            // Re-Load the window's data. This is time-consuming, but it is the only way to make paragraphs line
-            // correctly side-by-side.
-            Window.LoadData();
-
-            // Restore the selection insertion point
-            return bookmark.RestoreCursorPosition();
-        }
-        #endregion
     }
-
-
-    #region NUnit Tests
-    [TestFixture] public class Test_OWPara
-    {
-        // Attrs from Setup ------------------------------------------------------------------
-        #region Attr{g}: OWWindow Wnd
-        OWWindow Wnd
-        {
-            get
-            {
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
-        Form m_Form;
-        DSection m_section;
-        #region VAttr{g}: JWritingSystem WSVernacular
-        JWritingSystem WSVernacular
-        {
-            get
-            {
-                return G.Project.TargetTranslation.WritingSystemVernacular;
-            }
-        }
-        #endregion
-        OWPara op;
-
-        // Data ------------------------------------------------------------------------------
-        #region Method: DParagraph CreateParagraph_John_3_16()
-        private DParagraph CreateParagraph_John_3_16()
-        {
-            // Create a paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
-            p.StyleAbbrev = "p";
-
-            // Add various runs
-            p.AddRun(DChapter.Create("3"));
-            p.AddRun(DVerse.Create("16"));
-
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "For God so loved the "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that he gave his one and only son"));
-            p.AddRun(text);
-
-            p.AddRun(DVerse.Create("17"));
-
-            text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that whosoever believes in him "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "but have everlasting life."));
-            p.AddRun(text);
-
-            m_section.Paragraphs.Append(p);
-
-            return p;
-        }
-        #endregion
-
-        // Setup/TearDown --------------------------------------------------------------------
-        #region Setup
-        [SetUp] public void Setup()
-        {
-            JWU.NUnit_Setup();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
-            G.Project.DisplayName = "Project";
-            G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
-            DBook book = new DBook("MRK", "");
-            G.Project.TargetTranslation.AddBook(book);
-            m_section = new DSection(1);
-            book.Sections.Append(m_section);
-
-            m_Window = new OWWindow("TestWindow", 1);
-
-            m_Form = new Form();
-            m_Form.Name = "TestForm";
-            m_Form.Controls.Add(m_Window);
-
-            // Set up John 3:16
-            DParagraph p = CreateParagraph_John_3_16();
-            op = new OWPara(Wnd, WSVernacular, p.Style, p, Color.Wheat, OWPara.Flags.IsEditable);
-            Wnd.StartNewRow();
-            Wnd.AddParagraph(0, op);
-            Wnd.LoadData();
-        }
-        #endregion
-        #region TearDown
-        [TearDown]
-        public void TearDown()
-        {
-            OurWordMain.Project = null;
-            m_Form.Dispose();
-            m_Form = null;
-        }
-        #endregion
-
-        // Making Selections -----------------------------------------------------------------
-        #region Test: Select_NextWord
-        [Test] public void Select_NextWord()
-        {
-            // Make a selection in the middle of "lo|ved"
-            int iBlock = 5;
-            OWWindow.Sel selection = op.Select_NextWord(iBlock + 1);
-            Assert.AreEqual(6, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
-            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
-
-            // Select at the beginning of "son". Should skip "17" and go to "that"
-            iBlock = 15;
-            selection = op.Select_NextWord(iBlock + 1);
-            Assert.AreEqual(17, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
-
-            // Select in the final word: Should return null
-            iBlock = 28;
-            selection = op.Select_NextWord(iBlock + 1);
-            Assert.IsNull(selection, "No selection made.");
-        }
-        #endregion
-        #region Test: Select_PreviousWord
-        [Test] public void Select_PreviousWord()
-        {
-            // Request to select the previous word from "loved": Should be the beginning of the current block
-            int iBlock = 5;
-            OWWindow.Sel selection = op.Select_PreviousWord(iBlock - 1);
-            Assert.AreEqual(4, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
-            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
-
-            // Select at the beginning of "that". Should skip "17" and go to "son"
-            iBlock = 17;
-            selection = op.Select_PreviousWord(iBlock - 1 );
-            Assert.AreEqual(15, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
-
-            // Select in the first word: Should return null
-            iBlock = 1;
-            selection = op.Select_PreviousWord(iBlock);
-            Assert.IsNull(selection, "No selection made.");
-        }
-        #endregion
-        #region Test: Select_BeginningOfFirstWord
-        [Test] public void Select_BeginningOfFirstWord()
-        {
-            OWWindow.Sel selection = op.Select_BeginningOfFirstWord();
-            Assert.IsNotNull(selection, "Selection is not null");
-            Assert.AreEqual("For ", selection.Anchor.Word.Text);
-        }
-        #endregion
-        #region Test: Select_EndOfLastWord
-        [Test] public void Select_EndOfLastWord()
-        {
-            OWWindow.Sel selection = op.Select_EndOfLastWord();
-            Assert.IsNotNull(selection, "Selection is not null");
-            Assert.AreEqual("life.", selection.Anchor.Word.Text);
-        }
-        #endregion
-
-        // Extending Selections --------------------------------------------------------------
-        #region Test: ExtendSelection_WordRight
-        [Test] public void ExtendSelection_WordRight()
-        {
-            // Make an Insertion Point in the middle of "lo|ved"
-            int iBlock = 5;
-            int iChar = 2;
-            OWWindow.Sel selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(iBlock, iChar));
-            Assert.AreEqual(iBlock, selection.Anchor.iBlock);
-            Assert.AreEqual(iChar, selection.Anchor.iChar);
-            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
-
-            // Extend to the right...#1  > "ved"
-            selection = op.ExtendSelection_WordRight(selection);
-            Assert.AreEqual("ved ", selection.SelectionString);
-
-            // Extend to the right...#2  > "ved the "
-            selection = op.ExtendSelection_WordRight(selection);
-            Assert.AreEqual("ved the ", selection.SelectionString);
-
-            // Extend to the right...#3  > "ved the world " (moving over italice)
-            selection = op.ExtendSelection_WordRight(selection);
-            Assert.AreEqual("ved the world ", selection.SelectionString);
-
-            // Extend to the right...#4  > "ved the world that " (moving past italics)
-            selection = op.ExtendSelection_WordRight(selection);
-            Assert.AreEqual("ved the world that ", selection.SelectionString);
-
-            // Boundary: Extend lots and lots of times; should stay at end of the DBT
-            for(int i=0; i<100; i++)
-                selection = op.ExtendSelection_WordRight(selection);
-            Assert.AreEqual("ved the world that he gave his one and only son", selection.SelectionString);
-
-            // Select at the end of a DBT: Extend should do nothing
-            selection = new OWWindow.Sel(op, selection.End);
-            selection = op.ExtendSelection_WordRight(selection);
-            Assert.IsTrue(selection.IsInsertionPoint);
-
-            // Select at the beginning of a word: Extend should get the entire word
-            selection = new OWWindow.Sel(op, 5, 0);
-            selection = op.ExtendSelection_WordRight(selection);
-            Assert.AreEqual("loved ", selection.SelectionString);
-        }
-        #endregion
-        #region Test: ExtendSelection_WordLeft
-        [Test] public void ExtendSelection_WordLeft()
-        {
-            // Make an Insertion Point in the middle of "lo|ved"
-            int iBlock = 5;
-            int iChar = 2;
-            OWWindow.Sel selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(iBlock, iChar));
-            Assert.AreEqual(iBlock, selection.Anchor.iBlock);
-            Assert.AreEqual(iChar, selection.Anchor.iChar);
-            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
-
-            // Extend to the left...#1  > "lo"
-            selection = op.ExtendSelection_WordLeft(selection);
-            Assert.AreEqual("lo", selection.SelectionString);
-
-            // Extend to the left...#2  > "so lo"
-            selection = op.ExtendSelection_WordLeft(selection);
-            Assert.AreEqual("so lo", selection.SelectionString);
-
-            // Boundary: Extend lots and lots of times; should stay at beginning of the DBT
-            for (int i = 0; i < 100; i++)
-                selection = op.ExtendSelection_WordLeft(selection);
-            Assert.AreEqual("For God so lo", selection.SelectionString);
-
-            // Select at the beginning of a DBT: Extend should do nothing
-            selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(2,0));
-            selection = op.ExtendSelection_WordLeft(selection);
-            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint at Beginning of DBT");
-        }
-        #endregion
-        #region Test: ExtendSelection_FarRight
-        [Test] public void ExtendSelection_FarRight()
-        {
-            // Make a selection at "lo|ved"
-            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
-
-            // Extend it to the right
-            selection = op.ExtendSelection_FarRight(selection);
-            Assert.AreEqual("ved the world that he gave his one and only son", 
-                selection.SelectionString);
-
-            // Boundary condition: make the selection at the end of a DBT
-            selection = new OWWindow.Sel(op, 15, 3);
-            selection = op.ExtendSelection_FarRight(selection);
-            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
-        }
-        #endregion
-        #region Test: ExtendSelection_FarLeft
-        [Test] public void ExtendSelection_FarLeft()
-        {
-            // Make a selection at "lo|ved"
-            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
-
-            // Extend it to the left
-            selection = op.ExtendSelection_FarLeft(selection);
-            Assert.AreEqual("For God so lo", selection.SelectionString);
-
-            // Boundary condition: make the selection at the beginning of a DBT
-            selection = new OWWindow.Sel(op, 2, 0);
-            selection = op.ExtendSelection_FarLeft(selection);
-            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
-        }
-        #endregion
-        #region Test: ExtendSelection_CharRight
-        [Test] public void ExtendSelection_CharRight()
-        {
-            // Make a selection at "lo|ved"
-            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
-
-            // Extend it to the right several times
-            selection = op.ExtendSelection_CharRight(selection);
-            Assert.AreEqual("v", selection.SelectionString);
-            selection = op.ExtendSelection_CharRight(selection);
-            Assert.AreEqual("ve", selection.SelectionString);
-            selection = op.ExtendSelection_CharRight(selection);
-            Assert.AreEqual("ved", selection.SelectionString);
-            selection = op.ExtendSelection_CharRight(selection);
-            Assert.AreEqual("ved ", selection.SelectionString);
-            selection = op.ExtendSelection_CharRight(selection);
-            Assert.AreEqual("ved t", selection.SelectionString);
-
-            // Boundary: should be able to extend at the end of a DBT
-            // Boundary condition: make the selection at the end of a DBT
-            selection = new OWWindow.Sel(op, 15, 3);
-            selection = op.ExtendSelection_CharRight(selection);
-            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
-        }
-        #endregion
-        #region Test: ExtendSelection_CharLeft
-        [Test] public void ExtendSelection_CharLeft()
-        {
-            // Make a selection at "lo|ved"
-            OWWindow.Sel selection = new OWWindow.Sel(op, 5, 2);
-
-            // Extend it to the right several times
-            selection = op.ExtendSelection_CharLeft(selection);
-            Assert.AreEqual("o", selection.SelectionString);
-            selection = op.ExtendSelection_CharLeft(selection);
-            Assert.AreEqual("lo", selection.SelectionString);
-            selection = op.ExtendSelection_CharLeft(selection);
-            Assert.AreEqual(" lo", selection.SelectionString);
-            selection = op.ExtendSelection_CharLeft(selection);
-            Assert.AreEqual("o lo", selection.SelectionString);
-            selection = op.ExtendSelection_CharLeft(selection);
-            Assert.AreEqual("so lo", selection.SelectionString);
-
-            // Boundary condition: make the selection at the beginning of a DBT
-            selection = new OWWindow.Sel(op, 2, 0);
-            selection = op.ExtendSelection_CharLeft(selection);
-            Assert.IsTrue(selection.IsInsertionPoint, "Should be an insertion point.");
-        }
-        #endregion
-
-        // Misc ------------------------------------------------------------------------------
-        #region Test: NormalizeSelection
-        [Test] public void NormalizeSelection()
-        {
-            // Part 1: Insertion Points
-
-            // Make a selection at the end of "loved"
-            OWWindow.Sel selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(5, 6));
-
-            // Normlizing should move it to the next one
-            selection = op.NormalizeSelection(selection);
-            Assert.AreEqual(6, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
-
-            // Normlizing again should have no effect
-            selection = op.NormalizeSelection(selection);
-            Assert.AreEqual(6, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
-
-            // Place at the end of a DBT: normalizing should not move it
-            selection = new OWWindow.Sel(op, new OWWindow.Sel.SelPoint(15, 3));
-            selection = op.NormalizeSelection(selection);
-            Assert.AreEqual(15, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
-
-            // Part 2: Extend Selections
-            // Make a selection the latter half of "loved"
-            selection = new OWWindow.Sel(op, 
-                new OWWindow.Sel.SelPoint(5, 3),
-                new OWWindow.Sel.SelPoint(5 ,6));
-            selection = op.NormalizeSelection(selection);
-            Assert.AreEqual(5, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
-            Assert.AreEqual(6, selection.End.iBlock);
-            Assert.AreEqual(0, selection.End.iChar);
-
-            // Normlizing again should have no effect
-            selection = op.NormalizeSelection(selection);
-            Assert.AreEqual(5, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
-            Assert.AreEqual(6, selection.End.iBlock);
-            Assert.AreEqual(0, selection.End.iChar);
-        }
-        #endregion
-    }
-    #endregion
-
 
 }

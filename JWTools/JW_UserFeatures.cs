@@ -143,9 +143,9 @@ namespace JWTools
             // m_box
             // 
             this.m_box.Controls.Add(this.m_lblDescription);
-            this.m_box.Location = new System.Drawing.Point(8, 324);
+            this.m_box.Location = new System.Drawing.Point(8, 411);
             this.m_box.Name = "m_box";
-            this.m_box.Size = new System.Drawing.Size(321, 112);
+            this.m_box.Size = new System.Drawing.Size(321, 94);
             this.m_box.TabIndex = 2;
             this.m_box.TabStop = false;
             this.m_box.Text = "Description";
@@ -154,14 +154,14 @@ namespace JWTools
             // 
             this.m_lblDescription.Location = new System.Drawing.Point(10, 16);
             this.m_lblDescription.Name = "m_lblDescription";
-            this.m_lblDescription.Size = new System.Drawing.Size(305, 88);
+            this.m_lblDescription.Size = new System.Drawing.Size(305, 74);
             this.m_lblDescription.TabIndex = 0;
             this.m_lblDescription.Text = "(description goes here)";
             // 
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(335, 354);
+            this.m_btnOK.Location = new System.Drawing.Point(335, 423);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 3;
@@ -171,7 +171,7 @@ namespace JWTools
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(335, 383);
+            this.m_btnCancel.Location = new System.Drawing.Point(335, 452);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 4;
@@ -209,7 +209,7 @@ namespace JWTools
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(335, 412);
+            this.m_btnHelp.Location = new System.Drawing.Point(335, 481);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 8;
@@ -242,7 +242,7 @@ namespace JWTools
             this.m_Tree.Name = "m_Tree";
             this.m_Tree.ShowNodeToolTips = true;
             this.m_Tree.ShowRootLines = false;
-            this.m_Tree.Size = new System.Drawing.Size(321, 294);
+            this.m_Tree.Size = new System.Drawing.Size(321, 381);
             this.m_Tree.TabIndex = 11;
             this.m_Tree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.cmdItemChecked);
             this.m_Tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.cmdBeforeCollapse);
@@ -253,7 +253,7 @@ namespace JWTools
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(422, 447);
+            this.ClientSize = new System.Drawing.Size(422, 516);
             this.Controls.Add(this.m_Tree);
             this.Controls.Add(this.m_btnJustTheBasics);
             this.Controls.Add(this.m_btnResetDefaults);
@@ -312,6 +312,20 @@ namespace JWTools
 			return base.ShowDialog(formParent);
 		}
 		#endregion
+        #region Method: AddNodeAlphabetic(TreeNodeCollection, TreeNode) - adds in sorted order
+        public void AddNodeAlphabetic(TreeNodeCollection nodes, TreeNode node)
+        {
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                if (node.Text.CompareTo(nodes[i].Text) < 0)
+                {
+                    nodes.Insert(i, node);
+                    return;
+                }
+            }
+            nodes.Add(node);
+        }
+        #endregion
 
         // Event Handling --------------------------------------------------------------------
         #region Method: void AddFeatureToTree(JW_Feature feat)
@@ -335,7 +349,7 @@ namespace JWTools
                 if (null == tnc)
                 {
                     TreeNode n = new TreeNode(feat.TreePath);
-                    Tree.Nodes.Add(n);
+                    AddNodeAlphabetic(Tree.Nodes, n);
                     tnc = n.Nodes;
                 }
             }
@@ -346,7 +360,7 @@ namespace JWTools
             TreeNode node = new TreeNode(feat.CheckBoxName);
             node.Checked = feat.Enabled;
             node.Tag = feat;
-            tnc.Add(node);
+            AddNodeAlphabetic(tnc, node);
         }
         #endregion
         #region Method: void CheckTopLevelNodes()
