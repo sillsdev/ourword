@@ -239,6 +239,11 @@ namespace OurWord.Edit
             // translation view does this; to distinquish, for paragraphs, we
             // check for the same editing flags.
         {
+            // We want most of the flags to be the same; though we don't care if
+            // CanItalics is different.
+            Flags |= OWPara.Flags.CanItalic;
+
+            // Loop through the entire display searching for the data source
             foreach (OWWindow.Row row in wnd.Rows)
             {
                 foreach (OWWindow.Row.Pile pile in row.Piles)
@@ -247,9 +252,9 @@ namespace OurWord.Edit
                     {
                         if (op.DataSource == objDataSource)
                         {
-                            if (Flags == op.Options)
+                            if ( Flags == (op.Options | OWPara.Flags.CanItalic))
                                 return op;
-                            else if (Flags == OWPara.Flags.None)
+                            else if (Flags == OWPara.Flags.CanItalic) // E.g., for where None was passed in
                                 return op;
                         }
                     }

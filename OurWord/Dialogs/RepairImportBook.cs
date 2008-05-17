@@ -152,8 +152,35 @@ namespace OurWord.Dialogs
         #endregion
 
         // Command Handlers ------------------------------------------------------------------
-		#region Cmd: cmdLoad - dlg has been invoked; load the file, scroll to the correct line, etc.
-		protected virtual void cmdLoad(object sender, System.EventArgs e)
+
+        protected string[] LoadFile(string sPathName)
+            // Loads the file into the RichTextBox. We can't use the RTF Box's LoadFile,
+            // because it appears to want to munge up the UTF8's. 
+        {
+            StreamReader sr = new StreamReader(sPathName, Encoding.UTF8);
+            TextReader r = TextReader.Synchronized(sr);
+
+            ArrayList a = new ArrayList();
+
+            do
+            {
+                string s = r.ReadLine();
+                if (s == null)
+                    break;
+                a.Add(s);
+            } while (true);
+
+            r.Close();
+
+            string[] v = new string[a.Count];
+            for (int i = 0; i < a.Count; i++)
+                v[i] = a[i] as string;
+
+            return v;
+        }
+
+        #region Cmd: cmdLoad - dlg has been invoked; load the file, scroll to the correct line, etc.
+        protected virtual void cmdLoad(object sender, System.EventArgs e)
 		{
             // Localization
             Localize();
@@ -180,7 +207,7 @@ namespace OurWord.Dialogs
 
 			// Read in the file and place it in the control
 			DataFile.Clear();
-			DataFile.LoadFile(PathName, RichTextBoxStreamType.PlainText);
+            DataFile.Lines = LoadFile(PathName);
 
 			// Scroll to the offending line and select it
 			SelectLine(DataFile, BookReadError.LineNo - 1);
@@ -288,12 +315,12 @@ namespace OurWord.Dialogs
 			string[] v = box.Lines;
 
 			int cStart = 0;
-			for(int i=0; i < nLine; i++)
+			for(int i=0; i < nLine && i < v.Length; i++)
 			{
 				cStart += (v[i].Length + 1);
 			}
 
-			if (0 <= nLine)
+			if (nLine >= 0 && nLine < box.Lines.Length)
 				box.Select(cStart, box.Lines[nLine].Length);
 		}
 		#endregion
@@ -625,7 +652,7 @@ namespace OurWord.Dialogs
 
 			// Front File
 			FrontFile.Clear();
-			FrontFile.LoadFile(FrontPathName, RichTextBoxStreamType.PlainText);
+            FrontFile.Lines = LoadFile(FrontPathName);
 
 			// Scroll to the offending line and select it
 			SelectLine(FrontFile, BookReadError.FrontLineNo - 1);

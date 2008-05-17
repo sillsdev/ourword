@@ -354,6 +354,74 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        // Verse numbers ---------------------------------------------------------------------
+        #region Test: FirstActualVerseNumber_VerseAtBeginning
+        [Test] public void FirstActualVerseNumber_VerseAtBeginning()
+        {
+            // Build the paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            p.AddRun(DVerse.Create("16"));
+
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
+                "For God so loved the world that he gave his one and only son "));
+            p.AddRun(text);
+
+            p.AddRun(DVerse.Create("17"));
+
+            text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "that whosoever believes in him shall not perish."));
+            p.AddRun(text);
+
+            m_section.Paragraphs.Append(p);
+
+            // Run the test
+            Assert.AreEqual(16, p.FirstActualVerseNumber);
+        }
+        #endregion
+        #region Test: FirstActualVerseNumber_VerseAtMiddle
+        [Test] public void FirstActualVerseNumber_VerseAtMiddle()
+        {
+            // Build the paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "For God so loved the world that he gave his one and only son "));
+            p.AddRun(text);
+
+            p.AddRun(DVerse.Create("17"));
+
+            text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "that whosoever believes in him shall not perish."));
+            p.AddRun(text);
+
+            m_section.Paragraphs.Append(p);
+
+            // Run the test
+            Assert.AreEqual(17, p.FirstActualVerseNumber);
+        }
+        #endregion
+        #region Test: FirstActualVerseNumber_NoVerse
+        [Test] public void FirstActualVerseNumber_NoVerse()
+        {
+            // Build the paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "For God so loved the world that he gave his one and only son "));
+            p.AddRun(text);
+
+            m_section.Paragraphs.Append(p);
+
+            // Run the test
+            Assert.AreEqual(0, p.FirstActualVerseNumber);
+        }
+        #endregion
+
         // Misc ------------------------------------------------------------------------------
         #region Test: EditableTextLength
         [Test]

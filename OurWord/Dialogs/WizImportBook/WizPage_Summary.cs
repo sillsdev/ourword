@@ -40,13 +40,22 @@ namespace OurWord.Dialogs.WizImportBook
             }
         }
         #endregion
+        #region VAttr{g}: string ImportPathName
+        string ImportPathName
+        {
+            get
+            {
+                return Wizard.ImportFileName;
+            }
+        }
+        #endregion
 
         // IJW_WizPage Implementation --------------------------------------------------------
         #region Method: void OnActivate()
         public void OnActivate()
         {
             m_textBook.Text = Wizard.BookAbbrev;
-            m_textFileName.Text = JWU.PathEllipses(Wizard.ImportFileName, 40);
+            m_textFileName.Text = JWU.PathEllipses(ImportPathName, 40);
             m_textFormat.Text = Wizard.Format;
             m_textStage.Text = Wizard.Stage + ", " + Wizard.Version.ToString();
             m_textDestination.Text = JWU.PathEllipses(Wizard.DestinationFolder, 40);

@@ -143,7 +143,7 @@ namespace JWTools
             // m_box
             // 
             this.m_box.Controls.Add(this.m_lblDescription);
-            this.m_box.Location = new System.Drawing.Point(8, 411);
+            this.m_box.Location = new System.Drawing.Point(8, 313);
             this.m_box.Name = "m_box";
             this.m_box.Size = new System.Drawing.Size(321, 94);
             this.m_box.TabIndex = 2;
@@ -152,7 +152,7 @@ namespace JWTools
             // 
             // m_lblDescription
             // 
-            this.m_lblDescription.Location = new System.Drawing.Point(10, 16);
+            this.m_lblDescription.Location = new System.Drawing.Point(10, 15);
             this.m_lblDescription.Name = "m_lblDescription";
             this.m_lblDescription.Size = new System.Drawing.Size(305, 74);
             this.m_lblDescription.TabIndex = 0;
@@ -161,7 +161,7 @@ namespace JWTools
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(335, 423);
+            this.m_btnOK.Location = new System.Drawing.Point(335, 326);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 3;
@@ -171,7 +171,7 @@ namespace JWTools
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(335, 452);
+            this.m_btnCancel.Location = new System.Drawing.Point(335, 355);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 4;
@@ -198,7 +198,7 @@ namespace JWTools
             // 
             // m_btnPasswordProtect
             // 
-            this.m_btnPasswordProtect.Location = new System.Drawing.Point(335, 270);
+            this.m_btnPasswordProtect.Location = new System.Drawing.Point(335, 198);
             this.m_btnPasswordProtect.Name = "m_btnPasswordProtect";
             this.m_btnPasswordProtect.Size = new System.Drawing.Size(75, 48);
             this.m_btnPasswordProtect.TabIndex = 7;
@@ -209,7 +209,7 @@ namespace JWTools
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(335, 481);
+            this.m_btnHelp.Location = new System.Drawing.Point(335, 384);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 8;
@@ -242,7 +242,7 @@ namespace JWTools
             this.m_Tree.Name = "m_Tree";
             this.m_Tree.ShowNodeToolTips = true;
             this.m_Tree.ShowRootLines = false;
-            this.m_Tree.Size = new System.Drawing.Size(321, 381);
+            this.m_Tree.Size = new System.Drawing.Size(321, 283);
             this.m_Tree.TabIndex = 11;
             this.m_Tree.AfterCheck += new System.Windows.Forms.TreeViewEventHandler(this.cmdItemChecked);
             this.m_Tree.BeforeCollapse += new System.Windows.Forms.TreeViewCancelEventHandler(this.cmdBeforeCollapse);
@@ -253,7 +253,7 @@ namespace JWTools
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(422, 516);
+            this.ClientSize = new System.Drawing.Size(422, 412);
             this.Controls.Add(this.m_Tree);
             this.Controls.Add(this.m_btnJustTheBasics);
             this.Controls.Add(this.m_btnResetDefaults);
@@ -265,13 +265,15 @@ namespace JWTools
             this.Controls.Add(this.m_btnOK);
             this.Controls.Add(this.m_box);
             this.Controls.Add(this.m_lblInstructions);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(400, 440);
             this.Name = "DialogSetupFeatures";
+            this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Set Up Features";
+            this.Resize += new System.EventHandler(this.cmdResize);
             this.Load += new System.EventHandler(this.cmd_OnLoad);
             this.m_box.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -404,13 +406,7 @@ namespace JWTools
 
 			// Select the first item (if there is a first item, that is.)
             if (Tree.Nodes.Count > 0)
-            {
-                TreeNode node = Tree.Nodes[0];
-                if (node.Nodes.Count > 0)
-                    Tree.SelectedNode = node.Nodes[0];
-                else
-                    Tree.SelectedNode = node;
-            }
+                Tree.SelectedNode = Tree.Nodes[0];
 		}
 		#endregion
 		#region Event: cmd_onPasswordProtect(...) - prompts for a password
@@ -562,6 +558,10 @@ namespace JWTools
         #region Cmd: cmdNodeSelected - updates the Description text
         private void cmdNodeSelected(object sender, TreeViewEventArgs e)
         {
+            // Default to blank, in case we select a node that has no description (e.g.,
+            // a top-level node.)
+            m_lblDescription.Text = "";
+
             TreeNode node = e.Node;
             if (null == node)
                 return;
@@ -571,6 +571,50 @@ namespace JWTools
                 return;
 
             m_lblDescription.Text = feature.Description;
+        }
+        #endregion
+
+        #region Cmd: cmdResize - permit the user to change the dialog's size
+        int m_nPreviousWidth = -1;
+        int m_nPreviousHeight = -1;
+        private void cmdResize(object sender, EventArgs e)
+        {
+            if (m_nPreviousWidth > 0)
+            {
+                int nDeltaWidth = Width - m_nPreviousWidth;
+
+                // Tree and Description Box: just change the width
+                m_Tree.Width += nDeltaWidth;
+                m_box.Width += nDeltaWidth;
+
+                // Buttons: change the x position
+                m_btnAllOn.Left += nDeltaWidth;
+                m_btnAllOff.Left += nDeltaWidth;
+                m_btnResetDefaults.Left += nDeltaWidth;
+                m_btnJustTheBasics.Left += nDeltaWidth;
+                m_btnPasswordProtect.Left += nDeltaWidth;
+                m_btnOK.Left += nDeltaWidth;
+                m_btnCancel.Left += nDeltaWidth;
+                m_btnHelp.Left += nDeltaWidth;
+            }
+            m_nPreviousWidth = Width;
+
+            if (m_nPreviousHeight > 0)
+            {
+                int nDeltaHeight = Height - m_nPreviousHeight;
+
+                // Tree: height changes to reflect the dialog size
+                m_Tree.Height += nDeltaHeight;
+
+                // Description: just reposition
+                m_box.Top += nDeltaHeight;
+
+                // Lower buttons: reposition (upper buttons remain in place)
+                m_btnOK.Top += nDeltaHeight;
+                m_btnCancel.Top += nDeltaHeight;
+                m_btnHelp.Top += nDeltaHeight;
+            }
+            m_nPreviousHeight = Height;
         }
         #endregion
     }

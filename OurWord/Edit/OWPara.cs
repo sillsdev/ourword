@@ -1974,10 +1974,6 @@ namespace OurWord.Edit
                 // Remember the position of this line
                 m_ptPosition = new PointF(x, y);
 
-                // Set the Chapter, if we have one
-                if (null != Chapter)
-                    Chapter.Position = new PointF(x, y);
-
                 // Indent for the chapter if necessary
                 x += LeftIndent;
 
@@ -2254,9 +2250,16 @@ namespace OurWord.Edit
                 if (ShowLineNumbers)
                     x += Window.LineNumberAttrs.ColumnWidth;
 
+                // If the line has a chapter, we set its position here, now that we know
+                // what the X position of the line is.
+                if (null != ln.Chapter)
+                    ln.Chapter.Position = new PointF(x, y);
+
                 // The X position depends upon the paragraph alignment. Note that
                 // the first line has to also allow for the paragraph's FirstLineIndent
-                if (ln == Lines[0])
+                // (assuming there is no chapter number; as we ignore first-line indentation
+                // where we have chapter numbers)
+                if (ln == Lines[0] && null == ln.Chapter)
                     x += (float)PStyle.FirstLineIndent * g.DpiX;
                 if (PStyle.IsRight)
                     x += (xMaxWidth - ln.MeasuredWidth);

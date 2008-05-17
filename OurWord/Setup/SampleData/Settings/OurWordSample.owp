@@ -1,4 +1,4 @@
-<DProject FileFormat="0" DisplayName="English" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\OurWordSample.owp" RelPath="" Comment="" DictApp="" DictData="" vdShowNotes="false" vdShowRelLangs="false" ShowMerge="false" ShowDictionary="false">
+<DProject FileFormat="0" DisplayName="English" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\OurWordSample.owp" RelPath="" Comment="" DictApp="" DictData="" vdShowNotes="true" vdShowRelLangs="false" ShowMerge="false" ShowDictionary="false">
   <own Name="Team">
     <DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" SettingsVersion="1" FileNameLanguage="English" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
     </DTeamSettings>

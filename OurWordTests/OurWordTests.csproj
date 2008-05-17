@@ -49,6 +49,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Edit\T_Bookmark.cs" />
+    <Compile Include="Edit\T_Drafting.cs" />
     <Compile Include="Edit\T_OWPara.cs" />
     <Compile Include="Edit\T_UndoRedo.cs" />
     <Compile Include="Edit\T_OWWindow.cs">
@@ -57,6 +58,7 @@
     <Compile Include="JWdb\T_SfDB.cs" />
     <Compile Include="JWTools\T_Localization.cs" />
     <Compile Include="JWTools\T_PathConverter.cs" />
+    <Compile Include="JWTools\T_Xml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

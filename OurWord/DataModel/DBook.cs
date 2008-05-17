@@ -14,6 +14,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
+using System.Text;
 using System.IO;
 using JWTools;
 using JWdb;

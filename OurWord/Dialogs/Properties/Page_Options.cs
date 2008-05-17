@@ -61,6 +61,7 @@ namespace OurWord.Dialogs
         const string c_sGroupNaturalnessCheck = "propNaturalnessCheck";
         const string c_sSuppressVerses = "propNCSuppressVerses";
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
+        const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
         const string c_sGroupWeSayDictionary = "propDictionary";
         const string c_sPathToDictionaryApp = "propDictApp";
@@ -130,12 +131,15 @@ namespace OurWord.Dialogs
                 case c_sSuppressVerses:
                     YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != SuppressPS);
-                    e.Value = SuppressPS.GetBoolString(G.SupressVerseNumbers);
+                    e.Value = SuppressPS.GetBoolString(WndNaturalness.SupressVerseNumbers);
                     break;
                 case c_sShowLineNumbers:
                     YesNoPropertySpec ShowLineNumbersPS = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ShowLineNumbersPS);
-                    e.Value = ShowLineNumbersPS.GetBoolString(G.ShowLineNumbers);
+                    e.Value = ShowLineNumbersPS.GetBoolString(WndNaturalness.ShowLineNumbers);
+                    break;
+                case c_sLineNumberColor:
+                    e.Value = WndNaturalness.LineNumbersColor;
                     break;
 
                 // WeSay Dictionary Setup
@@ -211,12 +215,15 @@ namespace OurWord.Dialogs
                 case c_sSuppressVerses:
                     YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != SuppressPS);
-                    G.SupressVerseNumbers = SuppressPS.IsTrue(e.Value);
+                    WndNaturalness.SupressVerseNumbers = SuppressPS.IsTrue(e.Value);
                     break;
                 case c_sShowLineNumbers:
                     YesNoPropertySpec ShowLineNumbersPS = e.Property as YesNoPropertySpec;
                     Debug.Assert(null != ShowLineNumbersPS);
-                    G.ShowLineNumbers = ShowLineNumbersPS.IsTrue(e.Value);
+                    WndNaturalness.ShowLineNumbers = ShowLineNumbersPS.IsTrue(e.Value);
+                    break;
+                case c_sLineNumberColor:
+                    WndNaturalness.LineNumbersColor = (string)e.Value;
                     break;
 
                 // WeSay Dictionary Setup
@@ -324,7 +331,8 @@ namespace OurWord.Dialogs
                 c_sZoomFactor,
                 "Zoom Factor",
                 "",
-                "Text in the windows can be larger (or smaller) by the chosen percentage.",
+                "Text in the windows can be larger (or smaller) by the chosen percentage. (You can " +
+                    "also set this in the Window dropdown.)",
                 new int[] { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 },
                 100
                 );
@@ -350,9 +358,18 @@ namespace OurWord.Dialogs
                     "specific line as you discuss the text with others.",
                 false
                 ));
+            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sLineNumberColor,
+                "Line Numbers Color",
+                c_sGroupNaturalnessCheck,
+                "The color of the line numbers in the Naturalness Check view. Choose a color that is " + 
+                    "visible against the background color; yet that doesn't detract from reading the " +
+                    "Scripture text.",
+                "DarkGray"));
             #endregion
 
             // WeSay Dictionary Setup
+            #region WeSay Options
             Bag.Properties.Add(new PropertySpec(
                 c_sPathToDictionaryApp,
                 "Path to the WeSay App",
@@ -371,6 +388,7 @@ namespace OurWord.Dialogs
                 null,
                 typeof(FilePathEditor),
                 null));
+            #endregion
 
             // Window Background Colors
             #region (Background Colors)

@@ -586,8 +586,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region TEST: DontReorderMarkEndings
-        [Test]
-        public void DontReorderMarkEndings()
+        [Test] public void DontReorderMarkEndings()
         {
             #region TestData - RAW
             string[] vsRaw = new string[] 
@@ -684,5 +683,46 @@ namespace OurWordTests.DataModel
             IO_TestEngine(vsRaw, vsSav);
         }
         #endregion
+
+        // Other Tests -----------------------------------------------------------------------
+        #region ParseVerseStrings
+        [Test] public void ParseVerseStrings()
+        {
+            string sVersePart = "";
+            string sTextPart = "";
+
+            // Test: Just a plain old verse number
+            string sInput = "3 Ije lais alekot.";
+            DSection.ParseVerseString(sInput, ref sVersePart, ref sTextPart);
+            Assert.AreEqual(sVersePart, "3");
+            Assert.AreEqual(sTextPart, "Ije lais alekot.");
+
+            // Test: A verse bridge with extra blank spaces
+            sInput = "24 - 26 Ije lais alekot.";
+            DSection.ParseVerseString(sInput, ref sVersePart, ref sTextPart);
+            Assert.AreEqual(sVersePart, "24-26");
+            Assert.AreEqual(sTextPart, "Ije lais alekot.");
+
+            // Test: A verse bridge with letters
+            sInput = "24b - 26a Ije lais alekot.";
+            DSection.ParseVerseString(sInput, ref sVersePart, ref sTextPart);
+            Assert.AreEqual(sVersePart, "24b-26a");
+            Assert.AreEqual(sTextPart, "Ije lais alekot.");
+
+            // Test: A verse bridge without spaces
+            sInput = "24-26a Ije lais alekot.";
+            DSection.ParseVerseString(sInput, ref sVersePart, ref sTextPart);
+            Assert.AreEqual(sVersePart, "24-26a");
+            Assert.AreEqual(sTextPart, "Ije lais alekot.");
+
+            //Console.WriteLine("Input = >" + sInput + "<");
+            //Console.WriteLine("Verse = >" + sVersePart + "<");
+            //Console.WriteLine("Text  = >" + sTextPart + "<");
+        }
+        #endregion
+
+
+
+
     }
 }

@@ -1760,9 +1760,14 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    return Brushes.DarkGray;
+                    return m_Brush;
+                }
+                set
+                {
+                    m_Brush = value;
                 }
             }
+            Brush m_Brush;
             #endregion
 
             #region Constructor(Graphics)
@@ -1771,6 +1776,9 @@ namespace OurWord.Edit
                 // We'll use a fixed-space font so that the numbers line up
                 float fSize = 10 * G.ZoomFactor;
                 m_fLineNumberFont = new Font("Courier New", fSize);
+
+                // Get the default Brush color; the window can overridei this
+                m_Brush = Brushes.DarkGray;
 
                 // Calculate the width required for the line number column
                 // We'll measure a fat, 3-digit string plus a trailing space

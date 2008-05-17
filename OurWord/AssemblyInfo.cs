@@ -32,7 +32,7 @@ using System.Security.Permissions;
 //    Build Number  - generally just bug fixes
 //    Revision      - not used.
 //
-[assembly: AssemblyVersion("0.9.12")]
+[assembly: AssemblyVersion("0.9.13")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

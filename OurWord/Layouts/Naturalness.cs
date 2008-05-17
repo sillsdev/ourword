@@ -30,6 +30,9 @@ namespace OurWord.View
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "Naturalness";
+        const string c_sRegNameLineNumbersColor = "LineNumbersColor";
+        const string c_RegNameSuppressVerseNumbers = "SuppressVerseNos";
+        const string c_RegNameShowLineNumbers = "ShowLineNumbers";
         #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
         static public string RegistryBackgroundColor
         {
@@ -42,6 +45,59 @@ namespace OurWord.View
                 OWWindow.SetRegistryBackgroundColor(c_sName, value);
             }
         }
+        #endregion
+        #region SAttr{g/s}: string LineNumbersColor - color for the line numbers
+        static public string LineNumbersColor
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sName, c_sRegNameLineNumbersColor, "DarkGray");
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sName, c_sRegNameLineNumbersColor, value); 
+            }
+        }
+        #endregion
+        #region SAttr{g/s}: bool SupressVerseNumbers
+        public static bool SupressVerseNumbers
+        {
+            get
+            {
+                if (-1 == s_nSupressVerseNumbers)
+                {
+                    s_nSupressVerseNumbers = JW_Registry.GetValue(c_sName,
+                        c_RegNameSuppressVerseNumbers, 0);
+                }
+                return (s_nSupressVerseNumbers == 1) ? true : false;
+            }
+            set
+            {
+                s_nSupressVerseNumbers = (value == true) ? 1 : 0;
+                JW_Registry.SetValue(c_sName, c_RegNameSuppressVerseNumbers, s_nSupressVerseNumbers);
+            }
+        }
+        static int s_nSupressVerseNumbers = -1;
+        #endregion
+        #region SAttr{g/s}: bool ShowLineNumbers
+        public static bool ShowLineNumbers
+        {
+            get
+            {
+                if (-1 == s_nShowLineNumbers)
+                {
+                    s_nShowLineNumbers = JW_Registry.GetValue(c_sName,
+                        c_RegNameShowLineNumbers, 0);
+                }
+                return (s_nShowLineNumbers == 1) ? true : false;
+            }
+            set
+            {
+                s_nShowLineNumbers = (value == true) ? 1 : 0;
+                JW_Registry.SetValue(c_sName, c_RegNameShowLineNumbers, s_nShowLineNumbers);
+            }
+        }
+        static int s_nShowLineNumbers = -1;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -136,9 +192,9 @@ namespace OurWord.View
                 OWPara.Flags options = OWPara.Flags.None;
                 if (p.IsUserEditable)
                     options |= OWPara.Flags.IsEditable;
-                if (G.SupressVerseNumbers)
+                if (WndNaturalness.SupressVerseNumbers)
                     options |= OWPara.Flags.SuppressVerseNumbers;
-                if (G.ShowLineNumbers)
+                if (WndNaturalness.ShowLineNumbers)
                     options |= OWPara.Flags.ShowLineNumbers;
                 if (OurWordMain.TargetIsLocked)
                     options |= OWPara.Flags.IsLocked;
@@ -176,7 +232,7 @@ namespace OurWord.View
                 OWPara.Flags options = OWPara.Flags.None;
                 if (fn.IsUserEditable)
                     options |= OWPara.Flags.IsEditable;
-                if (G.ShowLineNumbers)
+                if (WndNaturalness.ShowLineNumbers)
                     options |= OWPara.Flags.ShowLineNumbers;
                 if (OurWordMain.TargetIsLocked)
                     options |= OWPara.Flags.IsLocked;
@@ -205,6 +261,10 @@ namespace OurWord.View
             // Tell the superclass to finish loading, which involves laying out the window 
             // with the data we've just put in, as doing the same for any secondary windows.
             base.LoadData();
+
+            // Override the Line Numbers color by this window's setting
+            Color clr = Color.FromName(LineNumbersColor);
+            base.LineNumberAttrs.Brush = new SolidBrush(clr);
         }
         #endregion
     }

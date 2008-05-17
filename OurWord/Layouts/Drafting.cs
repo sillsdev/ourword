@@ -25,7 +25,6 @@ using JWTools;
 
 namespace OurWord.View
 {
-
     public class WndDrafting : OWWindow
     {
         // Registry-Stored Settings ----------------------------------------------------------
@@ -104,6 +103,195 @@ namespace OurWord.View
                     G.TTranslation.DisplayName.ToUpper();
 
                 return LocDB.Insert(sBase, new string[] { sFrontName, sTargetName });
+            }
+        }
+        #endregion
+
+        // Deal with mismatched paragraphs (e.g., Front doesn't match Target)-----------------
+        #region CLASS: ParagraphAlignmentPair
+        public class ParagraphAlignmentPair
+        {
+            // Attrs -------------------------------------------------------------------------
+            #region Attr{g}: int VerseNo - the first verse in the para; same in both front and target
+            public int VerseNo
+            {
+                get
+                {
+                    return m_nVerseNo;
+                }
+            }
+            int m_nVerseNo;
+            #endregion
+            #region Attr{g}: int iFront - index of first Front paragraph for this row
+            public int iFront
+            {
+                get
+                {
+                    return m_iFront;
+                }
+            }
+            int m_iFront;
+            #endregion
+            #region Attr{g}: int iTarget - index of first Target paragraph for this row
+            public int iTarget
+            {
+                get
+                {
+                    return m_iTarget;
+                }
+            }
+            int m_iTarget;
+            #endregion
+
+            #region Attr{g}: int cFront - count of how many front paragraphs go in this row
+            public int cFront
+            {
+                get
+                {
+                    return m_cFront;
+                }
+                set
+                {
+                    m_cFront = value;
+                }
+            }
+            int m_cFront;
+            #endregion
+            #region Attr{g}: int cTarget - count of how many target paragraphs go in this row
+            public int cTarget
+            {
+                get
+                {
+                    return m_cTarget;
+                }
+                set
+                {
+                    m_cTarget = value;
+                }
+            }
+            int m_cTarget;
+            #endregion
+
+            // Scaffolding ------------------------------------------------------------------
+            #region Constructor(nVerseNo, iFront, iTarget)
+            public ParagraphAlignmentPair(int _nVerseNo, int _iFfront, int _iTarget)
+            {
+                m_nVerseNo = _nVerseNo;
+
+                m_iFront = _iFfront;
+                m_iTarget = _iTarget;
+
+                m_cFront = 1;
+                m_cTarget = 1;
+            }
+            #endregion
+            #region VAttr{g}: void DebugString
+            public string DebugString
+            {
+                get
+                {
+                    return "VerseNo=" + VerseNo.ToString() +
+                        "      iFront=" + iFront.ToString() + "  c=" + cFront.ToString() +
+                        "      iTarget=" + iTarget.ToString() + "  c=" + cTarget.ToString();
+                }
+            }
+            #endregion
+        }
+        #endregion
+        #region SMethod: ParagraphAlignmentPair[] ScanForAlignmentPairs(...)
+        static public ParagraphAlignmentPair[] ScanForAlignmentPairs(
+            int iFront, int cFront, int iTarget, int cTarget)
+        {
+            ArrayList a = new ArrayList();
+
+            // By definition, the first paragraphs align, even if no verse is present
+            ParagraphAlignmentPair pairLast = new ParagraphAlignmentPair(0, iFront, iTarget);
+            a.Add(pairLast);
+
+            // Loop to create the list of alignment pairs
+            // Begin with the next Front paragraph, and loop through the total count
+            for(int iF = iFront + 1; iF < iFront + cFront; iF++)
+            {
+                // Get the next front paragraph
+                DParagraph pF = G.SFront.Paragraphs[iF] as DParagraph;
+
+                // Get its initial verse number. If it doesn't have a DVerse in it, then
+                // we look to the next front paragraph.
+                int nVerseFront = pF.FirstActualVerseNumber;
+                if (0 == nVerseFront)
+                    continue;
+
+                // Now loop through the Target paragraphs that we haven't handled yet
+                for (int iT = pairLast.iTarget + 1; iT < iTarget + cTarget; iT++)
+                {
+                    // Get the target paragraph
+                    DParagraph pT = G.STarget.Paragraphs[iT] as DParagraph;
+
+                    // Get its initial verse number, if any
+                    int nVerseTarget = pT.FirstActualVerseNumber;
+
+                    // If the two paragraph's verses are the same, then we have an alignment pair
+                    if (nVerseFront == nVerseTarget)
+                    {
+                        pairLast = new ParagraphAlignmentPair(nVerseTarget, iF, iT);
+                        a.Add(pairLast);
+                        break;
+                    }
+                }
+            }
+
+            // Convert to a vector
+            ParagraphAlignmentPair[] v = new ParagraphAlignmentPair[a.Count];
+            for (int k = 0; k < a.Count; k++)
+                v[k] = a[k] as ParagraphAlignmentPair;
+            return v;
+        }
+        #endregion
+        #region SMethod: void AddAlignmentCounts(...)
+        static public void AddAlignmentCounts(ParagraphAlignmentPair[] vPairs, int cFront, int cTarget)
+        {
+            for (int i = 0; i < vPairs.Length - 1; i++)
+            {
+                ParagraphAlignmentPair pair = vPairs[i];
+                ParagraphAlignmentPair next = vPairs[i + 1];
+
+                pair.cFront = next.iFront - pair.iFront;
+                pair.cTarget = next.iTarget - pair.iTarget;
+
+                cFront -= pair.cFront;
+                cTarget -= pair.cTarget;
+            }
+
+            ParagraphAlignmentPair last = vPairs[vPairs.Length - 1];
+            last.cFront = cFront;
+            last.cTarget = cTarget;
+        }
+        #endregion
+        #region Method: void LoadMismatchedParagraphs(int iFront, int cFront, int iTarget, int cTarget)
+        void LoadMismatchedParagraphs(int iFront, int cFront, int iTarget, int cTarget)
+        {
+            // Get the raw alignment pairs
+            ParagraphAlignmentPair[] vPairs = ScanForAlignmentPairs(iFront, cFront, iTarget, cTarget);
+
+            // Each pair needs the count of paragraphs that go with it
+            AddAlignmentCounts(vPairs, cFront, cTarget);
+
+            //  Create the rows according to the alignment pairs
+            foreach (ParagraphAlignmentPair pair in vPairs)
+            {
+                StartNewRow();
+                for (int kF = 0; kF < pair.cFront; kF++)
+                {
+                    DParagraph pFront = G.SFront.Paragraphs[ pair.iFront + kF ] as DParagraph;
+                    _LoadHintsFromFront(pFront);
+                    AddFrontParagraph(pFront);
+                }
+                for (int kT = 0; kT < pair.cTarget; kT++)
+                {
+                    DParagraph pTarget = G.STarget.Paragraphs[ pair.iTarget + kT ] as DParagraph;
+                    pTarget.BestGuessAtInsertingTextPositions();
+                    AddTargetParagraph(pTarget, true);
+                }
             }
         }
         #endregion
@@ -311,6 +499,10 @@ namespace OurWord.View
 
                 if (!_CanSideBySideParagraphs(iFront, cFront, iTarget, cTarget))
                 {
+                    LoadMismatchedParagraphs(iFront, cFront, iTarget, cTarget);
+
+                    #region OBSOLETE pending sufficient review, 15may08
+                    /*** OLD WAY, that I'm replacing with LoadMismatchedParagraphs on 15may08
                     StartNewRow();
                     for (int kF = 0; kF < cFront; kF++)
                     {
@@ -324,6 +516,8 @@ namespace OurWord.View
                         pTarget.BestGuessAtInsertingTextPositions();
                         AddTargetParagraph(pTarget, true);
                     }
+                    ************************************************************************/
+                    #endregion
                 }
                 else
                 {

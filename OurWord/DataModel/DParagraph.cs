@@ -187,6 +187,25 @@ namespace OurWord.DataModel
 			return true;
 		}
 		#endregion
+        #region Attr{g}: int FirstActualVerseNumber
+        /// <summary>
+        /// Searches the paragraph for its verse DVerse, and returns its number. If there
+        /// is no DVerse in the paragraph, then returns 0.
+        /// </summary>
+        public int FirstActualVerseNumber
+        {
+            get
+            {
+                foreach (DRun r in Runs)
+                {
+                    DVerse v = r as DVerse;
+                    if (null != v)
+                        return v.VerseNo;
+                }
+                return 0;
+            }
+        }
+        #endregion
 
 		// Derived Attrs: Ownership Hierarchy ------------------------------------------------
 		#region Attr[g}: DSection Section - the owning section

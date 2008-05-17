@@ -67,6 +67,20 @@
         <JParagraphStyle SpaceBefore="12" SpaceAfter="3" Alignment="2" FirstLineIndent="0" LeftMargin="0" RightMargin="0" Abbrev="ms" DisplayName="Major Section Title" Description="" Keep="true">
           <own Name="CharStyle">
             <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="" DisplayName="" Description="" Height="14" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+              <ownseq Name="fws">
+                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false" Strike="false">
+                  <ref Name="ws">3-WritingSystems-0</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false" Strike="false">
+                  <ref Name="ws">3-WritingSystems-1</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false" Strike="false">
+                  <ref Name="ws">3-WritingSystems-2</ref>
+                </JFontForWritingSystem>
+                <JFontForWritingSystem Name="Arial" Size="14" Bold="true" Italic="false" Strike="false">
+                  <ref Name="ws">3-WritingSystems-3</ref>
+                </JFontForWritingSystem>
+              </ownseq>
             </JCharacterStyle>
           </own>
         </JParagraphStyle>
@@ -330,7 +344,7 @@
         </JWritingSystem>
         <JWritingSystem IdeaGraph="true" Name="Chinese" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}" Keyboard="">
         </JWritingSystem>
-        <JWritingSystem IdeaGraph="false" Name="Latin" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="21 {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U} {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {eee}" ARResult="21 {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú} {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {Halelujah}" Keyboard="">
+        <JWritingSystem IdeaGraph="false" Name="Latin" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="22 {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U} {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {eee} {JC}" ARResult="22 {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú} {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {Halelujah} {Jesus Christ}" Keyboard="">
         </JWritingSystem>
         <JWritingSystem IdeaGraph="false" Name="Nigeria" Abbrev="" Punct=".,;:<>?!()[]" EndPunct=".>?!)],:;" ARSource="20 {`a} {`A} {`e} {`E} {`i} {`I} {`o} {`O} {`u} {`U} {^a} {^A} {^e} {^E} {^i} {^I} {^o} {^O} {^u} {^U}" ARResult="20 {à} {À} {è} {È} {ì} {Ì} {ò} {Ò} {ù} {Ù} {á} {Á} {é} {É} {í} {Í} {ó} {Ó} {ú} {Ú}" Keyboard="">
         </JWritingSystem>

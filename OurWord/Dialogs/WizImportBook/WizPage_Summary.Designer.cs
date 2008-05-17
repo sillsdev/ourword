@@ -44,9 +44,9 @@ namespace OurWord.Dialogs.WizImportBook
             // 
             // m_labelClickFinish
             // 
-            this.m_labelClickFinish.Location = new System.Drawing.Point(14, 162);
+            this.m_labelClickFinish.Location = new System.Drawing.Point(14, 171);
             this.m_labelClickFinish.Name = "m_labelClickFinish";
-            this.m_labelClickFinish.Size = new System.Drawing.Size(364, 57);
+            this.m_labelClickFinish.Size = new System.Drawing.Size(364, 56);
             this.m_labelClickFinish.TabIndex = 0;
             this.m_labelClickFinish.Text = "Click the Finish button to import this book into OurWord, or press the Previous b" +
                 "utton to make changes..";
@@ -101,7 +101,7 @@ namespace OurWord.Dialogs.WizImportBook
             // m_textStage
             // 
             this.m_textStage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_textStage.Location = new System.Drawing.Point(126, 105);
+            this.m_textStage.Location = new System.Drawing.Point(125, 105);
             this.m_textStage.Name = "m_textStage";
             this.m_textStage.Size = new System.Drawing.Size(252, 23);
             this.m_textStage.TabIndex = 7;
@@ -110,7 +110,7 @@ namespace OurWord.Dialogs.WizImportBook
             // 
             // m_labelStage
             // 
-            this.m_labelStage.Location = new System.Drawing.Point(34, 105);
+            this.m_labelStage.Location = new System.Drawing.Point(33, 105);
             this.m_labelStage.Name = "m_labelStage";
             this.m_labelStage.Size = new System.Drawing.Size(86, 23);
             this.m_labelStage.TabIndex = 6;
@@ -120,7 +120,7 @@ namespace OurWord.Dialogs.WizImportBook
             // m_textDestination
             // 
             this.m_textDestination.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_textDestination.Location = new System.Drawing.Point(126, 128);
+            this.m_textDestination.Location = new System.Drawing.Point(125, 128);
             this.m_textDestination.Name = "m_textDestination";
             this.m_textDestination.Size = new System.Drawing.Size(252, 23);
             this.m_textDestination.TabIndex = 9;
@@ -129,7 +129,7 @@ namespace OurWord.Dialogs.WizImportBook
             // 
             // m_labelDestination
             // 
-            this.m_labelDestination.Location = new System.Drawing.Point(34, 128);
+            this.m_labelDestination.Location = new System.Drawing.Point(33, 128);
             this.m_labelDestination.Name = "m_labelDestination";
             this.m_labelDestination.Size = new System.Drawing.Size(86, 23);
             this.m_labelDestination.TabIndex = 8;
@@ -139,7 +139,7 @@ namespace OurWord.Dialogs.WizImportBook
             // m_textFormat
             // 
             this.m_textFormat.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_textFormat.Location = new System.Drawing.Point(126, 82);
+            this.m_textFormat.Location = new System.Drawing.Point(125, 82);
             this.m_textFormat.Name = "m_textFormat";
             this.m_textFormat.Size = new System.Drawing.Size(252, 23);
             this.m_textFormat.TabIndex = 11;
@@ -148,7 +148,7 @@ namespace OurWord.Dialogs.WizImportBook
             // 
             // m_labelFormat
             // 
-            this.m_labelFormat.Location = new System.Drawing.Point(34, 82);
+            this.m_labelFormat.Location = new System.Drawing.Point(33, 82);
             this.m_labelFormat.Name = "m_labelFormat";
             this.m_labelFormat.Size = new System.Drawing.Size(86, 23);
             this.m_labelFormat.TabIndex = 10;

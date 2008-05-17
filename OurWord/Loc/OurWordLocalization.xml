@@ -1320,7 +1320,7 @@
       <English>Turn this on if you are working with multiple projects.</English>
     </Item>
     <Item ID="fPropertiesDialog_CheckBox">
-      <English>Project Properties Dialog</English>
+      <English>Configuration Dialog</English>
     </Item>
     <Item ID="fPropertiesDialog_Description">
       <English>Turn this on if you are want to adjust the properties for a project.</English>
@@ -1372,6 +1372,12 @@
     </Item>
     <Item ID="fStructuralEditing_Description">
       <English>Enables the translator to split and join paragraphs, or to assign different styles to a paragraph. By doing this the translation will depart from the paragraph structure of the front translation.</English>
+    </Item>
+    <Item ID="fCanDeleteNotes_CheckBox">
+      <English>Can Delete Notes?</English>
+    </Item>
+    <Item ID="fCanDeleteNotes_Description">
+      <English>Permits the user to delete notes. You can turn this off if you have valuable notes that you are concerned that a user might inadvertantly delete.</English>
     </Item>
     <Item ID="fMerge_CheckBox">
       <English>Merging</English>
@@ -2097,7 +2103,7 @@
       </Item>
       <Item ID="propZoomFactor" Tip="true">
         <English>Zoom Factor</English>
-        <Tip>Text in the windows can be larger (or smaller) by the chosen percentage.</Tip>
+        <Tip>Text in the windows can be larger (or smaller) by the chosen percentage. (You can also set this in the Window dropdown.)</Tip>
       </Item>
       <Item ID="propSuppressVerses" Tip="true">
         <English>Hide verse numbers?</English>
@@ -2248,9 +2254,6 @@
       <Item ID="strNotStandardFormat">
         <English>File '{0}' does not appear to be a Standard Format file. It does not begin with a backslash character.)</English>
       </Item>
-      <Item ID="strFileNotInSupportedEncoding">
-        <English>File '{0}' is not in a supported encoding. It should either be ASCII or UTF8.</English>
-      </Item>
       <Item ID="strMore">
         <English>(more)</English>
       </Item>
@@ -2258,7 +2261,7 @@
         <English>Unknown Markers: {0}</English>
       </Item>
       <Item ID="strFileStats">
-        <English>File: {0}{n}Encoding: {1}{n}Format: {2}{n}{3}</English>
+        <English>File: {0}{n}Format: {1}{n}{2}</English>
       </Item>
       <Item ID="strOpenDialogTitle">
         <English>Choose the file you wish to import</English>

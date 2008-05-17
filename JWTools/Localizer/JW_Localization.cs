@@ -1468,7 +1468,7 @@ namespace JWTools
         {
             // First, read in the Base data
             string sPathName = BasePath;
-            TextReader reader = JW_Util.GetTextReader(ref sPathName, "*.xml");
+            TextReader reader = JW_Util.OpenStreamReader(ref sPathName, "*.xml");
             XmlRead xml = new XmlRead(reader);
 
             while (xml.ReadNextLineUntilEndTag(c_sTag))

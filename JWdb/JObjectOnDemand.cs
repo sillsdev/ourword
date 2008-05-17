@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using JWTools;
 #endregion

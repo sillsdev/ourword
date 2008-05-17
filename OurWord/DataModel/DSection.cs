@@ -1123,17 +1123,103 @@ namespace OurWord.DataModel
 			return false;
 		}
 		#endregion
-		#region Method: void _ParseVerseStrings(...)
-		static public void _ParseVerseString(string s, ref string sVerseNo, ref string sVerseText)
+		#region Method: void ParseVerseStrings(...)
+		static public void ParseVerseString(string s, ref string sVerseNo, ref string sVerseText)
 		{
 			int i = 0;
 			sVerseNo = "";
 			sVerseText = "";
 
-			// Move past any leading spaces
-			while (s.Length > i && s[i] == ' ')
-				++i;
+            // Remove any leading spaces
+            s = s.Trim();
 
+            // Could have some leading punctuation (saw this is 43LukTch.ptx). We'll just
+            // move this to appear after the verse number.
+            while (s.Length > i && (s[i] == '(' || s[i] == '['))
+            {
+                sVerseText += s[i];
+                i++;
+            }
+
+            // Loop through the string
+            bool bMostRecentWasDigit = false;
+            for (; i < s.Length; i++)
+            {
+                char ch = s[i];
+                char chNext = (i < s.Length - 1) ? s[i + 1] : '\0';
+
+                // Verses will normally consist of digits
+                if (IsDigit(ch))
+                {
+                    // If the data is an 'l' (el), we assume it was a typo and change it to 
+                    // a '1' (one). Somewhat kuldgy, but I'm finding real data this way.
+                    if (ch == 'l')
+                        ch = '1';
+                    // Simularly O (oh) and zero
+                    if (ch == 'O')
+                        ch = '0';
+
+                    sVerseNo += ch;
+                    bMostRecentWasDigit = true;
+                    continue;
+                }
+
+                // A single letter is acceptable, if it immediately follows a digit (thus, '10b'),
+                // and if the following item is not a letter.
+                if (char.IsLetter(ch) && bMostRecentWasDigit)
+                {
+                    if (char.IsLetter(chNext))
+                        break;
+                    sVerseNo += ch;
+                    bMostRecentWasDigit = false;
+                    continue;
+                }
+
+                // Spaces are permitted only if the next character is not a letter
+                if (char.IsWhiteSpace(ch) && !char.IsLetter(chNext))
+                {
+                    bMostRecentWasDigit = false;
+                    continue;
+                }
+
+                // We permit a comma to be interpretted as a verse bridge
+                if (ch == ',')
+                {
+                    sVerseNo += '-';
+                    bMostRecentWasDigit = false;
+                    continue;
+                }
+
+                // A single hyphen is used for verse bridges
+                if (ch == '-')
+                {
+                    sVerseNo += ch;
+                    bMostRecentWasDigit = false;
+                    continue;
+                }
+
+                // If we're here, then we are no longer working on a verse number
+                break;
+            }
+
+            // Move past any blanks
+            while (i < s.Length && char.IsWhiteSpace(s[i]))
+                i++;
+
+            // Anything else is the verse text
+            if (s.Length > i)
+                sVerseText += s.Substring(i);
+
+            // If we wound up with multiple hyphens, then get rid of the interior. Thus "3,4,5" would
+            // have become "3-4-5", which we turn into "3-5"
+            int k1 = sVerseNo.IndexOf('-');
+            int k2 = sVerseNo.LastIndexOf('-');
+            if (k1 != -1 && k2 != -1 && k1 != k2)
+                sVerseNo = sVerseNo.Remove(k1, k2 - k1);
+
+            #region OBSOLETE - Replaced with the above on 10may08
+            /////////////////////
+            /***
 			// Could have some leading punctuation (saw this is 43LukTch.ptx). We'll just
 			// move this to appear after the verse number.
 			while (s.Length > i && (s[i] == '(' || s[i] == '[' ))
@@ -1173,7 +1259,9 @@ namespace OurWord.DataModel
 			// Anything else is the verse text
 			if (s.Length > i)
 				sVerseText = s.Substring(i);
-		}
+            ***/
+            #endregion
+        }
 		#endregion
 
 		// I/O (Standard Format) -------------------------------------------------------------
@@ -2876,8 +2964,6 @@ namespace OurWord.DataModel
 		public Test_DSection()
 			: base("DSection")
 		{
-			AddTest( new IndividualTest( ParseVerseStrings ),   "ParseVerseStrings" );
-
 			AddTest( new IndividualTest( TestIO_1 ),   "IO Section #1" );
 			AddTest( new IndividualTest( TestIO_2 ),   "IO Section #2" );
 			AddTest( new IndividualTest( TestIO_3 ),   "IO Section #3" );
@@ -3748,41 +3834,6 @@ namespace OurWord.DataModel
         #endregion
 
 		// Other Tests -----------------------------------------------------------------------
-		#region ParseVerseStrings
-		public void ParseVerseStrings()
-		{
-			string sVersePart = "";
-			string sTextPart = "";
-
-			// Test: Just a plain old verse number
-			string sInput = "3 Ije lais alekot.";
-			DSection._ParseVerseString(sInput, ref sVersePart, ref sTextPart);
-			AreSame(sVersePart, "3");
-			AreSame(sTextPart,  "Ije lais alekot.");
-
-			// Test: A verse bridge with extra blank spaces
-			sInput = "24 - 26 Ije lais alekot.";
-			DSection._ParseVerseString(sInput, ref sVersePart, ref sTextPart);
-			AreSame(sVersePart, "24-26");
-			AreSame(sTextPart,  "Ije lais alekot.");
-
-			// Test: A verse bridge with letters
-			sInput = "24b - 26a Ije lais alekot.";
-			DSection._ParseVerseString(sInput, ref sVersePart, ref sTextPart);
-			AreSame(sVersePart, "24b-26a");
-			AreSame(sTextPart,  "Ije lais alekot.");
-
-			// Test: A verse bridge without spaces
-			sInput = "24-26a Ije lais alekot.";
-			DSection._ParseVerseString(sInput, ref sVersePart, ref sTextPart);
-			AreSame(sVersePart, "24-26a");
-			AreSame(sTextPart,  "Ije lais alekot.");
-
-			Trace("Input = >" + sInput + "<");
-			Trace("Verse = >" + sVersePart + "<");
-			Trace("Text  = >" + sTextPart + "<");
-		}
-		#endregion
 		#region CreateTargetSection()
 		public void CreateTargetSection()
 			// Tests the routine which creates a blank, ready-for-translating, section

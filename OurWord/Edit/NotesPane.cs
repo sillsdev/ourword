@@ -208,6 +208,8 @@ namespace OurWord.Edit
 
             m_menuInsertBT.Visible = DNote.ShowBT &&
                 OurWordMain.App.MainWindowIsBackTranslation;
+
+            m_btnDeleteNote.Visible = OurWordMain.Features.F_CanDeleteNote;
         }
         #endregion
         #region Method: void SetControlsEnabling()
@@ -233,7 +235,6 @@ namespace OurWord.Edit
             m_btnDeleteNote.Enabled = canDeleteNote;
         }
         #endregion
-
     }
 
     public class NotesWnd : OWWindow

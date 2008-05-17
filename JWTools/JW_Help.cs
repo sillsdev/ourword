@@ -105,7 +105,7 @@ namespace JWTools
 					dlg.FileName = Path.GetDirectoryName(Application.ExecutablePath) +
 						"\\" + FileName;
 
-					// Filter on oTrans files
+					// Filter on HtmlHelp files
 					dlg.Filter = "Help Files (*.chm)|*.chm";
 					dlg.FilterIndex = 1;
 
@@ -212,7 +212,13 @@ namespace JWTools
 		#region Method: static void ShowDefaultTopic()
 		static public void ShowDefaultTopic()
 		{
-			Help.ShowHelp(Form, RegistryHelpFile);
+            try
+            {
+                Help.ShowHelp(Form, RegistryHelpFile);
+            }
+            catch (Exception) 
+            {
+            }
 		}
 		#endregion
 		#region Method: void ShowTopic(int nID)
@@ -222,7 +228,13 @@ namespace JWTools
 			{
 				if (topic.ID == nID)
 				{
-					Help.ShowHelp(Form, RegistryHelpFile, topic.Url);
+                    try
+                    {
+                        Help.ShowHelp(Form, RegistryHelpFile, topic.Url);
+                    }
+                    catch (Exception)
+                    {
+                    }
 					return;
 				}
 			}

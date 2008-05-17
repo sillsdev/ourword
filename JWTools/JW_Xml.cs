@@ -23,7 +23,8 @@ using Microsoft.Win32;
 
 namespace JWTools
 {
-	public class XmlField
+    #region CLASS: XmlField
+    public class XmlField
 		#region Documentation
 		/* Used to output a field (level) of xml. Supports several different tag formats:
 		 * 
@@ -234,6 +235,7 @@ namespace JWTools
 		}
 		#endregion
     }
+    #endregion
 
     #region CLASS: XmlReplace
     public class XmlReplace
@@ -268,6 +270,7 @@ namespace JWTools
     };
     #endregion
 
+    #region CLASS: XmlRead
     public class XmlRead
 		#region Documentation
 		/* Supports reading xml data. There are a series of methods to read through the
@@ -452,9 +455,11 @@ namespace JWTools
 			return (sTag == GetTag());
 		}
 		#endregion
-	}
+    }
+    #endregion
 
-	public class SfRead
+    #region CLASS: SfRead
+    public class SfRead
 	{
 		// Attributes ------------------------------------------------------------------------
 		StreamReader m_reader = null;
@@ -465,14 +470,16 @@ namespace JWTools
 		public int LineNumber = 0;
 
 
-		// Scaffolding -----------------------------------------------------------------------
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(StreamReader)
         public SfRead(StreamReader r)
         {
             m_reader = r;
             LineNumber = 0;
         }
-		#region Constructor(sPathName, string sFileFilter) - opens the reader
-		public SfRead(ref string sPathName, string sFileFilter)
+        #endregion
+        #region Constructor(sPathName, sFileFilter, enc) - opens the reader
+        public SfRead(ref string sPathName, string sFileFilter)
 		{
 			m_reader = JW_Util.OpenStreamReader(ref sPathName, sFileFilter);
 			LineNumber = 0;
@@ -562,10 +569,11 @@ namespace JWTools
 			return true;
 		}
 		#endregion
+    }
+    #endregion
 
-	}
-
-	public class SfWrite
+    #region CLASS: SfWrite
+    public class SfWrite
 	{
 		// Attributes ------------------------------------------------------------------------
 		private TextWriter m_writer = null;
@@ -698,11 +706,11 @@ namespace JWTools
 			m_writer.WriteLine("");
 		}
 		#endregion
-	}
+    }
+    #endregion
 
-
-	// WE WANT TO EVENTUALLY MAKE THIS OBSOLETE THROUGH ALL PROJECTS
-	#region HEADED FOR OBSOLESCENCE
+    // WE WANT TO EVENTUALLY MAKE THIS OBSOLETE THROUGH ALL PROJECTS
+	#region HEADED FOR OBSOLESCENCE - Class JW_Xml
 	public class JW_Xml
 	{
 		#region public static string GetTag(sLine) - retrieves the tag from the xml marker
@@ -786,7 +794,8 @@ namespace JWTools
 	}
 	#endregion
 
-	public class JW_Util
+    #region CLASS: JW_Util
+    public class JW_Util
 	{
 		#region Method: static void TextWriter GetTextWriter(string sPath)
 		public static TextWriter GetTextWriter(string sPath)
@@ -807,7 +816,7 @@ namespace JWTools
 			return tw;
 		}
 		#endregion
-		#region Method: static void TextReader GetTextReader(ref string sPath)
+		#region Method: static void TextReader GetTextReader(ref sPath, sFileFilter,)
 		public static TextReader GetTextReader(ref string sPath, string sFileFilter)
 		{
 			StreamReader r = OpenStreamReader(ref sPath, sFileFilter);
@@ -858,10 +867,9 @@ namespace JWTools
 				if (DialogResult.OK != dlg.ShowDialog(Form.ActiveForm))
 					throw new IOException("Unable to locate file" + sPathName);
 				sPathName = dlg.FileName;
-
 			}
 
-			return new StreamReader(sPathName, Encoding.UTF8);
+            return new StreamReader(sPathName, Encoding.UTF8);
 		}
 		#endregion
 
@@ -1065,7 +1073,8 @@ namespace JWTools
 		}
 		#endregion
 
-		static public string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
+        #region SMethod: string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
+        static public string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
 		{
 			Debug.Assert(sAttr.Length > 0);
 			Debug.Assert(sAttr[ sAttr.Length - 1] != '=');
@@ -1076,61 +1085,78 @@ namespace JWTools
 				s += c_chBlank;
 
 			return s;
-		}
-		static public string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
+        }
+        #endregion
+        #region SMethod: string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
+        static public string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
 		{
 			return XmlValue(sAttr, nValue.ToString(), bSpaceAfter );
-		}
-		static public string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
+        }
+        #endregion
+        #region SMethod: string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
+        static public string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
 		{
 			return XmlValue(sAttr,(bValue ? "true" : "false" ), bSpaceAfter );
-		}
-	}
+        }
+        #endregion
 
+        #region SMethod: Encoding GetUnicodeFileEncoding(String FileName)
+        public static Encoding GetUnicodeFileEncoding(String FileName)
+            // Return the Encoding of a text file.  Return Encoding.Default if no Unicode
+            // BOM (byte order mark) is found.
+        {
+            Encoding enc = null;
 
+            FileInfo info = new FileInfo(FileName);
 
+            FileStream stream = null;
 
+            try
+            {
+                stream = info.OpenRead();
 
-	#region OBSOLETE - NUnit Testing - NEED TO REPLACE
-	/***
-	[TestFixture]
-	public class JW_XmlTest
-	{
-		#region Test_TagRetrieval
-		[Test]
-		public void Test_TagRetrieval()
-		{
-			string sLine = "   <person name=\"John\" gender=\"male\" age=\"44\">";
-			Assert.IsTrue( "person" == JW_Xml.GetTag(sLine) );
-			Assert.IsTrue( "person" == JW_Xml.GetTag("<person>") );
+                Encoding[] UnicodeEncodings = { Encoding.BigEndianUnicode, Encoding.Unicode, Encoding.UTF8 };
 
-			Assert.IsTrue( JW_Xml.IsTag("person", sLine));
-			Assert.IsTrue( JW_Xml.IsTag("person", "<person>"));
+                for (int i = 0; enc == null && i < UnicodeEncodings.Length; i++)
+                {
+                    stream.Position = 0;
 
-			Assert.IsFalse( JW_Xml.IsTag("people", sLine));
+                    byte[] Preamble = UnicodeEncodings[i].GetPreamble();
 
-			Assert.IsTrue( JW_Xml.IsClosingTag("person", "</person>") );
-			Assert.IsTrue( JW_Xml.IsClosingTag("person", "     </person>") );
-			Assert.IsTrue( JW_Xml.IsClosingTag("/person", "</person>") );
-			Assert.IsTrue( JW_Xml.IsClosingTag("/person", "     </person>") );
-		}
-		#endregion
+                    bool PreamblesAreEqual = true;
 
-		#region Test_ValueRetrieval
-		[Test]
-		public void Test_ValueRetrieval()
-		{
-			string sLine = "   <person name=\"John\" gender=\"male\" age=\"44\">";
+                    for (int j = 0; PreamblesAreEqual && j < Preamble.Length; j++)
+                    {
+                        PreamblesAreEqual = Preamble[j] == stream.ReadByte();
+                    }
 
-			Assert.IsTrue("John" == JW_Xml.GetValue("name",sLine));
-			Assert.IsTrue("male" == JW_Xml.GetValue("gender",sLine));
-			Assert.IsTrue("44" == JW_Xml.GetValue("age",sLine));
-		}
-		#endregion
+                    if (PreamblesAreEqual)
+                    {
+                        enc = UnicodeEncodings[i];
+                    }
+                }
+            }
+            catch (System.IO.IOException)
+            {
+                return null;
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+            }
 
-	}
-	***/
-	#endregion
+            if (enc == null)
+            {
+                enc = Encoding.Default;
+            }
 
+            return enc;
+        }
+    #endregion
+    }
+    #endregion
 
 }

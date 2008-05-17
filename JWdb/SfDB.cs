@@ -13,6 +13,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
+using System.Text;
 using JWTools;
 #endregion
 
@@ -254,7 +255,7 @@ namespace JWdb
 			}
 		}
 		#endregion
-		#region Virtual: bool Read(ref string sPathName) - populate from StFmt disk file
+		#region Virtual: bool Read(ref sPathName) - populate from StFmt disk file
 		public virtual bool Read(ref string sPathName)
 		{
 			// Open the file for reading (if the user has to browse, then sPathName

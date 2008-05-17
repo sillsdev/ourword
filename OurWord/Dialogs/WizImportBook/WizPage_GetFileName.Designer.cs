@@ -33,6 +33,7 @@ namespace OurWord.Dialogs.WizImportBook
             this.m_labelFileName = new System.Windows.Forms.Label();
             this.m_btnBrowse = new System.Windows.Forms.Button();
             this.m_labelFileStats = new System.Windows.Forms.Label();
+            this.m_btnSpecifyEncoding = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // m_labelBrowse
@@ -76,15 +77,28 @@ namespace OurWord.Dialogs.WizImportBook
             // 
             this.m_labelFileStats.Location = new System.Drawing.Point(13, 130);
             this.m_labelFileStats.Name = "m_labelFileStats";
-            this.m_labelFileStats.Size = new System.Drawing.Size(385, 101);
+            this.m_labelFileStats.Size = new System.Drawing.Size(385, 89);
             this.m_labelFileStats.TabIndex = 4;
             this.m_labelFileStats.Text = "Please wait while OurWord examines this file...";
             this.m_labelFileStats.Visible = false;
+            // 
+            // m_btnSpecifyEncoding
+            // 
+            this.m_btnSpecifyEncoding.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_btnSpecifyEncoding.ForeColor = System.Drawing.Color.Red;
+            this.m_btnSpecifyEncoding.Location = new System.Drawing.Point(16, 222);
+            this.m_btnSpecifyEncoding.Name = "m_btnSpecifyEncoding";
+            this.m_btnSpecifyEncoding.Size = new System.Drawing.Size(160, 23);
+            this.m_btnSpecifyEncoding.TabIndex = 5;
+            this.m_btnSpecifyEncoding.Text = "Specify Encoding...";
+            this.m_btnSpecifyEncoding.UseVisualStyleBackColor = true;
+            this.m_btnSpecifyEncoding.Click += new System.EventHandler(this.cmdSpecifyEncoding);
             // 
             // WizPage_GetFileName
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.m_btnSpecifyEncoding);
             this.Controls.Add(this.m_labelFileStats);
             this.Controls.Add(this.m_btnBrowse);
             this.Controls.Add(this.m_labelFileName);
@@ -104,5 +118,6 @@ namespace OurWord.Dialogs.WizImportBook
         private System.Windows.Forms.Label m_labelFileName;
         private System.Windows.Forms.Button m_btnBrowse;
         private System.Windows.Forms.Label m_labelFileStats;
+        private System.Windows.Forms.Button m_btnSpecifyEncoding;
     }
 }

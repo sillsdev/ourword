@@ -479,6 +479,8 @@ namespace OurWord
         private ToolStripMenuItem m_menuShowTranslationsPane;
         private ToolStripMenuItem m_menuShowMergePane;
         private ToolStripMenuItem m_menuShowDictionaryPane;
+        private ToolStripSeparator m_separatorZoom;
+        private ToolStripMenuItem m_menuZoom;
         private ToolStripDropDownButton m_btnHelp;
         private ToolStripMenuItem m_menuHelpTopics;
         private ToolStripMenuItem m_menuAbout;
@@ -731,8 +733,7 @@ namespace OurWord
             m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
 
             // Window Menu in its entirety
-            bool bShowMainWindowSection = s_Features.F_JobBT || 
-                s_Features.F_JobNaturalness;
+            bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             bool bShowNotesPane = DNote.IsShowingAny;
             bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
@@ -756,6 +757,9 @@ namespace OurWord
             m_menuShowMergePane.Checked = DProject.ShowMergePane;
             m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
             m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
+
+            // Zoom menu command area
+            m_separatorZoom.Visible = bShowSideWindowsSection || bShowMainWindowSection;
 
             // Edit Menu / Structured Editing
             bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
@@ -1020,6 +1024,8 @@ namespace OurWord
             this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowMergePane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_separatorZoom = new System.Windows.Forms.ToolStripSeparator();
+            this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separator4 = new System.Windows.Forms.ToolStripSeparator();
             this.m_btnHelp = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuHelpTopics = new System.Windows.Forms.ToolStripMenuItem();
@@ -1081,7 +1087,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 0);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(824, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(855, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1525,7 +1531,9 @@ namespace OurWord
             this.m_menuShowNotesPane,
             this.m_menuShowTranslationsPane,
             this.m_menuShowMergePane,
-            this.m_menuShowDictionaryPane});
+            this.m_menuShowDictionaryPane,
+            this.m_separatorZoom,
+            this.m_menuZoom});
             this.m_btnWindow.Image = ((System.Drawing.Image)(resources.GetObject("m_btnWindow.Image")));
             this.m_btnWindow.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_btnWindow.Name = "m_btnWindow";
@@ -1533,6 +1541,7 @@ namespace OurWord
             this.m_btnWindow.Text = "Window";
             this.m_btnWindow.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.m_btnWindow.ToolTipText = "Shows the various windows you can turn on and off.";
+            this.m_btnWindow.DropDownOpening += new System.EventHandler(this.cmdWindowDropDownOpening);
             // 
             // m_menuDrafting
             // 
@@ -1599,6 +1608,17 @@ namespace OurWord
             this.m_menuShowDictionaryPane.Text = "Show &Dictionary Pane";
             this.m_menuShowDictionaryPane.ToolTipText = "Show the Dictionary Pane.";
             this.m_menuShowDictionaryPane.Click += new System.EventHandler(this.cmdToggleDictionaryPane);
+            // 
+            // m_separatorZoom
+            // 
+            this.m_separatorZoom.Name = "m_separatorZoom";
+            this.m_separatorZoom.Size = new System.Drawing.Size(229, 6);
+            // 
+            // m_menuZoom
+            // 
+            this.m_menuZoom.Name = "m_menuZoom";
+            this.m_menuZoom.Size = new System.Drawing.Size(232, 22);
+            this.m_menuZoom.Text = "Zoom Text";
             // 
             // m_separator4
             // 
@@ -1905,7 +1925,7 @@ namespace OurWord
             {
                 get
                 {
-                    return m_Dlg.GetEnabledState(ID.fPropertiesDialog.ToString());
+                    return m_Dlg.GetEnabledState(ID.fConfigurationDialog.ToString());
                 }
             }
             #endregion
@@ -1960,6 +1980,15 @@ namespace OurWord
                 get
                 {
                     return m_Dlg.GetEnabledState(ID.fStructuralEditing.ToString());
+                }
+            }
+            #endregion
+            #region Attr{g}: bool F_CanDeleteNote
+            public bool F_CanDeleteNote
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fCanDeleteNotes.ToString());
                 }
             }
             #endregion
@@ -2052,7 +2081,7 @@ namespace OurWord
             public enum ID
             {
                 fProject,
-                fPropertiesDialog,
+                fConfigurationDialog,
                 fPrint,
                 fJobBT,
                 fJobNaturalness,
@@ -2062,6 +2091,7 @@ namespace OurWord
                 fJustTheBasics,
                 fStructuralEditing,
                 fUndoRedo,
+                fCanDeleteNotes,
                 fLocalizer,
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
@@ -2135,6 +2165,13 @@ namespace OurWord
                     "Enables the Undo and Redo menus, by which you can undo actions such as " +
                         "typing, deleting, splitting and joining paragraphs, etc.");
 
+                m_Dlg.Add(ID.fCanDeleteNotes.ToString(),
+                    true,
+                    true,
+                    c_sNodeEditing,
+                    "Can Delete Notes?",
+                    "Permits the user to delete notes. You can turn this off if you have valuable " +
+                        "notes that you are concerned that a user might inadvertantly delete.");
                 #endregion
                 #region TOOLS FEATURES
                 m_Dlg.Add(ID.fRestoreBackup.ToString(),    
@@ -2157,7 +2194,7 @@ namespace OurWord
                         "plan on carefully reviewing and editing, so that it accurately matches " +
                         "the actual vernacular translation.");
 
-                m_Dlg.Add(ID.fPropertiesDialog.ToString(),
+                m_Dlg.Add(ID.fConfigurationDialog.ToString(),
                     true,
                     false,
                     c_sNodeTools,
@@ -2940,6 +2977,48 @@ namespace OurWord
         }
         #endregion
 
+        #region Cmd: cmdWindowDropDownOpening
+        private void cmdWindowDropDownOpening(object sender, EventArgs e)
+        {
+            // Populate the Zoom Factor subwindow, if it hasn't been populated already
+            if (0 == m_menuZoom.DropDownItems.Count)
+            {
+                int[] v = new int[] { 
+                60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 };
+
+                foreach (int n in v)
+                {
+                    ToolStripMenuItem mi = new ToolStripMenuItem(n.ToString() + "%", null,
+                        cmdChangeZoomPercent, "zzom_" + n.ToString());
+                    mi.Tag = n;
+                    m_menuZoom.DropDownItems.Add(mi);
+                }
+            }
+
+            // Check the one that is current
+            foreach (ToolStripMenuItem mi in m_menuZoom.DropDownItems)
+            {
+                mi.Checked = ((int)mi.Tag == G.ZoomPercent) ? true : false;
+            }
+        }
+        #endregion
+        #region Cmd: cmdChangeZoomPercent
+        private void cmdChangeZoomPercent(Object sender, EventArgs e)
+        {
+            ToolStripMenuItem mi = sender as ToolStripMenuItem;
+            if (null == mi)
+                return;
+
+            if (G.ZoomPercent != (int)mi.Tag)
+            {
+
+                G.ZoomPercent = (int)mi.Tag;
+                SetZoomFactor();
+                OnEnterSection();
+            }
+        }
+        #endregion
+
         // Tools
 		#region Can: canIncrementBookStatus
         private bool canIncrementBookStatus
@@ -3225,6 +3304,7 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
+
         #endregion
 
     }
@@ -3236,8 +3316,6 @@ namespace OurWord
         const string c_sSubKey = "Options";
         const string c_keyZoom = "Zoom";
         const string c_keyPictureSearchPath = "PictureSearchPath";
-        const string c_keySuppressVerseNumbers = "SuppressVerseNos";
-        const string c_keyShowLineNumbers = "ShowLineNumbers";
         #region SAttr{g}: float ZoomPercent
         public static int ZoomPercent
         {
@@ -3276,46 +3354,6 @@ namespace OurWord
                 JW_Registry.SetValue(c_sSubKey, c_keyPictureSearchPath, value);
             }
         }
-        #endregion
-        #region SAttr{g/s}: bool SupressVerseNumbers
-        public static bool SupressVerseNumbers
-        {
-            get
-            {
-                if (-1 == s_nSupressVerseNumbers)
-                {
-                    s_nSupressVerseNumbers = JW_Registry.GetValue(c_sSubKey, 
-                        c_keySuppressVerseNumbers, 0);
-                }
-                return (s_nSupressVerseNumbers == 1) ? true : false;
-            }
-            set
-            {
-                s_nSupressVerseNumbers = (value == true) ? 1 : 0;
-                JW_Registry.SetValue(c_sSubKey, c_keySuppressVerseNumbers, s_nSupressVerseNumbers);
-            }
-        }
-        static int s_nSupressVerseNumbers = -1;
-        #endregion
-        #region SAttr{g/s}: bool ShowLineNumbers
-        public static bool ShowLineNumbers
-        {
-            get
-            {
-                if (-1 == s_nShowLineNumbers)
-                {
-                    s_nShowLineNumbers = JW_Registry.GetValue(c_sSubKey,
-                        c_keyShowLineNumbers, 0);
-                }
-                return (s_nShowLineNumbers == 1) ? true : false;
-            }
-            set
-            {
-                s_nShowLineNumbers = (value == true) ? 1 : 0;
-                JW_Registry.SetValue(c_sSubKey, c_keyShowLineNumbers, s_nShowLineNumbers);
-            }
-        }
-        static int s_nShowLineNumbers = -1;
         #endregion
 
         // Stuff still in OurWordMain
