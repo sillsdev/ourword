@@ -23,7 +23,7 @@ Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Options\; ValueType: str
 Name: {app}\Help
 [Setup]
 AppName=Our Word!
-AppVerName=Beta 0.9n (-)
+AppVerName=Beta 0.9n
 DefaultDirName={pf}\TSC\Our Word
 AllowUNCPath=false
 AllowNoIcons=true
@@ -32,7 +32,7 @@ ShowLanguageDialog=yes
 PrivilegesRequired=admin
 AlwaysShowDirOnReadyPage=true
 AlwaysShowGroupOnReadyPage=true
-AppVersion=0.9n (-)
+AppVersion=0.9n
 UninstallDisplayIcon=
 UninstallDisplayName=Our Word!
 WindowVisible=true

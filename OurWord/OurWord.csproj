@@ -508,7 +508,7 @@
     </Compile>
     <Compile Include="Edit\Bookmark.cs" />
     <Compile Include="Edit\NotesPane.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Edit\NotesPane.Designer.cs">
       <DependentUpon>NotesPane.cs</DependentUpon>
