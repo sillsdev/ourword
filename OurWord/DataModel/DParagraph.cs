@@ -1188,8 +1188,12 @@ namespace OurWord.DataModel
             Section.Paragraphs.Remove(pNext);
 
             // Get rid of any spurious spaces, etc.
+            //
+            // (Note: I wonder if I really need this? I definiteily don't want to call
+            // Cleanup, because that can get rid of leading spaces, etc., which then
+            // mess up the selection when OW attempts to restore it following
+            // the join action. See Bug0281.)
             CombineAdjacentDTexts(false);  // Need to call this first with "false"
-            Cleanup();
         }
         #endregion
 

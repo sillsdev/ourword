@@ -706,6 +706,44 @@ namespace OurWord.Edit
             DFootnote m_Footnote = null;
             #endregion
 
+            #region VAttr{g}: bool FootnoteIsEditable - if T, we can jump to it by clicking on the letter
+            bool FootnoteIsEditable
+                // Test to see if the footnote is editable. If it is, then we
+                // 1. Show the Hand cursor when we hover over it,
+                // 2. Can jump to it
+                //
+                // This test will not work until the entire window has been laid out. 
+                // If we don't have a selection in the window, then it is safe to
+                // assume that the window is not ready.
+            {
+                get
+                {
+                    if (!m_bFootnoteIsEditableComputed)
+                    {
+                        // Can't do this if we don't have a selection
+                        if (!Window.HasSelection)
+                            return false;
+
+                        // Remember our current selection
+                        OWBookmark bm = new OWBookmark(Window.Selection);
+
+                        // Attempt to select the footnote
+                        m_bFootnoteIsEditable = Window.Select_FirstPositionInParagraph(Footnote);
+
+                        // Restore the original selection
+                        bm.RestoreWindowSelectionAndScrollPosition();
+
+                        // We did the analysis
+                        m_bFootnoteIsEditableComputed = true;
+                    }
+
+                    return m_bFootnoteIsEditable;
+                }
+            }
+            bool m_bFootnoteIsEditable;
+            bool m_bFootnoteIsEditableComputed = false;
+            #endregion
+
             #region Constructor(OWPara, DFootLetter)
             public EFootLetter(OWPara para, DFootLetter footLetter)
                 : base(para, footLetter.Text)
@@ -729,7 +767,9 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    return Cursors.Hand;
+                    if (FootnoteIsEditable)
+                     return Cursors.Hand;
+                 return Cursors.Arrow;
                 }
             }
             #endregion
@@ -1304,7 +1344,13 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    return Cursors.Hand;
+                    OWPara para = Window.FindOWParaContainingFootnoteLetter(Footnote);
+                    if (para != null)
+                    {
+                        if (para.Editable)
+                            return Cursors.Hand;
+                    }
+                    return Cursors.Arrow;
                 }
             }
             #endregion

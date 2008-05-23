@@ -195,17 +195,6 @@ namespace OurWord
         }
         #endregion
 
-        #region Warning:   void InsufficentSpaceForBackup(sDrive)
-        static public void InsufficentSpaceForBackup(string sDrive)
-        {
-            LocDB.Message(
-                "msgInsufficentSpaceForBackup",
-                "There was not enough space on drive {0} for the backup.",
-                null,
-                LocDB.MessageTypes.Warning);
-        }
-        #endregion
-
         #region Warning:   void MissingChapterRange()
         static public void MissingChapterRange()
         {
@@ -227,20 +216,6 @@ namespace OurWord
         }
         #endregion
 
-        #region YN:        bool NeedFloppyForBackup(string sBackupPathName)
-        static public bool NeedFloppyForBackup(string sBackupPathName)
-        {
-            return LocDB.Message("msgNeedFloppyForBackup",
-                "Unable to write backup file: \n\n" +
-                "     {0}\n\n" +
-                "Please make sure there is something in the drive (e.g., a " +
-                "floppy disk, or flash memory; or whatever is appropriate\n" +
-                "for the type of drive.\n\n" +
-                "Press Yes to try again, or No to cancel the backup.",
-                new string[] { sBackupPathName },
-                LocDB.MessageTypes.YN);
-        }
-        #endregion
         #region Info:      void NoFilterMatches()
         static public void NoFilterMatches()
         {
@@ -248,15 +223,6 @@ namespace OurWord
                 "There were no sections that matched your criteria.",
                 null,
                 LocDB.MessageTypes.Info);
-        }
-        #endregion
-        #region Error:     void NoPermissionToWriteFile()
-        static public void NoPermissionToWriteFile(string sPathName)
-        {
-            LocDB.Message("msgNoPermissionToWriteFile",
-                "You do not have system permission to write the file: \n\n    {0}.",
-                new string[] { sPathName },
-                LocDB.MessageTypes.Error);
         }
         #endregion
 

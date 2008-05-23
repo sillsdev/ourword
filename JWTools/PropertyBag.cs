@@ -827,15 +827,27 @@ namespace JWTools
         }
         #endregion
 
+        static StandardValuesCollection s_vFontNames = null;
+
         #region Method: override StandardValuesCollection GetStandardValues
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
-            string[] v = new string[FontFamily.Families.Length];
+            if (null == s_vFontNames)
+            {
+                Cursor old = Cursor.Current;
+                Cursor.Current = Cursors.WaitCursor;
 
-            for (int i = 0; i < FontFamily.Families.Length; i++)
-                v[i] = FontFamily.Families[i].Name;
+                string[] v = new string[FontFamily.Families.Length];
 
-            return new StandardValuesCollection(v);
+                for (int i = 0; i < FontFamily.Families.Length; i++)
+                    v[i] = FontFamily.Families[i].Name;
+
+                s_vFontNames = new StandardValuesCollection(v);
+
+                Cursor.Current = old;
+            }
+
+            return s_vFontNames;
         }
         #endregion
     }

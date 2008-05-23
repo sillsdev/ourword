@@ -202,7 +202,7 @@ namespace JWTools
             this.m_btnPasswordProtect.Name = "m_btnPasswordProtect";
             this.m_btnPasswordProtect.Size = new System.Drawing.Size(75, 48);
             this.m_btnPasswordProtect.TabIndex = 7;
-            this.m_btnPasswordProtect.Text = "Password Protect...";
+            this.m_btnPasswordProtect.Text = "&Password Protect...";
             this.m_btnPasswordProtect.Click += new System.EventHandler(this.cmd_onPasswordProtect);
             // 
             // m_btnHelp
@@ -222,7 +222,7 @@ namespace JWTools
             this.m_btnResetDefaults.Name = "m_btnResetDefaults";
             this.m_btnResetDefaults.Size = new System.Drawing.Size(75, 49);
             this.m_btnResetDefaults.TabIndex = 9;
-            this.m_btnResetDefaults.Text = "Reset Defaults";
+            this.m_btnResetDefaults.Text = "Reset &Defaults";
             this.m_btnResetDefaults.Click += new System.EventHandler(this.cmdResetDefaults);
             // 
             // m_btnJustTheBasics
@@ -231,7 +231,7 @@ namespace JWTools
             this.m_btnJustTheBasics.Name = "m_btnJustTheBasics";
             this.m_btnJustTheBasics.Size = new System.Drawing.Size(75, 55);
             this.m_btnJustTheBasics.TabIndex = 10;
-            this.m_btnJustTheBasics.Text = "Just The Basic Features";
+            this.m_btnJustTheBasics.Text = "&Just The Basic Features";
             this.m_btnJustTheBasics.Click += new System.EventHandler(this.cmdJustTheBasics);
             // 
             // m_Tree
@@ -586,6 +586,7 @@ namespace JWTools
                 // Tree and Description Box: just change the width
                 m_Tree.Width += nDeltaWidth;
                 m_box.Width += nDeltaWidth;
+                m_lblDescription.Width += nDeltaWidth;
 
                 // Buttons: change the x position
                 m_btnAllOn.Left += nDeltaWidth;

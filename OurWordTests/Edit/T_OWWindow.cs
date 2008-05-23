@@ -232,5 +232,61 @@ namespace OurWordTests.Edit
             Assert.AreEqual("30Oke t", p.AsString);
         }
         #endregion
+
+        #region Test: Join_FirstParaEndsWithSpace
+        [Test] public void Join_FirstParaEndsWithSpace()
+            // Bug0281
+        {
+            // Split a paragraph so that we get one that does not start with a verse
+            // First, figure out where we are
+            int iPara = 5;
+            DParagraph p = EditTest.Section.Paragraphs[iPara] as DParagraph;
+            Assert.AreEqual(c_sBenchmark, p.DebugString, "Benchmark: Paragraph contents");
+            DBasicText DBT = p.Runs[1] as DBasicText;
+            Assert.IsNotNull(DBT, "DBT Found");
+
+            // We'll use the OWBookmark code to locate its OWPara
+            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+
+            // Set the cursor position  "Oke |te," and do the split
+            // P: "Oke "
+            // P: "|te, ..."
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4);
+            EditTest.Wnd.cmdSplitParagraph();
+            Console.WriteLine("1 = <" + EditTest.Wnd.Selection.DBT.AsString.Substring(0,15) + ">, expecting <te, ...>"); 
+
+            // Now, do a split again, so we have
+            // P: "Oke "
+            // P: ""
+            // P: "|te, ..."
+            EditTest.Wnd.cmdSplitParagraph();
+            Console.WriteLine("2 = <" + EditTest.Wnd.Selection.DBT.AsString.Substring(0, 15) + ">, expecting <te, ...>"); 
+
+            // Move to the previous paragraph
+            // P: "Oke "
+            // P: "|"
+            // P: "te, ..."
+            EditTest.Wnd.cmdMoveCharLeft();
+            Console.WriteLine("3 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting <>"); 
+
+            // Type a blank space
+            // P: "Oke "
+            // P: " |"
+            // P: "te, ..."
+            (new TypingAction(EditTest.Wnd, ' ')).Do();
+            Console.WriteLine("4 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < >"); 
+
+            // Finally, do a Delete to join the paragraphs
+            // P: "Oke "
+            // P: " |te, ..."
+            EditTest.Wnd.cmdDelete();
+            Console.WriteLine("5 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < te, ...>"); 
+
+            // Verify the result ing paragraph/selection is " |te, ..."
+            Assert.IsTrue(EditTest.Wnd.Selection.IsInsertionPoint, "Should be a point, not a content selection");
+            Assert.AreEqual(1, EditTest.Wnd.Selection.DBT_iCharFirst);
+            Assert.AreEqual(" te, ", EditTest.Wnd.Selection.DBT.AsString.Substring(0, 5));
+        }
+        #endregion
     }
 }

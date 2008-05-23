@@ -254,7 +254,9 @@ namespace OurWord.Dialogs
             // 
             // IncrementBookStatus
             // 
+            this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.CancelButton = this.m_btnCancel;
             this.ClientSize = new System.Drawing.Size(410, 357);
             this.Controls.Add(this.m_btnHelp);
             this.Controls.Add(this.m_FileName);

@@ -1446,6 +1446,7 @@ namespace JWTools
         #region Method: void WriteXML(XmlField xmlParent)
         public void WriteXML()
         {
+            // Open a Text Writer to save to
             TextWriter writer = JW_Util.GetTextWriter(BasePath);
 
             XmlField xml = new XmlField(writer, c_sTag);
@@ -1456,6 +1457,7 @@ namespace JWTools
 
             xml.End();
 
+            // Done
             writer.Close();
 
             // Write the language alternatives
@@ -1500,6 +1502,9 @@ namespace JWTools
             // Build the language name
             string sPath = DataFolder + Path.DirectorySeparatorChar + lang.ID + ".xml";
 
+            // Save a backup in the current folder (See Bug0282.)
+            JW_Util.CreateBackup(sPath, ".bak");
+
             // Open the xml writer
             TextWriter w = JW_Util.GetTextWriter(sPath);
             XmlField xml = new XmlField(w, c_sTag);
@@ -1515,6 +1520,21 @@ namespace JWTools
             // Done
             xml.End();
             w.Close();
+
+            // Make a backup to the remote device if enabled. We have to create a file with the
+            // date in it so that the BackupSystem has something to copy; we then delete that
+            // file as there's no need to keep filling up the disk. (Bug0282)
+            string sRemotePath = Path.GetFileNameWithoutExtension(sPath) + " " + 
+                DateTime.Today.ToString("yyyy-MM-dd") + ".xml";
+            try
+            {
+                File.Copy(sPath, sRemotePath, true);
+                (new BackupSystem(sRemotePath)).MakeBackup();
+                File.Delete(sRemotePath);
+            }
+            catch (Exception)
+            {
+            }
         }
         #endregion
         #region Method: void ReadLanguageData(string sPath)

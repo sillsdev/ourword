@@ -280,8 +280,14 @@ namespace OurWord.Dialogs
 			if (DialogResult.OK == dlg.ShowDialog(this))
 			{
 				SettingsPath = dlg.FileName;
+                try
+                {
+                    G.BrowseDirectory = Path.GetDirectoryName(dlg.FileName);
+                }
+                catch (Exception)
+                {
+                }
 			}
-			G.BrowseDirectory = Path.GetDirectoryName( dlg.FileName );
 		}
 		#endregion
 		#region Handler: cmdHelp

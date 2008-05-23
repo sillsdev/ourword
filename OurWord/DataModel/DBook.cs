@@ -295,7 +295,7 @@ namespace OurWord.DataModel
             this.m_btnHelp.Location = new System.Drawing.Point(264, 408);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.m_btnHelp.TabIndex = 7;
+            this.m_btnHelp.TabIndex = 10;
             this.m_btnHelp.Text = "Help...";
             this.m_btnHelp.Click += new System.EventHandler(this.cmdHelp);
             // 
@@ -305,7 +305,7 @@ namespace OurWord.DataModel
             this.m_btnOK.Location = new System.Drawing.Point(88, 408);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
-            this.m_btnOK.TabIndex = 5;
+            this.m_btnOK.TabIndex = 8;
             this.m_btnOK.Text = "OK";
             // 
             // m_textComment
@@ -314,7 +314,7 @@ namespace OurWord.DataModel
             this.m_textComment.Multiline = true;
             this.m_textComment.Name = "m_textComment";
             this.m_textComment.Size = new System.Drawing.Size(440, 64);
-            this.m_textComment.TabIndex = 4;
+            this.m_textComment.TabIndex = 7;
             // 
             // m_lblComment
             // 
@@ -349,7 +349,7 @@ namespace OurWord.DataModel
             this.m_comboAbbreviation.MaxDropDownItems = 15;
             this.m_comboAbbreviation.Name = "m_comboAbbreviation";
             this.m_comboAbbreviation.Size = new System.Drawing.Size(360, 21);
-            this.m_comboAbbreviation.TabIndex = 2;
+            this.m_comboAbbreviation.TabIndex = 1;
             this.m_comboAbbreviation.TextChanged += new System.EventHandler(this.cmdOnComboSelection);
             // 
             // m_lblFile
@@ -375,7 +375,7 @@ namespace OurWord.DataModel
             this.m_btnBrowseFileName.Location = new System.Drawing.Point(376, 80);
             this.m_btnBrowseFileName.Name = "m_btnBrowseFileName";
             this.m_btnBrowseFileName.Size = new System.Drawing.Size(75, 23);
-            this.m_btnBrowseFileName.TabIndex = 3;
+            this.m_btnBrowseFileName.TabIndex = 2;
             this.m_btnBrowseFileName.Text = "Browse...";
             this.m_btnBrowseFileName.Click += new System.EventHandler(this.cmd_btnBrowse_clicked);
             // 
@@ -385,7 +385,7 @@ namespace OurWord.DataModel
             this.m_btnCancel.Location = new System.Drawing.Point(176, 408);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.m_btnCancel.TabIndex = 28;
+            this.m_btnCancel.TabIndex = 9;
             this.m_btnCancel.Text = "Cancel";
             // 
             // m_textName
@@ -404,7 +404,7 @@ namespace OurWord.DataModel
             this.m_comboStage.Location = new System.Drawing.Point(189, 32);
             this.m_comboStage.Name = "m_comboStage";
             this.m_comboStage.Size = new System.Drawing.Size(132, 21);
-            this.m_comboStage.TabIndex = 30;
+            this.m_comboStage.TabIndex = 3;
             this.m_comboStage.Text = "Draft";
             this.m_comboStage.TextChanged += new System.EventHandler(this.cmdOnStageChanged);
             // 
@@ -413,7 +413,7 @@ namespace OurWord.DataModel
             this.m_spinVersion.Location = new System.Drawing.Point(330, 32);
             this.m_spinVersion.Name = "m_spinVersion";
             this.m_spinVersion.Size = new System.Drawing.Size(48, 20);
-            this.m_spinVersion.TabIndex = 31;
+            this.m_spinVersion.TabIndex = 4;
             this.m_spinVersion.Text = "A";
             this.m_spinVersion.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
@@ -499,7 +499,7 @@ namespace OurWord.DataModel
             this.m_checkLocked.Location = new System.Drawing.Point(8, 224);
             this.m_checkLocked.Name = "m_checkLocked";
             this.m_checkLocked.Size = new System.Drawing.Size(440, 24);
-            this.m_checkLocked.TabIndex = 43;
+            this.m_checkLocked.TabIndex = 5;
             this.m_checkLocked.Text = "Locked: Editing is not permitted. (\"To Do\" notes can be added.)";
             // 
             // m_lblCopyright
@@ -516,7 +516,7 @@ namespace OurWord.DataModel
             this.m_editCopyright.Location = new System.Drawing.Point(88, 256);
             this.m_editCopyright.Name = "m_editCopyright";
             this.m_editCopyright.Size = new System.Drawing.Size(360, 20);
-            this.m_editCopyright.TabIndex = 45;
+            this.m_editCopyright.TabIndex = 6;
             // 
             // DBookProperties
             // 

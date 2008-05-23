@@ -369,7 +369,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
@@ -508,7 +508,7 @@
     </Compile>
     <Compile Include="Edit\Bookmark.cs" />
     <Compile Include="Edit\NotesPane.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Edit\NotesPane.Designer.cs">
       <DependentUpon>NotesPane.cs</DependentUpon>
@@ -527,8 +527,6 @@
     </Compile>
     <Compile Include="Layouts\Drafting.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="BackupSystem.cs">
     </Compile>
     <Compile Include="Layouts\Naturalness.cs">
       <SubType>Component</SubType>

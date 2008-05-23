@@ -765,6 +765,7 @@ namespace OurWord
             bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
             bool bEditMenuVisible = bStructuralEditing || Features.F_UndoRedo;
             SetupChangeParagraphStyleItems();
+            m_seperatorEdit.Visible = bStructuralEditing;
             m_menuChangeParagraphTo.Visible = bStructuralEditing;
             m_menuEdit.Visible = bEditMenuVisible;
             m_menuUndo.Visible = Features.F_UndoRedo;
@@ -2158,7 +2159,7 @@ namespace OurWord
                         "the paragraph structure of the front translation.");
 
                 m_Dlg.Add(ID.fUndoRedo.ToString(),
-                    false,
+                    true,
                     false,
                     c_sNodeEditing,
                     "Undo",

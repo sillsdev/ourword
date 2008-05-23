@@ -3,7 +3,7 @@
  * File:    BackupSystem.cs
  * Author:  John Wimbish
  * Created: 13 Aug 2004
- * Purpose: Modifies / edits the settings for the Drafts layout.
+ * Purpose: Routinely creates a backup on another device
  * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
@@ -20,14 +20,10 @@ using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
-using JWTools;
-using JWdb;
-using OurWord.DataModel;
-using OurWord.Edit;
 #endregion
 
 
-namespace OurWord
+namespace JWTools
 {
 	public class BackupSystem
 	{
@@ -158,8 +154,21 @@ namespace OurWord
 
 					// Display the message complaining about the missing flash card, and
 					// offering to try again
-					else if (! Messages.NeedFloppyForBackup( BackupPathName ) )
-						return false;
+                    else
+                    {
+                        if (false == LocDB.Message("msgNeedFloppyForBackup",
+                            "Unable to write backup file: \n\n" +
+                            "     {0}\n\n" +
+                            "Please make sure there is something in the drive (e.g., a " +
+                            "floppy disk, or flash memory; or whatever is appropriate\n" +
+                            "for the type of drive.\n\n" +
+                            "Press Yes to try again, or No to cancel the backup.",
+                            new string[] { BackupPathName },
+                            LocDB.MessageTypes.YN))
+                        {
+                            return false;
+                        }
+                    }
 				}
 			}
 
@@ -172,7 +181,11 @@ namespace OurWord
 				long lNeededSpace = fi.Length;
 				if (lNeededSpace + 1000 > lFreeDiskSpace)
 				{
-					Messages.InsufficentSpaceForBackup(sDrive);
+                    LocDB.Message(
+                        "msgInsufficentSpaceForBackup",
+                        "There was not enough space on drive {0} for the backup.",
+                        null,
+                        LocDB.MessageTypes.Warning);
 					return false;
 				}
 			}
@@ -201,11 +214,17 @@ namespace OurWord
 			}
 			catch (UnauthorizedAccessException)
 			{
-                Messages.NoPermissionToWriteFile(BackupPathName);
+                LocDB.Message("msgNoPermissionToWriteFile",
+                    "You do not have system permission to write the file: \n\n    {0}.",
+                    new string[] { BackupPathName },
+                    LocDB.MessageTypes.Error);
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-                Messages.UnableToSaveFile(BackupPathName);
+                LocDB.Message("msgUnableToSaveFile",
+                    "Unable to save the file: '{0}.'",
+                    new string[] { BackupPathName },
+                    LocDB.MessageTypes.Error);
 			}
 
 			// Delete older files if appropriate
@@ -377,10 +396,14 @@ namespace OurWord
 		{
 			FolderBrowserDialog dlg = new FolderBrowserDialog();
 
-            dlg.Description = G.GetLoc_Files("BrowseForBackupFolderDescr", 
+            dlg.Description = LocDB.GetValue(
+                new string[] { "Strings", "Files" },
+                "BrowseForBackupFolderDescr",
                 "Select the folder where you wish to place your backup files. If " +
-                "possible, this should not be your hard drive. A flash card is ideal; " +
-                "or a floppy drive can also be used.");  
+                    "possible, this should not be your hard drive. A flash card is ideal; " +
+                    "or a floppy drive can also be used.",  
+                null,
+                null);
 
 			dlg.RootFolder  = Environment.SpecialFolder.MyComputer;
 			if (DialogResult.OK == dlg.ShowDialog())

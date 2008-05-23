@@ -246,8 +246,35 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: virtual void OnSelectAndScrollFromFootnote(DFootnote footnote)
-        public virtual void OnSelectAndScrollFromFootnote(DFootnote footnote)
+
+        public OWPara FindOWParaContainingFootnoteLetter(DFootnote footnote)
+        {
+            // Find the paragraph containing the icon which references this note
+            foreach (Row row in Rows)
+            {
+                foreach (Row.Pile pile in row.Piles)
+                {
+                    foreach (OWPara para in pile.Paragraphs)
+                    {
+                        foreach (OWPara.EBlock block in para.Blocks)
+                        {
+                            OWPara.ESeeAlso also = block as OWPara.ESeeAlso;
+                            OWPara.EFootLetter letter = block as OWPara.EFootLetter;
+                            if ((also != null && also.Footnote == footnote) ||
+                                 (letter != null && letter.Footnote == footnote))
+                            {
+                                return para;
+                            }
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+
+        #region Method: void OnSelectAndScrollFromFootnote(DFootnote footnote)
+        public void OnSelectAndScrollFromFootnote(DFootnote footnote)
         {
             // Find the paragraph containing the icon which references this note
             foreach (Row row in Rows)
@@ -2880,6 +2907,15 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
+        #region Attr{g}: bool HasSelection
+        public bool HasSelection
+        {
+            get
+            {
+                return (null != Selection);
+            }
+        }
+        #endregion
 
         // Command Routing -------------------------------------------------------------------
         #region Method: override bool IsInputKey(Keys keyData) - T if EPanel processes this key
@@ -3091,6 +3127,9 @@ namespace OurWord.Edit
             if (HandleLockedFromEditing())
                 return;
 
+            if (!HasSelection)
+                return;
+
             if (Selection.Paragraph.JoinParagraph(OWPara.DeleteMode.kDelete))
                 return;
 
@@ -3101,6 +3140,9 @@ namespace OurWord.Edit
         public void cmdBackspace()
         {
             if (HandleLockedFromEditing())
+                return;
+
+            if (!HasSelection)
                 return;
 
             if (Selection.Paragraph.JoinParagraph(OWPara.DeleteMode.kBackSpace))
@@ -3115,12 +3157,18 @@ namespace OurWord.Edit
             if (HandleLockedFromEditing())
                 return;
 
+            if (!HasSelection)
+                return;
+
             (new DeleteAction(this, DeleteAction.DeleteMode.kCut)).Do();
         }
         #endregion
         #region URCmd: cmdCopy
         public void cmdCopy()
         {
+            if (!HasSelection)
+                return;
+
             (new DeleteAction(this, DeleteAction.DeleteMode.kCopy)).Do();
         }
         #endregion
@@ -3130,7 +3178,7 @@ namespace OurWord.Edit
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
 
-            if (!Char.IsControl(e.KeyChar))
+            if (!Char.IsControl(e.KeyChar) && HasSelection)
             {
                 (new TypingAction(this, e.KeyChar)).Do();
                 e.Handled = true;
@@ -3142,6 +3190,9 @@ namespace OurWord.Edit
         #region URCmd: cmdPaste
         public void cmdPaste()
         {
+            if (!HasSelection)
+                return;
+
             (new PasteAction(this)).Do();
         }
         #endregion

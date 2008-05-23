@@ -1280,17 +1280,20 @@
     <Item ID="Title">
       <English>Setup Features</English>
     </Item>
-    <Item ID="m_btnResetDefaults">
-      <English>Reset Defaults</English>
-    </Item>
-    <Item ID="m_btnPasswordProtect">
-      <English>&amp;Password Protect...</English>
-    </Item>
     <Item ID="m_btnAllOff">
       <English>All O&amp;ff</English>
     </Item>
     <Item ID="m_btnAllOn">
       <English>All &amp;On</English>
+    </Item>
+    <Item ID="m_btnResetDefaults">
+      <English>Reset &amp;Defaults</English>
+    </Item>
+    <Item ID="m_btnPasswordProtect">
+      <English>&amp;Password Protect...</English>
+    </Item>
+    <Item ID="m_btnJustTheBasics">
+      <English>&amp;Just The Basic Features</English>
     </Item>
     <Item ID="m_box">
       <English>Description</English>
@@ -1393,9 +1396,6 @@
     </Item>
     <Item ID="m_checkListFeatures">
       <English>Just the Basics</English>
-    </Item>
-    <Item ID="m_btnJustTheBasics">
-      <English>Just The Basic Features</English>
     </Item>
     <Item ID="fGoTo_Chapter_CheckBox">
       <English>Chapter Button</English>

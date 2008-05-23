@@ -119,6 +119,7 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BackupSystem.cs" />
     <Compile Include="JW_FeaturesPassword.cs">
       <SubType>Form</SubType>
     </Compile>

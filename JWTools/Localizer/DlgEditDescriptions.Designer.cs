@@ -91,6 +91,8 @@ namespace JWTools
             this.Controls.Add(this.m_lblGroupDescription);
             this.Controls.Add(this.m_btnOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "DlgEditDescriptions";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
