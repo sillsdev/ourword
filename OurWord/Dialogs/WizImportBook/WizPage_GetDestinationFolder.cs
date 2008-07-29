@@ -94,7 +94,7 @@ namespace OurWord.Dialogs.WizImportBook
         #region Method: void ShowHelp()
         public void ShowHelp()
         {
-            HelpSystem.Show_WizImportBook_WhereToStore();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kImportBook);
         }
         #endregion
 

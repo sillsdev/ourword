@@ -339,7 +339,7 @@ namespace OurWord.Dialogs
 		#region Cmd: cmdHelp(...) - Help button clicked
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			HelpSystem.Show_DlgRestoreFromBackup();
+			HelpSystem.ShowTopic(HelpSystem.Topic.kAutoBackup);
 		}
 		#endregion
 	}

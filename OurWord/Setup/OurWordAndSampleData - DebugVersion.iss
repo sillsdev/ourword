@@ -2,9 +2,7 @@
 Source: ..\bin\Debug\OurWord.exe; DestDir: {app}
 Source: ..\bin\Debug\JWTools.dll; DestDir: {app}
 Source: ..\bin\Debug\JWdb.dll; DestDir: {app}
-Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.chm; DestDir: {app}\Help
-Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\Table of Contents.hhc; DestDir: {app}\Help
-Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.HHK; DestDir: {app}\Help
+Source: ..\Help\OurWordHelp.chm; DestDir: {app}\Help
 Source: SampleData\*.*; DestDir: {userdocs}\OurWordSample; Flags: recursesubdirs createallsubdirs
 Source: ..\Loc\*.*; DestDir: {commonappdata}\OurWord\Loc
 Source: ..\..\lib\Palaso.Services.dll; DestDir: {app}
@@ -37,7 +35,7 @@ UninstallDisplayIcon=
 UninstallDisplayName=Our Word!
 WindowVisible=true
 WindowResizable=true
-OutputBaseFilename=SetupOurWord - Debug Versioin
+OutputBaseFilename=SetupOurWord - Debug Version
 ShowTasksTreeLines=true
 AppID={{B5CC113B-597C-4E1C-9C15-CDF7912E8BC2}
 AppendDefaultDirName=true

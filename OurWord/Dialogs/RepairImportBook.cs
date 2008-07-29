@@ -152,7 +152,7 @@ namespace OurWord.Dialogs
         #endregion
 
         // Command Handlers ------------------------------------------------------------------
-
+        #region Method: string[] LoadFile(string sPathName)
         protected string[] LoadFile(string sPathName)
             // Loads the file into the RichTextBox. We can't use the RTF Box's LoadFile,
             // because it appears to want to munge up the UTF8's. 
@@ -178,7 +178,7 @@ namespace OurWord.Dialogs
 
             return v;
         }
-
+        #endregion
         #region Cmd: cmdLoad - dlg has been invoked; load the file, scroll to the correct line, etc.
         protected virtual void cmdLoad(object sender, System.EventArgs e)
 		{

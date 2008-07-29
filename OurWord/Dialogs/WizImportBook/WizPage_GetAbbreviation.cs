@@ -30,24 +30,26 @@ namespace OurWord.Dialogs.WizImportBook
     public partial class WizPage_GetAbbreviation : UserControl, IJW_WizPage
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: WizImportBook Wizard - the owning wizard
-        WizImportBook Wizard
+        #region VAttr{g}: JW_Wizard Wizard - the owning wizard
+        JW_Wizard Wizard
         {
             get
             {
-                Debug.Assert(null != Parent as WizImportBook);
-                return Parent as WizImportBook;
+                Debug.Assert(null != Parent as JW_Wizard);
+                return Parent as JW_Wizard;
             }
         }
         #endregion
-        #region VAttr{g}: DTranslation Translation - the translation into which we are importing
-        DTranslation Translation
+        #region Attr{g}: DTranslation Translation
+        public DTranslation Translation
         {
             get
             {
-                return Wizard.Translation;
+                Debug.Assert(null != m_Translation);
+                return m_Translation;
             }
         }
+        DTranslation m_Translation = null;
         #endregion
 
         // Books ListView Control ------------------------------------------------------------
@@ -106,10 +108,25 @@ namespace OurWord.Dialogs.WizImportBook
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public WizPage_GetAbbreviation()
+        #region Constructor(DTranslation, string sWhichBook)
+        public WizPage_GetAbbreviation(DTranslation _translation, string sWhichBook)
         {
             InitializeComponent();
+
+            // Store the translation for further reference
+            m_Translation = _translation;
+
+            // Label: "Which book are you importing / creating?"
+            m_labelWhichBook.Text = sWhichBook;
+        }
+        #endregion
+        #region Attr{g}: Control[] vExclude
+        public Control[] vExclude
+        {
+            get
+            {
+                return new Control[] { m_labelWhichBook };
+            }
         }
         #endregion
 
@@ -146,7 +163,7 @@ namespace OurWord.Dialogs.WizImportBook
         #region Method: void ShowHelp()
         public void ShowHelp()
         {
-            HelpSystem.Show_WizImportBook_IdentifyBook();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kImportBook);
         }
         #endregion
 

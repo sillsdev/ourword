@@ -219,7 +219,7 @@ namespace JWTools
                     new string[] { BackupPathName },
                     LocDB.MessageTypes.Error);
 			}
-			catch (Exception e)
+			catch (Exception)
 			{
                 LocDB.Message("msgUnableToSaveFile",
                     "Unable to save the file: '{0}.'",

@@ -451,7 +451,7 @@ namespace OurWord.Dialogs
 		#region Handler: cmdHelp
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			HelpSystem.Show_DlgCreateTranslation();
+            HelpSystem.ShowDefaultTopic();
 		}
 		#endregion
 	}

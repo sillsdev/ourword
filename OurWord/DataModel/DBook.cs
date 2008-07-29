@@ -82,7 +82,7 @@ namespace OurWord.DataModel
 				m_sPathName = value;
 				if (value == "")
 					m_lblPathName.Text = "(No File Name)";
-				m_lblPathName.Text = JWU.PathEllipses(value, 38);
+				m_lblPathName.Text = JWU.PathEllipses(value, 50);
 			}
 		}
 		private string m_sPathName = "";
@@ -108,17 +108,6 @@ namespace OurWord.DataModel
 		}
 		private DTranslation m_Translation = null;
 		#endregion
-
-		private System.Windows.Forms.TextBox m_editCopyright;
-		private System.Windows.Forms.Label m_lblCopyright;
-		#region Attr{g/s}: string BookName = the contents of the Name control
-		public string BookName
-		{
-			get { return m_textName.Text; }
-			set { m_textName.Text = value; }
-		}
-		#endregion
-
 		#region Attr{g/s}: string Stage - the text of the Stage combo (Abbrev of TranslationStage)
 		public string Stage
 		{
@@ -147,82 +136,16 @@ namespace OurWord.DataModel
 		#endregion
 
 		// Methods ---------------------------------------------------------------------------
-		#region Method: void SetFocusOnName() - selects the name and sets focus to it
-		public void SetFocusOnName()
-		{
-			m_textName.Focus();
-			m_textName.Select();
-		}
-		#endregion
-		#region Method: void SetFocusOnPathBrowse() - selects the name and sets focus to it
-		public void SetFocusOnPathBrowse()
-		{
-			m_btnBrowseFileName.Focus();
-			m_btnBrowseFileName.Select();
-		}
-		#endregion
-		#region Method: bool ValidateData() - make sure it is OK to close the dialog
-		public bool ValidateData()
-			// I do this as a separate method, rather than having it in the OnClosing handler,
-			// so that the NUnit tests can call it easily.
-		{
-			// The book's name should have a non-zero length, signifying that the user has
-			// indeed entered a name.
-			if ( BookName.Length == 0 )
-			{
-                Messages.BookNeedsName();
-                SetFocusOnName();
-				return false;
-			}
-
-			// The book's name cannot be identical to the title of any other book in the
-			// translation; as it doesn't make sense to have identical book names.
-			foreach(DBook b in Translation.Books)
-			{
-				if (b.DisplayName == BookName && b != Book)
-				{
-                    Messages.DuplicateBookName();
-                    SetFocusOnName();
-					return false;
-				}
-			}
-
-			// The translation's path name should be to a valid file. (This should
-			// only be possible for Create and Import modes; Properties mode does not
-			// permit editing of the filename.)
-			if ( m_sPathName.Length == 0 || Path.GetFileName(m_sPathName).Length == 0)
-			{
-				if (Mode.kCreate == m_Mode)
-					Messages.BookNeedsFolder();
-				else // kImport
-					Messages.BookNeedsImportFilename();
-				SetFocusOnPathBrowse();
-				return false;
-			}
-
-			// No problems found
-			return true;
-		}
-		#endregion
 		#region Method: void UpdateTitleBar() - synch up Title Bar with contents of Name field
 		public void UpdateTitleBar()
 		{
-			if (BookName.Length == 0)
-				Text = StrRes.Properties_Book;
-			else
-			{
-				Text = StrRes.Properties( BookName.Trim() );
-			}
+				Text = StrRes.Properties( Book.DisplayName );
 		}
 		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
-		public enum Mode { kCreate, kProperties };
-		Mode m_Mode = Mode.kProperties;
-
 		#region Constructor(TFront, DTranslation, DBook, Mode)
-		public DBookProperties(DTranslation tFront, DTranslation translation, 
-			DBook book, Mode mode)
+		public DBookProperties(DTranslation tFront, DTranslation translation, DBook book)
 		{
 			// Required for Windows Form Designer support
 			InitializeComponent();
@@ -231,7 +154,6 @@ namespace OurWord.DataModel
 			m_book = book;
 			m_Translation = translation;
 			m_TFront = tFront;
-			m_Mode = mode;
 		}
 		#endregion
 		#region Windows Form Designer generated code
@@ -264,14 +186,9 @@ namespace OurWord.DataModel
             this.m_btnOK = new System.Windows.Forms.Button();
             this.m_textComment = new System.Windows.Forms.TextBox();
             this.m_lblComment = new System.Windows.Forms.Label();
-            this.m_lbName = new System.Windows.Forms.Label();
-            this.m_lblAbbrevation = new System.Windows.Forms.Label();
-            this.m_comboAbbreviation = new System.Windows.Forms.ComboBox();
             this.m_lblFile = new System.Windows.Forms.Label();
             this.m_lblPathName = new System.Windows.Forms.Label();
-            this.m_btnBrowseFileName = new System.Windows.Forms.Button();
             this.m_btnCancel = new System.Windows.Forms.Button();
-            this.m_textName = new System.Windows.Forms.Label();
             this.m_comboStage = new System.Windows.Forms.ComboBox();
             this.m_spinVersion = new System.Windows.Forms.DomainUpDown();
             this.m_lblExtension = new System.Windows.Forms.Label();
@@ -292,69 +209,42 @@ namespace OurWord.DataModel
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(264, 408);
+            this.m_btnHelp.Location = new System.Drawing.Point(278, 329);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.m_btnHelp.TabIndex = 10;
+            this.m_btnHelp.TabIndex = 8;
             this.m_btnHelp.Text = "Help...";
             this.m_btnHelp.Click += new System.EventHandler(this.cmdHelp);
             // 
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(88, 408);
+            this.m_btnOK.Location = new System.Drawing.Point(102, 329);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
-            this.m_btnOK.TabIndex = 8;
+            this.m_btnOK.TabIndex = 6;
             this.m_btnOK.Text = "OK";
             // 
             // m_textComment
             // 
-            this.m_textComment.Location = new System.Drawing.Point(8, 320);
+            this.m_textComment.Location = new System.Drawing.Point(7, 236);
             this.m_textComment.Multiline = true;
             this.m_textComment.Name = "m_textComment";
-            this.m_textComment.Size = new System.Drawing.Size(440, 64);
-            this.m_textComment.TabIndex = 7;
+            this.m_textComment.Size = new System.Drawing.Size(440, 75);
+            this.m_textComment.TabIndex = 5;
             // 
             // m_lblComment
             // 
-            this.m_lblComment.Location = new System.Drawing.Point(8, 304);
+            this.m_lblComment.Location = new System.Drawing.Point(7, 220);
             this.m_lblComment.Name = "m_lblComment";
             this.m_lblComment.Size = new System.Drawing.Size(100, 16);
             this.m_lblComment.TabIndex = 21;
             this.m_lblComment.Text = "Comment:";
             this.m_lblComment.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // m_lbName
-            // 
-            this.m_lbName.Location = new System.Drawing.Point(8, 48);
-            this.m_lbName.Name = "m_lbName";
-            this.m_lbName.Size = new System.Drawing.Size(72, 23);
-            this.m_lbName.TabIndex = 22;
-            this.m_lbName.Text = "Book Name:";
-            this.m_lbName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_lblAbbrevation
-            // 
-            this.m_lblAbbrevation.Location = new System.Drawing.Point(8, 16);
-            this.m_lblAbbrevation.Name = "m_lblAbbrevation";
-            this.m_lblAbbrevation.Size = new System.Drawing.Size(72, 23);
-            this.m_lblAbbrevation.TabIndex = 24;
-            this.m_lblAbbrevation.Text = "Abbrevation:";
-            this.m_lblAbbrevation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_comboAbbreviation
-            // 
-            this.m_comboAbbreviation.Location = new System.Drawing.Point(88, 16);
-            this.m_comboAbbreviation.MaxDropDownItems = 15;
-            this.m_comboAbbreviation.Name = "m_comboAbbreviation";
-            this.m_comboAbbreviation.Size = new System.Drawing.Size(360, 21);
-            this.m_comboAbbreviation.TabIndex = 1;
-            this.m_comboAbbreviation.TextChanged += new System.EventHandler(this.cmdOnComboSelection);
-            // 
             // m_lblFile
             // 
-            this.m_lblFile.Location = new System.Drawing.Point(8, 80);
+            this.m_lblFile.Location = new System.Drawing.Point(13, 66);
             this.m_lblFile.Name = "m_lblFile";
             this.m_lblFile.Size = new System.Drawing.Size(72, 23);
             this.m_lblFile.TabIndex = 26;
@@ -364,63 +254,69 @@ namespace OurWord.DataModel
             // m_lblPathName
             // 
             this.m_lblPathName.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_lblPathName.Location = new System.Drawing.Point(88, 80);
+            this.m_lblPathName.Location = new System.Drawing.Point(89, 66);
             this.m_lblPathName.Name = "m_lblPathName";
-            this.m_lblPathName.Size = new System.Drawing.Size(280, 23);
+            this.m_lblPathName.Size = new System.Drawing.Size(343, 23);
             this.m_lblPathName.TabIndex = 27;
             this.m_lblPathName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_btnBrowseFileName
-            // 
-            this.m_btnBrowseFileName.Location = new System.Drawing.Point(376, 80);
-            this.m_btnBrowseFileName.Name = "m_btnBrowseFileName";
-            this.m_btnBrowseFileName.Size = new System.Drawing.Size(75, 23);
-            this.m_btnBrowseFileName.TabIndex = 2;
-            this.m_btnBrowseFileName.Text = "Browse...";
-            this.m_btnBrowseFileName.Click += new System.EventHandler(this.cmd_btnBrowse_clicked);
             // 
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(176, 408);
+            this.m_btnCancel.Location = new System.Drawing.Point(190, 329);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.m_btnCancel.TabIndex = 9;
+            this.m_btnCancel.TabIndex = 7;
             this.m_btnCancel.Text = "Cancel";
-            // 
-            // m_textName
-            // 
-            this.m_textName.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_textName.Location = new System.Drawing.Point(88, 48);
-            this.m_textName.Name = "m_textName";
-            this.m_textName.Size = new System.Drawing.Size(360, 23);
-            this.m_textName.TabIndex = 29;
-            this.m_textName.Text = "(Book Name)";
-            this.m_textName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_textName.TextChanged += new System.EventHandler(this.cmd_textName_TextChanged);
             // 
             // m_comboStage
             // 
-            this.m_comboStage.Location = new System.Drawing.Point(189, 32);
+            this.m_comboStage.Location = new System.Drawing.Point(190, 32);
             this.m_comboStage.Name = "m_comboStage";
             this.m_comboStage.Size = new System.Drawing.Size(132, 21);
-            this.m_comboStage.TabIndex = 3;
+            this.m_comboStage.TabIndex = 1;
             this.m_comboStage.Text = "Draft";
-            this.m_comboStage.TextChanged += new System.EventHandler(this.cmdOnStageChanged);
+            this.m_comboStage.TextChanged += new System.EventHandler(this.cmdStageChanged);
             // 
             // m_spinVersion
             // 
+            this.m_spinVersion.Items.Add("A");
+            this.m_spinVersion.Items.Add("B");
+            this.m_spinVersion.Items.Add("C");
+            this.m_spinVersion.Items.Add("D");
+            this.m_spinVersion.Items.Add("E");
+            this.m_spinVersion.Items.Add("F");
+            this.m_spinVersion.Items.Add("G");
+            this.m_spinVersion.Items.Add("H");
+            this.m_spinVersion.Items.Add("I");
+            this.m_spinVersion.Items.Add("J");
+            this.m_spinVersion.Items.Add("K");
+            this.m_spinVersion.Items.Add("L");
+            this.m_spinVersion.Items.Add("M");
+            this.m_spinVersion.Items.Add("N");
+            this.m_spinVersion.Items.Add("O");
+            this.m_spinVersion.Items.Add("P");
+            this.m_spinVersion.Items.Add("Q");
+            this.m_spinVersion.Items.Add("R");
+            this.m_spinVersion.Items.Add("S");
+            this.m_spinVersion.Items.Add("T");
+            this.m_spinVersion.Items.Add("U");
+            this.m_spinVersion.Items.Add("Z");
+            this.m_spinVersion.Items.Add("V");
+            this.m_spinVersion.Items.Add("W");
+            this.m_spinVersion.Items.Add("Y");
+            this.m_spinVersion.Items.Add("Z");
             this.m_spinVersion.Location = new System.Drawing.Point(330, 32);
             this.m_spinVersion.Name = "m_spinVersion";
             this.m_spinVersion.Size = new System.Drawing.Size(48, 20);
-            this.m_spinVersion.TabIndex = 4;
+            this.m_spinVersion.TabIndex = 2;
             this.m_spinVersion.Text = "A";
             this.m_spinVersion.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // m_lblExtension
             // 
             this.m_lblExtension.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_lblExtension.Location = new System.Drawing.Point(392, 160);
+            this.m_lblExtension.Location = new System.Drawing.Point(395, 44);
             this.m_lblExtension.Name = "m_lblExtension";
             this.m_lblExtension.Size = new System.Drawing.Size(48, 21);
             this.m_lblExtension.TabIndex = 33;
@@ -430,7 +326,7 @@ namespace OurWord.DataModel
             // m_lblLanguageAbbrev
             // 
             this.m_lblLanguageAbbrev.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_lblLanguageAbbrev.Location = new System.Drawing.Point(24, 160);
+            this.m_lblLanguageAbbrev.Location = new System.Drawing.Point(27, 44);
             this.m_lblLanguageAbbrev.Name = "m_lblLanguageAbbrev";
             this.m_lblLanguageAbbrev.Size = new System.Drawing.Size(64, 21);
             this.m_lblLanguageAbbrev.TabIndex = 34;
@@ -439,7 +335,7 @@ namespace OurWord.DataModel
             // 
             // m_labelLanguageAbbrev
             // 
-            this.m_labelLanguageAbbrev.Location = new System.Drawing.Point(24, 144);
+            this.m_labelLanguageAbbrev.Location = new System.Drawing.Point(27, 28);
             this.m_labelLanguageAbbrev.Name = "m_labelLanguageAbbrev";
             this.m_labelLanguageAbbrev.Size = new System.Drawing.Size(72, 16);
             this.m_labelLanguageAbbrev.TabIndex = 36;
@@ -471,15 +367,17 @@ namespace OurWord.DataModel
             // 
             // m_boxFileName
             // 
+            this.m_boxFileName.Controls.Add(this.m_comboStage);
             this.m_boxFileName.Controls.Add(this.m_spinVersion);
             this.m_boxFileName.Controls.Add(this.m_labelVersion);
-            this.m_boxFileName.Controls.Add(this.m_comboStage);
             this.m_boxFileName.Controls.Add(this.m_labelStage);
             this.m_boxFileName.Controls.Add(this.m_labelBookAbbrev);
             this.m_boxFileName.Controls.Add(this.m_lblBookAbbrev);
-            this.m_boxFileName.Location = new System.Drawing.Point(8, 128);
+            this.m_boxFileName.Controls.Add(this.m_lblFile);
+            this.m_boxFileName.Controls.Add(this.m_lblPathName);
+            this.m_boxFileName.Location = new System.Drawing.Point(11, 12);
             this.m_boxFileName.Name = "m_boxFileName";
-            this.m_boxFileName.Size = new System.Drawing.Size(440, 64);
+            this.m_boxFileName.Size = new System.Drawing.Size(440, 99);
             this.m_boxFileName.TabIndex = 41;
             this.m_boxFileName.TabStop = false;
             this.m_boxFileName.Text = "File Name";
@@ -496,47 +394,40 @@ namespace OurWord.DataModel
             // 
             // m_checkLocked
             // 
-            this.m_checkLocked.Location = new System.Drawing.Point(8, 224);
+            this.m_checkLocked.Location = new System.Drawing.Point(11, 130);
             this.m_checkLocked.Name = "m_checkLocked";
             this.m_checkLocked.Size = new System.Drawing.Size(440, 24);
-            this.m_checkLocked.TabIndex = 5;
+            this.m_checkLocked.TabIndex = 3;
             this.m_checkLocked.Text = "Locked: Editing is not permitted. (\"To Do\" notes can be added.)";
             // 
             // m_lblCopyright
             // 
-            this.m_lblCopyright.Location = new System.Drawing.Point(8, 256);
+            this.m_lblCopyright.Location = new System.Drawing.Point(8, 157);
             this.m_lblCopyright.Name = "m_lblCopyright";
-            this.m_lblCopyright.Size = new System.Drawing.Size(56, 23);
+            this.m_lblCopyright.Size = new System.Drawing.Size(71, 23);
             this.m_lblCopyright.TabIndex = 44;
             this.m_lblCopyright.Text = "Copyright:";
-            this.m_lblCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.m_lblCopyright.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
             // m_editCopyright
             // 
-            this.m_editCopyright.Location = new System.Drawing.Point(88, 256);
+            this.m_editCopyright.Location = new System.Drawing.Point(10, 183);
             this.m_editCopyright.Name = "m_editCopyright";
-            this.m_editCopyright.Size = new System.Drawing.Size(360, 20);
-            this.m_editCopyright.TabIndex = 6;
+            this.m_editCopyright.Size = new System.Drawing.Size(440, 20);
+            this.m_editCopyright.TabIndex = 4;
             // 
             // DBookProperties
             // 
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
-            this.ClientSize = new System.Drawing.Size(458, 440);
+            this.ClientSize = new System.Drawing.Size(458, 361);
             this.Controls.Add(this.m_editCopyright);
+            this.Controls.Add(this.m_checkLocked);
             this.Controls.Add(this.m_textComment);
             this.Controls.Add(this.m_lblCopyright);
-            this.Controls.Add(this.m_checkLocked);
             this.Controls.Add(this.m_labelLanguageAbbrev);
             this.Controls.Add(this.m_lblLanguageAbbrev);
             this.Controls.Add(this.m_lblExtension);
-            this.Controls.Add(this.m_textName);
             this.Controls.Add(this.m_btnCancel);
-            this.Controls.Add(this.m_btnBrowseFileName);
-            this.Controls.Add(this.m_lblPathName);
-            this.Controls.Add(this.m_lblFile);
-            this.Controls.Add(this.m_comboAbbreviation);
-            this.Controls.Add(this.m_lblAbbrevation);
-            this.Controls.Add(this.m_lbName);
             this.Controls.Add(this.m_lblComment);
             this.Controls.Add(this.m_btnHelp);
             this.Controls.Add(this.m_btnOK);
@@ -548,8 +439,8 @@ namespace OurWord.DataModel
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Book Properties";
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmd_OnClosing);
-            this.Load += new System.EventHandler(this.cmd_OnLoad);
+            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
+            this.Load += new System.EventHandler(this.cmdLoad);
             this.m_boxFileName.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -557,19 +448,16 @@ namespace OurWord.DataModel
 		}
 		#endregion
 		#region Dialog Controls
+        private TextBox m_editCopyright;
+		private Label m_lblCopyright;
 		private Button   m_btnHelp;
 		private CheckBox m_checkLocked;
 		private TextBox  m_textComment;
 		private Label    m_lblComment;
-		private Button   m_btnOK;
-		private Label    m_lbName;
-		private Label    m_lblAbbrevation;
+        private Button m_btnOK;
 		private Label    m_lblFile;
-		private Label    m_lblPathName;
-		private ComboBox m_comboAbbreviation;
-		private Button   m_btnBrowseFileName;
-		private Button   m_btnCancel;
-		private Label    m_textName;
+        private Label m_lblPathName;
+        private Button m_btnCancel;
 		private ComboBox m_comboStage;
         private DomainUpDown m_spinVersion;
 		private Label    m_lblExtension;
@@ -581,112 +469,26 @@ namespace OurWord.DataModel
 		private GroupBox m_boxFileName;
 		private Label    m_lblBookAbbrev;
 		#endregion
-		#region Method: void InitializeComboBox(string sDefaultBookAbbrev)
-		private void InitializeComboBox(string sDefaultBookAbbrev)
-			// The combo is only enabled for Creating or Importing a book (as opposed to
-			// editing Properties), so we only want to show possibilities for a new
-			// book. The different scenarios are commented in the code.
-		{
-			m_comboAbbreviation.Items.Clear();
-
-			// (1) No front translation. This could be a sibling or reference translation,
-			// or it could be the case where the Front hasn't been declared yet. We just
-			// list all of the possible books, rather than try to program each possible
-			// situation, as it doesn't seem like a frequent-enough event to worry about.
-			if (null == TFront)
-			{
-				foreach( string sBookAbbrev in DBook.BookAbbrevs)
-				{
-					if (null == Translation.FindBook( sBookAbbrev ))
-						m_comboAbbreviation.Items.Add( sBookAbbrev );
-				}
-			}
-
-			// (2) We are doing the front translation. Show all books which we have not 
-			// yet started.
-			else if (TFront == Translation)
-			{
-				if (m_Mode == Mode.kProperties)
-				{
-					foreach( string sBookAbbrev in DBook.BookAbbrevs)
-						m_comboAbbreviation.Items.Add( sBookAbbrev );
-				}
-				else
-				{
-					foreach( string sBookAbbrev in DBook.BookAbbrevs)
-					{
-						if (null == TFront.FindBook( sBookAbbrev ))
-							m_comboAbbreviation.Items.Add( sBookAbbrev );
-					}
-				}
-			}
-
-			// (3) We are doing a Target translation. Show all books in the Front which
-			// have not been started in the target. If this results in no books (the 
-			// target has translated everything that exists in the front), we disable the
-			// combo.
-			else
-			{
-				foreach( DBook b in TFront.Books)
-				{
-					if (null == Translation.FindBook( b.BookAbbrev ))
-						m_comboAbbreviation.Items.Add( b.BookAbbrev );
-				}
-				if (0 == m_comboAbbreviation.Items.Count)
-					m_comboAbbreviation.Enabled = false;
-			}
-
-			// For the Text, we want to show the default. Thus we must make sure
-			// the default is one of the possibilities.
-			if (-1 == m_comboAbbreviation.Items.IndexOf(sDefaultBookAbbrev))
-				m_comboAbbreviation.Items.Add( sDefaultBookAbbrev );
-			m_comboAbbreviation.Text = sDefaultBookAbbrev;
-		}
-		#endregion
 
 		// Command Handlers ------------------------------------------------------------------
-		#region Cmd: cmd_OnLoad(...) - the dialog is loading; initialize the control contents
-		private void cmd_OnLoad(object sender, System.EventArgs e)
+		#region Cmd: cmdLoad(...) - the dialog is loading; initialize the control contents
+		private void cmdLoad(object sender, System.EventArgs e)
 		{
 			// Label text in the appropriate language
-			m_lblAbbrevation.Text      = DlgBookPropsRes.Abbreviation;
-			m_lbName.Text              = DlgBookPropsRes.BookName;
 			m_lblFile.Text             = DlgBookPropsRes.Folder;
-			m_btnBrowseFileName.Text   = DlgBookPropsRes.Browse;
 			m_boxFileName.Text         = DlgBookPropsRes.FileName;
 			m_labelLanguageAbbrev.Text = DlgBookPropsRes.LanguageAbbrev;
 			m_labelBookAbbrev.Text     = DlgBookPropsRes.Book;
 			m_labelStage.Text          = DlgBookPropsRes.Stage;
 			m_labelVersion.Text        = DlgBookPropsRes.Version;
+			m_lblFile.Text             = DlgBookPropsRes.Folder;
 			m_checkLocked.Text         = DlgBookPropsRes.Locked;
 			m_lblComment.Text          = DlgBookPropsRes.Comment;
 			m_lblCopyright.Text        = DlgBookPropsRes.Copyright;
 			m_btnOK.Text               = DlgBookPropsRes.OK;
 			m_btnCancel.Text           = DlgBookPropsRes.Cancel;
 			m_btnHelp.Text             = DlgBookPropsRes.Help;
-
-			// Changes depending upon the mode (Create / Import / Properties)
-			switch (m_Mode)
-			{
-				case Mode.kCreate:
-					m_comboAbbreviation.Enabled = true;
-					m_btnBrowseFileName.Visible = true;
-					m_checkLocked.Enabled = false;
-					m_lblFile.Text  = DlgBookPropsRes.Folder;
-                    if (Book.AbsolutePathName.Length > 0)
-                        BookPath = Path.GetDirectoryName(Book.AbsolutePathName);
-					break;
-
-				case Mode.kProperties:
-					// We don't allow much to be changed; so lots gets disabled.
-					m_comboAbbreviation.Enabled = false;
-					m_btnBrowseFileName.Visible = false;
-					m_lblPathName.Size = m_comboAbbreviation.Size;
-					m_lblFile.Text  = DlgBookPropsRes.Folder;
-                    if (Book.AbsolutePathName.Length > 0)
-                        BookPath = Path.GetDirectoryName(Book.AbsolutePathName);
-					break;
-			}
+			UpdateTitleBar();
 
 			// File Name Parts
 			DTeamSettings ts = G.TeamSettings;
@@ -695,14 +497,8 @@ namespace OurWord.DataModel
 			G.TranslationStages.PopulateCombo(m_comboStage);
 			Stage   = Book.TranslationStage.Abbrev;
 			Version = Book.Version;
-
-			// Book Name
-			m_textName.Font = new Font("Arial", 10, FontStyle.Bold);
-			m_textName.Text = Book.DisplayName;
-			UpdateTitleBar();
-
-			// Book Abbreviation
-			InitializeComboBox(Book.BookAbbrev);
+            if (Book.AbsolutePathName.Length > 0)
+                BookPath = Path.GetDirectoryName(Book.AbsolutePathName);
 
 			// IsLocked?
 			m_checkLocked.Checked = Book.Locked;
@@ -713,112 +509,45 @@ namespace OurWord.DataModel
 			// Copyright
 			m_editCopyright.Text = Book.Copyright;
 
-			// Select and set focus on the Name
-			SetFocusOnName();
+            // Initial selection
+            m_comboStage.Focus();
+            m_comboStage.Select();
 		}
 		#endregion
-
-		#region Cmd: cmd_btnBrowse_clicked(...) - user wants to browse for a filename for the book
-		private void cmd_btnBrowse_clicked(object sender, System.EventArgs e)
-		{
-			// We are creating a file, and thus all we need is the folder
-			// to put it in (the filename is generated from the Stage-Version-Minor
-			// settings.
-			FolderBrowserDialog dlgFolder = new FolderBrowserDialog();
-			dlgFolder.Description = DlgBookPropsRes.BrowseFolderDescription;
-
-			// Default to the Data Root folder; if we've browsed before, go to that
-			// folder we last browsed to.
-			dlgFolder.RootFolder = Environment.SpecialFolder.MyComputer;
-			dlgFolder.SelectedPath = G.BrowseDirectory;
-
-			if (DialogResult.OK == dlgFolder.ShowDialog())
-			{
-				BookPath = dlgFolder.SelectedPath;
-				G.BrowseDirectory =  dlgFolder.SelectedPath;
-			}
-		}
-		#endregion
-		#region Cmd: cmd_OnClosing(...) - validate, and stay open if there's a problem
-		private void cmd_OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
+		#region Cmd: cmdClosing(...) - validate, and stay open if there's a problem
+		private void cmdClosing(object sender, System.ComponentModel.CancelEventArgs e)
 		{
 			// We're only interested in further processing if the user has hit the OK
 			// button, signaling he is done and wishes to save his results.
 			if (DialogResult != DialogResult.OK)
 				return;
 
-			// Make sure whatever the use has entered is acceptable (various tests)
-			if (false == ValidateData())
+			// Determine the file name. 
+			string sPathNameI = DBook.ComputePathName(Translation.LanguageAbbrev,
+				Book.BookAbbrev, Book.TranslationStage.Abbrev, Book.Version, BookPath,
+                Book.IsTargetBook);
+
+			// Get the pathname as a result of user actions in the dialog
+			string sPathNameF = DBook.ComputePathName(Translation.LanguageAbbrev,
+				Book.BookAbbrev, Stage, Version, BookPath,
+                Book.IsTargetBook);
+
+			// If the user has asked for a different file name, and if the new
+			// file name exists, then ask the user if he really wants to overwrite
+			// the existing file. Abort if  he asks.
+			if (sPathNameI != sPathNameF && File.Exists(sPathNameF))
 			{
-				e.Cancel = true;
-				return;
-			}
-
-			// Determine the file name. In some cases, we want to be careful that we
-			// don't overwrite an existing file. It depends on the Mode.
-			//
-			// Regarding getting the pathname, we use the "long" version of the method
-			// call rather than the DBook's method because the book is not yet owned
-			// by the translation if this has been invoked via the Create button.
-
-			// For Create Mode, all we want to do is to check if the proposed file name
-			// already exists, and if they therefore want to overwrite it.
-            if (m_Mode == Mode.kCreate)
-			{
-                // We can't use book.IsTargetBook, because it isn't owned at this point.
-                bool bIsTargetBook = (Translation == G.Project.TargetTranslation);
-
-				string sPathName = DBook.ComputePathName(Translation.LanguageAbbrev,
-					m_comboAbbreviation.Text, Stage, Version, BookPath,
-                    bIsTargetBook);
-
-				// Check to see if we're going to overwrite an existing file
-				if (File.Exists(sPathName))
+                if (!Messages.ConfirmFileOverwrite(sPathNameF))
 				{
-                    if (!Messages.ConfirmFileOverwrite(sPathName))
-					{
-						e.Cancel = true;
-						return;
-					}
+					e.Cancel = true;
+					return;
 				}
-
-                Book.AbsolutePathName = sPathName;
 			}
 
-			// For Properties Mode, we have to be most careful, because the user may
-			// not have changed the filename; and we don't want to frighten him with
-			// a You're Gonna Overwrite Your File! message.
-			else if (m_Mode == Mode.kProperties)
-			{
-				// Get the pathname on entering the dialog
-				string sPathNameI = DBook.ComputePathName(Translation.LanguageAbbrev,
-					Book.BookAbbrev, Book.TranslationStage.Abbrev, Book.Version, BookPath,
-                    Book.IsTargetBook);
-
-				// Get the pathname as a result of user actions in the dialog
-				string sPathNameF = DBook.ComputePathName(Translation.LanguageAbbrev,
-					m_comboAbbreviation.Text, Stage, Version, BookPath,
-                    Book.IsTargetBook);
-
-				// If the user has asked for a different file name, and if the new
-				// file name exists, then ask the user if he really wants to overwrite
-				// the existing file. Abort if  he asks.
-				if (sPathNameI != sPathNameF && File.Exists(sPathNameF))
-				{
-                    if (!Messages.ConfirmFileOverwrite(sPathNameF))
-					{
-						e.Cancel = true;
-						return;
-					}
-				}
-
-                Book.AbsolutePathName = sPathNameF;
-			}
+            Book.AbsolutePathName = sPathNameF;
 
 			// If we've made it this far, then we are happy to accept all the changes.
 			// So set the attributes to the main DBook object.
-			Book.DisplayName = BookName;
-			Book.BookAbbrev  = m_comboAbbreviation.Text;
 			Book.Locked      = m_checkLocked.Checked;
 			Book.Comment     = m_textComment.Text;
 			Book.Copyright   = m_editCopyright.Text;
@@ -827,30 +556,8 @@ namespace OurWord.DataModel
             Book.DeclareDirty();
 		}
 		#endregion
-		#region Cmd: cmd_textName_TextChanged(...) - when Name is edited, update the title bar
-		private void cmd_textName_TextChanged(object sender, System.EventArgs e)
-		{
-			UpdateTitleBar();
-		}
-		#endregion
-		#region Cmd: cmdOnComboSelection(...)
-		private void cmdOnComboSelection(object sender, System.EventArgs e)
-		{
-			// Get the selection
-			string sAbbrev = m_comboAbbreviation.Text;
-
-			// Look up the corresponding book name
-			int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
-			if (-1 == iBook)
-				return;
-			BookName = Translation.BookNamesTable[iBook];
-
-			// Update the filename information
-            m_lblBookAbbrev.Text = G.GetLoc_BookAbbrev(sAbbrev);
-		}
-		#endregion
-		#region Cmd: cmdOnStageChanged(...)
-		private void cmdOnStageChanged(object sender, System.EventArgs e)
+		#region Cmd: cmdStageChanged(...)
+		private void cmdStageChanged(object sender, System.EventArgs e)
 		{
 			Version = 'A';
 		}
@@ -858,20 +565,7 @@ namespace OurWord.DataModel
 		#region Cmd: cmdHelp(...) - Help button clicked
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			HelpSystem.Show_DlgBookProperties();
-		}
-		#endregion
-
-		// Special Test Support --------------------------------------------------------------
-		#region Method: bool Test_ComboOffersAbbrev(sAbbrev) - see if combo has, e.g., "GEN" as a choice
-		public bool Test_ComboOffersAbbrev(string sAbbrev)
-		{
-			foreach (string s in m_comboAbbreviation.Items)
-			{
-				if (s == sAbbrev)
-					return true;
-			}
-			return false;
+			HelpSystem.ShowTopic(HelpSystem.Topic.kTranslationStages);
 		}
 		#endregion
 	}
@@ -1660,12 +1354,10 @@ namespace OurWord.DataModel
         #endregion
 
 		// Methods ---------------------------------------------------------------------------
-		#region Method: DialogResult EditProperties(translation, bImporting)
-		public DialogResult EditProperties(DTranslation TFront,
-			DTranslation translation, DBookProperties.Mode mode)
+		#region Method: DialogResult EditProperties(TFront, TTarget)
+		public DialogResult EditProperties(DTranslation TFront,	DTranslation translation)
 		{
-			DBookProperties dlg = new DBookProperties(TFront,
-				translation, this, mode);
+			DBookProperties dlg = new DBookProperties(TFront, translation, this);
 			return dlg.ShowDialog();
 		}
 		#endregion
@@ -2786,9 +2478,7 @@ namespace OurWord.DataModel
 		public Test_DBookProperties()
 			: base("DBookProperties")
 		{
-			AddTest( new IndividualTest( UpdateTitleBar ),           "UpdateTitleBar" );
 //			AddTest( new IndividualTest( EnforcesValidBookName ),    "EnforcesValidBookName" );
-			AddTest( new IndividualTest( ComboDuplicatesPrevented ), "ComboDuplicatesPrevented" );
 //			AddTest( new IndividualTest( EnforcesValidPath ),        "EnforcesValidPath" );
 			AddTest( new IndividualTest( RestoreFromBackup),         "Restore From Backup" );
 		}
@@ -2807,8 +2497,7 @@ namespace OurWord.DataModel
 			m_project.FrontTranslation = m_translation;
 			m_book = new DBook("GEN", "");
 			m_translation.Books.Append(m_book);
-			m_dlg = new DBookProperties(null, m_translation, m_book, 
-				DBookProperties.Mode.kCreate);
+			m_dlg = new DBookProperties(null, m_translation, m_book);
 		}
 		#endregion
 		#region Method: override void TearDown()
@@ -2821,23 +2510,7 @@ namespace OurWord.DataModel
 		}
 		#endregion
 
-		#region UpdateTitleBar
-		public void UpdateTitleBar()
-			// Make sure that the dialog's title bar updates when the text of the
-			// BookName attribute is changed. A command handler fires when the text
-			// is changed; and this handler updates the title bar. This test makes
-			// sure that the title bar is computed as expected, and that the command
-			// handler is indeed firing.
-		{
-			// Set name to an empty string
-			m_dlg.BookName = "";
-			AreSame( StrRes.Properties_Book, m_dlg.Text);
-
-			// Set name to the title of a book
-			m_dlg.BookName = "Test";
-			AreSame( StrRes.Properties("Test"), m_dlg.Text);
-		}
-		#endregion
+        /***
 		#region EnforcesValidBookName
 		public void EnforcesValidBookName()
 			// We want to make certain that the user does not define a DBook with an invalid
@@ -2873,33 +2546,7 @@ namespace OurWord.DataModel
             IsTrue("msgDuplicateBookName" == LocDB.LastMessageID);
 		}
 		#endregion
-		#region ComboDuplicatesPrevented
-		public void ComboDuplicatesPrevented()
-		{
-			// Make sure the combo box does not have "GEN" as a choice
-			IsFalse( m_dlg.Test_ComboOffersAbbrev("GEN") );
-		}
-		#endregion
-		#region EnforcesValidPath
-		public void EnforcesValidPath()
-			// We want to make certain that the user does not define a DBook with an invalid
-			// path. A path is invalid if the filename portion has zero length.
-			//
-			// When an error occurs, the focus should be placed on the offending control.
-			// Unfortunately, I cannot seem to get the test to work; apparently the dialog
-			// must actually be invoked for the focusing to work; I'm electing to not worry
-			// about testing it further here; I've coded it correctly, and it is not a 
-			// showstopper bug if somehow the code gets broken.
-		{
-			m_dlg.BookName = "test";
-			m_dlg.BookPath = "";
-			m_dlg.ValidateData();
-
-			// Should have gotten error that Path is not valid; and dialog should not be exited
-            IsTrue(LocDB.LastMessageID == "msgBookNeedsFolder");
-		}
-		#endregion
-
+        ***/
 		// RestoreFromBackup -----------------------------------------------------------------
 		#region Method: string GetSimpleParagraphText(DParagraph p)
 		string GetSimpleParagraphText(DParagraph p)

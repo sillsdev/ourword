@@ -100,7 +100,7 @@ namespace OurWord.Dialogs.WizImportBook
         #region Method: void ShowHelp()
         public void ShowHelp()
         {
-            HelpSystem.Show_WizImportBook_GetFilename();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kImportBook);
         }
         #endregion
 

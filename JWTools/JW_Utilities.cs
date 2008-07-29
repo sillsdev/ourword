@@ -235,6 +235,15 @@ namespace JWTools
             }
         }
         #endregion
+        #region SAttr{g}: string NUnit_TestFilePathName - returns a test filename
+        static public string NUnit_TestFilePathName
+        {
+            get
+            {
+                return NUnit_TestFileFolder + Path.DirectorySeparatorChar + "test.x";
+            }
+        }
+        #endregion
         #region SMethod: void NUnit_RemoveTestFileFolder()
         static public void NUnit_RemoveTestFileFolder()
         {
@@ -283,107 +292,4 @@ namespace JWTools
 
     }
 
-	#region TEST
-	public class Test_JWU : Test
-	{
-		#region Constructor() - Register all of the tests in this class
-		public Test_JWU()
-			: base( "JW Utilities" )
-		{
-			AddTest( new IndividualTest( Test_PathEllipses ),          "Path Ellipses" );
-			AddTest( new IndividualTest( Test_ArrayListToIntArray ),   "ArrayList to int[]" );
-			AddTest( new IndividualTest( Test_ArrayListToStringArray), "ArrayList to string[]" );
-			AddTest( new IndividualTest( Test_IsParatextFile ),        "Is Paratext Scripture File" );
-		}
-		#endregion
-
-		#region Test: Test_PathEllipses
-		public void Test_PathEllipses()
-		{
-			string sIn = "C:\\Documents and Settings\\John\\My Documents\\Projects\\MyFile.db";
-			string sExpected = "C:\\Documents and Se...\\MyFile.db";
-			string sOut = JWU.PathEllipses(sIn, 30);
-
-			AreSame(sExpected, sOut);
-		}
-		#endregion
-
-		#region Test: Test_ArrayListToIntArray
-		public void Test_ArrayListToIntArray()
-		{
-			// An array of starting data
-			int[] vExpected = new int[9];
-			vExpected[0] =   10;
-			vExpected[1] =   12;
-			vExpected[2] =   33;
-			vExpected[3] =   52;
-			vExpected[4] =   33;
-			vExpected[5] = 1442;
-			vExpected[6] =  152;
-			vExpected[7] =    3;
-			vExpected[8] =   15;
-
-			// Place it into the array list
-			ArrayList aIn = new ArrayList();
-			foreach(int n in vExpected)
-				aIn.Add(n);
-
-			// Do the conversion
-			int[] vActual = JWU.ArrayListToIntArray(aIn);
-
-			// Does the output match the original?
-			AreSame( vExpected.Length, vActual.Length );
-			for(int i=0; i < vExpected.Length; i++)
-				AreSame(vExpected[i], vActual[i]);
-		}
-		#endregion
-		#region Test: Test_ArrayListToStringArray
-		public void Test_ArrayListToStringArray()
-		{
-			// An array of starting data
-			string[] vExpected = new string[9];
-			vExpected[0] =   "Christiane";
-			vExpected[1] =   "Robert";
-			vExpected[2] =   "David";
-			vExpected[3] =   "Emily";
-			vExpected[4] =   "Robert";
-			vExpected[5] =   "John";
-			vExpected[6] =   "David";
-			vExpected[7] =   "Sandra";
-			vExpected[8] =   "Robert";
-
-			// Place it into the array list
-			ArrayList aIn = new ArrayList();
-			foreach(string s in vExpected)
-				aIn.Add(s);
-
-			// Do the conversion
-			string[] vActual = JWU.ArrayListToStringArray(aIn);
-
-			// Does the output match the original?
-			AreSame( vExpected.Length, vActual.Length );
-			for(int i=0; i < vExpected.Length; i++)
-				AreSame(vExpected[i], vActual[i]);
-		}
-		#endregion
-
-		#region Test: Test_IsParatextFile
-		public void Test_IsParatextFile()
-		{
-			IsTrue( JWU.IsParatextScriptureFile( "43LUKNIV84.PTX" ) );
-
-			IsTrue( JWU.IsParatextScriptureFile( "43LUKNIV84.PTW" ) );
-
-			IsTrue( JWU.IsParatextScriptureFile( 
-				"C:\\Documents and Settings\\John\\My Documents\\Projects\\JWTools\\" +
-				"TeraLuk.PTW" ) );
-
-			IsFalse( JWU.IsParatextScriptureFile( "Kup-MRK-Final-Mu.db" ) );
-
-			IsFalse( JWU.IsParatextScriptureFile( 
-				"C:\\CCC-Lg\\Kupang\\02-Mrk\\Kup-MRK-Final-Mu.db" ) );
-		}
-		#endregion
-	}
-	#endregion
 }

@@ -286,7 +286,7 @@ namespace OurWord
                 "Copyright Notice",
                 typeof(string),
                 "",
-                "Team-wide Copyright Notice (you can define a copyright for each" +
+                "Team-wide Copyright Notice (you can define a copyright for each " +
                     "individual book by using the Book Properties dialog.)",
                 "",
                 "",
@@ -310,7 +310,7 @@ namespace OurWord
         #region Method: void ShowHelp()
         public override void ShowHelp()
         {
-            HelpSystem.ShowPage_AdvancedPrintOptions();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kPrinting);
         }
         #endregion
         #region Attr{g}: string TabText

@@ -25,6 +25,7 @@ namespace JWdb
 	}
 	#endregion
 
+    #region CLASS: SfField
     public class SfField
     {
         // Content Attrs ---------------------------------------------------------------------
@@ -154,15 +155,17 @@ namespace JWdb
         #endregion
 
         // Public Methods --------------------------------------------------------------------
-        #region Method: void Write(SfWrite)
-        public void Write(SfWrite W)
+        #region Method: void Write(SfWrite, bWrapLines)
+        public void Write(SfWrite W, bool bWrapLines)
         {
-            W.Write(Mkr, Data);
+            W.Write(Mkr, Data, bWrapLines);
         }
         #endregion
     }
+    #endregion
 
-	public class SfDb
+    #region CLASS: SfDb
+    public class SfDb
 	{
 		// Attrs -----------------------------------------------------------------------------
 		#region Attr{g}: protected ArrayList Fields - No outside access permitted
@@ -312,7 +315,7 @@ namespace JWdb
 			return vData;
 		}
 		#endregion
-		#region Virtual: bool Write(string sPathName)
+		#region Method: bool Write(sPathName, bWrapLines)
 		string m_sMessage = "";
 		public string Message
 		{
@@ -321,7 +324,7 @@ namespace JWdb
 				return m_sMessage;
 			}
 		}
-		public virtual bool Write(string sPathName)
+		public bool Write(string sPathName, bool bWrapLines)
 		{
 			SfWrite W = null;
 
@@ -334,7 +337,7 @@ namespace JWdb
                     if (field.Mkr == RecordMkr)
                         W.WriteBlankLine();
 
-                    field.Write(W);
+                    field.Write(W, bWrapLines);
                 }
 
 				W.Close();
@@ -463,5 +466,5 @@ namespace JWdb
 		}
 		#endregion
     }
-
+    #endregion
 }

@@ -3,7 +3,7 @@
  * File:    T_PathConverted.cs
  * Author:  John Wimbish
  * Created: 05 Mar 2008
- * Purpose: Tests the PathConverted classe
+ * Purpose: Tests the PathConverted class
  * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using

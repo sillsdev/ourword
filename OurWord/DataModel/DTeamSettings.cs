@@ -430,19 +430,19 @@ namespace OurWord.DataModel
 		#endregion
 
 		// Character Style Abbreviations -----------------------------------------------------
-		public const string c_StyleAbbrevNormal         = "p";
-		public const string c_StyleAbbrevVerse          = "v";
-		public const string c_StyleAbbrevChapter        = "c";
-		public const string c_StyleAbbrevFootLetter     = "fn";
-		public const string c_StyleAbbrevSeeAlsoLetter  = "cf";
-		public const string c_StyleAbbrevItalic         = "i";
-		public const string c_StyleAbbrevBold           = "b";
-		public const string c_StyleAbbrevUnderline      = "u";
-		public const string c_StyleAbbrevDashed         = "d";
-		public const string c_StyleAbbrevLabel          = "L";
-        public const string c_StyleAbbrevPictureCaption = "cap";
-        public const string c_StyleNote                 = "nt";
-        public const string c_StyleFootnote             = "ft";
+		public const string c_StyleAbbrevNormal           = "p";
+		public const string c_StyleAbbrevVerse            = "v";
+		public const string c_StyleAbbrevChapter          = "c";
+		public const string c_StyleAbbrevFootLetter       = "fn";
+		public const string c_StyleAbbrevSeeAlsoLetter    = "cf";
+		public const string c_StyleAbbrevItalic           = "i";
+		public const string c_StyleAbbrevBold             = "b";
+		public const string c_StyleAbbrevUnderline        = "u";
+		public const string c_StyleAbbrevDashed           = "d";
+		public const string c_StyleAbbrevLabel            = "L";
+        public const string c_StyleAbbrevPictureCaption   = "cap";
+        public const string c_StyleNote                   = "nt";
+        public const string c_StyleFootnote               = "ft";
 
         // User-Interface Only
         public const string c_CStyleRevisionDeletion = "del";
@@ -455,9 +455,10 @@ namespace OurWord.DataModel
 		public const string c_StyleQuote3              = "q3";
 		public const string c_StyleQuoteCentered       = "qc";
         public const string c_StyleReferenceTranslation = "RefTrans";
+        public const string c_StyleAbbrevParaContinuation = "m";
 
-        public const string c_StyleMajorSection = "ms";
-        public const string c_StyleMajorSectionCrossRef = "mr";
+        public const string c_StyleMajorSection           = "ms";
+        public const string c_StyleMajorSectionCrossRef   = "mr";
 
         // User-Interface Only
         public const string c_PStyleMergeHeader = "MergeHeader";
@@ -611,19 +612,18 @@ namespace OurWord.DataModel
 				style.IsJustified = true;
 			}
 
+			// Paragraph continuation (m)
+            if (null == FindParagraphStyle(c_StyleAbbrevParaContinuation))
+			{
+                style = AddParagraphStyle(c_StyleAbbrevParaContinuation, "Paragraph Continuation");
+				style.SetFonts(true, 10, false);
+				style.IsJustified = true;
+			}
+
 			// Quote Level 1 (q)
 			if (null == FindParagraphStyle( c_StyleQuote1 ))
 			{
 				style = AddParagraphStyle(c_StyleQuote1, "Quote Level 1");
-				style.SetFonts(true, 10, false);
-				style.LeftMargin = 0.2;
-				style.IsJustified = true;
-			}
-
-			// Quote Level 1? (qm)
-			if (null == FindParagraphStyle("qm"))
-			{
-				style = AddParagraphStyle("qm", "Quote Level 1m");
 				style.SetFonts(true, 10, false);
 				style.LeftMargin = 0.2;
 				style.IsJustified = true;

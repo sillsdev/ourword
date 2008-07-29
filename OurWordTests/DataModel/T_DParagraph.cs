@@ -31,10 +31,10 @@ namespace OurWordTests.DataModel
 
         // Setup/TearDown --------------------------------------------------------------------
         #region Setup
-        [SetUp]
-        public void Setup()
+        [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
+
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
             G.TeamSettings.InitializeFactoryStyleSheet();
@@ -424,13 +424,91 @@ namespace OurWordTests.DataModel
 
         // Misc ------------------------------------------------------------------------------
         #region Test: EditableTextLength
-        [Test]
-        public void EditableTextLength()
+        [Test] public void EditableTextLength()
         {
             DParagraph p = SplitParagraphSetup();
 
             Assert.AreEqual(135, p.EditableTextLength);
         }
         #endregion
+        #region Test: AsString
+        [Test] public void AsString()
+        {
+            // Set up a paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            p.AddRun(DChapter.Create("3"));
+            p.AddRun(DVerse.Create("1"));
+            p.AddRun(DText.CreateSimple("In the beginning was the word."));
+            p.AddRun(DVerse.Create("2"));
+            p.AddRun(DText.CreateSimple("And the Word was with God, and the Word was God."));
+            p.AddRun(DVerse.Create("3"));
+            p.AddRun(DText.CreateSimple("He was with God in the beginning."));
+            p.Cleanup();  // Determines where leading spaces are needed
+
+            // Did we get what we expect?
+            string sExpected = "31In the beginning was the word. 2And the Word " +
+                "was with God, and the Word was God. 3He was with God in the " +
+                "beginning.";
+            Assert.AreEqual(sExpected, p.AsString);
+            //Console.WriteLine("AsString = \"" + p.AsString + "\"");
+        }
+        #endregion
+        #region Test: CombineDTexts
+        [Test] public void CombineDTexts()
+        {
+            // Create a paragraph
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+
+            // Place an initial phrase into the paragraph
+            p.SimpleText = "This is a phrase.";
+            p.SimpleTextBT = "This is the BT of a phrase.";
+
+            // Add a second phrase
+            DText text = DText.CreateSimple();
+            text.Phrases[0].Text = "Appended Phrase.";
+            text.PhrasesBT[0].Text = "Appended BT of a phrase.";
+            p.AddRun(text);
+
+            // This call should now combine the DTexts, and it should insert a space
+            // between them.
+            p.Cleanup();
+
+            // Test the result
+            Assert.AreEqual("This is a phrase. Appended Phrase.", p.SimpleText);
+            Assert.AreEqual("This is the BT of a phrase. Appended BT of a phrase.", p.SimpleTextBT);
+        }
+        #endregion
+        #region Test: BestGuessAtInsertingTextPositions
+        [Test] public void BestGuessAtInsertingTextPositions()
+        {
+            // An empty paragraph should be given a DText
+            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            p.BestGuessAtInsertingTextPositions();
+            Assert.AreEqual(1, p.Runs.Count);
+            Assert.IsNotNull(p.Runs[0] as DText);
+
+            // There should be DText after verses
+            p = new DParagraph(G.Project.TargetTranslation);
+            p.Runs.Append(DVerse.Create("3"));
+            p.Runs.Append(DVerse.Create("4"));
+            p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, G.Project.TargetTranslation)));
+            p.BestGuessAtInsertingTextPositions();
+            Assert.AreEqual(5, p.Runs.Count);
+            Assert.IsNotNull(p.Runs[0] as DVerse);
+            Assert.IsNotNull(p.Runs[1] as DText);
+            Assert.IsNotNull(p.Runs[2] as DVerse);
+            Assert.IsNotNull(p.Runs[3] as DText);
+            Assert.IsNotNull(p.Runs[4] as DSeeAlso);
+
+            // There should be a DText before a paragraph-initial footnote
+            p = new DParagraph(G.Project.TargetTranslation);
+            p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, G.Project.TargetTranslation)));
+            p.BestGuessAtInsertingTextPositions();
+            Assert.AreEqual(2, p.Runs.Count);
+            Assert.IsNotNull(p.Runs[0] as DText);
+            Assert.IsNotNull(p.Runs[1] as DSeeAlso);
+        }
+        #endregion
+
     }
 }

@@ -162,9 +162,9 @@ namespace JWTools
 
 			// Initialize topics for the JWTools DLL
 			AddTopic( JWTopic.kDlgSetupFeatures, 
-				"Reference\\Dialogs\\Features\\Dlg-Features.html");
-			AddTopic( JWTopic.kDlgPasswordProtect, 
-				"Reference\\Dialogs\\Features\\Dlg-PasswordProtect.html");
+				"Strategies\\SetupFeatures.html");
+			AddTopic( JWTopic.kDlgPasswordProtect,
+                "Strategies\\SetupFeatures.html");
 		}
 		#endregion
 		#region Method: void AddTopic(JWTopic nID, string sUrl)

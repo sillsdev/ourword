@@ -294,7 +294,7 @@ namespace OurWord.Dialogs
         #region Method: void ShowHelp()
         public override void ShowHelp()
         {
-            HelpSystem.Show_DlgProjectProperties_PageSetupReferences();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kReferenceTranslations);
         }
         #endregion
         #region Attr{g}: string TabText

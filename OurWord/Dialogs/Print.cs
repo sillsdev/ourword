@@ -688,7 +688,7 @@ namespace OurWord
 		#region Cmd: cmdHelp
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			HelpSystem.Show_DlgPrint();
+			HelpSystem.ShowTopic(HelpSystem.Topic.kPrinting);
 		}
 		#endregion
 		#region Cmd: cmdEntireBookChecked

@@ -6,7 +6,6 @@
  * Purpose: Implements JOwn, an atomic owning attribute.
  * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-
 #region Header: Using, etc.
 using System;
 using System.Collections;
@@ -58,8 +57,6 @@ using JWTools;
  *   of the conceptual model setup, rather than being read in with the data.)
  */
 #endregion
-
-
 
 namespace JWdb
 {
@@ -177,146 +174,5 @@ namespace JWdb
 		}
 		#endregion
 	}
-
-	#region TEST
-	public class Test_JOwn : Test
-	{
-		#region Constructor()
-		public Test_JOwn()
-			: base("JOwn")
-		{
-			AddTest( new IndividualTest( Ownership ),           "Ownership" );
-			AddTest( new IndividualTest( OwnershipUniqueness ), "OwnershipUniqueness" );
-			AddTest( new IndividualTest( OwnerStoresSelf ),     "OwnerStoresSelf" );
-			AddTest( new IndividualTest( SignatureControl ),    "SignatureControl" );
-			AddTest( new IndividualTest( ReadWrite ),           "ReadWrite" );
-		}
-		#endregion
-
-		// Ownership -------------------------------------------------------------------------
-		#region Ownership
-		public void Ownership()
-		{
-			// Create a couple of objects. They should have no owner
-			TObjB obj1 = new TObjB("b1");
-			IsTrue(obj1.Owner == null);
-			TObjB obj2 = new TObjB("b2");
-			IsTrue(obj2.Owner == null);
-
-			// Set the first obj into the attr, and see if it has an owner
-			TObjA objOwner = new TObjA("a");
-			objOwner.m_own1.Value = obj1;
-			IsTrue(obj1.Owner == objOwner);
-
-			// Put the other obj into the attr, and see that the owner is the second obj.
-			objOwner.m_own1.Value = obj2;
-			IsTrue(obj2.Owner == objOwner);
-			IsTrue(obj1.Owner == null);		
-		}
-		#endregion
-		#region OwnershipUniqueness
-		public void OwnershipUniqueness()
-		{
-			//EnableTracing = true;
-			bool bCaught = false;
-			try
-			{
-				// Create an owning object
-				TObjA objOwner = new TObjA("a");
-
-				// Place an object into the first attribute
-				TObjB objB = new TObjB("b1");
-				objOwner.m_own1.Value = objB;
-
-				// Now attempt to place it into the second attr. Should fail because
-				// object is already owned.
-				objOwner.m_own2.Value = objB;
-			}
-			catch (eAlreadyOwned)
-			{
-				Trace("Exception Caught");
-				bCaught = true;
-			}
-			IsTrue(bCaught);
-		}
-		#endregion
-		#region OwnerStoresSelf
-		public void OwnerStoresSelf()
-		{
-			TObjA objOwner = new TObjA("a");
-			IsTrue( objOwner._test_ContainsAttribute(objOwner.m_own1) );
-		}
-		#endregion
-
-		// Correct signature of owned object -------------------------------------------------
-		#region SignatureControl
-		public void SignatureControl()
-			// We declare a JOwn with a signature of one type, and then attempt to
-			// add an object to it of a different type. We expect an exception. If we check
-			// anytime an object is being added, then we prevent the sequence from ever
-			// having bad objects.
-		{
-			bool bCaught = false;
-			try
-			{
-				// Create an owning object
-				TObjA objOwner = new TObjA("a");
-
-				// Attempt to add the wrong kind of object
-				objOwner.m_own1.Value = new TObjD("d");
-			}
-			catch (eBadSignature)
-			{
-				bCaught = true;
-			}
-			IsTrue(bCaught);
-		}
-		#endregion
-
-		// I/O -------------------------------------------------------------------------------
-		#region Attr: ReadWritePathName - pathname for test file
-		private string ReadWritePathName
-		{
-			get 
-			{
-				string sPath = Application.ExecutablePath;
-				sPath = sPath.Substring(0, sPath.LastIndexOf("\\") ) + "\\Test.x";
-				return sPath;
-			}
-		}
-		#endregion
-		#region ReadWrite
-		public void ReadWrite()
-		{
-			// Create owning objects
-			TObjA objOwner1 = new TObjA("a1");
-			TObjA objOwner2 = new TObjA("a2");
-
-			// Set up an owning attr and write it out
-			objOwner1.m_own1.Value = new TObjB("VerseNo");
-			TextWriter tw = JUtil.GetTextWriter(ReadWritePathName);
-			objOwner1.m_own1.Write(tw, 0);
-			tw.Close();
-
-			// Read it into anouther owning attr
-			TextReader tr = JUtil.GetTextReader(ReadWritePathName);
-			string sLine;
-			while ( (sLine = tr.ReadLine()) != null)
-			{
-				objOwner2.m_own1.Read(sLine, tr);
-			}
-			tr.Close();
-
-			// Compare the two
-			TObjB b1 =  objOwner1.m_own1.Value as TObjB;
-			TObjB b2 =  objOwner2.m_own1.Value as TObjB;
-			AreSame(b1.Name, b2.Name);
-
-			// Cleanup
-			File.Delete(ReadWritePathName);
-		}
-		#endregion
-	}
-	#endregion
 
 }

@@ -184,7 +184,7 @@ namespace OurWord.Dialogs
         #region Method: void ShowHelp()
         public override void ShowHelp()
         {
-            //HelpSystem.ShowPage_Translation();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kTranslationNotes);
         }
         #endregion
         #region Attr{g}: string TabText

@@ -313,7 +313,7 @@ namespace OurWord.Dialogs
 		#region Method: void ShowHelp()
 		public override void ShowHelp()
 		{
-            HelpSystem.ShowPage_TranslationStages();
+            HelpSystem.ShowTopic( HelpSystem.Topic.kTranslationStages );
 		}
 		#endregion
         #region Attr{g}: string TabText

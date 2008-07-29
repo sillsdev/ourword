@@ -2,9 +2,7 @@
 Source: ..\bin\Release\OurWord.exe; DestDir: {app}
 Source: ..\bin\Release\JWTools.dll; DestDir: {app}
 Source: ..\bin\Release\JWdb.dll; DestDir: {app}
-Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.chm; DestDir: {app}\Help
-Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\Table of Contents.hhc; DestDir: {app}\Help
-Source: ..\..\..\..\..\..\Webs\tsc\Projects\OurWord\Help\OurWordHelp.HHK; DestDir: {app}\Help
+Source: ..\Help\OurWordHelp.chm; DestDir: {app}\Help
 Source: SampleData\*.*; DestDir: {userdocs}\OurWordSample; Flags: recursesubdirs createallsubdirs
 Source: ..\Loc\*.*; DestDir: {commonappdata}\OurWord\Loc
 Source: ..\..\lib\Palaso.Services.dll; DestDir: {app}

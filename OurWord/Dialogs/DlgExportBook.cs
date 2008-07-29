@@ -147,11 +147,5 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-        #region Cmd: cmdHelp
-        private void cmdHelp(object sender, EventArgs e)
-        {
-            HelpSystem.Show_DlgExportBook();
-        }
-        #endregion
     }
 }

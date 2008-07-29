@@ -297,12 +297,6 @@ namespace OurWord.Dialogs
 		#endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
-        public override void ShowHelp()
-        {
-            HelpSystem.ShowPage_SetupFront();
-        }
-        #endregion
         #region Attr{g}: string TabText
         public override string TabText
         {
@@ -362,12 +356,6 @@ namespace OurWord.Dialogs
 		#endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
-        public override void ShowHelp()
-        {
-            HelpSystem.ShowPage_SetupTarget();
-        }
-        #endregion
         #region Attr{g}: string TabText
         public override string TabText
         {

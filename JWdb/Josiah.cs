@@ -34,20 +34,14 @@ namespace JWdb
 		public eJosiahException()
 			: base(m_sError)
 		{
-			if (!Test.IsTesting)
-				Debug.Assert(false);
 		}
 		public eJosiahException(string message)
 			: base(m_sError + " - " + message)
 		{
-			if (!Test.IsTesting)
-				Debug.Assert(false);
 		}
 		public eJosiahException(string message, Exception inner)
 			: base(m_sError + " - " + message, inner)
 		{
-			if (!Test.IsTesting)
-				Debug.Assert(false);
 		}
 	}
 	#endregion

@@ -218,7 +218,7 @@ namespace OurWord.DataModel
 				// If we get here, then there are no front translation books for which
 				// we don't have a target translation. So....just return the first thing
 				// we can.
-				return DBook.BookAbbrevs[0];
+				return null;
 			}
 		}
 		#endregion
@@ -487,63 +487,4 @@ namespace OurWord.DataModel
 		#endregion
 	}
 
-	#region TEST
-	public class Test_DTranslation : Test
-	{
-		#region Constructor()
-		public Test_DTranslation()
-			: base("DTranslation")
-		{
-			AddTest( new IndividualTest( ConvertsCrossReferences ), "ConvertsCrossReferences" );
-		}
-		#endregion
-
-		#region ConvertsCrossReferences
-		public void ConvertsCrossReferences()
-			// Test the conversion from a Source cross-reference to a Target cross-reference.
-			// We want to see that 
-			// - only those things that are in the Source get changed,
-			// - only whole words in the string get changed (not partial matches)
-		{
-			DTranslation TFront = new DTranslation("Front", "Latin", "Latin");
-			DTranslation TTarget = new DTranslation("Target", "Latin", "Latin");
-
-			DBook book = new DBook();
-			TFront.Books.Append(book);
-			DSection section = new DSection(1);
-			book.Sections.Append(section);
-			DParagraph para = new DParagraph(TFront);
-			section.Paragraphs.Append(para);
-
-            TFront.BookNamesTable.Clear();
-			TFront.BookNamesTable.Append("Genesis");
-			TFront.BookNamesTable.Append("Exodus");
-			TFront.BookNamesTable.Append("Ge");
-			TFront.BookNamesTable.Append("2 Kings");
-			TFront.BookNamesTable.Append("Song of Songs");
-			TFront.BookNamesTable.Append("2 John");
-			TFront.BookNamesTable.Append("Carita (Mula-Mula)");
-
-            TTarget.BookNamesTable.Clear();
-			TTarget.BookNamesTable.Append("Kejadian");
-			TTarget.BookNamesTable.Append("Keluaran");
-			TTarget.BookNamesTable.Append("Imamat");
-			TTarget.BookNamesTable.Append("2 Raja-Raja");
-			TTarget.BookNamesTable.Append("Kidung Agung");
-			TTarget.BookNamesTable.Append("2 Yohanes");
-			TTarget.BookNamesTable.Append("Kejadian");
-
-			string sSource   = "(Genesis 3:4; Exodus 12:4, 3; Ex 3:4, " +
-				"Genesissy 23:4; 2 Kings 13:3; Carita (Mula-Mula) 5:5, 23";
-			string sExpected = "(Kejadian 3:4; Keluaran 12:4, 3; Ex 3:4, " +
-				"Genesissy 23:4; 2 Raja-Raja 13:3; Kejadian 5:5, 23";
-			para.SimpleText = sSource;
-
-			string sActual = TTarget.ConvertCrossReferences(para);
-
-			AreSame(sExpected, sActual);
-		}
-		#endregion
-	}
-	#endregion
 }

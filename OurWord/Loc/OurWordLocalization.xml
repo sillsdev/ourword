@@ -602,14 +602,8 @@
     <Item ID="msgBookIsLocked">
       <English>Please discuss suggested changes or improvements with your team advisor. Further changes to {0} cannot be made directly on this computer.</English>
     </Item>
-    <Item ID="msgBookNeedsFolder">
-      <English>Please enter a valid Folder for storing this book's data.</English>
-    </Item>
     <Item ID="msgBookNeedsImportFilename">
       <English>Please enter the filename that you wish to import.</English>
-    </Item>
-    <Item ID="msgBookNeedsName">
-      <English>Please enter a name for the book, e.g., 'Matthew.'</English>
     </Item>
     <Item ID="msgCantInsertNoteHere">
       <English>Notes cannot be inserted for book titles, picture captions or footnotes.</English>
@@ -737,6 +731,10 @@
     <Item ID="msgSectionTitleCannotHaveVerses">
       <English>You cannot change this paragraph to a Section Title, because a Section Title cannot have verses, chapters or footnotes in it.</English>
       <Info>This warning happens only if Structured Editing is turned on. It happens if the user attempts to change a paragraph containing verses, chapters, or footnotes into a Section Title.</Info>
+    </Item>
+    <Item ID="msgNoAvailableBooksInFront">
+      <English>There are no books defined in the Front for which you can Create or Import in the Target. You need to first define the book in the Front; only then will you be able to add it (via Create or Import) to the Target.</English>
+      <Info>This message is displayed when the user attempts to Create or Import a book into the Target translation, when there is no corresponding book available in the Front.</Info>
     </Item>
     <Group ID="FileStructureMessages" Title="005 - File Structure Messages" Translator="false">
       <Item ID="paragraphs">
@@ -1858,7 +1856,7 @@
       </Item>
       <Item ID="propCopyrightNotice" Tip="true">
         <English>Copyright Notice</English>
-        <Tip>Team-wide Copyright Notice (you can define a copyright for eachindividual book by using the Book Properties dialog.)</Tip>
+        <Tip>Team-wide Copyright Notice (you can define a copyright for each individual book by using the Book Properties dialog.)</Tip>
       </Item>
       <Item ID="option_kBlank">
         <English>(leave blank)</English>

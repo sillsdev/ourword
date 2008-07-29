@@ -317,11 +317,15 @@ namespace OurWord
             if (null != G.Project && G.Project.ShowTranslationsPane && MainWindowIsDrafting)
                 SideWindows.CreateTranslationsWindow();
 
+#if FEATURE_MERGE
             if (G.IsValidProject && s_Features.F_Merge && DProject.ShowMergePane)
                 SideWindows.CreateMergePane();
+#endif
 
+#if FEATURE_WESAY
             if (G.IsValidProject && s_Features.F_Dictionary && DProject.ShowDictionaryPane)
                 SideWindows.CreateDictionaryPane();
+#endif
 
             // Tell the system which side windows are being displayed; thereafter events will be 
             // automatically routed to these windows.
@@ -736,10 +740,14 @@ namespace OurWord
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             bool bShowNotesPane = DNote.IsShowingAny;
             bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
+#if (FEAT_WESAY || FEAT_MERGE)
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
             bool bShowMergePane = (s_Features.F_Merge && G.IsValidProject);
             bool bShowSideWindowsSection = bShowNotesPane || bShowTranslationsPane || 
                 bShowDictionaryPane || bShowMergePane;
+#else
+            bool bShowSideWindowsSection = bShowNotesPane || bShowTranslationsPane;
+#endif
             m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
 
             // Main Window itesm: Drafting, Naturalness, BT
@@ -753,10 +761,15 @@ namespace OurWord
             m_menuShowNotesPane.Checked = DProject.VD_ShowNotesPane;
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
+#if (FEAT_WESAY || FEAT_MERGE)
             m_menuShowMergePane.Visible = bShowMergePane;
             m_menuShowMergePane.Checked = DProject.ShowMergePane;
             m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
             m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
+#else
+            m_menuShowMergePane.Checked = false;
+            m_menuShowDictionaryPane.Visible = false;
+#endif
 
             // Zoom menu command area
             m_separatorZoom.Visible = bShowSideWindowsSection || bShowMainWindowSection;
@@ -2029,6 +2042,7 @@ namespace OurWord
 				}
 			}
 			#endregion
+#if FEATURE_MERGE
 
             #region Attr{g}: bool F_Merge
             public bool F_Merge
@@ -2039,6 +2053,8 @@ namespace OurWord
                 }
             }
             #endregion
+#endif
+#if FEATURE_WESAY
             #region Attr{g}: bool F_Dictionary
             public bool F_Dictionary
             {
@@ -2048,8 +2064,9 @@ namespace OurWord
                 }
             }
             #endregion
+#endif
 
-			// Scaffolding -------------------------------------------------------------------
+            // Scaffolding -------------------------------------------------------------------
 			#region Constructor()
 			public FeaturesMgr()
 			{
@@ -2096,8 +2113,12 @@ namespace OurWord
                 fLocalizer,
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
+#if FEATURE_MERGE
                 fMerge,
+#endif
+#if FEATURE_WESAY
                 fDictionary,
+#endif
                 kLast
             };
             #endregion
@@ -2131,6 +2152,7 @@ namespace OurWord
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
 
+#if FEATURE_MERGE
                 m_Dlg.Add(ID.fMerge.ToString(),
                     false,
                     false,
@@ -2138,7 +2160,9 @@ namespace OurWord
                     "Merging",
                     "Enables the Merge Pane, by which you can compare different versions of a book " +
                         "to see what is different, and to merge changes into the master copy.");
+#endif
 
+#if FEATURE_WESAY
                 m_Dlg.Add(ID.fDictionary.ToString(),
                     false,
                     false,
@@ -2147,6 +2171,7 @@ namespace OurWord
                     "Enables the Dictionary Pane, by which you can access a WeSay dictionary. " +
                         "You can enter words in the dictionary that are in the translation; and " +
                         "you can look up definitions when doing a back translation.");
+#endif
                 #endregion
                 #region EDITING FEATURES
                 m_Dlg.Add(ID.fStructuralEditing.ToString(),
@@ -2940,19 +2965,23 @@ namespace OurWord
         #region Cmd: cmdToggleMergePane
         private void cmdToggleMergePane(object sender, EventArgs e)
         {
+#if FEATURE_MERGE
             DProject.ShowMergePane = !DProject.ShowMergePane;
             _UpdateSideWindows();
             if (DProject.ShowMergePane)
                 SideWindows.ActivateMergePane();
+#endif
         }
         #endregion
         #region Cmd: cmdToggleDictionaryPane
         private void cmdToggleDictionaryPane(object sender, EventArgs e)
         {
+#if FEATURE_WESAY
             DProject.ShowDictionaryPane = !DProject.ShowDictionaryPane;
             _UpdateSideWindows();
             if (DProject.ShowDictionaryPane)
                 SideWindows.ActivateDictionaryPane();
+#endif
         }
         #endregion
 

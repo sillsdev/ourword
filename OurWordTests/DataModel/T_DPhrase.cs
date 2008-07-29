@@ -28,8 +28,7 @@ namespace OurWordTests.DataModel
     [TestFixture] public class T_DPhrase
     {
         #region Setup
-        [SetUp]
-        public void Setup()
+        [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
             OurWordMain.Project = new DProject();

@@ -45,32 +45,12 @@ namespace OurWord
                 LocDB.MessageTypes.Info);
         }
         #endregion
-        #region Warning:   void BookNeedsFolder()
-        static public void BookNeedsFolder()
-        {
-            LocDB.Message(
-                "msgBookNeedsFolder",
-                "Please enter a valid Folder for storing this book's data.",
-                null,
-                LocDB.MessageTypes.Warning);
-        }
-        #endregion
         #region Warning:   void BookNeedsImportFilename()
         static public void BookNeedsImportFilename()
         {
             LocDB.Message(
                 "msgBookNeedsImportFilename",
                 "Please enter the filename that you wish to import.",
-                null,
-                LocDB.MessageTypes.Warning);
-        }
-        #endregion
-        #region Warning:   void BookNeedsName()
-        static public void BookNeedsName()
-        {
-            LocDB.Message(
-                "msgBookNeedsName",
-                "Please enter a name for the book, e.g., 'Matthew.'",
                 null,
                 LocDB.MessageTypes.Warning);
         }

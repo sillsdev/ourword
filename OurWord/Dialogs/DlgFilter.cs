@@ -614,7 +614,7 @@ namespace OurWord.Dialogs
 		#region Cmd: cmdHelp
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			HelpSystem.Show_DlgFilter();		
+            HelpSystem.ShowTopic(HelpSystem.Topic.kFilters);
 		}
 		#endregion
         #region Cmd: cmdTurnOff - when the Turn Off button is clicked, clear out the text search boxes

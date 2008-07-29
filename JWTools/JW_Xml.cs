@@ -683,11 +683,21 @@ namespace JWTools
 			return rgLines;
 		}
 		#endregion
-		#region Method: void Write(sMarker, string sData)
-		public void Write(string sMarker, string sData)
+		#region Method: void Write(sMarker, string sData, bWrapLines)
+        public void Write(string sMarker, string sData, bool bWrapLines)
 		{
-			// Prepare the data for output
+            // Add the backslash and trailing space to the marker
 			string sFullMarker = PrepareFullMarker(sMarker);
+
+            // Option 1 - All on a single line
+            if (!bWrapLines)
+            {
+                m_writer.WriteLine(sFullMarker + sData);
+                return;
+            }
+
+            // Option 2 - Split into short lines
+			// Prepare the data for output
 			ArrayList rgLines = PrepareData(sData);
 
 			// Write out the first line (which includes the marker)
@@ -696,6 +706,7 @@ namespace JWTools
 				sFirstLine += rgLines[0];
 			m_writer.WriteLine(sFirstLine);
 
+            // Write out the remaining lines
 			for(int i = 1; i < rgLines.Count; i++)
 				m_writer.WriteLine(rgLines[i]);
 		}

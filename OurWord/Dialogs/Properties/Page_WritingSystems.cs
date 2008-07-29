@@ -78,7 +78,7 @@ namespace OurWord.Dialogs
         #region Method: void ShowHelp()
         public override void ShowHelp()
         {
-            HelpSystem.ShowPage_WritingSystems();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kWritingSystems);
         }
         #endregion
         #region Attr{g}: string TabText

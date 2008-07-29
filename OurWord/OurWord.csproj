@@ -25,6 +25,19 @@
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
+    <PublishUrl>http://localhost/OurWord/</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Web</InstallFrom>
+    <UpdateEnabled>true</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>true</IsWebBootstrapper>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -157,6 +170,14 @@
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Page_Notes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_FrontInfo.resx">
       <SubType>Designer</SubType>
@@ -369,7 +390,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>Form</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
@@ -427,6 +448,21 @@
     </Compile>
     <Compile Include="Dialogs\SplashScreen.cs">
       <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.Designer.cs">
+      <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.Designer.cs">
+      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
       <SubType>Form</SubType>
@@ -660,6 +696,13 @@
     <EmbeddedResource Include="Res\SectionPrevious.ico" />
     <EmbeddedResource Include="Res\SetUpFeatures.ico" />
     <EmbeddedResource Include="Res\Tools.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

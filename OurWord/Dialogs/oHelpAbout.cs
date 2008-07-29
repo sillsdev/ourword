@@ -29,7 +29,8 @@ using OurWord.DataModel;
 
 namespace OurWord
 {
-	public class DialogHelpAbout : System.Windows.Forms.Form
+    #region CLASS: DialogHelpAbout
+    public class DialogHelpAbout : System.Windows.Forms.Form
 	{
 		#region Form Controls
 		private PictureBox m_imgSeedCompanyLogo;
@@ -245,103 +246,57 @@ namespace OurWord
 			System.Diagnostics.Process.Start(sProcess);
 		}
 		#endregion
-	}
+    }
+    #endregion
 
-	public class HelpSystem : JW_Help
+    #region CLASS: HelpSystem
+    public class HelpSystem : JW_Help
 	{
+        // Register the help topics in the chm file
 		#region Method: Initialize()
-		static public void Initialize()
+
+        #region SMethod: void InitTopic_Strategy(Topic id, string sHtmlBase)
+        static void InitTopic_Strategy(Topic id, string sHtmlBase)
+        {
+            JW_Help.AddTopic((int)id, "Strategies\\" + sHtmlBase + ".html");
+        }
+        #endregion
+        #region SMethod: void InitTopic_ImportBook(Topic id, string sHtmlBase)
+        static void InitTopic_ImportBook(Topic id, string sHtmlBase)
+        {
+            JW_Help.AddTopic((int)id, "GettingStarted\\ImportBook\\" + sHtmlBase + ".html");
+        }
+        #endregion
+
+        static public void Initialize()
 		{
 			JW_Help.Initialize(OurWordMain.App, "OurWordMain.chm");
 
-			JW_Help.AddTopic( (int)Topic.kDlgBookProperties, 
-				"Reference\\Dialogs\\BookProperties\\Dlg-BookProperties.html");
+            // Misc Topics
+            JW_Help.AddTopic((int)Topic.kTableOfContents, "Index.html");
+            JW_Help.AddTopic((int)Topic.kNewBook, "GettingStarted\\NewBook\\CreateAnEmptyBook.html");
 
-			JW_Help.AddTopic( (int)Topic.kDlgIncrementBookStatus, 
-				"Reference\\Dialogs\\IncrementBookStatus\\Dlg-IncrementBookStatus.html");
+            // Strategies topics
+            InitTopic_Strategy(Topic.kAutoBackup,            "AutoBackup\\AutoBackup");
+            InitTopic_Strategy(Topic.kPrinting,              "Printing");
+            InitTopic_Strategy(Topic.kTranslationStages,     "TranslationStages");
+            InitTopic_Strategy(Topic.kReferenceTranslations, "ReferencingOtherTranslations");
+            InitTopic_Strategy(Topic.kWritingSystems,        "WritingSystems");
+            InitTopic_Strategy(Topic.kStyleSheet,            "Stylesheet");
+            InitTopic_Strategy(Topic.kFilters,               "Filters");
+            InitTopic_Strategy(Topic.kTranslationNotes,      "TranslationNotes");
 
-			JW_Help.AddTopic( (int)Topic.kDlgRestoreFromBackup, 
-				"Reference\\Dialogs\\RestoreFromBackup\\Dlg-RestoreFromBackup.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgOptions, 
-				"Reference\\Dialogs\\Options\\Dlg-Options.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgProjectProps, 
-				"Reference\\Dialogs\\ProjectProperties\\Dlg-ProjectProperties.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgProjectProps_PageOverview, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-Overview.html");
-            JW_Help.AddTopic((int)Topic.kPage_SetupFront, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-SetupFront.html");
-			JW_Help.AddTopic( (int)Topic.kPage_SetupTarget, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-SetupTarget.html");
-			JW_Help.AddTopic( (int)Topic.kDlgProjectProps_PageSetupSiblings, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-SetupSiblings.html");
-			JW_Help.AddTopic( (int)Topic.kDlgProjectProps_PageSetupReferences, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-SetupRefs.html");
-            JW_Help.AddTopic((int)Topic.kPage_Translation, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-TransProps.html");
-            JW_Help.AddTopic((int)Topic.kPage_StyleSheet, 
-				"Reference\\Dialogs\\ProjectProperties\\Page-Styles.html");
-            JW_Help.AddTopic((int)Topic.kPage_AdvancedPrintOptions, 
-				"Reference\\Dialogs\\ProjectProperties\\ProjProp-PrintOptions.html");
-            JW_Help.AddTopic((int)Topic.kPage_TranslationStages, 
-				"Reference\\Dialogs\\ProjectProperties\\ProjProp-TranslationStages.html");
-            JW_Help.AddTopic((int)Topic.kPage_WritingSystems,
-                "Tasks\\WritingSystems.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgCreateTranslation, 
-				"Reference\\Dialogs\\ProjectProperties\\Dlg-CreateTranslation.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgOpenTranslation, 
-				"Reference\\Dialogs\\ProjectProperties\\Dlg-OpenTranslation.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgBookNames, 
-				"Reference\\Dialogs\\ProjectProperties\\Dlg-BookNames.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgWritingSystems, 
-				"Reference\\Dialogs\\ProjectProperties\\Dlg-WritingSystems.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgPrint, 
-				"Reference\\Dialogs\\Print\\Dlg-Print.html");
-
-            JW_Help.AddTopic((int)Topic.kDlgExportBook,
-                "Reference\\Dialogs\\Dlg-ExportBook.html");
-
-			JW_Help.AddTopic( (int)Topic.kDlgFilter, 
-				"Reference\\Dialogs\\OnlyShowSectionsThat\\OnlyShowSectionsThat.html");
-
-			// Errors in the RepairImportBook dialog
-			JW_Help.AddTopic( (int)Topic.kErrMissingParagraphMarker, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_MissingParagraphMarker.html");
-			JW_Help.AddTopic( (int)Topic.kErrMissingVerseNumber, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_MissingVerseNumber.html");
-			JW_Help.AddTopic( (int)Topic.kErrMissingParagraphMarkerForCF, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_MissingParagraphMarkerForCF.html");
-			JW_Help.AddTopic( (int)Topic.kErrChapterNotInParagraph, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_ChapterNotInParagraph.html");
-			JW_Help.AddTopic( (int)Topic.kErrBadChapterNo, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_BadChapterNo.html");
-			JW_Help.AddTopic( (int)Topic.kErrMissingParagraphMarkerForNote, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_MissingParagraphMarkerForNote.html");
-			JW_Help.AddTopic( (int)Topic.kErrNoVerseInSection, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_NoVerseInSection.html");
-			JW_Help.AddTopic( (int)Topic.kErrStructureSectionMiscount, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_StructureSectionMiscount.html");
-			JW_Help.AddTopic( (int)Topic.kErrStructureMismatch, 
-				"Reference\\Dialogs\\RepairImportBook\\Err_StructureMismatch.html");
-
-            JW_Help.AddTopic((int)Topic.kWizImportBook_GetFilename,
-                "Reference\\Dialogs\\WizImportBook\\WizImportBook-GetFilename.html");
-            JW_Help.AddTopic((int)Topic.kWizImportBook_IdentifyBook,
-                "Reference\\Dialogs\\WizImportBook\\WizImportBook-IdentifyTheBook.html");
-            JW_Help.AddTopic((int)Topic.kWizImportBook_IdentifyStage,
-                "Reference\\Dialogs\\WizImportBook\\WizImportBook-IdentifyTheStage.html");
-            JW_Help.AddTopic((int)Topic.kWizImportBook_WhereToStore,
-                "Reference\\Dialogs\\WizImportBook\\WizImportBook-WhereToStore.html");
-            JW_Help.AddTopic((int)Topic.kWizImportBook_Summary,
-                "Reference\\Dialogs\\WizImportBook\\WizImportBook-Summary.html");
-
+            // Importing a book / associated errors
+            InitTopic_ImportBook(Topic.kImportBook, "ImportBook");
+            InitTopic_ImportBook(Topic.kErrMissingParagraphMarker, "Err_MissingParagraphMarker");
+            InitTopic_ImportBook(Topic.kErrMissingVerseNumber, "Err_MissingVerseNumber");
+            InitTopic_ImportBook(Topic.kErrMissingParagraphMarkerForCF, "Err_MissingParagraphMarkerForCF");
+            InitTopic_ImportBook(Topic.kErrChapterNotInParagraph, "Err_ChapterNotInParagraph");
+            InitTopic_ImportBook(Topic.kErrBadChapterNo, "Err_BadChapterNo");
+            InitTopic_ImportBook(Topic.kErrMissingParagraphMarkerForNote, "Err_MissingParagraphMarkerForNote");
+            InitTopic_ImportBook(Topic.kErrNoVerseInSection, "Err_NoVerseInSection");
+            InitTopic_ImportBook(Topic.kErrStructureMismatch, "Err_StructureMismatch");
+            InitTopic_ImportBook(Topic.kErrStructureSectionMiscount, "Err_StructureSectionMiscount");
 		}
 		#endregion
 
@@ -349,215 +304,38 @@ namespace OurWord
 		#region enum Topic ID's
 		public enum Topic
 		{
-			kDlgBookProperties = 0,
-			kDlgIncrementBookStatus,
-			kDlgRestoreFromBackup,
-			kDlgOptions,
-			kDlgProjectProps,
-			kDlgProjectProps_PageOverview,
-            kPage_SetupFront,
-			kPage_SetupTarget,
-			kDlgProjectProps_PageSetupSiblings,
-			kDlgProjectProps_PageSetupReferences,
-            kPage_Translation,
-            kPage_StyleSheet,
-            kPage_AdvancedPrintOptions,
-            kPage_TranslationStages,
-            kPage_WritingSystems,
-			kDlgCreateTranslation,
-			kDlgOpenTranslation,
-			kDlgBookNames,
-			kDlgWritingSystems,
-			kDlgPrint,
-            kDlgExportBook,
-			kDlgFilter,
+            kTableOfContents = 0,
+			kAutoBackup,
+            kPrinting,
+			kTranslationStages,
+            kReferenceTranslations,
+			kWritingSystems,
+            kStyleSheet,
+            kFilters,
+            kTranslationNotes,
+
+            kNewBook,
+
+            kImportBook,
+			kErrStructureSectionMiscount,
+			kErrStructureMismatch,
+			kErrMissingParagraphMarkerForNote,
+			kErrChapterNotInParagraph,
+			kErrBadChapterNo,
 			kErrMissingParagraphMarker,
 			kErrMissingVerseNumber,
 			kErrMissingParagraphMarkerForCF,
-			kErrChapterNotInParagraph,
-			kErrBadChapterNo,
-			kErrMissingParagraphMarkerForNote,
 			kErrNoVerseInSection,
-			kErrStructureSectionMiscount,
-			kErrStructureMismatch,
-            kWizImportBook_GetFilename,
-            kWizImportBook_IdentifyBook,
-            kWizImportBook_IdentifyStage,
-            kWizImportBook_WhereToStore,
-            kWizImportBook_Summary,
+
             kLast
 		}
 		#endregion
-
-		// Invoking individual topics --------------------------------------------------------
 		#region Method: void ShowTopic(Topic nID)
 		static public void ShowTopic(Topic nID)
 		{
 			JW_Help.ShowTopic((int)nID);
 		}
 		#endregion
-		#region Method: void Show_DlgBookProperties()
-		static public void Show_DlgBookProperties()
-		{
-			ShowTopic(Topic.kDlgBookProperties);
-		}
-		#endregion
-		#region Method: void Show_DlgIncrementBookStatus()
-		static public void Show_DlgIncrementBookStatus()
-		{
-			ShowTopic(Topic.kDlgIncrementBookStatus);
-		}
-		#endregion
-		#region Method: void Show_DlgRestoreFromBackup()
-		static public void Show_DlgRestoreFromBackup()
-		{
-			ShowTopic(Topic.kDlgRestoreFromBackup);
-		}
-		#endregion
-		#region Method: void Show_DlgPrint()
-		static public void Show_DlgPrint()
-		{
-			ShowTopic(Topic.kDlgPrint);
-		}
-		#endregion
-        #region Method: void Show_DlgExportBook()
-        static public void Show_DlgExportBook()
-        {
-            ShowTopic(Topic.kDlgExportBook);
-        }
-        #endregion
-
-		// Project Properties ----------------------------------------------------------------
-		#region Method: void Show_DlgProjectProperties()
-		static public void Show_DlgProjectProperties()
-		{
-			ShowTopic(Topic.kDlgProjectProps);
-		}
-		#endregion
-		#region Method: void Show_DlgProjectProperties_PageOverview()
-		static public void Show_DlgProjectProperties_PageOverview()
-		{
-			ShowTopic(Topic.kDlgProjectProps_PageOverview);
-		}
-		#endregion
-        #region Method: void ShowPage_SetupFront()
-        static public void ShowPage_SetupFront()
-		{
-			ShowTopic(Topic.kPage_SetupFront);
-		}
-		#endregion
-        #region Method: void ShowPage_SetupTarget()
-        static public void ShowPage_SetupTarget()
-		{
-			ShowTopic(Topic.kPage_SetupTarget);
-		}
-		#endregion
-		#region Method: void Show_DlgProjectProperties_PageSetupSiblings()
-		static public void Show_DlgProjectProperties_PageSetupSiblings()
-		{
-			ShowTopic(Topic.kDlgProjectProps_PageSetupSiblings);
-		}
-		#endregion
-		#region Method: void Show_DlgProjectProperties_PageSetupReferences()
-		static public void Show_DlgProjectProperties_PageSetupReferences()
-		{
-			ShowTopic(Topic.kDlgProjectProps_PageSetupReferences);
-		}
-		#endregion
-        #region Method: void ShowPage_Translation()
-        static public void ShowPage_Translation()
-		{
-            ShowTopic(Topic.kPage_Translation);
-		}
-		#endregion
-        #region Method: void ShowPage_StylesSheet()
-        static public void ShowPage_StylesSheet()
-		{
-			ShowTopic(Topic.kPage_StyleSheet);
-		}
-		#endregion
-        #region Method: void ShowPage_AdvancedPrintOptions()
-        static public void ShowPage_AdvancedPrintOptions()
-		{
-			ShowTopic(Topic.kPage_AdvancedPrintOptions);
-		}
-		#endregion
-        #region Method: void ShowPage_TranslationStages()
-        static public void ShowPage_TranslationStages()
-		{
-			ShowTopic(Topic.kPage_TranslationStages);
-		}
-		#endregion
-        #region Method: void ShowPage_WritingSystems()
-        static public void ShowPage_WritingSystems()
-        {
-            ShowTopic(Topic.kPage_WritingSystems);
-        }
-        #endregion
-
-        // Import Book Wizard ----------------------------------------------------------------
-        #region Method: void Show_WizImportBook_GetFilename()
-        static public void Show_WizImportBook_GetFilename()
-        {
-            ShowTopic(Topic.kWizImportBook_GetFilename);
-        }
-        #endregion
-        #region Method: void Show_WizImportBook_IdentifyBook()
-        static public void Show_WizImportBook_IdentifyBook()
-        {
-            ShowTopic(Topic.kWizImportBook_IdentifyBook);
-        }
-        #endregion
-        #region Method: void Show_WizImportBook_IdentifyStage()
-        static public void Show_WizImportBook_IdentifyStage()
-        {
-            ShowTopic(Topic.kWizImportBook_IdentifyStage);
-        }
-        #endregion
-        #region Method: void Show_WizImportBook_WhereToStore()
-        static public void Show_WizImportBook_WhereToStore()
-        {
-            ShowTopic(Topic.kWizImportBook_WhereToStore);
-        }
-        #endregion
-        #region Method: void Show_WizImportBook_Summary()
-        static public void Show_WizImportBook_Summary()
-        {
-            ShowTopic(Topic.kWizImportBook_Summary);
-        }
-        #endregion
-
-		#region Method: void Show_DlgCreateTranslation()
-		static public void Show_DlgCreateTranslation()
-		{
-			ShowTopic(Topic.kDlgCreateTranslation);
-		}
-		#endregion
-		#region Method: void Show_DlgOpenTranslation()
-		static public void Show_DlgOpenTranslation()
-		{
-			ShowTopic(Topic.kDlgOpenTranslation);
-		}
-		#endregion
-		#region Method: void Show_DlgBookNames()
-		static public void Show_DlgBookNames()
-		{
-			ShowTopic(Topic.kDlgBookNames);
-		}
-		#endregion
-		#region Method: void Show_DlgWritingSystems()
-		static public void Show_DlgWritingSystems()
-		{
-			ShowTopic(Topic.kDlgWritingSystems);
-		}
-		#endregion
-
-		#region Method: void Show_DlgFilter()
-		static public void Show_DlgFilter()
-		{
-			ShowTopic(Topic.kDlgFilter);
-		}
-		#endregion
-
-	}
+    }
+    #endregion
 }

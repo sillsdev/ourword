@@ -974,7 +974,7 @@ namespace OurWord
             return false;
         }
         #endregion
-        #region bool IsBookOverviewMarker(string sMarker)
+        #region Method: bool IsBookOverviewMarker(string sMarker)
         public bool IsBookOverviewMarker(string sMarker)
         {
             // First, normalize it.
@@ -1237,11 +1237,11 @@ namespace OurWord
             AddNormalizedMarker("tr",  "ntUns");    // Tomohon "tanya responden" (question for UNS
             AddNormalizedMarker("chk2", "chk");     // Second section comment
             AddNormalizedMarker("q1",   "q");       // USFM: the two are equal.
-            AddNormalizedMarker("m",    "p");       // USFM: NoFirstLineIndent becomes simply a \p
             AddNormalizedMarker("nb",   "p");       // USFM: NoBreakWithPrevPara becomes simply a \p
             AddNormalizedMarker("s1",   "s");       // USFM: Conflating these
-            AddNormalizedMarker("ms1", "ms");       // USFM: Conflating these
-            AddNormalizedMarker("ms2", "ms");       // USFM: Conflating these
+            AddNormalizedMarker("ms1",  "ms");      // USFM: Conflating these
+            AddNormalizedMarker("ms2",  "ms");      // USFM: Conflating these
+            AddNormalizedMarker("qm",   "m");       // USFM: NoFirstLineIndent (a.k.a. paragraph continuation)
 
 			// TODO: Need to persist these array values
 
@@ -1252,7 +1252,7 @@ namespace OurWord
 			m_rgParagraphMkrs.Add("q2");
 			m_rgParagraphMkrs.Add("q3");
 			m_rgParagraphMkrs.Add("qc");
-			m_rgParagraphMkrs.Add("qm");
+			m_rgParagraphMkrs.Add("m");
 
 			// Markers that signal fields that we'll discard
 			m_rgDiscardMrks = new ArrayList();

@@ -28,8 +28,6 @@ namespace OurWord.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DialogExportBook));
-            this.m_btnHelp = new System.Windows.Forms.Button();
             this.m_btnCancel = new System.Windows.Forms.Button();
             this.m_btnOK = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
@@ -40,21 +38,10 @@ namespace OurWord.Dialogs
             this.m_btnBrowse = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // m_btnHelp
-            // 
-            this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
-            this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(311, 132);
-            this.m_btnHelp.Name = "m_btnHelp";
-            this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.m_btnHelp.TabIndex = 18;
-            this.m_btnHelp.Text = "Help...";
-            this.m_btnHelp.Click += new System.EventHandler(this.cmdHelp);
-            // 
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(223, 132);
+            this.m_btnCancel.Location = new System.Drawing.Point(263, 134);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 17;
@@ -63,7 +50,7 @@ namespace OurWord.Dialogs
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(135, 132);
+            this.m_btnOK.Location = new System.Drawing.Point(175, 134);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 16;
@@ -141,7 +128,6 @@ namespace OurWord.Dialogs
             this.Controls.Add(this.m_labelBookname);
             this.Controls.Add(this.m_labelBook);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.m_btnHelp);
             this.Controls.Add(this.m_btnCancel);
             this.Controls.Add(this.m_btnOK);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -159,7 +145,6 @@ namespace OurWord.Dialogs
 
         #endregion
 
-        private System.Windows.Forms.Button m_btnHelp;
         private System.Windows.Forms.Button m_btnCancel;
         private System.Windows.Forms.Button m_btnOK;
         private System.Windows.Forms.Label label1;

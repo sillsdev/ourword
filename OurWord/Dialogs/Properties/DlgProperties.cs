@@ -437,6 +437,7 @@ namespace OurWord.Dialogs
         #region Method: virtual void ShowHelp()
         public virtual void ShowHelp()
         {
+            HelpSystem.ShowDefaultTopic();
         }
         #endregion
         #region Attr{g}: virtual string TabText

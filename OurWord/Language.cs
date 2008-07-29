@@ -157,34 +157,6 @@ namespace OurWord
 		#endregion
 
 		// Main Dialog labels, controls, etc. ------------------------------------------------
-		#region Label: Abbreviation
-		static public string Abbreviation
-		{
-			get
-			{
-				string[] res = 
-					{
-						"Abbreviation:",
-						"Singkatan:"
-					};
-				return GetAlternative(res);
-			}
-		}
-		#endregion
-		#region Label: BookName
-		static public string BookName
-		{
-			get
-			{
-				string[] res = 
-					{
-						"Book Name:",
-						"Nama Buku:"
-					};
-				return GetAlternative(res);
-			}
-		}
-		#endregion
 		#region Label: File
 		static public string File
 		{

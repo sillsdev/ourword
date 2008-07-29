@@ -42,7 +42,9 @@
     <Compile Include="DataModel\T_DFootnote.cs" />
     <Compile Include="DataModel\T_DParagraph.cs" />
     <Compile Include="DataModel\T_DPhrase.cs" />
+    <Compile Include="DataModel\T_DRun.cs" />
     <Compile Include="DataModel\T_DSection.cs" />
+    <Compile Include="DataModel\T_DTranslation.cs" />
     <Compile Include="DataModel\T_ScriptureDB.cs" />
     <Compile Include="Dialogs\T_BookNames.cs" />
     <Compile Include="Edit\EditTestsCommon.cs">
@@ -55,9 +57,12 @@
     <Compile Include="Edit\T_OWWindow.cs">
     </Compile>
     <Compile Include="JWdb\T_AutoReplace.cs" />
+    <Compile Include="JWdb\T_JOwn.cs" />
+    <Compile Include="JWdb\T_JOwnSeq.cs" />
     <Compile Include="JWdb\T_SfDB.cs" />
     <Compile Include="JWTools\T_Localization.cs" />
     <Compile Include="JWTools\T_PathConverter.cs" />
+    <Compile Include="JWTools\T_Utilities.cs" />
     <Compile Include="JWTools\T_Xml.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

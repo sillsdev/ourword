@@ -39,9 +39,10 @@ namespace OurWord.Dialogs.WizImportBook
             // 
             this.m_labelWhichBook.Location = new System.Drawing.Point(13, 10);
             this.m_labelWhichBook.Name = "m_labelWhichBook";
-            this.m_labelWhichBook.Size = new System.Drawing.Size(344, 13);
+            this.m_labelWhichBook.Size = new System.Drawing.Size(344, 33);
             this.m_labelWhichBook.TabIndex = 0;
             this.m_labelWhichBook.Text = "Which book are you importing?";
+            this.m_labelWhichBook.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
             // m_lvBooks
             // 
@@ -51,10 +52,10 @@ namespace OurWord.Dialogs.WizImportBook
             this.m_lvBooks.FullRowSelect = true;
             this.m_lvBooks.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.m_lvBooks.HideSelection = false;
-            this.m_lvBooks.Location = new System.Drawing.Point(16, 26);
+            this.m_lvBooks.Location = new System.Drawing.Point(16, 46);
             this.m_lvBooks.MultiSelect = false;
             this.m_lvBooks.Name = "m_lvBooks";
-            this.m_lvBooks.Size = new System.Drawing.Size(341, 219);
+            this.m_lvBooks.Size = new System.Drawing.Size(341, 199);
             this.m_lvBooks.TabIndex = 1;
             this.m_lvBooks.UseCompatibleStateImageBehavior = false;
             this.m_lvBooks.View = System.Windows.Forms.View.Details;

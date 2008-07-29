@@ -63,10 +63,11 @@ namespace OurWord.Dialogs
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
         const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
+#if FEATURE_WESAY
         const string c_sGroupWeSayDictionary = "propDictionary";
         const string c_sPathToDictionaryApp = "propDictApp";
         const string c_sPathToDictionaryData = "propDictData";
-
+#endif
         const string c_sGroup_BackgroundColors = "propBackgroundColors";
         const string c_sColorDrafting = "propBackColorDraftingWindow";
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
@@ -142,6 +143,7 @@ namespace OurWord.Dialogs
                     e.Value = WndNaturalness.LineNumbersColor;
                     break;
 
+#if FEATURE_WESAY
                 // WeSay Dictionary Setup
                 case c_sPathToDictionaryApp:
                     e.Value = new PathForPropertyGrid(
@@ -153,6 +155,7 @@ namespace OurWord.Dialogs
                         G.Project.PathToDictionaryData, 
                         "WeSay Dictionary(.lift)| *.lift");
                     break;
+#endif
 
                 // Window background colors
                 case c_sColorDrafting:
@@ -226,6 +229,7 @@ namespace OurWord.Dialogs
                     WndNaturalness.LineNumbersColor = (string)e.Value;
                     break;
 
+#if FEATURE_WESAY
                 // WeSay Dictionary Setup
                 case c_sPathToDictionaryApp:
                     G.Project.PathToDictionaryApp = ((PathForPropertyGrid)e.Value).Path;
@@ -233,6 +237,7 @@ namespace OurWord.Dialogs
                 case c_sPathToDictionaryData:
                     G.Project.PathToDictionaryData = ((PathForPropertyGrid)e.Value).Path;
                     break;
+#endif
 
                 // Window background colors
                 case c_sColorDrafting:
@@ -368,6 +373,7 @@ namespace OurWord.Dialogs
                 "DarkGray"));
             #endregion
 
+#if FEATURE_WESAY
             // WeSay Dictionary Setup
             #region WeSay Options
             Bag.Properties.Add(new PropertySpec(
@@ -389,6 +395,7 @@ namespace OurWord.Dialogs
                 typeof(FilePathEditor),
                 null));
             #endregion
+#endif
 
             // Window Background Colors
             #region (Background Colors)
@@ -436,7 +443,7 @@ namespace OurWord.Dialogs
         #region Method: void ShowHelp()
         public override void ShowHelp()
         {
-            //HelpSystem.ShowPage_Translation();
+            HelpSystem.ShowDefaultTopic();
         }
         #endregion
         #region Attr{g}: string TabText

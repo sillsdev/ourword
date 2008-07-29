@@ -2544,26 +2544,21 @@ namespace OurWord.DataModel
 		#region Method: void CalculateVersification(ref int nChapter, ref int nVerse)
 		public void CalculateVersification(ref int nChapter, ref int nVerse)
 		{
-			// Scan through the section for the first paragraph that returns a 
-			// non-zero verse. This will be the first verse of our section.
-			bool bChapterFound = false;
-			foreach(DParagraph p in Paragraphs)
-			{
-				if (p.ChapterI != 0 && p.VerseI == 1)
-					bChapterFound = true;
-
-				if (p.VerseI != 0)
-				{
-					nVerse = p.VerseI;
-					break;
-				}
-			}
-			if (bChapterFound)
-				++nChapter;
-
-			// No matter what, we expect at least a chapter of 1!
-			if (nChapter == 0)
-				nChapter = 1;
+            // Scan through the section for the first paragraph that returns a
+            // non-zero verse; this will be our first chapter/verse of the section,
+            // and we'll use it for any early paragraphs (e.g., section heads)
+            foreach (DParagraph p in Paragraphs)
+            {
+                if (p.VerseI != 0)
+                {
+                    nVerse = p.VerseI;
+                    if (0 != p.ChapterI)
+                        nChapter = p.ChapterI;
+                    break;
+                }
+            }
+            if (0 == nChapter)
+                nChapter = 1;
 
 			// The initial reference for the section defaults to the first thing passed in
 			ReferenceSpan.Start.Copy( new DReference(nChapter, nVerse ) );

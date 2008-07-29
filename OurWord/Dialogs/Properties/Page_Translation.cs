@@ -29,6 +29,13 @@ using OurWord.Dialogs;
 using OurWord.View;
 #endregion
 
+/* TODO: Make sure we can't get duplicate book names. We formerly had this as a 
+ * tet in the BookProperties dialog ValidateData, calling
+ *    Messages.DuplicateBookName();
+ * But now that dialog no longer handles the book name, it is done here.
+ *
+ */
+
 namespace OurWord.Dialogs
 {
     public class Page_Translation : DlgPropertySheet
@@ -419,12 +426,6 @@ namespace OurWord.Dialogs
 		#endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
-        public override void ShowHelp()
-        {
-            HelpSystem.ShowPage_Translation();
-        }
-        #endregion
         #region Attr{g}: string TabText
         public override string TabText
         {
@@ -938,8 +939,7 @@ namespace OurWord.Dialogs
 			// Launch the dialog
 			Debug.Assert(null != Trans);
 			Debug.Assert(null != Trans.Project);
-			book.EditProperties(Trans.Project.FrontTranslation, 
-				Trans, DBookProperties.Mode.kProperties);
+			book.EditProperties(Trans.Project.FrontTranslation, Trans);
 
 			// Update the list
 			_PopulateBookList(book.BookAbbrev);
@@ -989,10 +989,62 @@ namespace OurWord.Dialogs
 		private void cmdCreateBook(object sender, System.EventArgs e)
 		{
 			// Get an available book (one that hasn't already been created)
-			string sAbbrev = Trans.NextAvailableBookAbbrev;
-			if (sAbbrev.Length == 0)
-				return;
+            if (string.IsNullOrEmpty(Trans.NextAvailableBookAbbrev))
+            {
+                LocDB.Message("msgNoAvailableBooksInFront",
+                    "There are no books defined in the Front for which you can Create \n" +
+                    "or Import in the Target. You need to first define the book in the \n" +
+                    "Front; only then will you be able to add it (via Create or Import) \n" +
+                    "to the Target.",
+                    null,
+                    LocDB.MessageTypes.Error);
+                return;
+            }
 
+            // Do the wizard to get the desired settings
+            Dialogs.WizCreateBook.WizCreateBook wizard =
+                new OurWord.Dialogs.WizCreateBook.WizCreateBook(Trans);
+            if (DialogResult.OK != wizard.ShowDialog())
+                return;
+
+            // Determine the pathname for the new book; allow the user to abort
+            // if we might overwrite an existing file.
+            // Regarding getting the pathname, we use the "long" version of the method
+            // call rather than the DBook's method because the book is not yet owned
+            // by the translation if this has been invoked via the Create button.
+            string sNewPath = DBook.ComputePathName(
+                G.TTranslation.LanguageAbbrev,
+                wizard.NewBookAbbrev, 
+                G.TranslationStages.GetFromID( BookStages.c_idDraft ).Abbrev, 
+                'A', 
+                wizard.NewBookPath,
+                true);
+            if (File.Exists(sNewPath))
+            {
+                if (!Messages.ConfirmFileOverwrite(sNewPath))
+                {
+                    return;
+                }
+            }
+
+            // Create the book, with "Drafting" defaults
+            DBook book = new DBook(wizard.NewBookAbbrev, sNewPath);
+            int iBook = DBook.FindBookAbbrevIndex(wizard.NewBookAbbrev);
+            if (-1 == iBook)
+                return;
+            book.DisplayName = Trans.BookNamesTable[iBook];
+
+            Trans.AddBook(book);
+            if (false == book.InitializeFromFrontTranslation())
+            {
+                Trans.Books.Remove(book);
+                return;
+            }
+            book.Write();
+            _PopulateBookList(book.BookAbbrev);
+
+            #region OLD / OBSOLETE - 2 July 2008
+            /***
 			// Present the dialog so the user can decide what to do. We're done
 			// if the user cancels.
 			DBook book = new DBook(sAbbrev, "");
@@ -1012,7 +1064,9 @@ namespace OurWord.Dialogs
 			}
 			_PopulateBookList(sAbbrev);
             book.Write();
-		}
+            ***/
+            #endregion
+        }
 		#endregion
         #region Handler: cmdExportBook
         private void cmdExportBook(object sender, EventArgs e)
@@ -1172,6 +1226,8 @@ namespace OurWord.Dialogs
             {
                 LocItem item = LocGroup.Find(English[i]);
                 if (null == item)
+                    vs[i] = English[i];
+                else if (null == item.Alternates[iLanguage])
                     vs[i] = English[i];
                 else
                     vs[i] = item.Alternates[iLanguage].Value;

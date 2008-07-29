@@ -1,9 +1,9 @@
 /**********************************************************************************************
  * Project: Our Word!
- * File:    Dialogs\WizImportBook\WizPage_Summary.cs
+ * File:    Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs
  * Author:  John Wimbish
- * Created: 13 Feb 2007
- * Purpose: User Finishes the process
+ * Created: 28 Jun 2008
+ * Purpose: Provides basic information about creating a new book
  * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
@@ -25,28 +25,27 @@ using JWdb;
 using OurWord.DataModel;
 #endregion
 
-namespace OurWord.Dialogs.WizImportBook
+namespace OurWord.Dialogs.WizCreateBook
 {
-    public partial class WizPage_Summary : UserControl, IJW_WizPage
+    public partial class WizPage_CreateBookIntroduction : UserControl, IJW_WizPage
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: WizImportBook Wizard - the owning wizard
-        WizImportBook Wizard
+        #region VAttr{g}: JW_Wizard Wizard - the owning wizard
+        JW_Wizard Wizard
         {
             get
             {
-                Debug.Assert(null != Parent as WizImportBook);
-                return Parent as WizImportBook;
+                Debug.Assert(null != Parent as JW_Wizard);
+                return Parent as JW_Wizard;
             }
         }
         #endregion
-        #region VAttr{g}: string ImportPathName
-        string ImportPathName
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public WizPage_CreateBookIntroduction()
         {
-            get
-            {
-                return Wizard.ImportFileName;
-            }
+            InitializeComponent();
         }
         #endregion
 
@@ -54,11 +53,7 @@ namespace OurWord.Dialogs.WizImportBook
         #region Method: void OnActivate()
         public void OnActivate()
         {
-            m_textBook.Text = Wizard.BookAbbrev;
-            m_textFileName.Text = JWU.PathEllipses(ImportPathName, 40);
-            m_textFormat.Text = Wizard.Format;
-            m_textStage.Text = Wizard.Stage + ", " + Wizard.Version.ToString();
-            m_textDestination.Text = JWU.PathEllipses(Wizard.DestinationFolder, 40);
+            Wizard.PlaceFocusOnAdvanceButton();
         }
         #endregion
         #region Method: bool CanGoToNextPage()
@@ -70,32 +65,21 @@ namespace OurWord.Dialogs.WizImportBook
         #region Method: string PageNavigationTitle()
         public string PageNavigationTitle()
         {
-            return LocDB.GetValue(this, "strNavTitle", "Summary", null);
+            return LocDB.GetValue(this, "strNavTitle", "Introduction", null);
         }
         #endregion
         #region Method: void ShowHelp()
         public void ShowHelp()
         {
-            HelpSystem.ShowTopic(HelpSystem.Topic.kImportBook);
+            HelpSystem.ShowTopic(HelpSystem.Topic.kNewBook);
         }
         #endregion
 
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public WizPage_Summary()
+        // Command Handlers ------------------------------------------------------------------
+        #region Cmd: cmdLoad
+        private void cmdLoad(object sender, EventArgs e)
         {
-            InitializeComponent();
         }
         #endregion
-        #region Attr{g}: Control[] vExclude
-        public Control[] vExclude
-        {
-            get
-            {
-                return new Control[] { m_textStage, m_textFileName, m_textDestination, m_textFormat, m_textBook };
-            }
-        }
-        #endregion
-
     }
 }

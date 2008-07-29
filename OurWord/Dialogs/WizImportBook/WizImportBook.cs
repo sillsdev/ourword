@@ -119,7 +119,9 @@ namespace OurWord.Dialogs.WizImportBook
             m_pageGetFileName = new WizPage_GetFileName();
             AddPage(m_pageGetFileName);
 
-            m_pageGetAbbreviation = new WizPage_GetAbbreviation();
+            string sWhichBook = LocDB.GetValue(this, "idWhichImport",
+                "Which book do you wish to import?");
+            m_pageGetAbbreviation = new WizPage_GetAbbreviation(Translation, sWhichBook);
             AddPage(m_pageGetAbbreviation);
 
             m_pageGetStage = new WizPage_GetStage();
@@ -137,6 +139,7 @@ namespace OurWord.Dialogs.WizImportBook
         {
             // Create a master vector of exclusions of the subpages
             ArrayList a = new ArrayList();
+            a.AddRange(m_pageGetAbbreviation.vExclude);
             a.AddRange(m_pageSummary.vExclude);
             a.AddRange(m_pageGetStage.vExclude);
             Control[] vExclude = new Control[a.Count];

@@ -197,7 +197,7 @@ namespace OurWord.Dialogs
         #region Method: void ShowHelp()
         public override void ShowHelp()
         {
-            HelpSystem.ShowPage_StylesSheet();
+            HelpSystem.ShowTopic(HelpSystem.Topic.kStyleSheet);
         }
         #endregion
         #region Attr{g}: string TabText
@@ -796,6 +796,13 @@ namespace OurWord.Dialogs
 
             // Rebuild the styles
             G.StyleSheet.Initialize(true);
+
+            // Reset the underlying window. (See bug 0292). The issue is that when we rebuild
+            // the styles, we leave the underlying window in a bad state; the blocks are 
+            // pointing to obsolete JFontForWritingSystem objects. If OW is minimized (prior
+            // to the dialog being closed), then restored, we get a crash if we don't first
+            // reset these contents. An unlikely scenario, but it happened once, and so.....
+            G.App.ResetWindowContents();
 
             // Refresh this dialog (we must change the selection so that we
             // get the correct data on the right-hand side of the dialog.)
