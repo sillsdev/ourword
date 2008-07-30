@@ -3684,7 +3684,7 @@ namespace OurWord
                     v.Minor.ToString() +
                     ((v.Build == 0) ? "" : chBuild.ToString());
 
-                return "Beta " + sVersionNo;
+                return sVersionNo;
             }
         }
         #endregion
