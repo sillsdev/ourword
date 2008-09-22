@@ -549,7 +549,7 @@ namespace OurWord.DataModel
 					p = new DParagraph(Translation);
 
 				Paragraphs.Append(p);
-				p.CopyFromFront(pFront);
+				p.CopyFrom(pFront, true);
 			}
 
 			// Exegetical notes
@@ -2036,9 +2036,9 @@ namespace OurWord.DataModel
 				if (Map.IsFootnote( field.Mkr ))
 				{
 					// Create and append a footnote into the Section's sequence
-					DFootnote fn = new DFootnote(s_nChapter, s_nVerse, Section.Translation);
+					DFootnote fn = new DFootnote(s_nChapter, s_nVerse,
+                        Section.Translation, DFootnote.Types.kExplanatory);
 					Section.Footnotes.Append(fn);
-					fn.NoteType = DFootnote.Types.kExplanatory;
 
 					// Connect up the DRun in the most recent paragraph to this footnote
 					// (or alternatively, a |fn will be added.)
@@ -2331,9 +2331,9 @@ namespace OurWord.DataModel
 				field.Data = s;
 
 				// Create a footnote containing the text
-				DFootnote fn = new DFootnote(s_nChapter, s_nVerse, Section.Translation);
+				DFootnote fn = new DFootnote(s_nChapter, s_nVerse,
+                    Section.Translation, DFootnote.Types.kSeeAlso);
 				Section.Footnotes.Append(fn);
-				fn.NoteType = DFootnote.Types.kSeeAlso;
 				AddParagraphText(fn, field);
 
 				// Add the See Also text to the paragraph
@@ -2777,6 +2777,50 @@ namespace OurWord.DataModel
             }
 
             return c;
+        }
+        #endregion
+        #region Method: void UpdateFootnoteLetters()
+        public void UpdateFootnoteLetters()
+        {
+            char ch = 'a';
+            int i = 0;
+
+            foreach (DParagraph p in Paragraphs)
+            {
+                foreach (DRun r in p.Runs)
+                {
+                    // Retrieve the run; skip if not of the right type
+                    DFootLetter letter = r as DFootLetter;
+                    DSeeAlso also = r as DSeeAlso;
+                    if (null == letter && null == also)
+                        continue;
+
+                    DFootnote footnote = null;
+
+                    if (null != letter)
+                    {
+                        letter.Letter = ch;
+                        footnote = letter.Footnote;
+                    }
+
+                    if (null != also)
+                    {
+                        also.Letter = ch;
+                        footnote = also.Footnote;
+                    }
+
+                    // Make sure the footnotes are in the correct order
+                    int iCurrentFootnotePos = Footnotes.FindObj(footnote);
+                    Footnotes.MoveTo(iCurrentFootnotePos, i);
+                    i++;
+
+                    // Update the letter for the next one
+                    if (ch == 'z')
+                        ch = 'a';
+                    else
+                        ch++;
+                }
+            }
         }
         #endregion
 

@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -246,7 +247,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
-
+        #region Method: OWPara FindOWParaContainingFootnoteLetter(DFootnote)
         public OWPara FindOWParaContainingFootnoteLetter(DFootnote footnote)
         {
             // Find the paragraph containing the icon which references this note
@@ -271,7 +272,7 @@ namespace OurWord.Edit
             }
             return null;
         }
-
+        #endregion
 
         #region Method: void OnSelectAndScrollFromFootnote(DFootnote footnote)
         public void OnSelectAndScrollFromFootnote(DFootnote footnote)
@@ -2764,7 +2765,16 @@ namespace OurWord.Edit
                     if (string.IsNullOrEmpty(s_KeyboardName))
                         KeyboardController.DeactivateKeyboard();
                     else
+                    {
+                        // The following code is for debugging/diagnostics; to see what keyboards
+                        // are defined on the system.
+                        // 
+                        // List<KeyboardController.KeyboardDescriptor> v =
+                        //    KeyboardController.GetAvailableKeyboards(KeyboardController.Engines.All);
+                        // end diagnostic code
+
                         KeyboardController.ActivateKeyboard(s_KeyboardName);
+                    }
                 }
 
                 // Create a timer and start the on/off flashing
@@ -3117,6 +3127,46 @@ namespace OurWord.Edit
         public void cmdChangeParagraphTo(string sStyleAbbrev)
         {
             (new ChangeParagraphStyleAction(this, sStyleAbbrev)).Do();
+        }
+        #endregion
+
+        // Footnotes
+        #region URCmd: cmdInsertFootnote
+        public void cmdInsertFootnote()
+        {
+            (new InsertFootnoteAction(this)).Do();
+        }
+        #endregion
+        #region URCmd: cmdDeleteFootnote
+        public void cmdDeleteFootnote()
+        {
+            (new DeleteFootnoteAction(this)).Do();
+        }
+        #endregion
+        #region Can: canInsertFootnote
+        public bool canInsertFootnote
+        {
+            get
+            {
+                OWWindow.Sel selection = Selection;
+                if (null == selection)
+                    return false;
+
+                return selection.Paragraph.CanInsertFootnote;
+            }
+        }
+        #endregion
+        #region Can: canDeleteFootnote
+        public bool canDeleteFootnote
+        {
+            get
+            {
+                OWWindow.Sel selection = Selection;
+                if (null == selection)
+                    return false;
+
+                return selection.Paragraph.CanDeleteFootnote;
+            }
         }
         #endregion
 

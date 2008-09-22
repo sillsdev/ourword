@@ -406,17 +406,6 @@ namespace OurWord.Edit
         }
         OWBookmark m_bookmark_BeforeSplit;
         #endregion
-        #region Attr{g}: OWBookmark Bookmark_BeforeJoin
-        protected OWBookmark Bookmark_BeforeJoin
-        {
-            get
-            {
-                Debug.Assert(null != m_bookmark_BeforeJoin);
-                return m_bookmark_BeforeJoin;
-            }
-        }
-        OWBookmark m_bookmark_BeforeJoin;
-        #endregion
         #region Attr{g}: OWBookmark Bookmark_AfterSplit
         protected OWBookmark Bookmark_AfterSplit
         {
@@ -427,6 +416,17 @@ namespace OurWord.Edit
             }
         }
         OWBookmark m_bookmark_AfterSplit;
+        #endregion
+        #region Attr{g}: OWBookmark Bookmark_BeforeJoin
+        protected OWBookmark Bookmark_BeforeJoin
+        {
+            get
+            {
+                Debug.Assert(null != m_bookmark_BeforeJoin);
+                return m_bookmark_BeforeJoin;
+            }
+        }
+        OWBookmark m_bookmark_BeforeJoin;
         #endregion
         #region Attr{g}: OWBookmark Bookmark_AfterJoin
         protected OWBookmark Bookmark_AfterJoin
@@ -491,7 +491,7 @@ namespace OurWord.Edit
                 return false;
 
             // Reload the window's data. This is time-consuming, but it is the only way to make 
-            // cparagraphs line up orrectly side-by-side.
+            // paragraphs line up correctly side-by-side.
             Window.LoadData();
 
             // Restore the selection insertion point to the Window.Selection
@@ -1807,6 +1807,289 @@ namespace OurWord.Edit
 
             // Do the italics
             Italics();
+        }
+        #endregion
+    }
+    #endregion
+
+    // Footnotes -----------------------------------------------------------------------------
+    #region CLASS: InsertDeleteFootnoteAction : Action
+    public class InsertDeleteFootnoteAction : Action
+    {
+        // Protected Attrs -------------------------------------------------------------------
+        #region Attr{g}: OWWindow Window
+        protected OWWindow Window
+        {
+            get
+            {
+                Debug.Assert(null != m_Window);
+                return m_Window;
+            }
+        }
+        OWWindow m_Window;
+        #endregion
+        #region Attr{g}: OWBookmark Bookmark_BeforeInsert
+        protected OWBookmark Bookmark_BeforeInsert
+        {
+            get
+            {
+                Debug.Assert(null != m_bookmark_BeforeInsert);
+                return m_bookmark_BeforeInsert;
+            }
+        }
+        OWBookmark m_bookmark_BeforeInsert;
+        #endregion
+        #region Attr{g}: OWBookmark Bookmark_AfterInsert
+        protected OWBookmark Bookmark_AfterInsert
+        {
+            get
+            {
+                Debug.Assert(null != m_bookmark_AfterInsert);
+                return m_bookmark_AfterInsert;
+            }
+        }
+        OWBookmark m_bookmark_AfterInsert;
+        #endregion
+        #region Attr{g}: OWBookmark Bookmark_BeforeDelete
+        protected OWBookmark Bookmark_BeforeDelete
+        {
+            get
+            {
+                Debug.Assert(null != m_bookmark_BeforeDelete);
+                return m_bookmark_BeforeDelete;
+            }
+        }
+        OWBookmark m_bookmark_BeforeDelete;
+        #endregion
+        #region Attr{g}: OWBookmark Bookmark_AfterDelete
+        protected OWBookmark Bookmark_AfterDelete
+        {
+            get
+            {
+                Debug.Assert(null != m_bookmark_AfterDelete);
+                return m_bookmark_AfterDelete;
+            }
+        }
+        OWBookmark m_bookmark_AfterDelete;
+        #endregion
+
+        // Attrs needed for undoing a footnote deletion --------------------------------------
+        protected DFootnote m_CopyOfDeletedFootnote;
+        protected OWBookmark m_bookmark_PositionOfFootnoteLetter;
+        protected DFootnote m_InsertedFootnote;
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        protected InsertDeleteFootnoteAction(string sDisplayName, OWWindow window)
+            : base(sDisplayName)
+        {
+            m_Window = window;
+        }
+        #endregion
+
+        // Insert and Delete Commands --------------------------------------------------------
+        #region Method: bool InsertFootnote()
+        public bool InsertFootnote()
+        {
+            if (Window.HandleLockedFromEditing())
+                return false;
+
+            // Bookmark the "Before" selection so we can Undo back to it
+            OWWindow.Sel selection = Window.Selection;
+            m_bookmark_BeforeInsert = new OWBookmark(selection);
+
+            // If we have a selection, then move to the end of it. We'll be placing the new
+            // footnote at the end of this selection
+            if (selection.IsContentSelection)
+            {
+                selection = OWWindow.Sel.CreateSel(
+                    selection.Paragraph,
+                    selection.DBT,
+                    selection.DBT_iCharLast);
+            }
+
+            // Get the position where the footnote will happen
+            DBasicText text = selection.DBT;
+            int iPos = selection.DBT_iChar(selection.Anchor);
+
+            // Retrieve the underlying paragraph
+            DParagraph para = text.Paragraph;
+            if (null == para)
+                return false;
+
+            // Insert a DFootLetter into the paragraph
+            DFootLetter footLetter = para.InsertFootnote(text, iPos);
+            m_InsertedFootnote = footLetter.Footnote;
+
+            // Reload the window's data. This is time-consuming, but it is the only way to make 
+            // paragraphs line up correctly side-by-side.
+            Window.LoadData();
+
+            // Move editing to the new footnote
+            DFootnote footnote = footLetter.Footnote;
+            Window.Select_FirstPositionInParagraph(footnote);
+
+            // Remember where we are so we can undo
+            m_bookmark_AfterInsert = new OWBookmark(Window.Selection);
+
+            return true;
+        }
+        #endregion
+        #region Method: bool RemoveFootnote()
+        public bool RemoveFootnote()
+        {
+            if (Window.HandleLockedFromEditing())
+                return false;
+
+            // Bookmark the "Before" selection so we can Undo back to it
+            OWWindow.Sel selection = Window.Selection;
+            m_bookmark_BeforeDelete = new OWBookmark(selection);
+
+            // Retrieve the current footnote
+            DFootnote footnote = selection.DBT.Paragraph as DFootnote;
+            if (null == footnote)
+                return false;
+
+            // Prepare for possible future Undo
+            // Move the cursor to its place in the text; make a note of the selection
+            Window.OnSelectAndScrollFromFootnote(footnote);
+            m_bookmark_PositionOfFootnoteLetter = new OWBookmark(Window.Selection);
+            // Make a copy of the footnote
+            m_CopyOfDeletedFootnote = new DFootnote(footnote.Translation, footnote);
+            m_CopyOfDeletedFootnote.CopyFrom(footnote, false);
+
+            // Retrieve the paragraph and run that refers to it; and remove
+            // the footnote
+            bool bRemoved = false;
+            foreach (DParagraph p in footnote.Section.Paragraphs)
+            {
+                foreach (DRun r in p.Runs)
+                {
+                    DFootLetter letter = r as DFootLetter;
+                    if (letter == null)
+                        continue;
+
+                    if (letter.Footnote != footnote)
+                        continue;
+
+                    footnote.Section.Footnotes.Remove(footnote);
+                    p.RemoveFootnote(r as DFootLetter);
+                    bRemoved = true;
+                    break;
+                }
+                if (bRemoved)
+                    break;
+            }
+            if (!bRemoved)
+                return false;
+
+            // Reload the window's data. This is time-consuming, but it is the only way to make 
+            // paragraphs line up correctly side-by-side.
+            Window.LoadData();
+
+            // Select at the beginning of the window
+            Window.Select_FirstWord();
+
+            // Remember where we are so we can undo
+            m_bookmark_AfterDelete = new OWBookmark(Window.Selection);
+
+            return true;
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: InsertFootnoteAction : InsertDeleteFootnoteAction
+    public class InsertFootnoteAction : InsertDeleteFootnoteAction
+    {
+        #region Constructor(OWWindow)
+        public InsertFootnoteAction(OWWindow window)
+            : base("Insert Footnote", window)
+        {
+        }
+        #endregion
+
+        #region OMethod: bool Do() - Perform the Insert Footnote action
+        public override bool Do()
+        {
+            if (InsertFootnote())
+            {
+                Push();
+                return true;
+            }
+            return false;
+        }
+        #endregion
+        #region OMethod: void Undo()
+        public override void Undo()
+        {
+            // Don't assume that we're in the correct place
+            Bookmark_AfterInsert.RestoreWindowSelectionAndScrollPosition();
+
+            // Delete the footnote
+            RemoveFootnote();
+
+            // Restore to the original pre-Undo bookmark
+            Bookmark_BeforeInsert.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+        #region OMethod: void Redo()
+        public override void Redo()
+        {
+            // Don't assume that we're in the correct place
+            Bookmark_BeforeInsert.RestoreWindowSelectionAndScrollPosition();
+
+            // Insert the new footnote
+            InsertFootnote();
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: DeleteFootnoteAction : InsertDeleteFootnoteAction
+    public class DeleteFootnoteAction : InsertDeleteFootnoteAction
+    {
+        #region Constructor(OWWindow)
+        public DeleteFootnoteAction(OWWindow window)
+            : base("Delete Footnote", window)
+        {
+        }
+        #endregion
+
+        #region OMethod: bool Do() - Perform the Delete Footnote action
+        public override bool Do()
+        {
+            if (RemoveFootnote())
+            {
+                Push();
+                return true;
+            }
+            return false;
+        }
+        #endregion
+        #region OMethod: void Undo()
+        public override void Undo()
+        {
+            // Place the selection to where the footnote should go
+            m_bookmark_PositionOfFootnoteLetter.RestoreWindowSelectionAndScrollPosition();
+
+            // Insert the footnote
+            InsertFootnote();
+
+            // Copy its original contents back in; requires that we re-load the data
+            m_InsertedFootnote.CopyFrom(m_CopyOfDeletedFootnote, false);
+            Window.LoadData();
+
+            // Restore to the original pre-Undo bookmark
+            Bookmark_BeforeDelete.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+        #region OMethod: void Redo()
+        public override void Redo()
+        {
+            // Don't assume that we're in the correct place
+            Bookmark_BeforeDelete.RestoreWindowSelectionAndScrollPosition();
+
+            // Delete the footnote
+            RemoveFootnote();
         }
         #endregion
     }

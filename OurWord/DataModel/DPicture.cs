@@ -126,14 +126,14 @@ namespace OurWord.DataModel
 		}
 		#endregion
 
-		#region Method: override void CopyFromFront(DParagraph pFront)
-		public override void CopyFromFront(DParagraph pFront)
+        #region Method: override void CopyFrom(DParagraph pFront, bTruncateText))
+        public override void CopyFrom(DParagraph pFront, bool bTruncateText)
 		{
 			DPicture pictFront = pFront as DPicture;
 			Debug.Assert(null != pictFront);
 
 			// Copy the paragraph contents
-			base.CopyFromFront(pFront);
+            base.CopyFrom(pFront, bTruncateText);
 
 			// Copy the picture information from the Front's picture
 			PathName = pictFront.PathName;

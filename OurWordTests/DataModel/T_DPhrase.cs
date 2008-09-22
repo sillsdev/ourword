@@ -72,7 +72,7 @@ namespace OurWordTests.DataModel
             // Do the split
             text.Phrases.Split(phrase, 0);
 
-            // Should have two phrases now
+            // Should have one phrase now
             Assert.AreEqual(1, text.Phrases.Count);
             DPhrase phraseLeft = text.Phrases[0] as DPhrase;
             Assert.AreEqual("This is a phrase.", phraseLeft.Text);
@@ -90,7 +90,7 @@ namespace OurWordTests.DataModel
             // Do the split
             text.Phrases.Split(phrase, 5);
 
-            // Should have two phrases now
+            // Should have one phrase now
             Assert.AreEqual(1, text.Phrases.Count);
             DPhrase phraseLeft = text.Phrases[0] as DPhrase;
             Assert.AreEqual("Hello", phraseLeft.Text);

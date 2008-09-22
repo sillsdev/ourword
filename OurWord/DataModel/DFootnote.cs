@@ -128,7 +128,7 @@ namespace OurWord.DataModel
 		}
 		#endregion
 		#region Constructor(nChapter, nVerse, DTranslation)
-		public DFootnote(int nChapter, int nVerse, DTranslation trans)
+		public DFootnote(int nChapter, int nVerse, DTranslation trans, Types nNoteType)
 			: base(trans)
 		{
 			_ConstructAttrs();
@@ -136,23 +136,23 @@ namespace OurWord.DataModel
 
 			Reference = new DReference(nChapter, nVerse);
 
-			NoteType = Types.kSeeAlso;
+            NoteType = nNoteType;
 		}
 		#endregion
 		#region Method: void _ConstructAttrs()
 		private void _ConstructAttrs()
 		{
-			j_reference     = new JOwn("Reference",     this, typeof(DReference));
+			j_reference = new JOwn("Reference", this, typeof(DReference));
 		}
 		#endregion
 		#region Method: void _InitializeAttrs(DTranslation trans)
 		protected void _InitializeAttrs(DTranslation trans)
 		{
-			j_reference.Value  = new DReference();
+			j_reference.Value = new DReference();
 //			StyleAbbrev = OurWordMain.TeamSettings.SFMapping.StyleFootnotePara;
 		}
 		#endregion
-		#region Method: override bool ContentEquals(obj) - required override to preventn duplicates
+		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{
 			if (this.GetType() != obj.GetType())

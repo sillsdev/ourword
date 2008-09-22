@@ -35,7 +35,7 @@ using System.Windows.Forms;
 
 namespace JWTools
 {
-	#region CLASS PropertySpec - Represents a single property in the grid
+	#region CLASS: PropertySpec - Represents a single property in the grid
 	public class PropertySpec
     {
         // Attrs -----------------------------------------------------------------------------

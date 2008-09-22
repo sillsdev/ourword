@@ -251,7 +251,8 @@ namespace JWTools
             // DialogSetupFeatures
             // 
             this.AcceptButton = this.m_btnOK;
-            this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.m_btnCancel;
             this.ClientSize = new System.Drawing.Size(422, 412);
             this.Controls.Add(this.m_Tree);

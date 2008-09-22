@@ -131,6 +131,45 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VAttr{g}: bool CanInsertFootnote
+        public bool CanInsertFootnote
+        {
+            get
+            {
+                if (!Editable)
+                    return false;
+                if (IsLocked)
+                    return false;
+                if (!CanRestructureParagraphs)
+                    return false;
+
+                if (!G.Map.IsVernacularParagraph(PStyle.Abbrev))
+                    return false;
+
+                return true;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool CanDeleteFootnote
+        public bool CanDeleteFootnote
+        {
+            get
+            {
+                if (!Editable)
+                    return false;
+                if (IsLocked)
+                    return false;
+                if (!OurWordMain.s_Features.F_StructuralEditing)
+                    return false;
+
+                if (DataSource as DFootnote == null)
+                    return false;
+
+                return true;
+
+            }
+        }
+        #endregion
 
         // Ownership Hierarchy ---------------------------------------------------------------
         #region Attr{g}: OWWindow.Row.Pile Pile - the owning pile that this paragraph is in

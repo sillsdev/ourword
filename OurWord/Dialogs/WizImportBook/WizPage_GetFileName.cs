@@ -184,9 +184,9 @@ namespace OurWord.Dialogs.WizImportBook
             string s = sPathName;
             DB.Read(ref s);
             DB.TransformIn();
-            ArrayList aUnkonwnMarkers = DB.GetUnnownMarkersInventory();
+            ArrayList aUnknownMarkers = DB.GetUnnownMarkersInventory();
             string sUnrecognizedMarkers = "";
-            foreach (string sMkr in aUnkonwnMarkers)
+            foreach (string sMkr in aUnknownMarkers)
             {
                 if (sUnrecognizedMarkers.Length > 0)
                     sUnrecognizedMarkers += ", ";
@@ -320,5 +320,6 @@ namespace OurWord.Dialogs.WizImportBook
                 return;
         }
         #endregion
+
     }
 }

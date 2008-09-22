@@ -245,7 +245,7 @@ namespace JWTools
 
             // Make sure the mru is up-to-date, in case the FileName was changed 
             // since the read was done (I'm struggling to get this to work right
-            // when Rel PAth Names are changed; 30jan08)
+            // when Rel Path Names are changed; 30jan08)
             mru_Update();
         }
 		#endregion
@@ -536,7 +536,7 @@ namespace JWTools
 
 		}
 		#endregion
-        #region Method: LoadMruItem(sMenuText) - event for MRU menu item
+        #region Method: void LoadMruItem(sMenuText) - event for MRU menu item
         public void LoadMruItem(string sMenuText) 
 			// Event handler for when the user clicks on an item in the MRU. 
 		{

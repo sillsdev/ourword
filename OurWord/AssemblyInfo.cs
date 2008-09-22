@@ -33,7 +33,7 @@ using System.Security.Permissions;
 //    Revision      - not used.
 //
 // Was 0.9.13
-[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyVersion("1.0.1")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

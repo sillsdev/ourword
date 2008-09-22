@@ -265,6 +265,22 @@
         3gK2BQC9RDcFuZrexnoHvivYPJTTMWLs+s7OPzzRIokkMNVMDAAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="m_menuInsertFootnote.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAC9JREFUOE9jYBj+
+        QN9s5n8QBvkUmU2Uz7FphhlGsgED4wJ0W0kOA6L8OapoOIQAAAQTK78OYtXXAAAAAElFTkSuQmCC
+</value>
+  </data>
+  <data name="m_menuDeleteFootnote.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAHJJREFUOE9jYBje
+        YJmv738wXrbsP8in+mYz/4MwUb7GpRmrAeiKkfnIGnC6AOREuCYkZyNrgLFxegHdEJg/sRmCNQywuYKo
+        wIIpwhUORBkCtx0aXSBN2MRwGgazHV0BzBCCrgAZQFARPgWwlEaRIQOmGQCCh48QNO8xQAAAAABJRU5E
+        rkJggg==
+</value>
+  </data>
   <data name="m_menuEdit.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8

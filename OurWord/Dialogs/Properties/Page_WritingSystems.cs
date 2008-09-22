@@ -23,6 +23,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 
+using Palaso.UI.WindowsForms.Keyboarding;
 using JWTools;
 using JWdb;
 using OurWord;
@@ -238,17 +239,36 @@ namespace OurWord.Dialogs
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
 
-            // Keyboard name
+            // Keyboard name: choose from a list
+            List<KeyboardController.KeyboardDescriptor> v =
+               KeyboardController.GetAvailableKeyboards(KeyboardController.Engines.All);
+            string[] vNames = new string[v.Count + 1];
+            for (int i = 0; i < v.Count; i++)
+                vNames[i] = v[i].Name;
+            vNames[v.Count] = ""; // Provide for an empty one in case we don't want to specify one.
+            ps = new PropertySpec(
+                c_sPropKeyboard,
+                "Keyboard Name",
+                WritingSystem.Name,
+                "The name of the keyboard to use when typing in this writing system " +
+                    "(Windows IME, Keyman, etc.) Use the full name, not the abbreviation.",
+                vNames,
+                "");
+            ps.DontLocalizeEnums = true;
+
+            /*** (OLD WAY, when user had to type it in. Replaced 6 Aug 08, ver 1.0b.)
             ps = new PropertySpec(
                 c_sPropKeyboard,
                 "Keyboard Name",
                 typeof(string),
                 WritingSystem.Name,
                 "The name of the keyboard to use when typing in this writing system " +
-                    "(Windows IME, Keyman, etc.)",
+                    "(Windows IME, Keyman, etc.) Use the full name, not the abbreviation.",
                 "",
                 "",
                 null);
+            ***/
+
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
 

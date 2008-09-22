@@ -454,6 +454,8 @@ namespace OurWord
         private ToolStripDropDownButton m_btnChapter;
         private ToolStripMenuItem m_menuUndo;
         private ToolStripMenuItem m_menuRedo;
+        private ToolStripMenuItem m_menuInsertFootnote;
+        private ToolStripMenuItem m_menuDeleteFootnote;
         private ToolStripSeparator m_separatorUndoRedo;
         private ToolStripMenuItem m_menuPreviousSection;
         private ToolStripMenuItem m_menuNextSection;
@@ -618,7 +620,9 @@ namespace OurWord
                     sTitle = (sTitle.Substring(0, c_cMaxMenuLength) + "...");
 
                 // Put together a menu name
-                string sMenuText = sReference + " - " + sTitle;
+                string sMenuText = sReference;
+                if (!string.IsNullOrEmpty(sTitle))
+                    sMenuText += (" - " + sTitle);
 
                 // Add it to the appropriate button
                 if (i == iPos)
@@ -667,6 +671,8 @@ namespace OurWord
             m_menuCut.Enabled = bCanEdit;
             m_menuPaste.Enabled = bCanEdit;
             m_menuChangeParagraphTo.Enabled = bCanEdit;
+            m_menuInsertFootnote.Enabled = bCanEdit;
+            m_menuDeleteFootnote.Enabled = bCanEdit;
 
             // Notes
             if (SideWindows.HasNotesWindow)
@@ -750,7 +756,7 @@ namespace OurWord
 #endif
             m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
 
-            // Main Window itesm: Drafting, Naturalness, BT
+            // Main Window items: Drafting, Naturalness, BT
             m_menuDrafting.Visible = bShowMainWindowSection;
             m_menuBackTranslation.Visible = (bShowMainWindowSection && s_Features.F_JobBT);
             m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && s_Features.F_JobNaturalness);
@@ -780,6 +786,8 @@ namespace OurWord
             SetupChangeParagraphStyleItems();
             m_seperatorEdit.Visible = bStructuralEditing;
             m_menuChangeParagraphTo.Visible = bStructuralEditing;
+            m_menuInsertFootnote.Visible = bStructuralEditing;
+            m_menuDeleteFootnote.Visible = bStructuralEditing;
             m_menuEdit.Visible = bEditMenuVisible;
             m_menuUndo.Visible = Features.F_UndoRedo;
             m_menuRedo.Visible = Features.F_UndoRedo;
@@ -1006,6 +1014,8 @@ namespace OurWord
             this.m_menuPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.m_seperatorEdit = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuChangeParagraphTo = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuInsertFootnote = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuDeleteFootnote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnItalic = new System.Windows.Forms.ToolStripButton();
             this.m_btnGotoFirstSection = new System.Windows.Forms.ToolStripButton();
             this.m_btnGotoPreviousSection = new System.Windows.Forms.ToolStripSplitButton();
@@ -1238,7 +1248,9 @@ namespace OurWord
             this.m_menuCopy,
             this.m_menuPaste,
             this.m_seperatorEdit,
-            this.m_menuChangeParagraphTo});
+            this.m_menuChangeParagraphTo,
+            this.m_menuInsertFootnote,
+            this.m_menuDeleteFootnote});
             this.m_menuEdit.Image = ((System.Drawing.Image)(resources.GetObject("m_menuEdit.Image")));
             this.m_menuEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_menuEdit.Name = "m_menuEdit";
@@ -1312,6 +1324,22 @@ namespace OurWord
             this.m_menuChangeParagraphTo.Size = new System.Drawing.Size(189, 22);
             this.m_menuChangeParagraphTo.Text = "C&hange Paragraph To";
             this.m_menuChangeParagraphTo.ToolTipText = "Changes the style of the selected paragraph to another style.";
+            // 
+            // m_menuInsertFootnote
+            // 
+            this.m_menuInsertFootnote.Image = ((System.Drawing.Image)(resources.GetObject("m_menuInsertFootnote.Image")));
+            this.m_menuInsertFootnote.Name = "m_menuInsertFootnote";
+            this.m_menuInsertFootnote.Size = new System.Drawing.Size(189, 22);
+            this.m_menuInsertFootnote.Text = "Insert Footnote";
+            this.m_menuInsertFootnote.Click += new System.EventHandler(this.cmdInsertFootnote);
+            // 
+            // m_menuDeleteFootnote
+            // 
+            this.m_menuDeleteFootnote.Image = ((System.Drawing.Image)(resources.GetObject("m_menuDeleteFootnote.Image")));
+            this.m_menuDeleteFootnote.Name = "m_menuDeleteFootnote";
+            this.m_menuDeleteFootnote.Size = new System.Drawing.Size(189, 22);
+            this.m_menuDeleteFootnote.Text = "Delete Footnote";
+            this.m_menuDeleteFootnote.Click += new System.EventHandler(this.cmdDeleteFootnote);
             // 
             // m_btnItalic
             // 
@@ -1803,8 +1831,8 @@ namespace OurWord
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OurWordMain";
             this.Text = "Our Word!";
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmd_OnClosing);
             this.Load += new System.EventHandler(this.cmd_OnLoad);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdClosing);
             this.m_ToolStrip.ResumeLayout(false);
             this.m_ToolStrip.PerformLayout();
             this.m_toolStripContainer.BottomToolStripPanel.ResumeLayout(false);
@@ -2490,9 +2518,9 @@ namespace OurWord
             MainWindow.Focus();
         }
 		#endregion
-		#region Event: cmd_OnClosing(...) - on closing the app, save the window state
-		private void cmd_OnClosing(object sender, System.ComponentModel.CancelEventArgs e)
-		{
+        #region Event: cmdClosing - save window state, data, etc.
+        private void cmdClosing(object sender, FormClosingEventArgs e)
+        {
 			// Save data
 			OnLeaveProject();
 
@@ -2504,8 +2532,8 @@ namespace OurWord
 			m_WindowState.SaveWindowState();
 
 			G.TeamSettings.Write();
-		}
-		#endregion
+        }
+        #endregion
         #region Event: OnResize - prevent the size from becomming too small
         protected override void OnResize(EventArgs e)
         {
@@ -2776,7 +2804,7 @@ namespace OurWord
             if (null != FocusedWindow)
                 sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
 
-            // Uncheck all of the subitems
+            // Check/Uncheck all of the subitems
             foreach (ToolStripMenuItem mi in m_menuChangeParagraphTo.DropDownItems)
             {
                 mi.Checked = false;
@@ -2784,8 +2812,30 @@ namespace OurWord
                 if (mi.Tag as string == sAbbrev)
                     mi.Checked = true;
             }
+
+            // Enable the Insert/Delete footnote commands
+            m_menuDeleteFootnote.Enabled = (null == FocusedWindow) ?
+                false : FocusedWindow.canDeleteFootnote;
+            m_menuInsertFootnote.Enabled = (null == FocusedWindow) ?
+                false : FocusedWindow.canInsertFootnote;
         }
 		#endregion
+        #region Cmd: cmdInsertFootnote
+        private void cmdInsertFootnote(object sender, EventArgs e)
+        {
+            OWWindow wnd = FocusedWindow;
+            if (null != wnd)
+                wnd.cmdInsertFootnote();
+        }
+        #endregion
+        #region Cmd: cmdDeleteFootnote
+        private void cmdDeleteFootnote(object sender, EventArgs e)
+        {
+            OWWindow wnd = FocusedWindow;
+            if (null != wnd)
+                wnd.cmdDeleteFootnote();
+        }
+        #endregion
 
         // Navigation
 		#region Cmd: cmdGoToFirstSection
@@ -3334,7 +3384,6 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
-
         #endregion
 
     }

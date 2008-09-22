@@ -54,7 +54,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
-        // Splitting & Joinging paragraphs ---------------------------------------------------
+        // Splitting & Joining paragraphs ----------------------------------------------------
         #region Method: DParagraph SplitParagraphSetup()
         private DParagraph SplitParagraphSetup()
         {
@@ -189,8 +189,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region Test: SplitAndJoinParas_BoundaryEnding
-        [Test]
-        public void SplitAndJoinParas_BoundaryEnding()
+        [Test] public void SplitAndJoinParas_BoundaryEnding()
         {
             // Create a test paragraph
             DParagraph p = SplitParagraphSetup();
@@ -226,8 +225,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region Test: SplitAndJoinParas_AfterVerse
-        [Test]
-        public void SplitAndJoinParas_AfterVerse()
+        [Test] public void SplitAndJoinParas_AfterVerse()
         {
             // Create a test paragraph
             DParagraph p = SplitParagraphSetup();
@@ -258,8 +256,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region Test: SplitAndJoinParas_BeforeVerse
-        [Test]
-        public void SplitAndJoinParas_BeforeVerse()
+        [Test] public void SplitAndJoinParas_BeforeVerse()
         {
             // Create a test paragraph
             DParagraph p = SplitParagraphSetup();
@@ -351,6 +348,125 @@ namespace OurWordTests.DataModel
                 p.Split(p.Runs[2] as DBasicText, 23);
                 Assert.AreEqual(1, m_section.Paragraphs.Count);
             }
+        }
+        #endregion
+
+        // Inserting and Removing Footnotes --------------------------------------------------
+        #region Method: void TestInsertFootnote(iRun, iPosWithinRun, s, sBT)
+        DFootLetter TestInsertFootnote(int iRun, int iPosWithinRun, 
+            string sExpectedAfterInsert, string sExpectedAfterInsertBT)
+        {
+            // Create a test paragraph
+            DParagraph p = SplitParagraphSetup();
+
+            // Locate the run (DBasicText) in question
+            DBasicText dbt = p.Runs[iRun] as DBasicText;
+
+            // Insert the footnote
+            DFootLetter foot = p.InsertFootnote(dbt, iPosWithinRun);
+
+            // Debugging optional
+            Console.WriteLine("Expected    = <" + sExpectedAfterInsert + ">");
+            Console.WriteLine("Actual      = <" + p.DebugString + ">");
+            Console.WriteLine("Expected BT = <" + sExpectedAfterInsertBT + ">");
+            Console.WriteLine("Actual   BT = <" + p.ProseBTAsString + ">");
+
+            // Test
+            Assert.AreEqual(sExpectedAfterInsert, p.DebugString, "Insert Footnote");
+            Assert.AreEqual(sExpectedAfterInsertBT, p.ProseBTAsString, "Insert Footnote - BT");
+
+            return foot;
+        }
+        #endregion
+        #region Method: void TestRemoveFootnote(DParagraph p)
+        void TestRemoveFootnote(DFootLetter foot)
+        {
+            // Remove the footnote
+            DParagraph p = foot.Owner as DParagraph;
+            p.RemoveFootnote(foot);
+            Assert.AreEqual("{c 3}{v 16}For God so loved the |iworld |rthat he gave his one " +
+                "and only son{v 17}that whosoever believes in him |ishall not perish, |rbut " +
+                "have everlasting life.",
+                p.DebugString,
+                "Remove Footnote");
+
+            // Clear what we've done
+            m_section.Paragraphs.Clear();
+        }
+        #endregion
+        #region Test: InsertFootnote_BetweenWords
+        [Test] public void InsertFootnote_BetweenWords()
+        {
+            // Insert at "For |God"
+            DFootLetter letter = TestInsertFootnote(2, 4,
+                "{c 3}{v 16}For {fn a}God so loved the |iworld |rthat he gave his " +
+                    "one and only son{v 17}that whosoever believes in him |ishall " +
+                    "not perish, |rbut have everlasting life.",
+                "316a17");
+            TestRemoveFootnote(letter);
+        }
+        #endregion
+        #region Test: InsertFootnote_WithinWord
+        [Test] public void InsertFootnote_WithinWord()
+        {
+            // Insert at "wo|rld"
+            DFootLetter letter = TestInsertFootnote(2, 23,
+                "{c 3}{v 16}For God so loved the |iwo|r{fn a}|irld |rthat he gave his " +
+                    "one and only son{v 17}that whosoever believes in him |ishall " +
+                    "not perish, |rbut have everlasting life.",
+                "316a17");
+            TestRemoveFootnote(letter);
+        }
+        #endregion
+        #region Test: InsertFootnote_BoundaryBeginning
+        [Test] public void InsertFootnote_BoundaryBeginning()
+        {
+            // Insert at "|For God": we don't permit the footnote to be inserted
+            // at the beginning of a text, as there would be no text before it.
+            // So we expect nothing to happen.
+            DFootLetter letter = TestInsertFootnote(2, 0,
+                "{c 3}{v 16}For God so loved the |iworld |rthat he gave his " +
+                    "one and only son{v 17}that whosoever believes in him |ishall " +
+                    "not perish, |rbut have everlasting life.",
+                "31617");
+            Assert.IsNull(letter);
+        }
+        #endregion
+        #region Test: InsertFootnote_BoundaryEnding
+        [Test] public void InsertFootnote_BoundaryEnding()
+        {
+            // Insert at "life.|"
+            DFootLetter letter = TestInsertFootnote(4, 75,
+                "{c 3}{v 16}For God so loved the |iworld |rthat he gave his " +
+                    "one and only son{v 17}that whosoever believes in him |ishall " +
+                    "not perish, |rbut have everlasting life.{fn a}",
+                "31617a");
+            TestRemoveFootnote(letter);
+        }
+        #endregion
+        #region Test: InsertFootnote_AfterVerseNumber
+        [Test] public void InsertFootnote_AfterVerseNumber()
+        {
+            // Insert after verse 17: nothing should happen because we're at the beginning
+            // of text.
+            DFootLetter letter = TestInsertFootnote(4, 0,
+                "{c 3}{v 16}For God so loved the |iworld |rthat he gave his " +
+                    "one and only son{v 17}that whosoever believes in him |ishall " +
+                    "not perish, |rbut have everlasting life.",
+                "31617");
+            Assert.IsNull(letter);
+        }
+        #endregion
+        #region Test: InsertFootnote_BeforeVerseNumber
+        [Test] public void InsertFootnote_BeforeVerseNumber()
+        {
+            // Insert before verse 17: 
+            DFootLetter letter = TestInsertFootnote(2, 60,
+                "{c 3}{v 16}For God so loved the |iworld |rthat he gave his " +
+                    "one and only son{fn a}{v 17}that whosoever believes in him |ishall " +
+                    "not perish, |rbut have everlasting life.",
+                "316a17");
+            TestRemoveFootnote(letter);
         }
         #endregion
 
@@ -491,7 +607,8 @@ namespace OurWordTests.DataModel
             p = new DParagraph(G.Project.TargetTranslation);
             p.Runs.Append(DVerse.Create("3"));
             p.Runs.Append(DVerse.Create("4"));
-            p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, G.Project.TargetTranslation)));
+            p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, 
+                G.Project.TargetTranslation, DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(5, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DVerse);
@@ -502,7 +619,8 @@ namespace OurWordTests.DataModel
 
             // There should be a DText before a paragraph-initial footnote
             p = new DParagraph(G.Project.TargetTranslation);
-            p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, G.Project.TargetTranslation)));
+            p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, 
+                G.Project.TargetTranslation, DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(2, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DText);

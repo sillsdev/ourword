@@ -1012,7 +1012,7 @@ namespace OurWord.DataModel
 
             #region Method: DPhrase Split(DPhrase phraseToSplit, int iPos)
             /// <summary>
-            /// Splits the phrase, iff the position requested is not at a prhase boundary. 
+            /// Splits the phrase, iff the position requested is not at a phrase boundary. 
             /// Otherwise, nothing is done.
             /// </summary>
             /// <param name="phraseToSplit">The phrase to be split into two</param>
