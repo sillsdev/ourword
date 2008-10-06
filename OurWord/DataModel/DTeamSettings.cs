@@ -450,6 +450,7 @@ namespace OurWord.DataModel
 
 		// Paragraph Style Abbreviations -----------------------------------------------------
         public const string c_StyleSectionTitle        = "s";
+        public const string c_StyleCrossReference      = "r";
 		public const string c_StyleQuote1              = "q";
 		public const string c_StyleQuote2              = "q2";
 		public const string c_StyleQuote3              = "q3";
@@ -595,9 +596,9 @@ namespace OurWord.DataModel
             }
 
             // Cross Reference (r)
-			if (null == FindParagraphStyle("r"))
+            if (null == FindParagraphStyle(c_StyleCrossReference))
 			{
-				style = AddParagraphStyle("r", "Cross References");
+                style = AddParagraphStyle(c_StyleCrossReference, "Cross References");
 				style.SetFonts(true, 10, false, true, false, false, Color.Black);
 				style.IsCentered = true;
 				style.KeepWithNext = true;

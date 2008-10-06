@@ -30,6 +30,7 @@ namespace OurWord.View
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "BT";
+        public const string c_sRegDisplayInterlinearBT = "DisplayIBT";
         #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
         static public string RegistryBackgroundColor
         {
@@ -42,6 +43,25 @@ namespace OurWord.View
                 OWWindow.SetRegistryBackgroundColor(c_sName, value);
             }
         }
+        #endregion
+        #region SAttr{g}: bool DisplayInterlinearBT
+        static public bool DisplayInterlinearBT
+        {
+            get
+            {
+                if (s_nDisplayInterlinearBT == -1)
+                {
+                    s_nDisplayInterlinearBT = JW_Registry.GetValue(c_sName, c_sRegDisplayInterlinearBT, 0);
+                }
+                return (s_nDisplayInterlinearBT == 1) ? true : false;
+            }
+            set
+            {
+                s_nDisplayInterlinearBT = (value == true) ? 1 : 0;
+                JW_Registry.SetValue(c_sName, c_sRegDisplayInterlinearBT, s_nDisplayInterlinearBT);
+            }
+        }
+        static int s_nDisplayInterlinearBT = -1;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -98,8 +118,36 @@ namespace OurWord.View
         }
         #endregion
 
+        // Interlinear BT Option -------------------------------------------------------------
+        void LoadData_IBT()
+        {
+            // Loop through the paragraphs
+            foreach (DParagraph p in G.STarget.Paragraphs)
+            {
+                // Start the new row and add the left side (vernacular)
+                StartNewRow(false, GetPicture(p));
+
+
+                // TODO
+            }
+
+            // Tell the superclass to finish loading, which involves laying out the window 
+            // with the data we've just put in, as doing the same for any secondary windows.
+            base.LoadData();
+        }
+
         // Create the Window Contents from the data ------------------------------------------
         const int c_xMaxPictureWidth = 300;
+        #region Method: Bitmap GetPicture(DParagraph p)
+        Bitmap GetPicture(DParagraph p)
+        {
+            DPicture pict = p as DPicture;
+            if (null != pict)
+                return pict.GetBitmap(c_xMaxPictureWidth);
+            return null;
+        }
+        #endregion
+
         #region Method: override void LoadData()
         public override void LoadData()
         {
@@ -113,14 +161,8 @@ namespace OurWord.View
             // Load the paragraphs
             foreach (DParagraph p in G.STarget.Paragraphs)
             {
-                // Retrieve the bitmap, if a picture is involved
-                Bitmap bmp = null;
-                DPicture pict = p as DPicture;
-                if (null != pict)
-                    bmp = pict.GetBitmap(c_xMaxPictureWidth);
-
                 // Start the new row and add the left side (vernacular)
-                StartNewRow(false, bmp);
+                StartNewRow(false, GetPicture(p));
 
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)

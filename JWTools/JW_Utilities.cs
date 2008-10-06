@@ -14,6 +14,8 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.Management.Instrumentation;
+using System.Management;
 using System.Reflection;
 using System.Text;
 using System.Threading;
@@ -291,5 +293,370 @@ namespace JWTools
         #endregion
 
     }
+
+    #region CLASS: JW_Util
+    public class JW_Util
+	{
+		#region Method: static void TextWriter GetTextWriter(string sPath)
+		public static TextWriter GetTextWriter(string sPath)
+		{
+            // Delete any existing file, so that we can avoid the Read-Only
+            // problems that have been happening in Timor.
+            try
+            {
+                File.Delete(sPath);
+            }
+            catch (Exception)
+            {
+            }
+
+            // Create a new file to write to
+			StreamWriter w = new StreamWriter(sPath, false, Encoding.UTF8);
+			TextWriter tw = TextWriter.Synchronized(w);
+			return tw;
+		}
+		#endregion
+		#region Method: static void TextReader GetTextReader(ref sPath, sFileFilter,)
+		public static TextReader GetTextReader(ref string sPath, string sFileFilter)
+		{
+			StreamReader r = OpenStreamReader(ref sPath, sFileFilter);
+			TextReader tr = TextReader.Synchronized(r);
+			return tr;
+		}
+		#endregion
+
+		#region Method: StreamReader OpenStreamReader(...) - provides opportunity to browse
+		static public StreamReader OpenStreamReader(
+			ref string sPathName, 
+			string sFileFilter)
+		{
+			if (!File.Exists(sPathName))
+			{
+				// Tell the user, and see if he wants to browse for it
+				string sMessage = "Unable to locate file \n\"" + sPathName +
+					".\" \n\nDo you want to browse for it?";
+				DialogResult result = MessageBox.Show( Form.ActiveForm, sMessage, 
+					"File Not Found", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+				if (result != DialogResult.Yes)
+					throw new IOException("Unable to locate file" + sPathName);
+
+				// Browse for the file
+				OpenFileDialog dlg = new OpenFileDialog();
+
+				// We only want to return a single file
+				dlg.Multiselect = false;
+
+				// Filter on the desired type of files
+				if (null != sFileFilter && sFileFilter.Length > 0)
+				{
+					dlg.Filter = sFileFilter;
+					dlg.FilterIndex = 0;
+				}
+
+				// Retrieve Dialog Title from resources
+				dlg.Title = "Browse for " + Path.GetFileName(sPathName);
+
+				// Get the default pathname
+				if (sPathName.Length > 0)
+				{
+					dlg.InitialDirectory = Path.GetDirectoryName(sPathName);
+					dlg.FileName = Path.GetFileName(sPathName);
+				}
+
+				// Browse for the file
+				if (DialogResult.OK != dlg.ShowDialog(Form.ActiveForm))
+					throw new IOException("Unable to locate file" + sPathName);
+				sPathName = dlg.FileName;
+			}
+
+            return new StreamReader(sPathName, Encoding.UTF8);
+		}
+		#endregion
+
+		#region Method: static void CreateBackup(string sPathName, string sNewExtension)
+		static public void CreateBackup(string sPathName, string sNewExtension)
+		{
+			string sBackupPathName = Path.ChangeExtension(sPathName, sNewExtension);
+			if (File.Exists(sPathName))
+			{
+				try
+				{
+					if (File.Exists(sBackupPathName))
+						File.Delete(sBackupPathName);
+					File.Move(sPathName, sBackupPathName);
+				}
+				catch (Exception)
+				{}
+			}
+		}
+		#endregion
+		#region Method: static void RestoreFromBackup(string sPathName, string sExtension)
+		static public void RestoreFromBackup(string sPathName, string sExtension)
+		{
+			try
+			{
+				// Give time for the OS to finish any cleanup it is doing
+				Thread.Sleep(1000);
+
+				// Copy the backup onto the filename (provided one exists, of course)
+				string sBackupPathName = Path.ChangeExtension(sPathName, sExtension);
+				if (File.Exists(sBackupPathName))
+					File.Copy(sBackupPathName, sPathName, true);
+			}
+			catch (Exception)
+			{}
+		}
+		#endregion
+
+		#region Method: static long GetFreeDiskSpace(string sDrive)
+		static public long GetFreeDiskSpace(string sDrive)
+			// Borrowed from a message by Roman Rodov, 5mar04, on the CodeGuru
+			// message board. 
+		{
+			long lFreeSpace = 0L;
+
+			// Get the management class holding Logical Drive information
+			ManagementClass mcDriveClass = new ManagementClass("Win32_LogicalDisk");
+
+			// Enumerate all logical drives available
+//			Console.WriteLine("GetFreeDiskSpace thread exits here...");
+			ManagementObjectCollection mocDrives = mcDriveClass.GetInstances();
+			foreach(ManagementObject moDrive in mocDrives)
+			{
+				// sDeviceId will hold the drive name eg "C:"
+				String sDeviceId = moDrive.Properties["DeviceId"].Value.ToString() + "\\";
+				if (sDeviceId == sDrive)
+				{
+					PropertyData pd = moDrive.Properties["FreeSpace"];
+					lFreeSpace = long.Parse(pd.Value.ToString());
+					break;
+				}
+			}
+
+			// Done
+			mocDrives.Dispose();
+			mcDriveClass.Dispose();
+
+			return lFreeSpace;
+		}
+		#endregion
+
+		// XML Utilities ---------------------------------------------------------------------
+		const char c_chDelim = '\"';
+		const char c_chBlank = ' ';
+		#region Method: static string XmlGetStringAttr(string sAttr, string s)
+		static public string XmlGetStringAttr(string sAttr, string s)
+			// Given a string s, such as
+			//    <SR ID="3425" Gloss="return home" Form="pulang">
+			// if "Form" is requested, returns
+			//    pulang
+		{
+			// Find the Attribute within the string
+			int i = s.IndexOf(sAttr);
+			if (-1 == i)
+				return "";
+
+			// Move to the opening delimiter
+			while (i < s.Length && s[i] != c_chDelim)
+				++i;
+			if (i < s.Length && s[i] == c_chDelim)
+				++i;
+
+			// Extract the value
+			string sValue = "";
+			while( i < s.Length && s[i] != c_chDelim)
+			{
+				sValue += s[i];
+				i++;
+			}
+			return sValue;
+		}
+		#endregion
+		#region Method: static int XmlGetIntAttr(string sAttr, string s)
+		static public int XmlGetIntAttr(string sAttr, string s)
+		{
+			string sValue = XmlGetStringAttr(sAttr,s);
+
+			try
+			{
+				int nValue = Convert.ToInt16(sValue);
+				return nValue;
+			}
+			catch(Exception)
+			{
+				return 0;
+			}
+		}
+		#endregion
+		#region Method: static int XmlGetBoolAttr(string sAttr, string s)
+		static public bool XmlGetBoolAttr(string sAttr, string s)
+		{
+			string sValue = XmlGetStringAttr(sAttr,s);
+
+			if (sValue.ToLower() == "true")
+				return true;
+
+			return false;
+		}
+		#endregion
+		#region Method: static string[] XmlGetEmbeddedObjects(string sAttr, string s)
+		static public string[] XmlGetEmbeddedObjects(string sAttr, string s)
+		{
+			// The sTag will start each new embedded object
+			string sTag = "<" + sAttr + " ";
+
+			// Find the first one; if there isn't one, then return an empty array
+			int i = s.IndexOf(sTag);
+			if (-1 == i)
+				return new string[0];
+			s = s.Substring(i);
+
+			// We'll temporarily put the answers in an array list
+			ArrayList a = new ArrayList();
+
+			// Extract all of the strings. We assume that they are all here in a row,
+			// together. If this turns out not to be the case, then we'll need to
+			// rework the logic to use s.IndexOf(sTag) to find subsequent ones.
+			while (s.Length > 0 && s.IndexOf(sTag) == 0)
+			{
+				int nLen = XmlDistanceToClosingBrace(s);
+
+				string sObject = s.Substring(0, nLen + 1);
+
+				a.Add(sObject);
+
+				s = s.Substring(nLen + 1);
+
+				while (s.Length > 0 && s[0] == ' ')
+					s = s.Substring(1);
+			}
+
+			// Convert to a string array
+			string[] v = new string[ a.Count ];
+			for(int k=0; k<a.Count; k++)
+				v[k] = (string)a[k];
+			return v;
+		}
+		#endregion
+		#region Method: static int XmlDistanceToClosingBrace(string s)
+		static public int XmlDistanceToClosingBrace(string s)
+		{
+			// We should be sitting at an opening brace
+			if (s.Length == 0 || s[0] != '<')
+				return 0;
+
+			// Use this to ignore any '>' that might be in a field
+			bool bIsInField = false;
+
+			// Use this to skip over any embedded data
+			int cDepth = 0;
+
+			// Loop through the line until we find it
+			int i = 1;
+			while( i < s.Length )
+			{
+				// We've found the closing bracket
+				if (s[i] == '>' &&  !bIsInField && cDepth == 0)
+					break;
+
+				if ( s[i] == c_chDelim )
+					bIsInField = !bIsInField;
+
+				if ( s[i] == '<')
+					cDepth++;
+				if (s[i] == '>')
+					cDepth--;
+
+				i++;
+			}
+			return i;
+		}
+		#endregion
+
+        #region SMethod: string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
+        static public string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
+		{
+			Debug.Assert(sAttr.Length > 0);
+			Debug.Assert(sAttr[ sAttr.Length - 1] != '=');
+
+			string s = sAttr + "=" + c_chDelim + sValue + c_chDelim;
+
+			if (bSpaceAfter)
+				s += c_chBlank;
+
+			return s;
+        }
+        #endregion
+        #region SMethod: string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
+        static public string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
+		{
+			return XmlValue(sAttr, nValue.ToString(), bSpaceAfter );
+        }
+        #endregion
+        #region SMethod: string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
+        static public string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
+		{
+			return XmlValue(sAttr,(bValue ? "true" : "false" ), bSpaceAfter );
+        }
+        #endregion
+
+        #region SMethod: Encoding GetUnicodeFileEncoding(String FileName)
+        public static Encoding GetUnicodeFileEncoding(String FileName)
+            // Return the Encoding of a text file.  Return Encoding.Default if no Unicode
+            // BOM (byte order mark) is found.
+        {
+            Encoding enc = null;
+
+            FileInfo info = new FileInfo(FileName);
+
+            FileStream stream = null;
+
+            try
+            {
+                stream = info.OpenRead();
+
+                Encoding[] UnicodeEncodings = { Encoding.BigEndianUnicode, Encoding.Unicode, Encoding.UTF8 };
+
+                for (int i = 0; enc == null && i < UnicodeEncodings.Length; i++)
+                {
+                    stream.Position = 0;
+
+                    byte[] Preamble = UnicodeEncodings[i].GetPreamble();
+
+                    bool PreamblesAreEqual = true;
+
+                    for (int j = 0; PreamblesAreEqual && j < Preamble.Length; j++)
+                    {
+                        PreamblesAreEqual = Preamble[j] == stream.ReadByte();
+                    }
+
+                    if (PreamblesAreEqual)
+                    {
+                        enc = UnicodeEncodings[i];
+                    }
+                }
+            }
+            catch (System.IO.IOException)
+            {
+                return null;
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Close();
+                }
+            }
+
+            if (enc == null)
+            {
+                enc = Encoding.Default;
+            }
+
+            return enc;
+        }
+    #endregion
+    }
+    #endregion
 
 }

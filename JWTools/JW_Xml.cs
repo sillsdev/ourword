@@ -11,8 +11,6 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Drawing;
-using System.Management.Instrumentation;
-using System.Management;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
@@ -23,6 +21,721 @@ using Microsoft.Win32;
 
 namespace JWTools
 {
+    public class XItem
+    {
+        static protected bool Debugging = true;
+
+        #region VirtAttr{g}: string OneLiner
+        public virtual string OneLiner
+        {
+            get
+            {
+                return "";
+            }
+        }
+        #endregion
+        #region VirtMethod: bool ContentEquals(XItem item)
+        public virtual bool ContentEquals(XItem item)
+        {
+            Debug.Assert(false);
+            return false;
+        }
+        #endregion
+    }
+
+    public class XString : XItem
+    {
+        #region Attr{g}: string Text
+        public string Text
+        {
+            get
+            {
+                return m_sText;
+            }
+        }
+        string m_sText;
+        #endregion
+
+        #region Constructor(sText)
+        public XString(string sText)
+            : base()
+        {
+            m_sText = sText;
+        }
+        #endregion
+        #region OMethod: bool ContentEquals(XItem item)
+        public override bool ContentEquals(XItem item)
+        {
+            XString xs = item as XString;
+            if (null == xs)
+                return false;
+
+            if (Text != xs.Text)
+            {
+                if (XItem.Debugging)
+                {
+                    Console.WriteLine("TEXT MISMATCH:");
+                    Console.WriteLine("   <" + Text + ">");
+                    Console.WriteLine("   <" + xs.Text + ">");
+                }
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+
+        #region OAttr{g}: string OneLiner
+        public override string OneLiner
+        {
+            get
+            {
+                return Text;
+            }
+        }
+        #endregion
+    }
+
+    public class XElement : XItem
+    {
+        // Attrs -----------------------------------------------------------------------------
+        #region Attr{g}: string Tag
+        public string Tag
+        {
+            get
+            {
+                return m_sTag;
+            }
+        }
+        string m_sTag;
+        #endregion
+
+        // Sub Items -------------------------------------------------------------------------
+        #region Attr{g}: XItem[] Items
+        public XItem[] Items
+        {
+            get
+            {
+                Debug.Assert(null != m_vItems);
+                return m_vItems;
+            }
+        }
+        XItem[] m_vItems = null;
+        #endregion
+        #region Method: void AddSubItem(XItem)
+        public void AddSubItem(XItem item)
+        {
+            // Append it to the vector
+            XItem[] v = new XItem[Items.Length + 1];
+            for (int i = 0; i < Items.Length; i++)
+                v[i] = Items[i];
+            v[Items.Length] = item;
+            m_vItems = v;
+        }
+        #endregion
+        #region Method: void AddSubItem(string s)
+        public void AddSubItem(string s)
+        {
+            AddSubItem(new XString(s));
+        }
+        #endregion
+
+        // Embedded Class XAttr --------------------------------------------------------------
+        #region CLASS: XAttr
+        public class XAttr
+        {
+            // Attrs -------------------------------------------------------------------------
+            #region Attr{g}: string Tag
+            public string Tag
+            {
+                get
+                {
+                    return m_sTag;
+                }
+            }
+            string m_sTag;
+            #endregion
+            #region Attr{g}: Value
+            public string Value
+            {
+                get
+                {
+                    return m_sValue;
+                }
+            }
+            string m_sValue;
+            #endregion
+
+            // Scaffolding -------------------------------------------------------------------
+            #region Constructor(sTag, sValue)
+            public XAttr(string _sTag, string _sValue)
+            {
+                m_sTag = _sTag;
+                m_sValue = _sValue;
+            }
+            #endregion
+            #region Constructor(sTag, nValue)
+            public XAttr(string _sTag, int _nValue)
+            {
+                m_sTag = _sTag;
+                m_sValue = _nValue.ToString();
+            }
+            #endregion
+            #region Method: bool ContentEquals(XAttr attr)
+            public bool ContentEquals(XAttr attr)
+            {
+                if (Tag != attr.Tag)
+                    return false;
+                if (Value != attr.Value)
+                    return false;
+                return true;
+            }
+            #endregion
+
+            // I/O ---------------------------------------------------------------------------
+            const char c_chQuote = '\"';
+            #region VAttr{g}: string SaveString
+            public string SaveString
+            {
+                get
+                {
+                    string s = AmpersandsAndSuch(Value);
+                    return " " + Tag + '=' + c_chQuote + s + c_chQuote;
+                }
+            }
+            #endregion
+        }
+        #endregion
+        #region Attr{g}: XAttr[] Attrs
+        public XAttr[] Attrs
+        {
+            get
+            {
+                Debug.Assert(null != m_vXmlAttrs);
+                return m_vXmlAttrs;
+            }
+        }
+        XAttr[] m_vXmlAttrs;
+        #endregion
+        #region Method: void AddAttr(sTag, sValue)
+        public void AddAttr(string sTag, string sValue)
+        {
+            // Create the attribute
+            XAttr attr = new XAttr(sTag, sValue);
+
+            // Append it to the vector
+            XAttr[] v = new XAttr[Attrs.Length + 1];
+            for (int i = 0; i < Attrs.Length; i++)
+                v[i] = Attrs[i];
+            v[Attrs.Length] = attr;
+            m_vXmlAttrs = v;
+        }
+        #endregion
+        #region Method: void AddAttr(sTag, nValue)
+        public void AddAttr(string sTag, int nValue)
+        {
+            AddAttr(sTag, nValue.ToString());
+        }
+        #endregion
+        #region Method: void AddAttr(sTag, bValue)
+        public void AddAttr(string sTag, bool bValue)
+        {
+            string sValue = (bValue) ? "true" : "false";
+            AddAttr(sTag, sValue);
+        }
+        #endregion
+        #region Method: string GetAttrValue(sTag, sDefaultValue)
+        public string GetAttrValue(string sTag, string sDefaultValue)
+        {
+            foreach (XAttr attr in Attrs)
+            {
+                if (attr.Tag == sTag)
+                    return attr.Value;
+            }
+            return sDefaultValue;
+        }
+        #endregion
+        #region Method: bool GetAttrValue(sTag, bDefaultValue)
+        public bool GetAttrValue(string sTag, bool bDefaultValue)
+        {
+            foreach (XAttr attr in Attrs)
+            {
+                if (attr.Tag == sTag)
+                {
+                    if (attr.Value == "true")
+                        return true;
+                    else
+                        return false;
+                }
+            }
+            return bDefaultValue;
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(sTag)
+        public XElement(string sTag)
+            : base()
+        {
+            m_sTag = sTag;
+            m_vItems = new XItem[0];
+            m_vXmlAttrs = new XAttr[0];
+        }
+        #endregion
+        #region OMethod: bool ContentEquals(XItem item)
+        public override bool ContentEquals(XItem item)
+        {
+            XElement xe = item as XElement;
+            if (null == xe)
+                return false;
+
+            if (Tag != xe.Tag)
+            {
+                if (XItem.Debugging)
+                    Console.WriteLine("TAG MISMATCH: <" + Tag + ">---<" + xe.Tag + ">");
+                return false;
+            }
+
+            if (Attrs.Length != xe.Attrs.Length)
+            {
+                if (XItem.Debugging)
+                    Console.WriteLine("ATTRS LENGTH MISMATCH: <" + Attrs.Length.ToString() +
+                        ">---<" + xe.Attrs.Length.ToString() + ">  Tag=" + Tag);
+                return false;
+            }
+
+            for (int i = 0; i < Attrs.Length; i++)
+            {
+                if (!Attrs[i].ContentEquals(xe.Attrs[i]))
+                {
+                    return false;
+                }
+            }
+            
+            if (Items.Length != xe.Items.Length)
+            {
+                if (XItem.Debugging)
+                    Console.WriteLine("ITEMS LENGTH MISMATCH: <" + Items.Length.ToString() + 
+                        ">---<" + xe.Items.Length.ToString() + ">  Tag=" + Tag);
+                return false;
+            }
+
+            for (int i = 0; i < Items.Length; i++)
+            {
+                if (!Items[i].ContentEquals(xe.Items[i]))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        #endregion
+
+        // Virtual Attrs ---------------------------------------------------------------------
+        #region VAttr{s}: bool IsEmpty
+        public bool IsEmpty
+        {
+            get
+            {
+                if (HasAttrs)
+                    return false;
+                if (HasItems)
+                    return false;
+                return true;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool HasItems
+        bool HasItems
+        {
+            get
+            {
+                return (Items.Length > 0);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool HasAttrs
+        bool HasAttrs
+        {
+            get
+            {
+                return Attrs.Length > 0;
+            }
+        }
+        #endregion
+
+        // I/O -------------------------------------------------------------------------------
+        #region OAttr{g}: string OneLiner
+        public override string OneLiner
+        {
+            get
+            {
+                // We will put out nothing if there's nothing here to write
+                if (IsEmpty)
+                    return "";
+
+                // Will we need an end tag? Yes if we have Subitems
+                bool bUsesEndTag = HasItems;
+
+                // Start with the tag
+                string sLine = "<" + Tag;
+
+                // Add the attributes
+                foreach (XAttr attr in Attrs)
+                    sLine += attr.SaveString;
+
+                // Add the appropriate ending to the start entity
+                if (bUsesEndTag)
+                    sLine += ">";
+                else
+                    sLine += "/>";
+
+                // Write out any subfields
+                foreach (XItem item in Items)
+                    sLine += item.OneLiner;
+
+                // End Tag
+                if (bUsesEndTag)
+                    sLine += "</" + Tag + ">";
+
+                return sLine;
+            }
+        }
+        #endregion
+        #region SMethod: string AmpersandsAndSuch(sIn) - converts, e.g., '<' to "&lt;"
+        static public string AmpersandsAndSuch(string sIn)
+        {
+            if (string.IsNullOrEmpty(sIn))
+                return "";
+
+            XmlReplace[] replacements = XmlReplace.Replacements;
+
+            string sOut = "";
+            foreach (char ch in sIn)
+            {
+                bool bReplaced = false;
+                foreach (XmlReplace xr in replacements)
+                {
+                    if (xr.m_chMemory == ch)
+                    {
+                        sOut += xr.m_sXML;
+                        bReplaced = true;
+                        break;
+                    }
+                }
+
+                if (!bReplaced)
+                    sOut += ch;
+            }
+            return sOut;
+        }
+        #endregion
+        #region CLASS: CreateMethod
+        public class CreateMethod
+        {
+            // Content Attrs
+            #region Attr{g}: string[] VS
+            string[] VS
+            {
+                get
+                {
+                    Debug.Assert(null != m_vs);
+                    return m_vs;
+                }
+            }
+            string[] m_vs;
+            #endregion
+            #region Attr{g}: int I
+            int I
+            {
+                get
+                {
+                    return m_i;
+                }
+                set
+                {
+                    m_i = value;
+                }
+            }
+            int m_i;
+            #endregion
+            #region VAttr{g}: string S
+            string S
+            {
+                get
+                {
+                    Debug.Assert(!string.IsNullOrEmpty(m_vs[I]));
+                    return VS[I];
+                }
+            }
+            #endregion
+
+            // Virtual Attrs
+            #region VAttr{g}: bool IsEndTag
+            bool IsEndTag
+            {
+                get
+                {
+                    if (S.Length > 2 && S.Substring(0, 2) == "</")
+                        return true;
+                    return false;
+                }
+            }
+            #endregion
+            #region VAttr{g}: bool IsBeginTag
+            bool IsBeginTag
+            {
+                get
+                {
+                    if (S.Length > 1 && S[0] == '<' && !IsEndTag)
+                        return true;
+                    return false;
+                }
+            }
+            #endregion
+            #region VAttr{g}: bool IsSelfClosingTag
+            bool IsSelfClosingTag
+            {
+                get
+                {
+                    if (!IsBeginTag)
+                        return false;
+
+                    if (S.Substring( S.Length-2, 2) == "/>")
+                        return true;
+                    return false;
+                }
+            }
+            #endregion
+            #region VAttr{g}: string Tag - retrieves both begin and end tag names
+            string Tag
+            {
+                get
+                {
+                    if (!IsBeginTag && !IsEndTag)
+                        return null;
+
+                    string sTag = "";
+
+                    for (int i = 0; i < S.Length; i++)
+                    {
+                        char ch = S[i];
+
+                        if (ch == '<' || ch == '/')
+                            continue;
+
+                        if (char.IsWhiteSpace(ch) || ch=='>')
+                            break;
+
+                        sTag += ch;
+                    }
+
+                    return sTag;
+                }
+            }
+            #endregion
+
+            // Worker Methods
+            #region SMethod: string[] ParseIntoXmlStrings(string s)
+            static public string[] ParseIntoXmlStrings(string s)
+            {
+                ArrayList a = new ArrayList();
+
+                // We'll build the lines here
+                string sLine = "";
+
+                // Flag so that we get rid of leading spaces, tabs, etc.
+                bool bShouldEatWhitespace = true;
+
+                foreach (char ch in s)
+                {
+                    // Carriage return / line feed: we'll eat whitespace from here on
+                    if (char.IsControl(ch))
+                    {
+                        bShouldEatWhitespace = true;
+                        continue;
+                    }
+
+                    // Quit eating white space once we encounter something else
+                    if (!char.IsWhiteSpace(ch))
+                        bShouldEatWhitespace = false;
+
+                    // Eat whitespace if the conditions are correct
+                    if (bShouldEatWhitespace)
+                        continue;
+
+
+                    if (ch == '<')
+                    {
+                        if (sLine.Length > 0)
+                            a.Add(sLine);
+                        sLine = "";
+                    }
+
+                    sLine += ch;
+
+                    if (ch == '>')
+                    {
+                        if (sLine.Length > 0)
+                            a.Add(sLine);
+                        sLine = "";
+                    }
+                }
+
+                // Convert the array into a vector
+                string[] vs = new string[a.Count];
+                for (int i = 0; i < a.Count; i++)
+                {
+                    vs[i] = (string)a[i];
+                    Debug.Assert(!string.IsNullOrEmpty(vs[i]), "Should eat all empty data");
+                }
+                return vs;
+            }
+            #endregion
+            #region Method: void ParseAttrs(XElement x, string s)
+            void ParseAttrs(XElement x, string s)
+            {
+                int i = 0;
+
+                // Move past the tag
+                while (i < s.Length && s[i] != ' ')
+                    i++;
+
+                bool bIsAtAttr = true;
+                bool bIsAtValue = false;
+
+                // Loop until we end
+                string sAttr = "";
+                string sValue = "";
+                while (i < s.Length)
+                {
+                    char ch = s[i];
+
+                    // Break at end
+                    if (ch == '>' || ch == '/')
+                        break;
+
+                    // Move past whitespace
+                    if (!bIsAtValue && char.IsWhiteSpace(ch))
+                        goto loop;
+
+                    // Switches
+                    if (ch == '=')
+                    {
+                        bIsAtAttr = false;
+                        bIsAtValue = false;
+                        goto loop;
+                    }
+
+                    if (ch == '\"')
+                    {
+                        if (bIsAtValue)
+                        {
+                            x.AddAttr(sAttr, sValue);
+                            sAttr = "";
+                            sValue = "";
+                            bIsAtAttr = true;
+                            bIsAtValue = false;
+                        }
+                        else
+                            bIsAtValue = true;
+                        goto loop;
+                    }
+
+                    // Collect the attr name
+                    if (bIsAtAttr)
+                        sAttr += ch;
+                    if (bIsAtValue)
+                        sValue += ch;
+
+                loop:
+                    i++;
+                    
+                }
+            }
+            #endregion
+            #region Method: void ReadElement(XElement x) - recurses down
+            void ReadElement(XElement x)
+            {
+                while (!IsEndTag)
+                {
+                    // Not a begin tag, then it is string data
+                    if (!IsBeginTag)
+                    {
+                        x.AddSubItem(S);
+                    }
+
+                    // Otherwise an XElement tag
+                    else
+                    {
+                        XElement xDaughter = new XElement(Tag);
+                        ParseAttrs(xDaughter, S);
+                        x.AddSubItem(xDaughter);
+                        if (!IsSelfClosingTag)
+                        {
+                            I++;
+                            ReadElement(xDaughter);
+                        }
+                    }
+
+                    // Ready for the next one
+                    I++;
+                }
+            }
+            #endregion
+
+            // Public Interface
+            #region Constructor(sOneLiner)
+            public CreateMethod(string s)
+            {
+                m_vs = ParseIntoXmlStrings(s);
+                m_i = 0;
+            }
+            #endregion
+            #region Method: XElement[] Run()
+            public XElement[] Run()
+            {
+                ArrayList a = new ArrayList();
+
+                for(I = 0; I<VS.Length; I++)
+                {
+                    if (IsBeginTag)
+                    {
+                        XElement x = new XElement(Tag);
+                        ParseAttrs(x, S);
+                        a.Add(x);
+                        if (!IsSelfClosingTag)
+                        {
+                            I++;
+                            ReadElement(x);
+                        }
+
+                    }
+                }
+
+                // Convert to an array and return the result
+                XElement[] v = new XElement[a.Count];
+                for (int k = 0; k < a.Count; k++)
+                    v[k] = a[k] as XElement;
+                return v;
+            }
+            #endregion
+        }
+        #endregion
+        #region SMethod: XElement[] CreateFrom(s)
+        static public XElement[] CreateFrom(string s)
+        {
+            CreateMethod method = new CreateMethod(s);
+            return method.Run();
+        }
+        #endregion
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////
+
+
     #region CLASS: XmlField
     public class XmlField
 		#region Documentation
@@ -57,7 +770,7 @@ namespace JWTools
 		 * 		public void Write(XmlField xmlParent)
 		 *      {
 		 *          XmlField xml = xmlParent.GetDaughterXmlField("MyTag", true);
-		 *          xml.Begin( xml.GetAttrString("Height", Height.ToString()) );
+		 *          xml.Begin( XmlField.BuildAttrString("Height", Height.ToString()) );
 		 *          xml.WriteDataLine("Here is my data.");
 		 *          m_wnd.Write(xml);
 		 *          xml.End();
@@ -70,7 +783,7 @@ namespace JWTools
 		 *      </MyTag>
 		 * 
 		 * The OneLiner methods are used for tags where we want it all on one line. Thus:
-		 *     xml.OneLiner( xml.GetAttrString("Height", Height.ToString()), "Here is my data");
+		 *     xml.OneLiner( XmlField.BuildAttrString("Height", Height.ToString()), "Here is my data");
 		 * results in:
 		 *     <MyTag Height="20">Here is my data</MyTag>
 		 * 
@@ -128,68 +841,9 @@ namespace JWTools
 		}
 		#endregion
 
-		// Output methods --------------------------------------------------------------------
-		#region Method: void OneLiner(sData) - produces "<tag>my data</tag>"
-		public void OneLiner(string sData)
-		{
-			Debug.Assert(true == m_bUsesEndTag);
-			Debug.Assert(false == m_bEnded);
-			m_writer.WriteLine( Padding + "<" + m_sTag + ">" +
-                _AmpersandsAndSuch(sData) + 
-                "</" + m_sTag + ">");
-			m_bEnded = true;
-		}
-		#endregion
-		#region Method: void OneLiner(sValues, sData) - produces "<tag name="John">my data</tag>"
-		public void OneLiner(string sValues, string sData)
-		{
-			Debug.Assert(true == m_bUsesEndTag);
-			Debug.Assert(false == m_bEnded);
-
-            string sPad = " ";
-            if (!string.IsNullOrEmpty(sValues) && sValues[0] == ' ')
-                sPad = "";
-
-            m_writer.WriteLine(Padding + "<" + m_sTag + sPad + sValues + ">" + 
-                _AmpersandsAndSuch( sData ) + 
-                "</" + m_sTag + ">");
-			m_bEnded = true;
-		}
-		#endregion
-		#region Method: void Begin() - produces "<tag>"
-		public void Begin()
-		{
-			Debug.Assert(true == m_bUsesEndTag);
-			Debug.Assert(false == m_bEnded);
-			m_writer.WriteLine( Padding + "<" + m_sTag + ">");
-		}
-		#endregion
-		#region Method: void Begin(string sValues) - produces "<tag name="John">"
-		public void Begin(string sValues)
-		{
-			Debug.Assert(false == m_bEnded);
-			m_writer.WriteLine( Padding + "<" + m_sTag + sValues + ">");
-		}
-		#endregion
-		#region Method: void WriteDataLine(sDataLine) - writes out a string of data (e.g., between tags)
-		public void WriteDataLine(string sDataLine)
-		{
-			Debug.Assert(true == m_bUsesEndTag);
-			Debug.Assert(false == m_bEnded);
-			m_writer.WriteLine( Padding + sDataLine );
-		}
-		#endregion
-		#region Method: void End() - writes "</tag>" (or nothing if no end-tag desired)
-		public void End()
-		{
-			Debug.Assert(false == m_bEnded);
-			if (true == m_bUsesEndTag)
-				m_writer.WriteLine( Padding + "</" + m_sTag + ">");
-			m_bEnded = true;
-		}
-		#endregion
-        #region Method: string _AmpersandsAndSuch(string sIn)
-        string _AmpersandsAndSuch(string sIn)
+        // String Builder Methods ------------------------------------------------------------
+        #region SMethod: string AmpersandsAndSuch(sIn) - converts, e.g., '<' to "&lt;"
+        static public string AmpersandsAndSuch(string sIn)
         {
             XmlReplace[] replacements = XmlReplace.Replacements;
 
@@ -213,21 +867,108 @@ namespace JWTools
             return sOut;
         }
         #endregion
-        #region Method: string GetAttrString(sAttr, sValue) - produces " name="John""
-        public string GetAttrString(string sAttr, string sValue)
-		{
-            string sData = _AmpersandsAndSuch(sValue);
-            return " " + sAttr + "=\"" + sData + "\"";
-		}
-		#endregion
-        #region Method: string GetAttrString(sAttr, sValue) - produces " amount="10""
-        public string GetAttrString(string sAttr, int nValue)
+        #region SMethod: string BuildAttrString(sAttr, sValue)
+        public static string BuildAttrString(string sAttr, string sValue)
         {
-            string sValue = nValue.ToString();
-            string sData = _AmpersandsAndSuch(sValue);
+            string sData = AmpersandsAndSuch(sValue);
             return " " + sAttr + "=\"" + sData + "\"";
         }
         #endregion
+        #region SMethod: string BuildAttrString(sAttr, nValue)
+        public static string BuildAttrString(string sAttr, int nValue)
+        {
+            string sValue = nValue.ToString();
+            return BuildAttrString(sAttr, sValue);
+        }
+        #endregion
+        #region SMethod: string BuildBeginTag(sTag, sValues, bEndsHere)
+        static public string BuildBeginTag(string sTag, string sValues, bool bEndsHere)
+        {
+            string sEnd = (bEndsHere) ? "/>" : ">";
+
+            if (string.IsNullOrEmpty(sValues))
+                return "<" + sTag + sEnd;
+            return "<" + sTag + sValues + sEnd;
+        }
+        #endregion
+        #region SMethod: string BuildEndTag(sTag)
+        static public string BuildEndTag(string sTag)
+        {
+            return "</" + sTag + ">";
+        }
+        #endregion
+        #region SMethod: string BuildOneLiner(sTag, sValues, sData)
+        static public string BuildOneLiner(string sTag, string sValues, string sData)
+        {
+            if (!string.IsNullOrEmpty(sValues) && sValues[0] != ' ')
+                sValues = " " + sValues;
+
+            return BuildBeginTag(sTag, sValues, false) +
+                AmpersandsAndSuch(sData) +
+                BuildEndTag(sTag);
+        }
+        #endregion
+
+        // Output methods --------------------------------------------------------------------
+		#region Method: void OneLiner(sData) - produces "<tag>my data</tag>"
+		public void OneLiner(string sData)
+		{
+			Debug.Assert(true == m_bUsesEndTag);
+			Debug.Assert(false == m_bEnded);
+
+            m_writer.WriteLine(Padding + 
+                BuildOneLiner(m_sTag, null, sData));
+
+			m_bEnded = true;
+		}
+		#endregion
+		#region Method: void OneLiner(sValues, sData) - produces "<tag name="John">my data</tag>"
+		public void OneLiner(string sValues, string sData)
+		{
+			Debug.Assert(true == m_bUsesEndTag);
+			Debug.Assert(false == m_bEnded);
+
+            m_writer.WriteLine(Padding +
+                BuildOneLiner(m_sTag, sValues, sData));
+
+			m_bEnded = true;
+		}
+		#endregion
+		#region Method: void Begin() - produces "<tag>"
+		public void Begin()
+		{
+			Debug.Assert(true == m_bUsesEndTag);
+			Debug.Assert(false == m_bEnded);
+            m_writer.WriteLine(Padding + BuildBeginTag(m_sTag, null, false));
+		}
+		#endregion
+		#region Method: void Begin(string sValues) - produces "<tag name="John">"
+		public void Begin(string sValues)
+		{
+			Debug.Assert(false == m_bEnded);
+
+            m_writer.WriteLine(Padding + BuildBeginTag(m_sTag, sValues, false));
+		}
+		#endregion
+		#region Method: void WriteDataLine(sDataLine) - writes out a string of data (e.g., between tags)
+		public void WriteDataLine(string sDataLine)
+		{
+			Debug.Assert(true == m_bUsesEndTag);
+			Debug.Assert(false == m_bEnded);
+			m_writer.WriteLine( Padding + sDataLine );
+		}
+		#endregion
+		#region Method: void End() - writes "</tag>" (or nothing if no end-tag desired)
+		public void End()
+		{
+			Debug.Assert(false == m_bEnded);
+
+			if (true == m_bUsesEndTag)
+                m_writer.WriteLine(Padding + BuildEndTag(m_sTag));
+
+			m_bEnded = true;
+		}
+		#endregion
         #region Method: void WriteBlankLine() - desirable sometimes for aesthetic reasons
 		public void WriteBlankLine()
 		{
@@ -256,6 +997,21 @@ namespace JWTools
         {
             get
             {
+                if (null == s_vReplacments)
+                {
+                    s_vReplacments = new XmlReplace[] 
+                    { 
+                        new XmlReplace( "{n}", '\n' ),
+                        new XmlReplace( "&amp;", '&' ),
+                        new XmlReplace( "&quot;", '\"' ),
+                        new XmlReplace( "&lt;", '<' ),
+                        new XmlReplace( "&gt;", '>' )
+                    };
+                }
+
+                return s_vReplacments;
+
+                /**
                 return new XmlReplace[] 
                     { 
                         new XmlReplace( "{n}", '\n' ),
@@ -264,8 +1020,10 @@ namespace JWTools
                         new XmlReplace( "&lt;", '<' ),
                         new XmlReplace( "&gt;", '>' )
                     };
+                **/
             }
         }
+        static XmlReplace[] s_vReplacments = null;
         #endregion
     };
     #endregion
@@ -805,369 +1563,5 @@ namespace JWTools
 	}
 	#endregion
 
-    #region CLASS: JW_Util
-    public class JW_Util
-	{
-		#region Method: static void TextWriter GetTextWriter(string sPath)
-		public static TextWriter GetTextWriter(string sPath)
-		{
-            // Delete any existing file, so that we can avoid the Read-Only
-            // problems that have been happening in Timor.
-            try
-            {
-                File.Delete(sPath);
-            }
-            catch (Exception)
-            {
-            }
-
-            // Create a new file to write to
-			StreamWriter w = new StreamWriter(sPath, false, Encoding.UTF8);
-			TextWriter tw = TextWriter.Synchronized(w);
-			return tw;
-		}
-		#endregion
-		#region Method: static void TextReader GetTextReader(ref sPath, sFileFilter,)
-		public static TextReader GetTextReader(ref string sPath, string sFileFilter)
-		{
-			StreamReader r = OpenStreamReader(ref sPath, sFileFilter);
-			TextReader tr = TextReader.Synchronized(r);
-			return tr;
-		}
-		#endregion
-
-		#region Method: StreamReader OpenStreamReader(...) - provides opportunity to browse
-		static public StreamReader OpenStreamReader(
-			ref string sPathName, 
-			string sFileFilter)
-		{
-			if (!File.Exists(sPathName))
-			{
-				// Tell the user, and see if he wants to browse for it
-				string sMessage = "Unable to locate file \n\"" + sPathName +
-					".\" \n\nDo you want to browse for it?";
-				DialogResult result = MessageBox.Show( Form.ActiveForm, sMessage, 
-					"File Not Found", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
-				if (result != DialogResult.Yes)
-					throw new IOException("Unable to locate file" + sPathName);
-
-				// Browse for the file
-				OpenFileDialog dlg = new OpenFileDialog();
-
-				// We only want to return a single file
-				dlg.Multiselect = false;
-
-				// Filter on the desired type of files
-				if (null != sFileFilter && sFileFilter.Length > 0)
-				{
-					dlg.Filter = sFileFilter;
-					dlg.FilterIndex = 0;
-				}
-
-				// Retrieve Dialog Title from resources
-				dlg.Title = "Browse for " + Path.GetFileName(sPathName);
-
-				// Get the default pathname
-				if (sPathName.Length > 0)
-				{
-					dlg.InitialDirectory = Path.GetDirectoryName(sPathName);
-					dlg.FileName = Path.GetFileName(sPathName);
-				}
-
-				// Browse for the file
-				if (DialogResult.OK != dlg.ShowDialog(Form.ActiveForm))
-					throw new IOException("Unable to locate file" + sPathName);
-				sPathName = dlg.FileName;
-			}
-
-            return new StreamReader(sPathName, Encoding.UTF8);
-		}
-		#endregion
-
-		#region Method: static void CreateBackup(string sPathName, string sNewExtension)
-		static public void CreateBackup(string sPathName, string sNewExtension)
-		{
-			string sBackupPathName = Path.ChangeExtension(sPathName, sNewExtension);
-			if (File.Exists(sPathName))
-			{
-				try
-				{
-					if (File.Exists(sBackupPathName))
-						File.Delete(sBackupPathName);
-					File.Move(sPathName, sBackupPathName);
-				}
-				catch (Exception)
-				{}
-			}
-		}
-		#endregion
-		#region Method: static void RestoreFromBackup(string sPathName, string sExtension)
-		static public void RestoreFromBackup(string sPathName, string sExtension)
-		{
-			try
-			{
-				// Give time for the OS to finish any cleanup it is doing
-				Thread.Sleep(1000);
-
-				// Copy the backup onto the filename (provided one exists, of course)
-				string sBackupPathName = Path.ChangeExtension(sPathName, sExtension);
-				if (File.Exists(sBackupPathName))
-					File.Copy(sBackupPathName, sPathName, true);
-			}
-			catch (Exception)
-			{}
-		}
-		#endregion
-
-		#region Method: static long GetFreeDiskSpace(string sDrive)
-		static public long GetFreeDiskSpace(string sDrive)
-			// Borrowed from a message by Roman Rodov, 5mar04, on the CodeGuru
-			// message board. 
-		{
-			long lFreeSpace = 0L;
-
-			// Get the management class holding Logical Drive information
-			ManagementClass mcDriveClass = new ManagementClass("Win32_LogicalDisk");
-
-			// Enumerate all logical drives available
-//			Console.WriteLine("GetFreeDiskSpace thread exits here...");
-			ManagementObjectCollection mocDrives = mcDriveClass.GetInstances();
-			foreach(ManagementObject moDrive in mocDrives)
-			{
-				// sDeviceId will hold the drive name eg "C:"
-				String sDeviceId = moDrive.Properties["DeviceId"].Value.ToString() + "\\";
-				if (sDeviceId == sDrive)
-				{
-					PropertyData pd = moDrive.Properties["FreeSpace"];
-					lFreeSpace = long.Parse(pd.Value.ToString());
-					break;
-				}
-			}
-
-			// Done
-			mocDrives.Dispose();
-			mcDriveClass.Dispose();
-
-			return lFreeSpace;
-		}
-		#endregion
-
-		// XML Utilities ---------------------------------------------------------------------
-		const char c_chDelim = '\"';
-		const char c_chBlank = ' ';
-		#region Method: static string XmlGetStringAttr(string sAttr, string s)
-		static public string XmlGetStringAttr(string sAttr, string s)
-			// Given a string s, such as
-			//    <SR ID="3425" Gloss="return home" Form="pulang">
-			// if "Form" is requested, returns
-			//    pulang
-		{
-			// Find the Attribute within the string
-			int i = s.IndexOf(sAttr);
-			if (-1 == i)
-				return "";
-
-			// Move to the opening delimiter
-			while (i < s.Length && s[i] != c_chDelim)
-				++i;
-			if (i < s.Length && s[i] == c_chDelim)
-				++i;
-
-			// Extract the value
-			string sValue = "";
-			while( i < s.Length && s[i] != c_chDelim)
-			{
-				sValue += s[i];
-				i++;
-			}
-			return sValue;
-		}
-		#endregion
-		#region Method: static int XmlGetIntAttr(string sAttr, string s)
-		static public int XmlGetIntAttr(string sAttr, string s)
-		{
-			string sValue = XmlGetStringAttr(sAttr,s);
-
-			try
-			{
-				int nValue = Convert.ToInt16(sValue);
-				return nValue;
-			}
-			catch(Exception)
-			{
-				return 0;
-			}
-		}
-		#endregion
-		#region Method: static int XmlGetBoolAttr(string sAttr, string s)
-		static public bool XmlGetBoolAttr(string sAttr, string s)
-		{
-			string sValue = XmlGetStringAttr(sAttr,s);
-
-			if (sValue.ToLower() == "true")
-				return true;
-
-			return false;
-		}
-		#endregion
-		#region Method: static string[] XmlGetEmbeddedObjects(string sAttr, string s)
-		static public string[] XmlGetEmbeddedObjects(string sAttr, string s)
-		{
-			// The sTag will start each new embedded object
-			string sTag = "<" + sAttr + " ";
-
-			// Find the first one; if there isn't one, then return an empty array
-			int i = s.IndexOf(sTag);
-			if (-1 == i)
-				return new string[0];
-			s = s.Substring(i);
-
-			// We'll temporarily put the answers in an array list
-			ArrayList a = new ArrayList();
-
-			// Extract all of the strings. We assume that they are all here in a row,
-			// together. If this turns out not to be the case, then we'll need to
-			// rework the logic to use s.IndexOf(sTag) to find subsequent ones.
-			while (s.Length > 0 && s.IndexOf(sTag) == 0)
-			{
-				int nLen = XmlDistanceToClosingBrace(s);
-
-				string sObject = s.Substring(0, nLen + 1);
-
-				a.Add(sObject);
-
-				s = s.Substring(nLen + 1);
-
-				while (s.Length > 0 && s[0] == ' ')
-					s = s.Substring(1);
-			}
-
-			// Convert to a string array
-			string[] v = new string[ a.Count ];
-			for(int k=0; k<a.Count; k++)
-				v[k] = (string)a[k];
-			return v;
-		}
-		#endregion
-		#region Method: static int XmlDistanceToClosingBrace(string s)
-		static public int XmlDistanceToClosingBrace(string s)
-		{
-			// We should be sitting at an opening brace
-			if (s.Length == 0 || s[0] != '<')
-				return 0;
-
-			// Use this to ignore any '>' that might be in a field
-			bool bIsInField = false;
-
-			// Use this to skip over any embedded data
-			int cDepth = 0;
-
-			// Loop through the line until we find it
-			int i = 1;
-			while( i < s.Length )
-			{
-				// We've found the closing bracket
-				if (s[i] == '>' &&  !bIsInField && cDepth == 0)
-					break;
-
-				if ( s[i] == c_chDelim )
-					bIsInField = !bIsInField;
-
-				if ( s[i] == '<')
-					cDepth++;
-				if (s[i] == '>')
-					cDepth--;
-
-				i++;
-			}
-			return i;
-		}
-		#endregion
-
-        #region SMethod: string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
-        static public string XmlValue(string sAttr, string sValue, bool bSpaceAfter)
-		{
-			Debug.Assert(sAttr.Length > 0);
-			Debug.Assert(sAttr[ sAttr.Length - 1] != '=');
-
-			string s = sAttr + "=" + c_chDelim + sValue + c_chDelim;
-
-			if (bSpaceAfter)
-				s += c_chBlank;
-
-			return s;
-        }
-        #endregion
-        #region SMethod: string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
-        static public string XmlValue(string sAttr, int nValue, bool bSpaceAfter)
-		{
-			return XmlValue(sAttr, nValue.ToString(), bSpaceAfter );
-        }
-        #endregion
-        #region SMethod: string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
-        static public string XmlValue(string sAttr, bool bValue, bool bSpaceAfter)
-		{
-			return XmlValue(sAttr,(bValue ? "true" : "false" ), bSpaceAfter );
-        }
-        #endregion
-
-        #region SMethod: Encoding GetUnicodeFileEncoding(String FileName)
-        public static Encoding GetUnicodeFileEncoding(String FileName)
-            // Return the Encoding of a text file.  Return Encoding.Default if no Unicode
-            // BOM (byte order mark) is found.
-        {
-            Encoding enc = null;
-
-            FileInfo info = new FileInfo(FileName);
-
-            FileStream stream = null;
-
-            try
-            {
-                stream = info.OpenRead();
-
-                Encoding[] UnicodeEncodings = { Encoding.BigEndianUnicode, Encoding.Unicode, Encoding.UTF8 };
-
-                for (int i = 0; enc == null && i < UnicodeEncodings.Length; i++)
-                {
-                    stream.Position = 0;
-
-                    byte[] Preamble = UnicodeEncodings[i].GetPreamble();
-
-                    bool PreamblesAreEqual = true;
-
-                    for (int j = 0; PreamblesAreEqual && j < Preamble.Length; j++)
-                    {
-                        PreamblesAreEqual = Preamble[j] == stream.ReadByte();
-                    }
-
-                    if (PreamblesAreEqual)
-                    {
-                        enc = UnicodeEncodings[i];
-                    }
-                }
-            }
-            catch (System.IO.IOException)
-            {
-                return null;
-            }
-            finally
-            {
-                if (stream != null)
-                {
-                    stream.Close();
-                }
-            }
-
-            if (enc == null)
-            {
-                enc = Encoding.Default;
-            }
-
-            return enc;
-        }
-    #endregion
-    }
-    #endregion
 
 }

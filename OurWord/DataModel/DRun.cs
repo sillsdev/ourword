@@ -1176,6 +1176,7 @@ namespace OurWord.DataModel
 		}
 		private DPhrases m_osPhrases;
 		#endregion
+
 		#region JAttr{g}: DPhrases PhrasesBT
 		public DPhrases PhrasesBT
 		{

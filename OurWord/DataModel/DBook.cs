@@ -797,9 +797,9 @@ namespace OurWord.DataModel
             #region Method: void SaveXML(XmlField xmlParent)
             public void SaveXML(XmlField xmlParent)
             {
-                string s = xmlParent.GetAttrString(c_sSection, SectionNo);
-                s += xmlParent.GetAttrString(c_sPara, ParagraphNo);
-                s += xmlParent.GetAttrString(c_sDBT, DBTNo);
+                string s = XmlField.BuildAttrString(c_sSection, SectionNo);
+                s += XmlField.BuildAttrString(c_sPara, ParagraphNo);
+                s += XmlField.BuildAttrString(c_sDBT, DBTNo);
                 XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
                 xml.OneLiner(s, "");
             }
@@ -1007,8 +1007,8 @@ namespace OurWord.DataModel
             xmlParent.Begin();
             foreach (DMergeBook book in MergeBooks)
             {
-                string s = xmlParent.GetAttrString(c_xmlNickName, book.NickName);
-                s += xmlParent.GetAttrString(c_xmlPath, book.AbsolutePathName);
+                string s = XmlField.BuildAttrString(c_xmlNickName, book.NickName);
+                s += XmlField.BuildAttrString(c_xmlPath, book.AbsolutePathName);
                 XmlField xml = xmlParent.GetDaughterXmlField(c_xmlBook, true);
                 xml.OneLiner(s, "");
             }

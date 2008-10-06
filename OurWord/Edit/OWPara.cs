@@ -496,6 +496,21 @@ namespace OurWord.Edit
                     Para.WritingSystem);
             }
             #endregion
+            #region VirtMethod: bool ContentEquals(EBlock block)
+            public virtual bool ContentEquals(EBlock block)
+            {
+                if (null == block)
+                    return false;
+
+                if (Text != block.Text)
+                    return false;
+
+                if (GlueToNext != block.GlueToNext)
+                    return false;
+
+                return true;
+            }
+            #endregion
 
             // Painting ----------------------------------------------------------------------
             #region Attr{g}: JFontForWritingSystem FontForWS - remember it here for performance

@@ -60,7 +60,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelFrontVernacular
             // 
-            this.m_labelFrontVernacular.Location = new System.Drawing.Point(27, 49);
+            this.m_labelFrontVernacular.Location = new System.Drawing.Point(3, 14);
             this.m_labelFrontVernacular.Name = "m_labelFrontVernacular";
             this.m_labelFrontVernacular.Size = new System.Drawing.Size(256, 19);
             this.m_labelFrontVernacular.TabIndex = 1;
@@ -69,7 +69,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelFrontBT
             // 
-            this.m_labelFrontBT.Location = new System.Drawing.Point(12, 184);
+            this.m_labelFrontBT.Location = new System.Drawing.Point(3, 226);
             this.m_labelFrontBT.Name = "m_labelFrontBT";
             this.m_labelFrontBT.Size = new System.Drawing.Size(256, 21);
             this.m_labelFrontBT.TabIndex = 2;
@@ -78,31 +78,33 @@ namespace OurWord.Dialogs
             // 
             // m_textFrontVernacular
             // 
-            this.m_textFrontVernacular.Location = new System.Drawing.Point(30, 71);
+            this.m_textFrontVernacular.BackColor = System.Drawing.Color.LightYellow;
+            this.m_textFrontVernacular.Location = new System.Drawing.Point(21, 71);
             this.m_textFrontVernacular.Multiline = true;
             this.m_textFrontVernacular.Name = "m_textFrontVernacular";
             this.m_textFrontVernacular.ReadOnly = true;
             this.m_textFrontVernacular.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.m_textFrontVernacular.Size = new System.Drawing.Size(253, 145);
+            this.m_textFrontVernacular.Size = new System.Drawing.Size(262, 187);
             this.m_textFrontVernacular.TabIndex = 3;
             this.m_textFrontVernacular.TabStop = false;
             // 
             // m_textFrontBT
             // 
-            this.m_textFrontBT.Location = new System.Drawing.Point(15, 208);
+            this.m_textFrontBT.BackColor = System.Drawing.Color.LightYellow;
+            this.m_textFrontBT.Location = new System.Drawing.Point(6, 250);
             this.m_textFrontBT.Multiline = true;
             this.m_textFrontBT.Name = "m_textFrontBT";
             this.m_textFrontBT.ReadOnly = true;
             this.m_textFrontBT.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.m_textFrontBT.Size = new System.Drawing.Size(253, 140);
+            this.m_textFrontBT.Size = new System.Drawing.Size(262, 213);
             this.m_textFrontBT.TabIndex = 4;
             this.m_textFrontBT.TabStop = false;
             // 
             // m_btnKeepTarget
             // 
-            this.m_btnKeepTarget.Location = new System.Drawing.Point(201, 407);
+            this.m_btnKeepTarget.Location = new System.Drawing.Point(604, 12);
             this.m_btnKeepTarget.Name = "m_btnKeepTarget";
-            this.m_btnKeepTarget.Size = new System.Drawing.Size(194, 23);
+            this.m_btnKeepTarget.Size = new System.Drawing.Size(135, 86);
             this.m_btnKeepTarget.TabIndex = 5;
             this.m_btnKeepTarget.Text = "Do Nothing (Keep the Existing)";
             this.m_btnKeepTarget.UseVisualStyleBackColor = true;
@@ -110,9 +112,9 @@ namespace OurWord.Dialogs
             // 
             // m_btnReplaceWithFront
             // 
-            this.m_btnReplaceWithFront.Location = new System.Drawing.Point(201, 436);
+            this.m_btnReplaceWithFront.Location = new System.Drawing.Point(604, 104);
             this.m_btnReplaceWithFront.Name = "m_btnReplaceWithFront";
-            this.m_btnReplaceWithFront.Size = new System.Drawing.Size(194, 23);
+            this.m_btnReplaceWithFront.Size = new System.Drawing.Size(135, 86);
             this.m_btnReplaceWithFront.TabIndex = 6;
             this.m_btnReplaceWithFront.Text = "Replace the Target with the Front";
             this.m_btnReplaceWithFront.UseVisualStyleBackColor = true;
@@ -120,9 +122,9 @@ namespace OurWord.Dialogs
             // 
             // m_btnAppendFrontToTarget
             // 
-            this.m_btnAppendFrontToTarget.Location = new System.Drawing.Point(201, 465);
+            this.m_btnAppendFrontToTarget.Location = new System.Drawing.Point(604, 196);
             this.m_btnAppendFrontToTarget.Name = "m_btnAppendFrontToTarget";
-            this.m_btnAppendFrontToTarget.Size = new System.Drawing.Size(194, 23);
+            this.m_btnAppendFrontToTarget.Size = new System.Drawing.Size(135, 86);
             this.m_btnAppendFrontToTarget.TabIndex = 7;
             this.m_btnAppendFrontToTarget.Text = "Add the Front to the Target";
             this.m_btnAppendFrontToTarget.UseVisualStyleBackColor = true;
@@ -130,9 +132,9 @@ namespace OurWord.Dialogs
             // 
             // m_checkDoAll
             // 
-            this.m_checkDoAll.Location = new System.Drawing.Point(429, 465);
+            this.m_checkDoAll.Location = new System.Drawing.Point(604, 440);
             this.m_checkDoAll.Name = "m_checkDoAll";
-            this.m_checkDoAll.Size = new System.Drawing.Size(153, 52);
+            this.m_checkDoAll.Size = new System.Drawing.Size(135, 58);
             this.m_checkDoAll.TabIndex = 8;
             this.m_checkDoAll.Text = "Do this for any remaining conflicts.";
             this.m_checkDoAll.UseVisualStyleBackColor = true;
@@ -142,38 +144,41 @@ namespace OurWord.Dialogs
             // 
             this.m_groupFront.Controls.Add(this.m_textFrontBT);
             this.m_groupFront.Controls.Add(this.m_labelFrontBT);
+            this.m_groupFront.Controls.Add(this.m_labelFrontVernacular);
             this.m_groupFront.Location = new System.Drawing.Point(15, 35);
             this.m_groupFront.Name = "m_groupFront";
-            this.m_groupFront.Size = new System.Drawing.Size(274, 354);
+            this.m_groupFront.Size = new System.Drawing.Size(274, 469);
             this.m_groupFront.TabIndex = 9;
             this.m_groupFront.TabStop = false;
             this.m_groupFront.Text = "Front";
             // 
             // m_textTargetBT
             // 
-            this.m_textTargetBT.Location = new System.Drawing.Point(14, 208);
+            this.m_textTargetBT.BackColor = System.Drawing.Color.LightYellow;
+            this.m_textTargetBT.Location = new System.Drawing.Point(6, 250);
             this.m_textTargetBT.Multiline = true;
             this.m_textTargetBT.Name = "m_textTargetBT";
             this.m_textTargetBT.ReadOnly = true;
             this.m_textTargetBT.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.m_textTargetBT.Size = new System.Drawing.Size(273, 140);
+            this.m_textTargetBT.Size = new System.Drawing.Size(281, 213);
             this.m_textTargetBT.TabIndex = 13;
             this.m_textTargetBT.TabStop = false;
             // 
             // m_textTargetVernacular
             // 
-            this.m_textTargetVernacular.Location = new System.Drawing.Point(14, 36);
+            this.m_textTargetVernacular.BackColor = System.Drawing.Color.LightYellow;
+            this.m_textTargetVernacular.Location = new System.Drawing.Point(6, 36);
             this.m_textTargetVernacular.Multiline = true;
             this.m_textTargetVernacular.Name = "m_textTargetVernacular";
             this.m_textTargetVernacular.ReadOnly = true;
             this.m_textTargetVernacular.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.m_textTargetVernacular.Size = new System.Drawing.Size(273, 145);
+            this.m_textTargetVernacular.Size = new System.Drawing.Size(281, 187);
             this.m_textTargetVernacular.TabIndex = 12;
             this.m_textTargetVernacular.TabStop = false;
             // 
             // m_labelTargetBT
             // 
-            this.m_labelTargetBT.Location = new System.Drawing.Point(11, 184);
+            this.m_labelTargetBT.Location = new System.Drawing.Point(6, 226);
             this.m_labelTargetBT.Name = "m_labelTargetBT";
             this.m_labelTargetBT.Size = new System.Drawing.Size(276, 21);
             this.m_labelTargetBT.TabIndex = 11;
@@ -182,7 +187,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelTargetVernacular
             // 
-            this.m_labelTargetVernacular.Location = new System.Drawing.Point(14, 14);
+            this.m_labelTargetVernacular.Location = new System.Drawing.Point(6, 14);
             this.m_labelTargetVernacular.Name = "m_labelTargetVernacular";
             this.m_labelTargetVernacular.Size = new System.Drawing.Size(273, 19);
             this.m_labelTargetVernacular.TabIndex = 10;
@@ -197,7 +202,7 @@ namespace OurWord.Dialogs
             this.m_groupTarget.Controls.Add(this.m_labelTargetBT);
             this.m_groupTarget.Location = new System.Drawing.Point(295, 35);
             this.m_groupTarget.Name = "m_groupTarget";
-            this.m_groupTarget.Size = new System.Drawing.Size(293, 354);
+            this.m_groupTarget.Size = new System.Drawing.Size(293, 469);
             this.m_groupTarget.TabIndex = 14;
             this.m_groupTarget.TabStop = false;
             this.m_groupTarget.Text = "Target";
@@ -205,9 +210,9 @@ namespace OurWord.Dialogs
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(201, 494);
+            this.m_btnCancel.Location = new System.Drawing.Point(604, 288);
             this.m_btnCancel.Name = "m_btnCancel";
-            this.m_btnCancel.Size = new System.Drawing.Size(194, 23);
+            this.m_btnCancel.Size = new System.Drawing.Size(135, 86);
             this.m_btnCancel.TabIndex = 15;
             this.m_btnCancel.Text = "Cancel Copying";
             this.m_btnCancel.UseVisualStyleBackColor = true;
@@ -219,7 +224,7 @@ namespace OurWord.Dialogs
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(594, 524);
+            this.ClientSize = new System.Drawing.Size(751, 516);
             this.Controls.Add(this.m_btnCancel);
             this.Controls.Add(this.m_groupTarget);
             this.Controls.Add(this.m_checkDoAll);
@@ -227,7 +232,6 @@ namespace OurWord.Dialogs
             this.Controls.Add(this.m_btnReplaceWithFront);
             this.Controls.Add(this.m_btnKeepTarget);
             this.Controls.Add(this.m_textFrontVernacular);
-            this.Controls.Add(this.m_labelFrontVernacular);
             this.Controls.Add(this.m_labelInfo);
             this.Controls.Add(this.m_groupFront);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;

@@ -104,19 +104,19 @@ namespace JWTools
             XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
 
             // The ID for the language, e.g., "sp", "inz"
-            string s = xml.GetAttrString(c_sID, sLanguageID);
+            string s = XmlField.BuildAttrString(c_sID, sLanguageID);
 
             // The value
             if (bHasValue)
-                s += xml.GetAttrString(c_sValue, Value);
+                s += XmlField.BuildAttrString(c_sValue, Value);
 
             // Shortcut if present
             if (bHasKey)
-                s += xml.GetAttrString(c_sKey, ShortcutKey);
+                s += XmlField.BuildAttrString(c_sKey, ShortcutKey);
 
             // Tooltip if present
             if (bHasTip)
-                s += xml.GetAttrString(c_sTip, ToolTip);
+                s += XmlField.BuildAttrString(c_sTip, ToolTip);
 
             // Write it out
             xml.OneLiner(s, "");
@@ -499,11 +499,11 @@ namespace JWTools
         {
             // Beginning tag <Item> contains the ID
             XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-            string s = xml.GetAttrString(c_sID, ID);
+            string s = XmlField.BuildAttrString(c_sID, ID);
             if (CanHaveShortcutKey)
-                s += xml.GetAttrString(c_sKey, "true");
+                s += XmlField.BuildAttrString(c_sKey, "true");
             if (CanHaveToolTip)
-                s += xml.GetAttrString(c_sTip, "true");
+                s += XmlField.BuildAttrString(c_sTip, "true");
             xml.Begin(s);
 
             // Add the English
@@ -564,7 +564,7 @@ namespace JWTools
         {
             // Initialize the Item field
             XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-            string s = xml.GetAttrString(c_sID, ID);
+            string s = XmlField.BuildAttrString(c_sID, ID);
             xml.Begin(s);
 
             // Write the languge data
@@ -799,14 +799,14 @@ namespace JWTools
         {
             XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
 
-            string s = xml.GetAttrString(c_sID, ID);
+            string s = XmlField.BuildAttrString(c_sID, ID);
 
-            s += xml.GetAttrString(c_sTitle, Title);
+            s += XmlField.BuildAttrString(c_sTitle, Title);
 
             if (!string.IsNullOrEmpty(Description))
-                s += xml.GetAttrString(c_sDescription, Description);
+                s += XmlField.BuildAttrString(c_sDescription, Description);
 
-            s += xml.GetAttrString(c_sTranslatorAudience,
+            s += XmlField.BuildAttrString(c_sTranslatorAudience,
                 (TranslatorAudience) ? "true" : "false");
 
             xml.Begin(s);
@@ -855,7 +855,7 @@ namespace JWTools
         {
             XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
 
-            string s = xml.GetAttrString(c_sID, ID);
+            string s = XmlField.BuildAttrString(c_sID, ID);
 
             xml.Begin(s);
 
@@ -991,14 +991,14 @@ namespace JWTools
         {
             XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
 
-            string s = xml.GetAttrString(c_sID, ID);
-            s += xml.GetAttrString(c_sName, Name);
+            string s = XmlField.BuildAttrString(c_sID, ID);
+            s += XmlField.BuildAttrString(c_sName, Name);
 
             if (!string.IsNullOrEmpty(FontName))
-                s += xml.GetAttrString(c_sFontName, FontName);
+                s += XmlField.BuildAttrString(c_sFontName, FontName);
 
             if (0 != FontSize)
-                s += xml.GetAttrString(c_sFontSize, FontSize.ToString());
+                s += XmlField.BuildAttrString(c_sFontSize, FontSize.ToString());
 
             xml.OneLiner(s, "");
         }

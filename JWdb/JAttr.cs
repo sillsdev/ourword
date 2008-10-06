@@ -570,6 +570,21 @@ OLDWAY ****/
                 m_rgStrings[i] = vsNew[i];
         }
         #endregion
+        #region Method: bool IsSameAs(BStringArray a)
+        public bool IsSameAs(BStringArray a)
+        {
+            if (null == a)
+                return false;
+            if (a.Length != Length)
+                return false;
+            for (int i = 0; i < Length; i++)
+            {
+                if (this[i] != a[i])
+                    return false;
+            }
+            return true;
+        }
+        #endregion
 
         // Find a match somewhere within a string --------------------------------------------
         #region Method: int FindSubstringMatch(sLongString)

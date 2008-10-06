@@ -176,8 +176,7 @@ namespace OurWordTests.Edit
         }
         #endregion
         #region TearDown
-        [TearDown]
-        public void TearDown()
+        [TearDown] public void TearDown()
         {
             OurWordMain.Project = null;
             m_Form.Dispose();
