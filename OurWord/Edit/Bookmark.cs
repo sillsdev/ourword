@@ -244,11 +244,11 @@ namespace OurWord.Edit
             Flags |= OWPara.Flags.CanItalic;
 
             // Loop through the entire display searching for the data source
-            foreach (OWWindow.Row row in wnd.Rows)
+            foreach (Row row in wnd.Contents.SubItems)
             {
-                foreach (OWWindow.Row.Pile pile in row.Piles)
+                foreach (Pile pile in row.SubItems)
                 {
-                    foreach (OWPara op in pile.Paragraphs)
+                    foreach (OWPara op in pile.SubItems)
                     {
                         if (op.DataSource == objDataSource)
                         {

@@ -169,7 +169,7 @@ namespace JWdb
 	{
 		// Attrs -----------------------------------------------------------------------------
 		#region Attr{g}: protected ArrayList Fields - No outside access permitted
-		protected ArrayList Fields
+		public ArrayList Fields
 		{
 			get
 			{
@@ -373,7 +373,7 @@ namespace JWdb
         }
         #endregion
 		#region Method: void RemoveAt(i)
-		protected void RemoveAt(int i)
+		public void RemoveAt(int i)
 		{
 			Fields.RemoveAt(i);
 		}
@@ -386,7 +386,7 @@ namespace JWdb
 		}
 		#endregion
 		#region Method: void Remove(SfField)
-		protected void Remove(SfField field)
+		public void Remove(SfField field)
 		{
 			Fields.Remove(field);
 		}

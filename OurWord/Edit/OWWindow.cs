@@ -29,34 +29,34 @@ namespace OurWord.Edit
     public class OWWindow : Panel
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: bool DrawLineBetweenColumns - if T, draw the vertical line btwn columns
-        public bool DrawLineBetweenColumns
+        #region Attr{g/s}: float WidthBetweenColumns
+        public float WidthBetweenColumns
         {
             get
             {
-                return m_bDrawLineBetweenColumns;
+                return m_fWidthBetweenColumns;
             }
             set
             {
-                m_bDrawLineBetweenColumns = value;
+                m_fWidthBetweenColumns = value;
             }
         }
-        bool m_bDrawLineBetweenColumns = true;
+        float m_fWidthBetweenColumns;
         #endregion
-        #region Attr{g}: SizeF ColumnMargins - the pixels on each side of the columns (top & bottom)
-        public SizeF ColumnMargins
+        #region Attr{g}: SizeF WindowMargins - the pixels between window edge and content (top & bottom)
+        public SizeF WindowMargins
         {
             get
             {
-                Debug.Assert(null != m_szColumnMargins);
-                return m_szColumnMargins;
+                Debug.Assert(null != m_szWindowMargins);
+                return m_szWindowMargins;
             }
             set
             {
-                m_szColumnMargins = value;
+                m_szWindowMargins = value;
             }
         }
-        SizeF m_szColumnMargins;
+        SizeF m_szWindowMargins;
         #endregion
         #region Attr{g}: int ColumnCount - the number of columns in each row, must be >= 1.
         public int ColumnCount
@@ -140,19 +140,7 @@ namespace OurWord.Edit
 
             // Measure all of the EBlocks. This is a one-time thing; we only do it again when
             // individual EWords are edited/added/etc.
-            foreach (Row row in Rows)
-            {
-                foreach (Row.Pile pile in row.Piles)
-                {
-                    foreach (OWPara paragraph in pile.Paragraphs)
-                    {
-                        foreach (OWPara.EBlock block in paragraph.Blocks)
-                        {
-                            block.MeasureWidth(Draw.Graphics);
-                        }
-                    }
-                }
-            }
+            Contents.CalculateBlockWidths(Draw.Graphics);
 
             // Signal that we have a Draw object and that the blocks are all measured.
             // Otherwise, DoLayout would choke.
@@ -165,7 +153,8 @@ namespace OurWord.Edit
             Invalidate();
 
             // Select the first possible item
-            Select_FirstWord();
+            Contents.Select_FirstWord();
+            Focus();
 
             // Load, layout amd paint any secondary windows
             foreach (OWWindow w in SecondaryWindows)
@@ -207,24 +196,24 @@ namespace OurWord.Edit
         public virtual void OnSelectAndScrollFromNote(DNote note)
         {
             // Find the paragraph containing the icon which references this note
-            foreach (Row row in Rows)
+            foreach (Row row in Contents.SubItems)
             {
-                foreach (Row.Pile pile in row.Piles)
+                foreach (Pile pile in row.SubItems)
                 {
-                    foreach (OWPara para in pile.Paragraphs)
+                    foreach (OWPara para in pile.SubItems)
                     {
-                        if (!para.Editable)
+                        if (!para.IsEditable)
                             continue;
 
                         // We want to keep track of the most recent editable place, if any
-                        OWPara.EWord word = null;
+                        EWord word = null;
 
-                        foreach (OWPara.EBlock block in para.Blocks)
+                        foreach (EBlock block in para.SubItems)
                         {
                             // Keep updating this, so that it points to the most close word 
                             // preceeding the note icon
-                            if (block as OWPara.EWord != null)
-                                word = block as OWPara.EWord;
+                            if (block as EWord != null)
+                                word = block as EWord;
 
                             // Look for a Note icon
                             OWPara.ENote n = block as OWPara.ENote;
@@ -251,13 +240,13 @@ namespace OurWord.Edit
         public OWPara FindOWParaContainingFootnoteLetter(DFootnote footnote)
         {
             // Find the paragraph containing the icon which references this note
-            foreach (Row row in Rows)
+            foreach (Row row in Contents.SubItems)
             {
-                foreach (Row.Pile pile in row.Piles)
+                foreach (Pile pile in row.SubItems)
                 {
-                    foreach (OWPara para in pile.Paragraphs)
+                    foreach (OWPara para in pile.SubItems)
                     {
-                        foreach (OWPara.EBlock block in para.Blocks)
+                        foreach (EBlock block in para.SubItems)
                         {
                             OWPara.ESeeAlso also = block as OWPara.ESeeAlso;
                             OWPara.EFootLetter letter = block as OWPara.EFootLetter;
@@ -273,29 +262,28 @@ namespace OurWord.Edit
             return null;
         }
         #endregion
-
         #region Method: void OnSelectAndScrollFromFootnote(DFootnote footnote)
         public void OnSelectAndScrollFromFootnote(DFootnote footnote)
         {
             // Find the paragraph containing the icon which references this note
-            foreach (Row row in Rows)
+            foreach (Row row in Contents.SubItems)
             {
-                foreach (Row.Pile pile in row.Piles)
+                foreach (Pile pile in row.SubItems)
                 {
-                    foreach (OWPara para in pile.Paragraphs)
+                    foreach (OWPara para in pile.SubItems)
                     {
-                        if (!para.Editable)
+                        if (!para.IsEditable)
                             continue;
 
                         // We want to keep track of the most recent editable place, if any
-                        OWPara.EWord word = null;
+                        EWord word = null;
 
-                        foreach (OWPara.EBlock block in para.Blocks)
+                        foreach (EBlock block in para.SubItems)
                         {
                             // Keep updating this, so that it points to the most close word 
                             // preceeding the note icon
-                            if (block as OWPara.EWord != null)
-                                word = block as OWPara.EWord;
+                            if (block as EWord != null)
+                                word = block as EWord;
 
                             // Look for a FootLetter or a SeeAlso
                             OWPara.ESeeAlso also = block as OWPara.ESeeAlso;
@@ -416,11 +404,12 @@ namespace OurWord.Edit
             // Used for Up/Down arrow behavior
             m_LineUpDownX = new LineUpDownX();
 
-            // Initialize to empty rows
-            m_vRows = new Row[0];
+            // Initialize the EItems root container (to empty rows)
+            m_Contents = new ERoot(this);
 
             // Default margins
-            ColumnMargins = new SizeF(5, 5);
+            WindowMargins = new SizeF(7, 5);
+            WidthBetweenColumns = 10;
 
             // Set up a double buffer for flicker-free painting (it must be re-created
             // upon any resize.)
@@ -487,774 +476,23 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Rows ------------------------------------------------------------------------------
-        #region CLASS: Row
-        public class Row
-        {
-            // Attrs -------------------------------------------------------------------------
-            #region Attr{g}: OWWindow Window - the owning window
-            OWWindow Window
-            {
-                get
-                {
-                    Debug.Assert(null != m_Window);
-                    return m_Window;
-                }
-            }
-            OWWindow m_Window = null;
-            #endregion
-            #region Attr{g}: Bitmap Bmp - the picture's bitmap
-            Bitmap Bmp
-            {
-                get
-                {
-                    return m_bmp;
-                }
-            }
-            Bitmap m_bmp = null;
-            #endregion
-            const int c_BitmapMargin = 5;         // vert marg above/below the bitmap
-            const int c_BitmapPadAtBottom = 2;    // pixels at bottom to ensure line gets drawn
-
-            // Piles -------------------------------------------------------------------------
-            #region CLASS: Pile
-            public class Pile
-            {
-                // Screen Region -------------------------------------------------------------
-                #region Attr{g/s}: PointF Position
-                public PointF Position
-                {
-                    get
-                    {
-                        return m_ptPosition;
-                    }
-                    set
-                    {
-                        m_ptPosition = value;
-                    }
-                }
-                private PointF m_ptPosition;
-                #endregion
-                #region Attr{g/s}: float MeasuredWidth - Calc'd via the MeasureWidth method during layout
-                public float MeasuredWidth
-                {
-                    get
-                    {
-                        return m_fMeasuredWidth;
-                    }
-                    set
-                    {
-                        m_fMeasuredWidth = value;
-                    }
-                }
-                protected float m_fMeasuredWidth = 0;
-                #endregion
-                #region Attr{g/s}: float Height - calc'd from LineCount and Para.LineHeight
-                public float Height
-                {
-                    get
-                    {
-                        return m_fHeight;
-                    }
-                    set
-                    {
-                        m_fHeight = value;
-                    }
-                }
-                float m_fHeight = 0;
-                #endregion
-                #region VAttr{g}: RectangleF Rectangle
-                public RectangleF Rectangle
-                {
-                    get
-                    {
-                        return new RectangleF(Position, new SizeF(MeasuredWidth, Height));
-                    }
-                }
-                #endregion
-                #region Method: virtual bool ContainsPoint(PointF pt)
-                public bool ContainsPoint(PointF pt)
-                {
-                    return Rectangle.Contains(pt);
-                }
-                #endregion
-
-                // Attrs ---------------------------------------------------------------------
-                #region Attr{g}: OWPara[] Paragraphs - the paragraphs in this pile
-                public OWPara[] Paragraphs
-                {
-                    get
-                    {
-                        Debug.Assert(null != m_vParagraphs);
-                        return m_vParagraphs;
-                    }
-                }
-                OWPara[] m_vParagraphs;
-                #endregion
-                #region Attr{g}: Row Row - the owning row
-                public Row Row 
-                {
-                    get
-                    {
-                        Debug.Assert(null != m_Row);
-                        return m_Row;
-                    }
-                }
-                Row m_Row = null;
-                #endregion
-                #region VAttr{g}: OWWindow Window - the owning window
-                public OWWindow Window
-                {
-                    get
-                    {
-                        return Row.Window;
-                    }
-                }
-                #endregion
-                #region Attr{g}: bool DisplayFootnoteSeparator - if T, shows line btwn para's and footnotes
-                bool DisplayFootnoteSeparator
-                {
-                    get
-                    {
-                        return m_bDisplayFootnoteSeparator;
-                    }
-                }
-                bool m_bDisplayFootnoteSeparator = false;
-                #endregion
-
-                // Scaffolding ---------------------------------------------------------------
-                #region Constructor(Row)
-                public Pile(Row row, bool _bDisplayFootnoteSeparator)
-                {
-                    m_Row = row;
-                    m_vParagraphs = new OWPara[0];
-                    m_bDisplayFootnoteSeparator = _bDisplayFootnoteSeparator;
-                }
-                #endregion
-
-                // Placing Content into the window -------------------------------------------
-                #region Method: void AddParagraph(OWPara)
-                public void AddParagraph(OWPara p)
-                {
-                    // Create a new vector that is one longer
-                    OWPara[] v = new OWPara[Paragraphs.Length + 1];
-
-                    // Transfer the existing contents to it
-                    for (int i = 0; i < Paragraphs.Length; i++)
-                        v[i] = Paragraphs[i];
-
-                    // The final item in the new vector should be the appended paragraph
-                    v[Paragraphs.Length] = p;
-
-                    // Set the old to point ot the new
-                    m_vParagraphs = v;
-
-                    // The paragraph needs to know about the pile it belongs to
-                    p.Pile = this;
-                }
-                #endregion
-                #region Method: void RemoveParagraph(OWPara)
-                public void RemoveParagraph(OWPara p)
-                {
-                    // Create a new vector that is one shorted
-                    OWPara[] v = new OWPara[Paragraphs.Length - 1];
-
-                    // Transfer the keeper paragraphs to it
-                    int k = 0;
-                    for (int i = 0; i < Paragraphs.Length; i++)
-                    {
-                        if (Paragraphs[i] != p)
-                        {
-                            v[k] = Paragraphs[i];
-                            k++;
-                        }
-                    }
-
-                    // Set the old to point ot the new
-                    m_vParagraphs = v;
-                }
-                #endregion
-
-                // Layout & Paint ------------------------------------------------------------
-                #region Method: void DoLayout(PointF ptPos, int nColumnWidth)
-                public void DoLayout(PointF ptPos, int nColumnWidth)
-                {
-                    // Remember the top-left position and width
-                    Position = ptPos;
-                    MeasuredWidth = nColumnWidth;
-                    Height = 0;
-
-                    // If we are displaying the footnote separator, then add a pixel to the
-                    // height to make room for it.
-                    if (DisplayFootnoteSeparator)
-                        Height += 1;
-
-                    // Layout the paragraphs, one below the other
-                    foreach (OWPara p in Paragraphs)
-                    {
-                        p.DoLayout(new PointF(Position.X, Position.Y + Height), nColumnWidth);
-                        Height += p.Height;
-                    }
-                }
-                #endregion
-                #region Method: void Paint(ClipRectangle)
-                public void Paint(Rectangle ClipRectangle)
-                {
-                    // Display the footnote separator if appropriate
-                    if (DisplayFootnoteSeparator)
-                    {
-                        float xSeparatorWidth = Rectangle.Width / 3.0F;
-                        Pen pen = new Pen(Color.Black);
-                        Window.Draw.Line(pen, Position, 
-                            new PointF(Position.X + xSeparatorWidth, Position.Y));
-                    }
-
-                    // Display each of the paragraphs
-                    foreach (OWPara para in Paragraphs)
-                        para.Paint(ClipRectangle);
-                }
-                #endregion
-                #region Method: void RePosition(float y) - change the Y coord of this pile and its children
-                public void RePosition(float y)
-                {
-                    // Set the Pile's position
-                    Position = new PointF(Position.X, y);
-
-                    // We'll calculate the height of the pile here
-                    float fHeight = 0;
-
-                    // If we are displaying the footnote separator, then add a pixel to the
-                    // height to make room for it.
-                    if (DisplayFootnoteSeparator)
-                    {
-                        fHeight += 1;
-                        y += 1;
-                    }
-
-                    // Reset the "y" of each paragraph in the pile
-                    foreach (OWPara p in Paragraphs)
-                    {
-                        p.RePosition(y);
-
-                        y += p.Height;
-
-                        fHeight += p.Height;
-                    }
-
-                    Height = fHeight;
-                }
-                #endregion
-                #region Method: void AssignLineNumbers(ref int nLineNo)
-                public void AssignLineNumbers(ref int nLineNo)
-                {
-                    foreach(OWPara p in Paragraphs)
-                        p.AssignLineNumbers(ref nLineNo);
-                }
-                #endregion
-
-                // Selection -----------------------------------------------------------------
-                #region Method: bool Select_FirstWord()
-                public bool Select_FirstWord()
-                {
-                    foreach (OWPara p in Paragraphs)
-                    {
-                        // Attempt to make a selection in this paragraph
-                        OWWindow.Sel selection = p.Select_BeginningOfFirstWord();
-
-                        // If a selection was made, then set the Window to it and we're done
-                        if (null != selection)
-                        {
-                            Window.Selection = selection;
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                #endregion
-                #region Method: bool Select_NextWord(int iParaCandidate, int iWordCandidate)
-                public bool Select_NextWord(int iParaCandidate, int iWordCandidate)
-                {
-                    // Attempt within the candidate paragraph first
-                    OWWindow.Sel selection = Paragraphs[iParaCandidate].Select_NextWord(iWordCandidate);
-                    if (null != selection)
-                    {
-                        Window.Selection = selection;
-                        return true;
-                    }
-
-                    // Now attempt with all subsequent paragraphs
-                    for (int i = iParaCandidate + 1; i < Paragraphs.Length; i++)
-                    {
-                        selection = Paragraphs[i].Select_BeginningOfFirstWord();
-                        if (null != selection)
-                        {
-                            Window.Selection = selection;
-                            return true;
-                        }
-                    }
-
-                    // Unable to find something we could select
-                    return false;
-                }
-                #endregion
-                #region Method: bool Select_LastWord()
-                public bool Select_LastWord()
-                {
-                    for(int i = Paragraphs.Length - 1; i >=0 ; i--)
-                    {
-                        // Attempt to make a selection at the end of this paragraph
-                        OWWindow.Sel selection = Paragraphs[i].Select_EndOfLastWord();
-
-                        // If we suceeded, then set the Window's selection to it, and we're done
-                        // Otherwise we'll keep looping to the previous paragraph
-                        if (null != selection)
-                        {
-                            Window.Selection = selection;
-                            return true;
-                        }
-                    }
-                    return false;
-                }
-                #endregion
-                #region Method: bool Select_PreviousWord(int iParaCandidate, int iWordCandidate)
-                public bool Select_PreviousWord(int iParaCandidate, int iWordCandidate)
-                {
-                    // Attempt within the candidate paragraph first
-                    OWWindow.Sel selection = Paragraphs[iParaCandidate].Select_PreviousWord(iWordCandidate);
-                    if (null != selection)
-                    {
-                        Window.Selection = selection;
-                        return true;
-                    }
-
-                    // Now attempt with all subsequent paragraphs
-                    for (int i = iParaCandidate - 1; i >= 0; i--)
-                    {
-                        selection = Paragraphs[i].Select_EndOfLastWord();
-                        if (null != selection)
-                        {
-                            Window.Selection = selection;
-                            return true;
-                        }
-                    }
-
-                    // Unable to find something we could select
-                    return false;
-                }
-                #endregion
-
-                #region Method: EBlock GetBlockAt(PointF pt)
-                public OWPara.EBlock GetBlockAt(PointF pt)
-                {
-                    foreach (OWPara paragraph in Paragraphs)
-                    {
-                        OWPara.EBlock block = paragraph.GetBlockAt(pt);
-                        if (null != block)
-                            return block;
-                    }
-                    return null;
-                }
-                #endregion
-                #region Method: int GetParagraphIndex(OWPara p)
-                public int GetParagraphIndex(OWPara p)
-                {
-                    for (int i = 0; i < Paragraphs.Length; i++)
-                    {
-                        if (Paragraphs[i] == p)
-                            return i;
-                    }
-                    return -1;
-                }
-                #endregion
-            }
-            #endregion
-            #region Attr{g}: Pile[] Piles - the piles in this row
-            public Pile[] Piles
-            {
-                get
-                {
-                    Debug.Assert(null != m_vPiles);
-                    return m_vPiles;
-                }
-            }
-            Pile[] m_vPiles;
-            #endregion
-
-            // Scaffolding -------------------------------------------------------------------
-            #region Constructor(OWWindow, cColumns, bDisplayFootnoteSeparator, Bitmap)
-            public Row(OWWindow _Window, int cColumns, bool _bDisplayFootnoteSeparator, Bitmap _bmp)
-            {
-                // We want to remember the parent window
-                m_Window = _Window;
-
-                // Is there a bitmap requested?
-                m_bmp = _bmp;
-
-                // Create the vector that has room for each column
-                m_vPiles = new Pile[cColumns];
-
-                // Create a Pile for each column
-                for (int i = 0; i < cColumns; i++)
-                    m_vPiles[i] = new Pile(this, _bDisplayFootnoteSeparator);
-            }
-            #endregion
-
-            // Placing Content into the window -----------------------------------------------
-            #region Method: void AddParagraph(iCol, OWPara)
-            public void AddParagraph(int iCol, OWPara para)
-            {
-                // Acceptable parameters
-                Debug.Assert(iCol < Window.ColumnCount);
-                Debug.Assert(iCol >= 0 && iCol < Piles.Length);
-                Debug.Assert(null != para);
-
-                // Retrieve the requested pile
-                Pile pile = Piles[iCol];
-                Debug.Assert(null != pile);
-
-                // Append the paragraph to the pile
-                pile.AddParagraph(para);
-            }
-            #endregion
-
-            // Screen Region -----------------------------------------------------------------
-            #region Attr{g/s}: PointF Position
-            public PointF Position
-            {
-                get
-                {
-                    return m_ptPosition;
-                }
-                set
-                {
-                    m_ptPosition = value;
-                }
-            }
-            private PointF m_ptPosition;
-            #endregion
-            #region Attr{g/s}: float MeasuredWidth - Calc'd via the MeasureWidth method during layout
-            public float MeasuredWidth
-            {
-                get
-                {
-                    return m_fMeasuredWidth;
-                }
-                set
-                {
-                    m_fMeasuredWidth = value;
-                }
-            }
-            protected float m_fMeasuredWidth = 0;
-            #endregion
-            #region Attr{g/s}: float Height - calc'd from LineCount and Para.LineHeight
-            public float Height
-            {
-                get
-                {
-                    return m_fHeight;
-                }
-                set
-                {
-                    m_fHeight = value;
-                }
-            }
-            float m_fHeight = 0;
-            #endregion
-            #region VAttr{g}: RectangleF Rectangle
-            public RectangleF Rectangle
-            {
-                get
-                {
-                    return new RectangleF(Position, new SizeF(MeasuredWidth, Height));
-                }
-            }
-            #endregion
-            #region VAttr{g}: Rectangle IntRectangle
-            public Rectangle IntRectangle
-            {
-                get
-                {
-                    int x = (int)Position.X;
-                    int y = (int)Position.Y;
-                    int w = (int)MeasuredWidth;
-                    int h = (int)Height;
-                    return new Rectangle(x, y, w, h);
-                }
-            }
-            #endregion
-            #region Method: virtual bool ContainsPoint(PointF pt)
-            public bool ContainsPoint(PointF pt)
-            {
-                return Rectangle.Contains(pt);
-            }
-            #endregion
-
-            // Layout & Paint ----------------------------------------------------------------
-            #region Method: void DoLayout(...)
-            public void DoLayout(float[] xColumns, float y, int nColumnWidth)
-            {
-                MeasuredWidth = Window.Width;
-                _LayoutEngine(xColumns[0], y, xColumns, nColumnWidth);
-            }
-            #endregion
-            #region Method: void RePosition(float yNew) - Change the y coord of this Row and its children
-            public void RePosition(float yNew)
-            {
-                _LayoutEngine(Position.X, yNew, null, 0);
-
-                #region OBSOLETE ON 3 OCT 2007 - KEEP A WHILE TO MAKE SURE
-                /*** (Replaced by _LayoutEngine)
-                float fHeight = 0;
-
-                Position = new PointF(Position.X, y);
-
-                // Adjust y for the bitmap, if present
-                if (null != Bmp)
-                {
-                    // Adjust for the upper line
-                    y += 1; 
-                    // Adjust for the margin
-                    y += c_BitmapMargin;
-                    // Adjust for the bitmap itself
-                    y += Bmp.Height;
-                }
-
-                // Reposition the piles
-                foreach (Pile pile in Piles)
-                {
-                    pile.RePosition(y);
-                    fHeight = Math.Max(fHeight, pile.Height);
-                }
-
-                // Adjust the height for the bitmap
-                if (null != Bmp)
-                {
-                    // Adjust for the upper and lower lines
-                    fHeight += 2;
-                    // Adjust for padding at the bottom
-                    fHeight += c_BitmapPadAtBottom;
-                    // Adjust for the margin
-                    fHeight += c_BitmapMargin;
-                    // Adjust for the bitmap itself
-                    fHeight += Bmp.Height;
-                }
-
-                Height = fHeight;
-                ***/
-                #endregion
-            }
-            #endregion
-            #region Method: void _LayoutEngine(xLeft, yTop, float[] xColumns, nColumnWidth)
-            void _LayoutEngine(float xLeft, float yTop, float[] xColumns, int nColumnWidth)
-                // The goals are to layout the children, and to calclate the Height
-                //
-                // Parameters
-                //   xLeft - the left pixel for the Row
-                //   yTop - the top pixel for the Row
-                //   xColumns - the left x pixel for each column. If null, then
-                //       we want to just do a reposition, not a layout.
-                //   nColumnWidth - the desired width for each column in the row.
-                //       If nColumnWidth is nonzero, then we want to do a re-layout; 
-                //       otherwise it is just a reposition.
-            {
-                Position = new PointF(xLeft, yTop);
-
-                // Allow for the top part of the bitmap in "y" when laying out the piles
-                float fHeightBmp = 0;
-                if (null != Bmp)
-                {
-                    // Allow one pixel room for the line above the drawing
-                    fHeightBmp += 1;
-                    // Allow room for the margin above the bitmap
-                    fHeightBmp += c_BitmapMargin;
-                    // Allow room for the bitmap itself
-                    fHeightBmp += Bmp.Height;
-                }
-
-                // Calculate for the tallest pile
-                float fHeightPiles = 0;
-                for (int i = 0; i < Piles.Length; i++)
-                {
-
-                    if (nColumnWidth != 0 && null != xColumns)
-                    {
-                        PointF ptPilePosition = new PointF(
-                            xColumns[i],
-                            yTop + fHeightBmp);
-
-                        Piles[i].DoLayout(ptPilePosition, nColumnWidth);
-                    }
-                    else
-                    {
-                        Piles[i].RePosition(yTop + fHeightBmp);
-                    }
-
-                    fHeightPiles = Math.Max(Piles[i].Height, fHeightPiles);
-                }
-
-                // Adjust for the bottom part of the bitmap borders (if there is one)
-                if (null != Bmp)
-                {
-                    // Allow room for the margin below the bitmap
-                    fHeightBmp += c_BitmapMargin;
-                    // Allow one pixel for the line below the drawing
-                    fHeightBmp += 1;
-                    // Allow a touch of extra padding so the line draws correctly
-                    fHeightBmp += c_BitmapPadAtBottom;
-                }
-
-                // The Row's Height is the sum of PileHeight and BmpHeight
-                Height = fHeightBmp + fHeightPiles;
-            }
-            #endregion
-            #region Method: void Paint(ClipRectangle)
-            public void Paint(Rectangle ClipRectangle)
-            {
-                // Check to see that this is something we truly need to be painting; 
-                // simply return if not.
-                if (!ClipRectangle.IntersectsWith(IntRectangle))
-                    return;
-
-                // Handle the bitmap, if present
-                if (null != Bmp)
-                {
-                    // Line above and below
-                    Pen pen = new Pen(Color.Black);
-                    Window.Draw.Line(pen, 
-                        Position,
-                        new PointF(Position.X + Rectangle.Width, Position.Y));
-                    Window.Draw.Line(pen, 
-                        new PointF(Position.X, Position.Y + Rectangle.Height - 2),
-                        new PointF(Position.X + Rectangle.Width, Position.Y + Rectangle.Height - 2));
-
-                    // Draw the bitmap
-                    float xBmp = Position.X + (Rectangle.Width - Bmp.Width) / 2;
-                    float yBmp = Position.Y + 1 + c_BitmapMargin;
-                    Window.Draw.Image(Bmp, new PointF(xBmp, yBmp));
-                }
-
-                // Paint each pile
-                foreach (Pile pile in Piles)
-                    pile.Paint(ClipRectangle);
-            }
-            #endregion
-            #region Method: void AssignLineNumbers(ref int[] vnLineNo)
-            public void AssignLineNumbers(ref int[] vnLineNo)
-            {
-                for (int i = 0; i < Piles.Length; i++)
-                    Piles[i].AssignLineNumbers(ref vnLineNo[i]);
-            }
-            #endregion
-
-            // Selection ---------------------------------------------------------------------
-            #region Method: void Select_FirstWord()
-            public bool Select_FirstWord()
-            {
-                foreach (Pile pile in Piles)
-                {
-                    if (pile.Select_FirstWord())
-                        return true;
-                }
-                return false;
-            }
-            #endregion
-            #region Method: bool Select_NextWord(...)
-            public bool Select_NextWord(int iPileCandidate, int iParagraphCandidate, int iWordCandidate)
-            {
-                // Attempt within the candidate pile first
-                if (Piles[iPileCandidate].Select_NextWord(iParagraphCandidate, iWordCandidate))
-                    return true;
-
-                // Now attempt with all subsequent piles
-                for (int i = iPileCandidate + 1; i < Piles.Length; i++)
-                {
-                    if (Piles[i].Select_FirstWord())
-                        return true;
-                }
-
-                // Unable to find something we could select
-                return false;
-            }
-            #endregion
-            #region Method: bool Select_LastWord()
-            public bool Select_LastWord()
-            {
-                for (int i = Piles.Length - 1; i >= 0; i--)
-                {
-                    if (Piles[i].Select_LastWord())
-                        return true;
-                }
-                return false;
-            }
-            #endregion
-            #region Method: bool Select_PreviousWord(...)
-            public bool Select_PreviousWord(int iPileCandidate, int iParagraphCandidate, int iWordCandidate)
-            {
-                // Attempt within the candidate pile first
-                if (Piles[iPileCandidate].Select_PreviousWord(iParagraphCandidate, iWordCandidate))
-                    return true;
-
-                // Now attempt with all subsequent piles
-                for (int i = iPileCandidate - 1; i >= 0; i--)
-                {
-                    if (Piles[i].Select_LastWord())
-                        return true;
-                }
-
-                // Unable to find something we could select
-                return false;
-            }
-            #endregion
-
-            #region Method: EBlock GetBlockAt(PointF pt)
-            public OWPara.EBlock GetBlockAt(PointF pt)
-            {
-                // Since we are sequentially working through the rows, from top of window to
-                // bottom, all we need to do here is test whether the point comes lower than
-                // this row.
-                if (pt.Y > Position.Y + Height)
-                    return null;
-
-                foreach (Pile pile in Piles)
-                {
-                    OWPara.EBlock block = pile.GetBlockAt(pt);
-                    if (null != block)
-                        return block;
-                }
-                return null;
-            }
-            #endregion
-            #region Method: int GetPileIndex(Pile pile)
-            public int GetPileIndex(Pile pile)
-            {
-                for (int i = 0; i < Piles.Length; i++)
-                {
-                    if (Piles[i] == pile)
-                        return i;
-                }
-                return -1;
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g}: Row[] Rows
-        public Row[] Rows
+        // Placing Data Content into the window ----------------------------------------------
+        #region Attr{g}: ERoot Contents
+        public ERoot Contents
         {
             get
             {
-                Debug.Assert(null != m_vRows);
-                return m_vRows;
+                Debug.Assert(null != m_Contents);
+                return m_Contents;
             }
         }
-        Row[] m_vRows = null;
+        ERoot m_Contents;
         #endregion
-
-        // Placing Data Content into the window ----------------------------------------------
         #region Method: void Clear()
         public void Clear()
         {
             // Reset the Rows
-            m_vRows = new Row[0];
+            Contents.Clear();
 
             // No longer is there a selection
             Selection = null;
@@ -1264,45 +502,53 @@ namespace OurWord.Edit
                 w.Clear();
         }
         #endregion
+
         #region Method: void StartNewRow() - this version does not have the footnote separator
-        public void StartNewRow()
+        public EContainer StartNewRow()
         {
-            StartNewRow(false, null);
+            return StartNewRow(false);
         }
         #endregion
-        #region Method: void StartNewRow(bDisplayFootnoteSeparator, Bitmap)
-        public void StartNewRow(bool _bDisplayFootnoteSeparator, Bitmap _bmp)
+
+        #region Method: void StartNewRow(bDisplayFootnoteSeparator)
+        public EContainer StartNewRow(bool bDisplayFootnoteSeparator)
         {
-            // Create the new Row
-            Row row = new Row(this, ColumnCount, _bDisplayFootnoteSeparator, _bmp);
-
-            // Create a new vector that is one longer
-            Row[] v = new Row[Rows.Length + 1];
-
-            // Transfer the existing contents to it
-            for (int i = 0; i < Rows.Length; i++)
-                v[i] = Rows[i];
-
-            // The final item in the new vector should be the new, appended row
-            v[Rows.Length] = row;
-
-            // Set the old vector to now point to this new, longer one
-            m_vRows = v;
+            // Create the new Row and add it to the Root
+            Row row = new Row(this, Contents, ColumnCount, bDisplayFootnoteSeparator);
+            Contents.Append(row);
+            return row;
         }
         #endregion
+
         #region Method: void AddParagraph(int iCol, OWPara p)
         public void AddParagraph(int iCol, OWPara p)
         {
+            // Acceptable parameters
+            Debug.Assert(iCol < ColumnCount);
+            Debug.Assert(iCol >= 0);
+            Debug.Assert(null != p);
+
             // If we do not have any rows, then add one
-            if (Rows.Length == 0)
+            if (Contents.Count == 0)
                 StartNewRow();
 
-            // Retrieve the last row in our vector
-            Row row = Rows[Rows.Length - 1];
-            Debug.Assert(null != row);
+            // Retrieve the desired pile
+            Pile pile = LastRow.SubItems[iCol] as Pile;
+            Debug.Assert(null != pile);
 
-            // Add the paragraph to the desired column
-            row.AddParagraph(iCol, p);
+            // Add the paragraph
+            pile.Append(p);
+        }
+        #endregion
+        #region VAttr{g}: Row LastRow - most recent row created via StartNewRow
+        public Row LastRow
+        {
+            get
+            {
+                if (Contents.Count == 0)
+                    return null;
+                return Contents[Contents.Count - 1] as Row;
+            }
         }
         #endregion
 
@@ -1447,8 +693,8 @@ namespace OurWord.Edit
             }
             #endregion
             #region Method: void InvalidateBlock(EBlock)
-            delegate void InvalidateBlockCallback(OWPara.EBlock block);
-            public void InvalidateBlock(OWPara.EBlock block)
+            delegate void InvalidateBlockCallback(EBlock block);
+            public void InvalidateBlock(EBlock block)
                 // This can be called with the Sel Timer wants to redraw the flashing
                 // cursor; thus an asynchronic call from a different thread.
             {
@@ -1465,7 +711,7 @@ namespace OurWord.Edit
                     RectangleF r = new RectangleF(
                         block.Position.X,
                         block.Position.Y - Wnd.ScrollBarPosition,
-                        block.MeasuredWidth + block.JustificationPaddingAdded,
+                        block.Width + block.JustificationPaddingAdded,
                         block.Height);
 
                     Wnd.Invalidate(new Region(r), false);
@@ -1478,7 +724,7 @@ namespace OurWord.Edit
                 RectangleF r = new RectangleF(
                     para.Position.X,
                     para.Position.Y - Wnd.ScrollBarPosition,
-                    para.MeasuredWidth,
+                    para.Width,
                     para.Height);
 
                 Wnd.Invalidate(new Region(r), false);
@@ -1521,30 +767,6 @@ namespace OurWord.Edit
         }
         DrawBuffer m_Draw = null;
         #endregion
-        #region Attr{g}: float[] ColumnSeparatorPositions - the x's for the lines between columns
-        float[] ColumnSeparatorPositions
-        {
-            get
-            {
-                Debug.Assert(null != m_vfColumnSeparatorPositions);
-                Debug.Assert(m_vfColumnSeparatorPositions.Length == (ColumnCount - 1));
-                return m_vfColumnSeparatorPositions;
-            }
-        }
-        float[] m_vfColumnSeparatorPositions = null;
-        #endregion
-        #region Attr{g}: float[] ColumnContentPositions - the x's for the column text
-        float[] ColumnContentPositions
-        {
-            get
-            {
-                Debug.Assert(null != m_vfColumnContentPositions);
-                Debug.Assert(m_vfColumnContentPositions.Length == (ColumnCount));
-                return m_vfColumnContentPositions;
-            }
-        }
-        float[] m_vfColumnContentPositions = null;
-        #endregion
         #region Attr{g/s}: The background color for words which can be edited. Default is White
         public Color EditableBackgroundColor
         {
@@ -1568,57 +790,22 @@ namespace OurWord.Edit
             if (!m_bLoaded)
                 return;
 
-            if (ColumnCount == 0)
-                return;
-
-            // Calculate the width available for each column, and the spacing between columns
-            float fClientWidth = Width - m_ScrollBar.Width;
-            float fWidthBetweenColumns = ColumnMargins.Width * 2 + 
-                ((DrawLineBetweenColumns) ? 1 : 0);
-            float fTotalContentWidth = fClientWidth - ColumnMargins.Width * 2 - 
-                ((ColumnCount - 1) * fWidthBetweenColumns);
-            int nColumnWidth = (int)(fTotalContentWidth / (float)ColumnCount);
+            // Calculate the Lefts and Widths for the EContainer hierarchy
+            Contents.CalculateContainerHorizontals();
 
             // We'll start from the top of the window, taking into account the margin
-            float y = ColumnMargins.Height;
+            float y = WindowMargins.Height;
 
-            // Calculate the location of each column and the separator lines
-            m_vfColumnSeparatorPositions = new float[ColumnCount - 1];
-            m_vfColumnContentPositions = new float[ColumnCount];
-            float x = ColumnMargins.Width;
-            for (int i = 0; i < ColumnCount; i++)
+            // Lay out the items
+            foreach (EContainer container in Contents.SubItems)
             {
-                // On entering the loop, we are positioned for the column's content
-                m_vfColumnContentPositions[i] = x;
-
-                // Add the width of the column
-                x += nColumnWidth;
-
-                // Add the right column margin
-                x += ColumnMargins.Width;
-
-                // Add the line, if we are drawing it
-                if (DrawLineBetweenColumns)
-                {
-                    x += 1;
-                    if (i < ColumnCount - 1)
-                        m_vfColumnSeparatorPositions[i] = x;
-                }
-
-                // Add the margin into the next column
-                x += ColumnMargins.Width;
-            }
-
-            // Lay out the rows
-            foreach (Row row in Rows)
-            {
-                row.DoLayout(ColumnContentPositions, y, nColumnWidth);
-                y += row.Height;
+                container.CalculateContainerVerticals(y, false);
+                y += container.Height;
             }
 
             // Now that the lines have been defined in the low-level OWPara's,
             // give each line a line number
-            AssignLineNumbers();
+            Contents.CalculateLineNumbers();
 
             // Set the ScrollBar, adding some (30 pixels) padding at the bottom
             Layout_SetupScrollBar((int)y);
@@ -1667,23 +854,15 @@ namespace OurWord.Edit
             Draw.FillRectangle(BackColor, r);
 
             // If there is no data, then display a help message
-            if (Rows.Length == 0)
+            if (Contents.Count == 0)
             {
                 PaintNoDataMessage(e);
                 e.Graphics.DrawImageUnscaled(Draw.DoubleBuffer, 0, 0);
                 return;
             }
 
-            // Draw the lines between the columns
-            if (DrawLineBetweenColumns && ColumnCount > 1)
-            {
-                Pen pen = new Pen(Color.Black);
-                foreach (float x in ColumnSeparatorPositions)
-                    Draw.Line(pen, x, 0, x, Height);
-            }
-
             // Paint the rows
-            foreach (Row row in Rows)
+            foreach (Row row in Contents.SubItems)
                 row.Paint(r);
 
             // Text Selection
@@ -1710,44 +889,33 @@ namespace OurWord.Edit
             DoLayout();
         }
         #endregion
-        #region Method: int GetRowIndex(Row row)
-        public int GetRowIndex(Row row)
-        {
-            for (int i = 0; i < Rows.Length; i++)
-            {
-                if (Rows[i] == row)
-                    return i;
-            }
-            return -1;
-        }
-        #endregion
         #region Cmd: OnParagraphHeightChanged - recalculate positions to accomdate the new-sized paragraph
-        public void OnParagraphHeightChanged(Row rowContainingChangedParagraph)
+        public void OnParagraphHeightChanged(EContainer TopLevelContainer)
             // Each paragraph needs to recalculate its position and be redrawn
         {
             // Start at the top margin for the window
-            float y = ColumnMargins.Height;
+            float y = WindowMargins.Height;
 
             // We'll not redraw until we encounter the row that has changed; thus we'll use
             // bFound to indicate when we've located that row
             bool bFound = false;
 
             // Process through each row
-            foreach (Row row in Rows)
+            foreach (EContainer container in Contents.SubItems)
             {
                 // Set the bFound flag once we encounter the target row
-                if (row == rowContainingChangedParagraph)
+                if (container == TopLevelContainer)
                     bFound = true;
 
                 // RePosition each row from the target to the end of the screen
                 if (bFound)
-                    row.RePosition(y);
+                    container.CalculateContainerVerticals(y, true);
 
-                y += row.Height;
+                y += container.Height;
             }
 
             // Recalculate the lines numbers, as they may have changed
-            AssignLineNumbers();
+            Contents.CalculateLineNumbers();
 
             // Change the scrollbar to reflect the new height
             Layout_SetupScrollBar((int)y);
@@ -1829,24 +997,6 @@ namespace OurWord.Edit
         }
         public CLineNumberAttrs m_LineNumberAttrs = null;
         #endregion
-        #region Method: void AssignLineNumbers()
-        public void AssignLineNumbers()
-        {
-            // What is the maximum number of columns we have in any row?
-            int cColumns = 0;
-            foreach (Row r in Rows)
-                cColumns = Math.Max(cColumns, r.Piles.Length);
-
-            // Initialize a count for the number of columns we are supporting
-            int[] vnLineNo = new int[cColumns];
-            for (int i = 0; i < cColumns; i++)
-                vnLineNo[i] = 1;
-
-            // Go through each row, numbering the columns
-            foreach (Row r in Rows)
-                r.AssignLineNumbers(ref vnLineNo);
-        }
-        #endregion
 
         // Scroll Bar ------------------------------------------------------------------------
         #region Scroll Bar
@@ -1859,7 +1009,7 @@ namespace OurWord.Edit
                 return m_ScrollBar;
             }
         }
-        VScrollBar m_ScrollBar;
+        public VScrollBar m_ScrollBar;
         #endregion
         #region Attr{g/s}: float ScrollBarRange
         float ScrollBarRange
@@ -1996,7 +1146,7 @@ namespace OurWord.Edit
                 int m_iChar;
                 #endregion
                 #region Attr{g/s}: EWord Word
-                public OWPara.EWord Word
+                public EWord Word
                 {
                     get
                     {
@@ -2008,7 +1158,7 @@ namespace OurWord.Edit
                         m_Word = value;
                     }
                 }
-                OWPara.EWord m_Word = null;
+                EWord m_Word = null;
                 #endregion
 
                 // Secondary Attrs -----------------------------------------------------------
@@ -2186,14 +1336,15 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+
             #region VAttr{g}: int iRow - the index of the Row containing this selection
             public int iRow
             {
                 get
                 {
-                    OWWindow.Row row = Paragraph.Row;
+                    Row row = Paragraph.Row;
 
-                    int i = Window.GetRowIndex(row);
+                    int i = Window.Contents.Find(row);
                     Debug.Assert(-1 != i);
 
                     return i;
@@ -2205,10 +1356,10 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    OWWindow.Row.Pile pile = Paragraph.Pile;
-                    OWWindow.Row row = pile.Row;
+                    Pile pile = Paragraph.Pile;
+                    Row row = pile.Row;
 
-                    int i = row.GetPileIndex(pile);
+                    int i = row.Find(pile);
                     Debug.Assert(-1 != i);
 
                     return i;
@@ -2220,17 +1371,50 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    OWWindow.Row.Pile pile = Paragraph.Pile;
+                    Pile pile = Paragraph.Pile;
 
-                    int i = pile.GetParagraphIndex(Paragraph);
+                    int i = pile.Find(Paragraph);
                     Debug.Assert(-1 != i);
 
                     return i;
                 }
             }
             #endregion
+            #region VAttr{g}: ArrayList ContainerIndicesStack
+            public ArrayList ContainerIndicesStack
+            {
+                get
+                {
+                    ArrayList aiStack = new ArrayList();
+
+                    // Start with this word
+                    EItem item = Anchor.Word;
+
+                    // Work up until we get the Root
+                    do
+                    {
+                        // Iterate: Move to the owner of the item we just processed
+                        item = item.Owner;
+
+                        // Find this item within its own owner
+                        if (null == item.Owner)
+                            break;
+                        int i = item.Owner.Find(item);
+                        Debug.Assert(-1 != i);
+
+                        // Add it to the array, at the top, so that top-to-bottom works
+                        // downward through the hierarchy.
+                        aiStack.Insert(0, i);
+
+                    } while (true);
+
+                    return aiStack;
+                }
+            }
+            #endregion
+
             #region VAttr{g}: Row Row - the row containing this selection
-            public OWWindow.Row Row
+            public Row Row
             {
                 get
                 {
@@ -2239,7 +1423,7 @@ namespace OurWord.Edit
             }
             #endregion
             #region VAttr{g}: Pile Pile - the pile containing this selection
-            public OWWindow.Row.Pile Pile
+            public Pile Pile
             {
                 get
                 {
@@ -2247,6 +1431,7 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+
             #region VAttr{g}: string SelectionString
             public string SelectionString
             {
@@ -2273,7 +1458,7 @@ namespace OurWord.Edit
                         else if (i == Last.iBlock)
                             s += Last.Word.Text.Substring(0, Last.iChar);
                         else
-                            s += Paragraph.Blocks[i].Text;
+                            s += (Paragraph.SubItems[i] as EBlock).Text;
                     }
                     return s;
                 }
@@ -2289,9 +1474,9 @@ namespace OurWord.Edit
                         return false;
 
                     // Must be the first editable block
-                    for (int ib = 0; ib < Paragraph.Blocks.Length; ib++)
+                    for (int ib = 0; ib < Paragraph.SubItems.Length; ib++)
                     {
-                        if (Paragraph.Blocks[ib] as OWPara.EWord != null)
+                        if (Paragraph.SubItems[ib] as EWord != null)
                         {
                             if (ib != Anchor.iBlock)
                                 return false;
@@ -2318,9 +1503,9 @@ namespace OurWord.Edit
                         return false;
 
                     // Must be the last editable block
-                    for (int ib = Paragraph.Blocks.Length - 1; ib >= 0; ib--)
+                    for (int ib = Paragraph.SubItems.Length - 1; ib >= 0; ib--)
                     {
-                        if (Paragraph.Blocks[ib] as OWPara.EWord != null)
+                        if (Paragraph.SubItems[ib] as EWord != null)
                         {
                             if (ib != Anchor.iBlock)
                                 return false;
@@ -2329,7 +1514,7 @@ namespace OurWord.Edit
                     }
 
                     // Must be the last position in the block
-                    OWPara.EWord word = Paragraph.Blocks[Anchor.iBlock] as OWPara.EWord;
+                    EWord word = Paragraph.SubItems[Anchor.iBlock] as EWord;
                     if (Anchor.iChar != word.Text.Length)
                         return false;
 
@@ -2365,7 +1550,7 @@ namespace OurWord.Edit
                     for (int i = First.iBlock; i >= 0; i--)
                     {
                         // Attempt to cast to an EWord. 
-                        OWPara.EWord word = Paragraph.Blocks[i] as OWPara.EWord;
+                        EWord word = Paragraph.SubItems[i] as EWord;
                         
                         // As long as we keep finding EWords, we are still in the same 
                         // DBT. Otherwise, we've found the boundary, so return the
@@ -2397,10 +1582,10 @@ namespace OurWord.Edit
 
                     // Start at the first block of the selection, and scan forwards
                     // towards the end of the paragraph.
-                    for (int i = Last.iBlock; i < Paragraph.Blocks.Length; i++)
+                    for (int i = Last.iBlock; i < Paragraph.SubItems.Length; i++)
                     {
                         // Attempt to cast to an EWord. 
-                        OWPara.EWord word = Paragraph.Blocks[i] as OWPara.EWord;
+                        EWord word = Paragraph.SubItems[i] as EWord;
 
                         // As long as we keep finding EWords, we are still in the same 
                         // DBT. Otherwise, we've found the boundary, so return the
@@ -2425,7 +1610,7 @@ namespace OurWord.Edit
 
                 for (int i = DBT_iBlockFirst; i < sp.iBlock; i++)
                 {
-                    OWPara.EWord word = Paragraph.Blocks[i] as OWPara.EWord;
+                    EWord word = Paragraph.SubItems[i] as EWord;
                     Debug.Assert(null != word);
                     iPos += word.Text.Length;
                 }
@@ -2480,26 +1665,26 @@ namespace OurWord.Edit
 
                 // We''ll keep track of the EWord we're working on here
                 int iBlock = 0;
-                OWPara.EWord word = null;
+                EWord word = null;
 
                 // Scan for the first EWord for the DBT
-                for (; iBlock < paragraph.Blocks.Length; iBlock++)
+                for (; iBlock < paragraph.SubItems.Length; iBlock++)
                 {
-                    word = paragraph.Blocks[iBlock] as OWPara.EWord;
+                    word = paragraph.SubItems[iBlock] as EWord;
                     if (word != null && word.Phrase.BasicText == DBT)
                         break;
                 }
 
                 // Proceed through the words, working our way through the iPos
-                for (; iBlock < paragraph.Blocks.Length; iBlock++)
+                for (; iBlock < paragraph.SubItems.Length; iBlock++)
                 {
-                    word = paragraph.Blocks[iBlock] as OWPara.EWord;
+                    word = paragraph.SubItems[iBlock] as EWord;
                     if (null == word || word.Phrase.BasicText != DBT)
                     {
-                        if (iBlock > 0 && (paragraph.Blocks[iBlock - 1] as OWPara.EWord) != null)
+                        if (iBlock > 0 && (paragraph.SubItems[iBlock - 1] as EWord) != null)
                         {
                             return new Sel(paragraph, iBlock - 1,
-                                (paragraph.Blocks[iBlock - 1] as OWPara.EWord).Text.Length);
+                                (paragraph.SubItems[iBlock - 1] as EWord).Text.Length);
                         }
                         return null;
                     }
@@ -2524,12 +1709,12 @@ namespace OurWord.Edit
             {
                 // We''ll keep track of the EWord we're working on here
                 int iBlock = 0;
-                OWPara.EWord word = null;
+                EWord word = null;
 
                 // Scan for the first EWord for the DBT
-                for (; iBlock < paragraph.Blocks.Length; iBlock++)
+                for (; iBlock < paragraph.SubItems.Length; iBlock++)
                 {
-                    word = paragraph.Blocks[iBlock] as OWPara.EWord;
+                    word = paragraph.SubItems[iBlock] as EWord;
                     if (word != null && word.Phrase.BasicText == DBT)
                         break;
                 }
@@ -2538,10 +1723,10 @@ namespace OurWord.Edit
                 SelPoint sp2 = null;
 
                 // Proceed through the words, working our way through the iPos's
-                for (; iBlock < paragraph.Blocks.Length; iBlock++)
+                for (; iBlock < paragraph.SubItems.Length; iBlock++)
                 {
                     // Retrieve the EWord
-                    word = paragraph.Blocks[iBlock] as OWPara.EWord;
+                    word = paragraph.SubItems[iBlock] as EWord;
                     if (null == word || word.Phrase.BasicText != DBT)
                         return null;
 
@@ -2616,7 +1801,7 @@ namespace OurWord.Edit
                 {
                     Pen pen = new Pen(System.Drawing.Color.Black, 2);
 
-                    OWPara.EWord word = Anchor.Word;
+                    EWord word = Anchor.Word;
 
                     float x = word.Position.X + Anchor.xFromWordLeft;
 
@@ -2654,7 +1839,7 @@ namespace OurWord.Edit
                     // Paint the whole words in-between
                     for (int i = SelFirst.iBlock + 1; i < SelLast.iBlock; i++)
                     {
-                        OWPara.EWord word = Paragraph.Blocks[i] as OWPara.EWord;
+                        EWord word = Paragraph.SubItems[i] as EWord;
                         Debug.Assert(null != word);
                         if (null != word)
                             word.PaintSelection(-1, -1);
@@ -2673,10 +1858,10 @@ namespace OurWord.Edit
                     return false;
 
                 // Get the EWord the mouse if over
-                OWPara.EBlock block = Window.GetBlockAt(pt);
+                EBlock block = Window.GetBlockAt(pt);
                 if (null == block)
                     return false;
-                OWPara.EWord word = block as OWPara.EWord;
+                EWord word = block as EWord;
                 if (null == word)
                     return false;
 
@@ -2693,7 +1878,7 @@ namespace OurWord.Edit
                 // of the selected blocks, we know we have a Drag starting
                 for (int i = First.iBlock; i <= Last.iBlock; i++)
                 {
-                    if (word == Paragraph.Blocks[i] as OWPara.EWord)
+                    if (word == Paragraph.SubItems[i] as EWord)
                         return true;
                 }
 
@@ -2724,12 +1909,12 @@ namespace OurWord.Edit
 
                 // Set the Anchor and the Anchor.Word attribute
                 m_Anchor = _Anchor;
-                Anchor.Word = Paragraph.Blocks[Anchor.iBlock] as OWPara.EWord;
+                Anchor.Word = Paragraph.SubItems[Anchor.iBlock] as EWord;
 
                 // Set the End and the End.Word attribute
                 m_End = _End;
                 if (null != End)
-                    End.Word = Paragraph.Blocks[End.iBlock] as OWPara.EWord;
+                    End.Word = Paragraph.SubItems[End.iBlock] as EWord;
 
                 // If Anchor == End, then we have a Insertion Point.
                 if (null != End && Anchor.Word == End.Word && Anchor.iChar == End.iChar)
@@ -2739,12 +1924,12 @@ namespace OurWord.Edit
 
                 // Check for a potential InsertionIcon, and modify the selection to
                 // reflect it if so
-                if (Anchor.Word.Text == OWPara.EWord.c_chInsertionSpace.ToString())
+                if (Anchor.Word.Text == EWord.c_chInsertionSpace.ToString())
                 {
                     m_Anchor = new SelPoint(Anchor.iBlock, 0);
-                    Anchor.Word = Paragraph.Blocks[Anchor.iBlock] as OWPara.EWord;
+                    Anchor.Word = Paragraph.SubItems[Anchor.iBlock] as EWord;
                     m_End = new SelPoint(Anchor.iBlock, 1);
-                    End.Word = Paragraph.Blocks[End.iBlock] as OWPara.EWord;
+                    End.Word = Paragraph.SubItems[End.iBlock] as EWord;
                 }
 
                 // Get the selection drawn as fast as possible. The Timer will then make
@@ -2824,98 +2009,6 @@ namespace OurWord.Edit
             }
         }
         Sel m_Selection = null;
-        #endregion
-        #region Method: void Select_FirstWord()
-        public void Select_FirstWord()
-        {
-            Focus();
-
-            foreach (Row row in Rows)
-            {
-                row.Select_FirstWord();
-                if (null != Selection)
-                    break;
-            }
-        }
-        #endregion
-        #region Method: bool Select_NextWord(...)
-        public bool Select_NextWord(int iRowCandidate, int iPileCandidate, int iParagraphCandidate, int iWordCandidate)
-        {
-            // Attempt within the candidate row first
-            if (Rows[iRowCandidate].Select_NextWord(iPileCandidate, iParagraphCandidate, iWordCandidate))
-                return true;
-
-            // Now attempt with all subsequent rows
-            for (int i = iRowCandidate + 1; i < Rows.Length; i++)
-            {
-                if (Rows[i].Select_FirstWord())
-                    return true;
-            }
-
-            // Unable to find something we could select
-            return false;
-        }
-        #endregion
-        #region Method: bool Select_LastWord()
-        public bool Select_LastWord()
-        {
-            for (int i = Rows.Length - 1; i >= 0; i--)
-            {
-                if (Rows[i].Select_LastWord())
-                    return true;
-            }
-            return false;
-        }
-        #endregion
-        #region Method: bool Select_PreviousWord(...)
-        public bool Select_PreviousWord(int iRowCandidate, int iPileCandidate, int iParagraphCandidate, int iWordCandidate)
-        {
-            // Attempt within the candidate row first
-            if (Rows[iRowCandidate].Select_PreviousWord(iPileCandidate, iParagraphCandidate, iWordCandidate))
-                return true;
-
-            // Now attempt with all subsequent rows
-            for (int i = iRowCandidate - 1; i >= 0; i--)
-            {
-                if (Rows[i].Select_LastWord())
-                    return true;
-            }
-
-            // Unable to find something we could select
-            return false;
-        }
-        #endregion
-        #region Method: bool Select_FirstPositionInParagraph(DParagraph p)
-        public bool Select_FirstPositionInParagraph(DParagraph p)
-        {
-            // Drill down to find the OWPara whose datasource is p
-            foreach (Row row in Rows)
-            {
-                foreach (Row.Pile pile in row.Piles)
-                {
-                    foreach (OWPara para in pile.Paragraphs)
-                    {
-                        // Found it
-                        if (para.DataSource == p)
-                        {
-                            // Attempt to make a selection at the first editable position in the paragraph
-                            OWWindow.Sel selection = para.Select_BeginningOfFirstWord();
-
-                            // If a selection was made, then set the Window's selection to it
-                            if (null != selection)
-                            {
-                                Selection = selection;
-                                return true;
-                            }
-
-                            // A selection was not made
-                            return false;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
         #endregion
         #region Attr{g}: bool HasSelection
         public bool HasSelection
@@ -3305,11 +2398,11 @@ namespace OurWord.Edit
         MouseStates m_MouseState = MouseStates.kNone;
         bool m_bMouseDown = false;
         #region Method: EBlock GetBlockAt(PointF pt)
-        public OWPara.EBlock GetBlockAt(PointF pt)
+        public EBlock GetBlockAt(PointF pt)
         {
-            foreach (Row row in Rows)
+            foreach (Row row in Contents.SubItems)
             {
-                OWPara.EBlock block = row.GetBlockAt(pt);
+                EBlock block = row.GetBlockAt(pt);
                 if (null != block)
                     return block;
             }
@@ -3337,7 +2430,7 @@ namespace OurWord.Edit
  //           }
 
             // Get the EBlock we're over, and perform that block's action
-            OWPara.EBlock block = GetBlockAt(pt);
+            EBlock block = GetBlockAt(pt);
             if (null == block)
                 return;
             block.cmdLeftMouseClick(pt);
@@ -3355,7 +2448,7 @@ namespace OurWord.Edit
             // Get the EBlock we are currently over
             if (m_MouseState == MouseStates.kNone)
             {
-                OWPara.EBlock block = GetBlockAt(pt);
+                EBlock block = GetBlockAt(pt);
                 if (null != block)
                     Cursor = block.MouseOverCursor;
                 else
@@ -3364,7 +2457,7 @@ namespace OurWord.Edit
 
             if (m_MouseState == MouseStates.kSelectingText)
             {
-                OWPara.EBlock block = GetBlockAt(pt);
+                EBlock block = GetBlockAt(pt);
                 if (null != block)
                     block.cmdMouseMove(pt);
             }
@@ -3410,7 +2503,7 @@ namespace OurWord.Edit
             PointF pt = new PointF(e.X, e.Y + ScrollBarPosition);
 
             // Get the EBlock we are currently over
-            OWPara.EBlock block = GetBlockAt(pt);
+            EBlock block = GetBlockAt(pt);
 
             // Let the block handle it
             if (null != block)
@@ -3441,13 +2534,14 @@ namespace OurWord.Edit
         #region Cmd: cmdMoveTop - move cursor to first EWord in window
         void cmdMoveTop()
         {
-            Select_FirstWord();
+            Contents.Select_FirstWord();
+            Focus();
         }
         #endregion
-        #region Cmd: cmdMoveBottom - move cursor to first EWord in window
+        #region Cmd: cmdMoveBottom - move cursor to final EWord in window
         void cmdMoveBottom()
         {
-            Select_LastWord();
+            Contents.Select_LastWord_End();
         }
         #endregion
         #region Cmd: cmdMoveCharLeft - move cursor one char to the left
@@ -3480,8 +2574,7 @@ namespace OurWord.Edit
 
             // If we've made it here, then we want to move to the end of the previous
             // EWord (which may mean going to another paragraph/pile/row)
-            bool bSuccessful = Select_PreviousWord(Selection.iRow, Selection.iPile, 
-                Selection.iParagraph, Selection.Anchor.iBlock - 1);
+            bool bSuccessful = Contents.Select_PrevWord_End(Selection);
 
             // If this puts us at the end of a word, and if there was a EWord to our
             // right, then we need to decrement one more.
@@ -3526,11 +2619,10 @@ namespace OurWord.Edit
                 // next to us, then we'll want to actually be at the first position in
                 // that EWord. 
                 if (Selection.Anchor.iChar == Selection.Anchor.Word.Text.Length &&
-                    Selection.Anchor.iBlock < Selection.Paragraph.Blocks.Length - 1 &&
-                    null != Selection.Paragraph.Blocks[Selection.Anchor.iBlock + 1] as OWPara.EWord)
+                    Selection.Anchor.iBlock < Selection.Paragraph.SubItems.Length - 1 &&
+                    null != Selection.Paragraph.SubItems[Selection.Anchor.iBlock + 1] as EWord)
                 {
-                    Select_NextWord(Selection.iRow, Selection.iPile, Selection.iParagraph,
-                       Selection.Anchor.iBlock + 1);
+                    Contents.Select_NextWord_Begin(Selection);
                 }
 
                 return;
@@ -3538,8 +2630,7 @@ namespace OurWord.Edit
 
             // If we've made it here, then we want to move to the beginning of the next
             // EWord (which may mean going to another paragraph/pile/row)
-            Select_NextWord(Selection.iRow, Selection.iPile, Selection.iParagraph,
-                Selection.Anchor.iBlock + 1);
+            Contents.Select_NextWord_Begin(Selection);
         }
         #endregion
         #region Cmd: cmdMoveWordLeft
@@ -3552,8 +2643,7 @@ namespace OurWord.Edit
             // to the previous word
             if (Selection.First.iChar == 0)
             {
-                Select_PreviousWord(Selection.iRow, Selection.iPile, Selection.iParagraph,
-                    Selection.Anchor.iBlock - 1);
+                Contents.Select_PrevWord_Begin(Selection);
             }
 
             // Now move to the beginning of that word
@@ -3568,11 +2658,7 @@ namespace OurWord.Edit
         void cmdMoveWordRight()
             // We want to move to the beginning of the next EWord we can find
         {
-            if (null != Selection)
-            {
-                Select_NextWord(Selection.iRow, Selection.iPile, Selection.iParagraph,
-                    Selection.Last.iBlock + 1);
-            }
+            Contents.Select_NextWord_Begin(Selection);
         }
         #endregion
         #region Cmd: cmdMoveLineBegin
@@ -3597,47 +2683,7 @@ namespace OurWord.Edit
         #region Cmd: cmdMoveNextParagraph - e.g., in response to the Enter key
         void cmdMoveNextParagraph()
         {
-            if (null == Selection)
-                return;
-
-            // Get the current position we're in
-            int iPile = Selection.iPile;
-            int iPara = Selection.iParagraph;
-
-            // We ignore paragraphs until we find the one that is currently
-            // selected.
-            bool bParaFound = false;
-
-            for (int iRow = Selection.iRow; iRow < Rows.Length; iRow++)
-            {
-                // Retrieve the Row and Pile. (We want the same column
-                // as the current selection; so iPile does not change.)
-                Row row = Rows[iRow];
-                Row.Pile pile = row.Piles[iPile];
-
-                // Loop through the pile's paragraphs
-                foreach (OWPara p in pile.Paragraphs)
-                {
-                    // If we found the current paragraph at some point
-                    // previously, then we're ready to attempt a selection.
-                    // Once we succeed at getting a valid selection, then
-                    // we're done and we exit the method.
-                    if (bParaFound)
-                    {
-                        OWWindow.Sel selection = p.Select_BeginningOfFirstWord();
-                        if (null != selection)
-                        {
-                            Selection = selection;
-                            return;
-                        }
-                    }
-
-                    // Signal that the current paragraph has been found. From
-                    // here on out, any OWPara is a candidate.
-                    if (p == Selection.Paragraph)
-                        bParaFound = true;
-                } // endforeach p
-            } //endfor iRow
+            Contents.Select_NextPara_Begin(Selection);
         }
         #endregion
         #region Cmd: cmdMoveNextBasicText() - e.g., in response to the Tab key
@@ -3648,7 +2694,7 @@ namespace OurWord.Edit
 
             // Move to the end of the current DBasicText
             int iBlock = Selection.DBT_iBlockLast;
-            OWPara.EWord word = Selection.Paragraph.Blocks[iBlock] as OWPara.EWord;
+            EWord word = Selection.Paragraph.SubItems[iBlock] as EWord;
             Debug.Assert(null != word);
             Selection = new OWWindow.Sel(Selection.Paragraph,
                 iBlock, word.Text.Length);
@@ -3665,7 +2711,7 @@ namespace OurWord.Edit
 
             // Move to the beginning of the current DBasicText
             int iBlock = Selection.DBT_iBlockFirst;
-            OWPara.EWord word = Selection.Paragraph.Blocks[iBlock] as OWPara.EWord;
+            EWord word = Selection.Paragraph.SubItems[iBlock] as EWord;
             Debug.Assert(null != word);
             Selection = new OWWindow.Sel(Selection.Paragraph, iBlock, 0);
 
@@ -3786,23 +2832,23 @@ namespace OurWord.Edit
             {
                 // We want to stay in the same column (pile), so retrieve that row's
                 // appropriate pile if it exists.
-                if (Rows[iRow].Piles.Length <= Selection.iPile)
+                if ((Contents.SubItems[iRow] as Row).SubItems.Length <= Selection.iPile)
                     continue;
-                Row.Pile pile = Rows[iRow].Piles[Selection.iPile];
+                Pile pile = (Contents.SubItems[iRow] as Row).SubItems[Selection.iPile] as Pile;
 
                 // Work through the paragraphs in that pile. The first time around, we
                 // start at the paragraph that contains the current selection; otherwise
                 // we start at the last paragraph in the pile.
                 if (!bFirstTime)
-                    iParaStart = pile.Paragraphs.Length - 1;
+                    iParaStart = pile.SubItems.Length - 1;
 
                 // Loop through the pile's paragraphs
                 for (int iPara = iParaStart; iPara >= 0; iPara--)
                 {
-                    OWPara paragraph = pile.Paragraphs[iPara];
+                    OWPara paragraph = pile.SubItems[iPara] as OWPara;
 
                     // Skip this paragraph if it does not allow editing
-                    if (!paragraph.Editable)
+                    if (!paragraph.IsEditable)
                         continue;
 
                     if (!bFirstTime)
@@ -3842,21 +2888,22 @@ namespace OurWord.Edit
             int iLineStart = Selection.Paragraph.IndexOfLine(lnStart) + 1;
 
             // Work through the rows, starting with the one that contains the selection
-            for (int iRow = Selection.iRow; iRow < Rows.Length; iRow++)
+            for (int iRow = Selection.iRow; iRow < Contents.Count; iRow++)
             {
                 // We want to stay in the same column (pile), so retrieve that row's
                 // appropriate pile if it exists.
-                if (Rows[iRow].Piles.Length <= Selection.iPile)
+                Row row = Contents.SubItems[iRow] as Row;
+                if (row.SubItems.Length <= Selection.iPile)
                     continue;
-                Row.Pile pile = Rows[iRow].Piles[Selection.iPile];
+                Pile pile = row.SubItems[Selection.iPile] as Pile;
 
                 // Work through the paragraphs in that pile
-                for (int iPara = iParaStart; iPara < pile.Paragraphs.Length; iPara++)
+                for (int iPara = iParaStart; iPara < pile.SubItems.Length; iPara++)
                 {
-                    OWPara paragraph = pile.Paragraphs[iPara];
+                    OWPara paragraph = pile.SubItems[iPara] as OWPara;
 
                     // Skip this paragraph if it does not allow editing
-                    if (!paragraph.Editable)
+                    if (!paragraph.IsEditable)
                         continue;
 
                     for (int iLine = iLineStart; iLine < paragraph.Lines.Length; iLine++)

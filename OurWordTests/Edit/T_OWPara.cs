@@ -164,9 +164,15 @@ namespace OurWordTests.Edit
             m_Form.Controls.Add(m_Window);
 
             // Set up John 3:16
-            m_p = CreateParagraph_John_3_16();
-            m_op = new OWPara(Wnd, WSVernacular, m_p.Style, m_p, Color.Wheat, OWPara.Flags.IsEditable);
             Wnd.StartNewRow();
+            m_p = CreateParagraph_John_3_16();
+            m_op = new OWPara(Wnd, 
+                Wnd.LastRow.SubItems[0] as EContainer,
+                WSVernacular, 
+                m_p.Style, 
+                m_p, 
+                Color.Wheat, 
+                OWPara.Flags.IsEditable);
             Wnd.AddParagraph(0, m_op);
             Wnd.LoadData();
 
@@ -284,67 +290,83 @@ namespace OurWordTests.Edit
 
         // Making Selections -----------------------------------------------------------------
         #region Test: Select_NextWord
-        [Test]
-        public void Select_NextWord()
+        [Test] public void Select_NextWord()
         {
             // Make a selection in the middle of "lo|ved"
             int iBlock = 5;
-            OWWindow.Sel selection = m_op.Select_NextWord(iBlock + 1);
-            Assert.AreEqual(6, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
-            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
+            OWWindow.Sel selection = new OWWindow.Sel(m_op, iBlock, 2);
+            m_Window.Contents.Select_NextWord_Begin(selection);
+            Assert.AreEqual(6, m_Window.Selection.Anchor.iBlock);
+            Assert.AreEqual(0, m_Window.Selection.Anchor.iChar);
+            Assert.IsTrue(m_Window.Selection.IsInsertionPoint, "IsInsertionPoint");
 
             // Select at the beginning of "son". Should skip "17" and go to "that"
             iBlock = 15;
-            selection = m_op.Select_NextWord(iBlock + 1);
-            Assert.AreEqual(17, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
+            selection = new OWWindow.Sel(m_op, iBlock, 0);
+            m_Window.Contents.Select_NextWord_Begin(selection);
+            Assert.AreEqual(17, m_Window.Selection.Anchor.iBlock);
+            Assert.AreEqual(0, m_Window.Selection.Anchor.iChar);
 
             // Select in the final word: Should return null
             iBlock = 28;
-            selection = m_op.Select_NextWord(iBlock + 1);
-            Assert.IsNull(selection, "No selection made.");
+            selection = new OWWindow.Sel(m_op, iBlock, 0);
+            bool bSelectionMade = m_Window.Contents.Select_NextWord_Begin(selection);
+            Assert.IsFalse(bSelectionMade, "No selection made.");
         }
         #endregion
-        #region Test: Select_PreviousWord
-        [Test]
-        public void Select_PreviousWord()
+        #region Test: Select_PrevWord
+        [Test] public void Select_PreviousWord()
         {
             // Request to select the previous word from "loved": Should be the beginning of the current block
             int iBlock = 5;
-            OWWindow.Sel selection = m_op.Select_PreviousWord(iBlock - 1);
-            Assert.AreEqual(4, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
+            int iChar = 3;
+            OWWindow.Sel selection = new OWWindow.Sel(m_op, iBlock, iChar);
+            m_op.Window.Contents.Select_PrevWord_End(selection);
+            Assert.AreEqual(4, m_Window.Selection.Anchor.iBlock);
+            Assert.AreEqual(3, m_Window.Selection.Anchor.iChar);
+            Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
+
+            selection = new OWWindow.Sel(m_op, iBlock, iChar);
+            m_op.Window.Contents.Select_PrevWord_Begin(selection);
+            Assert.AreEqual(4, m_Window.Selection.Anchor.iBlock);
+            Assert.AreEqual(0, m_Window.Selection.Anchor.iChar);
             Assert.IsTrue(selection.IsInsertionPoint, "IsInsertionPoint");
 
             // Select at the beginning of "that". Should skip "17" and go to "son"
             iBlock = 17;
-            selection = m_op.Select_PreviousWord(iBlock - 1);
-            Assert.AreEqual(15, selection.Anchor.iBlock);
-            Assert.AreEqual(3, selection.Anchor.iChar);
+            selection = new OWWindow.Sel(m_op, iBlock, 0);
+            m_op.Window.Contents.Select_PrevWord_End(selection);
+            Assert.AreEqual(15, m_Window.Selection.Anchor.iBlock);
+            Assert.AreEqual(3, m_Window.Selection.Anchor.iChar);
+
+            selection = new OWWindow.Sel(m_op, iBlock, 0);
+            m_op.Window.Contents.Select_PrevWord_Begin(selection);
+            Assert.AreEqual(15, m_Window.Selection.Anchor.iBlock);
+            Assert.AreEqual(0, m_Window.Selection.Anchor.iChar);
 
             // Select in the first word: Should return null
-            iBlock = 1;
-            selection = m_op.Select_PreviousWord(iBlock);
-            Assert.IsNull(selection, "No selection made.");
+            iBlock = 2;
+            selection = new OWWindow.Sel(m_op, iBlock, 0);
+            bool bSuccessful = m_op.Window.Contents.Select_PrevWord_Begin(selection);
+            Assert.IsFalse(bSuccessful, "No selection made.");
+            bSuccessful = m_op.Window.Contents.Select_PrevWord_End(selection);
+            Assert.IsFalse(bSuccessful, "No selection made.");
         }
         #endregion
         #region Test: Select_BeginningOfFirstWord
-        [Test]
-        public void Select_BeginningOfFirstWord()
+        [Test] public void Select_BeginningOfFirstWord()
         {
-            OWWindow.Sel selection = m_op.Select_BeginningOfFirstWord();
-            Assert.IsNotNull(selection, "Selection is not null");
-            Assert.AreEqual("For ", selection.Anchor.Word.Text);
+            bool bSuccessful = m_op.Select_FirstWord();
+            Assert.IsTrue(bSuccessful, "Selection was made");
+            Assert.AreEqual("For ", Wnd.Selection.Anchor.Word.Text);
         }
         #endregion
         #region Test: Select_EndOfLastWord
-        [Test]
-        public void Select_EndOfLastWord()
+        [Test] public void Select_EndOfLastWord()
         {
-            OWWindow.Sel selection = m_op.Select_EndOfLastWord();
-            Assert.IsNotNull(selection, "Selection is not null");
-            Assert.AreEqual("life.", selection.Anchor.Word.Text);
+            bool bSuccessful = m_op.Select_LastWord_End();
+            Assert.IsTrue(bSuccessful, "Selection was made");
+            Assert.AreEqual("life.", m_Window.Selection.Anchor.Word.Text);
         }
         #endregion
 

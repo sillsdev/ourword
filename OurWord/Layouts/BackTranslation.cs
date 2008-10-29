@@ -74,12 +74,6 @@ namespace OurWord.View
             // there is nothing below when there actually is.
             ScrollPositionBufferMargin = 50;
 
-            // It seems to appear better without a line between the columns
-            DrawLineBetweenColumns = false;
-
-            // Establish a few pixels around the edges
-            ColumnMargins = new SizeF(5, 5);
-
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
         }
@@ -124,11 +118,21 @@ namespace OurWord.View
             // Loop through the paragraphs
             foreach (DParagraph p in G.STarget.Paragraphs)
             {
-                // Start the new row and add the left side (vernacular)
-                StartNewRow(false, GetPicture(p));
+                // Start the new row 
+                EContainer container = StartNewRow(false);
+                container.Bmp = GetPicture(p);
 
+                // Add the IBT
+                OWPara opIBT = new OWPara(
+                    this,
+                    LastRow.SubItems[0] as EContainer,
+                    p.Translation.WritingSystemVernacular,
+                    p.Style,
+                    p,
+                    BackColor,
+                    OWPara.Flags.ShowIBT);
+                AddParagraph(0, opIBT);
 
-                // TODO
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 
@@ -162,7 +166,8 @@ namespace OurWord.View
             foreach (DParagraph p in G.STarget.Paragraphs)
             {
                 // Start the new row and add the left side (vernacular)
-                StartNewRow(false, GetPicture(p));
+                EContainer container = StartNewRow(false);
+                container.Bmp = GetPicture(p);
 
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)
@@ -172,6 +177,7 @@ namespace OurWord.View
                 // Add the vernacular paragraph to the left; we don't edit it
                 OWPara op = new OWPara(
                     this,
+                    LastRow.SubItems[0] as EContainer,
                     p.Translation.WritingSystemVernacular,
                     p.Style,
                     p,
@@ -198,6 +204,7 @@ namespace OurWord.View
                 // Create and add the display paragraph
                 op = new OWPara(
                     this,
+                    LastRow.SubItems[1] as EContainer,
                     p.Translation.WritingSystemConsultant,
                     p.Style,
                     p,
@@ -210,12 +217,13 @@ namespace OurWord.View
             bool bFirstFootnote = true;
             foreach (DFootnote fn in G.STarget.Footnotes)
             {
-                StartNewRow(bFirstFootnote, null);
+                StartNewRow(bFirstFootnote);
                 bFirstFootnote = false;
 
                 // Add the vernacular paragraph to the left side
                 OWPara op = new OWPara(
                     this,
+                    LastRow.SubItems[0] as EContainer,
                     fn.Translation.WritingSystemVernacular,
                     fn.Style,
                     fn,
@@ -238,6 +246,7 @@ namespace OurWord.View
                 // Create and add the display paragraph
                 op = new OWPara(
                     this,
+                    LastRow.SubItems[1] as EContainer,
                     fn.Translation.WritingSystemConsultant,
                     fn.Style,
                     fn,

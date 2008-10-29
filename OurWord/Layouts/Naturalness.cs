@@ -110,12 +110,6 @@ namespace OurWord.View
             // there is nothing below when there actually is.
             ScrollPositionBufferMargin = 50;
 
-            // It seems to appear better without a line between the columns
-            DrawLineBetweenColumns = false;
-
-            // Establish a few pixels around the edges
-            ColumnMargins = new SizeF(5, 5);
-
             // Background color for the window
             BackColor = Color.Honeydew;
 
@@ -181,7 +175,8 @@ namespace OurWord.View
                     bmp = pict.GetBitmap(c_xMaxPictureWidth);
 
                 // Start the new row
-                StartNewRow(false, bmp);
+                EContainer container = StartNewRow(false);
+                container.Bmp = bmp;
 
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)
@@ -212,6 +207,7 @@ namespace OurWord.View
                 // Create and add the paragraph
                 OWPara op = new OWPara(
                     this,
+                    LastRow.SubItems[0] as EContainer,
                     p.Translation.WritingSystemVernacular,
                     p.Style,
                     p,
@@ -226,7 +222,7 @@ namespace OurWord.View
             {
                 DFootnote fn = G.STarget.Footnotes[iFn] as DFootnote;
 
-                StartNewRow(bFirstFootnote, null);
+                EContainer container = StartNewRow(bFirstFootnote);
                 bFirstFootnote = false;
 
                 OWPara.Flags options = OWPara.Flags.None;
@@ -250,6 +246,7 @@ namespace OurWord.View
 
                 OWPara op = new OWPara(
                     this,
+                    LastRow.SubItems[0] as EContainer,
                     fn.Translation.WritingSystemVernacular,
                     fn.Style,
                     fn,

@@ -746,7 +746,7 @@ namespace OurWord
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             bool bShowNotesPane = DNote.IsShowingAny;
             bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
-#if (FEAT_WESAY || FEAT_MERGE)
+#if (FEATURE_WESAY || FEATURE_MERGE)
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
             bool bShowMergePane = (s_Features.F_Merge && G.IsValidProject);
             bool bShowSideWindowsSection = bShowNotesPane || bShowTranslationsPane || 
@@ -767,7 +767,7 @@ namespace OurWord
             m_menuShowNotesPane.Checked = DProject.VD_ShowNotesPane;
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
-#if (FEAT_WESAY || FEAT_MERGE)
+#if (FEATURE_WESAY || FEATURE_MERGE)
             m_menuShowMergePane.Visible = bShowMergePane;
             m_menuShowMergePane.Checked = DProject.ShowMergePane;
             m_menuShowDictionaryPane.Visible = bShowDictionaryPane;

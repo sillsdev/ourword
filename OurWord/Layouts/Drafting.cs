@@ -53,12 +53,6 @@ namespace OurWord.View
             // there is nothing below when there actually is.
             ScrollPositionBufferMargin = 50;
 
-            // It seems to appear better without a line between the columns
-            DrawLineBetweenColumns = false;
-
-            // Establish a few pixels around the edges
-            ColumnMargins = new SizeF(5, 5);
-
             // Background color for the window; default is "Linen"
             BackColor = Color.Wheat;
 
@@ -423,7 +417,8 @@ namespace OurWord.View
             // Load them all in a single row if we must
             if (!_CanSideBySideFootnotes())
             {
-                StartNewRow(true, null);
+                StartNewRow(true);
+
                 for (int kF = 0; kF < G.SFront.Footnotes.Count; kF++)
                     AddFrontFootnote(G.SFront.Footnotes[kF] as DFootnote);
                 for (int kT = 0; kT < G.STarget.Footnotes.Count; kT++)
@@ -434,7 +429,7 @@ namespace OurWord.View
             // Otherwise, they are on individual parallel rows
             for (int k = 0; k < G.SFront.Footnotes.Count; k++)
             {
-                StartNewRow( ((k == 0) ? true : false), null );
+                StartNewRow( ((k == 0) ? true : false) );
 
                 DFootnote fFront = G.SFront.Footnotes[k] as DFootnote;
                 DFootnote fTarget = G.STarget.Footnotes[k] as DFootnote;
@@ -500,24 +495,6 @@ namespace OurWord.View
                 if (!_CanSideBySideParagraphs(iFront, cFront, iTarget, cTarget))
                 {
                     LoadMismatchedParagraphs(iFront, cFront, iTarget, cTarget);
-
-                    #region OBSOLETE pending sufficient review, 15may08
-                    /*** OLD WAY, that I'm replacing with LoadMismatchedParagraphs on 15may08
-                    StartNewRow();
-                    for (int kF = 0; kF < cFront; kF++)
-                    {
-                        DParagraph pFront = G.SFront.Paragraphs[iFront + kF] as DParagraph;
-                        _LoadHintsFromFront(pFront);
-                        AddFrontParagraph(pFront);
-                    }
-                    for (int kT = 0; kT < cTarget; kT++)
-                    {
-                        DParagraph pTarget = G.STarget.Paragraphs[iTarget + kT] as DParagraph;
-                        pTarget.BestGuessAtInsertingTextPositions();
-                        AddTargetParagraph(pTarget, true);
-                    }
-                    ************************************************************************/
-                    #endregion
                 }
                 else
                 {
@@ -530,7 +507,8 @@ namespace OurWord.View
                             bmp = pict.GetBitmap(c_xMaxPictureWidth);
                         
                         // Start the row
-                        StartNewRow(false, bmp);
+                        EContainer container = StartNewRow(false);
+                        container.Bmp = bmp;
 
                         // Synchronize the Vernacular to the Target
                         DParagraph pFront = G.SFront.Paragraphs[iFront + k] as DParagraph;
@@ -562,13 +540,16 @@ namespace OurWord.View
         #region Method: void AddFrontParagraph(DParagraph)
         void AddFrontParagraph(DParagraph pFront)
         {
-            AddParagraph(c_iColFront, new OWPara(
+            OWPara para = new OWPara(
                 this,
+                LastRow.SubItems[c_iColFront] as EContainer,
                 pFront.Translation.WritingSystemVernacular,
                 pFront.Style,
                 pFront,
                 BackColor,
-                OWPara.Flags.None));
+                OWPara.Flags.None);
+
+            AddParagraph(c_iColFront, para);
         }
         #endregion
         #region Method: void AddFrontFootnote(DFootnote)
@@ -576,6 +557,7 @@ namespace OurWord.View
         {
             AddParagraph(c_iColFront, new OWPara(
                 this,
+                LastRow.SubItems[c_iColFront] as EContainer,
                 fnFront.Translation.WritingSystemVernacular,
                 fnFront.Style,
                 fnFront,
@@ -607,6 +589,7 @@ namespace OurWord.View
             // Add the paragraph
             AddParagraph(c_iColTarget, new OWPara(
                 this,
+                LastRow.SubItems[c_iColTarget] as EContainer,
                 pTarget.Translation.WritingSystemVernacular,
                 pTarget.Style,
                 pTarget,
@@ -636,6 +619,7 @@ namespace OurWord.View
             // Add the displayable paragraph
             AddParagraph(c_iColTarget, new OWPara(
                 this,
+                LastRow.SubItems[c_iColTarget] as EContainer,
                 fnTarget.Translation.WritingSystemVernacular,
                 fnTarget.Style,
                 fnTarget,

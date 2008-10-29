@@ -766,6 +766,7 @@ namespace OurWord.Edit
                 StartNewRow();
                 OWPara p = new OWPara(
                     this,
+                    LastRow.SubItems[0] as EContainer,
                     SelectedTranslation.WritingSystemConsultant,
                     G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleAbbrevNormal),
                     "The current selection does not correspond to a merge issue.");
@@ -815,6 +816,7 @@ namespace OurWord.Edit
                         StartNewRow();
                         OWPara para = new OWPara(
                             this,
+                            LastRow.SubItems[0] as EContainer,
                             SelectedTranslation.WritingSystemConsultant,
                             G.StyleSheet.FindParagraphStyle(DStyleSheet.c_PStyleMergeHeader),
                             SelectedBook.MergeBooks[k].NickName);
@@ -866,6 +868,7 @@ namespace OurWord.Edit
             StartNewRow();
             OWPara para = new OWPara(
                 this,
+                LastRow.SubItems[0] as EContainer,
                 SelectedTranslation.WritingSystemConsultant,
                 G.StyleSheet.FindParagraphStyle(DStyleSheet.c_PStyleMergeParagraph),
                 sRef);
@@ -886,7 +889,11 @@ namespace OurWord.Edit
             if (MergePane.ShowDiffs)
             {
                 DPhrase[] vPhrases = AnalyzeDiff(BasicText.AsString, dbtMerge.AsString);
-                OWPara p = new OWPara(this, SelectedTranslation.WritingSystemVernacular, PStyle, vPhrases);
+                OWPara p = new OWPara(this,
+                    LastRow.SubItems[0] as EContainer,
+                    SelectedTranslation.WritingSystemVernacular, 
+                    PStyle, 
+                    vPhrases);
                 AddParagraph(0, p);
             }
 
@@ -896,6 +903,7 @@ namespace OurWord.Edit
             {
                 OWPara p = new OWPara(
                     this,
+                    LastRow.SubItems[0] as EContainer,
                     SelectedTranslation.WritingSystemVernacular,
                     PStyle,
                     new DRun[] { dbtMerge }, 

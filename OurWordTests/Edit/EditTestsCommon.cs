@@ -71,7 +71,12 @@ namespace OurWordTests.Edit
             foreach (DParagraph p in Section.Paragraphs)
             {
                 StartNewRow();
-                OWPara op = new OWPara(this, WSVernacular, p.Style, p, Color.Wheat,
+                OWPara op = new OWPara(this, 
+                    LastRow.SubItems[0] as EContainer,
+                    WSVernacular, 
+                    p.Style, 
+                    p, 
+                    Color.Wheat,
                     OWPara.Flags.IsEditable | OWPara.Flags.CanRestructureParagraphs);
                 AddParagraph(0, op);
             }

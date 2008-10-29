@@ -154,12 +154,17 @@ namespace OurWordTests.DataModel
             int i = 0;
             foreach (DParagraph p in Section.Paragraphs)
             {
-                OWPara para = new OWPara(Wnd, WSVernacular, p.Style, p, Color.Wheat,
+                Wnd.StartNewRow();
+                OWPara para = new OWPara(Wnd, 
+                    Wnd.LastRow.SubItems[0] as EContainer,
+                    WSVernacular,
+                    p.Style, 
+                    p, 
+                    Color.Wheat,
                     OWPara.Flags.IsEditable);
                 m_vParas[i] = para;
                 i++;
 
-                Wnd.StartNewRow();
                 Wnd.AddParagraph(0, para);
             }
             Wnd.LoadData();

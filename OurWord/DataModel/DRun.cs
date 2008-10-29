@@ -133,10 +133,8 @@ namespace OurWord.DataModel
 		public virtual string IntBTSfmSaveString
 		{
 			get
-				// By default, we just return the same thing as the Contents string. E.g.,
-				// for footnote letters.
 			{
-				return ContentsSfmSaveString;
+				return "";
 			}
 		}
 		#endregion
@@ -1176,7 +1174,6 @@ namespace OurWord.DataModel
 		}
 		private DPhrases m_osPhrases;
 		#endregion
-
 		#region JAttr{g}: DPhrases PhrasesBT
 		public DPhrases PhrasesBT
 		{

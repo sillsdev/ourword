@@ -938,7 +938,7 @@ namespace OurWord.Edit
                 return false;
 
             // Do nothing if the paragraph is uneditable
-            if (!op.Editable)
+            if (!op.IsEditable)
                 return false;
 
             // Do nothing if an Insertion Icon
@@ -1172,7 +1172,7 @@ namespace OurWord.Edit
                 return false;
 
             // Do nothing if the paragraph is uneditable
-            if (!op.Editable)
+            if (!op.IsEditable)
                 return false;
 
             // Save a bookmark for where we are prior to the insertion
@@ -1735,7 +1735,7 @@ namespace OurWord.Edit
                 return false;
 
             // Do nothing if the paragraph is uneditable
-            if (!op.Editable)
+            if (!op.IsEditable)
                 return false;
 
             // There's nothing to do if we don't have a content selection
@@ -1927,7 +1927,8 @@ namespace OurWord.Edit
 
             // Move editing to the new footnote
             DFootnote footnote = footLetter.Footnote;
-            Window.Select_FirstPositionInParagraph(footnote);
+            EContainer container = Window.Contents.FindContainerOfDataSource(footnote);
+            container.Select_FirstWord();
 
             // Remember where we are so we can undo
             m_bookmark_AfterInsert = new OWBookmark(Window.Selection);
@@ -1988,7 +1989,8 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Select at the beginning of the window
-            Window.Select_FirstWord();
+            Window.Contents.Select_FirstWord();
+            Window.Focus();
 
             // Remember where we are so we can undo
             m_bookmark_AfterDelete = new OWBookmark(Window.Selection);

@@ -471,42 +471,20 @@ namespace OurWord.Edit
             // Determine the note's style
             JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyle(DNote.StyleAbbrev);
 
-            // Create a OWParagraph for the note
-            OWPara p = new OWPara(this, ws, PStyle, note, clrEditableBackground, options);
-
-            // Add it to the view
+            // Create and add a OWParagraph for the note
             StartNewRow();
+            OWPara p = new OWPara(this, 
+                LastRow.SubItems[0] as EContainer,
+                ws, PStyle, note, clrEditableBackground, options);
             AddParagraph(0, p);
         }
         #endregion
         #region Method: override void OnSelectAndScrollToNote(DNote note)
         public override void OnSelectAndScrollToNote(DNote note)
         {
-            foreach (Row r in Rows)
-            {
-                // Retrieve the one and only pile in this row
-                if (r.Piles.Length == 0)
-                    continue;
-                Row.Pile pile = r.Piles[0];
-
-                // Examine all of the OWPara's in this pile (should just be one)
-                foreach (OWPara para in pile.Paragraphs)
-                {
-                    // If we find the paragraph which represents the note, attempt
-                    // to select with it (if we can, then focus this window); at
-                    // any rate, we're done.
-                    if (para.DataSource == note)
-                    {
-                        OWWindow.Sel selection = para.Select_BeginningOfFirstWord();
-                        if (null != selection)
-                        {
-                            Selection = selection;
-                            Focus();
-                        }
-                        return;
-                    }
-                }
-            }
+            EContainer container = Contents.FindContainerOfDataSource(note);
+            if (container.Select_FirstWord())
+                Focus();
         }
         #endregion
 
@@ -524,28 +502,8 @@ namespace OurWord.Edit
         #region Method: void SelectEndOfNote(DNote note)
         public void SelectEndOfNote(DNote note)
         {
-            // Drill down to find the OWPara that corresponds to the note
-            foreach (Row row in Rows)
-            {
-                foreach (Row.Pile pile in row.Piles)
-                {
-                    foreach (OWPara para in pile.Paragraphs)
-                    {
-                        if (para.DataSource == note)
-                        {
-                            // Attempt to make a selection at the end of this note
-                            OWWindow.Sel selection = para.Select_EndOfLastWord();
-
-                            // If selection made, set the Window's selection to it
-                            if (null != selection)
-                                Selection = selection;
-
-                            // Either way, we're done here
-                            return;
-                        }
-                    }
-                }
-            }
+            EContainer container = Contents.FindContainerOfDataSource(note);
+            container.Select_LastWord_End();
         }
         #endregion
     }
@@ -744,11 +702,11 @@ namespace OurWord.Edit
                 JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyleOrNormal(
                     DStyleSheet.c_StyleReferenceTranslation);
 
-                // Create a OWParagraph for the translation paragraph
-                OWPara p = new OWPara(this, ws, PStyle, vRuns, t.DisplayName, OWPara.Flags.None);
-
-                // Add it to the view
+                // Create and add a OWParagraph for the translation paragraph
                 StartNewRow();
+                OWPara p = new OWPara(this,
+                    LastRow.SubItems[0] as EContainer,
+                    ws, PStyle, vRuns, t.DisplayName, OWPara.Flags.None);
                 AddParagraph(0, p);
             }
 

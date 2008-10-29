@@ -282,7 +282,7 @@ namespace OurWordTests.Edit
             EditTest.Wnd.cmdDelete();
             Console.WriteLine("5 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < te, ...>"); 
 
-            // Verify the result ing paragraph/selection is " |te, ..."
+            // Verify the resulting paragraph/selection is " |te, ..."
             Assert.IsTrue(EditTest.Wnd.Selection.IsInsertionPoint, "Should be a point, not a content selection");
             Assert.AreEqual(1, EditTest.Wnd.Selection.DBT_iCharFirst);
             Assert.AreEqual(" te, ", EditTest.Wnd.Selection.DBT.AsString.Substring(0, 5));

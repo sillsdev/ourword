@@ -949,26 +949,23 @@ namespace OurWord
         #region Method: bool IsSectionContentsMarker(string sMarker)
         public bool IsSectionContentsMarker(string sMarker)
         {
-            // First, normalize it.
-            string s = GetNormalizedMarkerFor(sMarker);
-
-            // Now compare it against everything we currently recognize
-            if (IsMajorSectionMarker(s)) return true;
-            if (IsSection(s)) return true;
-            if (IsSection2(s)) return true;
-            if (IsCrossRef(s)) return true;
-            if (IsChapter(s)) return true;
-            if (IsVerse(s)) return true;
-            if (IsVerseText(s)) return true;
-            if (IsVernacularParagraph(s)) return true;
-            if (IsPicture(s)) return true;
-            if (IsSeeAlso(s)) return true;
-            if (IsFootnote(s)) return true;
-            if (IsCommentMarker(s)) return true;
-            if (IsStatusCommentMarker(s)) return true;
-            if (IsDateStampMarker(s)) return true;
-            if (IsCopyrightMarker(s)) return true;
-            if (DNote.IsNoteMarker(s)) return true;
+            // Compare it against everything we currently recognize
+            if (IsMajorSectionMarker(sMarker)) return true;
+            if (IsSection(sMarker)) return true;
+            if (IsSection2(sMarker)) return true;
+            if (IsCrossRef(sMarker)) return true;
+            if (IsChapter(sMarker)) return true;
+            if (IsVerse(sMarker)) return true;
+            if (IsVerseText(sMarker)) return true;
+            if (IsVernacularParagraph(sMarker)) return true;
+            if (IsPicture(sMarker)) return true;
+            if (IsSeeAlso(sMarker)) return true;
+            if (IsFootnote(sMarker)) return true;
+            if (IsCommentMarker(sMarker)) return true;
+            if (IsStatusCommentMarker(sMarker)) return true;
+            if (IsDateStampMarker(sMarker)) return true;
+            if (IsCopyrightMarker(sMarker)) return true;
+            if (DNote.IsNoteMarker(sMarker)) return true;
 
             // Didn't find it in our list
             return false;
@@ -977,20 +974,17 @@ namespace OurWord
         #region Method: bool IsBookOverviewMarker(string sMarker)
         public bool IsBookOverviewMarker(string sMarker)
         {
-            // First, normalize it.
-            string s = GetNormalizedMarkerFor(sMarker);
-
             // Now compare it against everything we currently recognize
-            if (IsFileIdMarker(s)) return true;
-            if (IsBookHistoryMarker(s)) return true;
-            if (IsBookNotesMarker(s)) return true;
-            if (IsHeaderMarker(s)) return true;
-            if (IsShoeboxRecordMarker(s)) return true;
-            if (IsDiscardedField(s)) return true;
-            if (IsMainTitleField(s)) return true;
-            if (IsSubTitleField(s)) return true;
-            if (IsCommentMarker(s)) return true;
-            if (IsDateStampMarker(s)) return true;
+            if (IsFileIdMarker(sMarker)) return true;
+            if (IsBookHistoryMarker(sMarker)) return true;
+            if (IsBookNotesMarker(sMarker)) return true;
+            if (IsHeaderMarker(sMarker)) return true;
+            if (IsShoeboxRecordMarker(sMarker)) return true;
+            if (IsDiscardedField(sMarker)) return true;
+            if (IsMainTitleField(sMarker)) return true;
+            if (IsSubTitleField(sMarker)) return true;
+            if (IsCommentMarker(sMarker)) return true;
+            if (IsDateStampMarker(sMarker)) return true;
 
             // Didn't find it in our list
             return false;
@@ -999,9 +993,6 @@ namespace OurWord
         #region Method: bool IsRecognizedMarker(string sMarker)
         public bool IsRecognizedMarker(string sMarker)
         {
-            // First, normalize it.
-            string s = GetNormalizedMarkerFor(sMarker);
-
             // Check the Section Contents Markers
             if (IsSectionContentsMarker(sMarker))
                 return true;
@@ -1017,24 +1008,21 @@ namespace OurWord
         #region Method: bool IsUSFMExportMarker(string sMarker)
         public bool IsUSFMExportMarker(string sMarker)
         {
-            // First, normalize it.
-            string s = GetNormalizedMarkerFor(sMarker);
-
             // Now compare it against everything we currently export to USFM
-            if (IsFileIdMarker(s)) return true;
-            if (IsHeaderMarker(s)) return true;
-            if (IsMainTitleField(s)) return true;
-            if (IsSubTitleField(s)) return true;
-            if (IsSection(s)) return true;
-            if (IsSection2(s)) return true;
-            if (IsCrossRef(s)) return true;
-            if (IsChapter(s)) return true;
-            if (IsVerse(s)) return true;
-            if (IsVerseText(s)) return true;
-            if (IsVernacularParagraph(s)) return true;
-            if (IsPicture(s)) return true;
-            if (IsSeeAlso(s)) return true;
-            if (IsFootnote(s)) return true;
+            if (IsFileIdMarker(sMarker)) return true;
+            if (IsHeaderMarker(sMarker)) return true;
+            if (IsMainTitleField(sMarker)) return true;
+            if (IsSubTitleField(sMarker)) return true;
+            if (IsSection(sMarker)) return true;
+            if (IsSection2(sMarker)) return true;
+            if (IsCrossRef(sMarker)) return true;
+            if (IsChapter(sMarker)) return true;
+            if (IsVerse(sMarker)) return true;
+            if (IsVerseText(sMarker)) return true;
+            if (IsVernacularParagraph(sMarker)) return true;
+            if (IsPicture(sMarker)) return true;
+            if (IsSeeAlso(sMarker)) return true;
+            if (IsFootnote(sMarker)) return true;
 
             // Didn't find it in our list
             return false;
@@ -1139,68 +1127,6 @@ namespace OurWord
 		}
 		#endregion
 
-        // Marker Normalization --------------------------------------------------------------
-        #region EMBEDDED CLASS: NormalizedMarker
-        public class NormalizedMarker
-        {
-            #region Attr{g}: string OddMarker
-            public string OddMarker
-            {
-                get
-                {
-                    return m_sOddMarker;
-                }
-            }
-            string m_sOddMarker;
-            #endregion
-            #region Attr{g}: string Normalized
-            public string Normalized
-            {
-                get
-                {
-                    return m_sNormalized;
-                }
-            }
-            string m_sNormalized;
-            #endregion
-            #region Constructor(sOddMarker, sNormalizedMarker)
-            public NormalizedMarker(string _sOddMarker, string _sNormalized)
-            {
-                m_sOddMarker = _sOddMarker;
-                m_sNormalized = _sNormalized;
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g}: ArrayList NormalizedMarkers
-        ArrayList NormalizedMarkers
-        {
-            get
-            {
-                Debug.Assert(null != m_aNormalizedMarkers);
-                return m_aNormalizedMarkers;
-            }
-        }
-        ArrayList m_aNormalizedMarkers;
-        #endregion
-        #region Method: void AddNormalizedMarker(sOddMarker, sNormalized)
-        public void AddNormalizedMarker(string sOddMarker, string sNormalized)
-        {
-            NormalizedMarkers.Add(new NormalizedMarker(sOddMarker, sNormalized));
-        }
-        #endregion
-        #region Method: string GetNormalizedMarkerFor(string sMarker)
-        public string GetNormalizedMarkerFor(string sMarker)
-        {
-            foreach (NormalizedMarker m in NormalizedMarkers)
-            {
-                if (m.OddMarker == sMarker)
-                    return m.Normalized;
-            }
-            return sMarker;
-        }
-        #endregion
-
         // Derived Attributes ----------------------------------------------------------------
 		#region Attr{g}: DTeamSettings TeamSettings - the owning settings
 		public DTeamSettings TeamSettings
@@ -1226,23 +1152,6 @@ namespace OurWord
 		public DSFMapping()
 			: base()
 		{
-            // List of normalized markers
-            m_aNormalizedMarkers = new ArrayList();
-            AddNormalizedMarker("mt1", "mt");       // Main Title alternate
-            AddNormalizedMarker("mt2", "st");       // Sub Title alternate
-            AddNormalizedMarker("nq",  "nt");       // Observed in Timor data
-            AddNormalizedMarker("nc",  "nt");       // Observed in Timor data
-            AddNormalizedMarker("ob",  "ov");       // Dumb development typo, but released in 0.6.
-            AddNormalizedMarker("vt2", "ov");       // Tomohon has \vt2 as an alternative version
-            AddNormalizedMarker("tr",  "ntUns");    // Tomohon "tanya responden" (question for UNS
-            AddNormalizedMarker("chk2", "chk");     // Second section comment
-            AddNormalizedMarker("q1",   "q");       // USFM: the two are equal.
-            AddNormalizedMarker("nb",   "p");       // USFM: NoBreakWithPrevPara becomes simply a \p
-            AddNormalizedMarker("s1",   "s");       // USFM: Conflating these
-            AddNormalizedMarker("ms1",  "ms");      // USFM: Conflating these
-            AddNormalizedMarker("ms2",  "ms");      // USFM: Conflating these
-            AddNormalizedMarker("qm",   "m");       // USFM: NoFirstLineIndent (a.k.a. paragraph continuation)
-
 			// TODO: Need to persist these array values
 
 			// Markers that signal a vernacular paragraph
