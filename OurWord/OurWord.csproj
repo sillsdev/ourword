@@ -109,10 +109,6 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="JWTools, Version=1.0.2934.14522, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\JWTools\bin\Debug\JWTools.dll</HintPath>
-    </Reference>
     <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Palaso.Services.dll</HintPath>
@@ -149,6 +145,10 @@
       <Name>JWdb</Name>
       <Project>{CD66A898-A60C-44F7-8731-EAE0E558C639}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
+    </ProjectReference>
+    <ProjectReference Include="..\JWTools\JWTools.csproj">
+      <Project>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</Project>
+      <Name>JWTools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -451,7 +451,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs">
       <SubType>UserControl</SubType>
@@ -466,7 +465,6 @@
       <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
       <SubType>UserControl</SubType>
@@ -499,7 +497,6 @@
       <DependentUpon>WizPage_Summary.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizNewProject\WizNewProject.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizNewProject\WizNew_FrontInfo.cs">
       <SubType>UserControl</SubType>
