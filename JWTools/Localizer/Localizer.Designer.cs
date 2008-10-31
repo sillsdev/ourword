@@ -45,6 +45,7 @@ namespace JWTools
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.m_labelLanguage = new System.Windows.Forms.ToolStripLabel();
             this.m_comboLanguage = new System.Windows.Forms.ToolStripComboBox();
+            this.m_lblRemaining = new System.Windows.Forms.ToolStripLabel();
             this.m_rtbInfo = new System.Windows.Forms.RichTextBox();
             this.m_labelYourLanguage = new System.Windows.Forms.Label();
             this.m_textYourLanguage = new System.Windows.Forms.TextBox();
@@ -52,7 +53,6 @@ namespace JWTools
             this.m_comboShortcutKey = new System.Windows.Forms.ComboBox();
             this.m_lblToolTip = new System.Windows.Forms.Label();
             this.m_textToolTip = new System.Windows.Forms.TextBox();
-            this.m_lblRemaining = new System.Windows.Forms.ToolStripLabel();
             this.m_labelNeedsAttention = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -207,6 +207,12 @@ namespace JWTools
             this.m_comboLanguage.Size = new System.Drawing.Size(160, 38);
             this.m_comboLanguage.SelectedIndexChanged += new System.EventHandler(this.cmdLanguageChanged);
             // 
+            // m_lblRemaining
+            // 
+            this.m_lblRemaining.Name = "m_lblRemaining";
+            this.m_lblRemaining.Size = new System.Drawing.Size(72, 35);
+            this.m_lblRemaining.Text = "(Remaining)";
+            // 
             // m_rtbInfo
             // 
             this.m_rtbInfo.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -277,12 +283,6 @@ namespace JWTools
             this.m_textToolTip.Size = new System.Drawing.Size(591, 77);
             this.m_textToolTip.TabIndex = 78;
             // 
-            // m_lblRemaining
-            // 
-            this.m_lblRemaining.Name = "m_lblRemaining";
-            this.m_lblRemaining.Size = new System.Drawing.Size(72, 35);
-            this.m_lblRemaining.Text = "(Remaining)";
-            // 
             // m_labelNeedsAttention
             // 
             this.m_labelNeedsAttention.ForeColor = System.Drawing.Color.Red;
@@ -310,11 +310,15 @@ namespace JWTools
             this.Controls.Add(this.m_tree);
             this.Controls.Add(this.m_labelGroups);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "Localizer";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Localizer";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdClosing);
             this.Load += new System.EventHandler(this.cmdLoad);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdClosing);
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
             this.ResumeLayout(false);

@@ -451,6 +451,7 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs">
       <SubType>UserControl</SubType>
@@ -465,6 +466,7 @@
       <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
       <SubType>UserControl</SubType>
@@ -497,6 +499,7 @@
       <DependentUpon>WizPage_Summary.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizNewProject\WizNewProject.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizNewProject\WizNew_FrontInfo.cs">
       <SubType>UserControl</SubType>
