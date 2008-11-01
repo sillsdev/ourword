@@ -3,3 +3,4 @@ bin
 obj
 output
 _ReSharper.OurWord
+*.suo
