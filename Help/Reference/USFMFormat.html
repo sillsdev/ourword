@@ -1,0 +1,112 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - USFM</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->USFM 
+  File Format for Scripture<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p><i>OurWord</i> supports SIL's &quot;standard format,&quot; in two flavors:</p>
+<ul>
+  <li> Shoebox/Toolbox, described <a href="FileFormat.html">here</a>.<br>
+  </li>
+  <li> Paratext's <font size="-1">USFM_DRAFT.STY</font> (a subset of <font size="-1">USFM</font>) 
+    plus a few additional markers</li>
+</ul>
+<p>A full description of <font size="-1">USFM</font> is maintained by the United 
+  Bible Societies at this <a href="http://confluence.ubs-icap.org/display/USFM/Home;jsessionid=4064B358F3B7C061D2DEC809C6BB2F0D">Internet 
+  site</a>.</p>
+<p><i>Paratext</i> introduced the <font size="-1">USFM_DRAFT</font> stylesheet 
+  in order to provide a subset of <font size="-1">USFM</font> that would be suitable 
+  for drafting. <i>OurWord</i> uses most of the markers in <font size="-1">USFM_DRAFT</font>. 
+  When a translation project reaches the stage of being published, it is likely 
+  that far more formatting will be desired than can be accomplished with <i>OurWord</i>'s 
+  limited set of markers.</p>
+<h4><font size="-1">USFM</font> Markers that are fully supported in <i>OurWord</i>:</h4>
+<ul>
+  <li><b> \id</b> - File identification<br>
+  </li>
+  <li><b> \h</b> - Running header<br>
+  </li>
+  <li><b> \mt</b> - Major Title (level 1)<br>
+  </li>
+  <li><b> \st</b> - Subtitle (commonly \mt2 in USFM.)</li>
+  <li><b>\ms</b> - Heading - major section level 1</li>
+  <li><b>\mr</b> - Heading - major section range references<br>
+  </li>
+  <li><b> \s</b> - Section level 1<br>
+  </li>
+  <li><b> \s2</b> - Section level 2<br>
+  </li>
+  <li><b> \r</b> - Parallel references<br>
+  </li>
+  <li><b> \c</b> - Chapter number<br>
+  </li>
+  <li><b> \v</b> - Verse number<br>
+  </li>
+  <li><b> \p</b> - Paragraph<br>
+  </li>
+  <li><b> \q</b> - Poetry (level 1)<br>
+  </li>
+  <li><b> \q2</b> - Poetry (level 2)<br>
+  </li>
+  <li><b> \q3</b> - Poetry (level 3)<br>
+  </li>
+  <li><b> \qc</b> - Poetry (centered)<br>
+  </li>
+  <li> Footnotes: \f .... \fr...\fr* \ft....\ft* .....\f*<br>
+  </li>
+  <li> Cross References: \x ..... \xo ... \xo* \xt ... \xt* ....\x*</li>
+</ul>
+<h4>Markers that are transformed:</h4>
+<ul>
+  <li><b> \mt1</b> (Major Title level 1) is converted to its equivalent,<b> \mt</b><br>
+  </li>
+  <li><b> \mt2</b> (Major Title level 2) is converted to the Toolbox equivalent, 
+    <b>\st</b><br>
+  </li>
+  <li><b> \s1</b> (section level 1) is converted to its equivalent, <b>\s</b><br>
+  </li>
+  <li><b> \m</b> (Paragraph at margin, no first line indent) is converted to <b>\p</b><br>
+  </li>
+  <li><b> \nb</b> (Paratext text, no break from previous paragraph) is converted 
+    to<b> \p</b><br>
+  </li>
+  <li><b> \q1</b> (Poetry level 1) is converted to its equivalent, <b>\q</b></li>
+</ul>
+<h4>Markers that are not currently supported in OURWORD:</h4>
+<ul>
+  <li><b> \imt</b> - Introduction major title level 1<br>
+  </li>
+  <li><b> \ip</b> - Introduction paragraph<br>
+  </li>
+  <li><b> \qs </b>- Poetry text: &quot;Selah&quot;<br>
+  </li>
+  <li><b> \b</b> - Poetry stanza break (blank line)<br>
+  </li>
+  <li><b> \sp</b> - Heading - speaker (e.g., &quot;Job&quot;)<br>
+  </li>
+  <li><b> \d </b>- Heading - descriptive title / Hebrew subtitle<br>
+  </li>
+  <li><b> \fq</b> - Footnote quotation or alternate rendering<br>
+  </li>
+  <li><b> \fig</b> - Figure / Illustration / Map</li>
+</ul>
+<p>On import, <i>OurWord</i> automatically detects the format and reads it correctly. 
+  <i>OurWord</i> saves files in the Toolbox standard; but you can export to <font size="-1">USFM</font> 
+  via the <i>Export</i> command in the <i>Configuration</i> dialog (in a translation's 
+  properties page).</p>
+<p></p>
+<p> </p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

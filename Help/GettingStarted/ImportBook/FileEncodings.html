@@ -1,0 +1,83 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - File Encodings</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->File 
+  Encodings <!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p>Once upon a time computer memory and speed was much, much smaller than today, 
+  and computers only permitted a total of 256 different letters<font size="2" color="#0000CC"><a href="#fn1">1</a></font> 
+  to be displayed. Half of these were set in stone, the other half could be customized 
+  to meet the needs of various writing systems. And so with the many different 
+  languages spoken around the world, fonts were created that would interpret these 
+  limited numbers into the shapes that the orthography needed.</p>
+<p>The result was, of course, chaos. It is impossible to interpret one of these 
+  files without having a font to go with it. And so as computers became faster 
+  and memory became cheaper, it was decided to devote more memory to storing each 
+  letter, and to create a standard, so that each and every different shape would 
+  be represented by a unique number.</p>
+<p>And so Unicode was born. </p>
+<p>There are several flavors of Unicode, but we have standardized on one known 
+  as UTF-8. We prefer UTF-8 because for those writing systems which only need 
+  the original 256 letters, the files continue to be the original, small size; 
+  yet for those writing systems that need more the standard readily handles them.</p>
+<p>And so, English, Chinese, Hebrew and Greek can all be represented in a single 
+  file. </p>
+<p>Microsoft, in the meantime, had come up with a Codepages concept, where a file 
+  could be interpreted according to a different &quot;page&quot;, and fonts designed 
+  for that page. And thus standards such as &quot;Western European (Windows) 1251&quot; 
+  became commonplace.</p>
+<p>The Unicode standard places three characters at the beginning of a file to 
+  identify its Encoding. These characters are hidden from you by the software 
+  you use to view the file, but they are valuable to the software in knowing how 
+  to read the data. When OurWord finds these three characters, it knows what to 
+  do. When they are nowhere to be found, then neither OurWord nor any other computer 
+  program on the planet have a clue how to interpret the file. The information 
+  must either exist in some settings file somewhere, or in someone's brain; otherwise 
+  the data cannot be interpreted.</p>
+<p>The world is moving to Unicode. We want to leave the chaos of these &quot;legacy&quot; 
+  systems, and move to an ordered world where we know what the data means. <i>OurWord</i> 
+  thus expects UTF8.</p>
+<p>If <i>OurWord</i> does not see the Unicode three characters (known as the BOM, 
+  or Byte Order Mark), then it has no choice but to declare that it can't interpret 
+  the file, and ask for your help. You have two choices:</p>
+<ol>
+  <li>Convert the file to UTF8 yourself, either by running it through some conversion 
+    software, or by getting help from an encodings specialist.</li>
+  <li>Use the Specify Encoding dialog to tell <i>OurWord</i> how to interpret 
+    the file. This latter option only works when the entire file was encoded in 
+    some legacy standard (such as &quot;Western European (Windows) 1251.&quot;</li>
+</ol>
+<p>In the Specify Encoding dialog you are shown how the file will look under the 
+  various possibile interpretations. If you find an interpretation that results 
+  in all of the letters looking correct, then you are probably OK to proceed with 
+  importing the file. But if you have any question at all, you should ask for 
+  help. Encodings are complicated, and not something you should attempt on your 
+  own if you do not understand the technological issues.</p>
+<p>Toolbox users pose a special case, in that Toolbox does not output the BOM 
+  characters. Toolbox allows individual fields within a file to be UTF8, and other 
+  fields within that same file to be legacy encodings. If you have such files 
+  as these, <i>OurWord</i> cannot convert your data; you will most definitely 
+  lose data if you try. Please get help from a specialist. On the other hand, 
+  if you imported an <i>OurWord</i> file into Toolbox and then used Toolbox to 
+  write it back out, then you are fine to have <i>OurWord</i> interpret it as 
+  UTF8. </p>
+<hr>
+<p><super><font size="2" color="#0000CC"><a name="fn1"></a>1</font></super> This 
+  is a simple introduction; I'm using &quot;letters&quot; inprecisely, rather 
+  than terms such as characters, graphemes, glyphs, and such. And I'm altogether 
+  ignoring diacritics. This is meant to be a rough explanation; not a detailed 
+  how-to manual.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

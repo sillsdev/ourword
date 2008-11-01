@@ -1,0 +1,141 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - File Format</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" --><i>OurWord</i> 
+  Standard Format Markup for Scripture<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p><i>OurWord</i> stores files using a Standard Format markup structure that is 
+  based on Jock Hughes' proposal from the <i>Notes On Computing</i> publication 
+  some years ago, and in use by the Timor Team and others in South Asia. The markers 
+  have been adjusted to more closely follow the Dallas Translation Department 
+  recommendations. The major points to notice are:</p>
+<ul>
+  <li> verse numbers sit in their own field,<br>
+  </li>
+  <li> verse text (or vernacular text) has its own field too,</li>
+  <li>Back translations and translator notes are in the same file as the vernacular 
+    translation, <br>
+  </li>
+  <li> back translations of any text field is created by placing a BT in front 
+    of the field code,<br>
+  </li>
+  <li> paragraph structure is marked by separate paragraph fields (\p, \m, \q, 
+    \q2, etc.)&#151;these do not need to be repeated for BT fields.</li>
+</ul>
+<h3>Fields</h3>
+<p>There are a number of field codes. These include the basics, plus fields for 
+  introductory material, Back Translation for both &quot;English&quot; and &quot;National&quot;. 
+  Most fields are set up to give a following field marker. This can be tweaked 
+  by the user.<br>
+</p>
+<blockquote> 
+  <h4>Basic Fields</h4>
+  <blockquote> 
+    <p> <b>\id</b> - 3-letter identification code<br>
+      <b>\h</b> - bookname for the Header<br>
+      <b>\bth</b> - BT of (h)</p>
+    <p> <b>\mt</b> - Main Title<br>
+      <b>\btmt</b> - BT of (mt)<br>
+      <b>\st </b>- Subtitle<br>
+      <b>\btst</b> - BT of (st)<br>
+    </p>
+    <p><b>\ms</b> - major section<br>
+      <b>\mr</b> - major section cross reference</p>
+    <p> <b>\c </b>- Chapter number<br>
+      <b>\s </b>- Section heading<br>
+      <b>\bts</b> - BT of (s)<b><br>
+      \s2</b> - secind level section heading<br>
+      <b>\bts2</b> - BT of (s2)<br>
+      <b>\r</b> - cross-Reference or section reference</p>
+    <p> <b>\p</b> - normal Paragraph<br>
+      <b>\v</b> - Verse number<br>
+      <b>\vt </b>- Verse Text (or Vernacular Text)<br>
+      <b>\btvt</b> - BT of (vt)</p>
+  </blockquote>
+  <h4>Translator Notes</h4>
+  <blockquote> 
+    <p> <b>\nt</b> - General Notes<br>
+      <b>\ntHint</b> - Hints for daughter translations<br>
+      <b>\ntUns</b> - Things to ask the UNS<br>
+      <b>\ntReas</b> - The reason or justification for a translation decision<br>
+      <b>\ntFT</b> - Potential issue in the front translation<br>
+      <b>\ntDef</b> - Definitions of words<br>
+      <b>\ntBT</b> - Back Translation information<br>
+      <b>\ov</b> - Old / previous version of the text<br>
+      <b>\ntck</b> - Notes for checking<br>
+      <b>\ntgk</b> - Exegesis note: Greek<br>
+      <b>\nthb</b> - Exegesis note: Hebrew<br>
+      <b>\ntcn</b> - Exegesis note: general</p>
+  </blockquote>
+  <h4>Pictures</h4>
+  <blockquote> 
+    <p> <b>\cat</b> - Picture catalog number or filename<br>
+      <b>\ref</b> - Picture reference for size, location<br>
+      <b>\cap</b> - Picture caption<br>
+      <b>\btcap</b> - BT of (cap)</p>
+  </blockquote>
+  <h4>Other Common Fields</h4>
+  <blockquote> 
+    <p> <b>\q </b>- Quote paragraph<br>
+      <b>\q2</b> - 2nd level for a Quote pp<br>
+      <b>\q3</b> - 3rd level for a Quote pp<br>
+      <b>\m</b> - margin paragraph (block or continuation pp)<br>
+      <b>\hist</b> - Book history<br>
+      <b>\ud </b>- Toolbox datestamp</p>
+  </blockquote>
+</blockquote>
+<h3> <br>
+  Footnotes</h3>
+<p>Footnotes are handled in the following manner:</p>
+<blockquote> 
+  <p> \v 1<br>
+    \vt Tabea fi di yako, Paulus, tongi tu nango roko rua, do, Silas|fn tu Timotius.<br>
+    \btvt Respectful.greetings from me, Paulus, and also my two friends, [do,] 
+    Silas|fn and Timotius.<br>
+    \ft 1:1: Silas ngaan sahet, do, Silvanus.<br>
+    \btft 1:1: Silas other name, (do,) Silvanus.</p>
+</blockquote>
+<p>The <b>|fn</b> in both text fields serves to mark the location of the reference. 
+  The footnotes follow the sentence (rather than split up the sentence).</p>
+<p>Footnotes that attach to the end of a verse or \vt do not require an |fn.</p>
+<blockquote> 
+  <p> \v 10<br>
+    \vt Verse text.<br>
+    \btvt Back translation of verse text.<br>
+    \ft 4:10: Footnote text. (footnote reference will be placed correctly at end 
+    of verse text)<br>
+    \btft 4:10: Back translation of footnote text.</p>
+</blockquote>
+<p>The routine used for formatting scripture does not handle multiple footnotes 
+  in a verse very well. The work-around is to divide the verse into separate bundles 
+  as follows.</p>
+<blockquote> 
+  <p> \v 11<br>
+    \vt Verse text. (up to first footnote, or through sentence that includes|fn 
+    first footnote)<br>
+    \btvt Back translation of verse text.<br>
+    \ft 4:11a: First footnote text in verse.<br>
+    \btft 4:11a: Back translation of footnote text.</p>
+  <p> \vt Verse text. (rest of verse)<br>
+    \btvt Back translation of verse text.<br>
+    \ft 4:11b: Second footnote text in verse. (footnote reference will be placed 
+    correctly at end of verse text)<br>
+    \btft 4:11b: Back translation of footnote text.<br>
+  </p>
+</blockquote>
+<p><font size="2">Written 30 Nov 2005 for version 0.5, largely as a paste of an 
+  existing Word document in use by the Timor Team. </font></p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

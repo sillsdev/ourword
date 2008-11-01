@@ -1,0 +1,155 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Settings Management</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Settings 
+  Management<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p>&nbsp;</p>
+<p><i>OurWord</i> maintains settings in several different places. The goal is 
+  to facilitate work with multiple translation projects by making it possible 
+  for some settings to be available to all projects; and yet having other settings 
+  be customizable for an individual translation. Data and settings are maintained 
+  in the following locations:</p>
+<blockquote> 
+  <p><a href="#Books">Translated Books</a><br>
+    <a href="#TranslationProperties">Translation Properties</a><br>
+    <a href="#ProjectProperties">Project Properties</a><br>
+    <a href="#TeamSettings">Team Settings</a><br>
+    <a href="#TeamSettings">Computer (registry) Settings</a></p>
+</blockquote>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="Books">Translated Books</a></h3>
+    </td>
+  </tr>
+</table>
+<p>Each translated book of the Bible is stored in its own file. Thus Mark will 
+  be in one file, Luke in another. <i>OurWord</i> maintains these files in <a href="../../Reference/FileFormat.html">Toolbox 
+  Standard Format for Scripture</a>.</p>
+<blockquote> 
+  <p><img src="TranslatedBook.JPG" width="226" height="55"></p>
+</blockquote>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="TranslationProperties">Translation Properties</a></h3>
+    </td>
+  </tr>
+</table>
+<p><i>OurWord</i> maintains a settings file in which it keeps track of all of 
+  the books in a translation. </p>
+<blockquote> 
+  <p><img src="TranslationProperties.JPG" width="550" height="184"></p>
+</blockquote>
+<p>Information in this <i>Translation Settings File</i> includes</p>
+<ul>
+  <li>The name of the translation (or alternatively, the language)</li>
+  <li>An abbreviation of the translation name</li>
+  <li>The list of translated books; for each there are various settings maintained 
+    such as the book's <a href="../../Reference/FileNames.html">filename</a> and 
+    its <a href="../../Strategies/TranslationStages.html">stage</a>.</li>
+  <li>The list of the names of the 66 books of the Bible in this language (used 
+    for generating cross references.)</li>
+</ul>
+<p>The <i>Translation Settings</i> are edited through the <i>Configuration Dialog</i>. 
+  The settings about each book in the translation are edited through the <i>Book 
+  Properties Dialog</i> (which is accessed from the <i>Configuration Dialog</i>.) 
+</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="ProjectProperties">Project Properties</a></h3>
+    </td>
+  </tr>
+</table>
+<p>An <i>OurWord</i> Project pulls together several translations. It tells the 
+  software which translation to treat as the Front, which to treat as the &quot;target&quot;, 
+  and permits additional translations to be specified as sibling translations 
+  or reference translations.</p>
+<blockquote> 
+  <p><img src="ProjectProperties.JPG" width="596" height="484"></p>
+</blockquote>
+<p>The <i>Project</i> settings are edited through the <i>Configuration</i> command 
+  of the <i>Tools </i> dropdown.</p>
+<p>By separating the Translation settings into different files, rather than lumping 
+  them in with the project files, it is possible to use the same translation settings 
+  for multiple projects. Thus one project might set up Translation A as a front 
+  and B as a target; a second project may use Translation A as a front and C as 
+  a target. The settings for Translation A are only entered once, and are afterwards 
+  available for all projects that need it.</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="ComputerSettings">Team Settings</a></h3>
+    </td>
+  </tr>
+</table>
+<p><i>OurWord</i> stores a number of settings in a TeamSettings file, making these 
+  available for all multiple projects and translations.</p>
+<blockquote> 
+  <p><img src="TeamSettings.JPG" width="655" height="686"></p>
+</blockquote>
+<p>Team Settings include such things as:</p>
+<ul>
+  <li>The Stylesheet containing styles for the display of Scripture text (e.g., 
+    a Book Title is boldface and 18 pt), for viewing and printing Scripture in 
+    the way you want.</li>
+  <li>Writing system behavior (e.g., what font to use for Chinese)</li>
+  <li>The names of the stages of translation (used in creating filenames for books)</li>
+</ul>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="TeamSettings">Computer (registry) Settings</a></h3>
+    </td>
+  </tr>
+</table>
+<p>Finally, there are a number of settings which are stored in the computer. These 
+  are settings that are unique to the individual user, and include:</p>
+<ul>
+  <li>Zoom Factor - how much to magnify text in the window</li>
+  <li>Language - Which language to use to display the user interface</li>
+  <li>The folder in which to make automated backup files</li>
+  <li>The location of this help file</li>
+</ul>
+<p>Most of these settings are edited through the Configuration dialog.</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="Further">Settings File Names and internal format</a></h3>
+    </td>
+  </tr>
+</table>
+<ul>
+  <li>A translation settings file has the extension <font size="-1">OTRANS</font>, 
+    e.g., <i>KupangMalay.oTrans</i>. </li>
+  <li>A project settings file has the extension <font size="-1">OWP</font>, e.g., 
+    <i>Amarasi.owp</i>.</li>
+  <li>The Team Settings file is &quot;<i>Default Team Settings.owt.</i>&quot;</li>
+  <li>All of these settings files are stored in <font size="-1">XML</font> format. 
+    While they can be edited directly in a text editor, we strongly prefer that 
+    you use <i>OurWord</i> instead. </li>
+</ul>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

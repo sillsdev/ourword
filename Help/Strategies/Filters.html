@@ -1,0 +1,115 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Filters</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Only 
+  Show Sections That... (filters)<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p>The <i>&quot;Only Show Sections That&quot; Dialog</i> is the means by which 
+  you can restrict the sections that you are working with to a smaller subset, 
+  based upon some criteria you set. <i>OurWord </i> provides a number of criteria 
+  that you can choose from. (Software such as <i>Shoebox/Toolbox</i> and <i>FieldWorks</i> 
+  refer to this type of feature as a <i>filter</i>.)</p>
+<p>The dialog is accessed from the Tools dropdown. By default, this option is 
+  not available; you must first turn it on through the <a href="SetupFeatures.html">Setup 
+  Features Dialog</a>. </p>
+<p>This dialog is likely to change as new types of criteria are added, but as 
+  of Version 1.0 the available choices are:</p>
+<blockquote> 
+  <p><b>A Word or Phrase...</b></p>
+  <ul>
+    <li><b>In the Vernacular</b> - Examines sections for a word or phrase in the 
+      translation, whether in the Scripture text, picture caption, or footnote.</li>
+    <li><b>In the Front</b> - Examines the Front Translation for the word or phrase. 
+      (Note this is the front translatin's scripture, not its back translation.)</li>
+    <li><b>In the Back Translation</b> - Examines the target's back translation 
+      for the search text. 
+      <p>Note that if you want to find something in the vernacular, that string 
+        must be typed in the box for the vernacular; if you want to find something 
+        in the front translation, that string must be typed in a different box 
+        - the one for the front translation. Etc.</p>
+    </li>
+  </ul>
+  <p><b>A Note of Type...</b></p>
+  <ul>
+    <li><b>To Do</b> - Checks for the presence of a &quot;To Do&quot; note, used 
+      to flag work that needs to be done in the section.</li>
+    <li><b>Ask UNS</b> - Checks for the presence of an &quot;Ask the Uninitiated 
+      Naive Speaker&quot; note, used for checking and testing.</li>
+  </ul>
+  <p><b>Possible Problems...</b></p>
+  <ul>
+    <li><b>Untranslated Text</b> - Checks for areas where there is text in the 
+      Front, but only a blank in the Target. You can use this to find all of the 
+      sections where drafting is still needed.</li>
+    <li><b>Mismatched Quotes</b> - Examines quotes (which must be of the angle 
+      bracket notation (e.g., &lt;&lt;Hello&gt;&gt;.) Checks to see if there is 
+      a mismatch where, for example, there is no closing quote to correspond to 
+      an opening quote.</li>
+    <li><b>Punctuation Problem</b> - Checks for the following types of issues 
+      related to punctuation: 
+      <ul>
+        <li>No end-punctuation at the end of a paragraph</li>
+        <li>&quot;Orphaned&quot; punctuation; that is, punctuation that is not 
+          adjacent to a word. (For example, a space prior to a period.) E.g., 
+          <ul>
+            <li>&quot;Space at the end of a sentence ?&quot;</li>
+            <li>&quot;&lt; Space just after a quote begins&quot;</li>
+            <li>&quot;Punctuation with spaces on both sides : like this colon&quot;</li>
+            <li>&quot;Two or more orphaned punctuation together !&gt;&quot;</li>
+          </ul>
+        </li>
+        <li>End-Punctuation (such as a period or question mark) following a footnote, 
+          rather than preceding. it.</li>
+      </ul>
+      Punctuation should be defined on the writing system (via the Properties 
+      dialog.) Otherwise, OW uses defaults that are appropriate for many roman 
+      writing systems (such as English.)</li>
+    <li><b>Picture Cannot Be Located on Disk</b> - Checks for the picture's path 
+      name to find those picture which do not have a file on the disk. (Note that 
+      you will need to exit <i>OurWord</i> and use an editor such as Toolbox in 
+      order to address any problems found. Also, the picture may display while 
+      in <i>OurWord</i>, because <i>OurWord</i> uses the path as found in the 
+      Front Translation to display the picture; but with this error, it is the 
+      Target Translation's path which is examined.)</li>
+  </ul>
+  <p><b>Structure...</b></p>
+  <ul>
+    <li><b>A Picture with a Caption</b> - Looks for those sections in which the 
+      picture in the Front Translation has a caption. Use this to check the consistency 
+      in the way you have handled your captions.</li>
+    <li><b>A Quote Paragraph</b> - Looks for sections that contain one of the 
+      several types of quote paragraphs. In standard format, these are &quot;\q&quot;, 
+      &quot;\q2&quot;, &quot;\q3&quot;, and &quot;\qc&quot;.</li>
+  </ul>
+</blockquote>
+<p>The &quot;<b>This Section Qualifies if</b>&quot; control allows you to choose 
+  one of two options:</p>
+<ul>
+  <li><b>Any One of These are True</b> - This option means that if any single 
+    one of the tests passes, then the section is included in the results. Thus 
+    for example, you could say &quot;Show me all sections that either havea Mismatched 
+    Quotes or Untranslated Text.&quot;</li>
+  <li><b>All of These are True</b> - This option means that every one of the checked 
+    tests must pass in order for the section to be included. An example would 
+    be &quot;Show me all sections that have both a To Do Note, and the word &quot;Farisi&quot; 
+    in the vernacular.&quot;</li>
+</ul>
+<p>Click on the <b>Turn On</b> button to instruct <i>OurWord</i> to examine the 
+  sections for the requested criteria. This will remain active until you go back 
+  to the dialog and click on the <b>Turn Off </b>button. Thus once this has been 
+  Turned On, clicking on the right arrow icon will take you to the next section 
+  matching the criteria you have set.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

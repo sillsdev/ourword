@@ -1,0 +1,195 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - File Mamagement</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->File 
+  Management<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p>This article describes a strategy for dealing with a situation where a front 
+  translation is serving several languages at once, and where these daughter languages 
+  each have computers whose files need to be kept in synchronization, e.g., :</p>
+<ul>
+  <li>The latest version of the Front translation needs to be placed on each daughter's 
+    machine</li>
+  <li>Revisions of daughter's books need to be collected and then dissimenated 
+    to the other machines (e.g., so that the Related Languages feature uses the 
+    latest versions of each book.)</li>
+</ul>
+<p>It reflects lessons learned from two language clusters which were initial users 
+  of <i>OurWord</i>. You will also want to review <a href="../SettingsManagement/SettingsManagement.html">Settings 
+  Management</a> for an understanding of how <i>OurWord</i> handles its settings 
+  files. </p>
+<p>Note that now that <i>OurWord</i> 1.0 supports relative pathnames, this strategy 
+  is less important to follow than it was in previous versions of <i>OurWord</i>. 
+  However, we still include it here as several concepts, especially administrators 
+  vs limited users, might be helpful.</p>
+<hr>
+<h3>1. Administrators and Limited Users</h3>
+<p>We highly recommend that only a handful of people on the team have access and 
+  authority to make changes, such as installing software, etc. This will make 
+  each computer much more stable, especially if users are less computer literate. 
+  Keep in mind that it may not be the translator who is the danger to the computer, 
+  files, and project, but rather their hacker nieces and nephews who can unknowingly 
+  trash a whole translation or introduce viruses. </p>
+<p>Users are set up through the Control Panel-User Accounts. We recommend that 
+  you password protect the Administrator; you may also wish to password protect 
+  the Limited users. Refer to your Windows documentation for more information.</p>
+<hr>
+<h3>2. C:\BaseFolder</h3>
+<p>Probably the key concept here is to place the data right off the C: drive, 
+  as opposed to using <i>My Documents</i>. The problem with <i>My Documents</i> 
+  is that it introduces differences to path names on various computers, e.g., 
+  the full paths on your computers will differ along the lines of: </p>
+<ul>
+  <li>C:\Documents and Settings\<b>Tombulu</b>\My Documents\OurWordData</li>
+  <li>C:\Documents and Settings\<b>Tondano</b>\My Documents\OurWordData</li>
+  <li>C:\Documents and Settings\<b>Totemboan</b>\My Documents\OurWordData</li>
+</ul>
+<p>Instead, if you place the data directly on the C: drive, you get a folder along 
+  the lines of:</p>
+<ul>
+  <li>C:\OurWordData</li>
+</ul>
+<p>This can thus be copied from machine to machine, without ever having any problems 
+  with resolving pathnames. (Actually, <i>OurWord</i> handles relative pathnames, 
+  so a My Documents solution should work if it is the only software you are using. 
+  But you are likely to run into problems with other software; whereas coming 
+  off of &quot;C:\&quot; is guaranteed to remove any potential problems.)</p>
+<p><i>OurWord</i> does not care what you name the base folder. You can use &quot;OurWordData&quot;, 
+  or you can use something more appropriate to your context.</p>
+<p><b>Important: </b>You will need to give your limited users access to this folder. 
+  While logged in as an Administrator, open the Windows Explorer and right-click 
+  over the folder, then choose Properties. Via this Properties Dialog, you can 
+  grant all of your users read and write access. </p>
+<p>If you are on a network, it may also be useful to share the folder for convenient 
+  access. I recommend that you share it with the language name, e.g., so that 
+  it appears as &quot;OurWordData-Tombulu&quot; on the network.</p>
+<hr>
+<h3>3. Language Folders</h3>
+<p>Given that we now have a base folder at C:\, the next step is to create subfolders 
+  for each language, thus:</p>
+<blockquote> 
+  <p><img src="Folders1.JPG" width="418" height="310"></p>
+</blockquote>
+<hr>
+<h3>4. Settings Folders</h3>
+<p>I prefer to hide settings files; I feel they are annoying to see when browsing 
+  for files. If you are using Toolbox (Shoebox) together with <i>OurWord</i>, 
+  you are likely to have numerous settings files. I tend to thus create a Settings 
+  folder underneath each language, e.g., </p>
+<blockquote> 
+  <p><img src="Folders2.JPG" width="418" height="352"></p>
+</blockquote>
+<p>Under these settings folders, you will want to save the Project (<font size="-1">OWP</font>) 
+  and Translation (<font size="-1">OTRANS</font>) files that you create through 
+  <i>O<font size="-1">UR</font>W<font size="-1">ORD</font></i>. Thus, for example, 
+  the project file for the Tombulu language would have the path:</p>
+<ul>
+  <li>c:\OurWordData\Tombulu\Settings\Tombulu.owp</li>
+</ul>
+<p>And the translation description file would be:</p>
+<ul>
+  <li>c:\OurWordData\Tombulu\Settings\Tombulu.otrans</li>
+</ul>
+<p></p>
+<p></p>
+<p></p>
+<hr>
+<h3>5. Pictures</h3>
+<p>I recommend that you create a separate folder under C:\ to hold the pictures. 
+  This can be something like</p>
+<ul>
+  <li>C:\Graphics or </li>
+  <li>C:\Pictures</li>
+</ul>
+<p>Here, you will place the pictures that you will use in Scripture.</p>
+<p><b>Note:</b> <i>OurWord</i> (and most Windows programs nowadays) no longer 
+  support the <font size="-1">PCX</font> format, so if you have such pictures, 
+  you will need to convert them to another format (such as <font size="-1">TIF</font> 
+  or <font size="-1">JPEG</font>).</p>
+<p>In your Scripture files, you will then have paths to these pictures. This will 
+  be something like:</p>
+<ul>
+  <li>\cat C:\Graphics\HK-LB\LB00234C.TIF</li>
+</ul>
+<p>Again, by placing these all at C:\ rather than in <i>My Documents</i>, none 
+  of the software you use will have any trouble resolving the pathnames to locate 
+  these pictures. </p>
+<blockquote> 
+  <p><img src="Folders3.JPG" width="375" height="367"></p>
+</blockquote>
+<hr>
+<h3>6. The Master Computer</h3>
+<p>You will want to choose one computer that will serve as the master. The process 
+  will be that you are continually &quot;harvesting&quot; files from the individual 
+  languages onto the master; and then copying the entire OurWordData folder from 
+  the master back down to the individual computers.</p>
+<p>The Master will also be the one you will want to have a backup process working 
+  for.</p>
+<hr>
+<h3>7. Processes</h3>
+<p><b>7.1 Harvesting Data. </b>Periodically, you will want to collect data from 
+  the individual languages. In a networked office situation, this can be done 
+  frequently; if you are in the situation where translators are carrying their 
+  laptops away for months at a time, then you will not be able to do this as often. 
+</p>
+<ol>
+  <li>Determine which Scripture files have been changed, then after checking for 
+    viruses, copy them to the Master Computer</li>
+  <li>If the file name for any of these Scripture files has changed (e.g., the 
+    book status has been incremented, then you will also need to copy the <font size="-1">OTRANS</font> 
+    file to the <i>Master Computer</i>.)</li>
+  <li>Copy these files into their corresponding folders on the Master Computer. 
+  </li>
+</ol>
+<p>After copying the files from a team computer, it is wise to increment the filenames 
+  of all books still in process. This avoids accidental overwrite of files if 
+  the translator has forgotten to increment a file after working on it.</p>
+<p><b>7.1 Setup a new language. </b>To set up a new language, or to change the 
+  setup for an existing language:</p>
+<ol>
+  <li>Harvest any data from the computer you will be changing (for a new language, 
+    there will not yet be any data to harvest)</li>
+  <li>On the Master Computer, create the folders as described above</li>
+  <li>On the Master Computer, launch <i>OurWord</i> and create (or modify) the 
+    settings for that language.</li>
+  <li>Copy the entire OurWordData file to the new language's computer</li>
+</ol>
+<p><b>7.1 Update individual computers. </b>To update the computers in the project, 
+  you mainly only need to copy the <i>OurWordData</i> file from the <i>Master 
+  Computer</i> onto their <i>C:\ </i>drive.</p>
+<ol>
+  <li><b>Important: </b>Make sure you have harvested any data that has been edited 
+    on this computer! Otherwise, you will copy over it and thus lose it (but do 
+    keep in mind that there are backups should this happen.) </li>
+  <li>Optional: You may want to delete all of the subfolders on their computer 
+    before beginning the copy in the next step. The reason is that as people <a href="../../Strategies/TranslationStages.html">change 
+    a book's status</a>, it will result in a growing number of files on the disk. 
+    By removing the subfolders, then when the copy is done, only the most current 
+    Scripture files will be on the disk.</li>
+  <li>Copy the <i>OurWordData</i> from the <i>Master Computer</i> onto their <i>C:</i> 
+    drive</li>
+</ol>
+<hr>
+<h3>8. Archival</h3>
+<p>On the Master Computer, you may also want to create an additional base folder, 
+  e.g., OurWordDataArchive, in which you store older files. Thus when a Scripture 
+  file's status is upgraded from &quot;Draft&quot; to &quot;Consultant Check&quot;, 
+  you can keep the older copies of these files around for future reference. </p>
+<p>You would typically not place these in the normal OurWordData folder, because 
+  this would just provide clutter, as well as increase the time needed to do the 
+  computer updates. </p>
+<p>&nbsp;</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

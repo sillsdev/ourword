@@ -1,0 +1,163 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Auto Backup</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Automatically 
+  backing up files<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p><i>OurWord</i> offers a behind-the-scenes backup feature, that silently creates 
+  and archives backups during the course of daily usage without the user needing 
+  to do anything. A command in the <i>Tools</i> dropdown allows a backup file 
+  to be restored.</p>
+<blockquote> 
+  <p><a href="#TheChallenge">The Backup Challenge</a><br>
+    <a href="#BackupDestination">The Backup Destination</a><br>
+    <a href="#TurningItOn">Turning On Auto-Backup</a><br>
+    <a href="#RestoringAFile">Restoring a File</a><br>
+    <a href="#ProgramBehavioralNotes">Program Behavioral Notes</a></p>
+</blockquote>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="TheChallenge">The Backup Challenge</a></h3>
+    </td>
+  </tr>
+</table>
+<p>Backing up data has been a problem since the first days people began using 
+  computers. The problems include:</p>
+<ul>
+  <li>Knowing what files to back up,</li>
+  <li>Knowing how to perform the backup</li>
+  <li>Messing with backup media</li>
+  <li>Remembering to do the backup</li>
+  <li>Taking the time from busy schedules to do the backup</li>
+</ul>
+<p>If you have been using a computer for very long, it is likely that either you 
+  personally or someone you know has lost significant work due to the lack of 
+  a backup. We have observed that new users especially find that making backups 
+  is challenging, largely because of the difficulties in file management. </p>
+<p><i>OurWord</i> has a behind-the-scenes solution. Other than an initial setup 
+  in which a destination is chosen, the user is not bothered about backup again.</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="BackupDestination">The Backup Destination</a></h3>
+    </td>
+  </tr>
+</table>
+<p>The destination for these backups needs to be a device that can be written 
+  many times. <i>OurWord</i> updates the backup every time the file is saved (which 
+  it does automatically every 10 minutes). Thus a CD is not acceptable, because 
+  a new CD would need to be inserted every 10 minutes (which most people would 
+  find both annoying and expensive!)</p>
+<p>We highly recommend that you use a flash memory device installed in the <font size="-1">PCMCIA</font> 
+  slot of your computer. </p>
+<blockquote> 
+  <p><img src="CompactFlash.JPG" width="458" height="158"></p>
+</blockquote>
+<p>As of March 2008, a 2Gig Compact Flash Card can be purchased for $US 25.00 
+  (e.g., see <a href="http://www.memorysuppliers.com/sandisk1.html">Vendor Example</a>). 
+  It plugs into an Adapter (roughly US $8) (<b>Note: I have no experience with 
+  this vendor; it is an example only!</b>)</p>
+<p>As shown below, the Card/Adapter Unit slides into the computer, and for all 
+  practical purposes becomes conveniently part of the machine. If the translator 
+  brings the computer to a workshop, the card is there. When the translator returns 
+  to his home, the card is there. Backups thus can continue uninterrupted, no 
+  matter where the laptop travels.</p>
+<blockquote> 
+  <p><img src="UnitSlidesIn.JPG" width="595" height="264"></p>
+</blockquote>
+<p>Once installed, the memory device appears as a drive in <i>Windows Explorer</i>, 
+  e.g., &quot;E:\&quot;. Files on it can be manipulated through Explorer in the 
+  same manner as other devices such as the hard disk.</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="TurningItOn">Turning On Auto-Backup</a></h3>
+    </td>
+  </tr>
+</table>
+<p>In order to turn on Auto-Backup, use the <i>Configuration Dialog</i>. There 
+  are two settings there:</p>
+<ul>
+  <li>A place to turn on/off the feature (the default is &quot;on&quot;)</li>
+  <li>A place to indicate the folder in which to store the backup files. (If no 
+    folder is specified, the user will be asked at runtime.)</li>
+</ul>
+<p>As mentioned above, we recommend that the folder be flash memory installed 
+  in the <font size="-1">PCMCIA</font> slot. In the absence of a suitable device, 
+  you can elect to identify a folder on your hard disk. This is better than nothing 
+  (but just barely), as it does protect you should want to undo the changes you 
+  made recently. But it does not protect you from a hard disk failure, which is 
+  a real risk in many of the climates and electrical power situations in which 
+  translation is typically done..</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="RestoringAFile">Restoring a File</a></h3>
+    </td>
+  </tr>
+</table>
+<p>A file is restored through the <i>Restore from Backup</i> command on the <i>Tools</i> 
+  dropdown. The command brings up the <i>Restore from Backup Dialog</i>. In this 
+  dialog, you browse through a list of files to choose the one to restore from. 
+</p>
+<p>&nbsp;</p>
+<table width="100%" border="0" bordercolor="#CCCCCC">
+  <tr> 
+    <td bgcolor="#CCCCCC" valign="middle"> 
+      <h3><a name="ProgramBehavioralNotes">Program behavioral notes</a></h3>
+    </td>
+  </tr>
+</table>
+<h4>Backup FileNames</h4>
+<p>When <i>OurWord</i> saves changes, it also creates a backup. The backup files 
+  all have the day's date in the filename, thus: </p>
+<ul>
+  <li>Ama-MRK-Draft-B - 2003 08 21.db</li>
+  <li>Ama-MRK-Draft-B - 2003 08 22.db</li>
+  <li>Ama-MRK-Draft-B - 2003 08 23.db</li>
+  <li>Ama-MRK-Draft-B - 2004 02 04.db</li>
+</ul>
+<p>Only one backup file is created for a given day. Thus a file might be saved 
+  many times during the course of the day; but the backup file only represents 
+  the contents of the most recent save.</p>
+<h4>Controlling proliferation</h4>
+<p>If you work on the same book for many days, you will find that you are producing 
+  a large number of backup files. In order to keep the number of files down, <i>OurWord</i> 
+  discards some of the older files, as follows:</p>
+<ul>
+  <li>For files older than two weeks, only the last file for a given week is saved; 
+    the others are deleted.</li>
+  <li>For files older then two months, only the last file for a given month is 
+    saved; the others are deleted.</li>
+</ul>
+<p>Thus if you edit the same book every day for an entire year, rather than 365 
+  backup files, you will have</p>
+<ul>
+  <li>The 14 most recent daily files,</li>
+  <li>6 recent weekly files,</li>
+  <li>10 recent monthly files, </li>
+  <li>for a Total of 30 files.</li>
+</ul>
+<p>For a book like Luke that weighs in at 400K, this would occupy 12 Meg on the 
+  storage device.</p>
+<p>Of course, you are encouraged to delete files from the storage device, or to 
+  move them periodically to a CD Rom, where they can serve as a more permanent 
+  archive. (This Backup feature does not pretend to function as a permanent archive.)</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

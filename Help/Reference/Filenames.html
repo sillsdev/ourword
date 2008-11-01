@@ -1,0 +1,62 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - FIle Names</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->File 
+  Names<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p><i>OurWord</i> controls the name of the file. The file name is composed of 
+  information about the book, and the name changes as this information is changed. 
+  (For example, if the book's stage is changed from &quot;Draft&quot; to &quot;Team 
+  Check&quot;, the filename will change to indicate the new stage.) The filename 
+  is composed of:</p>
+<blockquote>
+  <p> LangAbbrev-BookAbbrev-StageAbbrev-Version-Date.db</p>
+</blockquote>
+<p>where:</p>
+<ul>
+  <li><b> LangAbbrev</b> is typically the Ethnologue 3-Letter code, or some other 
+    shortened abbreviation of the language name. It is set in the Translation 
+    Properties Dialog.<br>
+  </li>
+  <li><b> BookAbbrev</b> is typically the standard 3-Letter SIL/UBS book abbreviations, 
+    but short abbreviations in other languages are also supported.<br>
+  </li>
+  <li><b> Stage </b>is one of the stages as defined in Tracking a Book's Stages 
+    of Translation.<br>
+  </li>
+  <li><b> Version</b> is a editing major pass, of the form 'A', 'B', 'C', etc. 
+    When changes are made in a pass through an entire book, a Version should be 
+    used.<br>
+  </li>
+  <li> Date is the date the file was last modified by <i>OurWord</i>. </li>
+</ul>
+<p>For example, the filename Ama-LUK-Adv-B 2008-01-17.db would be interpreted 
+  as:</p>
+<ul>
+  <li> Ama - The Amarasi language<br>
+  </li>
+  <li> LUK - Luke<br>
+  </li>
+  <li> Adv - Advisor Check Stage<br>
+  </li>
+  <li> B - Version B<br>
+  </li>
+  <li>Last edited on 17 January 2008</li>
+</ul>
+<p>When importing a book, the Import Dialog provides the opportunity to declare 
+  the book's stage and version information. Subsequent saves will result in the 
+  file being saved to the appropriate filename that is generated from this information.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

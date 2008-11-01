@@ -1,0 +1,170 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Localization</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Localization 
+  - Translating <i>OurWord</i>'s user interface into another language<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<h3>Summary</h3>
+<p>Localization is the process of translating the user interface from English 
+  into another language. <i>OurWord</i> allows two such translations to be active 
+  so that, e.g., you can set it up to first try to display a given element (such 
+  as a menu item) in the local language; and if unsuccessful, to then attempt 
+  in a national language; and if still unsuccessful, resort to English. <i>OurWord</i> 
+  provides a Localizer Tool through which you can easily translate the various 
+  user interface elements</p>
+<hr>
+<h3>Introduction</h3>
+<p>Localization is the process of translating the user interface into another 
+  language. <i>OurWord</i> was designed to make localization as easy as possible. 
+  Although software is normally presented to users with English user interfaces, 
+  it is our obvservation that translators prefer an interface that is in a language 
+  that is more familiar to them. Our goal with <i>OurWord</i> has been to make 
+  it easy not only to translate the user interface into a national language or 
+  a language of wider communication; but to be able to easily go even further 
+  and translate it into the mother tongue.</p>
+<p>To that end, <i>OurWord</i> provides a Localizer Tool, accessed from the Tools 
+  menu. (You turn on access to it through the <a href="SetupFeatures.html">Setup 
+  Features Dialog</a>.) Within the Localizer Tool, you first tell it that you 
+  want to localize to a new language, and then for each element in the user interface 
+  you supply its translation.</p>
+<hr>
+<h3>Translator vs Advisor</h3>
+<p><i>OurWord</i> makes a distinction between <b>Translator</b> versus <b>Advisor</b> 
+  tasks. The Advisor typically handles the various setup and configuration tasks. 
+  The Advisor interface is mostly contained in the Configuration Dialog, and is 
+  typically not seen by most translators. If you are working in a situation where 
+  the translator will not be doing any of the <i>OurWord</i> configuration, then 
+  you can elect to not localize those parts of the user interface. </p>
+<p>The <i>Localizer Tool</i> distinguishes between those elements which must be 
+  localized for the Translator verses which ones are only for the Advisor. In 
+  a Combo Box you can choose between:</p>
+<ul>
+  <li>Show All</li>
+  <li>Translator Items</li>
+  <li>Advisor Items</li>
+</ul>
+<hr>
+<h3>Preferred (Primary) and Fallback (Secondary) Languages</h3>
+<p>At runtime <i>OurWord</i> works with three languages. </p>
+<ol>
+  <li>It first attempts to display a given element (such as a menu name) in the 
+    Preferred (Primary) Language.</li>
+  <li>If it cannot find a translation in the Preferred Language, then it attempts 
+    to use the Fallback (Secondary) Language. </li>
+  <li>If there is no translation in the Fallback Language, then <i>OurWord</i> 
+    displays English.</li>
+</ol>
+<p>The Preferred and Fallback languages are specified in the Project-Properties 
+  dialog, under the Options section. </p>
+<p>This means that you can do a partial localization. E.g., you might have a thorough 
+  localization of most of <i>OurWord</i> in a national language such as Indonesian, 
+  and you would set this as your Fallback Language. Then you might just localize 
+  the menus into the receptor language, and set that as the Preferred Language. 
+  The result is that the most important parts of the user interface would be available 
+  to the translator in his own language, and less-common things such as error 
+  messages would be available in his national languages. And of course, less important 
+  elements would still display in English.</p>
+<p>Thus it is not a requirement to localize every single element in order to provide 
+  a meaningful user experience to the translator.</p>
+<hr>
+<h3>The Localizer Dialog</h3>
+<p>The <i>Localizer Dialog </i>is invoked via the <i>Tools</i> menu. The default 
+  installation of <i>OurWord</i> hides this dialog; you must turn it on through 
+  the <i>Setup Features</i> dialog. </p>
+<p>In this dialog, the tree view to the left contains all of the elements that 
+  must be localized. The elements are organized into groups, e.g.,</p>
+<ul>
+  <li>Menus</li>
+  <li>Toolbar Text</li>
+  <li>Dialog: Print</li>
+  <li>etc.</li>
+</ul>
+<p>So you can choose which item you wish to work on by selecting that group in 
+  the tree view, and then working on the elements within it.</p>
+<p>When you select an element, the area to the right of the dialog shows information 
+  about it. There is</p>
+<ul>
+  <li>general information about the entire group (e.g., if you are working on 
+    Menus, then you'll see general information about specific things you'll want 
+    to be aware of as you design the menu system),</li>
+  <li>information about the element you are translating (so that you can know 
+    how it fits into the big picture,</li>
+  <li>The item in English</li>
+  <li>Any shortcut key or tooltip associated with the item, in English</li>
+</ul>
+<p>You then have a place to do your own translations:</p>
+<ul>
+  <li>Of the item</li>
+  <li>Of the associated tooltip</li>
+  <li>Of the shortcut key</li>
+</ul>
+<p><b>To begin localization for a new language,</b> click on the <i>New</i> button. 
+  You will be presented with a dialog in which you enter the name of the language 
+  and optionally choose a font for displaying it. You can update this information 
+  at any time by clicking on the <i>Properties</i> button.</p>
+<p><b>The Treeview uses color coding</b> to indicate elements that still need 
+  work. Items in dark blue have translations; items in red still need work. An 
+  item will be in red if (1) it needs a translation, or (2) it does not match 
+  up with the English in some other area, e.g., menu items need an ampersand (&amp;) 
+  to indicate hot keys, some menu items need an ellipses (...) to indicate that 
+  a dialog will be brought up. You can set the Filter (in the toolbar) to only 
+  show those items that still need work.</p>
+<hr>
+<h3>File Storage</h3>
+<p>The localization file is stored in the &quot;CommonApplicationData&quot; folder, 
+  which is defined by the operating system. This is an area which can be accessed 
+  by both administrative and limited users.</p>
+<ul>
+  <li><i>Windows Vista</i>: C:\ProgramData\OurWord\Loc\</li>
+  <li><i>Windows XP</i>: C:\Documents and Settings\All Users\Application Data\OurWord\Loc</li>
+</ul>
+<p>(Note that depending on your operating system, you may need to fiddle with 
+  the settings in your Control Panel in order to be able to view these folders.)</p>
+<p>These are all stored in a separate XML files. The main file is <i>OurWordLocalizations.xml</i>. 
+  Other files are stored by their language ID's, e.g., </p>
+<ul>
+  <li><i>sp.xml</i> - Spanish</li>
+  <li><i>inz.xml</i> - Indonesian</li>
+</ul>
+<p><i>OurWord</i> ships with a number of these files; but you can add your own 
+  simply by placing it into the folder described above.</p>
+<hr>
+<h3>Eventual anticipated enhancements:</h3>
+<ul>
+  <li>Ability to merge files (so that it is possible to combine two different 
+    peoples' work on, e.g., Spanish.)</li>
+  <li>More conditions which trigger red text for when an item does not properly 
+    match up with the English.</li>
+</ul>
+<hr>
+<h3>Submitting languages for the general <i>OurWord</i> release</h3>
+<p>Where possible I would like to accumulate localizations for inclusions in future 
+  releases. This makes your work available for other users. They might either 
+  user it directly, or they might use it as a source for their own tweaks into 
+  a related languages.</p>
+<p>Please contact me if you are interested in submitting your localization. It 
+  is a simple thing for me to include it. The main issue for you to consider is 
+  how it might be updated in the future. Do you want to serve as the &quot;owner&quot;, 
+  meaning that if others have suggestions for changes, that they would run them 
+  by you for approval; or should we work out some other &quot;vetting&quot; person 
+  or committee to handle these suggestions? </p>
+<p>I also recognize that some languages are sensitive, and inclusion in a public 
+  release of <i>OurWord</i> would not be appropriate. Be aware that <i>OurWord</i> 
+  is &quot;open source,&quot; meaning that anyone in the world can download the 
+  software, including its localizations. If you are working with a sensitive language, 
+  you may prefer to pass your localizations to others through your own networking, 
+  rather than through the public release.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

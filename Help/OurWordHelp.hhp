@@ -1,0 +1,19 @@
+[OPTIONS]
+Compatibility=1.1 or later
+Compiled file=OurWordHelp.chm
+Default Window=main
+Default topic=Index.html
+Display compile progress=No
+Full-text search=Yes
+Language=0x409 English (United States)
+Title=Our Word Help
+
+[WINDOWS]
+main="Our Word Help",,,"Index.html",,,,,,0x3420,120,0x304e,,,,,1,,,0
+
+
+[FILES]
+Index.html
+
+[INFOTYPES]
+

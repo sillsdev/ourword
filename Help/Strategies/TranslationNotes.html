@@ -1,0 +1,165 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Types of Notes</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Translation 
+  Notes<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p>Translation Notes are notes that the translator or advisor makes during the 
+  translation process. <i>OurWord</i> supports the following types of notes:</p>
+<table width="100%" border="0">
+  <tr> 
+    <td width="18%"><b>Standard Format</b></td>
+    <td width="18%"><b>Note Name</b></td>
+    <td width="64%"><b>Comment</b></td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\nt</b></td>
+    <td width="18%">General</td>
+    <td width="64%">A general miscellaneous note.</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntck</b></td>
+    <td width="18%">To Do</td>
+    <td width="64%">A reminder of future work that needs to be done.</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntUns</b></td>
+    <td width="18%">Ask UNS</td>
+    <td width="64%">Questions to ask an UNS during a community check</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntReas</b></td>
+    <td width="18%">Reason</td>
+    <td width="64%">The justification for why things were done as they were.</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntFT</b></td>
+    <td width="18%">Suggestion for Front</td>
+    <td width="64%">Suggestion by a daughter team of feedback to give to the Front 
+      Translation. </td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntDef</b></td>
+    <td width="18%">Definition</td>
+    <td width="64%">The definition of a word in the translation (e.g., for the 
+      advisor's benefit)</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ov</b></td>
+    <td width="18%">Old Version</td>
+    <td width="64%">A previous version of the verse or phrase</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntBT</b></td>
+    <td width="18%">Back Translation</td>
+    <td width="64%">A note about the back translation (only shows up in the Back 
+      Translation job.)</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntHint</b></td>
+    <td width="18%">Hints for drafting</td>
+    <td width="64%">See below.</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntgk</b></td>
+    <td width="18%">Exegetical: Greek</td>
+    <td width="64%">See below.</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\nthb</b></td>
+    <td width="18%">Exegetical: Hebrew</td>
+    <td width="64%">See below.</td>
+  </tr>
+  <tr> 
+    <td width="18%"><b>\ntcn</b></td>
+    <td width="18%">Exegetical: General</td>
+    <td width="64%">See below.</td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<hr>
+<h3><i>Hints for Drafting</i> Notes</h3>
+<blockquote> 
+  <p>While it is true that the Front Translation contains a huge amount of information 
+    that can be used in creating the daughters, it is often desired to supplement 
+    the Front with additional notes that the translator might need. Such notes 
+    might include:</p>
+  <ul>
+    <li>areas that have been known to be stumbling blocks to translators in the 
+      past,</li>
+    <li>additional information that provides background or implicit information 
+      that the daughter translator needs. </li>
+    <li>the reasoning behind exegetical decisions, or perhaps, an alternative 
+      that is supportable in the original languages.</li>
+  </ul>
+  <p><b>Creating Hints for Drafting Notes. </b><i>OurWord</i> uses a <code>\ntHint</code> 
+    field in the Standard Format files it stores to represent these<i> Hint for 
+    Drafting</i> notes. If you desire to expand the Front translation with these 
+    hints, then you will need to place <code>\ntHint</code> fields within the 
+    Front. </p>
+  <ul>
+    <li>In most situations, you will need to directly edit the Standard Format 
+      file via Shoebox/Toolbox or Paratext.</li>
+    <li>If you are using a daughter (that is based on one Front) as the Front 
+      for another language, then you can insert <i>Hints for Drafting</i> notes 
+      within <i>OurWord</i>. Use the <i>Configuration</i> dialog to turn on these 
+      notes, as you would any other type of note that the program supports. </li>
+  </ul>
+  <p><b>Displaying Hints for Drafting Notes. </b>To display these notes when drafting, 
+    turn them on in the Notes section of the Configuration dialog.</p>
+  <p><b>Miscellaneous. </b><i>OurWord</i> attempts to match up notes from Front 
+    paragraphs to the Target paragraph; where the structures differ, the software 
+    may not always get it correct. I recommend that you always include the verse 
+    reference at the beginning of the note, and even better, the phrase that is 
+    being expounded upon, so make it easier for the translator to connect the 
+    note with the correct place in the text.</p>
+</blockquote>
+<hr>
+<h3><i>Exegetical</i> Notes</h3>
+<blockquote> 
+  <p><i>OurWord</i> offers a mechanism by which exegetical notes defined in the 
+    Front translation are automatically propagated to the daughter translation, 
+    and thus visible when working on the back translation, or when doing a printout 
+    for the consultant.</p>
+  <p>The notes are not edited within <i>OurWord</i>, rather, they must be inserted 
+    into the Front via Toolbox or other standard format editor. But as long as 
+    a section's structure is identical with that of the front, the note will be 
+    propagated to the daughter each time the daughter is read into <i>OurWord</i>. 
+  </p>
+  <p>There are three types of exegetical notes:</p>
+  <table width="100%" border="0">
+    <tr> 
+      <td width="19%">Standard Format Marker</td>
+      <td width="81%">Note</td>
+    </tr>
+    <tr> 
+      <td width="19%"><b>\ntgk</b></td>
+      <td width="81%">Greek exegesis</td>
+    </tr>
+    <tr> 
+      <td width="19%"><b>\nthb</b></td>
+      <td width="81%">Hebrew exegesis</td>
+    </tr>
+    <tr> 
+      <td width="19%"><b>\ntcn</b></td>
+      <td width="81%">General note for justification of the exegesis or structure</td>
+    </tr>
+  </table>
+  <p>In the Configuration Dialog, there is a checkbox to turn these notes on or 
+    off.</p>
+</blockquote>
+<p>&nbsp;</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

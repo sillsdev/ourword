@@ -1,0 +1,96 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Writing Systems</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Writing 
+  Systems<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<h3>General</h3>
+<p>We have struggled with the best way to handle writing systems for decades now. 
+  I do not claim to have done any better than other software; in fact, it is highly 
+  probable that what I've done here in <i>OurWord</i> is quite inadequate. Which 
+  likely means a revision is in the future. But in the meantime.....here is what 
+  we have:</p>
+<p>A writing system, loosely defined, is intended to be all of the information 
+  about displaying, sorting, and keyboarding for a given alphabet. A language 
+  might have multiple such systems; but in most cases a language has only one.</p>
+<p>Some examples of what writing systems describe:</p>
+<ul>
+  <li> That in Spanish, &quot;ll&quot; should be sorted as a single symbol<br>
+  </li>
+  <li> That in Tagalog, &quot;ng&quot;, &quot;n&quot; and &quot;g&quot; are all 
+    separate symbols.<br>
+  </li>
+  <li> That in many Chinese languages, a &quot;SimSun&quot; font will display 
+    its fonts correctly.</li>
+</ul>
+<p>In <i>LinguaLinks</i> (and then in <i>FieldWorks</i>), a writing system was 
+  defined at the &quot;language&quot; level, meaning that a given language could 
+  have a number of writing systems.</p>
+<p>In designing <i>OurWord</i>, I have had a goal of wanting the software to work 
+  for many languages with as little setup as possible. A part of that is that 
+  I am attempting to permit a Writing System to be defined apart from individual 
+  languages. Thus if all of the languages in a cluster can use a single Writing 
+  System, it is not necessary define it over and over again each time a new translation 
+  is begun.</p>
+<p>Within the StyleSheet, for each individual style, you are able to define a 
+  different font (font name, size, etc.) for each writing system. Thus a Book 
+  Title in Chinese will likely have a different font than in English; and yet 
+  for the paragraph style, you only need to define &quot;centered&quot; once.</p>
+<p>I expect eventually merge <i>OurWord</i> writing systems with the model that 
+  is supported by WeSay. </p>
+<h3>Configuration</h3>
+<p>The <i>Configuration Dialog</i>, under the <i>Team Settings </i>section, allows 
+  for writing systems information to be entered. Currently the following are allowed 
+  for each:</p>
+<ul>
+  <li>A name for the writing system, which is the way to identify it elsewhere 
+    in the software</li>
+  <li>A short abbreviation / ID, which is currently used in interfacing with the 
+    WeSay dictionary</li>
+  <li>A keyboard name, which is used to support automatic switching of keyboards 
+    (both Windows and KeyMan keyboards are supported.) <b>Note: </b>you need to 
+    enter the name of the keyboard, not the abbreviation. Thus, e.g., enter &quot;<i>Thai 
+    Kedmanee</i>&quot; rather than &quot;<i>TH</i>.&quot;</li>
+  <li>Punctuation: a list of punctuation in the writing system</li>
+  <li>End Punctuation: a list of punctuation that can occur following a word.</li>
+</ul>
+<p>Once a writing system is set up, then under a translation's settings (e.g., 
+  under the &quot;Target&quot; tab under &quot;Essentials&quot;, you need to enter 
+  the writing system for the two kinds of text: Advisor and Vernacular. </p>
+<ul>
+  <li>Vernacular - the translation</li>
+  <li>Advisor - the back translation</li>
+</ul>
+<p>Once this is done, keyboard switching should be operational.</p>
+<h3>Concerning general-purpose writing systems</h3>
+<p>It is normal in language software to set up a separate writing system for each 
+  language. However, if you note that the various languages in a cluster all use 
+  the same orthography, keyboardings, etc., it is permissable to set up a single 
+  writing system and have them all use it. <i>OurWord</i> defaults to a &quot;Latin&quot; 
+  writing system, which will work for the many languages that use an English orthography. 
+  Thus many languages can go ahead and use <i>OurWord</i> out of the box; others 
+  with more complicated languages will need to do additional setup.</p>
+<h3>Windows Repeated Keyboard Name Bug</h3>
+<p>Windows has an unfortunate idea of what a program wants when it asks it for 
+  the list of keyboards. Rather than give the actual name of the keyboard, it 
+  often gives the name of a keyboard elsewhere in the list. As a result, you might 
+  see the same keyboard name multiple times. This only happens when you have multiple 
+  keyboards under a single language; thus the workaround is to move each keyboard 
+  under its own separate language in your &quot;Regional and Language Options&quot; 
+  control panel. That is, you probably need to pretend that your keyboard is actually 
+  some other language. See <a href="http://wesay.org/wiki/Windows_Repeated_Keyboard_Name_Bug">http://wesay.org/wiki/Windows_Repeated_Keyboard_Name_Bug</a> 
+  for more details.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

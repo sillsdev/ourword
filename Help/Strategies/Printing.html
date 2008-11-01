@@ -1,0 +1,126 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - PRinting</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Printing<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p>Printing is accessed through the Print button. (If this button is not visible, 
+  use the <a href="SetupFeatures.html">Setup Features Dialog</a> to turn it on.) 
+  This command brings up a dialog, which allows you to set up the print job.</p>
+<p>The dialog allows you to set up the folowing:</p>
+<ul>
+  <li>The Printer combo box contains all of the printers that are currently available 
+    on your computer or network. Your default printer is shown, but you can use 
+    the drop-down arrow to choose a different printer.</li>
+  <li>The Range defines exactly what Scripture you will be printing: 
+    <ul>
+      <li> Entire Book will print the book that you currently have loaded<br>
+      </li>
+      <li> Current Section will just print the section that you are currently 
+        displaying<br>
+      </li>
+      <li> Pages will print the range of pages that you define.</li>
+      <li>Chapters will print the pages that contain the chapters you define</li>
+    </ul>
+  </li>
+  <li> Print Watermark will print a light-gray background on each page giving 
+    the status of the book, e.g., &quot;Draft&quot; or &quot;Team Revision.&quot; 
+    This can be helpful in reinforcing to a reader that the printout is not the 
+    final version, and thus comments and changes are welcome.<br>
+  </li>
+  <li> Make Substitutions converts angle brackets into quotes.<br>
+  </li>
+  <li> Print Pictures, if unchecked, will save paper by omitting pictures in the 
+    text.<br>
+  </li>
+  <li> Line Spacing permits you to choose between Single, 1.5 and Double. With 
+    the larger line spacings, it is easier for a person to hand-write comments.</li>
+</ul>
+<h3>Advanced Print Options</h3>
+<p>The <i>Configuration Dialog</i>, <i>Team Settings</i> section, allows you to 
+  specify other print options:</p>
+<ul>
+  <li>The composition of the footers on odd and even pages. For each footer, there 
+    are three parts (left, middle and right), and these parts can be set to any 
+    of the following options: 
+    <ul>
+      <li> Leave Blank<br>
+      </li>
+      <li> Page Number, which appears as, e.g., &quot;- 3 -&quot;<br>
+      </li>
+      <li> Book Stage and Date, which appears as, e.g., &quot;Draft - 6/1/2006&quot;<br>
+      </li>
+      <li> Language, Book Stage and Date, which appears as, e.g., &quot;Navajo 
+        - Draft - 6/1/2006&quot;<br>
+      </li>
+      <li> Copyright Notice, which is the string you enter in the Copyright Notice 
+        setting. This will be a team-wide notice. You can also define noticies 
+        for individual books, by going to the Book Properties Dialog.<br>
+      </li>
+      <li> Scripture Reference, which appears as, e.g., &quot;John 3:16.&quot; 
+        (This is the first verse number that appears on the page.)<br>
+      </li>
+    </ul>
+  </li>
+  <li>The contents of an optional copyright notice.</li>
+</ul>
+<p>The font used for the footer is the &quot;Running Header&quot; style, which 
+  you can change in the <a href="Stylesheet.html">StyleSheet</a>. This may especially 
+  be desirable if you use a lengthy copyright notice.</p>
+<h3>Printing Behavior Notes</h3>
+<p>The printing implementation currently does a number of things that are normally 
+  configurable in a standard word processor. The goals in this implementation 
+  were primarily</p>
+<ol>
+  <li> A feature that would be relatively simple to use, and<br>
+  </li>
+  <li>Intermediate printouts for the translation process (as opposed to final 
+    copy for publication.)</li>
+</ol>
+<p>Thus standard, implemented behavior includes:</p>
+<ul>
+  <li> Widow and orphan control - a single line in a paragraph will not be left 
+    by itself on a page.<br>
+  </li>
+  <li> Keep-With-Next - Paragraphs such as section headings will not appear on 
+    a page unless there is room to start their following paragraph.<br>
+  </li>
+  <li> Drop Caps - Chapter numbers are produced as drop capitals, such that they 
+    take up two lines.<br>
+  </li>
+  <li> Footers - the contents of footers are set up in the Configuration dialog 
+    and may include, e.g., the page number, the name of the book, the date of 
+    the printout. <br>
+  </li>
+  <li> A line of text will not appear on a page unless all footnotes for that 
+    line can also appear on that page.<br>
+  </li>
+  <li> Footnote letters begin with 'a' for each page (as opposed to beginning 
+    with 'a' for each section as in the screen display.)<br>
+  </li>
+  <li> Pictures are centered; <i>OurWord</i> does not yet support wrap-around 
+    text.<br>
+  </li>
+  <li> The watermark is automatically the Status of the book, centered on a 30 
+    degree angle, using the largest font size that will fit in the available space.<br>
+  </li>
+  <li> Page margins, portrait vs landscape, page size, etc., are all whatever 
+    is the default for the printer chosen. <i>OurWord</i> does not currently support 
+    tweaking of these.</li>
+</ul>
+<p>Thee is tremendous complexity in printing; I have a new appreciation for the 
+  programming behind software like <i>Microsoft Word</i>. Nevertheless, please 
+  feel free to Send feedback as to issues that you find especially limiting. </p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

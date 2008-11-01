@@ -1,0 +1,94 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Import an existing book</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Importing 
+  an existing book<!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p><i>OurWord</i> currently supports two flavors of Standard Format: (1) the <a href="../../Reference/FileFormat.html">format</a> 
+  used in <i>Shoebox/Toolbox</i>, and (2) a <a href="../../Reference/USFMFormat.html">subset</a> 
+  of <font size="-1">USFM</font> that is used by <i>Paratext</i>. </p>
+<h3>Starting the Import Process</h3>
+<p>Import is initiated via the Import button in the <i>Configuration</i> dialog. 
+  This button first brings up a wizard by which you supply basic information about 
+  the file:</p>
+<p>The first step in the wizard is for you to browse for the file that you wish 
+  to import. After you navigate to the file, the wizard does a quick scan of the 
+  file to determine whether or not it is one which can be imported, and displays 
+  information (or error messages) as appropriate. Only after a suitable file has 
+  been supplied with the <font size="-1">NEXT</font> button become enabled, so 
+  that you can proceed to the next page in the wizard.</p>
+<p>The second step is for you to identify the book being imported. This is a matter 
+  of choosing one of the possible 66 books from a list. <i>OurWord</i> will only 
+  show those books that are possiblities, thus if you do not see your book in 
+  the list...</p>
+<ul>
+  <li> The book may have already been imported<br>
+  </li>
+  <li>If you are importing a book into your translation, that book must already 
+    be defined in the Front translation; if it has not yet been defined there, 
+    then it will not appear in this list.<br>
+  </li>
+</ul>
+<p>The third step gives you the option of supplying additional information about 
+  the book. For the Stage, you can indicate whether the book is, e.g., a draft, 
+  or has been back translated, or has been consultant checked, etc. For the Version, 
+  you can append an optional letter to indicate, e.g., how many passes have been 
+  made through the draft. (There is more information about Stages and Versions 
+  <a href="../../Strategies/TranslationStages.html">here</a>.) </p>
+<p>The fourth step in the wizard allows you to specify the folder where the file 
+  will be stored. <i>OurWord</i> has its own <a href="../../Reference/Filenames.html">naming 
+  system</a> for filenames, through which you can see at a glance the book's language, 
+  abbreviation, stage, and version. <i>OurWord</i> does not give you control over 
+  the filename, but does let you decide into which folder you want it to be placed. 
+  You will normally want to store all of the books of a translation together on 
+  your hard disk.</p>
+<p>Once this information has been entered, the wizard displays a summary page 
+  of the decisions you have made. Clicking on <i>Finish</i> will ccause <i>OurWord</i> 
+  to proceed with the import.</p>
+<h3>Running into problems</h3>
+<p>It is very common for a book which was created by other software to not import. 
+  Standard Format can be a slippery animal, and mistakes in the use of markers, 
+  or in their order, or numerous other items can result in an error condition. 
+  In this case, <i>OurWord</i> will complain of the error, and will put up an 
+  editor by which you can attempt to solve the problem. (Or alternatively you 
+  can exit <i>OurWord</i> and do the fix in other software.) </p>
+<p>The following error messages may appear when importing:</p>
+<ul>
+  <li><a href="Err_BadChapterNo.html"> Bad Chapter Number</a><br>
+  </li>
+  <li><a href="Err_MissingParagraphMarker.html"> Missing Paragraph Marker</a><br>
+  </li>
+  <li><a href="Err_MissingParagraphMarkerForCF.html"> Missing Paragraph Marker 
+    for \cf field</a><br>
+  </li>
+  <li><a href="Err_MissingParagraphMarkerForNote.html"> Missing Paragraph Marker 
+    for Note</a><br>
+  </li>
+  <li><a href="Err_MissingVerseNumber.html"> Missing Verse Number</a></li>
+  <li><a href="Err_NoVerseInSection.html">Missing Verse in Section</a><br>
+  </li>
+  <li><a href="Err_StructureMismatch.html"> Structure Mismatch</a><br>
+  </li>
+  <li><a href="Err_StructureSectionMiscount.html"> Structure Section Miscount</a><br>
+  </li>
+</ul>
+<h3>Examine the Results</h3>
+<p>Unfortunately it is not always possible to correctly import these files, because 
+  the files often have errors and unrecognized markers within them; so you are 
+  strongly encouraged to carefully review the book once it has been imported into 
+  <i>OurWord</i> to make sure that everything appears correctly. If not, you may 
+  wish to edit the book in your external editor, and then do the import again.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>
