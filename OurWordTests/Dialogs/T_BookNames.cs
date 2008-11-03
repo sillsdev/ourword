@@ -41,9 +41,11 @@ namespace OurWordTests.Dialogs
         [Test]
         public void BookNameRetrieval()
         {
-            string[] vSpanish = BookNames.GetTable("Español");
+			// U+00F1 = small n with tilde
+            string[] vSpanish = BookNames.GetTable("Espa\u00F1ol");
 
-            Assert.AreEqual("Éxodo", vSpanish[1]);
+			// U+00c9 = capital E with acute
+            Assert.AreEqual("\u00C9xodo", vSpanish[1]);
         }
         #endregion
     }

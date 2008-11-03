@@ -36,6 +36,7 @@ namespace JWTools
 		#region Method: static public PathEllipses(string sPath, int cMaxChars)
 		static public string PathEllipses(string sPath, int cMaxLen)
 		{
+			sPath = PathConverter.ConvertDirectorySeparators(sPath);
 			if (sPath.Length <= cMaxLen)
 				return sPath;
 
@@ -50,7 +51,7 @@ namespace JWTools
 
 			int nLength = Math.Max(0, cMaxLen - 2 - sBaseName.Length);
 
-			return sDirectory.Substring(0, nLength) + "...\\" + sBaseName;
+			return sDirectory.Substring(0, nLength) + "..." + Path.DirectorySeparatorChar + sBaseName;
 		}
 		#endregion
 
@@ -277,7 +278,11 @@ namespace JWTools
         static public string GetApplicationDataFolder(string sSubFolder)
         {
             // Build the path
-            string sBase = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+			string sBase;
+			if (Environment.OSVersion.Platform == PlatformID.Unix)
+				sBase = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+			else
+            	sBase = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
             string sPath = sBase + Path.DirectorySeparatorChar + sSubFolder;
             if (string.IsNullOrEmpty(sBase))
                 return null;

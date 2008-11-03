@@ -27,6 +27,13 @@ namespace JWTools
         {
             if (string.IsNullOrEmpty(sPath))
                 return null;
+			
+			sPath = ConvertDirectorySeparators(sPath);
+			char[] separators = new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
+			string[] result = sPath.Split(separators);
+			if (result.Length > 0 && (!bKeepFilename || result[result.Length - 1] == ""))
+				Array.Resize(ref result, result.Length - 1);
+			return result;
 
             // Temporary place to hold the path components
             ArrayList a = new ArrayList();
@@ -148,6 +155,16 @@ namespace JWTools
             return sResultPath;
         }
         #endregion
+        #region SMethod: string ConvertDirectorySeparators(string sPath)
+        static public string ConvertDirectorySeparators(string sPath)
+		{
+			if (sPath == null)
+				return null;
+			if (Environment.OSVersion.Platform == PlatformID.Unix)
+				return sPath.Replace('\\', Path.DirectorySeparatorChar);
+			return sPath.Replace('/', Path.DirectorySeparatorChar);
+		}
+		#endregion
     }
 
 }
