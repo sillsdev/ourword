@@ -86,6 +86,7 @@ namespace OurWordTests.JWTools
             {
 				vRelative[i] = PathConverter.ConvertDirectorySeparators(vRelative[i]);
 				vAbsolute[i] = PathConverter.ConvertDirectorySeparators(vAbsolute[i]);
+
                 Assert.AreEqual(
                     vAbsolute[i],
                     PathConverter.RelativeToAbsolute(vOrigin[i], vRelative[i]),

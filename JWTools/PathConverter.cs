@@ -27,43 +27,18 @@ namespace JWTools
         {
             if (string.IsNullOrEmpty(sPath))
                 return null;
-			
+
+            // Platform-dependant form of the path
 			sPath = ConvertDirectorySeparators(sPath);
+			
+            // Break the path down into its components
 			char[] separators = new char[] {Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar};
 			string[] result = sPath.Split(separators);
-			if (result.Length > 0 && (!bKeepFilename || result[result.Length - 1] == ""))
-				Array.Resize(ref result, result.Length - 1);
-			return result;
-
-            // Temporary place to hold the path components
-            ArrayList a = new ArrayList();
-
-            // Break the path down into its parts
-            while (sPath.Length > 0)
-            {
-                int i = sPath.IndexOf(Path.DirectorySeparatorChar);
-
-                if (-1 == i)
-                {
-                    a.Add(sPath);
-                    sPath = "";
-                }
-                else
-                {
-                    a.Add( sPath.Substring(0, i) );
-                    sPath = sPath.Substring(i + 1);
-                }
-            }
 
             // Remove the filename
-            if (!bKeepFilename && a.Count > 0)
-                a.RemoveAt(a.Count - 1);
-
-            // Convert to a string vector and return the result
-            string[] v = new string[a.Count];
-            for (int i = 0; i < a.Count; ++i)
-                v[i] = (string)a[i];
-            return v;
+            if (result.Length > 0 && (!bKeepFilename || result[result.Length - 1] == ""))
+				Array.Resize(ref result, result.Length - 1);
+			return result;
         }
         #endregion
         #region SMethod: string RelativeToAbsolute(string sOriginPath, string sRelativePath)
