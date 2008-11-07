@@ -336,9 +336,6 @@ namespace OurWord
 
 	public class TestHarness
 	{
-		bool m_bTestJWTools        = true;
-		bool m_bTestJosiahDatabase = true;
-
 		#region Constructor()
 		public TestHarness()
 		{
@@ -348,47 +345,11 @@ namespace OurWord
 		#region Method: void Run()
 		public void Run()
 		{
-			// On developing a test, use this to avoid having to wait for all of them
-			// to execute.
-			bool bOneOnly = false;
-			if (bOneOnly)
-			{
-                Test test = new Test_DBookProperties();
-				test.Run();
-
-				/***
-				Test test = new Test_DContext();
-				test.Run();
-				test = new Test_DChunk();
-				test.Run();
-				test = new Test_DWord();
-				test.Run();
-				***/
-			}
-
-			// Josiah database tests
-			else
-			{
-				if (m_bTestJWTools)
-				{
-					(new Test_FileMenuIO()).Run();
-				}
-
-				if (m_bTestJosiahDatabase)
-				{
-					(new Test_JParagraph()).Run();
-					(new Test_JObject()).Run();
-					(new Test_JObjectOnDemand()).Run();
-					(new Test_JRef()).Run();
-					(new Test_JSeq()).Run();
-				}
-
-
-				(new Test_DBookProperties()).Run();
-				(new Test_DSection()).Run();
-				(new Test_Print()).Run();
-				(new Test_BackupSystem()).Run();  // Can temporarily disable to conserve battery
-			}
+			(new Test_FileMenuIO()).Run();
+			(new Test_DBookProperties()).Run();
+			(new Test_DSection()).Run();
+			(new Test_Print()).Run();
+			(new Test_BackupSystem()).Run();  // Can temporarily disable to conserve battery
 
 			Test.WriteHeader("COMPLETED SUCCESSFULLY");
 		}

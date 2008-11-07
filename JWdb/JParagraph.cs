@@ -339,49 +339,4 @@ namespace JWdb
 		#endregion
 	}
 
-
-	#region TEST
-	public class Test_JParagraph : Test
-	{
-		#region Constructor()
-		public Test_JParagraph()
-			: base("JParagraph")
-		{
-			AddTest( new IndividualTest( Test_IO ), "Test_IO" );
-		}
-		#endregion
-		#region Test_IO
-		public void Test_IO()
-		{
-			//EnableTracing = true;
-
-			// Create a paragraph, put some data into it
-			JWritingSystem jws = new JWritingSystem("English");
-			JParagraph pgOut = new JParagraph(jws);
-			pgOut.Contents = "Once upon a time there was a horse named Bob.";
-			Trace("Paragraph created and initialized");
-
-			// Write it out
-			string sPath = Application.ExecutablePath;
-			sPath = sPath.Substring(0, sPath.LastIndexOf("\\") ) + "\\DSection.x";
-			TextWriter tw = JUtil.GetTextWriter(sPath);
-			pgOut.Write(tw, 0);
-			tw.Close();
-			Trace("written");
-
-			// Read it into a new paragraph
-			TextReader tr = JUtil.GetTextReader(sPath);
-			string sIn = tr.ReadLine();
-			JParagraph pgIn = new JParagraph(sIn, tr);
-			tr.Close();
-			Trace("read");
-
-			// Compare the contents; should be the same
-			AreSame( pgIn.Contents, pgOut.Contents );
-		}
-		#endregion
-	}
-	#endregion
-
-
 }

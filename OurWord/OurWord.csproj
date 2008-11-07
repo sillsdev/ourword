@@ -328,6 +328,7 @@
     <Compile Include="DataModel\DTranslation.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="DataModel\DTranslatorNote.cs" />
     <Compile Include="DataModel\DWordList.cs" />
     <Compile Include="DataModel\SfMapping.cs">
       <SubType>Code</SubType>
@@ -547,7 +548,7 @@
     <Compile Include="Edit\EContainer.cs" />
     <Compile Include="Edit\EWord.cs" />
     <Compile Include="Edit\NotesPane.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Edit\NotesPane.Designer.cs">
       <DependentUpon>NotesPane.cs</DependentUpon>
@@ -573,7 +574,7 @@
     <Compile Include="Merge\DiffText.cs" />
     <Compile Include="Merge\DMergeBook.cs" />
     <Compile Include="Merge\MergePane.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Merge\MergePane.Designer.cs">
       <DependentUpon>MergePane.cs</DependentUpon>
