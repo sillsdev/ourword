@@ -193,7 +193,7 @@
     </target>
 
 	<target name="dist" depends="assemblyinfo make-output-dir, set-build-config, set-runtime-config">
-		<tar destfile="${project.output.dir}/wesay-src-${version}.tar.gz" compression="GZip">
+		<tar destfile="${project.output.dir}/ourword-src-${version}.tar.gz" compression="GZip">
 			<fileset basedir="${project.base.dir}">
 				<include name="./**/*.build" />
 				<include name="./**/*.cs" />

@@ -18,12 +18,12 @@
 				<include name="./**/*" />
 				<exclude name="./Setup" />				
 				<exclude name="./Setup/**/*" />				
-				<exclude name="*.cs" />
-				<exclude name="*.nunit" />
-				<exclude name="*.config" />
-				<exclude name="*.csproj" />
-				<exclude name="*.sln" />
-				<exclude name="*.build" />
+				<exclude name="**/*.cs" />
+				<exclude name="**/*.nunit" />
+				<exclude name="**/*.config" />
+				<exclude name="**/*.csproj" />
+				<exclude name="**/*.sln" />
+				<exclude name="**/*.build" />
 			</fileset>
 		</copy>
 
@@ -31,6 +31,7 @@
 			<in>
 				<items>
 					<include name="${build.namespace.dir}/**" />				
+					<exclude name="${build.namespace.dir}/Dialogs/Properties" /> <!-- review namespace issue see below -->				
 					<exclude name="${build.namespace.dir}/Layouts" />				
 					<exclude name="${build.namespace.dir}/Loc" />				
 					<exclude name="${build.namespace.dir}/Res" />				
@@ -47,6 +48,14 @@
 				</resgen>
 			</do>
 		</foreach>
+
+		<property name="current.dir" value="${build.namespace.dir}/Dialogs/Properties" />
+		<echo message="Compiling resources in ${current.dir}" />
+		<resgen todir="${current.dir}/.." usesourcepath="true">
+			<resources>
+				<include name="${current.dir}/*.resx" />
+			</resources>
+		</resgen>
 
 		<csc target="winexe" unless="false"
 			output="${project.output.dir}/OurWord.exe"
