@@ -35,7 +35,7 @@ namespace OurWordTests.JWTools
         [Test] public void PathEllipses()
         {
             string sIn = "C:\\Documents and Settings\\John\\My Documents\\Projects\\MyFile.db";
-            string sExpected = "C:\\Documents and Se...\\MyFile.db";
+            string sExpected = PathConverter.ConvertDirectorySeparators("C:\\Documents and Se...\\MyFile.db");
             string sOut = JWU.PathEllipses(sIn, 30);
 
             Assert.AreEqual(sExpected, sOut);

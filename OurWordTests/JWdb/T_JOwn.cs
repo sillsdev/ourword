@@ -31,6 +31,135 @@ namespace OurWordTests.JWdb
 {
     [TestFixture] public class T_JOwn
     {
+        // Supporting test classes
+	    #region TObjA
+	    public class TObjA : TObject 
+	    { 
+		    public JOwnSeq m_osA1 = null;
+		    public JOwnSeq m_osA2 = null;
+		    public JOwnSeq m_osA3 = null;
+		    public JOwn    m_own1 = null;
+		    public JOwn    m_own2 = null;
+		    public JRef    m_ref1 = null;
+		    public JRef    m_ref2 = null;
+
+		    // Constructor that attempts to create two attrs of the same name; should fail
+		    public TObjA(string s, bool b) : base(s)
+		    {
+			    m_own1 = new JOwn("own", this, typeof(JObject));
+			    m_own2 = new JOwn("own", this, typeof(JObject));
+		    }
+
+		    public TObjA(string s) : base(s) 
+		    {
+			    // One complete deep ownership hierarhcy
+			    m_osA1 = new JOwnSeq("A1", this, typeof(TObjB));
+			    m_osA1.Append(new TObjB("B1"));
+
+			    // Some more owning sequences for AllOwningAttrs testing
+			    m_osA2 = new JOwnSeq("A2", this, typeof(TObjB));
+			    m_osA2.Append(new TObjB("B2"));
+			    m_osA3 = new JOwnSeq("A3", this, typeof(TObjB));
+			    m_osA3.Append(new TObjB("B3"));
+
+			    // Some atomic owners
+			    m_own1 = new JOwn("own1", this, typeof(TObjB));
+			    m_own2 = new JOwn("own2", this, typeof(TObjB));
+
+			    // Some atomic references
+			    m_ref1 = new JRef("ref1", this, typeof(TObjE));
+			    m_ref1.Value = ObjE;
+			    m_ref2 = new JRef("ref2", this, typeof(TObjB));
+
+			    ObjD.m_ref2.Value = this;
+		    }
+		    public TObjB FirstB { get { return (TObjB)m_osA1[0]; } }
+		    public TObjC ObjC { get { return FirstB.ObjC; } }
+		    public TObjD ObjD { get { return ObjC.ObjD; } }
+		    public TObjE ObjE { get { return ObjC.ObjE; } }
+	    }
+	    #endregion
+	    #region TObjB
+	    public class TObjB : TObject 
+	    { 
+		    JOwnSeq m_osB = null;
+		    public TObjB(string s) : base(s) 
+		    {
+			    _ConstructAttrs();
+			    m_osB.Append(new TObjC("C"));
+		    }
+		    public TObjB() : base("") // Read constructor
+		    {
+			    _ConstructAttrs();
+		    }
+		    private void _ConstructAttrs()
+		    {
+			    m_osB = new JOwnSeq("B", this, typeof(TObjC));
+		    }
+		    public TObjC FirstC { get { return (TObjC)m_osB[0]; } }
+		    public TObjC ObjC { get { return (TObjC)m_osB[0]; } }
+		    public TObjD ObjD { get { return ObjC.ObjD; } }
+		    public TObjE ObjE { get { return ObjC.ObjE; } }
+	    }
+	    #endregion
+	    #region TObjC
+	    public class TObjC : TObject 
+	    { 
+		    public JOwnSeq m_osC = null;
+		    public JOwn m_own = null;
+		    public TObjC() : base("") 
+		    {
+			    _ConstructAttrs();
+		    }
+		    public TObjC(string s) : base(s) 
+		    {
+			    _ConstructAttrs();
+			    m_osC.Append(new TObjD("D"));
+			    m_own.Value = new TObjE("E");
+			    ObjD.m_ref1.Value = m_own.Value;
+		    }
+		    private void _ConstructAttrs()
+		    {
+			    m_osC = new JOwnSeq("C", this, typeof(TObjD));
+			    m_own = new JOwn("COwn", this, typeof(TObjE));
+		    }
+		    public TObjD FirstD { get { return (TObjD)m_osC[0]; } }
+		    public TObjD ObjD { get { return FirstD; } }
+		    public TObjE ObjE { get { return (TObjE)m_own.Value; } }
+	    }
+	    #endregion
+	    #region TobjD
+	    public class TObjD : TObject 
+	    { 
+		    public JRef m_ref1;
+		    public JRef m_ref2;
+		    public TObjD() : base("") 
+		    {
+			    _ConstructAttrs();
+		    }
+		    public TObjD(string s) : base(s) 
+		    {
+			    _ConstructAttrs();
+		    }
+		    private void _ConstructAttrs()
+		    {
+			    m_ref1 = new JRef("ref1", this, typeof(TObjE));
+			    m_ref2 = new JRef("ref2", this, typeof(TObjA));
+		    }
+	    }
+	    #endregion
+	    #region TobjE
+	    public class TObjE : TObject
+	    {
+		    public TObjE(string s): base(s)
+		    {
+		    }
+		    public TObjE(): base("")
+		    {
+		    }
+	    }
+	    #endregion
+
         // Setup/TearDown --------------------------------------------------------------------
         #region Setup
         [SetUp] public void Setup()
@@ -151,4 +280,6 @@ namespace OurWordTests.JWdb
         }
         #endregion
     }
+
+
 }

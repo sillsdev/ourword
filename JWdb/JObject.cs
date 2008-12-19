@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 27 Oct 2003
  * Purpose: Implements JObject, which is a base class for all data objects.
- * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -21,7 +21,23 @@ using JWTools;
 
 namespace JWdb
 {
-	// Exceptions ----------------------------------------------------------------------------
+    #region DOC - Defining a new type of Simple BAttr
+    /* DOC: To Define a new type of BAttr, do the following in JObject
+     * 
+     * - Add the test case for this type to the test: T_JObject.SimpleBAttrIO()
+     * 
+     * - Create a SetValue(ref YourNewType attr, YourNewType, newValue); its purpose
+     *     is to call DeclareDirty.
+     * 
+     * - Add DefineAttr methods to everything in the I/O:BAttrs section:
+     *    _LoopAttrsMethod
+     *    _SaveBasicAttrsMethod
+     *    to the JObject class itself
+     * 
+     */
+    #endregion
+
+    // Exceptions ----------------------------------------------------------------------------
 	#region Exception: eDuplicateAttrName - Attempt to create two attrs with the same name
 	public class eDuplicateAttrName : eJosiahException
 	{
@@ -176,6 +192,16 @@ namespace JWdb
             if (dAttr != dNewValue)
             {
                 dAttr = dNewValue;
+                DeclareDirty();
+            }
+        }
+        #endregion
+        #region Method: void SetValue(ref DateTime dtAttr, dtNewValue)
+        protected void SetValue(ref DateTime dtAttr, DateTime dtNewValue)
+        {
+            if (dtAttr != dtNewValue)
+            {
+                dtAttr = dtNewValue;
                 DeclareDirty();
             }
         }
@@ -376,6 +402,7 @@ namespace JWdb
 			public virtual void DefineAttr(string sName, ref bool b)           {}
 			public virtual void DefineAttr(string sName, ref string s)         {}
 			public virtual void DefineAttr(string sName, ref char ch)          {}
+            public virtual void DefineAttr(string sName, ref DateTime dt)      {}
 			public virtual void DefineAttr(string sName, ref BStringArray bsa) {}
 			public virtual void DefineAttr(string sName, ref BIntArray bna)    {}
 
@@ -439,8 +466,16 @@ namespace JWdb
 				AppendField(sName, chValue.ToString());
 			}
 			#endregion
-			#region Method: void DefineAttr(sName, ref BStringArray)
-			public override void DefineAttr(string sName, ref BStringArray bsaValue)
+            #region Method: void DefineAttr(sName, ref DateTime)
+            public override void DefineAttr(string sName, ref DateTime dt)
+            {
+                string s = dt.ToString("g", DateTimeFormatInfo.InvariantInfo);
+                //Console.WriteLine("Out Date = <" + s + ">");
+                AppendField(sName, s);
+            }
+            #endregion
+            #region Method: void DefineAttr(sName, ref BStringArray)
+            public override void DefineAttr(string sName, ref BStringArray bsaValue)
 			{
 				AppendField(sName, bsaValue.SaveLine);
 			}
@@ -580,8 +615,23 @@ namespace JWdb
 				}
 			}
 			#endregion
-			#region Method: void DefineAttr(sName, ref BStringArray)
-			public override void DefineAttr(string sName, ref BStringArray bsaValue)
+            #region Method: void DefineAttr(sName, ref datetime)
+            public override void DefineAttr(string sName, ref DateTime dt)
+            {
+                if (m_sReadName == sName)
+                {
+                    try
+                    {
+                        dt = DateTime.ParseExact(m_sReadValue, "g", DateTimeFormatInfo.InvariantInfo);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+            #endregion
+            #region Method: void DefineAttr(sName, ref BStringArray)
+            public override void DefineAttr(string sName, ref BStringArray bsaValue)
 			{
 				if (m_sReadName == sName)
 					bsaValue.Read(m_sReadValue);
@@ -664,7 +714,7 @@ namespace JWdb
 		}
 		#endregion
 
-		#region Methods: void DefineAttr(sName, ref "int, double, bool, string, bsa, bna");
+		#region Methods: void DefineAttr(sName, ref "int, double, bool, string, DateTime, bsa, bna");
 		protected void DefineAttr(string sName, ref int nValue)
 		{
 			Debug.Assert(null != m_LoopMethod);
@@ -690,7 +740,12 @@ namespace JWdb
 			Debug.Assert(null != m_LoopMethod);
 			m_LoopMethod.DefineAttr(sName, ref chValue);
 		}
-		protected void DefineAttr(string sName, ref BStringArray bsa)
+        protected void DefineAttr(string sName, ref DateTime dtValue)
+        {
+            Debug.Assert(null != m_LoopMethod);
+            m_LoopMethod.DefineAttr(sName, ref dtValue);
+        }
+        protected void DefineAttr(string sName, ref BStringArray bsa)
 		{
 			Debug.Assert(null != m_LoopMethod);
 			m_LoopMethod.DefineAttr(sName, ref bsa);
@@ -891,295 +946,6 @@ namespace JWdb
 		#endregion
 	}
 
-	#region TEST
-	#region TestData - Test Classes and Data for conducting many of the Josiah Tests
-	#region TObjA
-	public class TObjA : TObject 
-	{ 
-		public JOwnSeq m_osA1 = null;
-		public JOwnSeq m_osA2 = null;
-		public JOwnSeq m_osA3 = null;
-		public JOwn    m_own1 = null;
-		public JOwn    m_own2 = null;
-		public JRef    m_ref1 = null;
-		public JRef    m_ref2 = null;
-
-		// Constructor that attempts to create two attrs of the same name; should fail
-		public TObjA(string s, bool b) : base(s)
-		{
-			m_own1 = new JOwn("own", this, typeof(JObject));
-			m_own2 = new JOwn("own", this, typeof(JObject));
-		}
-
-		public TObjA(string s) : base(s) 
-		{
-			// One complete deep ownership hierarhcy
-			m_osA1 = new JOwnSeq("A1", this, typeof(TObjB));
-			m_osA1.Append(new TObjB("B1"));
-
-			// Some more owning sequences for AllOwningAttrs testing
-			m_osA2 = new JOwnSeq("A2", this, typeof(TObjB));
-			m_osA2.Append(new TObjB("B2"));
-			m_osA3 = new JOwnSeq("A3", this, typeof(TObjB));
-			m_osA3.Append(new TObjB("B3"));
-
-			// Some atomic owners
-			m_own1 = new JOwn("own1", this, typeof(TObjB));
-			m_own2 = new JOwn("own2", this, typeof(TObjB));
-
-			// Some atomic references
-			m_ref1 = new JRef("ref1", this, typeof(TObjE));
-			m_ref1.Value = ObjE;
-			m_ref2 = new JRef("ref2", this, typeof(TObjB));
-
-			ObjD.m_ref2.Value = this;
-		}
-		public TObjB FirstB { get { return (TObjB)m_osA1[0]; } }
-		public TObjC ObjC { get { return FirstB.ObjC; } }
-		public TObjD ObjD { get { return ObjC.ObjD; } }
-		public TObjE ObjE { get { return ObjC.ObjE; } }
-	}
-	#endregion
-	#region TObjB
-	public class TObjB : TObject 
-	{ 
-		JOwnSeq m_osB = null;
-		public TObjB(string s) : base(s) 
-		{
-			_ConstructAttrs();
-			m_osB.Append(new TObjC("C"));
-		}
-		public TObjB() : base("") // Read constructor
-		{
-			_ConstructAttrs();
-		}
-		private void _ConstructAttrs()
-		{
-			m_osB = new JOwnSeq("B", this, typeof(TObjC));
-		}
-		public TObjC FirstC { get { return (TObjC)m_osB[0]; } }
-		public TObjC ObjC { get { return (TObjC)m_osB[0]; } }
-		public TObjD ObjD { get { return ObjC.ObjD; } }
-		public TObjE ObjE { get { return ObjC.ObjE; } }
-	}
-	#endregion
-	#region TObjC
-	public class TObjC : TObject 
-	{ 
-		public JOwnSeq m_osC = null;
-		public JOwn m_own = null;
-		public TObjC() : base("") 
-		{
-			_ConstructAttrs();
-		}
-		public TObjC(string s) : base(s) 
-		{
-			_ConstructAttrs();
-			m_osC.Append(new TObjD("D"));
-			m_own.Value = new TObjE("E");
-			ObjD.m_ref1.Value = m_own.Value;
-		}
-		private void _ConstructAttrs()
-		{
-			m_osC = new JOwnSeq("C", this, typeof(TObjD));
-			m_own = new JOwn("COwn", this, typeof(TObjE));
-		}
-		public TObjD FirstD { get { return (TObjD)m_osC[0]; } }
-		public TObjD ObjD { get { return FirstD; } }
-		public TObjE ObjE { get { return (TObjE)m_own.Value; } }
-	}
-	#endregion
-	#region TobjD
-	public class TObjD : TObject 
-	{ 
-		public JRef m_ref1;
-		public JRef m_ref2;
-		public TObjD() : base("") 
-		{
-			_ConstructAttrs();
-		}
-		public TObjD(string s) : base(s) 
-		{
-			_ConstructAttrs();
-		}
-		private void _ConstructAttrs()
-		{
-			m_ref1 = new JRef("ref1", this, typeof(TObjE));
-			m_ref2 = new JRef("ref2", this, typeof(TObjA));
-		}
-	}
-	#endregion
-	#region TobjE
-	public class TObjE : TObject
-	{
-		public TObjE(string s): base(s)
-		{
-		}
-		public TObjE(): base("")
-		{
-		}
-	}
-	#endregion
-	#endregion
-
-	public class Test_JObject : Test
-	{
-		// Scaffolding -----------------------------------------------------------------------
-		#region Attrs
-		TObjA m_objA = null;
-		TObjB m_objB = null;
-		TObjC m_objC = null;
-		TObjD m_objD = null;
-		TObjE m_objE = null;
-		#endregion
-		#region Method: override void Setup()
-		public override void Setup()
-		{
-			m_objA = new TObjA("A");
-			m_objB = m_objA.FirstB;
-			m_objC = m_objB.FirstC;
-			m_objD = m_objC.FirstD;
-			m_objE = (TObjE)m_objC.m_own.Value;
-		}
-		#endregion
-		#region Method: override void TearDown()
-		public override void TearDown()
-		{
-			m_objA = null;
-			m_objB = null;
-			m_objC = null;
-			m_objD = null;
-			m_objE = null;
-		}
-		#endregion
-		#region Constructor()
-		public Test_JObject()
-			: base("JObject")
-		{
-			AddTest( new IndividualTest( AllOwningObjects ),     "AllOwningObjects" );
-			AddTest( new IndividualTest( RootOwner ),            "RootOwner" );
-			AddTest( new IndividualTest( All_X_Attrs ),          "All_X_Attrs" );
-			AddTest( new IndividualTest( PathFromOwningObject ), "PathFromOwningObject" );
-			AddTest( new IndividualTest( ObjectFromPath ),       "ObjectFromPath" );
-//			AddTest( new IndividualTest( NoDuplicateAttrNames ), "NoDuplicateAttrNames" );
-		}
-		#endregion
-
-		// Tests -----------------------------------------------------------------------------
-		#region AllOwningObjects
-		public void AllOwningObjects()
-		{
-			// objA should not have an owner
-			ArrayList list = m_objA.AllOwners;
-			AreSame(0, list.Count);
-
-			// ObjB should have one owner, objA.
-			list = m_objB.AllOwners;
-			AreSame(1, list.Count);
-			IsTrue(list[0] == m_objA);
-
-			// ObjD should have three owners, in order, A-B-C.
-			list = m_objD.AllOwners;
-			AreSame(3, list.Count);
-			IsTrue(list[0] == m_objA);
-			IsTrue(list[1] == m_objB);
-			IsTrue(list[2] == m_objC);
-		}
-		#endregion
-		#region RootOwner
-		public void RootOwner()
-		{
-			IsTrue( m_objA == m_objB.RootOwner);
-			IsTrue( m_objA == m_objC.RootOwner);
-			IsTrue( m_objA == m_objD.RootOwner);
-
-			IsTrue( m_objA.IsRoot );
-			IsFalse( m_objB.IsRoot );
-			IsFalse( m_objC.IsRoot );
-			IsFalse( m_objD.IsRoot );
-		}
-		#endregion
-		#region All_X_Attrs
-		public void All_X_Attrs()
-		{
-			// All owning attrs
-			ArrayList list = m_objA.AllOwningAttrs;
-			foreach( JAttr attr in list )
-			{
-				IsTrue( attr.GetType() != typeof(JRef) );
-				IsTrue( attr.GetType() == typeof(JOwnSeq) || attr.GetType() == typeof(JOwn) );
-			}
-
-			// All atomic own attrs
-			list = m_objA.AllJOwnAttrs;
-			foreach( JAttr attr in list )
-			{
-				IsTrue( attr.GetType() == typeof(JOwn) );
-			}
-
-			// All seq own attrs
-			list = m_objA.AllJOwnSeqAttrs;
-			foreach( JAttr attr in list )
-			{
-				IsTrue( attr.GetType() == typeof(JOwnSeq) );
-			}
-
-			// All atomic ref attrs
-			list = m_objA.AllJRefAttrs;
-			foreach( JAttr attr in list )
-			{
-				IsTrue( attr.GetType() == typeof(JRef) );
-			}
-
-		}
-		#endregion
-		#region PathFromOwningObject
-		public void PathFromOwningObject()
-		{
-			string s = m_objD.GetPathFromRoot();
-			Trace("ObjD Path from root = " + s);
-			AreSame( "-A1-0-B-0-C-0", s );
-			s = m_objD.GetPathFromOwningObject(m_objB);
-			Trace("ObjD Path from ObjB = " + s);
-			AreSame( "-B-0-C-0", s);
-
-			// Test the atomic owning path
-			s = m_objE.GetPathFromOwningObject(m_objB);
-			Trace("ObjE Path from ObjB = " + s);
-			AreSame( "-B-0-COwn", s);
-		}
-		#endregion
-		#region ObjectFromPath
-		public void ObjectFromPath()
-		{
-			// We'll use an object that has both JOwn and JOwnSeq's in its path.
-			string sPath = m_objE.GetPathFromRoot();
-
-			// Get the object; should be m_objE
-			JObject obj = m_objA.GetObjectFromPath(sPath);
-			IsTrue( m_objE == obj);
-		}
-		#endregion
-		#region NoDuplicateAttrNames
-		public void NoDuplicateAttrNames()
-		{
-			//EnableTracing = true;
-			bool bCaught = false;
-			try
-			{
-				Trace("Ready...");
-				TObjA obj = new TObjA("AttemptingTwo", true);
-			}
-			catch (eDuplicateAttrName)
-			{
-				Trace("Caught the expected exception");
-				bCaught = true;
-			}
-			IsTrue(bCaught);
-		}
-		#endregion
-	}
-	#endregion
 
 
 }

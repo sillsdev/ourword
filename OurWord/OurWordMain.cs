@@ -3794,7 +3794,7 @@ namespace OurWord
                 null);
         }
         #endregion
-        #region SMethod: string GetLoc_UndoRedo(sItemID, sEnglish) -      "Strings\UndoRedo"
+        #region SMethod: string GetLoc_UndoRedo(sItemID, sEnglish) -      "Strings/UndoRedo"
         static public string GetLoc_UndoRedo(string sItemID, string sEnglishDefault)
         {
             return LocDB.GetValue(
