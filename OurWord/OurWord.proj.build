@@ -1,0 +1,86 @@
+<project name="OurWord" default="build" basedir=".">
+	<target name="build">
+		<property name="build.namespace" value="OurWord" />
+		<property name="build.namespace.dir" value="${path::combine(project.resource.dir, build.namespace)}" />
+
+		<!-- review: usesourcepath will not work as the path of the source has been changed making it invalid -->
+		<copy todir="${build.namespace.dir}" >
+			<fileset basedir=".">
+				<include name="**/*.resx" />
+			</fileset>
+			<filterchain>
+				<replacestring from="\" to="/" />
+			</filterchain>
+		</copy>
+
+		<copy todir="${build.namespace.dir}" >
+			<fileset basedir=".">
+				<include name="./**/*" />
+				<exclude name="./Setup" />				
+				<exclude name="./Setup/**/*" />				
+				<exclude name="*.cs" />
+				<exclude name="*.nunit" />
+				<exclude name="*.config" />
+				<exclude name="*.csproj" />
+				<exclude name="*.sln" />
+				<exclude name="*.build" />
+			</fileset>
+		</copy>
+
+		<foreach item="Folder" property="current.dir">
+			<in>
+				<items>
+					<include name="${build.namespace.dir}/**" />				
+					<exclude name="${build.namespace.dir}/Layouts" />				
+					<exclude name="${build.namespace.dir}/Loc" />				
+					<exclude name="${build.namespace.dir}/Res" />				
+					<exclude name="${build.namespace.dir}/Resources" />				
+					<exclude name="${build.namespace.dir}/Utilities" />				
+				</items>
+			</in>
+			<do>
+				<echo message="Compiling resources in ${current.dir}" />
+				<resgen todir="${current.dir}" usesourcepath="true">
+					<resources>
+						<include name="${current.dir}/*.resx" />
+					</resources>
+				</resgen>
+			</do>
+		</foreach>
+
+		<csc target="winexe" unless="false"
+			output="${project.output.dir}/OurWord.exe"
+			doc="${project.output.dir}/doc/OurWord.xml"
+			debug="${build.debug}" 
+			define="${build.defines}">
+			<nowarn>
+				<warning number="618,672,1591"/>
+				<warning number="1699" if="${runtime.version=='2.0'}"/>
+				<warning number="1587"/>
+			</nowarn>
+			<sources basedir=".">
+				<include name="**/*.cs" />
+				<exclude name="**/DCluster.cs" />
+			</sources>
+			<references basedir="${project.output.dir}">
+				<include name="JWdb.dll" />	
+				<include name="JWTools.dll" />
+				<include name="Palaso.dll" />
+				<include name="PalasoReporting.dll" />
+				<include name="Palaso.Services.dll" />
+				<include name="PalasoUIWindowsForms.dll" />
+				<include name="System.Data.dll" />
+				<include name="System.Drawing.dll" />
+				<include name="System.Windows.Forms.dll" />
+				<include name="System.XML.dll" />
+			</references>
+			<resources prefix="${build.namespace}" basedir="${build.namespace.dir}" dynamicprefix="true">
+				<include name="${build.namespace.dir}/**/*.resources" />
+			</resources>
+		</csc>
+	</target>
+
+	<target name="clean">
+	</target>
+
+</project>

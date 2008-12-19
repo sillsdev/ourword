@@ -6,3 +6,5 @@ _ReSharper.OurWord
 *.suo
 *resharper*
 *.patch
+*~
+*.orig
