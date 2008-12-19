@@ -204,8 +204,10 @@
 				<include name="./**/*.htm" />
 				<include name="./**/*.bmp" />
 				<include name="./**/*.ico" />
+				<include name="./**/*.gif" />
 				<include name="lib/mono/**" />
 				<include name="build/*" />
+				<exclude name="output/**/*" />
 				<exclude name=".hg/**" />
 			</fileset>
 		</tar>
