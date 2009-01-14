@@ -105,7 +105,20 @@ namespace OurWordTests.DataModel
                     }
                 }
 
-                Console.Write("");
+                if (vsActual.Length > vsExpected.Length)
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("Actual was longer. Next line was:");
+                    Console.WriteLine(vsActual[ vsExpected.Length ]);
+                }
+                if (vsActual.Length < vsExpected.Length)
+                {
+                    Console.WriteLine("");
+                    Console.WriteLine("Expected was longer. Next line was:");
+                    Console.WriteLine(vsExpected[vsActual.Length]);
+                }
+
+                Console.WriteLine("");
             }
 
             // Compare
@@ -115,7 +128,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region Method: void IO_TestEngine(string[] vsRaw, string[] vsSav)
-        void IO_TestEngine(string[] vsRaw, string[] vsSav)
+        public void IO_TestEngine(string[] vsRaw, string[] vsSav)
         // vsRaw - typically data which we are importing, could have all 
         //            kinds of inconsistencies or problems.
         // vsSav - the cannonical/consistent format that we expect 

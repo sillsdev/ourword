@@ -469,7 +469,7 @@ namespace JWdb
             #region Method: void DefineAttr(sName, ref DateTime)
             public override void DefineAttr(string sName, ref DateTime dt)
             {
-                string s = dt.ToString("g", DateTimeFormatInfo.InvariantInfo);
+                string s = dt.ToString("u", DateTimeFormatInfo.InvariantInfo);
                 //Console.WriteLine("Out Date = <" + s + ">");
                 AppendField(sName, s);
             }
@@ -622,7 +622,7 @@ namespace JWdb
                 {
                     try
                     {
-                        dt = DateTime.ParseExact(m_sReadValue, "g", DateTimeFormatInfo.InvariantInfo);
+                        dt = DateTime.ParseExact(m_sReadValue, "u", DateTimeFormatInfo.InvariantInfo);
                     }
                     catch (Exception)
                     {

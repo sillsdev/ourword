@@ -29,8 +29,7 @@ namespace OurWordTests.DataModel
     [TestFixture] public class T_DBasicText
     {
         #region Setup
-        [SetUp]
-        public void Setup()
+        [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
             OurWordMain.Project = new DProject();

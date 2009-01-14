@@ -113,7 +113,7 @@ namespace OurWordTests.Edit
             Assert.IsNotNull(DBT, "DBT Found");
 
             // We'll use the OWBookmark code to locate its OWPara
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Set the cursor position
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, iSplitPos);
@@ -206,7 +206,7 @@ namespace OurWordTests.Edit
 
             // First Split: at "nam|olok"
             int iSplitPos1 = 17;
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, iSplitPos1);
             EditTest.Wnd.cmdSplitParagraph();
             _EvaluteSplitResults(cParagraphs, iPara, iSplitPos1, "olok");
@@ -214,7 +214,7 @@ namespace OurWordTests.Edit
             // Second Split, at "t|e "
             int iSplitPos2 = 5;
             p = EditTest.Section.Paragraphs[iPara] as DParagraph;
-            op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
             DBT = p.Runs[1] as DBasicText;
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, iSplitPos2);
             EditTest.Wnd.cmdSplitParagraph();
@@ -246,7 +246,7 @@ namespace OurWordTests.Edit
             Assert.IsNotNull(DBT, "DBT Found");
 
             // We'll use the OWBookmark code to locate its OWPara
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Set the cursor position  "Oke |te," and do the split
             // P: "Oke "

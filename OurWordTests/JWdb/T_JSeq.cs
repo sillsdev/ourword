@@ -466,5 +466,22 @@ namespace OurWordTests.JWdb
             Assert.AreEqual(6, container.seq.FindAll("David").Count);
         }
         #endregion
+
+        // Misc ------------------------------------------------------------------------------
+        #region Test: ContentEquals
+        [Test] public void ContentEquals()
+        {
+            TestObj_Container container1 = new TestObj_Container();
+            TestObj_Container container2 = new TestObj_Container();
+
+            // Sequences should be the same
+            Assert.IsTrue(container1.seq.Count > 2, "make sure we have a non-zero length sequence");
+            Assert.IsTrue(container1.seq.ContentEquals(container2.seq), "should be same");
+
+            // Add something to container 2; they should now be unequal
+            container2.seq.Append(new TestObj_Name("John"));
+            Assert.IsFalse(container1.seq.ContentEquals(container2.seq), "should be different");
+        }
+        #endregion
     }
 }

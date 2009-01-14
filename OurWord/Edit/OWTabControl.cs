@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 21 Mar 2007
  * Purpose: Tab Control for displaying the various OW Side-Windows (e.g., Notes)
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -189,6 +189,20 @@ namespace OurWord.Edit
             {
                 return (m_NotesPane != null);
             }
+        }
+        #endregion
+        #region Method: void AddNote(DNote note, bool bIsEditable)
+        public void AddNote(DNote note, bool bIsEditable)
+        {
+            if (HasNotesWindow)
+                NotesPane.WndNotes.AddNote(note, bIsEditable);
+        }
+        #endregion
+        #region Method: void AddNote(TranslatorNote, bIsEditable)
+        public void AddNote(TranslatorNote note)
+        {
+            if (HasNotesWindow)
+                NotesPane.WndNotes.AddNote(note);
         }
         #endregion
 
@@ -410,104 +424,6 @@ namespace OurWord.Edit
         #endregion
     }
 
-    public class NotesWindow : OWWindow
-    {
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color setting for this type of window
-        static public string RegistryBackgroundColor
-        {
-            get
-            {
-                return OWWindow.GetRegistryBackgroundColor(c_sName, "LightGray");
-            }
-            set
-            {
-                OWWindow.SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        const string c_sName = "Notes";
-        const int c_cColumnCount = 1;
-        #region Constructor()
-        public NotesWindow()
-            : base(c_sName, c_cColumnCount)
-        {
-            // We want to maintain a tiny bit of text below the cursor so the user does not think
-            // there is nothing below when there actually is.
-            ScrollPositionBufferMargin = 20;
-        }
-        #endregion
-        #region Cmd: OnGotFocus - make sure commands are properly enabled
-        protected override void OnGotFocus(EventArgs e)
-        {
-            base.OnGotFocus(e);
-            G.App.EnableMenusAndToolbars();
-        }
-        #endregion
-        #region Attr{g}: override string WindowName
-        public override string WindowName
-        {
-            get
-            {
-                return G.GetLoc_GeneralUI("NotesWindowName", "Notes");
-            }
-        }
-        #endregion
-
-        // Secondary Window Messaging --------------------------------------------------------
-        #region Method: override void OnAddNote(DNote note, bool bIsEditable)
-        protected override void OnAddNote(DNote note, bool bIsEditable)
-        {
-            // Determine the note's writing system
-            JWritingSystem ws = note.Paragraph.Translation.WritingSystemConsultant;
-
-            // Determine the note's background
-            Color clrEditableBackground = note.NoteDef.BackgroundColor;
-
-            // Determine the note's editability
-            OWPara.Flags options = (bIsEditable) ? OWPara.Flags.IsEditable : OWPara.Flags.None;
-
-            // Determine the note's style
-            JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyle(DNote.StyleAbbrev);
-
-            // Create and add a OWParagraph for the note
-            StartNewRow();
-            OWPara p = new OWPara(this, 
-                LastRow.SubItems[0] as EContainer,
-                ws, PStyle, note, clrEditableBackground, options);
-            AddParagraph(0, p);
-        }
-        #endregion
-        #region Method: override void OnSelectAndScrollToNote(DNote note)
-        public override void OnSelectAndScrollToNote(DNote note)
-        {
-            EContainer container = Contents.FindContainerOfDataSource(note);
-            if (container.Select_FirstWord())
-                Focus();
-        }
-        #endregion
-
-        // Misc Methods ----------------------------------------------------------------------
-        #region Method: DNote GetSelectedNote()
-        public DNote GetSelectedNote()
-        {
-            if (Selection == null)
-                return null;
-
-            DNote note = Selection.Paragraph.DataSource as DNote;
-            return note;
-        }
-        #endregion
-        #region Method: void SelectEndOfNote(DNote note)
-        public void SelectEndOfNote(DNote note)
-        {
-            EContainer container = Contents.FindContainerOfDataSource(note);
-            container.Select_LastWord_End();
-        }
-        #endregion
-    }
-
     public class TranslationsWindow : OWWindow
     {
         #region SAttr{g/s}: string RegistryBackgroundColor - background color setting for this type of window
@@ -704,8 +620,7 @@ namespace OurWord.Edit
 
                 // Create and add a OWParagraph for the translation paragraph
                 StartNewRow();
-                OWPara p = new OWPara(this,
-                    LastRow.SubItems[0] as EContainer,
+                OWPara p = new OWPara(
                     ws, PStyle, vRuns, t.DisplayName, OWPara.Flags.None);
                 AddParagraph(0, p);
             }

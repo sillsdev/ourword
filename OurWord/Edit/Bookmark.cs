@@ -216,7 +216,7 @@ namespace OurWord.Edit
             Debug.Assert(null != objDataSource);
 
             // Locate the OWPara which has this as its data source
-            OWPara op = FindPara(Window, objDataSource, ParagraphFlags);
+            OWPara op = Window.Contents.FindParagraph(objDataSource, ParagraphFlags);
             Debug.Assert(null != op);
 
             // Create and return the normalized selection
@@ -231,36 +231,6 @@ namespace OurWord.Edit
         {
             Window.Selection = CreateSelection();
             Window.ScrollBarPosition = ScrollBarPosition;
-        }
-        #endregion
-        #region SMethod: OWPara FindPara(OWWindow wnd, JObject objDataSource, OWPara.Flags)
-        static public OWPara FindPara(OWWindow wnd, JObject objDataSource, OWPara.Flags Flags)
-            // The paragraph may appear multiple times in a view (e.g., the back
-            // translation view does this; to distinquish, for paragraphs, we
-            // check for the same editing flags.
-        {
-            // We want most of the flags to be the same; though we don't care if
-            // CanItalics is different.
-            Flags |= OWPara.Flags.CanItalic;
-
-            // Loop through the entire display searching for the data source
-            foreach (Row row in wnd.Contents.SubItems)
-            {
-                foreach (Pile pile in row.SubItems)
-                {
-                    foreach (OWPara op in pile.SubItems)
-                    {
-                        if (op.DataSource == objDataSource)
-                        {
-                            if ( Flags == (op.Options | OWPara.Flags.CanItalic))
-                                return op;
-                            else if (Flags == OWPara.Flags.CanItalic) // E.g., for where None was passed in
-                                return op;
-                        }
-                    }
-                }
-            }
-            return null;
         }
         #endregion
         #region Method: bool IsAdjacentTo(OWBookmark bm)

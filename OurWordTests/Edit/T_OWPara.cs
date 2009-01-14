@@ -166,8 +166,7 @@ namespace OurWordTests.Edit
             // Set up John 3:16
             Wnd.StartNewRow();
             m_p = CreateParagraph_John_3_16();
-            m_op = new OWPara(Wnd, 
-                Wnd.LastRow.SubItems[0] as EContainer,
+            m_op = new OWPara( 
                 WSVernacular, 
                 m_p.Style, 
                 m_p, 

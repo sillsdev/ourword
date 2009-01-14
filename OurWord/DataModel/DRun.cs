@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -69,7 +70,20 @@ namespace OurWord.DataModel
 		}
 		#endregion
 
-		// Scaffolding -----------------------------------------------------------------------
+        #region VAttr{g}: DSection Section
+        public DSection Section
+        {
+            get
+            {
+                DParagraph p = Owner as DParagraph;
+                if (p == null)
+                    return null;
+                return p.Section;
+            }
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DRun()
 			: base()
@@ -953,6 +967,18 @@ namespace OurWord.DataModel
                 }
             }
             #endregion
+            #region VAttr{g}: DPhrase[] AsVector
+            public DPhrase[] AsVector
+            {
+                get
+                {
+                    DPhrase[] v = new DPhrase[Count];
+                    for (int i = 0; i < Count; i++)
+                        v[i] = this[i];
+                    return v;
+                }
+            }
+            #endregion
 
             #region Method: char GetCharAt(iPos)
             public char GetCharAt(int iPos)
@@ -1790,7 +1816,31 @@ namespace OurWord.DataModel
 	#region Class: DText
 	public class DText : DBasicText
 	{
-		// Translator Notes ------------------------------------------------------------------
+        // Translator Notes ------------------------------------------------------------------
+        #region Attr{g}: List<TranslatorNote> TranslatorNotes - The TranslatorNotes that go with this DText
+        public List<TranslatorNote> TranslatorNotes
+        {
+            get
+            {
+                return m_vTranslatorNotes;
+            }
+        }
+        private List<TranslatorNote> m_vTranslatorNotes;
+        #endregion
+        #region Method: TranslatorNote InsertNewTranslatorNote()
+        public TranslatorNote InsertNewTranslatorNote()
+        {
+            TranslatorNote note = new TranslatorNote(
+                Section.GetReferenceAt(this).ParseableName,
+                G.App.MainWindow.Selection.SelectionString
+                );
+
+            TranslatorNotes.Add(note);
+            return note;
+        }
+        #endregion
+
+        // Translator Notes will replace Notes
 		#region JAttr{g}: JOwnSeq Notes - E.g., ToDo notes, Hints, Reasons, etc.
 		public JOwnSeq Notes
 		{
@@ -1891,7 +1941,9 @@ namespace OurWord.DataModel
 		public DText()
 			: base()
 		{
-			// Translator Notes
+            // Translator Notes
+            m_vTranslatorNotes = new List<TranslatorNote>();
+
 			j_osNotes = new JOwnSeq("Notes", this, typeof(DNote));
 		}
 		#endregion
@@ -1940,7 +1992,11 @@ namespace OurWord.DataModel
 			// Append the vernacular and BT phrases
             base.Append(text, bInsertSpacesBetweenPhrases);
 
-			// Append the Translator Notes
+            // Append the Translator Notes
+            TranslatorNotes.AddRange(text.TranslatorNotes);
+            text.TranslatorNotes.Clear();
+
+			// Append the Translator Notes (Soon to be obsolete)
 			while (text.Notes.Count > 0)
 			{
 				// Get the note
@@ -1969,8 +2025,16 @@ namespace OurWord.DataModel
 			DB.Append( new SfField( G.Map.MkrVerseText, ContentsSfmSaveString, 
 				ProseBTSfmSaveString, IntBTSfmSaveString ) );
 
-			foreach(DNote note in Notes)
+            // Translator Notes (soon obsolete)
+            foreach (DNote note in Notes)
 				note.ToDB(DB);
+
+            // Translator Notes
+            foreach (TranslatorNote tn in TranslatorNotes)
+            {
+                SfField field = new SfField(DSFMapping.c_sMkrTranslatorNote, tn.ToXml.OneLiner);
+                DB.Append(field);
+            }
 		}
 		#endregion
 	}

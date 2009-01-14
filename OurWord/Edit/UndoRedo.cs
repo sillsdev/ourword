@@ -1953,7 +1953,7 @@ namespace OurWord.Edit
 
             // Prepare for possible future Undo
             // Move the cursor to its place in the text; make a note of the selection
-            Window.OnSelectAndScrollFromFootnote(footnote);
+            Window.Contents.OnSelectAndScrollFrom(footnote);
             m_bookmark_PositionOfFootnoteLetter = new OWBookmark(Window.Selection);
             // Make a copy of the footnote
             m_CopyOfDeletedFootnote = new DFootnote(footnote.Translation, footnote);

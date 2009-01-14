@@ -1,4 +1,4 @@
-<DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" SettingsVersion="1" FileNameLanguage="English" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5">
+<DTeamSettings FileFormat="0" DisplayName="" Path="C:\Users\JWimbish\Documents\Visual Studio 2008\Projects\ourword\OurWord\Setup\SampleData\Settings\Default Team Settings.owt" RelPath="Default Team Settings.owt" SettingsVersion="1" FileNameLanguage="English" FileNameLang="0" Copyright="Copyright © 2007." OddLeft="1" OddMiddle="2" OddRight="3" EvenLeft="3" EvenMiddle="2" EvenRight="5" NotesCategories="0">
   <own Name="StyleSheet">
     <DStyleSheet DisplayName="Default Style Sheet">
       <ownseq Name="ParaStyles">
@@ -274,6 +274,13 @@
             </JFontForWritingSystem>
             <JFontForWritingSystem Name="Arial" Size="10" Bold="true" Italic="false" Strike="false">
               <ref Name="ws">2-WritingSystems-3</ref>
+            </JFontForWritingSystem>
+          </ownseq>
+        </JCharacterStyle>
+        <JCharacterStyle Super="false" Sub="false" Editable="true" Abbrev="bh" DisplayName="Header in Window Panes" Description="" Height="12" Bold="true" Italic="false" Strikeout="false" Underline="false" FontColor="Black">
+          <ownseq Name="fws">
+            <JFontForWritingSystem Name="Arial" Size="12" Bold="true" Italic="false" Strike="false">
+              <ref Name="ws">2-WritingSystems-2</ref>
             </JFontForWritingSystem>
           </ownseq>
         </JCharacterStyle>

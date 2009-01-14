@@ -402,7 +402,7 @@ namespace OurWord.View
                 foreach(DNote note in text.Notes)
                 {
                     if (note.NoteType == DNote.Types.kHintForDaughter && note.Show)
-                        Secondary_AddNote(note, false);
+                        G.App.SideWindows.AddNote(note, false);
                 }
             }
         }
@@ -541,8 +541,6 @@ namespace OurWord.View
         void AddFrontParagraph(DParagraph pFront)
         {
             OWPara para = new OWPara(
-                this,
-                LastRow.SubItems[c_iColFront] as EContainer,
                 pFront.Translation.WritingSystemVernacular,
                 pFront.Style,
                 pFront,
@@ -556,8 +554,6 @@ namespace OurWord.View
         void AddFrontFootnote(DFootnote fnFront)
         {
             AddParagraph(c_iColFront, new OWPara(
-                this,
-                LastRow.SubItems[c_iColFront] as EContainer,
                 fnFront.Translation.WritingSystemVernacular,
                 fnFront.Style,
                 fnFront,
@@ -588,8 +584,6 @@ namespace OurWord.View
 
             // Add the paragraph
             AddParagraph(c_iColTarget, new OWPara(
-                this,
-                LastRow.SubItems[c_iColTarget] as EContainer,
                 pTarget.Translation.WritingSystemVernacular,
                 pTarget.Style,
                 pTarget,
@@ -618,8 +612,6 @@ namespace OurWord.View
 
             // Add the displayable paragraph
             AddParagraph(c_iColTarget, new OWPara(
-                this,
-                LastRow.SubItems[c_iColTarget] as EContainer,
                 fnTarget.Translation.WritingSystemVernacular,
                 fnTarget.Style,
                 fnTarget,

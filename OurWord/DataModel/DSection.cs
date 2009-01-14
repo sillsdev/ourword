@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
@@ -492,27 +493,17 @@ namespace OurWord.DataModel
 			: base()
 		{
 			m_nSectionNo = nSectionNo;
-			_ConstructAttrs();
-			_InitializeAttrs();
-		}
-		#endregion
-		#region Method: void _ConstructAttrs()
-		protected void _ConstructAttrs()
-		{
-			// Owning sequence. Flags are: 
-			// - Don't check for duplicates
-			// - Don't sort
-			m_osParagraphs = new JOwnSeq("Paras",     this, typeof(DParagraph), false, false);
-			m_osFootnotes  = new JOwnSeq("Footnotes", this, typeof(DFootnote),  false, false);
 
-			// Owning atomic
-			j_ownReferenceSpan = new JOwn("RefSpan", this, typeof(DReferenceSpan));
-		}
-		#endregion
-		#region Method: void _InitializeAttrs()
-		private void _InitializeAttrs()
-		{
-			ReferenceSpan = new DReferenceSpan();
+            // Paragraphs and Footnotes: flags are
+            // - Don't check for duplicates
+            // - Don't sort
+            m_osParagraphs = new JOwnSeq("Paras", this, typeof(DParagraph), false, false);
+            m_osFootnotes = new JOwnSeq("Footnotes", this, typeof(DFootnote), false, false);
+
+            // Scripture Reference Span
+            j_ownReferenceSpan = new JOwn("RefSpan", this, typeof(DReferenceSpan));
+            ReferenceSpan = new DReferenceSpan();
+
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -1900,6 +1891,7 @@ namespace OurWord.DataModel
 				while (iPosFirst <= iPosLast)
 				{
 					// Build a list of the Translator Notes that we'll output
+                    List<TranslatorNote> listTranslatorNotes = new List<TranslatorNote>();
 					ArrayList listNotes = new ArrayList();
 
 					// We will build the \vt data here
@@ -1924,6 +1916,8 @@ namespace OurWord.DataModel
 						DText text = run as DText;
 						if (null != text)
 						{
+                            listTranslatorNotes.AddRange(text.TranslatorNotes);
+
 							foreach(DNote note in text.Notes)
 								listNotes.Add(note);
 						}
@@ -2094,6 +2088,49 @@ namespace OurWord.DataModel
 			}
 			#endregion
 
+            // Translator Notes --------------------------------------------------------------
+            bool TranslatorNote_in(SfField field)
+            {
+                TranslatorNote tn = null;
+
+                // Is this field a TranslatorNote?
+                if (DSFMapping.c_sMkrTranslatorNote == field.Mkr)
+                {
+                    XElement[] x = XElement.CreateFrom(field.Data);
+                    if (x.Length == 1)
+                        tn = TranslatorNote.CreateFromXml(x[0]);
+                }
+
+                // Otherwise, is it an old-style (pre version 1.1) note?
+                else
+                {
+                    tn = TranslatorNote.ImportFromOldStyle(s_nChapter, s_nVerse, field);
+                }
+
+                // If we don't have a note, then we're done processing
+                if (null == tn)
+                    return false;
+
+                // Make sure we have a paragraph we can put it into
+                if (null == LastParagraph)
+                {
+                    throw new eBookReadException(
+                        G.GetLoc_Messages("msgMissingParagraphMarkerForNote",
+                            "A translator note was encountered but there was no paragraph " +
+                            "marker for it to go into."),
+                        HelpSystem.Topic.kErrMissingParagraphMarkerForNote,
+                        field.LineNo);
+                }
+
+                // Get the last DText, as that's where the note belongs
+                DText text = LastParagraph.GetOrAddLastDText();
+
+                // Insert the note
+                text.TranslatorNotes.Add(tn);
+
+                return true;
+            }
+
 			// Notes -------------------------------------------------------------------------
 			#region Method: bool Note_in(SfField)
 			private bool Note_in(SfField field)
@@ -2102,6 +2139,9 @@ namespace OurWord.DataModel
 				DNote.Types NoteType = DNote.GetTypeFromMarker(field.Mkr);
 				if (DNote.Types.kUnknown == NoteType)
 					return false;
+
+// Should not get here now that TranslatorNote_in is implemented
+Debug.Assert(false);
 
 				// Now that I've reorganized notes from paragraphs to DTexts, I need to
 				// get rid of the old {v 2} sequences.
@@ -2419,6 +2459,8 @@ namespace OurWord.DataModel
 						continue;
 
 					// Notes, Footnotes, See Also's
+                    if (TranslatorNote_in(field))
+                        continue;
 					if ( Note_in(field))
 						continue;
 					if ( Footnote_in(field))
@@ -2710,6 +2752,42 @@ namespace OurWord.DataModel
             return false;
         }
         #endregion
+        #region Method: DReference GetReferenceAt(DRun runTarget)
+        public DReference GetReferenceAt(DRun runTarget)
+        {
+            int nChapter = ReferenceSpan.Start.Chapter;
+            int nVerse = ReferenceSpan.Start.Verse;
+
+            foreach (DParagraph p in Paragraphs)
+            {
+                foreach (DRun run in p.Runs)
+                {
+                    DChapter chapter = run as DChapter;
+                    if (null != chapter)
+                    {
+                        nChapter = chapter.ChapterNo;
+                        continue;
+                    }
+
+                    DVerse verse = run as DVerse;
+                    if (null != verse)
+                    {
+                        nVerse = verse.VerseNo;
+                        continue;
+                    }
+
+                    if (run == runTarget)
+                    {
+                        return new DReference(nChapter, nVerse);
+                    }
+                }
+            }
+
+            Debug.Assert(false, "GetReferenceAt was called for a section that does not have the runTarget");
+            return null;
+        }
+        #endregion
+
         #region Method: string GetNoteReference(DNote note)
         public string GetNoteReference(DNote note)
             // Called when inserting a new note, where we want to get the text to display

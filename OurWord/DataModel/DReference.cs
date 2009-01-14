@@ -86,7 +86,7 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				return Chapter.ToString("00") + "." + Verse.ToString("00");
+				return Chapter.ToString("000") + "." + Verse.ToString("000");
 			}
 		}
 		#endregion
@@ -98,7 +98,7 @@ namespace OurWord.DataModel
 		{
 		}
 		#endregion
-		#region public Constructor() - sets up the object, Chapter:Verse are initialized
+		#region public Constructor(nChapter, nVerse) - sets up the object, Chapter:Verse are initialized
 		public DReference(int nChapter, int nVerse)
 			: base()
 		{
@@ -165,8 +165,41 @@ namespace OurWord.DataModel
 				Verse = 1;
 		}
 		#endregion
+        #region SMethod: DReference CreateFromParsing(s)
+        static public DReference CreateFromParsing(string s)
+        {
+            s = s.Trim();
+            int i = 0;
 
-		// Misc ------------------------------------------------------------------------------
+            // Extract the chapter part
+            string sChapter = "";
+            while (i < s.Length && s[i] != ':')
+                sChapter += s[i++];
+
+            // Skip over the medial puctuation
+            if (i < s.Length && s[i] == ':')
+                i++;
+
+            // Extract the verse part
+            string sVerse = "";
+            while (i < s.Length)
+                sVerse += s[i++];
+
+            // Convert to integers and create the reference, if possible
+            try
+            {
+                int nChapter = Convert.ToInt16(sChapter);
+                int nVerse = Convert.ToInt16(sVerse);
+                return new DReference(nChapter, nVerse);
+            }
+            catch (Exception) {}
+
+            // Not successful, return null
+            return null;
+        }
+        #endregion
+
+        // Misc ------------------------------------------------------------------------------
 		#region Method: bool ContentEquals(DReference) - T if the contents are the same
 		public bool ContentEquals(DReference rs)
 		{

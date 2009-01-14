@@ -195,6 +195,17 @@ namespace OurWord.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
+        #region BAttr{g}: BStringArray TranslatorNotesCategories
+        public BStringArray TranslatorNotesCategories
+        {
+            get
+            {
+                return m_bsaTranslatorNotesCategories;
+            }
+        }
+        public BStringArray m_bsaTranslatorNotesCategories = null;
+        #endregion
+
 		#region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
@@ -212,6 +223,9 @@ namespace OurWord.DataModel
 			DefineAttr("EvenLeft",     ref m_EvenLeft);
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
+
+            DefineAttr("NotesCategories", ref m_bsaTranslatorNotesCategories);
+
 		}
 		#endregion
 
@@ -344,7 +358,10 @@ namespace OurWord.DataModel
 
             // Default file name
             AbsolutePathName = DefaultPathName;
-		}
+
+            // Translator Notes Categories
+            m_bsaTranslatorNotesCategories = new BStringArray();
+        }
 		#endregion
 		#region void InitializeFactoryStyleSheet()
 		public void InitializeFactoryStyleSheet()
@@ -385,8 +402,19 @@ namespace OurWord.DataModel
 			InitializeFactoryStyleSheet();
 		}
 		#endregion
+        #region OMethod: bool OnLoad(ref sAbsolutePathName) - sets Note Categories
+        protected override bool OnLoad(ref string sAbsolutePathName)
+        {
+            bool bResult = base.OnLoad(ref sAbsolutePathName);
 
-	}
+            if (TranslatorNotesCategories.Length > 0)
+                TranslatorNote.Categories.AddRange(TranslatorNotesCategories.GetCopy());
+
+            return bResult;
+        }
+        #endregion
+
+    }
 	#endregion
 
 	#region CLASS: DStyleSheet : JStyleSheet
@@ -439,9 +467,9 @@ namespace OurWord.DataModel
 		public const string c_StyleAbbrevBold             = "b";
 		public const string c_StyleAbbrevUnderline        = "u";
 		public const string c_StyleAbbrevDashed           = "d";
+        public const string c_StyleAbbrevBigHeader        = "bh";
 		public const string c_StyleAbbrevLabel            = "L";
         public const string c_StyleAbbrevPictureCaption   = "cap";
-        public const string c_StyleNote                   = "nt";
         public const string c_StyleFootnote               = "ft";
 
         // User-Interface Only
@@ -460,6 +488,10 @@ namespace OurWord.DataModel
 
         public const string c_StyleMajorSection           = "ms";
         public const string c_StyleMajorSectionCrossRef   = "mr";
+
+        public const string c_StyleNoteHeader             = "NoteHeader";
+        public const string c_StyleNoteDiscussion         = "NoteDiscussion";
+        public const string c_StyleNote                   = "nt";   // Note Discussion Paragraph
 
         // User-Interface Only
         public const string c_PStyleMergeHeader = "MergeHeader";
@@ -675,7 +707,24 @@ namespace OurWord.DataModel
                 style.SpaceAfter = 3;
             }
 
-			// Note paragraph
+            // Notes
+            // Note Header
+            if (null == FindParagraphStyle(c_StyleNoteHeader))
+            {
+                style = AddParagraphStyle(c_StyleNoteHeader, "Note Header");
+                style.IsLeft = true;
+                style.SpaceBefore = 0;
+                style.SpaceAfter = 0;
+            }
+            // Note Discussion
+            if (null == FindParagraphStyle(c_StyleNoteDiscussion))
+            {
+                style = AddParagraphStyle(c_StyleNoteDiscussion, "Note Discussion");
+                style.IsJustified = true;
+                style.SpaceBefore = 0;
+                style.SpaceAfter = 0;
+            }
+            // Note Paragraph (soon to be deprecated)
             if (null == FindParagraphStyle(c_StyleNote))
 			{
                 style = AddParagraphStyle(c_StyleNote, "Note");
@@ -750,7 +799,15 @@ namespace OurWord.DataModel
                 charStyle.IsSuperScript = true;
 			}
 
-			// Label (L) - e.g., the verse reference at the beginning of a footnote
+            // Footnote Character (cf)
+            if (null == FindCharacterStyle(c_StyleAbbrevBigHeader))
+            {
+                charStyle = AddCharacterStyle(c_StyleAbbrevBigHeader,
+                    "Header in Window Panes");
+                charStyle.SetFonts(false, 12, true);
+            }
+
+            // Label (L) - e.g., the verse reference at the beginning of a footnote
 			if (null == FindCharacterStyle(c_StyleAbbrevLabel))
 			{
 				charStyle = AddCharacterStyle( c_StyleAbbrevLabel, "Label");

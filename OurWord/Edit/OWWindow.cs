@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 21 Mar 2007
  * Purpose: A window, with rows and piles
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Timers;
 using System.Threading;
@@ -192,122 +193,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: virtual void OnSelectAndScrollFromNote(DNote note)
-        public virtual void OnSelectAndScrollFromNote(DNote note)
-        {
-            // Find the paragraph containing the icon which references this note
-            foreach (Row row in Contents.SubItems)
-            {
-                foreach (Pile pile in row.SubItems)
-                {
-                    foreach (OWPara para in pile.SubItems)
-                    {
-                        if (!para.IsEditable)
-                            continue;
-
-                        // We want to keep track of the most recent editable place, if any
-                        EWord word = null;
-
-                        foreach (EBlock block in para.SubItems)
-                        {
-                            // Keep updating this, so that it points to the most close word 
-                            // preceeding the note icon
-                            if (block as EWord != null)
-                                word = block as EWord;
-
-                            // Look for a Note icon
-                            OWPara.ENote n = block as OWPara.ENote;
-                            if (n != null && n.Note == note)
-                            {
-                                // If we found a place we can select, then do so
-                                if (null != word)
-                                {
-                                    Selection = new Sel(word.Para, 
-                                        word.PositionWithinPara, 
-                                        word.Text.Length);
-
-                                    Focus();
-                                }
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
-        #region Method: OWPara FindOWParaContainingFootnoteLetter(DFootnote)
-        public OWPara FindOWParaContainingFootnoteLetter(DFootnote footnote)
-        {
-            // Find the paragraph containing the icon which references this note
-            foreach (Row row in Contents.SubItems)
-            {
-                foreach (Pile pile in row.SubItems)
-                {
-                    foreach (OWPara para in pile.SubItems)
-                    {
-                        foreach (EBlock block in para.SubItems)
-                        {
-                            OWPara.ESeeAlso also = block as OWPara.ESeeAlso;
-                            OWPara.EFootLetter letter = block as OWPara.EFootLetter;
-                            if ((also != null && also.Footnote == footnote) ||
-                                 (letter != null && letter.Footnote == footnote))
-                            {
-                                return para;
-                            }
-                        }
-                    }
-                }
-            }
-            return null;
-        }
-        #endregion
-        #region Method: void OnSelectAndScrollFromFootnote(DFootnote footnote)
-        public void OnSelectAndScrollFromFootnote(DFootnote footnote)
-        {
-            // Find the paragraph containing the icon which references this note
-            foreach (Row row in Contents.SubItems)
-            {
-                foreach (Pile pile in row.SubItems)
-                {
-                    foreach (OWPara para in pile.SubItems)
-                    {
-                        if (!para.IsEditable)
-                            continue;
-
-                        // We want to keep track of the most recent editable place, if any
-                        EWord word = null;
-
-                        foreach (EBlock block in para.SubItems)
-                        {
-                            // Keep updating this, so that it points to the most close word 
-                            // preceeding the note icon
-                            if (block as EWord != null)
-                                word = block as EWord;
-
-                            // Look for a FootLetter or a SeeAlso
-                            OWPara.ESeeAlso also = block as OWPara.ESeeAlso;
-                            OWPara.EFootLetter letter = block as OWPara.EFootLetter;
-                            if ( (also != null && also.Footnote == footnote) ||
-                                 (letter != null && letter.Footnote == footnote) )
-                            {
-                                // If we found a place we can select, then do so
-                                if (null != word)
-                                {
-                                    Selection = new Sel(word.Para,
-                                        word.PositionWithinPara,
-                                        word.Text.Length);
-
-                                    Focus();
-                                }
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        #endregion
 
         // Messages To Secondary Windows -----------------------------------------------------
         #region Attr{g}: OWWindow[] SecondaryWindows
@@ -342,16 +227,6 @@ namespace OurWord.Edit
                 v[i] = SecondaryWindows[i];
             v[SecondaryWindows.Length] = wnd;
             m_vSecondaryWindows = v;
-        }
-        #endregion
-        #region Secondary Window Message: AddNote
-        protected virtual void OnAddNote(DNote note, bool bIsEditable)
-        {
-        }
-        public void Secondary_AddNote(DNote note, bool bIsEditable)
-        {
-            foreach (OWWindow w in SecondaryWindows)
-                w.OnAddNote(note, bIsEditable);
         }
         #endregion
         #region Secondary Window Message: OnSelectAndScrollToNote
@@ -404,7 +279,7 @@ namespace OurWord.Edit
             // Used for Up/Down arrow behavior
             m_LineUpDownX = new LineUpDownX();
 
-            // Initialize the EItems root container (to empty rows)
+            // Initialize the EItems root container (to empty subitems)
             m_Contents = new ERoot(this);
 
             // Default margins
@@ -514,7 +389,7 @@ namespace OurWord.Edit
         public EContainer StartNewRow(bool bDisplayFootnoteSeparator)
         {
             // Create the new Row and add it to the Root
-            Row row = new Row(this, Contents, ColumnCount, bDisplayFootnoteSeparator);
+            Row row = new Row(ColumnCount, bDisplayFootnoteSeparator);
             Contents.Append(row);
             return row;
         }
@@ -624,6 +499,62 @@ namespace OurWord.Edit
             #endregion
 
             // Drawing Methods ---------------------------------------------------------------
+            public void DrawRoundedRectangle(Pen BorderPen, Brush FillBrush, RectangleF Rect, float Radius)
+            {
+                float xLeft = Rect.Left;
+                float xRight = Rect.Right;
+                float yTop = Rect.Top - Wnd.ScrollBarPosition;
+                float yBottom = Rect.Bottom - Wnd.ScrollBarPosition;
+
+                float diameter = Radius * 2;
+
+                GraphicsPath gp = new GraphicsPath();
+
+                gp.StartFigure();
+
+                // Top Horz line
+                gp.AddLine(xLeft + Radius, yTop, xRight - Radius, yTop);
+
+                // Top-right arc
+                gp.AddArc(xRight - diameter, yTop, diameter, diameter, 270, 90);
+
+                // Right Vert line
+                gp.AddLine(xRight, yTop + Radius, xRight, yBottom - Radius);
+
+                // Bottom-right arc
+                gp.AddArc(xRight - diameter, yBottom - diameter, diameter, diameter, 0, 90);
+
+                // Bottom Horz line
+                gp.AddLine(xRight - Radius, yBottom, xLeft + Radius, yBottom);
+
+                // Bottom-left arc
+                gp.AddArc(xLeft, yBottom - diameter, diameter, diameter, 90, 90);
+
+                // Left Vert line
+                gp.AddLine(xLeft, yBottom - Radius, xLeft, yTop + Radius);
+
+                // Top-Left arc
+                gp.AddArc(xLeft, yTop, diameter, diameter, 180, 90);
+
+                gp.CloseFigure();
+
+                // Fill the interior if requested
+                if (null != FillBrush)
+                    Graphics.FillPath(FillBrush, gp);
+
+                // Draw the border if requested
+                if (null != BorderPen)
+                    Graphics.DrawPath(BorderPen, gp);
+            }
+
+            #region Method: void DrawRectangle(Pen, RectangleF)
+            public void DrawRectangle(Pen pen, RectangleF rect)
+            {
+                Graphics.DrawRectangle(pen, 
+                    rect.X, rect.Y - Wnd.ScrollBarPosition,
+                    rect.Width, rect.Height);
+            }
+            #endregion
             #region Method: void FillRectangle(Color clrBackground, RectangleF rect)
             public void FillRectangle(Color clrBackground, RectangleF rect)
             {
@@ -802,6 +733,7 @@ namespace OurWord.Edit
                 container.CalculateContainerVerticals(y, false);
                 y += container.Height;
             }
+            Contents.Height = y - Contents.Position.Y;
 
             // Now that the lines have been defined in the low-level OWPara's,
             // give each line a line number
@@ -861,9 +793,8 @@ namespace OurWord.Edit
                 return;
             }
 
-            // Paint the rows
-            foreach (Row row in Contents.SubItems)
-                row.Paint(r);
+            // Paint the contents
+            Contents.OnPaint(r);
 
             // Text Selection
             if (null != Selection)
@@ -1337,49 +1268,6 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region VAttr{g}: int iRow - the index of the Row containing this selection
-            public int iRow
-            {
-                get
-                {
-                    Row row = Paragraph.Row;
-
-                    int i = Window.Contents.Find(row);
-                    Debug.Assert(-1 != i);
-
-                    return i;
-                }
-            }
-            #endregion
-            #region VAttr{g}: int iPile - the index of the Pile containing this selection
-            public int iPile
-            {
-                get
-                {
-                    Pile pile = Paragraph.Pile;
-                    Row row = pile.Row;
-
-                    int i = row.Find(pile);
-                    Debug.Assert(-1 != i);
-
-                    return i;
-                }
-            }
-            #endregion
-            #region VAttr{g}: int iParagraph - the index of the OWPara within the Pile, containing this selection
-            public int iParagraph
-            {
-                get
-                {
-                    Pile pile = Paragraph.Pile;
-
-                    int i = pile.Find(Paragraph);
-                    Debug.Assert(-1 != i);
-
-                    return i;
-                }
-            }
-            #endregion
             #region VAttr{g}: ArrayList ContainerIndicesStack
             public ArrayList ContainerIndicesStack
             {
@@ -1409,25 +1297,6 @@ namespace OurWord.Edit
                     } while (true);
 
                     return aiStack;
-                }
-            }
-            #endregion
-
-            #region VAttr{g}: Row Row - the row containing this selection
-            public Row Row
-            {
-                get
-                {
-                    return Paragraph.Row;
-                }
-            }
-            #endregion
-            #region VAttr{g}: Pile Pile - the pile containing this selection
-            public Pile Pile
-            {
-                get
-                {
-                    return Paragraph.Pile;
                 }
             }
             #endregion
@@ -1858,7 +1727,7 @@ namespace OurWord.Edit
                     return false;
 
                 // Get the EWord the mouse if over
-                EBlock block = Window.GetBlockAt(pt);
+                EBlock block = Window.Contents.GetBlockAt(pt);
                 if (null == block)
                     return false;
                 EWord word = block as EWord;
@@ -2397,18 +2266,6 @@ namespace OurWord.Edit
         enum MouseStates { kNone, kSelectingText, kPotentialDragDrop, kConfirmedDragDrop };
         MouseStates m_MouseState = MouseStates.kNone;
         bool m_bMouseDown = false;
-        #region Method: EBlock GetBlockAt(PointF pt)
-        public EBlock GetBlockAt(PointF pt)
-        {
-            foreach (Row row in Contents.SubItems)
-            {
-                EBlock block = row.GetBlockAt(pt);
-                if (null != block)
-                    return block;
-            }
-            return null;
-        }
-        #endregion
         #region Cmd: OnMouseDown
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -2430,7 +2287,7 @@ namespace OurWord.Edit
  //           }
 
             // Get the EBlock we're over, and perform that block's action
-            EBlock block = GetBlockAt(pt);
+            EBlock block = Contents.GetBlockAt(pt);
             if (null == block)
                 return;
             block.cmdLeftMouseClick(pt);
@@ -2448,7 +2305,7 @@ namespace OurWord.Edit
             // Get the EBlock we are currently over
             if (m_MouseState == MouseStates.kNone)
             {
-                EBlock block = GetBlockAt(pt);
+                EBlock block = Contents.GetBlockAt(pt);
                 if (null != block)
                     Cursor = block.MouseOverCursor;
                 else
@@ -2457,7 +2314,7 @@ namespace OurWord.Edit
 
             if (m_MouseState == MouseStates.kSelectingText)
             {
-                EBlock block = GetBlockAt(pt);
+                EBlock block = Contents.GetBlockAt(pt);
                 if (null != block)
                     block.cmdMouseMove(pt);
             }
@@ -2503,7 +2360,7 @@ namespace OurWord.Edit
             PointF pt = new PointF(e.X, e.Y + ScrollBarPosition);
 
             // Get the EBlock we are currently over
-            EBlock block = GetBlockAt(pt);
+            EBlock block = Contents.GetBlockAt(pt);
 
             // Let the block handle it
             if (null != block)
@@ -2819,55 +2676,11 @@ namespace OurWord.Edit
             float x = (UpDownX.IsActive) ? UpDownX.X : Selection.Last.X;
             UpDownX.Set(x);
 
-            // Figure out the starting points, which we obtain from the current selection.
-            // We want to start the scan on the preceeding line.
-            int iParaStart = Selection.iParagraph;
-            OWPara.Line lnStart = Selection.Paragraph.LineContainingBlock(
-                Selection.Last.Word);
-            int iLineStart = Selection.Paragraph.IndexOfLine(lnStart) - 1;
+            // Retrieve our current position in the container heirarchy
+            ArrayList aiStack = Selection.ContainerIndicesStack;
 
-            // Work through the rows, starting with the one that contains the selection
-            bool bFirstTime = true;
-            for (int iRow = Selection.iRow; iRow >=0; iRow--)
-            {
-                // We want to stay in the same column (pile), so retrieve that row's
-                // appropriate pile if it exists.
-                if ((Contents.SubItems[iRow] as Row).SubItems.Length <= Selection.iPile)
-                    continue;
-                Pile pile = (Contents.SubItems[iRow] as Row).SubItems[Selection.iPile] as Pile;
-
-                // Work through the paragraphs in that pile. The first time around, we
-                // start at the paragraph that contains the current selection; otherwise
-                // we start at the last paragraph in the pile.
-                if (!bFirstTime)
-                    iParaStart = pile.SubItems.Length - 1;
-
-                // Loop through the pile's paragraphs
-                for (int iPara = iParaStart; iPara >= 0; iPara--)
-                {
-                    OWPara paragraph = pile.SubItems[iPara] as OWPara;
-
-                    // Skip this paragraph if it does not allow editing
-                    if (!paragraph.IsEditable)
-                        continue;
-
-                    if (!bFirstTime)
-                        iLineStart = paragraph.Lines.Length - 1;
-
-                    for (int iLine = iLineStart; iLine >= 0; iLine--)
-                    {
-                        OWPara.Line line = paragraph.Lines[iLine];
-                        PointF pt = new PointF(x, line.Position.Y);
-
-                        if (line.MakeSelectionClosestTo(pt))
-                            return;
-                    }
-
-                    bFirstTime = false;
-                }
-                // We reset FirstTime here in case we never executted the inner loop.
-                bFirstTime = false;
-            }
+            // Select at the same position on the next line
+            Contents.MoveLineUp(aiStack, new PointF(x, Selection.Last.Word.Position.Y));
         }
         #endregion
         #region Cmd: cmdMoveLineDown
@@ -2880,44 +2693,11 @@ namespace OurWord.Edit
             float x = (UpDownX.IsActive) ? UpDownX.X : Selection.Last.X;
             UpDownX.Set(x);
 
-            // Figure out the starting points, which we obtain from the current selection.
-            // We want to start the scan on the following line.
-            int iParaStart = Selection.iParagraph;
-            OWPara.Line lnStart = Selection.Paragraph.LineContainingBlock(
-                Selection.Last.Word);
-            int iLineStart = Selection.Paragraph.IndexOfLine(lnStart) + 1;
+            // Retrieve our current position in the container heirarchy
+            ArrayList aiStack = Selection.ContainerIndicesStack;
 
-            // Work through the rows, starting with the one that contains the selection
-            for (int iRow = Selection.iRow; iRow < Contents.Count; iRow++)
-            {
-                // We want to stay in the same column (pile), so retrieve that row's
-                // appropriate pile if it exists.
-                Row row = Contents.SubItems[iRow] as Row;
-                if (row.SubItems.Length <= Selection.iPile)
-                    continue;
-                Pile pile = row.SubItems[Selection.iPile] as Pile;
-
-                // Work through the paragraphs in that pile
-                for (int iPara = iParaStart; iPara < pile.SubItems.Length; iPara++)
-                {
-                    OWPara paragraph = pile.SubItems[iPara] as OWPara;
-
-                    // Skip this paragraph if it does not allow editing
-                    if (!paragraph.IsEditable)
-                        continue;
-
-                    for (int iLine = iLineStart; iLine < paragraph.Lines.Length; iLine++)
-                    {
-                        OWPara.Line line = paragraph.Lines[iLine];
-                        PointF pt = new PointF(x, line.Position.Y);
-
-                        if (line.MakeSelectionClosestTo(pt))
-                            return;
-                    }
-                    iLineStart = 0;
-                }
-                iParaStart = 0;
-            }
+            // Select at the same position on the next line
+            Contents.MoveLineDown(aiStack, new PointF(x, Selection.Last.Word.Position.Y));
         }
         #endregion
         #region Cmd: cmdExtendLineUp

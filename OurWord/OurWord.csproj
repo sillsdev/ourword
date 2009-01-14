@@ -1,7 +1,7 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -26,6 +26,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <IsWebBootstrapper>true</IsWebBootstrapper>
+    <OldToolsVersion>2.0</OldToolsVersion>
     <PublishUrl>http://localhost/OurWord/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -36,7 +37,9 @@
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
     <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -328,7 +331,7 @@
     <Compile Include="DataModel\DTranslation.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataModel\DTranslatorNote.cs" />
+    <Compile Include="DataModel\TranslatorNote.cs" />
     <Compile Include="DataModel\DWordList.cs" />
     <Compile Include="DataModel\SfMapping.cs">
       <SubType>Code</SubType>
@@ -392,7 +395,7 @@
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
@@ -545,10 +548,12 @@
       <DependentUpon>DictionaryPane.cs</DependentUpon>
     </Compile>
     <Compile Include="Edit\Bookmark.cs" />
+    <Compile Include="Edit\ECollapsableColumn.cs" />
     <Compile Include="Edit\EContainer.cs" />
+    <Compile Include="Edit\EHeaderColumn.cs" />
     <Compile Include="Edit\EWord.cs" />
     <Compile Include="Edit\NotesPane.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Edit\NotesPane.Designer.cs">
       <DependentUpon>NotesPane.cs</DependentUpon>
@@ -574,7 +579,7 @@
     <Compile Include="Merge\DiffText.cs" />
     <Compile Include="Merge\DMergeBook.cs" />
     <Compile Include="Merge\MergePane.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Merge\MergePane.Designer.cs">
       <DependentUpon>MergePane.cs</DependentUpon>
@@ -598,33 +603,43 @@
     </Compile>
     <EmbeddedResource Include="DataModel\DBook.resx">
       <DependentUpon>DBook.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="DataModel\DProject.resx">
       <DependentUpon>DProject.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="DataModel\DTranslation.resx">
       <DependentUpon>DTranslation.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\CopyBTfromFront.resx">
       <DependentUpon>CopyBTfromFront.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DlgFilter.resx">
       <DependentUpon>DlgFilter.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\IncrementBookStatus.resx">
       <DependentUpon>IncrementBookStatus.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\oHelpAbout.resx">
       <DependentUpon>oHelpAbout.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Print.resx">
       <DependentUpon>Print.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\CreateTranslationDlg.resx">
       <DependentUpon>CreateTranslationDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\OpenTranslationDlg.resx">
       <DependentUpon>OpenTranslationDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_AdvancedPrintOptions.resx">
       <DependentUpon>Page_AdvancedPrintOptions.cs</DependentUpon>
@@ -652,12 +667,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\RepairImportBook.resx">
       <DependentUpon>RepairImportBook.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\RestoreFromBackup.resx">
       <DependentUpon>RestoreFromBackup.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="licenses.licx" />
     <EmbeddedResource Include="OurWordMain.resx">
@@ -704,8 +722,18 @@
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
       <Visible>False</Visible>
-      <ProductName>.NET Framework 2.0</ProductName>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
       <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

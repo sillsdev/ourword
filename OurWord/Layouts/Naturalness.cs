@@ -206,8 +206,6 @@ namespace OurWord.View
 
                 // Create and add the paragraph
                 OWPara op = new OWPara(
-                    this,
-                    LastRow.SubItems[0] as EContainer,
                     p.Translation.WritingSystemVernacular,
                     p.Style,
                     p,
@@ -245,8 +243,6 @@ namespace OurWord.View
 
 
                 OWPara op = new OWPara(
-                    this,
-                    LastRow.SubItems[0] as EContainer,
                     fn.Translation.WritingSystemVernacular,
                     fn.Style,
                     fn,

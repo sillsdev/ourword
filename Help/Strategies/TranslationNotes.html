@@ -13,7 +13,64 @@
 <hr>
 <!-- #BeginEditable "Contents" --> 
 <p>Translation Notes are notes that the translator or advisor makes during the 
-  translation process. <i>OurWord</i> supports the following types of notes:</p>
+  translation process. </p>
+<p>Beginning with Version 1.1, OurWord has changed from its former model of supporting 
+  some twelve different types of static notes, to a conversational model of notes. 
+  In this conversational model, a note is more of a chat session between the various 
+  people on a translation team.</p>
+<p>&nbsp;</p>
+<hr>
+<h3>Notes about the Implementation</h3>
+<h3>1. File Storage</h3>
+<p>Translation Notes are stored in an xml format, regardless of whether the containing 
+  file is xml or standard format. Within a standard format file, a &quot;\tn&quot; 
+  marker indicates a translator note, and will appear along the lines of:</p>
+<p>\tn &lt;TranslatorNote Category=&quot;To Do&quot; Assigned=&quot;John&quot; 
+  Context=&quot;so loved the world&quot; Ref=&quot;003:016&quot;&gt;<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&lt;Disc Author=&quot;John&quot; Created=&quot;2008-11-01 
+  00:00:00Z&quot; Text=&quot;Check exegesis here.&quot;/&gt;<br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&lt;Disc Author=&quot;Sandra&quot; Created=&quot;2008-11-03 
+  00:00:00Z&quot; Text=&quot;Exegesis is fine.&quot;/&gt;<br>
+  &lt;/TranslatorNote&gt;</p>
+<p>You should never edit the contents of a note by hand, as you could cause <i>OurWord</i> 
+  to then fail to parse them. Always edit notes from within the OurWord editor.</p>
+<h3>2. Conversion of Old-Format Notes</h3>
+<p>The old notes consisted of a unique marker (e.g., \ov was an Old Version note; 
+  \ntDef was a Definition note) followed by the note text. On reading files with 
+  the old notes, <i>OurWord</i> now converts them to the new style, as follows:</p>
+<ul>
+  <li> The type (Old Version, Definition, etc.) is placed into the Category field</li>
+  <li>The contents are placed into a Discussion paragraph. That paragraph is given 
+    the date the file was imported, and the author is &quot;Old Note.&quot;</li>
+  <li>Assigned To is set to &quot;closed,&quot; indicating that now further action 
+    is expected.</li>
+</ul>
+<p>&nbsp;</p>
+<hr>
+<h2>--- IMPLEMENTATION ---</h2>
+<ol>
+  <li><font face="Wingdings">nn</font> Conceptual Model</li>
+  <li><font face="Wingdings">n</font><font face="Wingdings">n</font> Object I/O</li>
+  <li><font face="Wingdings">nn</font> Storage within a db file</li>
+  <li><font face="Wingdings">o</font><font face="Wingdings">o</font> Conversion 
+    from old types of notes </li>
+  <ul>
+    <li><font face="Wingdings">nn</font> Convert a single note</li>
+    <li><font face="Wingdings">oo</font> Wire into the file-read mechanism</li>
+  </ul>
+  <li><font face="Wingdings">oo</font> Handling Hints for drafting notes</li>
+  <li><font face="Wingdings">o</font><font face="Wingdings">o</font> Handling 
+    Exegetical notes</li>
+  <li><font face="Wingdings">o</font><font face="Wingdings">o</font> Notes Window 
+    (lots of sub-stuff coming here) 
+    <ul>
+      <li><font face="Wingdings">o</font> Design editor subclasses</li>
+    </ul>
+  </li>
+</ol>
+<hr>
+<h2>--- OLD - TO BE REPLACED ---</h2>
+<p><i>OurWord</i> supports the following types of notes:</p>
 <table width="100%" border="0">
   <tr> 
     <td width="18%"><b>Standard Format</b></td>

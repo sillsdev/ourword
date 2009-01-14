@@ -446,13 +446,22 @@ namespace OurWordTests.JWTools
         #region Test: OneLiner_AttrsOnly
         [Test] public void OneLiner_AttrsOnly()
         {
-            XElement xml = new XElement("birthdate");
+            string sTag = "birthdate";
+
+            XElement xml = new XElement(sTag);
             xml.AddAttr("year", 1959);
             xml.AddAttr("month", 11);
             xml.AddAttr("name", "John");
-            Assert.AreEqual(
-                "<birthdate year=\"1959\" month=\"11\" name=\"John\"/>",
-                xml.OneLiner);
+            DateTime dtMarried = new DateTime(1986, 8, 23, 14, 10, 05);
+            xml.AddAttr("married", dtMarried);
+            string sExpected = "<birthdate year=\"1959\" month=\"11\" name=\"John\" " +
+                "married=\"1986-08-23 14:10:05Z\"/>";
+            Assert.AreEqual(sExpected, xml.OneLiner);
+
+            // Test the ability to correctly read the values
+            XElement[] vxml2 = XElement.CreateFrom(sExpected);
+            DateTime dtMarried2 = vxml2[0].GetAttrValue("married", DateTime.Today);
+            Assert.IsTrue(0 == dtMarried.CompareTo(dtMarried2));
 
         }
         #endregion
@@ -563,7 +572,7 @@ namespace OurWordTests.JWTools
             Assert.AreEqual(sIn, vx[0].OneLiner);
         }
         #endregion
-        #region Test: ParseIntoXElements
+        #region Test: ParseIntoXElements_WithData
         [Test] public void ParseIntoXElements_WithData()
         {
             string sIn = "<word enc=\"eng\">Hello</word>";

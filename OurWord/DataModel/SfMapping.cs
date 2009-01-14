@@ -26,6 +26,7 @@ namespace OurWord
         public const string c_sMkrPictureCaption = "cap";  // Vernacular caption
         public const string c_sMkrPicturePath = "cat";  // Typically the full pathname
         public const string c_sMkrPictureWordRtf = "ref";  // Info to Word on how to display the picture
+        public const string c_sMkrTranslatorNote = "tn";
 
         // Back Translation Fields -----------------------------------------------------------
         #region Method: string MkrBT(string sMkrBase)
@@ -966,6 +967,7 @@ namespace OurWord
             if (IsDateStampMarker(sMarker)) return true;
             if (IsCopyrightMarker(sMarker)) return true;
             if (DNote.IsNoteMarker(sMarker)) return true;
+            if (c_sMkrTranslatorNote == sMarker) return true;
 
             // Didn't find it in our list
             return false;

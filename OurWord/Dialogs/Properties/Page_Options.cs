@@ -168,7 +168,7 @@ namespace OurWord.Dialogs
                     e.Value = WndNaturalness.RegistryBackgroundColor;
                     break;
                 case c_sColorNotes:
-                    e.Value = NotesWindow.RegistryBackgroundColor;
+                    e.Value = NotesWnd.RegistryBackgroundColor;
                     break;
                 case c_sColorOtherTranslations:
                     e.Value = TranslationsWindow.RegistryBackgroundColor;
@@ -250,7 +250,7 @@ namespace OurWord.Dialogs
                     WndNaturalness.RegistryBackgroundColor = (string)e.Value;
                     break;
                 case c_sColorNotes:
-                    NotesWindow.RegistryBackgroundColor = (string)e.Value;
+                    NotesWnd.RegistryBackgroundColor = (string)e.Value;
                     break;
                 case c_sColorOtherTranslations:
                     TranslationsWindow.RegistryBackgroundColor = (string)e.Value;

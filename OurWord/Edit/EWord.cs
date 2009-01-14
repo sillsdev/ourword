@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 27 Sep 2008
  * Purpose: An individual word in a paragraph
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -118,7 +118,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return Para.Window.Draw;
+                return Owner.Window.Draw;
             }
         }
         #endregion
@@ -136,15 +136,12 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(OWPara, sText)
-        public EBlock(OWPara _para, string _sText)
-            : base(_para.Window, _para)
+        #region Constructor(sText)
+        public EBlock(JFontForWritingSystem _FontForWS, string _sText)
+            : base()
         {
             m_sText = _sText;
-
-            // Default for the Character Style is the DParagraph's style
-            m_FontForWS = Para.PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                Para.WritingSystem);
+            m_FontForWS = _FontForWS;
         }
         #endregion
         #region VirtMethod: bool ContentEquals(EBlock block)
@@ -289,37 +286,26 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(...)
-        public EWord(OWPara para, 
-            JCharacterStyle style, 
+        public EWord( 
+            JFontForWritingSystem _FontForWS,
             DPhrase phrase, 
             string sText, 
             FontStyle _FontMods)
-            : base(para, sText)
+            : base(_FontForWS, sText)
         {
             // Remember the phrase from which this EWord was generated
             m_Phrase = phrase;
 
             // Retrieve the JFont as passed in.
-            JCharacterStyle cs = style;
             m_FontMods = _FontMods;
-
-            // Switch to italics (or whatever) if that is what is desired
-            if (phrase.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal &&
-                FontMods == FontStyle.Regular)
-            {
-                cs = G.StyleSheet.FindCharacterStyleOrNormal(phrase.CharacterStyleAbbrev);
-            }
-
-            m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
         }
         #endregion
         #region static EWord CreateAsInsertionIcon(OWPara, JCharacterStyle, DPhrase)
         static public EWord CreateAsInsertionIcon(
-            OWPara para, 
-            JCharacterStyle style, 
+            JFontForWritingSystem _FontForWS,
             DPhrase phrase)
         {
-            EWord word = new EWord(para, style, phrase, c_chInsertionSpace.ToString(),
+            EWord word = new EWord(_FontForWS, phrase, c_chInsertionSpace.ToString(),
                 FontStyle.Regular);
             return word;
         }
@@ -810,9 +796,9 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(OWPara)
-        public EInterlinear(OWPara _para)
-            : base(_para, "")
+        #region Constructor()
+        public EInterlinear(JFontForWritingSystem f)
+            : base(f, "")
         {
             m_vBundles = new EBundle[0];
         }
@@ -882,8 +868,8 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region SMethod: EInterlinear CreateFromXml(OWPara para, string s)
-        static public EInterlinear CreateFromXml(OWPara para, string s)
+        #region SMethod: EInterlinear CreateFromXml(string s)
+        static public EInterlinear CreateFromXml(OWPara p, string s)
         {
             // Parse into an element tree
             XElement[] vx = XElement.CreateFrom(s);
@@ -894,7 +880,7 @@ namespace OurWord.Edit
                 return null;
 
             // Retrieve the Meaning
-            EInterlinear ei = new EInterlinear(para);
+            EInterlinear ei = new EInterlinear(null);
             ei.m_sMeaning = x.GetAttrValue(c_sAttrMeaning, "");
             ei.m_sText = x.GetAttrValue(c_sAttrText, "");
             ei.GlueToNext = x.GetAttrValue(c_sAttrGlue, false);

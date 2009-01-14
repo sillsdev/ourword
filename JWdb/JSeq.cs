@@ -139,6 +139,21 @@ namespace JWdb
 			m_bIsSorted = bIsSorted;
 		}
 		#endregion
+        #region Method: bool ContentEquals(JSeq seq)
+        public bool ContentEquals(JSeq> seq)
+        {
+            if (Count != seq.Count)
+                return false;
+
+            for (int i = 0; i < Count; i++)
+            {
+                if (!seq[i].ContentEquals(this[i]))
+                    return false;
+            }
+
+            return true;
+        }
+        #endregion
 
 		// Enumerator ------------------------------------------------------------------------
 		#region Attribute: IEnumerator.Current - Returns the current JObject
@@ -570,5 +585,5 @@ namespace JWdb
 			return -1;
 		}
 		#endregion
-	}
+    }
 }

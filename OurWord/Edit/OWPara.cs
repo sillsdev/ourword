@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 15 Mar 2007
  * Purpose: An individual paragraph
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -181,27 +181,7 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Ownership Hierarchy ---------------------------------------------------------------
-        #region VAttr{g}: Pile Pile - the owning pile that this paragraph is in
-        public Pile Pile
-        {
-            get
-            {
-                Pile pile = Owner as Pile;
-                Debug.Assert(null != pile);
-                return pile;
-            }
-        }
-        #endregion
-        #region VAttr{g}: OWWindow.Row Row - the owning row
-        public Row Row
-        {
-            get
-            {
-                return Pile.Row;
-            }
-        }
-        #endregion
+        // Content Attrs ---------------------------------------------------------------------
         #region Attr{g}: JObject DataSource - the DParagraph or DNote behind this OWPara
         public JObject DataSource
         {
@@ -235,17 +215,13 @@ namespace OurWord.Edit
             #endregion
 
             // Scaffolding -------------------------------------------------------------------
-            #region Constructor(OWPara, DChapter)
-            public EChapter(OWPara para, DChapter chapter)
-                : base(para, chapter.Text)
+            #region Constructor(DChapter)
+            public EChapter(JFontForWritingSystem f, DChapter chapter)
+                : base(f, chapter.Text)
             {
                 // Add a little space to the end so that it appears a bit nicer in the 
                 // display. It is uneditable, so this only affects the display.
                 m_sText = Text + "\u00A0";
-
-                // We want to point to the appropriate font and store it for performance reasons
-                JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevChapter);
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
             }
             #endregion
 
@@ -297,12 +273,10 @@ namespace OurWord.Edit
             bool m_bNeedsExtraLeadingSpace = false;
             #endregion
 
-            #region Constructor(OWPara, DVerse)
-            public EVerse(OWPara para, DVerse verse)
-                : base(para, verse.Text)
+            #region Constructor(DVerse)
+            public EVerse(JFontForWritingSystem f, DVerse verse)
+                : base(f, verse.Text)
             {
-                JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevVerse);
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
             }
             #endregion
 
@@ -428,13 +402,10 @@ namespace OurWord.Edit
             bool m_bFootnoteIsEditableComputed = false;
             #endregion
 
-            #region Constructor(OWPara, DFootLetter)
-            public EFootLetter(OWPara para, DFootLetter footLetter)
-                : base(para, footLetter.Text)
+            #region Constructor(DFootLetter)
+            public EFootLetter(JFontForWritingSystem f, DFootLetter footLetter)
+                : base(f, footLetter.Text)
             {
-                JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter);
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
-
                 m_Footnote = footLetter.Footnote;
             }
             #endregion
@@ -480,14 +451,11 @@ namespace OurWord.Edit
             }
             DFootnote m_Footnote = null;
             #endregion
-            
-            #region Constructor(OWPara, DSeeAlso)
-            public ESeeAlso(OWPara para, DSeeAlso seeAlso)
-                : base(para, seeAlso.Text)
+                       
+            #region Constructor(DSeeAlso)
+            public ESeeAlso(JFontForWritingSystem f, DSeeAlso seeAlso)
+                : base(f, seeAlso.Text)
             {
-                JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevSeeAlsoLetter);
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
-
                 m_Footnote = seeAlso.Footnote;
             }
             #endregion
@@ -505,12 +473,10 @@ namespace OurWord.Edit
         {
             public const string c_Spaces = "\u00A0\u00A0";
 
-            #region Constructor(OWPara, DLabel)
-            public ELabel(OWPara para, DLabel label)
-                : base(para, label.Text + c_Spaces)
+            #region Constructor(DLabel)
+            public ELabel(JFontForWritingSystem f, DLabel label)
+                : base(f, label.Text + c_Spaces)
             {
-                JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevLabel);
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
             }
             #endregion
 
@@ -525,16 +491,10 @@ namespace OurWord.Edit
         #region CLASS: ELiteral
         class ELiteral : EBlock
         {
-            #region Constructor(OWPara, sText)
-            public ELiteral(OWPara para, string sText, string sCharStyleAbbrev)
-                : base(para, sText)
+            #region Constructor(sText)
+            public ELiteral(JFontForWritingSystem f, string sText)
+                : base(f, sText)
             {
-                JCharacterStyle cs = para.PStyle.CharacterStyle;
-
-                if (!string.IsNullOrEmpty(sCharStyleAbbrev) && sCharStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
-                    cs = G.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
-
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
             }
             #endregion
 
@@ -565,7 +525,16 @@ namespace OurWord.Edit
             {
                 get
                 {
+                    // Get this when we first need it. We previously had this in
+                    // the constructor; but the problem was that we do not
+                    // have access to the Window at the time of construction.
+                    if (null == m_bmp)
+                    {
+                        m_bmp = Note.NoteDef.GetTransparentBitmap(Window.BackColor);
+                    }
+
                     Debug.Assert(null != m_bmp);
+
                     return m_bmp;
                 }
             }
@@ -585,15 +554,11 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Constructor(OWPara, DNote)
-            public ENote(OWPara para, DNote _Note)
-                : base(para, "")
+            #region Constructor(DNote)
+            public ENote(JFontForWritingSystem f, DNote _Note)
+                : base(f, "")
             {
                 m_Note = _Note;
-
-                // Retrieve the bitmap, with the correct background
-                Color clrBackground = Para.Window.BackColor;
-                m_bmp = Note.NoteDef.GetTransparentBitmap(clrBackground);
             }
             #endregion
 
@@ -622,7 +587,7 @@ namespace OurWord.Edit
 
                 // Update the main window (if this isn't the main)
                 if (null != Window.MainWindow)
-                    Window.MainWindow.OnSelectAndScrollFromNote(Note);
+                    Window.MainWindow.Contents.OnSelectAndScrollFrom(Note);
             }
             #endregion
         }
@@ -642,13 +607,10 @@ namespace OurWord.Edit
             DFootnote m_Footnote = null;
             #endregion
 
-            #region Constructor(OWPara, DFootLetter)
-            public EFootnoteLabel(OWPara para, DFootnote footnote)
-                : base(para, footnote.Letter + " ")
-            {
-                JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter);
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(Para.WritingSystem);
-              
+            #region Constructor(DFootLetter)
+            public EFootnoteLabel(JFontForWritingSystem f, DFootnote footnote)
+                : base(f, footnote.Letter + " ")
+            {             
                 m_Footnote = footnote;
             }
             #endregion
@@ -665,7 +627,7 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    OWPara para = Window.FindOWParaContainingFootnoteLetter(Footnote);
+                    OWPara para = Window.Contents.FindParagraph(Footnote);
                     if (para != null)
                     {
                         if (para.IsEditable)
@@ -678,7 +640,7 @@ namespace OurWord.Edit
             #region Method: override void cmdLeftMouseClick(PointF pt)
             public override void cmdLeftMouseClick(PointF pt)
             {
-                Window.OnSelectAndScrollFromFootnote(Footnote);
+                Window.Contents.OnSelectAndScrollFrom(Footnote);
             }
             #endregion
         }
@@ -686,13 +648,10 @@ namespace OurWord.Edit
         #region CLASS: EBigHeader
         class EBigHeader : EBlock
         {
-            #region Constructor(OWPara, string sText)
-            public EBigHeader(OWPara para, JWritingSystem ws, string sText)
-                : base(para, sText + " ")
+            #region Constructor(string sText)
+            public EBigHeader(JFontForWritingSystem f, string sText)
+                : base(f, sText + " ")
             {
-                JCharacterStyle cs = G.StyleSheet.FindParagraphStyle(
-                    DStyleSheet.c_StyleSectionTitle).CharacterStyle;
-                m_FontForWS = cs.FindOrAddFontForWritingSystem(ws);
             }
             #endregion
 
@@ -754,6 +713,9 @@ namespace OurWord.Edit
                     }
                 }
 
+                // Get the font for the style
+                JFontForWritingSystem fontForWS = cs.FindOrAddFontForWritingSystem(WritingSystem);
+
                 // Process through the phrase's text string
                 for (int i = 0; i < phrase.Text.Length; i++)
                 {
@@ -761,7 +723,7 @@ namespace OurWord.Edit
                     // in order to build the next one.
                     if (WritingSystem.IsWordBreak(phrase.Text, i) && sWord.Length > 0)
                     {
-                        a.Add(new EWord(this, cs, phrase, sWord, mods));
+                        a.Add(new EWord(fontForWS, phrase, sWord, mods));
                         sWord = "";
                     }
 
@@ -772,7 +734,7 @@ namespace OurWord.Edit
                 // Pick up the final word in the string, IsWordBreak will not have 
                 // caught it.
                 if (sWord.Length > 0)
-                    a.Add(new EWord(this, cs, phrase, sWord, mods));
+                    a.Add(new EWord(fontForWS, phrase, sWord, mods));
             }
 
             // If we did not find any words, then we want to create an InsertionIcon
@@ -781,8 +743,10 @@ namespace OurWord.Edit
                 JCharacterStyle cStyle = (null != t.Paragraph) ?
                     t.Paragraph.Style.CharacterStyle :
                     t.Note.Style.CharacterStyle;
+                JFontForWritingSystem fontForWS = cStyle.FindOrAddFontForWritingSystem(
+                    WritingSystem);
 
-                a.Add(EWord.CreateAsInsertionIcon(this, cStyle, phrases[0]));
+                a.Add(EWord.CreateAsInsertionIcon(fontForWS, phrases[0]));
             }
 
             // Convert to an array of EWords
@@ -813,13 +777,18 @@ namespace OurWord.Edit
                 return;
 
             Debug.Assert(null != t);
+
+            foreach (TranslatorNote tn in t.TranslatorNotes)
+            {
+                G.App.SideWindows.AddNote(tn);
+            }
+
             foreach (DNote note in t.Notes)
             {
                 if (note.Show)
                 {
-                    Append(new ENote(this, note));
-
-                    Window.Secondary_AddNote(note, true);
+                    Append(new ENote(RetrieveFont(), note));
+                    G.App.SideWindows.AddNote(note, true);
                 }
             }
         }
@@ -854,35 +823,54 @@ namespace OurWord.Edit
                 blockLeft.GlueToNext = true;
         }
         #endregion
+
+        JFontForWritingSystem RetrieveFont(string sCharStyleAbbrev)
+        {
+            JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
+            return cs.FindOrAddFontForWritingSystem(WritingSystem);
+        }
+        JFontForWritingSystem RetrieveFont()
+        {
+            return PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
+        }
+
         #region Method: void _Initialize(DParagraph)
         void _Initialize(DParagraph p)
         {
             // Clear out any previous list contents
             Clear();
 
+            // Compute the fonts
+            JFontForWritingSystem fChapter = RetrieveFont(DStyleSheet.c_StyleAbbrevChapter);
+            JFontForWritingSystem fVerse = RetrieveFont(DStyleSheet.c_StyleAbbrevVerse);
+            JFontForWritingSystem fFootLetter = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
+            JFontForWritingSystem fSeeAlso = RetrieveFont(DStyleSheet.c_StyleAbbrevSeeAlsoLetter);
+            JFontForWritingSystem fLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevLabel);
+            JFontForWritingSystem fFootnoteLabel = fFootLetter;
+
             // If this is a footnote, we need to add its letter
             if (null != p as DFootnote)
-                Append(new EFootnoteLabel(this, p as DFootnote)); 
+                Append(new EFootnoteLabel(fFootnoteLabel, p as DFootnote)); 
 
             // Loop through the paragraph's runs
             foreach (DRun r in p.Runs)
             {
                 switch (r.GetType().Name)
                 {
-                    case "DVerse":
-                        Append(new EVerse(this, r as DVerse));
-                        break;
                     case "DChapter":
-                        Append(new EChapter(this, r as DChapter));
+                        Append(new EChapter(fChapter, r as DChapter));
+                        break;
+                    case "DVerse":
+                        Append(new EVerse(fVerse, r as DVerse));
                         break;
                     case "DFootLetter":
-                        Append(new EFootLetter(this, r as DFootLetter));
+                        Append(new EFootLetter(fFootLetter, r as DFootLetter));
                         break;
                     case "DSeeAlso":
-                        Append(new ESeeAlso(this, r as DSeeAlso));
+                        Append(new ESeeAlso(fSeeAlso, r as DSeeAlso));
                         break;
                     case "DLabel":
-                        Append(new ELabel(this, r as DLabel));
+                        Append(new ELabel(fLabel, r as DLabel));
                         break;
                     case "DBasicText":
                         _InitializeBasicTextWords(r as DBasicText, null);
@@ -963,15 +951,13 @@ namespace OurWord.Edit
         float m_fLineHeight = 0;
         #endregion      
 
-        #region private Constructor(OWWindow, EContainer, JWS, PStyle, JObject, flags) - the stuff that is in common
+        #region private Constructor(JWS, PStyle, JObject, flags) - the stuff that is in common
         private OWPara(
-            OWWindow _Window,
-            EContainer container,
             JWritingSystem _ws,
             JParagraphStyle _PStyle,
             JObject _objDataSource,
             Flags _Options)
-            : base(_Window, container)
+            : base()
         {
             // Keep track of the attributes passed in
             m_WritingSystem = _ws;
@@ -986,15 +972,14 @@ namespace OurWord.Edit
             m_vLines = new Line[0];
         }
         #endregion
-        #region Constructor(wnd, EContainer, JWS, PStyle, DParagraph, clrEditableBackground, Flags) - for DParagraph
-        public OWPara(OWWindow _wnd,
-            EContainer container,
+        #region Constructor(JWS, PStyle, DParagraph, clrEditableBackground, Flags) - for DParagraph
+        public OWPara(
             JWritingSystem _ws, 
             JParagraphStyle PStyle,
             DParagraph p,
             Color clrEditableBackground, 
             Flags _Options)
-            : this(_wnd, container, _ws, PStyle, p as JObject, _Options)
+            : this(_ws, PStyle, p as JObject, _Options)
         {
             // The paragraph itself may override to make itself uneditable, 
             // even though we received "true" from the _bEditable parameter.
@@ -1012,15 +997,14 @@ namespace OurWord.Edit
             m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion
-        #region Constructor(wnd, EContainer, JWS, PStyle, DNote, clrEditableBackground, Flags) - for DNote
-        public OWPara(OWWindow _wnd,
-            EContainer container,
+        #region Constructor(JWS, PStyle, DNote, clrEditableBackground, Flags) - for DNote
+        public OWPara(
             JWritingSystem _ws, 
             JParagraphStyle PStyle, 
             DNote note, 
             Color clrEditableBackground, 
             Flags _Options)
-            : this(_wnd, container, _ws, PStyle, note as JObject, _Options)
+            : this(_ws, PStyle, note as JObject, _Options)
         {
             // The note itself may override <_bEditable> to make itself uneditable, 
             // even though we received "true" from the <_bEditable> parameter.
@@ -1032,12 +1016,13 @@ namespace OurWord.Edit
                 WritingSystem).LineHeightZoomed;
 
             // Add the note's bitmap
-            ENote nNote = new ENote(this, note);
+            ENote nNote = new ENote(RetrieveFont(), note);
             nNote.GlueToNext = true;
             Append(nNote);
 
             // Add the verse reference
-            EVerse nVerse = new EVerse(this, new DVerse(" " + note.Reference + " "));
+            EVerse nVerse = new EVerse(RetrieveFont(DStyleSheet.c_StyleAbbrevVerse), 
+                new DVerse(" " + note.Reference + " "));
             nVerse.GlueToNext = true;
             Append(nVerse);
 
@@ -1048,15 +1033,14 @@ namespace OurWord.Edit
             m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion
-        #region Constructor(wnd, EContainer, JWS, PStyle, DRun[], sLabel, Flags)
-        public OWPara(OWWindow _wnd,
-            EContainer container,
+        #region Constructor(JWS, PStyle, DRun[], sLabel, Flags)
+        public OWPara(
             JWritingSystem _ws,
             JParagraphStyle PStyle,
             DRun[] vRuns, 
             string sLabel, 
             Flags _Options)
-            : this(_wnd, container, _ws, PStyle, vRuns[0].Owner, _Options)
+            : this(_ws, PStyle, vRuns[0].Owner, _Options)
             // For the Related Languages window
         {
             // Line height
@@ -1065,7 +1049,10 @@ namespace OurWord.Edit
 
             // We'll add the language name as a BigHeader
             if (!string.IsNullOrEmpty(sLabel))
-                Append(new EBigHeader(this, WritingSystem, sLabel));
+            {
+                JFontForWritingSystem f = RetrieveFont(DStyleSheet.c_StyleAbbrevBigHeader);
+                Append(new EBigHeader(f, /*WritingSystem,*/ sLabel));
+            }
 
             // Add the text (we only care about verses and text)
             foreach (DRun run in vRuns)
@@ -1073,7 +1060,8 @@ namespace OurWord.Edit
                 switch (run.GetType().Name)
                 {
                     case "DVerse":
-                        Append(new EVerse(this, run as DVerse));
+                        Append(new EVerse(RetrieveFont(DStyleSheet.c_StyleAbbrevVerse), 
+                            run as DVerse));
                         break;
                     case "DText":
                     case "DBasicText":
@@ -1097,23 +1085,21 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(wnd, EContainer, JWS, PStyle, sLiteralString)
-        public OWPara(OWWindow _wnd,
-            EContainer container,
+        #region Constructor(JWS, PStyle, sLiteralString)
+        public OWPara(
             JWritingSystem _ws, 
             JParagraphStyle pStyle, 
             string sLiteralText)
-            : this(_wnd, container, _ws, pStyle, new DPhrase[] { new DPhrase(null, sLiteralText) })
+            : this(_ws, pStyle, new DPhrase[] { new DPhrase(null, sLiteralText) })
         {
         }
         #endregion
-        #region Constructor(wnd, EContainer, JWS, PStyle, DPhrase[] vLiteralPhrases)
-        public OWPara(OWWindow _wnd,
-            EContainer container,
+        #region Constructor(JWS, PStyle, DPhrase[] vLiteralPhrases)
+        public OWPara(
             JWritingSystem _ws, 
             JParagraphStyle pStyle, 
             DPhrase[] vLiteralPhrases)
-            : this(_wnd, container, _ws, pStyle, (JObject)null, Flags.None)
+            : this(_ws, pStyle, (JObject)null, Flags.None)
         {
             // Line height
             m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
@@ -1132,7 +1118,20 @@ namespace OurWord.Edit
                     if (i < vs.Length - 1)
                         vs[i] = vs[i] + " ";
 
-                    Append(new ELiteral(this, vs[i], p.CharacterStyleAbbrev));
+                    // Figure out the font for this literal string
+                    // Start with the paragraph's character style
+                    JCharacterStyle cs = PStyle.CharacterStyle;
+                    // Override with the phrases's character style if it is different
+                    if (!string.IsNullOrEmpty(p.CharacterStyleAbbrev) &&
+                        p.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
+                    {
+                        cs = G.StyleSheet.FindCharacterStyle(p.CharacterStyleAbbrev);
+                    }
+                    // Get the front from whatever character style we wound up with
+                    JFontForWritingSystem f = cs.FindOrAddFontForWritingSystem(WritingSystem);
+
+                    // Add the literal
+                    Append(new ELiteral(f, vs[i]));
                 }
             }
         }
@@ -1246,8 +1245,8 @@ namespace OurWord.Edit
                 // Calculate the width of this number
                 float fWidth = window.Draw.Measure(s, window.LineNumberAttrs.Font);
 
-                // The X coordinate is the x of the column left, 
-                float x = para.Pile.Position.X;
+                // The X coordinate is the x of the window (root) left, 
+                float x = para.Root.Position.X;
                 // plus the width allocated to columns
                 x += window.LineNumberAttrs.ColumnWidth;
                 // Less the space needed to draw this number
@@ -1263,8 +1262,8 @@ namespace OurWord.Edit
             #endregion
 
             #region Constructor()
-            public Line(OWWindow _wnd, EContainer _owner)
-                : base(_wnd, _owner)
+            public Line()
+                : base()
             {
             }
             #endregion
@@ -1606,6 +1605,8 @@ namespace OurWord.Edit
             float ySpaceBefore = (((float)PStyle.SpaceBefore) * g.DpiY / 72.0F);
             ySpaceBefore *= G.ZoomFactor;
             y += ySpaceBefore;
+            y += FootnoteSeparatorHeight;
+            y += CalculateBitmapHeightRequirement();
 
             // A "chunk" is the word or words that we'll add incrementally to the line.
             // We can't just add one word at a time because some items will be glued
@@ -1620,7 +1621,7 @@ namespace OurWord.Edit
  
             // We'll build the lines here
             ClearLines();
-            Line line = new Line(Window, this);
+            Line line = new Line();
             AddLine(line);
 
             // Loop through all the blocks, adding them into lines
@@ -1634,7 +1635,7 @@ namespace OurWord.Edit
                     // line, so the chapter occurs at the left margin.
                     if (line.Count > 0)
                     {
-                        line = new Line(Window, this);
+                        line = new Line();
                         AddLine(line);
                     }
 
@@ -1666,7 +1667,7 @@ namespace OurWord.Edit
                     float fIndentLine = (null == line.Chapter) ? 0 : line.Chapter.Width;
 
                     // Create the new line, and put this appropriate indentation to it
-                    line = new Line(Window, this);
+                    line = new Line();
                     AddLine(line);
                     line.LeftIndent = fIndentLine;
 
@@ -1696,6 +1697,8 @@ namespace OurWord.Edit
             // Add any SpaceBefore and Space-After to the Height. 
             // Convert from Points (See SpaceBefore above.)
             Height += ySpaceBefore;
+            Height += FootnoteSeparatorHeight;
+            Height += CalculateBitmapHeightRequirement();
             float ySpaceAfter = (((float)PStyle.SpaceAfter) * g.DpiY / 72.0F);
             ySpaceAfter *= G.ZoomFactor;
             Height += ySpaceAfter;
@@ -1784,12 +1787,18 @@ namespace OurWord.Edit
         }
         Color m_EditableBackgroundColor = Color.White;
         #endregion
-        #region void Paint(Rectangle ClipRectangle)
-        public void Paint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(ClipRectangle)
+        public override void OnPaint(Rectangle ClipRectangle)
         {
             // See if this paragraph needs to be painted
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
+
+            // Footnote Separator if indicated
+            PaintFootnoteSeparator();
+
+            // Bitmap if indicated
+            PaintBitmap();
 
             // Paint the contents
             foreach (EBlock block in SubItems)
@@ -2188,6 +2197,66 @@ namespace OurWord.Edit
         }
         #endregion
         #endregion
+        #region OMethod: bool MoveLineDown(aiStack, ptCurrentLocation)
+        public override bool MoveLineDown(ArrayList aiStack, PointF ptCurrentLocation)
+        {
+            // Loop through the subitems
+            for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
+            {
+                EItem item = SubItems[i] as EItem;
+                EWord word = item as EWord;
+
+                // If uneditable, skip it
+                if (!item.IsEditable)
+                    continue;
+
+                // If not a word, skip it
+                if (null == word)
+                    continue;
+
+                // If the word is not beyond the "y" value, then skip it
+                if (word.Position.Y <= ptCurrentLocation.Y)
+                    continue;
+
+                // Get the line this word is in
+                Line line = LineContainingBlock(word);
+                if( line.MakeSelectionClosestTo(new PointF(ptCurrentLocation.X, word.Position.Y)))
+                    return true;
+            }
+
+            return false;
+        }
+        #endregion
+        #region OMethod: bool MoveLineUp(aiStack, ptCurrentLocation)
+        public override bool MoveLineUp(ArrayList aiStack, PointF ptCurrentLocation)
+        {
+            // Loop through the subitems
+            for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
+            {
+                EItem item = SubItems[i] as EItem;
+                EWord word = item as EWord;
+
+                // If uneditable, skip it
+                if (!item.IsEditable)
+                    continue;
+
+                // If not a word, skip it
+                if (null == word)
+                    continue;
+
+                // If the word is not below the "y" value, then skip it
+                if (word.Position.Y >= ptCurrentLocation.Y)
+                    continue;
+
+                // Get the line this word is in
+                Line line = LineContainingBlock(word);
+                if (line.MakeSelectionClosestTo(new PointF(ptCurrentLocation.X, word.Position.Y)))
+                    return true;
+            }
+
+            return false;
+        }
+        #endregion
 
         // Edit Operations -------------------------------------------------------------------
         public enum DeleteMode { kDelete, kCut, kCopy, kBackSpace };
@@ -2229,9 +2298,9 @@ namespace OurWord.Edit
             int iBlockFirst = selection.DBT_iBlockFirst;
             RemoveAt(selection.DBT_iBlockFirst, selection.DBT_BlockCount);
             EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
+            InsertAt(iBlockFirst, vWords);
             foreach (EWord w in vWords)
                 w.CalculateWidth(Window.Draw.Graphics);
-            InsertAt(iBlockFirst, vWords);
             ReLayout();
         }
         #endregion

@@ -71,8 +71,7 @@ namespace OurWordTests.Edit
             foreach (DParagraph p in Section.Paragraphs)
             {
                 StartNewRow();
-                OWPara op = new OWPara(this, 
-                    LastRow.SubItems[0] as EContainer,
+                OWPara op = new OWPara( 
                     WSVernacular, 
                     p.Style, 
                     p, 

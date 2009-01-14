@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 Feb 2008
  * Purpose: Internals of the Tab Page for displaying Notes
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -30,7 +30,7 @@ namespace OurWord.Edit
     public partial class NotesPane : UserControl
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: NotesWnd WndNotes
+        #region Attr{g}: NotesWnd WndNotes
         public NotesWnd WndNotes
         {
             get
@@ -88,6 +88,7 @@ namespace OurWord.Edit
         #region Cmd: cmdInsertNote
         private void cmdInsertNote(object sender, EventArgs e)
         {
+            /***
             string sNoteType = (string)((sender as ToolStripItem).Tag);
 
             for (DNote.Types k = 0; k != DNote.Types.kUnknown; k++)
@@ -98,6 +99,37 @@ namespace OurWord.Edit
                     return;
                 }
             }
+            ***/
+
+            // Translator Note - WILL REPLACE THE ABOVE EVENTUALLY
+
+            // Double-check that we think we can insert. In theory the menu
+            // item would have been disabled and so we would not get here if
+            // canInsertNote returns false.
+            if (!canInsertNote)
+                return;
+
+            // Retrieve the DText to which this note will be attached
+            if (G.App.MainWindow.Selection == null)
+                return;
+            DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
+
+            // Remember the location
+            OWBookmark bookmark = new OWBookmark(G.App.MainWindow.Selection);
+
+            // Insert the note
+            TranslatorNote note = new TranslatorNote(
+                text.Section.GetReferenceAt(text).ParseableName,
+                G.App.MainWindow.Selection.SelectionString
+                );
+            text.TranslatorNotes.Add(note);
+
+            // Update the display
+            G.App.ResetWindowContents();
+
+            // Return the Main Window to where it was
+            bookmark.RestoreWindowSelectionAndScrollPosition();
+
         }
         private void _InsertNote(DNote.Types type)
         {
@@ -299,9 +331,26 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Secondary Window Messaging --------------------------------------------------------
-        #region Method: override void OnAddNote(DNote note, bool bIsEditable)
-        protected override void OnAddNote(DNote note, bool bIsEditable)
+        #region Method: override void OnSelectAndScrollToNote(DNote note)
+        public override void OnSelectAndScrollToNote(DNote note)
+        {
+            EContainer container = Contents.FindContainerOfDataSource(note);
+            if (null != container)
+            {
+                if (container.Select_FirstWord())
+                    Focus();
+            }
+        }
+        #endregion
+
+        // Misc Methods ----------------------------------------------------------------------
+        public void AddNote(TranslatorNote note)
+        {
+            Contents.Append(note.BuildNotesPaneView());
+        }
+
+        #region Method: void AddNote(DNote note, bool bIsEditable)
+        public void AddNote(DNote note, bool bIsEditable)
         {
             // Determine the note's writing system
             JWritingSystem ws = note.Paragraph.Translation.WritingSystemConsultant;
@@ -319,27 +368,13 @@ namespace OurWord.Edit
             StartNewRow();
 
             // Create a OWParagraph for the note
-            OWPara p = new OWPara(this, 
-                LastRow.SubItems[0] as EContainer,
+            OWPara p = new OWPara( 
                 ws, PStyle, note, clrEditableBackground, options);
 
             // Add it to the view
             AddParagraph(0, p);
         }
         #endregion
-        #region Method: override void OnSelectAndScrollToNote(DNote note)
-        public override void OnSelectAndScrollToNote(DNote note)
-        {
-            EContainer container = Contents.FindContainerOfDataSource(note);
-            if (null != container)
-            {
-                if (container.Select_FirstWord())
-                    Focus();
-            }
-        }
-        #endregion
-
-        // Misc Methods ----------------------------------------------------------------------
         #region Method: DNote GetSelectedNote()
         public DNote GetSelectedNote()
         {

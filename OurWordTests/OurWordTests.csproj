@@ -1,14 +1,19 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>OurWordTests</RootNamespace>
     <AssemblyName>OurWordTests</AssemblyName>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -32,10 +37,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.2.8.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\nunit.framework.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -49,9 +50,11 @@
     <Compile Include="DataModel\T_DFootnote.cs" />
     <Compile Include="DataModel\T_DParagraph.cs" />
     <Compile Include="DataModel\T_DPhrase.cs" />
+    <Compile Include="DataModel\T_DReferenceSpan.cs" />
     <Compile Include="DataModel\T_DRun.cs" />
     <Compile Include="DataModel\T_DSection.cs" />
     <Compile Include="DataModel\T_DTranslation.cs" />
+    <Compile Include="DataModel\T_DTranslatorNote.cs" />
     <Compile Include="DataModel\T_EInterlinear.cs" />
     <Compile Include="DataModel\T_ScriptureDB.cs" />
     <Compile Include="Dialogs\T_BookNames.cs" />

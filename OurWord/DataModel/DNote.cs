@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 Jan 2004
  * Purpose: Handles a translator's (or consultant's) note in Scripture. 
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

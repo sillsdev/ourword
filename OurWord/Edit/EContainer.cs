@@ -3,8 +3,8 @@
  * File:    EContainer.cs
  * Author:  John Wimbish
  * Created: 14 Oct 2008
- * Purpose: An individual word in a paragraph
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Purpose: The various classes holding editor layout
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -21,9 +21,6 @@ using JWdb;
 using OurWord.DataModel;
 #endregion
 
-// TODO: BMP is at EContainer; should incorporate it into all OnPaint and VertCalc methods,
-//        so that objects other than ERowOfColumns can display a bitmap.
-// TODO: Move the FootnoteSeparator to the EContainer
 // TODO: Get rid of StartNewRow, so that we deal with the Piles as we build the container
 
 namespace OurWord.Edit
@@ -32,17 +29,6 @@ namespace OurWord.Edit
     public class EItem
     {
         // Ownership Hierarchy ---------------------------------------------------------------
-        #region Attr{g}: OWWindow Window - the owning window
-        public OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_wndWindow);
-                return m_wndWindow;
-            }
-        }
-        OWWindow m_wndWindow = null;
-        #endregion
         #region Attr{g/s}: EContainer Owner
         public EContainer Owner
         {
@@ -180,24 +166,73 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(OWWindow, EContainer Owner)
-        public EItem(OWWindow _Window, EContainer _Owner)
+        #region Constructor()
+        public EItem()
         {
-            m_Owner = _Owner;
-            m_wndWindow = _Window;
+        }
+        #endregion
+        #region VAttr{g}: OWWindow Window
+        public virtual OWWindow Window
+        {
+            get
+            {
+                OWWindow wnd = Root.Window;
+                Debug.Assert(null != wnd);
+                return wnd;
+            }
         }
         #endregion
 
         // Painting --------------------------------------------------------------------------
+        #region VirtMethod: void OnPaint(ClipRectangle)
         virtual public void OnPaint(Rectangle ClipRectangle)
         {
         }
+        #endregion
     }
     #endregion
 
     #region CLASS: EContainer
     public class EContainer : EItem, IEnumerator
     {
+        // Optional Footnote Separator at top of container -----------------------------------
+        #region Attr{g}: bool DisplayFootnoteSeparator - if T, shows line btwn para's and footnotes
+        virtual public bool DisplayFootnoteSeparator
+        {
+            get
+            {
+                return m_bDisplayFootnoteSeparator;
+            }
+            set
+            {
+                m_bDisplayFootnoteSeparator = value;
+            }
+        }
+        bool m_bDisplayFootnoteSeparator = false;
+        #endregion
+        #region Method: void PaintFootnoteSeparator()
+        protected void PaintFootnoteSeparator()
+            // Display the footnote separator if requested
+        {
+            if (!DisplayFootnoteSeparator)
+                return;
+
+            float xSeparatorWidth = Rectangle.Width / 3.0F;
+            Pen pen = new Pen(Color.Black);
+            Window.Draw.Line(pen, Position,
+                new PointF(Position.X + xSeparatorWidth, Position.Y));
+        }
+        #endregion
+        #region VAttr{g}: int FootnoteSeparatorHeight
+        protected int FootnoteSeparatorHeight
+        {
+            get
+            {
+                return (DisplayFootnoteSeparator) ? 1 : 0;
+            }
+        }
+        #endregion
+
         // Optional Bitmap at top of container -----------------------------------------------
         #region Attr{g/s}: Bitmap Bmp - the picture's bitmap
         public Bitmap Bmp
@@ -272,7 +307,6 @@ namespace OurWord.Edit
             return fHeightBmp;
         }
         #endregion
-
 
         // Owned containers ------------------------------------------------------------------
         #region Attr{g}: EItem[] SubItems
@@ -468,7 +502,10 @@ namespace OurWord.Edit
         {
             int iPos = Find(item);
             if (-1 != iPos)
+            {
                 RemoveAt(iPos);
+                InvalidateEnumerator();
+            }
         }
         #endregion
         #region Method: void Clear()
@@ -565,30 +602,87 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(Window, EContainer Owner)
-        public EContainer(OWWindow Window, EContainer Owner)
-            : base(Window, Owner)
+        #region Constructor()
+        public EContainer()
+            : base()
         {
             m_vSubItems = new EItem[0];
         }
         #endregion
 
         // Selections ------------------------------------------------------------------------
+        #region Method: int PopSelectionStack(ArrayList aiStack, int iDefault)
+        protected int PopSelectionStack(ArrayList aiStack, bool bForward)
+            // Determine where we'll start. If we have something in aiStack, then it means
+            // we're still working down through the hierarchy to the correct position.
+            // 
+            // If the stack is empty, then in initializing the calling func's loop...
+            //  - if we're moving forward, return 0
+            //  - if we're moving backward, return SubItems.Length - 1
+        {
+            if (aiStack.Count > 0)
+            {
+                int i = (int)aiStack[0];
+                aiStack.RemoveAt(0);
+                return i;
+            }
+
+            return bForward ? 0 : SubItems.Length - 1;
+        }
+        #endregion
+        #region VMethod: bool MoveLineDown(aiStack, ptCurrentLocation)
+        virtual public bool MoveLineDown(ArrayList aiStack, PointF ptCurrentLocation)
+        {
+            // Loop through the subitems
+            for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
+            {
+                EItem item = SubItems[i] as EItem;
+
+                // If uneditable, skip it
+                if (!item.IsEditable)
+                    continue;
+
+                // If we're at a container, we keep working downwards
+                EContainer container = item as EContainer;
+                if (null != container)
+                {
+                    if (container.MoveLineDown(aiStack, ptCurrentLocation))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
+        #region VMethod: bool MoveLineUp(aiStack, ptCurrentLocation)
+        virtual public bool MoveLineUp(ArrayList aiStack, PointF ptCurrentLocation)
+        {
+            // Loop through the subitems
+            for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
+            {
+                EItem item = SubItems[i] as EItem;
+
+                // If uneditable, skip it
+                if (!item.IsEditable)
+                    continue;
+
+                // If we're at a container, we keep working downwards
+                EContainer container = item as EContainer;
+                if (null != container)
+                {
+                    if (container.MoveLineUp(aiStack, ptCurrentLocation))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
         #region Method: bool Select_NextWord_Begin(aiStack)
         public bool Select_NextWord_Begin(ArrayList aiStack)
         {
-            // Determine where we'll start the loop. If we have something in aiStack, then it means
-            // we're still working down through the hierarchy to the correct position. On the other
-            // hand, if aiStack.Count is zero, then we want to loop through all of the subitems.
-            int iStart = 0;
-            if (aiStack.Count > 0)
-            {
-                iStart = (int)aiStack[0];
-                aiStack.RemoveAt(0);
-            }
-
             // Loop through the appropriate subitems
-            for (int i = iStart; i < Count; i++)
+            for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
             {
                 EItem item = SubItems[i] as EItem;
 
@@ -627,18 +721,8 @@ namespace OurWord.Edit
         /// <returns></returns>
         public bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
         {
-            // Determine where we'll start the loop. If we have something in aiStack, then it means
-            // we're still working down through the hierarchy to the correct position. On the other
-            // hand, if aiStack.Count is zero, then we want to loop through all of the subitems.
-            int iStart = SubItems.Length - 1;
-            if (aiStack.Count > 0)
-            {
-                iStart = (int)aiStack[0];
-                aiStack.RemoveAt(0);
-            }
-
             // Loop through the appropriate subitems
-            for (int i = iStart; i >= 0; i--)
+            for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
             {
                 EItem item = SubItems[i] as EItem;
 
@@ -720,10 +804,142 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
+        #region Method: bool OnSelectAndScrollFrom(JObject)
+        public bool OnSelectAndScrollFrom(JObject obj)
+        {
+            EWord wordToSelect = null;
+
+            // We support either of the following
+            DNote note = obj as DNote;
+            DFootnote footnote = obj as DFootnote;
+            Debug.Assert(null != note || null != footnote);
+
+            foreach (EItem item in SubItems)
+            {
+                if (!item.IsEditable)
+                    continue;
+
+                // Recurse down through the containers hierarchy
+                EContainer container = item as EContainer;
+                if (null != container)
+                {
+                    if (container.OnSelectAndScrollFrom(obj))
+                        return true;
+                }
+
+                // Do we have a selectable word? If so, we want to remember it, so that
+                // it points to the word most adjacent to the note icon.
+                EWord word = item as EWord;
+                if (null != word)
+                    wordToSelect = word;
+
+                bool bSelectionFound = false;
+
+                // Do we have a DNote?
+                OWPara.ENote n = item as OWPara.ENote;
+                if (n != null && note != null && n.Note == note)
+                    bSelectionFound = true;
+
+                // Do we have a Footnote
+                OWPara.ESeeAlso also = item as OWPara.ESeeAlso;
+                OWPara.EFootLetter letter = item as OWPara.EFootLetter;
+                if (null != footnote && (
+                    (also != null && also.Footnote == footnote) ||
+                    (letter != null && letter.Footnote == footnote)))
+                {
+                    bSelectionFound = true;
+                }
+
+                // Do we have a viable place to select?
+                if (bSelectionFound && null != wordToSelect)
+                {
+                    Window.Selection = new OWWindow.Sel(
+                        wordToSelect.Para,
+                        wordToSelect.PositionWithinPara,
+                        wordToSelect.Text.Length);
+                    Window.Focus();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+        #endregion
+        #region Method: OWPara FindParagraph(DFootnote)
+        public OWPara FindParagraph(DFootnote footnote)
+        {
+            foreach (EItem item in SubItems)
+            {
+                // Recurse to lower levels of the hierarchy
+                EContainer container = item as EContainer;
+                if (null != container)
+                {
+                    OWPara para = container.FindParagraph(footnote);
+                    if (null != para)
+                        return para;
+                }
+
+                // Test this item
+                OWPara.ESeeAlso also = item as OWPara.ESeeAlso;
+                OWPara.EFootLetter letter = item as OWPara.EFootLetter;
+                if ((also != null && also.Footnote == footnote) ||
+                     (letter != null && letter.Footnote == footnote))
+                {
+                    return this as OWPara;
+                }
+
+            }
+
+            return null;
+        }
+        #endregion
+        #region Method: OWPara FindParagraph(JObject objDataSource, OWPara.Flags)
+        public OWPara FindParagraph(JObject objDataSource, OWPara.Flags Flags)
+        {
+            // We want most of the flags to be the same; though we don't care if
+            // CanItalics is different.
+            Flags |= OWPara.Flags.CanItalic;
+
+            foreach (EItem item in SubItems)
+            {
+                // Recurse to lower levels of the hierarchy
+                EContainer container = item as EContainer;
+                if (null != container)
+                {
+                    OWPara para = container.FindParagraph(objDataSource, Flags);
+                    if (null != para)
+                        return para;
+                }
+
+                // Test this item
+                OWPara paragraph = item as OWPara;
+                if (null == paragraph)
+                    continue;
+                if (paragraph.DataSource == objDataSource)
+                {
+                    if (Flags == (paragraph.Options | OWPara.Flags.CanItalic))
+                        return paragraph;
+                    else if (Flags == OWPara.Flags.CanItalic) // E.g., for where None was passed in
+                        return paragraph;
+                }
+            }
+
+            return null;
+        }
+        #endregion
 
         // Layout Calculations ---------------------------------------------------------------
+        #region VirtMethod: float CalculateSubItemX(EItem subitem)
+        public virtual float CalculateSubItemX(EItem subitem)
+            // Return the X position for the subitem in question. In most cases
+            // this will be our own X, but in, e.g., the RowOfColumns, it will
+            // depend on which column the subitem represents.
+        {
+            return Position.X;
+        }
+        #endregion
         #region Method: void CalculateBlockWidths(g) - calculate all EBlocks
-        public void CalculateBlockWidths(Graphics g)
+        public virtual void CalculateBlockWidths(Graphics g)
         {
             foreach (EItem item in SubItems)
             {
@@ -757,7 +973,7 @@ namespace OurWord.Edit
             if (null != Owner)
             {
                 Width = Owner.AvailableWidthForOneSubitem;
-                Position = new PointF(Owner.Position.X, Position.Y);
+                Position = new PointF(Owner.CalculateSubItemX(this), Position.Y);
             }
 
             // Then calculate the width of the owned items (as they may need to
@@ -794,16 +1010,24 @@ namespace OurWord.Edit
         #endregion
 
         // Painting --------------------------------------------------------------------------
+        #region OMethod: void OnPaint(ClipRectangle)
         override public void OnPaint(Rectangle ClipRectangle)
         {
             // For performance, make sure we need to paint this container
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
 
+            // Footnote Separator if indicated
+            PaintFootnoteSeparator();
+
+            // Bitmap if indicated
+            PaintBitmap();
+
             // Paint the subcontainers
             foreach (EItem item in SubItems)
                 item.OnPaint(ClipRectangle);
         }
+        #endregion
     }
     #endregion
 
@@ -826,9 +1050,9 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(Window, EContainer Owner, cColumnsCount)
-        public ERowOfColumns(OWWindow Window, EContainer Owner, int cColumnsCount)
-            : base(Window, Owner)
+        #region Constructor(EContainer Owner, cColumnsCount)
+        public ERowOfColumns(/*EContainer Owner, */ int cColumnsCount)
+            : base(/*Owner*/)
         {
             m_cColumnsCount = cColumnsCount;
         }
@@ -863,19 +1087,23 @@ namespace OurWord.Edit
             }
 
             // The Row's Height is the sum of PileHeight and BmpHeight
-            Height = fHeightBmp + fHeightPiles;
+            Height = fHeightBmp + fHeightPiles + FootnoteSeparatorHeight;
         }
         #endregion
-
-        // Painting --------------------------------------------------------------------------
-        public override void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: float CalculateSubItemX(EItem subitem)
+        public override float CalculateSubItemX(EItem subitem)
+            // For the X, we need to figure out which column it is, and then multiply
+            // by the width of a column plus the space in-between columns
         {
-            // Handle the bitmap, if present
-            PaintBitmap();
+            int iColumn = Find(subitem);
+            Debug.Assert(-1 != iColumn);
 
-            // SubItems, etc.
-            base.OnPaint(ClipRectangle);
+            float x = Position.X + iColumn *
+                (AvailableWidthForOneSubitem + Window.WidthBetweenColumns);
+
+            return x;
         }
+        #endregion
     }
     #endregion
 
@@ -883,35 +1111,17 @@ namespace OurWord.Edit
     public class Row : ERowOfColumns
     {
         // Scaffolding -------------------------------------------------------------------
-        #region Constructor(OWWindow, Owner, cColumns, bDisplayFootnoteSeparator)
-        public Row(OWWindow _Window, EContainer _Owner, int cColumns, bool bDisplayFootnoteSeparator)
-            : base(_Window, _Owner, cColumns)
+        #region Constructor(Owner, cColumns, bDisplayFootnoteSeparator)
+        public Row(/*EContainer _Owner,*/ int cColumns, bool bDisplayFootnoteSeparator)
+            : base( /* _Owner, */ cColumns)
         {
             // Create a pile for each column
             for (int i = 0; i < cColumns; i++)
             {
-                Pile pile = new Pile(_Window, this);
+                Pile pile = new Pile();
                 pile.DisplayFootnoteSeparator = bDisplayFootnoteSeparator;
                 Append(pile);
             }
-        }
-        #endregion
-
-        // Layout & Paint ----------------------------------------------------------------
-        #region Method: void Paint(ClipRectangle)
-        public void Paint(Rectangle ClipRectangle)
-        {
-            // Check to see that this is something we truly need to be painting; 
-            // simply return if not.
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
-                return;
-
-            // Handle the bitmap, if present
-            PaintBitmap();
-
-            // Paint each pile
-            foreach (Pile pile in SubItems)
-                pile.Paint(ClipRectangle);
         }
         #endregion
     }
@@ -923,26 +1133,10 @@ namespace OurWord.Edit
     public class EColumn : EContainer
         // TODO: Should the DisplayFootnoteSeparator option be possible on all EContainers?
     {
-        // Optional Footnote Separator -------------------------------------------------------
-        #region Attr{g}: bool DisplayFootnoteSeparator - if T, shows line btwn para's and footnotes
-        virtual public bool DisplayFootnoteSeparator
-        {
-            get
-            {
-                return m_bDisplayFootnoteSeparator;
-            }
-            set
-            {
-                m_bDisplayFootnoteSeparator = value;
-            }
-        }
-        bool m_bDisplayFootnoteSeparator = false;
-        #endregion
-
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(Window, EContainer Owner, bDisplayFootnoteSeparator)
-        public EColumn(OWWindow Window, EContainer Owner)
-            : base(Window, Owner)
+        #region Constructor()
+        public EColumn()
+            : base()
         {
         }
         #endregion
@@ -952,18 +1146,13 @@ namespace OurWord.Edit
         public override void CalculateContainerHorizontals()
             // Override to account for the positions of individual columns within the row
         {
-            Debug.Assert(Owner != null && Owner as ERowOfColumns != null);
+            Debug.Assert(Owner != null);
 
             // Set the width as per usual
             Width = Owner.AvailableWidthForOneSubitem;
 
-            // For the X, we need to figure out which column we are, and then multiply
-            // by the width of a column plus the space in-between columns
-            int iColumn = Owner.Find(this);
-            Debug.Assert(-1 != iColumn);
-            float x = Owner.Position.X + iColumn * 
-                (Owner.AvailableWidthForOneSubitem + Window.WidthBetweenColumns);
-            Position = new PointF(x, Position.Y);
+            // The X depends upon which column we are, which the owner must tell us
+            Position = new PointF(Owner.CalculateSubItemX(this), Position.Y);
 
             // Process the sub-items as per usual
             foreach (EItem item in SubItems)
@@ -982,8 +1171,10 @@ namespace OurWord.Edit
 
             // If we are displaying the footnote separator, then add a pixel to the
             // height to make room for it.
-            if (DisplayFootnoteSeparator)
-                y += 1;
+            y += FootnoteSeparatorHeight;
+
+            // Allow for display of the bitmap if applicable
+            y += CalculateBitmapHeightRequirement();
 
             // Layout the owned subitems, one below the other
             foreach (EContainer container in SubItems)
@@ -996,30 +1187,6 @@ namespace OurWord.Edit
             Height = (y - Position.Y);
         }
         #endregion
-
-        // Painting --------------------------------------------------------------------------
-        #region Method: void PaintFootnoteSeparator()
-        protected void PaintFootnoteSeparator()
-            // Display the footnote separator if requested
-        {
-            if (!DisplayFootnoteSeparator)
-                return;
-
-            float xSeparatorWidth = Rectangle.Width / 3.0F;
-            Pen pen = new Pen(Color.Black);
-            Window.Draw.Line(pen, Position,
-                new PointF(Position.X + xSeparatorWidth, Position.Y));
-        }
-        #endregion
-
-        public override void OnPaint(Rectangle ClipRectangle)
-        {
-            // TODO: Once this is moved to the superclass, the if() can be refactored.
-            if (ClipRectangle.IntersectsWith(IntRectangle))
-                PaintFootnoteSeparator();
-
-            base.OnPaint(ClipRectangle);
-        }
     }
     #endregion
 
@@ -1036,12 +1203,24 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region Attr{g}: OWWindow Window - the owning window
+        override public OWWindow Window
+        {
+            get
+            {
+                Debug.Assert(null != m_wndWindow);
+                return m_wndWindow;
+            }
+        }
+        OWWindow m_wndWindow = null;
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(OWWindow)
         public ERoot(OWWindow _Window)
-            : base(_Window, null)
+            : base()
         {
+            m_wndWindow = _Window;
         }
         #endregion
 
@@ -1176,38 +1355,14 @@ namespace OurWord.Edit
     #region CLASS: Pile
     public class Pile : EColumn
     {
-        // Attrs ---------------------------------------------------------------------
-        #region VAttr{g}: Row Row - the owning row
-        public Row Row
-        {
-            get
-            {
-                Row row = Owner as Row;
-                Debug.Assert(null != row);
-                return row;
-            }
-        }
-        #endregion
-
         // Scaffolding ---------------------------------------------------------------
-        #region Constructor(Window, Row, bDisplayFootnoteSeparator)
-        public Pile(OWWindow _Window, Row row)
-            : base(_Window, row)
+        #region Constructor(Row)
+        public Pile(/*Row row*/)
+            : base(/*row*/)
         {
         }
         #endregion
 
-        // Layout & Paint ------------------------------------------------------------
-        #region Method: void Paint(ClipRectangle)
-        public void Paint(Rectangle ClipRectangle)
-        {
-            PaintFootnoteSeparator();
-
-            // Display each of the paragraphs
-            foreach (OWPara para in SubItems)
-                para.Paint(ClipRectangle);
-        }
-        #endregion
     }
     #endregion
 

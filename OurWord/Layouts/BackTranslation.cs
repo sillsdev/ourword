@@ -124,8 +124,6 @@ namespace OurWord.View
 
                 // Add the IBT
                 OWPara opIBT = new OWPara(
-                    this,
-                    LastRow.SubItems[0] as EContainer,
                     p.Translation.WritingSystemVernacular,
                     p.Style,
                     p,
@@ -176,8 +174,6 @@ namespace OurWord.View
 
                 // Add the vernacular paragraph to the left; we don't edit it
                 OWPara op = new OWPara(
-                    this,
-                    LastRow.SubItems[0] as EContainer,
                     p.Translation.WritingSystemVernacular,
                     p.Style,
                     p,
@@ -203,8 +199,6 @@ namespace OurWord.View
 
                 // Create and add the display paragraph
                 op = new OWPara(
-                    this,
-                    LastRow.SubItems[1] as EContainer,
                     p.Translation.WritingSystemConsultant,
                     p.Style,
                     p,
@@ -222,8 +216,6 @@ namespace OurWord.View
 
                 // Add the vernacular paragraph to the left side
                 OWPara op = new OWPara(
-                    this,
-                    LastRow.SubItems[0] as EContainer,
                     fn.Translation.WritingSystemVernacular,
                     fn.Style,
                     fn,
@@ -245,8 +237,6 @@ namespace OurWord.View
 
                 // Create and add the display paragraph
                 op = new OWPara(
-                    this,
-                    LastRow.SubItems[1] as EContainer,
                     fn.Translation.WritingSystemConsultant,
                     fn.Style,
                     fn,

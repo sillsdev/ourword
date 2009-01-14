@@ -68,7 +68,7 @@ namespace OurWordTests.Edit
             Assert.IsNotNull(DBT, "DBT Found");
 
             // We'll use the OWBookmark code to locate its OWPara
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te" and bookmark it
             OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4);
@@ -112,7 +112,7 @@ namespace OurWordTests.Edit
             Assert.IsNotNull(DBT, "DBT Found");
 
             // We'll use the OWBookmark code to locate its OWPara
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te|" and bookmark it
             OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4, 6);
@@ -175,7 +175,7 @@ namespace OurWordTests.Edit
             Assert.AreEqual(c_sBenchmark, p.DebugString, "Benchmark: Paragraph contents");
             DBasicText DBT = p.Runs[1] as DBasicText;
             Assert.IsNotNull(DBT, "DBT Found");
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p, OWPara.Flags.None);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te" and bookmark it
             OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4);

@@ -31,7 +31,7 @@ namespace OurWordTests.JWdb
 {
     [TestFixture] public class T_JOwn
     {
-        // Supporting test classes
+        // Supporting test classes -----------------------------------------------------------
 	    #region TObjA
 	    public class TObjA : TObject 
 	    { 

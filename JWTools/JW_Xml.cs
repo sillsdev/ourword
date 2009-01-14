@@ -11,6 +11,7 @@ using System;
 using System.Collections;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Windows.Forms;
 using System.IO;
 using System.Threading;
@@ -244,6 +245,13 @@ namespace JWTools
             AddAttr(sTag, sValue);
         }
         #endregion
+        #region Method: void AddAttr(sTag, dtValue)
+        public void AddAttr(string sTag, DateTime dtValue)
+        {
+            string sValue = dtValue.ToString("u");
+            AddAttr(sTag, sValue);
+        }
+        #endregion
         #region Method: string GetAttrValue(sTag, sDefaultValue)
         public string GetAttrValue(string sTag, string sDefaultValue)
         {
@@ -269,6 +277,26 @@ namespace JWTools
                 }
             }
             return bDefaultValue;
+        }
+        #endregion
+        #region Method: DateTime GetAttrValue(sTag, dtDefaultValue)
+        public DateTime GetAttrValue(string sTag, DateTime dtDefaultValue)
+        {
+            try
+            {
+                foreach (XAttr attr in Attrs)
+                {
+                    if (attr.Tag == sTag)
+                    {
+                        return DateTime.ParseExact(attr.Value, "u", DateTimeFormatInfo.InvariantInfo);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            return dtDefaultValue;
         }
         #endregion
 
