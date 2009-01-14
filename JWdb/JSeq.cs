@@ -140,7 +140,7 @@ namespace JWdb
 		}
 		#endregion
         #region Method: bool ContentEquals(JSeq seq)
-        public bool ContentEquals(JSeq> seq)
+        public bool ContentEquals(JSeq seq)
         {
             if (Count != seq.Count)
                 return false;

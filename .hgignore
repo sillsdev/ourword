@@ -4,3 +4,12 @@ obj
 output
 _ReSharper.OurWord
 *.suo
+*.bak
+*.owtbak
+*.oTransbak
+*.owpbak
+_UpgradeReport_Files
+*.user
+OurWordTesting.VisualState.xml
+TestResult.xml
+UpgradeLog.XML
