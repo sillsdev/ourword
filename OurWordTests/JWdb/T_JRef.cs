@@ -29,35 +29,35 @@ namespace OurWordTests.JWdb
         #region TObjA
         public class TObjA : JObject
         {
-            public JOwnSeq m_osA1 = null;
-            public JOwnSeq m_osA2 = null;
-            public JOwnSeq m_osA3 = null;
-            public JOwn m_own1 = null;
-            public JOwn m_own2 = null;
-            public JRef m_ref1 = null;
-            public JRef m_ref2 = null;
+            public JOwnSeq<TObjB> m_osA1 = null;
+            public JOwnSeq<TObjB> m_osA2 = null;
+            public JOwnSeq<TObjB> m_osA3 = null;
+            public JOwn<TObjB> m_own1 = null;
+            public JOwn<TObjB> m_own2 = null;
+            public JRef<TObjE> m_ref1 = null;
+            public JRef<TObjB> m_ref2 = null;
 
             public TObjA()
                 : base()
             {
                 // One complete deep ownership hierarhcy
-                m_osA1 = new JOwnSeq("A1", this, typeof(TObjB));
+                m_osA1 = new JOwnSeq<TObjB>("A1", this);
                 m_osA1.Append(new TObjB("B1"));
 
                 // Some more owning sequences for AllOwningAttrs testing
-                m_osA2 = new JOwnSeq("A2", this, typeof(TObjB));
+                m_osA2 = new JOwnSeq<TObjB>("A2", this);
                 m_osA2.Append(new TObjB("B2"));
-                m_osA3 = new JOwnSeq("A3", this, typeof(TObjB));
+                m_osA3 = new JOwnSeq<TObjB>("A3", this);
                 m_osA3.Append(new TObjB("B3"));
 
                 // Some atomic owners
-                m_own1 = new JOwn("own1", this, typeof(TObjB));
-                m_own2 = new JOwn("own2", this, typeof(TObjB));
+                m_own1 = new JOwn<TObjB>("own1", this);
+                m_own2 = new JOwn<TObjB>("own2", this);
 
                 // Some atomic references
-                m_ref1 = new JRef("ref1", this, typeof(TObjE));
+                m_ref1 = new JRef<TObjE>("ref1", this);
                 m_ref1.Value = ObjE;
-                m_ref2 = new JRef("ref2", this, typeof(TObjB));
+                m_ref2 = new JRef<TObjB>("ref2", this);
 
                 ObjD.m_ref2.Value = this;
             }
@@ -94,7 +94,7 @@ namespace OurWordTests.JWdb
         #region TObjB
         public class TObjB : TObject
         {
-            JOwnSeq m_osB = null;
+            JOwnSeq<TObjC> m_osB = null;
             public TObjB(string s)
                 : base(s)
             {
@@ -108,20 +108,20 @@ namespace OurWordTests.JWdb
             }
             private void _ConstructAttrs()
             {
-                m_osB = new JOwnSeq("B", this, typeof(TObjC));
+                m_osB = new JOwnSeq<TObjC>("B", this);
             }
             public TObjC FirstC
             {
                 get
                 {
-                    return (TObjC)m_osB[0];
+                    return m_osB[0] as TObjC;
                 }
             }
             public TObjC ObjC
             {
                 get
                 {
-                    return (TObjC)m_osB[0];
+                    return m_osB[0] as TObjC;
                 }
             }
             public TObjD ObjD
@@ -143,8 +143,8 @@ namespace OurWordTests.JWdb
         #region TObjC
         public class TObjC : TObject
         {
-            public JOwnSeq m_osC = null;
-            public JOwn m_own = null;
+            public JOwnSeq<TObjD> m_osC = null;
+            public JOwn<TObjE> m_own = null;
             public TObjC()
                 : base("")
             {
@@ -160,8 +160,8 @@ namespace OurWordTests.JWdb
             }
             private void _ConstructAttrs()
             {
-                m_osC = new JOwnSeq("C", this, typeof(TObjD));
-                m_own = new JOwn("COwn", this, typeof(TObjE));
+                m_osC = new JOwnSeq<TObjD>("C", this);
+                m_own = new JOwn<TObjE>("COwn", this);
             }
             public TObjD FirstD
             {
@@ -189,8 +189,8 @@ namespace OurWordTests.JWdb
         #region TobjD
         public class TObjD : TObject
         {
-            public JRef m_ref1;
-            public JRef m_ref2;
+            public JRef<TObjE> m_ref1;
+            public JRef<TObjA> m_ref2;
             public TObjD()
                 : base("")
             {
@@ -203,8 +203,8 @@ namespace OurWordTests.JWdb
             }
             private void _ConstructAttrs()
             {
-                m_ref1 = new JRef("ref1", this, typeof(TObjE));
-                m_ref2 = new JRef("ref2", this, typeof(TObjA));
+                m_ref1 = new JRef<TObjE>("ref1", this);
+                m_ref2 = new JRef<TObjA>("ref2", this);
             }
         }
         #endregion

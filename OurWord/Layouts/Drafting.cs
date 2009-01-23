@@ -293,7 +293,7 @@ namespace OurWord.View
         // Create the Window Contents from the data ------------------------------------------
         const int c_xMaxPictureWidth = 300;
         #region Method: int _CountMatchingParagraphTypes(int iStart, JOwnSeq vParagraphs)
-        int _CountMatchingParagraphTypes(int iStart, JOwnSeq vParagraphs)
+        int _CountMatchingParagraphTypes(int iStart, JOwnSeq<DParagraph> vParagraphs)
         {
             if (iStart >= vParagraphs.Count)
                 return 0;
@@ -475,13 +475,13 @@ namespace OurWord.View
                 // add one so that something will get displayed.
                 if (iFront == G.SFront.Paragraphs.Count)
                 {
-                    DParagraph pNew = new DParagraph(G.SFront.Translation);
+                    DParagraph pNew = new DParagraph();
                     pNew.AddedByCluster = true;
                     G.SFront.Paragraphs.Append(pNew);
                 }
                 if (iTarget == G.STarget.Paragraphs.Count)
                 {
-                    DParagraph pNew = new DParagraph(G.STarget.Translation);
+                    DParagraph pNew = new DParagraph();
                     pNew.AddedByCluster = true;
                     G.STarget.Paragraphs.Append(pNew);
                 }

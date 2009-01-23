@@ -36,7 +36,7 @@ namespace OurWordTests.DataModel
 
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
         }
         #endregion
 
@@ -55,7 +55,7 @@ namespace OurWordTests.DataModel
             G.Project.FrontTranslation.Books.Append(book);
             DSection section = new DSection(1);
             book.Sections.Append(section);
-            DParagraph para = new DParagraph(G.Project.FrontTranslation);
+            DParagraph para = new DParagraph();
             section.Paragraphs.Append(para);
 
             G.Project.FrontTranslation.BookNamesTable.Clear();

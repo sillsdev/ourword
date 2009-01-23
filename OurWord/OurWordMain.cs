@@ -2621,7 +2621,7 @@ namespace OurWord
 
             // Team Settings: start with the factory default; load over it if a file already exists
             DTeamSettings ts = new DTeamSettings();
-            ts.InitializeFactoryStyleSheet();
+            ts.EnsureInitialized();
             project.TeamSettings = ts;
             ts.AbsolutePathName = wiz.TeamSettingsPath;
             if (File.Exists(ts.AbsolutePathName))

@@ -312,14 +312,14 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				return j_ownNoteText.Value as DBasicText;
+				return j_ownNoteText.Value;
 			}
 			set
 			{
 				j_ownNoteText.Value = value;
 			}
 		}
-		private JOwn j_ownNoteText = null;
+		private JOwn<DBasicText> j_ownNoteText = null;
 		#endregion
 
 		// Note Definitions ------------------------------------------------------------------
@@ -728,7 +728,7 @@ namespace OurWord.DataModel
 			: base()
 		{
 			// Owning atomic
-			j_ownNoteText = new JOwn("NoteText", this, typeof(DBasicText));
+			j_ownNoteText = new JOwn<DBasicText>("NoteText", this);
 
 			// Note definitions
 			InitializeNoteDefs();

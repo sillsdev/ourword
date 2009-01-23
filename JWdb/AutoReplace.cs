@@ -100,13 +100,13 @@ namespace JWdb
 		#endregion
 	}
 
-	public class JSubstitutionList : JOwnSeq
+	public class JSubstitutionList<T> : JOwnSeq<T> where T:JObject
 	{
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor(sName, JObject objOwner)
 		public JSubstitutionList(string sName, JObject objOwner)
-			: base(sName, objOwner, typeof(JSubstitution), true, true)
+			: base(sName, objOwner, true, true)
 		{
 		}
 		#endregion

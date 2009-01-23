@@ -146,7 +146,7 @@ namespace OurWordTests.Edit
             OurWordMain.App = new OurWordMain();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Project";
             G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             s_book = new DBook("MRK","");

@@ -24,12 +24,17 @@ using JWdb;
 using OurWord.Edit;
 #endregion
 
+// TODO: Get rid of the Discussion.Text attr, in favor of supporting as many runs
+//     as desired. (Current implementation just does JParagraph.Runs[0]. That is,
+//     exactly one Run, which must be a DBasicText.
+// TODO: Can we accomplish the ToXml within the JObject mechanism? Surely so!
+
 namespace OurWord.DataModel
 {
-    public class Discussion
+    public class Discussion : JObject
     {
         // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g/s}: string Author
+        #region BAttr{g/s}: string Author
         public string Author
         {
             get
@@ -38,12 +43,12 @@ namespace OurWord.DataModel
             }
             set
             {
-                m_sAuthor = value;
+                SetValue(ref m_sAuthor, value);
             }
         }
         private string m_sAuthor = "";
         #endregion
-        #region Attr{g/s}: DateTime Created
+        #region BAttr{g/s}: DateTime Created
         public DateTime Created
         {
             get
@@ -52,24 +57,28 @@ namespace OurWord.DataModel
             }
             set
             {
-                m_dtCreated = value;
+                SetValue(ref m_dtCreated, value);
             }
         }
         private DateTime m_dtCreated;
         #endregion
-        #region Attr{g/s}: DBasicText Text
-        public DBasicText Text
+        #region JAttr{g}: JOwnSeq<DParagraph> Paragraphs
+        public JOwnSeq<DParagraph> Paragraphs
         {
             get
             {
-                return m_Text;
-            }
-            set
-            {
-                m_Text = value;
+                return m_osParagraphs;
             }
         }
-        private DBasicText m_Text;
+        JOwnSeq<DParagraph> m_osParagraphs;
+        #endregion
+        #region Method void DeclareAttrs()
+        protected override void DeclareAttrs()
+        {
+            base.DeclareAttrs();
+            DefineAttr("Author", ref m_sAuthor);
+            DefineAttr("Created", ref m_dtCreated);
+        }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -77,33 +86,54 @@ namespace OurWord.DataModel
         public Discussion()
             : base()
         {
-            m_dtCreated = DateTime.Now;
+            // Create the Paragraph attribute
+            m_osParagraphs = new JOwnSeq<DParagraph>("paras", this, false, false);
+
+            // Put an empty paragraph in it, with the default style
+            DParagraph p = new DParagraph();
+            p.StyleAbbrev = DStyleSheet.c_StyleNoteDiscussion;
+            p.SimpleText = "";
+            Paragraphs.Append(p);
+
+            // The Default date is "Today"
+            m_dtCreated = DateTime.Today;
+
+            // The Default author
+            Author = GetDefaultAuthor();
         }
         #endregion
         #region Constructor(sAuthor, string sSimpleText)
-        public Discussion(string sAuthor, DateTime dtCreated, string sText)
+        public Discussion(string sAuthor, DateTime dtCreated, string sSimpleText)
             : this()
         {
             Author = sAuthor;
             Created = dtCreated;
-            Text = new DBasicText(sText);
+
+            // Set the text of our one and only paragraph
+            Debug.Assert(1 == Paragraphs.Count);
+            Paragraphs[0].SimpleText = sSimpleText;
         }
         #endregion
-        #region Method: bool ContentEquals(Discussion)
-        public bool ContentEquals(Discussion discussion)
+        #region OMethod: bool ContentEquals(Discussion)
+ 		public override bool ContentEquals(JObject obj)
         {
+            Discussion discussion = obj as Discussion;
+            if (null == discussion)
+                return false;
+
             if (discussion.Author != Author)
                 return false;
             if (discussion.Created.CompareTo(Created) != 0)
                 return false;
-            if (discussion.Text.DebugString != Text.DebugString)
+
+            if (!discussion.Paragraphs.ContentEquals(Paragraphs))
                 return false;
 
             return true;
         }
         #endregion
-        #region Attr{g}: string SortKey
-        public string SortKey
+        #region OAttr{g}: string SortKey
+        public override string SortKey
         {
             get
             {
@@ -114,39 +144,21 @@ namespace OurWord.DataModel
         }
         #endregion
 
-        // I/O -------------------------------------------------------------------------------
-        #region I/O CONSTANTS
-        const string c_sTag = "Disc";
-        const string c_sAttrAuthor = "Author";
-        const string c_sAttrCreated = "Created";
-        const string c_sAttrText = "Text";
-        #endregion
-        #region VAttr{g}: XElement ToXml
-        public XElement ToXml
+        // Author in Registry ----------------------------------------------------------------
+        const string c_sRegistrySubkey = "TranslatorNotes";
+        const string c_sRegistryName = "AuthorName";
+        #region SMethod: string GetDefaultAuthor()
+        static public string GetDefaultAuthor()
         {
-            get
-            {
-                XElement x = new XElement(c_sTag);
-                x.AddAttr(c_sAttrAuthor, Author);
-                x.AddAttr(c_sAttrCreated, Created);
-                x.AddAttr(c_sAttrText, Text.AsString);
-                return x;
-            }
-        }
-        #endregion
-        #region SMethod: Discussion CreateFromXml(XElement)
-        static public Discussion CreateFromXml(XElement x)
-        {
-            if (x.Tag != c_sTag)
-                return null;
+            // Start with the name of the machine
+            string sAuthor = Environment.MachineName;
 
-            Discussion discussion = new Discussion();
+            // It might have been overridden in the Registry
+            string sAuthorInRegistry = JW_Registry.GetValue(c_sRegistrySubkey, c_sRegistryName, "");
+            if (!string.IsNullOrEmpty(sAuthorInRegistry))
+                sAuthor = sAuthorInRegistry;
 
-            discussion.Author = x.GetAttrValue(c_sAttrAuthor, "");
-            discussion.Created = x.GetAttrValue(c_sAttrCreated, DateTime.Now);
-            discussion.Text = DText.CreateSimple(x.GetAttrValue(c_sAttrText, ""));
-
-            return discussion;
+            return sAuthor;
         }
         #endregion
 
@@ -157,7 +169,7 @@ namespace OurWord.DataModel
             // Create a paragraph to hold the discussion text
             OWPara pDiscussionText = new OWPara(G.TTranslation.WritingSystemVernacular,
                 G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDiscussion),
-                Text.Phrases.AsVector);
+                Paragraphs[0], Color.White, OWPara.Flags.IsEditable);
 
             // For now, we'll put the author in as a paragraph
             OWPara pHeader = new OWPara(G.TTranslation.WritingSystemVernacular,
@@ -173,10 +185,10 @@ namespace OurWord.DataModel
     }
 
 
-    public class TranslatorNote
+    public class TranslatorNote : JObject
     {
         // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g/s}: string Category
+        #region BAttr{g/s}: string Category
         public string Category
         {
             get
@@ -185,12 +197,12 @@ namespace OurWord.DataModel
             }
             set
             {
-                m_sCategory = value;
+                SetValue(ref m_sCategory, value);
             }
         }
         private string m_sCategory;
         #endregion
-        #region Attr{g/s}: string AssignedTo
+        #region BAttr{g/s}: string AssignedTo
         public string AssignedTo
         {
             get
@@ -199,12 +211,12 @@ namespace OurWord.DataModel
             }
             set
             {
-                m_sAssignedTo = value;
+                SetValue(ref m_sAssignedTo, value);
             }
         }
         private string m_sAssignedTo = "";
         #endregion
-        #region Attr{g/s}: string Context
+        #region BAttr{g/s}: string Context
         public string Context
         {
             get
@@ -213,12 +225,12 @@ namespace OurWord.DataModel
             }
             set
             {
-                m_sContext = value;
+                SetValue(ref m_sContext, value);
             }
         }
         private string m_sContext;
         #endregion
-        #region Attr{g/s}: string Reference
+        #region BAttr{g/s}: string Reference
         public string Reference
         {
             get
@@ -228,24 +240,34 @@ namespace OurWord.DataModel
             set
             {
                 // We expect the reference of the form "003:016" (leading zeros)
-                Debug.Assert(value.Length == 7);
-                Debug.Assert(value[3] == ':');
+                Debug.Assert(value.Length == 7, "Reference length must be 7");
+                Debug.Assert(value[3] == ':', "Reference must have a ':' at position [3]");
 
-                m_sReference = value;
+                SetValue(ref m_sReference, value);
             }
         }
         private string m_sReference;
         #endregion
-        #region Attr{g}: List<Discussion> Discussions
-        public List<Discussion> Discussions
+        #region JAttr{g}: JOwnSeq<Discussion> Discussions
+        public JOwnSeq<Discussion> Discussions
         {
             get
             {
-                Debug.Assert(null != m_vDiscussions);
-                return m_vDiscussions;
+                Debug.Assert(null != m_osDiscussions);
+                return m_osDiscussions;
             }
         }
-        List<Discussion> m_vDiscussions;
+        JOwnSeq<Discussion> m_osDiscussions;
+        #endregion
+        #region Method void DeclareAttrs()
+        protected override void DeclareAttrs()
+        {
+            base.DeclareAttrs();
+            DefineAttr("Category", ref m_sCategory);
+            DefineAttr("AssignedTo", ref m_sAssignedTo);
+            DefineAttr("Context", ref m_sContext);
+            DefineAttr("Reference", ref m_sReference);
+        }
         #endregion
 
         // Categories (static) ---------------------------------------------------------------
@@ -254,8 +276,12 @@ namespace OurWord.DataModel
         {
             get
             {
+                // Make sure the categories have been initialized
+                InitializeCategories();
+
                 Debug.Assert(null != s_vCategories);
                 Debug.Assert(s_vCategories.Count > 0);
+
                 return s_vCategories;
             }
         }
@@ -266,6 +292,9 @@ namespace OurWord.DataModel
         {
             get
             {
+                // Make sure the categories have been initialized
+                InitializeCategories();
+
                 Debug.Assert(s_iDefaultCategory >= 0);
                 Debug.Assert(s_iDefaultCategory < Categories.Count);
                 return Categories[s_iDefaultCategory];
@@ -284,7 +313,7 @@ namespace OurWord.DataModel
         #region SMethod: void InitializeCategories()
         static public void InitializeCategories()
         {
-            if (null == s_vCategories)
+            if (null == s_vCategories || s_vCategories.Count == 0)
             {
                 s_vCategories = new List<string>();
                 s_vCategories.Add("Exegesis");
@@ -298,9 +327,6 @@ namespace OurWord.DataModel
         #region SMethod: void AddCategory(string sCategory)
         static public void AddCategory(string sCategory)
         {
-            // Make sure the categories have been initialized
-            InitializeCategories();
-
             // Check to see if it is already there
             if (-1 != Categories.IndexOf(sCategory))
                 return;
@@ -312,31 +338,35 @@ namespace OurWord.DataModel
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
-        public TranslatorNote(string _sReference, string _sContext)
+        public TranslatorNote()
             : base()
         {
-            // Discussions
-            m_vDiscussions = new List<Discussion>();
+            // Discussions, sorted by date
+            m_osDiscussions = new JOwnSeq<Discussion>("Discussions", this, false, true);
 
+            // Set the category to the default
+            Category = DefaultCategory;
+        }
+        #endregion
+        #region Constructor(sReference, sContext)
+        public TranslatorNote(string _sReference, string _sContext)
+            : this()
+        {
             // Reference, we expect something of the form "003:016", the Set attr 
             // asserts for this
             Reference = _sReference;
 
             // Context string
             Context = _sContext;
-
-            // Default Categories; expect to be overridden in the settings to something more
-            // matching to the individual project.
-            InitializeCategories();
-
-            // Set the category to the default
-            Category = DefaultCategory;
-
         }
         #endregion
         #region Method: bool ContentEquals(JObject)
-        public bool ContentEquals(TranslatorNote tn)
+        public override bool ContentEquals(JObject obj)
         {
+            TranslatorNote tn = obj as TranslatorNote;
+            if (null == tn)
+                return false;
+
             if (tn.Category != Category)
                 return false;
             if (tn.AssignedTo != AssignedTo)
@@ -348,6 +378,7 @@ namespace OurWord.DataModel
 
             if (Discussions.Count != tn.Discussions.Count)
                 return false;
+
             for (int i = 0; i < Discussions.Count; i++)
             {
                 if (!Discussions[i].ContentEquals(tn.Discussions[i]))
@@ -357,8 +388,8 @@ namespace OurWord.DataModel
             return true;
         }
         #endregion
-        #region Attr{g}: string SortKey
-        public string SortKey
+        #region OAttr{g}: string SortKey
+        public override string SortKey
         {
             get
             {
@@ -376,58 +407,9 @@ namespace OurWord.DataModel
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        #region I/O CONSTANTS
-        const string c_sTag = "TranslatorNote";
-        const string c_sAttrCategory = "Category";
-        const string c_sAttrAssignedTo = "Assigned";
-        const string c_sAttrContext = "Context";
-        const string c_sAttrReference = "Ref";
-        #endregion
-        #region VAttr{g}: XElement ToXml
-        public XElement ToXml
-        {
-            get
-            {
-                XElement x = new XElement(c_sTag);
-
-                x.AddAttr(c_sAttrCategory, Category);
-                x.AddAttr(c_sAttrAssignedTo, AssignedTo);
-                x.AddAttr(c_sAttrContext, Context);
-                x.AddAttr(c_sAttrReference, Reference);
-
-                foreach(Discussion d in Discussions)
-                    x.AddSubItem(d.ToXml);
-
-                return x;
-            }
-        }
-        #endregion
-        #region SMethod: TranslatorNote CreateFromXml(XElement)
-        static public TranslatorNote CreateFromXml(XElement x)
-        {
-            if (x.Tag != c_sTag)
-                return null;
-
-            TranslatorNote tn = new TranslatorNote(
-                x.GetAttrValue(c_sAttrReference, ""),
-                x.GetAttrValue(c_sAttrContext, "")
-                );
-
-            tn.Category = x.GetAttrValue(c_sAttrCategory, "");
-            tn.AssignedTo = x.GetAttrValue(c_sAttrAssignedTo, "");
-
-            foreach (XElement xSub in x.Items)
-            {
-                Discussion d = Discussion.CreateFromXml(xSub);
-                if (null != d)
-                    tn.Discussions.Add(d);
-            }
-
-            return tn;
-        }
-        #endregion
         #region SMethod: TranslatorNote ImportFromOldStyle(nChapter, nVerse, SfField)
-        static public TranslatorNote ImportFromOldStyle(int nChapter, int nVerse, SfField field)
+        static public TranslatorNote ImportFromOldStyle(
+            int nChapter, int nVerse, SfField field)
         {
             // The Category is derived from the marker
             string sCategory = G.GetLoc_NoteDefs("kGeneral", "General");
@@ -496,7 +478,7 @@ namespace OurWord.DataModel
 
             // Add the discussion
             Discussion disc = new Discussion(sAuthor, dtCreated, field.Data);
-            tn.Discussions.Add(disc);
+            tn.Discussions.Append(disc);
 
             // Done
             return tn;

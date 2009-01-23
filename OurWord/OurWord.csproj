@@ -550,6 +550,7 @@
     <Compile Include="Edit\Bookmark.cs" />
     <Compile Include="Edit\ECollapsableColumn.cs" />
     <Compile Include="Edit\EContainer.cs" />
+    <Compile Include="Edit\EControl.cs" />
     <Compile Include="Edit\EHeaderColumn.cs" />
     <Compile Include="Edit\EWord.cs" />
     <Compile Include="Edit\NotesPane.cs">

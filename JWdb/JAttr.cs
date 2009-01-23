@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 27 Oct 2003
  * Purpose: Implements the shared cc ontent attribute behavior.
- * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -13,6 +13,8 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
+
+using JWTools;
 #endregion
 
 namespace JWdb
@@ -52,16 +54,6 @@ namespace JWdb
 					return;
 				t = t.BaseType;
 			}
-
-/****OLDWAY
-			// Check for the obvious type
-//			if (obj.GetType() == m_signature)
-//				return;
-
-			// TODO: Make this recursive
-//			if (obj.GetType().BaseType == m_signature)
-//				return;
-OLDWAY ****/
 
 			// Failing that, throw an exception
 			throw new eBadSignature("JSeq:CheckCorrectSignature...");
@@ -106,63 +98,118 @@ OLDWAY ****/
 			return new string(' ', nIndent * 2);
 		}
 		#endregion
+        #region VMethod: void Clear()
+        public virtual void Clear()
+            // Removes all of the objects of this attribute. E.g., a sequence will have
+            // its objects removed. This is recursive, it should be called in all objects
+            // within the attribute; which then will call it on its attributes, etc.
+            // Should not only remove the objects, but also remove any ownership.
+        {
+            // We require the subclass to override this.
+            Debug.Assert(false);
+        }
+        #endregion
 
-		// I/O Support -----------------------------------------------------------------------
-		public string XmlBegin  { get { return "<"  + GetType().Name; } }
-		#region Attribute: OpeningXmlTagLine - e.g., "<ownseq Name="Section">
-		public virtual string OpeningXmlTagLine
-		{
-			get 
-			{
-				Debug.Assert(false);
-				return ""; 
-			}
-		}
-		#endregion
-		#region Method: bool IsOpeningXmlTagLine(sLine) - T if sLine has the opening tag
-		public bool IsOpeningXmlTagLine(string sLine)
-		{
-			sLine = sLine.Trim();
+        // I/O -------------------------------------------------------------------------------
+        #region VMethod: void ToXml(XElement)
+        public virtual void ToXml(XElement x)
+        {
+            Debug.Assert(false, "Subclass must override ToXml");
+        }
+        #endregion
+        #region VMethod: void FromXml(XElement x)
+        public virtual void FromXml(XElement x)
+        {
+            Debug.Assert(false, "Subclass must override FromXml");
+        }
+        #endregion
+        #region VMethod: void WriteOwnedObjectsOnDemand()
+        public virtual void WriteOwnedObjectsOnDemand()
+            // This is part of my refactoring to use generics. The 
+            // JObjectOnDemand.Write method had a for loop that was
+            // resulting in anything in the JOwn attr's Write command
+            // being called. So this duplicates it.
+            //    I rather suspect that JOwnSeq objects should have
+            // been included logically; but since it wasn't done originally,
+            // I don't add that here. At some point I need to go through 
+            // all of the Write logic, as it just feels tooo complicated right
+            // now. So for now, JOwn is the only JAttr subclass that implements
+            // this method.
+            // 14 Jan 09
+        {
+        }
+        #endregion
 
-			int iEnd = sLine.IndexOf('>');
-			if (iEnd < 0)
-				return false;
-			string sTest = sLine.Substring(0, iEnd + 1);
-
-			if (OpeningXmlTagLine == sTest)
-				return true;
-			return false;
-		}
-		#endregion
-		#region Method: virtual void Write(tw, nIndent) - do-nothing virtual
-		public virtual void Write(TextWriter tw, int nIndent)
-		{
-		}
-		#endregion
-		#region Method: virtual void Read(sFirstLine, tr) - do-nothing virtual
-		public virtual void Read(string sFirstLine, TextReader tr)
-		{
-		}
-		#endregion
-		#region JObject InvokeConstructor()
-		protected JObject InvokeConstructor()
+		#region JMethod: Object InvokeConstructor()
+		protected JObject InvokeConstructor(string sType)
 			// Locates the "Read" constructor for an object (or throws an exception if there
 			// isn't one; then invokes it with the appropriate parameters. Used by the
 			// Read methods on the owning attributes (atomic and sequence)
 		{
-			// Get the type
-//			Type t = JObject.GetTypeFromSignatureID(SignatureID);
-			Type t = m_signature;
+            // This is painful. We need to get the type in this obtuse way, from the
+            // class's name, because it could be a subclass of T. (E.g., we want a
+            // DText, not a DRun.
+            Type t = null;
+            Assembly[] va = AppDomain.CurrentDomain.GetAssemblies();
+            foreach (Assembly a in va)
+            {
+                string sTypeName = "OurWord.DataModel." + sType;
+                sTypeName += ", " + a.FullName;
+                t = Type.GetType(sTypeName);
+                if (null != t)
+                    break;
+            }
+
+			// If this failed, then we go with T.
+            if (null == t)
+                t = m_signature;
 
 			// Find the constructor
 			ConstructorInfo ci = t.GetConstructor(Type.EmptyTypes);
+            Debug.Assert(null != ci, "There's no single-parameter, public constructor() for" + sType);
+            Debug.Assert(ci.IsPublic, "The constructor for " + sType + "is not public.");
 
 			// Return the resultant object
 			JObject obj = (JObject)ci.Invoke(new Object[0]);
 			return obj;
 		}
 		#endregion
-	}
+        #region VMethod: void ResolveReferences()
+        public virtual void ResolveReferences()
+            // Workhorse for resolving reference attrivutes on a file read. It is called
+            // at the end of a read operation, after all owned objects have been read in.
+            // Its purpose is to add the pointers to these owned objects. For reference
+            // attributes, we set them; for other attributes, we just make sure that we
+            // recursively call any owned objects.
+        {
+            // We require the subclass to override this.
+            Debug.Assert(false);
+        }
+        #endregion
+        #region VMethod: string GetPathToOwnedObject(JObject)
+        public virtual string GetPathToOwnedObject(JObject obj)
+            // See the JObject._GetPathFromOwningObject method; this is a helper
+            // method to generate the path, called by JObject as it recursively
+            // works its way up to the root object. 
+            //    All owning attributes should implement this; reference attrs
+            // do not need to.
+            //    Return null if the object is not owned by this attribute, 
+            // return the attribute's component of the path if it is owned.
+        {
+            return null;
+        }
+        #endregion
+        #region VMethod: JObject GetObjectFromPath(sPath)
+        public virtual JObject GetObjectFromPath(string sPath)
+            // Called fro JObject.GetObjectFromPath, the idea is that owning attributes
+            // will override this to return the desired object, as specified by the
+            // path. Each override must interpret the sPath in order to know how
+            // to locate the desired object.
+        {
+            return null;
+        }
+        #endregion
+    }
 
 	public class BIntArray : IEnumerator
 	{

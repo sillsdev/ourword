@@ -28,9 +28,9 @@ namespace OurWordTests.JWdb
         #region Supporting Class: TObjLOD
         public class TObjLOD : JObjectOnDemand
         {
-            public JOwnSeq m_os = null;
-            public JOwn m_own = null;
-            public JRef m_ref = null;
+            public JOwnSeq<JCharacterStyle> m_os = null;
+            public JOwn<JCharacterStyle> m_own = null;
+            public JRef<JCharacterStyle> m_ref = null;
 
             public TObjLOD(string sDisplayName)
                 : base()
@@ -45,17 +45,17 @@ namespace OurWordTests.JWdb
                 AbsolutePathName = JWU.NUnit_TestFilePathName;
 
                 // Owning sequence
-                m_os = new JOwnSeq("os", this, typeof(JCharacterStyle));
+                m_os = new JOwnSeq<JCharacterStyle>("os", this);
                 m_os.Append(new JCharacterStyle("v", "Verse Number"));
                 m_os.Append(new JCharacterStyle("c", "Chapter Number"));
 
                 // Owning atomic
-                m_own = new JOwn("own", this, typeof(JCharacterStyle));
+                m_own = new JOwn<JCharacterStyle>("own", this);
                 m_own.Value = new JCharacterStyle("h", "Header");
 
                 // Reference Atomic
-                m_ref = new JRef("ref", this, typeof(JCharacterStyle));
-                m_ref.Value = m_own.Value;
+                m_ref = new JRef<JCharacterStyle>("ref", this);
+                m_ref.Value = m_own.Value as JCharacterStyle;
             }
         }
         #endregion
@@ -99,7 +99,7 @@ namespace OurWordTests.JWdb
             // Create a LOD attribute and populate it
             TObjLOD obj = new TObjLOD("OwnAtomicTest");
             Assert.IsNotNull(obj.m_own.Value);
-            JObject o;
+            JCharacterStyle o;
 
             // JRef: Clear --> Dirty is set to true
             obj.IsDirty = false;
@@ -109,7 +109,7 @@ namespace OurWordTests.JWdb
 
             // JRef: Set Value --> Dirty is set to true
             obj.IsDirty = false;
-            obj.m_ref.Value = obj.m_own.Value;
+            obj.m_ref.Value = obj.m_own.Value as JCharacterStyle;
             Assert.IsTrue(obj.IsDirty);
 
             // JRef: Get Value --> Dirty is unaffected

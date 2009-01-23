@@ -40,8 +40,9 @@ namespace OurWord.Edit
         }
         OWWindow m_Window;
         #endregion
+        /***
         #region Attr{g}: JOwnSeq SectionSeq - either Section.Paragraphs or Section.Footnotes
-        JOwnSeq SectionSeq
+        JOwnSeq<DParagraph> SectionSeq
         {
             get
             {
@@ -49,7 +50,7 @@ namespace OurWord.Edit
                 return m_SectionSeq;
             }
         }
-        JOwnSeq m_SectionSeq;
+        JOwnSeq<DParagraph> m_SectionSeq;
         #endregion
         #region Attr{g}: int iParaPosWithinSectionSeq - the position with the Secton's paragraph/Footnote sequence
         int iParaPosWithinSectionSeq
@@ -81,6 +82,7 @@ namespace OurWord.Edit
         }
         int m_iNotePosWithinRun = -1;
         #endregion
+        ***/
         #region Attr{g}: float ScrollBarPosition
         public float ScrollBarPosition
         {
@@ -134,6 +136,25 @@ namespace OurWord.Edit
         OWPara.Flags m_ParagraphFlags = OWPara.Flags.None;
         #endregion
 
+        string PathToDBTFromRoot
+        {
+            get
+            {
+                return m_sPathToDBTFromRoot;
+            }
+        }
+        string m_sPathToDBTFromRoot;
+
+        JObject Root
+        {
+            get
+            {
+                Debug.Assert(null != m_Root);
+                return m_Root;
+            }
+        }
+        JObject m_Root;
+
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(selection)
         public OWBookmark(OWWindow.Sel selection)
@@ -144,6 +165,11 @@ namespace OurWord.Edit
             // And editing flags
             m_ParagraphFlags = selection.Paragraph.Options;
 
+            // Get the path to the run
+            m_Root = selection.DBT.RootOwner;
+            m_sPathToDBTFromRoot = selection.DBT.GetPathFromRoot();
+
+            /***
             // Get the owning paragraph. The selection is owned by either a DNote or a
             // DParagraph, in case of the former we just go up a level.
             DParagraph p = selection.Paragraph.DataSource as DParagraph;
@@ -174,6 +200,7 @@ namespace OurWord.Edit
             // In the case of notes, find the note's position within the run
             if (null != note)
                 m_iNotePosWithinRun = (DBT as DText).Notes.FindObj(note);
+            ***/
 
             // Scroll bar position
             m_fScrollBarPosition = m_Window.ScrollBarPosition;
@@ -194,6 +221,20 @@ namespace OurWord.Edit
         #region Method: Sel CreateSelection()
         public OWWindow.Sel CreateSelection()
         {
+            // Retrieve the DBT
+            DBasicText DBT = Root.GetObjectFromPath(PathToDBTFromRoot) as DBasicText;
+            Debug.Assert(null != DBT);
+
+            // It's owner is the paragraph's data source
+            DParagraph pDataSource = DBT.Owner as DParagraph;
+            Debug.Assert(null != pDataSource);
+
+            // Locate the OWPara which has this data source
+            OWPara op = Window.Contents.FindParagraph(pDataSource, ParagraphFlags);
+            Debug.Assert(null != op);
+
+
+            /***
             // Retrieve the paragraph in question
             DParagraph p = SectionSeq[iParaPosWithinSectionSeq] as DParagraph;
             Debug.Assert(null != p);
@@ -218,6 +259,7 @@ namespace OurWord.Edit
             // Locate the OWPara which has this as its data source
             OWPara op = Window.Contents.FindParagraph(objDataSource, ParagraphFlags);
             Debug.Assert(null != op);
+            ***/
 
             // Create and return the normalized selection
             OWWindow.Sel selection = (IsInsertionPoint) ?
@@ -241,13 +283,9 @@ namespace OurWord.Edit
             // the two bookmarks.
             if (Window != bm.Window)
                 return false;
-            if (SectionSeq != bm.SectionSeq)
+            if (Root != bm.Root)
                 return false;
-            if (iParaPosWithinSectionSeq != bm.iParaPosWithinSectionSeq)
-                return false;
-            if (iRunPosWithinParagraph != bm.iRunPosWithinParagraph)
-                return false;
-            if (iNotePosWithinRun != bm.iNotePosWithinRun)
+            if (PathToDBTFromRoot != bm.PathToDBTFromRoot)
                 return false;
             if (ParagraphFlags != bm.ParagraphFlags)
                 return false;

@@ -132,7 +132,7 @@ namespace OurWord.DataModel
 
         // Static Work Methods ---------------------------------------------------------------
         #region SMethod: void InitializeGroupings(JOwnSeq seq)
-        static public void InitializeGroupings(JOwnSeq seq)
+        static public void InitializeGroupings(JOwnSeq<DBookGrouping> seq)
         {
             seq.Clear();
 

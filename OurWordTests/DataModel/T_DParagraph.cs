@@ -37,7 +37,7 @@ namespace OurWordTests.DataModel
 
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Project";
             G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK", "");
@@ -59,7 +59,7 @@ namespace OurWordTests.DataModel
         private DParagraph SplitParagraphSetup()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
 
             // Add various runs
             p.AddRun(DChapter.Create("3"));
@@ -475,7 +475,7 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_VerseAtBeginning()
         {
             // Build the paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
             p.AddRun(DVerse.Create("16"));
 
             DText text = new DText();
@@ -500,7 +500,7 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_VerseAtMiddle()
         {
             // Build the paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
 
             DText text = new DText();
             text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
@@ -524,7 +524,7 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_NoVerse()
         {
             // Build the paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
 
             DText text = new DText();
             text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
@@ -551,7 +551,7 @@ namespace OurWordTests.DataModel
         [Test] public void AsString()
         {
             // Set up a paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
             p.AddRun(DChapter.Create("3"));
             p.AddRun(DVerse.Create("1"));
             p.AddRun(DText.CreateSimple("In the beginning was the word."));
@@ -562,8 +562,8 @@ namespace OurWordTests.DataModel
             p.Cleanup();  // Determines where leading spaces are needed
 
             // Did we get what we expect?
-            string sExpected = "31In the beginning was the word. 2And the Word " +
-                "was with God, and the Word was God. 3He was with God in the " +
+            string sExpected = "31In the beginning was the word.2And the Word " +
+                "was with God, and the Word was God.3He was with God in the " +
                 "beginning.";
             Assert.AreEqual(sExpected, p.AsString);
             //Console.WriteLine("AsString = \"" + p.AsString + "\"");
@@ -573,7 +573,7 @@ namespace OurWordTests.DataModel
         [Test] public void CombineDTexts()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
 
             // Place an initial phrase into the paragraph
             p.SimpleText = "This is a phrase.";
@@ -598,17 +598,17 @@ namespace OurWordTests.DataModel
         [Test] public void BestGuessAtInsertingTextPositions()
         {
             // An empty paragraph should be given a DText
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(1, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DText);
 
             // There should be DText after verses
-            p = new DParagraph(G.Project.TargetTranslation);
+            p = new DParagraph();
             p.Runs.Append(DVerse.Create("3"));
             p.Runs.Append(DVerse.Create("4"));
             p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, 
-                G.Project.TargetTranslation, DFootnote.Types.kExplanatory)));
+                DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(5, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DVerse);
@@ -618,9 +618,9 @@ namespace OurWordTests.DataModel
             Assert.IsNotNull(p.Runs[4] as DSeeAlso);
 
             // There should be a DText before a paragraph-initial footnote
-            p = new DParagraph(G.Project.TargetTranslation);
+            p = new DParagraph();
             p.Runs.Append(DSeeAlso.Create('a', new DFootnote(2, 4, 
-                G.Project.TargetTranslation, DFootnote.Types.kExplanatory)));
+                DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(2, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DText);
@@ -628,5 +628,26 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        // I/O -------------------------------------------------------------------------------
+        #region Test: IoAbbreviated
+        [Test] public void IoAbbreviated()
+        {
+            // Create a paragraph with a single DText
+            DParagraph p = new DParagraph();
+            DText text = new DText();
+            p.Runs.Append(text);
+            text.Phrases.Append(new DPhrase("p", "This is some text."));
+
+            // Create the Xml Element from it
+            XElement x = p.ToXml(true);
+
+            // Create a new recipient paragraph and interpret the xml
+            DParagraph pNew = new DParagraph();
+            pNew.FromXml(x);
+
+            // Should be the same
+            Assert.IsTrue(p.ContentEquals(pNew), "Paragraphs should be equal.");
+        }
+        #endregion
     }
 }

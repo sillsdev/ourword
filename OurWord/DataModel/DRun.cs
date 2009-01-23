@@ -35,21 +35,6 @@ namespace OurWord.DataModel
 	public class DRun : JObject
 	{
 		// Attrs -----------------------------------------------------------------------------
-		#region Attr{g/s}: bool NeedsLeadingSpace - If T, insert space in views and file output
-		public bool NeedsLeadingSpace
-		{
-			get
-			{
-				return m_bNeedsLeadingSpace;
-			}
-			set
-			{
-				m_bNeedsLeadingSpace = value;
-			}
-		}
-		private bool m_bNeedsLeadingSpace = false;
-		#endregion
-
 		public const char c_codeVerse      = 'V';
 		public const char c_codeChapter    = 'C';
 		public const char c_codeFootNote   = 'F';
@@ -928,25 +913,26 @@ namespace OurWord.DataModel
 	}
 	#endregion
 
+
 	#region Class: DBasicText
 	public class DBasicText : DRun
 	{
 		// Attrs -----------------------------------------------------------------------------
 		#region CLASS DPhrases : JOwnSeq - handles typecasting
-		public class DPhrases : JOwnSeq
+		public class DPhrases<T> : JOwnSeq<T> where T:DPhrase
 		{
 			#region Constructor(sName, objOwner)
 			public DPhrases(string sName, JObject objOwner)
-				: base(sName, objOwner, typeof(DPhrase), false, false)
+				: base(sName, objOwner, false, false)
 			{
 			}
 			#endregion
 			#region DPhrase Indexer[]
-			public new DPhrase this [int index]
+			public new T this [int index]
 			{
 				get
 				{
-					return base[index] as DPhrase;
+					return base[index];
 				}
 				set
 				{
@@ -1191,21 +1177,58 @@ namespace OurWord.DataModel
                 CombineSameStyledPhrases();
             }
             #endregion
+
+            // I/O ---------------------------------------------------------------------------
+            public string ToSaveString
+            {
+                get
+                {
+                    // Start with an empty string
+                    string s = "";
+
+                    // Add the phrases
+                    foreach (DPhrase phrase in this)
+                        s += phrase.SfmSaveString;
+
+                    // Return the result
+                    return s;
+                }
+            }
+            public void FromSaveString(string s)
+            {
+                // We'll build a list of transitional phrase objects here
+                List<DSection.IO.Phrase> v = new List<DSection.IO.Phrase>();
+
+                // Parse the string into phrase objects
+                int iPos = 0;
+                DSection.IO.Phrase p;
+                while ((p = DSection.IO.Phrase.GetPhrase(s, ref iPos)) != null)
+                    v.Add(p);
+
+                // Create DPhrases from these
+                Clear();
+                foreach (DSection.IO.Phrase phrase in v)
+                {
+                    Append(new DPhrase(phrase.StyleAbbrev, phrase.Text));
+                }
+            }
+
+
         }
         #endregion
         #region JAttr{g}: DPhrases Phrases
-        public DPhrases Phrases
+        public DPhrases<DPhrase> Phrases
 		{
 			get { return m_osPhrases; }
 		}
-		private DPhrases m_osPhrases;
+		private DPhrases<DPhrase> m_osPhrases;
 		#endregion
 		#region JAttr{g}: DPhrases PhrasesBT
-		public DPhrases PhrasesBT
+		public DPhrases<DPhrase> PhrasesBT
 		{
 			get { return m_osPhrasesBT; }
 		}
-		private DPhrases m_osPhrasesBT;
+        private DPhrases<DPhrase> m_osPhrasesBT;
 		#endregion
 
 		// Derived / Const attrs -------------------------------------------------------------
@@ -1300,12 +1323,12 @@ namespace OurWord.DataModel
 
         // Scaffolding -----------------------------------------------------------------------
 		#region Constructor() - Creates the attributes
-		public  DBasicText()
+		public DBasicText()
 			: base()
 		{
 			// Construct the two types of phrases
-			m_osPhrases   = new DPhrases("Phrase",   this);
-			m_osPhrasesBT = new DPhrases("PhraseBT", this);
+            m_osPhrases = new DPhrases<DPhrase>("Phrase", this);
+            m_osPhrasesBT = new DPhrases<DPhrase>("PhraseBT", this);
 		}
 		#endregion
 		#region Constructor(string sText)
@@ -1422,17 +1445,7 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				string s = "";
-
-				if (NeedsLeadingSpace)
-					s += ' ';
-
-				foreach(DPhrase phrase in Phrases)
-				{
-					s += phrase.SfmSaveString;
-				}
-
-				return s;
+                return Phrases.ToSaveString;
 			}
 		}
 		#endregion
@@ -1441,17 +1454,7 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				string s = "";
-
-				if (NeedsLeadingSpace)
-					s += ' ';
-
-				foreach(DPhrase phrase in PhrasesBT)
-				{
-					s += phrase.SfmSaveString;
-				}
-
-				return s;
+                return PhrasesBT.ToSaveString;
 			}
 		}
 		#endregion
@@ -1500,7 +1503,7 @@ namespace OurWord.DataModel
         /// <returns>The number of spaces removed. We need this because this method is
         /// called during the delete command, and the number of spaces helps to determine
         /// where to place the cursor following the deletion.</returns>
-		public int EliminateSpuriousSpaces(DPhrases osPhrases)
+		public int EliminateSpuriousSpaces(DPhrases<DPhrase> osPhrases)
 		{
             int cSpacesRemoved = 0;
 
@@ -1577,7 +1580,7 @@ namespace OurWord.DataModel
         }
 
         #region Method: void _RemoveEmptyPhrases(DPhrases osPhrases)
-        void _RemoveEmptyPhrases(DPhrases osPhrases)
+        void _RemoveEmptyPhrases(DPhrases<DPhrase> osPhrases)
         {
             for (int i = 0; i < osPhrases.Count; )
             {
@@ -1590,7 +1593,7 @@ namespace OurWord.DataModel
         }
         #endregion
         #region Method: void _CombinePhrases(DPhrases osPhrases)
-        void _CombinePhrases(DPhrases osPhrases)
+        void _CombinePhrases(DPhrases<DPhrase> osPhrases)
         {
             for (int i = 0; i < osPhrases.Count - 1; )
             {
@@ -1611,7 +1614,7 @@ namespace OurWord.DataModel
         #endregion
         #endregion
         #region Method: void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend)
-        private void AppendPhrases(DPhrases osPhrases, DPhrases phrasesToAppend, bool bInsertSpacesBetweenPhrases)
+        private void AppendPhrases(DPhrases<DPhrase> osPhrases, DPhrases<DPhrase> phrasesToAppend, bool bInsertSpacesBetweenPhrases)
 		{
 			DPhrase LastPhrase = ( osPhrases.Count > 0 ) ? osPhrases[ osPhrases.Count - 1] : null;
 
@@ -1817,15 +1820,16 @@ namespace OurWord.DataModel
 	public class DText : DBasicText
 	{
         // Translator Notes ------------------------------------------------------------------
-        #region Attr{g}: List<TranslatorNote> TranslatorNotes - The TranslatorNotes that go with this DText
-        public List<TranslatorNote> TranslatorNotes
+        #region JAttr{g}: JOwnSeq<TranslatorNote> TranslatorNotes
+        public JOwnSeq<TranslatorNote> TranslatorNotes
         {
             get
             {
-                return m_vTranslatorNotes;
+                Debug.Assert(null != m_osTranslatorNotes);
+                return m_osTranslatorNotes;
             }
         }
-        private List<TranslatorNote> m_vTranslatorNotes;
+        JOwnSeq<TranslatorNote> m_osTranslatorNotes;
         #endregion
         #region Method: TranslatorNote InsertNewTranslatorNote()
         public TranslatorNote InsertNewTranslatorNote()
@@ -1835,21 +1839,21 @@ namespace OurWord.DataModel
                 G.App.MainWindow.Selection.SelectionString
                 );
 
-            TranslatorNotes.Add(note);
+            TranslatorNotes.Append(note);
             return note;
         }
         #endregion
 
         // Translator Notes will replace Notes
 		#region JAttr{g}: JOwnSeq Notes - E.g., ToDo notes, Hints, Reasons, etc.
-		public JOwnSeq Notes
+		public JOwnSeq<DNote> Notes
 		{
 			get
 			{
 				return j_osNotes;
 			}
 		}
-		private JOwnSeq j_osNotes;
+		private JOwnSeq<DNote> j_osNotes;
 		#endregion
 		#region Method: DNote GetNoteOfType(DNote.Types type)
 		public DNote GetNoteOfType(DNote.Types type)
@@ -1942,9 +1946,9 @@ namespace OurWord.DataModel
 			: base()
 		{
             // Translator Notes
-            m_vTranslatorNotes = new List<TranslatorNote>();
+            m_osTranslatorNotes = new JOwnSeq<TranslatorNote>("tn", this, false, true);
 
-			j_osNotes = new JOwnSeq("Notes", this, typeof(DNote));
+			j_osNotes = new JOwnSeq<DNote>("Notes", this);
 		}
 		#endregion
 		#region Method: static public DText CreateSimple()
@@ -1993,7 +1997,7 @@ namespace OurWord.DataModel
             base.Append(text, bInsertSpacesBetweenPhrases);
 
             // Append the Translator Notes
-            TranslatorNotes.AddRange(text.TranslatorNotes);
+            TranslatorNotes.Append(text.TranslatorNotes);
             text.TranslatorNotes.Clear();
 
 			// Append the Translator Notes (Soon to be obsolete)
@@ -2032,11 +2036,13 @@ namespace OurWord.DataModel
             // Translator Notes
             foreach (TranslatorNote tn in TranslatorNotes)
             {
-                SfField field = new SfField(DSFMapping.c_sMkrTranslatorNote, tn.ToXml.OneLiner);
+                SfField field = new SfField(DSFMapping.c_sMkrTranslatorNote, tn.ToXml(true).OneLiner);
                 DB.Append(field);
             }
+
 		}
 		#endregion
+
 	}
 	#endregion
 
@@ -2048,29 +2054,22 @@ namespace OurWord.DataModel
 		public const int  c_cInsertedSpaces = 7;           // Number spaces for InsertionIcon
 		public const char c_chVerticalBar = '|';           // Sfm for char styles
 
-		// Attrs -----------------------------------------------------------------------------
-		#region Attr{g/s}: public string Text - The well-formed contents of the phrase
+		// BAttrs ----------------------------------------------------------------------------
+		#region BAttr{g/s}: public string Text - The well-formed contents of the phrase
 		public string Text
 		{
 			get
 			{
-				return m_text;
+                return m_sText;
 			}
 			set
 			{
-                m_text = value;
-
-                // Removed this 3mar08, as it was wreaking havoc on the editor's delete
-                // function. It was originally here to prevent double spaces when reading
-                // in a file. Test suites seems to all pass even with this removed.
-//				m_text = EliminateSpuriousSpaces(value);
-
-                DeclareDirty();
+                SetValue(ref m_sText, value);
 			}
 		}
-		string m_text;
+		string m_sText;
 		#endregion
-		#region Attr{g/s}: public string CharacterStyleAbbrev
+		#region BAttr{g/s}: public string CharacterStyleAbbrev
 		public string CharacterStyleAbbrev
 		{
 			get
@@ -2080,12 +2079,22 @@ namespace OurWord.DataModel
 			set
 			{
 				Debug.Assert(null != value && value.Length > 0);
-				m_sCharacterStyleAbbrev = value;
+                SetValue(ref m_sCharacterStyleAbbrev, value);
 			}
 		}
 		string m_sCharacterStyleAbbrev = DStyleSheet.c_StyleAbbrevNormal;
 		#endregion
-        #region Attr{g}: bool IsItalic
+        #region Method void DeclareAttrs()
+        protected override void DeclareAttrs()
+        {
+            base.DeclareAttrs();
+            DefineAttr("Text", ref m_sText);
+            DefineAttr("Style", ref m_sCharacterStyleAbbrev);
+        }
+        #endregion
+
+        // Derived Attrs ---------------------------------------------------------------------
+        #region VAttr{g}: bool IsItalic
         public bool IsItalic
         {
             get
@@ -2094,8 +2103,6 @@ namespace OurWord.DataModel
             }
         }
         #endregion
-
-            // Derived Attrs ---------------------------------------------------------------------
 		#region Attr{g}: public string SfmSaveString -  For saving to an SFM file
 		public string SfmSaveString
 		{
@@ -2176,14 +2183,19 @@ namespace OurWord.DataModel
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-		#region Constructor(sStyleAbbrev, sText)
-		public DPhrase(string sCharacterStyleAbbrev, string sText)
-			: base()
+        #region Constructor() - for xml read
+        public DPhrase()
+            : base()
+        {
+        }
+        #endregion
+        #region Constructor(sStyleAbbrev, sText)
+        public DPhrase(string sCharacterStyleAbbrev, string sText)
+			: this()
 		{
 			// Make certain we have a valid Style; use the normal style if the StyleAbbrev
 			// passed in is empty, or if it represents a paragraph style.
-			if (null == sCharacterStyleAbbrev ||
-				0 == sCharacterStyleAbbrev.Length || 
+			if (string.IsNullOrEmpty(sCharacterStyleAbbrev) || 
 				false == G.StyleSheet.IsCharacterStyle(sCharacterStyleAbbrev))
 			{
 				sCharacterStyleAbbrev = DStyleSheet.c_StyleAbbrevNormal;
@@ -2196,6 +2208,7 @@ namespace OurWord.DataModel
 		#endregion
 		#region Constructor(DPhrase source)
 		public DPhrase( DPhrase source )
+            : this()
 		{
 			CharacterStyleAbbrev = source.CharacterStyleAbbrev;
 			Text                 = source.Text;

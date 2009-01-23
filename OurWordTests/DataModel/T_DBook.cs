@@ -116,7 +116,7 @@ namespace OurWordTests.DataModel
             // Setup
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
             G.Project.TargetTranslation = Translation;

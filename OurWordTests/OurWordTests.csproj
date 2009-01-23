@@ -72,7 +72,6 @@
     <Compile Include="JWdb\T_JObjectOnDemand.cs" />
     <Compile Include="JWdb\T_JOwn.cs" />
     <Compile Include="JWdb\T_JOwnSeq.cs" />
-    <Compile Include="JWdb\T_JParagraph.cs" />
     <Compile Include="JWdb\T_JRef.cs" />
     <Compile Include="JWdb\T_JSeq.cs" />
     <Compile Include="JWdb\T_SfDB.cs" />

@@ -33,7 +33,7 @@ namespace OurWordTests.DataModel
             JWU.NUnit_Setup();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Test Project";
         }
         #endregion

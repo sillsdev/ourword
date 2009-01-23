@@ -5,7 +5,7 @@
  * Created: 27 Oct 2003
  * Purpose: Implements the shared sequence behavior, used by subclasses such as JOwnSeq
  *            and JRefSeq.
- * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 
 #region Header: Using, etc.
@@ -92,7 +92,7 @@ namespace JWdb
 	#endregion
 
 	// Class JSeq ----------------------------------------------------------------------------
-	public class JSeq : JAttr, IEnumerator, IComparer
+	public class JSeq<T> : JAttr, IEnumerator, IComparer where T:JObject
 	{
 		// Public attributes -----------------------------------------------------------------
 		#region Attribute: int Count{g} - the number of objects in the sequence
@@ -140,7 +140,7 @@ namespace JWdb
 		}
 		#endregion
         #region Method: bool ContentEquals(JSeq seq)
-        public bool ContentEquals(JSeq seq)
+        public bool ContentEquals(JSeq<T> seq)
         {
             if (Count != seq.Count)
                 return false;
@@ -262,13 +262,13 @@ namespace JWdb
 
 		// Putting objects into the list; removing them from the list ------------------------
 		#region Indexer[] - provides array access (get/set)
-		virtual public JObject this [ int index ]
+		virtual public T this [ int index ]
 		{
 			get
 			{
 				if (index < 0 || index >= m_list.Count)
 					return null;
-				return (JObject)m_list[index];
+				return m_list[index] as T;
 			}
 			set
 			{
@@ -356,8 +356,8 @@ namespace JWdb
 			InvalidateEnumerator();              // Any active enumerator is now invalid
 		}
 		#endregion
-		#region Method: void Clear() - removes all JObjects from the list
-		virtual public void Clear()
+		#region OMethod: void Clear() - removes all JObjects from the list
+		public override void Clear()
 		{
 			m_list.Clear();
 			InvalidateEnumerator();              // Any active enumerator is now invalid

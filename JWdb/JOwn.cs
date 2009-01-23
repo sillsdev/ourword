@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 27 Oct 2003
  * Purpose: Implements JOwn, an atomic owning attribute.
- * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -60,27 +60,19 @@ using JWTools;
 
 namespace JWdb
 {
-	public class JOwn : JAttr
+	public class JOwn<T> : JAttr where T:JObject
 	{
-		// Attributes ------------------------------------------------------------------------
-
-		// Private attributes ----------------------------------------------------------------
-		#region Private Attribute: JObject m_object - stores the object
-		protected JObject m_object = null;
-		#endregion
-		static private string m_sTag = "own";    // xml tag for I/O
-
 		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor(sName, objOwner, signature) - sets up the attribute
-		public JOwn(string sName, JObject objOwner, Type signature)
-			: base(sName, objOwner, signature)
+		#region Constructor(sName, objOwner) - sets up the attribute
+		public JOwn(string sName, JObject objOwner)
+			: base(sName, objOwner, typeof(T))
 		{
 		}
 		#endregion
 
 		// Getting / Setting -----------------------------------------------------------------
-		#region Attr{g/s}: JObject Value - main method for getting / setting the attr's value
-		public JObject Value
+		#region Attr{g/s}: T Value - main method for getting / setting the attr's value
+		public T Value
 		{
 			get
 			{
@@ -95,7 +87,7 @@ namespace JWdb
 				else
 				{
 					// Integrity check
-					CheckCorrectSignature(value);
+//					CheckCorrectSignature(value);
 
 					// Remove ownership from the object we're about to remove
 					if (null != m_object)
@@ -110,9 +102,10 @@ namespace JWdb
 				}
 			}
 		}
+		protected T m_object = null;
 		#endregion
 		#region Method: void Clear() - sets the value to null
-		public void Clear()
+		public override void Clear()
 		{
 			if (null != m_object)
 			{
@@ -125,54 +118,98 @@ namespace JWdb
 		#endregion
 
 		// I/O -------------------------------------------------------------------------------
-		#region Attribute: OpeningXmlTagLine - e.g., "<own Name="Section">
-		public override string OpeningXmlTagLine
-		{
-			get { return "<" + m_sTag + " Name=\"" + Name + "\">"; }
-		}
-		#endregion
-		#region Attribute: ClosingXmlTagLine - e.g., "</own>
-		private string ClosingXmlTagLine
-		{
-			get { return "</" + m_sTag + ">"; }
-		}
-		#endregion
-		#region Method: Write(TextWriter) - writes the owning attr and its object to xml file
-		public override void Write(TextWriter tw, int nIndent)
-		{
-			// No reason to write the attr unless it has a value
-			if (null != m_object)
-			{
-				tw.WriteLine(IndentPadding(nIndent) + OpeningXmlTagLine);
-				m_object.Write(tw, nIndent + 1);
-				tw.WriteLine(IndentPadding(nIndent) + ClosingXmlTagLine);
-			}
-		}
-		#endregion
-		#region Method: Read(string sFirstLine, TextReader tr) - reads from xml file
-		public override void Read(string sFirstLine, TextReader tr)
-		{
-			// If the contents of the first line are not this owning sequence, then return.
-			if (sFirstLine != OpeningXmlTagLine)
-				return;
+		const string c_sTag = "own";    // xml tag for I/O
+        #region OMethod: void ToXml(XElement xObject)
+        public override void ToXml(XElement xObject)
+        {
+            if (null != Value)
+            {
+                // Create an XElement for the JOwn
+                XElement xOwn = new XElement(c_sTag);
+                xOwn.AddAttr("Name", Name);
 
-			// Read lines from the stream until the Closing Tag is found
-			string sLine;
-			while ( (sLine = tr.ReadLine()) != null)
-			{
-				// We're done when we see the end of the sequence
-				sLine = sLine.Trim();
-				if (sLine == ClosingXmlTagLine)
-					break;
+                // Add it to the owning object's XElement
+                xObject.AddSubItem(xOwn);
 
-				// Otherwise, create a new object of the signature type and read its data
-				JObject obj = InvokeConstructor();
-				obj.Read(sLine, tr);
-				Debug.Assert(obj != null);
-				Value = obj;
-			}
-		}
-		#endregion
-	}
+                // If an owned object is a JObjectOnDemand, then we write it (if
+                //    it is dirty, as determined by Write()) out in a separate operation,
+                //    as it will be saved to its own file. 
+                // We also save the BasicAttrs in our current file, so that we'll
+                //    have the filename, so that we can know how to load it when
+                //    the time comes!
+                // Otherwise, for just normal JObjects, we add ALL of the contents 
+                //    as an XElement
+                JObjectOnDemand ood = Value as JObjectOnDemand;
+                if (null != ood)
+                {
+                    xOwn.AddSubItem(Value.ToXml(false));
+                    ood.Write();
+                }
+                else
+                    xOwn.AddSubItem(Value.ToXml(true));
+            }
+        }
+        #endregion
+        #region OMethod: void FromXml(XElement x)
+        public override void FromXml(XElement x)
+        {
+            if (x.Tag != c_sTag)
+                return;
+
+            // Get the XElement that is the value for this; there should be
+            // exactly one subitem
+            if (x.Items.Length != 1)
+                return;
+            XElement xObj = x.Items[0] as XElement;
+            if (null == xObj)
+                return;
+
+            // Create an object of our type
+            T obj = InvokeConstructor(xObj.Tag) as T;
+
+            // Read it in
+            obj.FromXml(xObj);
+
+            // Set the ownership
+            Value = obj;
+        }
+        #endregion
+
+        #region OMethod: void ResolveReferences()
+        public override void ResolveReferences()
+        {
+            if (null != Value)
+                Value.ResolveReferences();
+        }
+        #endregion
+        #region OMethod: string GetPathToOwnedObject(JObject)
+        public override string GetPathToOwnedObject(JObject obj)
+        {
+            if (Value != obj)
+                return null;
+
+            return "-" + Name;
+        }
+        #endregion
+        #region OMethod: void WriteOwnedObjectsOnDemand()
+        public override void WriteOwnedObjectsOnDemand()
+        {
+            JObjectOnDemand ood = Value as JObjectOnDemand;
+            if (null != ood)
+                ood.Write();
+        }
+        #endregion
+        #region OMethod: JObject GetObjectFromPath(sPath)
+        public override JObject GetObjectFromPath(string sPath)
+        {
+            // If there is no more path left, then return our current object
+            if (string.IsNullOrEmpty(sPath))
+                return Value;
+
+            // Otherwise, we continue recursing down the ownership hierarchy
+            return Value.GetObjectFromPath(sPath);
+        }
+        #endregion
+    }
 
 }

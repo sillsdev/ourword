@@ -68,7 +68,7 @@ namespace OurWordTests.DataModel
         void SetupSection()
         {
             // Section Head
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
             p.StyleAbbrev = DStyleSheet.c_StyleSectionTitle;
             p.AddRun(DText.CreateSimple(
                 "Tuhan Yesus kasi umpama so'al biji yang paling kici",
@@ -76,14 +76,14 @@ namespace OurWordTests.DataModel
             Section.Paragraphs.Append(p);
 
             // Cross Reference
-            p = new DParagraph(G.Project.TargetTranslation);
+            p = new DParagraph();
             p.StyleAbbrev = DStyleSheet.c_StyleCrossReference;
             p.AddRun(DText.CreateSimple(
                 "(Mateos 13:31-32, 34; Lukas 13:18-19)"));
             Section.Paragraphs.Append(p);
 
             // Paragraph starting at verse 30
-            p = new DParagraph(G.Project.TargetTranslation);
+            p = new DParagraph();
             p.StyleAbbrev = DStyleSheet.c_StyleAbbrevNormal;
             p.AddRun(DVerse.Create("30"));
             p.AddRun(DText.CreateSimple(
@@ -106,7 +106,7 @@ namespace OurWordTests.DataModel
             Section.Paragraphs.Append(p);
 
             // Paragraph starting at verse 33
-            p = new DParagraph(G.Project.TargetTranslation);
+            p = new DParagraph();
             p.StyleAbbrev = DStyleSheet.c_StyleAbbrevNormal;
             p.AddRun(DVerse.Create("33"));
             p.AddRun(DText.CreateSimple(
@@ -131,7 +131,7 @@ namespace OurWordTests.DataModel
             OurWordMain.App = new OurWordMain();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Project";
             G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK", "");

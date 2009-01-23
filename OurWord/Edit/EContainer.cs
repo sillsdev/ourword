@@ -74,7 +74,7 @@ namespace OurWord.Edit
 
         // Screen Region ---------------------------------------------------------------------
         #region Attr{g/s}: PointF Position - top,left coord
-        public PointF Position
+        virtual public PointF Position
         {
             get
             {

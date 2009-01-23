@@ -156,49 +156,49 @@ namespace OurWord.DataModel
         {
             get
             {
-                return (DTeamSettings)j_oTeamSettings.Value;
+                return j_oTeamSettings.Value;
             }
             set
             {
                 j_oTeamSettings.Value = value;
             }
         }
-        private JOwn j_oTeamSettings = null;
+        private JOwn<DTeamSettings> j_oTeamSettings = null;
         #endregion
 		#region JAttr{g}: DTranslation FrontTranslation - e.g., the Kupang Translation
 		public DTranslation FrontTranslation
 		{
 			get 
 			{ 
-				return (DTranslation)m_FrontTranslation.Value; 
+				return m_FrontTranslation.Value; 
 			}
 			set
 			{
 				m_FrontTranslation.Value = value;
 			}
 		}
-		private JOwn m_FrontTranslation = null; 
+		private JOwn<DTranslation> m_FrontTranslation = null; 
 		#endregion
 		#region JAttr{g}: DTranslation TargetTranslation - e.g., the target Translation
 		public DTranslation TargetTranslation
 		{
 			get 
 			{ 
-				return (DTranslation)m_TargetTranslation.Value; 
+				return m_TargetTranslation.Value; 
 			}
 			set
 			{
 				m_TargetTranslation.Value = value;
 			}
 		}
-		private JOwn m_TargetTranslation = null; 
+		private JOwn<DTranslation> m_TargetTranslation = null; 
 		#endregion
 		#region JAttr{g}: JOwnSeq OtherTranslations - related and reference translations
-		public JOwnSeq OtherTranslations
+		public JOwnSeq<DTranslation> OtherTranslations
 		{
 			get { return m_osOtherTranslations; }
 		}
-		private JOwnSeq m_osOtherTranslations; 
+		private JOwnSeq<DTranslation> m_osOtherTranslations; 
 		#endregion
 
 		// Derived Attrs: Global settings ----------------------------------------------------
@@ -863,16 +863,16 @@ namespace OurWord.DataModel
         private void _ConstructAttrs()
 		{
             // Team Settings
-            j_oTeamSettings = new JOwn("Team", this, typeof(DTeamSettings));
+            j_oTeamSettings = new JOwn<DTeamSettings>("Team", this);
             j_oTeamSettings.Value = new DTeamSettings();
             TeamSettings.New();
 
 			// Owning Attrs
-            m_FrontTranslation = new JOwn("Front", this, typeof(DTranslation));
-			m_TargetTranslation = new JOwn("Target", this, typeof(DTranslation));
+            m_FrontTranslation = new JOwn<DTranslation>("Front", this);
+			m_TargetTranslation = new JOwn<DTranslation>("Target", this);
 
 			// Other Translations
-			m_osOtherTranslations = new JOwnSeq("OtherTrans", this, typeof(DTranslation),
+			m_osOtherTranslations = new JOwnSeq<DTranslation>("OtherTrans", this,
                 false, false);
 		}
 		#endregion
@@ -886,53 +886,35 @@ namespace OurWord.DataModel
         }
         #endregion
 
-		// Methods ---------------------------------------------------------------------------
-		#region Method: void Write(tw, nIndent) - writes the project, and writes its translations
-		public override void Write(TextWriter tw, int nIndent)
-		{
-			// Write this DProject as per normal
-			base.Write(tw, nIndent);
-
-			// Write the LoadOnDemand translation objects
-			if (null != FrontTranslation)
-				FrontTranslation.Write();
-
-			if (null != TargetTranslation)
-				TargetTranslation.Write();
-
-			foreach (DTranslation t in OtherTranslations)
-				t.Write();
-		}
-		#endregion
-
-		#region Method: void Read(sLine, tr) - reads the proj, and reads its translations
-		public override void Read(string sLine, TextReader tr)
-		{
-			// Read this DProject as per normal
-            string sAbsolutePathName = this.AbsolutePathName;
-			base.Read(sLine, tr);
-            this.AbsolutePathName = sAbsolutePathName;
+        // Methods ---------------------------------------------------------------------------
+        #region OMethod: bool OnLoad(ref string sAbsolutePathName)
+        protected override bool OnLoad(ref string sAbsolutePathName)
+        {
+            // Read this DProject as per normal
+            if (!base.OnLoad(ref sAbsolutePathName))
+                return false;
 
             // Initialize the Team Settings file
             if (string.IsNullOrEmpty(TeamSettings.AbsolutePathName))
                 TeamSettings.New();
             else
                 TeamSettings.Load();
+            TeamSettings.EnsureInitialized();
 
-			// Read the LoadOnDemand translation objects
-			if (null != FrontTranslation)
-			{
+            // Read the LoadOnDemand translation objects
+            if (null != FrontTranslation)
+            {
                 FrontTranslation.Load();
                 if (!FrontTranslation.Loaded)
-					FrontTranslation = null;
-			}
+                    FrontTranslation = null;
+            }
 
-			if (null != TargetTranslation)
-			{
+            if (null != TargetTranslation)
+            {
                 TargetTranslation.Load();
                 if (!TargetTranslation.Loaded)
-					TargetTranslation = null;
-			}
+                    TargetTranslation = null;
+            }
 
             // Load the other translations; remove them from the list if unsuccessful
             for (int i = 0; i < OtherTranslations.Count; )
@@ -946,10 +928,13 @@ namespace OurWord.DataModel
                 else
                     i++;
             }
-		}
-		#endregion
-		#region Method: void SaveCurrentBook()
-		public void SaveCurrentBook()
+
+            return true;
+        }
+        #endregion
+
+        #region Method: void SaveCurrentBook()
+        public void SaveCurrentBook()
 		{
 			if (null == STarget)
 				return;

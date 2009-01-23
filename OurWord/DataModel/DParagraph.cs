@@ -26,18 +26,32 @@ using OurWord.View;
 namespace OurWord.DataModel
 {
 
-	public class DParagraph : JParagraph
+	public class DParagraph : JObject 
 	{
 		// ZAttrs ----------------------------------------------------------------------------
-		#region JAttr{g}: JOwnSeq Runs - seq of DRun (verse no, chapter no, TextElement)
-		public JOwnSeq Runs
+        #region BAttr{g/s}: string StyleAbbrev - e.g., "p", "q", "q2".
+        public string StyleAbbrev
+        {
+            get
+            {
+                return m_sStyleAbbrev;
+            }
+            set
+            {
+                SetValue(ref m_sStyleAbbrev, value);
+            }
+        }
+        private string m_sStyleAbbrev = "p";
+        #endregion
+        #region JAttr{g}: JOwnSeq Runs - seq of DRun (verse no, chapter no, TextElement)
+		public JOwnSeq<DRun> Runs
 		{
 			get
 			{
 				return j_osRuns;
 			}
 		}
-		private JOwnSeq j_osRuns;
+		private JOwnSeq<DRun> j_osRuns;
 		#endregion
 		#region Declare BAttrs
 		enum BAttrs { bContents = BAttrBase };
@@ -45,7 +59,8 @@ namespace OurWord.DataModel
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
-		}
+            DefineAttr("Abbrev", ref m_sStyleAbbrev);
+        }
 		#endregion
 
 		// Run-Time Only Attrs ---------------------------------------------------------------
@@ -414,8 +429,6 @@ namespace OurWord.DataModel
 
 				foreach(DRun run in this.Runs)
 				{
-					if (run.NeedsLeadingSpace)
-						s += " ";
 					s += run.AsString;
 				}
 
@@ -432,8 +445,6 @@ namespace OurWord.DataModel
 
 				foreach(DRun run in this.Runs)
 				{
-					if (run.NeedsLeadingSpace)
-						s += " ";
 					s += run.ProseBTAsString;
 				}
 
@@ -773,33 +784,6 @@ namespace OurWord.DataModel
 				run.EliminateSpuriousSpaces();
 			CombineAdjacentDTexts(true);
 
-			// Set defaults to no leading spaces
-			foreach(DRun run in Runs)
-			{
-				run.NeedsLeadingSpace = false;
-			}
-
-			// If we have a DText or a footnote/seealso, and if it is followed
-			// by a chapter, verse, or DText, then we insert a space; which we
-			// do as a leading space in the chapter, verse or DText.
-			for(int i=0; i < Runs.Count - 1; i++)
-			{
-				// Are we at a text or a footnote?
-				if (null == Runs[i] as DText && 
-					null == Runs[i] as DFootLetter &&
-					null == Runs[i] as DSeeAlso)
-				{
-					continue;
-				}
-
-				// Is the next one a Chapter, Verse or Text?
-				DRun run = Runs[i+1] as DRun;
-				if (null != run as DChapter)
-					run.NeedsLeadingSpace = true;
-				else if (null != run as DVerse)
-					run.NeedsLeadingSpace = true;
-			}
-
 			// Make sure we have at a minimum a DText with a DPhrase; that is, we
 			// do not want a paragraph that has no runs
 			if (0 == Runs.Count)
@@ -1064,7 +1048,7 @@ namespace OurWord.DataModel
 
             // Create and insert  a new, empty paragraph to receive the right-side of the split
             DSection section = Paragraph.Section;
-            DParagraph paraNew = new DParagraph(Paragraph.Translation);
+            DParagraph paraNew = new DParagraph();
             paraNew.StyleAbbrev = Paragraph.StyleAbbrev;
             int iParaNew = section.Paragraphs.FindObj(Paragraph) + 1;
             section.Paragraphs.InsertAt(iParaNew, paraNew);
@@ -1196,7 +1180,7 @@ namespace OurWord.DataModel
 
             // Create an empty footnote, insert it into the section
             DFootnote footnote = new DFootnote(nChapter, nVerse, 
-                this.Translation, DFootnote.Types.kExplanatory);
+                DFootnote.Types.kExplanatory);
             footnote.SimpleText = "";         // Insert some text so we have a place to type
             Section.Footnotes.Append(footnote);
 
@@ -1364,6 +1348,15 @@ namespace OurWord.DataModel
 		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public DParagraph()
+            : base()
+        {
+            j_osRuns = new JOwnSeq<DRun>("Runs", this, false, false);
+
+            StyleAbbrev = "";
+        }
+        #endregion
 		#region Method: void CopyFrom(DParagraph pFront)
 		public virtual void CopyFrom(DParagraph pFront, bool bTruncateText)
 		{
@@ -1406,7 +1399,7 @@ namespace OurWord.DataModel
 				if (null != foot)
 				{
 					DFootnote fnFront = foot.Footnote;
-					DFootnote fnTarget = new DFootnote( Translation, fnFront);
+					DFootnote fnTarget = new DFootnote( fnFront);
 					Section.Footnotes.Append(fnTarget);
 					Runs.Append( DFootLetter.Copy( foot, fnTarget ) );
 					continue;
@@ -1417,7 +1410,7 @@ namespace OurWord.DataModel
 				if (null != also)
 				{
 					DFootnote fnFront = also.Footnote;
-					DFootnote fnTarget = new DFootnote( Translation, fnFront);
+					DFootnote fnTarget = new DFootnote( fnFront);
 					Section.Footnotes.Append(fnTarget);
 					fnTarget.ConvertCrossReferences(fnFront);
 					Runs.Append( DSeeAlso.Copy( also, fnTarget ) );
@@ -1450,29 +1443,6 @@ namespace OurWord.DataModel
 			}
 		}
 		#endregion
-
-		#region Constructor(DTranslation Trans) 
-		public DParagraph(DTranslation Translation)
-			: base(Translation.WritingSystemVernacular)
-		{
-			_ConstructAttrs();
-			StyleAbbrev = "";
-			_Initialize(null);
-		}
-		#endregion
-		#region Method: void _ConstructAttrs()
-		private void _ConstructAttrs()
-		{
-			j_osRuns = new JOwnSeq("Runs", this, typeof(DRun), false, false);
-		}
-		#endregion
-        #region Method: private void _Initialize(sStyleAbbrev) - sets up the attributes, creating objs, etc.
-        private void _Initialize(string sStyleAbbrev)
-		{
-			if (null != sStyleAbbrev)
-				StyleAbbrev = sStyleAbbrev;
-		}
-		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{
@@ -1499,6 +1469,78 @@ namespace OurWord.DataModel
 			return true;
 		}
 		#endregion
+
+        // I/O -------------------------------------------------------------------------------
+        const string c_sAttrContents = "Contents";
+        const string c_sAttrBT = "BT";
+        public override XElement ToXml(bool bIncludeNonBasicAttrs)
+        {
+            // Afraid of future changes to the class definition. This first assertion means
+            // that the only JAttr we have is Runs.
+            Debug.Assert(AllAttrs.Count == 1);
+            // This next assertion means we have exactly one BAttr (StyleAbbrev)
+            Debug.Assert(BAttrCount == 1);
+            // If any of this changes, then ToXml and FromXml will need to be updated.
+
+            // If we have exactly one DText, and no other runs, then we do a shorter
+            // output, in order to make the disk files a bit more human readable
+            // and concise.
+            // So first we test to see if the condition applies. If it doesn't, then
+            // we let the normal mechanism do the work.
+            bool bCanShorthand = (Runs.Count == 1 && Runs[0] as DText != null);
+            if (!bCanShorthand)
+                return base.ToXml(bIncludeNonBasicAttrs);
+
+            // Create the XElement for this object
+            XElement x = new XElement(GetType().Name);
+
+            // Do the basic attributes
+            x.AddAttr("Abbrev", m_sStyleAbbrev);
+
+            // Do our one-and-only DText
+            DText text = Runs[0] as DText;
+            string sContents = text.Phrases.ToSaveString;
+            string sBT = text.PhrasesBT.ToSaveString;
+            x.AddAttr(c_sAttrContents, sContents);
+            if (!string.IsNullOrEmpty(sBT))
+                x.AddAttr(c_sAttrBT, sBT);
+
+            // Done
+            return x;
+        }
+        public override void FromXml(XElement x)
+        {
+            // If we have a Contents attribute, then it means we used our special override
+            // of ToXml.
+            if (null == x.FindAttr("Contents"))
+            {
+                base.FromXml(x);
+                return;
+            }
+
+            // We want exactly one DText
+            Clear();
+            DText text = new DText();
+            Runs.Append(text);
+
+            // So if we are here, we do the reverse of ToXml
+            // First, get the abbrev
+            XElement.XAttr attr = x.FindAttr("Abbrev");
+            if (null != attr)
+                m_sStyleAbbrev = attr.Value;
+
+            // Retrieve the contents
+            attr = x.FindAttr(c_sAttrContents);
+            if (null != attr)
+                text.Phrases.FromSaveString(attr.Value);
+
+            // Retrieve the back translation
+            attr = x.FindAttr(c_sAttrBT);
+            if (null != attr)
+                text.PhrasesBT.FromSaveString(attr.Value);
+        }
+
+
 	}
 
 }

@@ -968,7 +968,7 @@ namespace OurWord.Edit
 
             // Retrieve the DBasicText and phrases we'll delete
             DBasicText DBT = selection.DBT;
-            DBasicText.DPhrases phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
@@ -1209,7 +1209,7 @@ namespace OurWord.Edit
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
             DBasicText DBT = sel.DBT;
-            DBasicText.DPhrases phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll keep track of which DPhrase we're currently processing here
             int iPhrase = 0;
@@ -1747,7 +1747,7 @@ namespace OurWord.Edit
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
             DBasicText DBT = Window.Selection.DBT;
-            DBasicText.DPhrases phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
@@ -1956,7 +1956,7 @@ namespace OurWord.Edit
             Window.Contents.OnSelectAndScrollFrom(footnote);
             m_bookmark_PositionOfFootnoteLetter = new OWBookmark(Window.Selection);
             // Make a copy of the footnote
-            m_CopyOfDeletedFootnote = new DFootnote(footnote.Translation, footnote);
+            m_CopyOfDeletedFootnote = new DFootnote(footnote);
             m_CopyOfDeletedFootnote.CopyFrom(footnote, false);
 
             // Retrieve the paragraph and run that refers to it; and remove

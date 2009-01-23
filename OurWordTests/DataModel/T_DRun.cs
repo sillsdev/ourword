@@ -36,7 +36,7 @@ namespace OurWordTests.DataModel
             OurWordMain.App = new OurWordMain();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
         }
         #endregion
 
@@ -375,6 +375,46 @@ namespace OurWordTests.DataModel
             _Evaluate(2, 10, "a",            aWords, aPositions);
             _Evaluate(3, 12, "pathalogical", aWords, aPositions);
             _Evaluate(4, 29, "case.",        aWords, aPositions);
+        }
+        #endregion
+    }
+
+    [TestFixture] public class T_DText
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+
+            OurWordMain.App = new OurWordMain();
+            OurWordMain.Project = new DProject();
+            G.Project.TeamSettings = new DTeamSettings();
+            G.TeamSettings.EnsureInitialized();
+        }
+        #endregion
+
+        #region Test: ToFromString
+        [Test] public void ToFromString()
+        {
+            // Create a DText that has several phrases
+            DText text = new DText();
+            text.Phrases.Append(new DPhrase("p", "These are the "));
+            text.Phrases.Append(new DPhrase("i", "times "));
+            text.Phrases.Append(new DPhrase("p", "that "));
+            text.Phrases.Append(new DPhrase("u", "try "));
+            text.Phrases.Append(new DPhrase("b", "men's souls."));
+
+            // Is the output what we expect?
+            string sSave = text.Phrases.ToSaveString;
+            Assert.AreEqual("These are the |itimes |rthat |utry |r|bmen's souls.|r", 
+                sSave);
+
+            // Create a recipient DText
+            DText text2 = new DText();
+            text2.Phrases.FromSaveString(sSave);
+
+            // Are the two texts equal?
+            Assert.IsTrue(text.ContentEquals(text2), "DTexts are not the same");
         }
         #endregion
 

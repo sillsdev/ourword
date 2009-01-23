@@ -76,15 +76,15 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				return j_reference.Value as DReference;
+				return j_reference.Value;
 			}
 			set
 			{
 				Debug.Assert(null != value);
-				(j_reference.Value as DReference).Copy(value);
+				j_reference.Value.Copy(value);
 			}
 		}
-		private JOwn j_reference = null;
+		private JOwn<DReference> j_reference = null;
 		#endregion
 
 		// Derived Attrs ---------------------------------------------------------------------
@@ -116,40 +116,29 @@ namespace OurWord.DataModel
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-		#region Constructor(DTranslation trans, DFootnote FnFront)
-		public DFootnote(DTranslation trans, DFootnote FnFront)
-			: base(trans)
+        #region private Constructor()
+        private DFootnote()
+            : base()
+        {
+            j_reference = new JOwn<DReference>("Reference", this);
+            j_reference.Value = new DReference();
+        }
+        #endregion
+        #region Constructor(DFootnote FnFront)
+        public DFootnote(DFootnote FnFront)
+			: this()
 		{
-			_ConstructAttrs();
-			_InitializeAttrs(trans);
-
 			Reference  = FnFront.Reference;
 			NoteType = FnFront.NoteType;
 		}
 		#endregion
 		#region Constructor(nChapter, nVerse, DTranslation)
-		public DFootnote(int nChapter, int nVerse, DTranslation trans, Types nNoteType)
-			: base(trans)
+		public DFootnote(int nChapter, int nVerse, Types nNoteType)
+			: this()
 		{
-			_ConstructAttrs();
-			_InitializeAttrs(trans);
-
 			Reference = new DReference(nChapter, nVerse);
 
             NoteType = nNoteType;
-		}
-		#endregion
-		#region Method: void _ConstructAttrs()
-		private void _ConstructAttrs()
-		{
-			j_reference = new JOwn("Reference", this, typeof(DReference));
-		}
-		#endregion
-		#region Method: void _InitializeAttrs(DTranslation trans)
-		protected void _InitializeAttrs(DTranslation trans)
-		{
-			j_reference.Value = new DReference();
-//			StyleAbbrev = OurWordMain.TeamSettings.SFMapping.StyleFootnotePara;
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates

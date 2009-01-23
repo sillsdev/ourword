@@ -203,35 +203,35 @@ namespace OurWord.DataModel
 
         // JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: JOwnSeq Footnotes - Includes footnotes and SeeAlso's
-		public JOwnSeq Footnotes
+        public JOwnSeq<DParagraph> Footnotes
 		{
 			get
 			{
 				return m_osFootnotes;
 			}
 		}
-		private JOwnSeq m_osFootnotes;
+        private JOwnSeq<DParagraph> m_osFootnotes;
 		#endregion
 		#region JAttr{g}: JOwnSeq Paragraphs - a paragraph, its BT, IBT, etc.
-		public JOwnSeq Paragraphs
+		public JOwnSeq<DParagraph> Paragraphs
 		{
 			get { return m_osParagraphs; }
 		}
-		private JOwnSeq m_osParagraphs;
+		private JOwnSeq<DParagraph> m_osParagraphs;
 		#endregion
 		#region JAttr{g/s}: DReferenceSpan ReferenceSpan - the verses covered by this section
 		public DReferenceSpan ReferenceSpan
 		{
 			get
 			{
-				return (DReferenceSpan)j_ownReferenceSpan.Value;
+				return j_ownReferenceSpan.Value;
 			}
 			set
 			{
 				j_ownReferenceSpan.Value = value;
 			}
 		}
-		private JOwn j_ownReferenceSpan = null;
+		private JOwn<DReferenceSpan> j_ownReferenceSpan = null;
 		#endregion
 
 		// Derived Attributes: Ownership Hiererachy ------------------------------------------
@@ -497,11 +497,11 @@ namespace OurWord.DataModel
             // Paragraphs and Footnotes: flags are
             // - Don't check for duplicates
             // - Don't sort
-            m_osParagraphs = new JOwnSeq("Paras", this, typeof(DParagraph), false, false);
-            m_osFootnotes = new JOwnSeq("Footnotes", this, typeof(DFootnote), false, false);
+            m_osParagraphs = new JOwnSeq<DParagraph>("Paras", this, false, false);
+            m_osFootnotes = new JOwnSeq<DParagraph>("Footnotes", this, false, false);
 
             // Scripture Reference Span
-            j_ownReferenceSpan = new JOwn("RefSpan", this, typeof(DReferenceSpan));
+            j_ownReferenceSpan = new JOwn<DReferenceSpan>("RefSpan", this);
             ReferenceSpan = new DReferenceSpan();
 
 		}
@@ -535,9 +535,9 @@ namespace OurWord.DataModel
 				DParagraph p = null;
 
 				if (null != pFront as DPicture)
-					p = new DPicture(Translation);
+					p = new DPicture();
 				else
-					p = new DParagraph(Translation);
+					p = new DParagraph();
 
 				Paragraphs.Append(p);
 				p.CopyFrom(pFront, true);
@@ -1584,8 +1584,9 @@ namespace OurWord.DataModel
 				}
 			}
 			#endregion
+
 			#region Method: static void CombineLikePhrases( JOwnSeq os )
-			static private void CombineLikePhrases(JOwnSeq os)
+			static private void CombineLikePhrases(JOwnSeq<DPhrase> os)
 			{
 				for(int i=0; i<os.Count - 1; )
 				{
@@ -1602,6 +1603,7 @@ namespace OurWord.DataModel
 				}
 			}
 			#endregion
+
 			#region Method: static ArrayList GetPhrases(string sSource)
 			static ArrayList GetPhrases(string sSource)
 			{
@@ -1916,7 +1918,8 @@ namespace OurWord.DataModel
 						DText text = run as DText;
 						if (null != text)
 						{
-                            listTranslatorNotes.AddRange(text.TranslatorNotes);
+                            foreach (TranslatorNote tn in text.TranslatorNotes)
+                                listTranslatorNotes.Add(tn);
 
 							foreach(DNote note in text.Notes)
 								listNotes.Add(note);
@@ -1971,7 +1974,7 @@ namespace OurWord.DataModel
 					pict = LastParagraph as DPicture;
 				if (null == pict)
 				{
-					pict = new DPicture(Section.Translation);
+					pict = new DPicture();
 					Section.Paragraphs.Append(pict);
 				}
 
@@ -2009,7 +2012,7 @@ namespace OurWord.DataModel
 				// If the current field's marker is a match, then create a new paragraph
 				if (field.Mkr == sMkr)
 				{
-					DParagraph p = new DParagraph(Section.Translation);
+					DParagraph p = new DParagraph();
 					Section.Paragraphs.Append(p);
 
 					p.StyleAbbrev = sStyle;
@@ -2031,7 +2034,7 @@ namespace OurWord.DataModel
 				{
 					// Create and append a footnote into the Section's sequence
 					DFootnote fn = new DFootnote(s_nChapter, s_nVerse,
-                        Section.Translation, DFootnote.Types.kExplanatory);
+                        DFootnote.Types.kExplanatory);
 					Section.Footnotes.Append(fn);
 
 					// Connect up the DRun in the most recent paragraph to this footnote
@@ -2089,6 +2092,7 @@ namespace OurWord.DataModel
 			#endregion
 
             // Translator Notes --------------------------------------------------------------
+            bool m_bConvertNotes = false;
             bool TranslatorNote_in(SfField field)
             {
                 TranslatorNote tn = null;
@@ -2098,13 +2102,20 @@ namespace OurWord.DataModel
                 {
                     XElement[] x = XElement.CreateFrom(field.Data);
                     if (x.Length == 1)
-                        tn = TranslatorNote.CreateFromXml(x[0]);
+                    {
+                        tn = new TranslatorNote();
+                        tn.FromXml(x[0]);
+                    }
                 }
 
                 // Otherwise, is it an old-style (pre version 1.1) note?
                 else
                 {
-                    tn = TranslatorNote.ImportFromOldStyle(s_nChapter, s_nVerse, field);
+                    if (m_bConvertNotes)
+                    {
+                        tn = TranslatorNote.ImportFromOldStyle(
+                            s_nChapter, s_nVerse, field);
+                    }
                 }
 
                 // If we don't have a note, then we're done processing
@@ -2126,7 +2137,7 @@ namespace OurWord.DataModel
                 DText text = LastParagraph.GetOrAddLastDText();
 
                 // Insert the note
-                text.TranslatorNotes.Add(tn);
+                text.TranslatorNotes.Append(tn);
 
                 return true;
             }
@@ -2140,8 +2151,11 @@ namespace OurWord.DataModel
 				if (DNote.Types.kUnknown == NoteType)
 					return false;
 
-// Should not get here now that TranslatorNote_in is implemented
-Debug.Assert(false);
+                if (m_bConvertNotes)
+                {
+                    // Should not get here now that TranslatorNote_in is implemented
+                    Debug.Assert(false);
+                }
 
 				// Now that I've reorganized notes from paragraphs to DTexts, I need to
 				// get rid of the old {v 2} sequences.
@@ -2246,7 +2260,7 @@ Debug.Assert(false);
 				}
 
 				// Create the new paragraph. The style is the same as the field marker
-				DParagraph p = new DParagraph(Section.Translation);
+				DParagraph p = new DParagraph();
 				Section.Paragraphs.Append(p);
 
 				p.StyleAbbrev = field.Mkr;
@@ -2372,7 +2386,7 @@ Debug.Assert(false);
 
 				// Create a footnote containing the text
 				DFootnote fn = new DFootnote(s_nChapter, s_nVerse,
-                    Section.Translation, DFootnote.Types.kSeeAlso);
+                    DFootnote.Types.kSeeAlso);
 				Section.Footnotes.Append(fn);
 				AddParagraphText(fn, field);
 
@@ -3098,7 +3112,7 @@ Debug.Assert(false);
 		{
 			// Team Settings (uses program defaults)
 			TeamSettings = new DTeamSettings();
-			TeamSettings.InitializeFactoryStyleSheet();
+			TeamSettings.EnsureInitialized();
 
 			// Initialize Project1
 			Project1 = new DProject();

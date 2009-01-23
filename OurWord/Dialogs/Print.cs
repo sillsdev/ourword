@@ -1060,7 +1060,7 @@ namespace OurWord
 		public bool IncrementParagraph()
 		{
 			// Get the JOwnSeq attribute that holds this paragraph
-			JOwnSeq OwnSeq = (null == Paragraph as DFootnote) ? 
+			JOwnSeq<DParagraph> OwnSeq = (null == Paragraph as DFootnote) ? 
 				Section.Paragraphs :
 				Section.Footnotes  ;
 
@@ -1145,7 +1145,7 @@ namespace OurWord
 					return true;
 
 				// Do we have more paragraphs?
-				JOwnSeq OwnSeq = (null == Paragraph as DFootnote) ? 
+				JOwnSeq<DParagraph> OwnSeq = (null == Paragraph as DFootnote) ? 
 					Section.Paragraphs :
 					Section.Footnotes  ;
 				int iPara = OwnSeq.FindObj(Paragraph);

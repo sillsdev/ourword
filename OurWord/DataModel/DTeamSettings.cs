@@ -235,10 +235,10 @@ namespace OurWord.DataModel
 		{
 			get 
 			{ 
-				return (DStyleSheet)m_StyleSheet.Value; 
+				return m_StyleSheet.Value; 
 			}
 		}
-		private JOwn m_StyleSheet = null;  
+		private JOwn<DStyleSheet> m_StyleSheet = null;  
 		#endregion
 		#region JAttr{g}: DSFMapping SFMapping
 		public DSFMapping SFMapping
@@ -247,10 +247,10 @@ namespace OurWord.DataModel
 			{
 				if (null == j_SFMapping.Value)
 					j_SFMapping.Value = new DSFMapping();
-				return (DSFMapping)j_SFMapping.Value;
+				return j_SFMapping.Value;
 			}
 		}
-		private JOwn j_SFMapping = null;
+		private JOwn<DSFMapping> j_SFMapping = null;
 		#endregion
 		#region JAttr{g}: BookStages TranslationStages
 		public BookStages TranslationStages
@@ -259,29 +259,29 @@ namespace OurWord.DataModel
 			get 
 			{ 
 				if (null == m_TranslationStages)
-					m_TranslationStages = new JOwn("Stages", this, typeof(BookStages));
+                    m_TranslationStages = new JOwn<BookStages>("Stages", this);
 
-				if (null == m_TranslationStages.Value as BookStages)
+				if (null == m_TranslationStages.Value)
 					m_TranslationStages.Value = new BookStages();
 
-				return m_TranslationStages.Value as BookStages; 
+				return m_TranslationStages.Value; 
 			}
 		}
-		private JOwn m_TranslationStages = null;  
+		private JOwn<BookStages> m_TranslationStages = null;  
 		#endregion
         #region JAttr{g}: JOwnSeq BookGroupings
-        public JOwnSeq BookGroupings
+        public JOwnSeq<DBookGrouping> BookGroupings
         {
             get
             {
                 if(null == m_BookGroupings)
-                    m_BookGroupings = new JOwnSeq("BookGroupings", this, typeof(DBookGrouping));
+                    m_BookGroupings = new JOwnSeq<DBookGrouping>("BookGroupings", this);
                 if (m_BookGroupings.Count == 0)
                     DBookGrouping.InitializeGroupings(m_BookGroupings);
                 return m_BookGroupings;
             }
         }
-        private JOwnSeq m_BookGroupings = null;
+        private JOwnSeq<DBookGrouping> m_BookGroupings = null;
         #endregion
 
         // Attributes ------------------------------------------------------------------------
@@ -321,15 +321,8 @@ namespace OurWord.DataModel
 		public DTeamSettings()
 			: base()
 		{
-			ConstructAttrs();
-			j_SFMapping.Value = new DSFMapping();
-		}
-		#endregion
-		#region ConstructAttrs()
-		private void ConstructAttrs()
-		{
 			// Style Sheet
-			m_StyleSheet = new JOwn("StyleSheet", this, typeof(DStyleSheet));
+			m_StyleSheet = new JOwn<DStyleSheet>("StyleSheet", this);
 
 			// Translation Stages. Note that we initialize this at runtime (i.e., 
 			// we call "new BookStages" as part of the TranslationStages
@@ -340,14 +333,15 @@ namespace OurWord.DataModel
 			// 2. BookStages was a later addition and earlier data (e.g.,
 			//    Timor) does not have it, so to construct it here means
 			//    that the Read operation would overwrite it.
-			m_TranslationStages = new JOwn("Stages", this, typeof(BookStages));
+			m_TranslationStages = new JOwn<BookStages>("Stages", this);
 
             // Book Groupings
-            m_BookGroupings = new JOwnSeq("BookGroupings", this, typeof(DBookGrouping));
+            m_BookGroupings = new JOwnSeq<DBookGrouping>("BookGroupings", this);
             DBookGrouping.InitializeGroupings(m_BookGroupings);
 
 			// Standard Format conversion mapping
-			j_SFMapping = new JOwn("SFMapping", this, typeof(DSFMapping));
+			j_SFMapping = new JOwn<DSFMapping>("SFMapping", this);
+			j_SFMapping.Value = new DSFMapping();
 
 			// Default copyright notice
 			if (CopyrightNotice.Length == 0)
@@ -363,14 +357,19 @@ namespace OurWord.DataModel
             m_bsaTranslatorNotesCategories = new BStringArray();
         }
 		#endregion
-		#region void InitializeFactoryStyleSheet()
-		public void InitializeFactoryStyleSheet()
-		{
-			if (null == m_StyleSheet.Value)
-				m_StyleSheet.Value = new DStyleSheet();
 
-			StyleSheet.Initialize(false);
-		}
+		#region void EnsureInitialized()
+        public void EnsureInitialized()
+            // This is re-entrant; we want to be able to scan an existing TeamSettings
+            // to make sure it reflects our current needs, as OurWord may change 
+        {
+            // Style Sheet
+            if (null == m_StyleSheet.Value)
+                m_StyleSheet.Value = new DStyleSheet();
+            StyleSheet.Initialize(false);
+
+            // TODO: Other TeamSEttings initializations
+        }
 		#endregion
         #region VAttr{g}: override string DefaultFileExtension
         public override string DefaultFileExtension
@@ -399,7 +398,7 @@ namespace OurWord.DataModel
 			Clear();
 
 			// Set to default values
-			InitializeFactoryStyleSheet();
+			EnsureInitialized();
 		}
 		#endregion
         #region OMethod: bool OnLoad(ref sAbsolutePathName) - sets Note Categories
@@ -514,6 +513,7 @@ namespace OurWord.DataModel
 
 		// Initialization --------------------------------------------------------------------
         public const string c_Latin = "Latin";
+        public const string c_DefaultWritingSystem = c_Latin;
 		#region Method: void _InitializeWritingSystems()
 		private void _InitializeWritingSystems()
 		{

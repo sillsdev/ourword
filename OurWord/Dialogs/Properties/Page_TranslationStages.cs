@@ -699,14 +699,14 @@ namespace OurWord.Dialogs
 	{
 		// ZAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: JOwnSeq TranslationStages - The translation stages defined for this Team
-		public JOwnSeq TranslationStages
+		public JOwnSeq<TranslationStage> TranslationStages
 		{
 			get
 			{
 				return m_osTranslationStages;
 			}
 		}
-		private JOwnSeq m_osTranslationStages;
+		private JOwnSeq<TranslationStage> m_osTranslationStages;
 		#endregion
 		#region BAttr{g/s}: int NextID - The next available ID for creating a new TranslationStage
 		private int NextID
@@ -770,7 +770,7 @@ namespace OurWord.Dialogs
 			: base()
 		{
 			// Initialize the owning sequence object
-			m_osTranslationStages = new JOwnSeq("Stages", this, typeof(TranslationStage), 
+			m_osTranslationStages = new JOwnSeq<TranslationStage>("Stages", this, 
 				false, false);
 
 			// Initialize the default Stages values; a Read of the TeamSettings will override.

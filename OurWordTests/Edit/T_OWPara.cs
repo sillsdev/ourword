@@ -109,7 +109,7 @@ namespace OurWordTests.Edit
         private DParagraph CreateParagraph_John_3_16()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph(G.Project.TargetTranslation);
+            DParagraph p = new DParagraph();
             p.StyleAbbrev = "p";
 
             // Add various runs
@@ -147,7 +147,7 @@ namespace OurWordTests.Edit
             OurWordMain.App = new OurWordMain();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Project";
             G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK", "");

@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 15 Mar 2004
  * Purpose: Implements JRef, an atomic reference attribute.
- * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -37,66 +37,26 @@ using JWTools;
 
 namespace JWdb
 {
-	#region Class JRefHolder - temporarily holds the xml imput file path during a Read operation
-	public class JRefHolder : JObject
-	{
-		// ZAttrs ----------------------------------------------------------------------------
-		#region BAttr{g/s}: string RefPath - the path to the referenced object
-		public string RefPath
-		{
-			get
-			{
-				return m_sRefPath;
-			}
-			set
-			{
-				m_sRefPath = value;
-			}
-		}
-		private string m_sRefPath;
-		#endregion
-		#region Method: void DeclareAttrs()
-		protected override void DeclareAttrs()
-		{
-			base.DeclareAttrs();
-			DefineAttr("RefPath", ref m_sRefPath);
-		}
-		#endregion
-
-		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor(string sRefPath)
-		public JRefHolder(string sRefPath) 
-			: base()
-		{
-			RefPath = sRefPath;
-		}
-		#endregion
-	}
-	#endregion
-
-	public class JRef : JAttr
+	public class JRef<T> : JAttr where T:JObject
 	{
 		// Private attributes ----------------------------------------------------------------
-		#region Private Attribute: JObject m_referencedObject - stores the object referenced
-		protected JObject m_referencedObject = null;
-		#endregion
-		static private string m_sTag = "ref";    // xml tag for I/O
+        string m_sTemporaryReferencePath;        // Used during read process
 
 		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor(sName, objOwner, signature) - sets up the attribute
-		public JRef(string sName, JObject objOwner, Type signature)
-			: base(sName, objOwner, signature)
+		#region Constructor(sName, objOwner) - sets up the attribute
+		public JRef(string sName, JObject objOwner)
+			: base(sName, objOwner, typeof(T))
 		{
 		}
 		#endregion
 
 		// Getting / Setting -----------------------------------------------------------------
-		#region Attr{g/s} JObject Value - main method for getting / setting the attr's value
-		public JObject Value
+		#region Attr{g/s} T Value - main method for getting / setting the attr's value
+		public T Value
 		{
 			get
 			{
-				return m_referencedObject;
+                return m_objValue;
 			}
 			set
 			{
@@ -104,98 +64,89 @@ namespace JWdb
 					Clear();
 				else
 				{
-					// Integrity check
-					CheckCorrectSignature(value);
-
-					// Now insert the target object and give it an owner
-					m_referencedObject = value;
+					// Insert the target object and give it an owner
+                    m_objValue = value;
 
 					DeclareDirty();
 				}
 			}
 		}
+        protected T m_objValue = null;
 		#endregion
-		#region Method: void Clear() - removes the object
-		public void Clear()
+		#region OMethod: void Clear() - removes the object
+		public override void Clear()
 		{
-			m_referencedObject = null;
+            m_objValue = null;
 			DeclareDirty();
 		}
 		#endregion
 
 		// I/O -------------------------------------------------------------------------------
-		#region Attribute: OpeningXmlTagLine - e.g., "<ref Name="CurrentWritingSystem">
-		public override string OpeningXmlTagLine
+		const string c_sTag = "ref";    // xml tag for I/O
+        #region OMethod: void ToXml(XElement xObject)
+        public override void ToXml(XElement xObject)
+        {
+            // If not pointing to anything, then there is nothing to write
+            if (null == Value)
+                return;
+
+            // Create an XElement for the JRef
+            XElement xRef = new XElement(c_sTag);
+            xRef.AddAttr("Name", Name);
+
+            // Add it to the owning object's XElement
+            xObject.AddSubItem(xRef);
+
+            // Add the contents
+            string s = PathToReferencedObject;
+            xRef.AddSubItem(new XString(s));
+        }
+        #endregion
+        #region OMethod: void FromXml(XElement x)
+        public override void FromXml(XElement x)
+        {
+            if (x.Tag != c_sTag)
+                return;
+
+            // The path is stored as an XString data object
+            if (x.Items.Length != 1)
+                return;
+            XString xs = x.Items[0] as XString;
+            if (null == xs)
+                return;
+
+            // Store it for now, we'll resolve it later (after all objects have been read in)
+            // via the ResolveReferences method
+            m_sTemporaryReferencePath = xs.Text;
+        }
+        #endregion
+
+        #region OMethod: void ResolveReferences()
+        public override void ResolveReferences()
 		{
-			get { return "<" + m_sTag + " Name=\"" + Name + "\">"; }
-		}
-		#endregion
-		#region Attribute: ClosingXmlTagLine - e.g., "</own>
-		private string ClosingXmlTagLine
-		{
-			get { return "</" + m_sTag + ">"; }
-		}
-		#endregion
-		#region Method: Write(TextWriter) - writes the reference attr
-		public override void Write(TextWriter tw, int nIndent)
-		{
-			// If not pointing to anything, then there is nothing to write
-			if (null == Value)
-				return;
+            if (string.IsNullOrEmpty(m_sTemporaryReferencePath))
+                return;
 
-			string s = PathToReferencedObject;
-			tw.WriteLine(IndentPadding(nIndent) + OpeningXmlTagLine + 
-				PathToReferencedObject + ClosingXmlTagLine);
-		}
-		#endregion
-		#region Method: Read(string sFirstLine, TextReader tr) - reads from xml file
-		public override void Read(string s, TextReader tr)
-			// We create a temporary object, a JRefHolder, and place it in the ReferencedObject
-			// attribute here. Then at the end of the read (from the topmost object), we
-			// call ResolveReference recursively, which goes through and converts these
-			// paths into real references. It is necessary to wait to do this, because
-			// we must be sure that all objects have been read in, before attempting to
-			// reference to them.
-		{
-			// Extract the path
-			string sRefPath = s.Substring( s.IndexOf('>') + 1 );
-			sRefPath = sRefPath.Substring(0, sRefPath.IndexOf('<'));
+            // Extract from the RefPath how high up the ownership hiererchy 
+            string sUp = m_sTemporaryReferencePath.Substring(0, 
+                m_sTemporaryReferencePath.IndexOf('-'));
+            int cUp = Convert.ToInt16(sUp);
+            string sDown = m_sTemporaryReferencePath.Substring(
+                m_sTemporaryReferencePath.IndexOf('-') + 1);
 
-			// Store it for now, we'll resolve it later (after all objects have been read in).
-			m_referencedObject = new JRefHolder(sRefPath);
-		}
-		#endregion
-		#region Method: void ResolveReference()
-		public void ResolveReference()
-		{
-			// The attribute does not have a value set
-			if (null == m_referencedObject)
-				return;
+            // Move up the hierarchy as directed
+            JObject obj = this.Owner;
+            while (cUp > 0)
+            {
+                obj = obj.Owner;
+                --cUp;
+            }
 
-			// Convert the place holder into a real reference
-			if (m_referencedObject.GetType() == typeof(JRefHolder))
-			{
-				// Extract our RefPath, and remove the JRefHolder object
-				string sRefPath = ((JRefHolder)m_referencedObject).RefPath;
-				m_referencedObject = null;
+            // Find the target object
+            Value = obj.GetObjectFromPath(sDown) as T;
 
-				// Extract from the RefPath how high up the ownership hiererchy 
-				string sUp = sRefPath.Substring(0, sRefPath.IndexOf('-') );
-				int cUp = Convert.ToInt16(sUp);
-				string sDown = sRefPath.Substring( sRefPath.IndexOf('-') + 1);
-
-				// Move up the hierarchy as directed
-				JObject obj = this.Owner;
-				while (cUp > 0)
-				{
-					obj = obj.Owner;
-					--cUp;
-				}
-
-				// Find the target object
-				JObject objTarget = obj.GetObjectFromPath(sDown);
-				Value = objTarget;
-			}
+            // Don't need to take up memory with this any longer
+            m_sTemporaryReferencePath = null;
 		}
 		#endregion
 		#region Attr{g}: string PathToReferencedObject - returns human-readable path for xml file
@@ -221,7 +172,7 @@ namespace JWdb
 				}
 				string sPath = nDistanceUp.ToString();
 
-				// Point to the nearies object that the two have in common
+				// Point to the nearest object that the two have in common
 				JObject objTop = Owner;
 				for(int i=0; i<nDistanceUp; i++)
 				{

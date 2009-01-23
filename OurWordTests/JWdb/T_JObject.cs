@@ -52,76 +52,76 @@ namespace OurWordTests.JWdb
             #endregion
 
             #region Attr{g}: JOwnSeq OwnSeq1
-            public JOwnSeq OwnSeq1
+            public JOwnSeq<TestObject> OwnSeq1
             {
                 get
                 {
                     return m_osOwnSeq1;
                 }
             }
-            JOwnSeq m_osOwnSeq1;
+            JOwnSeq<TestObject> m_osOwnSeq1;
             #endregion
             #region Attr{g}: JOwnSeq OwnSeq2
-            public JOwnSeq OwnSeq2
+            public JOwnSeq<TestObject> OwnSeq2
             {
                 get
                 {
                     return m_osOwnSeq2;
                 }
             }
-            JOwnSeq m_osOwnSeq2;
+            JOwnSeq<TestObject> m_osOwnSeq2;
             #endregion
             #region Attr{g}: JOwnSeq OwnSeq3
-            public JOwnSeq OwnSeq3
+            public JOwnSeq<TestObject> OwnSeq3
             {
                 get
                 {
                     return m_osOwnSeq3;
                 }
             }
-            JOwnSeq m_osOwnSeq3;
+            JOwnSeq<TestObject> m_osOwnSeq3;
             #endregion
 
             #region Attr{g}: JOwn Own1
-            public JOwn Own1
+            public JOwn<TestObject> Own1
             {
                 get
                 {
                     return m_own1;
                 }
             }
-            JOwn m_own1;
+            JOwn<TestObject> m_own1;
             #endregion
             #region Attr{g}: JOwn Own2
-            public JOwn Own2
+            public JOwn<TestObject> Own2
             {
                 get
                 {
                     return m_own2;
                 }
             }
-            JOwn m_own2;
+            JOwn<TestObject> m_own2;
             #endregion
 
             #region Attr{g}: JRef Ref1
-            public JRef Ref1
+            public JRef<TestObject> Ref1
             {
                 get
                 {
                     return m_ref1;
                 }
             }
-            JRef m_ref1;
+            JRef<TestObject> m_ref1;
             #endregion
             #region Attr{g}: JRef Ref2
-            public JRef Ref2
+            public JRef<TestObject> Ref2
             {
                 get
                 {
                     return m_ref2;
                 }
             }
-            JRef m_ref2;
+            JRef<TestObject> m_ref2;
             #endregion
 
             // Scaffolding -------------------------------------------------------------------
@@ -131,15 +131,15 @@ namespace OurWordTests.JWdb
             {
                 m_sName = sName;
 
-                m_osOwnSeq1 = new JOwnSeq("os1", this, typeof(TestObject));
-                m_osOwnSeq2 = new JOwnSeq("os2", this, typeof(TestObject));
-                m_osOwnSeq3 = new JOwnSeq("os3", this, typeof(TestObject));
+                m_osOwnSeq1 = new JOwnSeq<TestObject>("os1", this);
+                m_osOwnSeq2 = new JOwnSeq<TestObject>("os2", this);
+                m_osOwnSeq3 = new JOwnSeq<TestObject>("os3", this);
 
-                m_own1 = new JOwn("own1", this, typeof(TestObject));
-                m_own2 = new JOwn("own2", this, typeof(TestObject));
+                m_own1 = new JOwn<TestObject>("own1", this);
+                m_own2 = new JOwn<TestObject>("own2", this);
 
-                m_ref1 = new JRef("ref1", this, typeof(TestObject));
-                m_ref2 = new JRef("ref2", this, typeof(TestObject));
+                m_ref1 = new JRef<TestObject>("ref1", this);
+                m_ref2 = new JRef<TestObject>("ref2", this);
             }
             #endregion
             #region OAttr{g}: string SortKey
@@ -210,45 +210,6 @@ namespace OurWordTests.JWdb
             Assert.IsFalse(objLevel4.IsRoot);
         }
         #endregion
-        #region Test: All_X_Attrs
-        [Test] public void All_X_Attrs()
-        {
-            // All owning attrs
-            ArrayList list = objRoot.AllOwningAttrs;
-            Assert.AreEqual(5, list.Count);
-            foreach (JAttr attr in list)
-            {
-                Assert.IsTrue(attr.GetType() != typeof(JRef));
-                Assert.IsTrue(attr.GetType() == typeof(JOwnSeq) || 
-                    attr.GetType() == typeof(JOwn));
-            }
-
-            // All atomic own attrs
-            list = objRoot.AllJOwnAttrs;
-            Assert.AreEqual(2, list.Count);
-            foreach (JAttr attr in list)
-            {
-                Assert.IsTrue(attr.GetType() == typeof(JOwn));
-            }
-
-            // All seq own attrs
-            list = objRoot.AllJOwnSeqAttrs;
-            Assert.AreEqual(3, list.Count);
-            foreach (JAttr attr in list)
-            {
-                Assert.IsTrue(attr.GetType() == typeof(JOwnSeq));
-            }
-
-            // All atomic ref attrs
-            list = objRoot.AllJRefAttrs;
-            Assert.AreEqual(2, list.Count);
-            foreach (JAttr attr in list)
-            {
-                Assert.IsTrue(attr.GetType() == typeof(JRef));
-            }
-
-        }
-        #endregion
         #region Test: PathFromOwningObject
         [Test] public void PathFromOwningObject()
         {
@@ -285,20 +246,20 @@ namespace OurWordTests.JWdb
         class TestObjectDups : TestObject
         {
             #region Attr{g}: JOwnSeq OwnSeqDup
-            public JOwnSeq OwnSeqDup
+            public JOwnSeq<TestObject> OwnSeqDup
             {
                 get
                 {
                     return m_osOwnSeqDup;
                 }
             }
-            JOwnSeq m_osOwnSeqDup;
+            JOwnSeq<TestObject> m_osOwnSeqDup;
             #endregion
             #region Constructor()
             public TestObjectDups()
                 : base("dup")
             {
-                m_osOwnSeqDup = new JOwnSeq("os2", this, typeof(TestObject));
+                m_osOwnSeqDup = new JOwnSeq<TestObject>("os2", this);
             }
             #endregion
         }
@@ -314,7 +275,7 @@ namespace OurWordTests.JWdb
 
         #region Test: SimpleBAttrIO
         #region Embedded Class for Testing: BAttrTestObject
-        class BAttrTestObject : JObject
+        class BAttrTestObject : JObjectOnDemand
         {
             #region BAttr{g/s}: string Name
             public string Name
@@ -443,25 +404,21 @@ namespace OurWordTests.JWdb
             Assert.AreEqual('M', objStart.Gender, "Set");
 
             // Write out the object
-            string sFileName = "text.x";
-            TextWriter tw = JWU.NUnit_OpenTextWriter(sFileName);
-            objStart.Write(tw, 0);
-            tw.Close();
+            objStart.AbsolutePathName = JWU.NUnit_TestFilePathName;
+            objStart.Write();
 
             // Create a read-in object and populate it from the file we just wrote out
             BAttrTestObject objEnd = new BAttrTestObject();
-            TextReader tr = JWU.NUnit_OpenTextReader(sFileName);
-            string sLine = tr.ReadLine();
-            objEnd.Read(sLine, tr);
-            tr.Close();
+            objEnd.AbsolutePathName = JWU.NUnit_TestFilePathName;
+            objEnd.Load();
 
             // Test that the attributes are all the same
-            Assert.AreEqual(objStart.Name, objEnd.Name, "Read");
-            Assert.AreEqual(objStart.IsYoung, objEnd.IsYoung, "Read");
-            Assert.AreEqual(objStart.Age, objEnd.Age, "Read");
-            Assert.AreEqual(objStart.Weight, objEnd.Weight, "Read");
-            Assert.AreEqual(objStart.DOB, objEnd.DOB, "Read");
-            Assert.AreEqual(objStart.Gender, objEnd.Gender, "Read");
+            Assert.AreEqual(objStart.Name, objEnd.Name, "Read-Name");
+            Assert.AreEqual(objStart.IsYoung, objEnd.IsYoung, "Read-IsYoung");
+            Assert.AreEqual(objStart.Age, objEnd.Age, "Read-Age");
+            Assert.AreEqual(objStart.Weight, objEnd.Weight, "Read-Weight");
+            Assert.AreEqual(objStart.DOB, objEnd.DOB, "Read-DOB");
+            Assert.AreEqual(objStart.Gender, objEnd.Gender, "Read-Gender");
         }
         #endregion
     }

@@ -698,34 +698,34 @@ namespace OurWord.DataModel
 
 		// JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: JOwnSeq Sections - the list of sections in this book
-		public JOwnSeq Sections
+		public JOwnSeq<DSection> Sections
 		{
 			get 
 			{ 
 				return j_osSections; 
 			}
 		}
-		private JOwnSeq j_osSections = null;
+		private JOwnSeq<DSection> j_osSections = null;
 		#endregion
 		#region JAttr{g}: JOwnSeq History - seq of paragraphs given notes about translation history
-		public JOwnSeq History
+		public JOwnSeq<DParagraph> History
 		{
 			get 
 			{ 
 				return j_osHistory; 
 			}
 		}
-		private JOwnSeq j_osHistory = null;
+		private JOwnSeq<DParagraph> j_osHistory = null;
 		#endregion
 		#region JAttr{g}: JOwnSeq Notes - seq of paragraphs given notes about misc notes
-		public JOwnSeq Notes
+		public JOwnSeq<DParagraph> Notes
 		{
 			get 
 			{ 
 				return j_osNotes; 
 			}
 		}
-		private JOwnSeq j_osNotes = null;
+		private JOwnSeq<DParagraph> j_osNotes = null;
 		#endregion
 
 		// Temporary (run-time) attrs --------------------------------------------------------
@@ -1308,29 +1308,19 @@ namespace OurWord.DataModel
 		public DBook()
 			: base()
 		{
-			ConstructAttrs();
+			j_osSections   = new JOwnSeq<DSection>("Sections", this, true, false);
+			j_osHistory    = new JOwnSeq<DParagraph>("History", this, false, false);
+			j_osNotes      = new JOwnSeq<DParagraph>("Notes", this, false, false);
+            m_vMergeBooks = new DMergeBook[0];
 		}
 		#endregion
 		#region Constructor(sBookAbbrev, sPath)
 		public DBook(string sBookAbbrev, string sPath)
-			: base()
+			: this()
 		{
-			// Initialize the attributes
-			ConstructAttrs();
-
 			// Initial values for some attrs
 			BookAbbrev = sBookAbbrev;
             AbsolutePathName = sPath;
-		}
-		#endregion
-		#region Method: void ConstructAttrs() - constructs the JObject's attributes
-		private void ConstructAttrs()
-		{
-			// Owning Sequence Attrs
-			j_osSections   = new JOwnSeq("Sections",  this, typeof(DSection), true, false);
-			j_osHistory    = new JOwnSeq("History",   this, typeof(JParagraph), false, false);
-			j_osNotes      = new JOwnSeq("Notes",     this, typeof(JParagraph), false, false);
-            m_vMergeBooks = new DMergeBook[0];
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -1895,7 +1885,7 @@ namespace OurWord.DataModel
 			{
 				if (Map.IsBookHistoryMarker(field.Mkr))
 				{
-					DParagraph p = new DParagraph(Book.Translation);
+					DParagraph p = new DParagraph();
 					Book.History.Append( p );
 					p.StyleAbbrev = "p";
 					p.SimpleText = field.Data;
@@ -1918,7 +1908,7 @@ namespace OurWord.DataModel
 			{
 				if (Map.IsBookNotesMarker(field.Mkr))
 				{
-					DParagraph p = new DParagraph(Book.Translation);
+					DParagraph p = new DParagraph();
 					Book.Notes.Append( p );
 					p.StyleAbbrev = "p";
 					p.SimpleText = field.Data;
@@ -2593,7 +2583,7 @@ namespace OurWord.DataModel
             m_book.Version = 'A';
 
             // Append an extra paragraph
-            DParagraph p = new DParagraph(m_translation);
+            DParagraph p = new DParagraph();
             DSection section = m_book.Sections[0] as DSection;
             section.Paragraphs.Append(p);
             p.StyleAbbrev = "q";

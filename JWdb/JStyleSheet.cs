@@ -54,34 +54,34 @@ namespace JWdb
 
 		// JAttributes: ----------------------------------------------------------------------
 		#region Attr{g}: JOwnSeq ParagraphStyles - the list of paragraph styles
-		public JOwnSeq ParagraphStyles
+		public JOwnSeq<JParagraphStyle> ParagraphStyles
 		{
 			get 
 			{ 
 				return j_osParagraphStyles; 
 			}
 		}
-		private JOwnSeq j_osParagraphStyles = null;
+		private JOwnSeq<JParagraphStyle> j_osParagraphStyles = null;
 		#endregion
 		#region Attr{g}: JOwnSeq CharacterStyles - the list of character styles
-		public JOwnSeq CharacterStyles
+		public JOwnSeq<JCharacterStyle> CharacterStyles
 		{
 			get 
 			{ 
 				return j_osCharacterStyles; 
 			}
 		}
-		private JOwnSeq j_osCharacterStyles = null;
+		private JOwnSeq<JCharacterStyle> j_osCharacterStyles = null;
 		#endregion
 		#region Attr{g}: JOwnSeq WritingSystems - the list of writing systems
-		public JOwnSeq WritingSystems
+		public JOwnSeq<JWritingSystem> WritingSystems
 		{
 			get 
 			{ 
 				return j_osWritingSystems; 
 			}
 		}
-		private JOwnSeq j_osWritingSystems = null;
+		private JOwnSeq<JWritingSystem> j_osWritingSystems = null;
 		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
@@ -89,9 +89,9 @@ namespace JWdb
 		public JStyleSheet()
 			: base()
 		{
-            j_osParagraphStyles = new JOwnSeq("ParaStyles", this, typeof(JParagraphStyle), true, true);
-            j_osCharacterStyles = new JOwnSeq("CharStyles", this, typeof(JCharacterStyle), true, true);
-            j_osWritingSystems = new JOwnSeq("WritingSystems", this, typeof(JWritingSystem), true, true);
+            j_osParagraphStyles = new JOwnSeq<JParagraphStyle>("ParaStyles", this, true, true);
+            j_osCharacterStyles = new JOwnSeq<JCharacterStyle>("CharStyles", this, true, true);
+            j_osWritingSystems = new JOwnSeq<JWritingSystem>("WritingSystems", this, true, true);
 		}
 		#endregion
 		#region Attr(g): string SortKey - overridden to enable JOWnSeq Find method support.
@@ -426,10 +426,10 @@ namespace JWdb
 		{
 			get 
 			{ 
-				return (JCharacterStyle)j_CharacterStyle.Value; 
+				return j_CharacterStyle.Value; 
 			}
 		}
-		private JOwn j_CharacterStyle = null; 
+		private JOwn<JCharacterStyle> j_CharacterStyle = null; 
 		#endregion
 
 		// Derived Attributes ----------------------------------------------------------------
@@ -518,34 +518,19 @@ namespace JWdb
 		public JParagraphStyle()
 			: base()
 		{
-			_ConstructAttrs();
-			_InitializeAttrs();
+            j_CharacterStyle = new JOwn<JCharacterStyle>("CharStyle", this);
+            j_CharacterStyle.Value = new JCharacterStyle();
 		}
 		#endregion
 		#region Constructor(sAbbrev, sDisplayName)
 		public JParagraphStyle(string sAbbrev, string sDisplayName)
-			: base()
+			: this()
 		{
-			_ConstructAttrs();
-			_InitializeAttrs();
 			Abbrev = sAbbrev;
 			DisplayName = sDisplayName;
 		}
 		#endregion
-		#region Method: void _ConstructAttrs() - constructs the JObject's attributes
-		private void _ConstructAttrs()
-		{
-			// Owning Attrs
-			j_CharacterStyle = new JOwn("CharStyle",  this, typeof(JCharacterStyle));
-		}
-		#endregion
-		#region Method: void _InitializeAttrs() - constructs the JObject's attributes
-		private void _InitializeAttrs()
-		{
-			// Owning Attrs
-			j_CharacterStyle.Value = new JCharacterStyle();
-		}
-		#endregion
+
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{
@@ -664,14 +649,14 @@ namespace JWdb
             {
                 Debug.Assert(null != j_refWritingSystem);
                 Debug.Assert(null != j_refWritingSystem.Value);
-                return j_refWritingSystem.Value as JWritingSystem;
+                return j_refWritingSystem.Value;
             }
             set
             {
                 j_refWritingSystem.Value = value;
             }
         }
-        JRef j_refWritingSystem;
+        JRef<JWritingSystem> j_refWritingSystem;
         #endregion
 
         // VAttrs ----------------------------------------------------------------------------
@@ -850,15 +835,13 @@ namespace JWdb
 			: base()
 		{
             ClearFonts();
-            j_refWritingSystem = new JRef("ws", this, typeof(JWritingSystem));
+            j_refWritingSystem = new JRef<JWritingSystem>("ws", this);
 		}
 		#endregion
         #region Constructor(JWritingSystem) 
         public JFontForWritingSystem(JWritingSystem ws)
-            : base()
+            : this()
         {
-            ClearFonts();
-            j_refWritingSystem = new JRef("ws", this, typeof(JWritingSystem));
             WritingSystem = ws;
         }
         #endregion
@@ -1089,14 +1072,14 @@ namespace JWdb
 
         // FontsForWritingSystems ------------------------------------------------------------
         #region Attr{g}: JOwnSeq FontsForWritingSystems - the list of FontsForWritingSystems
-        public JOwnSeq FontsForWritingSystems
+        public JOwnSeq<JFontForWritingSystem> FontsForWritingSystems
         {
             get
             {
                 return j_osFontsForWritingSystems;
             }
         }
-        private JOwnSeq j_osFontsForWritingSystems = null;
+        private JOwnSeq<JFontForWritingSystem> j_osFontsForWritingSystems = null;
         #endregion
         #region Method: JFontForWritingSystem FindOrAddFontForWritingSystem(ws)
         public JFontForWritingSystem FindOrAddFontForWritingSystem(JWritingSystem ws)
@@ -1199,24 +1182,18 @@ namespace JWdb
 		public JCharacterStyle()
 			: base()
 		{
-			_ConstructAttrs();
-		}
+            j_osFontsForWritingSystems = new JOwnSeq<JFontForWritingSystem>("fws", this);
+        }
 		#endregion
 		#region Constructor(sAbbrev, sDisplayName) 
 		public JCharacterStyle(string sAbbrev, string sDisplayName)
-			: base()
+			: this()
 		{
-			_ConstructAttrs();
 			Abbrev = sAbbrev;
 			DisplayName = sDisplayName;
 		}
 		#endregion
-		#region Method: void ConstructAttrs() - constructs the JObject's attributes
-		private void _ConstructAttrs()
-		{
-            j_osFontsForWritingSystems = new JOwnSeq("fws", this, typeof(JFontForWritingSystem));
-		}
-		#endregion
+
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{
@@ -1505,14 +1482,6 @@ namespace JWdb
             return false;
         }
         #endregion
-        #region Method: override void Read(string sLine, TextReader tr, bSupressReadingBasicAttrs)
-		public override void Read(string sLine, TextReader tr)
-		{
-			base.Read(sLine, tr);
-
-			BuildAutoReplace();
-		}
-		#endregion
         #region Method: bool IsWordBreak(s, iPos)
         public bool IsWordBreak(string s, int iPos)
             // At this point, I define a word break as occuring at either the beginning of the
@@ -1540,6 +1509,17 @@ namespace JWdb
             return false;
         }
         #endregion
+
+        // I/O -------------------------------------------------------------------------------
+        #region OMethod: void FromXml(XElement x)
+        public override void FromXml(XElement x)
+        {
+            base.FromXml(x);
+
+            BuildAutoReplace();
+        }
+        #endregion
+
     }
 	#endregion
 }

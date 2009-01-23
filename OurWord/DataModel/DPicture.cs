@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 Jan 2004
  * Purpose: Handles a picture (including its caption, caption BT, filename, etc.) 
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -69,37 +69,24 @@ namespace OurWord.DataModel
 		{
 			get 
 			{ 
-				return j_Reference.Value as DReference; 
+				return j_Reference.Value; 
 			}
 			set
 			{
-				DReference r = j_Reference.Value as DReference;
-				r.Copy(value);
+                j_Reference.Value.Copy(value);
 			}
 		}
-		private JOwn j_Reference = null;
+		private JOwn<DReference> j_Reference = null;
 		#endregion
 
 		// Derived Attributes ----------------------------------------------------------------
 
 		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor(DTranslation Translation)
-		public DPicture(DTranslation Translation)
-			: base(Translation)
+		#region Constructor()
+		public DPicture()
+			: base()
 		{
-			_ConstructAttrs();
-			_InitializeAttrs(Translation);
-		}
-		#endregion
-		#region Method: void _ConstructAttrs()
-		private void _ConstructAttrs()
-		{
-			j_Reference     = new JOwn("Reference",   this, typeof(DReference));
-		}
-		#endregion
-		#region Method: void _InitializeAttrs(DTranslation Translation, pgAttachedTo)
-		protected void _InitializeAttrs(DTranslation Translation /*, DParagraph pgAttachedTo*/ )
-		{
+			j_Reference = new JOwn<DReference>("Reference", this);
 			j_Reference.Value = new DReference();
 
 			StyleAbbrev = G.TeamSettings.SFMapping.StylePicCaption;

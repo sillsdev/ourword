@@ -682,7 +682,7 @@ namespace OurWord.Edit
         EWord[] ParseBasicTextIntoWords(DBasicText t, JCharacterStyle CStyleOverride)
         {
             // Select between the Vernacular vs the Back Translation text
-            DBasicText.DPhrases phrases = (DisplayBT) ? t.PhrasesBT : t.Phrases;
+            DBasicText.DPhrases<DPhrase> phrases = (DisplayBT) ? t.PhrasesBT : t.Phrases;
             Debug.Assert(phrases.Count > 0);
 
             // We'll temporarily collect the EWords here
@@ -823,17 +823,19 @@ namespace OurWord.Edit
                 blockLeft.GlueToNext = true;
         }
         #endregion
-
+        #region Method: JFontForWritingSystem RetrieveFont(sCharStyleAbbrev)
         JFontForWritingSystem RetrieveFont(string sCharStyleAbbrev)
         {
             JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
             return cs.FindOrAddFontForWritingSystem(WritingSystem);
         }
+        #endregion
+        #region Method: JFontForWritingSystem RetrieveFont()
         JFontForWritingSystem RetrieveFont()
         {
             return PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
         }
-
+        #endregion
         #region Method: void _Initialize(DParagraph)
         void _Initialize(DParagraph p)
         {

@@ -122,7 +122,7 @@ namespace OurWord.Edit
                 text.Section.GetReferenceAt(text).ParseableName,
                 G.App.MainWindow.Selection.SelectionString
                 );
-            text.TranslatorNotes.Add(note);
+            text.TranslatorNotes.Append(note);
 
             // Update the display
             G.App.ResetWindowContents();

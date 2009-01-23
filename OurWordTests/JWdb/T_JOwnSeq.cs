@@ -49,10 +49,10 @@ namespace OurWordTests.JWdb
         #region Test_Ownership
         class TestOwnershipMethod : JObject
         {
-            JOwnSeq ownseq;
+            JOwnSeq<TObject1> ownseq;
             public TestOwnershipMethod()
             {
-                ownseq = new JOwnSeq("Ownership", this, typeof(TObject1));
+                ownseq = new JOwnSeq<TObject1>("Ownership", this);
 
                 // Test the Append method
                 TObject1 objA = new TObject1("orange");
@@ -97,12 +97,12 @@ namespace OurWordTests.JWdb
         #region OwnershipUniqueness
         class OwnershipUniquenessMethod : JObject
         {
-            JOwnSeq ownseq1;
-            JOwnSeq ownseq2;
+            JOwnSeq<TObject1> ownseq1;
+            JOwnSeq<TObject1> ownseq2;
             public OwnershipUniquenessMethod()
             {
-                ownseq1 = new JOwnSeq("unique1", this, typeof(TObject1));
-                ownseq2 = new JOwnSeq("unique2", this, typeof(TObject1));
+                ownseq1 = new JOwnSeq<TObject1>("unique1", this);
+                ownseq2 = new JOwnSeq<TObject1>("unique2", this);
                 TObject1 obj = new TObject1("hello");
                 ownseq1.Append(obj);
                 ownseq2.Append(obj); // should fail, because obj is already owned by ownseq1.
@@ -118,10 +118,10 @@ namespace OurWordTests.JWdb
         #region ObjectUniqueness
         class ObjectUniquenessMethod : JObject
         {
-            JOwnSeq ownseq;
+            JOwnSeq<TObject1> ownseq;
             public ObjectUniquenessMethod()
             {
-                ownseq = new JOwnSeq("Unique3", this, typeof(TObject1));
+                ownseq = new JOwnSeq<TObject1>("Unique3", this);
 
                 // We're testing for referential duplicates, not content duplicates, so we
                 // must turn off this code.
@@ -147,10 +147,10 @@ namespace OurWordTests.JWdb
         #region OwnerStoresSelf
         class OwnerStoresSelfMethod : JObject
         {
-            JOwnSeq ownseq;
+            JOwnSeq<TObject1> ownseq;
             public OwnerStoresSelfMethod()
             {
-                ownseq = new JOwnSeq("StoresSelf", this, typeof(TObject1));
+                ownseq = new JOwnSeq<TObject1>("StoresSelf", this);
                 Assert.IsTrue(_test_ContainsAttribute(ownseq));
             }
         }
@@ -161,77 +161,77 @@ namespace OurWordTests.JWdb
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        #region ReadWrite
-        class ReadWriteMethod : JObject
+        #region Test: ReadWrite
+        #region Class: OwnSeqTestUnsorted : JObjectOnDemand
+        class OwnSeqTestUnsorted : JObjectOnDemand
         {
-            JOwnSeq ownseqW;
-            JOwnSeq ownseqR;
-            JOwnSeq ownseqRS;
-            public ReadWriteMethod()
+            public JOwnSeq<TObject> m_os;
+
+            public OwnSeqTestUnsorted()
+                : base()
             {
-                string sPathName = JWU.NUnit_TestFilePathName;
-
-                // Set up a unsorted owning sequence
-                m_bSurpressDuplicateAttrTest = true;
-                ownseqW = new JOwnSeq("test", this, typeof(TObject));
-                ownseqW.Append(new TObject("Verse"));
-                ownseqW.Append(new TObject("Chapter"));
-                ownseqW.Append(new TObject("Inscription"));
-                ownseqW.Append(new TObject("Lord"));
-
-                // Write it out
-                TextWriter tw = JUtil.GetTextWriter(sPathName);
-                ownseqW.Write(tw, 0);
-                tw.Close();
-
-                // Read in to another unsorted sequence
-                ownseqR = new JOwnSeq("test", this, typeof(TObject));
-                TextReader tr = JUtil.GetTextReader(sPathName);
-                string sLine;
-                while ((sLine = tr.ReadLine()) != null)
-                {
-                    ownseqR.Read(sLine, tr);
-                }
-                tr.Close();
-
-                // Compare the two
-                Assert.AreEqual(4, ownseqR.Count);
-                Assert.AreEqual(ownseqW.Count, ownseqR.Count);
-                for (int i = 0; i < 4; ++i)
-                {
-                    TObject objW = ownseqW[i] as TObject;
-                    TObject objR = ownseqR[i] as TObject;
-                    Assert.AreEqual(objW.Name, objR.Name);
-                }
-
-                // Create an empty sorted sequence
-                ownseqRS = new JOwnSeq("test", this, typeof(TObject), false, true);
-                tr = JUtil.GetTextReader(sPathName);
-                while ((sLine = tr.ReadLine()) != null)
-                {
-                    ownseqRS.Read(sLine, tr);
-                }
-                tr.Close();
-
-                // Verify that the sorted sequence is indeed sorted
-                for (int i = 0; i < ownseqRS.Count - 2; i++)
-                {
-                    TObject obj1 = ownseqRS[i] as TObject;
-                    TObject obj2 = ownseqRS[i + 1] as TObject;
-                    Assert.IsTrue(obj1.SortKey.CompareTo(obj2.SortKey) < 0);
-                }
-
-                // Cleanup
-                File.Delete(sPathName);
+                m_os = new JOwnSeq<TObject>("os", this, true, false);
             }
         }
-        [Test] public void ReadWrite()
+        #endregion
+        #region Class: OwnSeqTestSorted : JObjectOnDemand
+        class OwnSeqTestSorted : JObjectOnDemand
         {
-            new ReadWriteMethod();
+            public JOwnSeq<TObject> m_os;
+
+            public OwnSeqTestSorted()
+                : base()
+            {
+                m_os = new JOwnSeq<TObject>("os", this, true, true);
+            }
         }
         #endregion
+        [Test] public void ReadWrite()
+        {
+            // Create the object (it's an unsorted sequence)
+            OwnSeqTestUnsorted ost1 = new OwnSeqTestUnsorted();
+            ost1.m_os.Append(new TObject("Verse"));
+            ost1.m_os.Append(new TObject("Chapter"));
+            ost1.m_os.Append(new TObject("Inscription"));
+            ost1.m_os.Append(new TObject("Lord"));
+            ost1.AbsolutePathName = JWU.NUnit_TestFilePathName;
+            ost1.Write();
+
+            // Read into another object
+            OwnSeqTestUnsorted ost2 = new OwnSeqTestUnsorted();
+            ost2.AbsolutePathName = JWU.NUnit_TestFilePathName;
+            ost2.Load();
+
+            // Compare the two
+            Assert.AreEqual(4, ost2.m_os.Count);
+            Assert.AreEqual(ost1.m_os.Count, ost2.m_os.Count);
+            for (int i = 0; i < 4; ++i)
+            {
+                TObject objW = ost1.m_os[i] as TObject;
+                TObject objR = ost2.m_os[i] as TObject;
+                Assert.AreEqual(objW.Name, objR.Name);
+            }
+
+            // Read it into the Sorted sequence object
+            OwnSeqTestSorted oSorted = new OwnSeqTestSorted();
+            oSorted.AbsolutePathName = JWU.NUnit_TestFilePathName;
+            oSorted.Load();
+            Assert.AreEqual(4, oSorted.m_os.Count);
+            // Verify that the sorted sequence is indeed sorted
+            for (int i = 0; i < oSorted.m_os.Count - 2; i++)
+            {
+                TObject obj1 = oSorted.m_os[i] as TObject;
+                TObject obj2 = oSorted.m_os[i + 1] as TObject;
+                Assert.IsTrue(obj1.SortKey.CompareTo(obj2.SortKey) < 0);
+            }
+
+            // Cleanup
+            File.Delete(JWU.NUnit_TestFilePathName);
+        }
+        #endregion
+
         #region SetUpAnOwningSequence
-        static public void SetUpAnOwningSequence(JOwnSeq os)
+        static public void SetUpAnOwningSequence(JOwnSeq<TObject> os)
         // If anything is changed here, I need to also change the FindUnsorted test.
         {
             os.Clear();
@@ -245,28 +245,36 @@ namespace OurWordTests.JWdb
             os.Append(objD);
         }
         #endregion
+
+        #region OLD MERGE TESTS - keep around in case we re-implement this
+        /***
         #region MergeNone
         class MergeNoneMethod : JObject
         {
-            JOwnSeq os;
-            JOwnSeq osM;
+            JOwnSeq<TObject> os;
+            JOwnSeq<TObject> osM;
             public MergeNoneMethod()
             {
                 string sPathName = JWU.NUnit_TestFilePathName;
 
                 // Set up a unsorted owning sequence  that we can merge into
                 m_bSurpressDuplicateAttrTest = true;
-                os = new JOwnSeq("test", this, typeof(TObject), true, false);
+                os = new JOwnSeq<TObject>("test", this, true, false);
                 T_JOwnSeq.SetUpAnOwningSequence(os);
                 string sPath = sPathName + "mn";
 
                 // Set up a merge OS: Test kNone.
-                osM = new JOwnSeq("test", this, typeof(TObject), true, false);
+                osM = new JOwnSeq<TObject>("test", this, true, false);
                 os.MergeOption = Merge.kNone;
                 osM.Append(new TObject("Fred"));
                 osM.Append(new TObject("Emily"));
                 TextWriter tw = JUtil.GetTextWriter(sPath);
-                osM.Write(tw, 0);
+
+                XElement x = new XElement("os");
+                osM.ToXml(x);
+                x.Out(tw, 0);
+//                osM.Write(tw, 0);
+
                 tw.Close();
 
                 // Do the merge.
@@ -290,28 +298,34 @@ namespace OurWordTests.JWdb
             new MergeNoneMethod();
         }
         #endregion
+
         #region MergeKeepOld
         class MergeKeepOldMethod : JObject
         {
-            JOwnSeq os;
-            JOwnSeq osM;
+            JOwnSeq<TObject> os;
+            JOwnSeq<TObject> osM;
             public MergeKeepOldMethod()
             {
                 string sPathName = JWU.NUnit_TestFilePathName;
 
                 // Set up a unsorted owning sequence  that we can merge into
-                os = new JOwnSeq("Old", this, typeof(TObject), true, false);
+                os = new JOwnSeq<TObject>("Old", this, true, false);
                 T_JOwnSeq.SetUpAnOwningSequence(os);
                 foreach (TObject o in os)  // So we can tell the old from the new
                     o.Description = "1";
                 string sPath = sPathName + "mko";
 
                 // Set up a merge OS: Test kKeepOld.
-                osM = new JOwnSeq("OldM", this, typeof(TObject), true, false);
+                osM = new JOwnSeq<TObject>("OldM", this, true, false);
                 osM.Append(new TObject("David"));
                 osM.Append(new TObject("Emily"));
                 TextWriter tw = JUtil.GetTextWriter(sPathName);
-                osM.Write(tw, 0);
+
+                XElement x = new XElement("os");
+                osM.ToXml(x);
+                x.Out(tw, 0);
+//                osM.Write(tw, 0);
+
                 tw.Close();
 
                 // Do the merge.
@@ -343,26 +357,31 @@ namespace OurWordTests.JWdb
         #region MergeKeepNew
         class MergeKeepNewMethod : JObject
         {
-            JOwnSeq os;
-            JOwnSeq osM;
+            JOwnSeq<TObject> os;
+            JOwnSeq<TObject> osM;
             public MergeKeepNewMethod()
             {
                 string sPathName = JWU.NUnit_TestFilePathName;
 
                 // Set up a unsorted owning sequence  that we can merge into
                 m_bSurpressDuplicateAttrTest = true;
-                os = new JOwnSeq("test", this, typeof(TObject), true, false);
+                os = new JOwnSeq<TObject>("test", this, true, false);
                 T_JOwnSeq.SetUpAnOwningSequence(os);
                 foreach (TObject o in os)  // So we can tell the old from the new
                     o.Description = "1";
                 string sPath = sPathName + "mkn";
 
                 // Set up a merge OS: Test kKeepNew.
-                osM = new JOwnSeq("test", this, typeof(TObject), true, false);
+                osM = new JOwnSeq<TObject>("test", this, true, false);
                 osM.Append(new TObject("David"));
                 osM.Append(new TObject("Emily"));
                 TextWriter tw = JUtil.GetTextWriter(sPath);
-                osM.Write(tw, 0);
+
+                XElement x = new XElement("os");
+                osM.ToXml(x);
+                x.Out(tw, 0);
+//                osM.Write(tw, 0);
+
                 tw.Close();
 
                 // Do the merge.
@@ -388,6 +407,8 @@ namespace OurWordTests.JWdb
         {
             new MergeKeepNewMethod();
         }
+        #endregion
+        ***/
         #endregion
     }
 }

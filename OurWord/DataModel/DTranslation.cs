@@ -133,11 +133,11 @@ namespace OurWord.DataModel
 
 		// JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: JOwnSeq Books - sequence of DBook
-		public JOwnSeq Books
+		public JOwnSeq<DBook> Books
 		{
 			get { return m_osBooks; }
 		}
-		JOwnSeq m_osBooks = null;
+		JOwnSeq<DBook> m_osBooks = null;
 		#endregion
 
 		// Derived Attributes ----------------------------------------------------------------
@@ -356,7 +356,7 @@ namespace OurWord.DataModel
 			m_bsaBookNamesTable = new BStringArray(BookNames.GetTable(ts.FileNameLanguage));
 
 			// Owning Sequence
-			m_osBooks = new JOwnSeq("Books", this, typeof(DBook), true, true);
+			m_osBooks = new JOwnSeq<DBook>("Books", this, true, true);
 		}
 		#endregion
 		#region Attribute(g): string SortKey - supports find, sort

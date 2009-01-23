@@ -51,7 +51,7 @@ namespace OurWordTests.DataModel
             JWU.NUnit_Setup();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Test Project";
         }
         #endregion
@@ -61,9 +61,44 @@ namespace OurWordTests.DataModel
             TranslatorNote tn = new TranslatorNote("003:016", "so loved the world");
             tn.Category = "To Do";
             tn.AssignedTo = "John";
-            tn.Discussions.Add(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
-            tn.Discussions.Add(new Discussion("Sandra", new DateTime(2008, 11, 3), "Exegesis is fine."));
+            tn.Discussions.Append(new Discussion("John", new DateTime(2008, 11, 1), 
+                "Check exegesis here."));
+            tn.Discussions.Append(new Discussion("Sandra", new DateTime(2008, 11, 3), 
+                "Exegesis is fine."));
             return tn;
+        }
+        #endregion
+        #region Method: string GetExpectedParagraphString(string sText)
+        string GetExpectedParagraphString(string sText)
+        {
+            /***
+             * This code represents the XML of a complete paragraph, with runs, dtext,
+             * etc. In order to keep files human-readable and sizes down, I made it
+             * possible for some of the simple paragraphs to be presented in a 
+             * more abbreviated manner. But I keep this around both as a reminder,
+             * and in case I have to go back at some point.
+             * 
+            string s = "<ownseq Name=\"paras\">";
+            s += "<DParagraph Abbrev=\"NoteDiscussion\">";
+            s += "<ownseq Name=\"Runs\">";
+            s += "<DText>";
+
+            s += "<ownseq Name=\"Phrase\">";
+            s += "<DPhrase Text=\"" + sText + "\" Style=\"p\"/>";
+            s += "</ownseq>";
+
+            s += "</DText>";
+            s += "</ownseq>";
+            s += "</DParagraph>";
+            s += "</ownseq>";
+            ***/
+
+            string s = "<ownseq Name=\"paras\">";
+            s += "<DParagraph Abbrev=\"NoteDiscussion\" ";
+            s += "Contents=\"" + sText + "\"/>";
+            s += "</ownseq>";
+
+            return s;
         }
         #endregion
 
@@ -72,30 +107,26 @@ namespace OurWordTests.DataModel
         [Test] public void ContentEquals_Discussion()
         {
             // Create a base discussion object
-            Discussion discussion = new Discussion();
-            discussion.Author = "John";
-            discussion.Created = new DateTime(2008, 11, 23);
-            discussion.Text = new DBasicText("Is bibit the correct term for seed here?");
+            Discussion discussion = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
 
             // Test equality
             Assert.IsTrue(discussion.ContentEquals(discussion));
 
             // Test if author gets changed
-            Discussion d2 = new Discussion();
-            d2.Author = "Sandra";
-            d2.Created = discussion.Created;
-            d2.Text = new DBasicText(discussion.Text);
+            Discussion d2 = new Discussion("Sandra", discussion.Created,
+                "Is bibit the correct term for seed here?");
             Assert.IsFalse(discussion.ContentEquals(d2));
 
             // Test if date gets changed
-            d2.Author = discussion.Author;
-            d2.Created = DateTime.Now;
-            Assert.IsFalse(discussion.ContentEquals(d2));
+            Discussion d3 = new Discussion("John", DateTime.Now,
+                "Is bibit the correct term for seed here?");
+            Assert.IsFalse(discussion.ContentEquals(d3));
 
             // Test if content gets changed
-            d2.Created = discussion.Created;
-            d2.Text = new DBasicText("This is different");
-            Assert.IsFalse(discussion.ContentEquals(d2));
+            Discussion d4 = new Discussion("John", discussion.Created,
+                "This is different");
+            Assert.IsFalse(discussion.ContentEquals(d4));
         }
         #endregion
         #region Test: ContentEquals_Note
@@ -105,13 +136,13 @@ namespace OurWordTests.DataModel
             TranslatorNote tn1 = new TranslatorNote("003:016", "so loved the world");
             tn1.Category = "To Do";
             tn1.AssignedTo = "John";
-            tn1.Discussions.Add(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
+            tn1.Discussions.Append(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
 
             // Set up a duplicate
             TranslatorNote tn2 = new TranslatorNote("003:016", "so loved the world");
             tn2.Category = "To Do";
             tn2.AssignedTo = "John";
-            tn2.Discussions.Add(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
+            tn2.Discussions.Append(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
 
             // Equality
             Assert.IsTrue(tn1.ContentEquals(tn2));
@@ -147,24 +178,26 @@ namespace OurWordTests.DataModel
         [Test] public void IO_Discussion()
         {
             // Create a discussion object with attributes
-            Discussion discussion = new Discussion();
-            discussion.Author = "John";
-            discussion.Created = new DateTime(2008, 11, 23);
-            discussion.Text = new DBasicText("Is bibit the correct term for seed here?");
+            Discussion discussion = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
 
             // Get the Xml element
-            XElement x = discussion.ToXml;
+            XElement x = discussion.ToXml(true);
 
             // Is it what we expect?
-            Assert.AreEqual("<Disc Author=\"John\" Created=\"2008-11-23 00:00:00Z\" " +
-                "Text=\"Is bibit the correct term for seed here?\"/>", x.OneLiner);
+            Assert.AreEqual(
+                "<Discussion Author=\"John\" Created=\"2008-11-23 00:00:00Z\">" +
+                    GetExpectedParagraphString("Is bibit the correct term for seed here?") +
+                    "</Discussion>", 
+                 x.OneLiner);
 
             // Create a Discussion object from this Xml element
-            Discussion discussionRead = Discussion.CreateFromXml(x);
+            Discussion discussionRead = new Discussion();
+            discussionRead.FromXml(x);
 
             // They should be identical
-            Assert.IsNotNull(discussionRead);
-            Assert.IsTrue(discussion.ContentEquals(discussionRead));
+            Assert.IsNotNull(discussionRead, "is not null: discussionRead");
+            Assert.IsTrue(discussion.ContentEquals(discussionRead), "ContentEquals");
         }
         #endregion
         #region Test: IO_Note
@@ -174,19 +207,22 @@ namespace OurWordTests.DataModel
             TranslatorNote tn = CreateTestTranslatorNote();
 
             // Do we get the XML save that we expect?
-            XElement x = tn.ToXml;
+            XElement x = tn.ToXml(true);
             Assert.AreEqual(
-                "<TranslatorNote Category=\"To Do\" Assigned=\"John\" " +
-                    "Context=\"so loved the world\" Ref=\"003:016\">" +
-                    "<Disc Author=\"John\" Created=\"2008-11-01 00:00:00Z\" Text=\"Check exegesis here.\"/>" +
-                    "<Disc Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\" Text=\"Exegesis is fine.\"/>" +
-                    "</TranslatorNote>", 
+                "<TranslatorNote Category=\"To Do\" AssignedTo=\"John\" " +
+                    "Context=\"so loved the world\" Reference=\"003:016\">" +
+                    "<ownseq Name=\"Discussions\">" +
+                    "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
+                        GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
+                    "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
+                        GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
+                    "</ownseq></TranslatorNote>",
                 x.OneLiner);
 
             // Create a new Translator Note from this Xml element; they should be identical
-            TranslatorNote tnRead = TranslatorNote.CreateFromXml(x);
-            Assert.IsNotNull(tnRead);
-            Assert.IsTrue(tn.ContentEquals(tnRead), "Should be identical");
+            TranslatorNote tnNew = new TranslatorNote();
+            tnNew.FromXml(x);
+            Assert.IsTrue(tn.ContentEquals(tnNew), "Should be identical");
         }
         #endregion
         #region Test: IO_Section
@@ -220,7 +256,7 @@ namespace OurWordTests.DataModel
 				    "angry to scream at Petrus and Yohanis.",
 			    "\\tn ",
             };
-            vs[vs.Length - 1] += tn.ToXml.OneLiner;
+            vs[vs.Length - 1] += tn.ToXml(true).OneLiner;
 
             // Make sure we have something that looks like a note
             Assert.AreEqual("\\tn <Trans", vs[vs.Length-1].Substring(0, 10));
@@ -235,6 +271,9 @@ namespace OurWordTests.DataModel
         #region Test: Categories
         [Test] public void Categories()
         {
+            TranslatorNote.Categories.Clear();
+            TranslatorNote.InitializeCategories();
+
             // Add a category twice
             TranslatorNote.AddCategory("New Category");
             TranslatorNote.AddCategory("New Category");
@@ -258,7 +297,7 @@ namespace OurWordTests.DataModel
             TranslatorNote tn = TranslatorNote.ImportFromOldStyle(2, 15, f);
 
             Assert.AreEqual("002:015", tn.Reference);
-            Assert.AreEqual(sNoteText, tn.Discussions[0].Text.AsString);
+            Assert.AreEqual(sNoteText, tn.Discussions[0].Paragraphs[0].SimpleText);
             Assert.AreEqual("Old Note", tn.Discussions[0].Author);
             Assert.AreEqual("General", tn.Category);
         }
@@ -272,7 +311,7 @@ namespace OurWordTests.DataModel
             TranslatorNote tn = TranslatorNote.ImportFromOldStyle(2, 15, f);
 
             Assert.AreEqual("002:015", tn.Reference);
-            Assert.AreEqual(sNoteText, tn.Discussions[0].Text.AsString);
+            Assert.AreEqual(sNoteText, tn.Discussions[0].Paragraphs[0].SimpleText);
             Assert.AreEqual("Old Note", tn.Discussions[0].Author);
             Assert.AreEqual("To Do", tn.Category);
         }

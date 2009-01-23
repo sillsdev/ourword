@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 19 Dec 2003
  * Purpose: Provides a shorthand for frequent xml operations.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -40,6 +40,13 @@ namespace JWTools
         {
             Debug.Assert(false);
             return false;
+        }
+        #endregion
+
+        #region VMethod: void Out(TextWriter W, int nIndent)
+        public virtual void Out(TextWriter W, int nIndent)
+        {
+            Debug.Assert(false, "Subclass must override XItem.Out");
         }
         #endregion
     }
@@ -93,6 +100,15 @@ namespace JWTools
             {
                 return Text;
             }
+        }
+        #endregion
+
+        #region OMethod: void Out(TextWriter W, int nIndent)
+        public override void Out(TextWriter W, int nIndent)
+        {
+            string sIndent = new string(' ', nIndent * 2);
+
+            W.WriteLine(sIndent + Text);
         }
         #endregion
     }
@@ -218,6 +234,19 @@ namespace JWTools
         }
         XAttr[] m_vXmlAttrs;
         #endregion
+        #region Method: XAttr FindAttr(sTag)
+        public XAttr FindAttr(string sTag)
+        {
+            foreach (XAttr attr in Attrs)
+            {
+                if (attr.Tag == sTag)
+                    return attr;
+            }
+
+            return null;
+        }
+        #endregion
+
         #region Method: void AddAttr(sTag, sValue)
         public void AddAttr(string sTag, string sValue)
         {
@@ -238,6 +267,13 @@ namespace JWTools
             AddAttr(sTag, nValue.ToString());
         }
         #endregion
+        #region Method: void AddAttr(sTag, dValue)
+        public void AddAttr(string sTag, double dValue)
+        {
+            int nValue = (int)(dValue * 1000000.0);
+            AddAttr(sTag, nValue);
+        }
+        #endregion
         #region Method: void AddAttr(sTag, bValue)
         public void AddAttr(string sTag, bool bValue)
         {
@@ -245,38 +281,88 @@ namespace JWTools
             AddAttr(sTag, sValue);
         }
         #endregion
+        #region Method: void AddAttr(sTag, chValue)
+        public void AddAttr(string sTag, char chValue)
+        {
+            AddAttr(sTag, chValue.ToString());
+        }
+        #endregion
         #region Method: void AddAttr(sTag, dtValue)
         public void AddAttr(string sTag, DateTime dtValue)
         {
-            string sValue = dtValue.ToString("u");
+            string sValue = dtValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
             AddAttr(sTag, sValue);
         }
         #endregion
+
         #region Method: string GetAttrValue(sTag, sDefaultValue)
         public string GetAttrValue(string sTag, string sDefaultValue)
         {
-            foreach (XAttr attr in Attrs)
-            {
-                if (attr.Tag == sTag)
-                    return attr.Value;
-            }
+            XAttr attr = FindAttr(sTag);
+
+            if (null != attr)
+                return attr.Value;
+
             return sDefaultValue;
+        }
+        #endregion
+        #region Method: int GetAttrValue(sTag, nDefaultValue)
+        public int GetAttrValue(string sTag, int nDefaultValue)
+        {
+            try
+            {
+                XAttr attr = FindAttr(sTag);
+                if (null != attr)
+                    return Convert.ToInt16(attr.Value);
+            }
+            catch (Exception) {}
+
+            return nDefaultValue;
+        }
+        #endregion
+        #region Method: double GetAttrValue(sTag, dDefaultValue)
+        public double GetAttrValue(string sTag, double dDefaultValue)
+        {
+            try
+            {
+                XAttr attr = FindAttr(sTag);
+                if (null != attr)
+                {
+                    int nValue = Convert.ToInt32(attr.Value);
+                    return ((double)nValue) / 1000000;
+                }
+            }
+            catch (Exception) {}
+
+            return dDefaultValue;
         }
         #endregion
         #region Method: bool GetAttrValue(sTag, bDefaultValue)
         public bool GetAttrValue(string sTag, bool bDefaultValue)
         {
-            foreach (XAttr attr in Attrs)
+            XAttr attr = FindAttr(sTag);
+            if (null != attr)
             {
-                if (attr.Tag == sTag)
-                {
-                    if (attr.Value == "true")
-                        return true;
-                    else
-                        return false;
-                }
+                if (attr.Value == "true")
+                    return true;
+                else
+                    return false;
             }
+
             return bDefaultValue;
+        }
+        #endregion
+        #region Method: char GetAttrValue(sTag, chDefaultValue)
+        public char GetAttrValue(string sTag, char chDefaultValue)
+        {
+            XAttr attr = FindAttr(sTag);
+            if (null != attr)
+            {
+                if (0 < attr.Value.Length)
+                    return attr.Value[0];
+            }
+
+            return chDefaultValue;
         }
         #endregion
         #region Method: DateTime GetAttrValue(sTag, dtDefaultValue)
@@ -284,17 +370,14 @@ namespace JWTools
         {
             try
             {
-                foreach (XAttr attr in Attrs)
+                XAttr attr = FindAttr(sTag);
+                if (null != attr)
                 {
-                    if (attr.Tag == sTag)
-                    {
-                        return DateTime.ParseExact(attr.Value, "u", DateTimeFormatInfo.InvariantInfo);
-                    }
+                    return DateTime.ParseExact(attr.Value, "u",
+                        DateTimeFormatInfo.InvariantInfo);
                 }
             }
-            catch (Exception)
-            {
-            }
+            catch (Exception) {}
 
             return dtDefaultValue;
         }
@@ -493,6 +576,7 @@ namespace JWTools
             {
                 get
                 {
+                    Debug.Assert(I < m_vs.Length);
                     Debug.Assert(!string.IsNullOrEmpty(m_vs[I]));
                     return VS[I];
                 }
@@ -500,6 +584,17 @@ namespace JWTools
             #endregion
 
             // Virtual Attrs
+            #region VAttr{g}: bool IsStringData
+            bool IsStringData
+            {
+                get
+                {
+                    if (!IsBeginTag && !IsEndTag)
+                        return true;
+                    return false;
+                }
+            }
+            #endregion
             #region VAttr{g}: bool IsEndTag
             bool IsEndTag
             {
@@ -509,6 +604,17 @@ namespace JWTools
                         return true;
                     return false;
                 }
+            }
+            #endregion
+            #region Method: bool IsEndTagFor(sTag)
+            bool IsEndTagFor(string sTag)
+            {
+                string sEndTag = "</" + sTag + ">";
+
+                if (sEndTag == S)
+                    return true;
+
+                return false;
             }
             #endregion
             #region VAttr{g}: bool IsBeginTag
@@ -570,6 +676,8 @@ namespace JWTools
             {
                 ArrayList a = new ArrayList();
 
+                bool bIsWithinQuote = false;
+
                 // We'll build the lines here
                 string sLine = "";
 
@@ -579,6 +687,7 @@ namespace JWTools
                 foreach (char ch in s)
                 {
                     // Carriage return / line feed: we'll eat whitespace from here on
+                    // (We also eat the control characters)
                     if (char.IsControl(ch))
                     {
                         bShouldEatWhitespace = true;
@@ -593,17 +702,25 @@ namespace JWTools
                     if (bShouldEatWhitespace)
                         continue;
 
+                    // Determine whether or not we are within a quote
+                    if (ch == '\"')
+                        bIsWithinQuote = !bIsWithinQuote;
 
-                    if (ch == '<')
+                    // If we've encountered a new field, then add what we have thus far
+                    // and start a new line
+                    if (!bIsWithinQuote && ch == '<')
                     {
                         if (sLine.Length > 0)
                             a.Add(sLine);
                         sLine = "";
                     }
 
+                    // Build the line
                     sLine += ch;
 
-                    if (ch == '>')
+                    // If we encounter the end of a field, then add this line
+                    // and start a new one
+                    if (!bIsWithinQuote && ch == '>')
                     {
                         if (sLine.Length > 0)
                             a.Add(sLine);
@@ -624,6 +741,9 @@ namespace JWTools
             #region Method: void ParseAttrs(XElement x, string s)
             void ParseAttrs(XElement x, string s)
             {
+                if (Tag == "JWritingSystem")
+                    Console.WriteLine("break here");
+
                 int i = 0;
 
                 // Move past the tag
@@ -640,8 +760,10 @@ namespace JWTools
                 {
                     char ch = s[i];
 
-                    // Break at end
-                    if (ch == '>' || ch == '/')
+                    // Break at end (as indicated by a close bracket, assuming we're not
+                    // in the midst of collecting a Value (otherwise, it might just be
+                    // harmless punctuation.
+                    if (!bIsAtValue && (ch == '>' || ch == '/'))
                         break;
 
                     // Move past whitespace
@@ -685,30 +807,50 @@ namespace JWTools
             #endregion
             #region Method: void ReadElement(XElement x) - recurses down
             void ReadElement(XElement x)
+                // Read this element, and any sub-elements
+                // Leave "I" pointing to the string after this element
             {
-                while (!IsEndTag)
+                // Assumes we're sitting at a begin tag
+                if (!IsBeginTag)
+                    Console.WriteLine("wasn't the begin tag");
+                Debug.Assert(IsBeginTag);
+
+                // Retrieve our attrs
+                ParseAttrs(x, S);
+
+                // If we're self-closing, then we're done
+                if (IsSelfClosingTag)
                 {
-                    // Not a begin tag, then it is string data
-                    if (!IsBeginTag)
-                    {
-                        x.AddSubItem(S);
-                    }
-
-                    // Otherwise an XElement tag
-                    else
-                    {
-                        XElement xDaughter = new XElement(Tag);
-                        ParseAttrs(xDaughter, S);
-                        x.AddSubItem(xDaughter);
-                        if (!IsSelfClosingTag)
-                        {
-                            I++;
-                            ReadElement(xDaughter);
-                        }
-                    }
-
-                    // Ready for the next one
                     I++;
+                    return;
+                }
+
+                // Otherwise, we potentially have data. So we loop to collect it all
+                string sTag = Tag; // Remember the tag before we move off of this line
+                I++;               // Move to the next line
+                while (I < VS.Length)
+                {
+                    // If it is our end line, then move off it, and we're done
+                    if (IsEndTagFor(sTag))
+                    {
+                        I++;
+                        return;
+                    }
+
+                    // If it is a string, then collect it and move off it
+                    if (IsStringData)
+                    {
+                        x.AddSubItem( new XString(S) );
+                        I++;
+                        continue;
+                    }
+
+                    // Otherwise, it is a subitem. We recurse lower, which will
+                    // result in our moving past it once we're done.
+                    string sDaughterTag = Tag;
+                    XElement xDaughter = new XElement(sDaughterTag);
+                    x.AddSubItem(xDaughter);
+                    ReadElement(xDaughter);
                 }
             }
             #endregion
@@ -726,19 +868,14 @@ namespace JWTools
             {
                 ArrayList a = new ArrayList();
 
-                for(I = 0; I<VS.Length; I++)
+                I = 0;
+                while (I < VS.Length)
                 {
                     if (IsBeginTag)
                     {
                         XElement x = new XElement(Tag);
-                        ParseAttrs(x, S);
                         a.Add(x);
-                        if (!IsSelfClosingTag)
-                        {
-                            I++;
-                            ReadElement(x);
-                        }
-
+                        ReadElement(x);
                     }
                 }
 
@@ -756,6 +893,67 @@ namespace JWTools
         {
             CreateMethod method = new CreateMethod(s);
             return method.Run();
+        }
+        #endregion
+        #region SMethod: XElement[] CreateFrom(ref string sPath, string sFileFilter)
+        static public XElement[] CreateFrom(ref string sPath, string sFileFilter)
+        {
+            // Open the file
+            StreamReader r = JW_Util.OpenStreamReader(ref sPath, sFileFilter);
+            TextReader tr = TextReader.Synchronized(r);
+
+            // Read its contents into a string
+            string sFileContents = tr.ReadToEnd();
+
+            // Done with the file
+            tr.Close();
+
+            // Parse into XElements
+            return CreateFrom(sFileContents);
+        }
+        #endregion
+
+        #region OMethod: void Out(W, nIndent)
+        public override void Out(TextWriter W, int nIndent)
+        {
+            // We will put out nothing if there's nothing here to write
+            if (IsEmpty)
+                return;
+
+            string sIndent = new string(' ', nIndent * 2);
+
+            // Will we need an end tag? Yes if we have Subitems
+            bool bUsesEndTag = HasItems;
+
+            // Build the start tag
+            string sBegin = "<" + Tag;
+            foreach (XAttr attr in Attrs)
+                sBegin += attr.SaveString;
+            sBegin += (bUsesEndTag) ? ">" : "/>";
+
+            // Build the end tag, if any
+            string sEnd = "";
+            if (bUsesEndTag)
+                sEnd = ("</" + Tag + ">");
+
+            // Special case: one item, and its a string
+            if (HasItems && Items.Length == 1 && Items[0] as XString != null)
+            {
+                XString xs = Items[0] as XString;
+                W.WriteLine(sIndent + sBegin + xs.Text + sEnd);
+                return;
+            }
+
+            // Write the start tag
+            W.WriteLine(sIndent + sBegin);
+
+            // Write the data
+            foreach (XItem item in Items)
+                item.Out(W, nIndent + 1);
+
+            // Build the end tag, if any
+            if (bUsesEndTag)
+                W.WriteLine(sIndent + "</" + Tag + ">");
         }
         #endregion
     }

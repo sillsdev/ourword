@@ -109,24 +109,6 @@ namespace JWdb
             }
         }
         #endregion
-        #region VAttr{g}: ArrayList AllOwnedJObjectOnDemand
-        ArrayList AllOwnedJObjectOnDemand
-        {
-            get
-            {
-                ArrayList aAttrs = AllJOwnAttrs;
-
-                ArrayList ans = new ArrayList();
-                foreach (JOwn own in aAttrs)
-                {
-                    if (null != own.Value as JObjectOnDemand)
-                        ans.Add(own.Value);
-                }
-
-                return ans;
-            }
-        }
-        #endregion
 
         // Runtime Attrs ---------------------------------------------------------------------
 		#region Attr{g/s}: string AbsolutePathName - The filename under which the object is stored
@@ -260,65 +242,6 @@ namespace JWdb
 		}
 		protected bool m_bIsLoaded = false;
 		#endregion
-        #region Method: virtual bool OnLoad(ref string sAbsolutePathName)
-        protected virtual bool OnLoad(ref string sAbsolutePathName)
-        {
-            TextReader tr = JW_Util.GetTextReader(ref sAbsolutePathName, FileFilter);
-            XmlRead xml = new XmlRead(tr);
-
-            // Store the Absolute and Relative Paths (in case they changed). We MUST do it here,
-            // because ObjOnDemands may embed other ObjOnDemands, and attempts to read these
-            // lower level ones via the Read method below need for this upper-level JObjOnDemand
-            // to have its path name properly set.
-            AbsolutePathName = sAbsolutePathName;
-
-            // Read down to the tag
-            string sLine = tr.ReadLine();   // Read the <RootObjectBeginMarker> line
-            if (null != sLine)
-                Read(sLine, tr);
-            tr.Close();
-            ResolveReferences();
-            return true;
-        }
-        #endregion
-        #region Method: virtual void OnWrite()
-        protected virtual void OnWrite()
-        {
-			// Create a backup file by copying this one, if it exists
-            string sExtension = Path.GetExtension(AbsolutePathName);
-			string sBackupExtension = sExtension + "bak";
-            JW_Util.CreateBackup(AbsolutePathName, sBackupExtension);
-
-			TextWriter tw = null;
-			try
-			{
-				// Open the file for writing
-                tw = JUtil.GetTextWriter(AbsolutePathName);
-
-				// Begin tag (includes the basic attributes)
-				SaveBasicAttrs(tw, 0);
-
-				// Now the major attributes
-				foreach (JAttr attr in AllAttrs)
-					attr.Write(tw, 1);
-
-				// End Tag
-				tw.WriteLine( IndentPadding(0) + XmlEndTag );
-
-				// Done writing
-				tw.Close();
-			}
-			catch (Exception)
-			{
-				// Make sure the file is closed
-				try { if (null != tw) tw.Close(); }
-				catch(Exception) {}
-
-				// Restore from the backup
-                JW_Util.RestoreFromBackup(AbsolutePathName, sBackupExtension);
-			}
-        }
-        #endregion
 
         #region Method: void Load()
         public void Load()
@@ -347,7 +270,7 @@ namespace JWdb
                 if (OnLoad(ref sPathName))
                     m_bIsLoaded = true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 m_bIsLoaded = false;  // Should still be false, but make certain
                 return;
@@ -366,6 +289,29 @@ namespace JWdb
             AbsolutePathName = sPathName;
 		}
 		#endregion
+        #region Method: virtual bool OnLoad(ref string sAbsolutePathName)
+        protected virtual bool OnLoad(ref string sAbsolutePathName)
+        {
+            XElement[] vx = XElement.CreateFrom(ref sAbsolutePathName, FileFilter);
+            if (vx.Length != 1)
+                return false;
+
+            // Store the Absolute and Relative Paths (in case they changed). We MUST do it here,
+            // because ObjOnDemands may embed other ObjOnDemands, and attempts to read these
+            // lower level ones via the Read method below need for this upper-level JObjOnDemand
+            // to have its path name properly set.
+            AbsolutePathName = sAbsolutePathName;
+
+            // Populate the owning object hierarchy
+            FromXml(vx[0]);
+
+            // Set any Reference attributes
+            ResolveReferences();
+
+            return true;
+        }
+        #endregion
+
         #region Method: void Unload()
         public void Unload()
         {
@@ -378,39 +324,56 @@ namespace JWdb
         }
         #endregion
 
-		#region Method: void Write(TextWriter, nIndent) - called by the owner to write basic info
-		public override void Write(TextWriter tw, int nIndent)
-			// This is the method called by the owner; we do not write the entire object, but
-			// rather, write just what we need in order to be able to do the LoadOnDemand
-			// at some later point. Thus this object's data is kept in a separate file.
-			//    Note: At this point it isn't necessary to include any superclass attrs, 
-			// but if any are added to the superclass, we'll need to make provision for them
-			// here.
-		{
-			SaveBasicAttrs(tw, nIndent);
-			tw.WriteLine( IndentPadding(nIndent) + XmlEndTag );
-
-            // If our data is dirty, then go ahead and write the complete object as well
-            if (IsDirty)
-                Write();
-		}
-		#endregion
-
 		#region Method: void Write() - topmost level Write, writes all data
 		public void Write()
 		{
             // Give the owned JObjectOnDemand's an opportunity to be written
-            foreach (JObjectOnDemand ood in AllOwnedJObjectOnDemand)
-                ood.Write();
+            foreach (JAttr attr in AllAttrs)
+                attr.WriteOwnedObjectsOnDemand();
 
             // Do nothing if no changes have been made
             if (!IsDirty)
                 return;
 
-            // Perform the object-specific write
+            // Perform the object-specific write; default is our 
+            // JObject built-in XML write
             OnWrite();
 		}
 		#endregion
+        #region Method: virtual void OnWrite()
+        protected virtual void OnWrite()
+        {
+			// Create a backup file by copying this one, if it exists
+            string sExtension = Path.GetExtension(AbsolutePathName);
+			string sBackupExtension = sExtension + "bak";
+            JW_Util.CreateBackup(AbsolutePathName, sBackupExtension);
+
+			TextWriter W = null;
+			try
+			{
+                // Create an Xml representation of the object
+                XElement x = ToXml(true);
+
+				// Open the file for writing
+                W = JUtil.GetTextWriter(AbsolutePathName);
+
+                // Write it out
+                x.Out(W, 0);
+
+				// Done writing
+				W.Close();
+			}
+			catch (Exception)
+			{
+				// Make sure the file is closed
+				try { if (null != W) W.Close(); }
+				catch(Exception) {}
+
+				// Restore from the backup
+                JW_Util.RestoreFromBackup(AbsolutePathName, sBackupExtension);
+			}
+        }
+        #endregion
 	}
 
 }

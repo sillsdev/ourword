@@ -38,7 +38,7 @@ namespace OurWordTests.Edit
             JWU.NUnit_Setup();
             OurWordMain.Project = new DProject();
             G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.InitializeFactoryStyleSheet();
+            G.TeamSettings.EnsureInitialized();
             G.Project.DisplayName = "Drafting Test Project";
 
             G.Project.FrontTranslation = new DTranslation("Front Translation", "Latin", "Latin");

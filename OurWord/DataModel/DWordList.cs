@@ -28,24 +28,24 @@ namespace OurWord.DataModel
     {
         // ZAttrs ----------------------------------------------------------------------------
         #region JAttr{g}: JOwnSeq Words - the list of individual Words
-        public JOwnSeq Words
+        public JOwnSeq<WSingleWord> Words
         {
             get
             {
                 return m_osWords;
             }
         }
-        private JOwnSeq m_osWords;
+        private JOwnSeq<WSingleWord> m_osWords;
         #endregion
         #region JAttr{g}: JOwnSeq Phrases - the list of miltiword phrases
-        public JOwnSeq Phrases
+        public JOwnSeq<WMultiWord> Phrases
         {
             get
             {
                 return m_osPhrases;
             }
         }
-        private JOwnSeq m_osPhrases;
+        private JOwnSeq<WMultiWord> m_osPhrases;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -53,8 +53,8 @@ namespace OurWord.DataModel
         public WordList()
             : base()
         {
-            m_osWords = new JOwnSeq("Words", this, typeof(WSingleWord), true, true);
-            m_osPhrases = new JOwnSeq("Phrases", this, typeof(WMultiWord), true, true);
+            m_osWords = new JOwnSeq<WSingleWord>("Words", this, true, true);
+            m_osPhrases = new JOwnSeq<WMultiWord>("Phrases", this, true, true);
         }
         #endregion
     }
@@ -166,14 +166,14 @@ namespace OurWord.DataModel
     {
         // ZAttrs ----------------------------------------------------------------------------
         #region JAttr{g}: JOwnSeq Words - the Words which make up this multiword phrase
-        public JOwnSeq Words
+        public JOwnSeq<WSingleWord> Words
         {
             get
             {
                 return m_osWords;
             }
         }
-        private JOwnSeq m_osWords;
+        private JOwnSeq<WSingleWord> m_osWords;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -181,7 +181,7 @@ namespace OurWord.DataModel
         public WMultiWord()
             : base()
         {
-            m_osWords = new JOwnSeq("Words", this, typeof(WSingleWord), false, false);
+            m_osWords = new JOwnSeq<WSingleWord>("Words", this, false, false);
         }
         #endregion
         #region Method: override bool ContentEquals(obj) - required override to prevent duplicates

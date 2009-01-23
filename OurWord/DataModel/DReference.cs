@@ -262,30 +262,28 @@ namespace OurWord.DataModel
 		{
 			get 
 			{ 
-				return j_Start.Value as DReference; 
+				return j_Start.Value; 
 			}
 			set
 			{
-				DReference r = j_Start.Value as DReference;
-				r.Copy(value);
+                j_Start.Value.Copy(value);
 			}
 		}
-		private JOwn j_Start = null;
+		private JOwn<DReference> j_Start = null;
 		#endregion
 		#region JAttr{g/s}: DReference End - the last reference of the span
 		public DReference End
 		{
 			get 
 			{ 
-				return j_End.Value as DReference; 
+				return j_End.Value; 
 			}
 			set
 			{
-				DReference r = j_End.Value as DReference;
-				r.Copy(value);
+                j_End.Value.Copy(value);
 			}
 		}
-		private JOwn j_End = null;
+		private JOwn<DReference> j_End = null;
 		#endregion
 
 		// Derived Attrs ---------------------------------------------------------------------
@@ -313,26 +311,15 @@ namespace OurWord.DataModel
 		#endregion
 
         // Scaffolding -----------------------------------------------------------------------
-		#region Constructor() - initializes the object
+		#region Constructor()
 		public DReferenceSpan()
 			: base()
 		{
-			_ConstructAttrs();
-			_InitializeAttrs();
-		}
-		#endregion
-		#region Method: void _ConstructAttrs()
-		private void _ConstructAttrs()
-		{
-			j_Start = new JOwn("Start", this, typeof(DReference));
-			j_End   = new JOwn("End",   this, typeof(DReference));
-		}
-		#endregion
-		#region Method: void _InitializeAttrs()
-		private void _InitializeAttrs()
-		{
-			j_Start.Value = new DReference();
-			j_End.Value   = new DReference();
+            j_Start = new JOwn<DReference>("Start", this);
+            j_Start.Value = new DReference();
+
+            j_End = new JOwn<DReference>("End", this);
+            j_End.Value = new DReference();
 		}
 		#endregion
 		#region Method: bool ContentEquals(DReferenceSpan) - T if the contents are the same

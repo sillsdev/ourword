@@ -50,11 +50,11 @@ namespace OurWordTests.JWdb
         #region Supporting Class: TestObj_Container
         class TestObj_Container : JObject
         {
-            public JOwnSeq seq;
+            public JOwnSeq<TestObj_Name> seq;
             public TestObj_Container()
                 : base()
             {
-                seq = new JOwnSeq("test", this, typeof(TestObj_Name));
+                seq = new JOwnSeq<TestObj_Name>("test", this);
                 seq.Append(new TestObj_Name("Emily"));
                 seq.Append(new TestObj_Name("Robert"));
                 seq.Append(new TestObj_Name("David"));
@@ -71,14 +71,15 @@ namespace OurWordTests.JWdb
         #endregion
 
         // Correct signature of owned objects ------------------------------------------------
+        // (These tests will all go away as I make the change to T)
         #region Supporting Classes for signature of owned objects
         class ObjTypeA : JObject
         {
-            public JOwnSeq seq;
+            public JOwnSeq<ObjTypeA> seq;
             public ObjTypeA()
                 : base()
             {
-                seq = new JOwnSeq("test", this, typeof(ObjTypeA));
+                seq = new JOwnSeq<ObjTypeA>("test", this);
             }
         }
         class ObjTypeB : JObject
@@ -105,21 +106,6 @@ namespace OurWordTests.JWdb
         {
             ObjTypeA objA = new ObjTypeA();
             objA.seq.InsertAt(0, new ObjTypeB());
-        }
-        #endregion
-        #region Test: SignatureControl_Indexer
-        [Test]
-        [ExpectedException(typeof(eBadSignature))]
-        public void SignatureControl_Indexer()
-        {
-            ObjTypeA objA = new ObjTypeA();
-
-            // Append an object into place [0], which we will then attempt to replace via
-            // the indexer.
-            objA.seq.Append(new ObjTypeA());
-
-            ObjTypeB objB = new ObjTypeB();
-            objA.seq[0] = objB;
         }
         #endregion
 
