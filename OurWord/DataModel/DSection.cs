@@ -1952,6 +1952,8 @@ namespace OurWord.DataModel
 					// Add the Translator Notes
 					foreach(DNote note in listNotes)
 						note.ToDB(DB);
+                    foreach (TranslatorNote tn in listTranslatorNotes)
+                        tn.AddToSfmDB(DB);
 				}
 
 				// Reset the counters, since we have now dealt with their data
@@ -2092,7 +2094,7 @@ namespace OurWord.DataModel
 			#endregion
 
             // Translator Notes --------------------------------------------------------------
-            bool m_bConvertNotes = false;
+            bool m_bConvertNotes = true;
             bool TranslatorNote_in(SfField field)
             {
                 TranslatorNote tn = null;
@@ -2219,12 +2221,14 @@ namespace OurWord.DataModel
 				return true;
 			}
 			#endregion
+            /***
 			#region Method: void Note_out(DNote note)
 			void Note_out(DNote note)
 			{
 				note.ToDB(DB);
 			}
 			#endregion
+            ***/
 
 			// DateStamp ---------------------------------------------------------------------
 			#region Method: bool DateStamp_in(SfField field)

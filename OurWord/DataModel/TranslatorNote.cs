@@ -24,11 +24,6 @@ using JWdb;
 using OurWord.Edit;
 #endregion
 
-// TODO: Get rid of the Discussion.Text attr, in favor of supporting as many runs
-//     as desired. (Current implementation just does JParagraph.Runs[0]. That is,
-//     exactly one Run, which must be a DBasicText.
-// TODO: Can we accomplish the ToXml within the JObject mechanism? Surely so!
-
 namespace OurWord.DataModel
 {
     public class Discussion : JObject
@@ -457,8 +452,8 @@ namespace OurWord.DataModel
             }
             AddCategory(sCategory);
 
-            // The author is set to "Old Note".
-            string sAuthor = G.GetLoc_String("kOldStyleNote", "Old Note");
+            // The author is set to "Unknown Author".
+            string sAuthor = G.GetLoc_String("kUnknownAuthor", "Unknown Author");
 
             // The date is set to today
             DateTime dtCreated = DateTime.Now;
@@ -482,6 +477,71 @@ namespace OurWord.DataModel
 
             // Done
             return tn;
+        }
+        #endregion
+        #region Method: SfField ToSfm()
+        public SfField ToSfField()
+            // This allows us to write the note in the old style, which we
+            // do for now, until we're ready to convert everyone for good.
+            //
+            // I do want to delete this at some point, and just convert everyone
+            // to the new style. But best not to make too many waves while testing.
+        {
+            // The old style has exactly one discussion
+            if (Discussions.Count != 1)
+                return null;
+
+            // The old style has exactly one paragraph
+            if (Discussions[0].Paragraphs.Count != 1)
+                return null;
+
+            // The old style has exactly one DText
+            if (Discussions[0].Paragraphs[0].Runs.Count != 1)
+                return null;
+            if (Discussions[0].Paragraphs[0].Runs[0] as DText == null)
+                return null;
+
+            // The old style's author is "Unknown Author"
+            string sAuthor = G.GetLoc_String("kUnknownAuthor", "Unknown Author");
+            if (Discussions[0].Author != sAuthor)
+                return null;
+
+            // Figure out the marker from the category. This is ugly, but it IS going away.
+            string sMkr = "nt";
+            if (Category == G.GetLoc_NoteDefs("kHintForDaughter", "Hint for Drafting Daughters"))
+                sMkr = "ntHint";
+            else if (Category == G.GetLoc_NoteDefs("kToDo", "To Do"))
+                sMkr = "ntck";
+            else if (Category == G.GetLoc_NoteDefs("kAskUns", "Ask UNS"))
+                sMkr = "ntUns";
+            else if (Category == G.GetLoc_NoteDefs("kReason", "Reason"))
+                sMkr = "ntReas";
+            else if (Category == G.GetLoc_NoteDefs("kFront", "Front Issues"))
+                sMkr = "ntFT";
+            else if (Category == G.GetLoc_NoteDefs("kDefinition", "Definitions"))
+                sMkr = "ntDef";
+            else if (Category == G.GetLoc_NoteDefs("kOldVersion", "Old Versions"))
+                sMkr = "ov";
+            else if (Category == G.GetLoc_NoteDefs("kBT", "Back Translation"))
+                sMkr = "ntBT";
+            else if (Category == G.GetLoc_NoteDefs("kGreek", "Greek"))
+                sMkr = "ntgk";
+            else if (Category == G.GetLoc_NoteDefs("kHebrew", "Hebrew"))
+                sMkr = "nthb";
+            else if (Category == G.GetLoc_NoteDefs("kExegesis", "Exegesis"))
+                sMkr = "ntcn";
+
+            // Create the note
+            return new SfField(sMkr, Discussions[0].Paragraphs[0].Runs[0].ContentsSfmSaveString);
+        }
+        #endregion
+        #region Method: void AddToSfmDB(ScriptureDB DB)
+        public void AddToSfmDB(ScriptureDB DB)
+        {
+            SfField f = ToSfField();
+            if (null == f)
+                f = new SfField(DSFMapping.c_sMkrTranslatorNote, ToXml(true).OneLiner);
+            DB.Append(f);
         }
         #endregion
 

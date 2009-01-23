@@ -2036,13 +2036,13 @@ namespace OurWord.DataModel
             // Translator Notes
             foreach (TranslatorNote tn in TranslatorNotes)
             {
-                SfField field = new SfField(DSFMapping.c_sMkrTranslatorNote, tn.ToXml(true).OneLiner);
-                DB.Append(field);
+                // We're doing this temporary ToSfm thing for now. Later, the new SfField
+                // line is all we'll need.
+                tn.AddToSfmDB(DB);
             }
 
 		}
 		#endregion
-
 	}
 	#endregion
 

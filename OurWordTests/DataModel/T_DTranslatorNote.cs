@@ -298,7 +298,7 @@ namespace OurWordTests.DataModel
 
             Assert.AreEqual("002:015", tn.Reference);
             Assert.AreEqual(sNoteText, tn.Discussions[0].Paragraphs[0].SimpleText);
-            Assert.AreEqual("Old Note", tn.Discussions[0].Author);
+            Assert.AreEqual("Unknown Author", tn.Discussions[0].Author);
             Assert.AreEqual("General", tn.Category);
         }
         #endregion
@@ -312,7 +312,7 @@ namespace OurWordTests.DataModel
 
             Assert.AreEqual("002:015", tn.Reference);
             Assert.AreEqual(sNoteText, tn.Discussions[0].Paragraphs[0].SimpleText);
-            Assert.AreEqual("Old Note", tn.Discussions[0].Author);
+            Assert.AreEqual("Unknown Author", tn.Discussions[0].Author);
             Assert.AreEqual("To Do", tn.Category);
         }
         #endregion
