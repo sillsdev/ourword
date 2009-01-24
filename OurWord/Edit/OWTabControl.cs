@@ -191,13 +191,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: void AddNote(DNote note, bool bIsEditable)
-        public void AddNote(DNote note, bool bIsEditable)
-        {
-            if (HasNotesWindow)
-                NotesPane.WndNotes.AddNote(note, bIsEditable);
-        }
-        #endregion
         #region Method: void AddNote(TranslatorNote, bIsEditable)
         public void AddNote(TranslatorNote note)
         {

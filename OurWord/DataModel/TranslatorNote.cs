@@ -158,6 +158,27 @@ namespace OurWord.DataModel
         #endregion
 
         // View Construction -----------------------------------------------------------------
+        #region VAttr{g}: DParagraph FirstParagraph
+        public DParagraph FirstParagraph
+        {
+            get
+            {
+                Debug.Assert(0 < Paragraphs.Count);
+                return Paragraphs[0];
+            }
+        }
+        #endregion       
+        #region VAttr{g}: DParagraph LastParagraph
+        public DParagraph LastParagraph
+        {
+            get
+            {
+                int c = Paragraphs.Count;
+                Debug.Assert(0 != c);
+                return Paragraphs[c - 1];
+            }
+        }
+        #endregion
         #region Method: EContainer BuildNotesPaneView()
         public EContainer BuildNotesPaneView()
         {
@@ -243,6 +264,20 @@ namespace OurWord.DataModel
         }
         private string m_sReference;
         #endregion
+        #region BAttr{g/s}: bool ShowInDaughterTranslations
+        public bool ShowInDaughterTranslations
+        {
+            get
+            {
+                return m_bShowInDaughterTranslations;
+            }
+            set
+            {
+                SetValue(ref m_bShowInDaughterTranslations, value);
+            }
+        }
+        bool m_bShowInDaughterTranslations = false;
+        #endregion
         #region JAttr{g}: JOwnSeq<Discussion> Discussions
         public JOwnSeq<Discussion> Discussions
         {
@@ -262,6 +297,7 @@ namespace OurWord.DataModel
             DefineAttr("AssignedTo", ref m_sAssignedTo);
             DefineAttr("Context", ref m_sContext);
             DefineAttr("Reference", ref m_sReference);
+            DefineAttr("ShowInDaughter", ref m_bShowInDaughterTranslations);
         }
         #endregion
 
@@ -400,14 +436,26 @@ namespace OurWord.DataModel
             }
         }
         #endregion
+        #region Attr{g}: DText Text - the owning DText
+        public DText Text
+        {
+            get
+            {
+                DText text = Owner as DText;
+                Debug.Assert(null != text);
+                return text;
+            }
+        }
+        #endregion
 
         // I/O -------------------------------------------------------------------------------
         #region SMethod: TranslatorNote ImportFromOldStyle(nChapter, nVerse, SfField)
         static public TranslatorNote ImportFromOldStyle(
             int nChapter, int nVerse, SfField field)
         {
-            // The Category is derived from the marker
+            // The Category and ShowInDaughter are derived from the marker
             string sCategory = G.GetLoc_NoteDefs("kGeneral", "General");
+            bool bShowInDaughters = false;
             switch (field.Mkr)
             {
                 case "nt":
@@ -415,7 +463,8 @@ namespace OurWord.DataModel
                     break;
                 case "ntHint":
                     sCategory = G.GetLoc_NoteDefs("kHintForDaughter", 
-                        "Hint for Drafting Daughters"); 
+                        "Hint for Drafting Daughters");
+                    bShowInDaughters = true;
                     break;
                 case "ntck":
                     sCategory = G.GetLoc_NoteDefs("kToDo", "To Do"); 
@@ -439,13 +488,16 @@ namespace OurWord.DataModel
                     sCategory = G.GetLoc_NoteDefs("kBT", "Back Translation"); 
                     break;
                 case "ntgk":
-                    sCategory = G.GetLoc_NoteDefs("kGreek", "Greek"); 
+                    sCategory = G.GetLoc_NoteDefs("kGreek", "Greek");
+                    bShowInDaughters = true;
                     break;
                 case "nthb":
-                    sCategory = G.GetLoc_NoteDefs("kHebrew", "Hebrew"); 
+                    sCategory = G.GetLoc_NoteDefs("kHebrew", "Hebrew");
+                    bShowInDaughters = true;
                     break;
                 case "ntcn":
-                    sCategory = G.GetLoc_NoteDefs("kExegesis", "Exegesis"); 
+                    sCategory = G.GetLoc_NoteDefs("kExegesis", "Exegesis");
+                    bShowInDaughters = true;
                     break;
                 default: // Not an old-style note
                     return null;
@@ -470,6 +522,7 @@ namespace OurWord.DataModel
             // Create the Note. We will not have a context for it.
             TranslatorNote tn = new TranslatorNote(sReference, sContext);
             tn.Category = sCategory;
+            tn.ShowInDaughterTranslations = bShowInDaughters;
 
             // Add the discussion
             Discussion disc = new Discussion(sAuthor, dtCreated, field.Data);
@@ -479,6 +532,20 @@ namespace OurWord.DataModel
             return tn;
         }
         #endregion
+        static public bool IsOldStyleMarker(string sMkr)
+        {
+            string[] vs = { "nt", "ntHint", "ntck", "ntUns", "ntReas", "ntFT", "ntDef", 
+                              "ov", "ntBT", "ntgk", "nthb", "ntcn" };
+
+            foreach (string s in vs)
+            {
+                if (sMkr == s)
+                    return true;
+            }
+
+            return false;
+        }
+
         #region Method: SfField ToSfm()
         public SfField ToSfField()
             // This allows us to write the note in the old style, which we
@@ -671,6 +738,26 @@ namespace OurWord.DataModel
         #endregion
 
         // View Construction -----------------------------------------------------------------
+        #region VAttr{g}: DParagraph FirstParagraph - first paragraph in the first discussion obj
+        public DParagraph FirstParagraph
+        {
+            get
+            {
+                Debug.Assert(0 < Discussions.Count);
+                return Discussions[0].FirstParagraph;
+            }
+        }
+        #endregion
+        #region VAttr{g}: DParagraph LastParagraph - last paragraph in the last discussion obj
+        public DParagraph LastParagraph
+        {
+            get
+            {
+                Debug.Assert(0 != Discussions.Count);
+                return Discussions[Discussions.Count - 1].LastParagraph;
+            }
+        }
+        #endregion
         #region Method: EContainer BuildNotesPaneView()
         public EContainer BuildNotesPaneView()
             // We place the note in a collapsable container, so the user can hit the 
@@ -692,6 +779,54 @@ namespace OurWord.DataModel
                 eHeader.Append(disc.BuildNotesPaneView());
 
             return eHeader;
+        }
+        #endregion
+        #region VAttr{g}: bool Show
+        public bool Show
+            // TODO: Implement filtering on category. This current implementation
+            // shows all, regardless of category
+        {
+            get
+            {
+                // If the Notes Window is not visible, then we don't show notes.
+                if (!G.App.HasSideWindows)
+                    return false;
+                if (!G.App.SideWindows.HasNotesWindow)
+                    return false;
+
+                // Is this a Front Translation "Hint For Daughter" note?
+                DTranslation t = Text.Paragraph.Translation;
+                if (t == G.FTranslation)
+                {
+                    if (ShowInDaughterTranslations)
+                        return true;
+                    return false;
+                }
+
+                return true;
+            }
+        }
+        #endregion
+        #region SMethod: Bitmap GetBitmap(clrBackground)
+        static public Bitmap GetBitmap(Color clrBackground)
+        {
+            // Retrieve the bitmap from resources
+            Bitmap bmp = JWU.GetBitmap("NoteGeneric.ico");
+
+            // Set its transparent color to the background color. We assume that the
+            // pixel at 0,0 is a background pixel.
+            Color clrTransparent = bmp.GetPixel(0, 0);
+            for (int h = 0; h < bmp.Height; h++)
+            {
+                for (int w = 0; w < bmp.Width; w++)
+                {
+                    if (bmp.GetPixel(w, h) == clrTransparent)
+                        bmp.SetPixel(w, h, clrBackground);
+                }
+            }
+
+            Debug.Assert(null != bmp);
+            return bmp;
         }
         #endregion
     }

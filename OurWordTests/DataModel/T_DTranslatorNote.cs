@@ -210,7 +210,8 @@ namespace OurWordTests.DataModel
             XElement x = tn.ToXml(true);
             Assert.AreEqual(
                 "<TranslatorNote Category=\"To Do\" AssignedTo=\"John\" " +
-                    "Context=\"so loved the world\" Reference=\"003:016\">" +
+                    "Context=\"so loved the world\" Reference=\"003:016\" " +
+                     "ShowInDaughter=\"false\">" +
                     "<ownseq Name=\"Discussions\">" +
                     "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
                         GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +

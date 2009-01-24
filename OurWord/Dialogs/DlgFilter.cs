@@ -75,10 +75,6 @@ namespace OurWord.Dialogs
 					return false;
 				if (Filter_VernacularBT)
 					return false;
-				if (Filter_NoteToDo)
-					return false;
-				if (Filter_NoteAskUNS)
-					return false;
 				if (Filter_UntranslatedText)
 					return false;
 				if (Filter_MismatchedQuotes)
@@ -164,26 +160,6 @@ namespace OurWord.Dialogs
 		}
 		#endregion
 
-		// A Note of Type
-		#region Attr{g}: bool Filter_NoteToDo
-		public bool Filter_NoteToDo
-		{
-			get
-			{
-				return m_checkNoteToDo.Checked;
-			}
-		}
-		#endregion
-		#region Attr{g}: bool Filter_NoteAskUNS
-		public bool Filter_NoteAskUNS
-		{
-			get
-			{
-				return m_checkNoteAskUNS.Checked;
-			}
-		}
-		#endregion
-
 		// Possible Problems
 		#region Attr{g}: bool Filter_UntranslatedText
 		public bool Filter_UntranslatedText
@@ -264,11 +240,7 @@ namespace OurWord.Dialogs
         private GroupBox m_groupWordOrPhrase;
         private TextBox m_textVernacular;
         private TextBox m_textFront;
-		private TextBox  m_textBT;
-
-		private GroupBox m_groupNote;
-		private CheckBox m_checkNoteToDo;
-		private CheckBox m_checkNoteAskUNS;
+        private TextBox m_textBT;
 
 		private GroupBox m_groupProblems;
 		private CheckBox m_checkUntranslatedText;
@@ -316,8 +288,6 @@ namespace OurWord.Dialogs
             this.m_comboQualifies = new System.Windows.Forms.ComboBox();
             this.m_checkMismatchedQuotes = new System.Windows.Forms.CheckBox();
             this.m_checkUntranslatedText = new System.Windows.Forms.CheckBox();
-            this.m_checkNoteToDo = new System.Windows.Forms.CheckBox();
-            this.m_checkNoteAskUNS = new System.Windows.Forms.CheckBox();
             this.m_textVernacular = new System.Windows.Forms.TextBox();
             this.m_textFront = new System.Windows.Forms.TextBox();
             this.m_textBT = new System.Windows.Forms.TextBox();
@@ -325,14 +295,12 @@ namespace OurWord.Dialogs
             this.m_labelInTheBackTranslation = new System.Windows.Forms.Label();
             this.m_labelInTheFront = new System.Windows.Forms.Label();
             this.m_labelInTheVernacular = new System.Windows.Forms.Label();
-            this.m_groupNote = new System.Windows.Forms.GroupBox();
             this.m_groupProblems = new System.Windows.Forms.GroupBox();
             this.m_checkCannotLocatePicture = new System.Windows.Forms.CheckBox();
             this.m_checkPunctuationProblem = new System.Windows.Forms.CheckBox();
             this.m_checkQuote = new System.Windows.Forms.CheckBox();
             this.m_groupStructure = new System.Windows.Forms.GroupBox();
             this.m_groupWordOrPhrase.SuspendLayout();
-            this.m_groupNote.SuspendLayout();
             this.m_groupProblems.SuspendLayout();
             this.m_groupStructure.SuspendLayout();
             this.SuspendLayout();
@@ -348,7 +316,7 @@ namespace OurWord.Dialogs
             // 
             // m_checkPictureWithCaption
             // 
-            this.m_checkPictureWithCaption.Location = new System.Drawing.Point(24, 320);
+            this.m_checkPictureWithCaption.Location = new System.Drawing.Point(27, 259);
             this.m_checkPictureWithCaption.Name = "m_checkPictureWithCaption";
             this.m_checkPictureWithCaption.Size = new System.Drawing.Size(144, 24);
             this.m_checkPictureWithCaption.TabIndex = 30;
@@ -358,7 +326,7 @@ namespace OurWord.Dialogs
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(256, 416);
+            this.m_btnHelp.Location = new System.Drawing.Point(259, 355);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 52;
@@ -368,7 +336,7 @@ namespace OurWord.Dialogs
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(168, 416);
+            this.m_btnCancel.Location = new System.Drawing.Point(171, 355);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 51;
@@ -378,7 +346,7 @@ namespace OurWord.Dialogs
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(80, 416);
+            this.m_btnOK.Location = new System.Drawing.Point(83, 355);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 50;
@@ -386,7 +354,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelQualifies
             // 
-            this.m_labelQualifies.Location = new System.Drawing.Point(8, 368);
+            this.m_labelQualifies.Location = new System.Drawing.Point(11, 307);
             this.m_labelQualifies.Name = "m_labelQualifies";
             this.m_labelQualifies.Size = new System.Drawing.Size(136, 23);
             this.m_labelQualifies.TabIndex = 19;
@@ -395,7 +363,7 @@ namespace OurWord.Dialogs
             // 
             // m_comboQualifies
             // 
-            this.m_comboQualifies.Location = new System.Drawing.Point(144, 368);
+            this.m_comboQualifies.Location = new System.Drawing.Point(147, 307);
             this.m_comboQualifies.Name = "m_comboQualifies";
             this.m_comboQualifies.Size = new System.Drawing.Size(240, 21);
             this.m_comboQualifies.TabIndex = 40;
@@ -411,27 +379,11 @@ namespace OurWord.Dialogs
             // 
             // m_checkUntranslatedText
             // 
-            this.m_checkUntranslatedText.Location = new System.Drawing.Point(24, 232);
+            this.m_checkUntranslatedText.Location = new System.Drawing.Point(27, 171);
             this.m_checkUntranslatedText.Name = "m_checkUntranslatedText";
             this.m_checkUntranslatedText.Size = new System.Drawing.Size(136, 24);
             this.m_checkUntranslatedText.TabIndex = 20;
             this.m_checkUntranslatedText.Text = "Untranslated Text";
-            // 
-            // m_checkNoteToDo
-            // 
-            this.m_checkNoteToDo.Location = new System.Drawing.Point(16, 16);
-            this.m_checkNoteToDo.Name = "m_checkNoteToDo";
-            this.m_checkNoteToDo.Size = new System.Drawing.Size(136, 24);
-            this.m_checkNoteToDo.TabIndex = 10;
-            this.m_checkNoteToDo.Text = "To Do";
-            // 
-            // m_checkNoteAskUNS
-            // 
-            this.m_checkNoteAskUNS.Location = new System.Drawing.Point(160, 16);
-            this.m_checkNoteAskUNS.Name = "m_checkNoteAskUNS";
-            this.m_checkNoteAskUNS.Size = new System.Drawing.Size(208, 24);
-            this.m_checkNoteAskUNS.TabIndex = 11;
-            this.m_checkNoteAskUNS.Text = "Ask the UNS";
             // 
             // m_textVernacular
             // 
@@ -493,23 +445,12 @@ namespace OurWord.Dialogs
             this.m_labelInTheVernacular.Text = "...In the Vernacular:";
             this.m_labelInTheVernacular.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // m_groupNote
-            // 
-            this.m_groupNote.Controls.Add(this.m_checkNoteToDo);
-            this.m_groupNote.Controls.Add(this.m_checkNoteAskUNS);
-            this.m_groupNote.Location = new System.Drawing.Point(8, 152);
-            this.m_groupNote.Name = "m_groupNote";
-            this.m_groupNote.Size = new System.Drawing.Size(376, 48);
-            this.m_groupNote.TabIndex = 32;
-            this.m_groupNote.TabStop = false;
-            this.m_groupNote.Text = "A Note of type:";
-            // 
             // m_groupProblems
             // 
             this.m_groupProblems.Controls.Add(this.m_checkCannotLocatePicture);
             this.m_groupProblems.Controls.Add(this.m_checkPunctuationProblem);
             this.m_groupProblems.Controls.Add(this.m_checkMismatchedQuotes);
-            this.m_groupProblems.Location = new System.Drawing.Point(8, 216);
+            this.m_groupProblems.Location = new System.Drawing.Point(11, 155);
             this.m_groupProblems.Name = "m_groupProblems";
             this.m_groupProblems.Size = new System.Drawing.Size(376, 72);
             this.m_groupProblems.TabIndex = 33;
@@ -543,7 +484,7 @@ namespace OurWord.Dialogs
             // m_groupStructure
             // 
             this.m_groupStructure.Controls.Add(this.m_checkQuote);
-            this.m_groupStructure.Location = new System.Drawing.Point(8, 304);
+            this.m_groupStructure.Location = new System.Drawing.Point(11, 243);
             this.m_groupStructure.Name = "m_groupStructure";
             this.m_groupStructure.Size = new System.Drawing.Size(376, 48);
             this.m_groupStructure.TabIndex = 35;
@@ -556,8 +497,7 @@ namespace OurWord.Dialogs
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(394, 448);
-            this.Controls.Add(this.m_groupNote);
+            this.ClientSize = new System.Drawing.Size(394, 391);
             this.Controls.Add(this.m_textBT);
             this.Controls.Add(this.m_textFront);
             this.Controls.Add(this.m_textVernacular);
@@ -579,11 +519,9 @@ namespace OurWord.Dialogs
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Only Show Sections That";
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdClosing);
             this.Load += new System.EventHandler(this.cmdLoad);
+            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
             this.m_groupWordOrPhrase.ResumeLayout(false);
-            this.m_groupNote.ResumeLayout(false);
             this.m_groupProblems.ResumeLayout(false);
             this.m_groupStructure.ResumeLayout(false);
             this.ResumeLayout(false);

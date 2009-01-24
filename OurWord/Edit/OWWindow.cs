@@ -230,10 +230,10 @@ namespace OurWord.Edit
         }
         #endregion
         #region Secondary Window Message: OnSelectAndScrollToNote
-        public virtual void OnSelectAndScrollToNote(DNote note)
+        public virtual void OnSelectAndScrollToNote(TranslatorNote note)
         {
         }
-        public void Secondary_SelectAndScrollToNote(DNote note)
+        public void Secondary_SelectAndScrollToNote(TranslatorNote note)
         {
             foreach (OWWindow w in SecondaryWindows)
                 w.OnSelectAndScrollToNote(note);
@@ -499,6 +499,7 @@ namespace OurWord.Edit
             #endregion
 
             // Drawing Methods ---------------------------------------------------------------
+            #region Method: void DrawRoundedRectangle(Pen, FillBrush, Rect, Radius)
             public void DrawRoundedRectangle(Pen BorderPen, Brush FillBrush, RectangleF Rect, float Radius)
             {
                 float xLeft = Rect.Left;
@@ -546,7 +547,7 @@ namespace OurWord.Edit
                 if (null != BorderPen)
                     Graphics.DrawPath(BorderPen, gp);
             }
-
+            #endregion
             #region Method: void DrawRectangle(Pen, RectangleF)
             public void DrawRectangle(Pen pen, RectangleF rect)
             {
@@ -2051,10 +2052,6 @@ namespace OurWord.Edit
             DParagraph paragraph = p.DataSource as DParagraph;
             if (null != paragraph)
                 return paragraph.StyleAbbrev;
-
-            DNote note = p.DataSource as DNote;
-            if (null != note)
-                return note.Style.Abbrev;
 
             return null;
         }

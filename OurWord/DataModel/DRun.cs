@@ -1179,6 +1179,7 @@ namespace OurWord.DataModel
             #endregion
 
             // I/O ---------------------------------------------------------------------------
+            #region Attr{g}: string ToSaveString
             public string ToSaveString
             {
                 get
@@ -1194,6 +1195,8 @@ namespace OurWord.DataModel
                     return s;
                 }
             }
+            #endregion
+            #region Method: void FromSaveString(string s)
             public void FromSaveString(string s)
             {
                 // We'll build a list of transitional phrase objects here
@@ -1212,8 +1215,7 @@ namespace OurWord.DataModel
                     Append(new DPhrase(phrase.StyleAbbrev, phrase.Text));
                 }
             }
-
-
+            #endregion
         }
         #endregion
         #region JAttr{g}: DPhrases Phrases
@@ -1237,16 +1239,8 @@ namespace OurWord.DataModel
 		{
 			get
 			{
+                Debug.Assert(null != Owner as DParagraph);
 				return Owner as DParagraph;
-			}
-		}
-		#endregion
-		#region Attr{g}: DNote Note
-		public DNote Note
-		{
-			get
-			{
-				return Owner as DNote;
 			}
 		}
 		#endregion
@@ -1266,32 +1260,6 @@ namespace OurWord.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: DBook Book
-		DBook Book
-		{
-			get
-			{
-				if (null != Paragraph)
-					return Paragraph.Book;
-				if (null != Note && null != Note.Paragraph)
-					return Note.Paragraph.Book;
-				return null;
-			}
-		}
-		#endregion
-        #region VAttr{g}: JCharacterStyle CharacterStyle
-        public JCharacterStyle CharacterStyle
-        {
-            get
-            {
-                if (null != Paragraph)
-                    return Paragraph.Style.CharacterStyle;
-                if (null != Note)
-                    return Note.Style.CharacterStyle;
-                return null;
-            }
-        }
-        #endregion
         #region VAttr{g}: int PhrasesLength
         public int PhrasesLength
         {
@@ -1300,20 +1268,6 @@ namespace OurWord.DataModel
                 int c = 0;
 
                 foreach (DPhrase phrase in Phrases)
-                    c += phrase.Text.Length;
-
-                return c;
-            }
-        }
-        #endregion
-        #region VAttr{g}: int PhrasesBTLength
-        public int PhrasesBTLength
-        {
-            get
-            {
-                int c = 0;
-
-                foreach (DPhrase phrase in PhrasesBT)
                     c += phrase.Text.Length;
 
                 return c;
@@ -1844,102 +1798,6 @@ namespace OurWord.DataModel
         }
         #endregion
 
-        // Translator Notes will replace Notes
-		#region JAttr{g}: JOwnSeq Notes - E.g., ToDo notes, Hints, Reasons, etc.
-		public JOwnSeq<DNote> Notes
-		{
-			get
-			{
-				return j_osNotes;
-			}
-		}
-		private JOwnSeq<DNote> j_osNotes;
-		#endregion
-		#region Method: DNote GetNoteOfType(DNote.Types type)
-		public DNote GetNoteOfType(DNote.Types type)
-		{
-			foreach(DNote note in Notes)
-			{
-				if (note.NoteType == type)
-					return note;
-			}
-			return null;
-		}
-		#endregion
-		#region Method: void DeleteNote(DNote.Types type)
-		public void DeleteNote(DNote.Types type)
-		{
-			DNote note = GetNoteOfType(type);
-			if (null != note)
-				Notes.Remove(note);
-		}
-		#endregion
-		#region Method: void CopyNote( DNote source)
-		public void CopyNote( DNote source)
-		{
-			// Nothing to do if there is not source
-			if (null == source)
-				return;
-
-			// Delete any previous version of the note
-			DeleteNote( source.NoteType );
-
-			// Create the new note
-			DNote note = new DNote( source );
-			if (null != note)
-				Notes.Append(note);
-		}
-		#endregion
-		#region Method: void UpdateExegesisNotes( DText source)
-		public void UpdateExegesisNotes( DText source)
-		{
-			CopyNote( source.GetNoteOfType( DNote.Types.kGreek ) );
-			CopyNote( source.GetNoteOfType( DNote.Types.kHebrew ) );
-			CopyNote( source.GetNoteOfType( DNote.Types.kExegesis ) );
-		}
-		#endregion
-        #region Method: DNote InsertNote(DNote.Types type, string sSelectedText)
-        public DNote InsertNote(DNote.Types type, string sSelectedText)
-        {
-            // Make sure the target paragraph is an acceptable destination for a Note.
-            // Notes are not allowed on pictures, book titles, book header, or footnotes.
-            if (null == Paragraph ||
-                null != Paragraph as DPicture ||
-                G.Map.IsTitleStyle(Paragraph.StyleAbbrev) ||
-                G.Map.IsHeaderStyle(Paragraph.StyleAbbrev) ||
-                G.Map.IsFootnoteParaStyle(Paragraph.StyleAbbrev))
-            {
-                Messages.CantInsertNoteHere();
-                return null;
-            }
-
-            // Set up the note text based on the NoteType's text plus the user's selection
-            string sDefaultNoteText = DNote.GetDefaultNoteText(type, sSelectedText, Paragraph);
-
-            // Get (or create) a note for this paragraph of the desired type
-            DNote note = GetNoteOfType(type);
-            if (null == note)
-            {
-                note = new DNote(
-                    G.GetLoc_String("NewNote", "NEW"),  
-                    new DBasicText(sDefaultNoteText), type);
-                Notes.Append(note);
-                note.Reference = Paragraph.Section.GetNoteReference(note);
-            }
-            else
-            {
-                DPhrase phrase = note.NoteText.Phrases[0] as DPhrase;
-                if (null == phrase)
-                    return null;
-                if (phrase.Text.Length > 0)
-                    phrase.Text += "; ";
-                phrase.Text += sDefaultNoteText;
-            }
-
-            return note;
-        }
-        #endregion
-
         // Scaffolding -----------------------------------------------------------------------
 		#region Constructor() - Creates the attributes
 		public DText()
@@ -1947,8 +1805,6 @@ namespace OurWord.DataModel
 		{
             // Translator Notes
             m_osTranslatorNotes = new JOwnSeq<TranslatorNote>("tn", this, false, true);
-
-			j_osNotes = new JOwnSeq<DNote>("Notes", this);
 		}
 		#endregion
 		#region Method: static public DText CreateSimple()
@@ -1999,28 +1855,6 @@ namespace OurWord.DataModel
             // Append the Translator Notes
             TranslatorNotes.Append(text.TranslatorNotes);
             text.TranslatorNotes.Clear();
-
-			// Append the Translator Notes (Soon to be obsolete)
-			while (text.Notes.Count > 0)
-			{
-				// Get the note
-				DNote note = text.Notes[0] as DNote;
-
-				// Get the corresponding note in This
-				DNote noteHome = GetNoteOfType( note.NoteType );
-
-				// If we don't have one of this type, we just move it over
-				if (null == noteHome)
-				{
-					text.Notes.Remove(note);
-					Notes.Append(note);
-					continue;
-				}
-
-				// Otherwise, we must append the note to the text
-                noteHome.NoteText.Append(note.NoteText, true);
-				text.Notes.Remove(note);
-			}
 		}
 		#endregion
 		#region Method: override void ToSfm(ScriptureDB DB)
@@ -2028,10 +1862,6 @@ namespace OurWord.DataModel
 		{
 			DB.Append( new SfField( G.Map.MkrVerseText, ContentsSfmSaveString, 
 				ProseBTSfmSaveString, IntBTSfmSaveString ) );
-
-            // Translator Notes (soon obsolete)
-            foreach (DNote note in Notes)
-				note.ToDB(DB);
 
             // Translator Notes
             foreach (TranslatorNote tn in TranslatorNotes)

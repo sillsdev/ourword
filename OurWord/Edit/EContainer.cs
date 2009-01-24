@@ -810,7 +810,7 @@ namespace OurWord.Edit
             EWord wordToSelect = null;
 
             // We support either of the following
-            DNote note = obj as DNote;
+            TranslatorNote note = obj as TranslatorNote;
             DFootnote footnote = obj as DFootnote;
             Debug.Assert(null != note || null != footnote);
 
@@ -835,7 +835,7 @@ namespace OurWord.Edit
 
                 bool bSelectionFound = false;
 
-                // Do we have a DNote?
+                // Do we have a Translator Note?
                 OWPara.ENote n = item as OWPara.ENote;
                 if (n != null && note != null && n.Note == note)
                     bSelectionFound = true;

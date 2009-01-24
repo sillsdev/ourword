@@ -744,7 +744,7 @@ namespace OurWord
 
             // Window Menu in its entirety
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
-            bool bShowNotesPane = DNote.IsShowingAny;
+            bool bShowNotesPane = DProject.VD_ShowNotesPane;
             bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
 #if (FEATURE_WESAY || FEATURE_MERGE)
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
@@ -3181,8 +3181,6 @@ namespace OurWord
 				m_dlgFilter.Filter_VernacularText, m_dlgFilter.Filter_VernacularSearchString,
 				m_dlgFilter.Filter_FrontText,      m_dlgFilter.Filter_FrontSearchString,
 				m_dlgFilter.Filter_VernacularBT,   m_dlgFilter.Filter_VernacularBTSearchString,
-				m_dlgFilter.Filter_NoteToDo,
-				m_dlgFilter.Filter_NoteAskUNS,
 				m_dlgFilter.Filter_UntranslatedText,
 				m_dlgFilter.Filter_MismatchedQuotes,
 				m_dlgFilter.Filter_PictureWithCaption, 

@@ -390,19 +390,16 @@ namespace OurWord.View
         #region Method: _LoadHintsFromFront(DParagraph pFront)
         void _LoadHintsFromFront(DParagraph pFront)
         {
-            if (!DNote.ShowHintsFromFront)
-                return;
-
             foreach(DRun r in pFront.Runs)
             {
                 DText text = r as DText;
                 if (null == text)
                     continue;
 
-                foreach(DNote note in text.Notes)
+                foreach (TranslatorNote tn in text.TranslatorNotes)
                 {
-                    if (note.NoteType == DNote.Types.kHintForDaughter && note.Show)
-                        G.App.SideWindows.AddNote(note, false);
+                    if (tn.ShowInDaughterTranslations && tn.Show)
+                        G.App.SideWindows.AddNote(tn);
                 }
             }
         }

@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
@@ -802,24 +803,6 @@ namespace OurWord.DataModel
 		}
 		#endregion
 
-		#region Method: void UpdateExegesisNotes( DParagraph pSource)
-		public void UpdateExegesisNotes( DParagraph pSource)
-		{
-			if (pSource.StructureCodes == StructureCodes)
-			{
-				SynchRunsToModelParagraph(pSource);
-				for(int i=0; i < Runs.Count; i++)
-				{
-					DText t   = Runs[i] as DText;
-					DText src = pSource.Runs[i] as DText;
-
-					if (null != t && null != src)
-						t.UpdateExegesisNotes(src);
-				}
-			}
-		}
-		#endregion
-
         // Methods involving splitting -------------------------------------------------------
         #region Method: DBasicText SplitText(DBasicText dbtToSplit, int iTextSplitPos)
         #region Implementation Class: SplitTextMethod
@@ -1313,34 +1296,22 @@ namespace OurWord.DataModel
 			return text;
 		}
 		#endregion
-		#region Method: DNote GetNoteOfType(DNote.Types type)
-		public DNote GetNoteOfType(DNote.Types type)
-		{
-			DText text = GetOrAddLastDText();
-
-			return text.GetNoteOfType(type);
-		}
-		#endregion
-		#region Attr{g}: DNote[] AllNotes
-		public DNote[] AllNotes
+        #region Attr{g}: list<TranslatorNote> AllNotes
+        public List<TranslatorNote> AllNotes
 		{
 			get
 			{
-				ArrayList list = new ArrayList();
+                var v = new List<TranslatorNote>();
 
 				foreach(DRun run in Runs)
 				{
-					if (null != run as DText)
+                    DText text = run as DText;
+                    if (null != text)
 					{
-						foreach(DNote note in (run as DText).Notes)
-							list.Add(note);
+                        foreach (TranslatorNote tn in text.TranslatorNotes)
+                            v.Add(tn);
 					}
 				}
-
-				DNote[] v = new DNote[list.Count];
-
-				for(int i=0; i<list.Count; i++)
-					v[i] = list[i] as DNote;
 
 				return v;
 			}
@@ -1473,6 +1444,7 @@ namespace OurWord.DataModel
         // I/O -------------------------------------------------------------------------------
         const string c_sAttrContents = "Contents";
         const string c_sAttrBT = "BT";
+        #region OMethod: XElement ToXml(bool bIncludeNonBasicAttrs)
         public override XElement ToXml(bool bIncludeNonBasicAttrs)
         {
             // Afraid of future changes to the class definition. This first assertion means
@@ -1508,6 +1480,8 @@ namespace OurWord.DataModel
             // Done
             return x;
         }
+        #endregion
+        #region OMethod: void FromXml(XElement x)
         public override void FromXml(XElement x)
         {
             // If we have a Contents attribute, then it means we used our special override
@@ -1539,8 +1513,8 @@ namespace OurWord.DataModel
             if (null != attr)
                 text.PhrasesBT.FromSaveString(attr.Value);
         }
+        #endregion
 
-
-	}
+    }
 
 }

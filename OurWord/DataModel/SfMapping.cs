@@ -966,7 +966,8 @@ namespace OurWord
             if (IsStatusCommentMarker(sMarker)) return true;
             if (IsDateStampMarker(sMarker)) return true;
             if (IsCopyrightMarker(sMarker)) return true;
-            if (DNote.IsNoteMarker(sMarker)) return true;
+            if (TranslatorNote.IsOldStyleMarker(sMarker))
+                return true;
             if (c_sMkrTranslatorNote == sMarker) return true;
 
             // Didn't find it in our list

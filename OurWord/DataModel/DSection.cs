@@ -542,12 +542,8 @@ namespace OurWord.DataModel
 				Paragraphs.Append(p);
 				p.CopyFrom(pFront, true);
 			}
-
-			// Exegetical notes
-			UpdateExegesisNotes(SFront);
 		}
 		#endregion
-
 		#region Method: void UpdateFromFront(DSection SFront)
 		public void UpdateFromFront(DSection SFront)
 		{
@@ -565,9 +561,6 @@ namespace OurWord.DataModel
 			vTarget = _GetCrossRefFootnotes(this,   DFootnote.Types.kExplanatory);
 			vFront  = _GetCrossRefFootnotes(SFront, DFootnote.Types.kExplanatory);
 			_UpdateExplanatoryLabels(vFront, vTarget);
-
-			// Exegetical notes
-			UpdateExegesisNotes(SFront);
 		}
 		#region Helper Method: ArrayList _GetCrossRefParagraphs(DSection)
 		ArrayList _GetCrossRefParagraphs(DSection section)
@@ -636,22 +629,7 @@ namespace OurWord.DataModel
 		}
 		#endregion
 		#endregion
-		#region Method: void UpdateExegesisNotes( DSection SFront)
-		public void UpdateExegesisNotes( DSection SFront)
-		{
-			if (SectionMatchesFront(SFront))
-			{
-				for(int i=0; i<Paragraphs.Count; i++)
-				{
-					DParagraph pTarget = Paragraphs[i] as DParagraph;
-					DParagraph pSource = SFront.Paragraphs[i] as DParagraph;
 
-					if (null != pTarget && null != pSource)
-						pTarget.UpdateExegesisNotes(pSource);
-				}
-			}
-		}
-		#endregion
 
 		// Filters ---------------------------------------------------------------------------
 		#region Attr{g/s}: bool MatchesFilter - T if DSection has passed current Filter test
@@ -713,25 +691,6 @@ namespace OurWord.DataModel
 			{
 				if (DStyleSheet.IsQuoteStyle( p.StyleAbbrev ))
 					return true;
-			}
-			return false;
-		}
-		#endregion
-		#region Method: bool FilterTest_HasNoteOfType( DNote.Types kType)
-		public bool FilterTest_HasNoteOfType( DNote.Types kType)
-		{
-			foreach(DParagraph p in Paragraphs)
-			{
-				foreach( DRun r in p.Runs)
-				{
-					DText text = r as DText;
-					if (null != text)
-					{
-						DNote note = text.GetNoteOfType(kType);
-						if (null != note)
-							return true;
-					}
-				}
 			}
 			return false;
 		}
@@ -1033,8 +992,6 @@ namespace OurWord.DataModel
 			bool bVernacularText, string sVernacularSearchString,
 			bool bFrontText,      string sFrontSearchString,
 			bool bVernacularBT,   string sVernacularBTSearchString,
-			bool bNoteToDo,
-			bool bNoteAskUNS,
 			bool bUntranslatedText,
 			bool bMismatchedQuotes,
 			bool bPictureWithCaption, 
@@ -1056,12 +1013,6 @@ namespace OurWord.DataModel
 				a.Add( FilterTest_VernacularStringInFront(sFrontSearchString) );
 			if (bVernacularBT)
 				a.Add( FilterTest_HasBTString(sVernacularBTSearchString) );
-
-			// Note Type Tests
-			if (bNoteToDo)
-				a.Add( FilterTest_HasNoteOfType( DNote.Types.kToDo ) );
-			if (bNoteAskUNS)
-				a.Add( FilterTest_HasNoteOfType( DNote.Types.kAskUns ) );
 
 			// Possible Problems
 			if (bUntranslatedText)
@@ -1894,7 +1845,6 @@ namespace OurWord.DataModel
 				{
 					// Build a list of the Translator Notes that we'll output
                     List<TranslatorNote> listTranslatorNotes = new List<TranslatorNote>();
-					ArrayList listNotes = new ArrayList();
 
 					// We will build the \vt data here
 					string sContents = "";
@@ -1920,9 +1870,6 @@ namespace OurWord.DataModel
 						{
                             foreach (TranslatorNote tn in text.TranslatorNotes)
                                 listTranslatorNotes.Add(tn);
-
-							foreach(DNote note in text.Notes)
-								listNotes.Add(note);
 						}
 
 						DFootLetter foot = run as DFootLetter;
@@ -1950,8 +1897,6 @@ namespace OurWord.DataModel
 						Footnote_out(footnote);
 
 					// Add the Translator Notes
-					foreach(DNote note in listNotes)
-						note.ToDB(DB);
                     foreach (TranslatorNote tn in listTranslatorNotes)
                         tn.AddToSfmDB(DB);
 				}
@@ -2094,7 +2039,7 @@ namespace OurWord.DataModel
 			#endregion
 
             // Translator Notes --------------------------------------------------------------
-            bool m_bConvertNotes = true;
+            #region Method: bool TranslatorNote_in(SfField)
             bool TranslatorNote_in(SfField field)
             {
                 TranslatorNote tn = null;
@@ -2113,11 +2058,8 @@ namespace OurWord.DataModel
                 // Otherwise, is it an old-style (pre version 1.1) note?
                 else
                 {
-                    if (m_bConvertNotes)
-                    {
-                        tn = TranslatorNote.ImportFromOldStyle(
-                            s_nChapter, s_nVerse, field);
-                    }
+                    tn = TranslatorNote.ImportFromOldStyle(
+                        s_nChapter, s_nVerse, field);
                 }
 
                 // If we don't have a note, then we're done processing
@@ -2143,94 +2085,9 @@ namespace OurWord.DataModel
 
                 return true;
             }
+            #endregion
 
-			// Notes -------------------------------------------------------------------------
-			#region Method: bool Note_in(SfField)
-			private bool Note_in(SfField field)
-			{
-				// Determine if we are dealing with a note; if not, return false.
-				DNote.Types NoteType = DNote.GetTypeFromMarker(field.Mkr);
-				if (DNote.Types.kUnknown == NoteType)
-					return false;
-
-                if (m_bConvertNotes)
-                {
-                    // Should not get here now that TranslatorNote_in is implemented
-                    Debug.Assert(false);
-                }
-
-				// Now that I've reorganized notes from paragraphs to DTexts, I need to
-				// get rid of the old {v 2} sequences.
-				field.Data = DNote.ConvertOldVerseReferences(field.Data);
-
-				// Convert the note text to its component runs. There should only be one,
-				// and it should be a DText. (We still return "true", because even though
-				// we aren't adding a note; we are still indeed finished with the field.)
-				char chLetter = 'a';
-				DRun[] runs = FieldToRuns(field, ref chLetter);
-				if (chLetter != 'a' || runs.Length != 1)
-					return true;
-				DText noteText = runs[0] as DText;
-				if (null == noteText)
-					return true;
-
-				// For a note, we really want a Basic Text, so we must do a conversion
-				DBasicText bt = new DBasicText(noteText);
-
-				// Make sure we have a paragraph we can put it into
-				if (null == LastParagraph)
-				{
-					throw new eBookReadException(
-                        G.GetLoc_Messages("msgMissingParagraphMarkerForNote",
-                            "A translator note was encountered but there was no paragraph marker " +
-                            "for it to go into."),
-						HelpSystem.Topic.kErrMissingParagraphMarkerForNote,
-						field.LineNo);
-				}
-
-				// Locate the note if it already exists in the paragraph
-				DNote note = LastParagraph.GetNoteOfType(NoteType);
-
-				// If it doesn't exist (the normal case, go ahead and add the new one);
-				// then return.
-				if (null == note)
-				{
-					string sReference = s_nVerse.ToString();
-
-                    if (DSection.ParagraphHasNoReference(LastParagraph))
-                    {
-                        string sNonVersePara = G.GetLoc_StyleName(LastParagraph.Style.DisplayName);
-                        if (0 != sNonVersePara.Length)
-                            sReference = sNonVersePara;
-                    }
-
-					note = new DNote(sReference, bt, NoteType);
-					DText text = LastParagraph.GetOrAddLastDText();
-					text.Notes.Append(note);
-					return true;
-				}
-
-				// If we have gotten here, then we are dealing with data in which multiple notes
-				// are attached to \vt's, rather than to the entire paragraph. So we need to
-				// append some extra information to help the user track where the note came from.
-				// We simply add the verse (for now, in italic font)
-				string sVerseString = "(" + s_nVerse.ToString() + ") ";
-				DPhrase phrase = new DPhrase("i", sVerseString);
-				bt.Phrases.InsertAt(0, phrase);
-				note.NoteText.Append(bt, true);
-				return true;
-			}
-			#endregion
-            /***
-			#region Method: void Note_out(DNote note)
-			void Note_out(DNote note)
-			{
-				note.ToDB(DB);
-			}
-			#endregion
-            ***/
-
-			// DateStamp ---------------------------------------------------------------------
+            // DateStamp ---------------------------------------------------------------------
 			#region Method: bool DateStamp_in(SfField field)
 			private bool DateStamp_in(SfField field)
 			{
@@ -2479,8 +2336,6 @@ namespace OurWord.DataModel
 					// Notes, Footnotes, See Also's
                     if (TranslatorNote_in(field))
                         continue;
-					if ( Note_in(field))
-						continue;
 					if ( Footnote_in(field))
 						continue;
 					if ( AddSeeAlso(field))
@@ -2501,7 +2356,7 @@ namespace OurWord.DataModel
 						{
 							field.Data = "(" + field.Mkr + ") " + field.Data;
 							field.Mkr  = "nt";
-							Note_in(field);
+                            TranslatorNote_in(field);
 						}
 					}
 
@@ -2806,61 +2661,7 @@ namespace OurWord.DataModel
         }
         #endregion
 
-        #region Method: string GetNoteReference(DNote note)
-        public string GetNoteReference(DNote note)
-            // Called when inserting a new note, where we want to get the text to display
-            // to the left of the note in the Notes Pane.
-        {
-            int nChapter = ReferenceSpan.Start.Chapter;
-            int nVerse = ReferenceSpan.Start.Verse;
 
-            foreach (DParagraph p in Paragraphs)
-            {
-                foreach (DRun run in p.Runs)
-                {
-                    DChapter chapter = run as DChapter;
-                    if (null != chapter)
-                    {
-                        nChapter = chapter.ChapterNo;
-                        continue;
-                    }
-
-                    DVerse verse = run as DVerse;
-                    if (null != verse)
-                    {
-                        nVerse = verse.VerseNo;
-                        continue;
-                    }
-
-                    DText text = run as DText;
-                    if (null != text)
-                    {
-                        foreach (DNote n in text.Notes)
-                        {
-                            if (n == note)
-                            {
-                                // Some paragraphs (e.g., Section Title) just return the 
-                                // stylename rather than the reference
-                                if (ParagraphHasNoReference(p))
-                                {
-                                    string sNonVersePara = G.GetLoc_StyleName(p.Style.DisplayName);
-                                    if (0 != sNonVersePara.Length)
-                                        return sNonVersePara;
-                                }
-
-                                // Compute and return the reference
-                                return nVerse.ToString();
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Should not get here
-            Debug.Assert(false);
-            return "";
-        }
-        #endregion
         #region Method: int CountParagraphsWithStyle(string sStyleAbbrev)
         public int CountParagraphsWithStyle(string sStyleAbbrev)
         {
@@ -3718,12 +3519,12 @@ namespace OurWord.DataModel
 					t.IsTrue(pg1.ChapterF == pg2.ChapterF);
 					t.IsTrue(pg1.VerseF   == pg2.VerseF);
 				}
-				t.AreSame( pg1.AllNotes.Length, pg2.AllNotes.Length );
-				for(int iN=0; iN < pg1.AllNotes.Length; iN++)
+                t.AreSame(pg1.AllNotes.Count, pg2.AllNotes.Count);
+                for (int iN = 0; iN < pg1.AllNotes.Count; iN++)
 				{
-					DNote n1 = pg1.AllNotes[iN] as DNote;
-					DNote n2 = pg2.AllNotes[iN] as DNote;
-					t.IsTrue( n1.NoteText.ContentEquals( n2.NoteText ) );
+					TranslatorNote n1 = pg1.AllNotes[iN];
+                    TranslatorNote n2 = pg2.AllNotes[iN];
+					t.IsTrue( n1.ContentEquals( n2 ) );
 				}
 			}
 
@@ -3878,7 +3679,7 @@ namespace OurWord.DataModel
 			// Notes
 			int cNotes = 0;
 			foreach(DParagraph para in Section2.Paragraphs)
-				cNotes += para.AllNotes.Length;
+				cNotes += para.AllNotes.Count;
 			AreSame( cNotes, 4);
 		}
 		#endregion

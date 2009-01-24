@@ -304,9 +304,6 @@
     <Compile Include="DataModel\DFootnote.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataModel\DNote.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DataModel\DParagraph.cs">
       <SubType>Code</SubType>
     </Compile>

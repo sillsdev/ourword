@@ -25,6 +25,9 @@ using OurWord.View;
 using OurWord.Edit;
 #endregion
 
+// TODO: Decise on the note's editability when creating the view. E.g., Hints For Daughters
+//   are not editable. Neither are paragraphs earlier written, as per my design document.
+
 namespace OurWord.Edit
 {
     public partial class NotesPane : UserControl
@@ -88,21 +91,6 @@ namespace OurWord.Edit
         #region Cmd: cmdInsertNote
         private void cmdInsertNote(object sender, EventArgs e)
         {
-            /***
-            string sNoteType = (string)((sender as ToolStripItem).Tag);
-
-            for (DNote.Types k = 0; k != DNote.Types.kUnknown; k++)
-            {
-                if (k.ToString() == sNoteType)
-                {
-                    _InsertNote(k);
-                    return;
-                }
-            }
-            ***/
-
-            // Translator Note - WILL REPLACE THE ABOVE EVENTUALLY
-
             // Double-check that we think we can insert. In theory the menu
             // item would have been disabled and so we would not get here if
             // canInsertNote returns false.
@@ -114,57 +102,32 @@ namespace OurWord.Edit
                 return;
             DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
 
-            // Remember the location
+            // Remember the location, as we have to reset the scroll position 
+            // after we regenerate window contents
             OWBookmark bookmark = new OWBookmark(G.App.MainWindow.Selection);
 
-            // Insert the note
+            // Create a blank note and insert it
             TranslatorNote note = new TranslatorNote(
                 text.Section.GetReferenceAt(text).ParseableName,
                 G.App.MainWindow.Selection.SelectionString
                 );
+            note.Discussions.Append(new Discussion());
             text.TranslatorNotes.Append(note);
 
-            // Update the display
+            // Recalculate the display
             G.App.ResetWindowContents();
 
             // Return the Main Window to where it was
             bookmark.RestoreWindowSelectionAndScrollPosition();
 
-        }
-        private void _InsertNote(DNote.Types type)
-        {
-            // Double-check that we think we can insert. In theory the menu
-            // item would have been disabled and so we would not get here if
-            // canInsertNote returns false.
-            if (!canInsertNote)
-                return;
-
-            // Retrieve the DText to which this note will be attached
-            if (G.App.MainWindow.Selection == null)
-                return;
-            DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
-            if (null == text)
-                return;
-
-            // Remember the location
-            OWBookmark bookmark = new OWBookmark(G.App.MainWindow.Selection);
-
-            // Insert the note
-            DNote note = text.InsertNote(type, G.App.MainWindow.Selection.SelectionString);
-            if (null != note)
-            {
-                // Update the display
-                G.App.ResetWindowContents();
-
-                // Return the Main Window to where it was
-                bookmark.RestoreWindowSelectionAndScrollPosition();
-
-                // Select the new note and bring the focus to it
-                WndNotes.SelectEndOfNote(note);
-                WndNotes.Focus();
-            }
+            // Select the new note and bring the focus to it
+            EContainer container = WndNotes.Contents.FindContainerOfDataSource(
+                note.LastParagraph);
+            container.Select_LastWord_End();
+            WndNotes.Focus();
         }
         #endregion
+
         #region Can: bool canDeleteNote
         public bool canDeleteNote
         {
@@ -192,14 +155,14 @@ namespace OurWord.Edit
             if (!canDeleteNote)
                 return;
 
-            // Request the targeted DNote from the NotesWnd
+            // Request the targeted TranslatorNote from the NotesWnd
             Debug.Assert(null != WndNotes);
-            DNote note = WndNotes.GetSelectedNote();
-            if (null == note)
+            TranslatorNote tn = WndNotes.GetSelectedNote();
+            if (null == tn)
                 return;
 
             // Give the user the opportunity to change his/her mind
-            string sText = note.NoteText.ContentsAsString;
+            string sText = tn.Context;
             if (sText.Length > 40)
                 sText = sText.Substring(0, 40) + "...";
             string sMsgAddition = "\n\n\"" + sText + "\"";
@@ -208,9 +171,9 @@ namespace OurWord.Edit
 
             // Remove the note from the paragraph (we delete it from the
             // owning DText)
-            DText text = note.Text;
+            DText text = tn.Text;
             Debug.Assert(null != text);
-            text.Notes.Remove(note);
+            text.TranslatorNotes.Remove(tn);
 
             // Regenerate the windows
             G.App.ResetWindowContents();
@@ -226,21 +189,7 @@ namespace OurWord.Edit
         // Visibility and Enabling -----------------------------------------------------------
         #region Method: void SetControlsVisibility()
         public void SetControlsVisibility()
-            // Visibility is based mostly on user settings, as stored in DNote; but o
-            // occasionally on context (e.g., back translation)
         {
-            m_menuInsertGeneral.Visible = DNote.ShowGeneral;
-            m_menuInsertToDo.Visible = DNote.ShowToDo;
-            m_menuInsertAskUNS.Visible = DNote.ShowAskUns;
-            m_menuInsertDefinition.Visible = DNote.ShowDefinition;
-            m_menuInsertOldVersion.Visible = DNote.ShowOldVersion;
-            m_menuInsertReason.Visible = DNote.ShowReason;
-            m_menuInsertFrontIssue.Visible = DNote.ShowFront;
-            m_menuInsertHintForDaughter.Visible = DNote.ShowHintForDaughter;
-
-            m_menuInsertBT.Visible = DNote.ShowBT &&
-                OurWordMain.App.MainWindowIsBackTranslation;
-
             m_btnDeleteNote.Visible = OurWordMain.Features.F_CanDeleteNote;
         }
         #endregion
@@ -250,20 +199,7 @@ namespace OurWord.Edit
             // not when we are in the notes pane. And we can only delete notes if
             // we are in the notes pane.
         {
-            // Insert Note menu items
-            bool bCanInsertNote = canInsertNote;
-            m_btnInsert.Enabled = bCanInsertNote;
-            m_menuInsertGeneral.Enabled = bCanInsertNote;
-            m_menuInsertToDo.Enabled = bCanInsertNote;
-            m_menuInsertAskUNS.Enabled = bCanInsertNote;
-            m_menuInsertDefinition.Enabled = bCanInsertNote;
-            m_menuInsertOldVersion.Enabled = bCanInsertNote;
-            m_menuInsertReason.Enabled = bCanInsertNote;
-            m_menuInsertFrontIssue.Enabled = bCanInsertNote;
-            m_menuInsertHintForDaughter.Enabled = bCanInsertNote;
-            m_menuInsertBT.Enabled = bCanInsertNote;
-
-            // Delete Note
+            m_btnInsert.Enabled = canInsertNote;
             m_btnDeleteNote.Enabled = canDeleteNote;
         }
         #endregion
@@ -331,10 +267,10 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: override void OnSelectAndScrollToNote(DNote note)
-        public override void OnSelectAndScrollToNote(DNote note)
+        #region Method: override void OnSelectAndScrollToNote(TranslatorNote)
+        public override void OnSelectAndScrollToNote(TranslatorNote note)
         {
-            EContainer container = Contents.FindContainerOfDataSource(note);
+            EContainer container = Contents.FindContainerOfDataSource(note.FirstParagraph);
             if (null != container)
             {
                 if (container.Select_FirstWord())
@@ -344,54 +280,31 @@ namespace OurWord.Edit
         #endregion
 
         // Misc Methods ----------------------------------------------------------------------
+        #region Method: void AddNote(TranslatorNote)
         public void AddNote(TranslatorNote note)
         {
             Contents.Append(note.BuildNotesPaneView());
         }
-
-        #region Method: void AddNote(DNote note, bool bIsEditable)
-        public void AddNote(DNote note, bool bIsEditable)
-        {
-            // Determine the note's writing system
-            JWritingSystem ws = note.Paragraph.Translation.WritingSystemConsultant;
-
-            // Determine the note's background
-            Color clrEditableBackground = note.NoteDef.BackgroundColor;
-
-            // Determine the note's editability
-            OWPara.Flags options = (bIsEditable) ? OWPara.Flags.IsEditable : OWPara.Flags.None;
-
-            // Determine the note's style
-            JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyle(DNote.StyleAbbrev);
-
-            // Start a new row
-            StartNewRow();
-
-            // Create a OWParagraph for the note
-            OWPara p = new OWPara( 
-                ws, PStyle, note, clrEditableBackground, options);
-
-            // Add it to the view
-            AddParagraph(0, p);
-        }
         #endregion
-        #region Method: DNote GetSelectedNote()
-        public DNote GetSelectedNote()
+
+        #region Method: TranslatorNote GetSelectedNote()
+        public TranslatorNote GetSelectedNote()
         {
             if (Selection == null)
                 return null;
 
-            DNote note = Selection.Paragraph.DataSource as DNote;
-            return note;
+            DParagraph p = Selection.Paragraph.DataSource as DParagraph;
+            Debug.Assert(null != p);
+
+            Discussion d = p.Owner as Discussion;
+            if (null == d)
+                return null;
+
+            TranslatorNote tn = d.Owner as TranslatorNote;
+            return tn;
         }
         #endregion
-        #region Method: void SelectEndOfNote(DNote note)
-        public void SelectEndOfNote(DNote note)
-        {
-            EContainer container = Contents.FindContainerOfDataSource(note);
-            container.Select_LastWord_End();
-        }
-        #endregion
+
     }
 
 }

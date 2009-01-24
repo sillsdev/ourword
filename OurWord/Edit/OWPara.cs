@@ -509,8 +509,8 @@ namespace OurWord.Edit
         #region CLASS: ENote
         public class ENote : EBlock
         {
-            #region Attr{g}: DNote Note
-            public DNote Note
+            #region Attr{g}: TranslatorNote Note
+            public TranslatorNote Note
             {
                 get
                 {
@@ -518,7 +518,7 @@ namespace OurWord.Edit
                     return m_Note;
                 }
             }
-            DNote m_Note = null;
+            TranslatorNote m_Note = null;
             #endregion
             #region Attr{g}: Bitmap Bmp - the note's bitmap
             Bitmap Bmp
@@ -529,12 +529,9 @@ namespace OurWord.Edit
                     // the constructor; but the problem was that we do not
                     // have access to the Window at the time of construction.
                     if (null == m_bmp)
-                    {
-                        m_bmp = Note.NoteDef.GetTransparentBitmap(Window.BackColor);
-                    }
+                        m_bmp = TranslatorNote.GetBitmap(Window.BackColor);
 
                     Debug.Assert(null != m_bmp);
-
                     return m_bmp;
                 }
             }
@@ -554,8 +551,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Constructor(DNote)
-            public ENote(JFontForWritingSystem f, DNote _Note)
+            #region Constructor(TranslatorNote)
+            public ENote(JFontForWritingSystem f, TranslatorNote _Note)
                 : base(f, "")
             {
                 m_Note = _Note;
@@ -701,7 +698,7 @@ namespace OurWord.Edit
                 JCharacterStyle cs = CStyleOverride;
                 if (null == cs)
                 {
-                    cs = t.CharacterStyle;
+                    cs = t.Paragraph.Style.CharacterStyle;
                     if (phrase.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
                     {
                         if (phrase.CharacterStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
@@ -740,9 +737,7 @@ namespace OurWord.Edit
             // If we did not find any words, then we want to create an InsertionIcon
             if (a.Count == 0)
             {
-                JCharacterStyle cStyle = (null != t.Paragraph) ?
-                    t.Paragraph.Style.CharacterStyle :
-                    t.Note.Style.CharacterStyle;
+                JCharacterStyle cStyle = t.Paragraph.Style.CharacterStyle;
                 JFontForWritingSystem fontForWS = cStyle.FindOrAddFontForWritingSystem(
                     WritingSystem);
 
@@ -780,15 +775,10 @@ namespace OurWord.Edit
 
             foreach (TranslatorNote tn in t.TranslatorNotes)
             {
-                G.App.SideWindows.AddNote(tn);
-            }
-
-            foreach (DNote note in t.Notes)
-            {
-                if (note.Show)
+                if (tn.Show)
                 {
-                    Append(new ENote(RetrieveFont(), note));
-                    G.App.SideWindows.AddNote(note, true);
+                    Append(new ENote(RetrieveFont(), tn));
+                    G.App.SideWindows.AddNote(tn);
                 }
             }
         }
@@ -996,42 +986,6 @@ namespace OurWord.Edit
             _Initialize(p);
 
             // Retrieve the background color for editable parts of the paragraph
-            m_EditableBackgroundColor = clrEditableBackground;
-        }
-        #endregion
-        #region Constructor(JWS, PStyle, DNote, clrEditableBackground, Flags) - for DNote
-        public OWPara(
-            JWritingSystem _ws, 
-            JParagraphStyle PStyle, 
-            DNote note, 
-            Color clrEditableBackground, 
-            Flags _Options)
-            : this(_ws, PStyle, note as JObject, _Options)
-        {
-            // The note itself may override <_bEditable> to make itself uneditable, 
-            // even though we received "true" from the <_bEditable> parameter.
-            if (!note.IsUserEditable)
-                IsEditable = false;
-
-            // Line height
-            m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).LineHeightZoomed;
-
-            // Add the note's bitmap
-            ENote nNote = new ENote(RetrieveFont(), note);
-            nNote.GlueToNext = true;
-            Append(nNote);
-
-            // Add the verse reference
-            EVerse nVerse = new EVerse(RetrieveFont(DStyleSheet.c_StyleAbbrevVerse), 
-                new DVerse(" " + note.Reference + " "));
-            nVerse.GlueToNext = true;
-            Append(nVerse);
-
-            // Add the note text
-            _InitializeBasicTextWords(note.NoteText, null);
-
-            // Retrieve the background color for editable parts of the note
             m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion

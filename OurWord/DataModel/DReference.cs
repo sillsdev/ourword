@@ -86,7 +86,7 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				return Chapter.ToString("000") + "." + Verse.ToString("000");
+				return Chapter.ToString("000") + ":" + Verse.ToString("000");
 			}
 		}
 		#endregion
