@@ -325,6 +325,12 @@ namespace JWdb
 			return -1;
 		}
 		#endregion
+        #region Method: int IndexOf(nValue)
+        public int IndexOf(int nValue)
+        {
+            return FindFirstPosition(nValue);
+        }
+        #endregion
 
 		// Enumerator ------------------------------------------------------------------------
 		#region Attribute: IEnumerator.Current - Returns the current JObject
@@ -600,6 +606,12 @@ namespace JWdb
 			return -1;
 		}
 		#endregion
+        #region Method: int IndexOf(string sValue)
+        public int IndexOf(string sValue)
+        {
+            return FindFirstPosition(sValue);
+        }
+        #endregion
         #region Method: string[] GetCopy()
         public string[] GetCopy()
         {
@@ -799,7 +811,18 @@ namespace JWdb
 			}
 			while (i<s.Length && s[i] == ' ')
 				i++;
-			int cArraySize = Convert.ToInt32(sCount);
+
+            int cArraySize = 0;
+            try
+            {
+                cArraySize = Convert.ToInt32(sCount);
+            }
+            catch (Exception) 
+            {
+                m_rgStrings = new string[0];
+                return;
+            }
+
 			string[] rg  = new string[cArraySize];
 
 			// Retrieve the rest of the strings

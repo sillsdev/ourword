@@ -90,12 +90,21 @@ namespace OurWord.Edit
             // Toggle the setting
             IsCollapsed = !IsCollapsed;
 
+            // If the selection is in this container, we'll need to move it
+            bool bMustMoveSelection = ContainsSelection;
+
             // TODO: Recalculate our vertical spacing: CalculateContainerVerticals
             // Call Window.OnParagraphHeightChanged, rather than what we're doing
             // here of calling DoLayout. (Actually, unless there is a performance
             // issue, maybe it doesn't matter so much?)
             Window.DoLayout();
             Window.Invalidate();
+
+            // So if we needed to, then select the first word of the window
+            // TODO: Select into the preceeding or following EContainer
+            //     so as to not mess up scrolling.
+            if (bMustMoveSelection)
+                Window.Contents.Select_FirstWord();
         }
         #endregion
 
@@ -138,9 +147,8 @@ namespace OurWord.Edit
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
 
-            // If we are displaying the footnote separator, then add a pixel to the
-            // height to make room for it.
-            y += FootnoteSeparatorHeight;
+            // Top Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
 
             // PlusMinus icon position
             PlusMinusIcon.Position = new PointF(
@@ -168,6 +176,9 @@ namespace OurWord.Edit
                 }
             }
 
+            // Bottom Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
+
             // Calculate the resulting height
             Height = (y - Position.Y);
         }
@@ -179,8 +190,8 @@ namespace OurWord.Edit
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
 
-            // Footnote Separator if indicated
-            PaintFootnoteSeparator();
+            // Borders if indicated
+            Border.Paint();
 
             // PlusMinus Control
             PlusMinusIcon.OnPaint(ClipRectangle);

@@ -183,6 +183,11 @@ namespace OurWord.Edit
         private void cmdLoad(object sender, EventArgs e)
         {
             LocDB.Localize(m_toolstripNotes);
+
+            // Set this up after calling Localize, as we don't want to change these
+            // from what the advisor will typically have set up. Those few items
+            // in the menu that need to be localized are done by the method.
+            SetupShowDropdown();
         }
         #endregion
 
@@ -203,6 +208,124 @@ namespace OurWord.Edit
             m_btnDeleteNote.Enabled = canDeleteNote;
         }
         #endregion
+        #region Method: void SetupShowDropdown()
+        public void SetupShowDropdown()
+        {
+            // Start with an empty list
+            m_Show.DropDownItems.Clear();
+
+            // Add the categories
+            foreach (string s in TranslatorNote.Categories)
+            {
+                // Create a new menu item
+                ToolStripMenuItem item = new ToolStripMenuItem(s);
+
+                // Retrieve the checked state from the registry
+                item.CheckState = TranslatorNote.GetCategoryIsChecked(s) ?
+                    CheckState.Checked : CheckState.Unchecked;
+
+                // Set the event handler
+                item.Click += new System.EventHandler(cmdToggleCategoryChecked);
+
+                // We'll use this for the Show All command
+                item.Tag = "category";
+
+                // Add it to the menu list
+                m_Show.DropDownItems.Add(item);
+            }
+
+            // Add a menu item to show all of the categories
+            string sShowAllCategories = G.GetLoc_Notes("ShowAllCategories", "Show All Categories");
+            ToolStripMenuItem itemAll = new ToolStripMenuItem(sShowAllCategories);
+            itemAll.Click += new System.EventHandler(cmdTurnOnAllCategories);
+            m_Show.DropDownItems.Add(itemAll);
+
+            // Show Notes from the Front Translation
+            if (TranslatorNote.FrontCategories.Count > 0)
+            {
+                // Add a menu item for the Front Translation notes we want to see
+                string sFrontCategories = G.GetLoc_NoteDefs("FrontCategories", "Notes From Front Translation");
+                ToolStripMenuItem itemFromFront = new ToolStripMenuItem(sFrontCategories);
+                m_Show.DropDownItems.Add(itemFromFront);
+
+                // Add the Front Translation Categories to this submenu
+                foreach (string s in TranslatorNote.FrontCategories)
+                {
+                    // Create a new menu item
+                    ToolStripMenuItem item = new ToolStripMenuItem(s);
+
+                    // Retrieve the checked state
+                    item.CheckState = TranslatorNote.GetFrontCategoryIsChecked(s) ?
+                        CheckState.Checked : CheckState.Unchecked;
+
+                    // Set the event handler
+                    item.Click += new System.EventHandler(cmdToggleFrontCategoryChecked);
+
+                    // Add it to the menu list
+                    itemFromFront.DropDownItems.Add(item);
+                }
+            }
+        }
+        #endregion
+        #region Cmd: cmdTurnOnAllCategories
+        private void cmdTurnOnAllCategories(object sender, EventArgs e)
+        {
+            // Make sure all Category menu items are checked
+            foreach (ToolStripMenuItem item in m_Show.DropDownItems)
+            {
+                if ((string)item.Tag == "category")
+                {
+                    item.Checked = true;
+                    string sCategory = item.Text;
+                    TranslatorNote.SetCategoryIsChecked(sCategory, true);
+                }
+            }
+
+            // Regenerate the window display
+            G.App.ResetWindowContents();
+        }
+        #endregion
+        #region Cmd: cmdToggleCategoryChecked
+        private void cmdToggleCategoryChecked(object sender, EventArgs e)
+        {
+            // Determine which category has changed
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
+            string sCategory = item.Text;
+
+            // Toggle the checked state and reset the menu item
+            bool bDisplayThisCategory = !item.Checked;
+            item.Checked = bDisplayThisCategory;
+
+            // Place the setting into the registry
+            TranslatorNote.SetCategoryIsChecked(sCategory, bDisplayThisCategory);
+
+            // Regenerate the window display
+            G.App.ResetWindowContents();
+        }
+        #endregion
+        #region Cmd: cmdToggleFrontCategoryChecked
+        private void cmdToggleFrontCategoryChecked(object sender, EventArgs e)
+        {
+            // Determine which category has changed
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
+            string sCategory = item.Text;
+
+            // Toggle the checked state and reset the menu item
+            bool bDisplayThisCategory = !item.Checked;
+            item.Checked = bDisplayThisCategory;
+
+            // Place the setting into the registry
+            TranslatorNote.SetFrontCategoryIsChecked(sCategory, bDisplayThisCategory);
+
+            // Regenerate the window display
+            G.App.ResetWindowContents();
+        }
+        #endregion
+
     }
 
     public class NotesWnd : OWWindow

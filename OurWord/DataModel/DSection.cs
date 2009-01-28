@@ -485,8 +485,25 @@ namespace OurWord.DataModel
 		}
 		int m_nLineNoInFile;
 		#endregion
+        #region VAttr{g}: List<TranslatorNote> AllNotes
+        public List<TranslatorNote> AllNotes
+        {
+            get
+            {
+                var v = new List<TranslatorNote>();
 
-		// Scaffolding -----------------------------------------------------------------------
+                foreach (DParagraph p in Paragraphs)
+                    v.AddRange(p.AllNotes);
+
+                foreach (DParagraph p in Footnotes)
+                    v.AddRange(p.AllNotes);
+
+                return v;
+            }
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
 		public int m_nSectionNo = -1;
 		#region Constructor()
 		public DSection(int nSectionNo)

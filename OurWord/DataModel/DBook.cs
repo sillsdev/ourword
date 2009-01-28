@@ -2033,6 +2033,9 @@ namespace OurWord.DataModel
 					Book.UpdateFromFront(Book.FrontBook);
 				}
 
+                // Add any Note Categories we might not yet have
+                TranslatorNote.ScanBookForNewCategories(Book);
+
                 // Read any auxiliary info
                 Book.ReadAuxiliarySettings();
 

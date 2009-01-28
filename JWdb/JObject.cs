@@ -457,7 +457,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    bsa.Read(m_ioX.GetAttrValue(sName,""));
+                    bsa.Read(m_ioX.GetAttrValue(sName,"0"));
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, bsa.SaveLine);

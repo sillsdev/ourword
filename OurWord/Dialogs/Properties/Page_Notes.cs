@@ -48,9 +48,12 @@ namespace OurWord.Dialogs
 
         // Property Grid ---------------------------------------------------------------------
         #region BAG CONSTANTS
-        const string c_sShow = "Show_";
-        const string c_sColor = "Color_";
-        const string c_sShowNotesFromFront = "ShowNotesFromFront";
+        const string c_sGroupColors = "Colors";
+        const string c_sNotesWndBkgColor = "propNotesWndBkgColor";
+        const string c_sNotesBorderColor = "propBorderColor";
+        const string c_sNotesHeaderColor = "propHeaderColor";
+        const string c_sNotesUneditableColor = "propUneditableolor";
+
         const string c_sYes = "Yes";
         const string c_sNo = "No";
         #endregion
@@ -68,11 +71,41 @@ namespace OurWord.Dialogs
         #region Method: void bag_GetValue(...)
         void bag_GetValue(object sender, PropertySpecEventArgs e)
         {
+            switch (e.Property.ID)
+            {
+                case c_sNotesWndBkgColor:
+                    e.Value = NotesWnd.RegistryBackgroundColor;
+                    break;
+                case c_sNotesBorderColor:
+                    e.Value = TranslatorNote.BorderColor.Name;
+                    break;
+                case c_sNotesHeaderColor:
+                    e.Value = TranslatorNote.DiscussionHeaderColor.Name;
+                    break;
+                case c_sNotesUneditableColor:
+                    e.Value = TranslatorNote.UneditableColor.Name;
+                    break;
+            }
         }
         #endregion
         #region Method: void bag_SetValue(...)
         void bag_SetValue(object sender, PropertySpecEventArgs e)
         {
+            switch (e.Property.ID)
+            {
+                case c_sNotesWndBkgColor:
+                    NotesWnd.RegistryBackgroundColor = (string)e.Value;
+                    break;
+                case c_sNotesBorderColor:
+                    TranslatorNote.BorderColor = Color.FromName( (string)e.Value );
+                    break;
+                case c_sNotesHeaderColor:
+                    TranslatorNote.DiscussionHeaderColor = Color.FromName((string)e.Value);
+                    break;
+                case c_sNotesUneditableColor:
+                    TranslatorNote.UneditableColor = Color.FromName((string)e.Value);
+                    break;
+            }
         }
         #endregion
         #region Method: void SetupPropertyGrid()
@@ -82,6 +115,33 @@ namespace OurWord.Dialogs
             m_bag = new PropertyBag();
             Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
             Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
+
+
+            // Colors
+            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sNotesWndBkgColor,
+                "Window Background",
+                c_sGroupColors,
+                "The color of the Notes window background.",
+                "Light Gray"));
+            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sNotesBorderColor,
+                "Outer Border",
+                c_sGroupColors,
+                "The color of the thin borders of an individual chat/discussion.",
+                "Dark Gray"));
+            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sNotesHeaderColor,
+                "Header Area",
+                c_sGroupColors,
+                "The color of inner area of an individual chat/discussion.",
+                "Light Green"));
+            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sNotesUneditableColor,
+                "Non-Editable Discussion",
+                c_sGroupColors,
+                "The color of those discussion/chats which are not available for edit.",
+                "Light Yellow"));
 
             // Localize the bag
             LocDB.Localize(this, Bag);

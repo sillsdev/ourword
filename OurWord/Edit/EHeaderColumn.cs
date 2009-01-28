@@ -39,51 +39,7 @@ namespace OurWord.Edit
         EContainer m_Header;
         #endregion
 
-        #region Attr{g/s}: Styles Style
-        public Styles Style
-        {
-            get
-            {
-                return m_Style;
-            }
-            set
-            {
-                m_Style = value;
-            }
-        }
-        Styles m_Style;
-        #endregion
-        public enum Styles { Normal, RoundedBorder };
-
         // RoundedBorder Attrs ---------------------------------------------------------------
-        #region Attr{g/s}: Color OuterBorderColor
-        public Color OuterBorderColor
-        {
-            get
-            {
-                return m_OuterBorderColor;
-            }
-            set
-            {
-                m_OuterBorderColor = value;
-            }
-        }
-        Color m_OuterBorderColor;
-        #endregion
-        #region Attr{g/s}: Color InnerBorderColor
-        public Color InnerBorderColor
-        {
-            get
-            {
-                return m_InnerBorderColor;
-            }
-            set
-            {
-                m_InnerBorderColor = value;
-            }
-        }
-        Color m_InnerBorderColor;
-        #endregion
         #region Attr{g/s}: Color HeaderBackgroundColor
         public Color HeaderBackgroundColor
         {
@@ -140,15 +96,6 @@ namespace OurWord.Edit
         }
         int m_nOuterRoundedBorderRadius;
         #endregion
-        #region VAttr{g}: bool IsRoundedBorder
-        public bool IsRoundedBorder
-        {
-            get
-            {
-                return (Style == Styles.RoundedBorder);
-            }
-        }
-        #endregion
         float m_yContentsTop;
         float m_yContentsBottom;
 
@@ -160,46 +107,10 @@ namespace OurWord.Edit
             // Save the header
             m_Header = _Header;
             m_Header.Owner = this;
-
-            // Default Style is Normal (no borders)
-            m_Style = Styles.Normal;
-
-            // Rounded Border Style attrs
-            m_OuterBorderColor = Color.DarkGray;
-            m_InnerBorderColor = Color.DarkGray;
-            m_HeaderBackgroundColor = Color.LightGreen;
-            m_ContentsBackgroundColor = Color.LightYellow;
-            m_nRoundedBorderInternalMargin = 4;
-            m_nOuterRoundedBorderRadius = 12;
         }
         #endregion
 
         // Layout Calculations & Painting ----------------------------------------------------
-        #region OAttr{g}: float AvailableWidthForOneSubitem
-        public override float AvailableWidthForOneSubitem
-        {
-            get
-            {
-                float fAdjust = 0;
-
-                if (IsRoundedBorder)
-                    fAdjust = OuterRoundedBorderRadius * 2;
-
-                return base.AvailableWidthForOneSubitem - fAdjust;
-            }
-        }
-        #endregion
-        #region OMethod: float CalculateSubItemX(EItem subitem)
-        public override float CalculateSubItemX(EItem subitem)
-        {
-            float fAdjust = 0;
-
-            if (IsRoundedBorder)
-                fAdjust = OuterRoundedBorderRadius;
-
-            return base.CalculateSubItemX(subitem) + fAdjust;
-        }
-        #endregion
         #region OMethod: void CalculateBlockWidths(Graphics g) - Include Header blocks
         public override void CalculateBlockWidths(Graphics g)
         {
@@ -227,21 +138,13 @@ namespace OurWord.Edit
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
 
-            // If we are displaying the footnote separator, then add a pixel to the
-            // height to make room for it.
-            y += FootnoteSeparatorHeight;
-
-            // Rounded Borders: Allow room for the outer border top
-            if (IsRoundedBorder)
-                y += 1;
+            // Top Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
 
             // Header
             Header.CalculateContainerVerticals(y, bRepositionOnly);
             y += Header.Height;
 
-            // Rounded Borders: Allow room for the inner border top
-            if (IsRoundedBorder)
-                y += 1;
             m_yContentsTop = y;
 
             // Allow for display of the bitmap if applicable
@@ -256,13 +159,7 @@ namespace OurWord.Edit
 
             m_yContentsBottom = y;
 
-            // Rounded Borders: Allow room for the bottom border
-            if (IsRoundedBorder)
-            {
-                y += 1;
-                y += RoundedBorderInternalMargin;
-                y += 1;
-            }
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
 
             // Calculate the resulting height
             Height = (y - Position.Y);
@@ -276,27 +173,7 @@ namespace OurWord.Edit
                 return;
 
             // Footnote Separator if indicated
-            PaintFootnoteSeparator();
-
-            // Rounded Rectangle Style: 
-            if (IsRoundedBorder)
-            {
-                // Draw a filled rounded rectangle around the entire container 
-                Pen penOuter = new Pen(OuterBorderColor);
-                Brush brushOuter = new SolidBrush(HeaderBackgroundColor);
-                Window.Draw.DrawRoundedRectangle(penOuter, brushOuter,
-                    Rectangle, OuterRoundedBorderRadius);
-
-                // Draw a filled rounder rectangle around the contents area
-                Pen penInner = new Pen(InnerBorderColor);
-                Brush brushInner = new SolidBrush(ContentsBackgroundColor);
-                float fHeight = m_yContentsBottom - m_yContentsTop + 2; // allow 2 for border lines
-                RectangleF rectInner = new RectangleF(
-                    Position.X + RoundedBorderInternalMargin, m_yContentsTop,
-                    Width - (RoundedBorderInternalMargin * 2), fHeight);
-                Window.Draw.DrawRoundedRectangle(penInner, brushInner,
-                    rectInner, OuterRoundedBorderRadius - RoundedBorderInternalMargin);
-            }
+            Border.Paint();
 
             // Header
             Header.OnPaint(ClipRectangle);

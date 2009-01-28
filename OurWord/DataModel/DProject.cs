@@ -894,6 +894,10 @@ namespace OurWord.DataModel
             if (!base.OnLoad(ref sAbsolutePathName))
                 return false;
 
+            // Save the Absolute pathname, as it may have changed, and we need to know
+            // it in order to load the various objects velow
+            AbsolutePathName = sAbsolutePathName;
+
             // Initialize the Team Settings file
             if (string.IsNullOrEmpty(TeamSettings.AbsolutePathName))
                 TeamSettings.New();

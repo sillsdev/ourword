@@ -195,6 +195,20 @@ namespace OurWord.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
+        #region BAttr{g/s}: string DefaultTranslatorNoteCategory
+        public string DefaultTranslatorNoteCategory
+        {
+            get
+            {
+                return m_sDefaultTranslatorNoteCategory;
+            }
+            set
+            {
+                SetValue(ref m_sDefaultTranslatorNoteCategory, value);
+            }
+        }
+        string m_sDefaultTranslatorNoteCategory = "English";
+        #endregion
         #region BAttr{g}: BStringArray TranslatorNotesCategories
         public BStringArray TranslatorNotesCategories
         {
@@ -224,8 +238,9 @@ namespace OurWord.DataModel
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
 
+            // Translator Notes Categories
+            DefineAttr("DefaultCategory", ref m_sDefaultTranslatorNoteCategory);
             DefineAttr("NotesCategories", ref m_bsaTranslatorNotesCategories);
-
 		}
 		#endregion
 
@@ -357,20 +372,6 @@ namespace OurWord.DataModel
             m_bsaTranslatorNotesCategories = new BStringArray();
         }
 		#endregion
-
-		#region void EnsureInitialized()
-        public void EnsureInitialized()
-            // This is re-entrant; we want to be able to scan an existing TeamSettings
-            // to make sure it reflects our current needs, as OurWord may change 
-        {
-            // Style Sheet
-            if (null == m_StyleSheet.Value)
-                m_StyleSheet.Value = new DStyleSheet();
-            StyleSheet.Initialize(false);
-
-            // TODO: Other TeamSEttings initializations
-        }
-		#endregion
         #region VAttr{g}: override string DefaultFileExtension
         public override string DefaultFileExtension
         {
@@ -380,6 +381,36 @@ namespace OurWord.DataModel
             }
         }
         #endregion
+
+        // Initializations -------------------------------------------------------------------
+        #region Method: void EnsureInit_Categories()
+        void EnsureInit_Categories()
+        {
+            if (TranslatorNotesCategories.Length == 0)
+            {
+                TranslatorNotesCategories.Append("Exegesis");
+                TranslatorNotesCategories.Append("To Do");
+
+                DefaultTranslatorNoteCategory = "To Do";
+            }
+        }
+        #endregion
+        #region void EnsureInitialized()
+        public void EnsureInitialized()
+            // This is re-entrant; we want to be able to scan an existing TeamSettings
+            // to make sure it reflects our current needs, as OurWord may change 
+        {
+            // Style Sheet
+            if (null == m_StyleSheet.Value)
+                m_StyleSheet.Value = new DStyleSheet();
+            StyleSheet.Initialize(false);
+
+            // Translator Notes Categories
+            EnsureInit_Categories();
+
+            // TODO: Other TeamSEttings initializations
+        }
+		#endregion
 
         // I/O -------------------------------------------------------------------------------
         #region VAttr: override string FileFilter
@@ -401,18 +432,6 @@ namespace OurWord.DataModel
 			EnsureInitialized();
 		}
 		#endregion
-        #region OMethod: bool OnLoad(ref sAbsolutePathName) - sets Note Categories
-        protected override bool OnLoad(ref string sAbsolutePathName)
-        {
-            bool bResult = base.OnLoad(ref sAbsolutePathName);
-
-            if (TranslatorNotesCategories.Length > 0)
-                TranslatorNote.Categories.AddRange(TranslatorNotesCategories.GetCopy());
-
-            return bResult;
-        }
-        #endregion
-
     }
 	#endregion
 
@@ -488,7 +507,9 @@ namespace OurWord.DataModel
         public const string c_StyleMajorSection           = "ms";
         public const string c_StyleMajorSectionCrossRef   = "mr";
 
+        // Translator Notes
         public const string c_StyleNoteHeader             = "NoteHeader";
+        public const string c_StyleNoteDate               = "NoteDate";
         public const string c_StyleNoteDiscussion         = "NoteDiscussion";
         public const string c_StyleNote                   = "nt";   // Note Discussion Paragraph
 
@@ -715,6 +736,14 @@ namespace OurWord.DataModel
                 style.IsLeft = true;
                 style.SpaceBefore = 0;
                 style.SpaceAfter = 0;
+            }
+            if (null == FindParagraphStyle(c_StyleNoteDate))
+            {
+                style = AddParagraphStyle(c_StyleNoteDate, "Note Date");
+                style.IsRight = true;
+                style.SpaceBefore = 0;
+                style.SpaceAfter = 0;
+                style.SetFonts(true, 9, false);
             }
             // Note Discussion
             if (null == FindParagraphStyle(c_StyleNoteDiscussion))

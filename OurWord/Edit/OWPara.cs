@@ -187,7 +187,13 @@ namespace OurWord.Edit
         {
             get
             {
-                Debug.Assert(null != m_objDataSource);
+                // Because I allowo literals, sometimes paragraphs to not have data sources.
+                // EContainer.FindContainerOfDataSource, e.g., needs DataSource to return
+                // null, rather than fire an assertion.
+                //    Once I get all OWPara's to have a data source, then I should
+                // put this assertion back in.
+                // Debug.Assert(null != m_objDataSource);
+
                 return m_objDataSource;
             }
         }
@@ -1561,7 +1567,7 @@ namespace OurWord.Edit
             float ySpaceBefore = (((float)PStyle.SpaceBefore) * g.DpiY / 72.0F);
             ySpaceBefore *= G.ZoomFactor;
             y += ySpaceBefore;
-            y += FootnoteSeparatorHeight;
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
             y += CalculateBitmapHeightRequirement();
 
             // A "chunk" is the word or words that we'll add incrementally to the line.
@@ -1653,7 +1659,8 @@ namespace OurWord.Edit
             // Add any SpaceBefore and Space-After to the Height. 
             // Convert from Points (See SpaceBefore above.)
             Height += ySpaceBefore;
-            Height += FootnoteSeparatorHeight;
+            Height += Border.GetTotalWidth(BorderBase.BorderSides.Top);
+            Height += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
             Height += CalculateBitmapHeightRequirement();
             float ySpaceAfter = (((float)PStyle.SpaceAfter) * g.DpiY / 72.0F);
             ySpaceAfter *= G.ZoomFactor;
@@ -1750,8 +1757,8 @@ namespace OurWord.Edit
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
 
-            // Footnote Separator if indicated
-            PaintFootnoteSeparator();
+            // Borders if indicated
+            Border.Paint();
 
             // Bitmap if indicated
             PaintBitmap();

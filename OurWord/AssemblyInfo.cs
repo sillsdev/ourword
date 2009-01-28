@@ -32,8 +32,12 @@ using System.Security.Permissions;
 //    Build Number  - generally just bug fixes
 //    Revision      - not used.
 //
-// Was 0.9.13
-[assembly: AssemblyVersion("1.0.2")]
+
+// Huichol throwaway versions
+// 1.1.0 - initial
+// 1.1.1 - fixed Load problems with Absolute Paths
+
+[assembly: AssemblyVersion("1.1.2")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

@@ -272,18 +272,14 @@ namespace OurWordTests.DataModel
         #region Test: Categories
         [Test] public void Categories()
         {
-            TranslatorNote.Categories.Clear();
-            TranslatorNote.InitializeCategories();
-
             // Add a category twice
             TranslatorNote.AddCategory("New Category");
             TranslatorNote.AddCategory("New Category");
 
             // We expect to have the default categories plus our new one
-            Assert.AreEqual(4, TranslatorNote.Categories.Count);
+            Assert.AreEqual(3, TranslatorNote.Categories.Length);
             Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("Exegesis"));
             Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("To Do"));
-            Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("Front Issue?"));
             Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("New Category"));
         }
         #endregion
@@ -379,6 +375,23 @@ namespace OurWordTests.DataModel
             tn.Context = "";
             text = tn.GetCollapsableHeaderText("");
             Assert.AreEqual("3:16:" + chSpace, text.AsString);
+        }
+        #endregion
+        #region Test: RemoveInitialRefFromText
+        [Test] public void RemoveInitialRefFromText()
+        {
+            TranslatorNote tn = new TranslatorNote("010:020", "");
+
+            Assert.AreEqual("This how it is.",
+                tn.RemoveInitialReferenceFromText("10:20: This how it is."));
+
+            Assert.AreEqual("This how it is.",
+                tn.RemoveInitialReferenceFromText("10:20 This how it is."));
+
+            Assert.AreEqual("10:21 This how it is.",
+                tn.RemoveInitialReferenceFromText("10:21 This how it is."));
+
+
         }
         #endregion
     }

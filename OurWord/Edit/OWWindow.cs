@@ -1268,7 +1268,30 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+            #region VAttr{g} List<EContainer> ContainerStack
+            public List<EContainer> ContainerStack
+            {
+                get
+                {
+                    List<EContainer> v = new List<EContainer>();
 
+                    // Start with the owner of the selection word
+                    EContainer container = Anchor.Word.Owner;
+
+                    while (null != container)
+                    {
+                        // We add it to the top of the list, so that it is working
+                        // top-to-bottom fashion.
+                        v.Insert(0, container);
+
+                        // Move to the next one up the hierarhcy
+                        container = container.Owner;
+                    }
+
+                    return v;
+                }
+            }
+            #endregion
             #region VAttr{g}: ArrayList ContainerIndicesStack
             public ArrayList ContainerIndicesStack
             {

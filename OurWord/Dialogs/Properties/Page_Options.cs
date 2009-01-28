@@ -72,7 +72,6 @@ namespace OurWord.Dialogs
         const string c_sColorDrafting = "propBackColorDraftingWindow";
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
         const string c_sColorNaturalnessCheck = "propBackColorNaturalnessCheckWindow";
-        const string c_sColorNotes = "propBackColorNotesWindow";
         const string c_sColorOtherTranslations = "propBackColorOtherTranslationsWindow";
         #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
@@ -167,9 +166,6 @@ namespace OurWord.Dialogs
                 case c_sColorNaturalnessCheck:
                     e.Value = WndNaturalness.RegistryBackgroundColor;
                     break;
-                case c_sColorNotes:
-                    e.Value = NotesWnd.RegistryBackgroundColor;
-                    break;
                 case c_sColorOtherTranslations:
                     e.Value = TranslationsWindow.RegistryBackgroundColor;
                     break;
@@ -248,9 +244,6 @@ namespace OurWord.Dialogs
                     break;
                 case c_sColorNaturalnessCheck:
                     WndNaturalness.RegistryBackgroundColor = (string)e.Value;
-                    break;
-                case c_sColorNotes:
-                    NotesWnd.RegistryBackgroundColor = (string)e.Value;
                     break;
                 case c_sColorOtherTranslations:
                     TranslationsWindow.RegistryBackgroundColor = (string)e.Value;
@@ -416,12 +409,6 @@ namespace OurWord.Dialogs
                 "Naturalness Check",
                 c_sGroup_BackgroundColors,
                 "The color of the Naturalness Check window background.",
-                "Wheat"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sColorNotes,
-                "Notes",
-                c_sGroup_BackgroundColors,
-                "The color of the Notes window background.",
                 "Wheat"));
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorOtherTranslations,

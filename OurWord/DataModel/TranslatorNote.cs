@@ -138,9 +138,19 @@ namespace OurWord.DataModel
             }
         }
         #endregion
+        #region VAttr{g}: TranslatorNote Note
+        public TranslatorNote Note
+        {
+            get
+            {
+                TranslatorNote tn = Owner as TranslatorNote;
+                Debug.Assert(null != tn);
+                return tn;
+            }
+        }
+        #endregion
 
         // Author in Registry ----------------------------------------------------------------
-        const string c_sRegistrySubkey = "TranslatorNotes";
         const string c_sRegistryName = "AuthorName";
         #region SMethod: string GetDefaultAuthor()
         static public string GetDefaultAuthor()
@@ -149,7 +159,8 @@ namespace OurWord.DataModel
             string sAuthor = Environment.MachineName;
 
             // It might have been overridden in the Registry
-            string sAuthorInRegistry = JW_Registry.GetValue(c_sRegistrySubkey, c_sRegistryName, "");
+            string sAuthorInRegistry = JW_Registry.GetValue(
+                TranslatorNote.c_sRegistrySubkey, c_sRegistryName, "");
             if (!string.IsNullOrEmpty(sAuthorInRegistry))
                 sAuthor = sAuthorInRegistry;
 
@@ -175,27 +186,76 @@ namespace OurWord.DataModel
             {
                 int c = Paragraphs.Count;
                 Debug.Assert(0 != c);
-                return Paragraphs[c - 1];
+                DParagraph p = Paragraphs[c - 1];
+                Debug.Assert(null != p);
+                return p;
             }
         }
         #endregion
         #region Method: EContainer BuildNotesPaneView()
         public EContainer BuildNotesPaneView()
         {
-            // Create a paragraph to hold the discussion text
-            OWPara pDiscussionText = new OWPara(G.TTranslation.WritingSystemVernacular,
-                G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDiscussion),
-                Paragraphs[0], Color.White, OWPara.Flags.IsEditable);
+            int nRoundedCornerInset = 8;
 
-            // For now, we'll put the author in as a paragraph
-            OWPara pHeader = new OWPara(G.TTranslation.WritingSystemVernacular,
+            // We'll put this Discussion into a HeaderColumn. The header will be the
+            // author and date, the body will be the paragraphs
+
+            // Define the Header. Insert the left/right margins so that they do not overlap
+            // the rounded corners.
+            ERowOfColumns eHeader = new ERowOfColumns(2);
+            eHeader.Border.Padding.Left = nRoundedCornerInset;
+            eHeader.Border.Padding.Right = nRoundedCornerInset;
+
+            OWPara pAuthor = new OWPara(G.TTranslation.WritingSystemVernacular,
                 G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
                 Author);
+            eHeader.Append(pAuthor);
 
-            EHeaderColumn eHeaderCol = new EHeaderColumn(pHeader);
-            eHeaderCol.Style = EHeaderColumn.Styles.RoundedBorder;
-            eHeaderCol.Append(pDiscussionText);
-            return eHeaderCol;
+            OWPara pDate = new OWPara(G.TTranslation.WritingSystemVernacular,
+                G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDate),
+                Created.ToShortDateString());
+            eHeader.Append(pDate);
+
+           
+            // Create the main container and define its border
+            EHeaderColumn eMainContainer = new EHeaderColumn(eHeader);
+            eMainContainer.Border = new EContainer.RoundedBorder(eMainContainer, 12);
+            eMainContainer.Border.BorderColor = TranslatorNote.BorderColor;
+            eMainContainer.Border.FillColor = TranslatorNote.DiscussionHeaderColor;
+            // The contents of the HeaderColumn are inset from the edges
+            eMainContainer.Border.Padding.Left = 3;
+            eMainContainer.Border.Padding.Right = 2;
+            eMainContainer.Border.Padding.Bottom = 2;
+
+            // Is this discussion editable?
+            bool bEditable = true;
+            // If not the last one in the Note, it isn't
+            if (this != Note.LastDiscussion)
+                bEditable = false;
+
+            // Color depends on editability
+            Color clrBackground = (bEditable) ? Color.White : TranslatorNote.UneditableColor;
+
+            // Create a Column to hold the discussion paragraphs. Insert the left/right
+            // margins so nothing overlaps the rounded corners.
+            EColumn eDiscussionHolder = new EColumn();
+            eDiscussionHolder.Border = new EContainer.RoundedBorder(eDiscussionHolder, 12);
+            eDiscussionHolder.Border.BorderColor = TranslatorNote.BorderColor;
+            eDiscussionHolder.Border.FillColor = clrBackground;
+            eDiscussionHolder.Border.Padding.Left = nRoundedCornerInset;
+            eDiscussionHolder.Border.Padding.Right = nRoundedCornerInset;
+            eMainContainer.Append(eDiscussionHolder);
+
+            // Add the paragraphs to the Discussion Holder
+            foreach (DParagraph para in Paragraphs)
+            {
+                OWPara pDiscussion = new OWPara(G.TTranslation.WritingSystemVernacular,
+                    G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDiscussion),
+                    para, clrBackground, OWPara.Flags.IsEditable);
+                eDiscussionHolder.Append(pDiscussion);
+            }
+
+            return eMainContainer;
         }
         #endregion
     }
@@ -204,7 +264,7 @@ namespace OurWord.DataModel
     public class TranslatorNote : JObject
     {
         // Content Attrs ---------------------------------------------------------------------
-        #region BAttr{g/s}: string Category
+        #region BAttr{g/s}: string Category - adds new ones at runtime if needed
         public string Category
         {
             get
@@ -301,57 +361,27 @@ namespace OurWord.DataModel
         }
         #endregion
 
-        // Categories (static) ---------------------------------------------------------------
-        #region SAttr{g/s}: List<string>  Categories
-        static public List<string> Categories
+        // Categories ------------------------------------------------------------------------
+        #region VAttr{g}: BStringArray Categories
+        static public BStringArray Categories
         {
             get
             {
-                // Make sure the categories have been initialized
-                InitializeCategories();
-
-                Debug.Assert(null != s_vCategories);
-                Debug.Assert(s_vCategories.Count > 0);
-
-                return s_vCategories;
+                return G.TeamSettings.TranslatorNotesCategories;
             }
         }
-        static List<string> s_vCategories = null;
         #endregion
         #region SVAttr{g/s}: string DefaultCategory
         static public string DefaultCategory
         {
             get
             {
-                // Make sure the categories have been initialized
-                InitializeCategories();
-
-                Debug.Assert(s_iDefaultCategory >= 0);
-                Debug.Assert(s_iDefaultCategory < Categories.Count);
-                return Categories[s_iDefaultCategory];
+                return G.TeamSettings.DefaultTranslatorNoteCategory;
             }
             set
             {
-                for (int i = 0; i < Categories.Count; i++)
-                {
-                    if (Categories[i] == value)
-                        s_iDefaultCategory = i;
-                }
-            }
-        }
-        static int s_iDefaultCategory;
-        #endregion
-        #region SMethod: void InitializeCategories()
-        static public void InitializeCategories()
-        {
-            if (null == s_vCategories || s_vCategories.Count == 0)
-            {
-                s_vCategories = new List<string>();
-                s_vCategories.Add("Exegesis");
-                s_vCategories.Add("Front Issue?");
-                s_vCategories.Add("To Do");
-
-                DefaultCategory = "To Do";
+                Debug.Assert(-1 != Categories.IndexOf(value));
+                G.TeamSettings.DefaultTranslatorNoteCategory = value;
             }
         }
         #endregion
@@ -363,8 +393,150 @@ namespace OurWord.DataModel
                 return;
 
             // If it wasn't there, then add it
-            Categories.Add(sCategory);
+            Categories.Append(sCategory);
         }
+        #endregion
+        const string c_sCategoryRegistrySubKey = c_sRegistrySubkey + "\\" + "Category";
+        #region SMethod: bool GetCategoryIsChecked(sCategory)
+        static public bool GetCategoryIsChecked(string sCategory)
+        {
+            return JW_Registry.GetValue(c_sCategoryRegistrySubKey, sCategory, true);
+        }
+        #endregion
+        #region SMethod: void SetCategoryIsChecked(sCategory, bIsChecked)
+        static public void SetCategoryIsChecked(string sCategory, bool bIsChecked)
+        {
+            JW_Registry.SetValue(c_sCategoryRegistrySubKey, sCategory, bIsChecked);
+        }
+        #endregion
+
+        #region SAttr{g}: List<string> FrontCategories
+        static public List<string> FrontCategories
+        {
+            get
+            {
+                if (null == s_FrontCategories)
+                    s_FrontCategories = new List<string>();
+                Debug.Assert(null != s_FrontCategories);
+                return s_FrontCategories;
+            }
+        }
+        static List<string> s_FrontCategories;
+        #endregion
+        const string c_sFrontCategoryRegistrySubKey = c_sRegistrySubkey + "\\" + "FrontCategory";
+        #region SMethod: bool GetFrontCategoryIsChecked(sCategory)
+        static public bool GetFrontCategoryIsChecked(string sCategory)
+        {
+            return JW_Registry.GetValue(c_sFrontCategoryRegistrySubKey, sCategory, true);
+        }
+        #endregion
+        #region SMethod: void SetFrontCategoryIsChecked(sCategory, bIsChecked)
+        static public void SetFrontCategoryIsChecked(string sCategory, bool bIsChecked)
+        {
+            JW_Registry.SetValue(c_sFrontCategoryRegistrySubKey, sCategory, bIsChecked);
+        }
+        #endregion
+
+        #region Method: void ScanBookForNewCategories(DBook book)
+        static public void ScanBookForNewCategories(DBook book)
+        {
+            bool bIsFront = (book.Translation == G.FTranslation);
+            bool bIsTarget = (book.Translation == G.TTranslation);
+
+            // Don'e waste time except for Front and Target translations
+            if (!bIsFront && !bIsTarget)
+                return;
+
+            List<TranslatorNote> v = new List<TranslatorNote>();
+            foreach (DSection section in book.Sections)
+                v.AddRange(section.AllNotes);
+
+            foreach (TranslatorNote tn in v)
+            {
+                if (bIsTarget)
+                    AddCategory(tn.Category);
+                else
+                {
+                    if (tn.ShowInDaughterTranslations && -1 == FrontCategories.IndexOf(tn.Category))
+                        FrontCategories.Add(tn.Category);
+                }
+            }
+        }
+        #endregion
+
+        // Settings --------------------------------------------------------------------------
+        public const string c_sRegistrySubkey = "TranslatorNotes";
+        #region Attr{g/s}: Color BorderColor
+        static public Color BorderColor
+        {
+            get
+            {
+                if (Color.Empty == s_BorderColor)
+                {
+                    string s = JW_Registry.GetValue(c_sRegistrySubkey, 
+                        "BorderColor", "DarkGray");
+                    s_BorderColor = Color.FromName(s);
+                }
+                Debug.Assert(Color.Empty != s_BorderColor);
+                return s_BorderColor;
+            }
+            set
+            {
+                s_BorderColor = value;
+                Debug.Assert(Color.Empty != s_BorderColor);
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "BorderColor", value.Name);
+            }
+        }
+        static Color s_BorderColor = Color.Empty;
+        #endregion
+        #region Attr{g/s}: Color DiscussionHeaderColor
+        static public Color DiscussionHeaderColor
+        {
+            get
+            {
+                if (Color.Empty == s_DiscussionHeaderColor)
+                {
+                    string s = JW_Registry.GetValue(c_sRegistrySubkey, 
+                        "DiscussionHeaderColor", "LightGreen");
+                    s_DiscussionHeaderColor = Color.FromName(s);
+                }
+                Debug.Assert(Color.Empty != s_DiscussionHeaderColor);
+                return s_DiscussionHeaderColor;
+            }
+            set
+            {
+                s_DiscussionHeaderColor = value;
+                Debug.Assert(Color.Empty != s_DiscussionHeaderColor);
+                JW_Registry.SetValue(c_sRegistrySubkey, 
+                    "DiscussionHeaderColor", value.Name);
+            }
+        }
+        static Color s_DiscussionHeaderColor = Color.Empty;
+        #endregion
+        #region Attr{g/s}: Color UneditableColor
+        static public Color UneditableColor
+        {
+            get
+            {
+                if (s_UneditableColor == Color.Empty)
+                {
+                    string s = JW_Registry.GetValue(c_sRegistrySubkey, 
+                        "UneditableColor", "LightYellow");
+                    s_UneditableColor = Color.FromName(s);
+                }
+                Debug.Assert(Color.Empty != s_UneditableColor);
+                return s_UneditableColor;
+            }
+            set
+            {
+                s_UneditableColor = value;
+                Debug.Assert(Color.Empty != s_UneditableColor);
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "UneditableColor", value.Name);
+            }
+        }
+        static Color s_UneditableColor = Color.Empty;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -514,24 +686,28 @@ namespace OurWord.DataModel
             string sReference = nChapter.ToString("000") + ":" + 
                 nVerse.ToString("000");
 
-            // The note needs a context. We'll go with the first five words
-            // of the note. Its messy in that it gets repeated when the note is
-            // expanded, unless we clear the ShowHeaderWhenExpanded flag.
-            string sContext = GetWordsRight(field.Data, 0, 5);
-
             // Create the Note. We will not have a context for it.
-            TranslatorNote tn = new TranslatorNote(sReference, sContext);
+            TranslatorNote tn = new TranslatorNote(sReference, "");
             tn.Category = sCategory;
             tn.ShowInDaughterTranslations = bShowInDaughters;
 
+            // Remove any reference from the data
+            string sData = tn.RemoveInitialReferenceFromText(field.Data);
+
+            // The note needs a context. We'll go with the first five words
+            // of the note. Its messy in that it gets repeated when the note is
+            // expanded, unless we clear the ShowHeaderWhenExpanded flag.
+            tn.Context = GetWordsRight(sData, 0, 5);
+
             // Add the discussion
-            Discussion disc = new Discussion(sAuthor, dtCreated, field.Data);
-            tn.Discussions.Append(disc);
+            Discussion disc = new Discussion(sAuthor, dtCreated, sData);
+            tn.Discussions.Append(disc);          
 
             // Done
             return tn;
         }
         #endregion
+        #region SMethod: bool IsOldStyleMarker(string sMkr)
         static public bool IsOldStyleMarker(string sMkr)
         {
             string[] vs = { "nt", "ntHint", "ntck", "ntUns", "ntReas", "ntFT", "ntDef", 
@@ -545,7 +721,7 @@ namespace OurWord.DataModel
 
             return false;
         }
-
+        #endregion
         #region Method: SfField ToSfm()
         public SfField ToSfField()
             // This allows us to write the note in the old style, which we
@@ -609,6 +785,49 @@ namespace OurWord.DataModel
             if (null == f)
                 f = new SfField(DSFMapping.c_sMkrTranslatorNote, ToXml(true).OneLiner);
             DB.Append(f);
+        }
+        #endregion
+        #region Method: string RemoveInitialReferenceFromText(string sIn)
+        public string RemoveInitialReferenceFromText(string sIn)
+            // It is redundant in the display, to show the reference there, but to also
+            // have it in the note text. So I remove it on import, as we have a lot of
+            // legacy notes that have it.
+        {
+            // Collect any reference that exists in the first paragraph
+            string sRef = "";
+            int iPos = 0;
+            for (; iPos < sIn.Length; iPos++)
+            {
+                char ch = sIn[iPos];
+
+                if (char.IsDigit(ch) || ch == ':' || char.IsWhiteSpace(ch))
+                    sRef += ch;
+                else
+                    break;
+            }
+
+            // Get the reference as we've stored it on the note, but as we plan
+            // to display it in the header
+            string sFromNote = GetDisplayableReference();
+
+            // Remove leading/trailing spaces and punctuation from both, so we can
+            // compare without the confusion
+            sFromNote = sFromNote.Trim();
+            sRef = sRef.Trim();
+            while (sRef.Length > 1 && char.IsPunctuation(sRef[sRef.Length - 1]))
+                sRef = sRef.Substring(0, sRef.Length - 1);
+            while (sFromNote.Length > 1 && char.IsPunctuation(sFromNote[sFromNote.Length - 1]))
+                sFromNote = sFromNote.Substring(0, sFromNote.Length - 1);
+
+            // If it does not equal the note's reference (as we want to display it),
+            // then we keep it.
+            if (sFromNote != sRef)
+                return sIn;
+
+            // Remove what we determined whne we were originally collecting the reference
+            sIn = (iPos < sIn.Length) ?
+                sIn.Substring(iPos) : "";
+            return sIn;
         }
         #endregion
 
@@ -738,6 +957,16 @@ namespace OurWord.DataModel
         #endregion
 
         // View Construction -----------------------------------------------------------------
+        #region VAttr{g}: Discussion LastDiscussion
+        public Discussion LastDiscussion
+        {
+            get
+            {
+                Debug.Assert(0 != Discussions.Count);
+                return Discussions[Discussions.Count - 1];
+            }
+        }
+        #endregion
         #region VAttr{g}: DParagraph FirstParagraph - first paragraph in the first discussion obj
         public DParagraph FirstParagraph
         {
@@ -753,8 +982,9 @@ namespace OurWord.DataModel
         {
             get
             {
-                Debug.Assert(0 != Discussions.Count);
-                return Discussions[Discussions.Count - 1].LastParagraph;
+                DParagraph p = LastDiscussion.LastParagraph;
+                Debug.Assert(null != p);
+                return p;
             }
         }
         #endregion
@@ -774,17 +1004,31 @@ namespace OurWord.DataModel
             eHeader.IsCollapsed = false;
             eHeader.ShowHeaderWhenExpanded = true;
 
+            // We want a horizontal line underneath it, to separate notes visually from 
+            // each other
+            eHeader.Border = new EContainer.SquareBorder(eHeader);
+            eHeader.Border.BorderPlacement = EContainer.BorderBase.BorderSides.Bottom;
+            eHeader.Border.BorderColor = Color.DarkGray;
+            eHeader.Border.BorderWidth = 2;
+            eHeader.Border.Margin.Bottom = 5;
+            eHeader.Border.Padding.Bottom = 5;
+
             // Add the Discussions
             foreach (Discussion disc in Discussions)
                 eHeader.Append(disc.BuildNotesPaneView());
+
+            // Add the Category and AssignedTo
+            // TODO: Make these changeable by the user
+            OWPara pTail = new OWPara(G.TTranslation.WritingSystemConsultant,
+                G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
+                Category );
+            eHeader.Append(pTail);
 
             return eHeader;
         }
         #endregion
         #region VAttr{g}: bool Show
         public bool Show
-            // TODO: Implement filtering on category. This current implementation
-            // shows all, regardless of category
         {
             get
             {
@@ -798,10 +1042,16 @@ namespace OurWord.DataModel
                 DTranslation t = Text.Paragraph.Translation;
                 if (t == G.FTranslation)
                 {
-                    if (ShowInDaughterTranslations)
-                        return true;
-                    return false;
+                    if (!ShowInDaughterTranslations)
+                        return false;
+                    if (!GetFrontCategoryIsChecked(Category))
+                        return false;
+                    return true;
                 }
+
+                // Is this a category we want to see?
+                if (!GetCategoryIsChecked(Category))
+                    return false;
 
                 return true;
             }

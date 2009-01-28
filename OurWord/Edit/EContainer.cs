@@ -22,6 +22,7 @@ using OurWord.DataModel;
 #endregion
 
 // TODO: Get rid of StartNewRow, so that we deal with the Piles as we build the container
+// TODO: Implement Left and Right Borders
 
 namespace OurWord.Edit
 {
@@ -195,42 +196,472 @@ namespace OurWord.Edit
     #region CLASS: EContainer
     public class EContainer : EItem, IEnumerator
     {
-        // Optional Footnote Separator at top of container -----------------------------------
-        #region Attr{g}: bool DisplayFootnoteSeparator - if T, shows line btwn para's and footnotes
-        virtual public bool DisplayFootnoteSeparator
+        // Optional Borders ------------------------------------------------------------------
+        #region CLASS: BorderBase
+        public class BorderBase
+        {
+            // Margin and Padding ------------------------------------------------------------
+            #region CLASS: RectOffset
+            public class RectOffset
+            {
+                #region Attr{g/s}: int Top
+                public int Top
+                {
+                    get
+                    {
+                        return m_nTop;
+                    }
+                    set
+                    {
+                        m_nTop = value;
+                    }
+                }
+                int m_nTop;
+                #endregion
+                #region Attr{g/s}: int Bottom
+                public int Bottom
+                {
+                    get
+                    {
+                        return m_nBottom;
+                    }
+                    set
+                    {
+                        m_nBottom = value;
+                    }
+                }
+                int m_nBottom;
+                #endregion
+                #region Attr{g/s}: int Left
+                public int Left
+                {
+                    get
+                    {
+                        return m_nLeft;
+                    }
+                    set
+                    {
+                        m_nLeft = value;
+                    }
+                }
+                int m_nLeft;
+                #endregion
+                #region Attr{g/s}: int Right
+                public int Right
+                {
+                    get
+                    {
+                        return m_nRight;
+                    }
+                    set
+                    {
+                        m_nRight = value;
+                    }
+                }
+                int m_nRight;
+                #endregion
+
+                #region Constructor()
+                public RectOffset()
+                {
+                }
+                #endregion
+            }
+            #endregion
+            #region Attr{g/s}: RectOffset Margin - outside of border
+            public RectOffset Margin
+            {
+                get
+                {
+                    Debug.Assert(null != m_Margin);
+                    return m_Margin;
+                }
+                set
+                {
+                    m_Margin = value;
+                }
+            }
+            RectOffset m_Margin;
+            #endregion
+            #region Attr{g/s}: RectOffset Padding - inside of border
+            public RectOffset Padding
+            {
+                get
+                {
+                    Debug.Assert(null != m_Padding);
+                    return m_Padding;
+                }
+                set
+                {
+                    m_Padding = value;
+                }
+            }
+            RectOffset m_Padding;
+            #endregion
+            #region VAttr{g}: RectangleF BorderRectangle
+            protected RectangleF BorderRectangle
+            {
+                get
+                {
+                    RectangleF r = new RectangleF(LeftBorder, TopBorder,
+                        RightBorder - LeftBorder + 1, BottomBorder - TopBorder + 1);
+                    return r;
+                }
+            }
+            #endregion
+            #region Method: int GetTotalWidth(BorderSides side)
+            public int GetTotalWidth(BorderSides side)
+            {
+                int c = 0;
+
+                // Are we wanting to get the top side?
+                if ((side & BorderSides.Top) == BorderSides.Top)
+                {
+                    // Add the Margin
+                    c += Margin.Top;
+
+                    // If the Top Border is turned on, then add its width
+                    if ((BorderPlacement & BorderSides.Top) == BorderSides.Top)
+                        c += BorderWidth;
+
+                    // Add the padding
+                    c += Padding.Top;
+                }
+
+                // Same logic for the other three sides
+                if ((side & BorderSides.Bottom) == BorderSides.Bottom)
+                {
+                    c += Margin.Bottom;
+                    if ((BorderPlacement & BorderSides.Bottom) == BorderSides.Bottom)
+                        c += BorderWidth;
+                    c += Padding.Bottom;
+                }
+
+                if ((side & BorderSides.Left) == BorderSides.Left)
+                {
+                    c += Margin.Left;
+                    if ((BorderPlacement & BorderSides.Left) == BorderSides.Left)
+                        c += BorderWidth;
+                    c += Padding.Left;
+                }
+
+                if ((side & BorderSides.Right) == BorderSides.Right)
+                {
+                    c += Margin.Right;
+                    if ((BorderPlacement & BorderSides.Right) == BorderSides.Right)
+                        c += BorderWidth;
+                    c += Padding.Right;
+                }
+
+                return c;
+            }
+            #endregion
+
+            // Drawing Attributes ------------------------------------------------------------
+            #region Attr{g/s}; Color BorderColor
+            public Color BorderColor
+            {
+                get
+                {
+                    return m_BorderColor;
+                }
+                set
+                {
+                    m_BorderColor = value;
+                }
+            }
+            Color m_BorderColor = Color.Black;
+            #endregion
+            #region Attr{g/s}; Color FillColor
+            public Color FillColor
+            {
+                get
+                {
+                    return m_FillColor;
+                }
+                set
+                {
+                    m_FillColor = value;
+                }
+            }
+            Color m_FillColor = Color.Empty;
+            #endregion
+            #region Attr{g/s}: int BorderWidth
+            public int BorderWidth
+            {
+                get
+                {
+                    return m_nBorderWidth;
+                }
+                set
+                {
+                    Debug.Assert(value >= 0 && value < 5);
+                    m_nBorderWidth = value;
+                }
+            }
+            int m_nBorderWidth = 0;
+            #endregion
+            #region VAttr{g}: Pen BorderPen
+            protected Pen BorderPen
+            {
+                get
+                {
+                    return new Pen(BorderColor, BorderWidth);
+                }
+            }
+            #endregion
+            #region VAttr{g}:  Brush FillBrush
+            protected Brush FillBrush
+            {
+                get
+                {
+                    if (Color.Empty != FillColor)
+                        return new SolidBrush(FillColor);
+                    return Brushes.Transparent;
+                }
+            }
+            #endregion
+
+            // Which Sides to Display --------------------------------------------------------
+            #region Enum: BorderSides - Top, Bottom, All, None, etc.
+            public enum BorderSides
+            {
+                Top = 1,
+                Bottom = 2,
+                Left = 4,
+                Right = 8,
+                All = Top | Bottom | Left | Right,
+                LeftAndRight = Left | Right,
+                TopAndBottom = Top | Bottom,
+                None = 0
+            }
+            #endregion
+            #region Attr{g/s}: BorderSides BorderPlacement
+            public BorderSides BorderPlacement
+            {
+                get
+                {
+                    return m_BorderPlacement;
+                }
+                set
+                {
+                    m_BorderPlacement = value;
+                }
+            }
+            BorderSides m_BorderPlacement = BorderSides.None;
+            #endregion
+
+            // Scaffolding -------------------------------------------------------------------
+            #region Constructor(EItem)
+            public BorderBase(EItem item)
+            {
+                m_Item = item;
+
+                m_Margin = new RectOffset();
+                m_Padding = new RectOffset();
+            }
+            #endregion
+            #region Attr{g}: EItem Item
+            EItem Item
+            {
+                get
+                {
+                    Debug.Assert(null != m_Item);
+                    return m_Item;
+                }
+            }
+            EItem m_Item;
+            #endregion
+            #region VAttr{g}: OWWindow.DrawBuffer Draw
+            protected OWWindow.DrawBuffer Draw
+            {
+                get
+                {
+                    return Item.Window.Draw;
+                }
+            }
+            #endregion
+
+            // Border locations (i.e., adjusted for margin) ----------------------------------
+            #region Attr{g}: float LeftBorder
+            protected float LeftBorder
+            {
+                get
+                {
+                    return Item.Rectangle.Left + Margin.Left;
+                }
+            }
+            #endregion
+            #region Attr{g}: float RightBorder
+            protected float RightBorder
+            {
+                get
+                {
+                    return Item.Rectangle.Right + Margin.Right;
+                }
+            }
+            #endregion
+            #region Attr{g}: float TopBorder
+            protected float TopBorder
+            {
+                get
+                {
+                    return Item.Rectangle.Top + Margin.Top;
+                }
+            }
+            #endregion
+            #region Attr{g}: float BottomBorder
+            protected float BottomBorder
+            {
+                get
+                {
+                    return Item.Rectangle.Bottom - Margin.Bottom;
+                }
+            }
+            #endregion
+
+            // Layout and Drawing ------------------------------------------------------------
+            #region VMethod: void Paint()
+            virtual public void Paint()
+            {
+            }
+            #endregion
+        }
+        #endregion
+        #region CLASS: SquareBorder : BorderBase
+        public class SquareBorder : BorderBase
+        {
+            #region Constructor(EItem)
+            public SquareBorder(EItem item)
+                : base(item)
+            {
+                BorderPlacement = BorderSides.All;
+                BorderWidth = 1;
+                BorderColor = Color.Black;
+            }
+            #endregion
+
+            #region OMethod: void Paint()
+            public override void Paint()
+            {
+                Pen pen = BorderPen;
+                OWWindow.DrawBuffer d = Draw;
+
+                PointF LeftTop = new PointF(LeftBorder, TopBorder);
+                PointF LeftBottom = new PointF(LeftBorder, BottomBorder);
+                PointF RightTop = new PointF(RightBorder, TopBorder);
+                PointF RightBottom = new PointF(RightBorder, BottomBorder);
+
+                if ((BorderPlacement & BorderSides.Top) == BorderSides.Top)
+                    d.Line(pen, LeftTop, RightTop);
+                if ((BorderPlacement & BorderSides.Bottom) == BorderSides.Bottom)
+                    d.Line(pen, LeftBottom, RightBottom);
+
+                if ((BorderPlacement & BorderSides.Left) == BorderSides.Left)
+                    d.Line(pen, LeftTop, LeftBottom);
+                if ((BorderPlacement & BorderSides.Right) == BorderSides.Right)
+                    d.Line(pen, RightTop, RightBottom);
+            }
+            #endregion
+        }
+        #endregion
+        #region CLASS: RoundedBorder : BorderBase
+        public class RoundedBorder : BorderBase
+        {
+            #region Attr{g/s}: int RoundedBorderRadius
+            public int RoundedBorderRadius
+            {
+                get
+                {
+                    return m_nRoundedBorderRadius;
+                }
+                set
+                {
+                    m_nRoundedBorderRadius = value;
+                }
+            }
+            int m_nRoundedBorderRadius = 10;
+            #endregion
+
+            #region Constructor(EItem)
+            public RoundedBorder(EItem item, int nRoundedBorderRadius)
+                : base(item)
+            {
+                m_nRoundedBorderRadius = nRoundedBorderRadius;
+
+                BorderPlacement = BorderSides.All;
+                BorderWidth = 1;
+                BorderColor = Color.Black;
+            }
+            #endregion
+
+            #region OMethod: void Paint()
+            public override void Paint()
+            {
+                Draw.DrawRoundedRectangle(BorderPen, FillBrush,
+                    BorderRectangle, RoundedBorderRadius);
+            }
+            #endregion
+        }
+        #endregion
+        #region CLASS: FootnoteSeparatorBorder : BorderBase
+        public class FootnoteSeparatorBorder : BorderBase
+        {
+            #region Attr{g/s}: float SeparatorWidth
+            public float SeparatorWidth
+            {
+                get
+                {
+                    return m_SeparatorWidth;
+                }
+                set
+                {
+                    m_SeparatorWidth = value;
+                }
+            }
+            float m_SeparatorWidth = 0;
+            #endregion
+
+            #region Constructor(EItem)
+            public FootnoteSeparatorBorder(EItem item, float fSeparatorWidth)
+                : base(item)
+            {
+                m_SeparatorWidth = fSeparatorWidth;
+
+                BorderPlacement = BorderSides.All;
+                BorderWidth = 1;
+                BorderColor = Color.Black;
+            }
+            #endregion
+
+            #region OMethod: void Paint()
+            public override void Paint()
+            {
+                if (0 == SeparatorWidth)
+                    return;
+
+                Draw.Line(BorderPen,
+                   new PointF(LeftBorder, TopBorder),
+                   new PointF(LeftBorder + SeparatorWidth, TopBorder));
+            }
+            #endregion
+        }
+        #endregion
+        #region Attr{g/s}: BorderBase Border
+        public BorderBase Border
         {
             get
             {
-                return m_bDisplayFootnoteSeparator;
+                Debug.Assert(null != m_Border);
+                return m_Border;
             }
             set
             {
-                m_bDisplayFootnoteSeparator = value;
+                Debug.Assert(null != value);
+                m_Border = value;
             }
         }
-        bool m_bDisplayFootnoteSeparator = false;
-        #endregion
-        #region Method: void PaintFootnoteSeparator()
-        protected void PaintFootnoteSeparator()
-            // Display the footnote separator if requested
-        {
-            if (!DisplayFootnoteSeparator)
-                return;
-
-            float xSeparatorWidth = Rectangle.Width / 3.0F;
-            Pen pen = new Pen(Color.Black);
-            Window.Draw.Line(pen, Position,
-                new PointF(Position.X + xSeparatorWidth, Position.Y));
-        }
-        #endregion
-        #region VAttr{g}: int FootnoteSeparatorHeight
-        protected int FootnoteSeparatorHeight
-        {
-            get
-            {
-                return (DisplayFootnoteSeparator) ? 1 : 0;
-            }
-        }
+        BorderBase m_Border;
         #endregion
 
         // Optional Bitmap at top of container -----------------------------------------------
@@ -607,6 +1038,9 @@ namespace OurWord.Edit
             : base()
         {
             m_vSubItems = new EItem[0];
+
+            // Default to an empty border
+            m_Border = new BorderBase(this);
         }
         #endregion
 
@@ -927,6 +1361,22 @@ namespace OurWord.Edit
             return null;
         }
         #endregion
+        #region Attr{g}:  bool ContainsSelection
+        public bool ContainsSelection
+        {
+            get
+            {
+                if (!Window.HasSelection)
+                    return false;
+
+                List<EContainer> vContainers = Window.Selection.ContainerStack;
+                if (vContainers.Contains(this))
+                    return true;
+
+                return false;
+            }
+        }
+        #endregion
 
         // Layout Calculations ---------------------------------------------------------------
         #region VirtMethod: float CalculateSubItemX(EItem subitem)
@@ -935,7 +1385,7 @@ namespace OurWord.Edit
             // this will be our own X, but in, e.g., the RowOfColumns, it will
             // depend on which column the subitem represents.
         {
-            return Position.X;
+            return Position.X + Border.GetTotalWidth(BorderBase.BorderSides.Left);
         }
         #endregion
         #region Method: void CalculateBlockWidths(g) - calculate all EBlocks
@@ -961,7 +1411,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return Width;
+                return Width - Border.GetTotalWidth(BorderBase.BorderSides.LeftAndRight);
             }
         }
         #endregion
@@ -973,7 +1423,9 @@ namespace OurWord.Edit
             if (null != Owner)
             {
                 Width = Owner.AvailableWidthForOneSubitem;
-                Position = new PointF(Owner.CalculateSubItemX(this), Position.Y);
+
+                float xleft = Owner.CalculateSubItemX(this);
+                Position = new PointF(xleft, Position.Y);
             }
 
             // Then calculate the width of the owned items (as they may need to
@@ -1017,8 +1469,8 @@ namespace OurWord.Edit
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
 
-            // Footnote Separator if indicated
-            PaintFootnoteSeparator();
+            // Borders as indicated
+            Border.Paint();
 
             // Bitmap if indicated
             PaintBitmap();
@@ -1051,8 +1503,8 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(EContainer Owner, cColumnsCount)
-        public ERowOfColumns(/*EContainer Owner, */ int cColumnsCount)
-            : base(/*Owner*/)
+        public ERowOfColumns(int cColumnsCount)
+            : base()
         {
             m_cColumnsCount = cColumnsCount;
         }
@@ -1064,7 +1516,12 @@ namespace OurWord.Edit
         {
             get
             {
-                float fAvailableContentWidth = Width - 
+                // Get the toal width available for content
+                float fTotalContentWidth = Width - 
+                    Border.GetTotalWidth(BorderBase.BorderSides.LeftAndRight);
+
+                // Get the width available for a single subitem
+                float fAvailableContentWidth = fTotalContentWidth - 
                     ((ColumnsCount - 1) * Window.WidthBetweenColumns);
                 return fAvailableContentWidth / ColumnsCount;
             }
@@ -1073,21 +1530,29 @@ namespace OurWord.Edit
         #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
         public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
         {
+            // Remember the top-left position and width
             Position = new PointF(Position.X, y);
 
+            // Top Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
+
             // Allow for the top part of the bitmap in "y" when laying out the piles
-            float fHeightBmp = CalculateBitmapHeightRequirement();
+            y += CalculateBitmapHeightRequirement();
 
             // Calculate for the tallest pile
-            float fHeightPiles = 0;
+            float fHighest = 0;
             foreach (EContainer container in SubItems)
             {
-                container.CalculateContainerVerticals(y + fHeightBmp, bRepositionOnly);
-                fHeightPiles = Math.Max(container.Height, fHeightPiles);
+                container.CalculateContainerVerticals(y, bRepositionOnly);
+                fHighest = Math.Max(fHighest, container.Height);
             }
+            y += fHighest;
+
+            // Bottom Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
 
             // The Row's Height is the sum of PileHeight and BmpHeight
-            Height = fHeightBmp + fHeightPiles + FootnoteSeparatorHeight;
+            Height = (y - Position.Y);
         }
         #endregion
         #region OMethod: float CalculateSubItemX(EItem subitem)
@@ -1095,10 +1560,14 @@ namespace OurWord.Edit
             // For the X, we need to figure out which column it is, and then multiply
             // by the width of a column plus the space in-between columns
         {
+            // Locate which column we're in
             int iColumn = Find(subitem);
             Debug.Assert(-1 != iColumn);
 
-            float x = Position.X + iColumn *
+            // The Leftmost x (the x of the first column) takes into account borders
+            float xLeftMost = Position.X + Border.GetTotalWidth(BorderBase.BorderSides.Left);
+
+            float x = xLeftMost + iColumn *
                 (AvailableWidthForOneSubitem + Window.WidthBetweenColumns);
 
             return x;
@@ -1112,14 +1581,15 @@ namespace OurWord.Edit
     {
         // Scaffolding -------------------------------------------------------------------
         #region Constructor(Owner, cColumns, bDisplayFootnoteSeparator)
-        public Row(/*EContainer _Owner,*/ int cColumns, bool bDisplayFootnoteSeparator)
-            : base( /* _Owner, */ cColumns)
+        public Row(int cColumns, bool bDisplayFootnoteSeparator)
+            : base(cColumns)
         {
             // Create a pile for each column
             for (int i = 0; i < cColumns; i++)
             {
                 Pile pile = new Pile();
-                pile.DisplayFootnoteSeparator = bDisplayFootnoteSeparator;
+                if (bDisplayFootnoteSeparator)
+                    pile.Border = new FootnoteSeparatorBorder(this, 40);
                 Append(pile);
             }
         }
@@ -1131,7 +1601,6 @@ namespace OurWord.Edit
 
     #region CLASS: EColumn : EContainer
     public class EColumn : EContainer
-        // TODO: Should the DisplayFootnoteSeparator option be possible on all EContainers?
     {
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -1142,36 +1611,14 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateContainerHorizontals()
-        public override void CalculateContainerHorizontals()
-            // Override to account for the positions of individual columns within the row
-        {
-            Debug.Assert(Owner != null);
-
-            // Set the width as per usual
-            Width = Owner.AvailableWidthForOneSubitem;
-
-            // The X depends upon which column we are, which the owner must tell us
-            Position = new PointF(Owner.CalculateSubItemX(this), Position.Y);
-
-            // Process the sub-items as per usual
-            foreach (EItem item in SubItems)
-            {
-                EContainer container = item as EContainer;
-                if (null != container)
-                    container.CalculateContainerHorizontals();
-            }
-        }
-        #endregion
         #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
         public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
 
-            // If we are displaying the footnote separator, then add a pixel to the
-            // height to make room for it.
-            y += FootnoteSeparatorHeight;
+            // Top Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
 
             // Allow for display of the bitmap if applicable
             y += CalculateBitmapHeightRequirement();
@@ -1182,6 +1629,9 @@ namespace OurWord.Edit
                 container.CalculateContainerVerticals(y, bRepositionOnly);
                 y += container.Height;
             }
+
+            // Bottom Border
+            y += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
 
             // Calculate the resulting height
             Height = (y - Position.Y);
@@ -1356,9 +1806,9 @@ namespace OurWord.Edit
     public class Pile : EColumn
     {
         // Scaffolding ---------------------------------------------------------------
-        #region Constructor(Row)
-        public Pile(/*Row row*/)
-            : base(/*row*/)
+        #region Constructor()
+        public Pile()
+            : base()
         {
         }
         #endregion
