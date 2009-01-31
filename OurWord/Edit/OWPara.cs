@@ -1740,7 +1740,7 @@ namespace OurWord.Edit
         #endregion
 
         // Painting --------------------------------------------------------------------------
-        #region VAttr{g}: Color EditableBackgroundColor - shows the user where typing is permitted
+        #region Attr{g}: Color EditableBackgroundColor - shows the user where typing is permitted
         public Color EditableBackgroundColor
         {
             get
@@ -1749,6 +1749,23 @@ namespace OurWord.Edit
             }
         }
         Color m_EditableBackgroundColor = Color.White;
+        #endregion
+        #region Attr{g/s}: Color NonEditableBackgroundColor - shows where typing is not permitted
+        public Color NonEditableBackgroundColor
+        {
+            get
+            {
+                if (m_NonEditableBackgroundColor == Color.Empty)
+                    m_NonEditableBackgroundColor = Window.BackColor;
+                return m_NonEditableBackgroundColor;
+            }
+            set
+            {
+                Debug.Assert(Color.Empty != value);
+                m_NonEditableBackgroundColor = value;
+            }
+        }
+        Color m_NonEditableBackgroundColor = Color.Empty;
         #endregion
         #region OMethod: void OnPaint(ClipRectangle)
         public override void OnPaint(Rectangle ClipRectangle)

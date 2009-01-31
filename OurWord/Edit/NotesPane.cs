@@ -215,117 +215,135 @@ namespace OurWord.Edit
             m_Show.DropDownItems.Clear();
 
             // Add the categories
-            foreach (string s in TranslatorNote.Categories)
+            foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
             {
-                // Create a new menu item
-                ToolStripMenuItem item = new ToolStripMenuItem(s);
+                ToolStripMenuItem item = cat.CreateMenuItem(
+                    new EventHandler(cmdToggleClassificationChecked));
 
-                // Retrieve the checked state from the registry
-                item.CheckState = TranslatorNote.GetCategoryIsChecked(s) ?
-                    CheckState.Checked : CheckState.Unchecked;
-
-                // Set the event handler
-                item.Click += new System.EventHandler(cmdToggleCategoryChecked);
-
-                // We'll use this for the Show All command
-                item.Tag = "category";
-
-                // Add it to the menu list
                 m_Show.DropDownItems.Add(item);
             }
 
             // Add a menu item to show all of the categories
             string sShowAllCategories = G.GetLoc_Notes("ShowAllCategories", "Show All Categories");
             ToolStripMenuItem itemAll = new ToolStripMenuItem(sShowAllCategories);
-            itemAll.Click += new System.EventHandler(cmdTurnOnAllCategories);
+            itemAll.Click += new System.EventHandler(cmdTurnOnAllClassifications);
             m_Show.DropDownItems.Add(itemAll);
 
-            // Show Notes from the Front Translation
+            // Categories from the Front Translation
             if (TranslatorNote.FrontCategories.Count > 0)
             {
+                // Add a separator
+                if (m_Show.DropDownItems.Count > 0)
+                    m_Show.DropDownItems.Add(new ToolStripSeparator());
+
                 // Add a menu item for the Front Translation notes we want to see
                 string sFrontCategories = G.GetLoc_NoteDefs("FrontCategories", "Notes From Front Translation");
                 ToolStripMenuItem itemFromFront = new ToolStripMenuItem(sFrontCategories);
                 m_Show.DropDownItems.Add(itemFromFront);
 
                 // Add the Front Translation Categories to this submenu
-                foreach (string s in TranslatorNote.FrontCategories)
+                foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.FrontCategories)
                 {
-                    // Create a new menu item
-                    ToolStripMenuItem item = new ToolStripMenuItem(s);
+                    ToolStripMenuItem item = cat.CreateMenuItem(
+                        new EventHandler(cmdToggleClassificationChecked));
 
-                    // Retrieve the checked state
-                    item.CheckState = TranslatorNote.GetFrontCategoryIsChecked(s) ?
-                        CheckState.Checked : CheckState.Unchecked;
-
-                    // Set the event handler
-                    item.Click += new System.EventHandler(cmdToggleFrontCategoryChecked);
-
-                    // Add it to the menu list
                     itemFromFront.DropDownItems.Add(item);
                 }
             }
+
+            // "Assigned To" choice
+            AddAssignedTo();
+
         }
         #endregion
-        #region Cmd: cmdTurnOnAllCategories
-        private void cmdTurnOnAllCategories(object sender, EventArgs e)
+        #region Cmd: cmdTurnOnAllClassifications
+        private void cmdTurnOnAllClassifications(object sender, EventArgs e)
         {
             // Make sure all Category menu items are checked
-            foreach (ToolStripMenuItem item in m_Show.DropDownItems)
+            foreach (ToolStripItem item in m_Show.DropDownItems)
             {
-                if ((string)item.Tag == "category")
-                {
-                    item.Checked = true;
-                    string sCategory = item.Text;
-                    TranslatorNote.SetCategoryIsChecked(sCategory, true);
-                }
+                // Cast to a menu item, if possible
+                ToolStripMenuItem menuItem = item as ToolStripMenuItem;
+                if (null == menuItem)
+                    continue;
+
+                // Get the Classification from the tag
+                TranslatorNote.Classifications.Classification classification =
+                    menuItem.Tag as TranslatorNote.Classifications.Classification;
+                if (null == classification)
+                    continue;
+
+                // Check both the menu and the Classification
+                menuItem.Checked = true;
+                classification.IsChecked = true;
             }
 
             // Regenerate the window display
             G.App.ResetWindowContents();
         }
         #endregion
-        #region Cmd: cmdToggleCategoryChecked
-        private void cmdToggleCategoryChecked(object sender, EventArgs e)
+        #region Cmd: cmdToggleClassificationChecked
+        private void cmdToggleClassificationChecked(object sender, EventArgs e)
         {
-            // Determine which category has changed
+            // Retrieve the menu item
             ToolStripMenuItem item = sender as ToolStripMenuItem;
             if (null == item)
                 return;
-            string sCategory = item.Text;
+
+            // Retrieve the Category from the tag
+            TranslatorNote.Classifications.Classification classification =
+                item.Tag as TranslatorNote.Classifications.Classification;
+            if (null == classification)
+                return;
 
             // Toggle the checked state and reset the menu item
             bool bDisplayThisCategory = !item.Checked;
             item.Checked = bDisplayThisCategory;
-
-            // Place the setting into the registry
-            TranslatorNote.SetCategoryIsChecked(sCategory, bDisplayThisCategory);
-
-            // Regenerate the window display
-            G.App.ResetWindowContents();
-        }
-        #endregion
-        #region Cmd: cmdToggleFrontCategoryChecked
-        private void cmdToggleFrontCategoryChecked(object sender, EventArgs e)
-        {
-            // Determine which category has changed
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            if (null == item)
-                return;
-            string sCategory = item.Text;
-
-            // Toggle the checked state and reset the menu item
-            bool bDisplayThisCategory = !item.Checked;
-            item.Checked = bDisplayThisCategory;
-
-            // Place the setting into the registry
-            TranslatorNote.SetFrontCategoryIsChecked(sCategory, bDisplayThisCategory);
+            classification.IsChecked = bDisplayThisCategory;
 
             // Regenerate the window display
             G.App.ResetWindowContents();
         }
         #endregion
 
+        // AssignedTo Menu Items -------------------------------------------------------------
+        ToolStripMenuItem m_menuShowAllPeople;
+        ToolStripMenuItem m_menuShowJustMe;
+        #region Cmd: cmdAssignedToClicked
+        private void cmdAssignedToClicked(object sender, EventArgs e)
+        {
+            // Check the menu items as requested
+            m_menuShowAllPeople.Checked = (sender == m_menuShowAllPeople);
+            m_menuShowJustMe.Checked = (sender == m_menuShowJustMe);
+
+            // Update the setting this affects
+            TranslatorNote.ShowAllPeople = m_menuShowAllPeople.Checked;
+
+            // Regenerate the window display
+            G.App.ResetWindowContents();
+        }
+        #endregion
+        #region Method: void AddAssignedTo()
+        void AddAssignedTo()
+        {
+            // Add a separator
+            if (m_Show.DropDownItems.Count > 0)
+                m_Show.DropDownItems.Add(new ToolStripSeparator());
+
+            // Menu item to Show All
+            m_menuShowAllPeople = new ToolStripMenuItem("Show Notes Assigned to Anyone");
+            m_menuShowAllPeople.Checked = TranslatorNote.ShowAllPeople;
+            m_menuShowAllPeople.Click += new EventHandler(cmdAssignedToClicked);
+            m_Show.DropDownItems.Add(m_menuShowAllPeople);
+
+            // Menu item to only show current user AssignedTo's
+            string sShowJustMe = "Show Notes Assigned to '" + Discussion.DefaultAuthor + "'";
+            m_menuShowJustMe = new ToolStripMenuItem(sShowJustMe);
+            m_menuShowJustMe.Checked = !TranslatorNote.ShowAllPeople;
+            m_menuShowJustMe.Click += new EventHandler(cmdAssignedToClicked);
+            m_Show.DropDownItems.Add(m_menuShowJustMe);
+        }
+        #endregion
     }
 
     public class NotesWnd : OWWindow
@@ -406,7 +424,7 @@ namespace OurWord.Edit
         #region Method: void AddNote(TranslatorNote)
         public void AddNote(TranslatorNote note)
         {
-            Contents.Append(note.BuildNotesPaneView());
+            Contents.Append(note.BuildNotesPaneView(this));
         }
         #endregion
 

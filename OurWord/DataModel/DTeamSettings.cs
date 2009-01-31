@@ -195,29 +195,25 @@ namespace OurWord.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
-        #region BAttr{g/s}: string DefaultTranslatorNoteCategory
-        public string DefaultTranslatorNoteCategory
+        #region BAttr{g}: BStringArray NotesCategories
+        public BStringArray NotesCategories
         {
             get
             {
-                return m_sDefaultTranslatorNoteCategory;
-            }
-            set
-            {
-                SetValue(ref m_sDefaultTranslatorNoteCategory, value);
+                return m_bsaNotesCategories;
             }
         }
-        string m_sDefaultTranslatorNoteCategory = "English";
+        public BStringArray m_bsaNotesCategories = null;
         #endregion
-        #region BAttr{g}: BStringArray TranslatorNotesCategories
-        public BStringArray TranslatorNotesCategories
+        #region BAttr{g}: BStringArray NotesFrontCategories
+        public BStringArray NotesFrontCategories
         {
             get
             {
-                return m_bsaTranslatorNotesCategories;
+                return m_bsaNotesFrontCategories;
             }
         }
-        public BStringArray m_bsaTranslatorNotesCategories = null;
+        public BStringArray m_bsaNotesFrontCategories = null;
         #endregion
 
 		#region Method: void DeclareAttrs()
@@ -238,10 +234,10 @@ namespace OurWord.DataModel
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
 
-            // Translator Notes Categories
-            DefineAttr("DefaultCategory", ref m_sDefaultTranslatorNoteCategory);
-            DefineAttr("NotesCategories", ref m_bsaTranslatorNotesCategories);
-		}
+            // Translator Notes
+            DefineAttr("NotesCategories", ref m_bsaNotesCategories);
+            DefineAttr("NotesFrontCategories", ref m_bsaNotesFrontCategories);
+        }
 		#endregion
 
 		// JAttrs ----------------------------------------------------------------------------
@@ -369,7 +365,8 @@ namespace OurWord.DataModel
             AbsolutePathName = DefaultPathName;
 
             // Translator Notes Categories
-            m_bsaTranslatorNotesCategories = new BStringArray();
+            m_bsaNotesCategories = new BStringArray();
+            m_bsaNotesFrontCategories = new BStringArray();
         }
 		#endregion
         #region VAttr{g}: override string DefaultFileExtension
@@ -383,18 +380,6 @@ namespace OurWord.DataModel
         #endregion
 
         // Initializations -------------------------------------------------------------------
-        #region Method: void EnsureInit_Categories()
-        void EnsureInit_Categories()
-        {
-            if (TranslatorNotesCategories.Length == 0)
-            {
-                TranslatorNotesCategories.Append("Exegesis");
-                TranslatorNotesCategories.Append("To Do");
-
-                DefaultTranslatorNoteCategory = "To Do";
-            }
-        }
-        #endregion
         #region void EnsureInitialized()
         public void EnsureInitialized()
             // This is re-entrant; we want to be able to scan an existing TeamSettings
@@ -404,9 +389,6 @@ namespace OurWord.DataModel
             if (null == m_StyleSheet.Value)
                 m_StyleSheet.Value = new DStyleSheet();
             StyleSheet.Initialize(false);
-
-            // Translator Notes Categories
-            EnsureInit_Categories();
 
             // TODO: Other TeamSEttings initializations
         }

@@ -644,6 +644,17 @@ namespace JWdb
             return true;
         }
         #endregion
+        #region Method: bool Contains(string s)
+        public bool Contains(string s)
+        {
+            for (int i = 0; i < Length; i++)
+            {
+                if (s == this[i])
+                    return true;
+            }
+            return false;
+        }
+        #endregion
 
         // Find a match somewhere within a string --------------------------------------------
         #region Method: int FindSubstringMatch(sLongString)

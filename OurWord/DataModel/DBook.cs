@@ -2034,7 +2034,7 @@ namespace OurWord.DataModel
 				}
 
                 // Add any Note Categories we might not yet have
-                TranslatorNote.ScanBookForNewCategories(Book);
+                TranslatorNote.ScanBookForNewClassifications(Book);
 
                 // Read any auxiliary info
                 Book.ReadAuxiliarySettings();

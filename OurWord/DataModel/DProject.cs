@@ -129,6 +129,16 @@ namespace OurWord.DataModel
         }
         private string m_sPathToDictionaryData = "";
         #endregion
+        #region BAttr{g}:   BStringArray People
+        public BStringArray People
+        {
+            get
+            {
+                return m_bsaPeople;
+            }
+        }
+        public BStringArray m_bsaPeople = null;
+        #endregion
 
         #region Method void DeclareAttrs()
 		protected override void DeclareAttrs()
@@ -142,6 +152,9 @@ namespace OurWord.DataModel
 
 			DefineAttr("vdShowNotes",    ref m_bVD_ShowNotesPane);
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
+
+            DefineAttr("People", ref m_bsaPeople);
+
 
 #if (FEAT_WESAY || FEAT_MERGE)
             DefineAttr("ShowMerge",      ref m_bShowMergePane);
@@ -842,6 +855,8 @@ namespace OurWord.DataModel
 
 			_ConstructAttrs();
 
+            m_bsaPeople = new BStringArray();
+
             // Default for a display name
             DisplayName = c_sDefaultProjectName;
 		}
@@ -932,6 +947,9 @@ namespace OurWord.DataModel
                 else
                     i++;
             }
+
+            // Re-initialize the Translator Notes
+            TranslatorNote.InitClassifications();
 
             return true;
         }

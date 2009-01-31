@@ -649,6 +649,11 @@ namespace OurWord.DataModel
 			// 1. following a verse
 			// 2. paragraph initial if the first thing would otherwise be a footnote
 			// 3. if the paragraph is otherwise empty
+            //
+            // We use the SuppressDeclareDirty option when entering these, because 
+            // the changes are not saved when the book goes out to standard format;
+            // therefore we don't wish to create a save that has no changes on the
+            // disk. 
 		{
 			// Case 1: If we have a DVerse, then we should have a place to type following it.
 			for(int i=0; i<Runs.Count; i++)
@@ -661,7 +666,7 @@ namespace OurWord.DataModel
 
 				if (null != verse && null == text)
 				{
-					Runs.InsertAt( i+1, DText.CreateSimple() );
+					Runs.InsertAt( i+1, DText.CreateSimple(), true );
 				}
 			}
 
@@ -672,14 +677,14 @@ namespace OurWord.DataModel
 				if (Runs[0] as DFootLetter != null ||
 					Runs[0] as DSeeAlso != null)
 				{
-					Runs.InsertAt(0, DText.CreateSimple() );
+					Runs.InsertAt(0, DText.CreateSimple(), true );
 				}
 			}
 
 			// Case 3: An empty paragraph should have a place to type
 			if (Runs.Count == 0)
 			{
-				Runs.Append( DText.CreateSimple() );
+				Runs.Append( DText.CreateSimple(), true );
 			}
 		}
 		#endregion
@@ -724,7 +729,7 @@ namespace OurWord.DataModel
 				if (bModelIsDText && bTargetIsNot && !bTargetPrevIsDText)
 				{
 					DText text = DText.CreateSimple();
-					Runs.InsertAt(iTarget, text);
+					Runs.InsertAt(iTarget, text, true);
 				}
 			}
 		}

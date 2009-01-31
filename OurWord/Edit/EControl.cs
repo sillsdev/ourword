@@ -27,7 +27,7 @@ namespace OurWord.Edit
     public class EControl : EItem
     {
         #region Attr{g}: Control Control
-        protected Control Control
+        public Control Control
         {
             get
             {
@@ -39,19 +39,6 @@ namespace OurWord.Edit
         #endregion
 
         // Screen Region ---------------------------------------------------------------------
-        #region OAttr{g/s}: PointF Position
-        public override PointF Position
-        {
-            get
-            {
-                return Control.Location;
-            }
-            set
-            {
-                Control.Location = new Point( (int)value.X, (int)value.Y);
-            }
-        }
-        #endregion
         #region OAttr{g/s}: float Height
         public override float Height
         {
@@ -80,11 +67,12 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(Control)
-        public EControl(Control _Control)
+        #region Constructor(OWWindow, Control)
+        public EControl(OWWindow wnd, Control _Control)
             : base()
         {
             m_Control = _Control;
+            wnd.Controls.Add(m_Control);
         }
         #endregion
         #region OMethod: EBlock GetBlockAt(pt) - return null
@@ -93,51 +81,137 @@ namespace OurWord.Edit
             return null;
         }
         #endregion
-    }
-
-
-    public class ETextBox : EControl
-    {
-        #region VAttr{g}: TextBox TextBox
-        TextBox TextBox
+        #region OMethod: void Clear()
+        public override void Clear()
         {
-            get
-            {
-                Debug.Assert(null != Control as TextBox);
-                return Control as TextBox;
-            }
+            Control.Dispose();
+            Window.Controls.Remove(Control);
+            m_Control = null;
         }
         #endregion
-        #region VAttr{g/s}: string Text
-        public string Text
+
+        // Layout Calculations ---------------------------------------------------------------
+        #region VMethod: void CalculateHorizontals()
+        public virtual void CalculateHorizontals()
+        {
+            // The X position is given us from the EContainer that owns it
+            float xleft = Owner.CalculateSubItemX(this);
+            Position = new PointF(xleft, Position.Y);
+            Control.Left = (int)xleft;
+
+            // The width will be that of the control, which is set when the subclass is
+            // created. Therefore we do nothing here. If we want the control to extend
+            // across the entire width of the container, then we use that container's
+            // AvailableWidthForOneSubitem method (see EToolStrip)
+        }
+        #endregion
+        #region VMethod: void CalculateVerticals()
+        public virtual void CalculateVerticals(float y, bool bRepositionOnly)
+        {
+            // Set to the top-left position and width
+            Position = new PointF(Position.X, y);
+        }
+        #endregion
+
+        // Painting --------------------------------------------------------------------------
+        #region OMethod: void OnPaint(Rectangle ClipRectangle)
+        public override void OnPaint(Rectangle ClipRectangle)
+        {
+            // We must move the control according to scrolling
+            float fScrollAmount = Window.ScrollBarPosition;
+            Control.Top = (int)(Position.Y - fScrollAmount);
+        }
+        #endregion
+    }
+
+    public class EToolStrip : EControl
+    {
+        #region CLASS: ToolStripRenderedEx : ToolStripSystemRenderer
+        public class ToolStripRenderedEx : ToolStripSystemRenderer
+        {
+            #region Constructor()
+            public ToolStripRenderedEx()
+                : base()
+            {
+            }
+            #endregion
+            #region OMethod: void OnRenderToolStripBorder(e) - supress the border
+            protected override void OnRenderToolStripBorder(ToolStripRenderEventArgs e)
+            {
+                // Do Nothing. This gets rid of the white line that was being painted
+                // at the bottom.
+            }
+            #endregion
+        }
+        #endregion
+
+        // Screen Region ---------------------------------------------------------------------
+        #region OAttr{g/s}: float Height
+        public override float Height
         {
             get
             {
-                return TextBox.Text;
+                return Control.Height + c_nTopMargin;
             }
             set
             {
-                TextBox.Text = value;
+                Control.Height = (int)value;
+            }
+        }
+        #endregion
+        const int c_nTopMargin = 3;   // Windows wants to overwrite the drawing above it.
+
+        // Attrs -----------------------------------------------------------------------------
+        #region VAttr{g}: ToolStrip ToolStrip
+        public ToolStrip ToolStrip
+        {
+            get
+            {
+                Debug.Assert(null != Control as ToolStrip);
+                return Control as ToolStrip;
             }
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
-        public ETextBox()
-            : base( new TextBox())
+        public EToolStrip(OWWindow wnd)
+            : base( wnd, new ToolStrip())
         {
-        }
-        #endregion
-        #region Constructor(sText)
-        public ETextBox(string sText)
-            : this()
-        {
-            Text = sText;
+            ToolStrip.Anchor = AnchorStyles.None;
+            ToolStrip.GripStyle = ToolStripGripStyle.Hidden;
+            ToolStrip.TabStop = false;
+            ToolStrip.BackColor = wnd.BackColor;
+            ToolStrip.Renderer = new ToolStripRenderedEx();
+            ToolStrip.LayoutStyle = ToolStripLayoutStyle.HorizontalStackWithOverflow;
+
+            // If the window is too small in width, this causes a dropdown button to appear 
+            // by which the user can access the other buttons on the toolbar
+            ToolStrip.AutoSize = false;
         }
         #endregion
 
+        // Layout Calculations ---------------------------------------------------------------
+        #region OMethod: void CalculateHorizontals()
+        public override void CalculateHorizontals()
+            // We want our width to be as big as the owning container allows
+        {
+            // Pick up the Position.X from the superclass
+            base.CalculateHorizontals();
+
+            Width = Owner.AvailableWidthForOneSubitem;
+        }
+        #endregion
+        #region OMethod: void CalculateVerticals()
+        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        {
+            // Set to the top-left position and width
+            Position = new PointF(Position.X, y + c_nTopMargin);
+        }
+        #endregion
     }
+
+
 
 
 }

@@ -272,15 +272,19 @@ namespace OurWordTests.DataModel
         #region Test: Categories
         [Test] public void Categories()
         {
+            // We clear this, because previous tests leave it in a strange state
+            TranslatorNote.Categories.Clear();
+            TranslatorNote.InitClassifications();
+
             // Add a category twice
-            TranslatorNote.AddCategory("New Category");
-            TranslatorNote.AddCategory("New Category");
+            TranslatorNote.Categories.AddItem("New Category");
+            TranslatorNote.Categories.AddItem("New Category");
 
             // We expect to have the default categories plus our new one
-            Assert.AreEqual(3, TranslatorNote.Categories.Length);
-            Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("Exegesis"));
-            Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("To Do"));
-            Assert.AreNotEqual(-1, TranslatorNote.Categories.IndexOf("New Category"));
+            Assert.AreEqual(3, TranslatorNote.Categories.Count);
+            Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("Exegesis"));
+            Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("To Do"));
+            Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("New Category"));
         }
         #endregion
 

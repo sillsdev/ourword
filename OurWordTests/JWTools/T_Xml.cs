@@ -422,13 +422,25 @@ namespace OurWordTests.JWTools
         [Test] public void AmpersandsAndSuch()
         {
             Assert.AreEqual("He said, &lt;&lt;Hello&gt;&gt; to her.",
-                XElement.AmpersandsAndSuch("He said, <<Hello>> to her."));
+                XElement.AmpersandsAndSuch_Write("He said, <<Hello>> to her."), "1a");
+            Assert.AreEqual("He said, <<Hello>> to her.",
+                XElement.AmpersandsAndSuch_Read("He said, &lt;&lt;Hello&gt;&gt; to her."), "1b");
 
             Assert.AreEqual("He said, &quot;Hello&quot; to her.",
-                XElement.AmpersandsAndSuch("He said, \"Hello\" to her."));
+                XElement.AmpersandsAndSuch_Write("He said, \"Hello\" to her."), "2a");
+            Assert.AreEqual("He said, \"Hello\" to her.",
+                XElement.AmpersandsAndSuch_Read("He said, &quot;Hello&quot; to her."), "2b");
 
             Assert.AreEqual("John &amp; Sandra{n}Authors{n}",
-                XElement.AmpersandsAndSuch("John & Sandra\nAuthors\n"));
+                XElement.AmpersandsAndSuch_Write("John & Sandra\nAuthors\n"), "3a");
+            Assert.AreEqual("John & Sandra\nAuthors\n",
+                XElement.AmpersandsAndSuch_Read("John &amp; Sandra{n}Authors{n}"), "3b");
+
+            Assert.AreEqual("He said, &lt;&lt;Hello.&gt;&gt;",
+                XElement.AmpersandsAndSuch_Write("He said, <<Hello.>>"), "4a");
+            Assert.AreEqual("He said, <<Hello.>>",
+                XElement.AmpersandsAndSuch_Read("He said, &lt;&lt;Hello.&gt;&gt;"), "4b");
+        
         }
         #endregion
         #region Test: BuildAttrString

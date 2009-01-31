@@ -913,7 +913,6 @@ namespace OurWord.DataModel
 	}
 	#endregion
 
-
 	#region Class: DBasicText
 	public class DBasicText : DRun
 	{

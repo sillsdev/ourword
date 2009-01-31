@@ -54,6 +54,9 @@ namespace OurWord.Dialogs
         const string c_sNotesHeaderColor = "propHeaderColor";
         const string c_sNotesUneditableColor = "propUneditableolor";
 
+        const string c_sGroupMisc = "Misc";
+        const string c_sDefaultAuthor = "propDefaultAuthor";
+
         const string c_sYes = "Yes";
         const string c_sNo = "No";
         #endregion
@@ -85,6 +88,11 @@ namespace OurWord.Dialogs
                 case c_sNotesUneditableColor:
                     e.Value = TranslatorNote.UneditableColor.Name;
                     break;
+
+                case c_sDefaultAuthor:
+                    e.Value = Discussion.DefaultAuthor;
+                    break;
+
             }
         }
         #endregion
@@ -105,6 +113,10 @@ namespace OurWord.Dialogs
                 case c_sNotesUneditableColor:
                     TranslatorNote.UneditableColor = Color.FromName((string)e.Value);
                     break;
+
+                case c_sDefaultAuthor:
+                    Discussion.DefaultAuthor = (string)e.Value;
+                    break;
             }
         }
         #endregion
@@ -116,8 +128,8 @@ namespace OurWord.Dialogs
             Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
             Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
 
-
             // Colors
+            #region Colors
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sNotesWndBkgColor,
                 "Window Background",
@@ -142,6 +154,23 @@ namespace OurWord.Dialogs
                 c_sGroupColors,
                 "The color of those discussion/chats which are not available for edit.",
                 "Light Yellow"));
+            #endregion
+
+            // Misc
+            #region Misc
+            Bag.Properties.Add(new PropertySpec(
+                c_sDefaultAuthor,
+                "New Note Author's Name",
+                typeof(string),
+                "",
+                "This defaults to your computer's name; you'll probably want to " + 
+                    "your real name here, so that others will know that it was " +
+                    "who wrote the note.",
+                "",
+                "",
+                null
+                ));
+            #endregion
 
             // Localize the bag
             LocDB.Localize(this, Bag);

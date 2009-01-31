@@ -353,8 +353,11 @@ namespace OurWord.Dialogs
                     new Page_Options(this));
 
                 // Notes
-                AddPage(c_tagNotes,
-                    new Page_Notes(this));
+                if (OurWordMain.Features.TranslatorNotes)
+                {
+                    AddPage(c_tagNotes,
+                        new Page_Notes(this));
+                }
             }
 
             // TeamSettings

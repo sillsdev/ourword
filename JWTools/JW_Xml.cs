@@ -216,7 +216,7 @@ namespace JWTools
             {
                 get
                 {
-                    string s = AmpersandsAndSuch(Value);
+                    string s = AmpersandsAndSuch_Write(Value);
                     return " " + Tag + '=' + c_chQuote + s + c_chQuote;
                 }
             }
@@ -514,8 +514,8 @@ namespace JWTools
             }
         }
         #endregion
-        #region SMethod: string AmpersandsAndSuch(sIn) - converts, e.g., '<' to "&lt;"
-        static public string AmpersandsAndSuch(string sIn)
+        #region SMethod: string AmpersandsAndSuch_Write(sIn) - converts, e.g., '<' to "&lt;"
+        static public string AmpersandsAndSuch_Write(string sIn)
         {
             if (string.IsNullOrEmpty(sIn))
                 return "";
@@ -542,6 +542,42 @@ namespace JWTools
             return sOut;
         }
         #endregion
+
+        #region SMethod: string AmpersandsAndSuch_Read(sIn) - converts, e.g., "&lt;" tp '<'
+        static public string AmpersandsAndSuch_Read(string sIn)
+        {
+            string sOut = "";
+
+            XmlReplace[] replacements = XmlReplace.Replacements;
+
+            int i = 0;
+            while (i < sIn.Length)
+            {
+                bool bReplaced = false;
+                foreach (XmlReplace xr in replacements)
+                {
+                    int n = xr.m_sXML.Length;
+                    if (i <= sIn.Length - n && sIn.Substring(i, n) == xr.m_sXML)
+                    {
+                        sOut += xr.m_chMemory;
+                        i += n;
+                        bReplaced = true;
+                        break;
+                    }
+                }
+
+                // Everything else
+                if (!bReplaced)
+                {
+                    sOut += sIn[i];
+                    i++;
+                }
+            }
+
+            return sOut;
+        }
+        #endregion
+
         #region CLASS: CreateMethod
         public class CreateMethod
         {
@@ -741,8 +777,8 @@ namespace JWTools
             #region Method: void ParseAttrs(XElement x, string s)
             void ParseAttrs(XElement x, string s)
             {
-                if (Tag == "JWritingSystem")
-                    Console.WriteLine("break here");
+//                if (Tag == "JWritingSystem")
+//                    Console.WriteLine("break here");
 
                 int i = 0;
 
@@ -782,7 +818,7 @@ namespace JWTools
                     {
                         if (bIsAtValue)
                         {
-                            x.AddAttr(sAttr, sValue);
+                            x.AddAttr(sAttr, AmpersandsAndSuch_Read(sValue));
                             sAttr = "";
                             sValue = "";
                             bIsAtAttr = true;

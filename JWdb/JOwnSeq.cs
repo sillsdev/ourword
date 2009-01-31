@@ -171,8 +171,26 @@ namespace JWdb
 			obj.Owner = Owner; 
 		}
 		#endregion
-		#region OMethod: void Append(obj) - Adds ownership support to the base method
-		override public void Append(JObject obj)
+        #region Method: void InsertAt(iPos, JObject, bSuppressDeclareDirty)
+        public void InsertAt(int iPos, JObject obj, bool bSuppressDeclareDirty)
+        {
+            // During tests, I don't necessarily have a JObjectOnDemand owning this
+            if (Owner.SaveObj == null)
+            {
+                InsertAt(iPos, obj);
+                return;
+            }
+
+            bool bDirty = this.Owner.SaveObj.IsDirty;
+
+            InsertAt(iPos, obj);
+
+            if (bSuppressDeclareDirty)
+                Owner.SaveObj.IsDirty = bDirty;
+        }
+        #endregion
+        #region OMethod: void Append(obj) - Adds ownership support to the base method
+        override public void Append(JObject obj)
 			// Appends the object to the end of the list (for an unsorted list). For a
 			// sorted list, the object is placed into its correct sorted position. In
 			// the case of duplicates in a sorted list, the new object is placed after 
@@ -182,6 +200,12 @@ namespace JWdb
 			obj.Owner = Owner;              // The object is now owned
 		}
 		#endregion
+        #region Method: void Append(JObject obj, bool bSuppressDeclareDirty)
+        public void Append(JObject obj, bool bSuppressDeclareDirty)
+        {
+            InsertAt(Count, obj, bSuppressDeclareDirty);
+        }
+        #endregion
         #region Method: void Append(JOwnSeq<T> seq)
         public void Append(JOwnSeq<T> seq)
         {

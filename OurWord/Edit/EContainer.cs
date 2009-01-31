@@ -183,6 +183,12 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VMethod: void Clear()
+        public virtual void Clear()
+        {
+            // Used (in subclasses) to clear out any subitems and to dispose of any resources
+        }
+        #endregion
 
         // Painting --------------------------------------------------------------------------
         #region VirtMethod: void OnPaint(ClipRectangle)
@@ -939,9 +945,15 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: void Clear()
-        public void Clear()
+        #region OMethod: void Clear()
+        public override void Clear()
+            // Recursively works down, because we need to dispose of any EControls
         {
+            foreach (EItem item in SubItems)
+            {
+                item.Clear();
+            }
+
             m_vSubItems = new EItem[0];
         }
         #endregion
@@ -1435,6 +1447,10 @@ namespace OurWord.Edit
                 EContainer container = item as EContainer;
                 if (null != container)
                     container.CalculateContainerHorizontals();
+
+                EControl control = item as EControl;
+                if (null != control)
+                    control.CalculateHorizontals();
             }
         }
         #endregion
@@ -1456,8 +1472,12 @@ namespace OurWord.Edit
         #region VirtMethod: void CalculateLineNumbers(ref nLineNo)
         virtual protected void CalculateLineNumbers(ref int nLineNo)
         {
-            foreach (EContainer container in SubItems)
-                container.CalculateLineNumbers(ref nLineNo);
+            foreach (EItem item in SubItems)
+            {
+                EContainer container = item as EContainer;
+                if (null != container)
+                    container.CalculateLineNumbers(ref nLineNo);
+            }
         }
         #endregion
 

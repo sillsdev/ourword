@@ -169,11 +169,23 @@ namespace OurWord.Edit
                 y += CalculateBitmapHeightRequirement();
 
                 // Layout the owned subitems, one below the other
-                foreach (EContainer container in SubItems)
+                foreach (EItem item in SubItems)
                 {
-                    container.CalculateContainerVerticals(y, bRepositionOnly);
-                    y += container.Height;
+                    EContainer container = item as EContainer;
+                    if (null != container)
+                    {
+                        container.CalculateContainerVerticals(y, bRepositionOnly);
+                        y += container.Height;
+                    }
+
+                    EControl control = item as EControl;
+                    if (null != control)
+                    {
+                        control.CalculateVerticals(y, bRepositionOnly);
+                        y += control.Height;
+                    }
                 }
+
             }
 
             // Bottom Border

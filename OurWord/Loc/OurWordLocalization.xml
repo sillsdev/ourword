@@ -365,7 +365,7 @@
         <English>General</English>
       </Item>
       <Item ID="kHintForDaughter">
-        <English>Hint for Drafting Daughters</English>
+        <English>Drafting Help</English>
       </Item>
       <Item ID="kToDo">
         <English>To Do</English>
@@ -383,7 +383,7 @@
         <English>Definitions</English>
       </Item>
       <Item ID="kOldVersion">
-        <English>Old Versions</English>
+        <English>Old Version</English>
       </Item>
       <Item ID="kBT">
         <English>Back Translation</English>
@@ -2141,11 +2141,11 @@
       </Item>
       <Item ID="Show_kHintForDaughter" Tip="true">
         <English>Show?</English>
-        <Tip>If yes, the Hint for Drafting Daughters Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
+        <Tip>If yes, the Drafting Help Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text.</Tip>
       </Item>
       <Item ID="Color_kHintForDaughter" Tip="true">
         <English>Background Color</English>
-        <Tip>The color for the background of the Hint for Drafting Daughters Note in the Notes Pane.</Tip>
+        <Tip>The color for the background of the Drafting Help Note in the Notes Pane.</Tip>
       </Item>
       <Item ID="ShowNotesFromFront" Tip="true">
         <English>Show Hints from the Front Translation?</English>

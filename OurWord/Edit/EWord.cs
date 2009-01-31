@@ -327,7 +327,7 @@ namespace OurWord.Edit
             PaintBackgroundRectangle(
                 (Para.IsEditable && !Para.IsLocked) ?
                     Para.EditableBackgroundColor :
-                    Window.BackColor);
+                    Para.NonEditableBackgroundColor);
 
             // The text
             if (!IsInsertionIcon)
@@ -388,7 +388,7 @@ namespace OurWord.Edit
 
             // Paint the white background, for those portions that are not selected
             PaintBackgroundRectangle(
-                Para.IsLocked ? Window.BackColor : Para.EditableBackgroundColor);
+                Para.IsLocked ? Para.NonEditableBackgroundColor : Para.EditableBackgroundColor);
 
             // Paint the selected background
             RectangleF rectSelected = new RectangleF(xSelLeft, Position.Y, xSelRight - xSelLeft, Height);

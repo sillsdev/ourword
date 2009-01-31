@@ -311,7 +311,7 @@ namespace OurWord
         {
             SideWindows.Clear();
 
-            if (DProject.VD_ShowNotesPane)
+            if (G.IsValidProject && OurWordMain.s_Features.TranslatorNotes && DProject.VD_ShowNotesPane)
                 SideWindows.CreateNotesWindow();
 
             if (null != G.Project && G.Project.ShowTranslationsPane && MainWindowIsDrafting)
@@ -744,15 +744,15 @@ namespace OurWord
 
             // Window Menu in its entirety
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
-            bool bShowNotesPane = DProject.VD_ShowNotesPane;
+            bool bShowTranslatorNotesMenu = (G.IsValidProject && s_Features.TranslatorNotes);
             bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
 #if (FEATURE_WESAY || FEATURE_MERGE)
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
             bool bShowMergePane = (s_Features.F_Merge && G.IsValidProject);
-            bool bShowSideWindowsSection = bShowNotesPane || bShowTranslationsPane || 
+            bool bShowSideWindowsSection = s_Features.TranslatorNotes || bShowTranslationsPane || 
                 bShowDictionaryPane || bShowMergePane;
 #else
-            bool bShowSideWindowsSection = bShowNotesPane || bShowTranslationsPane;
+            bool bShowSideWindowsSection = bShowTranslatorNotesMenu || bShowTranslationsPane;
 #endif
             m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
 
@@ -763,8 +763,8 @@ namespace OurWord
             m_separatorWindow.Visible = bShowMainWindowSection && bShowSideWindowsSection;
 
             // Side Window Items
-            m_menuShowNotesPane.Visible = bShowNotesPane;
-            m_menuShowNotesPane.Checked = DProject.VD_ShowNotesPane;
+            m_menuShowNotesPane.Visible = bShowTranslatorNotesMenu;
+            m_menuShowNotesPane.Checked = bShowTranslatorNotesMenu && DProject.VD_ShowNotesPane;
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
 #if (FEATURE_WESAY || FEATURE_MERGE)
@@ -773,7 +773,7 @@ namespace OurWord
             m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
             m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
 #else
-            m_menuShowMergePane.Checked = false;
+            m_menuShowMergePane.Visible = false;
             m_menuShowDictionaryPane.Visible = false;
 #endif
 
@@ -935,6 +935,9 @@ namespace OurWord
             this.components = new System.ComponentModel.Container();
 			InitializeComponent();
 
+			// Initialize the features we will make available
+			s_Features = new FeaturesMgr();
+
             // Initialize the Client Window (do now, to establish proper z-order)
             CreateClientWindows();
             SetupSideWindows();
@@ -942,9 +945,6 @@ namespace OurWord
 			// Initialize the window state mechanism. We'll default to a full screen
 			// the first time we are launched.
 			m_WindowState = new JW_WindowState(this, true);
-
-			// Initialize the features we will make available
-			s_Features = new FeaturesMgr();
 
             // Create the Undo/Redo Stack
             int nUndoRedoMaxDepth = 10;
@@ -1953,6 +1953,15 @@ namespace OurWord
                 }
             }
             #endregion
+            #region Attr{g}: bool TranslatorNotes
+            public bool TranslatorNotes
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fTranslatorNotes.ToString());
+                }
+            }
+            #endregion
             #region Attr{g}: bool F_Project
 			public bool F_Project
 			{
@@ -2141,6 +2150,7 @@ namespace OurWord
                 fLocalizer,
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
+                fTranslatorNotes,
 #if FEATURE_MERGE
                 fMerge,
 #endif
@@ -2180,6 +2190,14 @@ namespace OurWord
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
 
+                m_Dlg.Add(ID.fTranslatorNotes.ToString(),
+                    false,
+                    false,
+                    c_sNodeWindows,
+                    "Translator Notes",
+                    "Enables the Translator Notes side window, through which you can make notes " +
+                        "about the translation and share them with others on your team.");
+                        
 #if FEATURE_MERGE
                 m_Dlg.Add(ID.fMerge.ToString(),
                     false,
@@ -3342,8 +3360,8 @@ namespace OurWord
 			{
 				OnLeaveSection();
                 SetupMenusAndToolbarsVisibility();
-				OnEnterSection();
-			}
+                OnEnterProject();  // Makes sure we reset the side windows
+            }
 		}
 		#endregion
 		#region Cmd: cmdDebugTesting

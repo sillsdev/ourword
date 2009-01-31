@@ -178,10 +178,22 @@ namespace JWdb
 			}
 			set
 			{
-                //if (m_bIsDirty == false && value == true)
-                //    Console.WriteLine("DIRTY SET..." + DisplayName);
-                //if (m_bIsDirty == true && value == false)
-                //    Console.WriteLine("DIRTY CLEARED..." + DisplayName);
+                /***
+                // Diagnostics: comment out unless needed
+                if (this.GetType().ToString() == "OurWord.DataModel.DBook")
+                {
+                    string sDisplayName = DisplayName;
+                    if (Owner != null && (Owner as JObjectOnDemand != null))
+                        sDisplayName = (Owner as JObjectOnDemand).DisplayName + " - " + sDisplayName;
+                   if ("English - Mark" == sDisplayName)
+                    {
+                        if (m_bIsDirty == false && value == true)
+                            Console.WriteLine("DIRTY SET..." + sDisplayName);
+                        if (m_bIsDirty == true && value == false)
+                            Console.WriteLine("DIRTY CLEARED..." + sDisplayName);
+                    }
+                }
+                ***/
 
                 m_bIsDirty = value;
 			}
