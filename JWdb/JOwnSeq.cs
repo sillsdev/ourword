@@ -275,6 +275,14 @@ namespace JWdb
 			objNew.Owner = Owner;
 		}
 		#endregion
+        #region OMethod: bool IsOwnerOf(JObject)
+        public override bool IsOwnerOf(JObject obj)
+        {
+            if (-1 != FindObj(obj))
+                return true;
+            return false;
+        }
+        #endregion
 
         // I/O -------------------------------------------------------------------------------
 		const string m_cTag = "ownseq"; // xml tag for I/O

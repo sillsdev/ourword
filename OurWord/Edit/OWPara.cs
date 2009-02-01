@@ -67,7 +67,7 @@ namespace OurWord.Edit
                     // Reverse it.....................001010
                     m_Options = ~m_Options;
 
-                    // Add in the IsEditable value......___1__
+                    // Add in the IsEditable value....___1__
                     // yields.........................001110
                     m_Options |= Flags.IsEditable;
 
@@ -764,31 +764,6 @@ namespace OurWord.Edit
             Append(vWords);
         }
         #endregion
-        #region Method: void _InitializeTextNotes(DText t)
-        void _InitializeTextNotes(DText t)
-            // Whether or not a particular note is actually shown depends both on Global
-            // settings and on the particular context. We currently have all of that
-            // logic in the Show attr in DNote.
-        {
-            // The logic is that if the paragraph is not IsEditable, then we don't display
-            // any notes for it. This prevents the notes icons from showing up in the
-            // Back Translation view, on both the Left and the Right Sides, as we only
-            // want them on the Right side, not both places.
-            if (HideNotesIcons)
-                return;
-
-            Debug.Assert(null != t);
-
-            foreach (TranslatorNote tn in t.TranslatorNotes)
-            {
-                if (tn.Show)
-                {
-                    Append(new ENote(RetrieveFont(), tn));
-                    G.App.SideWindows.AddNote(tn);
-                }
-            }
-        }
-        #endregion
         #region Method: void _InitializeGlueToNext(int iLeft)
         void _InitializeGlueToNext(int iLeft)
         {
@@ -875,7 +850,6 @@ namespace OurWord.Edit
                         break;
                     case "DText":
                         _InitializeBasicTextWords(r as DBasicText, null);
-                        _InitializeTextNotes(r as DText);
                         break;
                     default:
                         Console.WriteLine("Unknown type in OWPara.Initialize...Name=" + 
@@ -1527,9 +1501,9 @@ namespace OurWord.Edit
         #endregion
         #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
         override public void CalculateContainerVerticals(float y, bool bRepositionOnly)
-        // y - The top coordinate of the paragraph. We'll use "y" to work through the 
-        //     height of the paragraph, setting the individula paragraph parts.
-        #region DOC - Leading Space before Verses
+            // y - The top coordinate of the paragraph. We'll use "y" to work through the 
+            //     height of the paragraph, setting the individula paragraph parts.
+            #region DOC - Leading Space before Verses
             /* Leading Space before Verses - Whether or not to have leading space before
              *   a verse is a Layout issue. If the verse number is at the beginning of a
              *   line, no leading space is required. But if it is in the middle of a line,
@@ -1541,7 +1515,7 @@ namespace OurWord.Edit
              *      I needed to do this to make it look correct, but I sure do dislike
              *   adding little things like this, due to the Bug potential.
              */
-        #endregion
+            #endregion
         {
             if (bRepositionOnly)
                 RePosition(y);
@@ -1725,7 +1699,12 @@ namespace OurWord.Edit
 
             // Otherwise, we need to shift things up/down. So we call the Window and tell
             // it refigure everything starting with the owning Row
-            Window.OnParagraphHeightChanged(TopContainer);
+// TEMPORARY TESTING HILARIO SCREEN PROBLEM: Trying the full DoLayout/Invalidate to
+// see if the culprit is the ReLayout thing.
+            Window.DoLayout();
+            Window.Invalidate();
+            //Window.OnParagraphHeightChanged(TopContainer);
+// END TEMPORARY
         }
         #endregion
         #region OMethod: void CalculateLineNumbers(ref nLineNo)

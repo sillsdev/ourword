@@ -40,49 +40,6 @@ namespace OurWord.Edit
         }
         OWWindow m_Window;
         #endregion
-        /***
-        #region Attr{g}: JOwnSeq SectionSeq - either Section.Paragraphs or Section.Footnotes
-        JOwnSeq<DParagraph> SectionSeq
-        {
-            get
-            {
-                Debug.Assert(null != m_SectionSeq);
-                return m_SectionSeq;
-            }
-        }
-        JOwnSeq<DParagraph> m_SectionSeq;
-        #endregion
-        #region Attr{g}: int iParaPosWithinSectionSeq - the position with the Secton's paragraph/Footnote sequence
-        int iParaPosWithinSectionSeq
-        {
-            get
-            {
-                return m_iParaPosWithinSectionSeq;
-            }
-        }
-        int m_iParaPosWithinSectionSeq;
-        #endregion
-        #region Attr[g}: int iRunPosWithinParagraph
-        int iRunPosWithinParagraph
-        {
-            get
-            {
-                return m_iRunPosWithinParagraph;
-            }
-        }
-        int m_iRunPosWithinParagraph;
-        #endregion
-        #region Attr[g}: int iNotePosWithinRun
-        int iNotePosWithinRun
-        {
-            get
-            {
-                return m_iNotePosWithinRun;
-            }
-        }
-        int m_iNotePosWithinRun = -1;
-        #endregion
-        ***/
         #region Attr{g}: float ScrollBarPosition
         public float ScrollBarPosition
         {
@@ -135,7 +92,7 @@ namespace OurWord.Edit
         }
         OWPara.Flags m_ParagraphFlags = OWPara.Flags.None;
         #endregion
-
+        #region Attr{g}: string PathToDBTFromRoot
         string PathToDBTFromRoot
         {
             get
@@ -144,7 +101,8 @@ namespace OurWord.Edit
             }
         }
         string m_sPathToDBTFromRoot;
-
+        #endregion
+        #region Attr{g}: JObject Root
         JObject Root
         {
             get
@@ -154,6 +112,7 @@ namespace OurWord.Edit
             }
         }
         JObject m_Root;
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(selection)
@@ -168,39 +127,6 @@ namespace OurWord.Edit
             // Get the path to the run
             m_Root = selection.DBT.RootOwner;
             m_sPathToDBTFromRoot = selection.DBT.GetPathFromRoot();
-
-            /***
-            // Get the owning paragraph. The selection is owned by either a DNote or a
-            // DParagraph, in case of the former we just go up a level.
-            DParagraph p = selection.Paragraph.DataSource as DParagraph;
-            DNote note = selection.Paragraph.DataSource as DNote;
-            if (null != note)
-                p = note.Paragraph;
-            Debug.Assert(null != p);
-
-            // Get the paragraph's position within its owning sequence
-            m_iParaPosWithinSectionSeq = p.Section.Paragraphs.FindObj(p);
-            if (-1 != m_iParaPosWithinSectionSeq)
-            {
-                m_SectionSeq = p.Section.Paragraphs;
-            }
-            else
-            {
-                m_iParaPosWithinSectionSeq = p.Section.Footnotes.FindObj(p);
-                m_SectionSeq = p.Section.Footnotes;
-            }
-            Debug.Assert(-1 != m_iParaPosWithinSectionSeq);
-
-            // Get the run's position within its paragraph
-            DBasicText DBT = selection.DBT;
-            if (null != note)
-                DBT = note.Text;
-            m_iRunPosWithinParagraph = p.Runs.FindObj(DBT);
-
-            // In the case of notes, find the note's position within the run
-            if (null != note)
-                m_iNotePosWithinRun = (DBT as DText).Notes.FindObj(note);
-            ***/
 
             // Scroll bar position
             m_fScrollBarPosition = m_Window.ScrollBarPosition;
@@ -232,34 +158,6 @@ namespace OurWord.Edit
             // Locate the OWPara which has this data source
             OWPara op = Window.Contents.FindParagraph(pDataSource, ParagraphFlags);
             Debug.Assert(null != op);
-
-
-            /***
-            // Retrieve the paragraph in question
-            DParagraph p = SectionSeq[iParaPosWithinSectionSeq] as DParagraph;
-            Debug.Assert(null != p);
-
-            // Retrieve the DBT in question
-            DBasicText DBT = p.Runs[iRunPosWithinParagraph] as DBasicText;
-
-            // Locate the Note in question, if any
-            DNote note = null;
-            if (DBT as DText != null && iNotePosWithinRun != -1)
-            {
-                note = (DBT as DText).Notes[iNotePosWithinRun] as DNote;
-                DBT = note.NoteText;
-            }
-
-            // Determine the data source
-            JObject objDataSource = p;
-            if (null != note)
-                objDataSource = note;
-            Debug.Assert(null != objDataSource);
-
-            // Locate the OWPara which has this as its data source
-            OWPara op = Window.Contents.FindParagraph(objDataSource, ParagraphFlags);
-            Debug.Assert(null != op);
-            ***/
 
             // Create and return the normalized selection
             OWWindow.Sel selection = (IsInsertionPoint) ?

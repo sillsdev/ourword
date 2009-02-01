@@ -272,8 +272,6 @@ namespace OurWordTests.DataModel
         #region Test: Categories
         [Test] public void Categories()
         {
-            // We clear this, because previous tests leave it in a strange state
-            TranslatorNote.Categories.Clear();
             TranslatorNote.InitClassifications();
 
             // Add a category twice

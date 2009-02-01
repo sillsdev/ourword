@@ -486,20 +486,28 @@ namespace OurWord.DataModel
 		int m_nLineNoInFile;
 		#endregion
         #region VAttr{g}: List<TranslatorNote> AllNotes
-        public List<TranslatorNote> AllNotes
+        public List<TranslatorNote> GetAllTranslatorNotes(bool bLimitToThoseToBeShown)
         {
-            get
+            var v = new List<TranslatorNote>();
+
+            foreach (DParagraph p in Paragraphs)
+                v.AddRange(p.AllNotes);
+
+            foreach (DParagraph p in Footnotes)
+                v.AddRange(p.AllNotes);
+
+            if (bLimitToThoseToBeShown)
             {
-                var v = new List<TranslatorNote>();
-
-                foreach (DParagraph p in Paragraphs)
-                    v.AddRange(p.AllNotes);
-
-                foreach (DParagraph p in Footnotes)
-                    v.AddRange(p.AllNotes);
-
-                return v;
+                var vShown = new List<TranslatorNote>();
+                foreach(TranslatorNote tn in v)
+                {
+                    if (tn.Show)
+                        vShown.Add(tn);
+                }
+                v = vShown;
             }
+
+            return v;
         }
         #endregion
 

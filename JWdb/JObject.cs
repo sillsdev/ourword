@@ -294,8 +294,24 @@ namespace JWdb
 			return null;
 		}
 		#endregion
+        #region Method: JAttr GetMyOwningAttr()
+        public JAttr GetMyOwningAttr()
+        {
+            // IF we don't have an owner, then we can't do this.
+            if (null == Owner)
+                return null;
 
-		// Methods ---------------------------------------------------------------------------
+            foreach (JAttr attr in Owner.AllAttrs)
+            {
+                if (attr.IsOwnerOf(this))
+                    return attr;
+            }
+
+            return null;
+        }
+        #endregion
+
+        // Methods ---------------------------------------------------------------------------
 		#region Constructor()
 		public JObject()
 		{

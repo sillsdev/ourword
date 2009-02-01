@@ -483,7 +483,7 @@ namespace OurWord.Edit
             // Remember the cursor position so that we can restore back to it....Split()
             // may remove some of the underlying data, so we need the bookmark to restore
             // a valid selection.
-            OWBookmark bm = new OWBookmark(selection);
+            Window.PushEditState();
 
             // Split the underlying paragraph
             DParagraph paraNew = para.Split(text, iPos);
@@ -495,7 +495,7 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the selection insertion point to the Window.Selection
-            bm.RestoreWindowSelectionAndScrollPosition();
+            Window.PopEditState();
 
             // This has us at the end of the first paragraph, we need to move to the
             // beginning of the next one

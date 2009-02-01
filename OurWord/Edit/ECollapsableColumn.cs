@@ -185,7 +185,6 @@ namespace OurWord.Edit
                         y += control.Height;
                     }
                 }
-
             }
 
             // Bottom Border
@@ -211,6 +210,11 @@ namespace OurWord.Edit
             // Header
             if (ShowHeaderWhenExpanded || IsCollapsed)
                 Header.OnPaint(ClipRectangle);
+
+            // Set the owned controls visibility according to whether or not
+            // we are collapsed. We want them invisible if collapsed, so that
+            // the Window does not attempt to draw them.
+            SetOwnedControlsVisibility(!IsCollapsed);
 
             // If we're expanded, then show the subitems
             if (!IsCollapsed)

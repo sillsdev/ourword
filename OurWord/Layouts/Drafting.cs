@@ -277,7 +277,6 @@ namespace OurWord.View
                 for (int kF = 0; kF < pair.cFront; kF++)
                 {
                     DParagraph pFront = G.SFront.Paragraphs[ pair.iFront + kF ] as DParagraph;
-                    _LoadHintsFromFront(pFront);
                     AddFrontParagraph(pFront);
                 }
                 for (int kT = 0; kT < pair.cTarget; kT++)
@@ -387,23 +386,7 @@ namespace OurWord.View
             return true;
         }
         #endregion
-        #region Method: _LoadHintsFromFront(DParagraph pFront)
-        void _LoadHintsFromFront(DParagraph pFront)
-        {
-            foreach(DRun r in pFront.Runs)
-            {
-                DText text = r as DText;
-                if (null == text)
-                    continue;
 
-                foreach (TranslatorNote tn in text.TranslatorNotes)
-                {
-                    if (tn.ShowInDaughterTranslations && tn.Show)
-                        G.App.SideWindows.AddNote(tn);
-                }
-            }
-        }
-        #endregion
         #region Method: void _LoadFootnotes()
         void _LoadFootnotes()
         {
@@ -518,7 +501,6 @@ namespace OurWord.View
                             continue;
 
                         // Add the left and right paragraphs
-                        _LoadHintsFromFront(pFront);
                         AddFrontParagraph(pFront);
                         AddTargetParagraph(pTarget, pFront.HasItalics);
                     }

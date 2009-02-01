@@ -110,6 +110,13 @@ namespace JWdb
         }
         #endregion
 
+        #region Method: bool IsOwnerOf(JObject)
+        public virtual bool IsOwnerOf(JObject obj)
+        {
+            return false;
+        }
+        #endregion
+
         // I/O -------------------------------------------------------------------------------
         #region VMethod: void ToXml(XElement)
         public virtual void ToXml(XElement x)

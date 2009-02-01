@@ -112,6 +112,12 @@ namespace OurWord.Edit
             Position = new PointF(Position.X, y);
         }
         #endregion
+        #region OMethod: void SetOwnedControlsVisibility(bVisible)
+        public override void SetOwnedControlsVisibility(bool bVisible)
+        {
+            Control.Visible = bVisible;
+        }
+        #endregion
 
         // Painting --------------------------------------------------------------------------
         #region OMethod: void OnPaint(Rectangle ClipRectangle)

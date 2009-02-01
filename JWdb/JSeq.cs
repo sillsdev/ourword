@@ -574,8 +574,8 @@ namespace JWdb
 			return list;
 		}
 		#endregion
-		#region Method: int FindObject(JObject) - returns the index of the obj, or -1 if not found
-		public int FindObj(JObject obj)
+        #region Method: int FindObj(JObject) - returns the index of the obj, or -1 if not found
+        public int FindObj(JObject obj)
 		{
 			for(int i=0; i<m_list.Count; i++)
 			{

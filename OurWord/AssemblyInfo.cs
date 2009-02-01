@@ -37,7 +37,7 @@ using System.Security.Permissions;
 // 1.1.0 - initial
 // 1.1.1 - fixed Load problems with Absolute Paths
 
-[assembly: AssemblyVersion("1.1.2")]
+[assembly: AssemblyVersion("1.1.3")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

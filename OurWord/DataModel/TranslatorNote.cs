@@ -310,16 +310,21 @@ namespace OurWord.DataModel
             eDiscussionHolder.Border.Padding.Right = nRoundedCornerInset;
             eMainContainer.Append(eDiscussionHolder);
 
+            // Paragraph editing options
+            OWPara.Flags options = OWPara.Flags.None;
+            if (IsEditable)
+                options |= (OWPara.Flags.IsEditable | OWPara.Flags.CanItalic);
+            if (OurWordMain.Features.F_StructuralEditing)
+                options |= OWPara.Flags.CanRestructureParagraphs;
+
             // Add the paragraphs to the Discussion Holder
             foreach (DParagraph para in Paragraphs)
             {
                 // Create the OWPara and add it to its container
                 OWPara pDiscussion = new OWPara(G.TTranslation.WritingSystemVernacular,
                     G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDiscussion),
-                    para, clrBackground, 
-                    (IsEditable ? 
-                        OWPara.Flags.IsEditable | OWPara.Flags.CanItalic : 
-                        OWPara.Flags.None)
+                    para, clrBackground,
+                    options
                     );
                 if (!IsEditable)
                     pDiscussion.NonEditableBackgroundColor = clrBackground;
@@ -332,7 +337,7 @@ namespace OurWord.DataModel
     }
     #endregion
 
-    public class TranslatorNote : JObject
+    public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
         #region BAttr{g/s}: string Category - adds new ones at runtime if needed
@@ -619,8 +624,19 @@ namespace OurWord.DataModel
             {
                 m_sName = sName;
                 m_bsaSettingsSource = bsaSettingsSource;
-                m_vsFactoryDefaultMembers = vsFactoryDefaultMembers;
-                m_sFactoryDefaultValue = sFactoryDefaultValue;
+
+                // Factory Defaults: Use Localized Versions
+                string[] vs = new string[vsFactoryDefaultMembers.Length];
+                for (int i = 0; i < vs.Length; i++)
+                {
+                    vs[i] = G.GetLoc_Notes("k" + vsFactoryDefaultMembers[i],
+                        vsFactoryDefaultMembers[i]);
+                }
+                m_vsFactoryDefaultMembers = vs;
+
+                // Use localized version of the Default Value, too.
+                m_sFactoryDefaultValue = G.GetLoc_Notes("k" + sFactoryDefaultValue, 
+                    sFactoryDefaultValue);
 
                 // Derive a registry key from the note's key and the name
                 m_sRegistrySubKey = TranslatorNote.c_sRegistrySubkey + "\\" + sName;
@@ -707,6 +723,9 @@ namespace OurWord.DataModel
             // Initialize the classifcations, both from their data source, and their
             // factory defaults. This zeros out anything existing, and should thus be
             // called when a new project is loaded.
+            //
+            // The factory defaults, as passed in, are converted into localized
+            // versions by the constructor
         {
             s_vCategories = new Classifications("Categories",
                G.TeamSettings.NotesCategories,
@@ -718,7 +737,7 @@ namespace OurWord.DataModel
                 new string[] { "Drafting Help", "Exegesis" },
                 "Exegesis");
 
-            s_vPeople = new Classifications("People",
+            s_vPeople = new Classifications("People", 
                 G.Project.People,
                 new string[] { "Translator", "Advisor", "Consultant", "None" },
                 "None");
@@ -737,7 +756,7 @@ namespace OurWord.DataModel
             // Collect all of the book's notes
             List<TranslatorNote> v = new List<TranslatorNote>();
             foreach (DSection section in book.Sections)
-                v.AddRange(section.AllNotes);
+                v.AddRange(section.GetAllTranslatorNotes(false));
 
             // Add classifications according to their kind
             foreach (TranslatorNote tn in v)
@@ -900,6 +919,13 @@ namespace OurWord.DataModel
             }
         }
         #endregion
+        #region Method: int IComparable<T>.CompareTo(T)
+        public int CompareTo(TranslatorNote tn)
+        {
+            return SortKey.CompareTo(tn.SortKey);
+        }
+        #endregion
+
         #region Attr{g}: DText Text - the owning DText
         public DText Text
         {
@@ -1431,7 +1457,6 @@ namespace OurWord.DataModel
                 ts.Items.Add(new ToolStripLabel("  "));
 
                 ToolStripDropDownButton menuCategory = new ToolStripDropDownButton(Category);
-//                menuCategory.Image = JWU.GetBitmap("Note_ToDo.ico");
                 foreach (Classifications.Classification cat in Categories)
                 {
                     if (cat.IsChecked)
@@ -1466,8 +1491,8 @@ namespace OurWord.DataModel
             ts.Items.Add(new ToolStripLabel("  "));
 
             // Place the AssignedTo as a drop-down button
-            ToolStripDropDownButton menuAssignedTo = new ToolStripDropDownButton("Assign To");
-//            menuAssignedTo.Image = JWU.GetBitmap("Note_AskUns.ico");
+            string sMenuName = G.GetLoc_Notes("kAssignTo", "Assign To");
+            ToolStripDropDownButton menuAssignedTo = new ToolStripDropDownButton(sMenuName);
             foreach (Classifications.Classification cl in People)
             {
                 ToolStripMenuItem item = new ToolStripMenuItem(cl.Name);
@@ -1602,4 +1627,7 @@ namespace OurWord.DataModel
         }
         #endregion
     }
+
+
+
 }

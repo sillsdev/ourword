@@ -72,6 +72,12 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VMethod: void SetOwnedControlsVisibility(bVisible)
+        public virtual void SetOwnedControlsVisibility(bool bVisible)
+            // top-level: do nothing
+        {
+        }
+        #endregion
 
         // Screen Region ---------------------------------------------------------------------
         #region Attr{g/s}: PointF Position - top,left coord
@@ -1041,6 +1047,16 @@ namespace OurWord.Edit
             }
 
             return false;
+        }
+        #endregion
+        #region OMethod: void SetOwnedControlsVisibility(bVisible)
+        public override void SetOwnedControlsVisibility(bool bVisible)
+            // Apply to all subitems
+        {
+            foreach (EItem item in SubItems)
+            {
+                item.SetOwnedControlsVisibility(bVisible);
+            }
         }
         #endregion
 

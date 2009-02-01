@@ -1035,13 +1035,11 @@ namespace OurWord.DataModel
                 return null;
 
             // Create and insert  a new, empty paragraph to receive the right-side of the split
-            DSection section = Paragraph.Section;
+            JOwnSeq<DParagraph> seq = Paragraph.GetMyOwningAttr() as JOwnSeq<DParagraph>;
             DParagraph paraNew = new DParagraph();
             paraNew.StyleAbbrev = Paragraph.StyleAbbrev;
-            int iParaNew = section.Paragraphs.FindObj(Paragraph) + 1;
-            section.Paragraphs.InsertAt(iParaNew, paraNew);
-
-            //DParagraph paraNew = CreateDestinationParagraph(Paragraph);
+            int iParaNew = seq.FindObj(Paragraph) + 1;
+            seq.InsertAt(iParaNew, paraNew);
 
             // Move the runs to the new paragraph
             int iMove = Paragraph.Runs.FindObj(dbtRight);
@@ -1076,9 +1074,6 @@ namespace OurWord.DataModel
 
             // Return our new paragraph
             return paraNew;
-
-//            SplitParagraphMethod m = new SplitParagraphMethod(dbtToSplit, iTextSplitPos);
-//            return m.Run();
         }
         #endregion
         #region Method: void JoinToNext()

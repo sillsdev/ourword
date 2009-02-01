@@ -25,9 +25,6 @@ using OurWord.View;
 using OurWord.Edit;
 #endregion
 
-// TODO: Decise on the note's editability when creating the view. E.g., Hints For Daughters
-//   are not editable. Neither are paragraphs earlier written, as per my design document.
-
 namespace OurWord.Edit
 {
     public partial class NotesPane : UserControl
@@ -421,13 +418,6 @@ namespace OurWord.Edit
         #endregion
 
         // Misc Methods ----------------------------------------------------------------------
-        #region Method: void AddNote(TranslatorNote)
-        public void AddNote(TranslatorNote note)
-        {
-            Contents.Append(note.BuildNotesPaneView(this));
-        }
-        #endregion
-
         #region Method: TranslatorNote GetSelectedNote()
         public TranslatorNote GetSelectedNote()
         {
@@ -446,6 +436,107 @@ namespace OurWord.Edit
         }
         #endregion
 
+        #region OMethod: void LoadData()
+        public override void LoadData()
+        {
+            // Start with an empty window
+            Clear();
+
+            // Nothing more to do if we don't have a completely-defined project
+            if (!G.Project.HasDataToDisplay)
+                return;
+
+            // Retrieve the notes that we will be showing, from both Front and Target
+            List<TranslatorNote> vNotes = G.STarget.GetAllTranslatorNotes(true);
+            vNotes.AddRange(G.SFront.GetAllTranslatorNotes(true));
+
+            // Sort (the IComparer will do this by reference)
+            vNotes.Sort();
+            
+            // Place them into the window
+            foreach (TranslatorNote note in vNotes)
+                Contents.Append( note.BuildNotesPaneView(this) );
+
+            // Tell the superclass to finish loading, which involves laying out the window 
+            // with the data we've just put in, as doing the same for any secondary windows.
+            base.LoadData();
+
+            // Make sure we're positioned at the top. For a longer set of data, we might
+            // not be, because the very top of a note is not editable.
+            ScrollBarPosition = 0;
+        }
+        #endregion
+
+        // Save/Restore Editing State overrides ----------------------------------------------
+        #region CLASS: NotesEditState : EditState
+        protected class NotesEditState : EditState
+        {
+            #region Attr{g}: List<bool> HeaderCollapseState
+            List<bool> HeaderCollapseState
+            {
+                get
+                {
+                    Debug.Assert(null != m_vHeaderCollapseState);
+                    return m_vHeaderCollapseState;
+                }
+            }
+            List<bool> m_vHeaderCollapseState;
+            #endregion
+
+            #region OMethod: void Restore()
+            public override void Restore()
+            {
+                // Bookmark
+                base.Restore();
+
+                // Restore the Header Collapse states
+
+                // Get a list of header containers currently in the window
+                var vChc = new List<ECollapsableHeaderColumn>();
+                foreach (EContainer container in Wnd.Contents)
+                {
+                    ECollapsableHeaderColumn chc = container as ECollapsableHeaderColumn;
+                    if (null != chc)
+                        vChc.Add(chc);
+                }
+
+                // Are they the same length?
+                if (vChc.Count != HeaderCollapseState.Count)
+                    return;
+
+                // Restore the values
+                for (int i = 0; i < vChc.Count; i++)
+                    vChc[i].IsCollapsed = HeaderCollapseState[i];
+
+                // Re-do the layout
+                Wnd.DoLayout();
+                Wnd.Invalidate();
+            }
+            #endregion
+
+            #region Constructor(OWWindow)
+            public NotesEditState(OWWindow wnd)
+                : base(wnd)
+            {
+                // Save the header collapse states
+                m_vHeaderCollapseState = new List<bool>();
+                foreach (EContainer container in wnd.Contents)
+                {
+                    ECollapsableHeaderColumn chc = container as ECollapsableHeaderColumn;
+                    if (null != chc)
+                        m_vHeaderCollapseState.Add(chc.IsCollapsed);
+                }
+            }
+            #endregion
+        }
+        #endregion
+        #region OMethod: void PushEditState()
+        public override void PushEditState()
+        {
+            NotesEditState es = new NotesEditState(this);
+            EditStateStack.Add(es);
+        }
+        #endregion
     }
 
 }

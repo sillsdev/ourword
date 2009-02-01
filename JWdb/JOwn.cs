@@ -210,6 +210,15 @@ namespace JWdb
             return Value.GetObjectFromPath(sPath);
         }
         #endregion
+
+        #region OMethod: bool IsOwnerOf(JObject)
+        public override bool IsOwnerOf(JObject obj)
+        {
+            if (obj == Value)
+                return true;
+            return false;
+        }
+        #endregion
     }
 
 }
