@@ -429,7 +429,7 @@ namespace OurWord.Edit
 
         // Save/Restore Editing State --------------------------------------------------------
         #region CLASS: EditState
-        protected class EditState
+        public class EditState
         {
             #region Attr{g}: OWBookmark Bookmark
             public OWBookmark Bookmark
@@ -484,11 +484,12 @@ namespace OurWord.Edit
         }
         List<EditState> m_vEditStateStack;
         #endregion
-        #region VMethod: void PushEditState()
-        virtual public void PushEditState()
+        #region VMethod: EditState PushEditState()
+        virtual public EditState PushEditState()
         {
             EditState es = new EditState(this);
             EditStateStack.Add( es );
+            return es;
         }
         #endregion
         #region Method: void PopEditState()

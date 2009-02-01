@@ -1079,12 +1079,25 @@ namespace OurWord.DataModel
         #region Method: void JoinToNext()
         public void JoinToNext()
         {
+            // Retrieve the sequence that owns this paragraph
+            JOwnSeq<DParagraph> seq = GetMyOwningAttr() as JOwnSeq<DParagraph>;
+            Debug.Assert(null != seq);
+
+            // Retrieve the paragraph that follows this one
+            int iNext = seq.FindObj(this) + 1;
+            if (iNext >= seq.Count)
+                return;
+            DParagraph pNext = seq[iNext] as DParagraph;
+            Debug.Assert(null != pNext);
+
+            /***
             // Retrieve the following paragraph
             int iNext = Section.Paragraphs.FindObj(this) + 1;
             if (iNext >= Section.Paragraphs.Count)
                 return;
             DParagraph pNext = Section.Paragraphs[iNext] as DParagraph;
             Debug.Assert(null != pNext);
+            ***/
 
             // Move its runs into this one
             while (pNext.Runs.Count > 0)
@@ -1095,7 +1108,8 @@ namespace OurWord.DataModel
             }
 
             // Remove it from the owner
-            Section.Paragraphs.Remove(pNext);
+            seq.Remove(pNext);
+//            Section.Paragraphs.Remove(pNext);
 
             // Get rid of any spurious spaces, etc.
             //

@@ -520,14 +520,24 @@ namespace OurWord.Edit
                 return false;
 
             // Retrieve the paragraph previous to it
+            JOwnSeq<DParagraph> seq = p.GetMyOwningAttr() as JOwnSeq<DParagraph>;
+            Debug.Assert(null != seq);
+            int i = seq.FindObj(p) - 1;
+            if (i < 0)
+                return false;
+            p = seq[i] as DParagraph;
+
+            /***
             int i = p.Section.Paragraphs.FindObj(p) - 1;
             if (i < 0)
                 return false;
             p = p.Section.Paragraphs[i] as DParagraph;
+            ***/
 
             // We need to move the Window selection left, so that we have something valid to bookmark
             Window.cmdMoveCharLeft();
-            OWBookmark bm = new OWBookmark(Window.Selection);
+//            OWBookmark bm = new OWBookmark(Window.Selection);
+            OWWindow.EditState editState = Window.PushEditState();
 
             // Join the paragraphs in the underlying data
             p.JoinToNext();
@@ -537,10 +547,12 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the bookmark now that the paragraphs have changed
-            bm.RestoreWindowSelectionAndScrollPosition();
+//            bm.RestoreWindowSelectionAndScrollPosition();
+            Window.PopEditState();
 
             // Remember this position in case we do a future Undo
-            m_bookmark_AfterJoin = bm;
+//            m_bookmark_AfterJoin = bm;
+            m_bookmark_AfterJoin = editState.Bookmark;
 
             return true;
         }

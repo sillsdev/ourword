@@ -469,7 +469,7 @@ namespace OurWord.Edit
 
         // Save/Restore Editing State overrides ----------------------------------------------
         #region CLASS: NotesEditState : EditState
-        protected class NotesEditState : EditState
+        public class NotesEditState : EditState
         {
             #region Attr{g}: List<bool> HeaderCollapseState
             List<bool> HeaderCollapseState
@@ -530,11 +530,12 @@ namespace OurWord.Edit
             #endregion
         }
         #endregion
-        #region OMethod: void PushEditState()
-        public override void PushEditState()
+        #region OMethod: EditState PushEditState()
+        public override EditState PushEditState()
         {
             NotesEditState es = new NotesEditState(this);
             EditStateStack.Add(es);
+            return es;
         }
         #endregion
     }
