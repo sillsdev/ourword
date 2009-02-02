@@ -960,6 +960,15 @@ namespace OurWord.DataModel
         #endregion
 
         // I/O -------------------------------------------------------------------------------
+        #region SAttr{g}: string UnknownAuthor
+        static string UnknownAuthor
+        {
+            get
+            {
+                return G.GetLoc_String("kUnknownAuthor", "Unknown Author");
+            }
+        }
+        #endregion
         #region SMethod: TranslatorNote ImportFromOldStyle(nChapter, nVerse, SfField)
         static public TranslatorNote ImportFromOldStyle(
             int nChapter, int nVerse, SfField field)
@@ -1015,7 +1024,7 @@ namespace OurWord.DataModel
             }
 
             // The author is set to "Unknown Author".
-            string sAuthor = G.GetLoc_String("kUnknownAuthor", "Unknown Author");
+            string sAuthor = UnknownAuthor;
 
             // The date is set to today
             DateTime dtCreated = DateTime.Now;
@@ -1496,6 +1505,11 @@ namespace OurWord.DataModel
             ToolStripDropDownButton menuAssignedTo = new ToolStripDropDownButton(sMenuName);
             foreach (Classifications.Classification cl in People)
             {
+                // Don't let it be assigned to "Unknown Author"
+                if (cl.Name == UnknownAuthor)
+                    continue;
+
+                // Create the menu item
                 ToolStripMenuItem item = new ToolStripMenuItem(cl.Name);
                 item.Click += new EventHandler(OnChangeAssignedTo);
                 if (cl.Name == AssignedTo)

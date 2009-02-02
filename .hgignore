@@ -1,7 +1,7 @@
 syntax: glob
+OurWord\Setup\Output/*.exe
 bin
 obj
-output
 _ReSharper.OurWord
 *.suo
 *.bak
