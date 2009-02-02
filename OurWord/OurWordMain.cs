@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 using System.IO;
@@ -529,56 +530,6 @@ namespace OurWord
         private ToolStripLabel m_tbLanguageInfo;
         private ToolStripLabel m_tbCurrentPassage;
         #endregion
-        #region Method: void SetupChangeParagraphStyleItems()
-        public void SetupChangeParagraphStyleItems()
-        {
-            // Remove any previous subitems
-            m_menuChangeParagraphTo.DropDownItems.Clear();
-
-            // Populate
-            /*Paragraphs
-             * Common
-             * - p
-             * - q
-             * - q2
-             * 
-             * Restricted
-             * - book subtitle - only in the first record
-             * - book title - only in the first record
-             * - s - only one per record
-             * 
-             * Rare
-             * - ms (major super-section)
-             * - mr (major super-section corss reference)
-             * - s2 (sub-section header)
-             * - qm (can't remember what this one is, but have seen it occasionally in data)
-             * - q3 (quote/poetry level 3)
-             * - qc (centered quote)
-            */
-            string[] vsAbbrevs = {  
-                DStyleSheet.c_StyleAbbrevNormal,
-                DStyleSheet.c_StyleQuote1,
-                DStyleSheet.c_StyleQuote2,
-                DStyleSheet.c_StyleQuote3,
-                DStyleSheet.c_StyleSectionTitle };
-
-            foreach(string sAbbrev in vsAbbrevs)
-            {
-                JParagraphStyle pstyle = G.StyleSheet.FindParagraphStyle(sAbbrev);
-                if (null == pstyle)
-                    continue;
-
-                ToolStripMenuItem mi = new ToolStripMenuItem(
-                    pstyle.DisplayName, 
-                    null,
-                    cmdChangeParagraphStyle, 
-                    "m_menuChangeParagraphStyle_" + sAbbrev);
-                mi.Tag = sAbbrev;
-
-                m_menuChangeParagraphTo.DropDownItems.Add(mi);
-            }
-        }
-        #endregion
         #region Method: void SetupNavigationButtons()
         private const int c_cMaxMenuLength = 60; // Keep sub-menus from getting too long
         public void SetupNavigationButtons()
@@ -648,6 +599,54 @@ namespace OurWord
         public void EnableItalicsButton()
         {
             m_btnItalic.Enabled = canItalic;
+        }
+        #endregion
+        #region Method: void SetupChangeParagraphToDropdown()
+        private void SetupChangeParagraphToDropdown()
+        {
+            // If not visible, nothing to do (the Available attr is what Windows uses,
+            // because the item isn't Visible until it is actually displayed; but
+            // Available means it will be displayed when the menu it put together
+            // for display upon dropdown.
+            if (m_menuChangeParagraphTo.Available == false)
+                return;
+
+            // Clear out any previous subitems
+            m_menuChangeParagraphTo.DropDownItems.Clear();
+
+            // Get the currently-selected paragraph
+            OWWindow wnd = FocusedWindow;
+            if (null == wnd)
+                return;
+            OWWindow.Sel selection = wnd.Selection;
+            if (null == selection)
+                return;
+            DParagraph p = selection.DBT.Paragraph;
+            if (null == p)
+                return;
+
+            // Get the paragraph's possible styles
+            List<string> vPossibilities = p.CanChangeParagraphStyleTo;
+
+            // Create menu items for each of these
+            foreach (string sAbbrev in vPossibilities)
+            {
+                JParagraphStyle pstyle = G.StyleSheet.FindParagraphStyle(sAbbrev);
+                if (null == pstyle)
+                    continue;
+
+                ToolStripMenuItem mi = new ToolStripMenuItem(
+                    pstyle.DisplayName,
+                    null,
+                    cmdChangeParagraphStyle,
+                    "m_menuChangeParagraphStyle_" + sAbbrev);
+                mi.Tag = sAbbrev;
+
+                if (sAbbrev == p.StyleAbbrev)
+                    mi.Checked = true;
+
+                m_menuChangeParagraphTo.DropDownItems.Add(mi);
+            }
         }
         #endregion
         #region Method: void EnableMenusAndToolbars()
@@ -783,7 +782,6 @@ namespace OurWord
             // Edit Menu / Structured Editing
             bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
             bool bEditMenuVisible = bStructuralEditing || Features.F_UndoRedo;
-            SetupChangeParagraphStyleItems();
             m_seperatorEdit.Visible = bStructuralEditing;
             m_menuChangeParagraphTo.Visible = bStructuralEditing;
             m_menuInsertFootnote.Visible = bStructuralEditing;
@@ -2817,19 +2815,8 @@ namespace OurWord
         #region Cmd: cmdEditDropdownOpening - place a checkmark beside the current style
         private void cmdEditDropdownOpening(object sender, EventArgs e)
         {
-            // Get the style of the current paragraph, if any
-            string sAbbrev = "";
-            if (null != FocusedWindow)
-                sAbbrev = FocusedWindow.GetCurrentParagraphStyle();
-
-            // Check/Uncheck all of the subitems
-            foreach (ToolStripMenuItem mi in m_menuChangeParagraphTo.DropDownItems)
-            {
-                mi.Checked = false;
-
-                if (mi.Tag as string == sAbbrev)
-                    mi.Checked = true;
-            }
+            // Submenu for changing paragraph styles
+            SetupChangeParagraphToDropdown();
 
             // Enable the Insert/Delete footnote commands
             m_menuDeleteFootnote.Enabled = (null == FocusedWindow) ?
@@ -2838,6 +2825,7 @@ namespace OurWord
                 false : FocusedWindow.canInsertFootnote;
         }
 		#endregion
+
         #region Cmd: cmdInsertFootnote
         private void cmdInsertFootnote(object sender, EventArgs e)
         {
@@ -3400,8 +3388,9 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
-        #endregion
 
+
+        #endregion
     }
 
 	#region CLASS G - Globals for convenient access

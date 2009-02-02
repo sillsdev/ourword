@@ -229,8 +229,17 @@ namespace OurWord.DataModel
 		{
 			get
 			{
-				Debug.Assert(null != Owner);
-				return (DSection)Owner;
+                // Somewhere up the ownership hierarchy, we are owned by a section. Most
+                // paragraphs are immediately owned by the section, but those in Translator
+                // Notes are several levels down.
+                JObject obj = Owner;
+                while (null != obj && obj as DSection == null)
+                    obj = obj.Owner;
+
+                DSection section = obj as DSection;
+                Debug.Assert(null != section, "Paragraph is not (eventually) owned by a DSection");
+
+                return section;
 			}
 		}
 		#endregion
@@ -504,6 +513,54 @@ namespace OurWord.DataModel
                 }
 
                 return c;
+            }
+        }
+        #endregion
+        #region VAttr{g}: List<string> CanChangeParagraphStyleTo
+        public List<string> CanChangeParagraphStyleTo
+        {
+            get
+            {
+                // We'll compile the possible styles here
+                var vPossibilities = new List<string>();
+
+                // Some styles are always possibilities
+                vPossibilities.Add(DStyleSheet.c_StyleAbbrevNormal);
+                vPossibilities.Add(DStyleSheet.c_StyleQuote1);
+                vPossibilities.Add(DStyleSheet.c_StyleQuote2);
+                vPossibilities.Add(DStyleSheet.c_StyleQuote3);
+
+                // Translator Notes
+                bool bIsTranslatorNote = (Owner as Discussion != null);
+                if (bIsTranslatorNote)
+                {
+                    vPossibilities.Add(DStyleSheet.c_StyleNoteDiscussion);
+                    vPossibilities.Add(DStyleSheet.c_StyleSectionTitle);
+                    vPossibilities.Add(DStyleSheet.c_StyleSectionSubTitle);
+                }
+
+                // Is Scripture (rather than, e.g., a Translator Note)
+                bool bIsScripture = (Owner == Section);
+                if (bIsScripture)
+                {
+                    vPossibilities.Add(DStyleSheet.c_StyleMajorSection);
+                    vPossibilities.Add(DStyleSheet.c_StyleSectionTitle);
+                    vPossibilities.Add(DStyleSheet.c_StyleSectionSubTitle);
+                }
+
+                // Scripture in the First Section of the book
+                bool bIsFirstSection = (Book.Sections.FindObj(Section) == 0);
+                if (bIsFirstSection && bIsScripture)
+                {
+                    vPossibilities.Add(DStyleSheet.c_StyleBookTitle);
+                    vPossibilities.Add(DStyleSheet.c_StyleBookSubTitle);
+                }
+
+                // Make sure our current style is present.
+                if (!vPossibilities.Contains(StyleAbbrev))
+                    vPossibilities.Add(StyleAbbrev);
+
+                return vPossibilities;
             }
         }
         #endregion
@@ -1090,15 +1147,6 @@ namespace OurWord.DataModel
             DParagraph pNext = seq[iNext] as DParagraph;
             Debug.Assert(null != pNext);
 
-            /***
-            // Retrieve the following paragraph
-            int iNext = Section.Paragraphs.FindObj(this) + 1;
-            if (iNext >= Section.Paragraphs.Count)
-                return;
-            DParagraph pNext = Section.Paragraphs[iNext] as DParagraph;
-            Debug.Assert(null != pNext);
-            ***/
-
             // Move its runs into this one
             while (pNext.Runs.Count > 0)
             {
@@ -1109,7 +1157,6 @@ namespace OurWord.DataModel
 
             // Remove it from the owner
             seq.Remove(pNext);
-//            Section.Paragraphs.Remove(pNext);
 
             // Get rid of any spurious spaces, etc.
             //

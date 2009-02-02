@@ -322,8 +322,9 @@ namespace OurWord.DataModel
             {
                 // Create the OWPara and add it to its container
                 OWPara pDiscussion = new OWPara(G.TTranslation.WritingSystemVernacular,
-                    G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDiscussion),
-                    para, clrBackground,
+                    G.StyleSheet.FindParagraphStyle( para.StyleAbbrev),
+                    para, 
+                    clrBackground,
                     options
                     );
                 if (!IsEditable)

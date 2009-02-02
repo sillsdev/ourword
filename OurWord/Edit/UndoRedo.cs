@@ -527,17 +527,9 @@ namespace OurWord.Edit
                 return false;
             p = seq[i] as DParagraph;
 
-            /***
-            int i = p.Section.Paragraphs.FindObj(p) - 1;
-            if (i < 0)
-                return false;
-            p = p.Section.Paragraphs[i] as DParagraph;
-            ***/
-
             // We need to move the Window selection left, so that we have something valid to bookmark
             Window.cmdMoveCharLeft();
-//            OWBookmark bm = new OWBookmark(Window.Selection);
-            OWWindow.EditState editState = Window.PushEditState();
+            OWWindow.EditState es = Window.PushEditState();
 
             // Join the paragraphs in the underlying data
             p.JoinToNext();
@@ -547,12 +539,10 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the bookmark now that the paragraphs have changed
-//            bm.RestoreWindowSelectionAndScrollPosition();
             Window.PopEditState();
 
             // Remember this position in case we do a future Undo
-//            m_bookmark_AfterJoin = bm;
-            m_bookmark_AfterJoin = editState.Bookmark;
+            m_bookmark_AfterJoin = es.Bookmark;
 
             return true;
         }
@@ -715,7 +705,8 @@ namespace OurWord.Edit
         bool _IsValidRequest(DParagraph p)
         {
             // If we're requesting a Section Title.... 
-            if (RequestedStyleAbbrev == DStyleSheet.c_StyleSectionTitle)
+            bool bIsScripture = (p.Owner == p.Section);
+            if (bIsScripture && RequestedStyleAbbrev == DStyleSheet.c_StyleSectionTitle)
             {
                 // ...there must not already be a section title
                 if (p.Section.CountParagraphsWithStyle(DStyleSheet.c_StyleSectionTitle) > 0)
@@ -746,7 +737,8 @@ namespace OurWord.Edit
         OWBookmark _ChangeStyle(DParagraph p, string sNewStyleAbbrev)
         {
             // Remember the cursor position so that we can restore back to it after the re-LoadData.
-            OWBookmark bm = new OWBookmark(Window.Selection);
+            OWWindow.EditState es = Window.PushEditState();
+            OWBookmark bm = es.Bookmark;
 
             // Change the underlying paragraph's style
             p.StyleAbbrev = sNewStyleAbbrev;
@@ -756,8 +748,7 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the selection insertion point
-            bm.RestoreWindowSelectionAndScrollPosition();
-
+            Window.PopEditState();
             return bm;
         }
         #endregion

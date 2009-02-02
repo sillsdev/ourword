@@ -477,17 +477,20 @@ namespace OurWord.DataModel
         public const string c_CStyleRevisionAddition = "add";
 
 		// Paragraph Style Abbreviations -----------------------------------------------------
-        public const string c_StyleSectionTitle        = "s";
-        public const string c_StyleCrossReference      = "r";
-		public const string c_StyleQuote1              = "q";
-		public const string c_StyleQuote2              = "q2";
-		public const string c_StyleQuote3              = "q3";
-		public const string c_StyleQuoteCentered       = "qc";
-        public const string c_StyleReferenceTranslation = "RefTrans";
-        public const string c_StyleAbbrevParaContinuation = "m";
-
+        // Scripture Text
+        public const string c_StyleBookTitle              = "mt";
+        public const string c_StyleBookSubTitle           = "st";
         public const string c_StyleMajorSection           = "ms";
         public const string c_StyleMajorSectionCrossRef   = "mr";
+        public const string c_StyleSectionTitle           = "s";
+        public const string c_StyleSectionSubTitle        = "s2";
+        public const string c_StyleCrossReference         = "r";
+		public const string c_StyleQuote1                 = "q";
+		public const string c_StyleQuote2                 = "q2";
+		public const string c_StyleQuote3                 = "q3";
+        public const string c_StyleQuoteCentered          = "qc";
+        public const string c_StyleReferenceTranslation   = "RefTrans";
+        public const string c_StyleAbbrevParaContinuation = "m";
 
         // Translator Notes
         public const string c_StyleNoteHeader             = "NoteHeader";
@@ -560,9 +563,9 @@ namespace OurWord.DataModel
 			}
 
 			// Main Book Title (mt)
-			if (null == FindParagraphStyle("mt"))
+            if (null == FindParagraphStyle(c_StyleBookTitle))
 			{
-				style = AddParagraphStyle("mt", "Book Title");
+                style = AddParagraphStyle(c_StyleBookTitle, "Book Title");
 				style.SetFonts(false, 16, true);
 				style.IsCentered = true;
 				style.KeepWithNext = true;
@@ -570,9 +573,9 @@ namespace OurWord.DataModel
 			}
 
 			// Book SubTitle (st)
-			if (null == FindParagraphStyle("st"))
+            if (null == FindParagraphStyle(c_StyleBookSubTitle))
 			{
-				style = AddParagraphStyle("st", "Book SubTitle");
+                style = AddParagraphStyle(c_StyleBookSubTitle, "Book SubTitle");
 				style.SetFonts(false, 14, true);
 				style.IsCentered = true;
 				style.KeepWithNext = true;
@@ -610,9 +613,9 @@ namespace OurWord.DataModel
 			}
 
 			// Section Header Level 2 (s2)
-			if (null == FindParagraphStyle("s2"))
+            if (null == FindParagraphStyle(c_StyleSectionSubTitle))
 			{
-				style = AddParagraphStyle("s2", "Section Title 2");
+                style = AddParagraphStyle(c_StyleSectionSubTitle, "Section Title 2");
 				style.SetFonts(false, 12, true);
 				style.SpaceBefore = 9;
 				style.IsCentered = true;
@@ -732,8 +735,8 @@ namespace OurWord.DataModel
             {
                 style = AddParagraphStyle(c_StyleNoteDiscussion, "Note Discussion");
                 style.IsJustified = true;
-                style.SpaceBefore = 0;
-                style.SpaceAfter = 0;
+                style.SpaceBefore = 3;
+                style.SpaceAfter = 3;
             }
             // Note Paragraph (soon to be deprecated)
             if (null == FindParagraphStyle(c_StyleNote))
