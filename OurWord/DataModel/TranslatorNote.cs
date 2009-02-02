@@ -443,7 +443,7 @@ namespace OurWord.DataModel
         public class Classifications : List<Classifications.Classification>
         {
             #region CLASS: Classification
-            public class Classification
+            public class Classification : IComparable<Classification>
             {
                 #region Attr{g}: string Name
                 public string Name
@@ -510,6 +510,12 @@ namespace OurWord.DataModel
                     m_sName = sName;
                 }
                 #endregion
+                #region Method: int IComparable<T>.CompareTo(T)
+                public int CompareTo(Classification cl)
+                {
+                    return Name.CompareTo(cl.Name);
+                }
+                #endregion
             }
             #endregion
 
@@ -558,8 +564,8 @@ namespace OurWord.DataModel
             {
                 get
                 {
-                    string sValue = JW_Registry.GetValue(RegistrySubKey, c_sDefaultValue, DefaultFactoryValue);
-                    Debug.Assert(null != FindItem(sValue));
+                    string sValue = JW_Registry.GetValue(RegistrySubKey, 
+                        c_sDefaultValue, DefaultFactoryValue);
                     return sValue;
                 }
                 set
@@ -580,6 +586,54 @@ namespace OurWord.DataModel
             string m_sFactoryDefaultValue;
             #endregion
 
+            // Configuration Dialog support --------------------------------------------------
+            #region Attr{g/s}: string CommaDelimitedString - access from Configuration Dialog
+            public string CommaDelimitedString
+            {
+                get
+                {
+                    string s = "";
+
+                    foreach (Classification cl in this)
+                        s += cl.Name + ", ";
+
+                    return s;
+                }
+                set
+                {
+                    if (string.IsNullOrEmpty(value))
+                        return;
+
+                    // Parse the string into its parts
+                    string[] vNames = value.Split(new char[] { ',' });
+
+                    // Remove any spaces
+                    for (int i = 0; i < vNames.Length; i++)
+                        vNames[i] = vNames[i].Trim();
+
+                    // Clear out the list, and the corresponding Settings BSA; we'll
+                    // rebuild both as we call AddItem in this and called methods
+                    Clear();
+                    SettingsSource.Clear();
+
+                    // Clear out the list, then build it from these new values
+                    Clear();
+                    foreach (string s in vNames)
+                        AddItem(s);
+
+                    // Scan the book to make sure we haven't deleted anything we need
+                    ScanBookForNewClassifications(G.TBook);
+
+                    // If we still have an empty list, then add the factory defaults
+                    // back in.
+                    AddFactoryDefaults();
+
+                    // Make sure whatever is out default value is in the list
+                    AddItem(DefaultValue);
+                }
+            }
+            #endregion
+
             // Operations --------------------------------------------------------------------
             #region Method: void AddItem(sName)
             public void AddItem(string sName)
@@ -594,6 +648,7 @@ namespace OurWord.DataModel
 
                 // Create and add the new one
                 Add(new Classification(this, sName));
+                Sort();
 
                 // Add it to the settings. 
                 if (!SettingsSource.Contains(sName))
@@ -657,6 +712,16 @@ namespace OurWord.DataModel
             }
             string m_sRegistrySubKey;
             #endregion
+            #region Method: void AddFactoryDefaults()
+            void AddFactoryDefaults()
+            {
+                if (Count == 0 && null != FactoryDefaultMembers)
+                {
+                    foreach (string s in FactoryDefaultMembers)
+                        AddItem(s);
+                }
+            }
+            #endregion
             #region Method: void InitFromSettingsSource()
             public void InitFromSettingsSource()
             {
@@ -668,11 +733,7 @@ namespace OurWord.DataModel
                     AddItem(s);
 
                 // If we're still empty, go with the factory defaults
-                if (Count == 0 && null != FactoryDefaultMembers)
-                {
-                    foreach (string s in FactoryDefaultMembers)
-                        AddItem(s);
-                }
+                AddFactoryDefaults();
             }
             #endregion
         }
@@ -747,6 +808,9 @@ namespace OurWord.DataModel
         #region SMethod: void ScanBookForNewClassifications(DBook book)
         static public void ScanBookForNewClassifications(DBook book)
         {
+            if (null == book || !book.Loaded)
+                return;
+
             bool bIsFront = (book.Translation == G.FTranslation);
             bool bIsTarget = (book.Translation == G.TTranslation);
 

@@ -57,6 +57,12 @@ namespace OurWord.Dialogs
         const string c_sGroupMisc = "Misc";
         const string c_sDefaultAuthor = "propDefaultAuthor";
 
+        const string c_sGroupClassifications = "Categories & People";
+        const string c_sCategories = "propCategories";
+        const string c_sShowCategories = "propShowCategories";
+        const string c_sPeople = "propPeople";
+        const string c_sShowAssignedTo = "propShowAssignedTo";
+
         const string c_sYes = "Yes";
         const string c_sNo = "No";
         #endregion
@@ -93,6 +99,12 @@ namespace OurWord.Dialogs
                     e.Value = Discussion.DefaultAuthor;
                     break;
 
+                case c_sCategories:
+                    e.Value = TranslatorNote.Categories.CommaDelimitedString;
+                    break;
+                case c_sPeople:
+                    e.Value = TranslatorNote.People.CommaDelimitedString;
+                    break;
             }
         }
         #endregion
@@ -116,6 +128,13 @@ namespace OurWord.Dialogs
 
                 case c_sDefaultAuthor:
                     Discussion.DefaultAuthor = (string)e.Value;
+                    break;
+
+                case c_sCategories:
+                    TranslatorNote.Categories.CommaDelimitedString = (string)e.Value;
+                    break;
+                case c_sPeople:
+                    TranslatorNote.People.CommaDelimitedString = (string)e.Value;
                     break;
             }
         }
@@ -156,13 +175,40 @@ namespace OurWord.Dialogs
                 "Light Yellow"));
             #endregion
 
+            // Categories & People
+            Bag.Properties.Add(new PropertySpec(
+                c_sCategories,
+                "Categories of Notes",
+                typeof(string),
+                c_sGroupClassifications,
+                "Provide a list of the categories of notes, separated by commas. Note that any " +
+                    "existing categories in the current book will be automatically added back " +
+                    "into this list.",
+                "",
+                "",
+                null
+                ));
+
+            Bag.Properties.Add(new PropertySpec(
+                c_sPeople,
+                "People we can Assign To",
+                typeof(string),
+                c_sGroupClassifications,
+                "Provide a list of the people that a note can be assigned to, separated by " +
+                    "commas. Note that any existing people in the current book will be " +
+                    "automatically added back into this list.",
+                "",
+                "",
+                null
+                ));
+
             // Misc
             #region Misc
             Bag.Properties.Add(new PropertySpec(
                 c_sDefaultAuthor,
                 "New Note Author's Name",
                 typeof(string),
-                "",
+                c_sGroupMisc,
                 "This defaults to your computer's name; you'll probably want to " + 
                     "your real name here, so that others will know that it was " +
                     "who wrote the note.",

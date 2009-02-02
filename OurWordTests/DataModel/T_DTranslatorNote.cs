@@ -285,6 +285,32 @@ namespace OurWordTests.DataModel
             Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("New Category"));
         }
         #endregion
+        #region Test: CommaDelimitedString
+        [Test] public void CommaDelimitedString()
+        {
+            // Initialize Categories to "To Do" and "Exegesis". 
+            TranslatorNote.InitClassifications();
+
+            // Add a few more
+            TranslatorNote.Categories.AddItem("Hebrew");
+            TranslatorNote.Categories.AddItem("Greek");
+
+            // Check the produced string
+            Assert.AreEqual("Exegesis, Greek, Hebrew, To Do, ",
+                TranslatorNote.Categories.CommaDelimitedString,
+                "Get CommaDelimitedString");
+
+            // Create a different string
+            string sCategories = "Emily, David, Robert, Christiane, Sandra, John, ";
+            TranslatorNote.Categories.CommaDelimitedString = sCategories;
+
+            // If it loaded correctly, we will have a rearranged string; plus "To Do"
+            // added back in as the DefaultValue
+            Assert.AreEqual("Christiane, David, Emily, John, Robert, Sandra, To Do, ",
+                TranslatorNote.Categories.CommaDelimitedString,
+                "Set CommaDelimitedString");
+        }
+        #endregion
 
         // Conversion from 1.0-styled notes
         #region Test: OldStyleNotesConversion_General
