@@ -40,6 +40,16 @@ namespace OurWord.Edit
         }
         OWWindow m_Window;
         #endregion
+        #region Attr{g}: bool HasSelection
+        bool HasSelection
+        {
+            get
+            {
+                return m_bHasSelection;
+            }
+        }
+        bool m_bHasSelection;
+        #endregion
         #region Attr{g}: float ScrollBarPosition
         public float ScrollBarPosition
         {
@@ -121,7 +131,13 @@ namespace OurWord.Edit
             // The Window
             m_Window = _Wnd;
 
+            // Scroll bar position
+            m_fScrollBarPosition = m_Window.ScrollBarPosition;
+
             // The Selection
+            m_bHasSelection = Window.HasSelection;
+            if (!HasSelection)
+                return;
             OWWindow.Sel selection = Window.Selection;
 
             // Paragraph editing flags
@@ -130,9 +146,6 @@ namespace OurWord.Edit
             // Get the path to the run
             m_Root = selection.DBT.RootOwner;
             m_sPathToDBTFromRoot = selection.DBT.GetPathFromRoot();
-
-            // Scroll bar position
-            m_fScrollBarPosition = m_Window.ScrollBarPosition;
 
             // Selection Start Position
             m_iAnchorPositionInParagraph = selection.DBT_iChar(selection.Anchor);
@@ -177,6 +190,9 @@ namespace OurWord.Edit
         #region Method: Sel CreateSelection()
         public OWWindow.Sel CreateSelection()
         {
+            if (!HasSelection)
+                return null;
+
             // Retrieve the DBT
             DBasicText DBT = Root.GetObjectFromPath(PathToDBTFromRoot) as DBasicText;
             Debug.Assert(null != DBT);

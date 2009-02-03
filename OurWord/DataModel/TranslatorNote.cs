@@ -1473,6 +1473,10 @@ namespace OurWord.DataModel
         #region Cmd: OnAddResponse
         private void OnAddResponse(object sender, EventArgs e)
         {
+            NotesWnd wnd = G.App.SideWindows.NotesPane.WndNotes;
+            (new AddDiscussionAction(wnd, this)).Do();
+
+            /***
             // Add a new Discussion object
             Discussion d = new Discussion();
             Discussions.Append(d);
@@ -1487,6 +1491,7 @@ namespace OurWord.DataModel
             w.Focus();
 
             Debug_VerifyIntegrity();
+            ***/
         }
         #endregion
 

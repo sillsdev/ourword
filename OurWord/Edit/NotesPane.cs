@@ -158,6 +158,22 @@ namespace OurWord.Edit
             if (null == tn)
                 return;
 
+            // If we have more than one discussion, then we just want to remove that
+            // last discussion, not the entire note
+            if (tn.Discussions.Count > 1)
+            {
+                // Give the user the opportunity to change his/her mind
+                string sRemoveDiscussionMsg = tn.LastDiscussion.Paragraphs[0].AsString;
+                if (sRemoveDiscussionMsg.Length > 40)
+                    sRemoveDiscussionMsg = sRemoveDiscussionMsg.Substring(0, 40) + "...";
+                if (false == Messages.ConfirmNoteDeletion("\n\n\"" + sRemoveDiscussionMsg + "\""))
+                    return;
+
+                // Remove it
+                (new RemoveDiscussionAction(WndNotes, tn)).Do();
+                return;
+            }
+
             // Give the user the opportunity to change his/her mind
             string sText = tn.Context;
             if (sText.Length > 40)
@@ -524,10 +540,11 @@ namespace OurWord.Edit
             List<NoteCollapseState> m_vCollapsedStates;
             #endregion
 
-            #region OMethod: void RestoreWindowSelectionAndScrollPosition()
-            public override void RestoreWindowSelectionAndScrollPosition()
+            #region Method: void RestoreCollapseStates()
+            public void RestoreCollapseStates()
+                // For restoring the collapsed states, without restoring the superclass
+                // bookmark
             {
-                // Restore the header collapse states
                 foreach (EItem item in Window.Contents)
                 {
                     // Get the collapsable container
@@ -555,6 +572,14 @@ namespace OurWord.Edit
                 // Re-do the layout
                 Window.DoLayout();
                 Window.Invalidate();
+            }
+            #endregion
+
+            #region OMethod: void RestoreWindowSelectionAndScrollPosition()
+            public override void RestoreWindowSelectionAndScrollPosition()
+            {
+                // Restore the header collapse states
+                RestoreCollapseStates();
 
                 // Restore the rest of the Bookmark
                 base.RestoreWindowSelectionAndScrollPosition();

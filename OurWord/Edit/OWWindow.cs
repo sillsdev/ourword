@@ -427,92 +427,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Save/Restore Editing State --------------------------------------------------------
-        /***
-        #region CLASS: EditState
-        public class EditState
-        {
-            #region Attr{g}: OWBookmark Bookmark
-            public OWBookmark Bookmark
-            {
-                get
-                {
-                    return m_Bookmark;
-                }
-            }
-            OWBookmark m_Bookmark;
-            #endregion
-            #region Attr[g}: OWWindow Wnd
-            protected OWWindow Wnd
-            {
-                get
-                {
-                    Debug.Assert(null != m_wnd);
-                    return m_wnd;
-                }
-            }
-            OWWindow m_wnd;
-            #endregion
-
-            #region VMethod: void Restore()
-            virtual public void Restore()
-            {
-                if (null != Bookmark)
-                    Bookmark.RestoreWindowSelectionAndScrollPosition();
-            }
-            #endregion
-
-            #region Constructor(OWWindow)
-            public EditState(OWWindow wnd)
-            {
-                m_wnd = wnd;
-
-                if (null != wnd.Selection)
-                    m_Bookmark = new OWBookmark(wnd.Selection);
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g}: List<EditState> EditStateStack
-        protected List<EditState> EditStateStack
-        {
-            get
-            {
-                if (m_vEditStateStack == null)
-                    m_vEditStateStack = new List<EditState>();
-                return m_vEditStateStack;
-            }
-        }
-        List<EditState> m_vEditStateStack;
-        #endregion
-        #region VMethod: EditState PushEditState()
-        virtual public EditState PushEditState()
-        {
-            EditState es = new EditState(this);
-            EditStateStack.Add( es );
-            return es;
-        }
-        #endregion
-        #region Method: void PopEditState()
-        public void PopEditState()
-        {
-            int iPos = EditStateStack.Count - 1;
-            Debug.Assert(iPos != -1, "EditStateStack push/pop is out of sequence");
-
-            EditState es = EditStateStack[iPos];
-            EditStateStack.RemoveAt(iPos);
-
-            es.Restore();
-        }
-        #endregion
-        ***/
-
-        public virtual OWBookmark CreateBookmark()
-        {
-            return new OWBookmark(this);
-        }
-
-
         // Layout & Paint --------------------------------------------------------------------
         #region CLASS: DrawBuffer
         public class DrawBuffer
@@ -1996,6 +1910,12 @@ namespace OurWord.Edit
             {
                 return (null != Selection);
             }
+        }
+        #endregion
+        #region VMethod: OWBookmark CreateBookmark()
+        public virtual OWBookmark CreateBookmark()
+        {
+            return new OWBookmark(this);
         }
         #endregion
 

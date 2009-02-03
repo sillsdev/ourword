@@ -87,24 +87,45 @@ namespace OurWord.Edit
         #region Method: void ToggleCollapsed()
         public void ToggleCollapsed()
         {
-            // Toggle the setting
-            IsCollapsed = !IsCollapsed;
+            (new ToggleCollapsedHeader(Window, this)).Do();
+        }
+        #endregion
 
-            // If the selection is in this container, we'll need to move it
-            bool bMustMoveSelection = ContainsSelection;
+        // Selections: Override to account for IsCollapsed -----------------------------------
+        #region OMethod: bool Select_FirstWord()
+        public override bool Select_FirstWord()
+        {
+            if (IsCollapsed)
+                return false;
 
-            // TODO: Recalculate our vertical spacing: CalculateContainerVerticals
-            // Call Window.OnParagraphHeightChanged, rather than what we're doing
-            // here of calling DoLayout. (Actually, unless there is a performance
-            // issue, maybe it doesn't matter so much?)
-            Window.DoLayout();
-            Window.Invalidate();
+            return base.Select_FirstWord();
+        }
+        #endregion
+        #region OMethod: bool Select_NextWord_Begin(aiStack)
+        public override bool Select_NextWord_Begin(ArrayList aiStack)
+        {
+            if (IsCollapsed)
+                return false;
 
-            // So if we needed to, then select the first word of the window
-            // TODO: Select into the preceeding or following EContainer
-            //     so as to not mess up scrolling.
-            if (bMustMoveSelection)
-                Window.Contents.Select_FirstWord();
+            return base.Select_NextWord_Begin(aiStack);
+        }
+        #endregion
+        #region OMethod: bool Select_PrevWord(aiStack, bSelectAtEndOfWord)
+        public override bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
+        {
+            if (IsCollapsed)
+                return false;
+
+            return base.Select_PrevWord(aiStack, bSelectAtEndOfWord);
+        }
+        #endregion
+        #region VMethod: bool Select_LastWord_End()
+        public override bool Select_LastWord_End()
+        {
+            if (IsCollapsed)
+                return false;
+
+            return base.Select_LastWord_End();
         }
         #endregion
 

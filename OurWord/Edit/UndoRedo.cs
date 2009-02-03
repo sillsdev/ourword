@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 01 Mar 2008
  * Purpose: Handles Undo / Redo actions
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -30,6 +30,16 @@ namespace OurWord.Edit
     #region CLASS: Action - Superclass for Do, Undo, Redo commands
     public class Action
     {
+        #region Attr{g}: OWWindow Window
+        protected OWWindow Window
+        {
+            get
+            {
+                return m_Window;
+            }
+        }
+        OWWindow m_Window;
+        #endregion
         #region Attr{g}: string DisplayName
         public string DisplayName
         {
@@ -50,9 +60,12 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Constructor(sDisplayName)
-        public Action(string sDisplayName)
+        #region Constructor(OWWindow, sDisplayName)
+        public Action(OWWindow window, string sDisplayName)
         {
+            Debug.Assert(null != window);
+            m_Window = window;
+
             m_sDisplayName = sDisplayName;
         }
         #endregion
@@ -379,22 +392,109 @@ namespace OurWord.Edit
     }
     #endregion
 
+    // ToDo: If we can make BookmarkedAction the superclass for all, then we can
+    // combine it with Action. Makes sense, to just have a Before and After
+    // set of bookmarks. And simpler logic, to just have the two methods to override
+    #region CLASS: BookmarkedAction
+    public class BookmarkedAction : Action
+    {
+        #region Attr{g}: OWBookmark BmBefore
+        protected OWBookmark BmBefore
+        {
+            get
+            {
+                Debug.Assert(null != m_BmBefore);
+                return m_BmBefore;
+            }
+        }
+        OWBookmark m_BmBefore;
+        #endregion
+        #region Attr{g}: OWBookmark BmAfter
+        protected OWBookmark BmAfter
+        {
+            get
+            {
+                Debug.Assert(null != m_BmAfter);
+                return m_BmAfter;
+            }
+        }
+        OWBookmark m_BmAfter;
+        #endregion
+
+        #region Constructor(sDisplayName, OWWindow, TranslatorNote)
+        public BookmarkedAction(OWWindow window, string sDisplayName)
+            : base(window, sDisplayName)
+        {
+        }
+        #endregion
+
+        // Suclasses should override these two
+        #region VMethod: bool PerformAction() 
+        virtual protected bool PerformAction()
+        {
+            return false;
+        }
+        #endregion
+        #region VMethod: void ReverseAction()
+        virtual protected void ReverseAction()
+        {
+        }
+        #endregion
+
+        // Do, Undo, Redo
+        #region OMethod: bool Do()
+        public override bool Do()
+        {
+            // Bookmark the Before state so we can Undo back to it
+            m_BmBefore = Window.CreateBookmark();
+
+            // Do the action
+            if (false == PerformAction())
+                return false;
+
+            // Remember where we are for undo purposes
+            m_BmAfter = Window.CreateBookmark();
+
+            // Place this action on the stack
+            Push();
+            return true;
+        }
+        #endregion
+        #region OMethod: void Undo()
+        public override void Undo()
+        {
+            // Don't assume that we're in the correct place
+            BmAfter.RestoreWindowSelectionAndScrollPosition();
+
+            // Undo the action
+            ReverseAction();
+
+            // Restore to the original pre-Undo bookmark
+            BmBefore.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+        #region OMethod: void Redo()
+        public override void Redo()
+        {
+            // Restore to the original place before we insernted
+            BmBefore.RestoreWindowSelectionAndScrollPosition();
+
+            // Perform the action
+            PerformAction();
+
+            // Restore to the After place
+            BmAfter.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+    }
+    #endregion
+
+
     // Join / Split Paragraphs ---------------------------------------------------------------
     #region CLASS: SplitJoinParagraphAction : Action
     public class SplitJoinParagraphAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        protected OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
         #region Attr{g}: OWBookmark Bookmark_BeforeSplit
         protected OWBookmark Bookmark_BeforeSplit
         {
@@ -443,9 +543,8 @@ namespace OurWord.Edit
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         protected SplitJoinParagraphAction(string sDisplayName, OWWindow window)
-            : base(sDisplayName)
+            : base(window, sDisplayName)
         {
-            m_Window = window;
         }
         #endregion
 
@@ -645,17 +744,6 @@ namespace OurWord.Edit
     public class ChangeParagraphStyleAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        protected OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
         #region Attr{g}: string RequestedStyleAbbrev
         string RequestedStyleAbbrev
         {
@@ -693,9 +781,8 @@ namespace OurWord.Edit
         // Scaffolding ----------------------------------------------------------------------
         #region Constructor(OWWindow)
         public ChangeParagraphStyleAction(OWWindow window, string sRequestedStyleAbbrev)
-            : base("Change Paragraph Style")
+            : base(window, "Change Paragraph Style")
         {
-            m_Window = window;
             m_sRequestedStyleAbbrev = sRequestedStyleAbbrev;
         }
         #endregion
@@ -825,17 +912,6 @@ namespace OurWord.Edit
     public class DeleteAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        protected OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
         public enum DeleteMode { kDelete, kCut, kCopy, kBackSpace, kNone };
         #region Attr{g}: DeleteMode Mode
         protected DeleteMode Mode
@@ -913,14 +989,13 @@ namespace OurWord.Edit
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(OWWindow, DeleteMode)
         public DeleteAction(OWWindow window, DeleteMode mode)
-            : base(
+            : base(window,
                 (mode == DeleteMode.kDelete) ? "Delete" : 
                 (mode == DeleteMode.kCut) ? "Cut" :
                 (mode == DeleteMode.kCopy) ? "Copy" :
                 (mode == DeleteMode.kBackSpace) ? "Backspace" :
                 "Other")
         {
-            m_Window = window;
             m_Mode = mode;
         }
         #endregion
@@ -1083,17 +1158,6 @@ namespace OurWord.Edit
     public class InsertAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        protected OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
         #region Attr{g/s}: OWBookmark Bookmark_BeforeInsert
         protected OWBookmark Bookmark_BeforeInsert
         {
@@ -1149,17 +1213,15 @@ namespace OurWord.Edit
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(string sDisplayName, OWWindow, sTextToInsert)
         public InsertAction(string sDisplayName, OWWindow window, string sTextToInsert)
-            : base(sDisplayName)
+            : base(window, sDisplayName)
         {
-            m_Window = window;
             m_sTextToInsert = sTextToInsert;
         }
         #endregion
         #region Constructor(OWWindow, chCharToInsert)
         public InsertAction(OWWindow window, char chCharToInsert)
-            : base("Typing")
+            : base(window, "Typing")
         {
-            m_Window = window;
             m_sTextToInsert = chCharToInsert.ToString();
         }
         #endregion
@@ -1684,17 +1746,6 @@ namespace OurWord.Edit
     public class ItalicsAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        protected OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
         #region Attr{g}: DBasicText DBT_CopyOfOriginal
         DBasicText DBT_CopyOfOriginal
         {
@@ -1721,9 +1772,8 @@ namespace OurWord.Edit
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sDisplayName, OWWindow)
         public ItalicsAction(OWWindow window)
-            : base("Italics")
+            : base(window, "Italics")
         {
-            m_Window = window;
         }
         #endregion
 
@@ -1814,22 +1864,73 @@ namespace OurWord.Edit
     }
     #endregion
 
+    // Toggle Expand/Collapsed Header --------------------------------------------------------
+    #region CLASS: ToggleCollapsedHeader
+    public class ToggleCollapsedHeader : BookmarkedAction
+    {
+        #region Attr{g}: CollapsableHeaderColumn CHC
+        ECollapsableHeaderColumn CHC
+        {
+            get
+            {
+                Debug.Assert(null != m_chc);
+                return m_chc;
+            }
+        }
+        ECollapsableHeaderColumn m_chc;
+        #endregion
+
+        #region Constructor(OWWindow, ECollapsableHeaderColumn)
+        public ToggleCollapsedHeader(OWWindow window, ECollapsableHeaderColumn chc)
+            : base(window, (chc.IsCollapsed ? "Expand" : "Collapse"))
+        {
+            m_chc = chc;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Toggle the setting
+            CHC.IsCollapsed = !CHC.IsCollapsed;
+
+            // If the selection is in this container, we'll need to move it
+            bool bMustMoveSelection = CHC.ContainsSelection;
+
+            // TODO: Recalculate our vertical spacing: CalculateContainerVerticals
+            // Call Window.OnParagraphHeightChanged, rather than what we're doing
+            // here of calling DoLayout. (Actually, unless there is a performance
+            // issue, maybe it doesn't matter so much?)
+            Window.DoLayout();
+            Window.Invalidate();
+
+            // So if we needed to, then select the first word of the window
+            // TODO: Select into the preceeding or following EContainer
+            //     so as to not mess up scrolling.
+            // TODO: What if there is no place to move the selection?
+            if (bMustMoveSelection)
+            {
+                if (!Window.Contents.Select_FirstWord())
+                    Window.Selection = null;
+            }
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            PerformAction();
+        }
+        #endregion
+    }
+    #endregion
+
     // Footnotes -----------------------------------------------------------------------------
     #region CLASS: InsertDeleteFootnoteAction : Action
     public class InsertDeleteFootnoteAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: OWWindow Window
-        protected OWWindow Window
-        {
-            get
-            {
-                Debug.Assert(null != m_Window);
-                return m_Window;
-            }
-        }
-        OWWindow m_Window;
-        #endregion
         #region Attr{g}: OWBookmark Bookmark_BeforeInsert
         protected OWBookmark Bookmark_BeforeInsert
         {
@@ -1881,11 +1982,10 @@ namespace OurWord.Edit
         protected DFootnote m_InsertedFootnote;
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
+        #region Constructor(sDisplayName, OWWindow)
         protected InsertDeleteFootnoteAction(string sDisplayName, OWWindow window)
-            : base(sDisplayName)
+            : base(window, sDisplayName)
         {
-            m_Window = window;
         }
         #endregion
 
@@ -2098,4 +2198,151 @@ namespace OurWord.Edit
         #endregion
     }
     #endregion
+
+    // Translator Notes ----------------------------------------------------------------------
+    // + Append a discussion
+    // + Remove a discussion
+    // - Insert a Note
+    // - Remove a Note in its entirety
+    //
+    // TODO: When notes are collapsed, and we Remove, what happens if there is no place
+    //   to select? 
+    #region CLASS: AddDiscussionAction
+    public class AddDiscussionAction : BookmarkedAction
+    {
+        #region Attr[g}: TranslatorNote Note
+        protected TranslatorNote Note
+        {
+            get
+            {
+                Debug.Assert(null != m_Note);
+                return m_Note;
+            }
+        }
+        TranslatorNote m_Note;
+        #endregion
+        #region Constructor(OWWindow, Note)
+        public AddDiscussionAction(OWWindow window, TranslatorNote note)
+            : base(window, "Add Response to Note")
+        {
+            m_Note = note;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+            // Create and add a new discussion item
+        {
+            // Create a new Discussion object and add it to the note
+            Discussion d = new Discussion();
+            Note.Discussions.Append(d);
+            Note.Debug_VerifyIntegrity();
+
+            // Reload the Window, and recalculate its display
+            Window.LoadData();
+
+            // This will re-layout the window with Notes properly expanded/collapsed
+            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+
+            // Select the new discussion
+            EContainer container = Window.Contents.FindContainerOfDataSource(d.LastParagraph);
+            container.Select_LastWord_End();
+            Window.Focus();
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Retrieve the last discussion
+            Discussion d = Note.LastDiscussion;
+
+            // Remove it from the note
+            Note.Discussions.Remove(d);
+            Note.Debug_VerifyIntegrity();
+
+            // Reload the Window, and recalculate its display
+            Window.LoadData();
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: RemoveDiscussionAction
+    public class RemoveDiscussionAction : BookmarkedAction
+    {
+        #region Attr[g}: TranslatorNote Note
+        protected TranslatorNote Note
+        {
+            get
+            {
+                Debug.Assert(null != m_Note);
+                return m_Note;
+            }
+        }
+        TranslatorNote m_Note;
+        #endregion
+        #region Attr{g}: Discussion RemovedDiscussion
+        Discussion RemovedDiscussion
+        {
+            get
+            {
+                Debug.Assert(null != m_RemovedDiscussion);
+                return m_RemovedDiscussion;
+            }
+            set
+            {
+                Debug.Assert(null != value);
+                m_RemovedDiscussion = value;
+            }
+        }
+        Discussion m_RemovedDiscussion;
+        #endregion
+
+        #region Constructor(OWWindow, Note)
+        public RemoveDiscussionAction(OWWindow window, TranslatorNote note)
+            : base(window, "Remove Response to Note")
+        {
+            m_Note = note;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Removing the only discussion is the same as deleting the note
+            if (Note.Discussions.Count < 2)
+                return false;
+
+            // Remember it so we can undo it
+            RemovedDiscussion = Note.LastDiscussion;
+
+            // Remove it from the note
+            Note.Discussions.Remove(Note.LastDiscussion);
+            Note.Debug_VerifyIntegrity();
+
+            // Reload the Window, and recalculate its display
+            Window.LoadData();
+            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Append the removed discussion
+            Note.Discussions.Append(RemovedDiscussion);
+            Note.Debug_VerifyIntegrity();
+
+            // Reload the Window, and recalculate its display
+            Window.LoadData();
+        }
+        #endregion
+    }
+    #endregion
+
+
+
+
 }

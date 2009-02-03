@@ -1140,8 +1140,8 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
-        #region Method: bool Select_NextWord_Begin(aiStack)
-        public bool Select_NextWord_Begin(ArrayList aiStack)
+        #region VMethod: bool Select_NextWord_Begin(aiStack)
+        public virtual bool Select_NextWord_Begin(ArrayList aiStack)
         {
             // Loop through the appropriate subitems
             for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
@@ -1173,7 +1173,7 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
-        #region Method: bool Select_PrevWord(aiStack, bSelectAtEndOfWord)
+        #region VMethod: bool Select_PrevWord(aiStack, bSelectAtEndOfWord)
         /// <summary>
         /// Places the selection into the previous word.
         /// </summary>
@@ -1181,7 +1181,7 @@ namespace OurWord.Edit
         /// <param name="bSelectAtEndOfWord">If false, places the selection at the beginning of
         /// the word; if true, the selection goes at the end of the word.</param>
         /// <returns></returns>
-        public bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
+        public virtual bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
         {
             // Loop through the appropriate subitems
             for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
@@ -1214,8 +1214,8 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
-        #region Method: bool Select_FirstWord()
-        public bool Select_FirstWord()
+        #region VMethod: bool Select_FirstWord()
+        public virtual bool Select_FirstWord()
         {
             if (!IsEditable)
                 return false;
@@ -1240,8 +1240,8 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
-        #region Method: bool Select_LastWord_End()
-        public bool Select_LastWord_End()
+        #region VMethod: bool Select_LastWord_End()
+        public virtual bool Select_LastWord_End()
         {
             if (!IsEditable)
                 return false;

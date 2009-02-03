@@ -32,17 +32,23 @@ namespace OurWordTests.Edit
     {
         // Setup/TearDown --------------------------------------------------------------------
         #region Setup
-        [SetUp]
-        public void Setup()
+        [SetUp] public void Setup()
         {
+            EditTest.Setup(DataModel.T_DSection.s_vsRaw4);
+
             JWU.NUnit_Setup();
+        }
+        #endregion
+        #region TearDown
+        [TearDown] public void TearDown()
+        {
+            EditTest.TearDown();
         }
         #endregion
 
         // Stack Operations ------------------------------------------------------------------
         #region Test: TestStackOperations
-        [Test]
-        public void TestStackOperations()
+        [Test] public void TestStackOperations()
         {
             string sTyping = "Typing 'abc'";
             string sBackspace = "Backspace";
@@ -55,9 +61,9 @@ namespace OurWordTests.Edit
             Assert.IsTrue(!stack.HasRedo, "No Redo in stack - a");
 
             // Add a few items to the stack
-            stack.Push(new Action(sTyping));
-            stack.Push(new Action(sBackspace));
-            stack.Push(new Action(sJoin));
+            stack.Push(new Action(EditTest.Wnd, sTyping));
+            stack.Push(new Action(EditTest.Wnd, sBackspace));
+            stack.Push(new Action(EditTest.Wnd, sJoin));
             Assert.IsTrue(stack.HasUndo, "Has Undo in stack - b");
             Assert.IsTrue(!stack.HasRedo, "No Redo in stack - b");
 
@@ -92,14 +98,13 @@ namespace OurWordTests.Edit
             Assert.IsTrue(stack.HasRedo, "Has Redo in stack - e");
 
             // Add a new item; should clear ReDo 
-            stack.Push(new Action(sDelete));
+            stack.Push(new Action(EditTest.Wnd, sDelete));
             Assert.IsTrue(stack.HasUndo, "Has Undo in stack - f");
             Assert.IsTrue(!stack.HasRedo, "No Redo in stack - f");
         }
         #endregion
         #region Test: TestStackMaxDepth
-        [Test]
-        public void TestStackMaxDepth()
+        [Test] public void TestStackMaxDepth()
         {
             // Create a stack of infinite depth
             UndoRedoStack stack = new UndoRedoStack(0, null, null);
@@ -115,11 +120,11 @@ namespace OurWordTests.Edit
             string sBackspace = "Backspace";
             string sJoin = "Join Paragraphs";
             string sDelete = "Delete";
-            stack.Push(new Action(sTyping));
-            stack.Push(new Action(sSplit));
-            stack.Push(new Action(sBackspace));
-            stack.Push(new Action(sJoin));
-            stack.Push(new Action(sDelete));
+            stack.Push(new Action(EditTest.Wnd, sTyping));
+            stack.Push(new Action(EditTest.Wnd, sSplit));
+            stack.Push(new Action(EditTest.Wnd, sBackspace));
+            stack.Push(new Action(EditTest.Wnd, sJoin));
+            stack.Push(new Action(EditTest.Wnd, sDelete));
 
             // We should have only the last three entries
             Assert.AreEqual(sDelete, stack.Undo().DisplayName);
