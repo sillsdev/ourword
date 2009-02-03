@@ -101,7 +101,7 @@ namespace OurWord.Edit
 
             // Remember the location, as we have to reset the scroll position 
             // after we regenerate window contents
-            OWBookmark bookmark = new OWBookmark(G.App.MainWindow.Selection);
+            OWBookmark MainWndBookmark = G.App.MainWindow.CreateBookmark();
 
             // Create a blank note and insert it
             TranslatorNote note = new TranslatorNote(
@@ -115,7 +115,7 @@ namespace OurWord.Edit
             G.App.ResetWindowContents();
 
             // Return the Main Window to where it was
-            bookmark.RestoreWindowSelectionAndScrollPosition();
+            MainWndBookmark.RestoreWindowSelectionAndScrollPosition();
 
             // Select the new note and bring the focus to it
             EContainer container = WndNotes.Contents.FindContainerOfDataSource(
@@ -476,74 +476,146 @@ namespace OurWord.Edit
         #endregion
 
         // Save/Restore Editing State overrides ----------------------------------------------
-        #region CLASS: NotesEditState : EditState
-        public class NotesEditState : EditState
+        #region CLASS: NotesBookmark : OWBookmark
+        public class NotesBookmark : OWBookmark
         {
-            #region Attr{g}: List<bool> HeaderCollapseState
-            List<bool> HeaderCollapseState
+            #region CLASS: NoteCollapseState
+            class NoteCollapseState
+            {
+                #region Attr{g}: TranslatorNote Note
+                public TranslatorNote Note
+                {
+                    get
+                    {
+                        return m_Note;
+                    }
+                }
+                TranslatorNote m_Note;
+                #endregion
+                #region Attr{g}: bool IsCollapsed
+                public bool IsCollapsed
+                {
+                    get
+                    {
+                        return m_bIsCollapsed;
+                    }
+                }
+                bool m_bIsCollapsed;
+                #endregion
+
+                #region Contructor(TranslatorNote, bIsCollapsed)
+                public NoteCollapseState(TranslatorNote note, bool bIsCollapsed)
+                {
+                    m_Note = note;
+                    m_bIsCollapsed = bIsCollapsed;
+                }
+                #endregion
+            }
+            #endregion
+            #region Attr{g}: List<NoteCollapseState> CollapsedStates
+            List<NoteCollapseState> CollapsedStates
             {
                 get
                 {
-                    Debug.Assert(null != m_vHeaderCollapseState);
-                    return m_vHeaderCollapseState;
+                    Debug.Assert(null != m_vCollapsedStates);
+                    return m_vCollapsedStates;
                 }
             }
-            List<bool> m_vHeaderCollapseState;
+            List<NoteCollapseState> m_vCollapsedStates;
             #endregion
 
-            #region OMethod: void Restore()
-            public override void Restore()
+            #region OMethod: void RestoreWindowSelectionAndScrollPosition()
+            public override void RestoreWindowSelectionAndScrollPosition()
             {
-                // Bookmark
-                base.Restore();
-
-                // Restore the Header Collapse states
-
-                // Get a list of header containers currently in the window
-                var vChc = new List<ECollapsableHeaderColumn>();
-                foreach (EContainer container in Wnd.Contents)
+                // Restore the header collapse states
+                foreach (EItem item in Window.Contents)
                 {
-                    ECollapsableHeaderColumn chc = container as ECollapsableHeaderColumn;
-                    if (null != chc)
-                        vChc.Add(chc);
+                    // Get the collapsable container
+                    ECollapsableHeaderColumn collapsable = item as ECollapsableHeaderColumn;
+                    if (null == collapsable)
+                        continue;
+
+                    // Get its note
+                    TranslatorNote note = GetNoteFromContainer(collapsable);
+                    if (null == note)
+                        continue;
+
+                    // Get the matching NoteCollapseState, and use it to set the
+                    // collapse state of our display container
+                    foreach (NoteCollapseState ncs in CollapsedStates)
+                    {
+                        if (ncs.Note == note)
+                        {
+                            collapsable.IsCollapsed = ncs.IsCollapsed;
+                            break;
+                        }
+                    }
                 }
 
-                // Are they the same length?
-                if (vChc.Count != HeaderCollapseState.Count)
-                    return;
-
-                // Restore the values
-                for (int i = 0; i < vChc.Count; i++)
-                    vChc[i].IsCollapsed = HeaderCollapseState[i];
-
                 // Re-do the layout
-                Wnd.DoLayout();
-                Wnd.Invalidate();
+                Window.DoLayout();
+                Window.Invalidate();
+
+                // Restore the rest of the Bookmark
+                base.RestoreWindowSelectionAndScrollPosition();
+            }
+            #endregion
+            #region Method: TranslatorNote GetNoteFromContainer(EContainer)
+            TranslatorNote GetNoteFromContainer(EContainer container)
+            {
+                OWPara para = container as OWPara;
+                if (null != para)
+                {
+                    DParagraph pSource = para.DataSource as DParagraph;
+                    if (null != pSource)
+                    {
+                        Discussion discussion = pSource.Owner as Discussion;
+                        if (null != discussion)
+                            return discussion.Note;
+                    }
+                }
+
+                foreach (EItem item in container.SubItems)
+                {
+                    EContainer SubContainer = item as EContainer;
+                    if (null != SubContainer)
+                    {
+                        TranslatorNote n = GetNoteFromContainer(SubContainer);
+                        if (null != n)
+                            return n;
+                    }
+                }
+
+                return null;
             }
             #endregion
 
             #region Constructor(OWWindow)
-            public NotesEditState(OWWindow wnd)
+            public NotesBookmark(OWWindow wnd)
                 : base(wnd)
             {
                 // Save the header collapse states
-                m_vHeaderCollapseState = new List<bool>();
-                foreach (EContainer container in wnd.Contents)
+                m_vCollapsedStates = new List<NoteCollapseState>();
+                foreach (EItem item in wnd.Contents)
                 {
-                    ECollapsableHeaderColumn chc = container as ECollapsableHeaderColumn;
-                    if (null != chc)
-                        m_vHeaderCollapseState.Add(chc.IsCollapsed);
+                    ECollapsableHeaderColumn collapsable = item as ECollapsableHeaderColumn;
+                    if (null == collapsable)
+                        continue;
+
+                    TranslatorNote note = GetNoteFromContainer(collapsable);
+                    if (null == note)
+                        continue;
+
+                    CollapsedStates.Add(new NoteCollapseState(note, collapsable.IsCollapsed));
                 }
             }
             #endregion
         }
         #endregion
-        #region OMethod: EditState PushEditState()
-        public override EditState PushEditState()
+        #region OMethod: OWBookmark CreateBookmark()
+        public override OWBookmark CreateBookmark()
         {
-            NotesEditState es = new NotesEditState(this);
-            EditStateStack.Add(es);
-            return es;
+            return new NotesBookmark(this);
         }
         #endregion
     }

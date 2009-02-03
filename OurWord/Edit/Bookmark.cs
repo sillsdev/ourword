@@ -30,7 +30,7 @@ namespace OurWord.Edit
     {
         // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: OWWindow Window
-        OWWindow Window
+        protected OWWindow Window
         {
             get
             {
@@ -116,12 +116,15 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(selection)
-        public OWBookmark(OWWindow.Sel selection)
+        public OWBookmark(OWWindow _Wnd)
         {
             // The Window
-            m_Window = selection.Paragraph.Window;
+            m_Window = _Wnd;
 
-            // And editing flags
+            // The Selection
+            OWWindow.Sel selection = Window.Selection;
+
+            // Paragraph editing flags
             m_ParagraphFlags = selection.Paragraph.Options;
 
             // Get the path to the run
@@ -140,6 +143,33 @@ namespace OurWord.Edit
                 m_iEndPositionInParagraph = selection.DBT_iChar(selection.End);
                 m_bIsInsertionPoint = false;
             }
+        }
+        #endregion
+        #region VMethod: bool ContentEquals(OWBookmark)
+        public virtual bool ContentEquals( OWBookmark bm )
+        {
+            if (Window != bm.Window)
+                return false;
+
+            if (AnchorPositionInParagraph != bm.AnchorPositionInParagraph)
+                return false;
+
+            if (EndPositionInParagraph != bm.EndPositionInParagraph)
+                return false;
+
+            if (IsInsertionPoint != bm.IsInsertionPoint)
+                return false;
+
+            if (ParagraphFlags != bm.ParagraphFlags)
+                return false;
+
+            if (PathToDBTFromRoot != bm.PathToDBTFromRoot)
+                return false;
+
+            if (Root != bm.Root)
+                return false;
+
+            return true;
         }
         #endregion
 
@@ -167,7 +197,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: void RestoreWindowSelectionAndScrollPosition()
-        public void RestoreWindowSelectionAndScrollPosition()
+        public virtual void RestoreWindowSelectionAndScrollPosition()
         {
             Window.Selection = CreateSelection();
             Window.ScrollBarPosition = ScrollBarPosition;

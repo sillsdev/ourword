@@ -71,34 +71,34 @@ namespace OurWordTests.Edit
             OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te" and bookmark it
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4);
-            selection = op.NormalizeSelection(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
             string s1 = "te, ";
-            Assert.AreEqual(s1, selection.Anchor.Word.Text, "Set Bookmark 1");
-            Assert.AreEqual(2, selection.Anchor.iBlock);
-            Assert.AreEqual(0, selection.Anchor.iChar);
-            OWBookmark bm1 = new OWBookmark(selection);
+            Assert.AreEqual(s1, EditTest.Wnd.Selection.Anchor.Word.Text, "Set Bookmark 1");
+            Assert.AreEqual(2, EditTest.Wnd.Selection.Anchor.iBlock);
+            Assert.AreEqual(0, EditTest.Wnd.Selection.Anchor.iChar);
+            OWBookmark bm1 = EditTest.Wnd.CreateBookmark();
 
             // select "iJe|sus" and bookmark it
-            selection = OWWindow.Sel.CreateSel(op, DBT, 10);
-            selection = op.NormalizeSelection(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 10);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
             string s2 = "Jesus ";
-            Assert.AreEqual(s2, selection.Anchor.Word.Text, "Set Bookmark 2");
-            Assert.AreEqual(3, selection.Anchor.iBlock);
-            Assert.AreEqual(2, selection.Anchor.iChar);
-            OWBookmark bm2 = new OWBookmark(selection);
+            Assert.AreEqual(s2, EditTest.Wnd.Selection.Anchor.Word.Text, "Set Bookmark 2");
+            Assert.AreEqual(3, EditTest.Wnd.Selection.Anchor.iBlock);
+            Assert.AreEqual(2, EditTest.Wnd.Selection.Anchor.iChar);
+            OWBookmark bm2 = EditTest.Wnd.CreateBookmark();
 
             // Return to the first bookmark
-            selection = bm1.CreateSelection();
-            Assert.AreEqual(s1, selection.Anchor.Word.Text, "Return to " + s1);
-            Assert.AreEqual(2, selection.Anchor.iBlock, "1 - iBlock");
-            Assert.AreEqual(0, selection.Anchor.iChar, "1 - iChar");
+            bm1.RestoreWindowSelectionAndScrollPosition();
+            Assert.AreEqual(s1, EditTest.Wnd.Selection.Anchor.Word.Text, "Return to " + s1);
+            Assert.AreEqual(2, EditTest.Wnd.Selection.Anchor.iBlock, "1 - iBlock");
+            Assert.AreEqual(0, EditTest.Wnd.Selection.Anchor.iChar, "1 - iChar");
 
             // Return to the second bookmark
-            selection = bm2.CreateSelection();
-            Assert.AreEqual(s2, selection.Anchor.Word.Text, "Return to " + s2);
-            Assert.AreEqual(3, selection.Anchor.iBlock, "2 - iBlock");
-            Assert.AreEqual(2, selection.Anchor.iChar, "2 - iChar");
+            bm2.RestoreWindowSelectionAndScrollPosition();
+            Assert.AreEqual(s2, EditTest.Wnd.Selection.Anchor.Word.Text, "Return to " + s2);
+            Assert.AreEqual(3, EditTest.Wnd.Selection.Anchor.iBlock, "2 - iBlock");
+            Assert.AreEqual(2, EditTest.Wnd.Selection.Anchor.iChar, "2 - iChar");
         }
         #endregion
         #region Test: BasicContentBookmarks
@@ -115,29 +115,28 @@ namespace OurWordTests.Edit
             OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te|" and bookmark it
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4, 6);
-            selection = op.NormalizeSelection(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4, 6);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
             string s1 = "te";
-            Assert.AreEqual(s1, selection.SelectionString);
-            OWBookmark bm1 = new OWBookmark(selection);
+            Assert.AreEqual(s1, EditTest.Wnd.Selection.SelectionString);
+            OWBookmark bm1 = EditTest.Wnd.CreateBookmark();
 
             // Select "a|ntei|n" and bookmark it
-            selection =  OWWindow.Sel.CreateSel(op, DBT, 23, 27);
-            selection = op.NormalizeSelection(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 23, 27);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
             string s2 = "ntei";
-            Assert.AreEqual(s2, selection.SelectionString);
-            OWBookmark bm2 = new OWBookmark(selection);
+            Assert.AreEqual(s2, EditTest.Wnd.Selection.SelectionString);
+            OWBookmark bm2 = EditTest.Wnd.CreateBookmark();
 
             // Return to the first bookmark
-            selection = bm1.CreateSelection();
-            Assert.AreEqual(s1, selection.SelectionString, "Return to " + s1);
+            bm1.RestoreWindowSelectionAndScrollPosition();
+            Assert.AreEqual(s1, EditTest.Wnd.Selection.SelectionString, "Return to " + s1);
 
             // Return to the second bookmark
-            selection = bm2.CreateSelection();
-            Assert.AreEqual(s2, selection.SelectionString, "Return to " + s2);
+            bm2.RestoreWindowSelectionAndScrollPosition();
+            Assert.AreEqual(s2, EditTest.Wnd.Selection.SelectionString, "Return to " + s2);
         }
         #endregion
-        /***
         #region Test: BookmarkEquality
         [Test] public void BookmarkEquality()
         {
@@ -147,25 +146,24 @@ namespace OurWordTests.Edit
             Assert.AreEqual(c_sBenchmark, p.DebugString, "Benchmark: Paragraph contents");
             DBasicText DBT = p.Runs[1] as DBasicText;
             Assert.IsNotNull(DBT, "DBT Found");
-            OWPara op = OWBookmark.FindPara(EditTest.Wnd, p);
+            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te" and bookmark it
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4);
-            selection = op.NormalizeSelection(selection);
-            OWBookmark bm1 = new OWBookmark(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            OWBookmark bm1 = EditTest.Wnd.CreateBookmark();
 
             // Create another one: should be equal
-            OWBookmark bm2 = new OWBookmark(selection);
-            Assert.IsTrue(bm1.Equals(bm2), "bookmark equals");
+            OWBookmark bm2 = EditTest.Wnd.CreateBookmark();
+            Assert.IsTrue(bm1.ContentEquals(bm2), "bookmark equals");
 
             // Different selection should not be equal
-            selection = OWWindow.Sel.CreateSel(op, DBT, 5);
-            selection = op.NormalizeSelection(selection);
-            bm2 = new OWBookmark(selection);
-            Assert.IsFalse(bm1.Equals(bm2), "bookmark not equal");
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 5);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            bm2 = EditTest.Wnd.CreateBookmark();
+            Assert.IsFalse(bm1.ContentEquals(bm2), "bookmark not equal");
         }
         #endregion
-        ***/
         #region Test: BookmarkIsAdjacentTo
         [Test] public void BookmarkIsAdjacentTo()
         {
@@ -178,38 +176,38 @@ namespace OurWordTests.Edit
             OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te" and bookmark it
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(op, DBT, 4);
-            selection = op.NormalizeSelection(selection);
-            OWBookmark bm1 = new OWBookmark(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            OWBookmark bm1 = EditTest.Wnd.CreateBookmark();
 
             // Create another one: because they are both insertion points, 
             // they should be adjacent
-            OWBookmark bm2 = new OWBookmark(selection);
+            OWBookmark bm2 = EditTest.Wnd.CreateBookmark();
             Assert.IsTrue(bm1.IsAdjacentTo(bm2), "insertion points");
 
             // Create one that is a content bookmark: "Oke |te|, |iJesus"
-            selection = OWWindow.Sel.CreateSel(op, DBT, 4, 6);
-            selection = op.NormalizeSelection(selection);
-            bm2 = new OWBookmark(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4, 6);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            bm2 = EditTest.Wnd.CreateBookmark();
             Assert.IsTrue(bm1.IsAdjacentTo(bm2), "insertion point; selection");
 
             // Create one that is not adjacent
-            selection = OWWindow.Sel.CreateSel(op, DBT, 5, 6);
-            selection = op.NormalizeSelection(selection);
-            bm2 = new OWBookmark(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 5, 6);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            bm2 = EditTest.Wnd.CreateBookmark();
             Assert.IsFalse(bm1.IsAdjacentTo(bm2), "insertion point; selection; not adjacent");
 
             // Two adjacent selections
-            selection = OWWindow.Sel.CreateSel(op, DBT, 3, 5);
-            selection = op.NormalizeSelection(selection);
-            bm1 = new OWBookmark(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 3, 5);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            bm1 = EditTest.Wnd.CreateBookmark();
             Assert.IsTrue(bm1.IsAdjacentTo(bm2), "two selections");
             Assert.IsTrue(bm2.IsAdjacentTo(bm1), "two selections");
 
             // two non-adjacent selections
-            selection = OWWindow.Sel.CreateSel(op, DBT, 3, 4);
-            selection = op.NormalizeSelection(selection);
-            bm1 = new OWBookmark(selection);
+            EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 3, 4);
+            EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
+            bm1 = EditTest.Wnd.CreateBookmark();
             Assert.IsFalse(bm1.IsAdjacentTo(bm2), "two selections; not adjacent");
             Assert.IsFalse(bm2.IsAdjacentTo(bm1), "two selections; not adjacent");
         }

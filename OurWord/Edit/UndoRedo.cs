@@ -458,7 +458,7 @@ namespace OurWord.Edit
 
             // Bookmark the "Before" selection so we can Undo back to it
             OWWindow.Sel selection = Window.Selection;
-            m_bookmark_BeforeSplit = new OWBookmark(selection);
+            m_bookmark_BeforeSplit = Window.CreateBookmark();
 
             // If we have a selection, we don't want to delete the text. While deleting it  
             // is the typical Microsoft Word behavior, I fear it would be unsettling to the
@@ -483,7 +483,7 @@ namespace OurWord.Edit
             // Remember the cursor position so that we can restore back to it....Split()
             // may remove some of the underlying data, so we need the bookmark to restore
             // a valid selection.
-            Window.PushEditState();
+            OWBookmark bm = Window.CreateBookmark();
 
             // Split the underlying paragraph
             DParagraph paraNew = para.Split(text, iPos);
@@ -495,14 +495,14 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the selection insertion point to the Window.Selection
-            Window.PopEditState();
+            bm.RestoreWindowSelectionAndScrollPosition();
 
             // This has us at the end of the first paragraph, we need to move to the
             // beginning of the next one
             Window.cmdMoveCharRight();
 
             // Remember this position in case we do a future Undo
-            m_bookmark_AfterSplit = new OWBookmark(Window.Selection);
+            m_bookmark_AfterSplit = Window.CreateBookmark();
 
             return true;
         }
@@ -512,7 +512,7 @@ namespace OurWord.Edit
         {
             // Bookmark the "Before" selection so we can Undo back to it
             OWWindow.Sel selection = Window.Selection;
-            m_bookmark_BeforeJoin = new OWBookmark(selection);
+            m_bookmark_BeforeJoin = Window.CreateBookmark();
 
             // Retrieve the underlying paragraph
             DParagraph p = selection.Paragraph.DataSource as DParagraph;
@@ -529,7 +529,7 @@ namespace OurWord.Edit
 
             // We need to move the Window selection left, so that we have something valid to bookmark
             Window.cmdMoveCharLeft();
-            OWWindow.EditState es = Window.PushEditState();
+            OWBookmark bm = Window.CreateBookmark();
 
             // Join the paragraphs in the underlying data
             p.JoinToNext();
@@ -539,10 +539,10 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the bookmark now that the paragraphs have changed
-            Window.PopEditState();
+            bm.RestoreWindowSelectionAndScrollPosition();
 
             // Remember this position in case we do a future Undo
-            m_bookmark_AfterJoin = es.Bookmark;
+            m_bookmark_AfterJoin = bm;
 
             return true;
         }
@@ -737,8 +737,7 @@ namespace OurWord.Edit
         OWBookmark _ChangeStyle(DParagraph p, string sNewStyleAbbrev)
         {
             // Remember the cursor position so that we can restore back to it after the re-LoadData.
-            OWWindow.EditState es = Window.PushEditState();
-            OWBookmark bm = es.Bookmark;
+            OWBookmark bm = Window.CreateBookmark();
 
             // Change the underlying paragraph's style
             p.StyleAbbrev = sNewStyleAbbrev;
@@ -748,7 +747,7 @@ namespace OurWord.Edit
             Window.LoadData();
 
             // Restore the selection insertion point
-            Window.PopEditState();
+            bm.RestoreWindowSelectionAndScrollPosition();
             return bm;
         }
         #endregion
@@ -949,7 +948,7 @@ namespace OurWord.Edit
                 return false;
 
             // Save a bookmark for where we are prior to the deletion
-            m_bookmark_BeforeDelete = new OWBookmark(selection);
+            m_bookmark_BeforeDelete = Window.CreateBookmark();
 
             // If an InsertionPoint, extend Right/Left if kDelete/kBackspace. We need a selection
             // with a beginning and ending, so that we have something we can actually delete.
@@ -992,7 +991,7 @@ namespace OurWord.Edit
                 Clipboard.SetText(DeletedText, TextDataFormat.UnicodeText);
                 if (Mode == DeleteMode.kCopy)
                 {
-                    m_bookmark_AfterDelete = new OWBookmark(Window.Selection);
+                    m_bookmark_AfterDelete = Window.CreateBookmark();
                     return true;
                 }
             }
@@ -1008,7 +1007,7 @@ namespace OurWord.Edit
             Window.Selection = op.NormalizeSelection(selection);
 
             // Save a bookmark for the result of the deletion
-            m_bookmark_AfterDelete = new OWBookmark(Window.Selection);
+            m_bookmark_AfterDelete = Window.CreateBookmark();
 
             // Successful
             return true;
@@ -1179,7 +1178,7 @@ namespace OurWord.Edit
                 return false;
 
             // Save a bookmark for where we are prior to the insertion
-            m_bookmark_BeforeInsert = new OWBookmark(Window.Selection);
+            m_bookmark_BeforeInsert = Window.CreateBookmark();
 
             // If we have an InsertionIcon, replace it with a space, so that the normal
             // mechanism can deal with it (deleting the space, then doing the insertion.)
@@ -1267,7 +1266,7 @@ namespace OurWord.Edit
 
             // Save a bookmark for the result of the deletion
         done:
-            m_bookmark_AfterInsert = new OWBookmark(Window.Selection);
+            m_bookmark_AfterInsert = Window.CreateBookmark();
             return true;
         }
         #endregion
@@ -1526,11 +1525,11 @@ namespace OurWord.Edit
             // We Need to copy the "Before" state, because the Insert process will
             // do something mid-process (after the AutoReplace); and we really need the
             // start Going In.
-            OWBookmark bm = new OWBookmark(Window.Selection);
+            OWBookmark bm = Window.CreateBookmark();
 
             // Get the AutoReplace text
             TextToInsert = ProcessAutoReplace();
-            m_bookmark_AutoReplace = new OWBookmark(Window.Selection);
+            m_bookmark_AutoReplace = Window.CreateBookmark();
 
             // If it returned nothing, then we just want to insert the key that was pressed
             if (string.IsNullOrEmpty(TextToInsert))
@@ -1746,7 +1745,7 @@ namespace OurWord.Edit
                 return false;
 
             // Save a bookmark for where we are prior to the italics
-            m_bookmark_Italics = new OWBookmark(Window.Selection);
+            m_bookmark_Italics = Window.CreateBookmark();
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
             DBasicText DBT = Window.Selection.DBT;
@@ -1899,7 +1898,7 @@ namespace OurWord.Edit
 
             // Bookmark the "Before" selection so we can Undo back to it
             OWWindow.Sel selection = Window.Selection;
-            m_bookmark_BeforeInsert = new OWBookmark(selection);
+            m_bookmark_BeforeInsert = Window.CreateBookmark();
 
             // If we have a selection, then move to the end of it. We'll be placing the new
             // footnote at the end of this selection
@@ -1934,7 +1933,7 @@ namespace OurWord.Edit
             container.Select_FirstWord();
 
             // Remember where we are so we can undo
-            m_bookmark_AfterInsert = new OWBookmark(Window.Selection);
+            m_bookmark_AfterInsert = Window.CreateBookmark();
 
             return true;
         }
@@ -1947,7 +1946,7 @@ namespace OurWord.Edit
 
             // Bookmark the "Before" selection so we can Undo back to it
             OWWindow.Sel selection = Window.Selection;
-            m_bookmark_BeforeDelete = new OWBookmark(selection);
+            m_bookmark_BeforeDelete = Window.CreateBookmark();
 
             // Retrieve the current footnote
             DFootnote footnote = selection.DBT.Paragraph as DFootnote;
@@ -1957,7 +1956,7 @@ namespace OurWord.Edit
             // Prepare for possible future Undo
             // Move the cursor to its place in the text; make a note of the selection
             Window.Contents.OnSelectAndScrollFrom(footnote);
-            m_bookmark_PositionOfFootnoteLetter = new OWBookmark(Window.Selection);
+            m_bookmark_PositionOfFootnoteLetter = Window.CreateBookmark();
             // Make a copy of the footnote
             m_CopyOfDeletedFootnote = new DFootnote(footnote);
             m_CopyOfDeletedFootnote.CopyFrom(footnote, false);
@@ -1996,7 +1995,7 @@ namespace OurWord.Edit
             Window.Focus();
 
             // Remember where we are so we can undo
-            m_bookmark_AfterDelete = new OWBookmark(Window.Selection);
+            m_bookmark_AfterDelete = Window.CreateBookmark();
 
             return true;
         }

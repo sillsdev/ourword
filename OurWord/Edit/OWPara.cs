@@ -388,7 +388,7 @@ namespace OurWord.Edit
                             return false;
 
                         // Remember our current selection
-                        OWBookmark bm = new OWBookmark(Window.Selection);
+                        OWBookmark bm = Window.CreateBookmark();
 
                         // Attempt to select the footnote
                         EContainer container = Window.Contents.FindContainerOfDataSource(Footnote);

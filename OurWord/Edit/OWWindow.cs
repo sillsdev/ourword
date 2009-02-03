@@ -428,6 +428,7 @@ namespace OurWord.Edit
         #endregion
 
         // Save/Restore Editing State --------------------------------------------------------
+        /***
         #region CLASS: EditState
         public class EditState
         {
@@ -504,6 +505,13 @@ namespace OurWord.Edit
             es.Restore();
         }
         #endregion
+        ***/
+
+        public virtual OWBookmark CreateBookmark()
+        {
+            return new OWBookmark(this);
+        }
+
 
         // Layout & Paint --------------------------------------------------------------------
         #region CLASS: DrawBuffer
