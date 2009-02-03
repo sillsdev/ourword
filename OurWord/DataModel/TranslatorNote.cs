@@ -914,6 +914,36 @@ namespace OurWord.DataModel
         }
         static Color s_UneditableColor = Color.Empty;
         #endregion
+        #region Attr{g/s}: bool ShowAssignedTo
+        static public bool ShowAssignedTo
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sRegistrySubkey,
+                        "ShowAssignedTo", false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "ShowAssignedTo", value);
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool ShowCategories
+        static public bool ShowCategories
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sRegistrySubkey,
+                        "ShowCategories", false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "ShowCategories", value);
+            }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -1493,7 +1523,7 @@ namespace OurWord.DataModel
         }
         #endregion
 
-        #region Method: BuildAddButton(ToolStrip)
+        #region Method: void BuildAddButton(ToolStrip)
         void BuildAddButton(ToolStrip ts)
         {
             // Is this note editable?
@@ -1517,6 +1547,10 @@ namespace OurWord.DataModel
         #region Method: void BuildCategoryControl(ToolStrip)
         void BuildCategoryControl(ToolStrip ts)
         {
+            // If this is turned off, don't show anything
+            if (!ShowCategories)
+                return;
+
             // Determine if the category is changeable by this user
             // Default to "yes"
             bool bCategoryIsChangeable = true;
@@ -1557,6 +1591,10 @@ namespace OurWord.DataModel
         #region Method: void BuildAssignedToControl(ToolStrip)
         void BuildAssignedToControl(ToolStrip ts)
         {
+            // If this is turned off, don't show anything
+            if (!ShowAssignedTo)
+                return;
+
             // If this is a Front Translation note, we don't want to show anything.
             if (!IsOwnedInTargetTranslation)
                 return;
@@ -1602,6 +1640,13 @@ namespace OurWord.DataModel
             // Add the AssignedTo Control
             BuildAssignedToControl(ts);
 
+            // If we didn't add anything, then dispose of it
+            if (ts.Items.Count == 0)
+            {
+                ts.Dispose();
+                return null;
+            }
+
             return toolstrip;
         }
         #endregion
@@ -1635,11 +1680,14 @@ namespace OurWord.DataModel
             foreach (Discussion disc in Discussions)
                 eHeader.Append(disc.BuildNotesPaneView());
 
-            // Add the Category and AssignedTo
+            // Add the Category and AssignedTo, if turned on
             if (IsOwnedInTargetTranslation)
             {
                 EToolStrip ts = BuildToolStrip(wnd);
-                eHeader.Append(ts);
+
+                // We only add this if it turned out that there is something actually in it
+                if (null != ts)
+                    eHeader.Append(ts);
             }
 
             return eHeader;

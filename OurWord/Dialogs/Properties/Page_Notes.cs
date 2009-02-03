@@ -102,8 +102,18 @@ namespace OurWord.Dialogs
                 case c_sCategories:
                     e.Value = TranslatorNote.Categories.CommaDelimitedString;
                     break;
+                case c_sShowCategories:
+                    YesNoPropertySpec ShowCategoriesPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ShowCategoriesPS);
+                    e.Value = ShowCategoriesPS.GetBoolString(TranslatorNote.ShowCategories);
+                    break;
                 case c_sPeople:
                     e.Value = TranslatorNote.People.CommaDelimitedString;
+                    break;
+                case c_sShowAssignedTo:
+                    YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ShowAssignedToPS);
+                    e.Value = ShowAssignedToPS.GetBoolString(TranslatorNote.ShowAssignedTo);
                     break;
             }
         }
@@ -133,8 +143,18 @@ namespace OurWord.Dialogs
                 case c_sCategories:
                     TranslatorNote.Categories.CommaDelimitedString = (string)e.Value;
                     break;
+                case c_sShowCategories:
+                    YesNoPropertySpec ShowCategoriesPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ShowCategoriesPS);
+                    TranslatorNote.ShowCategories = ShowCategoriesPS.IsTrue(e.Value);
+                    break;
                 case c_sPeople:
                     TranslatorNote.People.CommaDelimitedString = (string)e.Value;
+                    break;
+                case c_sShowAssignedTo:
+                    YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != ShowAssignedToPS);
+                    TranslatorNote.ShowAssignedTo = ShowAssignedToPS.IsTrue(e.Value);
                     break;
             }
         }
@@ -176,6 +196,7 @@ namespace OurWord.Dialogs
             #endregion
 
             // Categories & People
+            #region Categories & People
             Bag.Properties.Add(new PropertySpec(
                 c_sCategories,
                 "Categories of Notes",
@@ -187,6 +208,14 @@ namespace OurWord.Dialogs
                 "",
                 "",
                 null
+                ));
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sShowCategories,
+                "Show Categories combobox?",
+                c_sGroupClassifications,
+                "If Yes, you will have the ability to classify a note according to its " +
+                    "category, and to then turn the display of categorized notes on and off.",
+                false
                 ));
 
             Bag.Properties.Add(new PropertySpec(
@@ -201,6 +230,15 @@ namespace OurWord.Dialogs
                 "",
                 null
                 ));
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sShowAssignedTo,
+                "Show Assigned To combobox?",
+                c_sGroupClassifications,
+                "If Yes, you will have the ability to assign a note to a person's attention; " +
+                    "and to then turn off the display of any notes that are not assigned to you.",
+                false
+                ));
+            #endregion
 
             // Misc
             #region Misc

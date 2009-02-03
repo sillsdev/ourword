@@ -212,45 +212,50 @@ namespace OurWord.Edit
             m_Show.DropDownItems.Clear();
 
             // Add the categories
-            foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
+            if (TranslatorNote.ShowCategories)
             {
-                ToolStripMenuItem item = cat.CreateMenuItem(
-                    new EventHandler(cmdToggleClassificationChecked));
-
-                m_Show.DropDownItems.Add(item);
-            }
-
-            // Add a menu item to show all of the categories
-            string sShowAllCategories = G.GetLoc_Notes("ShowAllCategories", "Show All Categories");
-            ToolStripMenuItem itemAll = new ToolStripMenuItem(sShowAllCategories);
-            itemAll.Click += new System.EventHandler(cmdTurnOnAllClassifications);
-            m_Show.DropDownItems.Add(itemAll);
-
-            // Categories from the Front Translation
-            if (TranslatorNote.FrontCategories.Count > 0)
-            {
-                // Add a separator
-                if (m_Show.DropDownItems.Count > 0)
-                    m_Show.DropDownItems.Add(new ToolStripSeparator());
-
-                // Add a menu item for the Front Translation notes we want to see
-                string sFrontCategories = G.GetLoc_NoteDefs("FrontCategories", "Notes From Front Translation");
-                ToolStripMenuItem itemFromFront = new ToolStripMenuItem(sFrontCategories);
-                m_Show.DropDownItems.Add(itemFromFront);
-
-                // Add the Front Translation Categories to this submenu
-                foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.FrontCategories)
+                foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
                 {
                     ToolStripMenuItem item = cat.CreateMenuItem(
                         new EventHandler(cmdToggleClassificationChecked));
 
-                    itemFromFront.DropDownItems.Add(item);
+                    m_Show.DropDownItems.Add(item);
+                }
+
+                // Add a menu item to show all of the categories
+                string sShowAllCategories = G.GetLoc_Notes("ShowAllCategories", "Show All Categories");
+                ToolStripMenuItem itemAll = new ToolStripMenuItem(sShowAllCategories);
+                itemAll.Click += new System.EventHandler(cmdTurnOnAllClassifications);
+                m_Show.DropDownItems.Add(itemAll);
+
+                // Categories from the Front Translation
+                if (TranslatorNote.FrontCategories.Count > 0)
+                {
+                    // Add a separator
+                    if (m_Show.DropDownItems.Count > 0)
+                        m_Show.DropDownItems.Add(new ToolStripSeparator());
+
+                    // Add a menu item for the Front Translation notes we want to see
+                    string sFrontCategories = G.GetLoc_NoteDefs("FrontCategories", "Notes From Front Translation");
+                    ToolStripMenuItem itemFromFront = new ToolStripMenuItem(sFrontCategories);
+                    m_Show.DropDownItems.Add(itemFromFront);
+
+                    // Add the Front Translation Categories to this submenu
+                    foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.FrontCategories)
+                    {
+                        ToolStripMenuItem item = cat.CreateMenuItem(
+                            new EventHandler(cmdToggleClassificationChecked));
+
+                        itemFromFront.DropDownItems.Add(item);
+                    }
                 }
             }
 
             // "Assigned To" choice
             AddAssignedTo();
 
+            // If nothing was added, then we don't show this in the notes pane
+            m_Show.Visible = (m_Show.DropDownItems.Count > 0);
         }
         #endregion
         #region Cmd: cmdTurnOnAllClassifications
@@ -323,6 +328,9 @@ namespace OurWord.Edit
         #region Method: void AddAssignedTo()
         void AddAssignedTo()
         {
+            if (!TranslatorNote.ShowAssignedTo)
+                return;
+
             // Add a separator
             if (m_Show.DropDownItems.Count > 0)
                 m_Show.DropDownItems.Add(new ToolStripSeparator());
