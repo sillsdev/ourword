@@ -111,6 +111,16 @@ namespace OurWord
                 LocDB.MessageTypes.YN);
         }
         #endregion
+        #region YN:        bool ConfirmDiscussionDeletion(sNoteText)
+        static public bool ConfirmDiscussionDeletion(string sNoteText)
+        {
+            return LocDB.Message(
+                "msgConfirmDiscussionDeletion",
+                "Are you sure you want to delete the discussion item:\n  {0}?",
+                new string[] { sNoteText },
+                LocDB.MessageTypes.YN);
+        }
+        #endregion
         #region YN:        bool ConfirmTargetReplace(sPathname)
         static public bool ConfirmTargetReplace(string sPathname)
         {

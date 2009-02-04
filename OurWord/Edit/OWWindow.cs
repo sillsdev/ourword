@@ -1268,7 +1268,7 @@ namespace OurWord.Edit
                 }
             }
             #endregion
-            #region VAttr{g} List<EContainer> ContainerStack
+            #region VAttr{g}: List<EContainer> ContainerStack
             public List<EContainer> ContainerStack
             {
                 get

@@ -440,6 +440,11 @@ namespace OurWord.Edit
         {
         }
         #endregion
+        #region VMethod: void UndoFinishing()
+        protected virtual void UndoFinishing()
+        {
+        }
+        #endregion
 
         // Do, Undo, Redo
         #region OMethod: bool Do()
@@ -471,6 +476,9 @@ namespace OurWord.Edit
 
             // Restore to the original pre-Undo bookmark
             BmBefore.RestoreWindowSelectionAndScrollPosition();
+
+            // Hook for, e.g., changing focus to a different window
+            UndoFinishing();
         }
         #endregion
         #region OMethod: void Redo()
@@ -2200,13 +2208,6 @@ namespace OurWord.Edit
     #endregion
 
     // Translator Notes ----------------------------------------------------------------------
-    // + Append a discussion
-    // + Remove a discussion
-    // - Insert a Note
-    // - Remove a Note in its entirety
-    //
-    // TODO: When notes are collapsed, and we Remove, what happens if there is no place
-    //   to select? 
     #region CLASS: AddDiscussionAction
     public class AddDiscussionAction : BookmarkedAction
     {
@@ -2341,8 +2342,225 @@ namespace OurWord.Edit
         #endregion
     }
     #endregion
+    #region CLASS: InsertNoteAction
+    public class InsertNoteAction : BookmarkedAction
+        #region Doc
+        /* The user will have a selection (and focus) in the main window, and 
+         * when we insert the note, focus goes to the notes window. So on Undo,
+         * we have to restore things in the main window, including moving
+         * focus there. 
+         */
+        #endregion
+    {
+        #region Attr{g/s}: OWBookmark BmMainWnd - keep track of the main window's selection
+        protected OWBookmark BmMainWnd
+        {
+            get
+            {
+                Debug.Assert(null != m_BmMainWnd);
+                return m_BmMainWnd;
+            }
+            set
+            {
+                m_BmMainWnd = value;
+            }
+        }
+        OWBookmark m_BmMainWnd;
+        #endregion
+        #region Attr[g}: TranslatorNote Note - so we know which to delete on an Undo op
+        protected TranslatorNote Note
+        {
+            get
+            {
+                Debug.Assert(null != m_Note);
+                return m_Note;
+            }
+        }
+        TranslatorNote m_Note;
+        #endregion
 
+        #region Constructor(OWWindow)
+        public InsertNoteAction(OWWindow window)
+            : base(window, "Insert Translator Note")
+        {
+        }
+        #endregion
 
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Remember the main window location, as we have to reset the 
+            // scroll position after we regenerate window contents
+            if (G.App.MainWindow.Selection == null)
+                return false;
+            BmMainWnd = G.App.MainWindow.CreateBookmark();
 
+            // Retrieve the DText to which this note will be attached
+            DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
+
+            // Create a blank note and insert it
+            m_Note = new TranslatorNote(
+                text.Section.GetReferenceAt(text).ParseableName,
+                G.App.MainWindow.Selection.SelectionString
+                );
+            Note.Discussions.Append(new Discussion());
+            text.TranslatorNotes.Append(Note);
+
+            // Recalculate the entire display
+            G.App.ResetWindowContents();
+
+            // Return the Main Window to where it was
+            BmMainWnd.RestoreWindowSelectionAndScrollPosition();
+
+            // Return the notes window to its previous collapse/expand states
+            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+
+            // Select the new note and bring the focus to it
+            EContainer container = Window.Contents.FindContainerOfDataSource(
+                Note.LastParagraph);
+            container.Select_LastWord_End();
+            Window.Focus();
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Remove the note from the owning DText
+            DText text = Note.Text;
+            Debug.Assert(null != text);
+            text.TranslatorNotes.Remove(Note);
+
+            // Recalculate the entire display
+            G.App.ResetWindowContents();
+
+            // Focus back to the main window
+            BmMainWnd.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+        #region OMethod: void UndoFinishing()
+        protected override void UndoFinishing()
+        {
+            // Restore focus back to the main window, where it was before the
+            // note was inserted.
+            G.App.MainWindow.Focus();
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: DeleteNoteAction
+    public class DeleteNoteAction : BookmarkedAction
+        #region Doc
+        /* Focus and Selection will be in the Notes window. When we delete the 
+         * note, we need a new selection in the notes window. Thus our behavior
+         * it not like InsertNoteAction, where focus changes windows.
+         */
+        #endregion
+    {
+        // The Note we'll Undo
+        #region Attr[g}: TranslatorNote Note - We keep it so we can restore on Undo
+        protected TranslatorNote Note
+        {
+            get
+            {
+                Debug.Assert(null != m_Note);
+                return m_Note;
+            }
+        }
+        TranslatorNote m_Note;
+        #endregion
+
+        // Where the re-inserted note will be placed
+        #region Attr{g}: JObject Root
+        JObject Root
+        {
+            get
+            {
+                Debug.Assert(null != m_Root);
+                return m_Root;
+            }
+        }
+        JObject m_Root;
+        #endregion
+        #region Attr{g}: string PathToDBTFromRoot
+        string PathToDBTFromRoot
+        {
+            get
+            {
+                return m_sPathToDBTFromRoot;
+            }
+        }
+        string m_sPathToDBTFromRoot;
+        #endregion
+        #region Attr{g/s}: int NotePos - of Note within the DText's attr
+        int NotePos
+        {
+            get
+            {
+                return m_iNotePos;
+            }
+            set
+            {
+                m_iNotePos = value;
+            }
+        }
+        int m_iNotePos;
+        #endregion
+
+        #region Constructor(OWWindow)
+        public DeleteNoteAction(OWWindow window, TranslatorNote note)
+            : base(window, "Delete Translator Note")
+        {
+            Debug.Assert(null != note);
+            m_Note = note;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Get the owning DText
+            DText text = Note.Text;
+            Debug.Assert(null != text);
+
+            // Save the path to it, so we can recover it on an undo. (We can't just
+            // store the DText, because subsequent actions could have destroyed it.)
+            m_Root = Note.RootOwner;
+            m_sPathToDBTFromRoot = text.GetPathFromRoot();
+            NotePos = text.TranslatorNotes.FindObj(Note);
+            Debug.Assert(-1 != NotePos);
+
+            // Remove the note from its owning DText
+            text.TranslatorNotes.Remove(Note);
+
+            // Regenerate all of the windows
+            G.App.ResetWindowContents();
+
+            // Return the notes window to its previous collapse/expand states
+            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Get the DText we want to insert to
+            DText text = Root.GetObjectFromPath(PathToDBTFromRoot) as DText;
+            Debug.Assert(null != text);
+
+            // Re-insert the note
+            text.TranslatorNotes.InsertAt(NotePos, Note);
+
+            // Recalculate the entire display
+            G.App.ResetWindowContents();
+
+            // Return the notes window to its previous collapse/expand states
+            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+        }
+        #endregion
+    }
+    #endregion
 
 }

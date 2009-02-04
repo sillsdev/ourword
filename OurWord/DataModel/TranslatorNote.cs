@@ -1475,23 +1475,6 @@ namespace OurWord.DataModel
         {
             NotesWnd wnd = G.App.SideWindows.NotesPane.WndNotes;
             (new AddDiscussionAction(wnd, this)).Do();
-
-            /***
-            // Add a new Discussion object
-            Discussion d = new Discussion();
-            Discussions.Append(d);
-
-            // Recalculate the display
-            G.App.ResetWindowContents();
-
-            // Select the new discussion
-            NotesWnd w = G.App.SideWindows.NotesPane.WndNotes;
-            EContainer container = w.Contents.FindContainerOfDataSource(LastParagraph);
-            container.Select_LastWord_End();
-            w.Focus();
-
-            Debug_VerifyIntegrity();
-            ***/
         }
         #endregion
 

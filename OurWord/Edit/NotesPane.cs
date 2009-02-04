@@ -94,34 +94,7 @@ namespace OurWord.Edit
             if (!canInsertNote)
                 return;
 
-            // Retrieve the DText to which this note will be attached
-            if (G.App.MainWindow.Selection == null)
-                return;
-            DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
-
-            // Remember the location, as we have to reset the scroll position 
-            // after we regenerate window contents
-            OWBookmark MainWndBookmark = G.App.MainWindow.CreateBookmark();
-
-            // Create a blank note and insert it
-            TranslatorNote note = new TranslatorNote(
-                text.Section.GetReferenceAt(text).ParseableName,
-                G.App.MainWindow.Selection.SelectionString
-                );
-            note.Discussions.Append(new Discussion());
-            text.TranslatorNotes.Append(note);
-
-            // Recalculate the display
-            G.App.ResetWindowContents();
-
-            // Return the Main Window to where it was
-            MainWndBookmark.RestoreWindowSelectionAndScrollPosition();
-
-            // Select the new note and bring the focus to it
-            EContainer container = WndNotes.Contents.FindContainerOfDataSource(
-                note.LastParagraph);
-            container.Select_LastWord_End();
-            WndNotes.Focus();
+            (new InsertNoteAction(WndNotes)).Do();
         }
         #endregion
 
@@ -166,7 +139,7 @@ namespace OurWord.Edit
                 string sRemoveDiscussionMsg = tn.LastDiscussion.Paragraphs[0].AsString;
                 if (sRemoveDiscussionMsg.Length > 40)
                     sRemoveDiscussionMsg = sRemoveDiscussionMsg.Substring(0, 40) + "...";
-                if (false == Messages.ConfirmNoteDeletion("\n\n\"" + sRemoveDiscussionMsg + "\""))
+                if (false == Messages.ConfirmDiscussionDeletion("\n\n\"" + sRemoveDiscussionMsg + "\""))
                     return;
 
                 // Remove it
@@ -182,14 +155,8 @@ namespace OurWord.Edit
             if (false == Messages.ConfirmNoteDeletion(sMsgAddition))
                 return;
 
-            // Remove the note from the paragraph (we delete it from the
-            // owning DText)
-            DText text = tn.Text;
-            Debug.Assert(null != text);
-            text.TranslatorNotes.Remove(tn);
-
-            // Regenerate the windows
-            G.App.ResetWindowContents();
+            // Remove it
+            (new DeleteNoteAction(WndNotes, tn)).Do();
         }
         #endregion
         #region Cmd: cmdLoad - Localize the toolstrip
