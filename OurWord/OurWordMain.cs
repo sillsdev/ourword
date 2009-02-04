@@ -793,12 +793,6 @@ namespace OurWord
             m_btnEditCut.Visible = !bEditMenuVisible;
             m_btnEditPaste.Visible = !bEditMenuVisible;
 
-            // Notes
-            // TODO: It is possible that the Got/Lost Focus handler in NotesPane makes this
-            // not necessary.
-            if (SideWindows.HasNotesWindow)
-                SideWindows.NotesPane.SetControlsVisibility();
-
             // Clear dropdown subitems so we don't attempt to localize them
             m_Config.RemoveMRUItems(m_btnProject);
             m_btnGotoPreviousSection.DropDownItems.Clear();
@@ -2032,15 +2026,6 @@ namespace OurWord
                 }
             }
             #endregion
-            #region Attr{g}: bool F_CanDeleteNote
-            public bool F_CanDeleteNote
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fCanDeleteNotes.ToString());
-                }
-            }
-            #endregion
             #region Attr{g}: bool F_UndoRedo
             public bool F_UndoRedo
             {
@@ -2144,7 +2129,6 @@ namespace OurWord
                 fJustTheBasics,
                 fStructuralEditing,
                 fUndoRedo,
-                fCanDeleteNotes,
                 fLocalizer,
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
@@ -2234,14 +2218,6 @@ namespace OurWord
                     "Undo",
                     "Enables the Undo and Redo menus, by which you can undo actions such as " +
                         "typing, deleting, splitting and joining paragraphs, etc.");
-
-                m_Dlg.Add(ID.fCanDeleteNotes.ToString(),
-                    true,
-                    true,
-                    c_sNodeEditing,
-                    "Can Delete Notes?",
-                    "Permits the user to delete notes. You can turn this off if you have valuable " +
-                        "notes that you are concerned that a user might inadvertantly delete.");
                 #endregion
                 #region TOOLS FEATURES
                 m_Dlg.Add(ID.fRestoreBackup.ToString(),    

@@ -172,12 +172,6 @@ namespace OurWord.Edit
         #endregion
 
         // Visibility and Enabling -----------------------------------------------------------
-        #region Method: void SetControlsVisibility()
-        public void SetControlsVisibility()
-        {
-            m_btnDeleteNote.Visible = OurWordMain.Features.F_CanDeleteNote;
-        }
-        #endregion
         #region Method: void SetControlsEnabling()
         public void SetControlsEnabling()
             // The idea is that we insert notes when we are in the main window, but
