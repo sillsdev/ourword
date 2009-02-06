@@ -162,10 +162,18 @@ namespace JWTools
 		{
 			CheckValidRootKey();
 			RegistryKey key = OpenRegistryKey(sSubKey);
-			string sValue = key.GetValue(sName, sDefaultValue).ToString();
-			if (sValue == sDefaultValue)
-				SetValue(sSubKey, sName, sValue);
-			key.Close();
+			string sValue = sDefaultValue;
+			if (key != null)
+			{
+				sValue = (string)key.GetValue(sName, sDefaultValue);
+				if (sValue == sDefaultValue)
+					SetValue(sSubKey, sName, sDefaultValue);
+				key.Close();
+			}
+			else
+			{
+				SetValue(sSubKey, sName, sDefaultValue);
+			}
 			return sValue;
 		}
 		#endregion
