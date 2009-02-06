@@ -282,7 +282,7 @@ namespace JWdb
                 if (OnLoad(ref sPathName))
                     m_bIsLoaded = true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 m_bIsLoaded = false;  // Should still be false, but make certain
                 return;

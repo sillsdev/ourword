@@ -45,7 +45,7 @@ namespace OurWordTests.DataModel
     [TestFixture] public class T_DTranslatorNote
     {
         // Test Data & Etc
-        #region Setup
+        #region Setup 
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();

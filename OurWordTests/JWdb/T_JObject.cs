@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 5 Nov 2008
  * Purpose: Tests the JObject implementation
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

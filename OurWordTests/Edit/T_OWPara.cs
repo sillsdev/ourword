@@ -1091,5 +1091,103 @@ namespace OurWordTests.Edit
             Assert.AreEqual(0, selection.End.iChar);
         }
         #endregion
+
+
+        #region Method: DParagraph CreateParagraph_LongHuicholWords()
+        private DParagraph CreateParagraph_LongHuicholWords()
+        {
+            // Create a paragraph
+            DParagraph p = new DParagraph();
+            p.StyleAbbrev = "p";
+
+            // Add various runs
+            p.AddRun(DVerse.Create("16"));
+
+            m_DBT1 = new DText();
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
+                "Mepücatemaicai memüteyurieniquecai. "));
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, 
+                "yuxexuitü "));
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
+                "ivaviyacaitüni tineunaque quetatineutaxatüa."));
+            p.AddRun(m_DBT1);
+
+            p.AddRun(DVerse.Create("17"));
+
+            m_DBT2 = new DText();
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "Haqueva pepeyetüa? "));
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic,
+                "Quenanucuqueca! 'Acacaüyari queneutahivi! "));
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "Mücü canicacaüyaritüni."));
+            p.AddRun(m_DBT2);
+
+            m_section.Paragraphs.Append(p);
+
+            return p;
+        }
+        #endregion
+        [Test] public void ProposeNextLayoutChunk()
+        {
+            // Zero out stuff, we're starting over
+            Wnd.Clear();
+            m_section.Paragraphs.Clear();
+
+            // Create a paragraph with big Huchol words.
+            Wnd.StartNewRow();
+            m_p = CreateParagraph_LongHuicholWords();
+            m_op = new OWPara(
+                WSVernacular,
+                m_p.Style,
+                m_p,
+                Color.Wheat,
+                OWPara.Flags.IsEditable);
+            Wnd.AddParagraph(0, m_op);
+
+            // By nature of LoadData, all the EBlocks will have been measured
+            Wnd.LoadData();
+
+            // Add the widths of the first two EBlocks
+            float fAvailWidth = 0;
+            for (int i = 0; i < 2; i++)
+                fAvailWidth += m_op.SubItems[i].Width;
+
+            // TEST 1 - SHOULD JUST FIT
+            // Request chunking from the paragraph
+            OWPara.ProposeNextLayoutChunk chunk = new OWPara.ProposeNextLayoutChunk(
+                Wnd.Draw.Graphics, m_op, fAvailWidth, 0);
+
+            // Check the two and three words
+            EWord wL = m_op.SubItems[1] as EWord;
+            EWord wR = m_op.SubItems[2] as EWord;
+
+            Assert.IsFalse(wL.Hyphenated, "1-First word should not be hyphenated");
+            Assert.IsFalse(wR.Hyphenated, "1-Second word should not be hyphenated");
+
+            Assert.AreEqual("Mepücatemaicai ", wL.Text);
+            Assert.AreEqual("memüteyurieniquecai. ", wR.Text);
+
+
+            // TEST 2 - DOESNT' FIT
+            // Subtract a bit to make it too small
+            fAvailWidth -= 20;
+
+            // Request chunking from the paragraph
+            chunk = new OWPara.ProposeNextLayoutChunk(
+                Wnd.Draw.Graphics, m_op, fAvailWidth, 0);
+
+            // Check the two and three words
+            wL = m_op.SubItems[1] as EWord;
+            wR = m_op.SubItems[2] as EWord;
+
+            Assert.IsTrue(wL.Hyphenated, "2-First word should be hyphenated");
+            Assert.IsFalse(wR.Hyphenated, "2-Second word should not be hyphenated");
+
+            Assert.AreEqual("Mepücate", wL.Text);
+            Assert.AreEqual("maicai ", wR.Text);
+        }
+
+
     }
 }

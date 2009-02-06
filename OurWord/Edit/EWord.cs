@@ -136,7 +136,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(sText)
+        #region Constructor(JFontForWritingSystem, sText)
         public EBlock(JFontForWritingSystem _FontForWS, string _sText)
             : base()
         {
@@ -162,7 +162,7 @@ namespace OurWord.Edit
 
         // Painting ----------------------------------------------------------------------
         #region Attr{g}: JFontForWritingSystem FontForWS - remember it here for performance
-        protected JFontForWritingSystem FontForWS
+        public JFontForWritingSystem FontForWS
         {
             get
             {
@@ -284,6 +284,19 @@ namespace OurWord.Edit
         FontStyle m_FontMods;
         #endregion
 
+        public bool Hyphenated
+        {
+            get
+            {
+                return m_Hyphenated;
+            }
+            set
+            {
+                m_Hyphenated = value;
+            }
+        }
+        bool m_Hyphenated = false;
+
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(...)
         public EWord( 
@@ -300,6 +313,15 @@ namespace OurWord.Edit
             m_FontMods = _FontMods;
         }
         #endregion
+        public EWord Clone()
+        {
+            EWord word = new EWord(
+                FontForWS,
+                Phrase,
+                Text, 
+                FontMods);
+            return word;
+        }
         #region static EWord CreateAsInsertionIcon(OWPara, JCharacterStyle, DPhrase)
         static public EWord CreateAsInsertionIcon(
             JFontForWritingSystem _FontForWS,
@@ -646,9 +668,18 @@ namespace OurWord.Edit
         override public void CalculateWidth(Graphics g)
         {
             if (IsInsertionIcon)
+            {
                 Width = Draw.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);
+            }
+            else if (Hyphenated)
+            {
+                Width = Draw.Measure(Text, Font);
+                Width += Draw.Measure("-", Font);
+            }
             else
+            {
                 base.CalculateWidth(g);
+            }
         }
         #endregion
     }

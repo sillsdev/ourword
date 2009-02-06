@@ -1510,6 +1510,43 @@ namespace JWdb
         }
         #endregion
 
+        public bool IsHyphenBreak(string s, int iPos)
+            /* OK, this is quick-and-dirty, to see if I can get a simple hyphenation
+             * support working. I will need to do more than this. But this implementation
+             * will be that I can hyphen if:
+             * - I'm four letters from either end of a word
+             * - I'm located at a consonant
+             * - The preveeding letter is not a consonant
+             * 
+             * E.g., this is a CV-CV type of rule.
+             * 
+             * I'm going to need to install that ICU stuff (sigh) to do this right.
+             * Pity the poor user that must download it.
+             * 
+             * Or maybe I can do something where users can enter rules for simple
+             * stuff. Joe tells me that Huichol hyphens after CV's. So saying CV-
+             * plus enumerating the consonants is sufficient for Huichol.
+             */
+        {
+            string sConsonants = "'bcdfghjklmnpqrstvwxzy";
+
+            // 1 - Don't be too close to an end of a word
+            if (iPos < 4)
+                return false;
+            if (iPos > s.Length - 4)
+                return false;
+
+            // 2. Sitting on a consonant
+            if (sConsonants.IndexOf( char.ToLower(s[iPos]) ) == -1)
+                return false;
+
+            // 3. Sitting after a vowell
+            if (sConsonants.IndexOf( char.ToLower(s[iPos-1])) != -1)
+                return false;
+
+            return true;
+        }
+
         // I/O -------------------------------------------------------------------------------
         #region OMethod: void FromXml(XElement x)
         public override void FromXml(XElement x)

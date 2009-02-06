@@ -294,7 +294,7 @@ namespace OurWord.Edit
             BorderStyle = BorderStyle.Fixed3D;
 
             // Vector of secondary windows
-            m_vSecondaryWindows = new OWWindow[0];
+            m_vSecondaryWindows = new OWWindow[0];           
         }
         #endregion
         #region Method: void TypingErrorBeep()

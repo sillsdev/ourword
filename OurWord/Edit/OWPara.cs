@@ -558,10 +558,16 @@ namespace OurWord.Edit
             #endregion
 
             #region Constructor(TranslatorNote)
-            public ENote(JFontForWritingSystem f, TranslatorNote _Note)
-                : base(f, "")
+            public ENote(TranslatorNote _Note)
+                : base(null, "")
             {
                 m_Note = _Note;
+            }
+            #endregion
+            #region OMethod: void CalculateWidth(Graphics g)
+            public override void CalculateWidth(Graphics g)
+            {
+                // Do-nothing override
             }
             #endregion
 
@@ -764,6 +770,16 @@ namespace OurWord.Edit
             Append(vWords);
         }
         #endregion
+        #region Method: void InitializeNoteIcons(DText)
+        void InitializeNoteIcons(DText text)
+        {
+            foreach (TranslatorNote tn in text.TranslatorNotes)
+            {
+                if (tn.Show)
+                    Append( new ENote(tn) );
+            }
+        }
+        #endregion
         #region Method: void _InitializeGlueToNext(int iLeft)
         void _InitializeGlueToNext(int iLeft)
         {
@@ -850,6 +866,7 @@ namespace OurWord.Edit
                         break;
                     case "DText":
                         _InitializeBasicTextWords(r as DBasicText, null);
+                        InitializeNoteIcons(r as DText);
                         break;
                     default:
                         Console.WriteLine("Unknown type in OWPara.Initialize...Name=" + 
@@ -866,25 +883,6 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region VAttr{g}: bool HideNotesIcons - Surpress Notes, even if they'd otherwise appear
-        public bool HideNotesIcons
-            // In the Back Translation Job, we need to make sure that we see the Notes icons
-            // only on the right-hand side; the side that is editable. By basing the 
-            // decision on "IsEditable", we get the job done.
-            //
-            // Otherwise, we could always pass in a parameter to "AddParagraph" and deal
-            // with it as we create the paragraphs. But I think that this strategy should
-            // be adequate.
-        {
-            get
-            {
-                if (!IsEditable)
-                    return true;
-                return false;
-            }
-        }
-        #endregion
-
         #region Attr{g}: JWritingSystem WritingSystem
         public JWritingSystem WritingSystem
         {
@@ -1408,6 +1406,275 @@ namespace OurWord.Edit
             return -1;
         }
         #endregion
+
+        public class ProposeNextLayoutChunk
+        {
+            // Attrs: Input params
+            #region Attr{g}: int iStartItem
+            int iStartItem
+            {
+                get
+                {
+                    return c_iStartItem;
+                }
+            }
+            int c_iStartItem;
+            #endregion
+            #region Attr{g}: OWPara Para
+            OWPara Para
+            {
+                get
+                {
+                    Debug.Assert(null != m_Para);
+                    return m_Para;
+                }
+            }
+            OWPara m_Para;
+            #endregion
+            #region Attr{g/s}: float AvailableWidth
+            float AvailableWidth
+            {
+                get
+                {
+                    Debug.Assert(-1 != m_fAvailableWidth);
+                    return m_fAvailableWidth;
+                }
+            }
+            float m_fAvailableWidth = -1;
+            #endregion
+            #region Attr{g}: Graphics G
+            Graphics G
+            {
+                get
+                {
+                    Debug.Assert(null != m_g);
+                    return m_g;
+                }
+            }
+            Graphics m_g;
+            #endregion
+
+            // Attrs: The Answer
+            #region Attr{g/s}: int ChunkSize
+            public int ChunkSize
+            {
+                get
+                {
+                    Debug.Assert(-1 != m_cChunkSize);
+                    return m_cChunkSize;
+                }
+                set
+                {
+                    m_cChunkSize = value;
+                }
+            }
+            int m_cChunkSize = -1;
+            #endregion
+            #region Attr{g/s}: float ChunkWidth
+            float ChunkWidth
+            {
+                get
+                {
+                    Debug.Assert(-1 != m_fChunkWidth);
+                    return m_fChunkWidth;
+                }
+                set
+                {
+                    m_fChunkWidth = value;
+                }
+            }
+            float m_fChunkWidth = -1;
+            #endregion
+            #region Attr{g}: bool TooLarge
+            public bool TooLarge
+            {
+                get
+                {
+                    return m_bTooLarge;
+                }
+            }
+            bool m_bTooLarge;
+            #endregion
+
+            // Helper Methods
+            #region Method: void CalculateChunkContents()
+            void CalculateChunkContents()
+            {
+                ChunkSize = 0;
+                ChunkWidth = 0;
+
+                for (int i = iStartItem; i < Para.SubItems.Length; i++)
+                {
+                    // Get the next block: could be a verse, footnote letter, etc.
+                    EBlock block = Para.SubItems[i] as EBlock;
+
+                    // Keep track of our chunk width and size thus far
+                    ChunkWidth += block.Width;
+                    ChunkSize++;
+
+                    // If we aren't glued to next, then we've identified our chunk size
+                    if (!block.GlueToNext)
+                        break;
+                }
+            }
+            #endregion
+            #region VAttr{g}: bool ChunkFitsWithinWidth
+            bool ChunkFitsWithinWidth
+            {
+                get
+                {
+                    if (ChunkWidth <= AvailableWidth)
+                        return true;
+                    return false;
+                }
+            }
+            #endregion
+            #region VAttr{g}: EWord HyphenedWord
+            EWord HyphenedWord
+            {
+                get
+                {
+                    for (int i = iStartItem; i < iStartItem + ChunkSize; i++)
+                    {
+                        if (Para.SubItems[i] as EWord != null)
+                            return Para.SubItems[i] as EWord;
+                    }
+                    Debug.Assert(false, "Each chunk should have an EWord.");
+                    return null;
+                }
+            }
+            #endregion
+
+            // Hyphenation
+            #region Attr{g/s}: int iHyphenPos
+            int iHyphenPos
+            {
+                get
+                {
+                    Debug.Assert(-1 != m_iHyphenPos);
+                    return m_iHyphenPos;
+                }
+                set
+                {
+                    m_iHyphenPos = value;
+                }
+            }
+            int m_iHyphenPos = -1;
+            #endregion
+            #region Attr{g}: string OriginalTextToHyphen
+            string OriginalTextToHyphen
+            {
+                get
+                {
+                    return m_sOriginalWordToHyphen;
+                }
+            }
+            string m_sOriginalWordToHyphen = "";
+            #endregion
+            #region Method: bool CalcNextHyphenPos()
+            bool CalcNextHyphenPos()
+                // Returns false if there are no hyphenation positions
+            {
+                EWord word = HyphenedWord;
+                JWritingSystem ws = word.FontForWS.WritingSystem;
+                string s = word.Text;
+
+                for (iHyphenPos = s.Length - 1; iHyphenPos > 0; iHyphenPos--)
+                {
+                    if (ws.IsHyphenBreak(OriginalTextToHyphen, iHyphenPos))
+                        return true;
+                }
+
+                return false;
+            }
+            #endregion
+            #region Method: void CreateHyphenedWordPair()
+            void CreateHyphenedWordPair()
+                // Creates the hyphened word / overflow word pair, if they do
+                // not already exist
+            {
+                EWord word = HyphenedWord;
+
+                // Already done
+                if (word.Hyphenated == true)
+                    return;
+
+                // Create a new, empty word
+                EWord wordNew = word.Clone();
+                wordNew.Text = "";
+
+                // Insert it after our word
+                int iPos = Para.Find(word);
+                Para.InsertAt(iPos + 1, wordNew);
+
+                // We now have a hyphenated word
+                word.Hyphenated = true;
+            }
+            #endregion
+            #region Method: void MoveTextIntoOverflowWord()
+            void MoveTextIntoOverflowWord()
+            {
+                EWord wordHyphen = HyphenedWord;
+                int iWordOverflow = Para.Find(wordHyphen) + 1;
+                Debug.Assert(iWordOverflow < Para.SubItems.Length);
+                EWord wordOverflow = Para.SubItems[iWordOverflow] as EWord;
+                Debug.Assert(null != wordOverflow);
+
+                wordHyphen.Text = OriginalTextToHyphen.Substring(0, iHyphenPos);
+                wordOverflow.Text = OriginalTextToHyphen.Substring(iHyphenPos);
+
+                // The words now have new lengths
+                wordHyphen.CalculateWidth(G);
+                wordOverflow.CalculateWidth(G);
+
+                // TODO: THE HYPHENED WORD NEEDS TO INCLUDE ROOM FOR THE HYPHEN
+            }
+            #endregion
+
+            // Public Interface
+            #region Constructor(g, para, fAvailableWidth, iStartItem)
+            public ProposeNextLayoutChunk(Graphics g, OWPara para, float fAvailableWidth, int iStartItem)
+            {
+                m_g = g;
+                m_Para = para;
+                m_fAvailableWidth = fAvailableWidth;
+                c_iStartItem = iStartItem;
+
+                while (true)
+                {
+                    CalculateChunkContents();
+
+                    // This chunk fits; its good to place into the line
+                    if (ChunkFitsWithinWidth)
+                    {
+                        m_bTooLarge = false;
+                        return;
+                    }
+
+                    // If our first time through, make a copy of what we'll be hyphenating,
+                    // so we'll have access to its full context
+                    if (string.IsNullOrEmpty(OriginalTextToHyphen))
+                        m_sOriginalWordToHyphen = HyphenedWord.Text;
+
+                    // Calculate the next hyphenation break, if there is one. If there
+                    // isn't, then this chunk will not fit into the line.
+                    if (CalcNextHyphenPos() == false)
+                    {
+                        m_bTooLarge = true;
+                        return;
+                    }
+
+                    // Create a hyphenated word-pair (hyphened word and overflow word) if
+                    // such do not already exist.
+                    CreateHyphenedWordPair();
+
+                    // Move the hyphenated text from left to right
+                    MoveTextIntoOverflowWord();
+                }
+            }
+            #endregion
+        }
+
         #region Method: float Layout_CalcNextChunkWidth(...)
         float Layout_CalcNextChunkWidth(Graphics g, int i, out int cChunkSize)
             // Calculate the width of the next "chunk" that we would add to the line, if
@@ -1416,7 +1683,7 @@ namespace OurWord.Edit
             // Retrieve the first element (the one at "i")
             EBlock block = SubItems[i] as EBlock;
 
-            // Measure the proposed Element
+            // Measure the proposed first element
             float fWidth = block.Width;
 
             // We'll define the chunk as being One element in size
@@ -1522,6 +1789,8 @@ namespace OurWord.Edit
 
             Graphics g = Window.Draw.Graphics;
 
+            // Combine all hyphenated words, we'll figure out shortly if we must re-hyphenate
+
             // Remember the top coordinate
             Position = new PointF(Position.X, y);
 
@@ -1591,9 +1860,12 @@ namespace OurWord.Edit
                 }
 
                 // Measure the next "chunk" we want to add (this may be more than one EBlock
-                // due to glue.)
+                // due to glue, but it will have at most only one DText). If the chunk is too
+                // long, then we break it apart using hyphenation rules.
                 float fWidth = Layout_CalcNextChunkWidth(g, i, out cChunkSize);
                 Debug.Assert(cChunkSize >= 1);
+
+
 
                 // Will the Chunk fit on the line? If not, start a new line
                 if (x + fWidth > xMaxWidth)
