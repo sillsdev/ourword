@@ -1,4 +1,5 @@
-﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
     <ProductVersion>8.0.50727</ProductVersion>
@@ -109,493 +110,277 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Palaso.Services.dll</HintPath>
     </Reference>
-    <Reference Include="PalasoUIWindowsForms, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="PalasoUIWindowsForms, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\PalasoUIWindowsForms.dll</HintPath>
     </Reference>
-    <Reference Include="System">
-      <Name>System</Name>
-    </Reference>
-    <Reference Include="System.Data">
-      <Name>System.Data</Name>
-    </Reference>
-    <Reference Include="System.Design">
-      <Name>System.Design</Name>
-    </Reference>
-    <Reference Include="System.Drawing">
-      <Name>System.Drawing</Name>
-    </Reference>
-    <Reference Include="System.Drawing.Design">
-      <Name>System.Drawing.Design</Name>
-    </Reference>
-    <Reference Include="System.Web">
-      <Name>System.Web</Name>
-    </Reference>
-    <Reference Include="System.Windows.Forms">
-      <Name>System.Windows.Forms</Name>
-    </Reference>
-    <Reference Include="System.Xml">
-      <Name>System.XML</Name>
-    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Drawing.Design" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
     <ProjectReference Include="..\JWdb\JWdb.csproj">
+      <Project>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</Project>
       <Name>JWdb</Name>
-      <Project>{CD66A898-A60C-44F7-8731-EAE0E558C639}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
     <ProjectReference Include="..\JWTools\JWTools.csproj">
-      <Project>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</Project>
+      <Project>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</Project>
       <Name>JWTools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="App.ico" />
-    <Content Include="ChangesHistory.html" />
-    <Content Include="OurWord.ico" />
-    <EmbeddedResource Include="Dialogs\ChapterMenu.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ChapterMenu.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgDebug.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DlgDebug.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgSpecifyEncoding.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Page_Notes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_FrontInfo.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_FrontInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_Introduction.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_Introduction.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_ProjectName.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_ProjectName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_Summary.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_Summary.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_TargetInfo.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_TargetInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_TeamSettings.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dictionary\DictionaryPane.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DictionaryPane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Edit\NotesPane.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>NotesPane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Merge\MergePane.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>MergePane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Res\FileNew.gif" />
-    <EmbeddedResource Include="Res\FileOpen.gif" />
-    <EmbeddedResource Include="Res\DeleteMergeFile.ico" />
-    <None Include="Res\editfind.gif" />
-    <EmbeddedResource Include="Res\Edit.ico" />
-    <EmbeddedResource Include="Res\Blank.ico" />
-    <Content Include="Res\Increment.ico" />
-    <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\DlgProperties.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DlgProperties.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_Options.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Page_Options.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_TeamSettings.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Page_TeamSettings.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <SubType>Designer</SubType>
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Res\JobNaturalness.ico" />
-    <EmbeddedResource Include="Res\JobBT.ico" />
-    <EmbeddedResource Include="Res\JobDrafting.ico" />
-    <None Include="Res\MergeConfigure.bmp" />
-    <None Include="Res\MergePrevDiff.bmp" />
-    <None Include="Res\MergNextDiff.bmp" />
-    <Content Include="Res\NoteEdit.ico" />
-    <Content Include="Res\NoteInsert.ico" />
-    <Content Include="Res\NoteMerge.ico" />
-    <None Include="Res\OurWord.png" />
-    <Content Include="Res\ProgressIndicatorBackground.jpg" />
-    <EmbeddedResource Include="Res\Project.ico" />
-    <EmbeddedResource Include="Res\SectionFirst.ico" />
-    <EmbeddedResource Include="Res\SectionLast.ico" />
-    <EmbeddedResource Include="Res\Properties.ico" />
-    <EmbeddedResource Include="Dialogs\DlgExportBook.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DlgExportBook.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_WritingSystems.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>Page_WritingSystems.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetFileName.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetStage.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetStage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_Summary.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_Summary.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Res\WizImportFile.gif" />
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="DataModel\DBook.cs" />
     <Compile Include="DataModel\DBookGrouping.cs" />
-    <Compile Include="DataModel\DFootnote.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DNote.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DParagraph.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DPicture.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DProject.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DReference.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DRun.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DSection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DTeamSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DTranslation.cs">
-      <SubType>Code</SubType>
-    </Compile>
+    <Compile Include="DataModel\DFootnote.cs" />
+    <Compile Include="DataModel\DNote.cs" />
+    <Compile Include="DataModel\DParagraph.cs" />
+    <Compile Include="DataModel\DPicture.cs" />
+    <Compile Include="DataModel\DProject.cs" />
+    <Compile Include="DataModel\DReference.cs" />
+    <Compile Include="DataModel\DRun.cs" />
+    <Compile Include="DataModel\DSection.cs" />
+    <Compile Include="DataModel\DTeamSettings.cs" />
+    <Compile Include="DataModel\DTranslation.cs" />
     <Compile Include="DataModel\DTranslatorNote.cs" />
     <Compile Include="DataModel\DWordList.cs" />
-    <Compile Include="DataModel\SfMapping.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\StdFmtTransform.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Dialogs\ChapterMenu.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="DataModel\SfMapping.cs" />
+    <Compile Include="DataModel\StdFmtTransform.cs" />
+    <Compile Include="Dialogs\ChapterMenu.cs" />
     <Compile Include="Dialogs\ChapterMenu.Designer.cs">
       <DependentUpon>ChapterMenu.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\CopyBTfromFront.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\DlgCopyBTConflict.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Dialogs\CopyBTfromFront.cs" />
+    <Compile Include="Dialogs\DlgCopyBTConflict.cs" />
     <Compile Include="Dialogs\DlgCopyBTConflict.Designer.cs">
       <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgDebug.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Dialogs\DlgDebug.cs" />
     <Compile Include="Dialogs\DlgDebug.Designer.cs">
       <DependentUpon>DlgDebug.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgExportBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Dialogs\DlgExportBook.cs" />
     <Compile Include="Dialogs\DlgExportBook.Designer.cs">
       <DependentUpon>DlgExportBook.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgFilter.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\DlgSpecifyEncoding.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Dialogs\DlgSpecifyEncoding.cs" />
     <Compile Include="Dialogs\DlgSpecifyEncoding.Designer.cs">
       <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\IncrementBookStatus.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="Dialogs\IncrementBookStatus.cs" />
     <Compile Include="Dialogs\Messages.cs" />
-    <Compile Include="Dialogs\oHelpAbout.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Print.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\CreateTranslationDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Ctrl_AutoReplace.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\Properties\Ctrl_AutoReplace.cs" />
     <Compile Include="Dialogs\Properties\Ctrl_AutoReplace.Designer.cs">
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\DlgProperties.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
-      <DependentUpon>DlgProperties.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Properties\OpenTranslationDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_Notes.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs" />
+    <Compile Include="Dialogs\Properties\Page_Notes.cs" />
     <Compile Include="Dialogs\Properties\Page_Notes.Designer.cs">
       <DependentUpon>Page_Notes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_Options.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Options.cs" />
     <Compile Include="Dialogs\Properties\Page_Options.Designer.cs">
       <DependentUpon>Page_Options.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_SetupFT.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_StyleSheet.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_TeamSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\Properties\Page_SetupFT.cs" />
+    <Compile Include="Dialogs\Properties\Page_StyleSheet.cs" />
+    <Compile Include="Dialogs\Properties\Page_TeamSettings.cs" />
     <Compile Include="Dialogs\Properties\Page_TeamSettings.Designer.cs">
       <DependentUpon>Page_TeamSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_TranslationStages.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_OtherTranslations.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_WritingSystems.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\Properties\Page_TranslationStages.cs" />
+    <Compile Include="Dialogs\Properties\Page_OtherTranslations.cs" />
+    <Compile Include="Dialogs\Properties\Page_WritingSystems.cs" />
     <Compile Include="Dialogs\Properties\Page_WritingSystems.Designer.cs">
       <DependentUpon>Page_WritingSystems.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_Translation.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\RepairImportBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\RestoreFromBackup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\SplashScreen.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Translation.cs" />
+    <Compile Include="Dialogs\SplashScreen.cs" />
+    <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs" />
+    <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs" />
     <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.Designer.cs">
       <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.cs" />
     <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.Designer.cs">
       <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizImportBook.cs" />
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs" />
     <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.Designer.cs">
       <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.cs" />
     <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.Designer.cs">
       <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.cs" />
     <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.Designer.cs">
       <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.cs" />
     <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.Designer.cs">
       <DependentUpon>WizPage_GetStage.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_Summary.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizImportBook\WizPage_Summary.cs" />
     <Compile Include="Dialogs\WizImportBook\WizPage_Summary.Designer.cs">
       <DependentUpon>WizPage_Summary.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNewProject.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_FrontInfo.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizNewProject\WizNewProject.cs" />
+    <Compile Include="Dialogs\WizNewProject\WizNew_FrontInfo.cs" />
     <Compile Include="Dialogs\WizNewProject\WizNew_FrontInfo.Designer.cs">
       <DependentUpon>WizNew_FrontInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_Introduction.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizNewProject\WizNew_Introduction.cs" />
     <Compile Include="Dialogs\WizNewProject\WizNew_Introduction.Designer.cs">
       <DependentUpon>WizNew_Introduction.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_ProjectName.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizNewProject\WizNew_ProjectName.cs" />
     <Compile Include="Dialogs\WizNewProject\WizNew_ProjectName.Designer.cs">
       <DependentUpon>WizNew_ProjectName.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_Summary.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizNewProject\WizNew_Summary.cs" />
     <Compile Include="Dialogs\WizNewProject\WizNew_Summary.Designer.cs">
       <DependentUpon>WizNew_Summary.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_TargetInfo.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizNewProject\WizNew_TargetInfo.cs" />
     <Compile Include="Dialogs\WizNewProject\WizNew_TargetInfo.Designer.cs">
       <DependentUpon>WizNew_TargetInfo.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_TeamSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dialogs\WizNewProject\WizNew_TeamSettings.cs" />
     <Compile Include="Dialogs\WizNewProject\WizNew_TeamSettings.Designer.cs">
       <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dictionary\DictionaryPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
+    <Compile Include="Dictionary\DictionaryPane.cs" />
     <Compile Include="Dictionary\DictionaryPane.Designer.cs">
       <DependentUpon>DictionaryPane.cs</DependentUpon>
     </Compile>
     <Compile Include="Edit\Bookmark.cs" />
     <Compile Include="Edit\EContainer.cs" />
     <Compile Include="Edit\EWord.cs" />
-    <Compile Include="Edit\NotesPane.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Edit\NotesPane.cs" />
     <Compile Include="Edit\NotesPane.Designer.cs">
       <DependentUpon>NotesPane.cs</DependentUpon>
     </Compile>
-    <Compile Include="Edit\OWPara.cs">
-    </Compile>
-    <Compile Include="Edit\OWWindow.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Edit\OWPara.cs" />
+    <Compile Include="Edit\OWWindow.cs" />
     <Compile Include="Edit\UndoRedo.cs" />
-    <Compile Include="Language.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Layouts\BackTranslation.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Layouts\Drafting.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Layouts\Naturalness.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Language.cs" />
+    <Compile Include="Layouts\BackTranslation.cs" />
+    <Compile Include="Layouts\Drafting.cs" />
+    <Compile Include="Layouts\Naturalness.cs" />
     <Compile Include="Merge\DiffText.cs" />
     <Compile Include="Merge\DMergeBook.cs" />
-    <Compile Include="Merge\MergePane.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Merge\MergePane.cs" />
     <Compile Include="Merge\MergePane.Designer.cs">
       <DependentUpon>MergePane.cs</DependentUpon>
     </Compile>
-    <Compile Include="OurWordMain.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Edit\OWTabControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="OurWordMain.cs" />
+    <Compile Include="Edit\OWTabControl.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Test.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Utilities\ColorComboQ.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="Test.cs" />
+    <Compile Include="Utilities\ColorComboQ.cs" />
+    <EmbeddedResource Include="Dialogs\ChapterMenu.resx">
+      <DependentUpon>ChapterMenu.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DlgDebug.resx">
+      <DependentUpon>DlgDebug.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DlgSpecifyEncoding.resx">
+      <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
+      <DependentUpon>Page_Notes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
+      <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.resx">
+      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_FrontInfo.resx">
+      <DependentUpon>WizNew_FrontInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_Introduction.resx">
+      <DependentUpon>WizNew_Introduction.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_ProjectName.resx">
+      <DependentUpon>WizNew_ProjectName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_Summary.resx">
+      <DependentUpon>WizNew_Summary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_TargetInfo.resx">
+      <DependentUpon>WizNew_TargetInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_TeamSettings.resx">
+      <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dictionary\DictionaryPane.resx">
+      <DependentUpon>DictionaryPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Edit\NotesPane.resx">
+      <DependentUpon>NotesPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Merge\MergePane.resx">
+      <DependentUpon>MergePane.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Res\filenew.gif" />
+    <EmbeddedResource Include="Res\fileopen.gif" />
+    <EmbeddedResource Include="Res\DeleteMergeFile.ico" />
+    <EmbeddedResource Include="Res\Edit.ico" />
+    <EmbeddedResource Include="Res\Blank.ico" />
+    <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
+      <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
+      <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_Options.resx">
+      <DependentUpon>Page_Options.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_TeamSettings.resx">
+      <DependentUpon>Page_TeamSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx" />
+    <EmbeddedResource Include="Res\JobNaturalness.ico" />
+    <EmbeddedResource Include="Res\JobBT.ico" />
+    <EmbeddedResource Include="Res\JobDrafting.ico" />
+    <EmbeddedResource Include="Res\Project.ico" />
+    <EmbeddedResource Include="Res\SectionFirst.ico" />
+    <EmbeddedResource Include="Res\SectionLast.ico" />
+    <EmbeddedResource Include="Res\Properties.ico" />
+    <EmbeddedResource Include="Dialogs\DlgExportBook.resx">
+      <DependentUpon>DlgExportBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_WritingSystems.resx">
+      <DependentUpon>Page_WritingSystems.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.resx">
+      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.resx">
+      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetFileName.resx">
+      <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetStage.resx">
+      <DependentUpon>WizPage_GetStage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_Summary.resx">
+      <DependentUpon>WizPage_Summary.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Res\WizImportFile.gif" />
     <EmbeddedResource Include="DataModel\DBook.resx">
       <DependentUpon>DBook.cs</DependentUpon>
     </EmbeddedResource>
@@ -608,53 +393,26 @@
     <EmbeddedResource Include="Dialogs\CopyBTfromFront.resx">
       <DependentUpon>CopyBTfromFront.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgFilter.resx">
-      <DependentUpon>DlgFilter.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\IncrementBookStatus.resx">
       <DependentUpon>IncrementBookStatus.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\oHelpAbout.resx">
-      <DependentUpon>oHelpAbout.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Print.resx">
-      <DependentUpon>Print.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\CreateTranslationDlg.resx">
-      <DependentUpon>CreateTranslationDlg.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\OpenTranslationDlg.resx">
-      <DependentUpon>OpenTranslationDlg.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_AdvancedPrintOptions.resx">
       <DependentUpon>Page_AdvancedPrintOptions.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_SetupFT.resx">
       <DependentUpon>Page_SetupFT.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_StyleSheet.resx">
       <DependentUpon>Page_StyleSheet.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_TranslationStages.resx">
       <DependentUpon>Page_TranslationStages.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_OtherTranslations.resx">
       <DependentUpon>Page_OtherTranslations.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Translation.resx">
       <DependentUpon>Page_Translation.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\RepairImportBook.resx">
-      <DependentUpon>RepairImportBook.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\RestoreFromBackup.resx">
-      <DependentUpon>RestoreFromBackup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
@@ -662,7 +420,6 @@
     <EmbeddedResource Include="licenses.licx" />
     <EmbeddedResource Include="OurWordMain.resx">
       <DependentUpon>OurWordMain.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Res\Character.ico" />
     <EmbeddedResource Include="Res\Copy.ico" />
@@ -700,6 +457,28 @@
     <EmbeddedResource Include="Res\SectionPrevious.ico" />
     <EmbeddedResource Include="Res\SetUpFeatures.ico" />
     <EmbeddedResource Include="Res\Tools.ico" />
+    <Content Include="App.ico" />
+    <Content Include="ChangesHistory.html" />
+    <Content Include="OurWord.ico" />
+    <Content Include="Res\Increment.ico" />
+    <Content Include="Res\NoteEdit.ico" />
+    <Content Include="Res\NoteInsert.ico" />
+    <Content Include="Res\NoteMerge.ico" />
+    <Content Include="Res\ProgressIndicatorBackground.jpg" />
+    <None Include="Res\editfind.gif" />
+    <None Include="Res\MergeConfigure.bmp" />
+    <None Include="Res\MergePrevDiff.bmp" />
+    <None Include="Res\MergNextDiff.bmp" />
+    <None Include="Res\OurWord.png" />
+    <Compile Include="Dialogs\Properties\DialogCreateTranslation.cs" />
+    <Compile Include="Dialogs\Properties\DialogOpenTranslation.cs" />
+    <Compile Include="Dialogs\DialogFilter.cs" />
+    <Compile Include="Dialogs\DialogHelpAbout.cs" />
+    <Compile Include="Dialogs\DialogPrint.cs" />
+    <Compile Include="Dialogs\DialogRepairImportBook.cs" />
+    <Compile Include="Dialogs\DialogRestoreFromBackup.cs" />
+    <Compile Include="Dialogs\Properties\DialogProperties.cs" />
+    <Compile Include="Dialogs\Properties\DialogProperties.Designer.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -715,4 +494,11 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <ProjectExtensions>
+    <MonoDevelop>
+      <Properties>
+        <GtkDesignInfo gtkVersion="2.12.3" />
+      </Properties>
+    </MonoDevelop>
+  </ProjectExtensions>
 </Project>

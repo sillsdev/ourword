@@ -21,7 +21,7 @@ using System.Security.Permissions;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("John S. Wimbish")]
 [assembly: AssemblyProduct("OurWord!")]
-[assembly: AssemblyCopyright("© 2004-08, John S. Wimbish")]
+[assembly: AssemblyCopyright("ï¿½ 2004-08, John S. Wimbish")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
 
@@ -33,7 +33,7 @@ using System.Security.Permissions;
 //    Revision      - not used.
 //
 // Was 0.9.13
-[assembly: AssemblyVersion("1.0.2")]
+[assembly: AssemblyVersion("1.0.0")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

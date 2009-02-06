@@ -19,7 +19,7 @@ using Microsoft.Win32;
 
 namespace JWTools
 {
-	#region FORM CLASS: JW_UserFeatures
+	#region FORM CLASS: DialogSetupFeatures
 	public class DialogSetupFeatures : System.Windows.Forms.Form
 	{
 		// Array of features ----------------------------------------------------------------

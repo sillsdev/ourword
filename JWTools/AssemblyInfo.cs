@@ -11,7 +11,7 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("The Seed Company")]
 [assembly: AssemblyProduct("MultiColumn Scriptures")]
-[assembly: AssemblyCopyright("© 2003-05, John S. Wimbish")]
+[assembly: AssemblyCopyright("ï¿½ 2003-05, John S. Wimbish")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]	
 
@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
