@@ -1333,9 +1333,16 @@ namespace JWTools
             public override bool CanResetValue(object component)
 			{
 				if (item.DefaultValue == null)
+				{
 					return false;
+				}
 				else
-					return !GetValue(component).Equals(item.DefaultValue);
+				{
+					object o = GetValue(component);
+					if (o == null) 
+						return false;
+					return !o.Equals(item.DefaultValue);
+				}
             }
             #endregion
             #region OMethod: object GetValue(object component)
@@ -1369,11 +1376,9 @@ namespace JWTools
             public override bool ShouldSerializeValue(object component)
 			{
 				object val = GetValue(component);
-
-				if (item.DefaultValue == null && val == null)
+				if (val == null)
 					return false;
-				else
-					return !val.Equals(item.DefaultValue);
+				return !val.Equals(item.DefaultValue);
             }
             #endregion
         }
