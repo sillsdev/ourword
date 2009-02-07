@@ -102,11 +102,19 @@ namespace OurWord.Dialogs
         #endregion
 
         // Property Grid ---------------------------------------------------------------------
+        #region Property Grid Constants
         const string c_sPropName = "propName";
         const string c_sPropAbbrev = "propAbbrev";
         const string c_sPropPunctuation = "propPunctuation";
         const string c_sPropEndPunctuation = "propEndPunctuation";
         const string c_sPropKeyboard = "propKeyboard";
+
+        const string c_sGroupAutoHyphen = "Automatic Hyphenation";
+        const string c_sPropUseAutoHyphen = "propUseAutoHyphen";
+        const string c_sPropConsonants = "propConsonants";
+        const string c_sPropAutoHyphenCVPattern = "propAutoHyphenCVPattern";
+        const string c_sPropAutoHyphenMinSplitSize = "propAutoHyphenMinSplitSize";
+        #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
         PropertyBag Bag
         {
@@ -121,36 +129,73 @@ namespace OurWord.Dialogs
         #region Method: void bag_GetValue(object sender, PropertySpecEventArgs e)
         void bag_GetValue(object sender, PropertySpecEventArgs e)
         {
+            // General
+            #region Name
             if (e.Property.ID == c_sPropName)
             {
                 e.Value = WritingSystem.Name;
             }
-
-            else if (e.Property.ID == c_sPropAbbrev)
+            #endregion
+            #region Abbrev
+            if (e.Property.ID == c_sPropAbbrev)
             {
                 e.Value = WritingSystem.Abbrev;
             }
-
-            else if (e.Property.ID == c_sPropKeyboard)
+            #endregion
+            #region Keyboard
+            if (e.Property.ID == c_sPropKeyboard)
             {
                 e.Value = WritingSystem.KeyboardName;
             }
-
-            else if (e.Property.ID == c_sPropPunctuation)
+            #endregion
+            #region Punctuation
+            if (e.Property.ID == c_sPropPunctuation)
             {
                 e.Value = WritingSystem.PunctuationChars;
             }
-
-            else if (e.Property.ID == c_sPropEndPunctuation)
+            #endregion
+            #region EndPunctuation
+            if (e.Property.ID == c_sPropEndPunctuation)
             {
                 e.Value = WritingSystem.EndPunctuationChars;
             }
+            #endregion
+
+            // Auto Hyphenation
+            #region Use Autommated Hyphenation
+            if (e.Property.ID == c_sPropUseAutoHyphen)
+            {
+                YesNoPropertySpec yn = e.Property as YesNoPropertySpec;
+                Debug.Assert(null != yn);
+                e.Value = yn.GetBoolString(WritingSystem.UseAutomatedHyphenation);
+            }
+            #endregion
+            #region Consonants
+            if (e.Property.ID == c_sPropConsonants)
+            {
+                e.Value = WritingSystem.Consonants;
+            }
+            #endregion
+            #region HyphenationCVPattern
+            if (e.Property.ID == c_sPropAutoHyphenCVPattern)
+            {
+                e.Value = WritingSystem.HyphenationCVPattern;
+            }
+            #endregion
+            #region Min Split Size
+            if (e.Property.ID == c_sPropAutoHyphenMinSplitSize)
+            {
+                string s = WritingSystem.MinHyphenSplit.ToString() + " letters";
+                e.Value = s;
+            }
+            #endregion
         }
         #endregion
         #region Method: void bag_SetValue(object sender, PropertySpecEventArgs e)
         void bag_SetValue(object sender, PropertySpecEventArgs e)
         {
-            // Name
+            // General
+            #region Name
             if (e.Property.ID == c_sPropName)
             {
                 // Nothing to do if they are the same
@@ -178,28 +223,65 @@ namespace OurWord.Dialogs
                 PopulateList();
                 m_listWritingSystems.SelectedItem = WritingSystem.Name;
             }
-
-            // Abbreviation
+            #endregion
+            #region Abbreviation
             if (e.Property.ID == c_sPropAbbrev)
             {
                 WritingSystem.Abbrev = (string)e.Value;
             }
-
-            // Keyboard Name
+            #endregion
+            #region Keyboard Name
             if (e.Property.ID == c_sPropKeyboard)
+            {
                 WritingSystem.KeyboardName = (string)e.Value;
-
-            // Punctuation
+            }
+            #endregion
+            #region Punctuation
             if (e.Property.ID == c_sPropPunctuation)
             {
                 WritingSystem.PunctuationChars = (string)e.Value;
             }
-
-            // End Punctuation
+            #endregion
+            #region End Punctuation
             if (e.Property.ID == c_sPropEndPunctuation)
             {
                 WritingSystem.EndPunctuationChars = (string)e.Value;
             }
+            #endregion
+
+            // Auto Hyphenation
+            #region Use Automated Hyphenation
+            if (e.Property.ID == c_sPropUseAutoHyphen)
+            {
+                YesNoPropertySpec yn = e.Property as YesNoPropertySpec;
+                Debug.Assert(null != yn);
+                WritingSystem.UseAutomatedHyphenation = yn.IsTrue(e.Value);
+            }
+            #endregion
+            #region Consonants
+            if (e.Property.ID == c_sPropConsonants)
+            {
+                WritingSystem.Consonants = (string)e.Value;
+            }
+            #endregion
+            #region HyphenationCVPattern
+            if (e.Property.ID == c_sPropAutoHyphenCVPattern)
+            {
+                WritingSystem.HyphenationCVPattern = (string)e.Value;
+            }
+            #endregion
+            #region Min Split Size
+            if (e.Property.ID == c_sPropAutoHyphenMinSplitSize)
+            {
+                // TODO: When we localize this, we'll need a way to parse the
+                // number regardless of where it appears in the string. Currently
+                // GetDoubleFromGridText assumes the number is at the beginning
+                // of the string.
+
+                int n = (int)Page_StyleSheet.GetDoubleFromGridText((string)e.Value);
+                WritingSystem.MinHyphenSplit = Math.Max(n, 1);
+            }
+            #endregion
         }
         #endregion
         #region Method: void SetupPropertyGrid()
@@ -210,7 +292,8 @@ namespace OurWord.Dialogs
             Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
             Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
 
-            // Name
+            // General Properties
+            #region string: Name
             PropertySpec ps = new PropertySpec(
                 c_sPropName,
                 "Name", 
@@ -224,8 +307,8 @@ namespace OurWord.Dialogs
                 ps.Attributes = new Attribute[] { ReadOnlyAttribute.Yes };
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
-
-            // Abbreviation / ID
+            #endregion
+            #region string: Abbreviation / ID
             ps = new PropertySpec(
                 c_sPropAbbrev,
                 "Abbreviation / ID",
@@ -238,8 +321,8 @@ namespace OurWord.Dialogs
                 null);
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
-
-            // Keyboard name: choose from a list
+            #endregion
+            #region List<>: Keyboard name: choose from a list
             List<KeyboardController.KeyboardDescriptor> v =
                KeyboardController.GetAvailableKeyboards(KeyboardController.Engines.All);
             string[] vNames = new string[v.Count + 1];
@@ -255,24 +338,10 @@ namespace OurWord.Dialogs
                 vNames,
                 "");
             ps.DontLocalizeEnums = true;
-
-            /*** (OLD WAY, when user had to type it in. Replaced 6 Aug 08, ver 1.0b.)
-            ps = new PropertySpec(
-                c_sPropKeyboard,
-                "Keyboard Name",
-                typeof(string),
-                WritingSystem.Name,
-                "The name of the keyboard to use when typing in this writing system " +
-                    "(Windows IME, Keyman, etc.) Use the full name, not the abbreviation.",
-                "",
-                "",
-                null);
-            ***/
-
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
-
-            // Punctuation Charaters
+            #endregion
+            #region string: Punctuation Charaters
             ps = new PropertySpec(
                 c_sPropPunctuation,
                 "Punctuation", 
@@ -284,8 +353,8 @@ namespace OurWord.Dialogs
                 null);
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
-
-            // End Punctuation Charaters
+            #endregion
+            #region string: End Punctuation Charaters
             ps = new PropertySpec(
                 c_sPropEndPunctuation,
                 "End Punctuation", 
@@ -297,6 +366,51 @@ namespace OurWord.Dialogs
                 null);
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
+            #endregion
+
+            // Auto-Hyphenation Properties
+            #region YesNo: Turn On Auto-Hyphenation?
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sPropUseAutoHyphen,
+                "Turn On Auto-Hyphenation?",
+                c_sGroupAutoHyphen,
+                "If Yes, long words will be automatically hyphenated during editing. Hyphens " +
+                    "are not physically placed in the data; they merely appear on screen.",
+                false
+                ));
+            #endregion
+            #region string: Consonants
+            Bag.Properties.Add(new PropertySpec(
+                c_sPropConsonants,
+                "Consonants",
+                typeof(string),
+                c_sGroupAutoHyphen,
+                "List the consonants for this writing systems. (Eveything that isn't a" +
+                    "consonant or punctuation is considered to be a vowel.)",
+                "",
+                "",
+                null));
+            #endregion
+            #region string: Hyphen CV Pattern
+            Bag.Properties.Add(new PropertySpec(
+                c_sPropAutoHyphenCVPattern,
+                "CV Pattern",
+                typeof(string),
+                c_sGroupAutoHyphen,
+                "Indicate where the hyphen will go, e.g., V-C, or VC-CV.",
+                "",
+                "",
+                null));
+            #endregion
+            #region formatted string: Min Split Size
+            Bag.Properties.Add(new PropertySpec(
+                c_sPropAutoHyphenMinSplitSize,
+                "Min Split Size",
+                typeof(string),
+                c_sGroupAutoHyphen,
+                "Hyphenation will not result in a word-part that is smaller than this value.",
+                "3 letters"));
+            #endregion
 
             // Localize the bag
             LocDB.Localize(this, Bag);

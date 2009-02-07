@@ -248,7 +248,7 @@ namespace OurWord.Dialogs
         #endregion
 
         #region Method: double GetDoubleFromGridText(string s)
-        double GetDoubleFromGridText(string s)
+        static public double GetDoubleFromGridText(string s)
         {
             // Extract the numerical part of the string
             string sValue = "";

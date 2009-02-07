@@ -163,6 +163,8 @@ namespace OurWordTests.Edit
             m_Form.Name = "TestForm";
             m_Form.Controls.Add(m_Window);
 
+            WSVernacular.UseAutomatedHyphenation = false;
+
             // Set up John 3:16
             Wnd.StartNewRow();
             m_p = CreateParagraph_John_3_16();
@@ -1092,7 +1094,7 @@ namespace OurWordTests.Edit
         }
         #endregion
 
-
+        // Hyphenation -----------------------------------------------------------------------
         #region Method: DParagraph CreateParagraph_LongHuicholWords()
         private DParagraph CreateParagraph_LongHuicholWords()
         {
@@ -1104,8 +1106,8 @@ namespace OurWordTests.Edit
             p.AddRun(DVerse.Create("16"));
 
             m_DBT1 = new DText();
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
-                "Mepücatemaicai memüteyurieniquecai. "));
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+                "Mepücatemaicai memü memüteyurieniquecai. "));
             m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, 
                 "yuxexuitü "));
             m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
@@ -1128,11 +1130,15 @@ namespace OurWordTests.Edit
             return p;
         }
         #endregion
+        #region Test: ProposeNextLayoutChunk
         [Test] public void ProposeNextLayoutChunk()
         {
             // Zero out stuff, we're starting over
             Wnd.Clear();
             m_section.Paragraphs.Clear();
+
+            // Set up the hyphenation
+            WSVernacular.UseAutomatedHyphenation = true;
 
             // Create a paragraph with big Huchol words.
             Wnd.StartNewRow();
@@ -1156,7 +1162,7 @@ namespace OurWordTests.Edit
             // TEST 1 - SHOULD JUST FIT
             // Request chunking from the paragraph
             OWPara.ProposeNextLayoutChunk chunk = new OWPara.ProposeNextLayoutChunk(
-                Wnd.Draw.Graphics, m_op, fAvailWidth, 0);
+                Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
 
             // Check the two and three words
             EWord wL = m_op.SubItems[1] as EWord;
@@ -1166,7 +1172,7 @@ namespace OurWordTests.Edit
             Assert.IsFalse(wR.Hyphenated, "1-Second word should not be hyphenated");
 
             Assert.AreEqual("Mepücatemaicai ", wL.Text);
-            Assert.AreEqual("memüteyurieniquecai. ", wR.Text);
+            Assert.AreEqual("memü ", wR.Text);
 
 
             // TEST 2 - DOESNT' FIT
@@ -1175,7 +1181,7 @@ namespace OurWordTests.Edit
 
             // Request chunking from the paragraph
             chunk = new OWPara.ProposeNextLayoutChunk(
-                Wnd.Draw.Graphics, m_op, fAvailWidth, 0);
+                Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
 
             // Check the two and three words
             wL = m_op.SubItems[1] as EWord;
@@ -1187,7 +1193,56 @@ namespace OurWordTests.Edit
             Assert.AreEqual("Mepücate", wL.Text);
             Assert.AreEqual("maicai ", wR.Text);
         }
+        #endregion
+        #region Test: void RemoveHyphenation()
+        [Test] public void RemoveHyphenation()
+        {
+            // Zero out stuff, we're starting over
+            Wnd.Clear();
+            m_section.Paragraphs.Clear();
 
+            WSVernacular.UseAutomatedHyphenation = true;
 
+            // Create a paragraph with big Huchol words.
+            Wnd.StartNewRow();
+            m_p = CreateParagraph_LongHuicholWords();
+            m_op = new OWPara(
+                WSVernacular,
+                m_p.Style,
+                m_p,
+                Color.Wheat,
+                OWPara.Flags.IsEditable);
+            Wnd.AddParagraph(0, m_op);
+
+            // How many blocks do we have currently
+            int cBlocks = m_op.SubItems.Length;
+
+            // By nature of LoadData, all the EBlocks will have been measured
+            Wnd.LoadData();
+
+            // Add the widths of the first two EBlocks
+            float fAvailWidth = 0;
+            for (int i = 0; i < 2; i++)
+                fAvailWidth += m_op.SubItems[i].Width;
+
+            // Subtract a bit to make it too small
+            fAvailWidth -= 20;
+
+            // Request chunking from the paragraph
+            OWPara.ProposeNextLayoutChunk chunk = new OWPara.ProposeNextLayoutChunk(
+                Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
+
+            // Because we hyphenated, we should have an extra block
+            Assert.IsTrue(m_op.SubItems.Length > cBlocks, "Hyphenation created new blocks");
+            Assert.AreEqual("Mepücate", (m_op.SubItems[1] as EWord).Text);
+
+            // Now remove them
+            m_op.RemoveHyphenation();
+
+            // Should be back to the same number of blocks
+            Assert.IsTrue(m_op.SubItems.Length == cBlocks , "New block has been removed");
+            Assert.AreEqual("Mepücatemaicai ", (m_op.SubItems[1] as EWord).Text);
+        }
+        #endregion
     }
 }

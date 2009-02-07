@@ -42,10 +42,13 @@ namespace OurWordTests.JWdb
 
         #region Test: HuicholHyphenation
         [Test] public void HuicholHyphenation()
-            // This is a temporary test for the Huichol CV rule. 
-            // Hope to replace this sooner rather than later.
         {
             JWritingSystem ws = G.StyleSheet.FindWritingSystem("Latin");
+
+            ws.UseAutomatedHyphenation = true;
+            ws.Consonants = "bcdfghjklmnpqrstvwxyz";
+            ws.HyphenationCVPattern = "V-C";
+            ws.MinHyphenSplit = 3;
 
             string sLongWord = "caniyemieximecaitüni";
 
@@ -55,5 +58,24 @@ namespace OurWordTests.JWdb
             Assert.IsFalse(ws.IsHyphenBreak(sLongWord, 14), "caniyemieximec-aitüni");
         }
         #endregion
+        #region Test: EnglishHyphenation
+        [Test] public void EnglishHyphenation()
+        {
+            JWritingSystem ws = G.StyleSheet.FindWritingSystem("Latin");
+
+            ws.UseAutomatedHyphenation = true;
+            ws.Consonants = "bcdfghjklmnpqrstvwxyz";
+            ws.HyphenationCVPattern = "VC-C";
+            ws.MinHyphenSplit = 3;
+
+            string sLongWord = "itbogglesthemind";
+
+            Assert.IsTrue(ws.IsHyphenBreak(sLongWord, 5), "itbog-glesthemind");
+            Assert.IsFalse(ws.IsHyphenBreak(sLongWord, 2), "it-bogglesthemind");
+            Assert.IsTrue(ws.IsHyphenBreak(sLongWord, 9), "itboggles-themind");
+            Assert.IsFalse(ws.IsHyphenBreak(sLongWord, 10), "itbogglest-hemind");
+        }
+        #endregion
+
     }
 }

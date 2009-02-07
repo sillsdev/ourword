@@ -284,6 +284,8 @@ namespace OurWord.Edit
         FontStyle m_FontMods;
         #endregion
 
+        // Hyphenation
+        #region Attr{g/s}: bool Hyphenated
         public bool Hyphenated
         {
             get
@@ -296,6 +298,22 @@ namespace OurWord.Edit
             }
         }
         bool m_Hyphenated = false;
+        #endregion
+        #region Attr{g/s}: float HyphenWidth
+        float HyphenWidth
+        {
+            get
+            {
+                return m_fHyphenWidth;
+            }
+            set
+            {
+                m_fHyphenWidth = value;
+            }
+        }
+        float m_fHyphenWidth = 0;
+        #endregion
+
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(...)
@@ -313,6 +331,7 @@ namespace OurWord.Edit
             m_FontMods = _FontMods;
         }
         #endregion
+        #region Method: EWord Clone()
         public EWord Clone()
         {
             EWord word = new EWord(
@@ -322,6 +341,7 @@ namespace OurWord.Edit
                 FontMods);
             return word;
         }
+        #endregion
         #region static EWord CreateAsInsertionIcon(OWPara, JCharacterStyle, DPhrase)
         static public EWord CreateAsInsertionIcon(
             JFontForWritingSystem _FontForWS,
@@ -338,7 +358,7 @@ namespace OurWord.Edit
         void PaintBackgroundRectangle(Color color)
         {
             RectangleF r = new RectangleF(Position,
-                new SizeF(Width + JustificationPaddingAdded, Height));
+                new SizeF(Width + JustificationPaddingAdded - HyphenWidth, Height));
             Draw.FillRectangle(color, r);
         }
         #endregion
@@ -353,7 +373,15 @@ namespace OurWord.Edit
 
             // The text
             if (!IsInsertionIcon)
+            {
                 Draw.String(Text, Font, GetBrush(), Position);
+
+                if (Hyphenated)
+                {
+                    Draw.String("-", Font, GetBrush(), 
+                        new PointF(Position.X + Width - HyphenWidth, Position.Y));
+                }
+            }
         }
         #endregion
         #region Method: void PaintSelection(int iCharLeft, int iCharRight)
@@ -674,7 +702,9 @@ namespace OurWord.Edit
             else if (Hyphenated)
             {
                 Width = Draw.Measure(Text, Font);
-                Width += Draw.Measure("-", Font);
+
+                HyphenWidth = Draw.Measure("-", Font);
+                Width += HyphenWidth;
             }
             else
             {

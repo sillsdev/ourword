@@ -1336,18 +1336,82 @@ namespace JWdb
         }
         private string m_sKeyboardName = "";
         #endregion
+        // Auto Hyphen Attrs
+        #region BAttr{g/s}: string Consonants - a list of Consonants for this WS
+        public string Consonants
+        {
+            get
+            {
+                return m_sConsonants;
+            }
+            set
+            {
+                SetValue(ref m_sConsonants, value);
+            }
+        }
+        private string m_sConsonants = c_sDefaultConsonants;
+        public const string c_sDefaultConsonants = "bcdfghjklmnpqrstvwxyz";
+        #endregion
+        #region BAttr{g/s}: bool UseAutomatedHyphenation
+        public bool UseAutomatedHyphenation
+        {
+            get
+            {
+                return m_bUseAutomatedHyphenation;
+            }
+            set
+            {
+                SetValue(ref m_bUseAutomatedHyphenation, value);
+            }
+        }
+        private bool m_bUseAutomatedHyphenation = false;
+        #endregion
+        #region BAttr{g/s}: string HyphenationCVPattern - E.g., "V-C", or "VC-CV"
+        public string HyphenationCVPattern
+        {
+            get
+            {
+                return m_sHyphenationCVPattern;
+            }
+            set
+            {
+                SetValue(ref m_sHyphenationCVPattern, value);
+            }
+        }
+        private string m_sHyphenationCVPattern = c_sHyphenationCVPattern;
+        public const string c_sHyphenationCVPattern = "V-C";
+        #endregion
+        #region BAttr{g/s}: int MinHyphenSplit - points of space before a paragraph
+        public int MinHyphenSplit
+        {
+            get
+            {
+                return m_nMinHyphenSplit;
+            }
+            set
+            {
+                SetValue(ref m_nMinHyphenSplit, value);
+            }
+        }
+        private int m_nMinHyphenSplit = 3;
+        #endregion
+        // DeclareAttrs
         #region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
-			DefineAttr("IdeaGraph", ref m_bIsIdeaGraph);
-			DefineAttr("Name",      ref m_sName);
-            DefineAttr("Abbrev",    ref m_sAbbrev);
-            DefineAttr("Punct",     ref m_sPunctuationChars);
-			DefineAttr("EndPunct",  ref m_sEndPunctuationChars);
-			DefineAttr("ARSource",  ref m_bsaAutoReplaceSource);
-			DefineAttr("ARResult",  ref m_bsaAutoReplaceResult);
-            DefineAttr("Keyboard",  ref m_sKeyboardName);
+			DefineAttr("IdeaGraph",  ref m_bIsIdeaGraph);
+			DefineAttr("Name",       ref m_sName);
+            DefineAttr("Abbrev",     ref m_sAbbrev);
+            DefineAttr("Punct",      ref m_sPunctuationChars);
+			DefineAttr("EndPunct",   ref m_sEndPunctuationChars);
+            DefineAttr("Consonants", ref m_sConsonants);
+            DefineAttr("AutoHyph",   ref m_bUseAutomatedHyphenation);
+            DefineAttr("AutoHyphCV", ref m_sHyphenationCVPattern);
+            DefineAttr("AutoHyphMinSplit", ref m_nMinHyphenSplit);
+            DefineAttr("ARSource",   ref m_bsaAutoReplaceSource);
+			DefineAttr("ARResult",   ref m_bsaAutoReplaceResult);
+            DefineAttr("Keyboard",   ref m_sKeyboardName);
 		}
 		#endregion
 
@@ -1509,7 +1573,7 @@ namespace JWdb
             return false;
         }
         #endregion
-
+        #region Method: bool IsHyphenBreak(sWord, iPosWithinWord)
         public bool IsHyphenBreak(string s, int iPos)
             /* OK, this is quick-and-dirty, to see if I can get a simple hyphenation
              * support working. I will need to do more than this. But this implementation
@@ -1518,7 +1582,7 @@ namespace JWdb
              * - I'm located at a consonant
              * - The preveeding letter is not a consonant
              * 
-             * E.g., this is a CV-CV type of rule.
+             * E.g., this is a V-C type of rule.
              * 
              * I'm going to need to install that ICU stuff (sigh) to do this right.
              * Pity the poor user that must download it.
@@ -1528,24 +1592,56 @@ namespace JWdb
              * plus enumerating the consonants is sufficient for Huichol.
              */
         {
-            string sConsonants = "'bcdfghjklmnpqrstvwxzy";
+            // Don't bother if automated hyphenation is not turned on
+            if (UseAutomatedHyphenation == false)
+                return false;
 
             // 1 - Don't be too close to an end of a word
-            if (iPos < 4)
+            if (iPos < MinHyphenSplit)
                 return false;
-            if (iPos > s.Length - 4)
-                return false;
-
-            // 2. Sitting on a consonant
-            if (sConsonants.IndexOf( char.ToLower(s[iPos]) ) == -1)
+            if (iPos > s.Length - MinHyphenSplit)
                 return false;
 
-            // 3. Sitting after a vowell
-            if (sConsonants.IndexOf( char.ToLower(s[iPos-1])) != -1)
+            // Find the position of the hyphen in our string
+            int iHyphenPos = HyphenationCVPattern.IndexOf('-');
+            if (-1 == iHyphenPos)
                 return false;
+
+            // Get the pattern string, minus the hyphen
+            string sPattern = HyphenationCVPattern.Remove(iHyphenPos, 1);
+
+            // Determine where to start, and if we have room for the test
+            int iStart = iPos - iHyphenPos;
+            if (iStart < 0)
+                return false;
+            int cPositions = sPattern.Length;
+            if (iStart + cPositions > s.Length)
+                return false;
+
+            // Check against our pattern
+            for(int k=0; k<cPositions; k++)
+            {
+                char chPattern = sPattern[k];
+                char chTest = s[iStart + k];
+
+                // Sitting on a consonant?
+                if (char.ToUpper(chPattern) == 'C')
+                {
+                    if (Consonants.IndexOf( char.ToLower(chTest)) == -1)
+                        return false;
+                }
+
+                // Sitting on a vowel?
+                if (char.ToUpper(chPattern) == 'V')
+                {
+                    if (Consonants.IndexOf( char.ToLower(chTest)) != -1)
+                        return false;
+                }
+            }
 
             return true;
         }
+        #endregion
 
         // I/O -------------------------------------------------------------------------------
         #region OMethod: void FromXml(XElement x)

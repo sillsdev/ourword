@@ -48,7 +48,6 @@ namespace JWdb
 	}
 	#endregion
 
-
 	public class JObject : Object
 		#region Documentation
 		// Requirements for subclasses:
@@ -365,7 +364,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    nValue = m_ioX.GetAttrValue(sName, 0);
+                    nValue = m_ioX.GetAttrValue(sName, nValue);
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, nValue);
@@ -383,7 +382,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    dblValue = m_ioX.GetAttrValue(sName, (double)0.0);
+                    dblValue = m_ioX.GetAttrValue(sName, dblValue);
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, dblValue);
@@ -401,7 +400,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    bValue = m_ioX.GetAttrValue(sName, false);
+                    bValue = m_ioX.GetAttrValue(sName, bValue);
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, bValue);
@@ -419,7 +418,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    sValue = m_ioX.GetAttrValue(sName, "");
+                    sValue = m_ioX.GetAttrValue(sName, sValue);
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, sValue);
@@ -437,7 +436,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    chValue = m_ioX.GetAttrValue(sName, '\0');
+                    chValue = m_ioX.GetAttrValue(sName, chValue);
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, chValue);
@@ -455,7 +454,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    dtValue = m_ioX.GetAttrValue(sName, DateTime.Now);
+                    dtValue = m_ioX.GetAttrValue(sName, dtValue);
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, dtValue);
@@ -473,7 +472,7 @@ namespace JWdb
             switch (m_ioOperation)
             {
                 case Ops.kRead:
-                    bsa.Read(m_ioX.GetAttrValue(sName,"0"));
+                    bsa.Read(m_ioX.GetAttrValue(sName, "0"));
                     return;
                 case Ops.kSave:
                     m_ioX.AddAttr(sName, bsa.SaveLine);

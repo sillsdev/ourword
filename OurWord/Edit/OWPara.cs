@@ -1407,6 +1407,7 @@ namespace OurWord.Edit
         }
         #endregion
 
+        #region CLASS/Method: ProposeNextLayoutChunk
         public class ProposeNextLayoutChunk
         {
             // Attrs: Input params
@@ -1471,7 +1472,7 @@ namespace OurWord.Edit
             int m_cChunkSize = -1;
             #endregion
             #region Attr{g/s}: float ChunkWidth
-            float ChunkWidth
+            public float ChunkWidth
             {
                 get
                 {
@@ -1494,6 +1495,30 @@ namespace OurWord.Edit
                 }
             }
             bool m_bTooLarge;
+            #endregion
+            #region VAttr{g}: string DebugHelper
+            public string DebugHelper
+            {
+                get
+                {
+                    string s = "Size=" + ChunkSize.ToString();
+                    s += "  Large=" + (TooLarge?"T ":"F ");
+                    for(int i=0; i<ChunkSize; i++)
+                        s += (Para.SubItems[iStartItem + i] as EBlock).Text;
+                    return s;
+
+                }
+            }
+            #endregion
+            #region Attr{g}: bool ForcedHyphen - If T, we hyphened regardless of writing system
+            public bool ForcedHyphen
+            {
+                get
+                {
+                    return m_bForcedHyphen;
+                }
+            }
+            bool m_bForcedHyphen;
             #endregion
 
             // Helper Methods
@@ -1539,8 +1564,24 @@ namespace OurWord.Edit
                         if (Para.SubItems[i] as EWord != null)
                             return Para.SubItems[i] as EWord;
                     }
-                    Debug.Assert(false, "Each chunk should have an EWord.");
                     return null;
+                }
+            }
+            #endregion
+            #region VAttr{g}: EWord OverflowWord
+            EWord OverflowWord
+            {
+                get
+                {
+                    EWord wordHyphen = HyphenedWord;
+                    if (null == wordHyphen)
+                        return null;
+
+                    int iWordOverflow = Para.Find(wordHyphen) + 1;
+                    if( iWordOverflow >= Para.SubItems.Length)
+                        return null;
+                    EWord wordOverflow = Para.SubItems[iWordOverflow] as EWord;
+                    return wordOverflow;
                 }
             }
             #endregion
@@ -1581,6 +1622,15 @@ namespace OurWord.Edit
 
                 for (iHyphenPos = s.Length - 1; iHyphenPos > 0; iHyphenPos--)
                 {
+                    // This is triggered if a hyphen is required, because there
+                    // is nothing on the line yet, and we've already tried
+                    // the normal way of asking the writing system. I.e.,
+                    // last resort.
+                    if (ForcedHyphen)
+                        return true;
+
+                    // This is the preferred way of doing a hyphen: asking the
+                    // writing system if we can.
                     if (ws.IsHyphenBreak(OriginalTextToHyphen, iHyphenPos))
                         return true;
                 }
@@ -1615,9 +1665,8 @@ namespace OurWord.Edit
             void MoveTextIntoOverflowWord()
             {
                 EWord wordHyphen = HyphenedWord;
-                int iWordOverflow = Para.Find(wordHyphen) + 1;
-                Debug.Assert(iWordOverflow < Para.SubItems.Length);
-                EWord wordOverflow = Para.SubItems[iWordOverflow] as EWord;
+                Debug.Assert(null != wordHyphen);
+                EWord wordOverflow = OverflowWord;
                 Debug.Assert(null != wordOverflow);
 
                 wordHyphen.Text = OriginalTextToHyphen.Substring(0, iHyphenPos);
@@ -1626,14 +1675,43 @@ namespace OurWord.Edit
                 // The words now have new lengths
                 wordHyphen.CalculateWidth(G);
                 wordOverflow.CalculateWidth(G);
+            }
+            #endregion
+            #region Method: void RemoveAnyHyphenation()
+            void RemoveAnyHyphenation()
+                // If we just can't fit, we need to remove any attempt at hyphenation we
+                // may have done.
+            {
+                m_bTooLarge = true;
 
-                // TODO: THE HYPHENED WORD NEEDS TO INCLUDE ROOM FOR THE HYPHEN
+                EWord word = HyphenedWord;
+                if (null == word)
+                    return;
+
+                if (!word.Hyphenated)
+                    return;
+
+                if (word.Text == OriginalTextToHyphen)
+                    return;
+
+                EWord wordOverflow = OverflowWord;
+                Debug.Assert(null != wordOverflow);
+
+                word.Text += wordOverflow.Text;
+                word.Hyphenated = wordOverflow.Hyphenated;
+                word.CalculateWidth(G);
+
+                Para.Remove(wordOverflow);
             }
             #endregion
 
             // Public Interface
             #region Constructor(g, para, fAvailableWidth, iStartItem)
-            public ProposeNextLayoutChunk(Graphics g, OWPara para, float fAvailableWidth, int iStartItem)
+            public ProposeNextLayoutChunk(Graphics g, 
+                OWPara para, 
+                float fAvailableWidth, 
+                int iStartItem,
+                bool bMustForceHyphen)
             {
                 m_g = g;
                 m_Para = para;
@@ -1644,10 +1722,18 @@ namespace OurWord.Edit
                 {
                     CalculateChunkContents();
 
-                    // This chunk fits; its good to place into the line
+                    // This chunk fits; it qualifies to place into the line
                     if (ChunkFitsWithinWidth)
                     {
                         m_bTooLarge = false;
+                        return;
+                    }
+
+                    // If there is no hyphenable entity, then we are by definition 
+                    // too large.
+                    if (null == HyphenedWord)
+                    {
+                        m_bTooLarge = true;
                         return;
                     }
 
@@ -1660,6 +1746,21 @@ namespace OurWord.Edit
                     // isn't, then this chunk will not fit into the line.
                     if (CalcNextHyphenPos() == false)
                     {
+
+                        // This means we've yet to put anything on the current line. So
+                        // even though CalcNextHyphenPos turned out negative, we now
+                        // have to reset and try again, this time not asking the 
+                        // writing system, but instead, just carving off letters until
+                        // the resultant word fits on the line.
+                        if (bMustForceHyphen)
+                        {
+                            RemoveAnyHyphenation();
+                            m_bForcedHyphen = true;
+                            iHyphenPos = HyphenedWord.Text.Length - 1;
+                            continue;
+                        }
+
+                        RemoveAnyHyphenation();
                         m_bTooLarge = true;
                         return;
                     }
@@ -1674,6 +1775,40 @@ namespace OurWord.Edit
             }
             #endregion
         }
+        #endregion
+        #region Method: void RemoveHyphenation()
+        public void RemoveHyphenation()
+        {
+            for (int i = 0; i < SubItems.Length - 1; )
+            {
+                // Is this a hyphenated word?
+                EWord word = SubItems[i] as EWord;
+                if (null == word)
+                    goto loop;
+                if (!word.Hyphenated)
+                    goto loop;
+
+                // Is the next item a word?
+                EWord wordNext = SubItems[i + 1] as EWord;
+                if (null == wordNext)
+                {
+                    word.Hyphenated = false;
+                    goto loop;
+                }
+
+                // If yes, combine the two (but don't loop, because we may
+                // be continuing a hyphenation into even the next word.)
+                word.Text = word.Text + wordNext.Text;
+                word.Hyphenated = wordNext.Hyphenated;
+                word.CalculateWidth(Window.Draw.Graphics);
+                RemoveAt(i+1);
+                continue;
+
+            loop:
+                i++;
+            }
+        }
+        #endregion
 
         #region Method: float Layout_CalcNextChunkWidth(...)
         float Layout_CalcNextChunkWidth(Graphics g, int i, out int cChunkSize)
@@ -1766,12 +1901,13 @@ namespace OurWord.Edit
             Height = y - ptPos.Y;
         }
         #endregion
+
         #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
-        override public void CalculateContainerVerticals(float y, bool bRepositionOnly)
-            // y - The top coordinate of the paragraph. We'll use "y" to work through the 
-            //     height of the paragraph, setting the individula paragraph parts.
-            #region DOC - Leading Space before Verses
-            /* Leading Space before Verses - Whether or not to have leading space before
+        public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
+        // y - The top coordinate of the paragraph. We'll use "y" to work through the 
+        //     height of the paragraph, setting the individula paragraph parts.
+        #region DOC - Leading Space before Verses
+        /* Leading Space before Verses - Whether or not to have leading space before
              *   a verse is a Layout issue. If the verse number is at the beginning of a
              *   line, no leading space is required. But if it is in the middle of a line,
              *   then we need the space.
@@ -1782,7 +1918,7 @@ namespace OurWord.Edit
              *      I needed to do this to make it look correct, but I sure do dislike
              *   adding little things like this, due to the Bug potential.
              */
-            #endregion
+        #endregion
         {
             if (bRepositionOnly)
                 RePosition(y);
@@ -1790,6 +1926,9 @@ namespace OurWord.Edit
             Graphics g = Window.Draw.Graphics;
 
             // Combine all hyphenated words, we'll figure out shortly if we must re-hyphenate
+            RemoveHyphenation();
+
+            string sDebug = (SubItems[0] as EBlock).Text;
 
             // Remember the top coordinate
             Position = new PointF(Position.X, y);
@@ -1813,24 +1952,17 @@ namespace OurWord.Edit
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
             y += CalculateBitmapHeightRequirement();
 
-            // A "chunk" is the word or words that we'll add incrementally to the line.
-            // We can't just add one word at a time because some items will be glued
-            // to others. Thus the final word in a phrase might be glued to a footnote
-            // letter, which might be glued to another footnote letter. We define all of
-            // that as a "chunk".
-            int cChunkSize = 1;
-
             // We'll add to x until we get to xMaxWidth, to know how much can fit on a line.
             // For this first x, we need to allow for the paragraph's FirstLineIndent
             float x = (float)PStyle.FirstLineIndent * g.DpiX;
- 
+
             // We'll build the lines here
             ClearLines();
             Line line = new Line();
             AddLine(line);
 
             // Loop through all the blocks, adding them into lines
-            for (int i = 0; i < SubItems.Length; i += cChunkSize)
+            for (int i = 0; i < SubItems.Length; )
             {
                 // If we have a chapter, we treat if separately, since it takes up two lines.
                 EChapter chapter = SubItems[i] as EChapter;
@@ -1847,6 +1979,7 @@ namespace OurWord.Edit
                     line.Chapter = chapter;
                     x = chapter.Width;
                     line.LeftIndent = chapter.Width;
+                    i++;
                     continue;
                 }
 
@@ -1862,13 +1995,16 @@ namespace OurWord.Edit
                 // Measure the next "chunk" we want to add (this may be more than one EBlock
                 // due to glue, but it will have at most only one DText). If the chunk is too
                 // long, then we break it apart using hyphenation rules.
-                float fWidth = Layout_CalcNextChunkWidth(g, i, out cChunkSize);
-                Debug.Assert(cChunkSize >= 1);
+                float fAvailWidth = xMaxWidth - x;
+                bool bMustForceHyphen = (line.SubItems.Length == 0);
+                ProposeNextLayoutChunk chunk = new ProposeNextLayoutChunk(
+                    g, this, fAvailWidth, i, bMustForceHyphen);
 
-
+                Debug.Assert( !(chunk.TooLarge && line.SubItems.Length == 0),
+                    "Word too long for the line, and wasn't hyphenated. Shouldn't happen.");
 
                 // Will the Chunk fit on the line? If not, start a new line
-                if (x + fWidth > xMaxWidth)
+                if (chunk.TooLarge)
                 {
                     // If we're working on a chapter, then both this line and the next line will 
                     // need to reflect the indentation
@@ -1889,12 +2025,20 @@ namespace OurWord.Edit
                         verse.NeedsExtraLeadingSpace = false;
                         verse.CalculateWidth(g);
                     }
+
+                    // Loop back, because now that we have a longer line, we can try hyphenation
+                    // proposals that might have previously failed.
+                    continue;
                 }
 
-                // Add the chunk(s) to the line
-                for(int k=0; k<cChunkSize; k++)
-                    line.Append(SubItems[i + k] as EBlock);
-                x += fWidth;
+                // Add the approved chunk(s) to the line
+                for (int k = 0; k < chunk.ChunkSize; k++)
+                {
+                    EBlock block = SubItems[i] as EBlock;
+                    line.Append(block);
+                    x += block.Width;   // Can't use ChunkWidth because of verse width recalcs
+                    i++;
+                }
             }
 
             // Finally, we need to loop and actually assign Screen Coordinates to these objects,
@@ -1913,6 +2057,8 @@ namespace OurWord.Edit
             Height += ySpaceAfter;
         }
         #endregion
+
+
         #region Method: void RePosition(float yNew) - change the Y coord of the paragraph and its parts
         public void RePosition(float yNew)
             // Moves all of the "y" coordinates in the paragraph (paragraph, EBlocks, Lines)

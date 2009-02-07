@@ -1,0 +1,69 @@
+<html>
+<!-- #BeginTemplate "/Templates/Normal.dwt" --> 
+<head>
+<!-- #BeginEditable "doctitle" --> 
+<title>OurWord Help - Automated Hyphenation</title>
+<!-- #EndEditable --> 
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body bgcolor="#FFFFFF" text="#000000" background="../Images/Background.gif">
+<p><i><font size="4">OurWord Help</font></i> <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font size="5"><b><!-- #BeginEditable "Page%20Title" -->Automated 
+  Hyphenation <!-- #EndEditable --></b></font></p>
+<hr>
+<!-- #BeginEditable "Contents" --> 
+<p><i>OurWord</i> offers a quick-and-dirty means of hyphenation, which admittedly 
+  will not be sufficient for some languages. Depending on expressed user interest, 
+  future versions may incorporate a more rigorous approach to the problem. For 
+  now, though, we hope that a reasonable number of language can benefit.</p>
+<h3>1. Setup</h3>
+<p>Hyphenation is set up in the <i>Configuration Dialog</i>, under the <i>Team 
+  Settings</i> section, the <a href="WritingSystems.html">Writing 
+  Systems</a> tab. Because each writing system is potentially different, <i>OurWord</i> 
+  permits you to set up a different hyphenation definition for each one. </p>
+<p>1. You must first turn on the feature by changing &quot;<b><i>Turn On Auto-Hyphenation</i></b>&quot; 
+  to &quot;<b><i>Yes</i></b>&quot;. By default it is set to &quot;<b><i>No</i></b>&quot;, 
+  because automated hyphenation has a high potential to confuse new computer users.</p>
+<p>2. At the heart of hyphenation is to specify a CV pattern, where you indicate 
+  where the hyphen is permitted. </p>
+<ul>
+  <li>&quot;VC-C&quot; works for many English words, such as &quot;bog-gle&quot;, 
+    &quot;com-mit&quot;, and &quot;air-plane.&quot; Unfortunately it fails for 
+    words such as &quot;pa-per,&quot; thus it is recognized that OurWord will 
+    not completely cover all of the hyphenation rules of many languages.</li>
+  <li>&quot;V-C&quot; works for Huichol words, where closed syllables do not exist, 
+    thus &quot;p&uuml;-ca-heu-x&uuml;-ca-cai-ri&quot;</li>
+</ul>
+<p>(Please feel free to contact me with your requests on how I might enhance this 
+  feature in the future to support your language. I do know that the &quot;right&quot; 
+  way is to support the ICU library, and imagine that I will indeed at some point, 
+  again, depending on user demand for this feature.)</p>
+<p>3. You need to tell OurWord what your <i><b>consonants</b></i> are. Because 
+  we then know the consonants and the punctuation, we can infer that everything 
+  else is a vowel. </p>
+<p>4. Finally, the &quot;<i><b>Min. Split Size</b></i>&quot; is your way of telling 
+  OurWord not to break a word down into parts that are too small. Thus a minimum 
+  size of three would prevent &quot;ap-ple&quot;, because &quot;ap&quot; would 
+  be too small. </p>
+<hr>
+<h3>2. Behavior</h3>
+<p>If turned on, hyphens are automatically created, and automatically update as 
+  you type or otherwise edit the text. The hyphens appear outside of the white 
+  background, indicating that the user cannot type on top of them. Hopefully the 
+  user will not be tempted to type in hyphens, because doing so would cause them 
+  to be part of the data. If you ever see a hyphen with a white background, it 
+  was inserted by the user, not by OurWord.</p>
+<p>If a single word becomes too long to fit in a line, and if hyphenation is turned 
+  off (or if the hyphen rule does not apply), then OurWord will arbitrarily display 
+  a hyphen in order to keep the line from overflowing from view on the screen. 
+  Again, these hyphens are not inserted into the data, they merely appear on the 
+  screen.</p>
+<p>Hyphens are not yet implemented in the Print routine. I know, I know......stay 
+  tuned.....and the more voices that request it, the higher this stuff moves up 
+  on my To Do list.</p>
+<!-- #EndEditable --> 
+<hr>
+<p><font size="2">Updated as of Version 1.0.</font></p>
+</body>
+<!-- #EndTemplate -->
+</html>

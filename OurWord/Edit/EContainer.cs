@@ -911,7 +911,7 @@ namespace OurWord.Edit
             for (int i = 0; i < iPos; i++)
                 v[i] = SubItems[i];
 
-            for (int i = iPos; i < SubItems.Length; i++)
+            for (int i = iPos; i < SubItems.Length - 1; i++)
                 v[i] = SubItems[i + 1];
 
             m_vSubItems = v;
