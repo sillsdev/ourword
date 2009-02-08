@@ -1213,6 +1213,11 @@ namespace OurWord.DataModel
                 {
                     Append(new DPhrase(phrase.StyleAbbrev, phrase.Text));
                 }
+
+                // At a minimum we want at least one empty phrase. If "s" was empty
+                // when passed in, then we wioll not have this.
+                if (this.Count == 0)
+                    Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, ""));
             }
             #endregion
         }

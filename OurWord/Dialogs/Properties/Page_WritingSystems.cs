@@ -102,6 +102,14 @@ namespace OurWord.Dialogs
         #endregion
 
         // Property Grid ---------------------------------------------------------------------
+        #region Method: GetLoc_MinSplitSize(int nValue) - returns localization of "{0} letters"
+        string GetLoc_MinSplitSize(int nValue)
+        {
+            string sBase = G.GetLoc_String("WritingSystemMinSplitSize", "{0} letters");
+            string sValue = nValue.ToString();
+            return LocDB.Insert(sBase, new string[] { sValue } );
+        }
+        #endregion
         #region Property Grid Constants
         const string c_sPropName = "propName";
         const string c_sPropAbbrev = "propAbbrev";
@@ -185,8 +193,7 @@ namespace OurWord.Dialogs
             #region Min Split Size
             if (e.Property.ID == c_sPropAutoHyphenMinSplitSize)
             {
-                string s = WritingSystem.MinHyphenSplit.ToString() + " letters";
-                e.Value = s;
+                e.Value = GetLoc_MinSplitSize(WritingSystem.MinHyphenSplit);
             }
             #endregion
         }
@@ -403,13 +410,14 @@ namespace OurWord.Dialogs
                 null));
             #endregion
             #region formatted string: Min Split Size
+            string sDefaultMinSplitSize = GetLoc_MinSplitSize(3);
             Bag.Properties.Add(new PropertySpec(
                 c_sPropAutoHyphenMinSplitSize,
                 "Min Split Size",
                 typeof(string),
                 c_sGroupAutoHyphen,
                 "Hyphenation will not result in a word-part that is smaller than this value.",
-                "3 letters"));
+                sDefaultMinSplitSize));
             #endregion
 
             // Localize the bag
