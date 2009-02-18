@@ -151,8 +151,9 @@ namespace JWTools
 		{
 			string sScreenName = JW_Registry.GetValue(c_sSubKeyState, "Screen", "");
 
-			if (sScreenName.Length > 0)
+			if (!String.IsNullOrEmpty(sScreenName))
 			{
+
 				foreach(Screen scr in Screen.AllScreens)
 				{
 					foreach(char ch in scr.DeviceName)
