@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
@@ -107,31 +107,47 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="BackupSystem.cs" />
-    <Compile Include="JW_FeaturesPassword.cs" />
-    <Compile Include="JW_FileMenuIO.cs" />
+    <Compile Include="JW_FeaturesPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="JW_FileMenuIO.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="JW_Help.cs" />
-    <Compile Include="JW_ListView.cs" />
-    <Compile Include="JW_MenuItem.cs" />
+    <Compile Include="JW_ListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="JW_MenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="JW_Registry.cs" />
     <Compile Include="JW_Test.cs" />
     <Compile Include="JW_UI.cs" />
     <Compile Include="JW_Utilities.cs" />
     <Compile Include="JW_WindowState.cs" />
-    <Compile Include="JW_Wizard.cs" />
+    <Compile Include="JW_Wizard.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="JW_Wizard.Designer.cs">
       <DependentUpon>JW_Wizard.cs</DependentUpon>
     </Compile>
     <Compile Include="JW_Xml.cs" />
-    <Compile Include="Localizer\DlgEditDescriptions.cs" />
+    <Compile Include="Localizer\DlgEditDescriptions.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Localizer\DlgEditDescriptions.Designer.cs">
       <DependentUpon>DlgEditDescriptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Localizer\JW_Localization.cs" />
-    <Compile Include="Localizer\Localizer.cs" />
+    <Compile Include="Localizer\Localizer.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Localizer\Localizer.Designer.cs">
       <DependentUpon>Localizer.cs</DependentUpon>
     </Compile>
-    <Compile Include="Localizer\NewLanguageDlg.cs" />
+    <Compile Include="Localizer\NewLanguageDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Localizer\NewLanguageDlg.Designer.cs">
       <DependentUpon>NewLanguageDlg.cs</DependentUpon>
     </Compile>
@@ -140,7 +156,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="PropertyBag.cs" />
-    <Compile Include="DialogSetupFeatures.cs" />
+    <Compile Include="DialogSetupFeatures.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <EmbeddedResource Include="Help.ico" />
     <EmbeddedResource Include="JW_FeaturesPassword.resx">
       <DependentUpon>JW_FeaturesPassword.cs</DependentUpon>
@@ -150,6 +168,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="JW_MenuItem.resx">
       <DependentUpon>JW_MenuItem.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="JW_Wizard.resx">
       <DependentUpon>JW_Wizard.cs</DependentUpon>
@@ -178,6 +197,7 @@
         <GtkDesignInfo gtkVersion="2.12.3" />
       </Properties>
     </MonoDevelop>
+    <VisualStudio />
   </ProjectExtensions>
   <ItemGroup>
     <None Include="DialogSetupFeatures.resx" />
