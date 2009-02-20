@@ -9,3 +9,5 @@ _ReSharper.OurWord
 *~
 *.orig
 *.resources
+*.pidb
+

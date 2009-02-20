@@ -24,7 +24,7 @@ using System.Runtime.CompilerServices;
 //      Build Number
 //      Revision
 //
-[assembly: AssemblyVersion("1.0.0")]
+[assembly: AssemblyVersion("1.0.3")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
