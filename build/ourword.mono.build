@@ -259,7 +259,7 @@
                                 <include name="**" />
                          </fileset>
                 </copy>
-                <copy file="${path::combine(project.base.dir, 'OurWord/Setup_Linux/tsc-ourword.desktop')}" tofile="${path::combine(USR_MENU, 'sil-wesay.desktop')}" />
+                <copy file="${path::combine(project.base.dir, 'OurWord/Setup_Linux/tsc-ourword.desktop')}" tofile="${path::combine(USR_MENU, 'tsc-ourword.desktop')}" />
  		<copy file="ourword.mono.runner" tofile="${USR_BIN}/ourword" />
 	</target>
     
