@@ -1,4 +1,4 @@
-namespace OurWord
+namespace OurWord.Dialogs
 {
     partial class DlgDebug
     {

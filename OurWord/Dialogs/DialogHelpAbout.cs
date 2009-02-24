@@ -27,7 +27,7 @@ using JWdb;
 using OurWord.DataModel;
 #endregion
 
-namespace OurWord
+namespace OurWord.Dialogs
 {
     #region CLASS: DialogHelpAbout
     public class DialogHelpAbout : System.Windows.Forms.Form

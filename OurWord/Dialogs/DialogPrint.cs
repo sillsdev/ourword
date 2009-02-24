@@ -28,7 +28,7 @@ using JWdb;
 using OurWord.DataModel;
 #endregion
 
-namespace OurWord
+namespace OurWord.Dialogs
 {
 	#region CLASS: PrintDlg - the dialog for the user entering his print desires
 	public class DialogPrint : System.Windows.Forms.Form
