@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=OurWord
+Comment=Translate Documents
+GenericName=Document Translation Tool
+Exec=ourword
+Icon=tsc-ourword
+Terminal=false
+Type=Application
+Categories=GTK;GNOME;Office;
+StartupNotify=true

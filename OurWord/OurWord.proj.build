@@ -18,6 +18,8 @@
 				<include name="./**/*" />
 				<exclude name="./Setup" />				
 				<exclude name="./Setup/**/*" />				
+				<exclude name="./Setup_Linux" />				
+				<exclude name="./Setup_Linux/**" />				
 				<exclude name="**/*.cs" />
 				<exclude name="**/*.nunit" />
 				<exclude name="**/*.config" />
