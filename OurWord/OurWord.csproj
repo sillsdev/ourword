@@ -240,10 +240,10 @@
     <Compile Include="Dialogs\Properties\Page_Translation.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Dialogs\SplashScreenManager.cs" />
     <Compile Include="Dialogs\SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\SplashScreenManager.cs" />
     <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs" />
     <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs">
       <SubType>UserControl</SubType>
@@ -371,6 +371,8 @@
     </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Test.cs" />
     <Compile Include="Utilities\ColorComboQ.cs">
@@ -387,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <DependentUpon>Page_Notes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
       <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
@@ -438,7 +443,10 @@
     <EmbeddedResource Include="Dialogs\Properties\Page_TeamSettings.resx">
       <DependentUpon>Page_TeamSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Res\JobNaturalness.ico" />
     <EmbeddedResource Include="Res\JobBT.ico" />
     <EmbeddedResource Include="Res\JobDrafting.ico" />
@@ -500,9 +508,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Translation.resx">
       <DependentUpon>Page_Translation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
-      <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DialogFilter.resx">
       <DependentUpon>DialogFilter.cs</DependentUpon>
