@@ -134,17 +134,24 @@ namespace OurWord.Dialogs
 		private double m_dblOpacityIncrement = .05;
         private double m_dblOpacityDecrement = .08;
         private System.Timers.Timer m_Timer;
-		private const int TIMER_INTERVAL = 50;
+		private const int TIMER_INTERVAL = 100;
 		#region Method: void OnTimerTick(object sender, System.EventArgs e)
 
         delegate void OnTimerTick_Callback(object sender, System.EventArgs e);
 
 		private void OnTimerTick(object sender, System.EventArgs e)
 		{
+		//Console.Write("S OnTick\n");
+				if (s_wndSplash == null)
+				{
+					throw new Exception("Window should not be null");
+				}
             if (s_wndSplash.InvokeRequired)
             {
+      //      Console.Write(" S Invoke\n");
                 OnTimerTick_Callback cb = new OnTimerTick_Callback(OnTimerTick);
                 s_wndSplash.Invoke(cb, new object[] { sender, e });
+      //      Console.Write(" E Invoke\n");
             }
             else
             {
