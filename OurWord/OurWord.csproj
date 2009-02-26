@@ -240,6 +240,7 @@
     <Compile Include="Dialogs\Properties\Page_Translation.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Dialogs\SplashScreenManager.cs" />
     <Compile Include="Dialogs\SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -334,7 +335,7 @@
     <Compile Include="Edit\EContainer.cs" />
     <Compile Include="Edit\EWord.cs" />
     <Compile Include="Edit\NotesPane.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Edit\NotesPane.Designer.cs">
       <DependentUpon>NotesPane.cs</DependentUpon>
@@ -357,7 +358,7 @@
     <Compile Include="Merge\DiffText.cs" />
     <Compile Include="Merge\DMergeBook.cs" />
     <Compile Include="Merge\MergePane.cs">
-      <SubType>Component</SubType>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Merge\MergePane.Designer.cs">
       <DependentUpon>MergePane.cs</DependentUpon>
@@ -370,6 +371,8 @@
     </Compile>
     <Compile Include="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Test.cs" />
     <Compile Include="Utilities\ColorComboQ.cs">
@@ -386,6 +389,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <DependentUpon>Page_Notes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
       <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
@@ -437,7 +443,10 @@
     <EmbeddedResource Include="Dialogs\Properties\Page_TeamSettings.resx">
       <DependentUpon>Page_TeamSettings.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Res\JobNaturalness.ico" />
     <EmbeddedResource Include="Res\JobBT.ico" />
     <EmbeddedResource Include="Res\JobDrafting.ico" />
@@ -500,8 +509,20 @@
     <EmbeddedResource Include="Dialogs\Properties\Page_Translation.resx">
       <DependentUpon>Page_Translation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
-      <DependentUpon>SplashScreen.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\DialogFilter.resx">
+      <DependentUpon>DialogFilter.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DialogHelpAbout.resx">
+      <DependentUpon>DialogHelpAbout.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DialogPrint.resx">
+      <DependentUpon>DialogPrint.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DialogRepairImportBook.resx">
+      <DependentUpon>DialogRepairImportBook.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DialogRestoreFromBackup.resx">
+      <DependentUpon>DialogRestoreFromBackup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="licenses.licx" />
     <EmbeddedResource Include="OurWordMain.resx">

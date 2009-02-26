@@ -3725,14 +3725,9 @@ namespace OurWord
         {
             get
             {
+				// Changed from Major.Minor(a-z) because of build system and linux packaging.
                 Version v = Assembly.GetExecutingAssembly().GetName().Version;
-
-                char chBuild = (char)((int)'a' + v.Build);
-
-                string sVersionNo = v.Major.ToString() + "." + 
-                    v.Minor.ToString() +
-                    ((v.Build == 0) ? "" : chBuild.ToString());
-
+                string sVersionNo = v.Major + "." + v.Minor + " Build " + v.Build;
                 return sVersionNo;
             }
         }

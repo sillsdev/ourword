@@ -461,7 +461,7 @@ namespace OurWord.Dialogs
         static private void ShowForm()
         {
             s_wndSplash = new SplashScreen();
-            Application.Run(s_wndSplash);
+        	s_wndSplash.ShowDialog();
         }
         #endregion
         #region Cmd: cmdLoad

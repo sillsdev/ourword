@@ -163,6 +163,10 @@
     <EmbeddedResource Include="JW_FeaturesPassword.resx">
       <DependentUpon>JW_FeaturesPassword.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="DialogSetupFeatures.resx">
+      <DependentUpon>DialogSetupFeatures.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="JW_FileMenuIO.resx">
       <DependentUpon>JW_FileMenuIO.cs</DependentUpon>
     </EmbeddedResource>
@@ -199,7 +203,4 @@
     </MonoDevelop>
     <VisualStudio />
   </ProjectExtensions>
-  <ItemGroup>
-    <None Include="DialogSetupFeatures.resx" />
-  </ItemGroup>
 </Project>
