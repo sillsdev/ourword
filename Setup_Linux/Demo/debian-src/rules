@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-NANT=MONO_SHARED_DIR=/tmp nant -buildfile:build/ourword.mono.build
+NANT=MONO_SHARED_DIR=/tmp nant -buildfile:build/ourword-demo.mono.build
 build: build-stamp
 build-stamp:
 	dh_testdir

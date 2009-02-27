@@ -42,6 +42,7 @@
 	<target name="clean" description="Delete all previously compiled binaries.">
 		<delete>
 			<fileset>
+				<include name="../output/**" />
 				<exclude name="../.hg/**" />
 				<exclude name="../lib/**" />
 			</fileset>
@@ -72,6 +73,7 @@
 	<target name="dist" depends="version make-output-dir, set-build-config, set-runtime-config">
 		<tar destfile="${project.output.dir}/ourword-demo-src-${version}.tar.gz" compression="GZip">
 			<fileset basedir="${project.base.dir}">
+				<include name="build/**" />
 				<include name="SampleProject/**" />
 				<exclude name=".hg/**" />
 			</fileset>
@@ -102,9 +104,9 @@
 		<property name="USR_SHARE" value="${path::combine(INSTALL_DIR, 'usr/share/ourword-demo')}"/>
                 <property name="USR_ICONS" value="${path::combine(INSTALL_DIR, 'usr/share/icons')}"/>
                 <property name="USR_MENU" value="${path::combine(INSTALL_DIR, 'usr/share/applications')}"/>
- 		<copy todir="${USR_SHARE}/example1">
-			<fileset basedir="${project.base.dir}">
-				<include name="SampleProject/**" />
+ 		<copy todir="${USR_SHARE}/Example1">
+			<fileset basedir="${project.base.dir}/SampleProject">
+				<include name="**" />
 			 </fileset>
 		</copy>
  		<copy file="ourword-demo.mono.runner" tofile="${USR_BIN}/ourword-demo" />
