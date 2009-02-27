@@ -1,8 +1,6 @@
 ourword (1.0-1sil1) hardy; urgency=low
 
   * Initial Linux build  
-  * Updated to upstream OurWord 1.0
-  * Status is still experimental in Linux / Ubuntu
 
  -- Cambell Prince <cambell_prince@sil.org>  Fri, 28 Nov 2008 10:57:47 +0700
 

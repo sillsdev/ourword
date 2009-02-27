@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ ! -f ~/OurWordExamples/Example1/Settings/OurWordSample.owp ]
+	then
+		mkdir -p ~/.config/OurWordExamples/Example1
+		cp -r /usr/share/ourword-demo/Example1 ~/OurWordExamples/
+fi
+exec mono /usr/share/ourword/OurWord.exe ~/OurWordExamples/Example1/Settings/OurWordSample.owp "$@"
