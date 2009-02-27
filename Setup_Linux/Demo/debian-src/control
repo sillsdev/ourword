@@ -1,0 +1,16 @@
+Source: ourword-demo
+Section: editors
+Priority: optional
+Maintainer: Cambell Prince <cambell_prince@sil.org>
+Build-Depends: debhelper (>=5), nant (>= 0.86+rc1)
+Standards-Version: 3.7.3
+
+Package: ourword-demo
+Section: editors
+Architecture: any
+Depends: ourword
+Description: OurWord Examples, an example project for the OurWord translation editor
+ This is a sample project for the OurWord translation editor.
+ OurWord is translation software designed for national translators,
+ translating texts into minority languages. OurWord provides a simple
+ user interface suitable for novice computer users.

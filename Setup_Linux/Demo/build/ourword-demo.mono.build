@@ -42,10 +42,7 @@
 	<target name="clean" description="Delete all previously compiled binaries.">
 		<delete>
 			<fileset>
-				<include name="../**/bin/**" />
-				<include name="../**/obj/**" />
 				<include name="../output/**" />
-				<include name="../release/output/*" />
 				<exclude name="../.hg/**" />
 				<exclude name="../lib/**" />
 			</fileset>
@@ -73,143 +70,11 @@
 		<echo message="Version: ${version}" />
 	</target>
 
-	<target name="assemblyinfo" depends="version">
-		<foreach item="File" property="filename">
-			<in>
-				<items>
-					<include name="../**/AssemblyInfo.cs" />
-				</items>
-			</in>
-			<do>
-				<script language="C#">
-				<code><![CDATA[
-				public static void ScriptMain(Project project)
-				{
-					StreamReader reader = new StreamReader(project.Properties["filename"]);
-					string contents = reader.ReadToEnd();
-					reader.Close();
-					string replacement;
-					string newText = contents;
-					replacement = string.Format(
-						"[assembly: AssemblyVersion(\"{0}\")]",
-						project.Properties["version"]
-					);
-					newText = Regex.Replace(newText, @"\[assembly: AssemblyVersion\("".*""\)\]", replacement);
-					replacement = string.Format(
-						"[assembly: AssemblyFileVersion(\"{0}\")]",
-						project.Properties["version"]
-					);
-					newText = Regex.Replace(newText, @"\[assembly: AssemblyFileVersion\("".*""\)\]", replacement);
-					StreamWriter writer = new StreamWriter(project.Properties["filename"], false);
-					writer.Write(newText);
-					writer.Close();
-				}
-				]]>
-				</code>
-				</script>
-			</do>
-		</foreach>
-	</target>
-
-	<target name="build" description="Build all targets." depends="clean">
-		<call target="build-only"/>
-	</target>
-
-	<target name="rebuild">
-		<call target="build-only"/>
-	</target>
-
-	<target name="build-only" depends="make-output-dir, set-build-config, set-runtime-config, copy-lib-files">
-		<nant target="build">
-			<properties>
-				<property name="build.defines" value="${build.defines}" />
-	        	<property name="build.debug" value="${build.debug}" />
-				<property name="build.debug" value="${build.debug}" />
-				<property name="project.lib.dir" value="${project.lib.dir}" />
-				<property name="project.output.dir" value="${project.output.dir}" />
-			</properties>    		
-			<buildfiles refid="project.buildfiles.src" />
-    	</nant>
-
-        <property name="expected.output" value="${project.output.dir}/OurWord.exe"/>
-        <fail unless="${file::exists(expected.output)}">Output file doesn't exist in ${expected.output}</fail>
-    </target>
-    
-	<target name="test" description="Build all targets." depends="build-only">
-		<call target="test-only"/>
-	</target>
-
-     <target name="test-only">
-<!-- Run tests the first time without stopping the build under on failing tests because we want to be able to see ALL failing tests in the log.
-		The downside to this is that TeamCity will show a passing build even with failing tests-->
-		
-		<echo message="*********************************************************************"/>
-		<echo message="******                  Begin Test run!	                    ********"/>
-		<echo message="*********************************************************************"/>	
-
-	<foreach item="File" property="filename">
-	    <in>
-			<items>
-				<include name="${project.output.dir}/*.Tests.dll" />
-       		</items>
-	    </in>
-	    <do>
-		    <nunit2 failonerror="false" verbose="true">
-    		<formatter type="Plain"/>
-    		<test>
-            <assemblies>
-            	<include name="${filename}" />
-            </assemblies>
-            <categories>
-				<exclude name="MouseSensitive"/>
-				<exclude name="Windows IME"/>
-            	<exclude name="Keyman6"/>
-            	<exclude name="Keyman7"/>
-          	</categories>
-    		</test>    	
-    	</nunit2>
-	    </do>
-		</foreach>
-
-		<echo message="*********************************************************************"/>
-		<echo message="******                  End Test run!                        ********"/>
-		<echo message="*********************************************************************"/>
-
-<!-- Run the tests a second time, failing as soon as possible. We do this so that TeamCity indicates a failed build on failing tests-->
-		<nunit2 haltonfailure="true" failonerror="true">
-    		<formatter type="Plain" usefile="false" />
-    		<test>
-            <assemblies>
-            	<include name="${project.output.dir}/*.Tests.dll" />
-            </assemblies>
-            <categories>
-				<exclude name="MouseSensitive"/>
-				<exclude name="Windows IME"/>
-            	<exclude name="Keyman6"/>
-            	<exclude name="Keyman7"/>
-          	</categories>
-    		</test>    	
-    	</nunit2>
-    </target>
-
-	<target name="dist" depends="assemblyinfo make-output-dir, set-build-config, set-runtime-config">
-		<tar destfile="${project.output.dir}/ourword-src-${version}.tar.gz" compression="GZip">
+	<target name="dist" depends="version make-output-dir, set-build-config, set-runtime-config">
+		<tar destfile="${project.output.dir}/ourword-demo-src-${version}.tar.gz" compression="GZip">
 			<fileset basedir="${project.base.dir}">
-				<include name="./**/*.build" />
-				<include name="./**/*.cs" />
-				<include name="./**/*.resx" />
-				<include name="./**/Resources/*" />
-				<include name="./**/*.png" />
-				<include name="./**/*.xsl" />
-				<include name="./**/*.htm" />
-				<include name="./**/*.bmp" />
-				<include name="./**/*.ico" />
-				<include name="./**/*.gif" />
-				<include name="OurWord/Loc/**" />
-				<include name="Setup_Linux/Desktop/**" />
-				<include name="lib/mono/**" />
-				<include name="build/*" />
-				<exclude name="output/**/*" />
+				<include name="build/**" />
+				<include name="SampleProject/**" />
 				<exclude name=".hg/**" />
 			</fileset>
 		</tar>
@@ -219,7 +84,7 @@
 		<echo message="Deleting exising files from publish folder. Note: this folder is above the project.base.dir" />
         <delete>
             <fileset>
-                <include name="${project.base.dir}/../ourword_*" />
+                <include name="${project.base.dir}/../ourword-demo_*" />
 			</fileset>
 		</delete>
 		<echo message="Reverting package changelog debian-src/changelog" />
@@ -236,31 +101,15 @@
 	<target name="install" depends="set-build-config, set-runtime-config, set-output-dir">
 		<property name="INSTALL_DIR" value="/" overwrite="false" />
 		<property name="USR_BIN" value="${path::combine(INSTALL_DIR, 'usr/bin')}"/>
-		<property name="USR_SHARE" value="${path::combine(INSTALL_DIR, 'usr/share/ourword')}"/>
+		<property name="USR_SHARE" value="${path::combine(INSTALL_DIR, 'usr/share/ourword-demo')}"/>
                 <property name="USR_ICONS" value="${path::combine(INSTALL_DIR, 'usr/share/icons')}"/>
                 <property name="USR_MENU" value="${path::combine(INSTALL_DIR, 'usr/share/applications')}"/>
- 		<copy todir="${USR_SHARE}">
-			<fileset basedir="${project.output.dir}">
-				<include name="*.dll" />
-				<include name="*.exe" />
-				<include name="*.config" />
-				<exclude name="*Tests.dll" />
-				<exclude name="*Test.dll" />
-				<exclude name="*.mdb" />
-			 </fileset>
-		</copy>
-		<copy todir="${path::combine(USR_SHARE, 'Loc')}">
-			<fileset basedir="${project.src.dir}/OurWord/Loc">
+ 		<copy todir="${USR_SHARE}/Example1">
+			<fileset basedir="${project.base.dir}/SampleProject">
 				<include name="**" />
 			 </fileset>
 		</copy>
-                <copy todir="${USR_ICONS}">
-                        <fileset basedir="${path::combine(project.base.dir, 'Setup_Linux/Desktop/icons')}">
-                                <include name="**" />
-                         </fileset>
-                </copy>
-                <copy file="${path::combine(project.base.dir, 'Setup_Linux/Desktop/tsc-ourword.desktop')}" tofile="${path::combine(USR_MENU, 'tsc-ourword.desktop')}" />
- 		<copy file="ourword.mono.runner" tofile="${USR_BIN}/ourword" />
+ 		<copy file="ourword-demo.mono.runner" tofile="${USR_BIN}/ourword-demo" />
 	</target>
     
 
