@@ -4,7 +4,8 @@ NANT=MONO_SHARED_DIR=/tmp nant -buildfile:build/ourword-demo.mono.build
 build: build-stamp
 build-stamp:
 	dh_testdir
-	$(NANT) build-only
+	# No build required for the demo data
+	# $(NANT) build-only
 	touch build-stamp
 
 clean:
