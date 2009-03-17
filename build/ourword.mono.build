@@ -206,7 +206,8 @@
 				<include name="./**/*.ico" />
 				<include name="./**/*.gif" />
 				<include name="OurWord/Loc/**" />
-				<include name="Setup_Linux/Desktop/**" />
+        <include name="Help/*.chm" />
+        <include name="Setup_Linux/Desktop/**" />
 				<include name="lib/mono/**" />
 				<include name="build/*" />
 				<exclude name="output/**/*" />
