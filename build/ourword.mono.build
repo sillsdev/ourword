@@ -254,10 +254,15 @@
 				<include name="**" />
 			 </fileset>
 		</copy>
-                <copy todir="${USR_ICONS}">
-                        <fileset basedir="${path::combine(project.base.dir, 'Setup_Linux/Desktop/icons')}">
-                                <include name="**" />
-                         </fileset>
+    <copy todir="${path::combine(USR_SHARE, 'Help')}">
+      <fileset basedir="${project.src.dir}/Help">
+        <include name="*.chm" />
+      </fileset>
+    </copy>
+    <copy todir="${USR_ICONS}">
+        <fileset basedir="${path::combine(project.base.dir, 'Setup_Linux/Desktop/icons')}">
+          <include name="**" />
+        </fileset>
                 </copy>
                 <copy file="${path::combine(project.base.dir, 'Setup_Linux/Desktop/tsc-ourword.desktop')}" tofile="${path::combine(USR_MENU, 'tsc-ourword.desktop')}" />
  		<copy file="ourword.mono.runner" tofile="${USR_BIN}/ourword" />

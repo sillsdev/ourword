@@ -9,17 +9,10 @@
 #region Using
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using System.IO;
-using Microsoft.Win32;
+
 #endregion
 
 namespace JWTools
@@ -34,7 +27,8 @@ namespace JWTools
 				return m_nID;
 			}
 		}
-		int    m_nID;
+
+		readonly int    m_nID;
 		#endregion
 		#region Attr{g}: string Url - the URL that corresponds to the ID
 		public string Url
@@ -46,7 +40,8 @@ namespace JWTools
 				return m_sUrl;
 			}
 		}
-		string m_sUrl;
+
+		readonly string m_sUrl;
 		#endregion
 
 		#region Constructor(nID, sUrl)
@@ -97,7 +92,6 @@ namespace JWTools
 				if (0 == sPath.Length)
 				{
 					OpenFileDialog dlg = new OpenFileDialog();
-
 					// We only want to return a single file
 					dlg.Multiselect = false;
 
@@ -108,6 +102,10 @@ namespace JWTools
 					// Filter on HtmlHelp files
 					dlg.Filter = "Help Files (*.chm)|*.chm";
 					dlg.FilterIndex = 1;
+
+					#if MONO
+					dlg.InitialDirectory = "/usr/share/ourword/Help";
+					#endif
 
 					// Retrieve Dialog Title from resources
 					dlg.Title = "Locate the \"" + FileName + "\" help file";
@@ -214,9 +212,13 @@ namespace JWTools
 		{
             try
             {
-                Help.ShowHelp(Form, RegistryHelpFile);
+#if  MONO
+				ShowHelp();
+#else
+				Help.ShowHelp(Form, RegistryHelpFile);
+#endif
             }
-            catch (Exception) 
+			catch  //!!! review: CJP 28 Feb 2009
             {
             }
 		}
@@ -230,9 +232,13 @@ namespace JWTools
 				{
                     try
                     {
+#if MONO
+						ShowHelp();
+#else
                         Help.ShowHelp(Form, RegistryHelpFile, topic.Url);
+#endif
                     }
-                    catch (Exception)
+                    catch //!!! review: CJP 28 Feb 2009
                     {
                     }
 					return;
@@ -242,6 +248,23 @@ namespace JWTools
 			ShowDefaultTopic();
 		}
 		#endregion
+
+#if MONO
+		private static void ShowHelp()
+		{
+			string helpFilePath = RegistryHelpFile;
+			if (!File.Exists(helpFilePath))
+			{
+				throw new FileNotFoundException("Help file not found", helpFilePath);
+			}
+			Process proc = new Process();
+			proc.StartInfo.FileName = "/usr/bin/chmsee";
+			proc.StartInfo.Arguments = helpFilePath;
+			proc.StartInfo.UseShellExecute = false;
+			proc.StartInfo.RedirectStandardOutput = false;
+			proc.Start();
+		}
+#endif
 
 		// Individual topics -----------------------------------------------------------------
 		#region Method: void Show_DlgFeatures()
