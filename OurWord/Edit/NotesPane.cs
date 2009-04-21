@@ -20,7 +20,7 @@ using System.Timers;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.View;
 using OurWord.Edit;
 #endregion
@@ -200,7 +200,7 @@ namespace OurWord.Edit
                 }
 
                 // Add a menu item to show all of the categories
-                string sShowAllCategories = G.GetLoc_Notes("ShowAllCategories", "Show All Categories");
+                string sShowAllCategories = Loc.GetNotes("ShowAllCategories", "Show All Categories");
                 ToolStripMenuItem itemAll = new ToolStripMenuItem(sShowAllCategories);
                 itemAll.Click += new System.EventHandler(cmdTurnOnAllClassifications);
                 m_Show.DropDownItems.Add(itemAll);
@@ -213,7 +213,7 @@ namespace OurWord.Edit
                         m_Show.DropDownItems.Add(new ToolStripSeparator());
 
                     // Add a menu item for the Front Translation notes we want to see
-                    string sFrontCategories = G.GetLoc_NoteDefs("FrontCategories", "Notes From Front Translation");
+                    string sFrontCategories = Loc.GetNoteDefs("FrontCategories", "Notes From Front Translation");
                     ToolStripMenuItem itemFromFront = new ToolStripMenuItem(sFrontCategories);
                     m_Show.DropDownItems.Add(itemFromFront);
 
@@ -428,19 +428,19 @@ namespace OurWord.Edit
             Clear();
 
             // Nothing more to do if we don't have a completely-defined project
-            if (!G.Project.HasDataToDisplay)
+            if (!DB.Project.HasDataToDisplay)
                 return;
 
             // Retrieve the notes that we will be showing, from both Front and Target
-            List<TranslatorNote> vNotes = G.STarget.GetAllTranslatorNotes(true);
-            vNotes.AddRange(G.SFront.GetAllTranslatorNotes(true));
+            List<TranslatorNote> vNotes = DB.TargetSection.GetAllShownTranslatorNotes();
+            vNotes.AddRange(DB.FrontSection.GetAllShownTranslatorNotes());
 
             // Sort (the IComparer will do this by reference)
             vNotes.Sort();
             
             // Place them into the window
             foreach (TranslatorNote note in vNotes)
-                Contents.Append( note.BuildNotesPaneView(this) );
+                Contents.Append( BuildView(note) );
 
             // Tell the superclass to finish loading, which involves laying out the window 
             // with the data we've just put in, as doing the same for any secondary windows.
@@ -514,7 +514,7 @@ namespace OurWord.Edit
                         continue;
 
                     // Get its note
-                    TranslatorNote note = GetNoteFromContainer(collapsable);
+                    TranslatorNote note = NotesWnd.GetNoteFromContainer(collapsable);
                     if (null == note)
                         continue;
 
@@ -546,35 +546,6 @@ namespace OurWord.Edit
                 base.RestoreWindowSelectionAndScrollPosition();
             }
             #endregion
-            #region Method: TranslatorNote GetNoteFromContainer(EContainer)
-            TranslatorNote GetNoteFromContainer(EContainer container)
-            {
-                OWPara para = container as OWPara;
-                if (null != para)
-                {
-                    DParagraph pSource = para.DataSource as DParagraph;
-                    if (null != pSource)
-                    {
-                        Discussion discussion = pSource.Owner as Discussion;
-                        if (null != discussion)
-                            return discussion.Note;
-                    }
-                }
-
-                foreach (EItem item in container.SubItems)
-                {
-                    EContainer SubContainer = item as EContainer;
-                    if (null != SubContainer)
-                    {
-                        TranslatorNote n = GetNoteFromContainer(SubContainer);
-                        if (null != n)
-                            return n;
-                    }
-                }
-
-                return null;
-            }
-            #endregion
 
             #region Constructor(OWWindow)
             public NotesBookmark(OWWindow wnd)
@@ -604,6 +575,362 @@ namespace OurWord.Edit
             return new NotesBookmark(this);
         }
         #endregion
+
+        // Command Handlers ------------------------------------------------------------------
+        #region Cmd: OnChangeCategory - user has responded to the Category dropdown
+        public void OnChangeCategory(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
+
+            TranslatorNote note = item.Tag as TranslatorNote;
+            if (null == note)
+                return;
+
+            (new ChangeClassification(NotesPane.WndNotes,
+               note, sender as ToolStripMenuItem, "Change Category to")).Do();
+        }
+        #endregion
+        #region Cmd: OnChangeAssignedTo - user has responded to the AssignedTo dropdown
+        public void OnChangeAssignedTo(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
+
+            TranslatorNote note = item.Tag as TranslatorNote;
+            if (null == note)
+                return;
+
+            (new ChangeClassification(NotesPane.WndNotes,
+                note, sender as ToolStripMenuItem, "Assign to")).Do();
+        }
+        #endregion
+        #region Cmd: OnAddResponse
+        public void OnAddResponse(object sender, EventArgs e)
+        {
+            ToolStripButton item = sender as ToolStripButton;
+            if (null == item)
+                return;
+
+            TranslatorNote note = item.Tag as TranslatorNote;
+            if (null == note)
+                return;
+
+            (new AddDiscussionAction(NotesPane.WndNotes, note)).Do();
+        }
+        #endregion
+
+        // View Building ---------------------------------------------------------------------
+        #region SMethod: TranslatorNote GetNoteFromContainer(EContainer)
+        static TranslatorNote GetNoteFromContainer(EContainer container)
+            // The container can be any subcontainer in the view hierarchy
+        {
+            OWPara para = container as OWPara;
+            if (null != para)
+            {
+                DParagraph pSource = para.DataSource as DParagraph;
+                if (null != pSource)
+                {
+                    Discussion discussion = pSource.Owner as Discussion;
+                    if (null != discussion)
+                        return discussion.Note;
+                }
+            }
+
+            foreach (EItem item in container.SubItems)
+            {
+                EContainer SubContainer = item as EContainer;
+                if (null != SubContainer)
+                {
+                    TranslatorNote n = GetNoteFromContainer(SubContainer);
+                    if (null != n)
+                        return n;
+                }
+            }
+
+            return null;
+        }
+        #endregion
+        #region Method: ECollapsableHeaderColumn GetCollapsableFromNote(note)
+        public ECollapsableHeaderColumn GetCollapsableFromNote(TranslatorNote note)
+        {
+            foreach (EContainer container in Contents)
+            {
+                var collapsable = container as ECollapsableHeaderColumn;
+                if (null == collapsable)
+                    continue;
+
+                if (note == collapsable.Tag as TranslatorNote)
+                    return collapsable;
+            }
+            return null;
+        }
+        #endregion
+
+        #region Method: void BuildAddButton(TranslatorNote, ToolStrip)
+        void BuildAddButton(TranslatorNote note, ToolStrip ts)
+        {
+            // Is this note editable?
+            if (!note.IsEditable)
+                return;
+
+            // Are we allowed to add a discussion? No, if we have the same
+            // author and the same date.
+            if (note.LastDiscussion.Author == Discussion.DefaultAuthor &&
+                note.LastDiscussion.Created.Date == DateTime.Today)
+                return;
+
+            // If here, we can go ahead and create the Respond button
+            string sButtonText = Loc.GetNotes("AddResponse", "Respond");
+            ToolStripButton btnAddResponse = new ToolStripButton(sButtonText);
+            btnAddResponse.Image = JWU.GetBitmap("Note_OldVersions.ico");
+            btnAddResponse.Tag = note;
+            btnAddResponse.Click += new EventHandler(OnAddResponse);
+            ts.Items.Add(btnAddResponse);
+        }
+        #endregion
+        #region Method: void BuildCategoryControl(note, ToolStrip)
+        void BuildCategoryControl(TranslatorNote note, ToolStrip ts)
+        {
+            // If this is turned off, don't show anything
+            if (!TranslatorNote.ShowCategories)
+                return;
+
+            // Determine if the category is changeable by this user
+            // Default to "yes"
+            bool bCategoryIsChangeable = true;
+            // Can't change it if it is the front translation
+            if (!note.IsOwnedInTargetTranslation)
+                bCategoryIsChangeable = false;
+
+            // If editable, then we buld a dropdown control
+            if (bCategoryIsChangeable)
+            {
+                // We need a touch of space between controls
+                ts.Items.Add(new ToolStripLabel("  "));
+
+                ToolStripDropDownButton menuCategory = new ToolStripDropDownButton(note.Category);
+                foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
+                {
+                    if (cat.IsChecked)
+                    {
+                        ToolStripMenuItem item = new ToolStripMenuItem(cat.Name);
+                        item.Tag = note;
+                        item.Click += new EventHandler(OnChangeCategory);
+                        if (cat.Name == note.Category)
+                        {
+                            item.Checked = true;
+                            menuCategory.Text = cat.Name;
+                        }
+                        menuCategory.DropDownItems.Add(item);
+                    }
+                }
+                ts.Items.Add(menuCategory);
+                return;
+            }
+
+            // Otherwise, we just display it
+            ToolStripLabel labelCategory = new ToolStripLabel(note.Category);
+            ts.Items.Add(labelCategory);
+        }
+        #endregion
+        #region Method: void BuildAssignedToControl(note, ToolStrip)
+        void BuildAssignedToControl(TranslatorNote note, ToolStrip ts)
+        {
+            // If this is turned off, don't show anything
+            if (!TranslatorNote.ShowAssignedTo)
+                return;
+
+            // If this is a Front Translation note, we don't want to show anything.
+            if (!note.IsOwnedInTargetTranslation)
+                return;
+
+            // We need a touch of space between controls
+            ts.Items.Add(new ToolStripLabel("  "));
+
+            // Place the AssignedTo as a drop-down button
+            string sMenuName = Loc.GetNotes("kAssignTo", "Assign To");
+            ToolStripDropDownButton menuAssignedTo = new ToolStripDropDownButton(sMenuName);
+            foreach (TranslatorNote.Classifications.Classification cl in TranslatorNote.People)
+            {
+                // Don't let it be assigned to "Unknown Author"
+                if (cl.Name == TranslatorNote.UnknownAuthor)
+                    continue;
+
+                // Create the menu item
+                ToolStripMenuItem item = new ToolStripMenuItem(cl.Name);
+                item.Tag = note;
+                item.Click += new EventHandler(OnChangeAssignedTo);
+                if (cl.Name == note.AssignedTo)
+                {
+                    item.Checked = true;
+                    menuAssignedTo.Text = cl.Name;
+                }
+                menuAssignedTo.DropDownItems.Add(item);
+            }
+            ts.Items.Add(menuAssignedTo);
+        }
+        #endregion
+
+        #region Method: EToolStrip BuildToolStrip(note)
+        EToolStrip BuildToolStrip(TranslatorNote note)
+        {
+            // Create the EToolStrip
+            EToolStrip toolstrip = new EToolStrip(this);
+            ToolStrip ts = toolstrip.ToolStrip; // Shorthand
+
+            // Add the "Add" button
+            BuildAddButton(note, ts);
+
+            // Add the Category Control
+            BuildCategoryControl(note, ts);
+
+            // Add the AssignedTo Control
+            BuildAssignedToControl(note, ts);
+
+            // If we didn't add anything, then dispose of it
+            if (ts.Items.Count == 0)
+            {
+                ts.Dispose();
+                return null;
+            }
+
+            return toolstrip;
+        }
+        #endregion
+        #region Method: EContainer BuildView(note)
+        public EContainer BuildView(TranslatorNote note)
+            // We place the note in a collapsable container, so the user can hit the 
+            // plus/minus icon to see the entire note or not.
+        {
+            // Create a header paragraph, to show when the note is collapsed
+            DBasicText textHeader = note.GetCollapsableHeaderText("");
+            OWPara pHeader = new OWPara(
+                DB.TargetTranslation.WritingSystemVernacular,
+                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
+                textHeader.Phrases.AsVector);
+
+            // Create the Collapsable Header Column to house the note
+            ECollapsableHeaderColumn eHeader = new ECollapsableHeaderColumn(pHeader);
+            eHeader.IsCollapsed = true;
+            eHeader.ShowHeaderWhenExpanded = true;
+            eHeader.Tag = note;
+
+            // We want a horizontal line underneath it, to separate notes visually from 
+            // each other
+            eHeader.Border = new EContainer.SquareBorder(eHeader);
+            eHeader.Border.BorderPlacement = EContainer.BorderBase.BorderSides.Bottom;
+            eHeader.Border.BorderColor = Color.DarkGray;
+            eHeader.Border.BorderWidth = 2;
+            eHeader.Border.Margin.Bottom = 5;
+            eHeader.Border.Padding.Bottom = 5;
+
+            // Add the Discussions
+            foreach (Discussion disc in note.Discussions)
+                eHeader.Append(BuildView(disc));
+
+            // Add the Category and AssignedTo, if turned on
+            if (note.IsOwnedInTargetTranslation)
+            {
+                EToolStrip ts = BuildToolStrip(note);
+
+                // We only add this if it turned out that there is something actually in it
+                if (null != ts)
+                    eHeader.Append(ts);
+            }
+
+            return eHeader;
+        }
+        #endregion
+
+        #region Method: EContainer BuildView(Discussion)
+        public EContainer BuildView(Discussion discussion)
+        // We'll put this Discussion into a HeaderColumn. The header will be the
+        // author and date, the body will be the paragraphs
+        {
+            discussion.Debug_VerifyIntegrity();
+
+            int nRoundedCornerInset = 8;
+
+            // We don't bother with showing the date for Notes from the Front Translation,
+            // figuring that this is less relevant (and therefore clutter)
+            bool bIsFromTargetTranslation = discussion.Note.IsOwnedInTargetTranslation;
+            int cHeaderColumns = (bIsFromTargetTranslation) ? 2 : 1;
+
+            // Define the Header. Insert the left/right margins so that they do not overlap
+            // the rounded corners.
+            ERowOfColumns eHeader = new ERowOfColumns(cHeaderColumns);
+            eHeader.Border.Padding.Left = nRoundedCornerInset;
+            eHeader.Border.Padding.Right = nRoundedCornerInset;
+
+            OWPara pAuthor = new OWPara(
+                DB.TargetTranslation.WritingSystemVernacular,
+                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
+                discussion.Author);
+            eHeader.Append(pAuthor);
+
+            // Define the author
+            if (bIsFromTargetTranslation)
+            {
+                OWPara pDate = new OWPara(
+                    DB.TargetTranslation.WritingSystemVernacular,
+                    DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDate),
+                    discussion.Created.ToShortDateString());
+                eHeader.Append(pDate);
+            }
+
+            // Create the main container and define its border
+            EHeaderColumn eMainContainer = new EHeaderColumn(eHeader);
+            eMainContainer.Border = new EContainer.RoundedBorder(eMainContainer, 12);
+            eMainContainer.Border.BorderColor = TranslatorNote.BorderColor;
+            eMainContainer.Border.FillColor = TranslatorNote.DiscussionHeaderColor;
+            // The contents of the HeaderColumn are inset from the edges
+            eMainContainer.Border.Padding.Left = 3;
+            eMainContainer.Border.Padding.Right = 2;
+            eMainContainer.Border.Padding.Bottom = 2;
+
+            // Color depends on editability
+            Color clrBackground = (discussion.IsEditable) ? Color.White : TranslatorNote.UneditableColor;
+
+            // Create a Column to hold the discussion paragraphs. Insert the left/right
+            // margins so nothing overlaps the rounded corners.
+            EColumn eDiscussionHolder = new EColumn();
+            eDiscussionHolder.Border = new EContainer.RoundedBorder(eDiscussionHolder, 12);
+            eDiscussionHolder.Border.BorderColor = TranslatorNote.BorderColor;
+            eDiscussionHolder.Border.FillColor = clrBackground;
+            eDiscussionHolder.Border.Padding.Left = nRoundedCornerInset;
+            eDiscussionHolder.Border.Padding.Right = nRoundedCornerInset;
+            eMainContainer.Append(eDiscussionHolder);
+
+            // Paragraph editing options
+            OWPara.Flags options = OWPara.Flags.None;
+            if (discussion.IsEditable)
+                options |= (OWPara.Flags.IsEditable | OWPara.Flags.CanItalic);
+            if (OurWordMain.Features.F_StructuralEditing)
+                options |= OWPara.Flags.CanRestructureParagraphs;
+
+            // Add the paragraphs to the Discussion Holder
+            foreach (DParagraph para in discussion.Paragraphs)
+            {
+                // Create the OWPara and add it to its container
+                OWPara pDiscussion = new OWPara(
+                    DB.TargetTranslation.WritingSystemVernacular,
+                    DB.StyleSheet.FindParagraphStyle(para.StyleAbbrev),
+                    para,
+                    clrBackground,
+                    options
+                    );
+                if (!discussion.IsEditable)
+                    pDiscussion.NonEditableBackgroundColor = clrBackground;
+                eDiscussionHolder.Append(pDiscussion);
+            }
+
+            return eMainContainer;
+        }
+        #endregion
+
     }
 
 }

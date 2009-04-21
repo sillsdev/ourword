@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 Jan 2008
  * Purpose: Introduces the NewProject Wizard
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -23,7 +23,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizNewProject

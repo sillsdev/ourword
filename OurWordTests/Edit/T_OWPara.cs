@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Tests the OWPara class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -19,9 +19,9 @@ using NUnit.Framework;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -49,7 +49,7 @@ namespace OurWordTests.Edit
         {
             get
             {
-                return G.Project.TargetTranslation.WritingSystemVernacular;
+                return DB.Project.TargetTranslation.WritingSystemVernacular;
             }
         }
         #endregion
@@ -117,17 +117,17 @@ namespace OurWordTests.Edit
             p.AddRun(DVerse.Create("16"));
 
             m_DBT1 = new DText();
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "For God so loved the "));
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "For God so loved the "));
             m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that he gave his one and only son"));
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that he gave his one and only son"));
             p.AddRun(m_DBT1);
 
             p.AddRun(DVerse.Create("17"));
 
             m_DBT2 = new DText();
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that whosoever believes in him "));
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that whosoever believes in him "));
             m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "but have everlasting life."));
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "but have everlasting life."));
             p.AddRun(m_DBT2);
 
             m_section.Paragraphs.Append(p);
@@ -145,13 +145,13 @@ namespace OurWordTests.Edit
 
             // Application and Project initialization
             OurWordMain.App = new OurWordMain();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Project";
-            G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
-            DBook book = new DBook("MRK", "");
-            G.Project.TargetTranslation.AddBook(book);
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
+            DBook book = new DBook("MRK");
+            DB.Project.TargetTranslation.AddBook(book);
             G.URStack.Clear();
 
             m_section = new DSection(1);
@@ -185,7 +185,7 @@ namespace OurWordTests.Edit
         #region TearDown
         [TearDown] public void TearDown()
         {
-            OurWordMain.Project = null;
+            DB.Project = null;
             m_Form.Dispose();
             m_Form = null;
         }
@@ -1106,22 +1106,22 @@ namespace OurWordTests.Edit
             p.AddRun(DVerse.Create("16"));
 
             m_DBT1 = new DText();
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "Mepücatemaicai memü memüteyurieniquecai. "));
             m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, 
                 "yuxexuitü "));
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
+            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, 
                 "ivaviyacaitüni tineunaque quetatineutaxatüa."));
             p.AddRun(m_DBT1);
 
             p.AddRun(DVerse.Create("17"));
 
             m_DBT2 = new DText();
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "Haqueva pepeyetüa? "));
             m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic,
                 "Quenanucuqueca! 'Acacaüyari queneutahivi! "));
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "Mücü canicacaüyaritüni."));
             p.AddRun(m_DBT2);
 

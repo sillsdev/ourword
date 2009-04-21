@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 16 Mar 2006
  * Purpose: Dialog to copy the back translations from the front to the daughter
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -25,7 +25,7 @@ using Microsoft.Win32;
 
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 
@@ -245,10 +245,10 @@ namespace OurWord
 
 			// Craft the message to display the names of the languages involved
 			string sSummary = "This process will copy the back translation from " +
-				G.Project.FrontTranslation.DisplayName + " " +
-				G.Project.SFront.Book.DisplayName + " to " +
-				G.Project.TargetTranslation.DisplayName + " " +
-				G.Project.STarget.Book.DisplayName + ".";
+				DB.Project.FrontTranslation.DisplayName + " " +
+				DB.Project.SFront.Book.DisplayName + " to " +
+				DB.Project.TargetTranslation.DisplayName + " " +
+				DB.Project.STarget.Book.DisplayName + ".";
 			m_labelSynopsis.Text = sSummary;
 		}
 		#endregion

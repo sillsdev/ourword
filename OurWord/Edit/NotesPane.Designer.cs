@@ -59,6 +59,7 @@ namespace OurWord.Edit
             this.m_btnInsert.Size = new System.Drawing.Size(40, 35);
             this.m_btnInsert.Text = "Insert";
             this.m_btnInsert.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnInsert.ToolTipText = "Insert a new Note regarding the selected text in the main pane.";
             this.m_btnInsert.Click += new System.EventHandler(this.cmdInsertNote);
             // 
             // m_btnDeleteNote
@@ -69,6 +70,7 @@ namespace OurWord.Edit
             this.m_btnDeleteNote.Size = new System.Drawing.Size(53, 35);
             this.m_btnDeleteNote.Text = "Delete...";
             this.m_btnDeleteNote.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnDeleteNote.ToolTipText = "Delete this Discussion (or Note if there is only one Discussion item)...";
             this.m_btnDeleteNote.Click += new System.EventHandler(this.cmdDeleteNote);
             // 
             // m_Show

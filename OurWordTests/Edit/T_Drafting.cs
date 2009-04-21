@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 15 May 2008
  * Purpose: Tests the Drafting layout class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -17,9 +17,9 @@ using NUnit.Framework;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -36,25 +36,25 @@ namespace OurWordTests.Edit
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Drafting Test Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Drafting Test Project";
 
-            G.Project.FrontTranslation = new DTranslation("Front Translation", "Latin", "Latin");
-            FrontBook = new DBook("GEN", "");
-            G.Project.FrontTranslation.AddBook(FrontBook);
+            DB.Project.FrontTranslation = new DTranslation("Front Translation", "Latin", "Latin");
+            FrontBook = new DBook("GEN");
+            DB.Project.FrontTranslation.AddBook(FrontBook);
 
-            G.Project.TargetTranslation = new DTranslation("Target Translation", "Latin", "Latin");
-            TargetBook = new DBook("GEN", "");
-            G.Project.TargetTranslation.AddBook(TargetBook);
+            DB.Project.TargetTranslation = new DTranslation("Target Translation", "Latin", "Latin");
+            TargetBook = new DBook("GEN");
+            DB.Project.TargetTranslation.AddBook(TargetBook);
         }
         #endregion
         #region TearDown
         [TearDown]
         public void TearDown()
         {
-            OurWordMain.Project = null;
+            DB.Project = null;
         }
         #endregion
         #region Method: void ReadIntoBook(DBook book, string[] vs)
@@ -71,8 +71,7 @@ namespace OurWordTests.Edit
             W.Close();
 
             // Now read it into the book
-            book.AbsolutePathName = sPathname;
-            book.Load();
+			book.Load(ref sPathname, new NullProgress());
         }
         #endregion
 
@@ -367,16 +366,16 @@ namespace OurWordTests.Edit
             ReadIntoBook(TargetBook, vsTarget);
 
             // Set the sections
-            G.Project.Nav.GoToFirstAvailableBook();
-            G.Project.Nav.GoToFirstSection();
+            DB.Project.Nav.GoToFirstAvailableBook(new NullProgress());
+            DB.Project.Nav.GoToFirstSection();
 
             // Conduct the alignment routine
             WndDrafting.ParagraphAlignmentPair[] v = WndDrafting.ScanForAlignmentPairs(
-                0, G.SFront.Paragraphs.Count,
-                0, G.STarget.Paragraphs.Count);
+                0, DB.FrontSection.Paragraphs.Count,
+                0, DB.TargetSection.Paragraphs.Count);
             WndDrafting.AddAlignmentCounts(v, 
-                G.SFront.Paragraphs.Count, 
-                G.STarget.Paragraphs.Count);
+                DB.FrontSection.Paragraphs.Count, 
+                DB.TargetSection.Paragraphs.Count);
 
             // Temp code to write out the results to a desktop file
             //TextWriter W = JW_Util.GetTextWriter("C:\\Users\\JWimbish\\Desktop\\Output.txt");
@@ -397,8 +396,8 @@ namespace OurWordTests.Edit
             int cTarget = 0;
             foreach (WndDrafting.ParagraphAlignmentPair pair in v)
             {
-                DParagraph pF = G.SFront.Paragraphs[pair.iFront] as DParagraph;
-                DParagraph pT = G.STarget.Paragraphs[pair.iTarget] as DParagraph;
+                DParagraph pF = DB.FrontSection.Paragraphs[pair.iFront] as DParagraph;
+                DParagraph pT = DB.TargetSection.Paragraphs[pair.iTarget] as DParagraph;
 
                 Assert.AreEqual(pF.FirstActualVerseNumber, pair.VerseNo);
                 Assert.AreEqual(pT.FirstActualVerseNumber, pair.VerseNo);
@@ -407,8 +406,8 @@ namespace OurWordTests.Edit
                 cFront += pair.cFront;
                 cTarget += pair.cTarget;
             }
-            Assert.AreEqual(G.SFront.Paragraphs.Count, cFront);
-            Assert.AreEqual(G.STarget.Paragraphs.Count, cTarget);
+            Assert.AreEqual(DB.FrontSection.Paragraphs.Count, cFront);
+            Assert.AreEqual(DB.TargetSection.Paragraphs.Count, cTarget);
         }
         #endregion
 

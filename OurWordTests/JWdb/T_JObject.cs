@@ -381,7 +381,17 @@ namespace OurWordTests.JWdb
             {
             }
             #endregion
-        }
+
+			#region OAttr{g}: string StoragePath
+			public override string StoragePath
+			{
+				get
+				{
+					return JWU.NUnit_TestFilePathName;
+				}
+			}
+			#endregion
+		}
         #endregion
 
         [Test] public void SimpleBAttrIO()
@@ -404,13 +414,11 @@ namespace OurWordTests.JWdb
             Assert.AreEqual('M', objStart.Gender, "Set");
 
             // Write out the object
-            objStart.AbsolutePathName = JWU.NUnit_TestFilePathName;
-            objStart.Write();
+            objStart.Write(new NullProgress());
 
             // Create a read-in object and populate it from the file we just wrote out
             BAttrTestObject objEnd = new BAttrTestObject();
-            objEnd.AbsolutePathName = JWU.NUnit_TestFilePathName;
-            objEnd.Load();
+            objEnd.Load(new NullProgress());
 
             // Test that the attributes are all the same
             Assert.AreEqual(objStart.Name, objEnd.Name, "Read-Name");
@@ -419,6 +427,92 @@ namespace OurWordTests.JWdb
             Assert.AreEqual(objStart.Weight, objEnd.Weight, "Read-Weight");
             Assert.AreEqual(objStart.DOB, objEnd.DOB, "Read-DOB");
             Assert.AreEqual(objStart.Gender, objEnd.Gender, "Read-Gender");
+        }
+        #endregion
+
+        // Merging
+        #region Test: MergeBasicAttrs
+        #region Class TMerge - test class for MergeBasicAttrs
+        class TMerge : JObject
+        {
+            public string m_sName;
+            public int m_nAge;
+            public DateTime m_dtBirthDay;
+            public char m_chGender;
+            #region OMethod: void DeclareAttrs()
+            protected override void DeclareAttrs()
+            {
+                base.DeclareAttrs();
+                DefineAttr("name", ref m_sName);
+                DefineAttr("age", ref m_nAge);
+                DefineAttr("birthday", ref m_dtBirthDay);
+                DefineAttr("gender", ref m_chGender);
+            }
+            #endregion
+
+            #region Constructor(sName, nAge, dtBirthDay, chGender)
+            public TMerge(string sName, int nAge, DateTime dtBirthDay, char chGender)
+            {
+                m_sName = sName;
+                m_nAge = nAge;
+                m_dtBirthDay = dtBirthDay;
+                m_chGender = chGender;
+            }
+            #endregion
+
+            #region Method: bool IsSame(TMerge obj)
+            public bool IsSame(TMerge obj)
+            {
+                if (m_sName != obj.m_sName)
+                    return false;
+                if (m_nAge != obj.m_nAge)
+                    return false;
+                if (m_dtBirthDay != obj.m_dtBirthDay)
+                    return false;
+                if (m_chGender != obj.m_chGender)
+                    return false;
+                return true;
+            }
+            #endregion
+            #region Method: TMerge Clone()
+            public TMerge Clone()
+            {
+                return new TMerge(m_sName, m_nAge, m_dtBirthDay, m_chGender);
+            }
+            #endregion
+        }
+        #endregion
+
+        [Test] public void MergeBasicAttrs()
+        {
+            TMerge John = new TMerge("John", 49, new DateTime(1959, 11, 23), 'M');
+            TMerge Sandra = new TMerge("Sandra", 47, new DateTime(1961, 8, 8), 'F');
+            TMerge Emily = new TMerge("Emily", 20, new DateTime(1988, 11, 3), 'F');
+
+            // Theirs changes, ours stays the same: expect result to be Theirs
+            TMerge Parent = John.Clone();
+            TMerge Mine = John.Clone();
+            TMerge Theirs = Sandra.Clone();
+            Mine.MergeBasicAttrs(Parent, Theirs, false);
+            Assert.IsTrue(Mine.IsSame(Theirs), "A");
+
+            // Ours changes, theirs stays the same; expect result to be our original value
+            Mine = Sandra.Clone();
+            Theirs = John.Clone();
+            Mine.MergeBasicAttrs(Parent, Theirs, false);
+            Assert.IsTrue(Mine.IsSame(Sandra.Clone()), "B");
+
+            // Both change, We're supposed to win
+            Mine = Sandra.Clone();
+            Theirs = Emily.Clone();
+            Mine.MergeBasicAttrs(Parent, Theirs, true);
+            Assert.IsTrue(Mine.IsSame(Sandra.Clone()), "C");          
+
+            // Both change, They're supposed to win
+            Mine = Sandra.Clone();
+            Theirs = Emily.Clone();
+            Mine.MergeBasicAttrs(Parent, Theirs, false);
+            Assert.IsTrue(Mine.IsSame(Emily.Clone()), "D");
         }
         #endregion
     }

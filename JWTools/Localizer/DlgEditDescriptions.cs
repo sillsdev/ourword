@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 22 Aug 2007
  * Purpose: Allows me to edit the English descriptions for the Localization tool.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

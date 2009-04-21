@@ -17,6 +17,7 @@ using System.Globalization;
 using System.Management.Instrumentation;
 using System.Management;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
@@ -226,8 +227,8 @@ namespace JWTools
             get
             {
                 string sPath = JW_Registry.GetValue("NUnit_LocDbDir",
-                    "C:\\Users\\JWimbish\\Documents\\Visual Studio 2005\\Projects\\" +
-                    "OurWord\\trunk\\OurWord\\bin\\Debug\\Testing");
+                    "C:\\Users\\JWimbish\\Documents\\Visual Studio 2008\\Projects\\" +
+                    "ourword\\OurWord\\bin\\Debug\\Testing");
 
                 if (!Directory.Exists(sPath))
                     Directory.CreateDirectory(sPath);
@@ -296,8 +297,96 @@ namespace JWTools
             return sPath;
         }
         #endregion
+		#region SMethod: string GetMyDocumentsFolder(string sSubFolder)
+		static public string GetMyDocumentsFolder(string sSubFolder)
+		{
+			// Start with the system's special folder
+			string sBase;
+			if (Environment.OSVersion.Platform == PlatformID.Unix)
+				sBase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+			else
+				sBase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+			if (string.IsNullOrEmpty(sBase))
+				return null;
 
-    }
+			// Build the rest of the path
+			string sPath = sBase + Path.DirectorySeparatorChar;
+			if (!string.IsNullOrEmpty(sSubFolder))
+				sPath += (sSubFolder + Path.DirectorySeparatorChar);
+
+			// If the folder does not exist, then create it
+			if (!Directory.Exists(sPath))
+				Directory.CreateDirectory(sPath);
+			if (!Directory.Exists(sPath))
+				return null;
+
+			return sPath;
+		}
+		#endregion
+		#region SMethod: GetAllUsersDocumentsFolder() - (not currently used)
+		/*** KEEPING THE CODE, SHOULD I EVER WANT TO DO THIS
+		 * 
+		[DllImport("shell32.dll")]
+		public static extern Int32 SHGetFolderPath(IntPtr hwndOwner, Int32 nFolder, IntPtr hToken,
+			UInt32 dwFlags, StringBuilder pszPath); 
+		static public string GetAllUsersDocumentsFolder()
+		{
+			/////////////////////////////////////////////////////////
+			// TODO - Gonna need a LINUX equivalent for this mess. //
+			/////////////////////////////////////////////////////////
+			if (Environment.OSVersion.Platform == PlatformID.Unix)
+				Debug.Assert(false, "NEED A LINUX EQUIVALENT in GetAllUsersDocumentsFolder");
+
+			// The file system directory that contains documents that are common to all users. 
+			// A typical paths is "C:\Documents and Settings\All Users\Documents." Valid for 
+			// Windows NT systems and Microsoft Windows® 95 and Windows 98 systems with 
+			// Shfolder.dll installed.
+			Int32 nCommonDocs = (0x002e);
+
+			// SHGFP_TYPE_CURRENT is the current value for user, verify it exists
+            UInt32 dwFlag = 0; 
+
+			// Call the Windows Shell function
+			StringBuilder path = new System.Text.StringBuilder(256);
+			SHGetFolderPath(IntPtr.Zero, nCommonDocs, IntPtr.Zero, dwFlag, path);
+
+			// Add the path separator and return the result
+			return path.ToString() + Path.DirectorySeparatorChar;
+		}
+		***/
+		#endregion
+		#region SMethod: string ExtractRightmostSubFolder(sPath)
+		static public string ExtractRightmostSubFolder(string sPath)
+			// Given, e.g., 
+			//     "c:\Documents and Settings\All Users\Hello\",
+			// returns
+			//     "Hello"
+		{
+			// We'll put the answer here
+			string sFolderName = "";
+
+			// Nothing to do if empty
+			if (string.IsNullOrEmpty(sPath))
+				return "";
+
+			// If the final character is a Directory Separator, remove it
+			if (sPath[sPath.Length - 1] == Path.DirectorySeparatorChar)
+				sPath = sPath.Substring(0, sPath.Length - 1);
+
+			// Process through the path. Whenever we encounter a '\', reset
+			// so that when we finally end, we'll have retreived the final one.
+			foreach (char ch in sPath)
+			{
+				if (ch == Path.DirectorySeparatorChar)
+					sFolderName = "";
+				else
+					sFolderName += ch;
+			}
+
+			return sFolderName;
+		}
+		#endregion
+	}
 
     #region CLASS: JW_Util
     public class JW_Util
@@ -321,7 +410,7 @@ namespace JWTools
 			return tw;
 		}
 		#endregion
-		#region Method: static void TextReader GetTextReader(ref sPath, sFileFilter,)
+		#region Method: static void TextReader GetTextReader(ref sPath, sFileFilter)
 		public static TextReader GetTextReader(ref string sPath, string sFileFilter)
 		{
 			StreamReader r = OpenStreamReader(ref sPath, sFileFilter);
@@ -379,7 +468,7 @@ namespace JWTools
 		#endregion
 
 		#region Method: static void CreateBackup(string sPathName, string sNewExtension)
-		static public void CreateBackup(string sPathName, string sNewExtension)
+		static public string CreateBackup(string sPathName, string sNewExtension)
 		{
 			string sBackupPathName = Path.ChangeExtension(sPathName, sNewExtension);
 			if (File.Exists(sPathName))
@@ -393,6 +482,7 @@ namespace JWTools
 				catch (Exception)
 				{}
 			}
+			return sBackupPathName;
 		}
 		#endregion
 		#region Method: static void RestoreFromBackup(string sPathName, string sExtension)

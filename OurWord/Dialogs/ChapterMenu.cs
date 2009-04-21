@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 28 Feb 2008
  * Purpose: Displays a list of the chapters in the book, for fast navigation
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -20,7 +20,7 @@ using System.Timers;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.View;
 using OurWord.Edit;
 #endregion

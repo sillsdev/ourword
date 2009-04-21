@@ -112,6 +112,15 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Chorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\src\Chorus\obj\Debug\Chorus.exe</HintPath>
+    </Reference>
+    <Reference Include="ChorusMerge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <ExecutableExtension>.exe</ExecutableExtension>
+      <HintPath>..\..\chorus\src\ChorusMerge\obj\Debug\ChorusMerge.exe</HintPath>
+    </Reference>
     <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Palaso.Services.dll</HintPath>
@@ -158,6 +167,14 @@
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
     <Content Include="OurWord.ico" />
+    <EmbeddedResource Include="Dialogs\RestoreFromBackup.resx">
+      <DependentUpon>RestoreFromBackup.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\ChapterMenu.resx">
       <SubType>Designer</SubType>
       <DependentUpon>ChapterMenu.cs</DependentUpon>
@@ -170,9 +187,17 @@
       <SubType>Designer</SubType>
       <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_Collaboration.resx">
+      <DependentUpon>Page_Collaboration.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Page_Notes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_WritingSystemAddRemove.resx">
+      <DependentUpon>Page_WritingSystemAddRemove.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
       <SubType>Designer</SubType>
@@ -181,6 +206,10 @@
     <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.resx">
       <SubType>Designer</SubType>
       <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.resx">
+      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_FrontInfo.resx">
       <SubType>Designer</SubType>
@@ -198,25 +227,21 @@
       <SubType>Designer</SubType>
       <DependentUpon>WizNew_Summary.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_TargetInfo.resx">
+    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_Cluster.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>WizNew_TargetInfo.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_TeamSettings.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
+      <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dictionary\DictionaryPane.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DictionaryPane.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Edit\LiterateSettingsWnd.resx">
+      <DependentUpon>LiterateSettingsWnd.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Edit\NotesPane.resx">
       <SubType>Designer</SubType>
       <DependentUpon>NotesPane.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Merge\MergePane.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>MergePane.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Res\FileNew.gif" />
     <EmbeddedResource Include="Res\FileOpen.gif" />
@@ -224,6 +249,10 @@
     <None Include="Res\editfind.gif" />
     <EmbeddedResource Include="Res\Edit.ico" />
     <EmbeddedResource Include="Res\Blank.ico" />
+    <EmbeddedResource Include="Res\Collapse.ico" />
+    <EmbeddedResource Include="Res\Expand.ico" />
+    <EmbeddedResource Include="Res\Check.ico" />
+    <EmbeddedResource Include="Res\Failure.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
       <SubType>Designer</SubType>
@@ -241,9 +270,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>Page_Options.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_TeamSettings.resx">
+    <EmbeddedResource Include="Dialogs\Properties\Page_Cluster.resx">
       <SubType>Designer</SubType>
-      <DependentUpon>Page_TeamSettings.cs</DependentUpon>
+      <DependentUpon>Page_Cluster.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>
@@ -256,6 +285,7 @@
     <None Include="Res\MergeConfigure.bmp" />
     <None Include="Res\MergePrevDiff.bmp" />
     <None Include="Res\MergNextDiff.bmp" />
+    <None Include="Res\MoveDown.GIF" />
     <Content Include="Res\NoteEdit.ico" />
     <Content Include="Res\NoteInsert.ico" />
     <Content Include="Res\NoteMerge.ico" />
@@ -273,21 +303,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>Page_WritingSystems.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetFileName.resx">
       <SubType>Designer</SubType>
       <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetStage.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetStage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_Summary.resx">
       <SubType>Designer</SubType>
@@ -297,44 +315,14 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DataModel\DBook.cs">
+    <Compile Include="Dialogs\RestoreFromBackup.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DataModel\DBookGrouping.cs" />
-    <Compile Include="DataModel\DFootnote.cs">
-      <SubType>Code</SubType>
+    <Compile Include="Dialogs\SplashScreen.cs">
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="DataModel\DParagraph.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DPicture.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DProject.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DReference.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DRun.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DSection.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DTeamSettings.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\DTranslation.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\TranslatorNote.cs" />
-    <Compile Include="DataModel\DWordList.cs" />
-    <Compile Include="DataModel\SfMapping.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DataModel\StdFmtTransform.cs">
-      <SubType>Code</SubType>
+    <Compile Include="Dialogs\DlgBookProperties.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\ChapterMenu.cs">
       <SubType>Form</SubType>
@@ -382,7 +370,7 @@
     <Compile Include="Dialogs\Print.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Properties\CreateTranslationDlg.cs">
+    <Compile Include="Dialogs\Properties\DlgCreateTranslation.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\Ctrl_AutoReplace.cs">
@@ -403,6 +391,12 @@
     <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs">
       <SubType>UserControl</SubType>
     </Compile>
+    <Compile Include="Dialogs\Properties\Page_Collaboration.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Collaboration.Designer.cs">
+      <DependentUpon>Page_Collaboration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Properties\Page_Notes.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -421,17 +415,23 @@
     <Compile Include="Dialogs\Properties\Page_StyleSheet.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_TeamSettings.cs">
+    <Compile Include="Dialogs\Properties\Page_Cluster.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_TeamSettings.Designer.cs">
-      <DependentUpon>Page_TeamSettings.cs</DependentUpon>
+    <Compile Include="Dialogs\Properties\Page_Cluster.Designer.cs">
+      <DependentUpon>Page_Cluster.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_TranslationStages.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_OtherTranslations.cs">
       <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_WritingSystemAddRemove.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_WritingSystemAddRemove.Designer.cs">
+      <DependentUpon>Page_WritingSystemAddRemove.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_WritingSystems.cs">
       <SubType>UserControl</SubType>
@@ -441,15 +441,6 @@
     </Compile>
     <Compile Include="Dialogs\Properties\Page_Translation.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\RepairImportBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\RestoreFromBackup.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\SplashScreen.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs">
       <SubType>Form</SubType>
@@ -472,26 +463,14 @@
     <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.Designer.cs">
+    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.designer.cs">
       <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetDestinationFolder.Designer.cs">
-      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.Designer.cs">
       <DependentUpon>WizPage_GetFileName.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetStage.Designer.cs">
-      <DependentUpon>WizPage_GetStage.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_Summary.cs">
       <SubType>UserControl</SubType>
@@ -526,17 +505,11 @@
     <Compile Include="Dialogs\WizNewProject\WizNew_Summary.Designer.cs">
       <DependentUpon>WizNew_Summary.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_TargetInfo.cs">
+    <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_TargetInfo.Designer.cs">
-      <DependentUpon>WizNew_TargetInfo.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_TeamSettings.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizNewProject\WizNew_TeamSettings.Designer.cs">
-      <DependentUpon>WizNew_TeamSettings.cs</DependentUpon>
+    <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.Designer.cs">
+      <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </Compile>
     <Compile Include="Dictionary\DictionaryPane.cs">
       <SubType>UserControl</SubType>
@@ -550,6 +523,12 @@
     <Compile Include="Edit\EControl.cs" />
     <Compile Include="Edit\EHeaderColumn.cs" />
     <Compile Include="Edit\EWord.cs" />
+    <Compile Include="Edit\LiterateSettingsWnd.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Edit\LiterateSettingsWnd.Designer.cs">
+      <DependentUpon>LiterateSettingsWnd.cs</DependentUpon>
+    </Compile>
     <Compile Include="Edit\NotesPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -574,14 +553,6 @@
     <Compile Include="Layouts\Naturalness.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Merge\DiffText.cs" />
-    <Compile Include="Merge\DMergeBook.cs" />
-    <Compile Include="Merge\MergePane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Merge\MergePane.Designer.cs">
-      <DependentUpon>MergePane.cs</DependentUpon>
-    </Compile>
     <Compile Include="OurWordMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -596,19 +567,29 @@
     <Compile Include="Test.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utilities\ClusterListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Utilities\ClusterListView.Designer.cs">
+      <DependentUpon>ClusterListView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\ColorComboQ.cs">
       <SubType>Component</SubType>
     </Compile>
-    <EmbeddedResource Include="DataModel\DBook.resx">
-      <DependentUpon>DBook.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DataModel\DProject.resx">
-      <DependentUpon>DProject.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DataModel\DTranslation.resx">
-      <DependentUpon>DTranslation.cs</DependentUpon>
+    <Compile Include="Utilities\GroupedTasks.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Utilities\GroupedTasks.Designer.cs">
+      <DependentUpon>GroupedTasks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\GroupedTasksList.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Utilities\GroupedTasksList.Designer.cs">
+      <DependentUpon>GroupedTasksList.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Dialogs\DlgBookProperties.resx">
+      <DependentUpon>DlgBookProperties.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\CopyBTfromFront.resx">
@@ -631,8 +612,8 @@
       <DependentUpon>Print.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\CreateTranslationDlg.resx">
-      <DependentUpon>CreateTranslationDlg.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\Properties\DlgCreateTranslation.resx">
+      <DependentUpon>DlgCreateTranslation.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\OpenTranslationDlg.resx">
@@ -661,18 +642,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Translation.resx">
       <DependentUpon>Page_Translation.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\RepairImportBook.resx">
-      <DependentUpon>RepairImportBook.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\RestoreFromBackup.resx">
-      <DependentUpon>RestoreFromBackup.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\SplashScreen.resx">
-      <DependentUpon>SplashScreen.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="licenses.licx" />
@@ -716,6 +685,18 @@
     <EmbeddedResource Include="Res\SectionPrevious.ico" />
     <EmbeddedResource Include="Res\SetUpFeatures.ico" />
     <EmbeddedResource Include="Res\Tools.ico" />
+    <EmbeddedResource Include="Utilities\ClusterListView.resx">
+      <DependentUpon>ClusterListView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities\GroupedTasks.resx">
+      <DependentUpon>GroupedTasks.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities\GroupedTasksList.resx">
+      <DependentUpon>GroupedTasksList.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">

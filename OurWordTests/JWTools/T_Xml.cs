@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 14 May 2008
  * Purpose: Tests the xml classes
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -21,7 +21,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -60,7 +60,6 @@ namespace OurWordTests.JWTools
         }
         #endregion
     }
-
 
     [TestFixture] public class T_Xml
     {
@@ -453,6 +452,15 @@ namespace OurWordTests.JWTools
             // Int version
             attr = new XElement.XAttr("year", 1959);
             Assert.AreEqual(" year=\"1959\"", attr.SaveString);
+
+            // Guid version
+            string sGuid = "7eed4a8c-ee56-4d1c-859d-b8183679bd6d";
+            Guid g = new Guid(sGuid);
+            XElement x = new XElement("tag");
+            x.AddAttr("Guid", g);
+            Assert.AreEqual( " Guid=\"" + sGuid + "\"", x.Attrs[0].SaveString, "Guid version");
+            // Check the round trip
+            Assert.AreEqual(g, x.GetAttrValue("Guid", Guid.NewGuid()));
         }
         #endregion
         #region Test: OneLiner_AttrsOnly
@@ -631,7 +639,25 @@ namespace OurWordTests.JWTools
             Assert.IsTrue(xExpected.ContentEquals(vx[0]));
         }
         #endregion
+        #region Test: ParseIntoXmlStrings_WithData_YawaNote214
+        [Test] public void ParseIntoXmlStrings_WithData_YawaNote214()
+            // This is the bug that turned up on Mandowen's computer, 6apr09, due
+            // to my not taking into acount internal '=' character in the data.
+        {
+            string sContents = "ratoe taiso ubeke dai ware mbarije, ware ana daveti ngkodave " +
+                "ware mbakobe jewen. weye ana dave ama ine masyare: anave, anabe, muno ana " +
+                "raijaro aneme rai nsiso , (anave=peraya, iman) anabe= sifat, ";
+            string sIn = "<DParagraph Abbrev=\"NoteDiscussion\" Contents=\"" + sContents + "\"/>";
 
+            XElement[] vx = XElement.CreateFrom(sIn);
+
+            Assert.AreEqual(1, vx.Length);
+
+            XElement x = vx[0];
+
+            Assert.AreEqual(sContents, x.FindAttr("Contents").Value);
+        }
+        #endregion
     }
 
 

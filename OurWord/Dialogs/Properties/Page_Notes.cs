@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 12 Jan 2008
  * Purpose: Sets up the notes display.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -27,7 +27,7 @@ using System.Threading;
 using JWTools;
 using JWdb;
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -43,6 +43,8 @@ namespace OurWord.Dialogs
             : base(_ParentDlg)
         {
             InitializeComponent();
+
+			// Create a OWWindow as the one-and-only child
         }
         #endregion
 
@@ -265,14 +267,23 @@ namespace OurWord.Dialogs
         #endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return "idNotes";
+			}
+		}
+		#endregion
+		#region Method: void ShowHelp()
         public override void ShowHelp()
         {
             HelpSystem.ShowTopic(HelpSystem.Topic.kTranslationNotes);
         }
         #endregion
         #region Attr{g}: string TabText
-        public override string TabText
+        public override string Title
         {
             get
             {

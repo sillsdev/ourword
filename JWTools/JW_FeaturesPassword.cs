@@ -237,7 +237,7 @@ namespace JWTools
 		#region Event: cmdHelp(...)
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			JW_Help.Show_DlgPasswordProtect();
+			HelpSystem.Show_DlgPasswordProtect();
 		}
 		#endregion
 	}

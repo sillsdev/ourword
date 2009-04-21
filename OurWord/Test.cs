@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 2 Dec 2003
  * Purpose: Testing for the app.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -19,7 +19,7 @@ using System.Reflection;
 using System.Text;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -345,7 +345,7 @@ namespace OurWord
 		#region Method: void Run()
 		public void Run()
 		{
-			(new Test_FileMenuIO()).Run();
+//			(new Test_FileMenuIO()).Run();
 			(new Test_DBookProperties()).Run();
 			(new Test_DSection()).Run();
 			(new Test_Print()).Run();

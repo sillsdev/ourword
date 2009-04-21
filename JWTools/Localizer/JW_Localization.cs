@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 12 May 2007
  * Purpose: Localization system.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -1529,7 +1529,7 @@ namespace JWTools
             try
             {
                 File.Copy(sPath, sRemotePath, true);
-                (new BackupSystem(sRemotePath)).MakeBackup();
+                (new BackupSystem(sRemotePath, null)).MakeBackup();
                 File.Delete(sRemotePath);
             }
             catch (Exception)
@@ -1611,7 +1611,7 @@ namespace JWTools
         }
         #endregion
 
-        // Messages ----------------------------C:\Users\JWimbish\Documents\Visual Studio 2005\Projects\OurWord\trunk\OurWord\Language.cs----------------------------------------------
+        // Messages --------------------------------------------------------------------------
         #region Method: string Insert(string sBase, string[] vsInsert)
         static public string Insert(string sBase, string[] v)
         {

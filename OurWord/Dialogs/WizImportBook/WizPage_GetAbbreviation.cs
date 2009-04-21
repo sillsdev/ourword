@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 1 Feb 2007
  * Purpose: User indentifies which book (supplies the abbreviation)
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -22,7 +22,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizImportBook

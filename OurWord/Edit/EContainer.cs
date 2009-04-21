@@ -18,7 +18,7 @@ using System.IO;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 // TODO: Get rid of StartNewRow, so that we deal with the Piles as we build the container
@@ -171,6 +171,21 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region Attr{g/s}: object Tag - Like Microsoft does in their controls
+        public object Tag
+        {
+            get
+            {
+                return m_Tag;
+            }
+            set
+            {
+                m_Tag = value;
+            }
+        }
+        object m_Tag;
+        #endregion
+
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -196,13 +211,35 @@ namespace OurWord.Edit
         }
         #endregion
 
+		// Layout Calculations ---------------------------------------------------------------
+		#region VirtMethod: void CalculateVerticals(y, bRepositionOnly)
+		virtual public void CalculateVerticals(float y, bool bRepositionOnly)
+		// Layout any children, and calculate the Height. 
+		//
+		// Parameters
+		//   yTop - the top pixel for the container
+		//   bRepositionOnly - we just adjust the y values, we don't recalculate the heights,
+		//        or, e.g., in the case of a paragraph, re-layout all of the elements.
+		//        (e.g., when one paragraph has gotten larger, and the ones below it need to 
+		//        shift down.
+		{
+			// This will be different for every subclass
+			Debug.Assert(false);
+		}
+		#endregion
+
         // Painting --------------------------------------------------------------------------
         #region VirtMethod: void OnPaint(ClipRectangle)
         virtual public void OnPaint(Rectangle ClipRectangle)
         {
         }
         #endregion
-    }
+		#region VirtMethod: void PaintControls()
+		virtual public void PaintControls()
+		{
+		}
+		#endregion
+	}
     #endregion
 
     #region CLASS: EContainer
@@ -509,7 +546,7 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    return Item.Rectangle.Right + Margin.Right;
+                    return Item.Rectangle.Right - Margin.Right;
                 }
             }
             #endregion
@@ -844,13 +881,13 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region VirtMethod: void Append(EItem)
+        #region VirtMethod: void AddParagraph(EItem)
         public virtual void Append(EItem item)
         {
             InsertAt(SubItems.Length, item);
         }
         #endregion
-        #region Method: void Append(EItem[] vAppend)
+        #region Method: void AddParagraph(EItem[] vAppend)
         public void Append(EItem[] vAppend)
         {
             InsertAt(SubItems.Length, vAppend);
@@ -1470,21 +1507,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region VirtMethod: void CalculateContainerVerticals(y, bRepositionOnly)
-        virtual public void CalculateContainerVerticals(float y, bool bRepositionOnly)
-        // Layout the children, and calclate the Height
-        //
-        // Parameters
-        //   yTop - the top pixel for the container
-        //   bRepositionOnly - we just adjust the y values, we don't recalculate the heights,
-        //        or, e.g., in the case of a paragraph, re-layout all of the elements.
-        //        (e.g., when one paragraph has gotten larger, and the ones below it need to 
-        //        shift down.
-        {
-            // This will be different for every subclass
-            Debug.Assert(false);
-        }
-        #endregion
         #region VirtMethod: void CalculateLineNumbers(ref nLineNo)
         virtual protected void CalculateLineNumbers(ref int nLineNo)
         {
@@ -1516,7 +1538,14 @@ namespace OurWord.Edit
                 item.OnPaint(ClipRectangle);
         }
         #endregion
-    }
+		#region OMethod: void PaintControls()
+		public override void PaintControls()
+		{
+			foreach (EItem item in SubItems)
+				item.PaintControls();
+		}
+		#endregion
+	}
     #endregion
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1563,8 +1592,8 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
-        public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
+        public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -1577,10 +1606,10 @@ namespace OurWord.Edit
 
             // Calculate for the tallest pile
             float fHighest = 0;
-            foreach (EContainer container in SubItems)
+            foreach (EItem item in SubItems)
             {
-                container.CalculateContainerVerticals(y, bRepositionOnly);
-                fHighest = Math.Max(fHighest, container.Height);
+				item.CalculateVerticals(y, bRepositionOnly);
+				fHighest = Math.Max(fHighest, item.Height);
             }
             y += fHighest;
 
@@ -1647,8 +1676,8 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
-        public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
+        public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -1660,10 +1689,10 @@ namespace OurWord.Edit
             y += CalculateBitmapHeightRequirement();
 
             // Layout the owned subitems, one below the other
-            foreach (EContainer container in SubItems)
+            foreach (EItem item in SubItems)
             {
-                container.CalculateContainerVerticals(y, bRepositionOnly);
-                y += container.Height;
+				item.CalculateVerticals(y, bRepositionOnly);
+				y += item.Height;
             }
 
             // Bottom Border
@@ -1825,11 +1854,28 @@ namespace OurWord.Edit
                 EContainer container = item as EContainer;
                 if (null != container)
                     container.CalculateContainerHorizontals();
+
+				EControl control = item as EControl;
+				if (null != control)
+					control.CalculateHorizontals();
             }
         }
         #endregion
-        #region Method: void CalculateLineNumbers()
-        public void CalculateLineNumbers()
+		#region OMethod:  void CalculateVerticals(float y, bool bRepositionOnly)
+		public override void CalculateVerticals(float y, bool bRepositionOnly)
+		{
+			// Lay out the items
+			foreach (EItem item in SubItems)
+			{
+				item.CalculateVerticals(y, false);
+				y += item.Height;
+			}
+
+			Height = y - Position.Y;
+		}
+		#endregion
+		#region Method: void CalculateLineNumbers()
+		public void CalculateLineNumbers()
         {
             int nLineNo = 1;
             CalculateLineNumbers(ref nLineNo);

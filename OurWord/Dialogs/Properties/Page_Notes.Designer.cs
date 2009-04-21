@@ -28,27 +28,30 @@ namespace OurWord.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
-            this.m_PropGrid = new System.Windows.Forms.PropertyGrid();
-            this.SuspendLayout();
-            // 
-            // m_PropGrid
-            // 
-            this.m_PropGrid.Location = new System.Drawing.Point(13, 14);
-            this.m_PropGrid.Name = "m_PropGrid";
-            this.m_PropGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.m_PropGrid.Size = new System.Drawing.Size(443, 332);
-            this.m_PropGrid.TabIndex = 46;
-            this.m_PropGrid.ToolbarVisible = false;
-            // 
-            // Page_Notes
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.Controls.Add(this.m_PropGrid);
-            this.Name = "Page_Notes";
-            this.Size = new System.Drawing.Size(468, 361);
-            this.Load += new System.EventHandler(this.cmdLoad);
-            this.ResumeLayout(false);
+			this.m_PropGrid = new System.Windows.Forms.PropertyGrid();
+			this.SuspendLayout();
+			// 
+			// m_PropGrid
+			// 
+			this.m_PropGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_PropGrid.Location = new System.Drawing.Point(3, 3);
+			this.m_PropGrid.Name = "m_PropGrid";
+			this.m_PropGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+			this.m_PropGrid.Size = new System.Drawing.Size(462, 355);
+			this.m_PropGrid.TabIndex = 46;
+			this.m_PropGrid.ToolbarVisible = false;
+			// 
+			// Page_Notes
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+			this.Controls.Add(this.m_PropGrid);
+			this.Name = "Page_Notes";
+			this.Size = new System.Drawing.Size(468, 361);
+			this.Load += new System.EventHandler(this.cmdLoad);
+			this.ResumeLayout(false);
 
         }
 

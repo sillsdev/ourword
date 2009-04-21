@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -128,8 +129,8 @@ namespace JWTools
         #endregion
 
         // Sub Items -------------------------------------------------------------------------
-        #region Attr{g}: XItem[] Items
-        public XItem[] Items
+        #region Attr{g}: List<XItem> Items
+        public List<XItem> Items
         {
             get
             {
@@ -137,17 +138,12 @@ namespace JWTools
                 return m_vItems;
             }
         }
-        XItem[] m_vItems = null;
+        List<XItem> m_vItems;
         #endregion
         #region Method: void AddSubItem(XItem)
         public void AddSubItem(XItem item)
         {
-            // Append it to the vector
-            XItem[] v = new XItem[Items.Length + 1];
-            for (int i = 0; i < Items.Length; i++)
-                v[i] = Items[i];
-            v[Items.Length] = item;
-            m_vItems = v;
+            Items.Add(item);
         }
         #endregion
         #region Method: void AddSubItem(string s)
@@ -172,12 +168,17 @@ namespace JWTools
             }
             string m_sTag;
             #endregion
-            #region Attr{g}: Value
+            #region Attr{g/s}: Value
             public string Value
             {
                 get
                 {
                     return m_sValue;
+                }
+                set
+                {
+                    // Set is used by the Merge process
+                    m_sValue = value;
                 }
             }
             string m_sValue;
@@ -294,6 +295,13 @@ namespace JWTools
             AddAttr(sTag, sValue);
         }
         #endregion
+        #region Method: void AddAttr(sTag, guidValue)
+        public void AddAttr(string sTag, Guid guidValue)
+        {
+            // 32 digits separated by hyphens
+            AddAttr(sTag, guidValue.ToString("D"));
+        }
+        #endregion
 
         #region Method: string GetAttrValue(sTag, sDefaultValue)
         public string GetAttrValue(string sTag, string sDefaultValue)
@@ -382,6 +390,27 @@ namespace JWTools
             return dtDefaultValue;
         }
         #endregion
+        #region Method: Guid GetAttrValue(sTag, guidDefaultValue)
+        public Guid GetAttrValue(string sTag, Guid guidDefaultValue)
+        {
+            XAttr attr = FindAttr(sTag);
+            if (null != attr)
+            {
+                if (0 < attr.Value.Length)
+                {
+                    try
+                    {
+                        return new Guid(attr.Value);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+
+            return guidDefaultValue;
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sTag)
@@ -389,7 +418,7 @@ namespace JWTools
             : base()
         {
             m_sTag = sTag;
-            m_vItems = new XItem[0];
+            m_vItems = new List<XItem>();
             m_vXmlAttrs = new XAttr[0];
         }
         #endregion
@@ -423,15 +452,15 @@ namespace JWTools
                 }
             }
             
-            if (Items.Length != xe.Items.Length)
+            if (Items.Count != xe.Items.Count)
             {
                 if (XItem.Debugging)
-                    Console.WriteLine("ITEMS LENGTH MISMATCH: <" + Items.Length.ToString() + 
-                        ">---<" + xe.Items.Length.ToString() + ">  Tag=" + Tag);
+                    Console.WriteLine("ITEMS LENGTH MISMATCH: <" + Items.Count.ToString() + 
+                        ">---<" + xe.Items.Count.ToString() + ">  Tag=" + Tag);
                 return false;
             }
 
-            for (int i = 0; i < Items.Length; i++)
+            for (int i = 0; i < Items.Count; i++)
             {
                 if (!Items[i].ContentEquals(xe.Items[i]))
                 {
@@ -462,7 +491,7 @@ namespace JWTools
         {
             get
             {
-                return (Items.Length > 0);
+                return (Items.Count > 0);
             }
         }
         #endregion
@@ -542,7 +571,6 @@ namespace JWTools
             return sOut;
         }
         #endregion
-
         #region SMethod: string AmpersandsAndSuch_Read(sIn) - converts, e.g., "&lt;" tp '<'
         static public string AmpersandsAndSuch_Read(string sIn)
         {
@@ -777,9 +805,6 @@ namespace JWTools
             #region Method: void ParseAttrs(XElement x, string s)
             void ParseAttrs(XElement x, string s)
             {
-//                if (Tag == "JWritingSystem")
-//                    Console.WriteLine("break here");
-
                 int i = 0;
 
                 // Move past the tag
@@ -806,8 +831,8 @@ namespace JWTools
                     if (!bIsAtValue && char.IsWhiteSpace(ch))
                         goto loop;
 
-                    // Switches
-                    if (ch == '=')
+                    // Switches: are we at an '=' that is not within a value?
+                    if (ch == '=' && !bIsAtValue)
                     {
                         bIsAtAttr = false;
                         bIsAtValue = false;
@@ -931,18 +956,11 @@ namespace JWTools
             return method.Run();
         }
         #endregion
-        #region SMethod: XElement[] CreateFrom(ref string sPath, string sFileFilter)
-        static public XElement[] CreateFrom(ref string sPath, string sFileFilter)
+		#region SMethod: XElement[] CreateFrom(TextReader)
+		static public XElement[] CreateFrom(TextReader tr)
         {
-            // Open the file
-            StreamReader r = JW_Util.OpenStreamReader(ref sPath, sFileFilter);
-            TextReader tr = TextReader.Synchronized(r);
-
             // Read its contents into a string
             string sFileContents = tr.ReadToEnd();
-
-            // Done with the file
-            tr.Close();
 
             // Parse into XElements
             return CreateFrom(sFileContents);
@@ -973,7 +991,7 @@ namespace JWTools
                 sEnd = ("</" + Tag + ">");
 
             // Special case: one item, and its a string
-            if (HasItems && Items.Length == 1 && Items[0] as XString != null)
+            if (HasItems && Items.Count == 1 && Items[0] as XString != null)
             {
                 XString xs = Items[0] as XString;
                 W.WriteLine(sIndent + sBegin + xs.Text + sEnd);
@@ -1272,17 +1290,6 @@ namespace JWTools
                 }
 
                 return s_vReplacments;
-
-                /**
-                return new XmlReplace[] 
-                    { 
-                        new XmlReplace( "{n}", '\n' ),
-                        new XmlReplace( "&amp;", '&' ),
-                        new XmlReplace( "&quot;", '\"' ),
-                        new XmlReplace( "&lt;", '<' ),
-                        new XmlReplace( "&gt;", '>' )
-                    };
-                **/
             }
         }
         static XmlReplace[] s_vReplacments = null;
@@ -1482,29 +1489,21 @@ namespace JWTools
     public class SfRead
 	{
 		// Attributes ------------------------------------------------------------------------
-		StreamReader m_reader = null;
+		TextReader m_reader = null;
 		public string Marker;
 		public string Data;
 		public bool   AtEndOfFile = false;
 		private bool  m_bSuppressReadOnce = false;
 		public int LineNumber = 0;
 
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(StreamReader)
-        public SfRead(StreamReader r)
+		// Scaffolding -----------------------------------------------------------------------
+		#region Constructor(TextReader)
+		public SfRead(TextReader tr)
         {
-            m_reader = r;
+            m_reader = tr;
             LineNumber = 0;
         }
         #endregion
-        #region Constructor(sPathName, sFileFilter, enc) - opens the reader
-        public SfRead(ref string sPathName, string sFileFilter)
-		{
-			m_reader = JW_Util.OpenStreamReader(ref sPathName, sFileFilter);
-			LineNumber = 0;
-		}
-		#endregion
 		#region Method: public void Close() - closes the StreamReader
 		public void Close()
 		{

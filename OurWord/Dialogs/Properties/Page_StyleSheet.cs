@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 17 May 2006
  * Purpose: Create settings for the Front, or open existing ones.
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -26,7 +26,7 @@ using System.Threading;
 using JWTools;
 using JWdb;
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -75,8 +75,7 @@ namespace OurWord.Dialogs
         private Label m_labelInstructions;
         private Button m_btnRestoreDefaults;
         private PropertyGrid m_PropGrid;
-        private ColumnHeader m_col1;
-        private Label m_labelStyleSheet;
+		private ColumnHeader m_col1;
         private System.ComponentModel.Container components = null;
         #endregion
         #region Constructor()
@@ -108,100 +107,107 @@ namespace OurWord.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
-            this.m_listStyles = new System.Windows.Forms.ListView();
-            this.m_col1 = new System.Windows.Forms.ColumnHeader();
-            this.m_labelInstructions = new System.Windows.Forms.Label();
-            this.m_btnRestoreDefaults = new System.Windows.Forms.Button();
-            this.m_PropGrid = new System.Windows.Forms.PropertyGrid();
-            this.m_labelStyleSheet = new System.Windows.Forms.Label();
-            this.SuspendLayout();
-            // 
-            // m_listStyles
-            // 
-            this.m_listStyles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+			this.m_listStyles = new System.Windows.Forms.ListView();
+			this.m_col1 = new System.Windows.Forms.ColumnHeader();
+			this.m_labelInstructions = new System.Windows.Forms.Label();
+			this.m_btnRestoreDefaults = new System.Windows.Forms.Button();
+			this.m_PropGrid = new System.Windows.Forms.PropertyGrid();
+			this.SuspendLayout();
+			// 
+			// m_listStyles
+			// 
+			this.m_listStyles.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)));
+			this.m_listStyles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.m_col1});
-            this.m_listStyles.FullRowSelect = true;
-            this.m_listStyles.HideSelection = false;
-            this.m_listStyles.Location = new System.Drawing.Point(8, 32);
-            this.m_listStyles.MultiSelect = false;
-            this.m_listStyles.Name = "m_listStyles";
-            this.m_listStyles.Size = new System.Drawing.Size(157, 303);
-            this.m_listStyles.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.m_listStyles.TabIndex = 0;
-            this.m_listStyles.UseCompatibleStateImageBehavior = false;
-            this.m_listStyles.View = System.Windows.Forms.View.Details;
-            this.m_listStyles.SelectedIndexChanged += new System.EventHandler(this.cmdListSelectionChanged);
-            // 
-            // m_col1
-            // 
-            this.m_col1.Text = "Styles";
-            this.m_col1.Width = 145;
-            // 
-            // m_labelInstructions
-            // 
-            this.m_labelInstructions.Location = new System.Drawing.Point(184, 0);
-            this.m_labelInstructions.Name = "m_labelInstructions";
-            this.m_labelInstructions.Size = new System.Drawing.Size(276, 52);
-            this.m_labelInstructions.TabIndex = 2;
-            this.m_labelInstructions.Text = "Select a style from the list on the left, then edit its settings below. Some sett" +
-                "ings require you to click on the plus sign in order to edit their settings.";
-            this.m_labelInstructions.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // m_btnRestoreDefaults
-            // 
-            this.m_btnRestoreDefaults.Location = new System.Drawing.Point(5, 337);
-            this.m_btnRestoreDefaults.Name = "m_btnRestoreDefaults";
-            this.m_btnRestoreDefaults.Size = new System.Drawing.Size(160, 23);
-            this.m_btnRestoreDefaults.TabIndex = 30;
-            this.m_btnRestoreDefaults.Text = "Restore Default Values...";
-            this.m_btnRestoreDefaults.Click += new System.EventHandler(this.cmdRestoreDefaultValues);
-            // 
-            // m_PropGrid
-            // 
-            this.m_PropGrid.LineColor = System.Drawing.SystemColors.ScrollBar;
-            this.m_PropGrid.Location = new System.Drawing.Point(187, 55);
-            this.m_PropGrid.Name = "m_PropGrid";
-            this.m_PropGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.m_PropGrid.Size = new System.Drawing.Size(273, 305);
-            this.m_PropGrid.TabIndex = 32;
-            this.m_PropGrid.ToolbarVisible = false;
-            // 
-            // m_labelStyleSheet
-            // 
-            this.m_labelStyleSheet.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_labelStyleSheet.Location = new System.Drawing.Point(8, 8);
-            this.m_labelStyleSheet.Name = "m_labelStyleSheet";
-            this.m_labelStyleSheet.Size = new System.Drawing.Size(146, 21);
-            this.m_labelStyleSheet.TabIndex = 33;
-            this.m_labelStyleSheet.Text = "Style Sheet:";
-            this.m_labelStyleSheet.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // Page_StyleSheet
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.Controls.Add(this.m_labelStyleSheet);
-            this.Controls.Add(this.m_PropGrid);
-            this.Controls.Add(this.m_btnRestoreDefaults);
-            this.Controls.Add(this.m_labelInstructions);
-            this.Controls.Add(this.m_listStyles);
-            this.Name = "Page_StyleSheet";
-            this.Size = new System.Drawing.Size(468, 368);
-            this.Load += new System.EventHandler(this.cmdLoad);
-            this.ResumeLayout(false);
+			this.m_listStyles.FullRowSelect = true;
+			this.m_listStyles.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.m_listStyles.HideSelection = false;
+			this.m_listStyles.Location = new System.Drawing.Point(0, 32);
+			this.m_listStyles.MultiSelect = false;
+			this.m_listStyles.Name = "m_listStyles";
+			this.m_listStyles.ShowItemToolTips = true;
+			this.m_listStyles.Size = new System.Drawing.Size(157, 287);
+			this.m_listStyles.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			this.m_listStyles.TabIndex = 0;
+			this.m_listStyles.UseCompatibleStateImageBehavior = false;
+			this.m_listStyles.View = System.Windows.Forms.View.Details;
+			this.m_listStyles.SelectedIndexChanged += new System.EventHandler(this.cmdListSelectionChanged);
+			// 
+			// m_col1
+			// 
+			this.m_col1.Text = "Styles";
+			this.m_col1.Width = 145;
+			// 
+			// m_labelInstructions
+			// 
+			this.m_labelInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_labelInstructions.Location = new System.Drawing.Point(0, 0);
+			this.m_labelInstructions.Name = "m_labelInstructions";
+			this.m_labelInstructions.Size = new System.Drawing.Size(468, 29);
+			this.m_labelInstructions.TabIndex = 2;
+			this.m_labelInstructions.Text = "Select a style from the list on the left, then edit its settings below. Some sett" +
+				"ings require you to click on the plus sign in order to edit their settings.";
+			this.m_labelInstructions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// m_btnRestoreDefaults
+			// 
+			this.m_btnRestoreDefaults.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.m_btnRestoreDefaults.Location = new System.Drawing.Point(0, 325);
+			this.m_btnRestoreDefaults.Name = "m_btnRestoreDefaults";
+			this.m_btnRestoreDefaults.Size = new System.Drawing.Size(160, 23);
+			this.m_btnRestoreDefaults.TabIndex = 30;
+			this.m_btnRestoreDefaults.Text = "Restore Default Values...";
+			this.m_btnRestoreDefaults.Click += new System.EventHandler(this.cmdRestoreDefaultValues);
+			// 
+			// m_PropGrid
+			// 
+			this.m_PropGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_PropGrid.LineColor = System.Drawing.SystemColors.ScrollBar;
+			this.m_PropGrid.Location = new System.Drawing.Point(163, 32);
+			this.m_PropGrid.Name = "m_PropGrid";
+			this.m_PropGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+			this.m_PropGrid.Size = new System.Drawing.Size(305, 316);
+			this.m_PropGrid.TabIndex = 32;
+			this.m_PropGrid.ToolbarVisible = false;
+			// 
+			// Page_StyleSheet
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+			this.Controls.Add(this.m_PropGrid);
+			this.Controls.Add(this.m_btnRestoreDefaults);
+			this.Controls.Add(this.m_labelInstructions);
+			this.Controls.Add(this.m_listStyles);
+			this.Name = "Page_StyleSheet";
+			this.Size = new System.Drawing.Size(468, 349);
+			this.Load += new System.EventHandler(this.cmdLoad);
+			this.ResumeLayout(false);
 
         }
         #endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return "idStyleSheet";
+			}
+		}
+		#endregion
+		#region Method: void ShowHelp()
         public override void ShowHelp()
         {
             HelpSystem.ShowTopic(HelpSystem.Topic.kStyleSheet);
         }
         #endregion
         #region Attr{g}: string TabText
-        public override string TabText
+        public override string Title
         {
             get
             {
@@ -602,7 +608,7 @@ namespace OurWord.Dialogs
                 // We only want to display those writing systems that we are actually using
                 // in the project; rather than the whole universe of WS's that ship with OW.
                 JWritingSystem ws = fws.WritingSystem;
-                foreach (DTranslation t in G.Project.AllTranslations)
+                foreach (DTranslation t in DB.Project.AllTranslations)
                 {
                     if (t.WritingSystemConsultant != ws && t.WritingSystemVernacular != ws)
                         goto loop;
@@ -767,9 +773,9 @@ namespace OurWord.Dialogs
             string sStyleName = item.Text;
 
             // Retrieve the style from the stylesheet
-            JParagraphStyle pstyle = G.StyleSheet.FindParagraphStyleByDisplayName(sStyleName);
+            JParagraphStyle pstyle = DB.StyleSheet.FindParagraphStyleByDisplayName(sStyleName);
             JCharacterStyle cstyle = (null == pstyle) ?
-                G.StyleSheet.FindCharacterStyleByDisplayName(sStyleName) :
+                DB.StyleSheet.FindCharacterStyleByDisplayName(sStyleName) :
                 pstyle.CharacterStyle;
             if (null == cstyle)
                 return;
@@ -795,7 +801,7 @@ namespace OurWord.Dialogs
             PStyle = null;
 
             // Rebuild the styles
-            G.StyleSheet.Initialize(true);
+            DB.StyleSheet.Initialize(true);
 
             // Reset the underlying window. (See bug 0292). The issue is that when we rebuild
             // the styles, we leave the underlying window in a bad state; the blocks are 
@@ -831,11 +837,11 @@ namespace OurWord.Dialogs
             m_listStyles.Items.Clear();
 
             // Add the paragraph styles
-            foreach (JParagraphStyle style in G.StyleSheet.ParagraphStyles)
+            foreach (JParagraphStyle style in DB.StyleSheet.ParagraphStyles)
                 m_listStyles.Items.Add(new ListViewItem(style.DisplayName, 1));
 
             // Add the character styles which are not OW-internal ones
-            foreach (JCharacterStyle style in G.StyleSheet.CharacterStyles)
+            foreach (JCharacterStyle style in DB.StyleSheet.CharacterStyles)
             {
                 bool bInternal = false;
                 if (style.Abbrev == DStyleSheet.c_StyleAbbrevUnderline)
@@ -859,6 +865,7 @@ namespace OurWord.Dialogs
                 m_listStyles.Items[i].Selected = true;
         }
         #endregion
+
     }
 
 }

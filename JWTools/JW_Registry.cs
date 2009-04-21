@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 03 Oct 2003
  * Purpose: Provides a shorthand for frequent Registry operations.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 22 Nov 2004
  * Purpose: A color picking combo, displays the "web" colors (all of which have names).
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -17,7 +17,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.View;
 using JWdb;
 using JWTools;

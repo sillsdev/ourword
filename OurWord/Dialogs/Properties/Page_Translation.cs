@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 28 Dec 2004
  * Purpose: Edit the properties of a DTranslation.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -23,8 +23,8 @@ using System.Threading;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -40,17 +40,17 @@ namespace OurWord.Dialogs
 {
     public class Page_Translation : DlgPropertySheet
 	{
-		// Attrs -----------------------------------------------------------------------------
-		#region Attr{g}: DTranslation Trans
-		DTranslation Trans
+        // Attrs -----------------------------------------------------------------------------
+        #region Attr{g}: DTranslation Translation
+        DTranslation Translation
 		{
 			get
 			{
-				Debug.Assert(null != m_Trans);
-				return m_Trans;
+				Debug.Assert(null != m_Translation);
+				return m_Translation;
 			}
 		}
-		DTranslation m_Trans = null;
+		DTranslation m_Translation = null;
 		#endregion
 		#region Attr{g}: bool SuppressCreateBook
 		bool SuppressCreateBook
@@ -62,35 +62,18 @@ namespace OurWord.Dialogs
 		}
 		bool m_bSuppressCreateBook = false;
 		#endregion
-		#region Attr{g}: DBook CurrentlySelectedBook - null if nothing is selected
-		DBook CurrentlySelectedBook
-		{
-			get
-			{
-				// If nothing selected, there is nothing to do.
-				if (m_listviewBooks.SelectedItems.Count == 0)
-					return null;
-
-				// Get the current selection
-				ListViewItem item = m_listviewBooks.SelectedItems[0];
-				return Trans.FindBook(item.Text);
-			}
-		}
-		#endregion
 		#region Attr{g}: DBook CurrentBook - the currently-displayed book
 		DBook CurrentBook
 		{
 			get
 			{
-				DSection section = OurWordMain.Project.STarget;
+				DSection section = DB.Project.STarget;
 				if (null == section)
 					return null;
 				return section.Book;
 			}
 		}
 		#endregion
-
-		// Control Contents ------------------------------------------------------------------
 		#region Attr{g/s}: string LanguageName
 		string LanguageName
 		{
@@ -104,39 +87,31 @@ namespace OurWord.Dialogs
 			}
 		}
 		#endregion
-		#region Attr{g}: ListViewItemCollection BookList
-		ListView.ListViewItemCollection BookList
-		{
-			get
-			{
-				return m_listviewBooks.Items;
-			}
-		}
-		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Controls
 		private System.Windows.Forms.Label m_lblLanguageName;
         private System.Windows.Forms.TextBox m_editLanguageName;
-		private System.Windows.Forms.Button m_btnImportBook;
-		private System.Windows.Forms.Button m_btnRemove;
-		private System.Windows.Forms.Button m_btnCreate;
-		private System.Windows.Forms.Button m_btnProperties;
-		private System.Windows.Forms.ListView m_listviewBooks;
-		private System.Windows.Forms.ColumnHeader m_columnAbbrev;
-        private System.Windows.Forms.ColumnHeader m_columnName;
         private Button m_btnRemoveTranslation;
         private TabControl m_tabctrlTranslation;
-        private TabPage m_tabGeneral;
-        private TabPage m_tabBooks;
-        private TabPage m_tabBookNames;
+        private TabPage m_tabOther;
         private PropertyGrid m_PropGridGeneral;
-        private PropertyGrid m_PropGridBookNames;
-        private Button m_btnCopyBookNames;
-        private Label m_lblFrom;
+		private TabPage m_tabBooks;
+        private DataGridView m_gridBooks;
+		private Button m_bProperties;
+		private Button m_bRemove;
+		private Button m_bExport;
+		private Button m_bImport;
+        private Button m_bCreate;
+		private DataGridViewTextBoxColumn m_colAbbreviation;
+		private DataGridViewTextBoxColumn m_colBookName;
         private ComboBox m_comboLanguage;
-        private ColumnHeader m_columnFilename;
-        private Button m_btnExport;
+        private Button m_btnCopyBookNames;
+        private RadioButton m_radioStartedBooks;
+        private RadioButton m_radioOldTestament;
+        private RadioButton m_radioNewTestament;
+        private RadioButton m_radioAll;
+        private DataGridViewTextBoxColumn m_colStage;
 		#endregion
         #region Constructor(DlgProperties, DTranslation, bSuppressCreateBook)
         public Page_Translation(DialogProperties _ParentDlg, 
@@ -148,7 +123,7 @@ namespace OurWord.Dialogs
 			InitializeComponent();
 
 			// Initialize attributes
-			m_Trans = trans;
+			m_Translation = trans;
 			m_bSuppressCreateBook = bSuppressCreateBook;
 		}
 		#endregion
@@ -176,31 +151,34 @@ namespace OurWord.Dialogs
 		/// </summary>
 		private void InitializeComponent()
 		{
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_lblLanguageName = new System.Windows.Forms.Label();
             this.m_editLanguageName = new System.Windows.Forms.TextBox();
-            this.m_btnImportBook = new System.Windows.Forms.Button();
-            this.m_btnRemove = new System.Windows.Forms.Button();
-            this.m_btnCreate = new System.Windows.Forms.Button();
-            this.m_btnProperties = new System.Windows.Forms.Button();
-            this.m_listviewBooks = new System.Windows.Forms.ListView();
-            this.m_columnAbbrev = new System.Windows.Forms.ColumnHeader();
-            this.m_columnName = new System.Windows.Forms.ColumnHeader();
-            this.m_columnFilename = new System.Windows.Forms.ColumnHeader();
-            this.m_btnExport = new System.Windows.Forms.Button();
             this.m_btnRemoveTranslation = new System.Windows.Forms.Button();
             this.m_tabctrlTranslation = new System.Windows.Forms.TabControl();
-            this.m_tabGeneral = new System.Windows.Forms.TabPage();
-            this.m_PropGridGeneral = new System.Windows.Forms.PropertyGrid();
             this.m_tabBooks = new System.Windows.Forms.TabPage();
-            this.m_tabBookNames = new System.Windows.Forms.TabPage();
+            this.m_radioStartedBooks = new System.Windows.Forms.RadioButton();
+            this.m_radioOldTestament = new System.Windows.Forms.RadioButton();
+            this.m_radioNewTestament = new System.Windows.Forms.RadioButton();
+            this.m_radioAll = new System.Windows.Forms.RadioButton();
             this.m_comboLanguage = new System.Windows.Forms.ComboBox();
-            this.m_lblFrom = new System.Windows.Forms.Label();
             this.m_btnCopyBookNames = new System.Windows.Forms.Button();
-            this.m_PropGridBookNames = new System.Windows.Forms.PropertyGrid();
+            this.m_bProperties = new System.Windows.Forms.Button();
+            this.m_bRemove = new System.Windows.Forms.Button();
+            this.m_bExport = new System.Windows.Forms.Button();
+            this.m_bImport = new System.Windows.Forms.Button();
+            this.m_bCreate = new System.Windows.Forms.Button();
+            this.m_gridBooks = new System.Windows.Forms.DataGridView();
+            this.m_colAbbreviation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_colBookName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_colStage = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_tabOther = new System.Windows.Forms.TabPage();
+            this.m_PropGridGeneral = new System.Windows.Forms.PropertyGrid();
             this.m_tabctrlTranslation.SuspendLayout();
-            this.m_tabGeneral.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
-            this.m_tabBookNames.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).BeginInit();
+            this.m_tabOther.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_lblLanguageName
@@ -214,96 +192,19 @@ namespace OurWord.Dialogs
             // 
             // m_editLanguageName
             // 
+            this.m_editLanguageName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_editLanguageName.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_editLanguageName.Location = new System.Drawing.Point(112, 6);
             this.m_editLanguageName.Name = "m_editLanguageName";
-            this.m_editLanguageName.Size = new System.Drawing.Size(322, 26);
+            this.m_editLanguageName.Size = new System.Drawing.Size(339, 26);
             this.m_editLanguageName.TabIndex = 1;
             this.m_editLanguageName.Text = "Translation Name";
-            this.m_editLanguageName.TextChanged += new System.EventHandler(this.cmdLangNameChanged);
-            // 
-            // m_btnImportBook
-            // 
-            this.m_btnImportBook.Location = new System.Drawing.Point(358, 35);
-            this.m_btnImportBook.Name = "m_btnImportBook";
-            this.m_btnImportBook.Size = new System.Drawing.Size(76, 23);
-            this.m_btnImportBook.TabIndex = 7;
-            this.m_btnImportBook.Text = "Import...";
-            this.m_btnImportBook.Click += new System.EventHandler(this.cmdImportBook);
-            // 
-            // m_btnRemove
-            // 
-            this.m_btnRemove.Location = new System.Drawing.Point(358, 93);
-            this.m_btnRemove.Name = "m_btnRemove";
-            this.m_btnRemove.Size = new System.Drawing.Size(76, 23);
-            this.m_btnRemove.TabIndex = 8;
-            this.m_btnRemove.Text = "Remove...";
-            this.m_btnRemove.Click += new System.EventHandler(this.cmdRemoveBook);
-            // 
-            // m_btnCreate
-            // 
-            this.m_btnCreate.Location = new System.Drawing.Point(358, 6);
-            this.m_btnCreate.Name = "m_btnCreate";
-            this.m_btnCreate.Size = new System.Drawing.Size(76, 23);
-            this.m_btnCreate.TabIndex = 6;
-            this.m_btnCreate.Text = "Create...";
-            this.m_btnCreate.Click += new System.EventHandler(this.cmdCreateBook);
-            // 
-            // m_btnProperties
-            // 
-            this.m_btnProperties.Location = new System.Drawing.Point(358, 122);
-            this.m_btnProperties.Name = "m_btnProperties";
-            this.m_btnProperties.Size = new System.Drawing.Size(76, 23);
-            this.m_btnProperties.TabIndex = 9;
-            this.m_btnProperties.Text = "Properties...";
-            this.m_btnProperties.Click += new System.EventHandler(this.cmdBookProperties);
-            // 
-            // m_listviewBooks
-            // 
-            this.m_listviewBooks.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.m_columnAbbrev,
-            this.m_columnName,
-            this.m_columnFilename});
-            this.m_listviewBooks.FullRowSelect = true;
-            this.m_listviewBooks.HideSelection = false;
-            this.m_listviewBooks.LabelWrap = false;
-            this.m_listviewBooks.Location = new System.Drawing.Point(6, 6);
-            this.m_listviewBooks.MultiSelect = false;
-            this.m_listviewBooks.Name = "m_listviewBooks";
-            this.m_listviewBooks.ShowItemToolTips = true;
-            this.m_listviewBooks.Size = new System.Drawing.Size(346, 307);
-            this.m_listviewBooks.TabIndex = 5;
-            this.m_listviewBooks.UseCompatibleStateImageBehavior = false;
-            this.m_listviewBooks.View = System.Windows.Forms.View.Details;
-            this.m_listviewBooks.DoubleClick += new System.EventHandler(this.cmdBookProperties);
-            // 
-            // m_columnAbbrev
-            // 
-            this.m_columnAbbrev.Text = "Abbreviation";
-            this.m_columnAbbrev.Width = 70;
-            // 
-            // m_columnName
-            // 
-            this.m_columnName.Text = "Book Name";
-            this.m_columnName.Width = 115;
-            // 
-            // m_columnFilename
-            // 
-            this.m_columnFilename.Text = "Filename";
-            this.m_columnFilename.Width = 147;
-            // 
-            // m_btnExport
-            // 
-            this.m_btnExport.Location = new System.Drawing.Point(358, 64);
-            this.m_btnExport.Name = "m_btnExport";
-            this.m_btnExport.Size = new System.Drawing.Size(76, 23);
-            this.m_btnExport.TabIndex = 10;
-            this.m_btnExport.Text = "Export...";
-            this.m_btnExport.Click += new System.EventHandler(this.cmdExportBook);
             // 
             // m_btnRemoveTranslation
             // 
-            this.m_btnRemoveTranslation.Location = new System.Drawing.Point(6, 290);
+            this.m_btnRemoveTranslation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.m_btnRemoveTranslation.Location = new System.Drawing.Point(6, 310);
             this.m_btnRemoveTranslation.Name = "m_btnRemoveTranslation";
             this.m_btnRemoveTranslation.Size = new System.Drawing.Size(159, 23);
             this.m_btnRemoveTranslation.TabIndex = 5;
@@ -313,99 +214,236 @@ namespace OurWord.Dialogs
             // 
             // m_tabctrlTranslation
             // 
-            this.m_tabctrlTranslation.Controls.Add(this.m_tabGeneral);
+            this.m_tabctrlTranslation.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_tabctrlTranslation.Controls.Add(this.m_tabBooks);
-            this.m_tabctrlTranslation.Controls.Add(this.m_tabBookNames);
-            this.m_tabctrlTranslation.Location = new System.Drawing.Point(10, 10);
+            this.m_tabctrlTranslation.Controls.Add(this.m_tabOther);
+            this.m_tabctrlTranslation.Location = new System.Drawing.Point(0, 0);
             this.m_tabctrlTranslation.Name = "m_tabctrlTranslation";
             this.m_tabctrlTranslation.SelectedIndex = 0;
-            this.m_tabctrlTranslation.Size = new System.Drawing.Size(448, 345);
+            this.m_tabctrlTranslation.Size = new System.Drawing.Size(468, 365);
             this.m_tabctrlTranslation.TabIndex = 6;
-            // 
-            // m_tabGeneral
-            // 
-            this.m_tabGeneral.Controls.Add(this.m_PropGridGeneral);
-            this.m_tabGeneral.Controls.Add(this.m_btnRemoveTranslation);
-            this.m_tabGeneral.Controls.Add(this.m_lblLanguageName);
-            this.m_tabGeneral.Controls.Add(this.m_editLanguageName);
-            this.m_tabGeneral.Location = new System.Drawing.Point(4, 22);
-            this.m_tabGeneral.Name = "m_tabGeneral";
-            this.m_tabGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.m_tabGeneral.Size = new System.Drawing.Size(440, 319);
-            this.m_tabGeneral.TabIndex = 0;
-            this.m_tabGeneral.Text = "General";
-            this.m_tabGeneral.UseVisualStyleBackColor = true;
-            // 
-            // m_PropGridGeneral
-            // 
-            this.m_PropGridGeneral.Location = new System.Drawing.Point(9, 38);
-            this.m_PropGridGeneral.Name = "m_PropGridGeneral";
-            this.m_PropGridGeneral.Size = new System.Drawing.Size(425, 245);
-            this.m_PropGridGeneral.TabIndex = 6;
-            this.m_PropGridGeneral.ToolbarVisible = false;
             // 
             // m_tabBooks
             // 
-            this.m_tabBooks.Controls.Add(this.m_btnExport);
-            this.m_tabBooks.Controls.Add(this.m_listviewBooks);
-            this.m_tabBooks.Controls.Add(this.m_btnProperties);
-            this.m_tabBooks.Controls.Add(this.m_btnCreate);
-            this.m_tabBooks.Controls.Add(this.m_btnRemove);
-            this.m_tabBooks.Controls.Add(this.m_btnImportBook);
+            this.m_tabBooks.Controls.Add(this.m_radioStartedBooks);
+            this.m_tabBooks.Controls.Add(this.m_radioOldTestament);
+            this.m_tabBooks.Controls.Add(this.m_radioNewTestament);
+            this.m_tabBooks.Controls.Add(this.m_radioAll);
+            this.m_tabBooks.Controls.Add(this.m_comboLanguage);
+            this.m_tabBooks.Controls.Add(this.m_btnCopyBookNames);
+            this.m_tabBooks.Controls.Add(this.m_bProperties);
+            this.m_tabBooks.Controls.Add(this.m_bRemove);
+            this.m_tabBooks.Controls.Add(this.m_bExport);
+            this.m_tabBooks.Controls.Add(this.m_bImport);
+            this.m_tabBooks.Controls.Add(this.m_bCreate);
+            this.m_tabBooks.Controls.Add(this.m_gridBooks);
             this.m_tabBooks.Location = new System.Drawing.Point(4, 22);
             this.m_tabBooks.Name = "m_tabBooks";
             this.m_tabBooks.Padding = new System.Windows.Forms.Padding(3);
-            this.m_tabBooks.Size = new System.Drawing.Size(440, 319);
-            this.m_tabBooks.TabIndex = 1;
+            this.m_tabBooks.Size = new System.Drawing.Size(460, 339);
+            this.m_tabBooks.TabIndex = 4;
             this.m_tabBooks.Text = "Books";
             this.m_tabBooks.UseVisualStyleBackColor = true;
             // 
-            // m_tabBookNames
+            // m_radioStartedBooks
             // 
-            this.m_tabBookNames.Controls.Add(this.m_comboLanguage);
-            this.m_tabBookNames.Controls.Add(this.m_lblFrom);
-            this.m_tabBookNames.Controls.Add(this.m_btnCopyBookNames);
-            this.m_tabBookNames.Controls.Add(this.m_PropGridBookNames);
-            this.m_tabBookNames.Location = new System.Drawing.Point(4, 22);
-            this.m_tabBookNames.Name = "m_tabBookNames";
-            this.m_tabBookNames.Size = new System.Drawing.Size(440, 319);
-            this.m_tabBookNames.TabIndex = 3;
-            this.m_tabBookNames.Text = "Book Names";
-            this.m_tabBookNames.UseVisualStyleBackColor = true;
+            this.m_radioStartedBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_radioStartedBooks.Location = new System.Drawing.Point(343, 285);
+            this.m_radioStartedBooks.Name = "m_radioStartedBooks";
+            this.m_radioStartedBooks.Size = new System.Drawing.Size(111, 17);
+            this.m_radioStartedBooks.TabIndex = 112;
+            this.m_radioStartedBooks.TabStop = true;
+            this.m_radioStartedBooks.Text = "Started Books";
+            this.m_radioStartedBooks.UseVisualStyleBackColor = true;
+            this.m_radioStartedBooks.CheckedChanged += new System.EventHandler(this.cmdFilterOnStartedBooks);
+            // 
+            // m_radioOldTestament
+            // 
+            this.m_radioOldTestament.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_radioOldTestament.Location = new System.Drawing.Point(343, 267);
+            this.m_radioOldTestament.Name = "m_radioOldTestament";
+            this.m_radioOldTestament.Size = new System.Drawing.Size(111, 17);
+            this.m_radioOldTestament.TabIndex = 111;
+            this.m_radioOldTestament.TabStop = true;
+            this.m_radioOldTestament.Text = "Old Testament";
+            this.m_radioOldTestament.UseVisualStyleBackColor = true;
+            this.m_radioOldTestament.CheckedChanged += new System.EventHandler(this.cmdFilterOnOT);
+            // 
+            // m_radioNewTestament
+            // 
+            this.m_radioNewTestament.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_radioNewTestament.Location = new System.Drawing.Point(343, 249);
+            this.m_radioNewTestament.Name = "m_radioNewTestament";
+            this.m_radioNewTestament.Size = new System.Drawing.Size(111, 17);
+            this.m_radioNewTestament.TabIndex = 110;
+            this.m_radioNewTestament.TabStop = true;
+            this.m_radioNewTestament.Text = "New Testament";
+            this.m_radioNewTestament.UseVisualStyleBackColor = true;
+            this.m_radioNewTestament.CheckedChanged += new System.EventHandler(this.cmdFilterOnNT);
+            // 
+            // m_radioAll
+            // 
+            this.m_radioAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_radioAll.Location = new System.Drawing.Point(343, 231);
+            this.m_radioAll.Name = "m_radioAll";
+            this.m_radioAll.Size = new System.Drawing.Size(111, 17);
+            this.m_radioAll.TabIndex = 109;
+            this.m_radioAll.TabStop = true;
+            this.m_radioAll.Text = "All";
+            this.m_radioAll.UseVisualStyleBackColor = true;
+            this.m_radioAll.CheckedChanged += new System.EventHandler(this.cmdFilterOnAll);
             // 
             // m_comboLanguage
             // 
-            this.m_comboLanguage.Location = new System.Drawing.Point(220, 295);
+            this.m_comboLanguage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_comboLanguage.Location = new System.Drawing.Point(343, 192);
             this.m_comboLanguage.Name = "m_comboLanguage";
-            this.m_comboLanguage.Size = new System.Drawing.Size(121, 21);
-            this.m_comboLanguage.TabIndex = 107;
-            // 
-            // m_lblFrom
-            // 
-            this.m_lblFrom.Location = new System.Drawing.Point(166, 295);
-            this.m_lblFrom.Name = "m_lblFrom";
-            this.m_lblFrom.Size = new System.Drawing.Size(48, 23);
-            this.m_lblFrom.TabIndex = 106;
-            this.m_lblFrom.Text = "from";
-            this.m_lblFrom.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.m_comboLanguage.Size = new System.Drawing.Size(111, 21);
+            this.m_comboLanguage.TabIndex = 108;
             // 
             // m_btnCopyBookNames
             // 
-            this.m_btnCopyBookNames.Location = new System.Drawing.Point(48, 295);
+            this.m_btnCopyBookNames.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnCopyBookNames.Location = new System.Drawing.Point(343, 155);
             this.m_btnCopyBookNames.Name = "m_btnCopyBookNames";
-            this.m_btnCopyBookNames.Size = new System.Drawing.Size(112, 23);
-            this.m_btnCopyBookNames.TabIndex = 105;
-            this.m_btnCopyBookNames.Text = "Copy Book Names";
+            this.m_btnCopyBookNames.Size = new System.Drawing.Size(111, 36);
+            this.m_btnCopyBookNames.TabIndex = 106;
+            this.m_btnCopyBookNames.Text = "Copy Book Names from";
             this.m_btnCopyBookNames.Click += new System.EventHandler(this.cmdCopyBookNames);
             // 
-            // m_PropGridBookNames
+            // m_bProperties
             // 
-            this.m_PropGridBookNames.Location = new System.Drawing.Point(14, 13);
-            this.m_PropGridBookNames.Name = "m_PropGridBookNames";
-            this.m_PropGridBookNames.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.m_PropGridBookNames.Size = new System.Drawing.Size(414, 276);
-            this.m_PropGridBookNames.TabIndex = 0;
-            this.m_PropGridBookNames.ToolbarVisible = false;
+            this.m_bProperties.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_bProperties.Location = new System.Drawing.Point(343, 114);
+            this.m_bProperties.Name = "m_bProperties";
+            this.m_bProperties.Size = new System.Drawing.Size(111, 23);
+            this.m_bProperties.TabIndex = 13;
+            this.m_bProperties.Text = "Properties...";
+            this.m_bProperties.Click += new System.EventHandler(this.cmdBookProperties);
+            // 
+            // m_bRemove
+            // 
+            this.m_bRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_bRemove.Location = new System.Drawing.Point(343, 87);
+            this.m_bRemove.Name = "m_bRemove";
+            this.m_bRemove.Size = new System.Drawing.Size(111, 23);
+            this.m_bRemove.TabIndex = 12;
+            this.m_bRemove.Text = "Remove...";
+            this.m_bRemove.Click += new System.EventHandler(this.cmdRemoveBook);
+            // 
+            // m_bExport
+            // 
+            this.m_bExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_bExport.Location = new System.Drawing.Point(343, 60);
+            this.m_bExport.Name = "m_bExport";
+            this.m_bExport.Size = new System.Drawing.Size(111, 23);
+            this.m_bExport.TabIndex = 11;
+            this.m_bExport.Text = "Export...";
+            this.m_bExport.Click += new System.EventHandler(this.cmdExportBook);
+            // 
+            // m_bImport
+            // 
+            this.m_bImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_bImport.Location = new System.Drawing.Point(343, 33);
+            this.m_bImport.Name = "m_bImport";
+            this.m_bImport.Size = new System.Drawing.Size(111, 23);
+            this.m_bImport.TabIndex = 8;
+            this.m_bImport.Text = "Import...";
+            this.m_bImport.Click += new System.EventHandler(this.cmdImportBook);
+            // 
+            // m_bCreate
+            // 
+            this.m_bCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_bCreate.Location = new System.Drawing.Point(343, 6);
+            this.m_bCreate.Name = "m_bCreate";
+            this.m_bCreate.Size = new System.Drawing.Size(111, 23);
+            this.m_bCreate.TabIndex = 7;
+            this.m_bCreate.Text = "Create...";
+            this.m_bCreate.Click += new System.EventHandler(this.cmdCreateBook);
+            // 
+            // m_gridBooks
+            // 
+            this.m_gridBooks.AllowUserToAddRows = false;
+            this.m_gridBooks.AllowUserToDeleteRows = false;
+            this.m_gridBooks.AllowUserToResizeRows = false;
+            this.m_gridBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_gridBooks.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.m_gridBooks.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.m_colAbbreviation,
+            this.m_colBookName,
+            this.m_colStage});
+            this.m_gridBooks.Location = new System.Drawing.Point(6, 6);
+            this.m_gridBooks.MultiSelect = false;
+            this.m_gridBooks.Name = "m_gridBooks";
+            this.m_gridBooks.RowHeadersVisible = false;
+            this.m_gridBooks.RowTemplate.Height = 19;
+            this.m_gridBooks.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.m_gridBooks.Size = new System.Drawing.Size(331, 327);
+            this.m_gridBooks.TabIndex = 0;
+            this.m_gridBooks.Resize += new System.EventHandler(this.cmdDataGridResized);
+            this.m_gridBooks.SelectionChanged += new System.EventHandler(this.cmdGridSelectionChanged);
+            // 
+            // m_colAbbreviation
+            // 
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle1;
+            this.m_colAbbreviation.HeaderText = "Abbrev";
+            this.m_colAbbreviation.Name = "m_colAbbreviation";
+            this.m_colAbbreviation.ReadOnly = true;
+            this.m_colAbbreviation.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.m_colAbbreviation.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.m_colAbbreviation.ToolTipText = "The standard 3-letter abbreviation for this book, commonly used in Bible translat" +
+                "ion organizations to identify the book.";
+            this.m_colAbbreviation.Width = 50;
+            // 
+            // m_colBookName
+            // 
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle2;
+            this.m_colBookName.HeaderText = "Book Name";
+            this.m_colBookName.Name = "m_colBookName";
+            this.m_colBookName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.m_colBookName.ToolTipText = "The name of the book in your language.";
+            this.m_colBookName.Width = 170;
+            // 
+            // m_colStage
+            // 
+            this.m_colStage.HeaderText = "Stage";
+            this.m_colStage.Name = "m_colStage";
+            this.m_colStage.ReadOnly = true;
+            this.m_colStage.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.m_colStage.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.m_colStage.ToolTipText = "E.g., Draft, Revision, Consultant Checked, etc.";
+            this.m_colStage.Width = 90;
+            // 
+            // m_tabOther
+            // 
+            this.m_tabOther.Controls.Add(this.m_PropGridGeneral);
+            this.m_tabOther.Controls.Add(this.m_btnRemoveTranslation);
+            this.m_tabOther.Controls.Add(this.m_lblLanguageName);
+            this.m_tabOther.Controls.Add(this.m_editLanguageName);
+            this.m_tabOther.Location = new System.Drawing.Point(4, 22);
+            this.m_tabOther.Name = "m_tabOther";
+            this.m_tabOther.Padding = new System.Windows.Forms.Padding(3);
+            this.m_tabOther.Size = new System.Drawing.Size(460, 339);
+            this.m_tabOther.TabIndex = 0;
+            this.m_tabOther.Text = "Other";
+            this.m_tabOther.UseVisualStyleBackColor = true;
+            // 
+            // m_PropGridGeneral
+            // 
+            this.m_PropGridGeneral.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_PropGridGeneral.Location = new System.Drawing.Point(9, 38);
+            this.m_PropGridGeneral.Name = "m_PropGridGeneral";
+            this.m_PropGridGeneral.Size = new System.Drawing.Size(442, 266);
+            this.m_PropGridGeneral.TabIndex = 6;
+            this.m_PropGridGeneral.ToolbarVisible = false;
             // 
             // Page_Translation
             // 
@@ -416,65 +454,73 @@ namespace OurWord.Dialogs
             this.Size = new System.Drawing.Size(468, 368);
             this.Load += new System.EventHandler(this.cmdLoad);
             this.m_tabctrlTranslation.ResumeLayout(false);
-            this.m_tabGeneral.ResumeLayout(false);
-            this.m_tabGeneral.PerformLayout();
             this.m_tabBooks.ResumeLayout(false);
-            this.m_tabBookNames.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).EndInit();
+            this.m_tabOther.ResumeLayout(false);
+            this.m_tabOther.PerformLayout();
             this.ResumeLayout(false);
 
 		}
 		#endregion
 
-        // DlgPropertySheet overrides --------------------------------------------------------
-        #region Attr{g}: string TabText
-        public override string TabText
+		// DlgPropertySheet overrides --------------------------------------------------------
+		#region SMethod: string ComputeID(string sTranslationDisplayName)
+		public static string ComputeID(string sTranslationDisplayName)
+		{
+			return "idTranslation_" + sTranslationDisplayName;
+		}
+		#endregion
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				// For Visual Studio
+				if (null == m_Translation) 
+					return ""; 
+
+				return ComputeID(Translation.DisplayName);
+			}
+		}
+		#endregion
+		#region Attr{g}: string TabText
+        public override string Title
         {
             get
             {
                 string sLeader = "";
-                if (Trans == G.FTranslation)
+                if (Translation == DB.FrontTranslation)
                     sLeader = "Front: ";
-                else if (Trans == G.TTranslation)
+                else if (Translation == DB.TargetTranslation)
                     sLeader = "Target: ";
 
-                return sLeader + Trans.DisplayName;
+                return sLeader + Translation.DisplayName;
             }
         }
         #endregion
         #region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
+            HarvestBookNames();
+
 			// The translation's name should be a valid, non-zero-lengthed name
 			if (LanguageName.Length == 0)
 			{
-                m_tabctrlTranslation.SelectedTab = m_tabGeneral;
+                m_tabctrlTranslation.SelectedTab = m_tabOther;
                 Messages.TranslationNeedsName();
                 m_editLanguageName.Focus();
 				m_editLanguageName.Select();
 				return false;
 			}
-			Trans.DisplayName = LanguageName;
-
-			// The translation's abbreviation must be non-zero length
-			if (m_sAbbreviation.Length == 0)
-			{
-                m_tabctrlTranslation.SelectedTab = m_tabGeneral;
-                Messages.TranslationNeedsAbbrev();
-                m_PropGridGeneral.Focus();
-                m_PropGridGeneral.Select();
-				return false;
-			}
-            Trans.LanguageAbbrev = m_sAbbreviation;
+			Translation.DisplayName = LanguageName;
 
             return true;
         }
         #endregion
 
         // Property Grid: General ------------------------------------------------------------
-        const string c_sPropAbbreviation = "propAbbreviation";
         const string c_sPropWSAdvisor = "propWSAdvisor";
         const string c_sPropWSVernacular = "propWSVernacular";
-        string m_sAbbreviation;
         #region Attr{g}: PropertyBag BagGeneral
         PropertyBag BagGeneral
         {
@@ -491,16 +537,12 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-                case c_sPropAbbreviation:
-                    e.Value = m_sAbbreviation;
-                    break;
-
                 case c_sPropWSAdvisor:
-                    e.Value = Trans.ConsultantWritingSystemName;
+                    e.Value = Translation.ConsultantWritingSystemName;
                     break;
 
                 case c_sPropWSVernacular:
-                    e.Value = Trans.VernacularWritingSystemName;
+                    e.Value = Translation.VernacularWritingSystemName;
                     break;
             }
         }
@@ -510,16 +552,12 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-                case c_sPropAbbreviation:
-                    m_sAbbreviation = (string)e.Value;
-                    break;
-
                 case c_sPropWSAdvisor:
-                    Trans.ConsultantWritingSystemName = (string)e.Value;
+                    Translation.ConsultantWritingSystemName = (string)e.Value;
                     break;
 
                 case c_sPropWSVernacular:
-                    Trans.VernacularWritingSystemName = (string)e.Value;
+                    Translation.VernacularWritingSystemName = (string)e.Value;
                     break;
             }
         }
@@ -532,22 +570,9 @@ namespace OurWord.Dialogs
             BagGeneral.GetValue += new PropertySpecEventHandler(bagGeneral_GetValue);
             BagGeneral.SetValue += new PropertySpecEventHandler(bagGeneral_SetValue);
 
-            string[] vsWritingSystems = new string[G.StyleSheet.WritingSystems.Count];
-            for (int i = 0; i < G.StyleSheet.WritingSystems.Count; i++)
-                vsWritingSystems[i] = (G.StyleSheet.WritingSystems[i] as JWritingSystem).Name;
-
-            // Abbreviation
-            BagGeneral.Properties.Add( new PropertySpec(
-                c_sPropAbbreviation,
-                "Language Abbreviation",
-                typeof(string),
-                "",
-                "Typically the Ethnoloque Code, a short (e.g., 3-letter) abbreviation of the " +
-                    "language name. One of its uses is in composing the filenames.",
-                "",
-                "", 
-                null
-                ));
+            string[] vsWritingSystems = new string[DB.StyleSheet.WritingSystems.Count];
+            for (int i = 0; i < DB.StyleSheet.WritingSystems.Count; i++)
+                vsWritingSystems[i] = (DB.StyleSheet.WritingSystems[i] as JWritingSystem).Name;
 
             // Vernacular Writing System
             PropertySpec ps = new PropertySpec(
@@ -583,79 +608,197 @@ namespace OurWord.Dialogs
         }
         #endregion
 
-        // Property Grid: BookNames ----------------------------------------------------------
-        #region Attr{g}: PropertyBag BagBookNames
-        PropertyBag BagBookNames
+        // Show Filter -----------------------------------------------------------------------
+        enum FilterOn { kAll, kNT, kOT, kStartedBooks };
+        FilterOn m_FilterOn = FilterOn.kNT;
+        #region Cmd: cmdFilterOnAll
+        private void cmdFilterOnAll(object sender, EventArgs e)
+        {
+            if (m_radioAll.Checked)
+            {
+                m_FilterOn = FilterOn.kAll;
+                UpdateFilter();
+            }
+        }
+        #endregion
+        #region Cmd: cmdFilterOnNT
+        private void cmdFilterOnNT(object sender, EventArgs e)
+        {
+            if (m_radioNewTestament.Checked)
+            {
+                m_FilterOn = FilterOn.kNT;
+                UpdateFilter();
+            }
+        }
+        #endregion
+        #region Cmd: cmdFilterOnOT
+        private void cmdFilterOnOT(object sender, EventArgs e)
+        {
+            if (m_radioOldTestament.Checked)
+            {
+                m_FilterOn = FilterOn.kOT;
+                UpdateFilter();
+            }
+        }
+        #endregion
+        #region Cmd: cmdFilterOnStartedBooks
+        private void cmdFilterOnStartedBooks(object sender, EventArgs e)
+        {
+            if (m_radioStartedBooks.Checked)
+            {
+                m_FilterOn = FilterOn.kStartedBooks;
+                UpdateFilter();
+            }
+        }
+        #endregion
+        #region Method: void UpdateFilter()
+        void UpdateFilter()
+        {
+            m_radioAll.Checked = (m_FilterOn == FilterOn.kAll);
+            m_radioNewTestament.Checked = (m_FilterOn == FilterOn.kNT);
+            m_radioOldTestament.Checked = (m_FilterOn == FilterOn.kOT);
+            m_radioStartedBooks.Checked = (m_FilterOn == FilterOn.kStartedBooks);
+
+            // The grid will apply the filter
+            PopulateGrid(SelectedBookAbbrev);
+        }
+        #endregion
+
+        // Books Data Grid -------------------------------------------------------------------
+        #region Method: void PopulateGrid(string sBookAbbrevToSelect)
+        void PopulateGrid(string sBookAbbrevToSelect)
+		{
+            // In case book names have been changed, we want to harvest them before we
+            // regenerate this.
+            HarvestBookNames();
+
+            // Clear out whatever was there
+			m_gridBooks.Rows.Clear();
+
+            int iMatthew = 39;
+
+			// One row per book
+			for (int i = 0; i < DBook.BookAbbrevsCount; i++)
+			{
+				string sBookAbbrev = DBook.BookAbbrevs[i];
+
+				// If the book exists in the translation, get its stage
+				DBook book = Translation.FindBook(sBookAbbrev);
+				string sStage = ((null == book) ? "" : book.TranslationStage.Name);
+
+                // Apply the Show filter
+                switch (m_FilterOn)
+                {
+                    case FilterOn.kNT:
+                        if (i < iMatthew)
+                            continue;
+                        break;
+                    case FilterOn.kOT:
+                        if (i >= iMatthew)
+                            continue;
+                        break;
+                    case FilterOn.kStartedBooks:
+                        if (null == book)
+                            continue;
+                        break;
+                }
+
+                // Put together the objects that go into the row's cells, then
+                // create and add the row
+				object[] v = 
+				{
+					sBookAbbrev,
+					Translation.BookNamesTable[i],
+					sStage
+				};
+				DataGridViewRow row = new DataGridViewRow();
+				row.CreateCells(m_gridBooks, v);
+                row.Tag = sBookAbbrev;
+				m_gridBooks.Rows.Add(row);
+
+				// If the book doesn't exist, gray out the stage cell
+                if (null == book)
+                    row.Cells[2].Style.BackColor = BackColor;
+
+                // For locked books, set the forecolor to red
+                foreach (DataGridViewCell cell in row.Cells)
+                {
+                    cell.Style.ForeColor =
+                        (null != book && book.Locked) ?
+                        Color.Red :
+                        Color.Black;
+                }
+
+                // Select this row?
+                if (sBookAbbrev == sBookAbbrevToSelect)
+                    row.Selected = true;
+			}
+        }
+        #endregion
+        #region Attr{g/s}: string SelectedBookAbbrev
+        string SelectedBookAbbrev
         {
             get
             {
-                Debug.Assert(null != m_BagBookNames);
-                return m_BagBookNames;
+                if (m_gridBooks.SelectedRows.Count != 1)
+                    return null;
+                return (string)m_gridBooks.SelectedRows[0].Tag;
             }
-        }
-        PropertyBag m_BagBookNames;
-        #endregion
-        #region Method: void bagBookNames_GetValue(...)
-        void bagBookNames_GetValue(object sender, PropertySpecEventArgs e)
-        {
-            // The PropertyID is the book's abbrev
-            string sAbbrev = e.Property.ID;
-
-            // Get the book's index
-            int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
-
-            // Look up the bookname in the tabe
-            e.Value = Trans.BookNamesTable[iBook];
-        }
-        #endregion
-        #region Method: void bagBookNames_SetValue(...)
-        void bagBookNames_SetValue(object sender, PropertySpecEventArgs e)
-        {
-            // The PropertyID is the book's abbrev
-            string sAbbrev = e.Property.ID;
-
-            // Get the book's index
-            int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
-
-            // Set the value to the table
-           Trans.BookNamesTable[iBook] = (string)e.Value; ;
-        }
-        #endregion
-        #region Method: void SetupPropGrid_BookNames()
-        void SetupPropGrid_BookNames()
-        {
-            // Create the PropertyBag for this style
-            m_BagBookNames = new PropertyBag();
-            BagBookNames.GetValue += new PropertySpecEventHandler(bagBookNames_GetValue);
-            BagBookNames.SetValue += new PropertySpecEventHandler(bagBookNames_SetValue);
-
-            // One line per book
-            for (int i = 0; i < DBook.BookAbbrevsCount; i++)
+            set
             {
-                PropertySpec ps = new PropertySpec(
-                    DBook.BookAbbrevs[i],
-                    BookNames.GetName(i),
-                    typeof(string),
-                    null,
-                    "Enter the name of the book in this language for " + BookNames.GetName(i),
-                    "",
-                    "",
-                    null);
-                ps.DontLocalizeName = true;
-                ps.DontLocalizeCategory = true;
-                ps.DontLocalizeHelp = true;
-                BagBookNames.Properties.Add(ps);
+                // Find the row in question, and select it
+                foreach (DataGridViewRow row in m_gridBooks.Rows)
+                {
+                    if ((string)row.Tag == value)
+                    {
+                        row.Selected = true;
+                        return;
+                    }
+                }
             }
+        }
+        #endregion
+        #region VAttr{g}: DBook SelectedBook
+        DBook SelectedBook
+        {
+            get
+            {
+                string sAbbrev = SelectedBookAbbrev;
+                if (!string.IsNullOrEmpty(sAbbrev))
+                    return Translation.FindBook(sAbbrev);
+                return null;
+            }
+        }
+        #endregion
+        #region Method: void HarvestBookNames()
+        void HarvestBookNames()
+        {
+            foreach (DataGridViewRow row in m_gridBooks.Rows)
+            {
+                string sAbbrev = (string)row.Cells[0].Value;
+                string sName = (string)row.Cells[1].Value;
 
-            // Localize the bag
-            LocDB.Localize(this, BagBookNames);
+                // Don't do anything if it was set to empty; assume that
+                // was a user mistake.
+                if (string.IsNullOrEmpty(sName))
+                    continue;
 
-            // Set the Property Grid to this PropertyBag
-            m_PropGridBookNames.SelectedObject = BagBookNames;
+                int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
+                if (-1 != iBook)
+                {
+                    // Update the name in the table
+                    Translation.BookNamesTable[iBook] = sName;
 
+                    // Update the book's display name
+                    DBook book = Translation.FindBook(sAbbrev);
+                    if (null != book)
+                        book.DisplayName = sName;
+                }
+            }
         }
         #endregion
 
+        // Copy Book Names -------------------------------------------------------------------
         #region ComboBox ComboLanguage
         ComboBox ComboLanguage
         {
@@ -704,7 +847,7 @@ namespace OurWord.Dialogs
             }
 
             // Put in the FileName language (if different)
-            DTeamSettings ts = G.TeamSettings;
+            DTeamSettings ts = DB.TeamSettings;
             string sFileNameLang = ts.FileNameLanguage;
             if (!ComboBoxHasPossiblity(sFileNameLang))
             {
@@ -713,9 +856,9 @@ namespace OurWord.Dialogs
             }
 
             // Put in the Front Translation (if this isn't the Front)
-            if (null != G.Project.FrontTranslation && G.Project.FrontTranslation != Trans)
+            if (null != DB.Project.FrontTranslation && DB.Project.FrontTranslation != Translation)
             {
-                string sFrontLang = G.Project.FrontTranslation.DisplayName;
+                string sFrontLang = DB.Project.FrontTranslation.DisplayName;
                 if (!ComboBoxHasPossiblity(sFrontLang))
                 {
                     ComboLanguage.Items.Add(sFrontLang);
@@ -726,17 +869,17 @@ namespace OurWord.Dialogs
             // Put in the Target Translation (if this isn't the Target) but from here
             // on out, we don't select it in the combo box (thus leaving a Resources
             // language as the default.
-            if (null != G.Project.TargetTranslation && G.Project.TargetTranslation != Trans)
+            if (null != DB.Project.TargetTranslation && DB.Project.TargetTranslation != Translation)
             {
-                string sTargetLang = G.Project.TargetTranslation.DisplayName;
+                string sTargetLang = DB.Project.TargetTranslation.DisplayName;
                 if (!ComboBoxHasPossiblity(sTargetLang))
                     ComboLanguage.Items.Add(sTargetLang);
             }
 
             // Put in any other translations
-            foreach (DTranslation t in G.Project.OtherTranslations)
+            foreach (DTranslation t in DB.Project.OtherTranslations)
             {
-                if (t != Trans && !ComboBoxHasPossiblity(t.DisplayName))
+                if (t != Translation && !ComboBoxHasPossiblity(t.DisplayName))
                     ComboLanguage.Items.Add(t.DisplayName);
             }
         }
@@ -751,11 +894,11 @@ namespace OurWord.Dialogs
             string[] vsBookNamesSource = null;
 
             // Locate the source BookNames table: DTranslations as source
-            if (null != G.Project.FrontTranslation && G.Project.FrontTranslation.DisplayName == sLanguage)
-                vsBookNamesSource = G.Project.FrontTranslation.BookNamesTable.GetCopy();
-            if (null != G.Project.TargetTranslation && G.Project.TargetTranslation.DisplayName == sLanguage)
-                vsBookNamesSource = G.Project.TargetTranslation.BookNamesTable.GetCopy();
-            foreach (DTranslation t in G.Project.OtherTranslations)
+            if (null != DB.Project.FrontTranslation && DB.Project.FrontTranslation.DisplayName == sLanguage)
+                vsBookNamesSource = DB.Project.FrontTranslation.BookNamesTable.GetCopy();
+            if (null != DB.Project.TargetTranslation && DB.Project.TargetTranslation.DisplayName == sLanguage)
+                vsBookNamesSource = DB.Project.TargetTranslation.BookNamesTable.GetCopy();
+            foreach (DTranslation t in DB.Project.OtherTranslations)
             {
                 if (t.DisplayName == sLanguage)
                     vsBookNamesSource = t.BookNamesTable.GetCopy();
@@ -779,143 +922,150 @@ namespace OurWord.Dialogs
                 return;
 
             // Populate the translation
-            Trans.BookNamesTable.ReplaceAll(vsBookNamesSource);
+            Translation.BookNamesTable.ReplaceAll(vsBookNamesSource);
 
             // Update the cross references in the loaded book
-            if (null != G.Project.FrontTranslation &&
-                G.Project.FrontTranslation.DisplayName == sLanguage &&
-                Trans == G.Project.TargetTranslation)
+            if (null != DB.Project.FrontTranslation &&
+                DB.Project.FrontTranslation.DisplayName == sLanguage &&
+                Translation == DB.Project.TargetTranslation)
             {
-                G.Project.TargetTranslation.UpdateFromFront();
+                DB.Project.TargetTranslation.UpdateFromFront();
             }
 
             // Recalculate the grid
-            SetupPropGrid_BookNames();
-            Invalidate();
+            PopulateGrid(SelectedBookAbbrev);
         }
         #endregion
 
-        // Command Handlers ------------------------------------------------------------------
-        #region Handler: cmdLoad - Populate the controls
-        private void cmdLoad(object sender, System.EventArgs e)
+		// Command Handlers ------------------------------------------------------------------
+		#region Cmd: cmdLoad - Populate the controls
+		private void cmdLoad(object sender, System.EventArgs e)
 		{
             // Localization
-            Control[] vExclude = { m_PropGridGeneral, m_PropGridBookNames };
+            Control[] vExclude = { m_PropGridGeneral };
             LocDB.Localize(this, vExclude);
 
-			// Translation Abbrev. (Load this before the Name, because if it is empty,
-			// the process of loading the name will supply a meaningful default.)
-            m_sAbbreviation = Trans.LanguageAbbrev;
-
 			// Language Name
-			LanguageName = Trans.DisplayName;
+			LanguageName = Translation.DisplayName;
 
             // Initialze the PropertyGrids
             SetupPropGrid_General();
-            SetupPropGrid_BookNames();
+
+            // We'll default to the New Testament since that covers most people
+            m_radioNewTestament.Checked = true;
 
 			// Populate the list of books; select the first item in the list
-			_PopulateBookList("GEN");
+			PopulateGrid("GEN");
 
-			// Hide the CreateBook button if requested (Front books cannot be created here)
-			if (SuppressCreateBook)
-				m_btnCreate.Visible = false;
+			// Hide the CreateBook button if requested (Front books cannot be created,
+            // they can only be imported. Move the other buttons up.
+            if (SuppressCreateBook)
+            {
+                m_bCreate.Visible = false;
+                m_bProperties.Location = m_bRemove.Location;
+                m_bRemove.Location = m_bExport.Location;
+                m_bExport.Location = m_bImport.Location;
+                m_bImport.Location = m_bCreate.Location;
+            }
 
             // Combo Box Possibilities
             PopulateComboBoxPossibilities();
 		}
 		#endregion
-		#region Handler: cmdLangNameChanged - Update Abbrev when LanguageName changes
-		private void cmdLangNameChanged(object sender, System.EventArgs e)
-		{
-            /*** 
-			// Don't erase an existing Abbrev should the user delete the Lang Name.
-			if (LanguageName.Length == 0)
-				return;				
-
-			// Get the default abbreviation as the first three letters of the name
-			int cAbbrevLength = 3;
-			string sDefaultAbbrev = "";
-			if (LanguageName.Length > 0)
-			{
-				foreach(char ch in LanguageName)
-				{
-					if (ch != ' ')
-					{
-						sDefaultAbbrev += ch;
-						cAbbrevLength--;
-					}
-					if (0 == cAbbrevLength)
-						break;
-				}
-			}
-
-			// If the abbreviation currently entered matches this default (for as
-			// many letters as it has), then add any remaining letters
-			int i=0;
-			if (Abbrev == "MyT" || Abbrev == "Fro")  // The default from "My Translation"
-				Abbrev = "";
-			for(; i < Abbrev.Length && i < sDefaultAbbrev.Length; i++)
-			{
-				if ( Abbrev[i] != sDefaultAbbrev[i] )
-					break;
-			}
-			if (i == Abbrev.Length && i < sDefaultAbbrev.Length)
-				Abbrev = sDefaultAbbrev;
-
-            // Update the tab page's text and title bar if appropriate
-            ParentDlg.UpdateActiveTabText();
-            ParentDlg.SetTitleBarText();
-            ***/
-		}
-		#endregion
-        #region Handler: cmdRemoveTranslation
-        private void cmdRemoveTranslation(object sender, EventArgs e)
+		#region Cmd: cmdRemoveTranslation
+		private void cmdRemoveTranslation(object sender, EventArgs e)
         {
             // Query the user to make certain
             if (!Messages.VerifyRemoveTranslation())
                 return;
 
             // Save the OTrans file in case anything has changed
-            ParentDlg.HarvestChangesFromCurrentSheet();
-            Trans.Write();
+            ParentDlg.HarvestChangesFromCurrentPage();
+            Translation.Write(G.CreateProgressIndicator());
 
             // Remove it from the appropriate object in the Properties
             bool bWasFront = false;
             bool bWasOther = false;
-            if (G.Project.FrontTranslation == Trans)
+            if (DB.Project.FrontTranslation == Translation)
             {
-                G.Project.FrontTranslation = null;
+                DB.Project.FrontTranslation = null;
                 bWasFront = true;
             }
-            else if (G.Project.TargetTranslation == Trans)
+            else if (DB.Project.TargetTranslation == Translation)
             {
-                G.Project.TargetTranslation = null;
+                DB.Project.TargetTranslation = null;
             }
             else
             {
-                G.Project.OtherTranslations.Remove(Trans);
+                DB.Project.OtherTranslations.Remove(Translation);
                 bWasOther = true;
             }
 
             // Regenerate the dialog 
-            if (bWasOther)
-                ParentDlg.SetupTabControl(DialogProperties.c_navTranslations);
-            else
-            {
-                ParentDlg.SetupTabControl(DialogProperties.c_navEssentials);
-                ParentDlg.ActivatePage( bWasFront ?
-                    DialogProperties.c_tagEssentialsFront : DialogProperties.c_tagEssentialsTarget);
-            }
+			if (bWasOther)
+			{
+                ParentDlg.InitNavigation(Page_OtherTranslations.c_sID);
+			}
+			else
+			{
+				string sActivatePage = (bWasFront ?
+					Page_SetupFront.c_sID : Page_SetupTarget.c_sID);
+                ParentDlg.InitNavigation(sActivatePage);
+			}
         }
         #endregion
 
-        // Books Page ------------------------------------------------------------------------
-		#region Handler: cmdRemoveBook - Remove Book button clicked
+		#region Cmd: cmdDataGridResized - adjust internal column width so we don't horizontal scroll
+		private void cmdDataGridResized(object sender, EventArgs e)
+		{
+			int iBookNameColumn = 1;
+
+			// Start with our available width
+			int nAvailableWidth = m_gridBooks.ClientRectangle.Width;
+
+			// Subtract a little kludge for the borders
+			nAvailableWidth -= 4;
+
+			// Subtract the scroll bar's width
+			nAvailableWidth -= SystemInformation.VerticalScrollBarWidth;
+
+			// Subtract the widths of the columns, except for the BookNames
+			// column (column[1]), which is the one we'll be setting
+			for (int i = 0; i < m_gridBooks.ColumnCount; i++)
+			{
+				if (i != iBookNameColumn)
+					nAvailableWidth -= m_gridBooks.Columns[i].Width;
+			}
+
+			// Stick with a minimum size in case the grid gets too small
+			// Of course, this will cause the horizontal scroll bar to appear
+			nAvailableWidth = Math.Max(nAvailableWidth, 100);
+
+			// Set the book-name column
+			m_gridBooks.Columns[iBookNameColumn].Width = nAvailableWidth;
+		}
+		#endregion
+		#region Cmd: cmdGridSelectionChanged
+		private void cmdGridSelectionChanged(object sender, EventArgs e)
+		{
+			// From the abbreviation, we can see if the translation defines this book
+            DBook book = Translation.FindBook(SelectedBookAbbrev);
+
+			// Disable/Enable buttons accordingly
+			m_bCreate.Enabled = (book == null);
+			m_bImport.Enabled = (book == null);
+			m_bExport.Enabled = (book != null);
+			m_bRemove.Enabled = (book != null);
+			m_bProperties.Enabled = (book != null);
+		}
+		#endregion
+
+		// Book Command Handlers -------------------------------------------------------------
+		#region Cmd: cmdRemoveBook - Remove Book button clicked
 		private void cmdRemoveBook(object sender, System.EventArgs e)
 		{
 			// Get the selection
-			DBook book = CurrentlySelectedBook;
+			DBook book = SelectedBook;
 			if (null == book)
 				return;
 
@@ -924,155 +1074,148 @@ namespace OurWord.Dialogs
 				return;
 
 			// Remove the book from the translation & refresh the listview
-			Trans.Books.Remove(book);
-			_PopulateBookList("");
+			Translation.Books.Remove(book);
+
+            // Update the property page
+            PopulateGrid(book.BookAbbrev);
 		}
 		#endregion
-		#region Handler: cmdBookProperties - either via Button or Double-Click
-		private void cmdBookProperties(object sender, System.EventArgs e)
+        #region Cmd: cmdBookProperties - either via Button or Double-Click
+        private void cmdBookProperties(object sender, System.EventArgs e)
 		{
 			// Get the current selection
-			DBook book = CurrentlySelectedBook;
+			DBook book = SelectedBook;
 			if (null == book)
 				return;
 
 			// Launch the dialog
-			Debug.Assert(null != Trans);
-			Debug.Assert(null != Trans.Project);
-			book.EditProperties(Trans.Project.FrontTranslation, Trans);
+			Debug.Assert(null != Translation);
+			Debug.Assert(null != Translation.Project);
+            DBookProperties dlg = new DBookProperties(
+                Translation.Project.FrontTranslation, Translation, book);
+            dlg.ShowDialog();
 
-			// Update the list
-			_PopulateBookList(book.BookAbbrev);
+            // Update the property page
+            PopulateGrid(book.BookAbbrev);
 		}
 		#endregion
-		#region Handler: cmdImportBook
-		private void cmdImportBook(object sender, System.EventArgs e)
+        #region Cmd: cmdImportBook
+        private void cmdImportBook(object sender, System.EventArgs e)
 		{
             // Show the wizard; the user will input the needed information and
             // indicate whether or not to proceed.
             Dialogs.WizImportBook.WizImportBook wizard =
-                new Dialogs.WizImportBook.WizImportBook(Trans);
+                new Dialogs.WizImportBook.WizImportBook(Translation);
             if (DialogResult.OK != wizard.ShowDialog())
                 return;
 
+			// Make sure it isn't already in the translation
+			DBook bookExisting = Translation.FindBook(wizard.BookAbbrev);
+			if (null != bookExisting)
+			{
+				if (Messages.VerifyReplaceBook())
+				{
+					if (bookExisting.StoragePath != wizard.ImportFileName &&
+						File.Exists(bookExisting.StoragePath))
+					{
+						File.Delete(bookExisting.StoragePath);
+					}
+					Translation.Books.Remove(bookExisting);
+				}
+				else
+					return;
+			}
+
             // Create a book object
-            DBook book = new DBook(wizard.BookAbbrev, wizard.ImportFileName);
+            DBook book = new DBook(wizard.BookAbbrev);
 
             // Add it to the translation (we must do this or book.LoadData cannot
             // properly check for errors.)
-            Trans.AddBook(book);
+            Translation.AddBook(book);
+
+			// We can now get a filename from the book. Let's make sure that file doesn't
+			// already exist. If it does, then let the user abort.
+			if (File.Exists(book.StoragePath) && book.StoragePath != wizard.ImportFileName)
+			{
+				if (!Messages.VerifyOverwriteBook())
+				{
+					Translation.Books.Remove(book);
+					return;
+				}
+			}
 
             // Attempt to read it in
             Debug.Assert(!book.Loaded);
-            book.Load();
+			string sImportPath = wizard.ImportFileName;
+            book.Load(ref sImportPath, G.CreateProgressIndicator());
             if (!book.Loaded)
             {
-                Trans.Books.Remove(book);
+                Translation.Books.Remove(book);
                 return;
             }
 
             // If successful, we now need to write it out to the desired path; this
             // will put it into our file format as well.
-            string sFileName = Path.GetFileName(book.AbsolutePathName);
-            book.AbsolutePathName = wizard.DestinationFolder + Path.DirectorySeparatorChar + sFileName;
-            book.TranslationStage = G.TranslationStages.GetFromAbbrev(wizard.Stage);
-            book.Version = wizard.Version;
             book.DisplayName = book.BookName;
             book.DeclareDirty();  // Make certain this will be written to file
-            book.Unload();    // Writes the file
+            book.Unload(G.CreateProgressIndicator());    // Writes the file
 
             // Update the property page
-            _PopulateBookList(book.BookAbbrev);
+            PopulateGrid(book.BookAbbrev);
 		}
 		#endregion
-		#region Handler: cmdCreateBook
-		private void cmdCreateBook(object sender, System.EventArgs e)
+        #region Cmd: cmdCreateBook
+        private void cmdCreateBook(object sender, System.EventArgs e)
 		{
-			// Get an available book (one that hasn't already been created)
-            if (string.IsNullOrEmpty(Trans.NextAvailableBookAbbrev))
+            // Get the book we wish to create from the selected row
+            string sAbbrev = SelectedBookAbbrev;
+            if (string.IsNullOrEmpty(sAbbrev))
+                return;
+            string sBookName = DBook.GetBookName(sAbbrev, Translation);
+
+            // Make sure the book exists in the Front
+            DBook bFront = DB.FrontTranslation.FindBook(sAbbrev);
+            if (null == bFront)
             {
-                LocDB.Message("msgNoAvailableBooksInFront",
-                    "There are no books defined in the Front for which you can Create \n" +
-                    "or Import in the Target. You need to first define the book in the \n" +
-                    "Front; only then will you be able to add it (via Create or Import) \n" +
-                    "to the Target.",
-                    null,
+                LocDB.Message("msgNoCorrespondingBookInFront",
+                    "OurWord uses the Source translation as a template when it creates a book\n" +
+                    "in the Target. Therefore, you need to first import {0} into\n" +
+                    "{1}, before you will be able to create it here in {2}.",
+                    new string[] { sBookName, DB.FrontTranslation.DisplayName, Translation.DisplayName },
                     LocDB.MessageTypes.Error);
                 return;
             }
 
-            // Do the wizard to get the desired settings
-            Dialogs.WizCreateBook.WizCreateBook wizard =
-                new OurWord.Dialogs.WizCreateBook.WizCreateBook(Trans);
-            if (DialogResult.OK != wizard.ShowDialog())
+            // Get confirmation as a courtesy to the user
+            bool bProceed = LocDB.Message("msgConfirmCreateBook",
+                "Do you want OurWord to create a blank book for drafting {0} into {1}?",
+                new string[] { sBookName, Translation.DisplayName },
+                LocDB.MessageTypes.YN);
+            if (!bProceed)
                 return;
-
-            // Determine the pathname for the new book; allow the user to abort
-            // if we might overwrite an existing file.
-            // Regarding getting the pathname, we use the "long" version of the method
-            // call rather than the DBook's method because the book is not yet owned
-            // by the translation if this has been invoked via the Create button.
-            string sNewPath = DBook.ComputePathName(
-                G.TTranslation.LanguageAbbrev,
-                wizard.NewBookAbbrev, 
-                G.TranslationStages.GetFromID( BookStages.c_idDraft ).Abbrev, 
-                'A', 
-                wizard.NewBookPath,
-                true);
-            if (File.Exists(sNewPath))
-            {
-                if (!Messages.ConfirmFileOverwrite(sNewPath))
-                {
-                    return;
-                }
-            }
 
             // Create the book, with "Drafting" defaults
-            DBook book = new DBook(wizard.NewBookAbbrev, sNewPath);
-            int iBook = DBook.FindBookAbbrevIndex(wizard.NewBookAbbrev);
+            DBook book = new DBook(sAbbrev);
+            int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
             if (-1 == iBook)
                 return;
-            book.DisplayName = Trans.BookNamesTable[iBook];
+            book.DisplayName = Translation.BookNamesTable[iBook];
 
-            Trans.AddBook(book);
-            if (false == book.InitializeFromFrontTranslation())
+            Translation.AddBook(book);
+            if (false == book.InitializeFromFrontTranslation(G.CreateProgressIndicator()))
             {
-                Trans.Books.Remove(book);
+                Translation.Books.Remove(book);
                 return;
             }
-            book.Write();
-            _PopulateBookList(book.BookAbbrev);
-
-            #region OLD / OBSOLETE - 2 July 2008
-            /***
-			// Present the dialog so the user can decide what to do. We're done
-			// if the user cancels.
-			DBook book = new DBook(sAbbrev, "");
-			if (DialogResult.OK != book.EditProperties(
-				Trans.Project.FrontTranslation, Trans, 
-				DBookProperties.Mode.kCreate))
-			{
-				return;
-			}
-
-			// Create the book from the Front translation's template
-			Trans.AddBook(book);
-			if (false == book.InitializeFromFrontTranslation())
-			{
-				Trans.Books.Remove(book);
-				return;
-			}
-			_PopulateBookList(sAbbrev);
-            book.Write();
-            ***/
-            #endregion
+            book.Write(G.CreateProgressIndicator());
+            PopulateGrid(sAbbrev);
         }
 		#endregion
-        #region Handler: cmdExportBook
+        #region Cmd: cmdExportBook
         private void cmdExportBook(object sender, EventArgs e)
         {
             // Get the selection
-            DBook book = CurrentlySelectedBook;
+            DBook book = SelectedBook;
             if (null == book)
                 return;
 
@@ -1082,179 +1225,10 @@ namespace OurWord.Dialogs
                 return;
 
             // Export the book
-            book.Export(dlg.ExportPathName);
+            IProgressIndicator progress = G.CreateProgressIndicator();
+            book.Export(dlg.ExportPathName, ScriptureDB.Formats.kParatext, progress);
         }
         #endregion
+	}
 
-        // Methods ---------------------------------------------------------------------------
-		#region Method: void _PopulateBookList() - puts the Books into the ListView control
-		private void _PopulateBookList(string sSelectedAbbrev)
-		{
-			int i = 0;
-			int iSelect = -1;
-
-			BookList.Clear();
-			foreach (DBook book in Trans.Books)
-			{
-				if (book.BookAbbrev == sSelectedAbbrev)
-					iSelect = i;
-				++i;
-
-
-                // First column is the book's abbreviation
-				ListViewItem item = new ListViewItem( book.BookAbbrev );
-
-				// We show an item as being "Locked" by giving it a red color in the
-				// list view.
-				if (book.Locked)
-					item.ForeColor = Color.Red;
-
-                // 2nd Column is the book's display name
-				item.SubItems.Add( book.DisplayName );
-
-                // 3rd Column is the book's file name
-                string sFilename = book.RelativePathName;
-                if (string.IsNullOrEmpty(sFilename))
-                    sFilename = book.AbsolutePathName;
-                if (!string.IsNullOrEmpty(sFilename))
-                    sFilename = Path.GetFileName(sFilename);
-                item.SubItems.Add(sFilename);
-               
-
-                // Tooltip
-//                item.ToolTipText = "Howdy!";
-//                string sToolTip = book.BookAbbrev + " - " + book.DisplayName + "\n" +
-//                    book.AbsolutePathName;
-//                item.ToolTipText = sToolTip;
-
-                // Add the row to the list
-				BookList.Add(item);
-			}
-
-			if (BookList.Count > 0 && iSelect == -1)
-				iSelect = 0;
-            if (iSelect != -1)
-            {
-                BookList[iSelect].Selected = true;
-                BookList[iSelect].Focused = true;
-            }
-
-			// We need to return focus back to the list control (and away from wherever it was).
-			// This also results in the control being re-drawn. E.g., if the Locked setting
-			// was changed via the Properties dialog, the item will not be drawn in red without
-			// our first doing this.
-			m_listviewBooks.Focus();
-		}
-		#endregion
-    }
-
-
-    #region CLASS BookNames - E.g., Genesis, Exodus, Leviticus, etc.
-    public class BookNames
-    {
-        // Attrs -----------------------------------------------------------------------------
-        #region SAttr{g}: LocGroup LocGroup - the localization group containing the book names (LocItems)
-        const string c_LocGroupID = "BookNames";
-        static LocGroup LocGroup
-        {
-            get
-            {
-                if (null == s_LocGroup)
-                    s_LocGroup = LocDB.DB.FindGroup(c_LocGroupID);
-                return s_LocGroup;
-            }
-        }
-        static LocGroup s_LocGroup = null;
-        #endregion
-
-        // Retrieve a single name, according to the current language preferences
-        #region Method: string GetName(int index)
-        static public string GetName(int index)
-        {
-            Debug.Assert(index >= 0 && index < 66);
-
-            // The LocItem's lookup ID is the English form of the book
-            string sLocItemID = English[index];
-
-            // If for some reason the Group was not found, then return the English value
-            if (null == LocGroup)
-                return English[index];
-
-            // Find the LocItem containing the localizations; return English if not found
-            LocItem item = LocGroup.Find(sLocItemID);
-            if (null == item)
-                return English[index];
-
-            // The LocDB will either return the string in the requested language, or
-            // English if not found.
-            return item.AltValue;
-        }
-        #endregion
-
-        // Retrieve a table of Book Names ----------------------------------------------------
-        const int c_cTableSize = 66;      // Number of books in the Bible
-        #region Method: string[] GetTable(LanguageResources.Languages lang)
-        static public string[] GetTable(LanguageResources.Languages lang)
-        {
-            // Retrieve the name of the language
-            string sLanguageName = LanguageResources.GetLanguageName(lang);
-
-            // The GetTable(sLanguageName) method will do the rest of the work
-            return GetTable(sLanguageName);
-        }
-        #endregion
-        #region Method: string[] GetTable(string sLanguageName)
-        static public string[] GetTable(string sLanguageName)
-        // Return a vector of strings for the 66 books, corresponding to the
-        // requested language name.
-        {
-            // We'll build the table here
-            string[] vs = new string[c_cTableSize];
-
-            // Get the index of the alternative we'll want
-            LocLanguage lang = LocDB.DB.FindLanguageByName(sLanguageName);
-            if (null == lang)
-                return English;
-            int iLanguage = lang.Index;
-
-            // Make sure we found the LocGroup
-            if (null == LocGroup)
-                return English;
-
-            // Fill up the table
-            for (int i = 0; i < c_cTableSize; i++)
-            {
-                LocItem item = LocGroup.Find(English[i]);
-                if (null == item)
-                    vs[i] = English[i];
-                else if (null == item.Alternates[iLanguage])
-                    vs[i] = English[i];
-                else
-                    vs[i] = item.Alternates[iLanguage].Value;
-            }
-
-            return vs;
-        }
-        #endregion
-
-        // Localized list of booknames -------------------------------------------------------
-        #region Attr{g} string[] English - if we can't find a language, we always have English here
-        static public string[] English = 
-	{ 
-		"Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua",
-		"Judges", "Ruth", "1 Samuel", "2 Samuel", "1 Kings", "2 Kings", 
-		"1 Chronicles", "2 Chronicles", "Ezra", "Nehemiah", "Esther", "Job", 
-		"Psalms", "Proverbs", "Ecclesiastes", "Song of Songs", "Isaiah", 
-		"Jeremiah", "Lamentations", "Ezekiel", "Daniel", "Hosea", "Joel", 
-		"Amos", "Obadiah", "Jonah", "Micah", "Nahum", "Habakkuk", "Zephaniah",
-		"Haggai", "Zechariah", "Malachi", "Matthew", "Mark", "Luke", "John", 
-		"Acts", "Romans", "1 Corinthians", "2 Corinthians", "Galatians", 
-		"Ephesians", "Philippians", "Colossians", "1 Thessalonians", 
-		"2 Thessalonians", "1 Timothy", "2 Timothy", "Titus", "Philemon", 
-		"Hebrews", "James", "1 Peter", "2 Peter", "1 John", "2 John", "3 John", 
-		"Jude", "Revelation" 
-	};
-        #endregion
-    }
-    #endregion
 }

@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 10 Jul 2008
  * Purpose: Tests the JWU class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -21,7 +21,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -118,5 +118,27 @@ namespace OurWordTests.JWTools
                 "C:\\CCC-Lg\\Kupang\\02-Mrk\\Kup-MRK-Final-Mu.db"));
         }
         #endregion
-    }
+
+		#region Test: RightmostSubfolder
+		[Test] public void RightmostSubfolder()
+		{
+			string sTarget = "My Folder";
+
+			string sPath = "C:" + Path.DirectorySeparatorChar +
+				"Documents and Settings" + Path.DirectorySeparatorChar +
+				"AllUsers" + Path.DirectorySeparatorChar +
+				"MyStuff" + Path.DirectorySeparatorChar +
+				sTarget;
+
+			// Try it once without a trailing separator character
+			string sFolder = JWU.ExtractRightmostSubFolder(sPath);
+			Assert.AreEqual(sTarget, sFolder);
+
+			// Try again, this time with a trailing separator char
+			sPath += Path.DirectorySeparatorChar;
+			sFolder = JWU.ExtractRightmostSubFolder(sPath);
+			Assert.AreEqual(sTarget, sFolder);
+		}
+		#endregion
+	}
 }

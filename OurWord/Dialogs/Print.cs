@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 20 Feb 2006
  * Purpose: Printing (direct to printer)
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -25,7 +25,7 @@ using Microsoft.Win32;
 
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord
@@ -769,7 +769,7 @@ namespace OurWord
 		{
 			get
 			{
-				return G.StyleSheet.FindParagraphStyleOrNormal(Paragraph.StyleAbbrev);
+				return DB.StyleSheet.FindParagraphStyleOrNormal(Paragraph.StyleAbbrev);
 			}
 		}
 		#endregion
@@ -892,7 +892,7 @@ namespace OurWord
 
                 // Determine if glue required: based on following punctuation
                 if (!string.IsNullOrEmpty(next.Text) &&  
-                    G.TTranslation.WritingSystemVernacular.IsPunctuation(next.Text[0]))
+                    DB.TargetTranslation.WritingSystemVernacular.IsPunctuation(next.Text[0]))
                 {
                     bNeedsGlue = true;
                 }
@@ -996,7 +996,7 @@ namespace OurWord
 				return;
 
             PWord wordLetter = new PWord(chLetter.ToString(),
-                G.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
+                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
                 null);
 
 			wordLetter.GlueTo = m_vPWords[0];
@@ -1056,8 +1056,8 @@ namespace OurWord
 			return true;
 		}
 		#endregion
-		#region Method: bool IncrementParagraph()
-		public bool IncrementParagraph()
+        #region Method: bool IncrementParagraph(IProgressIndicator)
+        public bool IncrementParagraph(IProgressIndicator progress)
 		{
 			// Get the JOwnSeq attribute that holds this paragraph
 			JOwnSeq<DParagraph> OwnSeq = (null == Paragraph as DFootnote) ? 
@@ -1077,7 +1077,7 @@ namespace OurWord
 			// If there are no more paragraphs in this section, then we must 
 			// increment to the next section.
 			if (iParagraph >= OwnSeq.Count - 1)
-				return IncrementSection();
+                return IncrementSection(progress);
 
 			// Increment to the next paragraph
 			++iParagraph;
@@ -1087,14 +1087,14 @@ namespace OurWord
 
 			// If pictures are not desired, then increment past them
 			if (!PrintPictures && Paragraph as DPicture != null)
-				return IncrementParagraph();
+                return IncrementParagraph(progress);
 
 			// Successful
 			return true;
 		}
 		#endregion
-		#region Method: bool IncrementSection()
-		public bool IncrementSection()
+        #region Method: bool IncrementSection(IProgressIndicator)
+        public bool IncrementSection(IProgressIndicator progress)
 		{
 			// If the user only wants the current section, then we don't increment.
 			if (m_bJustPrintOneSection)
@@ -1120,7 +1120,7 @@ namespace OurWord
 			m_Paragraph = sectionNext.Paragraphs[0] as DParagraph;
 			InitializeParagraph();
 			m_iWord = 0;
-			G.ProgressStep();
+            progress.Step();
 
 			// Successful
 			return true;
@@ -1162,292 +1162,6 @@ namespace OurWord
 
 				return false;
 			}
-		}
-		#endregion
-	}
-	#endregion
-
-	#region CLASS: PWord
-	public class PWord
-		// "PrintWord" At the top level, single word to be printed. But it also
-		// includes PWords which might be glued to it, such as footnote letters.
-	{
-		// Attrs -----------------------------------------------------------------------------
-		#region Attr{g}: string Text - the string representing the word
-		public string Text
-		{
-			get
-			{
-				return m_Text;
-			}
-			set
-			{
-				m_Text = value;
-			}
-		}
-		string m_Text;
-		#endregion
-		#region Attr{g}: DRun Footnote - the DRun containing the footnote, or null
-		DRun Footnote
-		{
-			get
-			{
-				return m_Footnote;
-			}
-		}
-		DRun m_Footnote;
-		#endregion
-
-        #region Attr{g}: Font Font
-        public Font Font
-        {
-            get
-            {
-                Debug.Assert(null != m_Font);
-                return m_Font;
-            }
-        }
-        Font m_Font = null;
-        #endregion
-		#region Attr{g}: Brush TextBrush - retrieves the brush for painting text
-		public Brush TextBrush
-		{
-			get
-			{
-                return new SolidBrush(m_CStyle.FontColor);
-			}
-		}
-		#endregion
-		#region Attr{g/s}: PWord GlueTo
-		public PWord GlueTo
-		{
-			get
-			{
-				return m_GlueTo;
-			}
-			set
-			{
-				m_GlueTo = value;
-			}
-		}
-		PWord m_GlueTo = null;
-		#endregion
-		#region Attr{g}: string CStyleAbbrev
-		public string CStyleAbbrev
-		{
-			get
-			{
-				return m_CStyle.Abbrev;
-			}
-		}
-		#endregion
-		JCharacterStyle m_CStyle;
-		#region Attr{g}: DRun[] FootnoteRuns
-		public DRun[] FootnoteRuns
-		{
-			get
-			{
-				ArrayList a = new ArrayList();
-
-				if (null != Footnote)
-					a.Add( Footnote );
-
-				if (null != GlueTo)
-				{
-					foreach( DRun r in GlueTo.FootnoteRuns)
-						a.Add(r);
-				}
-
-				DRun[] v = new DRun[ a.Count ];
-
-				for(int i=0; i<a.Count; i++)
-					v[i] = a[i] as DRun;
-
-				return v;
-			}
-		}
-		#endregion
-		#region Attr{g}: bool HasFootnotes
-		public bool HasFootnotes
-		{
-			get
-			{
-				return ( (FootnoteRuns.Length > 0) ? true : false );
-			}
-		}
-		#endregion
-
-		// Methods ---------------------------------------------------------------------------
-		#region Attr{g}: float WidthShrinkage
-		float WidthShrinkage
-			// The words are too far apart, and I can't figure out why, so
-			// I'll arbitrarily subtract a tad. I'll probably need something more
-			// complicated than a raw number (e.g., a function of the font size),
-			// but for now, I'll try this.
-		{
-			get
-			{
-				return 2;
-			}
-		}
-		#endregion
-		#region Method: SizeF Measure(Graphics g)
-		public SizeF Measure(Graphics g)
-		{
-			// Measure this word
-            StringFormat fmt = StringFormat.GenericTypographic;
-            fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            SizeF sz = g.MeasureString(Text, Font, 1000, fmt);
-            // Old Way ---> SizeF sz = g.MeasureString(Text, Font);
-
-			// Add the measurements of words that we are glue'd to. This will recurse
-			// if the next word(s) are also glued to further words.
-			if (null != GlueTo)
-			{
-				SizeF szGlueTo = GlueTo.Measure(g);
-				sz.Width += szGlueTo.Width;
-				sz.Height = Math.Max( sz.Height, szGlueTo.Height );
-			}
-
-			// Return the result
-			return sz;
-		}
-		#endregion
-		#region Method: SizeF MeasureSpace(Graphics g)
-		public SizeF MeasureSpace(Graphics g)
-		{
-			// Get the measurement for a space in this font
-			SizeF sz = g.MeasureString(" ", Font);
-
-			// If we are glued to the next word, then we want the measurements of whichever
-			// space is in the largest font. (This recurses should other words be glued
-			// downstream.
-			if (null != GlueTo)
-			{
-				SizeF szGlueTo = GlueTo.MeasureSpace(g);
-
-				sz.Width  = Math.Max( sz.Width,  szGlueTo.Width);
-				sz.Height = Math.Max( sz.Height, szGlueTo.Height);
-			}
-
-			// Return the result
-			return sz;
-		}
-		#endregion
-		#region Method: void Draw(Graphics g, float x, float y)
-		public void Draw(Graphics g, float x, float y)
-		{
-			g.DrawString( Text, Font, TextBrush, x, y);
-
-			if (null != GlueTo)
-			{
-				x += g.MeasureString(Text, Font).Width - WidthShrinkage;
-				GlueTo.Draw(g, x, y);
-			}
-		}
-		#endregion
-		#region Method: void SetFootnoteLetter(ref char chFootnoteLetter)
-		public void SetFootnoteLetter(ref char chFootnoteLetter)
-		{
-			if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter ||
-				CStyleAbbrev == DStyleSheet.c_StyleAbbrevSeeAlsoLetter )
-			{
-				Text = chFootnoteLetter.ToString();
-				chFootnoteLetter++;
-			}
-
-			if (null != GlueTo)
-				GlueTo.SetFootnoteLetter(ref chFootnoteLetter);
-		}
-		#endregion
-		#region Attr{g}: char FirstFootnoteLetter
-		public char FirstFootnoteLetter
-		{
-			get
-			{
-				if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter ||
-					CStyleAbbrev == DStyleSheet.c_StyleAbbrevSeeAlsoLetter )
-				{
-					return Text[0];
-				}
-
-				if (null != GlueTo)
-					return GlueTo.FirstFootnoteLetter;
-
-				return ' ';
-			}
-		}
-		#endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Method: _InitializeFont(JCharacterStyle, JParagraphStyle)
-        void _InitializeFont(JCharacterStyle _CStyle, JParagraphStyle _PStyle)
-            // Set up the Font for the word
-        {
-            Debug.Assert(null != _CStyle);
-
-            // Determine what, if any, mods are requested
-            FontStyle mods = FontStyle.Regular;
-            if (string.IsNullOrEmpty(_CStyle.Abbrev))
-            {
-                _CStyle = _PStyle.CharacterStyle;
-            }
-            else if (_CStyle.Abbrev == DStyleSheet.c_StyleAbbrevItalic)
-            {
-                mods = FontStyle.Italic;
-                Debug.Assert(null != _PStyle);
-                _CStyle = _PStyle.CharacterStyle;
-            }
-            else if (_CStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
-            {
-                mods = FontStyle.Bold;
-                Debug.Assert(null != _PStyle);
-                _CStyle = _PStyle.CharacterStyle;
-            }
-
-            // Get the font container for the writing system
-            JFontForWritingSystem fws = _CStyle.FindOrAddFontForWritingSystem(
-                G.TTranslation.WritingSystemVernacular);
-
-            // Adjust for any modifications
-            m_Font = fws.FindOrAddFont(false, mods);
-
-            // Adjust for superscript
-            if (_CStyle.IsSuperScript)
-            {
-                float fSize = (float)m_Font.Size * 0.8f;
-                m_Font = new Font(m_Font.FontFamily, fSize, m_Font.Style);
-            }
-
-            m_CStyle = _CStyle;
-        }
-        #endregion
-
-        #region Constructor(string _Text, JCharacterStyle, JParagraphStyle)
-        public PWord(string _Text, JCharacterStyle _CStyle, JParagraphStyle _PStyle)
-		{
-			m_Text = _Text;
-			Debug.Assert(null != m_Text && m_Text.Length > 0);
-
-            _InitializeFont(_CStyle, _PStyle);
-
-			// Make any replacements
-			m_Text = Print.MakeReplacements( m_Text );
-		}
-		#endregion
-        #region Constructor(string _Text, JCharacterStyle, JParagraphStyle, DRun _Footnote)
-        public PWord(
-            string _Text, 
-            JCharacterStyle _CStyle, 
-            JParagraphStyle _PStyle,
-            DRun _Footnote)
-            : this(_Text, _CStyle, _PStyle) // _CharacterStyleAbbrev)
-		{
-			Debug.Assert(
-				_Footnote as DFootLetter != null ||
-				_Footnote as DSeeAlso    != null );
-
-			m_Footnote = _Footnote;
 		}
 		#endregion
 	}
@@ -1572,7 +1286,7 @@ namespace OurWord
 		{
 			get
 			{
-				return G.StyleSheet.FindParagraphStyleOrNormal(Paragraph.StyleAbbrev);
+				return DB.StyleSheet.FindParagraphStyleOrNormal(Paragraph.StyleAbbrev);
 			}
 		}
 		#endregion
@@ -2035,7 +1749,7 @@ namespace OurWord
 				return;
 
 			// Get the string to print
-			string sBookStatus = G.TBook.TranslationStage.Name;
+			string sBookStatus = DB.TargetBook.TranslationStage.Name;
 
 			// Calculate the maximum length this text should appear (non-rotated). We'll
 			// assume a 30-degree angle. 
@@ -2096,10 +1810,10 @@ namespace OurWord
 			// Copyright notice
 			if ( kFooterPart == DTeamSettings.FooterParts.kCopyrightNotice)
 			{
-				string sCopyright = G.TeamSettings.CopyrightNotice;
+				string sCopyright = DB.TeamSettings.CopyrightNotice;
 
-				if (G.TBook.HasCopyrightNotice)
-					sCopyright = G.TBook.Copyright;
+				if (DB.TargetBook.HasCopyrightNotice)
+					sCopyright = DB.TargetBook.Copyright;
 
 				return sCopyright;
 			}
@@ -2116,7 +1830,7 @@ namespace OurWord
 			// Stage and Date
 			if ( kFooterPart == DTeamSettings.FooterParts.kStageAndDate)
 			{
-				string sBookStatus = G.TBook.TranslationStage.Name;
+				string sBookStatus = DB.TargetBook.TranslationStage.Name;
 				string sDate = DateTime.Today.ToShortDateString();
 				return sBookStatus + " - " + sDate;
 			}
@@ -2124,8 +1838,8 @@ namespace OurWord
 			// Language Name, Stage and Date
 			if ( kFooterPart == DTeamSettings.FooterParts.kLanguageStageAndDate)
 			{
-				string sName       = G.TBook.Translation.DisplayName + " ";
-				string sBookStatus = G.TBook.TranslationStage.Name;
+				string sName       = DB.TargetBook.Translation.DisplayName + " ";
+				string sBookStatus = DB.TargetBook.TranslationStage.Name;
 				string sDate       = DateTime.Today.ToShortDateString();
 
 				return sName + " - " + sBookStatus + " - " + sDate;
@@ -2139,11 +1853,11 @@ namespace OurWord
 		float GetFooterAreaHeight(Graphics g)
 		{
 			// Retrieve the font for the footer
-			JParagraphStyle ps = G.StyleSheet.FindParagraphStyleOrNormal("h");
+			JParagraphStyle ps = DB.StyleSheet.FindParagraphStyleOrNormal("h");
 
 			// Measure arbitrary text in that font.
             Font font = ps.CharacterStyle.FindOrAddFontForWritingSystem(
-                G.TTranslation.WritingSystemVernacular).DefaultFont;
+                DB.TargetTranslation.WritingSystemVernacular).DefaultFont;
 			float yTextHeight =  g.MeasureString("ABCDE", font).Height;
 
 			// Allow double this line height
@@ -2164,16 +1878,16 @@ namespace OurWord
 		}
 		static string m_sFooterBookName;
 		#endregion
-		#region Method: RetrieveFooterBookName()
-		void RetrieveFooterBookName(ref DynamicPosition Pos)
+        #region Method: RetrieveFooterBookName(IProgressIndicator)
+        void RetrieveFooterBookName(ref DynamicPosition Pos, IProgressIndicator progress)
 		{
 			if (null == Pos.Word)
 				return;
 
-			if (Pos.ParagraphStyle.Abbrev == "h")
+			if (Pos.ParagraphStyle.SFM == "h")
 			{
 				FooterBookName = Pos.Paragraph.SimpleText;
-				Pos.IncrementParagraph();
+                Pos.IncrementParagraph(progress);
 			}
 		}
 		#endregion
@@ -2181,20 +1895,20 @@ namespace OurWord
 		void DrawRunningFooter(Graphics g)
 		{
 			// Is this an Odd or an Even page?
-			DTeamSettings.FooterParts kLeft  = G.TeamSettings.OddLeft;
-			DTeamSettings.FooterParts kMid   = G.TeamSettings.OddMiddle;
-			DTeamSettings.FooterParts kRight = G.TeamSettings.OddRight;
+			DTeamSettings.FooterParts kLeft  = DB.TeamSettings.OddLeft;
+			DTeamSettings.FooterParts kMid   = DB.TeamSettings.OddMiddle;
+			DTeamSettings.FooterParts kRight = DB.TeamSettings.OddRight;
 			if (IsEvenPage)
 			{
-				kLeft  = G.TeamSettings.EvenLeft;
-				kMid   = G.TeamSettings.EvenMiddle;
-				kRight = G.TeamSettings.EvenRight;
+				kLeft  = DB.TeamSettings.EvenLeft;
+				kMid   = DB.TeamSettings.EvenMiddle;
+				kRight = DB.TeamSettings.EvenRight;
 			}
 
 			// Retrieve the font for the footer
-			JParagraphStyle ps = G.StyleSheet.FindParagraphStyleOrNormal("h");
+			JParagraphStyle ps = DB.StyleSheet.FindParagraphStyleOrNormal("h");
             Font font = ps.CharacterStyle.FindOrAddFontForWritingSystem(
-                G.TTranslation.WritingSystemVernacular).DefaultFont;
+                DB.TargetTranslation.WritingSystemVernacular).DefaultFont;
 
 			// Left and Right Margins
 			float xLeft  = RectPage.Left;
@@ -2591,14 +2305,14 @@ namespace OurWord
 
 		// Misc Helper Methods ---------------------------------------------------------------
 		#region Method: vool IncrementToNextParagraphIfNecessary()
-		bool IncrementToNextParagraphIfNecessary(ref DynamicPosition Pos)
+		bool IncrementToNextParagraphIfNecessary(ref DynamicPosition Pos, IProgressIndicator progress)
 		{
 			if (null == Pos.Word)
 			{
-				bool bOK = Pos.IncrementParagraph();
+                bool bOK = Pos.IncrementParagraph(progress);
 
 				if (!bOK)
-					bOK = Pos.IncrementSection();
+                    bOK = Pos.IncrementSection(progress);
 
 				return bOK;
 			}
@@ -2653,7 +2367,7 @@ namespace OurWord
 			m_aDropCaps = new ArrayList();
 
 			// Default for the footer book name
-			FooterBookName = G.Project.STarget.Book.DisplayName;
+			FooterBookName = DB.Project.STarget.Book.DisplayName;
 
 			// Calculate the boundaries for the printable area. We do this by getting
 			// the boundaries for the entire page, and then adding in the margins.
@@ -2673,8 +2387,8 @@ namespace OurWord
             }
 		}
 		#endregion
-		#region Method: void Layout(ref DynamicPosition Pos)
-		public void Layout(ref DynamicPosition Pos)
+        #region Method: void Layout(ref DynamicPosition Pos, IProgressIndicator)
+        public void Layout(ref DynamicPosition Pos, IProgressIndicator progress)
 		{
 			// Get a graphics object through which we can measure text size
 			Graphics g = Doc.PrinterSettings.CreateMeasurementGraphics();
@@ -2694,11 +2408,11 @@ namespace OurWord
 			while (yBody < yFootnotes)
 			{
 				// Retrieve the running footer if we are on that paragraph.
-				RetrieveFooterBookName(ref Pos);
+				RetrieveFooterBookName(ref Pos, progress);
 
 				// If the CurrentWord is null, it means we need to increment
 				// to a new paragraph (and possibly a new section)
-				if (!IncrementToNextParagraphIfNecessary(ref Pos))
+				if (!IncrementToNextParagraphIfNecessary(ref Pos, progress))
 					break;
 
 				// If the para's first word is a Chapter Number, then it's a DropCap
@@ -2767,7 +2481,7 @@ namespace OurWord
 	    {
 			get
 			{
-				return G.Project.HasDataToDisplay;
+				return DB.Project.HasDataToDisplay;
 			}
 	    }
 		#endregion
@@ -2785,6 +2499,8 @@ namespace OurWord
 
 		int m_iCurrentPageNo = 0;
 		DialogPrint m_dlg;
+
+        IProgressIndicator m_Progress;
 
 		#region Attr{g/s}: static float LineSpacing
 		static public float LineSpacing
@@ -2812,51 +2528,6 @@ namespace OurWord
 		DynamicPosition m_position = null;
 		#endregion
 
-		// Text Replacements -----------------------------------------------------------------
-		static public bool ShouldMakeReplacements = false;
-		#region SAttr{g}: TreeRoot ReplaceTree
-		static public TreeRoot ReplaceTree
-		{
-			get
-			{
-				return s_ReplaceTree;
-			}
-		}
-		static TreeRoot s_ReplaceTree = null;
-		#endregion
-		#region Method: static void BuildReplaceTree()
-		static public void BuildReplaceTree()
-		{
-			if (null != s_ReplaceTree)
-				return;
-
-			s_ReplaceTree = new TreeRoot();
-
-			s_ReplaceTree.Add("<<<", "“‘");
-			s_ReplaceTree.Add("<<",  "“" );
-			s_ReplaceTree.Add("<",   "‘" );
-
-			s_ReplaceTree.Add(">>>", "’”");
-			s_ReplaceTree.Add(">>",  "”" );
-			s_ReplaceTree.Add(">",   "’" );
-		}
-		#endregion
-		#region Method: static string MakeReplacements(string s)
-		static public string MakeReplacements(string s)
-		{
-			// Just return the source string if replacements are not desired
-			if (!ShouldMakeReplacements)
-				return s;
-
-			// Make sure the tree has been built
-			if (null == ReplaceTree)
-				BuildReplaceTree();
-			Debug.Assert(null != ReplaceTree);
-
-			// Do the replacements
-			return ReplaceTree.MakeReplacements(s);
-		}
-		#endregion
 
 		// Main Page Printing Method ---------------------------------------------------------
 		#region Attr{g}: bool DoWePrintThisPage(PPage page, int nPageNo)
@@ -2918,17 +2589,18 @@ namespace OurWord
 			ev.HasMorePages = (m_iCurrentPageNo < Pages.Count) ? true : false;
 
 			// Update the progress indicator
-			G.ProgressStep();
+            m_Progress.Step();
 		}
 		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
-				public Print()
+		public Print()
 		{
 			m_aPages = new ArrayList();
+            m_Progress = new NullProgress();
 
-			BuildReplaceTree();
+			PWord.BuildReplaceTree();
 		}
 		#endregion
 		#region Method: bool Do() - Process the Print command (dialog, then print)
@@ -2949,13 +2621,13 @@ namespace OurWord
 				return false;
 
 			// Name of the document
-			pdoc.DocumentName = G.Project.STarget.Book.DisplayName;
+			pdoc.DocumentName = DB.Project.STarget.Book.DisplayName;
 
 			// Printer to use
 			pdoc.PrinterSettings.PrinterName = m_dlg.PrinterName;
 
 			// Substitutions?
-			Print.ShouldMakeReplacements = m_dlg.MakeSubstitutions;
+            PWord.ShouldMakeReplacements = m_dlg.MakeSubstitutions;
 
 			// Disable the little "Print Progress" dialog, by using StandardPrintController
 			// instead of the PrintControllerWithStatusDialog that would normally be
@@ -2964,9 +2636,9 @@ namespace OurWord
 
 			// Initial position in the document (which may be All Sections or just the
 			// current Section, depending on the print settings)
-			DSection InitialSection = G.STarget;
+			DSection InitialSection = DB.TargetSection;
 			if (!m_dlg.CurrentSection)
-				InitialSection = G.Project.STarget.Book.Sections[0] as DSection;
+				InitialSection = DB.Project.STarget.Book.Sections[0] as DSection;
 			if (null == InitialSection)
 				return false;
 			DParagraph InitialPara = InitialSection.Paragraphs[0] as DParagraph;
@@ -2980,7 +2652,8 @@ namespace OurWord
 			// Layout the pages. We must lay out all of the pages through the
 			// EndPage, even if StartPage is later, so that we know correctly
 			// what the pages look like.
-            G.ProgressStart(G.GetLoc_String("strFormattingPages", "Formatting Pages..."),
+            m_Progress = G.CreateProgressIndicator();
+            m_Progress.Start(G.GetLoc_String("strFormattingPages", "Formatting Pages..."),
                 InitialSection.Book.Sections.Count);
 			int nPageNo = 1;
 			LineSpacing = m_dlg.LineSpacing;
@@ -2990,7 +2663,7 @@ namespace OurWord
 				// Layout the page
 				PPage page = new PPage(pdoc, PreviousPage, nPageNo, m_dlg.PrintWaterMark);
 				PreviousPage = page;
-				page.Layout(ref m_position);
+                page.Layout(ref m_position, m_Progress);
 
 				// If this is a page we print, then add it to the array
 				if (DoWePrintThisPage(page, nPageNo))
@@ -3002,15 +2675,25 @@ namespace OurWord
 					break;
 
             } while (true);
-			G.ProgressEnd();
+            m_Progress.End();
 
 			// Print the document
-            G.ProgressStart(G.GetLoc_String("strPrintingPages", "Printing Pages..."),
+            m_Progress.Start(G.GetLoc_String("strPrintingPages", "Printing Pages..."),
                 Pages.Count);
 			m_iCurrentPageNo = 0;
-			pdoc.PrintPage += new PrintPageEventHandler(PrintPage);
-			pdoc.Print();
-			G.ProgressEnd();
+            try
+            {
+                pdoc.PrintPage += new PrintPageEventHandler(PrintPage);
+                pdoc.Print();
+            }
+            catch (Exception e)
+            {
+                LocDB.Message("msgPrintFailed",
+                    "Printing failed with Windows message:\n\n{0}.", 
+                    new string[] {e.Message}, 
+                    LocDB.MessageTypes.Error);
+            }
+            m_Progress.End();
 
 			return true;
 		}
@@ -3031,19 +2714,19 @@ namespace OurWord
 
 		public void TestSubstitutions()
 		{
-			Print.ShouldMakeReplacements = true;
-			AreSame("kuna'”,",   Print.MakeReplacements("kuna'>>,") );
-			AreSame("“Au",       Print.MakeReplacements("<<Au") );
-			AreSame("“‘Au",      Print.MakeReplacements("<<<Au") );
-			AreSame("“‘Au’”",    Print.MakeReplacements("<<<Au>>>") );
-			AreSame("A‘u",       Print.MakeReplacements("A<u") );
+            PWord.ShouldMakeReplacements = true;
+            AreSame("kuna'”,", PWord.MakeReplacements("kuna'>>,"));
+            AreSame("“Au", PWord.MakeReplacements("<<Au"));
+            AreSame("“‘Au", PWord.MakeReplacements("<<<Au"));
+            AreSame("“‘Au’”", PWord.MakeReplacements("<<<Au>>>"));
+            AreSame("A‘u", PWord.MakeReplacements("A<u"));
 
-			Print.ShouldMakeReplacements = false;
-			AreSame("kuna'>>,",  Print.MakeReplacements("kuna'>>,") );
-			AreSame("<<Au",      Print.MakeReplacements("<<Au") );
-			AreSame("<<<Au",     Print.MakeReplacements("<<<Au") );
-			AreSame("<<<Au>>>",  Print.MakeReplacements("<<<Au>>>") );
-			AreSame("A<u",       Print.MakeReplacements("A<u") );
+            PWord.ShouldMakeReplacements = false;
+            AreSame("kuna'>>,", PWord.MakeReplacements("kuna'>>,"));
+            AreSame("<<Au", PWord.MakeReplacements("<<Au"));
+            AreSame("<<<Au", PWord.MakeReplacements("<<<Au"));
+            AreSame("<<<Au>>>", PWord.MakeReplacements("<<<Au>>>"));
+            AreSame("A<u", PWord.MakeReplacements("A<u"));
 		}
 
 	}

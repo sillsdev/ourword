@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 18 Nov 2004
  * Purpose: Manages the Back Translation view.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -16,7 +16,7 @@ using System.Windows.Forms;
 using System.Data;
 using System.IO;
 
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Edit;
 using OurWord.View;
 using JWdb;
@@ -101,9 +101,9 @@ namespace OurWord.View
             {
                 string sBase = G.GetLoc_GeneralUI("BackTranslationReference", "{0}");
 
-                string sTargetName = (null == G.TTranslation) ?
+                string sTargetName = (null == DB.TargetTranslation) ?
                    G.GetLoc_GeneralUI("NoTargetDefined", "(no target defined)") :
-                   G.TTranslation.DisplayName.ToUpper();
+                   DB.TargetTranslation.DisplayName.ToUpper();
 
                 string s = LocDB.Insert(sBase, new string[] { sTargetName });
 
@@ -116,7 +116,7 @@ namespace OurWord.View
         void LoadData_IBT()
         {
             // Loop through the paragraphs
-            foreach (DParagraph p in G.STarget.Paragraphs)
+            foreach (DParagraph p in DB.TargetSection.Paragraphs)
             {
                 // Start the new row 
                 EContainer container = StartNewRow(false);
@@ -157,11 +157,11 @@ namespace OurWord.View
             Clear();
 
             // Nothing more to do if we don't have a completely-defined project
-            if (!G.Project.HasDataToDisplay)
+            if (!DB.Project.HasDataToDisplay)
                 return;
 
             // Load the paragraphs
-            foreach (DParagraph p in G.STarget.Paragraphs)
+            foreach (DParagraph p in DB.TargetSection.Paragraphs)
             {
                 // Start the new row and add the left side (vernacular)
                 EContainer container = StartNewRow(false);
@@ -209,7 +209,7 @@ namespace OurWord.View
 
             // Load the footnotes
             bool bFirstFootnote = true;
-            foreach (DFootnote fn in G.STarget.Footnotes)
+            foreach (DFootnote fn in DB.TargetSection.Footnotes)
             {
                 StartNewRow(bFirstFootnote);
                 bFirstFootnote = false;

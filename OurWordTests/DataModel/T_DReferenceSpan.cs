@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 01 Dec 2008
  * Purpose: Tests the DReferenceSpan and DReference classes
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -18,7 +18,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -31,10 +31,10 @@ namespace OurWordTests.DataModel
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Test Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Test Project";
         }
         #endregion
 

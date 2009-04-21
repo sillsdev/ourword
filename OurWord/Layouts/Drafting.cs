@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 17 Jan 2004
  * Purpose: Manages the Drafting view.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -16,10 +16,10 @@ using System.Windows.Forms;
 using System.Data;
 using System.IO;
 
-using OurWord.DataModel;
 using OurWord.Edit;
 using OurWord.View;
 using JWdb;
+using JWdb.DataModel;
 using JWTools;
 #endregion
 
@@ -81,20 +81,20 @@ namespace OurWord.View
         {
             get
             {
-                if (!G.IsValidProject)
+                if (!DB.IsValidProject)
                     return "";
-                if (null == OurWordMain.Project.TargetTranslation)
+                if (null == DB.Project.TargetTranslation)
                     return "";
 
                 string sBase = G.GetLoc_GeneralUI("DraftingReference", "{0} to {1}");
 
-                string sFrontName = (null == G.FTranslation) ?
+                string sFrontName = (null == DB.FrontTranslation) ?
                     G.GetLoc_GeneralUI("NoFrontDefined", "(no front defined)") :
-                    G.FTranslation.DisplayName;
+                    DB.FrontTranslation.DisplayName;
 
-                string sTargetName = (null == G.TTranslation) ?
+                string sTargetName = (null == DB.TargetTranslation) ?
                     G.GetLoc_GeneralUI("NoTargetDefined", "(no target defined)") :
-                    G.TTranslation.DisplayName.ToUpper();
+                    DB.TargetTranslation.DisplayName.ToUpper();
 
                 return LocDB.Insert(sBase, new string[] { sFrontName, sTargetName });
             }
@@ -207,7 +207,7 @@ namespace OurWord.View
             for(int iF = iFront + 1; iF < iFront + cFront; iF++)
             {
                 // Get the next front paragraph
-                DParagraph pF = G.SFront.Paragraphs[iF] as DParagraph;
+                DParagraph pF = DB.FrontSection.Paragraphs[iF] as DParagraph;
 
                 // Get its initial verse number. If it doesn't have a DVerse in it, then
                 // we look to the next front paragraph.
@@ -219,7 +219,7 @@ namespace OurWord.View
                 for (int iT = pairLast.iTarget + 1; iT < iTarget + cTarget; iT++)
                 {
                     // Get the target paragraph
-                    DParagraph pT = G.STarget.Paragraphs[iT] as DParagraph;
+                    DParagraph pT = DB.TargetSection.Paragraphs[iT] as DParagraph;
 
                     // Get its initial verse number, if any
                     int nVerseTarget = pT.FirstActualVerseNumber;
@@ -276,12 +276,12 @@ namespace OurWord.View
                 StartNewRow();
                 for (int kF = 0; kF < pair.cFront; kF++)
                 {
-                    DParagraph pFront = G.SFront.Paragraphs[ pair.iFront + kF ] as DParagraph;
+                    DParagraph pFront = DB.FrontSection.Paragraphs[ pair.iFront + kF ] as DParagraph;
                     AddFrontParagraph(pFront);
                 }
                 for (int kT = 0; kT < pair.cTarget; kT++)
                 {
-                    DParagraph pTarget = G.STarget.Paragraphs[ pair.iTarget + kT ] as DParagraph;
+                    DParagraph pTarget = DB.TargetSection.Paragraphs[ pair.iTarget + kT ] as DParagraph;
                     pTarget.BestGuessAtInsertingTextPositions();
                     AddTargetParagraph(pTarget, true);
                 }
@@ -348,8 +348,8 @@ namespace OurWord.View
             // then they cannot appear in side-by-side mode.
             for (int i = 0; i < cFront; i++)
             {
-                DParagraph pFront = G.SFront.Paragraphs[iFront + i] as DParagraph;
-                DParagraph pTarget = G.STarget.Paragraphs[iTarget + i] as DParagraph;
+                DParagraph pFront = DB.FrontSection.Paragraphs[iFront + i] as DParagraph;
+                DParagraph pTarget = DB.TargetSection.Paragraphs[iTarget + i] as DParagraph;
 
                 if (pFront.StyleAbbrev != pTarget.StyleAbbrev)
                     return false;
@@ -368,15 +368,15 @@ namespace OurWord.View
         {
             // If the two sections do not have the same number of footnotes, then
             // they cannot appear in the side-by-side mode.
-            if (G.SFront.Footnotes.Count != G.STarget.Footnotes.Count)
+            if (DB.FrontSection.Footnotes.Count != DB.TargetSection.Footnotes.Count)
                 return false;
 
             // If the individual footnotes do not have the same types, then 
             // they cannot appear in the side-by-side mode.
-            for (int i = 0; i < G.SFront.Footnotes.Count; i++)
+            for (int i = 0; i < DB.FrontSection.Footnotes.Count; i++)
             {
-                DFootnote fnFront = G.SFront.Footnotes[i] as DFootnote;
-                DFootnote fnTarget = G.STarget.Footnotes[i] as DFootnote;
+                DFootnote fnFront = DB.FrontSection.Footnotes[i] as DFootnote;
+                DFootnote fnTarget = DB.TargetSection.Footnotes[i] as DFootnote;
 
                 if (fnFront.NoteType != fnTarget.NoteType)
                     return false;
@@ -391,7 +391,7 @@ namespace OurWord.View
         void _LoadFootnotes()
         {
             // Anything to load?
-            if (G.SFront.Footnotes.Count == 0 && G.STarget.Footnotes.Count == 0)
+            if (DB.FrontSection.Footnotes.Count == 0 && DB.TargetSection.Footnotes.Count == 0)
                 return;
 
             // Load them all in a single row if we must
@@ -399,20 +399,20 @@ namespace OurWord.View
             {
                 StartNewRow(true);
 
-                for (int kF = 0; kF < G.SFront.Footnotes.Count; kF++)
-                    AddFrontFootnote(G.SFront.Footnotes[kF] as DFootnote);
-                for (int kT = 0; kT < G.STarget.Footnotes.Count; kT++)
-                    AddTargetFootnote(G.STarget.Footnotes[kT] as DFootnote, true);
+                for (int kF = 0; kF < DB.FrontSection.Footnotes.Count; kF++)
+                    AddFrontFootnote(DB.FrontSection.Footnotes[kF] as DFootnote);
+                for (int kT = 0; kT < DB.TargetSection.Footnotes.Count; kT++)
+                    AddTargetFootnote(DB.TargetSection.Footnotes[kT] as DFootnote, true);
                 return;
             }
 
             // Otherwise, they are on individual parallel rows
-            for (int k = 0; k < G.SFront.Footnotes.Count; k++)
+            for (int k = 0; k < DB.FrontSection.Footnotes.Count; k++)
             {
                 StartNewRow( ((k == 0) ? true : false) );
 
-                DFootnote fFront = G.SFront.Footnotes[k] as DFootnote;
-                DFootnote fTarget = G.STarget.Footnotes[k] as DFootnote;
+                DFootnote fFront = DB.FrontSection.Footnotes[k] as DFootnote;
+                DFootnote fTarget = DB.TargetSection.Footnotes[k] as DFootnote;
                 fTarget.SynchRunsToModelParagraph(fFront);
 
                 AddFrontFootnote(fFront);
@@ -428,7 +428,7 @@ namespace OurWord.View
             Clear();
 
             // Nothing more to do if we don't have a completely-defined project
-            if (!G.Project.HasDataToDisplay)
+            if (!DB.Project.HasDataToDisplay)
                 return;
 
             // Load the paragraphs, then the footnotes
@@ -448,29 +448,29 @@ namespace OurWord.View
             int iTarget = 0;
 
             // Loop until all paragraphs have been accounted for
-            while (iFront < G.SFront.Paragraphs.Count ||
-                   iTarget < G.STarget.Paragraphs.Count)
+            while (iFront < DB.FrontSection.Paragraphs.Count ||
+                   iTarget < DB.TargetSection.Paragraphs.Count)
             {
                 // If we are missing either a Front or a Target, we need to
                 // add one so that something will get displayed.
-                if (iFront == G.SFront.Paragraphs.Count)
+                if (iFront == DB.FrontSection.Paragraphs.Count)
                 {
                     DParagraph pNew = new DParagraph();
                     pNew.AddedByCluster = true;
-                    G.SFront.Paragraphs.Append(pNew);
+                    DB.FrontSection.Paragraphs.Append(pNew);
                 }
-                if (iTarget == G.STarget.Paragraphs.Count)
+                if (iTarget == DB.TargetSection.Paragraphs.Count)
                 {
                     DParagraph pNew = new DParagraph();
                     pNew.AddedByCluster = true;
-                    G.STarget.Paragraphs.Append(pNew);
+                    DB.TargetSection.Paragraphs.Append(pNew);
                 }
 
                 // We use Pictures to help us re-allign paragraphs; thus, we count 
                 // the number of paragraphs in both Front and Target that are the
                 // same type.
-                int cFront = _CountMatchingParagraphTypes(iFront, G.SFront.Paragraphs);
-                int cTarget = _CountMatchingParagraphTypes(iTarget, G.STarget.Paragraphs);
+                int cFront = _CountMatchingParagraphTypes(iFront, DB.FrontSection.Paragraphs);
+                int cTarget = _CountMatchingParagraphTypes(iTarget, DB.TargetSection.Paragraphs);
 
                 if (!_CanSideBySideParagraphs(iFront, cFront, iTarget, cTarget))
                 {
@@ -482,7 +482,7 @@ namespace OurWord.View
                     {
                         // Retrieve the bitmap, if a picture is involved
                         Bitmap bmp = null;
-                        DPicture pict = G.SFront.Paragraphs[iFront + k] as DPicture;
+                        DPicture pict = DB.FrontSection.Paragraphs[iFront + k] as DPicture;
                         if (null != pict)
                             bmp = pict.GetBitmap(c_xMaxPictureWidth);
                         
@@ -491,8 +491,8 @@ namespace OurWord.View
                         container.Bmp = bmp;
 
                         // Synchronize the Vernacular to the Target
-                        DParagraph pFront = G.SFront.Paragraphs[iFront + k] as DParagraph;
-                        DParagraph pTarget = G.STarget.Paragraphs[iTarget + k] as DParagraph;
+                        DParagraph pFront = DB.FrontSection.Paragraphs[iFront + k] as DParagraph;
+                        DParagraph pTarget = DB.TargetSection.Paragraphs[iTarget + k] as DParagraph;
                         pTarget.SynchRunsToModelParagraph(pFront);
 
                         // If we have no content in the Front and Target, then we don't add the paragraphs.

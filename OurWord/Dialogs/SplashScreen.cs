@@ -5,7 +5,7 @@
  * Created: 24 July 2004
  * Purpose: Display a splash screen on startup so the user is patient during what can be
  *          a lengthy load process.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -22,7 +22,6 @@ using System.Threading;
 using System.Timers;
 
 using JWTools;
-using OurWord;
 #endregion
 
 namespace OurWord.Dialogs
@@ -30,7 +29,7 @@ namespace OurWord.Dialogs
 	public class SplashScreen : System.Windows.Forms.Form
 	{
 		// Threading -------------------------------------------------------------------------
-        static bool IsEnabled = true;   // Set to false if needed for debugging
+        static public bool IsEnabled = true;   // Set to false if needed for debugging
         static Thread s_Thread = null;
         #region SAttr{g}: SplashScreen Wnd
         static public SplashScreen Wnd

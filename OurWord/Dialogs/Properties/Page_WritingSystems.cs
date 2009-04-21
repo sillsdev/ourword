@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 21 Apr 2006
  * Purpose: Setup all of the Writing Systems for the Team Settings
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -27,21 +27,137 @@ using Palaso.UI.WindowsForms.Keyboarding;
 using JWTools;
 using JWdb;
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
+using OurWord.Edit;
 #endregion
 
 namespace OurWord.Dialogs
 {
     public partial class Page_WritingSystems : DlgPropertySheet
     {
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public Page_WritingSystems(DialogProperties _ParentDlg)
+		// Hyphenation -----------------------------------------------------------------------
+		#region Attr{g}: LiterateSettingsWnd LS
+		LiterateSettingsWnd LS
+		{
+			get
+			{
+				Debug.Assert(null != m_LiterateSettingsWnd);
+				return m_LiterateSettingsWnd;
+			}
+		}
+		#endregion
+		YesNoSetting m_TurnOnHyphenation;
+		EditTextSetting m_HyphenationCVPattern;
+		EditTextSetting m_HyphenationConsonants;
+		IntSetting m_HyphenationMinSplitSize;
+		#region Method: BuildHyphenationWindow()
+		void BuildHyphenationWindow()
+		{
+			// Make sure the styles have been defined
+			Information.InitStyleSheet();
+
+			// Introduction
+			LS.AddInformation("ah100", Information.PStyleNormal, 
+				"_OurWord_ offers a quick-and-dirty means of hyphenation, which you may find useful if " +
+				"your language has long words. It is probably not sufficient if your language requires " +
+				"complex hyphenation rules, but perhaps it will be enough for drafting purposes.");
+
+			// Section: Setup
+			LS.AddInformation("ah200", Information.PStyleHeading1, "A. Setup");
+
+			LS.AddInformation("ah210", Information.PStyleNormal, 
+				"*1. You must first turn on the feature.* By default it is turned off because automated " +
+				"hyphenation has a high potential to comfuse new computer users.");
+			m_TurnOnHyphenation = LS.AddYesNo( 
+				"ahTurnOn", 
+				"Turn on Automatic Hyphenation?", 
+				"If Yes, long words will be automatically hyphenated during editing. Hyphens " +
+                    "are not physically placed in the data; they merely appear on screen.",
+				WritingSystem.UseAutomatedHyphenation);
+
+			LS.AddInformation("ah220", Information.PStyleNormal, 
+				"*2. At the heart of hyphenation you must specify a CV pattern,* in which you indicate " +
+				"where the hyphen is permitted.");
+			LS.AddInformation("ah221", Information.PStyleList1, 
+				"\"VC-C\" works for many English words, such as \"bog-gle\", \"com-mit\", and \"" +
+				"air-plane.\" (Unfortunately it fails for words such as \"pa-per,\" thus we recognize " +
+				"that _OurWord_ will not completely cover all of the hyphenation rules of many languages.)");
+			LS.AddInformation("ah222", Information.PStyleList1,
+				"\"V-C\" works for Huichol words, where closed syllables do not exist, thus " +
+				"\"pü-ca-heu-xü-ca-cai-ri.\"");
+			m_HyphenationCVPattern = LS.AddEditText("ahCV",
+				"CV Pattern:",
+				"Indicate where the hyphen will go, e.g., V-C, or VC-CV.",
+				WritingSystem.HyphenationCVPattern);
+
+			LS.AddInformation("ah230", Information.PStyleNormal, 
+				"*3. You need to tell _OurWord_ what your consonants are.* Once we know the consonants, " +
+				"and because we already know the punctuation, we can infer that everything else is a " +
+				"vowel; and thus we can check against the CV pattern you supplied.");
+			m_HyphenationConsonants = LS.AddEditText("ahCon",
+				"Consonants",
+				"List the consonants for this writing systems. (Eveything that isn't a " +
+					"consonant or punctuation is considered to be a vowel.)",
+				WritingSystem.Consonants);
+
+			LS.AddInformation("ah240", Information.PStyleNormal, 
+				"*4. Finally, you can specify a minimum size,* so that _OurWord_ will not break a word " +
+				"down into parts that are too small. Thus a minimum size of three letters would " +
+				"prevent \"ap-ple\", because \"ap\" would be too small.");
+			m_HyphenationMinSplitSize = LS.AddInt("ahMinSize",
+				"Minimum Split Size:",
+				"Hyphenation will not result in a word-part that is smaller than this value.",
+				WritingSystem.MinHyphenSplit, 1);
+
+			LS.AddInformation("ah250", Information.PStyleNormal, 
+				"That should cover it. You can now go to the main drafting screen and see how words " +
+				"are hyphenating, and come back here and tweak until you are happy with the result.");
+
+			// Section: Behavior
+			LS.AddInformation("ah300", Information.PStyleHeading1, "B. Behavior");
+			LS.AddInformation("ah301", Information.PStyleNormal, 
+				"If turned on, hyphens are automatically created, and then automatically update as " +
+				"you type or otherwise edit the text. They are never inserted into the data, and thus " +
+				"never are stored in the file. When editing, the hyphens appear outside of the white " +
+				"background, indicating that the user cannot type on top of them. Hopefully the user " +
+				"will not be tempted to type in hyphens, because doing so would cause them to be part " +
+				"of the data. If you ever see a hyphen with a white background, it was inserted by the " +
+				"user, not by _OurWord._");
+			LS.AddInformation("ah302", Information.PStyleNormal, 
+				"If a single word becomes too long to fit in a line, and if hyphenation is turned " +
+				"off (or if the hyphen rule does not apply), then _OurWord_ will arbitrarily display a " +
+				"hyphen in order to keep the line from overflowing from view on the screen. Again, " +
+				"these hyphens are not inserted into the data, they merely appear on the screen.");
+
+			// Section: Future
+			LS.AddInformation("ah400", Information.PStyleHeading1, "C. Future");
+			LS.AddInformation("ah401", Information.PStyleNormal, 
+				"Depending on expressed user interest, future versions may incorporate a more " +
+				"rigorous approach to the problem. Possibilities include permitting multiple " +
+				"CV patterns, regular expressions, or use of the very-rigorous International " +
+				"Components for Unicode (ICU) library. So please build your case for further " +
+				"work in this area.");
+			LS.AddInformation("ah402", Information.PStyleNormal, 
+				"Secondly, automatic hyphenation is not yet implemented in the Print routine. " +
+				"I know, I know......stay tuned.....and the more voices that request it, the " +
+				"higher this stuff moves up on my To Do list.");
+
+			LS.LoadContents();
+		}
+		#endregion
+
+		// Scaffolding -----------------------------------------------------------------------
+        #region Constructor(ParentDlg, JWritingSystem)
+        public Page_WritingSystems(DialogProperties _ParentDlg, JWritingSystem ws)
             : base(_ParentDlg)
         {
             InitializeComponent();
+
+			m_LiterateSettingsWnd.Name = "Automatic Hyphenation";
+
+			m_WritingSystem = ws;
         }
         #endregion
         #region Attr{g}: JWritingSystem WritingSystem
@@ -49,45 +165,41 @@ namespace OurWord.Dialogs
         {
             get
             {
+				Debug.Assert(null != m_WritingSystem);
                 return m_WritingSystem;
             }
         }
         JWritingSystem m_WritingSystem = null;
         #endregion
 
-        // Misc Methods ----------------------------------------------------------------------
-        #region Method: void PopulateList()
-        void PopulateList()
-        {
-            m_listWritingSystems.Items.Clear();
-
-            foreach (JWritingSystem ws in G.StyleSheet.WritingSystems)
-            {
-                m_listWritingSystems.Items.Add(ws.Name);
-            }
-        }
-        #endregion
-        #region Method: void SelectListItem(int i)
-        private void SelectListItem(int i)
-        {
-            if (m_listWritingSystems.Items.Count > i)
-                m_listWritingSystems.SelectedIndex = i;
-        }
-        #endregion
-
-        // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
+		// DlgPropertySheet overrides --------------------------------------------------------
+		#region SMethod: string ComputeID(string sWritingSystemName)
+		public static string ComputeID(string sWritingSystemName)
+		{
+			return "idWS_" + sWritingSystemName;
+		}
+		#endregion
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return ComputeID(WritingSystem.Name);
+			}
+		}
+		#endregion
+		#region Method: void ShowHelp()
         public override void ShowHelp()
         {
             HelpSystem.ShowTopic(HelpSystem.Topic.kWritingSystems);
         }
         #endregion
-        #region Attr{g}: string TabText
-        public override string TabText
+        #region Attr{g}: string Title
+        public override string Title
         {
             get
             {
-                return Strings.PropDlgTab_WritingSystems;
+                return WritingSystem.Name;
             }
         }
         #endregion
@@ -97,31 +209,29 @@ namespace OurWord.Dialogs
             m_ctrlAutoReplace.Harvest();
             WritingSystem.BuildAutoReplace();
             WritingSystem.DeclareDirty();
+
+			// Automated Hyphenation
+			WritingSystem.UseAutomatedHyphenation = m_TurnOnHyphenation.Value;
+			WritingSystem.HyphenationCVPattern = m_HyphenationCVPattern.Value;
+			WritingSystem.Consonants = m_HyphenationConsonants.Value;
+			try
+			{
+				WritingSystem.MinHyphenSplit = Convert.ToInt16(m_HyphenationMinSplitSize.Value);
+			}
+			catch (Exception)
+			{
+			}
             return true;
         }
         #endregion
 
         // Property Grid ---------------------------------------------------------------------
-        #region Method: GetLoc_MinSplitSize(int nValue) - returns localization of "{0} letters"
-        string GetLoc_MinSplitSize(int nValue)
-        {
-            string sBase = G.GetLoc_String("WritingSystemMinSplitSize", "{0} letters");
-            string sValue = nValue.ToString();
-            return LocDB.Insert(sBase, new string[] { sValue } );
-        }
-        #endregion
         #region Property Grid Constants
         const string c_sPropName = "propName";
         const string c_sPropAbbrev = "propAbbrev";
         const string c_sPropPunctuation = "propPunctuation";
         const string c_sPropEndPunctuation = "propEndPunctuation";
         const string c_sPropKeyboard = "propKeyboard";
-
-        const string c_sGroupAutoHyphen = "Automatic Hyphenation";
-        const string c_sPropUseAutoHyphen = "propUseAutoHyphen";
-        const string c_sPropConsonants = "propConsonants";
-        const string c_sPropAutoHyphenCVPattern = "propAutoHyphenCVPattern";
-        const string c_sPropAutoHyphenMinSplitSize = "propAutoHyphenMinSplitSize";
         #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
         PropertyBag Bag
@@ -168,34 +278,6 @@ namespace OurWord.Dialogs
                 e.Value = WritingSystem.EndPunctuationChars;
             }
             #endregion
-
-            // Auto Hyphenation
-            #region Use Autommated Hyphenation
-            if (e.Property.ID == c_sPropUseAutoHyphen)
-            {
-                YesNoPropertySpec yn = e.Property as YesNoPropertySpec;
-                Debug.Assert(null != yn);
-                e.Value = yn.GetBoolString(WritingSystem.UseAutomatedHyphenation);
-            }
-            #endregion
-            #region Consonants
-            if (e.Property.ID == c_sPropConsonants)
-            {
-                e.Value = WritingSystem.Consonants;
-            }
-            #endregion
-            #region HyphenationCVPattern
-            if (e.Property.ID == c_sPropAutoHyphenCVPattern)
-            {
-                e.Value = WritingSystem.HyphenationCVPattern;
-            }
-            #endregion
-            #region Min Split Size
-            if (e.Property.ID == c_sPropAutoHyphenMinSplitSize)
-            {
-                e.Value = GetLoc_MinSplitSize(WritingSystem.MinHyphenSplit);
-            }
-            #endregion
         }
         #endregion
         #region Method: void bag_SetValue(object sender, PropertySpecEventArgs e)
@@ -216,7 +298,7 @@ namespace OurWord.Dialogs
 
                 // We cannot accept the name change if it would result
                 // in a duplicate
-                foreach (JWritingSystem ws in G.StyleSheet.WritingSystems)
+                foreach (JWritingSystem ws in DB.StyleSheet.WritingSystems)
                 {
                     if (ws.Name == (string)e.Value)
                         return;
@@ -226,9 +308,10 @@ namespace OurWord.Dialogs
                 WritingSystem.Name = (string)e.Value;
 
                 // Update the list
-                G.StyleSheet.WritingSystems.ForceSort();
-                PopulateList();
-                m_listWritingSystems.SelectedItem = WritingSystem.Name;
+                DB.StyleSheet.WritingSystems.ForceSort();
+                ParentDlg.UpdateNavigationControls();
+//                PopulateList();
+//                m_listWritingSystems.SelectedItem = WritingSystem.Name;
             }
             #endregion
             #region Abbreviation
@@ -253,40 +336,6 @@ namespace OurWord.Dialogs
             if (e.Property.ID == c_sPropEndPunctuation)
             {
                 WritingSystem.EndPunctuationChars = (string)e.Value;
-            }
-            #endregion
-
-            // Auto Hyphenation
-            #region Use Automated Hyphenation
-            if (e.Property.ID == c_sPropUseAutoHyphen)
-            {
-                YesNoPropertySpec yn = e.Property as YesNoPropertySpec;
-                Debug.Assert(null != yn);
-                WritingSystem.UseAutomatedHyphenation = yn.IsTrue(e.Value);
-            }
-            #endregion
-            #region Consonants
-            if (e.Property.ID == c_sPropConsonants)
-            {
-                WritingSystem.Consonants = (string)e.Value;
-            }
-            #endregion
-            #region HyphenationCVPattern
-            if (e.Property.ID == c_sPropAutoHyphenCVPattern)
-            {
-                WritingSystem.HyphenationCVPattern = (string)e.Value;
-            }
-            #endregion
-            #region Min Split Size
-            if (e.Property.ID == c_sPropAutoHyphenMinSplitSize)
-            {
-                // TODO: When we localize this, we'll need a way to parse the
-                // number regardless of where it appears in the string. Currently
-                // GetDoubleFromGridText assumes the number is at the beginning
-                // of the string.
-
-                int n = (int)Page_StyleSheet.GetDoubleFromGridText((string)e.Value);
-                WritingSystem.MinHyphenSplit = Math.Max(n, 1);
             }
             #endregion
         }
@@ -375,51 +424,6 @@ namespace OurWord.Dialogs
             Bag.Properties.Add(ps);
             #endregion
 
-            // Auto-Hyphenation Properties
-            #region YesNo: Turn On Auto-Hyphenation?
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sPropUseAutoHyphen,
-                "Turn On Auto-Hyphenation?",
-                c_sGroupAutoHyphen,
-                "If Yes, long words will be automatically hyphenated during editing. Hyphens " +
-                    "are not physically placed in the data; they merely appear on screen.",
-                false
-                ));
-            #endregion
-            #region string: Consonants
-            Bag.Properties.Add(new PropertySpec(
-                c_sPropConsonants,
-                "Consonants",
-                typeof(string),
-                c_sGroupAutoHyphen,
-                "List the consonants for this writing systems. (Eveything that isn't a" +
-                    "consonant or punctuation is considered to be a vowel.)",
-                "",
-                "",
-                null));
-            #endregion
-            #region string: Hyphen CV Pattern
-            Bag.Properties.Add(new PropertySpec(
-                c_sPropAutoHyphenCVPattern,
-                "CV Pattern",
-                typeof(string),
-                c_sGroupAutoHyphen,
-                "Indicate where the hyphen will go, e.g., V-C, or VC-CV.",
-                "",
-                "",
-                null));
-            #endregion
-            #region formatted string: Min Split Size
-            string sDefaultMinSplitSize = GetLoc_MinSplitSize(3);
-            Bag.Properties.Add(new PropertySpec(
-                c_sPropAutoHyphenMinSplitSize,
-                "Min Split Size",
-                typeof(string),
-                c_sGroupAutoHyphen,
-                "Hyphenation will not result in a word-part that is smaller than this value.",
-                sDefaultMinSplitSize));
-            #endregion
-
             // Localize the bag
             LocDB.Localize(this, Bag);
 
@@ -428,81 +432,63 @@ namespace OurWord.Dialogs
         }
         #endregion
 
-        // Command Handlers ------------------------------------------------------------------
+		// Loading ---------------------------------------------------------------------------
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
             LocDB.Localize(this, new Control[] { } );
 
-            // The writing systems list
-            PopulateList();
+			// Set up the Grid Control
+			SetupPropertyGrid();
 
-            // Select the first writing system in the list
-            SelectListItem(0);
-        }
+			// Setup the Hyphenation LiterateSettings control
+			BuildHyphenationWindow();
+
+			// Set up the AutoReplace control
+			m_ctrlAutoReplace.Initialize(m_WritingSystem.AutoReplaceSource,
+				m_WritingSystem.AutoReplaceResult);
+		}
         #endregion
-        #region Cmd: cmdSelectedWSChanged
-        private void cmdSelectedWSChanged(object sender, EventArgs e)
-        {
-            // Retrieve the writing system name from the list
-            if (m_listWritingSystems.SelectedItems.Count != 1)
-                return;
-            string sName = (string)m_listWritingSystems.SelectedItem;
 
-            // Retrieve the WS from the stylesheet
-            m_WritingSystem = G.StyleSheet.FindWritingSystem(sName);
-            Debug.Assert(null != WritingSystem);
-
-            // Set up the Grid Control
-            SetupPropertyGrid();
-
-            // Set up the AutoReplace control
-            m_ctrlAutoReplace.Initialize(m_WritingSystem.AutoReplaceSource,
-                m_WritingSystem.AutoReplaceResult);
-
-            // If we're doing Latin, we don't allow the name to be edited, so
-            // that we can be sure we can find it elsewhere in the program as a
-            // default writing system.
-            m_btnRemove.Enabled = ((WritingSystem.Name == DStyleSheet.c_Latin) ? false : true);
-        }
-        #endregion
-        #region Cmd: cmdAddBtnClicked
-        private void cmdAddBtnClicked(object sender, EventArgs e)
-        {
-            string sName = "New Writing System";
-
-            // Don't add if there is already one of this name in the list
-            foreach (JWritingSystem ws in G.StyleSheet.WritingSystems)
-            {
-                if (ws.Name == sName)
-                    return;
-            }
-
-            // Add the new one to the stylesheet
-            G.StyleSheet.AddWritingSystem(sName);
-            G.StyleSheet.WritingSystems.ForceSort();
-
-            // Update the dialog to edit its settings
-            int iPos = m_listWritingSystems.Items.Add(sName);
-            SelectListItem(iPos);
-        }
-        #endregion
+		// Command Handlers ------------------------------------------------------------------
         #region Cmd: cmdRemoveBtnClicked
         private void cmdRemoveBtnClicked(object sender, EventArgs e)
+			// We prevent deletions of WS's that are in use, so as to not mess up life
+			// for the current project. Of course, loading a new project, we need
+			// to create a WS if it needs it and it isn't in the Team Settings.
         {
-            if (WritingSystem.Name == DStyleSheet.c_Latin)
-                return;
+			// We can't remove the writing system if:
+			// - It is Latin, which is our default WS we use when others aren't there
+			// - It is in use currently by the project.
+			// So display an error message to the effect. (We can't disable the button
+			// for this, because Microsoft does not permit a tooltip for disabled
+			// buttons.)
+			if (WritingSystem.Name == DStyleSheet.c_Latin)
+			{
+				Messages.UnableToRemoveLatin();
+				return;
+			}
+			foreach (DTranslation t in DB.Project.AllTranslations)
+			{
+				if (t.WritingSystemConsultant == WritingSystem ||
+					t.WritingSystemVernacular == WritingSystem)
+				{
+					Messages.UnableToRemoveWritingSystem(WritingSystem.Name);
+					return;
+				}
+			}
 
-            // TODO: Need an AreYouSure message
+            // We need an AreYouSure message, since we don't Undo it
+			if (!Messages.VerifyRemoveWritingSystem(WritingSystem.Name))
+				return;
             
             // Remove it from the StyleSheet
-            G.StyleSheet.WritingSystems.Remove(WritingSystem);
+			DB.StyleSheet.RemoveWritingSystem(WritingSystem);
 
-            // Rebuild the list and select the first item in it
-            PopulateList();
-            SelectListItem(0);
+			// Update the nav tree, and navigate to the Add page
+            ParentDlg.InitNavigation(Page_AddWritingSystem.ComputeID());
         }
         #endregion
-    }
+	}
 }

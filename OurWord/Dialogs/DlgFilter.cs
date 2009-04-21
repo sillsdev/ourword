@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 20 Feb 2006
  * Purpose: Supports Filters (menu item "Show Sections that Have..."
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -25,7 +25,7 @@ using Microsoft.Win32;
 
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs

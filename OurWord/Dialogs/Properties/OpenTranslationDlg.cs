@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 13 Jan 2005
  * Purpose: Open access to an existing file of translation settings.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -24,7 +24,7 @@ using System.Threading;
 using JWTools;
 using JWdb;
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion

@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 28 Jun 2008
  * Purpose: Wizard that manages creating a blank book in OurWord
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -23,7 +23,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs.WizImportBook;
 #endregion
 
@@ -43,7 +43,7 @@ namespace OurWord.Dialogs.WizCreateBook
             get
             {
                 string sAbbrev = m_pageGetAbbreviation.SelectedBookAbbrev;
-                return G.FTranslation.FindBook(sAbbrev);
+                return DB.FrontTranslation.FindBook(sAbbrev);
             }
         }
         #endregion

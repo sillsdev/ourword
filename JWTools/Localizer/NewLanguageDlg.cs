@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 08 Dec 2007
  * Purpose: Localization tool.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

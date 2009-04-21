@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 16 Dec 2004
  * Purpose: Localizations
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -23,7 +23,7 @@ using System.Threading;
 using JWTools;
 using JWdb;
 
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.View;
 using OurWord.Dialogs;
 #endregion

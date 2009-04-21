@@ -19,7 +19,7 @@ using System.Windows.Forms;
 using System.Text;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Edit
@@ -162,8 +162,8 @@ namespace OurWord.Edit
                 Position.Y);
         }
         #endregion
-        #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
-        public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
+        public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -179,7 +179,7 @@ namespace OurWord.Edit
             // Header
             if (ShowHeaderWhenExpanded || IsCollapsed)
             {
-                Header.CalculateContainerVerticals(y, bRepositionOnly);
+                Header.CalculateVerticals(y, bRepositionOnly);
                 y += Header.Height;
             }
 
@@ -192,19 +192,8 @@ namespace OurWord.Edit
                 // Layout the owned subitems, one below the other
                 foreach (EItem item in SubItems)
                 {
-                    EContainer container = item as EContainer;
-                    if (null != container)
-                    {
-                        container.CalculateContainerVerticals(y, bRepositionOnly);
-                        y += container.Height;
-                    }
-
-                    EControl control = item as EControl;
-                    if (null != control)
-                    {
-                        control.CalculateVerticals(y, bRepositionOnly);
-                        y += control.Height;
-                    }
+					item.CalculateVerticals(y, bRepositionOnly);
+					y += item.Height;
                 }
             }
 
@@ -218,6 +207,15 @@ namespace OurWord.Edit
         #region OMethod: void OnPaint(ClipRectangle)
         public override void OnPaint(Rectangle ClipRectangle)
         {
+            // Set the owned controls visibility according to whether or not
+            // we are collapsed. We want them invisible if collapsed, so that
+            // the Window does not attempt to draw them.
+            // For owned controls, we need to set their visibility regardless of
+            // whether the clip rectangle; otherwise they'll always be visible because
+            // the code to hide them would never be called (e.g., if the container has
+            // been scrolled off the screen.
+            SetOwnedControlsVisibility(!IsCollapsed);
+
             // For performance, make sure we need to paint this container
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
@@ -232,10 +230,6 @@ namespace OurWord.Edit
             if (ShowHeaderWhenExpanded || IsCollapsed)
                 Header.OnPaint(ClipRectangle);
 
-            // Set the owned controls visibility according to whether or not
-            // we are collapsed. We want them invisible if collapsed, so that
-            // the Window does not attempt to draw them.
-            SetOwnedControlsVisibility(!IsCollapsed);
 
             // If we're expanded, then show the subitems
             if (!IsCollapsed)

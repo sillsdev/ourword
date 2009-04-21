@@ -420,7 +420,7 @@ namespace JWTools
 		#region Event: cmdHelp(...)
 		private void cmdHelp(object sender, System.EventArgs e)
 		{
-			JW_Help.Show_DlgFeatures();
+			HelpSystem.Show_DlgFeatures();
 		}
 		#endregion
 

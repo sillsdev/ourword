@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 13 Feb 2007
  * Purpose: User Finishes the process
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -22,7 +22,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizImportBook
@@ -54,11 +54,9 @@ namespace OurWord.Dialogs.WizImportBook
         #region Method: void OnActivate()
         public void OnActivate()
         {
-            m_textBook.Text = Wizard.BookAbbrev;
+            m_textBook.Text = Wizard.BookAbbrev + " - " + Wizard.BookName;
             m_textFileName.Text = JWU.PathEllipses(ImportPathName, 40);
             m_textFormat.Text = Wizard.Format;
-            m_textStage.Text = Wizard.Stage + ", " + Wizard.Version.ToString();
-            m_textDestination.Text = JWU.PathEllipses(Wizard.DestinationFolder, 40);
         }
         #endregion
         #region Method: bool CanGoToNextPage()
@@ -92,7 +90,7 @@ namespace OurWord.Dialogs.WizImportBook
         {
             get
             {
-                return new Control[] { m_textStage, m_textFileName, m_textDestination, m_textFormat, m_textBook };
+                return new Control[] { m_textFileName, m_textFormat, m_textBook };
             }
         }
         #endregion

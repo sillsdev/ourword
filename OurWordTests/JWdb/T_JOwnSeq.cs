@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 14 July 2008
  * Purpose: Tests the JOwSeqn implementation
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -21,7 +21,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -54,7 +54,7 @@ namespace OurWordTests.JWdb
             {
                 ownseq = new JOwnSeq<TObject1>("Ownership", this);
 
-                // Test the Append method
+                // Test the AddParagraph method
                 TObject1 objA = new TObject1("orange");
                 ownseq.Append(objA);
                 Assert.IsTrue(objA.Owner == this);
@@ -167,23 +167,47 @@ namespace OurWordTests.JWdb
         {
             public JOwnSeq<TObject> m_os;
 
-            public OwnSeqTestUnsorted()
+			#region Constructor()
+			public OwnSeqTestUnsorted()
                 : base()
             {
                 m_os = new JOwnSeq<TObject>("os", this, true, false);
-            }
-        }
+			}
+			#endregion
+
+			#region OAttr{g}: string StoragePath
+			public override string StoragePath
+			{
+				get
+				{
+					return JWU.NUnit_TestFilePathName;
+				}
+			}
+			#endregion
+		}
         #endregion
         #region Class: OwnSeqTestSorted : JObjectOnDemand
         class OwnSeqTestSorted : JObjectOnDemand
         {
             public JOwnSeq<TObject> m_os;
 
-            public OwnSeqTestSorted()
+			#region Constructor()
+			public OwnSeqTestSorted()
                 : base()
             {
                 m_os = new JOwnSeq<TObject>("os", this, true, true);
-            }
+			}
+			#endregion
+
+			#region OAttr{g}: string StoragePath
+			public override string StoragePath
+			{
+				get
+				{
+					return JWU.NUnit_TestFilePathName;
+				}
+			}
+			#endregion
         }
         #endregion
         [Test] public void ReadWrite()
@@ -194,13 +218,11 @@ namespace OurWordTests.JWdb
             ost1.m_os.Append(new TObject("Chapter"));
             ost1.m_os.Append(new TObject("Inscription"));
             ost1.m_os.Append(new TObject("Lord"));
-            ost1.AbsolutePathName = JWU.NUnit_TestFilePathName;
-            ost1.Write();
+            ost1.Write(new NullProgress());
 
             // Read into another object
             OwnSeqTestUnsorted ost2 = new OwnSeqTestUnsorted();
-            ost2.AbsolutePathName = JWU.NUnit_TestFilePathName;
-            ost2.Load();
+            ost2.Load(new NullProgress());
 
             // Compare the two
             Assert.AreEqual(4, ost2.m_os.Count);
@@ -214,8 +236,7 @@ namespace OurWordTests.JWdb
 
             // Read it into the Sorted sequence object
             OwnSeqTestSorted oSorted = new OwnSeqTestSorted();
-            oSorted.AbsolutePathName = JWU.NUnit_TestFilePathName;
-            oSorted.Load();
+            oSorted.Load(new NullProgress());
             Assert.AreEqual(4, oSorted.m_os.Count);
             // Verify that the sorted sequence is indeed sorted
             for (int i = 0; i < oSorted.m_os.Count - 2; i++)
@@ -266,8 +287,8 @@ namespace OurWordTests.JWdb
                 // Set up a merge OS: Test kNone.
                 osM = new JOwnSeq<TObject>("test", this, true, false);
                 os.MergeOption = Merge.kNone;
-                osM.Append(new TObject("Fred"));
-                osM.Append(new TObject("Emily"));
+                osM.AddParagraph(new TObject("Fred"));
+                osM.AddParagraph(new TObject("Emily"));
                 TextWriter tw = JUtil.GetTextWriter(sPath);
 
                 XElement x = new XElement("os");
@@ -317,8 +338,8 @@ namespace OurWordTests.JWdb
 
                 // Set up a merge OS: Test kKeepOld.
                 osM = new JOwnSeq<TObject>("OldM", this, true, false);
-                osM.Append(new TObject("David"));
-                osM.Append(new TObject("Emily"));
+                osM.AddParagraph(new TObject("David"));
+                osM.AddParagraph(new TObject("Emily"));
                 TextWriter tw = JUtil.GetTextWriter(sPathName);
 
                 XElement x = new XElement("os");
@@ -373,8 +394,8 @@ namespace OurWordTests.JWdb
 
                 // Set up a merge OS: Test kKeepNew.
                 osM = new JOwnSeq<TObject>("test", this, true, false);
-                osM.Append(new TObject("David"));
-                osM.Append(new TObject("Emily"));
+                osM.AddParagraph(new TObject("David"));
+                osM.AddParagraph(new TObject("Emily"));
                 TextWriter tw = JUtil.GetTextWriter(sPath);
 
                 XElement x = new XElement("os");

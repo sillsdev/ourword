@@ -4,7 +4,7 @@
  * Author:  John Wimbish & Others as Noted Below
  * Created: 20 Aug 2007
  * Purpose: Make a PropertyGrid usable (e.g., localizable, etc).
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  * 
  * The code, unless otherwise noted:
  *    Copyright (C) 2002  Tony Allowatt

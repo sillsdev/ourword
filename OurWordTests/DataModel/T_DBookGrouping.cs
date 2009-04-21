@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Tests the DBookGrouping class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -17,9 +17,9 @@ using NUnit.Framework;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -38,7 +38,7 @@ namespace OurWordTests.DataModel
         [SetUp]
         public void Setup()
         {
-            m_OldProject = OurWordMain.Project;
+            m_OldProject = DB.Project;
 
             // NUnit Setup
             JWU.NUnit_Setup();
@@ -49,7 +49,7 @@ namespace OurWordTests.DataModel
 
             m_Project = new DProject();
             m_Project.TeamSettings = m_TeamSettings;
-            OurWordMain.Project = m_Project;
+            DB.Project = m_Project;
 
             DTranslation tFront = new DTranslation("Kupang", "Latin", "Latin");
             DTranslation tTarget = new DTranslation("Dhao", "Latin", "Latin");
@@ -66,13 +66,13 @@ namespace OurWordTests.DataModel
 
             foreach (string s in vs)
             {
-                DBook FBook = new DBook(s, "F_" + s + ".db");
+                DBook FBook = new DBook(s); //, "F_" + s + ".db");
                 tFront.AddBook(FBook);
                 FBook.DisplayName = FBook.BookName;
 
-                DBook TBook = new DBook(s, "T_" + s + ".db");
+                DBook TBook = new DBook(s); //, "T_" + s + ".db");
                 tTarget.AddBook(TBook);
-                TBook.DisplayName = TBook.BookName;
+                TBook.DisplayName = TBook.BookName;			
             }
         }
         #endregion
@@ -80,7 +80,7 @@ namespace OurWordTests.DataModel
         [TearDown]
         public void TearDown()
         {
-            OurWordMain.Project = m_OldProject;
+            DB.Project = m_OldProject;
         }
         #endregion
 

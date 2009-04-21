@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -124,10 +124,9 @@
     <Compile Include="JW_FeaturesPassword.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="JW_FileMenuIO.cs">
-      <SubType>Form</SubType>
+    <Compile Include="JW_MRU.cs">
     </Compile>
-    <Compile Include="JW_Help.cs">
+    <Compile Include="HelpSystem.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="JW_ListView.cs">
@@ -192,10 +191,6 @@
     <EmbeddedResource Include="Help.ico" />
     <EmbeddedResource Include="JW_FeaturesPassword.resx">
       <DependentUpon>JW_FeaturesPassword.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="JW_FileMenuIO.resx">
-      <DependentUpon>JW_FileMenuIO.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="JW_MenuItem.resx">

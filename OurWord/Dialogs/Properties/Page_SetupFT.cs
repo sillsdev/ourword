@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Jan 2005
  * Purpose: Create or Open settings for the Front/Target (hence "FT").
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -23,8 +23,8 @@ using System.Threading;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -87,84 +87,90 @@ namespace OurWord.Dialogs
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_SetupFT));
-            this.m_lblDefinition = new System.Windows.Forms.Label();
-            this.m_btnCreate = new System.Windows.Forms.Button();
-            this.m_btnOpen = new System.Windows.Forms.Button();
-            this.m_lblCreate = new System.Windows.Forms.Label();
-            this.m_lblOpen = new System.Windows.Forms.Label();
-            this.m_lblActions = new System.Windows.Forms.Label();
-            this.SuspendLayout();
-            // 
-            // m_lblDefinition
-            // 
-            this.m_lblDefinition.Location = new System.Drawing.Point(12, 9);
-            this.m_lblDefinition.Name = "m_lblDefinition";
-            this.m_lblDefinition.Size = new System.Drawing.Size(444, 64);
-            this.m_lblDefinition.TabIndex = 0;
-            this.m_lblDefinition.Text = resources.GetString("m_lblDefinition.Text");
-            // 
-            // m_btnCreate
-            // 
-            this.m_btnCreate.Location = new System.Drawing.Point(15, 100);
-            this.m_btnCreate.Name = "m_btnCreate";
-            this.m_btnCreate.Size = new System.Drawing.Size(122, 23);
-            this.m_btnCreate.TabIndex = 1;
-            this.m_btnCreate.Text = "Create New...";
-            this.m_btnCreate.Click += new System.EventHandler(this.cmdCreate);
-            // 
-            // m_btnOpen
-            // 
-            this.m_btnOpen.Location = new System.Drawing.Point(15, 158);
-            this.m_btnOpen.Name = "m_btnOpen";
-            this.m_btnOpen.Size = new System.Drawing.Size(122, 23);
-            this.m_btnOpen.TabIndex = 2;
-            this.m_btnOpen.Text = "Open Existing...";
-            this.m_btnOpen.Click += new System.EventHandler(this.cmdOpen);
-            // 
-            // m_lblCreate
-            // 
-            this.m_lblCreate.Location = new System.Drawing.Point(146, 100);
-            this.m_lblCreate.Name = "m_lblCreate";
-            this.m_lblCreate.Size = new System.Drawing.Size(313, 58);
-            this.m_lblCreate.TabIndex = 3;
-            this.m_lblCreate.Text = "Start from scratch to initialize settings for your front translation. You will be" +
-                " presented with blank settings, and will need to enter the name of the translati" +
-                "on, its books, etc.";
-            // 
-            // m_lblOpen
-            // 
-            this.m_lblOpen.Location = new System.Drawing.Point(146, 158);
-            this.m_lblOpen.Name = "m_lblOpen";
-            this.m_lblOpen.Size = new System.Drawing.Size(316, 69);
-            this.m_lblOpen.TabIndex = 4;
-            this.m_lblOpen.Text = "Make use of existing settings for your front translation. If you defined the tran" +
-                "slation in another project, then you can reuse it here, rather than entering the" +
-                " information all over again.";
-            // 
-            // m_lblActions
-            // 
-            this.m_lblActions.Location = new System.Drawing.Point(12, 73);
-            this.m_lblActions.Name = "m_lblActions";
-            this.m_lblActions.Size = new System.Drawing.Size(444, 23);
-            this.m_lblActions.TabIndex = 7;
-            this.m_lblActions.Text = "Available UndoStack:";
-            this.m_lblActions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // Page_SetupFT
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.Controls.Add(this.m_lblActions);
-            this.Controls.Add(this.m_lblOpen);
-            this.Controls.Add(this.m_lblCreate);
-            this.Controls.Add(this.m_btnOpen);
-            this.Controls.Add(this.m_btnCreate);
-            this.Controls.Add(this.m_lblDefinition);
-            this.Name = "Page_SetupFT";
-            this.Size = new System.Drawing.Size(468, 321);
-            this.Load += new System.EventHandler(this.cmdLoad);
-            this.ResumeLayout(false);
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_SetupFT));
+			this.m_lblDefinition = new System.Windows.Forms.Label();
+			this.m_btnCreate = new System.Windows.Forms.Button();
+			this.m_btnOpen = new System.Windows.Forms.Button();
+			this.m_lblCreate = new System.Windows.Forms.Label();
+			this.m_lblOpen = new System.Windows.Forms.Label();
+			this.m_lblActions = new System.Windows.Forms.Label();
+			this.SuspendLayout();
+			// 
+			// m_lblDefinition
+			// 
+			this.m_lblDefinition.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_lblDefinition.Location = new System.Drawing.Point(3, 0);
+			this.m_lblDefinition.Name = "m_lblDefinition";
+			this.m_lblDefinition.Size = new System.Drawing.Size(462, 64);
+			this.m_lblDefinition.TabIndex = 0;
+			this.m_lblDefinition.Text = resources.GetString("m_lblDefinition.Text");
+			// 
+			// m_btnCreate
+			// 
+			this.m_btnCreate.Location = new System.Drawing.Point(6, 91);
+			this.m_btnCreate.Name = "m_btnCreate";
+			this.m_btnCreate.Size = new System.Drawing.Size(122, 23);
+			this.m_btnCreate.TabIndex = 1;
+			this.m_btnCreate.Text = "Create New...";
+			this.m_btnCreate.Click += new System.EventHandler(this.cmdCreate);
+			// 
+			// m_btnOpen
+			// 
+			this.m_btnOpen.Location = new System.Drawing.Point(6, 149);
+			this.m_btnOpen.Name = "m_btnOpen";
+			this.m_btnOpen.Size = new System.Drawing.Size(122, 23);
+			this.m_btnOpen.TabIndex = 2;
+			this.m_btnOpen.Text = "Open Existing...";
+			this.m_btnOpen.Click += new System.EventHandler(this.cmdOpen);
+			// 
+			// m_lblCreate
+			// 
+			this.m_lblCreate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_lblCreate.Location = new System.Drawing.Point(137, 91);
+			this.m_lblCreate.Name = "m_lblCreate";
+			this.m_lblCreate.Size = new System.Drawing.Size(328, 58);
+			this.m_lblCreate.TabIndex = 3;
+			this.m_lblCreate.Text = "Start from scratch to initialize settings for your front translation. You will be" +
+				" presented with blank settings, and will need to enter the name of the translati" +
+				"on, its books, etc.";
+			// 
+			// m_lblOpen
+			// 
+			this.m_lblOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_lblOpen.Location = new System.Drawing.Point(137, 149);
+			this.m_lblOpen.Name = "m_lblOpen";
+			this.m_lblOpen.Size = new System.Drawing.Size(328, 69);
+			this.m_lblOpen.TabIndex = 4;
+			this.m_lblOpen.Text = "Make use of existing settings for your front translation. If you defined the tran" +
+				"slation in another project, then you can reuse it here, rather than entering the" +
+				" information all over again.";
+			// 
+			// m_lblActions
+			// 
+			this.m_lblActions.Location = new System.Drawing.Point(3, 64);
+			this.m_lblActions.Name = "m_lblActions";
+			this.m_lblActions.Size = new System.Drawing.Size(444, 23);
+			this.m_lblActions.TabIndex = 7;
+			this.m_lblActions.Text = "Available UndoStack:";
+			this.m_lblActions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+			// 
+			// Page_SetupFT
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+			this.Controls.Add(this.m_lblActions);
+			this.Controls.Add(this.m_lblOpen);
+			this.Controls.Add(this.m_lblCreate);
+			this.Controls.Add(this.m_btnOpen);
+			this.Controls.Add(this.m_btnCreate);
+			this.Controls.Add(this.m_lblDefinition);
+			this.Name = "Page_SetupFT";
+			this.Size = new System.Drawing.Size(468, 321);
+			this.Load += new System.EventHandler(this.cmdLoad);
+			this.ResumeLayout(false);
 
 		}
 		#endregion
@@ -189,6 +195,7 @@ namespace OurWord.Dialogs
 		#region Handler: cmdCreate - create a blank set of translation settings
 		private void cmdCreate(object sender, System.EventArgs e)
 		{
+			/***
 			// Make sure the user understands that this will remove his current Front/Target
 			// Translation from the project.
 			// Note: OVERRIDE ConfirmTranslationReplacement() in subclass
@@ -207,14 +214,15 @@ namespace OurWord.Dialogs
             Translation.AbsolutePathName = dlg.SettingsPath;
             Translation.LanguageAbbrev = dlg.Abbreviation;
 
-			// Tell the parent dialog to show the settings page for the translation
-            ParentDlg.SetupTabControl(DialogProperties.c_navEssentials);
-            ParentDlg.ActivatePage(Translation);
+			// Tell the parent dialog to show the settings page for the new translation
+			ParentDlg.InitNavTree(Page_Translation.ComputeID(Translation.DisplayName));
+			***/
         }
 		#endregion
 		#region Handler: cmdOpen - open an existing translation settings file
 		private void cmdOpen(object sender, System.EventArgs e)
 		{
+			/***
 			// Make sure the user understands that this will remove his current Front
 			// Translation from the project.
 			// Note: OVERRIDE ConfirmTranslationReplacement() in subclass
@@ -233,9 +241,9 @@ namespace OurWord.Dialogs
             Translation.Load();
             Translation.AbsolutePathName = dlg.SettingsPath;  // Second because Load overwrote it
 
-			// Tell the parent dialog to show the settings page for the translation
-            ParentDlg.SetupTabControl(DialogProperties.c_navEssentials);
-            ParentDlg.ActivatePage(Translation);
+			// Tell the parent dialog to show the settings page for the newly-opened translation
+			ParentDlg.InitNavTree(Page_Translation.ComputeID(Translation.DisplayName));
+			***/
         }
 		#endregion
 
@@ -256,14 +264,14 @@ namespace OurWord.Dialogs
         {
             get
             {
-                if (null != G.Project)
-                    return G.Project.FrontTranslation;
+                if (null != DB.Project)
+                    return DB.Project.FrontTranslation;
                 return null;
             }
             set
             {
-                if (null != G.Project)
-                    G.Project.FrontTranslation = value;
+                if (null != DB.Project)
+                    DB.Project.FrontTranslation = value;
             }
         }
         #endregion
@@ -297,8 +305,18 @@ namespace OurWord.Dialogs
 		#endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Attr{g}: string TabText
-        public override string TabText
+		public const string c_sID = "idSetupFront";
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return c_sID;
+			}
+		}
+		#endregion
+		#region Attr{g}: string TabText
+        public override string Title
         {
             get
             {
@@ -315,20 +333,20 @@ namespace OurWord.Dialogs
         {
             get
             {
-                if (null != G.Project)
-                    return G.Project.TargetTranslation ;
+                if (null != DB.Project)
+                    return DB.Project.TargetTranslation ;
                 return null;
             }
             set
             {
-                if (null != G.Project)
-                    G.Project.TargetTranslation = value;
+                if (null != DB.Project)
+                    DB.Project.TargetTranslation = value;
             }
         }
         #endregion
 
         #region Constructor(DlgProperties)
-        public Page_SetupTarget(DialogProperties _dlg)
+		public Page_SetupTarget(DialogProperties _dlg)
             : base(_dlg)
 		{
 		}
@@ -356,8 +374,18 @@ namespace OurWord.Dialogs
 		#endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Attr{g}: string TabText
-        public override string TabText
+		public const string c_sID = "idSetupTarget";
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return c_sID;
+			}
+		}
+		#endregion
+		#region Attr{g}: string TabText
+        public override string Title
         {
             get
             {

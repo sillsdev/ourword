@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 01 Dec 2003
  * Purpose: Information about the assembly.
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 
 using System.Reflection;
@@ -21,7 +21,7 @@ using System.Security.Permissions;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("John S. Wimbish")]
 [assembly: AssemblyProduct("OurWord!")]
-[assembly: AssemblyCopyright("© 2004-08, John S. Wimbish")]
+[assembly: AssemblyCopyright("© 2004-09, John S. Wimbish")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
 
@@ -37,7 +37,7 @@ using System.Security.Permissions;
 // 1.1.0 - initial
 // 1.1.1 - fixed Load problems with Absolute Paths
 
-[assembly: AssemblyVersion("1.1.3")]
+[assembly: AssemblyVersion("1.2.3")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

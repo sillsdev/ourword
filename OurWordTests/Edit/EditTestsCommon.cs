@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Common code for the edit tests
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -22,7 +22,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -37,7 +37,7 @@ namespace OurWordTests.Edit
         {
             get
             {
-                return G.Project.TargetTranslation.WritingSystemVernacular;
+                return DB.Project.TargetTranslation.WritingSystemVernacular;
             }
         }
         #endregion
@@ -144,13 +144,13 @@ namespace OurWordTests.Edit
 
             // Application and Project initialization
             OurWordMain.App = new OurWordMain();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Project";
-            G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
-            s_book = new DBook("MRK","");
-            G.Project.TargetTranslation.AddBook(s_book);
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
+            s_book = new DBook("MRK");
+            DB.Project.TargetTranslation.AddBook(s_book);
             G.URStack.Clear();
         }
         #endregion
@@ -167,8 +167,7 @@ namespace OurWordTests.Edit
             W.Close();
 
             // Now read it in, with full-blown book parsing mechanism
-            s_book.AbsolutePathName = sPath;
-            s_book.Load();
+            s_book.Load(ref sPath, new NullProgress());
 
             s_section = s_book.Sections[0] as DSection;
         }
@@ -198,11 +197,12 @@ namespace OurWordTests.Edit
         #region SMethod: void TearDown()
         static public void TearDown()
         {
-            OurWordMain.Project = null;
+            DB.Project = null;
             s_Form.Dispose();
             s_Form = null;
         }
         #endregion
+
     }
 
 }

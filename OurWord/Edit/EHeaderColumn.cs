@@ -19,7 +19,7 @@ using System.Windows.Forms;
 using System.Text;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Edit
@@ -132,8 +132,8 @@ namespace OurWord.Edit
             Header.CalculateContainerHorizontals();
         }
         #endregion
-        #region OMethod: void CalculateContainerVerticals(float y, bool bRepositionOnly)
-        public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(float y, bool bRepositionOnly)
+        public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -142,7 +142,7 @@ namespace OurWord.Edit
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
 
             // Header
-            Header.CalculateContainerVerticals(y, bRepositionOnly);
+            Header.CalculateVerticals(y, bRepositionOnly);
             y += Header.Height;
 
             m_yContentsTop = y;
@@ -151,10 +151,10 @@ namespace OurWord.Edit
             y += CalculateBitmapHeightRequirement();
 
             // Layout the owned subitems, one below the other
-            foreach (EContainer container in SubItems)
+            foreach (EItem item in SubItems)
             {
-                container.CalculateContainerVerticals(y, bRepositionOnly);
-                y += container.Height;
+				item.CalculateVerticals(y, bRepositionOnly);
+				y += item.Height;
             }
 
             m_yContentsBottom = y;

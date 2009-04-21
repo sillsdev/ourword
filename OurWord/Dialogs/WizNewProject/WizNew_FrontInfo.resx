@@ -117,4 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="m_lblInstructions.Text" xml:space="preserve">
+    <value>The Front language is used as a template, providing the sections, paragraphing, styles, etc., for your language as you create new, blank books to translate. You can enter a new Language Name, or use the dropdown arrow to choose a language that alread exists in this cluster.</value>
+  </data>
 </root>

@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 Jan 2008
  * Purpose: Obtains the name, abbreviation and settings file for the front translation
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -23,7 +23,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizNewProject
@@ -41,56 +41,24 @@ namespace OurWord.Dialogs.WizNewProject
             }
         }
         #endregion
-        #region VAttr{g}: bool UseExisting
-        public bool UseExisting
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(ExistingFrontSettingsFilePath))
-                    return false;
-                return true;
-            }
-        }
-        #endregion
-        #region VAttr{g}: string ExistingFrontSettingsFilePath
-        public string ExistingFrontSettingsFilePath
-        {
-            get
-            {
-                return m_sExistingFrontSettingsFilePath;
-            }
-        }
-        string m_sExistingFrontSettingsFilePath;
-        #endregion
-        #region VAttr{g}: string FrontName
-        public string FrontName
-        {
-            get
-            {
-                return m_textFrontName.Text;
-            }
-        }
-        #endregion
-        #region VAttr{g}: string FrontAbbreviation
-        public string FrontAbbreviation
-        {
-            get
-            {
-                return m_textFrontAbbreviation.Text;
-            }
-        }
-        #endregion
-        #region VAttr{g}: string FrontSettingsFolder
-        public string FrontSettingsFolder
-        {
-            get
-            {
-                return m_textFrontSettingsFolder.Text;
-            }
-        }
-        #endregion
+		#region VAttr{g}: bool CreatingNewFront
+		public bool CreatingNewFront
+			// T if the name in the combo box is not currently on the disk
+		{
+			get
+			{
+				var v = Wizard.Languages;
+				foreach (string s in v)
+				{
+					if (s == Wizard.FrontName)
+						return false;
+				}
+				return true;
+			}
+		}
+		#endregion
 
-        // Scaffolding -----------------------------------------------------------------------
+		// Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public WizNew_FrontInfo()
         {
@@ -102,16 +70,24 @@ namespace OurWord.Dialogs.WizNewProject
         #region Method: void OnActivate()
         public void OnActivate()
         {
-        }
+			// Populate the combo box
+			var v = Wizard.Languages;
+			m_comboChooseLanguage.Items.Clear();
+			foreach (string s in v)
+			{
+				m_comboChooseLanguage.Items.Add(s);
+
+				if (Wizard.FrontName == s)
+					m_comboChooseLanguage.Text = Wizard.FrontName;
+			}
+
+			Wizard.AdvanceButtonEnabled = CanGoToNextPage();
+		}
         #endregion
         #region Method: bool CanGoToNextPage()
         public bool CanGoToNextPage()
         {
-            if (string.IsNullOrEmpty(FrontName))
-                return false;
-            if (string.IsNullOrEmpty(FrontAbbreviation))
-                return false;
-            if (string.IsNullOrEmpty(FrontSettingsFolder))
+            if (string.IsNullOrEmpty(Wizard.FrontName))
                 return false;
             return true;
         }
@@ -129,88 +105,13 @@ namespace OurWord.Dialogs.WizNewProject
         }
         #endregion
 
-        // Command Handlers ------------------------------------------------------------------
-        #region Cmd: cmdUseExisting
-        private void cmdUseExisting(object sender, EventArgs e)
-        {
-            // Launch the dialog to prompt for the Settings Filename. The user has the 
-            // option to abort from this dlg.
-            DialogOpenTranslation dlg = new DialogOpenTranslation();
-            if (DialogResult.OK != dlg.ShowDialog())
-                return;
-
-            // Read in the translation object
-            DTranslation Translation = new DTranslation();
-            Translation.AbsolutePathName = dlg.SettingsPath;  // First so we know what to load
-            Translation.Load();
-            Translation.AbsolutePathName = dlg.SettingsPath;  // Second because Load overwrote it
-
-            // Retrieve all of the settings we're interested in
-            m_sExistingFrontSettingsFilePath = Translation.AbsolutePathName;
-            m_textFrontName.Text = Translation.DisplayName;
-            m_textFrontAbbreviation.Text = Translation.LanguageAbbrev;
-            m_textFrontSettingsFolder.Text = Path.GetDirectoryName(Translation.AbsolutePathName);
-
-            Wizard.AdvanceButtonEnabled = CanGoToNextPage();
-        }
-        #endregion
-        #region Cmd: cmdBrowse
-        private void cmdBrowse(object sender, EventArgs e)
-        {
-            // Set up the Browse For Folder dialog
-            FolderBrowserDialog dlg = new FolderBrowserDialog();
-            dlg.Description = LocDB.GetValue(this, "strBrowseFrontFolderDialogTitle",
-                "Choose the folder in which to store settings for the Front translation.", null);
-            dlg.ShowNewFolderButton = true;
-            dlg.RootFolder = Environment.SpecialFolder.MyComputer;
-            dlg.SelectedPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-
-            // Run the dialog
-            if (DialogResult.OK == dlg.ShowDialog(Wizard))
-            {
-                m_textFrontSettingsFolder.Text = dlg.SelectedPath;
-                Wizard.AdvanceButtonEnabled = CanGoToNextPage();
-            }
-        }
-        #endregion
-        #region Cmd: cmdLanguageNameChanged
-        private void cmdLanguageNameChanged(object sender, EventArgs e)
-            // Same algorithm as in the CreateTranslationDlg; probably should
-            // combine them at some point.
-        {
-            int cAbbrevLength = 3;
-
-            if (FrontName.Length == 0)
-                return;
-
-            // Get the default abbreviation as the first three letters of the name
-            string sDefaultAbbrev = "";
-            if (FrontName.Length > 0)
-            {
-                foreach (char ch in FrontName)
-                {
-                    if (ch != ' ')
-                    {
-                        sDefaultAbbrev += ch;
-                        cAbbrevLength--;
-                    }
-                    if (0 == cAbbrevLength)
-                        break;
-                }
-            }
-
-            // If the abbreviation currently entered matches this default (for as
-            // many letters as it has), then add any remaining letters
-            int i = 0;
-            for (; i < FrontAbbreviation.Length && i < sDefaultAbbrev.Length; i++)
-            {
-                if (FrontAbbreviation[i] != sDefaultAbbrev[i])
-                    break;
-            }
-            if (i == FrontAbbreviation.Length && i < sDefaultAbbrev.Length)
-                m_textFrontAbbreviation.Text = sDefaultAbbrev;
-        }
-        #endregion
-
-    }
+		// Command Handlers ------------------------------------------------------------------
+		#region Cmd: cmdComboTextChanged
+		private void cmdComboTextChanged(object sender, EventArgs e)
+		{
+			Wizard.FrontName = m_comboChooseLanguage.Text;
+			Wizard.AdvanceButtonEnabled = CanGoToNextPage();
+		}
+		#endregion
+	}
 }

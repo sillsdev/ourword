@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Tests the DBook class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -17,22 +17,53 @@ using NUnit.Framework;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
 
 namespace OurWordTests.DataModel
 {
-    [TestFixture] public class T_DBook
+	#region CLASS: DTestBook : DBook - let's us override the StoragePath for test purposes
+	public class DTestBook : DBook
+	{
+		#region Constructor(sStoragePath)
+		public DTestBook(string sStoragePath)
+			: base("MRK")
+		{
+			m_sStoragePath = sStoragePath;
+		}
+		#endregion
+		#region OAttr{g}: string StoragePath
+		public override string StoragePath
+		{
+			get
+			{
+				return m_sStoragePath;
+			}
+		}
+		string m_sStoragePath;
+		#endregion
+	}
+	#endregion
+
+	[TestFixture] public class T_DBook
     {
         // Helper Methods --------------------------------------------------------------------
         #region Method: void Setup()
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
+        }
+        #endregion
+        #region Method: void TearDown()
+        [TearDown] public void TearDown()
+        {
+            string sWaxhawClusterPath = JWU.GetMyDocumentsFolder("Waxhaw");
+            if (Directory.Exists(sWaxhawClusterPath))
+                Directory.Delete(sWaxhawClusterPath, true);
         }
         #endregion
 
@@ -61,7 +92,7 @@ namespace OurWordTests.DataModel
         // Make certain we have a two-digit sort key, so that, e.g.,
         // Leviticus follows Exodus rather than Proverbs.
         {
-            DBook book = new DBook("LEV", "");
+            DBook book = new DBook("LEV");
             Assert.AreEqual("02", book.SortKey);
         }
         #endregion
@@ -114,22 +145,21 @@ namespace OurWordTests.DataModel
             #endregion
 
             // Setup
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
-            G.Project.TargetTranslation = Translation;
+            DB.Project.TargetTranslation = Translation;
 
             // Write out vsRaw to disk file
             string sPathname = GetTestPathName("TestDBIO1");
             _WriteToFile(sPathname, vsRaw);
 
             // Now read it into the book. 
-            DBook Book = new DBook("MRK", "");
+			DBook Book = new DBook("MRK");
             Translation.AddBook(Book);
-            Book.AbsolutePathName = sPathname;
-            Book.Load();
+            Book.Load(ref sPathname, new NullProgress());
             Book.DisplayName = "Mark";
 
             // Check for the the proper book references for each section
@@ -138,6 +168,146 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("Mark 13:12-32", (Book.Sections[1] as DSection).ReferenceName);
             Assert.AreEqual("Mark 4:33-33", (Book.Sections[2] as DSection).ReferenceName);
             Assert.AreEqual("Mark 15:34-34", (Book.Sections[3] as DSection).ReferenceName);
+        }
+        #endregion
+        #region Test: ParseFileName
+        [Test] public void ParseFileName()
+            // The book is calculated as:
+            //    "01 GEN - Amarasi - Draft-A 2008-11-23"
+            // Here, we request the book to calculate something, so we can test both
+            // that the generate code hasn't changed, but also that we parse correctly.
+        {
+            // Set up a book
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DTranslation Translation = new DTranslation("Amarasi", "Latin", "Latin");
+            DB.Project.TargetTranslation = Translation;
+            DBook book = new DBook("MRK");
+            Translation.AddBook(book);
+
+            // Set up stage, version info
+            book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idCommunityCheck);
+            book.Version = "B";
+
+            // Compute the filename
+            string sBaseName = book.BaseNameForBackup;
+
+            Assert.AreEqual("41 MRK - Amarasi - Comm-B " + DB.Today, sBaseName);
+
+            // Now parse the filename
+            int nBookNumber = 0;
+            string sBookAbbrev = "";
+            string sLanguageName = "";
+            string sStageAbbrev = "";
+            string sVersion = "";
+            DBook.ParseFileName(sBaseName, ref nBookNumber, ref sBookAbbrev,
+                ref sLanguageName, ref sStageAbbrev, ref sVersion);
+
+            Assert.AreEqual(41, nBookNumber);
+            Assert.AreEqual("MRK", sBookAbbrev);
+            Assert.AreEqual("Amarasi", sLanguageName);
+            Assert.AreEqual("Comm", sStageAbbrev);
+            Assert.AreEqual("B", sVersion);
+        }
+        #endregion
+
+        #region Test: RestoreFromBackup
+        #region Method: string GetSimpleParagraphText(DParagraph p)
+        string GetSimpleParagraphText(DParagraph p)
+        {
+            if (p.Runs.Count == 0)
+                p.AddRun(new DText());
+            DText text = p.Runs[0] as DText;
+
+            if (text.Phrases.Count == 0)
+                text.Phrases.Append(new DPhrase(p.StyleAbbrev, ""));
+            DPhrase phrase = text.Phrases[0] as DPhrase;
+
+            return phrase.Text;
+        }
+        #endregion
+        #region Method: void SetSimpleParagraphText(DParagraph p, string s)
+        void SetSimpleParagraphText(DParagraph p, string s)
+        {
+            if (p.Runs.Count == 0)
+                p.AddRun(new DText());
+            DText text = p.Runs[0] as DText;
+
+            if (text.Phrases.Count == 0)
+                text.Phrases.Append(new DPhrase(p.StyleAbbrev, ""));
+            DPhrase phrase = text.Phrases[0] as DPhrase;
+
+            phrase.Text = s;
+        }
+        #endregion
+        [Test] public void RestoreFromBackup()
+        {
+            // We don't want message dialogs to show up during the tests
+            LocDB.Reset();
+            LocDB.SuppressMessages = true;
+
+            // Original settings
+            string sTextO = "Original";
+
+            // Later, changed settings (that backup will erase)
+            string sTextC = "Changed";
+
+            // Setup a project/translation/book
+            DB.Project = new DProject("Waxhaw");
+            DB.Project.TeamSettings = new DTeamSettings("Waxhaw");
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.InitialCreation(new NullProgress());
+            DTranslation translation = new DTranslation("Waxhaw", "Latin", "Latin");
+            DB.Project.FrontTranslation = translation;
+            DBook book = new DBook("GEN");
+            translation.Books.Append(book);
+
+            // Create an initial book which we will save as a backup
+            Test_DSection.InitializeBook(book, Test_DSection.m_SectionTest1);
+            book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idDraft);
+            book.Version = "A";
+
+            // Add an extra paragraph
+            DParagraph p = new DParagraph();
+            DSection section = book.Sections[0] as DSection;
+            section.Paragraphs.Append(p);
+            p.StyleAbbrev = "q";
+            SetSimpleParagraphText(p, sTextO);
+
+            // Save the book. Then save it again, so that "Original" gets placed
+            // into the ".backup" folder
+            book.DeclareDirty();
+            book.Write(new NullProgress());
+            book.DeclareDirty();
+            book.Write(new NullProgress());
+
+            // Compute the backup path we've just saved to
+            string sBackupPathName = book.Translation.Project.TeamSettings.BackupFolder +
+                    book.BaseNameForBackup + ".bak";
+
+            // Change the book and the pathname and save it as a current version
+            SetSimpleParagraphText(p, sTextC);
+            book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idConsultantCheck);
+            book.Version = "C";
+            book.DeclareDirty();
+            book.Write(new NullProgress());
+
+            // Restore the original
+            DBook.RestoreFromBackup(book, sBackupPathName, new NullProgress());
+
+            // Check for original data, stage, version,.
+            section = book.Sections[0] as DSection;
+            int iParaLast = section.Paragraphs.Count - 1;
+            DParagraph pg = section.Paragraphs[iParaLast] as DParagraph;
+            string sActual = GetSimpleParagraphText(pg);
+            Assert.AreEqual(sTextO, sActual);
+            Assert.AreEqual(BookStages.c_idDraft, book.TranslationStage.ID);
+            Assert.AreEqual("A", book.Version);
+
+            // Reset the LocDB
+            LocDB.Reset();
         }
         #endregion
     }

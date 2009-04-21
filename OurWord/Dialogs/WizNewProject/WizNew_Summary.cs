@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 Jan 2008
  * Purpose: A final opportunity to look over how the New Project will be created.
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -23,7 +23,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizNewProject
@@ -65,19 +65,27 @@ namespace OurWord.Dialogs.WizNewProject
         #region Method: void OnActivate()
         public void OnActivate()
         {
+			// New Language Name
             m_textLanguageName.Text = Wizard.ProjectName;
 
-            m_textAbbreviation.Text = Wizard.TargetAbbreviation;
+			// Source Language Name
+            m_textSourceTranslation.Text = Wizard.FrontName;
+			if (Wizard.CreatingNewFront)
+			{
+				m_textSourceTranslation.Text += 
+					(" " + G.GetLoc_String("CreatingNewFront", "(creating)"));
+			}
 
-            m_textSettingsFolder.Text = Wizard.TargetSettingsFolder;
-
-            m_textSourceTranslation.Text =
-                Wizard.FrontName + ", " +
-                Wizard.FrontAbbreviation + ", " +
-                Wizard.FrontSettingsFolder;
-
-            m_textTeamSettings.Text =
-                Wizard.TargetSettingsFolder;
+			// The Cluster its going into, if there are more than one in the system
+			if (!Wizard.ShowClusterChoicePage)
+			{
+				m_lblCluster.Visible = false;
+				m_textCluster.Visible = false;
+			}
+			else
+			{
+				m_textCluster.Text = Wizard.ChosenCluster;
+			}
         }
         #endregion
         #region Method: bool CanGoToNextPage()
@@ -89,7 +97,7 @@ namespace OurWord.Dialogs.WizNewProject
         #region Method: string PageNavigationTitle()
         public string PageNavigationTitle()
         {
-            return LocDB.GetValue(this, "strSummaryh", "Summary", null);
+            return LocDB.GetValue(this, "strSummary", "Summary", null);
         }
         #endregion
         #region Method: void ShowHelp()

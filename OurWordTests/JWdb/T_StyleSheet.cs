@@ -18,7 +18,7 @@ using System.Windows.Forms;
 using NUnit.Framework;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using JWTools;
 using JWdb;
 #endregion
@@ -33,17 +33,17 @@ namespace OurWordTests.JWdb
         {
             // Unit Test Setup
             JWU.NUnit_Setup();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Test Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Test Project";
         }
         #endregion
 
         #region Test: HuicholHyphenation
         [Test] public void HuicholHyphenation()
         {
-            JWritingSystem ws = G.StyleSheet.FindWritingSystem("Latin");
+            JWritingSystem ws = DB.StyleSheet.FindWritingSystem("Latin");
 
             ws.UseAutomatedHyphenation = true;
             ws.Consonants = "bcdfghjklmnpqrstvwxyz";
@@ -61,7 +61,7 @@ namespace OurWordTests.JWdb
         #region Test: EnglishHyphenation
         [Test] public void EnglishHyphenation()
         {
-            JWritingSystem ws = G.StyleSheet.FindWritingSystem("Latin");
+            JWritingSystem ws = DB.StyleSheet.FindWritingSystem("Latin");
 
             ws.UseAutomatedHyphenation = true;
             ws.Consonants = "bcdfghjklmnpqrstvwxyz";

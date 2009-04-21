@@ -21,7 +21,7 @@ using System.Threading;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Edit
@@ -127,7 +127,7 @@ namespace OurWord.Edit
             if (menuItem == null)
                 return;
 
-            // If there's not action, then we just use the basic menu item
+            // If there's no action, then we just use the basic menu item
             if (null == action)
             {
                 LocDB.Localize(menuItem);
@@ -218,7 +218,7 @@ namespace OurWord.Edit
             for (int i = 0; i < vAction.Length; i++)
                 v[i] = vAction[i];
 
-            // Append the new one
+            // AddParagraph the new one
             v[vAction.Length] = newAction;
 
             // Point to our new array
@@ -270,7 +270,7 @@ namespace OurWord.Edit
         #region Method: void Push(Action) - Insert a new edit action onto the stack
         public void Push(Action action)
         {
-            // Append the new action to the Undo stack
+            // AddParagraph the new action to the Undo stack
             _PushAction(ref m_vUndoStack, action);
 
             // Clear out the Redo Stack
@@ -341,7 +341,7 @@ namespace OurWord.Edit
             // Remove the action from the Undo stack
             Action action = _PopAction(ref m_vUndoStack);
 
-            // Append it to the redo stack
+            // AddParagraph it to the redo stack
             _PushAction(ref m_vRedoStack, action);
 
             // Do the Undo action
@@ -364,7 +364,7 @@ namespace OurWord.Edit
             // Remove the action from the Redo stack
             Action action = _PopAction(ref m_vRedoStack);
 
-            // Append it to the Undo stack
+            // AddParagraph it to the Undo stack
             _PushAction(ref m_vUndoStack, action);
 
             // Do the Redo action
@@ -801,10 +801,10 @@ namespace OurWord.Edit
         {
             // If we're requesting a Section Title.... 
             bool bIsScripture = (p.Owner == p.Section);
-            if (bIsScripture && RequestedStyleAbbrev == DStyleSheet.c_StyleSectionTitle)
+            if (bIsScripture && RequestedStyleAbbrev == DStyleSheet.c_sfmSectionHead)
             {
                 // ...there must not already be a section title
-                if (p.Section.CountParagraphsWithStyle(DStyleSheet.c_StyleSectionTitle) > 0)
+                if (p.Section.CountParagraphsWithStyle(DStyleSheet.c_sfmSectionHead) > 0)
                 {
                     LocDB.Message("msgSectionTitleAlreadyExists",
                         "You cannot change this paragraph to a Section Title, because a Section Title " +
@@ -907,11 +907,10 @@ namespace OurWord.Edit
         {
             get
             {
-                return G.StyleSheet.FindParagraphStyle(OriginalStyleAbbrev).DisplayName;
+                return DB.StyleSheet.FindParagraphStyle(OriginalStyleAbbrev).DisplayName;
             }
         }
         #endregion
-
     }
     #endregion
 
@@ -1458,7 +1457,7 @@ namespace OurWord.Edit
                 selection.DBT.ContentsAsString;
             string sSource = sDBT.Substring(0, selection.DBT_iCharFirst);
 
-            // Append what was just typed
+            // AddParagraph what was just typed
             sSource += chKey;
 
             // Check for a match
@@ -2332,7 +2331,7 @@ namespace OurWord.Edit
         #region OMethod: void ReverseAction()
         protected override void ReverseAction()
         {
-            // Append the removed discussion
+            // AddParagraph the removed discussion
             Note.Discussions.Append(RemovedDiscussion);
             Note.Debug_VerifyIntegrity();
 
@@ -2412,13 +2411,16 @@ namespace OurWord.Edit
             // Return the Main Window to where it was
             BmMainWnd.RestoreWindowSelectionAndScrollPosition();
 
+            // Locate the container that has our note, and expand it
+            var collapsable = (Window as NotesWnd).GetCollapsableFromNote(Note);
+            Debug.Assert(null != collapsable);
+            collapsable.IsCollapsed = false;
+
             // Return the notes window to its previous collapse/expand states
             (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
 
             // Select the new note and bring the focus to it
-            EContainer container = Window.Contents.FindContainerOfDataSource(
-                Note.LastParagraph);
-            container.Select_LastWord_End();
+            collapsable.Select_LastWord_End();
             Window.Focus();
 
             return true;
@@ -2562,6 +2564,123 @@ namespace OurWord.Edit
         #endregion
     }
     #endregion
+	#region CLASS: ChangeClassification
+	class ChangeClassification : BookmarkedAction
+    {
+        #region Attr{g}: TranslatorNote Note
+        TranslatorNote Note
+        {
+            get
+            {
+                Debug.Assert(null != m_Note);
+                return m_Note;
+            }
+        }
+        TranslatorNote m_Note;
+        #endregion
+        #region Attr{g}: ToolStripMenuItem NewClassification
+        ToolStripMenuItem NewClassification
+        {
+            get
+            {
+                Debug.Assert(null != m_itemNewClassification);
+                return m_itemNewClassification;
+            }
+        }
+        ToolStripMenuItem m_itemNewClassification;
+        #endregion
+        #region Attr{g}: ToolStripMenuItem OriginalClassification
+        ToolStripMenuItem OriginalClassification
+        {
+            get
+            {
+                Debug.Assert(null != m_itemOriginalClassification);
+                return m_itemOriginalClassification;
+            }
+        }
+        ToolStripMenuItem m_itemOriginalClassification;
+        #endregion
 
+        #region VAttr{g}: ToolStripDropDownButton ParentMenu
+        ToolStripDropDownButton ParentMenu
+        {
+            get
+            {
+                ToolStripDropDownButton menu = NewClassification.OwnerItem as ToolStripDropDownButton;
+                Debug.Assert(null != menu);
+                return menu;
 
+            }
+        }
+        #endregion
+        #region VAttr{g}: ToolStripMenuItem CurrentCheckedItem
+        ToolStripMenuItem CurrentCheckedItem
+        {
+            get
+            {
+                foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
+                {
+                    if (item.Checked)
+                        return item;
+                }
+                return null;
+            }
+        }
+        #endregion
+
+        #region Constructor(OWWindow, Note, ToolStripMenuItem newPerson)
+        public ChangeClassification(OWWindow window, 
+            TranslatorNote note,
+            ToolStripMenuItem itemNewClassification,
+            string sActionName)
+            : base(window, sActionName)
+        {
+            m_Note = note;
+            m_itemNewClassification = itemNewClassification;
+            m_itemOriginalClassification = CurrentCheckedItem;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Check the new item, uncheck the others
+            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
+                item.Checked = (item == NewClassification);
+
+            // Update the Category attribute
+            Note.AssignedTo = NewClassification.Text;
+
+            // Update the main menu text
+            ParentMenu.Text = NewClassification.Text;
+
+            return true;
+        }
+        #endregion
+        #region Omethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Check the new item, uncheck the others
+            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
+                item.Checked = (item == OriginalClassification);
+
+            // Update the Category attribute
+            Note.AssignedTo = OriginalClassification.Text;
+
+            // Update the main menu text
+            ParentMenu.Text = OriginalClassification.Text;
+        }
+        #endregion
+
+		#region OAttr{g}: string Contents - Places the name we assigned to, into the Undo menu
+		public override string Contents
+		{
+			get
+			{
+				return NewClassification.Text;
+			}
+		}
+		#endregion
+	}
+	#endregion
 }

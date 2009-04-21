@@ -18,7 +18,7 @@ using System.Timers;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.View;
 using OurWord.Edit;
 #endregion
@@ -44,7 +44,6 @@ namespace OurWord.Edit
             TabPages.Clear();
 
             m_NotesPane = null;
-            m_MergePane = null;
             m_TranslationsWindow = null;
             m_DictionaryPane = null;
         }
@@ -84,8 +83,6 @@ namespace OurWord.Edit
                 wndMain.RegisterSecondaryWindow(NotesPane.WndNotes);
             if (HasTranslationsWindow)
                 wndMain.RegisterSecondaryWindow(TranslationsWindow);
-            if (HasMergePane)
-                wndMain.RegisterSecondaryWindow(MergePane.WndMerge);
         }
         #endregion
         #region Method: void SetChildrenSizes()
@@ -96,9 +93,6 @@ namespace OurWord.Edit
 
             if (HasTranslationsWindow)
                 TranslationsWindow.SetSize(DisplayRectangle.Width, DisplayRectangle.Height);
-
-            if (HasMergePane)
-                MergePane.SetSize(DisplayRectangle.Size);
 
             if (HasDictionaryPane)
                 DictionaryPane.SetSize(DisplayRectangle.Size);
@@ -122,8 +116,6 @@ namespace OurWord.Edit
                     return NotesPane.WndNotes;
                 if (HasTranslationsWindow && TranslationsWindow.Focused)
                     return TranslationsWindow;
-                if (HasMergePane && MergePane.WndMerge.Focused)
-                    return MergePane.WndMerge;
                 return null;
             }
         }
@@ -233,41 +225,6 @@ namespace OurWord.Edit
             {
                 return (m_TranslationsWindow != null);
             }
-        }
-        #endregion
-
-        // Merge Window ----------------------------------------------------------------------
-        #region Attr{g}: MergePane MergePane
-        public MergePane MergePane
-        {
-            get
-            {
-                Debug.Assert(null != m_MergePane);
-                return m_MergePane;
-            }
-        }
-        MergePane m_MergePane = null;
-        #endregion
-        #region Method: void CreateMergePane()
-        public void CreateMergePane()
-        {
-            m_MergePane = new MergePane();
-            CreateContainerTabPage(m_MergePane, "Merge", "Merge");
-        }
-        #endregion
-        #region Attr{g}: bool HasMergePane
-        public bool HasMergePane
-        {
-            get
-            {
-                return (m_MergePane != null);
-            }
-        }
-        #endregion
-        #region Method: void ActivateMergePane()
-        public void ActivateMergePane()
-        {
-            ActivatePane(MergePane);
         }
         #endregion
 
@@ -476,8 +433,9 @@ namespace OurWord.Edit
         DRun[] _GetSynchronizedSiblingText(DTranslation TSibling, DBasicText dbt)
         {			
             // Get the book (load it if necessary)
-            DBook BSibling = G.Project.Nav.GetLoadedBook(TSibling, 
-                G.Project.SFront.Book.BookAbbrev);
+            DBook BSibling = DB.Project.Nav.GetLoadedBook(TSibling, 
+                DB.Project.SFront.Book.BookAbbrev,
+                G.CreateProgressIndicator());
             if (null == BSibling)
                 return null;
 
@@ -487,7 +445,7 @@ namespace OurWord.Edit
 
             // See if, for the section we are interested in, the paragraphs match up
             // with the front.
-            DSection SSibling = G.Project.Nav.GetSection(TSibling);
+            DSection SSibling = DB.Project.Nav.GetSection(TSibling);
             if (null == SSibling)
                 return null;
             if (!SSibling.AllParagraphsMatchFront)
@@ -531,8 +489,8 @@ namespace OurWord.Edit
             DParagraph pOwner = BasicText.Owner as DParagraph;
 
             // Get the reference book, loading it if necessary
-            string sBookAbbrev = G.Project.Nav.BookAbbrev;
-            DBook book = G.Project.Nav.GetLoadedBook(t, sBookAbbrev);
+            string sBookAbbrev = DB.Project.Nav.BookAbbrev;
+            DBook book = DB.Project.Nav.GetLoadedBook(t, sBookAbbrev, G.CreateProgressIndicator());
             if (null == book)
                 return null;
 
@@ -585,7 +543,7 @@ namespace OurWord.Edit
             if (BasicText == null)
                 return;
 
-            foreach (DTranslation t in G.Project.OtherTranslations)
+            foreach (DTranslation t in DB.Project.OtherTranslations)
             {
                 // First attempt as a synchronized sibling, as this gives a much tighter
                 // result. If that fails, then attempt as any old Reference Language
@@ -601,7 +559,7 @@ namespace OurWord.Edit
                 JWritingSystem ws = t.WritingSystemVernacular;
 
                 // The style for Ref Translation paragraphs
-                JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyleOrNormal(
+                JParagraphStyle PStyle = DB.StyleSheet.FindParagraphStyleOrNormal(
                     DStyleSheet.c_StyleReferenceTranslation);
 
                 // Create and add a OWParagraph for the translation paragraph

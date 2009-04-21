@@ -6,7 +6,7 @@
  * Purpose: Provides the About dialog for the app. This dialog gives a summary about the app,
  *            contact info for The Seed Company, copyright notice; and permaps most importantly
  *            the version information.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -24,7 +24,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord
@@ -178,7 +178,7 @@ namespace OurWord
             this.m_lblCopyright.Name = "m_lblCopyright";
             this.m_lblCopyright.Size = new System.Drawing.Size(288, 24);
             this.m_lblCopyright.TabIndex = 8;
-            this.m_lblCopyright.Text = "Copyright © 2004-08 John Wimbish. All rights reserved.";
+            this.m_lblCopyright.Text = "Copyright © 2004-09 John Wimbish. All rights reserved.";
             // 
             // m_OurWordIcon
             // 
@@ -249,93 +249,5 @@ namespace OurWord
     }
     #endregion
 
-    #region CLASS: HelpSystem
-    public class HelpSystem : JW_Help
-	{
-        // Register the help topics in the chm file
-		#region Method: Initialize()
 
-        #region SMethod: void InitTopic_Strategy(Topic id, string sHtmlBase)
-        static void InitTopic_Strategy(Topic id, string sHtmlBase)
-        {
-            JW_Help.AddTopic((int)id, "Strategies\\" + sHtmlBase + ".html");
-        }
-        #endregion
-        #region SMethod: void InitTopic_ImportBook(Topic id, string sHtmlBase)
-        static void InitTopic_ImportBook(Topic id, string sHtmlBase)
-        {
-            JW_Help.AddTopic((int)id, "GettingStarted\\ImportBook\\" + sHtmlBase + ".html");
-        }
-        #endregion
-
-        static public void Initialize()
-		{
-			JW_Help.Initialize(OurWordMain.App, "OurWordMain.chm");
-
-            // Misc Topics
-            JW_Help.AddTopic((int)Topic.kTableOfContents, "Index.html");
-            JW_Help.AddTopic((int)Topic.kNewBook, "GettingStarted\\NewBook\\CreateAnEmptyBook.html");
-
-            // Strategies topics
-            InitTopic_Strategy(Topic.kAutoBackup,            "AutoBackup\\AutoBackup");
-            InitTopic_Strategy(Topic.kPrinting,              "Printing");
-            InitTopic_Strategy(Topic.kTranslationStages,     "TranslationStages");
-            InitTopic_Strategy(Topic.kReferenceTranslations, "ReferencingOtherTranslations");
-            InitTopic_Strategy(Topic.kWritingSystems,        "WritingSystems");
-            InitTopic_Strategy(Topic.kStyleSheet,            "Stylesheet");
-            InitTopic_Strategy(Topic.kFilters,               "Filters");
-            InitTopic_Strategy(Topic.kTranslationNotes,      "TranslationNotes");
-
-            // Importing a book / associated errors
-            InitTopic_ImportBook(Topic.kImportBook, "ImportBook");
-            InitTopic_ImportBook(Topic.kErrMissingParagraphMarker, "Err_MissingParagraphMarker");
-            InitTopic_ImportBook(Topic.kErrMissingVerseNumber, "Err_MissingVerseNumber");
-            InitTopic_ImportBook(Topic.kErrMissingParagraphMarkerForCF, "Err_MissingParagraphMarkerForCF");
-            InitTopic_ImportBook(Topic.kErrChapterNotInParagraph, "Err_ChapterNotInParagraph");
-            InitTopic_ImportBook(Topic.kErrBadChapterNo, "Err_BadChapterNo");
-            InitTopic_ImportBook(Topic.kErrMissingParagraphMarkerForNote, "Err_MissingParagraphMarkerForNote");
-            InitTopic_ImportBook(Topic.kErrNoVerseInSection, "Err_NoVerseInSection");
-            InitTopic_ImportBook(Topic.kErrStructureMismatch, "Err_StructureMismatch");
-            InitTopic_ImportBook(Topic.kErrStructureSectionMiscount, "Err_StructureSectionMiscount");
-		}
-		#endregion
-
-		// Topics ----------------------------------------------------------------------------
-		#region enum Topic ID's
-		public enum Topic
-		{
-            kTableOfContents = 0,
-			kAutoBackup,
-            kPrinting,
-			kTranslationStages,
-            kReferenceTranslations,
-			kWritingSystems,
-            kStyleSheet,
-            kFilters,
-            kTranslationNotes,
-
-            kNewBook,
-
-            kImportBook,
-			kErrStructureSectionMiscount,
-			kErrStructureMismatch,
-			kErrMissingParagraphMarkerForNote,
-			kErrChapterNotInParagraph,
-			kErrBadChapterNo,
-			kErrMissingParagraphMarker,
-			kErrMissingVerseNumber,
-			kErrMissingParagraphMarkerForCF,
-			kErrNoVerseInSection,
-
-            kLast
-		}
-		#endregion
-		#region Method: void ShowTopic(Topic nID)
-		static public void ShowTopic(Topic nID)
-		{
-			JW_Help.ShowTopic((int)nID);
-		}
-		#endregion
-    }
-    #endregion
 }

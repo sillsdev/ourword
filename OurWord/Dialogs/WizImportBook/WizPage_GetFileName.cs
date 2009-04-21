@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 1 Feb 2007
  * Purpose: First page of wizard, user enters the file name
- * Legal:   Copyright (c) 2003-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -22,7 +22,7 @@ using System.IO;
 using Microsoft.Win32;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizImportBook
@@ -41,13 +41,13 @@ namespace OurWord.Dialogs.WizImportBook
         }
         string m_sPathName = "";
         #endregion
-        #region VAttr{g}: JW_Wizard Wizard - the owning wizard
-        JW_Wizard Wizard
+		#region VAttr{g}: WizImportBook Wizard - the owning wizard
+		WizImportBook Wizard
         {
             get
             {
-                Debug.Assert(null != Parent as JW_Wizard);
-                return Parent as JW_Wizard;
+				Debug.Assert(null != Parent as WizImportBook);
+				return Parent as WizImportBook;
             }
         }
         #endregion
@@ -178,12 +178,28 @@ namespace OurWord.Dialogs.WizImportBook
                 return false;
             }
 
-            // Read it in and look see that it is either Paratext or Toolbox; and check
-            // for any unknown markers.
+			// Read in the file; the rest of what we do is based on internals
             ScriptureDB DB = new ScriptureDB();
             string s = sPathName;
-            DB.Read(ref s);
+			TextReader tr = JW_Util.GetTextReader(ref s, "");
+			DB.Read(tr);
+			tr.Close();
             DB.TransformIn();
+
+			// Determine the book from the ID line
+			Wizard.BookAbbrev = DB.GetAbbrevFromIdLine();
+			int iBook = DBook.FindBookAbbrevIndex(Wizard.BookAbbrev);
+			if (-1 == iBook)
+			{
+				m_labelFileStats.Text = LocDB.GetValue(this, "strUnrecognizedBook",
+					"The file either does not have an \\id line, or does not have a " +
+					"recognized 3-Letter book abbreviation in it. OurWord expects " +
+					"something like \"\\id LUK\"", null);
+				return false;
+			}
+			Wizard.BookName = DBook.GetBookName(iBook, Wizard.Translation);
+
+            // See that it is either Paratext or Toolbox; and check  for any unknown markers.
             ArrayList aUnknownMarkers = DB.GetUnnownMarkersInventory();
             string sUnrecognizedMarkers = "";
             foreach (string sMkr in aUnknownMarkers)

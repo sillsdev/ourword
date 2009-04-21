@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 01 Feb 2007
  * Purpose: Wizard superclass
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -290,8 +290,13 @@ namespace JWTools
         }
         Color m_NavigationColor = Color.Black;
         #endregion
+		#region VirtMethod: void OnWizardFinished()
+		protected virtual void OnWizardFinished()
+		{
+		}
+		#endregion
 
-        // Command Handlers ------------------------------------------------------------------
+		// Command Handlers ------------------------------------------------------------------
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
@@ -356,7 +361,7 @@ namespace JWTools
         #region Cmd: cmdFinish
         private void cmdFinish(object sender, EventArgs e)
         {
-
+			OnWizardFinished();
         }
         #endregion
         #region Cmd: cmdActivated

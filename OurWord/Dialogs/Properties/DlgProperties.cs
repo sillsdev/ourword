@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 17 Sep 2007
  * Purpose: Edit the settings that an advisor will typically handle.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -26,18 +26,30 @@ using System.Threading;
 using JWTools;
 using JWdb;
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
+using OurWord.Utilities;
 #endregion
+
+// TODO: Check over Localization of pages, especially, e.g., "Front: Kupang"
 
 namespace OurWord.Dialogs
 {
     public partial class DialogProperties : Form
     {
-        // Controls --------------------------------------------------------------------------
-        #region Attr{s}: string NavTitleText
-        string NavTitleText
+		// Controls --------------------------------------------------------------------------
+		#region VAttr{g}: Label NavTitle
+		Label NavTitle
+		{
+			get
+			{
+				return m_NavTitle;
+			}
+		}
+		#endregion
+		#region VAttr{s}: string NavTitleText
+		string NavTitleText
         {
             set
             {
@@ -45,28 +57,189 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-        #region Attr{g}: TabControl TC
-        TabControl TC
+        #region VAttr{g}: GroupedTasksList NavList
+        GroupedTasksList NavList
         {
             get
             {
-                return m_TabControl;
+                Debug.Assert(null != m_NavTasks);
+                return m_NavTasks;
             }
         }
         #endregion
 
-        // Scaffolding -----------------------------------------------------------------------
+        // Pages -----------------------------------------------------------------------------
+        #region Attr{g}: List<DlgPropertySheet> Pages
+        List<DlgPropertySheet> Pages
+        {
+            get
+            {
+                Debug.Assert(null != m_Pages);
+                return m_Pages;
+            }
+        }
+        List<DlgPropertySheet> m_Pages;
+        #endregion
+		#region Attr{g/s}: DlgPropertySheet CurrentPage
+		DlgPropertySheet CurrentPage
+		{
+			get
+			{
+				return m_CurrentPage;
+			}
+			set
+			{
+				m_CurrentPage = value;
+			}
+		}
+		DlgPropertySheet m_CurrentPage;
+		#endregion
+        #region Method: bool HarvestChangesFromCurrentPage()
+        public bool HarvestChangesFromCurrentPage()
+        {
+            if (null != CurrentPage)
+                return CurrentPage.HarvestChanges();
+            return true;
+        }
+        #endregion
+        #region Method: void UpdateNavigationControls()
+        public void UpdateNavigationControls()
+        {
+            string sGroupTitle = "";
+            GroupedTasks gt = NavList.LastSelectedGroup;
+            if (null != gt)
+                sGroupTitle += (gt.GroupName + " - ");
+
+            NavTitleText = sGroupTitle + CurrentPage.Title;
+
+            if (null != NavList.LastSelectedButton)
+                NavList.LastSelectedButton.Text = "  " + CurrentPage.Title;
+        }
+        #endregion
+        #region Method: void SetActivePage(string sID)
+        public void SetActivePage(string sID)
+		{
+            // Locate the page we want to make current
+            DlgPropertySheet pageNew = null;
+            foreach (DlgPropertySheet page in Pages)
+            {
+                if (page.ID == sID)
+                    pageNew = page;
+            }
+            if (null == pageNew)
+                return;
+
+            // Turn off the old one
+            if (null != CurrentPage)
+            {
+                CurrentPage.Visible = false;
+                Controls.Remove(CurrentPage);
+            }
+
+            // Display the new page
+            int nMargin = NavTitle.Left - NavList.Right;
+            CurrentPage = pageNew;
+            CurrentPage.Left = NavTitle.Left;
+            CurrentPage.Top = NavTitle.Bottom + nMargin;
+            CurrentPage.Width = NavTitle.Width;
+            CurrentPage.Height = m_btnOK.Top - NavTitle.Bottom - nMargin * 2;
+            CurrentPage.Visible = true;
+            CurrentPage.Anchor = AnchorStyles.Bottom | AnchorStyles.Top |
+                AnchorStyles.Left | AnchorStyles.Right;
+            Controls.Add(CurrentPage);
+            CurrentPage.Focus();
+
+            // Update the Title Text
+            UpdateNavigationControls();
+            NavList.SelectButton(CurrentPage.ID);
+		}
+		#endregion
+        #region Method: void AddPage(GroupedTasks gt, page, iImage)
+        void AddPage(GroupedTasks gt, DlgPropertySheet page, int iImage)
+        {
+            Pages.Add(page);
+            gt.AddTask(page.Title, page.ID, iImage);
+        }
+        #endregion
+        #region Method: void InitNavigation(string sIdActivePage)
+        public void InitNavigation(string sIdActivePage)
+        {
+            // Clear out anything that is already there (makes this re-entrant); since setting
+            // up features, etc., can change what options are available
+            m_Pages = new List<DlgPropertySheet>();
+            NavList.ClearGroups();
+
+            // Translations
+            GroupedTasks gtTranslations = NavList.AddGroup("Translations");
+
+            if (null == DB.TargetTranslation)
+                AddPage(gtTranslations, new Page_SetupTarget(this), c_iImageDefault);
+            else
+                AddPage(gtTranslations, new Page_Translation(this, DB.TargetTranslation, false), c_iImageDefault);
+
+            if (null == DB.FrontTranslation)
+                AddPage(gtTranslations, new Page_SetupFront(this), c_iImageDefault);
+            else
+                AddPage(gtTranslations, new Page_Translation(this, DB.FrontTranslation, true), c_iImageDefault);
+
+            // Reference Translations
+            GroupedTasks gtReferenceTranslations = NavList.AddGroup("Reference");
+            AddPage(gtReferenceTranslations, new Page_OtherTranslations(this), c_iImageDefault);
+            foreach (DTranslation t in DB.Project.OtherTranslations)
+                AddPage(gtReferenceTranslations, new Page_Translation(this, t, true), c_iImageDefault);
+
+            // Options
+            GroupedTasks gtOptions = NavList.AddGroup("Options");
+            AddPage(gtOptions, new Page_Options(this), c_iImageOptions);
+            AddPage(gtOptions, new Page_Notes(this), c_iImageNotes);
+            AddPage(gtOptions, new Page_Collaboration(this), c_iImageCollaboration);
+            AddPage(gtOptions, new Page_Cluster(this), c_iImageClusters);
+            AddPage(gtOptions, new Page_StyleSheet(this), c_iImageStyleSheet);
+            AddPage(gtOptions, new Page_AdvancedPrintOptions(this), c_iImageAdvancedPrint);
+            AddPage(gtOptions, new Page_TranslationStages(this), c_iImageDefault);
+
+            // Writing Systems (start collapsed, as this is a less-frequent group)
+            GroupedTasks gtWritingSystems = NavList.AddGroup(Strings.PropDlgTab_WritingSystems);
+            gtWritingSystems.Expanded = false;
+            AddPage(gtWritingSystems, new Page_AddWritingSystem(this), c_iImageAddWritingSystem);
+            foreach (JWritingSystem ws in DB.StyleSheet.WritingSystems)
+                AddPage(gtWritingSystems, new Page_WritingSystems(this, ws), c_iImageWritingSystem);
+
+            // Go to the requested page
+            if (!string.IsNullOrEmpty(sIdActivePage))
+                SetActivePage(sIdActivePage);
+
+            // Make the nav list show up correctly
+            NavList.cmdLayout(null, null);
+        }
+        #endregion
+
+        // Images ----------------------------------------------------------------------------
+        const int c_iImageDefault = 0;
+        const int c_iImageAdvancedPrint = 1;
+        const int c_iImageNotes = 2;
+        const int c_iImageOptions = 3;
+        const int c_iImageWritingSystem = 4;
+        const int c_iImageAddWritingSystem = 5;
+        const int c_iImageStyleSheet = 6;
+        const int c_iImageCollaboration = 7;
+        const int c_iImageClusters = 8;
+
+		// Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public DialogProperties()
         {
             InitializeComponent();
+
+            // Set up the Tasks list
+            NavList.OnItemSelected = new GroupedTasksList.ItemSelectedDel(SetActivePage);
         }
         #endregion
         #region Method: void SetTitleBarText()
         public void SetTitleBarText()
         {
-            string sLanguageName = (null != G.Project.TargetTranslation) ?
-                G.Project.TargetTranslation.DisplayName : "";
+            string sLanguageName = (null != DB.Project.TargetTranslation) ?
+                DB.Project.TargetTranslation.DisplayName : "";
 
             if (!string.IsNullOrEmpty(sLanguageName))
             {
@@ -81,62 +254,29 @@ namespace OurWord.Dialogs
         }
         #endregion
 
-        // Navigation Buttons (left-hand side) -----------------------------------------------
-        #region Navigation Constants
-        public const string c_navEssentials = "Essentials";
-        public const string c_navOptions = "Options";
-        public const string c_navTranslations = "Translations";
-        public const string c_navTeamSettings = "TeamSettings";
-        #endregion
-        #region Cmd: cmdNavEssentials
-        private void cmdNavEssentials(object sender, EventArgs e)
-        {
-            string sActiveTag = (null == G.Project.TargetTranslation) ?
-                c_tagEssentialsFront : c_tagEssentialsTarget;
-
-            SetupTabControl(c_navEssentials);
-            ActivatePage(sActiveTag);
-
-            NavTitleText = m_btnNavEssentials.Text;
-        }
-        #endregion
-        #region Cmd: cmdNavOptions
-        private void cmdNavOptions(object sender, EventArgs e)
-        {
-            NavTitleText = m_btnNavOptions.Text;
-            SetupTabControl(c_navOptions);
-            ActivatePage(c_tagOptions);
-        }
-        #endregion
-        #region Cmd: cmdNavOtherTranslations
-        private void cmdNavOtherTranslations(object sender, EventArgs e)
-        {
-            NavTitleText = m_btnNavTranslations.Text;
-            SetupTabControl(c_navTranslations);
-            ActivatePage(c_tagOtherTranslations);
-        }
-        #endregion
-        #region Cmd: cmdNavTeamSettings
-        private void cmdNavTeamSettings(object sender, EventArgs e)
-        {
-            NavTitleText = m_btnNavTeamSettings.Text;
-            SetupTabControl(c_navTeamSettings);
-            ActivatePage(c_tagTeamSettings);
-        }
-        #endregion
-
         // Command Handlers ------------------------------------------------------------------
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
-            cmdNavEssentials(null, null);
-
             // Localization
-            Control[] vExclude = { m_NavTitle };
+            Control[] vExclude = { m_NavTitle, m_NavTasks };
             LocDB.Localize(this, vExclude);
 
             // Set the TitleBar after the localization, as we override it
             SetTitleBarText();
+
+			// The first page we'll go to
+			string sInitialPageID = Page_SetupFront.c_sID;
+			if (DB.FrontTranslation == null)
+				sInitialPageID = Page_SetupFront.c_sID;
+			else if (DB.TargetTranslation == null)
+				sInitialPageID = Page_SetupTarget.c_sID;
+			else
+				sInitialPageID = Page_Translation.ComputeID(DB.TargetTranslation.DisplayName);
+
+            // Set up the pages
+            NavList.Images = m_Images;
+            InitNavigation(sInitialPageID);
         }
         #endregion
         #region Cmd: cmdFormClosing
@@ -148,7 +288,7 @@ namespace OurWord.Dialogs
                 return;
 
             // Save the active pages's data
-            if (!HarvestChangesFromCurrentSheet())
+            if (!HarvestChangesFromCurrentPage())
             {
                 e.Cancel = true;
                 return;
@@ -160,12 +300,12 @@ namespace OurWord.Dialogs
 
             // The project should have a Front Translation. If not, we'll allow the user to
             // exit, but we will at least have warned him.
-            if (null == G.Project.FrontTranslation)
+            if (null == DB.Project.FrontTranslation)
             {
                 bCanCloseAnywayWarningIssued = true;
                 if (Messages.ProjectHasNoFront())
                 {
-                    ActivatePage(c_tagEssentialsFront);
+					SetActivePage(Page_SetupFront.c_sID);
                     e.Cancel = true;
                     return;
                 }
@@ -173,24 +313,24 @@ namespace OurWord.Dialogs
 
             // The project should have a Target Translation. If not, we'll allow the user to
             // exit, but we will at least have warned him.
-            if (!bCanCloseAnywayWarningIssued && null == G.Project.TargetTranslation)
+            if (!bCanCloseAnywayWarningIssued && null == DB.Project.TargetTranslation)
             {
                 if (Messages.ProjectHasNoTarget())
                 {
-                    ActivatePage(c_tagEssentialsTarget);
+					SetActivePage(Page_SetupTarget.c_sID);
                     e.Cancel = true;
                     return;
                 }
             }
 
             // Make sure the project has a reasonable name
-            if (null != G.Project.TargetTranslation &&
-                G.Project.TargetTranslation.DisplayName.Length > 0)
+            if (null != DB.Project.TargetTranslation &&
+                DB.Project.TargetTranslation.DisplayName.Length > 0)
             {
-                G.Project.DisplayName = G.Project.TargetTranslation.DisplayName;
+                DB.Project.DisplayName = DB.Project.TargetTranslation.DisplayName;
             }
             else
-                G.Project.DisplayName = "My Project";
+                DB.Project.DisplayName = "My Project";
 
             // Go ahead and close
             return;
@@ -199,211 +339,11 @@ namespace OurWord.Dialogs
         #region Cmd: cmdHelp
         private void cmdHelp(object sender, EventArgs e)
         {
-            CurrentSheet.ShowHelp();
+            CurrentPage.ShowHelp();
         }
         #endregion
 
-        // Tab Pages -------------------------------------------------------------------------
-        #region Page Constants
-        public const string c_tagEssentialsFront   = "Essentials-Front";
-        public const string c_tagEssentialsTarget  = "Essentials-Target";
-        const string c_tagOptions           = "Options";
-        const string c_tagNotes             = "Notes";
-        const string c_tagOtherTranslations = "OtherTranslations";
-        const string c_tagTeamSettings      = "TS";
-        const string c_tagWritingSystems    = "TS-WritingSystems";
-        const string c_tagStyleSheet        = "TS-StyleSheet";
-        const string c_tagAdvancedPrintOptions = "TS-AdvancedPrintOptions";
-        const string c_tagTranslationStages = "TS-TranslationStages";
-        #endregion
-        #region Method: string GetNewTagForOtherTranslation()
-        public string GetNewTagForOtherTranslation()
-        {
-            s_OtherTranslationTag++;
-            return c_tagOtherTranslations + s_OtherTranslationTag.ToString();
-        }
-        static long s_OtherTranslationTag = 0;
-        #endregion
-        #region Method: void AddPage(string sTag, DlgPropertySheet)
-        void AddPage(string sTag, DlgPropertySheet sheet)
-        {
-            // Create the TabPage and add it to the TabControl
-            TabPage page = new TabPage();
-            page.Tag = sTag;
-            TC.TabPages.Add(page);
-
-            // Retrieve the name of the tab from the sheet
-            page.Text = sheet.TabText; 
-
-            // Place the Sheet into the TabPage
-            page.Controls.Add(sheet);
-
-            // TODO: Localization
-        }
-        #endregion
-        #region Method: void ActivatePage(string sTag)
-        public void ActivatePage(string sTag)
-        {
-            foreach (TabPage page in TC.TabPages)
-            {
-                if ((string)page.Tag == sTag)
-                {
-                    TC.SelectTab(page);
-                    break;
-                }
-            }
-        }
-        #endregion
-        #region Method: void ActivatePage(DTranslation t)
-        public void ActivatePage(DTranslation t)
-        {
-            if (t == G.Project.FrontTranslation)
-            {
-                SetupTabControl(c_navEssentials);
-                ActivatePage(c_tagEssentialsFront);
-            }
-            else if (t == G.Project.TargetTranslation)
-            {
-                SetupTabControl(c_navEssentials);
-                ActivatePage(c_tagEssentialsTarget);
-            }
-            else if (-1 != G.Project.OtherTranslations.FindObj(t))
-            {
-                SetupTabControl(c_navTranslations);
-                foreach (TabPage page in TC.TabPages)
-                {
-                    if ((string)page.Text == t.DisplayName)
-                        TC.SelectTab(page);
-                }
-            }
-        }
-                #endregion
-        #region Attr{g}: DlgPropertySheet CurrentSheet
-        DlgPropertySheet CurrentSheet
-        {
-            get
-            {
-                TabPage pageCurrent = TC.SelectedTab;
-                if (null == pageCurrent)
-                    return null;
-
-                foreach (Control ctrl in pageCurrent.Controls)
-                {
-                    DlgPropertySheet sheet = ctrl as DlgPropertySheet;
-                    if (null != sheet)
-                        return sheet;
-                }
-
-                return null;
-            }
-        }
-        #endregion
-        #region Method: bool HarvestChangesFromCurrentSheet()
-        public bool HarvestChangesFromCurrentSheet()
-        {
-            if (null != CurrentSheet)
-                return CurrentSheet.HarvestChanges();
-            return true;
-        }
-        #endregion
-        #region Method: void SetupTabControl(sActiveNav)
-        public void SetupTabControl(string sActiveNav)
-        {
-            // Harvest Changes from the current page (if any). Abort if we fail;
-            // it means the user needs to fix something
-            if (!HarvestChangesFromCurrentSheet())
-                return;
-
-            // Clear out pages so we can start over
-            TC.TabPages.Clear();
-
-            // Essentials
-            if (sActiveNav == c_navEssentials)
-            {
-                // Front Translation
-                AddPage( c_tagEssentialsFront, (null == G.FTranslation) ?
-                    new Page_SetupFront(this) as DlgPropertySheet :
-                    new Page_Translation(this, G.FTranslation, true) as DlgPropertySheet);
-
-                // Target Translation
-                AddPage(c_tagEssentialsTarget, (null == G.TTranslation) ?
-                    new Page_SetupTarget(this) as DlgPropertySheet :
-                    new Page_Translation(this, G.TTranslation, false) as DlgPropertySheet);
-            }
-
-            // Other Translations
-            if (sActiveNav == c_navTranslations)
-            {
-                // Other Translations (General Page)
-                AddPage(c_tagOtherTranslations,
-                    new Page_OtherTranslations(this));
-
-                foreach (DTranslation t in G.Project.OtherTranslations)
-                {
-                    AddPage(GetNewTagForOtherTranslation(),
-                        new Page_Translation(this, t, true));
-                }
-            }
-
-            // Options
-            if (sActiveNav == c_navOptions)
-            {
-                // General Options
-                AddPage(c_tagOptions,
-                    new Page_Options(this));
-
-                // Notes
-                if (OurWordMain.Features.TranslatorNotes)
-                {
-                    AddPage(c_tagNotes,
-                        new Page_Notes(this));
-                }
-            }
-
-            // TeamSettings
-            if (sActiveNav == c_navTeamSettings)
-            {
-                // General Page
-                AddPage(c_tagTeamSettings,
-                    new Page_TeamSettings(this));
-
-                // StyleSheet Page
-                AddPage(c_tagStyleSheet,
-                    new Page_StyleSheet(this));
-
-                // Writing Systems Page
-                AddPage(c_tagWritingSystems,
-                    new Page_WritingSystems(this));
-
-                // Advanced Print Options Page
-                AddPage(c_tagAdvancedPrintOptions,
-                    new Page_AdvancedPrintOptions(this));
-
-                // Translation Stages
-                AddPage(c_tagTranslationStages, 
-                    new Page_TranslationStages(this));
-            }
-
-            // By Default, we activate the first page; we can call ActivatePage
-            // in order to activate a different one.
-            TC.SelectTab(0);
-        }
-        #endregion
-        #region Method: void UpdateActiveTabText()
-        public void UpdateActiveTabText()
-        {
-            TabPage pageCurrent = TC.SelectedTab;
-            if (null == pageCurrent)
-                return;
-
-            DlgPropertySheet sheet = CurrentSheet;
-            if (null == sheet)
-                return;
-
-            pageCurrent.Text = sheet.TabText;
-        }
-        #endregion
-    }
+	}
 
     #region CLASS: DlgPropertySheet - Provides stubs for page behavior
     public class DlgPropertySheet : System.Windows.Forms.UserControl
@@ -421,16 +361,30 @@ namespace OurWord.Dialogs
         DialogProperties m_ParentDlg;
         #endregion
 
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
+		// Scaffolding -----------------------------------------------------------------------
+        #region Constructor(parent)
         public DlgPropertySheet(DialogProperties _ParentDlg)
+			: this()
         {
             m_ParentDlg = _ParentDlg;
         }
         #endregion
-        public DlgPropertySheet() { }
+		#region Constructor() - for VS 2008
+		public DlgPropertySheet() 
+        { 
+        }
+		#endregion
 
-        // Stubs: Subclass should override
+		// Stubs: Subclass should override
+		#region Attr{g}: string ID - a unique ID for identifying this page
+		public virtual string ID
+		{
+			get
+			{
+				return "";
+			}
+		}
+		#endregion
         #region Method: virtual bool HarvestChanges() - return T if everything is OK
         public virtual bool HarvestChanges()
         {
@@ -443,8 +397,8 @@ namespace OurWord.Dialogs
             HelpSystem.ShowDefaultTopic();
         }
         #endregion
-        #region Attr{g}: virtual string TabText
-        public virtual string TabText
+        #region Attr{g}: virtual string Title
+        public virtual string Title
         {
             get
             {

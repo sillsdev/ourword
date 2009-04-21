@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 14 May 2004
  * Purpose: Allows an import file's encoding to be specified (and thus converted to UTF8)
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 5 Nov 2008
  * Purpose: Tests the T_JObjectOnDemand implementation
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -41,9 +41,6 @@ namespace OurWordTests.JWdb
                 // Display Name 
                 DisplayName = sDisplayName;
 
-                // Path name for the test
-                AbsolutePathName = JWU.NUnit_TestFilePathName;
-
                 // Owning sequence
                 m_os = new JOwnSeq<JCharacterStyle>("os", this);
                 m_os.Append(new JCharacterStyle("v", "Verse Number"));
@@ -56,8 +53,18 @@ namespace OurWordTests.JWdb
                 // Reference Atomic
                 m_ref = new JRef<JCharacterStyle>("ref", this);
                 m_ref.Value = m_own.Value as JCharacterStyle;
-            }
-        }
+			}
+
+			#region OAttr{g}: string StoragePath
+			public override string StoragePath
+			{
+				get
+				{
+					return JWU.NUnit_TestFilePathName;
+				}
+			}
+			#endregion
+		}
         #endregion
 
         #region Setup
@@ -79,12 +86,12 @@ namespace OurWordTests.JWdb
             // Write it and Release it; check that it is indeed released
             Assert.IsTrue(obj.Loaded);
             Assert.IsNotNull(obj.m_own.Value);
-            obj.Unload();
+            obj.Unload(new NullProgress());
             Assert.IsNull(obj.m_own.Value);
             Assert.IsFalse(obj.Loaded);
 
             // Load the object
-            obj.Load();
+            obj.Load(new NullProgress());
 
             // Check that it is loaded
             Assert.IsNotNull(obj.m_own.Value);
@@ -149,7 +156,7 @@ namespace OurWordTests.JWdb
             obj.m_os.Clear();
             Assert.IsTrue(obj.IsDirty);
 
-            // JSeq: Append --> Dirty is set to true
+            // JSeq: AddParagraph --> Dirty is set to true
             obj = new TObjLOD("OwnAtomicTest");
             obj.IsDirty = false;
             obj.m_os.Append(new JCharacterStyle("fn", "Footnote"));

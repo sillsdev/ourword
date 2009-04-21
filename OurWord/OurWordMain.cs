@@ -24,8 +24,8 @@ using System.Threading;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 
-using OurWord.DataModel;
 using OurWord.Edit;
 using OurWord.View;
 using OurWord.Dialogs;
@@ -33,33 +33,18 @@ using OurWord.Dialogs;
 
 namespace OurWord
 {
-	public class OurWordMain : System.Windows.Forms.Form, IJW_FileMenuIO
+	public class OurWordMain : System.Windows.Forms.Form
 		// Main application window and top-level message routing
 	{
 		// Static Objects & Globals ----------------------------------------------------------
-		#region Attr{g/s}: DProject Project - the current project we're editing / displaying / etc.
-		static public DProject Project 
-		{ 
-			get 
-			{ 
-				return s_project; 
-			} 
-			set
-			{
-				s_project = value;
-				// Note: Caller should reset the layout content.
-			}
-		}
-		static private DProject s_project = null;
-		#endregion
 		#region Attr{g}: bool TargetIsLocked
 		static public bool TargetIsLocked
 		{
 			get
 			{
-				Debug.Assert(null != Project);
+				Debug.Assert(null != DB.Project);
 
-				DSection section = Project.STarget;
+				DSection section = DB.Project.STarget;
 
 				DBook book = (null == section) ? null : section.Book;
 				if (null == book)
@@ -74,8 +59,8 @@ namespace OurWord
 		{
 			get
 			{
-				if (null != Project && null != Project.STarget)
-					return Project.STarget.Book;
+				if (null != DB.Project && null != DB.Project.STarget)
+					return DB.Project.STarget.Book;
 				return null;
 			}
 		}
@@ -170,6 +155,7 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
+        private ToolStripMenuItem m_Synchronize;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -312,10 +298,10 @@ namespace OurWord
         {
             SideWindows.Clear();
 
-            if (G.IsValidProject && OurWordMain.s_Features.TranslatorNotes && DProject.VD_ShowNotesPane)
+            if (DB.IsValidProject && OurWordMain.s_Features.TranslatorNotes && DProject.VD_ShowNotesPane)
                 SideWindows.CreateNotesWindow();
 
-            if (null != G.Project && G.Project.ShowTranslationsPane && MainWindowIsDrafting)
+            if (null != DB.Project && DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
                 SideWindows.CreateTranslationsWindow();
 
 #if FEATURE_MERGE
@@ -350,16 +336,16 @@ namespace OurWord
             // First, Display "Our Word"
 			Text = LanguageResources.AppTitle;
 
-            // If a book is loaded, then display its filename
-            if (null != Project && null != G.TBook)
+            // If a book is loaded, then display its name
+            if (null != DB.Project && null != DB.TargetBook)
             {
-                Text += (" - " + Path.GetFileNameWithoutExtension(G.TBook.AbsolutePathName));
+                Text += (" - " + DB.TargetBook.DisplayName);
                 return;
             }
 
             // If a project exists, then display its name
-			if (null != Project)
-				Text += (" - " + Project.DisplayName);
+			if (null != DB.Project)
+				Text += (" - " + DB.Project.DisplayName);
 		}
 		#endregion
         #region Method: void ResetWindowContents() - called whenever content changes (OnEnterSection)
@@ -372,7 +358,7 @@ namespace OurWord
             SetupMenusAndToolbarsVisibility();
 
             // Do we have a valid project? Can't do much if not.
-            if (null == Project || null == Project.SFront || null == Project.STarget)
+            if (null == DB.Project || null == DB.FrontSection || null == DB.TargetSection)
             {
                 MainWindow.Clear();
                 MainWindow.Invalidate();
@@ -408,7 +394,7 @@ namespace OurWord
             if (null != SideWindows)
                 SideWindows.SetZoomFactor(G.ZoomFactor);
 
-            G.StyleSheet.ZoomFactor = G.ZoomFactor;
+            DB.StyleSheet.ZoomFactor = G.ZoomFactor;
         }
         #endregion
         #endregion
@@ -433,19 +419,11 @@ namespace OurWord
 		{
 			//Console.WriteLine("--AutoSave Timer Tick--");
 
-			// No point if we're not showing an active project
-			if (null == Project || null == Project.SFront || null == Project.STarget)
-				return;
+            if (null == DB.Project)
+                return;
 
-			// Get the active book
-			DBook book = Project.STarget.Book;
-
-			// Save it
-			if (null != book && book.BookAbbrev.Length > 0 && book.IsDirty)
-			{
-                book.Write();
-				//Console.WriteLine("   --Autosaved " + book.DisplayName);
-			}
+            // Do the save
+            DB.Project.Save(G.CreateProgressIndicator());
 		}
 		#endregion
 
@@ -464,8 +442,7 @@ namespace OurWord
         private ToolStripDropDownButton m_btnProject;
         private ToolStripMenuItem m_menuNewProject;
         private ToolStripMenuItem m_menuOpenProject;
-        private ToolStripMenuItem m_menuSaveProject;
-        private ToolStripMenuItem m_menuSaveProjectAs;
+		private ToolStripMenuItem m_menuSaveProject;
         private ToolStripButton m_btnPrint;
         private ToolStripMenuItem m_menuConfigure;
         private ToolStripMenuItem m_menuCopyBTfromFront;
@@ -539,19 +516,19 @@ namespace OurWord
             m_btnGotoNextSection.DropDownItems.Clear();
 
             // Get our current position within the book
-            if (null == G.SFront)
+            if (null == DB.FrontSection)
                 return;
-            int iPos = G.FBook.Sections.FindObj(G.SFront);
+            int iPos = DB.FrontBook.Sections.FindObj(DB.FrontSection);
 
             // Loop to populate the Subitems
             ArrayList aPrevious = new ArrayList();
             ArrayList aNext = new ArrayList();
 
-            for (int i = 0; i < G.FBook.Sections.Count; i++)
+            for (int i = 0; i < DB.FrontBook.Sections.Count; i++)
             {
                 // Get the two sections
-                DSection SFront = G.FBook.Sections[i] as DSection;
-                DSection STarget = G.TBook.Sections[i] as DSection;
+                DSection SFront = DB.FrontBook.Sections[i] as DSection;
+                DSection STarget = DB.TargetBook.Sections[i] as DSection;
 
                 // If a filter is active, then we only care about sections that match
                 if (DSection.FilterIsActive && !STarget.MatchesFilter)
@@ -631,7 +608,7 @@ namespace OurWord
             // Create menu items for each of these
             foreach (string sAbbrev in vPossibilities)
             {
-                JParagraphStyle pstyle = G.StyleSheet.FindParagraphStyle(sAbbrev);
+                JParagraphStyle pstyle = DB.StyleSheet.FindParagraphStyle(sAbbrev);
                 if (null == pstyle)
                     continue;
 
@@ -652,12 +629,11 @@ namespace OurWord
         #region Method: void EnableMenusAndToolbars()
         public void EnableMenusAndToolbars()
         {
-            bool bValidProjectWithData = G.IsValidProject &&
-                null != G.SFront && null != G.STarget;
+            bool bValidProjectWithData = DB.IsValidProject &&
+                null != DB.FrontSection && null != DB.TargetSection;
 
             // Project
-            m_menuSaveProject.Enabled = G.IsValidProject;
-            m_menuSaveProjectAs.Enabled = G.IsValidProject;
+            m_menuSaveProject.Enabled = DB.IsValidProject;
 
             // Print
             m_btnPrint.Enabled = bValidProjectWithData;
@@ -678,14 +654,14 @@ namespace OurWord
                 SideWindows.NotesPane.SetControlsEnabling();
 
             // Go To menu
-            bool bIsAtFirstSection = bValidProjectWithData && Project.Nav.IsAtFirstSection;
+            bool bIsAtFirstSection = bValidProjectWithData && DB.Project.Nav.IsAtFirstSection;
             m_btnGotoFirstSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
             m_btnGotoPreviousSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
-            bool bIsAtLastSection = bValidProjectWithData && Project.Nav.IsAtLastSection;
+            bool bIsAtLastSection = bValidProjectWithData && DB.Project.Nav.IsAtLastSection;
             m_btnGotoNextSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
             m_btnGotoLastSection.Enabled = bValidProjectWithData && !bIsAtLastSection;
-            m_btnChapter.Enabled = G.IsValidProject;
-            m_btnGoToBook.Enabled = G.IsValidProject;
+            m_btnChapter.Enabled = DB.IsValidProject;
+            m_btnGoToBook.Enabled = DB.IsValidProject;
 
             // Tools menu
             m_menuIncrementBookStatus.Enabled = canIncrementBookStatus;
@@ -706,21 +682,21 @@ namespace OurWord
             //      of quickly going to Next/Previous sections.
         {
             // Project - If we have an invalid project, we turn this on regardless
-            bool bShowNewOpenEtc = (!G.IsValidProject || OurWordMain.Features.F_Project);
+            bool bShowNewOpenEtc = (!DB.IsValidProject || OurWordMain.Features.F_Project);
             m_btnProject.Visible = bShowNewOpenEtc;
 
             // Print
             m_btnPrint.Visible = OurWordMain.Features.F_Print;
 
             // Go To First / Last Section
-            m_btnGotoFirstSection.Visible = G.IsValidProject && Features.F_GoTo_FirstLast;
-            m_btnGotoLastSection.Visible = G.IsValidProject && Features.F_GoTo_FirstLast;
+            m_btnGotoFirstSection.Visible = DB.IsValidProject && Features.F_GoTo_FirstLast;
+            m_btnGotoLastSection.Visible = DB.IsValidProject && Features.F_GoTo_FirstLast;
 
             // Go To Chapter
-            m_btnChapter.Visible = G.IsValidProject && Features.F_GoTo_Chapter;
+            m_btnChapter.Visible = DB.IsValidProject && Features.F_GoTo_Chapter;
 
             // Configure - If we have an invalid project, we turn this on regardless
-            bool bShowConfigureDlg = (!G.IsValidProject || OurWordMain.Features.F_PropertiesDialog);
+            bool bShowConfigureDlg = (!DB.IsValidProject || OurWordMain.Features.F_PropertiesDialog);
             m_menuConfigure.Visible = bShowConfigureDlg;
 
             // Restore from Backup
@@ -736,15 +712,15 @@ namespace OurWord
             m_menuRunDebugTestSuite.Visible = bShowDebugItems;
 
             // Filters
-            m_menuOnlyShowSectionsThat.Visible = (G.IsValidProject && OurWordMain.Features.F_Filter);
+            m_menuOnlyShowSectionsThat.Visible = (DB.IsValidProject && OurWordMain.Features.F_Filter);
 
             // Localizer Tool
             m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
 
             // Window Menu in its entirety
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
-            bool bShowTranslatorNotesMenu = (G.IsValidProject && s_Features.TranslatorNotes);
-            bool bShowTranslationsPane = (G.IsValidProject && G.Project.OtherTranslations.Count > 0);
+            bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
+            bool bShowTranslationsPane = (DB.IsValidProject && DB.Project.OtherTranslations.Count > 0);
 #if (FEATURE_WESAY || FEATURE_MERGE)
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
             bool bShowMergePane = (s_Features.F_Merge && G.IsValidProject);
@@ -794,7 +770,8 @@ namespace OurWord
             m_btnEditPaste.Visible = !bEditMenuVisible;
 
             // Clear dropdown subitems so we don't attempt to localize them
-            m_Config.RemoveMRUItems(m_btnProject);
+			if (bShowNewOpenEtc)
+			MRU.RemoveMruItems(m_btnProject);
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
             m_btnGoToBook.DropDownItems.Clear();
@@ -804,7 +781,8 @@ namespace OurWord
 
             // Some submenus happen after localization (otherwise, we'd be adding spurious
             // entries into the localization database)
-            m_Config.BuildMRUPopupMenu(m_btnProject, cmdMRU, bShowNewOpenEtc);
+			if (bShowNewOpenEtc)
+				MRU.BuildPopupMenu(m_btnProject, cmdMRU);
             SetupNavigationButtons();
             DBookGrouping.PopulateGotoBook(m_btnGoToBook, cmdGotoBook);
             m_btnGoToBook.Visible = (m_btnGoToBook.DropDownItems.Count > 1);
@@ -814,6 +792,15 @@ namespace OurWord
         }
         #endregion
         // Status Bar
+        #region Attr{g}: ToolStripStatusLabel StatusLabel1
+        public ToolStripStatusLabel StatusLabel1
+        {
+            get
+            {
+                return m_StatusMessage1;
+            }
+        }
+        #endregion
         #region Attr{g/s}: string StatusMessage1
         public string StatusMessage1
         {
@@ -916,7 +903,17 @@ namespace OurWord
 		}
 		#endregion
 		private JW_WindowState  m_WindowState;   // Save/restore state on close/launch of app
-		private JW_FileMenuIO   m_Config;	     // Handles I/O of the configuration (project) file
+		#region Attr{g}: MRU MRU
+		public MRU MRU
+		{
+			get
+			{
+				Debug.Assert(null != m_Mru);
+				return m_Mru;
+			}
+		}
+		MRU m_Mru;
+		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
@@ -942,16 +939,12 @@ namespace OurWord
             int nUndoRedoMaxDepth = 10;
             m_URStack = new UndoRedoStack(nUndoRedoMaxDepth, m_menuUndo, m_menuRedo);
 
-			// Initialize the Project File Configuration system
-			m_Config = new JW_FileMenuIO(this, this,
-				LanguageResources.AppTitle,
-                G.GetLoc_Files("ProjectFileFilter", "Our Word! Project Files (*.owp)|*.owp"), 
-				"owp",
-				G.GetLoc_Files("DefaultProjectFileName","New Project.owp")); 
+			// Initialize the MRU
+			m_Mru = new MRU();
 
 			// Initialize to a blank project (if there is a recent project
 			// in the MRU, this will get overridden.)
-			s_project = new DProject();
+			DB.Project = new DProject();
 		}
 		#endregion
 		#region Method: void Dispose(...) - cleans up any resources being used
@@ -991,7 +984,6 @@ namespace OurWord
             this.m_menuNewProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOpenProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSaveProject = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuSaveProjectAs = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnPrint = new System.Windows.Forms.ToolStripButton();
             this.m_separator1 = new System.Windows.Forms.ToolStripSeparator();
             this.m_btnEditCut = new System.Windows.Forms.ToolStripButton();
@@ -1025,6 +1017,7 @@ namespace OurWord
             this.m_menuCurrentSectionOnly = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_Synchronize = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorDebug = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuRunDebugTestSuite = new System.Windows.Forms.ToolStripMenuItem();
@@ -1101,7 +1094,7 @@ namespace OurWord
             this.m_separator4,
             this.m_btnHelp});
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            this.m_ToolStrip.Location = new System.Drawing.Point(3, 0);
+            this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
             this.m_ToolStrip.Size = new System.Drawing.Size(855, 38);
             this.m_ToolStrip.TabIndex = 1;
@@ -1133,8 +1126,7 @@ namespace OurWord
             this.m_btnProject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuNewProject,
             this.m_menuOpenProject,
-            this.m_menuSaveProject,
-            this.m_menuSaveProjectAs});
+            this.m_menuSaveProject});
             this.m_btnProject.Image = ((System.Drawing.Image)(resources.GetObject("m_btnProject.Image")));
             this.m_btnProject.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_btnProject.Name = "m_btnProject";
@@ -1171,14 +1163,6 @@ namespace OurWord
             this.m_menuSaveProject.Text = "&Save";
             this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
             this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
-            // 
-            // m_menuSaveProjectAs
-            // 
-            this.m_menuSaveProjectAs.Name = "m_menuSaveProjectAs";
-            this.m_menuSaveProjectAs.Size = new System.Drawing.Size(155, 22);
-            this.m_menuSaveProjectAs.Text = "Save &As...";
-            this.m_menuSaveProjectAs.ToolTipText = "Save this project under a different name.";
-            this.m_menuSaveProjectAs.Click += new System.EventHandler(this.cmdSaveProjectAs);
             // 
             // m_btnPrint
             // 
@@ -1424,6 +1408,7 @@ namespace OurWord
             this.m_menuCopyBTfromFront,
             this.m_menuConfigure,
             this.m_menuSetUpFeatures,
+            this.m_Synchronize,
             this.m_menuLocalizerTool,
             this.m_separatorDebug,
             this.m_menuRunDebugTestSuite,
@@ -1504,6 +1489,14 @@ namespace OurWord
             this.m_menuSetUpFeatures.ToolTipText = "Set which features are turned on and off.";
             this.m_menuSetUpFeatures.Click += new System.EventHandler(this.cmdSetUpFeatures);
             // 
+            // m_Synchronize
+            // 
+            this.m_Synchronize.Image = global::OurWord.Properties.Resources.MoveDown;
+            this.m_Synchronize.Name = "m_Synchronize";
+            this.m_Synchronize.Size = new System.Drawing.Size(211, 22);
+            this.m_Synchronize.Text = "S&ynchronize";
+            this.m_Synchronize.Click += new System.EventHandler(this.cmdSynchronize);
+            // 
             // m_menuLocalizerTool
             // 
             this.m_menuLocalizerTool.Name = "m_menuLocalizerTool";
@@ -1559,8 +1552,8 @@ namespace OurWord
             // 
             this.m_btnWindow.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuDrafting,
-            this.m_menuBackTranslation,
             this.m_menuNaturalnessCheck,
+            this.m_menuBackTranslation,
             this.m_separatorWindow,
             this.m_menuShowNotesPane,
             this.m_menuShowTranslationsPane,
@@ -1712,8 +1705,8 @@ namespace OurWord
             // 
             // m_toolStripContainer.TopToolStripPanel
             // 
-            this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ToolStrip);
             this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_Taskbar);
+            this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ToolStrip);
             // 
             // m_StatusStrip
             // 
@@ -1742,7 +1735,7 @@ namespace OurWord
             // 
             // m_StatusMessage2
             // 
-            this.m_StatusMessage2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_StatusMessage2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_StatusMessage2.ForeColor = System.Drawing.Color.Red;
             this.m_StatusMessage2.Name = "m_StatusMessage2";
             this.m_StatusMessage2.Size = new System.Drawing.Size(0, 17);
@@ -1773,7 +1766,7 @@ namespace OurWord
             this.m_tbPadlock,
             this.m_tbLanguageInfo,
             this.m_tbCurrentPassage});
-            this.m_Taskbar.Location = new System.Drawing.Point(0, 38);
+            this.m_Taskbar.Location = new System.Drawing.Point(0, 0);
             this.m_Taskbar.Name = "m_Taskbar";
             this.m_Taskbar.Size = new System.Drawing.Size(912, 25);
             this.m_Taskbar.Stretch = true;
@@ -1823,7 +1816,7 @@ namespace OurWord
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OurWordMain";
             this.Text = "Our Word!";
-            this.Load += new System.EventHandler(this.cmd_OnLoad);
+            this.Load += new System.EventHandler(this.cmdLoad);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdClosing);
             this.m_ToolStrip.ResumeLayout(false);
             this.m_ToolStrip.PerformLayout();
@@ -1878,7 +1871,7 @@ namespace OurWord
         #endregion
         #region Method: static void Main() - main entry point for the application
         [STAThread]
-		static void Main() 
+		static void Main(string[] vArgs)
 		{
             // Initialize the registry (Needed by, e.g., Splash Screen and the
             // single-instance error message.)
@@ -1901,6 +1894,12 @@ namespace OurWord
             // Display a splash screen while we're loading. We want to retrieve everything
             // needed from the localization database, so that the SplashScreen, which runs
             // on its own thread, isn't having to go cross-thread to get them.
+			foreach (string s in vArgs)
+			{
+				if (s == "-nosplash")
+					SplashScreen.IsEnabled = false;
+			}
+
             SplashScreen.Additional = G.GetLoc_Splash("sOptionalAdditional", "-");
             SplashScreen.StatusMessage = G.GetLoc_Splash("sLoadingOurWord", "Loading Our Word...");
             SplashScreen.Version = G.GetLoc_DialogCommon("m_lblVersion", "Version {0}", 
@@ -1911,6 +1910,7 @@ namespace OurWord
 
             // Now start loading & run the program
             OurWordMain.s_App = new OurWordMain();
+            Application.EnableVisualStyles();
             Application.Run(s_App);
 
             // All done, release the Mutex
@@ -2338,32 +2338,25 @@ namespace OurWord
             G.URStack.Clear();
 		}
 		#endregion
-		#region Method: void OnLeaveProject()
-		private void OnLeaveProject()
+        #region Method: void OnLeaveProject(bCommitToRepository)
+        private void OnLeaveProject(bool bCommitToRepository)
 		{
 			// Do everything we would normally do on leaving a section (e.g., getting
 			// the data from the cache.)
 			OnLeaveSection();
 
 			// Prompt so that we save to disk
-            if (Project.HasContent)
-            {
-                Cursor = Cursors.WaitCursor;
-                m_Config.Save();
-                Cursor = Cursors.Default;
-            }
+            DB.Project.Save(G.CreateProgressIndicator());
 
             // Dispose of the Dictionary object if necessary
-            Project.Dispose();
+            DB.Project.Dispose();
 		}
 		#endregion
 		#region Method: void OnEnterProject()
 		private void OnEnterProject()
 		{
-			m_Config.InitialDirectory = G.TeamSettings.DataRootPath;
-
 			// If we aren't already navigated to a book, then attempt to find one.
-			Project.Nav.GoToReasonableBook();
+			DB.Project.Nav.GoToReasonableBook(G.CreateProgressIndicator());
 
             // A new project may have different settings for whether or not the
             // Side Windows are displayed.
@@ -2374,72 +2367,6 @@ namespace OurWord
 
             // Window contents, etc.
 			OnEnterSection();
-		}
-		#endregion
-
-        // Interface IFileMenuIO -------------------------------------------------------------
-        #region Method: void TemporaryFixes()
-        void TemporaryFixes()
-			// Use this to behind-the-scenes upgrade Timor and Manado styles....
-			// remove it for 1.0.
-		{
-            int nCurrentSettingsVersion = 1;
-
-            if (G.TeamSettings.SettingsVersion < nCurrentSettingsVersion)
-            {
-                // Fix Hebrews being associated with the wrong grouping
-                DBookGrouping.InitializeGroupings(G.TeamSettings.BookGroupings);
-            }
-
-            G.TeamSettings.SettingsVersion = nCurrentSettingsVersion;
-		}
-		#endregion
-		#region Attr{g}: string XmlTag - e.g., the "tag" within "<tag>"
-		public string XmlTag
-		{
-			get
-			{
-				return "OurWordProjectFile";
-			}
-		}
-		#endregion
-		#region Method: void New() - start with blank configuration (default values)
-		public void New()
-		{
-			// Nothing is done here; it is all handled in cmdNewProject
-		}
-		#endregion
-        #region Method: void Read(ref string sPathName) - read the configuration
-        public void Read(ref string sPathName)
-		{
-            Project = new DProject();
-            Project.AbsolutePathName = sPathName;
-            Project.Load();
-
-            // Make sure the registry is aware of the new file name, as it might have been changed.
-            sPathName = Project.AbsolutePathName;
-
-            // Make certain the stylesheet has the latest styles
-            Project.StyleSheet.Initialize(false);
-
-            TemporaryFixes();
-		}
-		#endregion
-		#region Method: void Write(sPathName) - writes configuration to project file
-		public void Write(string sPathName)
-		{
-			// Save the current book (in case changes have been made) We do this before
-			// writing the project settings, because the name of the book may be changed
-			// (e.g., a Paratext filename is saved as a DB) and we want the OTrans file
-			// to reflect the proper name.
-			Project.SaveCurrentBook();
-
-            // Store the Path Name (It may be different due to a SaveAs command)
-            Project.AbsolutePathName = sPathName;
-
-            // Let JObjectOnDemand handle the rest
-            Project.Write();
-
 		}
 		#endregion
 
@@ -2458,14 +2385,17 @@ namespace OurWord
             }
         }
         #endregion
-        #region Event: cmd_OnLoad(...)    - on loading the app, restore the window state
-        private void cmd_OnLoad(object sender, System.EventArgs e)
+        #region Event: cmdLoad
+        private void cmdLoad(object sender, System.EventArgs e)
 		{
 			// Init the Help system
-			HelpSystem.Initialize();
+            HelpSystem.Initialize(this, "OurWordMain.chm");
 
 			// Populate the MRU List; read in the project
-			m_Config.LoadMRUfromRegistry(true);   // Reads in the most recent project
+			MRU.LoadFromRegistry();
+			DB.Project = new DProject();
+			string sPath = MRU.TopItem;
+			DB.Project.Load(ref sPath, G.CreateProgressIndicator());
 
             // Initial Splitter Position
             m_SplitContainer.SplitterDistance = (int)((float)m_fSplitterPercent * (float)Width / 100.0F);
@@ -2481,7 +2411,7 @@ namespace OurWord
                 MainWindow = WndNaturalness;
 
             // Restore to where we last were.
-            Project.Nav.RetrievePositionFromRegistry();
+            DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
 
             // Set up the views, make the initial selection, etc.
             OnEnterProject();
@@ -2494,16 +2424,19 @@ namespace OurWord
 			InitializeAutoSave();
 
             // Loading all done: Close the splash screen
-            if (SplashScreen.Wnd.InvokeRequired)
-            {
-                SplashScreen.StopSplashScreen_Callback d = 
-                    new SplashScreen.StopSplashScreen_Callback(SplashScreen.Wnd.Stop);
-                this.Invoke(d, new object[] { this });
-            }
-            else
-            {
-                SplashScreen.Wnd.Stop(this);
-            }
+			if (SplashScreen.IsEnabled)
+			{
+				if (SplashScreen.Wnd.InvokeRequired)
+				{
+					SplashScreen.StopSplashScreen_Callback d =
+						new SplashScreen.StopSplashScreen_Callback(SplashScreen.Wnd.Stop);
+					this.Invoke(d, new object[] { this });
+				}
+				else
+				{
+					SplashScreen.Wnd.Stop(this);
+				}
+			}
 
             // Leave everything in a state where the main window has focus, so that the
             // Text Selection will be appropriately flashing its readiness
@@ -2514,16 +2447,16 @@ namespace OurWord
         private void cmdClosing(object sender, FormClosingEventArgs e)
         {
 			// Save data
-			OnLeaveProject();
+			OnLeaveProject(true);
 
 			// Save the current project's registry info
-			m_Config.SaveMRUtoRegistry();
-			Project.Nav.SavePositionToRegistry();
+			MRU.SaveToRegistry();
+			DB.Project.Nav.SavePositionToRegistry();
 			
 			// Save the window position
 			m_WindowState.SaveWindowState();
 
-			G.TeamSettings.Write();
+			DB.TeamSettings.Write(G.CreateProgressIndicator());
         }
         #endregion
         #region Event: OnResize - prevent the size from becomming too small
@@ -2602,59 +2535,37 @@ namespace OurWord
             if (DialogResult.OK != wiz.ShowDialog())
                 return;
 
-            // Make sure this current project is saved and up-to-date
-            OnLeaveProject();
+            // Make sure the current project is saved and up-to-date, before we create
+            // the new one. Commit to the Repository, to have a restoreo  point if we need it.
+            OnLeaveProject(true);
 
             // Create and initialize the new project according to the settings
-            DProject project = new DProject();
-            project.DisplayName = wiz.ProjectName;
-            project.AbsolutePathName = wiz.TargetSettingsFolder +
-                Path.DirectorySeparatorChar + project.DisplayName + ".owp";
+            DProject project = new DProject(wiz.ProjectName);
 
-            // Team Settings: start with the factory default; load over it if a file already exists
-            DTeamSettings ts = new DTeamSettings();
-            ts.EnsureInitialized();
-            project.TeamSettings = ts;
-            ts.AbsolutePathName = wiz.TeamSettingsPath;
-            if (File.Exists(ts.AbsolutePathName))
-                ts.Load();
+            // Team Settings: start with the factory default; load over it if a file already exists,
+			// otherwise create the new cluster
+			project.TeamSettings = new DTeamSettings(wiz.ChosenCluster);
+			project.TeamSettings.EnsureInitialized();
+            project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
 
-            // Front translation
-            DTranslation tFront = new DTranslation(wiz.FrontName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
-            if (!string.IsNullOrEmpty(wiz.ExistingFrontSettingsFilePath))
-            {
-                tFront.AbsolutePathName = wiz.ExistingFrontSettingsFilePath;
-                tFront.Load();
-                if (tFront.DisplayName != wiz.FrontName ||
-                    tFront.LanguageAbbrev != wiz.FrontAbbreviation ||
-                    Path.GetDirectoryName(tFront.AbsolutePathName) != wiz.FrontSettingsFolder)
-                {
-                    tFront = new DTranslation(wiz.FrontName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
-                }
-            }
-            project.FrontTranslation = tFront;
-            tFront.LanguageAbbrev = wiz.FrontAbbreviation;
-            tFront.AbsolutePathName = wiz.FrontSettingsFolder +
-                Path.DirectorySeparatorChar + wiz.FrontName + ".otrans";
+            // Create the front translation. If the settings file exists, load it; otherwise
+			// create its folder, settings file, etc.
+            project.FrontTranslation = new DTranslation(wiz.FrontName);
+            project.FrontTranslation.InitialCreation(G.CreateProgressIndicator());
 
             // Target Translation
-            DTranslation tTarget = new DTranslation(wiz.ProjectName, DStyleSheet.c_Latin, DStyleSheet.c_Latin);
-            project.TargetTranslation = tTarget;
-            tTarget.DisplayName = wiz.ProjectName;
-            tTarget.LanguageAbbrev = wiz.TargetAbbreviation;
-            tTarget.AbsolutePathName = wiz.TargetSettingsFolder +
-                Path.DirectorySeparatorChar + wiz.ProjectName + ".otrans";
+			project.TargetTranslation = new DTranslation(wiz.ProjectName);
+            project.TargetTranslation.InitialCreation(G.CreateProgressIndicator());
 
             // Set OW to this project
-            Project = project;
+            DB.Project = project;
 
             // Save everything, including placing into the MRU
-            m_Config.FileName = Project.AbsolutePathName;
-            m_Config.mru_Update();
-            m_Config.Save();
+			MRU.AddAtTop(DB.Project.StoragePath);
+            DB.Project.Write(G.CreateProgressIndicator());
 
             // Update the UI, views, etc
-            Project.Nav.GoToFirstAvailableBook();
+            DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
             OnEnterProject();
 
             // Edit properties?
@@ -2671,11 +2582,20 @@ namespace OurWord
                 return;
 
 			// Make sure this project is saved and up-to-date
-			OnLeaveProject();
+			OnLeaveProject(true);
 
-			// Present the dialog to find the desired settings file; then calls
-			// IFileMenuIO.Read to bring it in.
-			m_Config.Open();
+			// Present the dialog to find the desired settings file
+			OpenFileDialog dlg = new OpenFileDialog();
+			dlg.Filter = "Our Word! Project Files (*.owp)|*.owp";
+			dlg.FilterIndex = 1;
+			dlg.DefaultExt = "owp";
+			if (dlg.ShowDialog() != DialogResult.OK)
+				return;
+			string sPath = dlg.FileName;
+
+            DB.Project = new DProject();
+            DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+            MRU.MoveToTop(DB.Project.StoragePath);
 
 			// Update the UI, views, etc.
 			OnEnterProject();
@@ -2685,29 +2605,27 @@ namespace OurWord
         private void cmdSaveProject(Object sender, EventArgs e)
 		{
 			OnLeaveSection();
-			m_Config.InitialDirectory = G.BrowseDirectory;
-            m_Config.Save();
-		}
-		#endregion
-		#region Cmd: cmdSaveProjectAs
-        private void cmdSaveProjectAs(Object sender, EventArgs e)
-		{
-            // Don't allow if the menu item is hidden (Microsoft allows a Shortcut key to work,
-            // even though the menu command is hidden!)
-            if (!m_btnProject.Visible)
-                return;
-
-            OnLeaveSection();
-			m_Config.InitialDirectory = G.BrowseDirectory;
-			m_Config.SaveAs("Save this Project as");
+			DB.Project.Save(G.CreateProgressIndicator());
 		}
 		#endregion
 		#region Cmd: cmdMRU - opens Project from MRU list
         private void cmdMRU(Object sender, EventArgs e)
         {
-            OnLeaveProject();
-            m_Config.LoadMruItem( (sender as ToolStripMenuItem).Text );
-            Project.Nav.GoToFirstAvailableBook();
+			ToolStripMenuItem item = (sender as ToolStripMenuItem);
+			if (null == item)
+				return;
+
+			string sPath = (string)item.Tag;
+			if (string.IsNullOrEmpty(sPath))
+				return;
+
+            OnLeaveProject(true);
+
+            DB.Project = new DProject();
+            DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+            MRU.MoveToTop(DB.Project.StoragePath);
+
+            DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
             OnEnterProject();
         }
 		#endregion
@@ -2824,12 +2742,12 @@ namespace OurWord
         private void cmdGoToFirstSection(Object sender, EventArgs e)
 		{
             // Ignore if we're at the beginning already
-            if (Project.Nav.IsAtFirstSection)
+            if (DB.Project.Nav.IsAtFirstSection)
                 return;
 
             // Go to the first section
             OnLeaveSection();
-			Project.Nav.GoToFirstSection();
+			DB.Project.Nav.GoToFirstSection();
 			OnEnterSection();
 		}
 		#endregion
@@ -2840,12 +2758,12 @@ namespace OurWord
             if (null == btn || !btn.DropDownButtonPressed)
             {
                 // Ignore if we're at the beginning already
-                if (Project.Nav.IsAtFirstSection)
+                if (DB.Project.Nav.IsAtFirstSection)
                     return;
 
                 // Go to the previous section
                 OnLeaveSection();
-                Project.Nav.GoToPreviousSection();
+                DB.Project.Nav.GoToPreviousSection();
                 OnEnterSection();
             }
 		}
@@ -2857,12 +2775,12 @@ namespace OurWord
             if (null == btn || !btn.DropDownButtonPressed)
             {
                 // Ignore if we're at the end already
-                if (Project.Nav.IsAtLastSection)
+                if (DB.Project.Nav.IsAtLastSection)
                     return;
 
                 // Go to the next section
                 OnLeaveSection();
-                Project.Nav.GoToNextSection();
+                DB.Project.Nav.GoToNextSection();
                 OnEnterSection();
             }
 		}
@@ -2871,12 +2789,12 @@ namespace OurWord
         private void cmdGoToLastSection(Object sender, EventArgs e)
 		{
             // Ignore if we're at the end already
-            if (Project.Nav.IsAtLastSection)
+            if (DB.Project.Nav.IsAtLastSection)
                 return;
 
             // Go to the final section
             OnLeaveSection();
-			Project.Nav.GoToLastSection();
+			DB.Project.Nav.GoToLastSection();
 			OnEnterSection();
 		}
 		#endregion
@@ -2891,7 +2809,7 @@ namespace OurWord
 			OnLeaveSection();
 
 			// The first part of the menu name is the start reference of the desired section
-			DBook book = Project.SFront.Book;
+			DBook book = DB.Project.SFront.Book;
 			int i = 0;
 			foreach(DSection section in book.Sections)
 			{
@@ -2899,7 +2817,7 @@ namespace OurWord
 
                 if (sMenuText.StartsWith(sReference))
 				{
-					Project.Nav.GoToSection(i);
+					DB.Project.Nav.GoToSection(i);
 					OnEnterSection();
 					break;
 				}
@@ -2911,7 +2829,7 @@ namespace OurWord
         private void cmdGoToChapter(object sender, EventArgs e)
         {
             // Make sure we have a valid project
-            if (!G.IsValidProject)
+            if (!DB.IsValidProject)
                 return;
 
             // Retrieve the Chapter button
@@ -2924,10 +2842,10 @@ namespace OurWord
             pt = PointToScreen(pt);
 
             // What is the current chapter?
-            int nCurrent = G.STarget.ReferenceSpan.Start.Chapter;
+            int nCurrent = DB.TargetSection.ReferenceSpan.Start.Chapter;
 
             // Create and display the popup
-            ChapterMenu cm = new ChapterMenu(G.TBook, pt, nCurrent);
+            ChapterMenu cm = new ChapterMenu(DB.TargetBook, pt, nCurrent);
             DialogResult result = cm.ShowDialog(this);
             if (DialogResult.OK != result)
                 return;
@@ -2937,13 +2855,13 @@ namespace OurWord
                 return;
 
             // Retrieve the number of the section we're interested in
-            int iSection = G.TBook.Sections.FindObj(cm.Section);
+            int iSection = DB.TargetBook.Sections.FindObj(cm.Section);
             if (-1 == iSection)
                 return;
 
             // Navigate to that section
             OnLeaveSection();
-            Project.Nav.GoToSection(iSection);
+            DB.Project.Nav.GoToSection(iSection);
             OnEnterSection();
         }
         #endregion
@@ -2958,7 +2876,8 @@ namespace OurWord
 
             // Go to that book
             OnLeaveSection();
-            Project.Nav.GoToBook(sBookDisplayName);
+            DB.Project.Save(G.CreateProgressIndicator());
+            DB.Project.Nav.GoToBook(sBookDisplayName, G.CreateProgressIndicator());
             OnEnterSection();
         }
 		#endregion
@@ -3087,13 +3006,13 @@ namespace OurWord
 		{
 			get
 			{
-				if (null == Project)
+				if (null == DB.Project)
 					return false;
-				if (null == Project.FrontTranslation)
+				if (null == DB.Project.FrontTranslation)
 					return false;
-				if (null == Project.TargetTranslation)
+				if (null == DB.Project.TargetTranslation)
 					return false;
-				if (null == Project.Nav.STarget)
+				if (null == DB.Project.Nav.STarget)
 					return false;
 				return true;
 			}
@@ -3107,7 +3026,7 @@ namespace OurWord
 				return;
 
 			// Perform the dialog to get the increment desired
-			DBook book = Project.STarget.Book;
+			DBook book = DB.Project.STarget.Book;
 			IncrementBookStatus dlg = new IncrementBookStatus(book);
 			DialogResult result = dlg.ShowDialog();
 
@@ -3131,16 +3050,16 @@ namespace OurWord
 			if (!canIncrementBookStatus)
 				return;
 
-			DBook BTarget = Project.STarget.Book;
+			DBook BTarget = DB.Project.STarget.Book;
 
 			DialogRestoreFromBackup dlg = new DialogRestoreFromBackup(BTarget);
 			if (DialogResult.OK == dlg.ShowDialog())
 			{
-				OnLeaveProject();
+				OnLeaveProject(true);
 
-				DBook.RestoreFromBackup(BTarget, dlg.BackupPathName);
+				DBook.RestoreFromBackup(BTarget, dlg.BackupPathName, G.CreateProgressIndicator());
 
-				Project.Nav.GoToFirstSection();
+				DB.Project.Nav.GoToFirstSection();
 				OnEnterSection();
 			}
 		}
@@ -3175,22 +3094,22 @@ namespace OurWord
 		void UpdateFilterForCurrentSection()
 		{
 			// Don't bother if there is no target section, no filter, etc.
-			if (null == G.STarget)
+			if (null == DB.TargetSection)
 				return;
 			if (!DSection.FilterIsActive)
 				return;
-			if (!G.STarget.MatchesFilter)
+			if (!DB.TargetSection.MatchesFilter)
 				return;
 
 			// Run the test on the current section to update it.
-			Project.STarget.MatchesFilter = FilterTest(Project.STarget);
+			DB.Project.STarget.MatchesFilter = FilterTest(DB.Project.STarget);
 
 			// If the filter no longer matches this section...
-			if (!Project.STarget.MatchesFilter)
+			if (!DB.Project.STarget.MatchesFilter)
 			{
 				// Are there any other sections that still match the filter?
 				bool bNoMatches = true;
-				foreach(DSection section in G.TBook.Sections)
+				foreach(DSection section in DB.TargetBook.Sections)
 				{
 					if (section.MatchesFilter)
 						bNoMatches = false;
@@ -3199,7 +3118,7 @@ namespace OurWord
 				// If not, then we must turn off filters
 				if (bNoMatches)
 				{
-					G.TBook.RemoveFilter();
+					DB.TargetBook.RemoveFilter();
 					G.StatusSecondaryMessage = "";
 				}
 			}
@@ -3213,7 +3132,7 @@ namespace OurWord
         private void cmdFilter(Object sender, EventArgs e)
 		{
 			// Make sure we have a project with Front and Target book
-			if (!G.IsValidProject)
+			if (!DB.IsValidProject)
 				return;
 
 			// Get the user's pleasure
@@ -3224,7 +3143,7 @@ namespace OurWord
 			// If the user Canceled out, then we remove any existing filter
 			if (result == DialogResult.Cancel || m_dlgFilter.NothingIsChecked)
 			{
-				G.TBook.RemoveFilter();
+				DB.TargetBook.RemoveFilter();
 				G.StatusSecondaryMessage = "";
                 SetupMenusAndToolbarsVisibility();    // Reset the Navigation toolbar popups
 				return;
@@ -3232,12 +3151,13 @@ namespace OurWord
 
 			// Calculate the filter according to the user's requests, and position
 			// at the first match.
-            G.ProgressStart(
+            IProgressIndicator progress = G.CreateProgressIndicator();
+            progress.Start(
                 G.GetLoc_String("strCalculatingMatchingSections", "Calculating matching sections..."), 
-                G.TBook.Sections.Count);
+                DB.TargetBook.Sections.Count);
 			OnLeaveSection();
 			int cMatches = 0;
-			foreach(DSection section in G.TBook.Sections)
+			foreach(DSection section in DB.TargetBook.Sections)
 			{
 				// Make sure the default is that there isn't a match
 				section.MatchesFilter = false;
@@ -3253,9 +3173,9 @@ namespace OurWord
 				}
 
 				// Feedback to the user that progress is taking place
-				G.ProgressStep();
+                progress.Step();
 			}
-			G.ProgressEnd();
+            progress.End();
 
 			// If at least one section passed, then turn on filters and position at a
 			// matching section (if we aren't already at one.).
@@ -3263,7 +3183,7 @@ namespace OurWord
 			{
 				DSection.FilterIsActive = true;
                 G.StatusSecondaryMessage = G.GetLoc_String("strViewingASubset", "Viewing a Subset.");
-				if (!G.STarget.MatchesFilter)
+				if (!DB.TargetSection.MatchesFilter)
 					cmdGoToFirstSection(null,null);
 				else
                     SetupMenusAndToolbarsVisibility();
@@ -3294,7 +3214,10 @@ namespace OurWord
                 return;
 
 			OnLeaveSection();
-			Project.STarget.Book.CopyBackTranslationFromFront(bEntireBook);
+
+            CopyBtMethod method = new CopyBtMethod(bEntireBook);
+            method.Run();
+
 			OnEnterSection();
 		}
 		#endregion
@@ -3304,7 +3227,7 @@ namespace OurWord
             // Retrieve data and save the project to disk. We don't know if the
 			// user might remove the book from the project, so we need to make sure
 			// it was saved just in case.
-			OnLeaveProject();
+			OnLeaveProject(true);
 
             // Let the user change the properties
             DialogProperties dlg = new DialogProperties();
@@ -3342,11 +3265,28 @@ namespace OurWord
         #region Cmd: cmdLocalizer
         private void cmdLocalizer(Object sender, EventArgs e)
         {
-            OnLeaveProject();
+            OnLeaveProject(false);
 
             Localizer dlg = new Localizer(LocDB.DB);
             if (DialogResult.OK == dlg.ShowDialog())
                 OnEnterProject();
+        }
+        #endregion
+        #region Cmd: cmdSynchronize
+        private void cmdSynchronize(object sender, EventArgs e)
+        {
+            // Save everything, but don't commit, cause Synchronize will do a commit
+            DB.Project.Nav.SavePositionToRegistry();
+            OnLeaveProject(false);
+
+            DB.TeamSettings.Repository.SynchronizeWithRemote();
+
+            // We have to unload, then reload everything
+            string sPath = DB.Project.StoragePath;
+            DB.Project = new DProject();
+            DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+            DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
+            OnEnterProject();
         }
         #endregion
 
@@ -3364,8 +3304,6 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
-
-
         #endregion
     }
 
@@ -3375,7 +3313,6 @@ namespace OurWord
         // Options stored in the registry ----------------------------------------------------
         const string c_sSubKey = "Options";
         const string c_keyZoom = "Zoom";
-        const string c_keyPictureSearchPath = "PictureSearchPath";
         #region SAttr{g}: float ZoomPercent
         public static int ZoomPercent
         {
@@ -3402,39 +3339,8 @@ namespace OurWord
             }
         }
         #endregion
-        #region SAttr{g/s}: string PictureSearchPath
-        static public string PictureSearchPath
-        {
-            get
-            {
-                return JW_Registry.GetValue(c_sSubKey, c_keyPictureSearchPath, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sSubKey, c_keyPictureSearchPath, value);
-            }
-        }
-        #endregion
 
         // Stuff still in OurWordMain
-		#region Attr{g}: DProject Project - the current project we're editing / displaying / etc.
-		static public DProject Project 
-		{ 
-			get 
-			{ 
-				return OurWordMain.Project; 
-			} 
-		}
-		#endregion
-		#region Attr{g}: static DTeamSettings TeamSettings - global settings for, e.g., the TimorTeam
-		static public DTeamSettings TeamSettings 
-		{ 
-			get 
-			{ 
-				return Project.TeamSettings; 
-			} 
-		}
-		#endregion
         #region Attr{g}: OurWordMain App
         static public OurWordMain App
         {
@@ -3454,174 +3360,24 @@ namespace OurWord
         }
         #endregion
 
-        // Parts of a Project ----------------------------------------------------------------
-		#region Attr{g}: DTranslation FTranslation
-		static public DTranslation FTranslation
-		{
-			get
-			{
-				if (null == Project)
-					return null;
-				return Project.FrontTranslation;
-			}
-		}
-		#endregion
-		#region Attr{g}: DTranslation TTranslation
-		static public DTranslation TTranslation
-		{
-			get
-			{
-				if (null == Project)
-					return null;
-				return Project.TargetTranslation;
-			}
-		}
-		#endregion
-		#region Attr{g}: DBook FBook
-		static public DBook FBook
-		{
-			get
-			{
-				if (null == Project || null == Project.SFront)
-					return null;
-				return Project.SFront.Book;
+        // Status Bar ------------------------------------------------------------------------
+        #region SMethod: IProgressIndicator CreateProgressIndicator()
+        static public IProgressIndicator CreateProgressIndicator()
+        {
+            if (SplashScreen.IsShowing)
+                return new SplashProgress();
 
-			}
-		}
-		#endregion
-		#region Attr{g}: DBook TBook
-		static public DBook TBook
-		{
-			get
-			{
-				if (null == Project || null == Project.STarget)
-					return null;
-				return Project.STarget.Book;
+            if (null == OurWordMain.App)
+                return new NullProgress();
 
-			}
-		}
-		#endregion
-		#region Attr{g}: bool TBookIsLocked - T if target book is Locked
-		static public bool TBookIsLocked
-		{
-			get
-			{
-				if (null == TBook)
-					return false;
-				return TBook.Locked;
-			}
-		}
-		#endregion
+            return new ToolStripProgress(OurWordMain.App,
+                OurWordMain.App.ProgressBar,
+                OurWordMain.App.StatusLabel1);
+        }
+        #endregion
 
-		#region Attr{g}: DSection STarget
-		static public DSection STarget
-		{
-			get
-			{
-				if (null == Project)
-					return null;
-				return Project.STarget;
-
-			}
-		}
-		#endregion
-		#region Attr{g}: DSection SFront
-		static public DSection SFront
-		{
-			get
-			{
-				if (null == Project)
-					return null;
-				return Project.SFront;
-
-			}
-		}
-		#endregion
-		#region Attr{g}: bool IsValidProject
-		static public bool IsValidProject
-		{
-			get
-			{
-				if (null == Project)
-					return false;
-				if (null == FBook)
-					return false;
-				if (null == TBook)
-					return false;
-				return true;
-			}
-		}
-		#endregion
-
-		// Styles & Markers ------------------------------------------------------------------
-		#region Attr{g}: static public DSFMapping Map - Styles <> Sf Markers
-		public static DSFMapping Map
-		{
-			get
-			{
-				return TeamSettings.SFMapping;
-			}
-		}
-		#endregion
-		#region Attr{g}: static public DStyleSheet StyleSheet
-		static public DStyleSheet StyleSheet
-		{
-			get
-			{
-				return TeamSettings.StyleSheet;
-			}
-		}
-		#endregion
-		#region Attr{g}: static BookStages TranslationStages
-		static public BookStages TranslationStages
-		{
-			get
-			{
-				return G.TeamSettings.TranslationStages;
-			}
-		}
-		#endregion
-
-		// Status Bar ------------------------------------------------------------------------
-		#region Method: void ProgressStart(string sProgressMessage, int nCount)
-		public static void ProgressStart(string sProgressMessage, int nCount)
-		{
-            if (null != OurWordMain.App)
-            {
-                OurWordMain.App.StatusMessage1 = sProgressMessage;
-                ToolStripProgressBar bar = OurWordMain.App.ProgressBar;
-                bar.Invalidate();
-                bar.Minimum = 0;
-                bar.Maximum = nCount;
-                bar.Value = 0;
-                bar.Step = 1;
-                bar.Visible = true;
-                SetWaitCursor();
-            }
-		}
-		#endregion
-		#region Method: void ProgressStep()
-		public static void ProgressStep()
-		{
-            if (null != OurWordMain.App)
-            {
-                OurWordMain.App.ProgressBar.PerformStep();
-            }
-		}
-		#endregion
-		#region Method: void ProgressEnd()
-		public static void ProgressEnd()
-		{
-            if (null != OurWordMain.App)
-            {
-                SetNormalCursor();
-                OurWordMain.App.ProgressBar.Visible = false;
-                OurWordMain.App.StatusMessage1 = "";
-            }
-		}
-		#endregion
-		#region Attr{g/s}: string StatusSecondaryMessage
-		public static string StatusSecondaryMessage
+        #region Attr{g/s}: string StatusSecondaryMessage
+        public static string StatusSecondaryMessage
 		{
 			get
 			{
@@ -3641,28 +3397,14 @@ namespace OurWord
 		}
 		#endregion
 
-        // Wait Cursor -----------------------------------------------------------------------
-		#region Method: void SetWaitCursor()
-		static public void SetWaitCursor()
-		{
-			OurWordMain.App.Cursor = Cursors.WaitCursor;
-		}
-		#endregion
-		#region Method: void SetNormalCursor()
-		static public void SetNormalCursor()
-		{
-			OurWordMain.App.Cursor = Cursors.Default;
-		}
-		#endregion
-
 		// Browse Directory ------------------------------------------------------------------
 		#region Attr{g/s}: string BrowseDirectory - last navigated-to directory (runtime only)
 		public static string BrowseDirectory
 		{
 			get
 			{
-				if ( s_sBrowseDirectory.Length == 0 )
-					s_sBrowseDirectory = G.TeamSettings.DataRootPath;
+				if (s_sBrowseDirectory.Length == 0)
+					s_sBrowseDirectory = DB.TeamSettings.ClusterFolder;
 				return s_sBrowseDirectory;
 			}
 			set
@@ -3680,16 +3422,6 @@ namespace OurWord
         #endregion
 
         // Misc ------------------------------------------------------------------------------
-        #region SAttr{g}: string Today - returns today's date as "2005-08-21" format.
-        static public string Today
-        {
-            get
-            {
-                DateTime dt = DateTime.Today;
-                return dt.ToString("yyyy-MM-dd");
-            }
-        }
-        #endregion
         #region SAttr{g}: bool IsLinux
         static public bool IsLinux
         {
@@ -3737,28 +3469,6 @@ namespace OurWord
             return LocDB.GetValue(
                 new string[] { "Strings", "GeneralUI" },
                 sItemID, 
-                sEnglishDefault,
-                null,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_Notes(sItemID, sEnglish) -         "Strings\Notes"
-        static public string GetLoc_Notes(string sItemID, string sEnglishDefault)
-        {
-            return LocDB.GetValue(
-                new string[] { "Strings", "Notes" },
-                sItemID,
-                sEnglishDefault,
-                null,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_NoteDefs(sItemID, sEnglish) -      "Strings\NoteDefs"
-        static public string GetLoc_NoteDefs(string sItemID, string sEnglishDefault)
-        {
-            return LocDB.GetValue(
-                new string[] { "Strings", "NoteDefs" },
-                sItemID,
                 sEnglishDefault,
                 null,
                 null);
@@ -3850,61 +3560,8 @@ namespace OurWord
                 null);
         }
         #endregion
-        #region SMethod: string GetLoc_BookAbbrev(string sBookAbbrev) -   "BookAbbrevs"
-        static public string GetLoc_BookAbbrev(string sBookAbbrev)
-        {
-            return LocDB.GetValue(
-                new string[] { "BookAbbrevs" },
-                sBookAbbrev,
-                sBookAbbrev,
-                G.TeamSettings.FileNameLanguage,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_BookGroupings(sItemID, sEnglish) - "BookGroupings"
-        static public string GetLoc_BookGroupings(string sItemID, string sEnglishDefault)
-        {
-            return LocDB.GetValue(
-                new string[] { "BookGroupings" },
-                sItemID,
-                sEnglishDefault,
-                null,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_Messages(sItemID, sEnglish) -      "Messages"
-        static public string GetLoc_Messages(string sItemID, string sEnglishDefault)
-        {
-            return LocDB.GetValue(
-                new string[] { "Messages" },
-                sItemID,
-                sEnglishDefault,
-                null,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_Messages(sItemID, sEnglish) -      "Messages\FileStructureMessages"
-        static public string GetLoc_StructureMessages(string sItemID, string sEnglishDefault)
-        {
-            return LocDB.GetValue(
-                new string[] { "Messages", "FileStructureMessages" },
-                sItemID,
-                sEnglishDefault,
-                null,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_TranslationStage(sItemID, sEnglish) - "TranslationStages" 
-        static public string GetLoc_TranslationStage(string sItemID, string sEnglish)
-        {
-            return LocDB.GetValue(
-                new string[] { "TranslationStages" },
-                sItemID,
-                sEnglish,
-                G.TeamSettings.FileNameLanguage,
-                null);
-        }
-        #endregion
+        /***
+        ***/
     }
 	#endregion
 
@@ -3916,6 +3573,67 @@ namespace OurWord
 		{}
 	}
 	#endregion
+
+
+    public class SplashProgress : IProgressIndicator
+    {
+        #region Method: void Start(string sMessage, int nCount)
+        public void Start(string sMessage, int nCount)
+        {
+            if (SplashScreen.IsShowing)
+            {
+                if (SplashScreen.Wnd.InvokeRequired)
+                {
+                    SplashScreen.SetStatus_Callback d = new
+                        SplashScreen.SetStatus_Callback(SplashScreen.Wnd.SetStatus);
+                    G.App.Invoke(d, new object[] { sMessage, nCount });
+                }
+                else
+                {
+                    SplashScreen.Wnd.SetStatus(sMessage, nCount);
+                }
+            }
+        }
+        #endregion
+        #region Method: void Step()
+        public void Step()
+        {
+            if (SplashScreen.IsShowing)
+            {
+                if (SplashScreen.Wnd.InvokeRequired)
+                {
+                    SplashScreen.IncrementProgress_Callback d = new
+                        SplashScreen.IncrementProgress_Callback(SplashScreen.Wnd.IncrementProgress);
+                    G.App.Invoke(d, new object[] { });
+                }
+                else
+                {
+                    SplashScreen.Wnd.IncrementProgress();
+                }
+            }
+        }
+        #endregion
+        #region Method: void End()
+        public void End()
+        {
+            if (SplashScreen.IsShowing)
+            {
+                if (SplashScreen.Wnd.InvokeRequired)
+                {
+                    SplashScreen.ResetProgress_Callback d = new
+                        SplashScreen.ResetProgress_Callback(SplashScreen.Wnd.ResetProgress);
+                    G.App.Invoke(d, new object[] { });
+                }
+                else
+                {
+                    SplashScreen.Wnd.ResetProgress();
+                }
+            }
+        }
+        #endregion
+    }
+
+
 }
 
 

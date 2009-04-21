@@ -18,7 +18,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -44,15 +44,24 @@ namespace OurWordTests.DataModel
 {
     [TestFixture] public class T_DTranslatorNote
     {
+        DSection m_Section;
+
         // Test Data & Etc
         #region Setup 
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Test Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Test Project";
+            DB.Project.TargetTranslation = new DTranslation();
+
+            DBook book = new DBook("LUK");
+            DB.Project.TargetTranslation.Books.Append(book);
+
+            m_Section = new DSection(1);
+            book.Sections.Append(m_Section);
         }
         #endregion
         #region Method: TranslatorNote CreateTestTranslatorNote()
@@ -101,7 +110,15 @@ namespace OurWordTests.DataModel
             return s;
         }
         #endregion
-
+        #region Method: TranslatorNote CreateFromXmlString(string s)
+        TranslatorNote CreateFromXmlString(string s)
+        {
+            XElement x = XElement.CreateFrom(s)[0];
+            TranslatorNote note = new TranslatorNote();
+            note.FromXml(x);
+            return note;
+        }
+        #endregion
         // Content Equals
         #region Test: ContentEquals_Discussion
         [Test] public void ContentEquals_Discussion()
@@ -422,5 +439,137 @@ namespace OurWordTests.DataModel
 
         }
         #endregion
+
+        // Merge
+        #region Test: MergeDiscussion_WeChanged
+        [Test] public void MergeDiscussion_WeChanged()
+        {
+            Discussion Parent = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
+            Discussion Mine = new Discussion("John", new DateTime(2008, 11, 23),
+                "I say Bibit is the correct term.");
+            Discussion Theirs = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
+
+            Mine.Merge(Parent, Theirs);
+
+            Assert.AreEqual(
+                "D: Author={John} Created={11/23/2008} + Content={p:<I say Bibit is the correct term.>}",
+                Mine.DebugString);
+        }
+        #endregion
+        #region Test: MergeDiscussion_TheyChanged
+        [Test] public void MergeDiscussion_TheyChanged()
+        {
+            Discussion Parent = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
+            Discussion Theirs = new Discussion("John", new DateTime(2008, 11, 23),
+                "They say Bibit is the correct term.");
+            Discussion Mine = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
+
+            Mine.Merge(Parent, Theirs);
+
+            Assert.AreEqual(
+                "D: Author={John} Created={11/23/2008} + Content={p:<They say Bibit is the correct term.>}",
+                Mine.DebugString);
+        }
+        #endregion
+        #region Test: MergeDiscussion_BothChanged
+        [Test] public void MergeDiscussion_BothChanged()
+        {
+            Discussion Parent = new Discussion("John", new DateTime(2008, 11, 23),
+                "Is bibit the correct term for seed here?");
+            Discussion Theirs = new Discussion("John", new DateTime(2008, 11, 23),
+                "They say Bibit is the correct term.");
+            Discussion Mine = new Discussion("John", new DateTime(2008, 11, 23),
+                "I say Bibit is the wrong term.");
+
+            // TEST 1: They Win
+            // Set the DefaultAuthor to "Mary" so that "They" should win
+            string sDefaultAuthor = Discussion.DefaultAuthor;
+            Discussion.DefaultAuthor = "Mary";
+            Mine.Merge(Parent, Theirs);
+            Discussion.DefaultAuthor = sDefaultAuthor;
+            Assert.AreEqual(
+                "D: Author={John} Created={11/23/2008} + " +
+                    "Content={p:<They say Bibit is the correct term.>}",
+                Mine.DebugString);
+
+            // TEST 2: We Win
+            // Go again, but this time with "John" so that "We" win
+            Mine = new Discussion("John", new DateTime(2008, 11, 23),
+                "I say Bibit is the wrong term.");
+            Discussion.DefaultAuthor = "John";
+            Mine.Merge(Parent, Theirs);
+            Discussion.DefaultAuthor = sDefaultAuthor;
+            Assert.AreEqual(
+                "D: Author={John} Created={11/23/2008} + " +
+                    "Content={p:<I say Bibit is the wrong term.>}",
+                Mine.DebugString);
+        }
+        #endregion
+        #region Test: void MergeNote()
+        [Test] public void MergeNote()
+            // Tests that:
+            // - Both Mine and Theirs created a new Discussion; tests that both were
+            //     added.
+            // - Both Mine and Theirs changed the AssignedTo, but since Mine was the
+            //    most recent Discussion, the result should use Mine's AssignedTo.
+        {
+            string sParent = "<TranslatorNote Category=\"To Do\" AssignedTo=\"John\" " +
+                "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
+                "<ownseq Name=\"Discussions\">" +
+                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
+                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
+                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
+                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
+                "</ownseq></TranslatorNote>";
+            string sMine = "<TranslatorNote Category=\"To Do\" AssignedTo=\"Sandra\" " +
+                "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
+                "<ownseq Name=\"Discussions\">" +
+                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
+                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
+                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
+                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
+                  "<Discussion Author=\"John\" Created=\"2008-11-15 00:00:00Z\">" +
+                    GetExpectedParagraphString("I'm not convinced.") + "</Discussion>" +
+                "</ownseq></TranslatorNote>";
+            string sTheirs = "<TranslatorNote Category=\"To Do\" AssignedTo=\"Emily\" " +
+                "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
+                "<ownseq Name=\"Discussions\">" +
+                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
+                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
+                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
+                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
+                  "<Discussion Author=\"Sandra\" Created=\"2008-11-14 00:00:00Z\">" +
+                    GetExpectedParagraphString("Really, it is!") + "</Discussion>" +
+                "</ownseq></TranslatorNote>";
+
+            TranslatorNote Parent = CreateFromXmlString(sParent);
+            TranslatorNote Mine = CreateFromXmlString(sMine);
+            TranslatorNote Theirs = CreateFromXmlString(sTheirs);
+
+            Mine.Merge(Parent, Theirs);
+
+            string sExpected = "<TranslatorNote Category=\"To Do\" AssignedTo=\"Sandra\" " +
+                "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
+                "<ownseq Name=\"Discussions\">" +
+                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
+                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
+                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
+                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
+                  "<Discussion Author=\"Sandra\" Created=\"2008-11-14 00:00:00Z\">" +
+                    GetExpectedParagraphString("Really, it is!") + "</Discussion>" +
+                  "<Discussion Author=\"John\" Created=\"2008-11-15 00:00:00Z\">" +
+                    GetExpectedParagraphString("I'm not convinced.") + "</Discussion>" +
+                "</ownseq></TranslatorNote>";
+
+            XElement xOut = Mine.ToXml(true);
+            string sOut = xOut.OneLiner;
+            Assert.AreEqual(sExpected, sOut);
+        }
+        #endregion
+
     }
 }

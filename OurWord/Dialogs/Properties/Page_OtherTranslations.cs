@@ -1,14 +1,16 @@
+#region ***** Page_OtherTranslations.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Page_OtherTranslations.cs
  * Author:  John Wimbish
  * Created: 28 Dec 2004
  * Purpose: Sets up the members of the Siblings or the Reference translations list.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Data;
@@ -23,43 +25,75 @@ using System.Threading;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
+#endregion
 #endregion
 
 namespace OurWord.Dialogs
 {
     public class Page_OtherTranslations : DlgPropertySheet
 	{
-		// Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: ListBox List
-		ListBox List
+        // List of available languages to choose from ----------------------------------------
+        #region Attr{g}: List<string> AvailableLanguages
+        List<string> AvailableLanguages
+        {
+            get
+            {
+                return m_vAvailableLanguages;
+            }
+        }
+        List<string> m_vAvailableLanguages;
+        #endregion
+        #region Method: void BuildAvailableLanguages()
+        void BuildAvailableLanguages()
+        {
+            // Get the list from the current folder contents
+            m_vAvailableLanguages = DTeamSettings.GetLanguageListFromDisk(
+                DB.TeamSettings.DisplayName);
+
+            // Remove the Front and Target translations
+            if (null != DB.FrontTranslation)
+                AvailableLanguages.Remove(DB.FrontTranslation.DisplayName);
+            if (null != DB.TargetTranslation)
+                AvailableLanguages.Remove(DB.TargetTranslation.DisplayName);
+        }
+        #endregion
+
+        // CheckBox List ---------------------------------------------------------------------
+        #region Attr{g}: CheckedListBox List
+        CheckedListBox List
 		{
 			get
 			{
-				return m_list;
+                return m_listTranslations;
 			}
 		}
 		#endregion
-		#region Attr{g}: static string MostRecentFolder - so we nav to the same place
-		static string MostRecentFolder
-		{
-			get
-			{
-				if (0 == m_sMostRecentFolder.Length)
-					m_sMostRecentFolder = G.TeamSettings.DataRootPath;
-				return m_sMostRecentFolder;
-			}
-			set
-			{
-				Debug.Assert(value.Length > 0);
-				m_sMostRecentFolder = value;
-			}
-		}
-		private static string m_sMostRecentFolder = "";
-		#endregion
+        #region Method: void PopulateList()
+        void PopulateList()
+        {
+            List.Items.Clear();
+
+            foreach (string s in AvailableLanguages)
+            {
+                // Is the item already in our list?
+                bool bChecked = false;
+                foreach (DTranslation t in DB.Project.OtherTranslations)
+                {
+                    if (t.DisplayName == s)
+                        bChecked = true;
+                }
+
+                // Add the item, appropriately checked.
+                List.Items.Add(s, bChecked);
+            }
+        }
+        #endregion
+
+        // Attrs -----------------------------------------------------------------------------
         #region VAttr{g}: DTranslation SelectedTranslation
         DTranslation SelectedTranslation
         {
@@ -73,7 +107,7 @@ namespace OurWord.Dialogs
                 string sDisplayName = List.SelectedItem.ToString();
 
                 // Find it in the list
-                foreach (DTranslation t in G.Project.OtherTranslations)
+                foreach (DTranslation t in DB.Project.OtherTranslations)
                 {
                     if (t.DisplayName == sDisplayName)
                         return t;
@@ -86,16 +120,11 @@ namespace OurWord.Dialogs
 
         // Scaffolding -----------------------------------------------------------------------
 		#region Dialog Controls
-		protected System.Windows.Forms.Label m_lblSetup;
-		protected System.Windows.Forms.Label m_lblTranslation;
-		private System.Windows.Forms.Label m_lblActions;
+        protected System.Windows.Forms.Label m_lblSetup;
 		private System.Windows.Forms.Button m_btnCreate;
-		protected System.Windows.Forms.Label m_lblCreate;
-		private System.Windows.Forms.Button m_btnOpen;
-		protected System.Windows.Forms.Label m_lblOpen;
-		private System.Windows.Forms.ListBox m_list;
-		private System.Windows.Forms.Button m_btnRemove;
-		protected System.Windows.Forms.Label m_lblRemove;
+        protected System.Windows.Forms.Label m_lblCreate;
+        private CheckedListBox m_listTranslations;
+        private Label m_labelInstructions;
 		// Required designer variable.
 		private System.ComponentModel.Container components = null;
 		#endregion
@@ -128,121 +157,76 @@ namespace OurWord.Dialogs
 		private void InitializeComponent()
 		{
             this.m_lblSetup = new System.Windows.Forms.Label();
-            this.m_lblTranslation = new System.Windows.Forms.Label();
-            this.m_list = new System.Windows.Forms.ListBox();
-            this.m_lblActions = new System.Windows.Forms.Label();
-            this.m_btnRemove = new System.Windows.Forms.Button();
             this.m_btnCreate = new System.Windows.Forms.Button();
             this.m_lblCreate = new System.Windows.Forms.Label();
-            this.m_btnOpen = new System.Windows.Forms.Button();
-            this.m_lblOpen = new System.Windows.Forms.Label();
-            this.m_lblRemove = new System.Windows.Forms.Label();
+            this.m_listTranslations = new System.Windows.Forms.CheckedListBox();
+            this.m_labelInstructions = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // m_lblSetup
             // 
             this.m_lblSetup.Location = new System.Drawing.Point(8, 8);
             this.m_lblSetup.Name = "m_lblSetup";
-            this.m_lblSetup.Size = new System.Drawing.Size(445, 33);
+            this.m_lblSetup.Size = new System.Drawing.Size(457, 33);
             this.m_lblSetup.TabIndex = 0;
             this.m_lblSetup.Text = "A Reference Translation is another translation that you may want to view during t" +
                 "he translation process.";
             this.m_lblSetup.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // m_lblTranslation
-            // 
-            this.m_lblTranslation.Location = new System.Drawing.Point(8, 53);
-            this.m_lblTranslation.Name = "m_lblTranslation";
-            this.m_lblTranslation.Size = new System.Drawing.Size(88, 85);
-            this.m_lblTranslation.TabIndex = 15;
-            this.m_lblTranslation.Text = "Current Reference Translations:";
-            // 
-            // m_list
-            // 
-            this.m_list.Location = new System.Drawing.Point(102, 53);
-            this.m_list.Name = "m_list";
-            this.m_list.Size = new System.Drawing.Size(351, 147);
-            this.m_list.TabIndex = 1;
-            this.m_list.DoubleClick += new System.EventHandler(this.cmdProperties);
-            // 
-            // m_lblActions
-            // 
-            this.m_lblActions.Location = new System.Drawing.Point(8, 202);
-            this.m_lblActions.Name = "m_lblActions";
-            this.m_lblActions.Size = new System.Drawing.Size(445, 23);
-            this.m_lblActions.TabIndex = 17;
-            this.m_lblActions.Text = "Available UndoStack:";
-            this.m_lblActions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_btnRemove
-            // 
-            this.m_btnRemove.Location = new System.Drawing.Point(11, 325);
-            this.m_btnRemove.Name = "m_btnRemove";
-            this.m_btnRemove.Size = new System.Drawing.Size(75, 23);
-            this.m_btnRemove.TabIndex = 4;
-            this.m_btnRemove.Text = "Remove...";
-            this.m_btnRemove.Click += new System.EventHandler(this.cmdRemove);
-            // 
             // m_btnCreate
             // 
-            this.m_btnCreate.Location = new System.Drawing.Point(11, 228);
+            this.m_btnCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.m_btnCreate.Location = new System.Drawing.Point(11, 310);
             this.m_btnCreate.Name = "m_btnCreate";
-            this.m_btnCreate.Size = new System.Drawing.Size(75, 23);
+            this.m_btnCreate.Size = new System.Drawing.Size(75, 41);
             this.m_btnCreate.TabIndex = 2;
-            this.m_btnCreate.Text = "Create...";
+            this.m_btnCreate.Text = "Create New...";
             this.m_btnCreate.Click += new System.EventHandler(this.cmdCreate);
             // 
             // m_lblCreate
             // 
-            this.m_lblCreate.Location = new System.Drawing.Point(99, 228);
+            this.m_lblCreate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_lblCreate.Location = new System.Drawing.Point(92, 310);
             this.m_lblCreate.Name = "m_lblCreate";
-            this.m_lblCreate.Size = new System.Drawing.Size(354, 47);
+            this.m_lblCreate.Size = new System.Drawing.Size(373, 47);
             this.m_lblCreate.TabIndex = 19;
             this.m_lblCreate.Text = "Start from scratch to initialize settings for a reference translation. You will b" +
                 "e presented with blank settings, and will need to enter the name of the translat" +
-                "ion, its books, etc.";
+                "ion, import its books, etc.";
             // 
-            // m_btnOpen
+            // m_listTranslations
             // 
-            this.m_btnOpen.Location = new System.Drawing.Point(11, 275);
-            this.m_btnOpen.Name = "m_btnOpen";
-            this.m_btnOpen.Size = new System.Drawing.Size(75, 23);
-            this.m_btnOpen.TabIndex = 3;
-            this.m_btnOpen.Text = "Open...";
-            this.m_btnOpen.Click += new System.EventHandler(this.cmdOpen);
+            this.m_listTranslations.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_listTranslations.FormattingEnabled = true;
+            this.m_listTranslations.Location = new System.Drawing.Point(11, 58);
+            this.m_listTranslations.Name = "m_listTranslations";
+            this.m_listTranslations.Size = new System.Drawing.Size(269, 229);
+            this.m_listTranslations.Sorted = true;
+            this.m_listTranslations.TabIndex = 1;
+            this.m_listTranslations.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.cmdItemCheck);
             // 
-            // m_lblOpen
+            // m_labelInstructions
             // 
-            this.m_lblOpen.Location = new System.Drawing.Point(99, 275);
-            this.m_lblOpen.Name = "m_lblOpen";
-            this.m_lblOpen.Size = new System.Drawing.Size(354, 50);
-            this.m_lblOpen.TabIndex = 21;
-            this.m_lblOpen.Text = "Make use of existing settings for a reference translation. If you defined the tra" +
-                "nslation in another project, then you can reuse it here, rather than entering th" +
-                "e information all over again.";
-            // 
-            // m_lblRemove
-            // 
-            this.m_lblRemove.Location = new System.Drawing.Point(99, 325);
-            this.m_lblRemove.Name = "m_lblRemove";
-            this.m_lblRemove.Size = new System.Drawing.Size(354, 42);
-            this.m_lblRemove.TabIndex = 22;
-            this.m_lblRemove.Text = "Remove the selected translation from the list above. This does not remove the set" +
-                "tings file from the disk; it only removes it from this project.";
+            this.m_labelInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_labelInstructions.Location = new System.Drawing.Point(286, 58);
+            this.m_labelInstructions.Name = "m_labelInstructions";
+            this.m_labelInstructions.Size = new System.Drawing.Size(179, 168);
+            this.m_labelInstructions.TabIndex = 24;
+            this.m_labelInstructions.Text = "Place a check beside the translations you want to place in the Side Window. You c" +
+                "an use the Create button to add a new translation that does not appear in this l" +
+                "ist.";
             // 
             // Page_OtherTranslations
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.Controls.Add(this.m_lblRemove);
-            this.Controls.Add(this.m_lblOpen);
-            this.Controls.Add(this.m_btnOpen);
+            this.Controls.Add(this.m_labelInstructions);
+            this.Controls.Add(this.m_listTranslations);
             this.Controls.Add(this.m_lblCreate);
             this.Controls.Add(this.m_btnCreate);
-            this.Controls.Add(this.m_lblActions);
-            this.Controls.Add(this.m_list);
-            this.Controls.Add(this.m_lblTranslation);
-            this.Controls.Add(this.m_btnRemove);
             this.Controls.Add(this.m_lblSetup);
             this.Name = "Page_OtherTranslations";
             this.Size = new System.Drawing.Size(468, 368);
@@ -252,7 +236,120 @@ namespace OurWord.Dialogs
 		}
 		#endregion
 
-		// Methods ---------------------------------------------------------------------------
+        // DlgPropertySheet overrides --------------------------------------------------------
+		public const string c_sID = "idTranslations";
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return c_sID;
+			}
+		}
+		#endregion
+		#region Method: void ShowHelp()
+        public override void ShowHelp()
+        {
+            HelpSystem.ShowTopic(HelpSystem.Topic.kReferenceTranslations);
+        }
+        #endregion
+        #region Attr{g}: string TabText
+        public override string Title
+        {
+            get
+            {
+                return "Reference Translations";
+            }
+        }
+        #endregion
+
+		// Command Handlers ------------------------------------------------------------------
+		#region Cmd: cmdLoad
+		private void cmdLoad(object sender, System.EventArgs e)
+		{
+            Control[] vExclude = { m_listTranslations };
+            LocDB.Localize(this, vExclude);
+
+            BuildAvailableLanguages();
+
+			PopulateList();
+		}
+		#endregion
+        #region Cmd: cmdCreate - Add a new translation to the list
+        private void cmdCreate(object sender, System.EventArgs e)
+		{
+            // Ask the user to supply a valid name for this new translation
+            var dlg = new DlgCreateTranslation();
+            if (dlg.ShowDialog() != DialogResult.OK)
+                return;
+
+            // Create and store the new translation
+            DTranslation t = new DTranslation(dlg.TranslationName);
+            DB.Project.OtherTranslations.Append(t);
+            t.Write(new NullProgress());
+
+            // Add it to the Properties dialog and go to its page
+            ParentDlg.InitNavigation(Page_Translation.ComputeID(t.DisplayName));
+
+		}
+		#endregion
+        #region Cmd: cmdItemCheck - turn on/off display of a translation
+        private void cmdItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            // Retrieve the item
+            string sItem = (string)List.Items[e.Index];
+            bool bChecked = (e.NewValue == CheckState.Checked);
+
+            // Locate the trtanslation in the list, if it is there
+            int iPos = DB.Project.OtherTranslations.Find(sItem);
+
+            // If it is being unchecked, then remove it from the list.
+            if (!bChecked)
+            {
+                if (-1 != iPos)
+                {
+                    DTranslation tRemove = DB.Project.OtherTranslations[iPos];
+                    if (null != tRemove)
+                        DB.Project.OtherTranslations.Remove(tRemove);
+                    ParentDlg.InitNavigation(Page_OtherTranslations.c_sID);
+                }
+            }
+
+            // If it is being checked, then add it to the list if it isn't there
+            // (It may already be there if we're initializing the dialog)
+            if (bChecked)
+            {
+                if (-1 == iPos)
+                {
+                    DTranslation tInsert = new DTranslation(sItem);
+                    DB.Project.OtherTranslations.Append(tInsert);
+                    tInsert.Load(G.CreateProgressIndicator());
+                    ParentDlg.InitNavigation(Page_OtherTranslations.c_sID);
+                }
+            }
+        }
+        #endregion
+
+        // Destined for Obsolescence
+        #region Destined for Obsolescence
+        /***
+		#region Attr{g}: static string MostRecentFolder - so we nav to the same place
+		static string MostRecentFolder
+		{
+			get
+			{
+				if (0 == m_sMostRecentFolder.Length)
+					m_sMostRecentFolder = DB.TeamSettings.StoragePath;
+				return m_sMostRecentFolder;
+			}
+			set
+			{
+				Debug.Assert(value.Length > 0);
+				m_sMostRecentFolder = value;
+			}
+		}
+		private static string m_sMostRecentFolder = "";
+		#endregion
 		#region Method: void PopulateList()
 		protected void PopulateList()
 		{
@@ -266,7 +363,7 @@ namespace OurWord.Dialogs
 			List.Items.Clear();
 
 			// Put the daughter names into the list
-			foreach(DTranslation t in G.Project.OtherTranslations)
+			foreach(DTranslation t in DB.Project.OtherTranslations)
 			{
 				List.Items.Add( t.DisplayName );
 			}
@@ -289,155 +386,8 @@ namespace OurWord.Dialogs
 			}
 		}
 		#endregion
-
-        // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: void ShowHelp()
-        public override void ShowHelp()
-        {
-            HelpSystem.ShowTopic(HelpSystem.Topic.kReferenceTranslations);
-        }
+        ***/
         #endregion
-        #region Attr{g}: string TabText
-        public override string TabText
-        {
-            get
-            {
-                return "Translations List";
-            }
-        }
-        #endregion
-
-		// Command Handlers ------------------------------------------------------------------
-		#region Handler: cmdLoad
-		private void cmdLoad(object sender, System.EventArgs e)
-		{
-            Control[] vExclude = { };
-            LocDB.Localize(this, vExclude);
-
-			PopulateList();
-		}
-		#endregion
-		#region Handler: cmdCreate - Add a blank translation settings to the list
-		private void cmdCreate(object sender, System.EventArgs e)
-		{
-			// Launch the dialog to prompt for crucial information: Name and
-			// Settings Filename. The user has the option to abort from this dlg.
-			DialogCreateTranslation dlg = new DialogCreateTranslation();
-			if (DialogResult.OK != dlg.ShowDialog(this))
-				return;
-
-			// Create the DTranslation object, initialize it, place it into the Project
-			// settings.
-			DTranslation trans = new DTranslation( dlg.TranslationName, "Latin", "Latin");
-            G.Project.OtherTranslations.Append(trans);
-            trans.AbsolutePathName = dlg.SettingsPath;
-			trans.LanguageAbbrev = dlg.Abbreviation;
-			PopulateList(trans.DisplayName);
-
-			// Update the tabs
-            ParentDlg.SetupTabControl(DialogProperties.c_navTranslations);
-            ParentDlg.ActivatePage(trans);
-		}
-		#endregion
-		#region Handler: cmdOpen - add an existing translation to the list
-		private void cmdOpen(object sender, System.EventArgs e)
-		{
-            // Launch the dialog to prompt for the Settings Filename. The user has the 
-            // option to abort from this dlg.
-            DialogOpenTranslation dlg = new DialogOpenTranslation();
-            if (DialogResult.OK != dlg.ShowDialog())
-                return;
-
-            // Read in the translatino object
-            DTranslation trans = new DTranslation();
-            G.Project.OtherTranslations.Append(trans);
-            trans.AbsolutePathName = dlg.SettingsPath;  // First so we know what to load
-            trans.Load();
-            trans.AbsolutePathName = dlg.SettingsPath;  // Second because Load overwrote it
-
-            // Update the list
-            PopulateList(trans.DisplayName);
-
-            // Remember the folder for next time
-            MostRecentFolder = Path.GetDirectoryName(dlg.SettingsPath);
-
-            /*** THIS IS CODE I WROTE DURING THE PROP DLG REWRITE: I've replaced it
-             * with the above, having noticed that Page_SetupFT does things differently,
-             * and feeling that both should operate in the same manner.
-             * 
-			// Create and initialize the OS's OpenFileDialog. Settings are:
-			OpenFileDialog dlg = new OpenFileDialog();
-
-			// - We only want to return a single file
-			dlg.Multiselect = false;
-
-			// - Filter on oTrans files
-			dlg.Filter = StrRes.FileFilterTranslation;
-			dlg.FilterIndex = 0;
-
-			// - Use the same path as last time
-			dlg.InitialDirectory = MostRecentFolder;
-
-			// Retrieve Dialog Title from resources
-			dlg.Title = StrRes.DlgOpenSiblingTranslation_Title;
-
-			// Run the dialog
-			if (DialogResult.OK != dlg.ShowDialog(this))
-				return;
-
-			// Read in the translation's settings
-            DTranslation trans = new DTranslation(Path.GetFileName( dlg.FileName ), 
-                "Latin", "Latin");
-            G.Project.OtherTranslations.Append(trans);
-            trans.AbsolutePathName = dlg.FileName;  // First so we know what to load
-            trans.Load();
-            trans.AbsolutePathName = dlg.FileName;  // Second because Load overwrote it
-
-            // Update the list
-            PopulateList(trans.DisplayName);
-
-			// Remember the folder for next time
-			MostRecentFolder = Path.GetDirectoryName( dlg.FileName );
-            ***/
-
-            // Update the tabs
-            ParentDlg.SetupTabControl(DialogProperties.c_navTranslations);
-            ParentDlg.ActivatePage(trans);
-        }
-		#endregion
-		#region Handler: cmdRemove - remove a translation from the list
-		private void cmdRemove(object sender, System.EventArgs e)
-		{
-			// Nothing to do if there is nothing selected in the list
-            if (null == SelectedTranslation)
-                return;
-
-			// Make sure the user wants to remove the translation.
-			if (!Messages.VerifyRemoveTranslation() )
-				return;
-
-			// Remove it from the Project
-            ParentDlg.HarvestChangesFromCurrentSheet();
-            G.Project.OtherTranslations.Remove(SelectedTranslation);
-
-			// Refresh the listbox
-			PopulateList();
-
-            // Update the tabs
-            ParentDlg.SetupTabControl(DialogProperties.c_navTranslations);
-        }
-		#endregion
-		#region Handler: cmdProperties - on dbl click on list item, activate that page
-		private void cmdProperties(object sender, System.EventArgs e)
-		{
-            // Nothing to do if there is nothing selected in the list
-            if (null == SelectedTranslation)
-                return;
-
-            // Activate the tab
-            ParentDlg.ActivatePage(SelectedTranslation);
-		}
-		#endregion
     }
 
 }

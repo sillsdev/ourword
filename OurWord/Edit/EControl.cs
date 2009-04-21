@@ -19,7 +19,7 @@ using System.Windows.Forms;
 using System.Text;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Edit
@@ -105,8 +105,8 @@ namespace OurWord.Edit
             // AvailableWidthForOneSubitem method (see EToolStrip)
         }
         #endregion
-        #region VMethod: void CalculateVerticals()
-        public virtual void CalculateVerticals(float y, bool bRepositionOnly)
+		#region OMethod: void CalculateVerticals(y, bRepositionOnly)
+		public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Set to the top-left position and width
             Position = new PointF(Position.X, y);
@@ -119,16 +119,15 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Painting --------------------------------------------------------------------------
-        #region OMethod: void OnPaint(Rectangle ClipRectangle)
-        public override void OnPaint(Rectangle ClipRectangle)
-        {
-            // We must move the control according to scrolling
-            float fScrollAmount = Window.ScrollBarPosition;
-            Control.Top = (int)(Position.Y - fScrollAmount);
-        }
-        #endregion
-    }
+		// Painting --------------------------------------------------------------------------
+		#region OMethod: void PaintControls()
+		public override void PaintControls()
+		{
+			float fScrollAmount = Window.ScrollBarPosition;
+			Control.Top = (int)(Position.Y - fScrollAmount);
+		}
+		#endregion
+	}
 
     public class EToolStrip : EControl
     {
@@ -208,8 +207,8 @@ namespace OurWord.Edit
             Width = Owner.AvailableWidthForOneSubitem;
         }
         #endregion
-        #region OMethod: void CalculateVerticals()
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+		#region OMethod: void CalculateVerticals(y, bRepositionOnly)
+		public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Set to the top-left position and width
             Position = new PointF(Position.X, y + c_nTopMargin);

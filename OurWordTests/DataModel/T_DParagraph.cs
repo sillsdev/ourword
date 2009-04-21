@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Tests the DParagraph class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -18,7 +18,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -35,13 +35,13 @@ namespace OurWordTests.DataModel
         {
             JWU.NUnit_Setup();
 
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Project";
-            G.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
-            DBook book = new DBook("MRK", "");
-            G.Project.TargetTranslation.AddBook(book);
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
+            DBook book = new DBook("MRK");
+            DB.Project.TargetTranslation.AddBook(book);
             m_section = new DSection(1);
             book.Sections.Append(m_section);
         }
@@ -50,7 +50,7 @@ namespace OurWordTests.DataModel
         [TearDown]
         public void TearDown()
         {
-            OurWordMain.Project = null;
+            DB.Project = null;
         }
         #endregion
 
@@ -66,17 +66,17 @@ namespace OurWordTests.DataModel
             p.AddRun(DVerse.Create("16"));
 
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "For God so loved the "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "For God so loved the "));
             text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that he gave his one and only son"));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that he gave his one and only son"));
             p.AddRun(text);
 
             p.AddRun(DVerse.Create("17"));
 
             text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "that whosoever believes in him "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that whosoever believes in him "));
             text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, "but have everlasting life."));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "but have everlasting life."));
             p.AddRun(text);
 
             m_section.Paragraphs.Append(p);
@@ -335,7 +335,7 @@ namespace OurWordTests.DataModel
 
             // The styles we don't allow
             string[] vs = new string[] { 
-                DStyleSheet.c_StyleSectionTitle,
+                DStyleSheet.c_sfmSectionHead,
                 DStyleSheet.c_StyleAbbrevPictureCaption,
                 DStyleSheet.c_StyleNote,
                 DStyleSheet.c_StyleFootnote
@@ -479,14 +479,14 @@ namespace OurWordTests.DataModel
             p.AddRun(DVerse.Create("16"));
 
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, 
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, 
                 "For God so loved the world that he gave his one and only son "));
             p.AddRun(text);
 
             p.AddRun(DVerse.Create("17"));
 
             text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "that whosoever believes in him shall not perish."));
             p.AddRun(text);
 
@@ -503,14 +503,14 @@ namespace OurWordTests.DataModel
             DParagraph p = new DParagraph();
 
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "For God so loved the world that he gave his one and only son "));
             p.AddRun(text);
 
             p.AddRun(DVerse.Create("17"));
 
             text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "that whosoever believes in him shall not perish."));
             p.AddRun(text);
 
@@ -527,7 +527,7 @@ namespace OurWordTests.DataModel
             DParagraph p = new DParagraph();
 
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal,
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
                 "For God so loved the world that he gave his one and only son "));
             p.AddRun(text);
 
@@ -634,6 +634,7 @@ namespace OurWordTests.DataModel
         {
             // Create a paragraph with a single DText
             DParagraph p = new DParagraph();
+            m_section.Paragraphs.Append(p);
             DText text = new DText();
             p.Runs.Append(text);
             text.Phrases.Append(new DPhrase("p", "This is some text."));
@@ -649,5 +650,7 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(p.ContentEquals(pNew), "Paragraphs should be equal.");
         }
         #endregion
+
+
     }
 }

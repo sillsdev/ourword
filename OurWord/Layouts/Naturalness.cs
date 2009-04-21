@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 16 Aug 2007
  * Purpose: Manages the Naturalness Check view.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -17,7 +17,7 @@ using System.Windows.Forms;
 using System.Data;
 using System.IO;
 
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Edit;
 using OurWord.View;
 using JWdb;
@@ -138,12 +138,12 @@ namespace OurWord.View
         {
             get
             {
-                if (!G.IsValidProject)
+                if (!DB.IsValidProject)
                     return "";
-                if (null == OurWordMain.Project.TargetTranslation)
+                if (null == DB.Project.TargetTranslation)
                     return "";
 
-                return OurWordMain.Project.TargetTranslation.DisplayName.ToUpper();
+                return DB.Project.TargetTranslation.DisplayName.ToUpper();
             }
         }
         #endregion
@@ -157,16 +157,16 @@ namespace OurWord.View
             Clear();
 
             // Nothing more to do if we don't have a completely-defined project
-            if (!G.Project.HasDataToDisplay)
+            if (!DB.Project.HasDataToDisplay)
                 return;
 
             // Save calculating this over and over
-            bool bAllParagraphsMatchFront = G.STarget.AllParagraphsMatchFront;
+            bool bAllParagraphsMatchFront = DB.TargetSection.AllParagraphsMatchFront;
 
             // Load the paragraphs
-            for(int ip = 0; ip<G.STarget.Paragraphs.Count; ip++)
+            for (int ip = 0; ip < DB.TargetSection.Paragraphs.Count; ip++)
             {
-                DParagraph p = G.STarget.Paragraphs[ip] as DParagraph;
+                DParagraph p = DB.TargetSection.Paragraphs[ip] as DParagraph;
 
                 // Retrieve the bitmap, if a picture is involved
                 Bitmap bmp = null;
@@ -197,7 +197,7 @@ namespace OurWord.View
                 // Italics?
                 if (bAllParagraphsMatchFront)
                 {
-                    DParagraph pFront = G.SFront.Paragraphs[ip] as DParagraph;
+                    DParagraph pFront = DB.FrontSection.Paragraphs[ip] as DParagraph;
                     if (pFront.HasItalics)
                         options |= OWPara.Flags.CanItalic;
                 }
@@ -216,9 +216,9 @@ namespace OurWord.View
 
             // Load the footnotes
             bool bFirstFootnote = true;
-            for(int iFn = 0; iFn < G.STarget.Footnotes.Count; iFn++)
+            for (int iFn = 0; iFn < DB.TargetSection.Footnotes.Count; iFn++)
             {
-                DFootnote fn = G.STarget.Footnotes[iFn] as DFootnote;
+                DFootnote fn = DB.TargetSection.Footnotes[iFn] as DFootnote;
 
                 EContainer container = StartNewRow(bFirstFootnote);
                 bFirstFootnote = false;
@@ -234,7 +234,7 @@ namespace OurWord.View
                 // Italics?
                 if (bAllParagraphsMatchFront)
                 {
-                    DFootnote fnFront = G.SFront.Footnotes[iFn] as DFootnote;
+                    DFootnote fnFront = DB.FrontSection.Footnotes[iFn] as DFootnote;
                     if (fnFront.HasItalics)
                         options |= OWPara.Flags.CanItalic;
                 }

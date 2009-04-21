@@ -18,7 +18,7 @@ using System.IO;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Edit
@@ -313,7 +313,6 @@ namespace OurWord.Edit
         }
         float m_fHyphenWidth = 0;
         #endregion
-
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(...)
@@ -695,6 +694,8 @@ namespace OurWord.Edit
         #region OMethod: void CalculateWidth(Graphics g)
         override public void CalculateWidth(Graphics g)
         {
+			HyphenWidth = 0;
+
             if (IsInsertionIcon)
             {
                 Width = Draw.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);

@@ -17,7 +17,7 @@ using System.IO;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord.Edit
@@ -153,7 +153,7 @@ namespace OurWord.Edit
                 if (!CanRestructureParagraphs)
                     return false;
 
-                if (!G.Map.IsVernacularParagraph(PStyle.Abbrev))
+                if (!DB.Map.IsVernacularParagraph(PStyle.SFM))
                     return false;
 
                 return true;
@@ -711,7 +711,7 @@ namespace OurWord.Edit
                 if (null == cs)
                 {
                     cs = t.Paragraph.Style.CharacterStyle;
-                    if (phrase.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
+                    if (phrase.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
                     {
                         if (phrase.CharacterStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
                             mods = FontStyle.Bold;
@@ -775,7 +775,7 @@ namespace OurWord.Edit
         {
             foreach (TranslatorNote tn in text.TranslatorNotes)
             {
-                if (tn.Show)
+                if (tn.IsShown())
                     Append( new ENote(tn) );
             }
         }
@@ -813,7 +813,7 @@ namespace OurWord.Edit
         #region Method: JFontForWritingSystem RetrieveFont(sCharStyleAbbrev)
         JFontForWritingSystem RetrieveFont(string sCharStyleAbbrev)
         {
-            JCharacterStyle cs = G.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
+            JCharacterStyle cs = DB.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
             return cs.FindOrAddFontForWritingSystem(WritingSystem);
         }
         #endregion
@@ -866,7 +866,8 @@ namespace OurWord.Edit
                         break;
                     case "DText":
                         _InitializeBasicTextWords(r as DBasicText, null);
-                        InitializeNoteIcons(r as DText);
+                        if (G.App.HasSideWindows && G.App.SideWindows.HasNotesWindow)
+                            InitializeNoteIcons(r as DText);
                         break;
                     default:
                         Console.WriteLine("Unknown type in OWPara.Initialize...Name=" + 
@@ -1042,6 +1043,13 @@ namespace OurWord.Edit
             // Each Literal String will potentially have its own character style
             foreach (DPhrase p in vLiteralPhrases)
             {
+                // The Split method we're about to call will remove spaces, including
+                // a trailing one. We need to know if we had a trailing one, so we
+                // can add it back in.
+                bool bEndsWithSpace = false;
+                if (p.Text.Length > 0 && p.Text[p.Text.Length - 1] == ' ')
+                    bEndsWithSpace = true;
+
                 // Parse the Literal Test into its parts
                 string[] vs = p.Text.Split(new char[] { ' ' },
                     StringSplitOptions.RemoveEmptyEntries);
@@ -1049,7 +1057,7 @@ namespace OurWord.Edit
                 // Create the literal strings
                 for (int i = 0; i < vs.Length; i++)
                 {
-                    if (i < vs.Length - 1)
+                    if (i < vs.Length - 1 || bEndsWithSpace)
                         vs[i] = vs[i] + " ";
 
                     // Figure out the font for this literal string
@@ -1057,11 +1065,13 @@ namespace OurWord.Edit
                     JCharacterStyle cs = PStyle.CharacterStyle;
                     // Override with the phrases's character style if it is different
                     if (!string.IsNullOrEmpty(p.CharacterStyleAbbrev) &&
-                        p.CharacterStyleAbbrev != DStyleSheet.c_StyleAbbrevNormal)
+                        p.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
                     {
-                        cs = G.StyleSheet.FindCharacterStyle(p.CharacterStyleAbbrev);
+						JStyleSheet ss = PStyle.StyleSheet;
+						cs = ss.FindCharacterStyle(p.CharacterStyleAbbrev);
+                        //cs = G.StyleSheet.FindCharacterStyle(p.CharacterStyleAbbrev);
                     }
-                    // Get the front from whatever character style we wound up with
+                    // Get the font from whatever character style we wound up with
                     JFontForWritingSystem f = cs.FindOrAddFontForWritingSystem(WritingSystem);
 
                     // Add the literal
@@ -1136,7 +1146,7 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Append(EItem item)
+            #region OMethod: void AddParagraph(EItem item)
             public override void Append(EItem item)
                 // Override in order to make sure the Line doesn't become the owner, as until we
                 // do a rewrite, the Line isn't directly in the ownership hierarchy.
@@ -1902,8 +1912,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region OMethod: void CalculateContainerVerticals(y, bRepositionOnly)
-        public override void CalculateContainerVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
+        public override void CalculateVerticals(float y, bool bRepositionOnly)
         // y - The top coordinate of the paragraph. We'll use "y" to work through the 
         //     height of the paragraph, setting the individula paragraph parts.
         #region DOC - Leading Space before Verses
@@ -1927,8 +1937,6 @@ namespace OurWord.Edit
 
             // Combine all hyphenated words, we'll figure out shortly if we must re-hyphenate
             RemoveHyphenation();
-
-            string sDebug = (SubItems[0] as EBlock).Text;
 
             // Remember the top coordinate
             Position = new PointF(Position.X, y);
@@ -2058,7 +2066,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-
         #region Method: void RePosition(float yNew) - change the Y coord of the paragraph and its parts
         public void RePosition(float yNew)
             // Moves all of the "y" coordinates in the paragraph (paragraph, EBlocks, Lines)
@@ -2104,7 +2111,7 @@ namespace OurWord.Edit
                 nLineNo = Lines[0].LineNo;
 
             // Rework the paragraph: words on each line, justification, etc., etc.
-            CalculateContainerVerticals(Position.Y, false);
+            CalculateVerticals(Position.Y, false);
 
             // If the height did not change, then all we need to do is re-do the
             // line numbers (because we've created new Lines) and redraw the paragraph.
@@ -2171,6 +2178,9 @@ namespace OurWord.Edit
             if (!ClipRectangle.IntersectsWith(IntRectangle))
                 return;
 
+			// Bullet if indicated
+			PaintBullet();
+
             // Borders if indicated
             Border.Paint();
 
@@ -2189,8 +2199,29 @@ namespace OurWord.Edit
             }
         }
         #endregion
+		#region Method: void PaintBullet()
+		void PaintBullet()
+		{
+			if (!PStyle.Bulleted)
+				return;
 
-        // Selection -------------------------------------------------------------------------
+			Graphics g = Window.Draw.Graphics;
+
+			// The radius is 1/5 of the line height
+			float fRadius = LineHeight / 5;
+
+			// We'll place it to the left of our first line by three times the radius
+			float xLeft = Position.X + (float)PStyle.LeftMargin * g.DpiX - fRadius * 3;
+
+			// We'll place it vertically in the middle of the first line
+			float yTop = Position.Y + LineHeight / 2;
+
+			// Draw the bullet
+			Window.Draw.DrawBullet( Color.Black, new PointF(xLeft, yTop), fRadius);
+		}
+		#endregion
+
+		// Selection -------------------------------------------------------------------------
         #region Select_ and ExtendSelection_
 
         #region OMethod: EBlock GetBlockAt(PointF pt)

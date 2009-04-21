@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="m_lblExplanation.Text" xml:space="preserve">
-    <value>This should be the full name of the language you are translating into. It is the name that you and translators use to refer to the language. This name will appear throughout the user interface. (For example, 'Lakota Sioux.')</value>
+    <value>This should be the full name of the language you are translating into. It is the name that you and translators use to refer to the language. This name will appear throughout the user interface, and will also be part of each translated book's file name. (Examples of language names are 'Lakota Sioux,' 'Bahasa Indonesia,' and 'Español.')</value>
   </data>
 </root>

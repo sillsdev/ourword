@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 13 Aug 2004
  * Purpose: Routinely creates a backup on another device
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -57,6 +57,16 @@ namespace JWTools
 			}
 		}
 		#endregion
+        #region Attr{g}: string BackupBaseName
+        string BackupBaseName
+        {
+            get
+            {
+                return m_sBackupBaseName;
+            }
+        }
+        string m_sBackupBaseName = "";
+        #endregion
 
 		// Derived Attrs ---------------------------------------------------------------------
 		#region Attr{g}: string BackupFolder
@@ -70,10 +80,10 @@ namespace JWTools
 				// If we got nothing, we need to prompt the user; if the user chickens out
 				// (via the Cancel button), then we create a folder under his My Documents
 				// folder.
-				if (0 == sFolder.Length)
+				if (string.IsNullOrEmpty(sFolder))
 				{
 					sFolder = BrowseForFolder("");
-					if (0 == sFolder.Length)
+                    if (string.IsNullOrEmpty(sFolder))
 						sFolder = FallbackBackupFolder;
 					RegistryBackupFolder = sFolder;
 				}
@@ -82,18 +92,14 @@ namespace JWTools
 			}
 		}
 		#endregion
-		#region Attr{g}: BackupPathName
+		#region VAttr{g}: BackupPathName
 		string BackupPathName
 		{
 			get
 			{
-				// Get the base name
-				string sName = Path.GetFileNameWithoutExtension(SourcePathName);
-
-				// Append the extension to it (Note: GetExtension returns the '.')
-				sName += Path.GetExtension(SourcePathName);
-
-				return BackupFolder + Path.DirectorySeparatorChar + sName;
+                // GetExtension returns the "."
+                return BackupFolder + Path.DirectorySeparatorChar + BackupBaseName + 
+                    Path.GetExtension(SourcePathName);
 			}
 		}
 		#endregion
@@ -110,10 +116,16 @@ namespace JWTools
 		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor(sSourcePathName)
-		public BackupSystem(string sSourcePathName)
+		#region Constructor()
+        public BackupSystem(string sSourcePathName, string sBackupBaseName)
 		{
+            // The file we want to back up
 			m_sSourcePathName = sSourcePathName;
+
+            // If we didn't supply a new base name, then use the old one
+            if (string.IsNullOrEmpty(sBackupBaseName))
+                sBackupBaseName = Path.GetFileNameWithoutExtension(sSourcePathName);
+            m_sBackupBaseName = sBackupBaseName;
 		}
 		#endregion
 
@@ -210,7 +222,7 @@ namespace JWTools
 			// Copy the file to the backup filename
 			try
 			{
-				File.Copy( SourcePathName, BackupPathName, true);
+                File.Copy(SourcePathName, BackupPathName, true);
 			}
 			catch (UnauthorizedAccessException)
 			{
@@ -479,8 +491,9 @@ namespace JWTools
 			AreSame( cFilesToCreate, Directory.GetFiles(sTestPath).Length );
 
 			// Call the cleanup routine
-			string sSourcePath = sTestPath + Path.DirectorySeparatorChar + sBaseName + sExtension;
-			BackupSystem backup = new BackupSystem(sSourcePath);
+			string sSourcePath = sTestPath + Path.DirectorySeparatorChar + 
+                sBaseName + sExtension;
+            BackupSystem backup = new BackupSystem(sSourcePath, null);
 			backup.CleanUpOldFiles(sTestPath);
 
 			// The number of files we now have depends on the day of week, day of 

@@ -75,6 +75,18 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Chorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\src\Chorus\obj\Debug\Chorus.exe</HintPath>
+    </Reference>
+    <Reference Include="ChorusMerge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\src\ChorusMerge\obj\Debug\ChorusMerge.exe</HintPath>
+    </Reference>
+    <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Palaso.Services.dll</HintPath>
+    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -92,56 +104,97 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs">
+    <Compile Include="DataModel\BookNames.cs" />
+    <Compile Include="DataModel\DB.cs" />
+    <Compile Include="DataModel\DBook.cs" />
+    <Compile Include="DataModel\DBookGrouping.cs" />
+    <Compile Include="DataModel\DFootnote.cs" />
+    <Compile Include="DataModel\Dictionary.cs" />
+    <Compile Include="DataModel\DParagraph.cs" />
+    <Compile Include="DataModel\DPicture.cs" />
+    <Compile Include="DataModel\DProject.cs" />
+    <Compile Include="DataModel\DReference.cs" />
+    <Compile Include="DataModel\DRun.cs" />
+    <Compile Include="DataModel\DSection.cs" />
+    <Compile Include="DataModel\DTeamSettings.cs" />
+    <Compile Include="DataModel\DTranslation.cs" />
+    <Compile Include="DataModel\RepairImportBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataModel\Repository.cs" />
+    <Compile Include="DataModel\SfMapping.cs" />
+    <Compile Include="DataModel\StdFmtTransform.cs" />
+    <Compile Include="DataModel\SynchronizeProgressDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataModel\SynchronizeProgressDlg.Designer.cs">
+      <DependentUpon>SynchronizeProgressDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataModel\TranslationStage.cs" />
+    <Compile Include="DataModel\TranslatorNote.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="AutoReplace.cs">
+    <Compile Include="Cellar\AutoReplace.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JAttr.cs">
+    <Compile Include="Cellar\JAttr.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JObject.cs">
+    <Compile Include="Cellar\JObject.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JObjectOnDemand.cs">
+    <Compile Include="Cellar\JObjectOnDemand.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Josiah.cs">
+    <Compile Include="Cellar\JOwn.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JOwn.cs">
+    <Compile Include="Cellar\JOwnSeq.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JOwnSeq.cs">
+    <Compile Include="Cellar\JRef.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JRef.cs">
+    <Compile Include="Cellar\JSeq.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JSeq.cs">
+    <Compile Include="Cellar\JStyleSheet.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="JStyleSheet.cs">
+    <Compile Include="Cellar\SfDB.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="SfDB.cs">
-      <SubType>Code</SubType>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AutoReplace.id-ID.resx">
+    <Compile Include="Tools\Diff.cs" />
+    <Compile Include="Tools\Progress.cs" />
+    <EmbeddedResource Include="Cellar\AutoReplace.id-ID.resx">
       <DependentUpon>AutoReplace.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="AutoReplace.id.resx">
+    <EmbeddedResource Include="Cellar\AutoReplace.id.resx">
       <DependentUpon>AutoReplace.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="AutoReplace.resx">
+    <EmbeddedResource Include="Cellar\AutoReplace.resx">
       <DependentUpon>AutoReplace.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Josiah.resx">
-      <DependentUpon>Josiah.cs</DependentUpon>
+    <EmbeddedResource Include="DataModel\RepairImportBook.resx">
+      <DependentUpon>RepairImportBook.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataModel\SynchronizeProgressDlg.resx">
+      <DependentUpon>SynchronizeProgressDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

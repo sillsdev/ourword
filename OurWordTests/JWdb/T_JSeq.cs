@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 5 Nov 2008
  * Purpose: Tests the JSeq implementation
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -383,7 +383,7 @@ namespace OurWordTests.JWdb
             TestObj_Container container = new TestObj_Container();
             container.seq.IsSorted = true;
 
-            // Check the Append method
+            // Check the AddParagraph method
             TestObj_Name objJohn = new TestObj_Name("John");
             container.seq.Append(objJohn);
             Assert.IsTrue(container.seq[3] == objJohn);

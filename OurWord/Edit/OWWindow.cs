@@ -21,7 +21,7 @@ using System.Threading;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using Palaso.UI.WindowsForms.Keyboarding;
 #endregion
 
@@ -337,16 +337,16 @@ namespace OurWord.Edit
         {
             get
             {
-                if (!G.IsValidProject)
+                if (!DB.IsValidProject)
                     return "";
-                if (null == OurWordMain.Project.TargetTranslation)
+                if (null == DB.TargetTranslation)
                     return "";
-                if (null == OurWordMain.Project.FrontTranslation)
+                if (null == DB.FrontTranslation)
                     return "";
-                if (null == OurWordMain.Project.STarget)
+                if (null == DB.TargetSection)
                     return "";
 
-                return G.STarget.ReferenceName;
+                return DB.TargetSection.ReferenceName;
             }
         }
         #endregion
@@ -556,8 +556,20 @@ namespace OurWord.Edit
                     rect.Width, rect.Height);
             }
             #endregion
-            #region Method: void FillRectangle(Color clrBackground, RectangleF rect)
-            public void FillRectangle(Color clrBackground, RectangleF rect)
+			#region Method: void DrawBullet(Color, PointF, fRadius)
+			public void DrawBullet(Color color, PointF pt, float Radius)
+			{
+				Brush brush = new SolidBrush(color);
+
+				float xLeft = pt.X - Radius;
+				float yTop = pt.Y - Radius - Wnd.ScrollBarPosition;
+				float diameter = Radius * 2;
+
+				Graphics.FillEllipse(brush, xLeft, yTop, diameter, diameter);
+			}
+			#endregion
+			#region Method: void FillRectangle(Color clrBackground, RectangleF rect)
+			public void FillRectangle(Color clrBackground, RectangleF rect)
             {
                 Brush brush = new SolidBrush(clrBackground);
 
@@ -725,23 +737,16 @@ namespace OurWord.Edit
             // Calculate the Lefts and Widths for the EContainer hierarchy
             Contents.CalculateContainerHorizontals();
 
-            // We'll start from the top of the window, taking into account the margin
-            float y = WindowMargins.Height;
-
-            // Lay out the items
-            foreach (EContainer container in Contents.SubItems)
-            {
-                container.CalculateContainerVerticals(y, false);
-                y += container.Height;
-            }
-            Contents.Height = y - Contents.Position.Y;
+			// Calculate the vertical layout
+			float yTop = WindowMargins.Height;   // Top of the window, taking margin into account
+			Contents.CalculateVerticals(yTop, false);
 
             // Now that the lines have been defined in the low-level OWPara's,
             // give each line a line number
             Contents.CalculateLineNumbers();
 
             // Set the ScrollBar, adding some (30 pixels) padding at the bottom
-            Layout_SetupScrollBar((int)y);
+            Layout_SetupScrollBar((int)(yTop + Contents.Height));
         }
         #endregion
         #region Method: void PaintNoDataMessage(PaintEventArgs e)
@@ -750,25 +755,22 @@ namespace OurWord.Edit
             if (!IsMainWindow)
                 return;
 
-            string sText = G.GetLoc_GeneralUI("NoDataToDisplay", 
-                "(There is no data to display. Use the Project-Properties menu item to " +
-                "set up both a Front and a Target translation.)"); 
+            string sText = G.GetLoc_GeneralUI("NoDataToDisplayMsg", 
+                "(There is no data to display. Use the Project menu to create a new Project or " +
+				"open an existing project; or use Tools-Configure to set up both a Front and " +
+				"a Target translation.)"); 
 
             Brush brush = new SolidBrush(Color.Black);
-            Font font = SystemFonts.MenuFont;
+			Font font = new Font(SystemFonts.MenuFont.FontFamily, 
+				SystemFonts.MenuFont.Size * 1.5F);
 
-            Draw.MultilineText(sText, font, brush, ClientRectangle);
+			Rectangle rect = new Rectangle(
+				ClientRectangle.X + 20,
+				ClientRectangle.Y + 20,
+				ClientRectangle.Width - 40,
+				ClientRectangle.Height - 40);
 
-            /*** TODO OBS - 18dec07 - Replaced with the line above; I think using the 
-             * ClipRectangle was the reason it was displaying strangly on Mono. Need to 
-             * verify before deleting this code. 
-            Rectangle rect = new Rectangle(e.ClipRectangle.X,
-                e.ClipRectangle.Y + (int)ScrollBarPosition,
-                e.ClipRectangle.Width, e.ClipRectangle.Height);
-
-            Draw.MultilineText(sText, font, brush, rect);
-            ***/
-
+			Draw.MultilineText(sText, font, brush, rect);
         }
         #endregion
         #region Cmd: OnPaint
@@ -796,6 +798,10 @@ namespace OurWord.Edit
 
             // Paint the contents
             Contents.OnPaint(r);
+
+			// Paint any controls (otherwise, the ones we don't paint due to the
+			// clip rectangle, tend to stay around on the screen.)
+			Contents.PaintControls();
 
             // Text Selection
             if (null != Selection)
@@ -841,7 +847,7 @@ namespace OurWord.Edit
 
                 // RePosition each row from the target to the end of the screen
                 if (bFound)
-                    container.CalculateContainerVerticals(y, true);
+                    container.CalculateVerticals(y, true);
 
                 y += container.Height;
             }
@@ -989,11 +995,11 @@ namespace OurWord.Edit
 
             // A small change will be enough to move a normal line at a time. We're guessing
             // a value based on the Target Translation's normal (zoomed) line height.
-            JParagraphStyle PStyle = G.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleAbbrevNormal);
+            JParagraphStyle PStyle = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_sfmParagraph);
 
-            JWritingSystem ws = (null == G.TTranslation) ?
-                G.StyleSheet.FindWritingSystem(DStyleSheet.c_Latin) :
-                G.TTranslation.WritingSystemVernacular;
+            JWritingSystem ws = (null == DB.TargetTranslation) ?
+                DB.StyleSheet.FindWritingSystem(DStyleSheet.c_Latin) :
+                DB.TargetTranslation.WritingSystemVernacular;
 
             float fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
                 ws).LineHeightZoomed;
@@ -2055,7 +2061,7 @@ namespace OurWord.Edit
                 return false;
 
             // Retrieve the book we're working on
-            DBook book = G.STarget.Book;
+            DBook book = DB.TargetBook;
 
             // Have we displayed the "Book is locked" message yet? Do so if not.
             if (!book.UserHasSeenLockedMessage)

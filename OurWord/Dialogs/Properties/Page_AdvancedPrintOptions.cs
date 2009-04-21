@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 31 May 2006
  * Purpose: Set options for printing the footer
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -25,7 +25,7 @@ using Microsoft.Win32;
 
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 #endregion
 
@@ -36,8 +36,7 @@ namespace OurWord
 		// Scaffolding -----------------------------------------------------------------------
 		#region DIALOG CONTROLS
 
-        private System.Windows.Forms.Label m_labelTitle;
-        private PropertyGrid m_PropGrid;
+		private PropertyGrid m_PropGrid;
 		// Required designer variable.
 		private System.ComponentModel.Container components = null;
 		#endregion
@@ -69,39 +68,30 @@ namespace OurWord
 		/// </summary>
 		private void InitializeComponent()
 		{
-            this.m_labelTitle = new System.Windows.Forms.Label();
-            this.m_PropGrid = new System.Windows.Forms.PropertyGrid();
-            this.SuspendLayout();
-            // 
-            // m_labelTitle
-            // 
-            this.m_labelTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_labelTitle.Location = new System.Drawing.Point(15, 12);
-            this.m_labelTitle.Name = "m_labelTitle";
-            this.m_labelTitle.Size = new System.Drawing.Size(438, 23);
-            this.m_labelTitle.TabIndex = 21;
-            this.m_labelTitle.Text = "Advanced Printing Options";
-            this.m_labelTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_PropGrid
-            // 
-            this.m_PropGrid.Location = new System.Drawing.Point(18, 38);
-            this.m_PropGrid.Name = "m_PropGrid";
-            this.m_PropGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
-            this.m_PropGrid.Size = new System.Drawing.Size(435, 312);
-            this.m_PropGrid.TabIndex = 22;
-            this.m_PropGrid.ToolbarVisible = false;
-            // 
-            // Page_AdvancedPrintOptions
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.Controls.Add(this.m_PropGrid);
-            this.Controls.Add(this.m_labelTitle);
-            this.Name = "Page_AdvancedPrintOptions";
-            this.Size = new System.Drawing.Size(468, 368);
-            this.Load += new System.EventHandler(this.cmdLoad);
-            this.ResumeLayout(false);
+			this.m_PropGrid = new System.Windows.Forms.PropertyGrid();
+			this.SuspendLayout();
+			// 
+			// m_PropGrid
+			// 
+			this.m_PropGrid.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+						| System.Windows.Forms.AnchorStyles.Left)
+						| System.Windows.Forms.AnchorStyles.Right)));
+			this.m_PropGrid.Location = new System.Drawing.Point(3, 3);
+			this.m_PropGrid.Name = "m_PropGrid";
+			this.m_PropGrid.PropertySort = System.Windows.Forms.PropertySort.Categorized;
+			this.m_PropGrid.Size = new System.Drawing.Size(462, 365);
+			this.m_PropGrid.TabIndex = 22;
+			this.m_PropGrid.ToolbarVisible = false;
+			// 
+			// Page_AdvancedPrintOptions
+			// 
+			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+			this.Controls.Add(this.m_PropGrid);
+			this.Name = "Page_AdvancedPrintOptions";
+			this.Size = new System.Drawing.Size(468, 368);
+			this.Load += new System.EventHandler(this.cmdLoad);
+			this.ResumeLayout(false);
 
 		}
 		#endregion
@@ -138,30 +128,30 @@ namespace OurWord
             {
                 case c_sOddLeft:
                     e.Value = (e.Property as EnumPropertySpec).GetEnumValueFor(
-                        (int)G.TeamSettings.OddLeft);
+                        (int)DB.TeamSettings.OddLeft);
                     break;
                 case c_sOddCenter:
                     e.Value = (e.Property as EnumPropertySpec).GetEnumValueFor(
-                        (int)G.TeamSettings.OddMiddle);
+                        (int)DB.TeamSettings.OddMiddle);
                     break;
                 case c_sOddRight:
                     e.Value = (e.Property as EnumPropertySpec).GetEnumValueFor(
-                        (int)G.TeamSettings.OddRight);
+                        (int)DB.TeamSettings.OddRight);
                     break;
                 case c_sEvenLeft:
                     e.Value = (e.Property as EnumPropertySpec).GetEnumValueFor(
-                        (int)G.TeamSettings.EvenLeft);
+                        (int)DB.TeamSettings.EvenLeft);
                     break;
                 case c_sEvenCenter:
                     e.Value = (e.Property as EnumPropertySpec).GetEnumValueFor(
-                        (int)G.TeamSettings.EvenMiddle);
+                        (int)DB.TeamSettings.EvenMiddle);
                     break;
                 case c_sEvenRight:
                     e.Value = (e.Property as EnumPropertySpec).GetEnumValueFor(
-                        (int)G.TeamSettings.EvenRight);
+                        (int)DB.TeamSettings.EvenRight);
                     break;
                 case c_sCopyrightNotice:
-                    e.Value = G.TeamSettings.CopyrightNotice;
+                    e.Value = DB.TeamSettings.CopyrightNotice;
                     break;
             }
         }
@@ -172,31 +162,31 @@ namespace OurWord
             switch (e.Property.ID)
             {
                 case c_sOddLeft:
-                    G.TeamSettings.OddLeft = (DTeamSettings.FooterParts)
+                    DB.TeamSettings.OddLeft = (DTeamSettings.FooterParts)
                         (e.Property as EnumPropertySpec).GetEnumNumberFor((string)e.Value);
                     break;
                 case c_sOddCenter:
-                    G.TeamSettings.OddMiddle = (DTeamSettings.FooterParts)
+                    DB.TeamSettings.OddMiddle = (DTeamSettings.FooterParts)
                         (e.Property as EnumPropertySpec).GetEnumNumberFor((string)e.Value);
                     break;
                 case c_sOddRight:
-                    G.TeamSettings.OddRight = (DTeamSettings.FooterParts)
+                    DB.TeamSettings.OddRight = (DTeamSettings.FooterParts)
                         (e.Property as EnumPropertySpec).GetEnumNumberFor((string)e.Value);
                     break;
                 case c_sEvenLeft:
-                    G.TeamSettings.EvenLeft = (DTeamSettings.FooterParts)
+                    DB.TeamSettings.EvenLeft = (DTeamSettings.FooterParts)
                         (e.Property as EnumPropertySpec).GetEnumNumberFor((string)e.Value);
                     break;
                 case c_sEvenCenter:
-                    G.TeamSettings.EvenMiddle = (DTeamSettings.FooterParts)
+                    DB.TeamSettings.EvenMiddle = (DTeamSettings.FooterParts)
                         (e.Property as EnumPropertySpec).GetEnumNumberFor((string)e.Value);
                     break;
                 case c_sEvenRight:
-                    G.TeamSettings.EvenRight = (DTeamSettings.FooterParts)
+                    DB.TeamSettings.EvenRight = (DTeamSettings.FooterParts)
                         (e.Property as EnumPropertySpec).GetEnumNumberFor((string)e.Value);
                     break;
                 case c_sCopyrightNotice:
-                    G.TeamSettings.CopyrightNotice = (string)e.Value;
+                    DB.TeamSettings.CopyrightNotice = (string)e.Value;
                     break;
             }
         }
@@ -301,7 +291,16 @@ namespace OurWord
         #endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
-        #region Method: override bool HarvestChanges()
+		#region OAttr{g}: string ID
+		public override string ID
+		{
+			get
+			{
+				return "idAdvancedPrintOptions";
+			}
+		}
+		#endregion
+		#region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
             return true;
@@ -314,7 +313,7 @@ namespace OurWord
         }
         #endregion
         #region Attr{g}: string TabText
-        public override string TabText
+        public override string Title
         {
             get
             {

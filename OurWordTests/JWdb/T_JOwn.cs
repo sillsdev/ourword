@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 14 July 2008
  * Purpose: Tests the JOwn implementation
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -21,7 +21,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
@@ -83,7 +83,17 @@ namespace OurWordTests.JWdb
 		    public TObjC ObjC { get { return FirstB.ObjC; } }
 		    public TObjD ObjD { get { return ObjC.ObjD; } }
 		    public TObjE ObjE { get { return ObjC.ObjE; } }
-	    }
+
+			#region OAttr{g}: string StoragePath
+			public override string StoragePath
+			{
+				get
+				{
+					return T_JOwn.ReadWritePathName;
+				}
+			}
+			#endregion
+		}
 	    #endregion
 	    #region TObjB
 	    public class TObjB : TObject 
@@ -228,7 +238,7 @@ namespace OurWordTests.JWdb
 
         // I/O -------------------------------------------------------------------------------
         #region Attr: ReadWritePathName - pathname for test file
-        private string ReadWritePathName
+        public static string ReadWritePathName
         {
             get
             {
@@ -244,13 +254,11 @@ namespace OurWordTests.JWdb
             // Set up an owning attr and write it out
             TObjA objOwner1 = new TObjA("a1");
             objOwner1.m_own1.Value = new TObjB("VerseNo");
-            objOwner1.AbsolutePathName = ReadWritePathName;
-            objOwner1.Write();
+            objOwner1.Write(new NullProgress());
 
             // Read it into anouther owning attr
             TObjA objOwner2 = new TObjA("a2");
-            objOwner2.AbsolutePathName = ReadWritePathName;
-            objOwner2.Load();
+            objOwner2.Load(new NullProgress());
 
             // Compare the two
             TObjB b1 = objOwner1.m_own1.Value;

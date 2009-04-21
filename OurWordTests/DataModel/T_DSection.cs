@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Tests the DSection class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -19,7 +19,7 @@ using JWTools;
 using JWdb;
 
 using OurWord;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -60,8 +60,13 @@ namespace OurWordTests.DataModel
         #region Method: string[] _ReadFromFile(string sPathname)
         string[] _ReadFromFile(string sPathname)
         {
+			string sPath = sPathname;
+			TextReader tr = JW_Util.GetTextReader(ref sPath, "");
+
             SfDb DB = new SfDb();
-            DB.Read(ref sPathname);
+			DB.Read(tr);
+			tr.Close();
+
             string[] vs = DB.ExtractData();
             return vs;
         }
@@ -136,12 +141,12 @@ namespace OurWordTests.DataModel
         // 
         {
             // Preliminary: Create the superstructure we need for a DBook
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
-            G.Project.TargetTranslation = Translation;
+            DB.Project.TargetTranslation = Translation;
 
             //////////////////////////////////////////////////////////////////////////////////
             // PART 1: IMPORT vsRaw AND SEE IF WE SAVE IT TO MATCH vsSAV. Thus we are testing
@@ -153,17 +158,16 @@ namespace OurWordTests.DataModel
             _WriteToFile(sPathname, vsRaw);
 
             // Now read it into the book. This will test TransformIn and DBook/DSection Import
-            DBook Book = new DBook("MRK", "");
+			DTestBook Book = new DTestBook(sPathname);
             Translation.AddBook(Book);
-            Book.AbsolutePathName = sPathname;
-            Book.Load();
+            Book.Load(new NullProgress());
 
             // Now write it, to test TransformOut, & etc.
             Book.DeclareDirty();                 // It'll not write without this
-            Book.Write();
+            Book.Write(new NullProgress());
 
             // Read the result from disk
-            string[] vsResult = _ReadFromFile(Book.AbsolutePathName);
+			string[] vsResult = _ReadFromFile(Book.StoragePath);
 
             // Compare what was written (vsResult) with what we expect (vsSav)
             _Compare("PART ONE", vsResult, vsSav);
@@ -176,24 +180,23 @@ namespace OurWordTests.DataModel
             //////////////////////////////////////////////////////////////////////////////////
 
             // First, write the "cannonical" data out to disk file
-            sPathname = Test.GetPathName("TestDBIO2");
+            sPathname = GetTestPathName("TestDBIO2");
             _WriteToFile(sPathname, vsSav);
 
             // Now, read it into a book. This will do DB.TransformIn, as well as the
             // various read methods in DBook
             Translation.Books.Remove(Book);
-            Book = new DBook("MRK", "");
+			Book = new DTestBook(sPathname);
             Translation.AddBook(Book);
-            Book.AbsolutePathName = sPathname;
-            Book.Load();
+            Book.Load(new NullProgress());
 
             // Now, write it back out. This will do DB.TransformOut, as well as the
             // various write methods in DBook.
             Book.DeclareDirty();                 // It'll not write without this
-            Book.Write();
+            Book.Write(new NullProgress());
 
             // Finaly, read the result from disk
-            vsResult = _ReadFromFile(Book.AbsolutePathName);
+			vsResult = _ReadFromFile(Book.StoragePath);
 
             // Compare what was written (vsResult) with what we expect (vsSav)
             _Compare("PART TWO", vsResult, vsSav);
@@ -352,7 +355,7 @@ namespace OurWordTests.DataModel
 			    "nemema asli ba mi evili talalu ele.|fn Seng, nebe jangu angu botol " +
 			    "ememng angu||fn ma vil bue ening kivita. Mu ana boal ening to tu tahang-tahang " +
 			    "mina angu ma Yesus ong tang||, e jadi tanda Yesus Aing ta janing",
-			    "\\btvt This is some more back translation.",
+			    "\\btvt This is some more back translation.|fn",
 			    "\\ft This is a footnote.",
 			    "\\p",
 			    "\\v 2",
@@ -376,14 +379,14 @@ namespace OurWordTests.DataModel
 			    "\\vt Ne kasiang anaung salalu ae ing veng. Jadi, ini bisa taveding " +
 			    "di ini ing tulung. Ba kalo Naing,|fn lung niang ila, se Na ing veng " +
 			    "hama-hama niang ila. ",
-			    "\\btvt Some back translating for verse 5",
+			    "\\btvt Some back translating for verse 5|fn",
                 "\\ft A footnote for verse 5",
 			    "\\cf 14:7: Ulangan 15:11",
 			    "\\v 6",
 			    "\\vt Ne e vetang lung niang ila. Mang nehe jangu anga vede mina obokong " +
 			    "anga, ana sidiat ila ma Neboa veng etura, emang hula ana Ne baring " +
 			    "veng bunga me at ila.|fn",
-			    "\\btvt And verse six reads as so.",
+			    "\\btvt And verse six reads as so.|fn",
                 "\\nt And this is a translator note",
                 "\\ft Verse six footnote",
 			    "\\v 7",
@@ -417,7 +420,7 @@ namespace OurWordTests.DataModel
 			    "ila Simon e hava mi nana. ||Oras ||ini nana, nehe jangu nu Yesus evele " +
 			    "hoa Aing dapa. Ana ue botol nu pina ba ini var ma ening. ||Mina " +
 			    "nemema asli ba mi evili talalu ele.|fn",
-			    "\\btvt This is some more back translation.",
+			    "\\btvt This is some more back translation.|fn",
 			    "\\ft This is a footnote.",
                 "\\vt Seng, nebe jangu angu botol ememng angu||fn ma vil bue ening kivita. " +
                 "Mu ana boal ening to tu tahang-tahang mina angu ma Yesus ong tang||, e jadi " +
@@ -443,7 +446,7 @@ namespace OurWordTests.DataModel
 			    "\\v 5",
 			    "\\vt Ne kasiang anaung salalu ae ing veng. Jadi, ini bisa taveding " +
 			    "di ini ing tulung. Ba kalo Naing,|fn",
-			    "\\btvt Some back translating for verse 5",
+			    "\\btvt Some back translating for verse 5|fn",
                 "\\ft A footnote for verse 5",
                 "\\vt lung niang ila, se Na ing veng hama-hama niang ila.",
 			    "\\cf 14:7: Ulangan 15:11",
@@ -451,7 +454,7 @@ namespace OurWordTests.DataModel
 			    "\\vt Ne e vetang lung niang ila. Mang nehe jangu anga vede mina obokong " +
 			    "anga, ana sidiat ila ma Neboa veng etura, emang hula ana Ne baring " +
 			    "veng bunga me at ila.|fn",
-			    "\\btvt And verse six reads as so.",
+			    "\\btvt And verse six reads as so.|fn",
                 "\\nt And this is a translator note",
                 "\\ft Verse six footnote",
 			    "\\v 7",
@@ -504,7 +507,7 @@ namespace OurWordTests.DataModel
 			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
 				    "people, saying, \"Yesus has lived again from His death! With that, He " +
 				    "opened the path for dead people so that they also could live again.\"|fn " +
-				    "(check two kon)",
+				    "(check two kon)|fn",
 			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
 				    "man noen atuil mate haup in nuli pait.",
 			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
@@ -566,7 +569,7 @@ namespace OurWordTests.DataModel
 			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
 				    "people, saying, \"Yesus has lived again from His death! With that, He " +
 				    "opened the path for dead people so that they also could live again.\" " +
-				    "(check two kon)",
+				    "(check two kon)|fn",
 			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
 				    "man noen atuil mate haup in nuli pait.",
 			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
@@ -734,7 +737,674 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        // Merging ---------------------------------------------------------------------------
+        #region Method: DSection CreateSection(string[])
+        DSection CreateSection(string[] vs)
+        {
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DB.Project.TargetTranslation = new DTranslation("Translation", "Latin", "Latin");
+            DTestBook book = new DTestBook(JWU.NUnit_TestFilePathName);
+            DB.Project.TargetTranslation.Books.Append(book);
 
+            string sPath = JWU.NUnit_TestFilePathName;
+            _WriteToFile(sPath, vs);
+
+            book.Load(ref sPath, new NullProgress());
+            return book.Sections[ book.Sections.Count - 1];
+        }
+        #endregion
+        #region Method: void CompareMergeResults(vsExpected, vsActual)
+        void CompareMergeResults(string[] vsExpected, string[] vsActual)
+        {
+            Assert.IsTrue(vsExpected.Length == vsActual.Length, "Lengths should be equal");
+
+            for (int i = 0; i < vsExpected.Length; i++)
+            {
+                // Translator Notes: don't bother comparing their content, because the
+                // datetime will most definitely cause a problem.
+                if (vsExpected[i].Length > 4 && vsExpected[i].Substring(0, 4) == "\\tn ")
+                {
+                    if (vsActual[i].Length > 4 && vsActual[i].Substring(0, 4) == "\\tn ")
+                        continue;
+                    else
+                        Assert.IsTrue(false, "Actual was not a translator note in row " + i.ToString());
+                }
+
+                Assert.AreEqual(vsExpected[i], vsActual[i], "Differed in line " + i.ToString());
+            }
+        }
+        #endregion
+        #region Method: void WriteMergeCompareToConsole(vsExpected, vsActual)
+        void WriteMergeCompareToConsole(string[] vsExpected, string[] vsActual)
+        {
+            // Line By Line Comparison
+            for (int i = 0; i < vsActual.Length && i < vsExpected.Length; i++)
+            {
+                bool bDifferent = true;
+                if (vsExpected[i] == vsActual[i])
+                    bDifferent = false;
+                if (vsExpected[i].Length > 4 && vsExpected[i].Substring(0, 4) == "\\tn " &&
+                    vsActual[i].Length > 4 && vsActual[i].Substring(0, 4) == "\\tn ")
+                    bDifferent = false;
+
+                if (bDifferent)
+                    Console.WriteLine("*** DIFFERENT ***");
+
+                Console.WriteLine("Exp={" + vsExpected[i] + "}");
+                Console.WriteLine("Act={" + vsActual[i] + "}");
+                Console.WriteLine("");
+            }
+
+            // Actual all at once
+            Console.WriteLine("");
+            Console.WriteLine("Actual");
+            Console.WriteLine("------");
+            foreach (string s in vsActual)
+                Console.WriteLine(s);
+        }
+        #endregion
+
+        #region Test: Merge_SameStructure
+        [Test] public void Merge_SameStructure()
+        {
+            #region TestData: vsParent
+            string[] vsParent = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Petrus and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
+			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Petrus and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Petrus nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan dais na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\p",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot  " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+
+            // "Petrus" > "Peter"
+            #region TestData: vsMine
+            string[] vsMine = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Peter nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Peter and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Peter nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki. Oen maas komali le ahan Peter nol Yohanis.",
+			    "\\btvt At that time, Peter and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Peter and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Peter nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Peter and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan dais na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\p",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot  " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+
+            // Some All-Caps, but in different DTexts
+            #region TestData: vsTheirs
+            string[] vsTheirs = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Petrus and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
+			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Petrus and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Petrus nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "DENG lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan DAIS na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, THEY could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\p",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil MAN kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak TEBES. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their PEOPLE increased a lot  " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+
+            // Should have both Mine and Theirs with no TranslatorNotes, because the
+            // differences were all in different places
+            #region TestData: vsExpected
+            string[] vsExpected = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Peter nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Peter and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Peter nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki. Oen maas komali le ahan Peter nol Yohanis.",
+			    "\\btvt At that time, Peter and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Peter and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Peter nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Peter and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "DENG lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan DAIS na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, THEY could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\p",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil MAN kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak TEBES. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their PEOPLE increased a lot " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+
+            // Read in the sections
+            DSection Parent = CreateSection(vsParent);
+            DSection Mine = CreateSection(vsMine);
+            DSection Theirs = CreateSection(vsTheirs);
+            DSection Expect = CreateSection(vsExpected);
+
+            // Do the Merge
+            Mine.Merge(Parent, Theirs);
+
+            // Compare the result
+            Mine.Book.Write(new NullProgress());
+            string[] vsActual = _ReadFromFile(Mine.Book.StoragePath);
+            // WriteMergeCompareToConsole(vsExpected, vsActual);
+            CompareMergeResults(vsExpected, vsActual);
+        }
+        #endregion
+
+        [Test] public void Merge_DifferentStructures()
+        {
+            // Mine: Split some paragraphs
+            // Theirs: Changed "Petrus" to "Peter" in translation and back translation
+            // Expect to see: result with split paragraphs, "Peter" as Translation Notes
+            #region TestData: vsParent
+            string[] vsParent = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Petrus and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
+			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Petrus and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Petrus nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan dais na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\p",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot  " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+            #region TestData: vsMine
+            // 1. Split para containing v1 into two paras
+            // 2. Added a para prior to v3
+            // 3. Changed final para style from p to q
+            string[] vsMine = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+                "",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Petrus and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki.",
+			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. ",
+			    "\\p",
+                "\\vt Oen maas komali le ahan Petrus nol Yohanis.",
+                "\\btvt They came angry to scream at Petrus and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Petrus nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\p",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan dais na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\q",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot  " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+            #region TestData: vsTheirs
+            // Added a subtitle
+            // Changed "Petrus" to "Peter"
+            string[] vsTheirs = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+                "",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\st His Version",
+			    "\\id Mark",
+                "",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Peter nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Peter and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Peter nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki. Oen maas komali le ahan Peter nol Yohanis.",
+			    "\\btvt At that time, Peter and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Peer and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Peter nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Peter and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan dais na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\p",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot  " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+
+            #region TestData: vsExpected
+            string[] vsExpected = new string[] 
+		    {
+			    "\\_sh v3.0 2 SHW-Scripture", 
+			    "\\_DateStampHasFourDigitYear",
+			    "\\rcrd MRK",
+			    "\\h Mark",
+                "\\tn This section's paragraphing was changed by more than one user. We kept one; " +
+                    "you'll need to look at Mercurial's history to see what the other user did; we " +
+                    "were not able to keep their changes.",
+			    "\\st The Gospel Of",
+			    "\\mt Mark",
+			    "\\id Mark",
+			    "\\rcrd act4.1-4.22",
+			    "\\c 4",
+			    "\\s Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
+			    "\\bts The heads of religion summon Petrus and Yohanis to come appear.before [them]",
+			    "\\p",
+			    "\\v 1",
+			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
+				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "agama Saduki.",
+			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki.",
+                "\\tn Should be notes here and elsewhere about Petrus being changed to Peter",
+			    "\\p",
+                "\\vt Oen maas komali le ahan Petrus nol Yohanis.",
+                "\\btvt They came angry to scream at Petrus and Yohanis.",
+			    "\\v 2",
+			    "\\vt Oen komali lole Petrus nol Yohanis na mo, kom isi le tek " +
+				    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+				    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+				    "haup in nuli pait kon.>>|fn",
+			    "\\btvt They were angry because that Petrus and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)|fn",
+			    "\\ft 4:1-2: Atuil deng partai agama Saduki, oen sium in tui na lo " +
+				    "man noen atuil mate haup in nuli pait.",
+			    "\\btft 4:1-2: People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.",
+			    "\\p",
+			    "\\v 3",
+			    "\\vt Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+				    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+				    "Le ola ka halas-sam, oen nehan dais na.",
+			    "\\btvt And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem.",
+			    "\\q",
+			    "\\v 4",
+			    "\\vt Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+				    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+				    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+			    "\\btvt But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot " +
+				    "approximately to five thousand people."
+		    };
+            #endregion
+
+            // Read in the sections
+            DSection Parent = CreateSection(vsParent);
+            DSection Mine = CreateSection(vsMine);
+            DSection Theirs = CreateSection(vsTheirs);
+            DSection Expect = CreateSection(vsExpected);
+
+            // DSection.MergeMethod method: GetSectionContentAsFlatScreen
+            var m = new DSection.MergeMethod(Parent, Mine, Theirs);
+            var sFlatString = m.GetSectionContentsAsFlatString(Theirs);
+            #region Assert.AreEqual(sExpected, sFlatString)
+            Assert.AreEqual(
+                "Mark" +
+                "The Gospel Of" +
+                "Mark" +
+                "His Version" +
+                "Tulu-tulu agama las haman Peter nol Yohanis maas tala" +
+                  "The heads of religion summon Peter and Yohanis to come appear.before [them]" +
+                "41" +
+                "Dedeng na, Peter nol Yohanis nahdeh nabael nol atuli las sam, " +
+                    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
+                    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+                    "agama Saduki. Oen maas komali le ahan Peter nol Yohanis." +
+                  "At that time, Peter and Yohanis still were talking with those people, " +
+				    "several big/important people came. Those them(=They in focus), " +
+				    "[were] heads of the Yahudi religion, and the head of guarding the " +
+				    "*Temple, and people from the religious party Saduki. They came " +
+				    "angry to scream at Peer and Yohanis." +
+                "2" +
+                "Oen komali lole Peter nol Yohanis na mo, kom isi le tek " +
+                    "atuli-atuli las to-toang, noan, <<Yesus nuli pait son, deng Un in " +
+                    "mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon " +
+                    "haup in nuli pait kon.>>" +
+                  "They were angry because that Peter and Yohanis, like to tell all " +
+				    "people, saying, \"Yesus has lived again from His death! With that, He " +
+				    "opened the path for dead people so that they also could live again.\" " +
+				    "(check two kon)" +
+                "a" +
+                "3" +
+                "Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un " +
+                    "deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. " +
+                    "Le ola ka halas-sam, oen nehan dais na." +
+                  "And so they ordered their people to go capture the two of them. But " +
+				    "because the sun already wanted to set, then they pushed [&] entered " +
+				    "the two of them in jail. So.that the next day, they could take.care.of " +
+				    "that affair/litigation/problem." +
+                "4" +
+                "Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata " +
+                    "atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, " +
+                    "tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima." +
+                  "But from the people who liked to hear from those apostles, therefore " +
+				    "many people had already acknowledged that that which they taught, " +
+				    "[was] spot.on correct. That's.why their people increased a lot  " +
+				    "approximately to five thousand people." +
+                "4:1-2:Atuil deng partai agama Saduki, oen sium in tui na lo " +
+                    "man noen atuil mate haup in nuli pait." +
+                  "People from the religious party Saduki, they did not accept that " +
+				    "teaching that says dead people can live again.", 
+                sFlatString, "Problem in GetSectionContentAsFlatString");
+            #endregion
+
+            // DSection.MergeMethod method: PositionToRun
+            DRun run = m.PositionToRun(Theirs, 1000);
+            Assert.AreEqual("Oen komali lole Peter", (run as DText).AsString.Substring(0, 21));
+            run = m.PositionToRun(Theirs, 1900);
+            Assert.AreEqual("Mo deng atuli-atui", (run as DText).AsString.Substring(0, 18));
+            run = m.PositionToRun(Theirs, 2000);
+            Assert.AreEqual("Atuil deng partai agama", (run as DText).AsString.Substring(0, 23));
+
+            // Do the Merge
+            Mine.Merge(Parent, Theirs);
+
+            // Compare the result
+            Mine.Book.Write(new NullProgress());
+            string[] vsActual = _ReadFromFile(Mine.Book.StoragePath);
+
+            WriteMergeCompareToConsole(vsExpected, vsActual);
+
+            CompareMergeResults(vsExpected, vsActual);
+        }
 
 
     }

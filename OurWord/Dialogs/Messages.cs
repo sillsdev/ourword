@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 5 Oct 2007
  * Purpose: A compilation of the messages and strings used in OurWord.
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -26,7 +26,7 @@ using Microsoft.Win32;
 
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 #endregion
 
 namespace OurWord
@@ -272,24 +272,15 @@ namespace OurWord
         }
         #endregion
 
-        #region Error:     void UnableToSaveFile(sPathName)
-        static public void UnableToSaveFile(string sPathName)
-        {
-            LocDB.Message("msgUnableToSaveFile",
-                "Unable to save the file: '{0}.'",
-                new string[] { sPathName },
-                LocDB.MessageTypes.Error);
-        }
-        #endregion
 
         #region WarningYN: bool VerifyRemoveBook()
         static public bool VerifyRemoveBook()
         {
             return LocDB.Message(
                 "msgVerifyRemoveBook",
-                "Do you want to remove this book from the translation? (This will " +
-                    "not delete the file from the disk; it only removes OurWord's " +
-                    "awareness that the book exists.)",
+                "Do you want to remove this book from the translation?\n\n" +
+				"(This will not delete the file from the disk; it only removes\n" +
+				"OurWord's awareness that the book exists.)",
                 null,
                 LocDB.MessageTypes.WarningYN);
         }
@@ -317,6 +308,60 @@ namespace OurWord
                 LocDB.MessageTypes.YN);
         }
         #endregion
+		#region WarningYN: bool VerifyOverwriteBook()
+		static public bool VerifyOverwriteBook()
+		{
+			return LocDB.Message(
+				"msgVerifyOverwriteBook",
+				"There is already a file for this book. Is it OK if OurWord overwrites it? ",
+				null,
+				LocDB.MessageTypes.WarningYN);
+		}
+		#endregion
+		#region WarningYN: bool VerifyReplaceBook()
+		static public bool VerifyReplaceBook()
+		{
+			return LocDB.Message(
+				"msgVerifyOverwriteBook",
+				"This book already exists in the translation. Is it OK if OurWord replaces it?\n\n" +
+					"(Caution: Your current book's file will be deleted.)",
+				null,
+				LocDB.MessageTypes.WarningYN);
+		}
+		#endregion
+
+		#region Error:     void UnableToRemoveWritingSystem(sWritingSystemName)
+		static public void UnableToRemoveWritingSystem(string sWritingSystemName)
+		{
+			LocDB.Message("msgUnableToRemoveWritingSystem",
+				"OurWord is unable to remove the writing system: '{0}'\n" + 
+					"because it is in use by one or more translations in your project.",
+				new string[] { sWritingSystemName },
+				LocDB.MessageTypes.Error);
+		}
+		#endregion
+		#region Error:     void UnableToRemoveLatin()
+		static public void UnableToRemoveLatin()
+		{
+			LocDB.Message("msgUnableToRemoveLatin",
+				"OurWord is unable to remove the writing system: 'Latin'\n" +
+					"because OurWord makes use of it for various internal operations.",
+				null,
+				LocDB.MessageTypes.Error);
+		}
+		#endregion
+		#region WarningYN: bool VerifyRemoveWritingSystem(sWritingSystemName)
+		static public bool VerifyRemoveWritingSystem(string sWritingSystemName)
+		{
+			return LocDB.Message(
+				"msgVerifyRemoveWritingSystem",
+				"Do you want to remove the writing system {0} from your team settings?.",
+				new string[] { sWritingSystemName },
+				LocDB.MessageTypes.WarningYN);
+		}
+		#endregion
+
+
     }
     #endregion
 
@@ -427,7 +472,7 @@ namespace OurWord
         {
             get
             {
-                return G.GetLoc_String("PropDlgTab_PrintOptions", "Print Options");
+                return G.GetLoc_String("PropDlgTab_PrintOptions", "Advanced Print Options");
             }
         }
         #endregion

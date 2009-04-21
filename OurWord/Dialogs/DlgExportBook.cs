@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 26 July 2007
  * Purpose: Export the current book to, e.g., USFM/Paratext format.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -24,8 +24,8 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using JWdb.DataModel;
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -106,7 +106,7 @@ namespace OurWord.Dialogs
             CtrlText_BookName = Book.Translation.DisplayName + " - " + Book.DisplayName;
 
             // Default value for the export pathname
-            ExportPathName = Path.ChangeExtension(Book.AbsolutePathName, c_sParatextExtension);
+            ExportPathName = Path.ChangeExtension(Book.StoragePath, c_sParatextExtension);
         }
         #endregion
         #region Cmd: cmdBrowse

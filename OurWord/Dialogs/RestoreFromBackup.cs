@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 6 Nov 2004
  * Purpose: Restore the current book from a backup file.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -22,8 +22,8 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using JWdb.DataModel;
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -277,7 +277,7 @@ namespace OurWord.Dialogs
 
 			// Load the information about the book we're about to replace
 			m_labelBook.Text = Book.Translation.DisplayName + " - " + Book.DisplayName;
-            m_labelFilename.Text = Path.GetFileName(Book.AbsolutePathName);
+            m_labelFilename.Text = Path.GetFileName(Book.StoragePath);
 
 			// Backup path name
 			m_labelBackupFilename.Text = BackupPathName;
@@ -296,7 +296,7 @@ namespace OurWord.Dialogs
 
 			// Make sure we really, really want to do the restore.
 			bool bGoAhead = Messages.VerifyRestore(
-                    Path.GetFileName(Book.AbsolutePathName), 
+                    Path.GetFileName(Book.StoragePath), 
 					Path.GetFileName(BackupPathName));
 			if (!bGoAhead)
 				DialogResult = DialogResult.Cancel;
@@ -319,9 +319,10 @@ namespace OurWord.Dialogs
 					Environment.SpecialFolder.Personal);
 
 			// First part of file name
-			DTeamSettings ts = G.TeamSettings;
-			string sFileNameFirstPart = Book.Translation.LanguageAbbrev;
-            sFileNameFirstPart += ("-" + G.GetLoc_BookAbbrev(Book.BookAbbrev));
+			DTeamSettings ts = DB.TeamSettings;
+
+			string sFileNameFirstPart = Book.BookIndex.ToString("00");
+            sFileNameFirstPart += (" " + Book.BookAbbrev);
 
 			// Filter
 			dlg.Filter = "Backed-up Files (*.db)|" + sFileNameFirstPart + "-*.db|" + 

@@ -4,7 +4,7 @@
  * Author:   John Wimbish
  * Created:  15 Feb 2004
  * Purpose:  Automated Testing
- * Legal:    Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:    Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;

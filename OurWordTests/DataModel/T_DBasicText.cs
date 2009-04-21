@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 05 Mar 2008
  * Purpose: Tests the DBasicText class
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -16,9 +16,9 @@ using NUnit.Framework;
 
 using JWTools;
 using JWdb;
+using JWdb.DataModel;
 
 using OurWord;
-using OurWord.DataModel;
 using OurWord.Dialogs;
 using OurWord.View;
 #endregion
@@ -32,10 +32,10 @@ namespace OurWordTests.DataModel
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
-            OurWordMain.Project = new DProject();
-            G.Project.TeamSettings = new DTeamSettings();
-            G.TeamSettings.EnsureInitialized();
-            G.Project.DisplayName = "Project";
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings();
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
         }
         #endregion
 
@@ -49,9 +49,9 @@ namespace OurWordTests.DataModel
 
             // Create a multi-phrase text
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, s1));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s1));
             text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, s2));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, s3));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s3));
 
             // Test it's length
             int n = s1.Length + s2.Length + s3.Length;
@@ -137,9 +137,9 @@ namespace OurWordTests.DataModel
 
             // Create a multi-phrase text
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, s1));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s1));
             text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, s2));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevNormal, s3));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s3));
 
             return text;
         }
@@ -159,5 +159,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #endregion
+
+
     }
 }

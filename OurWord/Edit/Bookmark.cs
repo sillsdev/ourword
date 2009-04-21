@@ -5,7 +5,7 @@
  * Created: 21 Mar 2007
  * Purpose: A bookmark for the current Selection, that is not dependent on pointers
  *            to transient objects such as OWParas, DParagraphs, etc.
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -20,7 +20,7 @@ using System.Threading;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
-using OurWord.DataModel;
+using JWdb.DataModel;
 using Palaso.UI.WindowsForms.Keyboarding;
 #endregion
 

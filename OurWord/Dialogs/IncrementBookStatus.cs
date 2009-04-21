@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 03 November 2004
  * Purpose: Provides a dialog for incrementing the book's Stage, Version or Minor.
- * Legal:   Copyright (c) 2005-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -21,8 +21,8 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using JWdb.DataModel;
 using OurWord;
-using OurWord.DataModel;
 #endregion
 
 namespace OurWord.Dialogs
@@ -54,9 +54,7 @@ namespace OurWord.Dialogs
 		private System.Windows.Forms.Label m_lblComment;
 		private System.Windows.Forms.TextBox textBox1;
 		private System.Windows.Forms.Button m_btnOK;
-		private System.Windows.Forms.Button m_btnCancel;
-		private System.Windows.Forms.Label m_lblFileName;
-		private System.Windows.Forms.Label m_FileName;
+        private System.Windows.Forms.Button m_btnCancel;
 		private System.Windows.Forms.Button m_btnHelp;
 		private System.ComponentModel.Container components = null;
 		#endregion
@@ -102,8 +100,6 @@ namespace OurWord.Dialogs
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.m_btnOK = new System.Windows.Forms.Button();
             this.m_btnCancel = new System.Windows.Forms.Button();
-            this.m_lblFileName = new System.Windows.Forms.Label();
-            this.m_FileName = new System.Windows.Forms.Label();
             this.m_btnHelp = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -189,7 +185,7 @@ namespace OurWord.Dialogs
             // 
             // m_lblComment
             // 
-            this.m_lblComment.Location = new System.Drawing.Point(8, 192);
+            this.m_lblComment.Location = new System.Drawing.Point(8, 138);
             this.m_lblComment.Name = "m_lblComment";
             this.m_lblComment.Size = new System.Drawing.Size(100, 16);
             this.m_lblComment.TabIndex = 11;
@@ -198,7 +194,7 @@ namespace OurWord.Dialogs
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(8, 208);
+            this.textBox1.Location = new System.Drawing.Point(8, 154);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(392, 104);
@@ -207,7 +203,7 @@ namespace OurWord.Dialogs
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(80, 328);
+            this.m_btnOK.Location = new System.Drawing.Point(79, 275);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 13;
@@ -216,36 +212,17 @@ namespace OurWord.Dialogs
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(168, 328);
+            this.m_btnCancel.Location = new System.Drawing.Point(167, 275);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 14;
             this.m_btnCancel.Text = "Cancel";
             // 
-            // m_lblFileName
-            // 
-            this.m_lblFileName.Location = new System.Drawing.Point(8, 144);
-            this.m_lblFileName.Name = "m_lblFileName";
-            this.m_lblFileName.Size = new System.Drawing.Size(56, 23);
-            this.m_lblFileName.TabIndex = 15;
-            this.m_lblFileName.Text = "FileName:";
-            this.m_lblFileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_FileName
-            // 
-            this.m_FileName.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_FileName.Location = new System.Drawing.Point(72, 144);
-            this.m_FileName.Name = "m_FileName";
-            this.m_FileName.Size = new System.Drawing.Size(328, 23);
-            this.m_FileName.TabIndex = 16;
-            this.m_FileName.Text = "FileName.db";
-            this.m_FileName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // m_btnHelp
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(256, 328);
+            this.m_btnHelp.Location = new System.Drawing.Point(255, 275);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 17;
@@ -257,10 +234,8 @@ namespace OurWord.Dialogs
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(410, 357);
+            this.ClientSize = new System.Drawing.Size(410, 306);
             this.Controls.Add(this.m_btnHelp);
-            this.Controls.Add(this.m_FileName);
-            this.Controls.Add(this.m_lblFileName);
             this.Controls.Add(this.m_btnCancel);
             this.Controls.Add(this.m_btnOK);
             this.Controls.Add(this.textBox1);
@@ -280,8 +255,8 @@ namespace OurWord.Dialogs
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Increment Book Status";
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
             this.Load += new System.EventHandler(this.cmdLoad);
+            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,17 +274,15 @@ namespace OurWord.Dialogs
 			m_lblBook.Text     = DlgBookPropsRes.Book;
 			m_lblStage.Text    = DlgBookPropsRes.Stage;
 			m_lblVersion.Text  = DlgBookPropsRes.Version;
-			m_lblFileName.Text = DlgBookPropsRes.File;
 			m_lblComment.Text  = DlgBookPropsRes.Comment;
 			m_btnOK.Text       = DlgBookPropsRes.OK;
 			m_btnCancel.Text   = DlgBookPropsRes.Cancel;
 
 			// Set the control contents to reflect the current book's status
-			m_iStage        = G.TranslationStages.GetIndexOf( Book.TranslationStage );
+			m_iStage        = DB.TeamSettings.TranslationStages.GetIndexOf( Book.TranslationStage );
 			m_Book.Text     = Book.DisplayName;
 			m_Stage.Text    = Book.TranslationStage.Name;
 			m_Version.Text  = Book.Version.ToString();
-            m_FileName.Text = Path.GetFileName(Book.AbsolutePathName);
 		}
 		#endregion
 		#region Cmd: cmdClosing - Place dialog data into DBook
@@ -321,19 +294,19 @@ namespace OurWord.Dialogs
 				return;
 
 			Book.SetTranslationStageTo(m_Stage.Text);
-			Book.Version   = m_Version.Text[0];
+			Book.Version = m_Version.Text;
 		}
 		#endregion
 		#region Cmd: cmdIncrementStage
 		private void cmdIncrementStage(object sender, System.EventArgs e)
 		{
 			// Make sure incrementing is possible
-			if (m_iStage >= G.TranslationStages.Count)
+            if (m_iStage >= DB.TeamSettings.TranslationStages.Count)
 				return;
 
 			// Increment the stage
 			m_iStage++;
-			TranslationStage stage = G.TranslationStages.GetFromIndex(m_iStage);
+            TranslationStage stage = DB.TeamSettings.TranslationStages.GetFromIndex(m_iStage);
 			Debug.Assert(null != stage);
 			m_Stage.Text = stage.Name;
 
@@ -342,9 +315,6 @@ namespace OurWord.Dialogs
 
 			// Disable all of the buttons
 			DisableAllButtons();
-
-			// Update the file name
-			UpdateFileName();
 		}
 		#endregion
 		#region Cmd: cmdIncrementVersion
@@ -355,9 +325,6 @@ namespace OurWord.Dialogs
 
 			// Disable all of the buttons
 			DisableAllButtons();
-
-			// Update the file name
-			UpdateFileName();
 		}
 		#endregion
 		#region Cmd: cmdHelp(...) - Help button clicked
@@ -373,21 +340,6 @@ namespace OurWord.Dialogs
 		{
 			m_btnStage.Enabled   = false;
 			m_btnVersion.Enabled = false;
-		}
-		#endregion
-		#region Method: void UpdateFileName()
-		private void UpdateFileName()
-		{
-			string sStageAbbrev = G.TranslationStages.GetFromIndex(m_iStage).Abbrev;
-
-			string sPathName = DBook.ComputePathName(
-                Book.Translation.LanguageAbbrev,
-				Book.BookAbbrev, 
-                sStageAbbrev, 
-                m_Version.Text[0],
-                Path.GetDirectoryName(Book.AbsolutePathName),
-                Book.IsTargetBook);
-			m_FileName.Text = sPathName;
 		}
 		#endregion
 
