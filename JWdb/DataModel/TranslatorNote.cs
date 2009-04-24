@@ -123,7 +123,12 @@ namespace JWdb.DataModel
             Debug.Assert(1 == Paragraphs.Count);
             Paragraphs[0].Runs.Clear();
             foreach (DRun run in vRuns)
+            {
+                DText text = run as DText;
+                if (text != null && text.PhrasesBT.Count == 0)
+                    text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
                 Paragraphs[0].Runs.Append(run);
+            }
 
             Debug_VerifyIntegrity();
         }

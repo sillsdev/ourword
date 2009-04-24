@@ -638,6 +638,7 @@ namespace OurWordTests.DataModel
             DText text = new DText();
             p.Runs.Append(text);
             text.Phrases.Append(new DPhrase("p", "This is some text."));
+            text.PhrasesBT.Append(new DPhrase("p", ""));
 
             // Create the Xml Element from it
             XElement x = p.ToXml(true);

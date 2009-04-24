@@ -1486,6 +1486,15 @@ namespace JWdb.DataModel
         #region OMethod: void FromXml(XElement x)
         public override void FromXml(XElement x)
         {
+            // If we have no subitems, ite means we used our special override of ToXml
+            // Thus if we have subitems, then we let the base method take care of it.
+            if (x.Items.Count > 0)
+            {
+                base.FromXml(x);
+                return;
+            }
+
+            /***
             // If we have a Contents attribute, then it means we used our special override
             // of ToXml.
             if (null == x.FindAttr("Contents"))
@@ -1493,6 +1502,7 @@ namespace JWdb.DataModel
                 base.FromXml(x);
                 return;
             }
+            ***/
 
             // We want exactly one DText
             Clear();
@@ -1509,11 +1519,15 @@ namespace JWdb.DataModel
             attr = x.FindAttr(c_sAttrContents);
             if (null != attr)
                 text.Phrases.FromSaveString(attr.Value);
+            else
+                text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
 
             // Retrieve the back translation
             attr = x.FindAttr(c_sAttrBT);
             if (null != attr)
                 text.PhrasesBT.FromSaveString(attr.Value);
+            else
+                text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
         }
         #endregion
 
