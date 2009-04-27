@@ -543,19 +543,54 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+        #region VAttr{g}: bool IsExplanatory
+        public bool IsExplanatory
+        {
+            get
+            {
+                return (TypeCode == c_codeFootNote);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsSeeAlso
+        public bool IsSeeAlso
+        {
+            get
+            {
+                return (TypeCode == c_codeSeeAlso);
+            }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(chLetter, DFootnote)
         protected DFoot(char chLetter, DFootnote footnote)
             : base()
         {
+			// Make sure we are passed a valid letter
+            Debug.Assert(chLetter >= 'a' && chLetter <= 'z');
             m_chLetter = chLetter;
+
             m_footnote = footnote;
+        }
+        #endregion
+        #region Method: override bool ContentEquals(obj) - required override to prevent duplicates
+        public override bool ContentEquals(JObject obj)
+        {
+            if (this.GetType() != obj.GetType())
+                return false;
+
+            DFoot foot = obj as DFoot;
+
+            if (Letter != foot.Letter)
+                return false;
+
+            return true;
         }
         #endregion
 
         // DRun Override Scaffolding ---------------------------------------------------------
-		#region Attr{g}: override string AsString
+		#region OAttr{g}: override string AsString
 		public override string AsString
 		{
 			get
@@ -564,14 +599,101 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+        #region OAttr{g}: char TypeCode
+        public override char TypeCode
+        {
+            get
+            {
+                if (Footnote.NoteType == DFootnote.Types.kExplanatory)
+                    return c_codeFootNote;
+
+                if (Footnote.NoteType == DFootnote.Types.kSeeAlso)
+                    return c_codeSeeAlso;
+
+                Debug.Assert(false, "Unknown type code.");
+                return c_codeFootNote;
+            }
+        }
+        #endregion
+        #region Attr{g}: string ContentsSfmSaveString
+        public override string ContentsSfmSaveString
+        {
+            get
+            {
+                // For an Explanatory footnote, return |fn
+                if (IsExplanatory)
+                    return "|fn ";
+
+                // For SeeAlso, return nothing
+                return "";
+            }
+        }
+        #endregion
+        #region Attr{g}: string DebugString
+        public override string DebugString
+        {
+            get
+            {
+                string sStart = (IsSeeAlso) ? "{cf " : "{fn " ;
+                return sStart + Letter.ToString() + "}";
+            }
+        }
+        #endregion
+        #region method: override PWord[] GetPWords()
+        public override PWord[] GetPWords()
+        {
+            string sStyle = ((IsSeeAlso) ?
+                DStyleSheet.c_StyleAbbrevSeeAlsoLetter :
+                DStyleSheet.c_StyleAbbrevFootLetter );
+
+            PWord[] v = new PWord[1];
+            v[0] = new PWord(Text,
+                DB.StyleSheet.FindCharacterStyle(sStyle),
+                null,
+                this);
+            return v;
+        }
+        #endregion
+
+        // Methods ---------------------------------------------------------------------------
+        #region OMethod: void ToSfm(ScriptureDB DBS)
+        public override void ToSfm(ScriptureDB DBS)
+        {
+            // SeeAlso's are simple
+            if (IsSeeAlso)
+            {
+                DBS.Append(new SfField(DBS.Map.MkrSeeAlso, Footnote.SimpleText));
+                return;
+            }
+
+            // For Explanatory footnotes, append the "|fn" marker to the previous verse text
+            SfField LastField = DBS.LastField(DBS.Map.MkrVerseText);
+            if (null != LastField)
+            {
+                LastField.Data += "|fn";
+                LastField.BT += "|fn";
+            }
+
+            // Build the footnote text from its runs and append it to the DB
+            string sContents = "";
+            string sProseBT = "";
+            foreach (DRun run in Footnote.Runs)
+            {
+                sContents += run.ContentsSfmSaveString;
+                sProseBT += run.ProseBTSfmSaveString;
+            }
+            DBS.Append(new SfField(DBS.Map.MkrFootnote, sContents,
+                sProseBT, ""));
+        }
+        #endregion
     }
     #endregion
     #region Class: DFootLetter
     public class DFootLetter : DFoot
 	{
-		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor()
-		protected DFootLetter(char chLetter, DFootnote footnote)
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(char chLetter, DFootnote footnote)
+        protected DFootLetter(char chLetter, DFootnote footnote)
             : base(chLetter, footnote)
 		{
 		}
@@ -579,10 +701,6 @@ namespace JWdb.DataModel
 		#region Method: static DFootLetter Create(chLetter, DFootnote)
 		static public DFootLetter Create(char chLetter, DFootnote footnote)
 		{
-			// Make sure we are passed a valid letter and a valid DFootnote
-			if (chLetter < 'a' || chLetter > 'z')
-				return null;
-
 			return new DFootLetter( chLetter, footnote );
 		}
 		#endregion
@@ -592,86 +710,7 @@ namespace JWdb.DataModel
 			return new DFootLetter( footletter.Letter, fn );
 		}
 		#endregion
-		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
-		public override bool ContentEquals(JObject obj)
-		{
-			if (this.GetType() != obj.GetType())
-				return false;
 
-			DFootLetter foot = obj as DFootLetter;
-
-			if (Letter != foot.Letter)
-				return false;
-
-			return true;
-		}
-		#endregion
-
-		// DRun Override Scaffolding ---------------------------------------------------------
-		#region Attr{g}: char TypeCode - a single character representing the subclass type
-		public override char TypeCode
-		{
-			get
-			{
-				return c_codeFootNote;
-			}
-		}
-		#endregion
-		#region Attr{g}: string DebugString
-		public override string DebugString
-		{
-			get
-			{
-				return "{fn " + Letter.ToString() + "}";
-			}
-		}
-		#endregion
-		#region Attr{g}: string ContentsSfmSaveString
-		public override string ContentsSfmSaveString
-		{
-			get
-			{
-				return "|fn ";
-			}
-		}
-		#endregion
-		#region method: override PWord[] GetPWords()
-		public override PWord[] GetPWords()
-		{
-			PWord[] v = new PWord[1];
-			v[0] = new PWord(Text, 
-                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
-                null,
-                this);
-			return v;
-		}
-		#endregion
-
-		// Methods ---------------------------------------------------------------------------
-		#region Method: override void ToSfm(ScriptureDB DBS)
-		public override void ToSfm(ScriptureDB DBS)
-		{
-            // Append the "|fn" marker to the previous verse text
-            SfField LastField = DBS.LastField(DBS.Map.MkrVerseText);
-            if (null != LastField)
-            {
-                LastField.Data += "|fn";
-                LastField.BT += "|fn";
-            }
-
-            // Build the footnote text from its runs and append it to the DB
-			string sContents = "";
-			string sProseBT  = "";
-			foreach(DRun run in Footnote.Runs)
-			{
-				sContents += run.ContentsSfmSaveString;
-				sProseBT  += run.ProseBTSfmSaveString;
-			}
-
-			DBS.Append( new SfField( DBS.Map.MkrFootnote, sContents, 
-				sProseBT, "" ) );
-		}
-		#endregion
 	}
 	#endregion
 	#region Class: DSeeAlso
@@ -687,10 +726,6 @@ namespace JWdb.DataModel
 		#region Method: static DSeeAlso Create(chLetter, DFootnote)
 		static public DSeeAlso Create(char chLetter, DFootnote footnote)
 		{
-			// Make sure we are passed a valid letter
-			if (chLetter < 'a' || chLetter > 'z')
-				return null;
-
 			return new DSeeAlso( chLetter, footnote );
 		}
 		#endregion
@@ -700,70 +735,10 @@ namespace JWdb.DataModel
 			return new DSeeAlso( also.Letter, fn );
 		}
 		#endregion
-		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
-		public override bool ContentEquals(JObject obj)
-		{
-			if (this.GetType() != obj.GetType())
-				return false;
-
-			DSeeAlso also = obj as DSeeAlso;
-
-			if (Letter != also.Letter)
-				return false;
-
-			return true;
-		}
-		#endregion
-
-		// DRun Override Scaffolding ---------------------------------------------------------
-		#region Attr{g}: char TypeCode - a single character representing the subclass type
-		public override char TypeCode
-		{
-			get
-			{
-				return c_codeSeeAlso;
-			}
-		}
-		#endregion
-		#region Attr{g}: string DebugString
-		public override string DebugString
-		{
-			get
-			{
-				return "{cf " + Letter.ToString() + "}";
-			}
-		}
-		#endregion
-		#region Attr{g}: string ContentsSfmSaveString 
-		public override string ContentsSfmSaveString
-		{
-			get
-			{
-				return "";
-			}
-		}
-		#endregion
-		#region method: override PWord[] GetPWords()
-		public override PWord[] GetPWords()
-		{
-			PWord[] v = new PWord[1];
-			v[0] = new PWord(Text,
-                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevSeeAlsoLetter),
-                null,
-                this);
-			return v;
-		}
-		#endregion
-
-		// Methods ---------------------------------------------------------------------------
-		#region Method: override void ToSfm(ScriptureDB DBS)
-		public override void ToSfm(ScriptureDB DBS)
-		{
-			DBS.Append( new SfField( DBS.Map.MkrSeeAlso, Footnote.SimpleText ) );
-		}
-		#endregion
 	}
 	#endregion
+    /***
+    ***/
 
 	#region Class: DLabel
 	public class DLabel : DRun
