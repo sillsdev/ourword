@@ -564,7 +564,7 @@ namespace JWdb.DataModel
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(chLetter, DFootnote)
-        protected DFoot(char chLetter, DFootnote footnote)
+        public DFoot(char chLetter, DFootnote footnote)
             : base()
         {
 			// Make sure we are passed a valid letter
@@ -586,6 +586,12 @@ namespace JWdb.DataModel
                 return false;
 
             return true;
+        }
+        #endregion
+        #region SMethod: DFoot Copy(chLetter, DFootnote)
+        static public DFoot Copy(char chLetter, DFootnote footnote)
+        {
+            return new DFoot(chLetter, footnote);
         }
         #endregion
 
@@ -688,6 +694,7 @@ namespace JWdb.DataModel
         #endregion
     }
     #endregion
+    /***
     #region Class: DFootLetter
     public class DFootLetter : DFoot
 	{
@@ -737,7 +744,6 @@ namespace JWdb.DataModel
 		#endregion
 	}
 	#endregion
-    /***
     ***/
 
 	#region Class: DLabel
@@ -2555,9 +2561,7 @@ namespace JWdb.DataModel
             DRun _Footnote)
             : this(_Text, _CStyle, _PStyle) // _CharacterStyleAbbrev)
         {
-            Debug.Assert(
-                _Footnote as DFootLetter != null ||
-                _Footnote as DSeeAlso != null);
+            Debug.Assert( _Footnote as DFoot != null );
 
             m_Footnote = _Footnote;
         }

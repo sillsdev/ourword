@@ -152,7 +152,7 @@ namespace OurWordTests.DataModel
         #region Method: void CheckFoot(List<DRun>, iRun)
         void CheckFoot(List<DRun> vRuns, int iRun)
         {
-            DFootLetter foot = vRuns[iRun] as DFootLetter;
+            DFoot foot = vRuns[iRun] as DFoot;
             Assert.IsNotNull(foot);
 
             Assert.AreEqual('a', foot.Letter);

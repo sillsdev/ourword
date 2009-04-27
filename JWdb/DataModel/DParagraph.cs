@@ -577,30 +577,18 @@ namespace JWdb.DataModel
 		{
 			foreach(DRun run in Runs)
 			{
-				DFootLetter letter = run as DFootLetter;
-				if (null != letter && null == letter.Footnote)
-				{
-					letter.Footnote = footnote;
-					return;
-				}
-
-				DSeeAlso SeeAlso = run as DSeeAlso;
-				if (null != SeeAlso && null == SeeAlso.Footnote)
-				{
-					SeeAlso.Footnote = footnote;
-					return;
-				}
+                DFoot foot = run as DFoot;
+                if (null != foot && null == foot.Footnote)
+                {
+                    foot.Footnote = footnote;
+                    return;
+                }
 			}
 
 			// If we get to here, then it means we do not have a marker in the paragraph
 			// for this footnote. So we need to append a marker to the end of the
 			// paragraph.
-			DRun add = null;
-			if (footnote.NoteType == DFootnote.Types.kExplanatory)
-				add = DFootLetter.Create(chLetter, footnote);
-			else
-				add = DSeeAlso.Create(chLetter, footnote);
-
+            DRun add = new DFoot(chLetter, footnote);
             if (null != add)
             {
                 Runs.Append(add);
@@ -728,11 +716,8 @@ namespace JWdb.DataModel
 			// be a place to type prior to it.
 			if (Runs.Count > 0)
 			{
-				if (Runs[0] as DFootLetter != null ||
-					Runs[0] as DSeeAlso != null)
-				{
+                if (Runs[0] as DFoot != null)
 					Runs.InsertAt(0, DText.CreateSimple(), true );
-				}
 			}
 
 			// Case 3: An empty paragraph should have a place to type
@@ -817,22 +802,12 @@ namespace JWdb.DataModel
 			// attached to them, then we remove them from the paragraph.
 			for(int i=0; i < Runs.Count; )
 			{
-				DFootLetter foot = Runs[i] as DFootLetter;
-				DSeeAlso    also = Runs[i] as DSeeAlso;
+				DFoot foot = Runs[i] as DFoot;
 
-				bool bDelete = false;
-
-				if (null != foot && null == foot.Footnote)
-					bDelete = true;
-				if (null != also && null == also.Footnote)
-					bDelete = true;
-
-				if (bDelete)
-				{
-					Runs.RemoveAt(i);
-				}
-				else
-					i++;
+                if (null != foot && null == foot.Footnote)
+                    Runs.RemoveAt(i);
+                else
+                    i++;
 			}
 
 			CombineAdjacentDTexts(true);
@@ -1167,7 +1142,7 @@ namespace JWdb.DataModel
         #endregion
         // Insert / Remove Footnotes ---------------------------------------------------------
         #region Method: DFootLetter InsertFootnote(DBasicText, iPos)
-        public DFootLetter InsertFootnote(DBasicText dbt, int iPos)
+        public DFoot InsertFootnote(DBasicText dbt, int iPos)
         {
             // Illegal to insert a footnote within a footnote
             if (this as DFootnote != null)
@@ -1227,21 +1202,21 @@ namespace JWdb.DataModel
             Section.Footnotes.Append(footnote);
 
             // Create the footletter for it to go into, and insert it
-            DFootLetter letter = DFootLetter.Create('a', footnote);
-            Runs.InsertAt(iInsertPosition, letter);
+            DFoot foot = new DFoot('a', footnote);
+            Runs.InsertAt(iInsertPosition, foot);
 
             // Re-letter all footletters
             Section.UpdateFootnoteLetters();
 
-            return letter;
+            return foot;
         }
         #endregion
-        #region Method: void RemoveFootnote(DFootLetter letter)
-        public void RemoveFootnote(DFootLetter letter)
+        #region Method: void RemoveFootnote(DFoot)
+        public void RemoveFootnote(DFoot foot)
         {
             // Remove the footnote
-            Section.Footnotes.Remove(letter.Footnote);
-            Runs.Remove(letter);
+            Section.Footnotes.Remove(foot.Footnote);
+            Runs.Remove(foot);
             CombineAdjacentDTexts(false);
 
             // Re-letter all footletters
@@ -1368,27 +1343,20 @@ namespace JWdb.DataModel
 				}
 
 				// Footnote
-				DFootLetter foot = run as DFootLetter;
-				if (null != foot)
-				{
-					DFootnote fnFront = foot.Footnote;
-					DFootnote fnTarget = new DFootnote( fnFront);
-					Section.Footnotes.Append(fnTarget);
-					Runs.Append( DFootLetter.Copy( foot, fnTarget ) );
-					continue;
-				}
+                DFoot foot = run as DFoot;
+                if (null != foot)
+                {
+                    DFootnote fnFront = foot.Footnote;
+                    DFootnote fnTarget = new DFootnote(fnFront);
+                    Section.Footnotes.Append(fnTarget);
 
-				// See Also
-				DSeeAlso also = run as DSeeAlso;
-				if (null != also)
-				{
-					DFootnote fnFront = also.Footnote;
-					DFootnote fnTarget = new DFootnote( fnFront);
-					Section.Footnotes.Append(fnTarget);
-					fnTarget.ConvertCrossReferences(fnFront);
-					Runs.Append( DSeeAlso.Copy( also, fnTarget ) );
-					continue;
-				}
+                    if (foot.IsSeeAlso)
+                        fnTarget.ConvertCrossReferences(fnFront);
+
+                    Runs.Append(DFoot.Copy(foot.Letter, fnTarget));
+
+                    continue;
+                }
 
                 // DLabel
                 DLabel label = run as DLabel;

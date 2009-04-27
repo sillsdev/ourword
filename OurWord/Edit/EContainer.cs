@@ -1340,11 +1340,8 @@ namespace OurWord.Edit
                     bSelectionFound = true;
 
                 // Do we have a Footnote
-                OWPara.ESeeAlso also = item as OWPara.ESeeAlso;
-                OWPara.EFootLetter letter = item as OWPara.EFootLetter;
-                if (null != footnote && (
-                    (also != null && also.Footnote == footnote) ||
-                    (letter != null && letter.Footnote == footnote)))
+                OWPara.EFoot foot = item as OWPara.EFoot;
+                if (null != footnote && (foot != null && foot.Footnote == footnote) )
                 {
                     bSelectionFound = true;
                 }
@@ -1379,10 +1376,8 @@ namespace OurWord.Edit
                 }
 
                 // Test this item
-                OWPara.ESeeAlso also = item as OWPara.ESeeAlso;
-                OWPara.EFootLetter letter = item as OWPara.EFootLetter;
-                if ((also != null && also.Footnote == footnote) ||
-                     (letter != null && letter.Footnote == footnote))
+                OWPara.EFoot foot = item as OWPara.EFoot;
+                if (foot != null && foot.Footnote == footnote) 
                 {
                     return this as OWPara;
                 }

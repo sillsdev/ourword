@@ -998,9 +998,8 @@ namespace JWdb.DataModel
 			for(int i=0; i<p.Runs.Count - 1; i++)
 			{
 				// Are we sitting at a foot letter?
-				DFootLetter foot = p.Runs[i] as DFootLetter;
-				DSeeAlso  also = p.Runs[i] as DSeeAlso;
-				if (null == foot && null == also)
+				DFoot foot = p.Runs[i] as DFoot;
+				if (null == foot)
 					continue;
 
 				// Is the next item a DText
@@ -1716,7 +1715,7 @@ namespace JWdb.DataModel
 					// Footnote: add the new run into the array, then loop to the next one
 					if (raw.StyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
 					{
-                        DFootLetter foot = DFootLetter.Create(chNextFootLetter++, null);
+                        DFoot foot = new DFoot(chNextFootLetter++, null);
                         if (null != foot)  // TODO: Fails if we go beyond 'z'
 						    vRuns.Add( foot );
 						continue;
@@ -1786,7 +1785,7 @@ namespace JWdb.DataModel
 				foreach( DRun run in vRuns)
 				{
 					// Deal with a footnote if that is what we currently have
-					DFootLetter foot = run as DFootLetter;
+					DFoot foot = run as DFoot;
 					if (null != foot) 
 					{
 						iBT  = _AdvancePastFootnote(iBT,  vBTRawPhrases);
@@ -1920,7 +1919,7 @@ namespace JWdb.DataModel
 				{
 					if (null != run as DVerse || 
 						null != run as DChapter || 
-						null != run as DSeeAlso)
+						(null != run as DFoot && (run as DFoot).IsSeeAlso))
 					{
 						Debug.Assert(false, "Disallowed data in a simple paragraph.");
 						return;
@@ -1949,7 +1948,8 @@ namespace JWdb.DataModel
 				int cFootnotes = 0;
 				for(int i = iPosFirst; i <= iPosLast; i++)
 				{
-					if (null != p.Runs[i] as DFootLetter)
+                    DFoot foot = p.Runs[i] as DFoot;
+                    if (null != foot && foot.IsExplanatory)
 						++cFootnotes;
 				}
 
@@ -1985,8 +1985,8 @@ namespace JWdb.DataModel
                                 listTranslatorNotes.Add(tn);
 						}
 
-						DFootLetter foot = run as DFootLetter;
-						if (null != foot)
+						DFoot foot = run as DFoot;
+						if (null != foot && foot.IsExplanatory)
 						{
 							// Store the footnote
 							footnote = foot.Footnote;
@@ -2809,27 +2809,14 @@ namespace JWdb.DataModel
                 foreach (DRun r in p.Runs)
                 {
                     // Retrieve the run; skip if not of the right type
-                    DFootLetter letter = r as DFootLetter;
-                    DSeeAlso also = r as DSeeAlso;
-                    if (null == letter && null == also)
+                    DFoot foot = r as DFoot;
+                    if (null == foot)
                         continue;
 
-                    DFootnote footnote = null;
-
-                    if (null != letter)
-                    {
-                        letter.Letter = ch;
-                        footnote = letter.Footnote;
-                    }
-
-                    if (null != also)
-                    {
-                        also.Letter = ch;
-                        footnote = also.Footnote;
-                    }
+                    foot.Letter = ch;
 
                     // Make sure the footnotes are in the correct order
-                    int iCurrentFootnotePos = Footnotes.FindObj(footnote);
+                    int iCurrentFootnotePos = Footnotes.FindObj(foot.Footnote);
                     Footnotes.MoveTo(iCurrentFootnotePos, i);
                     i++;
 

@@ -2053,19 +2053,11 @@ namespace OurWord
 			// Loop through all of the Footnote / SeeAlso's we have
 			foreach( DRun run in vFootnoteRuns)
 			{
-				// There are two types of footnote runs, so we need to do a cast into
-				// both and then use whichever one fits.
-				DSeeAlso SeeAlso = run as DSeeAlso;
-				DFootLetter FootLetter = run as DFootLetter;
-				Debug.Assert(null != SeeAlso || null != FootLetter);
-
-				// The first footnote in a Section is 'a', then 'b', etc.
-//				char chLetter = (null != SeeAlso) ? 
-//					SeeAlso.Letter : FootLetter.Letter;
+                DFoot foot = run as DFoot;
+                Debug.Assert(null != foot);
 
 				// Retrieve the footnote text. This is a subclass of DParagraph
-				DFootnote footnote = (null != SeeAlso) ? 
-					SeeAlso.Footnote : FootLetter.Footnote;
+				DFootnote footnote = foot.Footnote;
 				PPosition PosFN = new PPosition(footnote, 0);								
 				PosFN.PrependLetter(chFootnoteLetter);
 

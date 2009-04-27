@@ -354,35 +354,64 @@ namespace OurWord.Edit
 
         }
         #endregion
-        #region CLASS: EFootLetter
-        public class EFootLetter : EBlock
+        #region CLASS: EFoot
+        public class EFoot : EBlock
         {
-            #region Attr{g}: DFootnote Footnote
+            #region Attr{g}: DFoot Foot
+            DFoot Foot
+            {
+                get
+                {
+                    Debug.Assert(null != m_Foot);
+                    return m_Foot;
+                }
+            }
+            DFoot m_Foot;
+            #endregion
+            #region VAttr{g}: DFootnote Footnote
             public DFootnote Footnote
             {
                 get
                 {
-                    Debug.Assert(null != m_Footnote);
-                    return m_Footnote;
+                    Debug.Assert(null != Foot.Footnote);
+                    return Foot.Footnote;
                 }
             }
-            DFootnote m_Footnote = null;
             #endregion
 
+            #region Constructor(JFontForWritingSystem, DFoot)
+            public EFoot(JFontForWritingSystem f, DFoot foot)
+                : base(f, foot.Text)
+            {
+                m_Foot = foot;
+            }
+            #endregion
+
+            #region Method: override void Paint()
+            public override void Paint()
+            {
+                Draw.String(Text, GetSuperscriptFont(), GetBrush(), Position);
+            }
+            #endregion
+
+            // Explanatory Footnote
             #region VAttr{g}: bool FootnoteIsEditable - if T, we can jump to it by clicking on the letter
             bool FootnoteIsEditable
-                // Test to see if the footnote is editable. If it is, then we
-                // 1. Show the Hand cursor when we hover over it,
-                // 2. Can jump to it
-                //
-                // This test will not work until the entire window has been laid out. 
-                // If we don't have a selection in the window, then it is safe to
-                // assume that the window is not ready.
+            // Test to see if the footnote is editable. If it is, then we
+            // 1. Show the Hand cursor when we hover over it,
+            // 2. Can jump to it
+            //
+            // This test will not work until the entire window has been laid out. 
+            // If we don't have a selection in the window, then it is safe to
+            // assume that the window is not ready.
             {
                 get
                 {
                     if (!m_bFootnoteIsEditableComputed)
                     {
+                        if (!Foot.IsExplanatory)
+                            return false;
+
                         // Can't do this if we don't have a selection
                         if (!Window.HasSelection)
                             return false;
@@ -408,70 +437,28 @@ namespace OurWord.Edit
             bool m_bFootnoteIsEditableComputed = false;
             #endregion
 
-            #region Constructor(DFootLetter)
-            public EFootLetter(JFontForWritingSystem f, DFootLetter footLetter)
-                : base(f, footLetter.Text)
-            {
-                m_Footnote = footLetter.Footnote;
-            }
-            #endregion
-
-            #region Method: override void Paint()
-            public override void Paint()
-            {
-                Draw.String(Text, GetSuperscriptFont(), GetBrush(), Position);
-            }
-            #endregion
-
             #region Attr{g}: Cursor MouseOverCursor - Indicates what a Left-Click will do
             public override Cursor MouseOverCursor
             {
                 get
                 {
                     if (FootnoteIsEditable)
-                     return Cursors.Hand;
-                 return Cursors.Arrow;
+                        return Cursors.Hand;
+                    return Cursors.Arrow;
                 }
             }
             #endregion
             #region Method: override void cmdLeftMouseClick(PointF pt)
             public override void cmdLeftMouseClick(PointF pt)
             {
-                EContainer container = Window.Contents.FindContainerOfDataSource(Footnote);
-                container.Select_FirstWord();
-            }
-            #endregion
-        }
-        #endregion
-        #region CLASS: ESeeAlso
-        public class ESeeAlso : EBlock
-        {
-            #region Attr{g}: DFootnote Footnote
-            public DFootnote Footnote
-            {
-                get
+                if (Foot.IsExplanatory)
                 {
-                    Debug.Assert(null != m_Footnote);
-                    return m_Footnote;
+                    EContainer container = Window.Contents.FindContainerOfDataSource(Footnote);
+                    container.Select_FirstWord();
                 }
-            }
-            DFootnote m_Footnote = null;
-            #endregion
-                       
-            #region Constructor(DSeeAlso)
-            public ESeeAlso(JFontForWritingSystem f, DSeeAlso seeAlso)
-                : base(f, seeAlso.Text)
-            {
-                m_Footnote = seeAlso.Footnote;
             }
             #endregion
 
-            #region Method: override void Paint()
-            public override void Paint()
-            {
-                Draw.String(Text, GetSuperscriptFont(), GetBrush(), Position);
-            }
-            #endregion
         }
         #endregion
         #region CLASS: ELabel
@@ -800,9 +787,7 @@ namespace OurWord.Edit
             blockLeft.GlueToNext = false;
 
             // But we do glue in the case, e.g., where we are followed by certain objects
-            if (blockRight as EFootLetter != null)
-                blockLeft.GlueToNext = true;
-            if (blockRight as ESeeAlso != null)
+            if (blockRight as EFoot != null)
                 blockLeft.GlueToNext = true;
             if (blockRight as ENote != null)
                 blockLeft.GlueToNext = true;
@@ -833,7 +818,6 @@ namespace OurWord.Edit
             JFontForWritingSystem fChapter = RetrieveFont(DStyleSheet.c_StyleAbbrevChapter);
             JFontForWritingSystem fVerse = RetrieveFont(DStyleSheet.c_StyleAbbrevVerse);
             JFontForWritingSystem fFootLetter = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
-            JFontForWritingSystem fSeeAlso = RetrieveFont(DStyleSheet.c_StyleAbbrevSeeAlsoLetter);
             JFontForWritingSystem fLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevLabel);
             JFontForWritingSystem fFootnoteLabel = fFootLetter;
 
@@ -852,11 +836,8 @@ namespace OurWord.Edit
                     case "DVerse":
                         Append(new EVerse(fVerse, r as DVerse));
                         break;
-                    case "DFootLetter":
-                        Append(new EFootLetter(fFootLetter, r as DFootLetter));
-                        break;
-                    case "DSeeAlso":
-                        Append(new ESeeAlso(fSeeAlso, r as DSeeAlso));
+                    case "DFoot":
+                        Append(new EFoot(fFootLetter, r as DFoot));
                         break;
                     case "DLabel":
                         Append(new ELabel(fLabel, r as DLabel));

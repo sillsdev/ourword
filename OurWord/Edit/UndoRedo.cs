@@ -2027,15 +2027,15 @@ namespace OurWord.Edit
                 return false;
 
             // Insert a DFootLetter into the paragraph
-            DFootLetter footLetter = para.InsertFootnote(text, iPos);
-            m_InsertedFootnote = footLetter.Footnote;
+            DFoot foot = para.InsertFootnote(text, iPos);
+            m_InsertedFootnote = foot.Footnote;
 
             // Reload the window's data. This is time-consuming, but it is the only way to make 
             // paragraphs line up correctly side-by-side.
             Window.LoadData();
 
             // Move editing to the new footnote
-            DFootnote footnote = footLetter.Footnote;
+            DFootnote footnote = foot.Footnote;
             EContainer container = Window.Contents.FindContainerOfDataSource(footnote);
             container.Select_FirstWord();
 
@@ -2075,15 +2075,15 @@ namespace OurWord.Edit
             {
                 foreach (DRun r in p.Runs)
                 {
-                    DFootLetter letter = r as DFootLetter;
-                    if (letter == null)
+                    DFoot foot = r as DFoot;
+                    if (foot == null)
                         continue;
 
-                    if (letter.Footnote != footnote)
+                    if (foot.Footnote != footnote)
                         continue;
 
                     footnote.Section.Footnotes.Remove(footnote);
-                    p.RemoveFootnote(r as DFootLetter);
+                    p.RemoveFootnote(foot);
                     bRemoved = true;
                     break;
                 }
