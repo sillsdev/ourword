@@ -619,7 +619,6 @@ namespace JWdb.DataModel
 		public const string c_StyleAbbrevVerse            = "v";
 		public const string c_StyleAbbrevChapter          = "c";
 		public const string c_StyleAbbrevFootLetter       = "fn";
-		public const string c_StyleAbbrevSeeAlsoLetter    = "cf";
 		public const string c_StyleAbbrevItalic           = "i";
 		public const string c_StyleAbbrevBold             = "b";
 		public const string c_StyleAbbrevUnderline        = "u";
@@ -976,15 +975,6 @@ namespace JWdb.DataModel
 			if (null == FindCharacterStyle(c_StyleAbbrevFootLetter))
 			{
 				charStyle = AddCharacterStyle( 	c_StyleAbbrevFootLetter, "Footnote Character");
-                charStyle.SetFonts(false, 10, false, false, false, false, Color.Navy);
-                charStyle.IsSuperScript = true;
-			}
-
-			// Footnote Character (cf)
-			if (null == FindCharacterStyle(c_StyleAbbrevSeeAlsoLetter))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevSeeAlsoLetter, 
-					"See Also Footnote Character");
                 charStyle.SetFonts(false, 10, false, false, false, false, Color.Navy);
                 charStyle.IsSuperScript = true;
 			}

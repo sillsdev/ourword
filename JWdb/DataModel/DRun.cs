@@ -648,13 +648,9 @@ namespace JWdb.DataModel
         #region method: override PWord[] GetPWords()
         public override PWord[] GetPWords()
         {
-            string sStyle = ((IsSeeAlso) ?
-                DStyleSheet.c_StyleAbbrevSeeAlsoLetter :
-                DStyleSheet.c_StyleAbbrevFootLetter );
-
             PWord[] v = new PWord[1];
             v[0] = new PWord(Text,
-                DB.StyleSheet.FindCharacterStyle(sStyle),
+                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
                 null,
                 this);
             return v;
@@ -694,57 +690,6 @@ namespace JWdb.DataModel
         #endregion
     }
     #endregion
-    /***
-    #region Class: DFootLetter
-    public class DFootLetter : DFoot
-	{
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(char chLetter, DFootnote footnote)
-        protected DFootLetter(char chLetter, DFootnote footnote)
-            : base(chLetter, footnote)
-		{
-		}
-		#endregion
-		#region Method: static DFootLetter Create(chLetter, DFootnote)
-		static public DFootLetter Create(char chLetter, DFootnote footnote)
-		{
-			return new DFootLetter( chLetter, footnote );
-		}
-		#endregion
-		#region Method: DFootLetter Copy( DFootLetter )
-		static public DFootLetter Copy( DFootLetter footletter, DFootnote fn )
-		{
-			return new DFootLetter( footletter.Letter, fn );
-		}
-		#endregion
-
-	}
-	#endregion
-	#region Class: DSeeAlso
-    public class DSeeAlso : DFoot
-	{
-		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor(char chLetter, DFootnote footnote)
-		protected DSeeAlso(char chLetter, DFootnote footnote)
-            : base(chLetter, footnote)
-		{
-		}
-		#endregion
-		#region Method: static DSeeAlso Create(chLetter, DFootnote)
-		static public DSeeAlso Create(char chLetter, DFootnote footnote)
-		{
-			return new DSeeAlso( chLetter, footnote );
-		}
-		#endregion
-		#region Method: DSeeAlso Copy( DSeeAlso )
-		static public DSeeAlso Copy( DSeeAlso also, DFootnote fn )
-		{
-			return new DSeeAlso( also.Letter, fn );
-		}
-		#endregion
-	}
-	#endregion
-    ***/
 
 	#region Class: DLabel
 	public class DLabel : DRun
@@ -2421,8 +2366,7 @@ namespace JWdb.DataModel
         #region Method: void SetFootnoteLetter(ref char chFootnoteLetter)
         public void SetFootnoteLetter(ref char chFootnoteLetter)
         {
-            if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter ||
-                CStyleAbbrev == DStyleSheet.c_StyleAbbrevSeeAlsoLetter)
+            if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
             {
                 Text = chFootnoteLetter.ToString();
                 chFootnoteLetter++;
@@ -2437,8 +2381,7 @@ namespace JWdb.DataModel
         {
             get
             {
-                if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter ||
-                    CStyleAbbrev == DStyleSheet.c_StyleAbbrevSeeAlsoLetter)
+                if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
                 {
                     return Text[0];
                 }

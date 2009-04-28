@@ -887,8 +887,6 @@ namespace OurWord
 					bNeedsGlue = true;
 				if (next.CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
 					bNeedsGlue = true;
-				if (next.CStyleAbbrev == DStyleSheet.c_StyleAbbrevSeeAlsoLetter)
-					bNeedsGlue = true;
 
                 // Determine if glue required: based on following punctuation
                 if (!string.IsNullOrEmpty(next.Text) &&  
