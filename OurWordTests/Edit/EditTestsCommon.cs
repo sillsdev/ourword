@@ -70,14 +70,13 @@ namespace OurWordTests.Edit
             // Load the window
             foreach (DParagraph p in Section.Paragraphs)
             {
-                StartNewRow();
                 OWPara op = new OWPara( 
                     WSVernacular, 
                     p.Style, 
                     p, 
                     Color.Wheat,
                     OWPara.Flags.IsEditable | OWPara.Flags.CanRestructureParagraphs);
-                AddParagraph(0, op);
+                Contents.Append(op);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

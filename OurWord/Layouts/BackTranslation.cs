@@ -112,32 +112,6 @@ namespace OurWord.View
         }
         #endregion
 
-        // Interlinear BT Option -------------------------------------------------------------
-        void LoadData_IBT()
-        {
-            // Loop through the paragraphs
-            foreach (DParagraph p in DB.TargetSection.Paragraphs)
-            {
-                // Start the new row 
-                EContainer container = StartNewRow(false);
-                container.Bmp = GetPicture(p);
-
-                // Add the IBT
-                OWPara opIBT = new OWPara(
-                    p.Translation.WritingSystemVernacular,
-                    p.Style,
-                    p,
-                    BackColor,
-                    OWPara.Flags.ShowIBT);
-                AddParagraph(0, opIBT);
-
-            }
-
-            // Tell the superclass to finish loading, which involves laying out the window 
-            // with the data we've just put in, as doing the same for any secondary windows.
-            base.LoadData();
-        }
-
         // Create the Window Contents from the data ------------------------------------------
         const int c_xMaxPictureWidth = 300;
         #region Method: Bitmap GetPicture(DParagraph p)
@@ -149,7 +123,17 @@ namespace OurWord.View
             return null;
         }
         #endregion
-
+        #region Method: OWPara CreateVernacularPara(DParagraph)
+        OWPara CreateVernacularPara(DParagraph p)
+        {
+            return new OWPara(
+                p.Translation.WritingSystemVernacular,
+                p.Style,
+                p,
+                BackColor,
+                OWPara.Flags.None);
+        }
+        #endregion
         #region Method: override void LoadData()
         public override void LoadData()
         {
@@ -164,8 +148,11 @@ namespace OurWord.View
             foreach (DParagraph p in DB.TargetSection.Paragraphs)
             {
                 // Start the new row and add the left side (vernacular)
-                EContainer container = StartNewRow(false);
-                container.Bmp = GetPicture(p);
+                EColumn colVernacular;
+                EColumn colBackTranslation;
+                ERowOfColumns row = WndDrafting.CreateRow(Contents,
+                    out colVernacular, out colBackTranslation, false);
+                row.Bmp = GetPicture(p);
 
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)
@@ -173,13 +160,8 @@ namespace OurWord.View
                     continue;
 
                 // Add the vernacular paragraph to the left; we don't edit it
-                OWPara op = new OWPara(
-                    p.Translation.WritingSystemVernacular,
-                    p.Style,
-                    p,
-                    BackColor,
-                    OWPara.Flags.None);
-                AddParagraph(0, op);
+                OWPara op = CreateVernacularPara(p);
+                colVernacular.Append(op);
 
                 // For certain types of paragraphs, we just display them on the BT side, rather
                 // than back-translating them. These paragraphs are ones we generated from the 
@@ -204,24 +186,22 @@ namespace OurWord.View
                     p,
                     ((p.IsUserEditable) ? EditableBackgroundColor : BackColor),
                     options);
-                AddParagraph(1, op);
+                colBackTranslation.Append(op);
             }
 
             // Load the footnotes
             bool bFirstFootnote = true;
             foreach (DFootnote fn in DB.TargetSection.Footnotes)
             {
-                StartNewRow(bFirstFootnote);
+                EColumn colVernacular;
+                EColumn colBackTranslation;
+                ERowOfColumns row = WndDrafting.CreateRow(Contents, 
+                    out colVernacular, out colBackTranslation, bFirstFootnote);
                 bFirstFootnote = false;
 
                 // Add the vernacular paragraph to the left side
-                OWPara op = new OWPara(
-                    fn.Translation.WritingSystemVernacular,
-                    fn.Style,
-                    fn,
-                    BackColor,
-                    OWPara.Flags.None);
-                AddParagraph(0, op);
+                OWPara op = CreateVernacularPara(fn);
+                colVernacular.Append(op);
 
                 // Options for the display paragraph
                 OWPara.Flags options = OWPara.Flags.None;
@@ -242,7 +222,7 @@ namespace OurWord.View
                     fn,
                     ((fn.IsUserEditable) ? EditableBackgroundColor : BackColor),
                     options);
-                AddParagraph(1, op);
+                colBackTranslation.Append(op);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

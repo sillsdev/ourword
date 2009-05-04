@@ -273,17 +273,20 @@ namespace OurWord.View
             //  Create the rows according to the alignment pairs
             foreach (ParagraphAlignmentPair pair in vPairs)
             {
-                StartNewRow();
+                EColumn colFront;
+                EColumn colTarget;
+                CreateRow(Contents, out colFront, out colTarget, false);
+
                 for (int kF = 0; kF < pair.cFront; kF++)
                 {
-                    DParagraph pFront = DB.FrontSection.Paragraphs[ pair.iFront + kF ] as DParagraph;
-                    AddFrontParagraph(pFront);
+                    DParagraph pFront = DB.FrontSection.Paragraphs[ pair.iFront + kF ];
+                    colFront.Append( CreateFrontPara(pFront) );
                 }
                 for (int kT = 0; kT < pair.cTarget; kT++)
                 {
-                    DParagraph pTarget = DB.TargetSection.Paragraphs[ pair.iTarget + kT ] as DParagraph;
+                    DParagraph pTarget = DB.TargetSection.Paragraphs[ pair.iTarget + kT ];
                     pTarget.BestGuessAtInsertingTextPositions();
-                    AddTargetParagraph(pTarget, true);
+                    colTarget.Append( CreateTargetPara(pTarget, true) );
                 }
             }
         }
@@ -387,8 +390,74 @@ namespace OurWord.View
         }
         #endregion
 
-        #region Method: void _LoadFootnotes()
-        void _LoadFootnotes()
+        public const int c_nFootnoteSeparatorWidth = 60;
+        #region Method: OWPara CreateFrontPara(DParagraph)
+        OWPara CreateFrontPara(DParagraph p)
+        {
+            return new OWPara(
+                p.Translation.WritingSystemVernacular,
+                p.Style,
+                p,
+                BackColor,
+                OWPara.Flags.None);
+        }
+        #endregion
+        #region Method: OWPara CreateTargetPara(DParagrap, bAllowItalics)
+        OWPara CreateTargetPara(DParagraph p, bool bAllowItalics)
+        {
+            // Options for paragraphs that will be on the right-hand, editable side
+            OWPara.Flags DraftingOptions = OWPara.Flags.None;
+            if (p.IsUserEditable)
+            {
+                DraftingOptions = OWPara.Flags.IsEditable;
+                if (OurWordMain.s_Features.F_StructuralEditing && null == p as DFootnote)
+                    DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
+                if (OurWordMain.TargetIsLocked)
+                    DraftingOptions |= OWPara.Flags.IsLocked;
+                if (bAllowItalics)
+                    DraftingOptions |= OWPara.Flags.CanItalic;
+            }
+
+            // Background Color
+            Color color = EditableBackgroundColor;
+            if (OurWordMain.TargetIsLocked || !p.IsUserEditable)
+                color = BackColor;
+
+            // Add the paragraph
+            return new OWPara(
+                p.Translation.WritingSystemVernacular,
+                p.Style,
+                p,
+                color,
+                DraftingOptions);
+        }
+        #endregion
+        #region Method: ERowOfColumns CreateRow(Container, out colLeft, out colRight, bIncludeSeparator)
+        static public ERowOfColumns CreateRow(EContainer Container, out EColumn colLeft, out EColumn colRight, bool bIncludeSeparator)
+        {
+            // A single row with two columns
+            ERowOfColumns row = new ERowOfColumns(2);
+            Container.Append(row);
+            colLeft = new EColumn();
+            colRight = new EColumn();
+            row.Append(colLeft);
+            row.Append(colRight);
+
+            // Footnote separator horizontal lines
+            if (bIncludeSeparator)
+            {
+                colLeft.Border = new EContainer.FootnoteSeparatorBorder(colLeft, 
+                    c_nFootnoteSeparatorWidth);
+                colRight.Border = new EContainer.FootnoteSeparatorBorder(colRight, 
+                    c_nFootnoteSeparatorWidth);
+            }
+
+            return row;
+        }
+        #endregion
+
+        #region Method: void LoadFootnotes()
+        void LoadFootnotes()
         {
             // Anything to load?
             if (DB.FrontSection.Footnotes.Count == 0 && DB.TargetSection.Footnotes.Count == 0)
@@ -397,30 +466,42 @@ namespace OurWord.View
             // Load them all in a single row if we must
             if (!_CanSideBySideFootnotes())
             {
-                StartNewRow(true);
+                // A single row with two columns
+                EColumn colFront;
+                EColumn colTarget;
+                CreateRow(Contents, out colFront, out colTarget, true);
 
+                // All Front Footnotes
                 for (int kF = 0; kF < DB.FrontSection.Footnotes.Count; kF++)
-                    AddFrontFootnote(DB.FrontSection.Footnotes[kF] as DFootnote);
+                    colFront.Append(CreateFrontPara(DB.FrontSection.Footnotes[kF]));
+
+                // All Target Footnotes
                 for (int kT = 0; kT < DB.TargetSection.Footnotes.Count; kT++)
-                    AddTargetFootnote(DB.TargetSection.Footnotes[kT] as DFootnote, true);
+                    colTarget.Append(CreateTargetPara(DB.TargetSection.Footnotes[kT], true));
+
                 return;
             }
 
             // Otherwise, they are on individual parallel rows
             for (int k = 0; k < DB.FrontSection.Footnotes.Count; k++)
             {
-                StartNewRow( ((k == 0) ? true : false) );
+                // A single row with two columns
+                EColumn colFront;
+                EColumn colTarget;
+                CreateRow(Contents, out colFront, out colTarget, k == 0);
 
+                // Ensure place to type
                 DFootnote fFront = DB.FrontSection.Footnotes[k] as DFootnote;
                 DFootnote fTarget = DB.TargetSection.Footnotes[k] as DFootnote;
                 fTarget.SynchRunsToModelParagraph(fFront);
 
-                AddFrontFootnote(fFront);
-                AddTargetFootnote(fTarget, fFront.HasItalics);
+                // Append the two
+                colFront.Append(CreateFrontPara(fFront));
+                colTarget.Append(CreateTargetPara(fTarget, fFront.HasItalics));
             }
-
         }
         #endregion
+
         #region Method: override void LoadData()
         public override void LoadData()
         {
@@ -432,8 +513,8 @@ namespace OurWord.View
                 return;
 
             // Load the paragraphs, then the footnotes
-            _LoadParagraphs();
-            _LoadFootnotes();
+            LoadParagraphs();
+            LoadFootnotes();
 
             // Tell the superclass to finish loading, which involves laying out the window 
             // with the data we've just put in, as doing the same for any secondary windows.
@@ -441,7 +522,7 @@ namespace OurWord.View
         }
         #endregion
         #region Method: void _LoadParagraphs()
-        void _LoadParagraphs()
+        void LoadParagraphs()
         {
             // We'll work our way through both the Front and the Target paragraphs
             int iFront = 0;
@@ -487,8 +568,10 @@ namespace OurWord.View
                             bmp = pict.GetBitmap(c_xMaxPictureWidth);
                         
                         // Start the row
-                        EContainer container = StartNewRow(false);
-                        container.Bmp = bmp;
+                        EColumn colFront;
+                        EColumn colTarget;
+                        ERowOfColumns row = CreateRow(Contents, out colFront, out colTarget, false);
+                        row.Bmp = bmp;
 
                         // Synchronize the Vernacular to the Target
                         DParagraph pFront = DB.FrontSection.Paragraphs[iFront + k] as DParagraph;
@@ -501,8 +584,8 @@ namespace OurWord.View
                             continue;
 
                         // Add the left and right paragraphs
-                        AddFrontParagraph(pFront);
-                        AddTargetParagraph(pTarget, pFront.HasItalics);
+                        colFront.Append(CreateFrontPara(pFront));
+                        colTarget.Append(CreateTargetPara(pTarget, pFront.HasItalics));
                     }
                 }
 
@@ -512,93 +595,6 @@ namespace OurWord.View
             }
         }
         #endregion
-
-        // Methods to create and add the display paragraphs ----------------------------------
-        const int c_iColFront = 0;    // The Front translation goes in the first (left) column
-        const int c_iColTarget = 1;   // The Target translation goes in the second (right) column
-        #region Method: void AddFrontParagraph(DParagraph)
-        void AddFrontParagraph(DParagraph pFront)
-        {
-            OWPara para = new OWPara(
-                pFront.Translation.WritingSystemVernacular,
-                pFront.Style,
-                pFront,
-                BackColor,
-                OWPara.Flags.None);
-
-            AddParagraph(c_iColFront, para);
-        }
-        #endregion
-        #region Method: void AddFrontFootnote(DFootnote)
-        void AddFrontFootnote(DFootnote fnFront)
-        {
-            AddParagraph(c_iColFront, new OWPara(
-                fnFront.Translation.WritingSystemVernacular,
-                fnFront.Style,
-                fnFront,
-                BackColor,
-                OWPara.Flags.None));
-        }
-        #endregion
-        #region Method: void AddTargetParagraph(DParagraph, bool AllowItalics)
-        void AddTargetParagraph(DParagraph pTarget, bool AllowItalics)
-        {
-            // Options for paragraphs that will be on the right-hand, editable side
-            OWPara.Flags DraftingOptions = OWPara.Flags.None;
-            if (pTarget.IsUserEditable)
-            {
-                DraftingOptions = OWPara.Flags.IsEditable;
-                if (OurWordMain.s_Features.F_StructuralEditing)
-                    DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
-                if (OurWordMain.TargetIsLocked)
-                    DraftingOptions |= OWPara.Flags.IsLocked;
-                if (AllowItalics)
-                    DraftingOptions |= OWPara.Flags.CanItalic;
-            }
-
-            // Background Color
-            Color color = EditableBackgroundColor;
-            if (OurWordMain.TargetIsLocked || !pTarget.IsUserEditable)
-                color = BackColor;
-
-            // Add the paragraph
-            AddParagraph(c_iColTarget, new OWPara(
-                pTarget.Translation.WritingSystemVernacular,
-                pTarget.Style,
-                pTarget,
-                color,
-                DraftingOptions));
-        }
-        #endregion
-        #region Method: void AddTargetFootnote(DFootnote, bAllowItalics)
-        void AddTargetFootnote(DFootnote fnTarget, bool AllowItalics)
-        {
-            // Editing options
-            OWPara.Flags DraftingOptions = OWPara.Flags.None;
-            if (fnTarget.IsUserEditable)
-            {
-                DraftingOptions = OWPara.Flags.IsEditable;
-                if (OurWordMain.TargetIsLocked)
-                    DraftingOptions |= OWPara.Flags.IsLocked;
-                if (AllowItalics)
-                    DraftingOptions |= OWPara.Flags.CanItalic;
-            }
-
-            // Background Color
-            Color color = EditableBackgroundColor;
-            if (OurWordMain.TargetIsLocked || !fnTarget.IsUserEditable)
-                color = BackColor;
-
-            // Add the displayable paragraph
-            AddParagraph(c_iColTarget, new OWPara(
-                fnTarget.Translation.WritingSystemVernacular,
-                fnTarget.Style,
-                fnTarget,
-                color,
-                DraftingOptions));
-        }
-        #endregion
-
 
     }
 

@@ -166,7 +166,6 @@ namespace OurWordTests.Edit
             WSVernacular.UseAutomatedHyphenation = false;
 
             // Set up John 3:16
-            Wnd.StartNewRow();
             m_p = CreateParagraph_John_3_16();
             m_op = new OWPara( 
                 WSVernacular, 
@@ -174,7 +173,7 @@ namespace OurWordTests.Edit
                 m_p, 
                 Color.Wheat, 
                 OWPara.Flags.IsEditable);
-            Wnd.AddParagraph(0, m_op);
+            Wnd.Contents.Append(m_op);
             Wnd.LoadData();
 
             // Tests will mess up if this gets changed.
@@ -1141,7 +1140,6 @@ namespace OurWordTests.Edit
             WSVernacular.UseAutomatedHyphenation = true;
 
             // Create a paragraph with big Huchol words.
-            Wnd.StartNewRow();
             m_p = CreateParagraph_LongHuicholWords();
             m_op = new OWPara(
                 WSVernacular,
@@ -1149,7 +1147,7 @@ namespace OurWordTests.Edit
                 m_p,
                 Color.Wheat,
                 OWPara.Flags.IsEditable);
-            Wnd.AddParagraph(0, m_op);
+            Wnd.Contents.Append(m_op);
 
             // By nature of LoadData, all the EBlocks will have been measured
             Wnd.LoadData();
@@ -1204,7 +1202,6 @@ namespace OurWordTests.Edit
             WSVernacular.UseAutomatedHyphenation = true;
 
             // Create a paragraph with big Huchol words.
-            Wnd.StartNewRow();
             m_p = CreateParagraph_LongHuicholWords();
             m_op = new OWPara(
                 WSVernacular,
@@ -1212,7 +1209,7 @@ namespace OurWordTests.Edit
                 m_p,
                 Color.Wheat,
                 OWPara.Flags.IsEditable);
-            Wnd.AddParagraph(0, m_op);
+            Wnd.Contents.Append(m_op);
 
             // How many blocks do we have currently
             int cBlocks = m_op.SubItems.Length;

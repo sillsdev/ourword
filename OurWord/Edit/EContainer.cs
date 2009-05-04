@@ -21,7 +21,6 @@ using JWdb;
 using JWdb.DataModel;
 #endregion
 
-// TODO: Get rid of StartNewRow, so that we deal with the Piles as we build the container
 // TODO: Implement Left and Right Borders
 
 namespace OurWord.Edit
@@ -1543,8 +1542,6 @@ namespace OurWord.Edit
 	}
     #endregion
 
-    //////////////////////////////////////////////////////////////////////////////////////////
-
     #region CLASS: ERowOfColumns : EContainer
     public class ERowOfColumns : EContainer
     {
@@ -1635,29 +1632,6 @@ namespace OurWord.Edit
         #endregion
     }
     #endregion
-
-    #region CLASS: Row
-    public class Row : ERowOfColumns
-    {
-        // Scaffolding -------------------------------------------------------------------
-        #region Constructor(Owner, cColumns, bDisplayFootnoteSeparator)
-        public Row(int cColumns, bool bDisplayFootnoteSeparator)
-            : base(cColumns)
-        {
-            // Create a pile for each column
-            for (int i = 0; i < cColumns; i++)
-            {
-                Pile pile = new Pile();
-                if (bDisplayFootnoteSeparator)
-                    pile.Border = new FootnoteSeparatorBorder(this, 40);
-                Append(pile);
-            }
-        }
-        #endregion
-    }
-    #endregion
-
-    //////////////////////////////////////////////////////////////////////////////////////////
 
     #region CLASS: EColumn : EContainer
     public class EColumn : EContainer
@@ -1878,20 +1852,5 @@ namespace OurWord.Edit
         #endregion
     }
     #endregion
-
-    #region CLASS: Pile
-    public class Pile : EColumn
-    {
-        // Scaffolding ---------------------------------------------------------------
-        #region Constructor()
-        public Pile()
-            : base()
-        {
-        }
-        #endregion
-
-    }
-    #endregion
-
 
 }

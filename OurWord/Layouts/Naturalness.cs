@@ -174,10 +174,6 @@ namespace OurWord.View
                 if (null != pict)
                     bmp = pict.GetBitmap(c_xMaxPictureWidth);
 
-                // Start the new row
-                EContainer container = StartNewRow(false);
-                container.Bmp = bmp;
-
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)
                 if (p.SimpleText.Length == 0 && p.SimpleTextBT.Length == 0)
@@ -211,7 +207,8 @@ namespace OurWord.View
                     p,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
-                AddParagraph(0, op);
+                op.Bmp = bmp;
+                Contents.Append(op);
             }
 
             // Load the footnotes
@@ -219,9 +216,6 @@ namespace OurWord.View
             for (int iFn = 0; iFn < DB.TargetSection.Footnotes.Count; iFn++)
             {
                 DFootnote fn = DB.TargetSection.Footnotes[iFn] as DFootnote;
-
-                EContainer container = StartNewRow(bFirstFootnote);
-                bFirstFootnote = false;
 
                 OWPara.Flags options = OWPara.Flags.None;
                 if (fn.IsUserEditable)
@@ -248,7 +242,14 @@ namespace OurWord.View
                     fn,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
-                AddParagraph(0, op);
+
+                if (bFirstFootnote)
+                {
+                    op.Border = new EContainer.FootnoteSeparatorBorder(op, WndDrafting.c_nFootnoteSeparatorWidth);
+                    bFirstFootnote = false;
+                }
+
+                Contents.Append(op);
             }
 
             // Tell the superclass to finish loading, which involves laying out the window 

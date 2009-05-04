@@ -563,10 +563,9 @@ namespace OurWord.Edit
                     DStyleSheet.c_StyleReferenceTranslation);
 
                 // Create and add a OWParagraph for the translation paragraph
-                StartNewRow();
                 OWPara p = new OWPara(
                     ws, PStyle, vRuns, t.DisplayName, OWPara.Flags.None);
-                AddParagraph(0, p);
+                Contents.Append(p);
             }
 
             LoadData();

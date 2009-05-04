@@ -378,55 +378,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: void StartNewRow() - this version does not have the footnote separator
-        public EContainer StartNewRow()
-        {
-            return StartNewRow(false);
-        }
-        #endregion
-
-        #region Method: void StartNewRow(bDisplayFootnoteSeparator)
-        public EContainer StartNewRow(bool bDisplayFootnoteSeparator)
-        {
-            // Create the new Row and add it to the Root
-            Row row = new Row(ColumnCount, bDisplayFootnoteSeparator);
-            Contents.Append(row);
-            return row;
-        }
-        #endregion
-
-        #region Method: void AddParagraph(int iCol, OWPara p)
-        public void AddParagraph(int iCol, OWPara p)
-        {
-            // Acceptable parameters
-            Debug.Assert(iCol < ColumnCount);
-            Debug.Assert(iCol >= 0);
-            Debug.Assert(null != p);
-
-            // If we do not have any rows, then add one
-            if (Contents.Count == 0)
-                StartNewRow();
-
-            // Retrieve the desired pile
-            Pile pile = LastRow.SubItems[iCol] as Pile;
-            Debug.Assert(null != pile);
-
-            // Add the paragraph
-            pile.Append(p);
-        }
-        #endregion
-        #region VAttr{g}: Row LastRow - most recent row created via StartNewRow
-        public Row LastRow
-        {
-            get
-            {
-                if (Contents.Count == 0)
-                    return null;
-                return Contents[Contents.Count - 1] as Row;
-            }
-        }
-        #endregion
-
         // Layout & Paint --------------------------------------------------------------------
         #region CLASS: DrawBuffer
         public class DrawBuffer
