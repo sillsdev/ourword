@@ -572,9 +572,10 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		#region Method: void ConnectFootnote(ref char chLetter, DFootnote footnote)
-		public void ConnectFootnote(ref char chLetter, DFootnote footnote)
+		#region Method: void ConnectFootnote(DFootnote footnote)
+		public void ConnectFootnote(DFootnote footnote)
 		{
+            // Look for a DFoot whose Footnote attribute is still null
 			foreach(DRun run in Runs)
 			{
                 DFoot foot = run as DFoot;
@@ -588,17 +589,7 @@ namespace JWdb.DataModel
 			// If we get to here, then it means we do not have a marker in the paragraph
 			// for this footnote. So we need to append a marker to the end of the
 			// paragraph.
-            DRun add = new DFoot(chLetter, footnote);
-            if (null != add)
-            {
-                Runs.Append(add);
-
-                // Increment the letter; wrap  back to 'a' if it is going too far
-                if (chLetter == 'z')
-                    chLetter = 'a';
-                else
-                    chLetter++;
-            }
+            Runs.Append(new DFoot(footnote));
 		}
 		#endregion
 
@@ -1202,11 +1193,11 @@ namespace JWdb.DataModel
             Section.Footnotes.Append(footnote);
 
             // Create the footletter for it to go into, and insert it
-            DFoot foot = new DFoot('a', footnote);
+            DFoot foot = new DFoot(footnote);
             Runs.InsertAt(iInsertPosition, foot);
 
             // Re-letter all footletters
-            Section.UpdateFootnoteLetters();
+            Section.UpdateFootnoteOrder();
 
             return foot;
         }
@@ -1220,7 +1211,7 @@ namespace JWdb.DataModel
             CombineAdjacentDTexts(false);
 
             // Re-letter all footletters
-            Section.UpdateFootnoteLetters();
+            Section.UpdateFootnoteOrder();
         }
         #endregion
 
@@ -1353,7 +1344,7 @@ namespace JWdb.DataModel
                     if (foot.IsSeeAlso)
                         fnTarget.ConvertCrossReferences(fnFront);
 
-                    Runs.Append(DFoot.Copy(foot.Letter, fnTarget));
+                    Runs.Append(DFoot.Copy(fnTarget));
 
                     continue;
                 }

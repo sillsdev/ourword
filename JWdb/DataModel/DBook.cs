@@ -1559,7 +1559,8 @@ namespace JWdb.DataModel
         #region Method: void Merge(DBook Parent, DBook Theirs)
         public void Merge(DBook Parent, DBook Theirs)
         {
-//            Debug.Fail("Breakpoint");
+            //Debug.Fail("Breakpoint");
+
             // At this point we must assume the same number of sections
             if (Sections.Count != Parent.Sections.Count)
                 return;
@@ -1568,7 +1569,10 @@ namespace JWdb.DataModel
 
             // Merge the sections
             for (int i = 0; i < Sections.Count; i++)
+            {
                 Sections[i].Merge(Parent.Sections[i], Theirs.Sections[i]);
+                Console.WriteLine("Merging section: " + i.ToString());
+            }
         }
         #endregion
         #region OMethod: void Merge(JObject Parent, JObject Theirs, bool bWeWin)

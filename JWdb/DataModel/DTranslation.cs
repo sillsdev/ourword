@@ -100,7 +100,36 @@ namespace JWdb.DataModel
 		}
 		public BStringArray m_bsaBookNamesTable = null;
 		#endregion
-		#region Method: void DeclareAttrs()
+
+        #region BAttr{g/s}: FootnoteSequenceTypes FootnoteSequenceType
+        public DFoot.FootnoteSequenceTypes FootnoteSequenceType
+        {
+            get
+            {
+                return (DFoot.FootnoteSequenceTypes)m_nFootnoteSequence;
+            }
+            set
+            {
+                SetValue(ref m_nFootnoteSequence, (int)value);
+            }
+        }
+        int m_nFootnoteSequence = (int)DFoot.FootnoteSequenceTypes.abc;
+        #endregion
+        #region BAttr{g}:   BStringArray FootnoteCustomSeq
+        public BStringArray FootnoteCustomSeq
+        {
+            get
+            {
+                // Initialize if needed
+                if (null == m_bsaFootnoteCustomSeq)
+                    m_bsaFootnoteCustomSeq = new BStringArray();
+                return m_bsaFootnoteCustomSeq;
+            }
+        }
+        public BStringArray m_bsaFootnoteCustomSeq = null;
+        #endregion
+
+        #region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
@@ -108,7 +137,10 @@ namespace JWdb.DataModel
 			DefineAttr("ConsultantWS",   ref m_sConsultantWritingSystemName);
 			DefineAttr("Comment",        ref m_sComment);
 			DefineAttr("BookNamesTable", ref m_bsaBookNamesTable);
-		}
+
+            DefineAttr("FootnoteSeqType", ref m_nFootnoteSequence);
+            DefineAttr("FootnoteCustomSeq", ref m_bsaFootnoteCustomSeq);
+        }
 		#endregion
 
 		// JAttrs ----------------------------------------------------------------------------
@@ -289,8 +321,9 @@ namespace JWdb.DataModel
 			: base()
 		{
 			// Complex basic attrs
-			DTeamSettings ts = DB.TeamSettings;
-			m_bsaBookNamesTable = new BStringArray(BookNames.GetTable(ts.FileNameLanguage));
+            m_bsaBookNamesTable = new BStringArray(
+                BookNames.GetTable(DB.TeamSettings.FileNameLanguage));
+            m_bsaFootnoteCustomSeq = new BStringArray();
 
 			// Owning Sequence
 			m_osBooks = new JOwnSeq<DBook>("Books", this, true, true);

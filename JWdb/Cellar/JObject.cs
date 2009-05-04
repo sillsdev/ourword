@@ -496,6 +496,8 @@ namespace JWdb
         #region Method: void DefineAttr(sName, ref bsa)
         protected void DefineAttr(string sName, ref BStringArray bsa)
 		{
+            Debug.Assert(null != bsa);
+
             switch (m_ioOperation)
             {
                 case Ops.kRead:

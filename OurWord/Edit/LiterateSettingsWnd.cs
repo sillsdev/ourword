@@ -389,13 +389,17 @@ namespace OurWord.Edit
 		}
 		string m_sDescription;
 		#endregion
-		#region Attr{g}: string Group
+		#region Attr{g/s}: string Group
 		public string Group
 		{
 			get
 			{
 				return m_sGroup;
 			}
+            set
+            {
+                m_sGroup = value;
+            }
 		}
 		string m_sGroup;
 		#endregion

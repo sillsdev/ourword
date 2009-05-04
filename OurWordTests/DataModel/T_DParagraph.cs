@@ -607,7 +607,7 @@ namespace OurWordTests.DataModel
             p = new DParagraph();
             p.Runs.Append(DVerse.Create("3"));
             p.Runs.Append(DVerse.Create("4"));
-            p.Runs.Append( new DFoot( 'a', new DFootnote(2, 4, DFootnote.Types.kExplanatory)));
+            p.Runs.Append( new DFoot( new DFootnote(2, 4, DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(5, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DVerse);
@@ -618,7 +618,7 @@ namespace OurWordTests.DataModel
 
             // There should be a DText before a paragraph-initial footnote
             p = new DParagraph();
-            p.Runs.Append(new DFoot('a', new DFootnote(2, 4, DFootnote.Types.kExplanatory)));
+            p.Runs.Append(new DFoot( new DFootnote(2, 4, DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(2, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DText);

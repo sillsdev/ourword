@@ -458,7 +458,6 @@ namespace OurWord.Edit
                 }
             }
             #endregion
-
         }
         #endregion
         #region CLASS: ELabel
@@ -2693,8 +2692,6 @@ namespace OurWord.Edit
             ReLayout();
         }
         #endregion
-
-
     }
 
 }

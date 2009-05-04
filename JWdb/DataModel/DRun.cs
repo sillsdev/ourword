@@ -502,21 +502,131 @@ namespace JWdb.DataModel
     #region CLass: DFoot
     public class DFoot : DRun
     {
-        // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g/s}: char Letter
-        public char Letter
+        // Footnote Letter -------------------------------------------------------------------
+        public enum FootnoteSequenceTypes { abc=0, iv, custom };
+        #region SAttr{g}: string[] FootnoteSequenceChoices
+        static public string[] FootnoteSequenceChoices
         {
             get
             {
-                return m_chLetter;
-            }
-            set
-            {
-                m_chLetter = value;
+                string[] vs = new string[3];
+                vs[0] = TypeToString(FootnoteSequenceTypes.abc);
+                vs[1] = TypeToString(FootnoteSequenceTypes.iv);
+                vs[2] = TypeToString(FootnoteSequenceTypes.custom);
+                return vs;
             }
         }
-        char m_chLetter = 'a';
         #endregion
+        const string c_abc = "a, b, c, ..., z";
+        const string c_iv = "i, ii, iii, iv, ...";
+        const string c_Custom = "Custom";
+        #region SMethod: string TypeToString(FootnoteSequenceTypes)
+        static public string TypeToString(FootnoteSequenceTypes nType)
+        {
+            switch (nType)
+            {
+                case FootnoteSequenceTypes.abc:
+                    return c_abc;
+                case FootnoteSequenceTypes.iv:
+                    return c_iv;
+                case FootnoteSequenceTypes.custom:
+                    return Loc.GetString("kFootnoteCustom", c_Custom);
+                default:
+                    Debug.Assert(false, "Unknown FootnoteSequenceType");
+                    return "*";
+            }
+        }
+        #endregion
+        #region SMethod: FootnoteSequenceTypes TypeFromString(s)
+        static public FootnoteSequenceTypes TypeFromString(string s)
+        {
+            if (s == c_abc)
+                return FootnoteSequenceTypes.abc;
+            if (s == c_iv)
+                return FootnoteSequenceTypes.iv;
+            return FootnoteSequenceTypes.custom;
+        }
+        #endregion
+
+        #region SMethod: string GetFootnoteLetter_abc(n)
+        static public string GetFootnoteLetter_abc(int n)
+        {
+            Debug.Assert(n >= 0);
+
+            while (n >= 26)
+                n -= 26;
+
+            return ((char)((int)'a' + n)).ToString();
+        }
+        #endregion
+        #region SMethod: string GetFootnoteLetter_iv(n)
+        static public string GetFootnoteLetter_iv(int n)
+            // For now, we just cycle through 30 over and over
+        {
+            string[] vRoman = 
+            { 
+                "i",   "ii",   "iii",   "iv",   "v",   "vi",   "vii",   "viii",   "ix",   "x",
+                "xi",  "xii",  "xiii",  "xiv",  "xv",  "xvi",  "xvii",  "xviii",  "xix",  "xx",
+                "xxi", "xxii", "xxiii", "xxiv", "xxv", "xxvi", "xxvii", "xxviii", "xxix", "xxx"
+            };
+
+            while (n >= vRoman.Length)
+                n -= vRoman.Length;
+
+            return vRoman[n];
+        }
+        #endregion
+        #region SMethod: string GetFootnoteLetter_bsa(n, bsa)
+        public static string GetFootnoteLetter_bsa(int n, BStringArray bsa)
+        {
+            // Debug version: make sure we have a valid bsa; Runtime version, return something
+            // useful.
+            Debug.Assert(null != bsa);
+            Debug.Assert(bsa.Length > 0);
+            if (null == bsa || bsa.Length == 0)
+                return "*";
+
+            // If all they want is, e.g., an asterix everywhere, then we just give it to them
+            if (bsa.Length == 1)
+            {
+                if (string.IsNullOrEmpty(bsa[0].Trim()))
+                    return "*";
+                return bsa[0];
+            }
+
+            // By reducing n, we in effect just have it roll over, e..g, from 'z' to 'a'.
+            while (n >= bsa.Length)
+                n -= bsa.Length;
+
+            return bsa[n];
+        }
+        #endregion
+        #region Method: string GetFootnoteLetterFor(int n)
+        public string GetFootnoteLetterFor(int n)
+        {
+            DTranslation t = Section.Translation;
+
+            switch (t.FootnoteSequenceType)
+            {
+                case FootnoteSequenceTypes.abc:
+                    return GetFootnoteLetter_abc(n);
+
+                case FootnoteSequenceTypes.iv:
+                    return GetFootnoteLetter_iv(n);
+
+                case FootnoteSequenceTypes.custom:
+                    return GetFootnoteLetter_bsa(n, t.FootnoteCustomSeq);
+
+                default:
+                    Debug.Assert(false, "Unsupported FootnoteSequenceType");
+                    break;
+            }
+
+            return "*";
+        }
+        #endregion
+
+        // Content Attrs ---------------------------------------------------------------------
         #region Attr{g/s}: DFootnote Footnote
         public DFootnote Footnote
         {
@@ -526,21 +636,46 @@ namespace JWdb.DataModel
             }
             set
             {
-                Debug.Assert(null != value);
                 m_footnote = value;
+
+                if (null != m_footnote)
+                    m_footnote.Foot = this;
             }
         }
         DFootnote m_footnote = null;
         #endregion
 
         // VAttrs ----------------------------------------------------------------------------
-		#region VAttr{g}: string Text - returns Letter as a string
+		#region VAttr{g}: string Text - returns the callout letter for the footnote
 		public string Text
 		{
 			get
 			{
-				return Letter.ToString();
-			}
+                // Get the owning section
+                DSection section = Section;
+                Debug.Assert(null != Section);
+
+                // Get this footnote's position within the owning section
+                int iPos = -1;
+                foreach (DParagraph p in Section.Paragraphs)
+                {
+                    foreach (DRun r in p.Runs)
+                    {
+                        DFoot foot = r as DFoot;
+
+                        if (null != foot)
+                            iPos++;
+
+                        if (foot == this)
+                            goto found;
+                    }
+                }
+            found:
+                Debug.Assert(-1 != iPos, "Footnote wasn't found in its owning section!");
+
+                // Return the proper letter, depending on the type in the DTranslation
+                return GetFootnoteLetterFor(iPos);
+            }
 		}
 		#endregion
         #region VAttr{g}: bool IsExplanatory
@@ -548,7 +683,7 @@ namespace JWdb.DataModel
         {
             get
             {
-                return (TypeCode == c_codeFootNote);
+                return Footnote.IsExplanatory;
             }
         }
         #endregion
@@ -557,21 +692,17 @@ namespace JWdb.DataModel
         {
             get
             {
-                return (TypeCode == c_codeSeeAlso);
+                return Footnote.IsSeeAlso;
             }
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(chLetter, DFootnote)
-        public DFoot(char chLetter, DFootnote footnote)
+        #region Constructor(DFootnote)
+        public DFoot(DFootnote footnote)
             : base()
         {
-			// Make sure we are passed a valid letter
-            Debug.Assert(chLetter >= 'a' && chLetter <= 'z');
-            m_chLetter = chLetter;
-
-            m_footnote = footnote;
+            Footnote = footnote;
         }
         #endregion
         #region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -582,16 +713,16 @@ namespace JWdb.DataModel
 
             DFoot foot = obj as DFoot;
 
-            if (Letter != foot.Letter)
+            if (Text != foot.Text)
                 return false;
 
             return true;
         }
         #endregion
-        #region SMethod: DFoot Copy(chLetter, DFootnote)
-        static public DFoot Copy(char chLetter, DFootnote footnote)
+        #region SMethod: DFoot Copy(DFootnote)
+        static public DFoot Copy(DFootnote footnote)
         {
-            return new DFoot(chLetter, footnote);
+            return new DFoot(footnote);
         }
         #endregion
 
@@ -610,10 +741,10 @@ namespace JWdb.DataModel
         {
             get
             {
-                if (Footnote.NoteType == DFootnote.Types.kExplanatory)
+                if (Footnote.IsExplanatory)
                     return c_codeFootNote;
 
-                if (Footnote.NoteType == DFootnote.Types.kSeeAlso)
+                if (Footnote.IsSeeAlso)
                     return c_codeSeeAlso;
 
                 Debug.Assert(false, "Unknown type code.");
@@ -641,7 +772,7 @@ namespace JWdb.DataModel
             get
             {
                 string sStart = (IsSeeAlso) ? "{cf " : "{fn " ;
-                return sStart + Letter.ToString() + "}";
+                return sStart + Text + "}";
             }
         }
         #endregion

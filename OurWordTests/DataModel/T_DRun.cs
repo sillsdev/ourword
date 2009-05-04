@@ -26,6 +26,7 @@ using OurWord.View;
 
 namespace OurWordTests.DataModel
 {
+    #region CLASS: T_DRun
     [TestFixture] public class T_DRun
     {
         #region Setup
@@ -154,8 +155,6 @@ namespace OurWordTests.DataModel
         {
             DFoot foot = vRuns[iRun] as DFoot;
             Assert.IsNotNull(foot);
-
-            Assert.AreEqual('a', foot.Letter);
         }
         #endregion
         #region Method: void CheckText(List<DRun>, iRun, iPhrase, sTextExpected)
@@ -185,15 +184,13 @@ namespace OurWordTests.DataModel
         #region Test: FieldToRuns
         [Test] public void FieldToRuns()
         {
-            char chNextFootLetter = 'a';
             SfField field = new SfField("vt", "", 1);
             List<DRun> vRuns = null;
 
             // Test: data with footnote in the middle
-            chNextFootLetter = 'a';
             field.Data = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
             field.BT = "This is a good story/matter. This is *God's Son's|fn life.";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(3, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije lais alekot. Ije Uis-neno In Anmone");
             CheckBT(vRuns, 0, 0, "This is a good story/matter. This is *God's Son's");
@@ -202,10 +199,9 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 2, 0, "life.");
 
             // Back translation does not have a footnote
-            chNextFootLetter = 'a';
             field.Data = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
             field.BT = "This is a good story/matter. This is *God's Son's life.";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(3, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije lais alekot. Ije Uis-neno In Anmone");
             CheckBT(vRuns, 0, 0, "This is a good story/matter. This is *God's Son's life.");
@@ -214,10 +210,9 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 2, 0, "");
 
             // Back translation has too many footnotes
-            chNextFootLetter = 'a';
             field.Data = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
             field.BT = "This is a good|fn story/matter. This is *God's Son's|fn life.";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(3, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije lais alekot. Ije Uis-neno In Anmone");
             CheckBT(vRuns, 0, 0, "This is a good");
@@ -226,10 +221,9 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 2, 0, "story/matter. This is *God's Son's life.");
 
             // Back translation has WAY too many footnotes
-            chNextFootLetter = 'a';
             field.Data = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
             field.BT = "This|fn is a good|fn story/matter.|fn This is *God's Son's|fn life.|fn";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(3, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije lais alekot. Ije Uis-neno In Anmone");
             CheckBT(vRuns, 0, 0, "This");
@@ -238,10 +232,9 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 2, 0, "is a good story/matter. This is *God's Son's life.");
 
             // Missing Back Translation
-            chNextFootLetter = 'a';
             field.Data = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
             field.BT = "";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(3, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije lais alekot. Ije Uis-neno In Anmone");
             CheckBT(vRuns, 0, 0, "");
@@ -250,17 +243,15 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 2, 0, "");
 
             // Test: Missing vernacular
-            chNextFootLetter = 'a';
             field.Data = "";
             field.BT = "This is a good story/matter. This is *God's Son's|fn life.";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(0, vRuns.Count);
 
             // Test: data with italic phrase in the middle
-            chNextFootLetter = 'a';
             field.Data = "Ije lais alekot. Ije |iUis-neno In Anmone|r in na' monin.";
             field.BT = "This is a good story/matter. This is |i*God's Son's|r life.";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(1, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije lais alekot. Ije ");
             CheckBT(vRuns, 0, 0, "This is a good story/matter. This is ");
@@ -270,10 +261,9 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 0, 2, " life.");
 
             // Test: data with heaps of phrases
-            chNextFootLetter = 'a';
             field.Data = "|bIje|r lais |ualekot|r. Ije |iUis-neno In Anmone|r in na' |dmonin.|r";
             field.BT = "|bThis|r is a good |ustory/matter|r. This is |i*God's Son's|r |dlife.|r";
-            vRuns = DSection.IO.FieldToRuns(field, ref chNextFootLetter);
+            vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(1, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije");
             CheckBT(vRuns, 0, 0, "This");
@@ -378,7 +368,66 @@ namespace OurWordTests.DataModel
         }
         #endregion
     }
+    #endregion
 
+    #region CLASS: T_DFoot
+    [TestFixture] public class T_DFoot
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: FootnoteLetter_abc
+        [Test] public void FootnoteLetter_abc()
+        {
+            Assert.AreEqual("a", DFoot.GetFootnoteLetter_abc(0));
+            Assert.AreEqual("c", DFoot.GetFootnoteLetter_abc(2));
+            Assert.AreEqual("z", DFoot.GetFootnoteLetter_abc(25));
+
+            Assert.AreEqual("a", DFoot.GetFootnoteLetter_abc(26));
+            Assert.AreEqual("b", DFoot.GetFootnoteLetter_abc(27));
+            Assert.AreEqual("c", DFoot.GetFootnoteLetter_abc(28 + 26));
+        }
+        #endregion
+        #region Test: FootnoteLetter_iv
+        [Test] public void FootnoteLetter_iv()
+        {
+            Assert.AreEqual("i", DFoot.GetFootnoteLetter_iv(0));
+            Assert.AreEqual("iii", DFoot.GetFootnoteLetter_iv(2));
+            Assert.AreEqual("xxvi", DFoot.GetFootnoteLetter_iv(25));
+
+            Assert.AreEqual("xxx", DFoot.GetFootnoteLetter_iv(29));
+            Assert.AreEqual("i", DFoot.GetFootnoteLetter_iv(30));
+            Assert.AreEqual("iii", DFoot.GetFootnoteLetter_iv(32 + 30));
+        }
+        #endregion
+        #region Test: FootnoteLetter_bsa
+        [Test] public void FootnoteLetter_bsa()
+        {
+            BStringArray bsa = new BStringArray();
+            bsa.Append("*");
+            bsa.Append("+");
+            bsa.Append("#");
+            bsa.Append("@");
+
+            Assert.AreEqual("*", DFoot.GetFootnoteLetter_bsa(0, bsa));
+            Assert.AreEqual("#", DFoot.GetFootnoteLetter_bsa(2, bsa));
+            Assert.AreEqual("@", DFoot.GetFootnoteLetter_bsa(3, bsa));
+
+            Assert.AreEqual("*", DFoot.GetFootnoteLetter_bsa(4, bsa));
+            Assert.AreEqual("#", DFoot.GetFootnoteLetter_bsa(6, bsa));
+            Assert.AreEqual("@", DFoot.GetFootnoteLetter_bsa(7, bsa));
+
+            Assert.AreEqual("*", DFoot.GetFootnoteLetter_bsa(8, bsa));
+        }
+        #endregion
+    }
+    #endregion
+
+    #region CLASS: T_DText
     [TestFixture] public class T_DText
     {
         #region Setup
@@ -536,4 +585,5 @@ namespace OurWordTests.DataModel
         }
         #endregion
     }
+    #endregion
 }

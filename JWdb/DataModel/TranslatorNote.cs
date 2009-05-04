@@ -115,8 +115,7 @@ namespace JWdb.DataModel
             string sFixed = DSection.IO.EatSpuriousVerticleBars(sSimpleText);
 
             // Parse the string into phrases
-            char ch = 'a';
-            List<DRun> vRuns = DSection.IO.CreateDRunsFromInputText(sFixed, ref ch);
+            List<DRun> vRuns = DSection.IO.CreateDRunsFromInputText(sFixed);
 
             // Add the phrases to our one-and-only paragraph
             // TODO: Multiple paragraphs, of course!
@@ -1100,7 +1099,7 @@ namespace JWdb.DataModel
             note.ShowInDaughterTranslations = ShowInDaughterTranslations;
 
             foreach (Discussion d in Discussions)
-                Discussions.Append(d.Clone());
+                note.Discussions.Append(d.Clone());
 
             return note;
         }

@@ -1365,8 +1365,6 @@ namespace JWdb.DataModel
 			bool m_VerseNumberFound = false;
 			#endregion
 
-			char m_chLetter = 'a';
-
 			// Chapter/Verse -----------------------------------------------------------------
 			#region Method: static void ResetChapterVerse()
 			static public void ResetChapterVerse()
@@ -1700,8 +1698,8 @@ namespace JWdb.DataModel
 				return i;
 			}
 			#endregion
-            #region Method: static List<DRun> CreateDRunsFromInputText(SfField, ref char chNextFootLetter)
-            static public List<DRun> CreateDRunsFromInputText(string sSource, ref char chNextFootLetter)
+            #region Method: static List<DRun> CreateDRunsFromInputText(SfField)
+            static public List<DRun> CreateDRunsFromInputText(string sSource)
 			{
 				// Retrieve the raw phrases
                 var vTextRawPhrases = GetPhrases(sSource);
@@ -1715,9 +1713,7 @@ namespace JWdb.DataModel
 					// Footnote: add the new run into the array, then loop to the next one
 					if (raw.StyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
 					{
-                        DFoot foot = new DFoot(chNextFootLetter++, null);
-                        if (null != foot)  // TODO: Fails if we go beyond 'z'
-						    vRuns.Add( foot );
+                        vRuns.Add(new DFoot(null));
 						continue;
 					}
 
@@ -1769,11 +1765,11 @@ namespace JWdb.DataModel
 				return vPhrases;
 			}
 			#endregion
-            #region Method: static List<DRun> FieldToRuns(SfField field, ref char chNextFootLetter)
-            static public List<DRun> FieldToRuns(SfField field, ref char chNextFootLetter)
+            #region Method: static List<DRun> FieldToRuns(SfField field)
+            static public List<DRun> FieldToRuns(SfField field)
 			{
 				// Loop to create the DRun's and populate the vRuns list
-				List<DRun> vRuns = CreateDRunsFromInputText(field.Data, ref chNextFootLetter);
+				List<DRun> vRuns = CreateDRunsFromInputText(field.Data);
 
 				// Retrieve the raw phrases (Vernacular and Back Translation)
 				var vBTRawPhrases = GetPhrases( field.BT );
@@ -1857,7 +1853,7 @@ namespace JWdb.DataModel
 			#region Method: void AddParagraphText(DParagraph, sfField)
 			public void AddParagraphText(DParagraph p, SfField field)
 			{
-				List<DRun> runs = FieldToRuns( field, ref m_chLetter );
+				List<DRun> runs = FieldToRuns( field );
 				foreach(DRun run in runs)
 					p.Runs.Append(run);
 			}
@@ -2095,13 +2091,13 @@ namespace JWdb.DataModel
 				if (Map.IsFootnote( field.Mkr ))
 				{
 					// Create and append a footnote into the Section's sequence
-					DFootnote fn = new DFootnote(s_nChapter, s_nVerse,
+					DFootnote footnote = new DFootnote(s_nChapter, s_nVerse,
                         DFootnote.Types.kExplanatory);
-					Section.Footnotes.Append(fn);
+                    Section.Footnotes.Append(footnote);
 
 					// Connect up the DRun in the most recent paragraph to this footnote
 					// (or alternatively, a |fn will be added.)
-					LastParagraph.ConnectFootnote(ref m_chLetter, fn);
+                    LastParagraph.ConnectFootnote(footnote);
 
 					// Footnote label
 					string sLabel;
@@ -2109,11 +2105,11 @@ namespace JWdb.DataModel
 					field.Data = DFootnote.ParseLabel(field.Data, out sLabel);
 					if (sLabel.Length > 0)
 					{
-						fn.Runs.Append( new DLabel(sLabel) );
+						footnote.Runs.Append( new DLabel(sLabel) );
 					}
 
 					// Populate the Contents and ProseBT of the footnote
-					AddParagraphText(fn, field);
+                    AddParagraphText(footnote, field);
 
 					return true;
 				}
@@ -2369,7 +2365,7 @@ namespace JWdb.DataModel
 				AddParagraphText(fn, field);
 
 				// Add the See Also text to the paragraph
-				LastParagraph.ConnectFootnote(ref m_chLetter, fn);
+				LastParagraph.ConnectFootnote(fn);
 
 				return true;
 			}
@@ -2403,10 +2399,6 @@ namespace JWdb.DataModel
                 // record marker for sorting; so it is important that we not change this.
 				SfField fSection = SDB.GetCurrentField();
                 Section.RecordKey = fSection.Data.Trim();
-
-				// As we come across |fn's in the text, we will first increment this following,
-				// and then use it to create the in-line marker, e.g., "{fn c}".
-				m_chLetter = 'a';
 
 				// Read Loop: reads in each SF field, and deals with it appropriately
 				do
@@ -2798,10 +2790,9 @@ namespace JWdb.DataModel
             return c;
         }
         #endregion
-        #region Method: void UpdateFootnoteLetters()
-        public void UpdateFootnoteLetters()
+        #region Method: void UpdateFootnoteOrder()
+        public void UpdateFootnoteOrder()
         {
-            char ch = 'a';
             int i = 0;
 
             foreach (DParagraph p in Paragraphs)
@@ -2813,18 +2804,10 @@ namespace JWdb.DataModel
                     if (null == foot)
                         continue;
 
-                    foot.Letter = ch;
-
                     // Make sure the footnotes are in the correct order
                     int iCurrentFootnotePos = Footnotes.FindObj(foot.Footnote);
                     Footnotes.MoveTo(iCurrentFootnotePos, i);
                     i++;
-
-                    // Update the letter for the next one
-                    if (ch == 'z')
-                        ch = 'a';
-                    else
-                        ch++;
                 }
             }
         }

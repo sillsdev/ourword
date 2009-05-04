@@ -323,9 +323,15 @@ namespace JWdb.DataModel
 
             public int Stop()
             {
-                try { StandardOutputReader.Abort(); }
+                try 
+                { 
+                    StandardOutputReader.Abort(); 
+                }
                 catch { }
-                try { StandardErrorReader.Abort(); }
+                try 
+                { 
+                    StandardErrorReader.Abort(); 
+                }
                 catch { }
                 StandardOutputReader = null;
                 StandardErrorReader = null;

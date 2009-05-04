@@ -53,23 +53,6 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		// Static Attrs ----------------------------------------------------------------------
-		#region SAttr{g/s}: enum RefLabelTypes RefLabelType - Label (kNone, kStandard (def))
-		public enum RefLabelTypes { kNone, kStandard };
-		static public RefLabelTypes RefLabelType
-		{
-			get
-			{
-				return (RefLabelTypes)m_nRefLabelType;
-			}
-			set
-			{
-				m_nRefLabelType = (int)value;
-			}
-		}
-		static private int m_nRefLabelType = (int)RefLabelTypes.kStandard;
-		#endregion
-
 		// JAttrs ----------------------------------------------------------------------------
 		#region Attr{g}: DReference Reference
 		public DReference Reference
@@ -87,6 +70,40 @@ namespace JWdb.DataModel
 		private JOwn<DReference> j_reference = null;
 		#endregion
 
+        // Content Attrs ---------------------------------------------------------------------
+        #region Attr{g}: DFoot Foot - Owner
+        public DFoot Foot
+        {
+            get
+            {
+                Debug.Assert(null != m_Foot);
+                return m_Foot;
+            }
+            set
+            {
+                m_Foot = value;
+            }
+        }
+        DFoot m_Foot;
+        #endregion
+
+        // Static Attrs ----------------------------------------------------------------------
+		#region SAttr{g/s}: enum RefLabelTypes RefLabelType - Label (kNone, kStandard (def))
+		public enum RefLabelTypes { kNone, kStandard };
+		static public RefLabelTypes RefLabelType
+		{
+			get
+			{
+				return (RefLabelTypes)m_nRefLabelType;
+			}
+			set
+			{
+				m_nRefLabelType = (int)value;
+			}
+		}
+		static private int m_nRefLabelType = (int)RefLabelTypes.kStandard;
+		#endregion
+
 		// Derived Attrs ---------------------------------------------------------------------
 		#region VAttr{g}: override bool IsUserEditable
 		public override bool IsUserEditable
@@ -99,18 +116,30 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
-        #region VAttr{g}: string Letter - 'a', 'b', ..., the letter as derived from position in owner
+        #region VAttr{g}: string Letter - 'a', 'b', ..., 
         public string Letter
         {
             get
             {
-                DSection section = Owner as DSection;
-                Debug.Assert(null != section);
-                int iPos = section.Footnotes.FindObj(this);
-
-                char ch = (char)((int)'a' + iPos);
-
-                return ch.ToString();
+                return Foot.Text;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsExplanatory
+        public bool IsExplanatory
+        {
+            get
+            {
+                return (NoteType == Types.kExplanatory);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsSeeAlso
+        public bool IsSeeAlso
+        {
+            get
+            {
+                return (NoteType == Types.kSeeAlso);
             }
         }
         #endregion

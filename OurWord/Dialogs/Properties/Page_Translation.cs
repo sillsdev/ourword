@@ -26,6 +26,7 @@ using JWdb;
 using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
+using OurWord.Edit;
 using OurWord.View;
 #endregion
 
@@ -95,7 +96,6 @@ namespace OurWord.Dialogs
         private Button m_btnRemoveTranslation;
         private TabControl m_tabctrlTranslation;
         private TabPage m_tabOther;
-        private PropertyGrid m_PropGridGeneral;
 		private TabPage m_tabBooks;
         private DataGridView m_gridBooks;
 		private Button m_bProperties;
@@ -111,6 +111,7 @@ namespace OurWord.Dialogs
         private RadioButton m_radioOldTestament;
         private RadioButton m_radioNewTestament;
         private RadioButton m_radioAll;
+        private LiterateSettingsWnd m_LiterateSettings;
         private DataGridViewTextBoxColumn m_colStage;
 		#endregion
         #region Constructor(DlgProperties, DTranslation, bSuppressCreateBook)
@@ -174,7 +175,7 @@ namespace OurWord.Dialogs
             this.m_colBookName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_colStage = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_tabOther = new System.Windows.Forms.TabPage();
-            this.m_PropGridGeneral = new System.Windows.Forms.PropertyGrid();
+            this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
             this.m_tabctrlTranslation.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).BeginInit();
@@ -422,7 +423,7 @@ namespace OurWord.Dialogs
             // 
             // m_tabOther
             // 
-            this.m_tabOther.Controls.Add(this.m_PropGridGeneral);
+            this.m_tabOther.Controls.Add(this.m_LiterateSettings);
             this.m_tabOther.Controls.Add(this.m_btnRemoveTranslation);
             this.m_tabOther.Controls.Add(this.m_lblLanguageName);
             this.m_tabOther.Controls.Add(this.m_editLanguageName);
@@ -434,16 +435,18 @@ namespace OurWord.Dialogs
             this.m_tabOther.Text = "Other";
             this.m_tabOther.UseVisualStyleBackColor = true;
             // 
-            // m_PropGridGeneral
+            // m_LiterateSettings
             // 
-            this.m_PropGridGeneral.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.m_LiterateSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_PropGridGeneral.Location = new System.Drawing.Point(9, 38);
-            this.m_PropGridGeneral.Name = "m_PropGridGeneral";
-            this.m_PropGridGeneral.Size = new System.Drawing.Size(442, 266);
-            this.m_PropGridGeneral.TabIndex = 6;
-            this.m_PropGridGeneral.ToolbarVisible = false;
+            this.m_LiterateSettings.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.m_LiterateSettings.DontAllowPropertyGrid = false;
+            this.m_LiterateSettings.Location = new System.Drawing.Point(9, 38);
+            this.m_LiterateSettings.Name = "m_LiterateSettings";
+            this.m_LiterateSettings.ShowDocumentation = true;
+            this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
+            this.m_LiterateSettings.TabIndex = 7;
             // 
             // Page_Translation
             // 
@@ -514,97 +517,140 @@ namespace OurWord.Dialogs
 			}
 			Translation.DisplayName = LanguageName;
 
+            // Writing Systems
+            Translation.ConsultantWritingSystemName = m_WSAdvisor.Value;
+            Translation.VernacularWritingSystemName = m_WSVernacular.Value;
+
+            // Footnotes
+            Translation.FootnoteSequenceType = DFoot.TypeFromString(
+                m_FootnoteLetterType.Value);
+            ParseFootnoteCustomSequence();
+
             return true;
         }
         #endregion
 
-        // Property Grid: General ------------------------------------------------------------
-        const string c_sPropWSAdvisor = "propWSAdvisor";
-        const string c_sPropWSVernacular = "propWSVernacular";
-        #region Attr{g}: PropertyBag BagGeneral
-        PropertyBag BagGeneral
+        // Literate Settings: Other ----------------------------------------------------------
+        #region Attr{g}: LiterateSettingsWnd LS
+        LiterateSettingsWnd LS
         {
             get
             {
-                Debug.Assert(null != m_BagGeneral);
-                return m_BagGeneral;
+                return m_LiterateSettings;
             }
         }
-        PropertyBag m_BagGeneral;
         #endregion
-        #region Method: void bagGeneral_GetValue(...)
-        void bagGeneral_GetValue(object sender, PropertySpecEventArgs e)
+        StringChoiceSetting m_WSAdvisor;
+        StringChoiceSetting m_WSVernacular;
+        StringChoiceSetting m_FootnoteLetterType;
+        EditTextSetting m_FootnoteCustomSequence;
+        #region Method: void ParseFootnoteCustomSequence()
+        void ParseFootnoteCustomSequence()
         {
-            switch (e.Property.ID)
+            string sIn = m_FootnoteCustomSequence.Value;
+            string[] vs = sIn.Split(new char[] { ' ', ',' });
+
+            if (null == vs || vs.Length == 0)
+                return;
+
+            Translation.FootnoteCustomSeq.Clear();
+            foreach (string s in vs)
             {
-                case c_sPropWSAdvisor:
-                    e.Value = Translation.ConsultantWritingSystemName;
-                    break;
-
-                case c_sPropWSVernacular:
-                    e.Value = Translation.VernacularWritingSystemName;
-                    break;
+                string sTrimmed = s.Trim();
+                if (!string.IsNullOrEmpty(sTrimmed))
+                    Translation.FootnoteCustomSeq.Append(sTrimmed);
             }
         }
         #endregion
-        #region Method: void bagGeneral_SetValue(...)
-        void bagGeneral_SetValue(object sender, PropertySpecEventArgs e)
+        #region Method: void BuildLiterateSettings()
+        void BuildLiterateSettings()
         {
-            switch (e.Property.ID)
-            {
-                case c_sPropWSAdvisor:
-                    Translation.ConsultantWritingSystemName = (string)e.Value;
-                    break;
-
-                case c_sPropWSVernacular:
-                    Translation.VernacularWritingSystemName = (string)e.Value;
-                    break;
-            }
-        }
-        #endregion
-        #region Method: void SetupPropGrid_General()
-        void SetupPropGrid_General()
-        {
-            // Create the PropertyBag for this style
-            m_BagGeneral = new PropertyBag();
-            BagGeneral.GetValue += new PropertySpecEventHandler(bagGeneral_GetValue);
-            BagGeneral.SetValue += new PropertySpecEventHandler(bagGeneral_SetValue);
-
+            // Get the list of currently-defined writing systems
             string[] vsWritingSystems = new string[DB.StyleSheet.WritingSystems.Count];
             for (int i = 0; i < DB.StyleSheet.WritingSystems.Count; i++)
                 vsWritingSystems[i] = (DB.StyleSheet.WritingSystems[i] as JWritingSystem).Name;
 
-            // Vernacular Writing System
-            PropertySpec ps = new PropertySpec(
-                c_sPropWSVernacular,
-                "Writing System for Vernacular Text",
-                "Writing Systems",
-                "The Writing System for the translation, you define these under " +
-                    "Team Settings.",
-                vsWritingSystems,
-                ""
-                );
-            ps.DontLocalizeEnums = true;
-            BagGeneral.Properties.Add(ps);
+            // Writing Systems
+            string sGroupWritingSystems = G.GetLoc_String("kWritingSystems", "Writing Systems");
+            LS.AddInformation("tr100", Information.PStyleHeading1,
+                "Writing Systems");
+            LS.AddInformation("tr110", Information.PStyleNormal,
+                "Writing Systems are defined in another section of this Configuration Dialog. " +
+                "They have information such as which keyboard to use when typing, autor-replace, " +
+                "which letters constitute punctuation, and how to do hyphenation. Once these " +
+                "have been defined, you need to tell OurWord which writing system to use for this " +
+                "translation.");
+            LS.AddInformation("tr120", Information.PStyleNormal,
+                "The Vernacular Writing System is the one in which the translation is done. Thus " +
+                "it will be used in the right-hand column of the drafting view.");
+            LS.AddInformation("tr130", Information.PStyleNormal,
+                "The Advisor Writing System is the one in which materials are typically created " +
+                "for the advisor or consultant. Thus it is the one used in the right-hand column " +
+                "of the back translation view.");
 
-            // Advisor Writing System
-            ps = new PropertySpec(
-                c_sPropWSAdvisor,
-                "Writing System for Advisor Text",
-                "Writing Systems",
-                "The Writing System for advisor or consultant text (e.g., the back translation), " +
-                    "you define these under Team Settings.",
-                vsWritingSystems,
-                ""
-                );
-            ps.DontLocalizeEnums = true;
-            BagGeneral.Properties.Add(ps);
+            m_WSVernacular = LS.AddAtringChoice(
+                "trVernacular",
+                "Vernacular",
+                "The writing system that this translation is being drafted in.",
+                Translation.VernacularWritingSystemName,
+                vsWritingSystems);
+            m_WSVernacular.Group = sGroupWritingSystems;
 
-            // Localize the bag
-            LocDB.Localize(this, BagGeneral);
+            m_WSAdvisor = LS.AddAtringChoice(
+                "trAdvisor",
+                "Advvisor",
+                "The writing system for the back translation and other materials the advisor or consultant might use.",
+                Translation.ConsultantWritingSystemName,
+                vsWritingSystems);
+            m_WSAdvisor.Group = sGroupWritingSystems;
 
-            // Set the Property Grid to this PropertyBag
-            m_PropGridGeneral.SelectedObject = BagGeneral;
+            // Footnotes
+            string sGroupFootnotes = G.GetLoc_String("kFootnotes", "Footnotes");
+            LS.AddInformation("tr200", Information.PStyleHeading1,
+                "Footnote Letter Sequence");
+            LS.AddInformation("tr210", Information.PStyleNormal,
+                "When a footnote is encountered within the Scriptures, it typically is signaled " +
+                "by a letter (such as 'a', 'b', 'c', etc.). By looking for that letter at the " +
+                "bottom of the page one can quickly see the corresponding footnote paragraph.");
+            LS.AddInformation("tr220", Information.PStyleNormal,
+                "OurWord defaults to the \"a, b, c, ...\" sequence, which is suitable for many " +
+                "alphabets. But a great many languages will need to define a different sequence. " +
+                "Thus if you cannot use one of the built-in sequences, you should enter your own.");
+            LS.AddInformation("tr230", Information.PStyleNormal,
+                "First, choose either one of the built-in sequences, or indicate that you are " +
+                "using a \"custom\" sequence that you will define.");
+
+            m_FootnoteLetterType = LS.AddAtringChoice(
+                "trFootnoteLetterType",
+                "Letter Sequence",
+                "Define the sequence of footnote callout letters. Use one of the OurWord built-in " +
+                    " sequences, or set to 'custom' to define your own sequence.",
+                DFoot.TypeToString(Translation.FootnoteSequenceType),
+                DFoot.FootnoteSequenceChoices);
+            m_FootnoteLetterType.Group = sGroupFootnotes;
+
+            LS.AddInformation("tr240", Information.PStyleNormal,
+                "To define a custom sequence, enter its letters, with spaces in-between. This " +
+                "allows a means for you to specify multi-letter combinations, e.g., the 'll' " +
+                "and 'ng' in \"...j k l ll m n ng o p...\"");
+
+            string sEditText = "";
+            foreach (string s in Translation.FootnoteCustomSeq)
+                sEditText += (s + ' ');
+            m_FootnoteCustomSequence = LS.AddEditText(
+                "trFootnoteCustom",
+                "Custom Sequence",
+                "If you want to use a custom sequence, set the Letter Sequence to 'custom', then " +
+                    "define you sequence here, using spaces as separators.",
+                sEditText);
+            m_FootnoteCustomSequence.Group = sGroupFootnotes;
+
+            LS.AddInformation("tr250", Information.PStyleNormal,
+                "If you have more footnotes than you have letters, then OurWord will just roll " +
+                "over back to the beginning. E.g., after 'z' comes 'a'.");
+
+            // Layout, etc
+            LS.LoadContents();
         }
         #endregion
 
@@ -942,14 +988,11 @@ namespace OurWord.Dialogs
 		private void cmdLoad(object sender, System.EventArgs e)
 		{
             // Localization
-            Control[] vExclude = { m_PropGridGeneral };
+            Control[] vExclude = { };
             LocDB.Localize(this, vExclude);
 
 			// Language Name
 			LanguageName = Translation.DisplayName;
-
-            // Initialze the PropertyGrids
-            SetupPropGrid_General();
 
             // We'll default to the New Testament since that covers most people
             m_radioNewTestament.Checked = true;
@@ -970,6 +1013,8 @@ namespace OurWord.Dialogs
 
             // Combo Box Possibilities
             PopulateComboBoxPossibilities();
+
+            BuildLiterateSettings();
 		}
 		#endregion
 		#region Cmd: cmdRemoveTranslation
@@ -1229,6 +1274,7 @@ namespace OurWord.Dialogs
             book.Export(dlg.ExportPathName, ScriptureDB.Formats.kParatext, progress);
         }
         #endregion
+
 	}
 
 }

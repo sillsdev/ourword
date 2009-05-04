@@ -169,9 +169,7 @@ namespace JWdb.DataModel
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
 
             DefineAttr("People", ref m_bsaPeople);
-
 			DefineAttr("Version", ref m_nVersion);
-
 
 #if (FEAT_WESAY || FEAT_MERGE)
             DefineAttr("ShowMerge",      ref m_bShowMergePane);
@@ -1006,50 +1004,6 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
-
-        /***
-        #region Attr{g}: string CommitMessage
-        public string CommitMessage
-        {
-            get
-            {
-                string s = "Changed: ";
-
-                // Did any settings change?
-                bool bSettingsChanged = false;
-                if (IsDirty)
-                    bSettingsChanged = true;
-                foreach (DTranslation t in AllTranslations)
-                {
-                    if (t.IsDirty)
-                        bSettingsChanged = true;
-                }
-                if (bSettingsChanged)
-                    s += "Settings. ";
-
-                // Did any books change?
-                foreach (DTranslation t in AllTranslations)
-                {
-                    bool bBookChanged = false;
-                    string sTranslation = t.DisplayName + ":";
-                    foreach (DBook book in t.Books)
-                    {
-                        if (book.IsDirty)
-                        {
-                            sTranslation += " " + book.BookAbbrev;
-                            bBookChanged = true;
-                        }
-                    }
-                    if (bBookChanged)
-                        s += sTranslation + ". ";
-                }
-
-                return s;
-            }
-        }
-        #endregion
-        ***/
-
         #region Method: void Save(IProgressIndicator)
         public void Save(IProgressIndicator progress)
         {
@@ -1067,31 +1021,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        /***
-		void ConvertFileSystem()
-		{
-			// Nothing to do if the paths already equal (the conversion was done at
-			// some other time
-			if (AbsolutePathName == StoragePath)
-				return;
-
-			G.App.Cursor = Cursors.WaitCursor;
-
-			// Resetting the path name declares it dirty, so it will be saved
-			AbsolutePathName = StoragePath;
-			G.App.MRU.ReplaceTop(AbsolutePathName);
-
-			// Move the translations over
-			foreach (DTranslation translation in AllTranslations)
-				translation.ConvertFileSystem();
-
-			// Force a Save to the project
-			DeclareDirty();
-			Write();
-
-			G.App.Cursor = Cursors.Default;
-		}
-		***/
 
 	}
 
