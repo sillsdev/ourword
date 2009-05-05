@@ -467,6 +467,15 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        public bool IsOldTestamentBook
+        {
+            get
+            {
+                if (BookIndex < 39)
+                    return true;
+                return false;
+            }
+        }
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor() - only for reading from xml

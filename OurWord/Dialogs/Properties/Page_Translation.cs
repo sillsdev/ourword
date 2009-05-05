@@ -994,8 +994,17 @@ namespace OurWord.Dialogs
 			// Language Name
 			LanguageName = Translation.DisplayName;
 
-            // We'll default to the New Testament since that covers most people
-            m_radioNewTestament.Checked = true;
+            // Determine how much to filter. Are there any OT books present? (if so, the
+            // first one will be, since they are stored in cannonical order.)
+            bool bOTBookPresent = false;
+            if (Translation.Books.Count > 0 && Translation.Books[0].IsOldTestamentBook)
+                bOTBookPresent = true;
+            m_FilterOn = ((bOTBookPresent) ? FilterOn.kAll : FilterOn.kNT);
+
+            if (bOTBookPresent)
+                m_radioAll.Checked = true;
+            else
+                m_radioNewTestament.Checked = true;
 
 			// Populate the list of books; select the first item in the list
 			PopulateGrid("GEN");
