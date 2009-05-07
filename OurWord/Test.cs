@@ -349,7 +349,6 @@ namespace OurWord
 			(new Test_DBookProperties()).Run();
 			(new Test_DSection()).Run();
 			(new Test_Print()).Run();
-			(new Test_BackupSystem()).Run();  // Can temporarily disable to conserve battery
 
 			Test.WriteHeader("COMPLETED SUCCESSFULLY");
 		}

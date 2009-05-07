@@ -251,7 +251,8 @@ namespace JWTools
         #region SMethod: void NUnit_RemoveTestFileFolder()
         static public void NUnit_RemoveTestFileFolder()
         {
-            Directory.Delete(NUnit_TestFileFolder, true);
+            if (Directory.Exists(NUnit_TestFileFolder))
+                Directory.Delete(NUnit_TestFileFolder, true);
         }
         #endregion
         #region SMethod: TextWriter NUnit_OpenTextWriter(sFileName)

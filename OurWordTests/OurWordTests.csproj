@@ -76,6 +76,7 @@
     <Compile Include="JWdb\T_JSeq.cs" />
     <Compile Include="JWdb\T_SfDB.cs" />
     <Compile Include="JWdb\T_StyleSheet.cs" />
+    <Compile Include="JWTools\T_BackupSystem.cs" />
     <Compile Include="JWTools\T_Localization.cs" />
     <Compile Include="JWTools\T_PathConverter.cs" />
     <Compile Include="JWTools\T_Utilities.cs" />

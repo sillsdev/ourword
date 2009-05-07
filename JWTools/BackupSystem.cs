@@ -240,24 +240,83 @@ namespace JWTools
 			}
 
 			// Delete older files if appropriate
-			CleanUpOldFiles(BackupFolder);
+			CleanUpOldFiles(BackupFolder, SourcePathName);
 		}
 		#endregion
 
 		// Helper methods for CleanUpOldFiles ------------------------------------------------
-		#region Method: DateTime DateFromFileName(string sPath)
-		DateTime DateFromFileName(string sPath)
-			// We use the Create date, rather than fool with parsing the file's name.
+		#region SMethod: DateTime DateFromFileName(string sPath)
+		static DateTime DateFromFileName(string sPath)
+			// We use the Create date, rather than fool with parsing the file's name,
+            // since it is a backup
 		{
 			return File.GetCreationTime(sPath);
 		}
 		#endregion
-		#region Method: void CleanUpOldFiles(string sBackupFolder)
-		public void CleanUpOldFiles(string sBackupFolder)
+        #region SMethod: string PruneDateFromFileName(string sPathName)
+        static public string PruneDateFromFileName(string sPathName)
+            // A date is in the form
+            //     yyyy-MM-dd
+            // e.g.,
+            //     2009-11-23
+            //     1985-08-02
+            // If present, it is the very end of the string.
+            //
+            // OK, the below code seems inelegant, ....I'm open to s.t. better.
+        {
+            string sBaseName = Path.GetFileNameWithoutExtension(sPathName);
+
+            int cDateLen = 10;
+            if (sBaseName.Length <= cDateLen)
+                return sBaseName;
+
+            int i = sBaseName.Length - 1;
+
+            // Day
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+
+            // Separator
+            if (sBaseName[i--] != '-')
+                return sBaseName;
+
+            // Month
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+
+            // Separator
+            if (sBaseName[i--] != '-')
+                return sBaseName;
+
+            // Year
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+            if (!char.IsDigit(sBaseName[i--]))
+                return sBaseName;
+
+            // Space
+            if (sBaseName[i] != ' ')
+                return sBaseName;
+
+            // Return the result from 'i'
+            return sBaseName.Substring(0, i);
+        }
+        #endregion
+        #region SMethod: void CleanUpOldFiles(string sBackupFolder)
+        static public void CleanUpOldFiles(string sBackupFolder, string sBaseName)
 		{
-			// Get the file name (less the date)
-			string sPathPartial = sBackupFolder + Path.DirectorySeparatorChar + 
-				Path.GetFileNameWithoutExtension(SourcePathName);
+            // Remove the date, if it is there
+            string sBaseNameWithoutDate = PruneDateFromFileName(sBaseName);
+            string sPathPartial = sBackupFolder + Path.DirectorySeparatorChar + 
+                sBaseNameWithoutDate;
 
 			// Get the list of files in the directory
 			string[] sAllFiles = Directory.GetFiles( sBackupFolder );
@@ -318,8 +377,8 @@ namespace JWTools
 
 		}
 		#endregion
-		#region Method: void DeleteOnWeeklyBasis(string sName, ref ArrayList list)
-		private void DeleteOnWeeklyBasis(string sName, ref ArrayList list)
+		#region SMethod: void DeleteOnWeeklyBasis(string sName, ref ArrayList list)
+		static private void DeleteOnWeeklyBasis(string sName, ref ArrayList list)
 		{
 			DateTime date = DateFromFileName(sName);
 
@@ -334,8 +393,8 @@ namespace JWTools
 			DeleteForPeriod(sName, ref list, dateBegin, dateEnd);
 		}
 		#endregion
-		#region Method: void DeleteOnMonthlyBasis(string sName, ref ArrayList list)
-		private void DeleteOnMonthlyBasis(string sName, ref ArrayList list)
+		#region SMethod: void DeleteOnMonthlyBasis(string sName, ref ArrayList list)
+		static private void DeleteOnMonthlyBasis(string sName, ref ArrayList list)
 		{
 			DateTime date = DateFromFileName(sName);
 
@@ -348,8 +407,8 @@ namespace JWTools
 			DeleteForPeriod(sName, ref list, dateBegin, dateEnd);
 		}
 		#endregion
-		#region Method: void DeleteForPeriod(...)
-		private void DeleteForPeriod(string sName, ref ArrayList list, 
+		#region SMethod: void DeleteForPeriod(...)
+		static private void DeleteForPeriod(string sName, ref ArrayList list, 
 			DateTime dateBegin, DateTime dateEnd)
 		{
 			DateTime date = DateFromFileName(sName);
@@ -424,93 +483,4 @@ namespace JWTools
 		}
 		#endregion
 	}
-
-	#region TEST
-	public class Test_BackupSystem : Test
-	{
-		#region Constructor()
-		public Test_BackupSystem()
-			: base("BackupSystem")
-		{
-			AddTest( new IndividualTest( CleanUpFileNames ), "CleanUpFileNames" );
-		}
-		#endregion
-
-		#region void CleanUpFileNames()
-		public void CleanUpFileNames()
-		{
-			int cFilesToCreate = 400;
-
-			// Create an empty working directory
-			string sTestPath = Path.GetDirectoryName(Application.ExecutablePath) + 
-				Path.DirectorySeparatorChar + "BackupTest";
-			if (Directory.Exists(sTestPath))
-				Directory.Delete(sTestPath, true);
-			Directory.CreateDirectory(sTestPath);
-
-			// Give the system time to get the directory stuff done
-			Thread.Sleep(1000);
-
-			// Base name & extension
-			string sBaseName = "TestFile";
-			string sExtension = ".db";
-
-			// Get today's date; we'll do it based on "today"
-			DateTime today = DateTime.Today;
-			int nYear  = today.Year;
-			int nMonth = today.Month;
-			int nDay   = today.Day;
-
-			// Create a whole bunch of files
-			DateTime dt = today;
-			for(int i = 0; i < cFilesToCreate; i++)
-			{
-				string sDate = dt.ToString("yyyy-MM-dd");
-				string sPath = sTestPath + Path.DirectorySeparatorChar + sBaseName + " " + sDate + sExtension;
-
-				FileStream f = File.Create(sPath);
-				f.Flush();
-				f.Close();
-				File.SetCreationTime(sPath, dt);
-
-				--nDay;
-				if (nDay < 1)
-				{
-					--nMonth;
-					if (nMonth < 1)
-					{
-						nMonth += 12;
-						--nYear;
-					}
-					nDay = DateTime.DaysInMonth(nYear, nMonth);
-				}
-				dt = new DateTime(nYear, nMonth, nDay);
-			}
-
-			// We should have a lot of files
-			AreSame( cFilesToCreate, Directory.GetFiles(sTestPath).Length );
-
-			// Call the cleanup routine
-			string sSourcePath = sTestPath + Path.DirectorySeparatorChar + 
-                sBaseName + sExtension;
-            BackupSystem backup = new BackupSystem(sSourcePath, null);
-			backup.CleanUpOldFiles(sTestPath);
-
-			// The number of files we now have depends on the day of week, day of 
-			// month, etc. There should be 14-to-21 daily files, 6-to-11 weekly
-			// files, and then 1 per month before that. Taking the minimum,
-			// and assuming an initial count of 400, we expect there to be
-			// at least 30 files. 
-			//   Then assuming the maximums, and an initial count of 400, we would
-			// expect there to be fewer than 50 files.
-			int cFiles = Directory.GetFiles(sTestPath).Length;
-			IsTrue(cFiles > 30);
-			IsTrue(cFiles < 50);
-
-			// Clean up my disk!
-			Directory.Delete(sTestPath, true);
-		}
-		#endregion
-	}
-	#endregion
 }

@@ -1010,12 +1010,21 @@ namespace JWdb.DataModel
             #endregion
 
             // Backup -------------------------------------------------------------------------
+            #region Attr{g}: string PathForBAK
+            string PathForBAK
+            {
+                get
+                {
+                    return Book.Translation.Project.TeamSettings.BackupFolder +
+                        Book.BaseNameForBackup + ".bak";
+                }
+            }
+            #endregion
             #region Method: void BackupToBAK()
             void BackupToBAK()
             {
                 // Create the Destination Path
-                string sBackupPath = Book.Translation.Project.TeamSettings.BackupFolder +
-                    Book.BaseNameForBackup + ".bak";
+                string sBackupPath = PathForBAK;
 
                 if (File.Exists(Book.StoragePath))
                 {
@@ -1024,6 +1033,10 @@ namespace JWdb.DataModel
                         if (File.Exists(sBackupPath))
                             File.Delete(sBackupPath);
                         File.Move(Book.StoragePath, sBackupPath);
+
+                        BackupSystem.CleanUpOldFiles(
+                            Book.Translation.Project.TeamSettings.BackupFolder,
+                            PathForBAK);
                     }
                     catch (Exception)
                     { }
@@ -1038,13 +1051,9 @@ namespace JWdb.DataModel
                     // Give time for the OS to finish any cleanup it is doing
                     Thread.Sleep(1000);
 
-                    // Create the Destination Path
-                    string sBackupPath = Book.Translation.Project.TeamSettings.BackupFolder +
-                        Book.BaseNameForBackup + ".bak";
-
                     // Copy the backup onto the filename (provided one exists, of course)
-                    if (File.Exists(sBackupPath))
-                        File.Copy(sBackupPath, Book.StoragePath, true);
+                    if (File.Exists(PathForBAK))
+                        File.Copy(PathForBAK, Book.StoragePath, true);
                 }
                 catch (Exception)
                 { }
