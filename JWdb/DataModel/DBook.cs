@@ -467,6 +467,7 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region Attr{g}: bool IsOldTestamentBook
         public bool IsOldTestamentBook
         {
             get
@@ -476,6 +477,7 @@ namespace JWdb.DataModel
                 return false;
             }
         }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor() - only for reading from xml

@@ -2,7 +2,7 @@
   <Language ID="sp" Name="Español"></Language>
   <Group ID="m_ToolStrip">
     <Item ID="m_btnExit">
-      <Alt ID="sp" Value="Salir" Tip="Guarde cambios pendientes y salir de VozNuestra"></Alt>
+      <Alt ID="sp" Value="Salir" Tip="Guarde cambios pendientes y salga de VozNuestra"></Alt>
     </Item>
     <Item ID="m_btnProjectSave">
       <Alt ID="sp" Value="Guardar" Tip="Guarde lo que está haciendo en memoria permanente."></Alt>
@@ -23,7 +23,7 @@
       <Alt ID="sp" Value="Guardar &amp;como..." Tip="Guarde este proyecto bajo otro nombre."></Alt>
     </Item>
     <Item ID="m_btnPrint">
-      <Alt ID="sp" Value="Imprimir..." Tip="Imprima este libro o partes de este libro."></Alt>
+      <Alt ID="sp" Value="Imprimir..." Tip="Imprima este libro o parte de este libro."></Alt>
     </Item>
     <Item ID="m_btnEditCut">
       <Alt ID="sp" Value="Cortar" Tip="Remueve el texto seleccionado y lo coloca en el portapapeles."></Alt>
@@ -92,7 +92,7 @@
       <Alt ID="sp" Value="&amp;Incrementar Estado del Libro..." Tip="Cambie el estado de desarrollo del libra al próximo estado en el proceso de la traducción."></Alt>
     </Item>
     <Item ID="m_menuRestoreFromBackup">
-      <Alt ID="sp" Value="&amp;Recuperar de la Copia de Seguridad..." Tip="Recupere de una versión anterior del libro."></Alt>
+      <Alt ID="sp" Value="&amp;Recuperar de la Copia de Seguridad..." Tip="Recupere una versión anterior del libro."></Alt>
     </Item>
     <Item ID="m_menuOnlyShowSectionsThat">
       <Alt ID="sp" Value="Mostrar Únicamente &amp;Secciones que ..." Tip="Filtre las secciones no conformables con un criterio determinado."></Alt>
@@ -107,7 +107,7 @@
       <Alt ID="sp" Value="Sólo Sección En &amp;Vigor..."></Alt>
     </Item>
     <Item ID="m_menuConfigure">
-      <Alt ID="sp" Value="&amp;Configurar..." Tip="Edite las elecciones para VozNuestra an general, y para el proyecto en vigor."></Alt>
+      <Alt ID="sp" Value="&amp;Configurar..." Tip="Edite las elecciones para VozNuestra en general, y para el proyecto en vigor."></Alt>
     </Item>
     <Item ID="m_menuSetUpFeatures">
       <Alt ID="sp" Value="Escoger &amp;Posibilidades..." Tip="Seleccione las posibilidades a activar y a desactivar."></Alt>
@@ -119,22 +119,22 @@
       <Alt ID="sp" Value="Ejecutar &amp;Plan de Pruebas..." Tip="Únicamente para programadores. Si Vd. ve esto, ¡páselo por alto!"></Alt>
     </Item>
     <Item ID="m_btnWindow">
-      <Alt ID="sp" Value="Ventana" Tip="Muestra cuales ventanas Vd. puede activar o desctivar."></Alt>
+      <Alt ID="sp" Value="Ventana" Tip="Muestra cuáles ventanas Vd. puede activar o desctivar."></Alt>
     </Item>
     <Item ID="m_menuDrafting">
-      <Alt ID="sp" Value="&amp;Borrador"></Alt>
+      <Alt ID="sp" Value="&amp;Borrador" Tip="Borrador en la ventana principal"></Alt>
     </Item>
     <Item ID="m_menuBackTranslation">
-      <Alt ID="sp" Value="Traducción &amp;Inversa"></Alt>
+      <Alt ID="sp" Value="Traducción &amp;Inversa" Tip="Traducción Inversa en la ventana principal"></Alt>
     </Item>
     <Item ID="m_menuNaturalnessCheck">
-      <Alt ID="sp" Value="Traducción &amp;Natural"></Alt>
+      <Alt ID="sp" Value="Prueba de Nivel &amp;Natural" Tip="Prueba de nivel natural en la ventana principal, sin traducción fuente"></Alt>
     </Item>
     <Item ID="m_menuShowNotesPane">
       <Alt ID="sp" Value="&amp;Mostrar Panel de Notas"></Alt>
     </Item>
     <Item ID="m_menuShowTranslationsPane">
-      <Alt ID="sp" Value="Mostrar Panel de &amp;Otras Traducciones" Tip="Muestre el Panel de Traducciones que no tienen la misma Traducción Fuente como ésta."></Alt>
+      <Alt ID="sp" Value="Mostrar Panel de &amp;Otras Traducciones" Tip="Muestre el Panel de Otras Traducciones, las que no tienen la misma Traducción Fuente como ésta."></Alt>
     </Item>
     <Item ID="m_menuShowMergePane">
       <Alt ID="sp" Value="Mostrar Panel de &amp;Fusionamiento" Tip="Muestre el Panel que le permite fusionar otras versiones de un archivo con el archivo maestro."></Alt>
@@ -146,7 +146,7 @@
       <Alt ID="sp" Value="&amp;Tópicos de Ayuda" Tip="Muestre la Ventana de Tópicos de Ayuda."></Alt>
     </Item>
     <Item ID="m_menuAbout">
-      <Alt ID="sp" Value="&amp;Acerca de Palabra Nuestra" Tip="Muestre informaciones acerca de esta versión de VozNuestra."></Alt>
+      <Alt ID="sp" Value="&amp;Acerca de VozNuestra" Tip="Muestre informaciones acerca de esta versión de VozNuestra."></Alt>
     </Item>
     <Item ID="m_menuUndo">
       <Alt ID="sp" Value="&amp;Deshacer"></Alt>
@@ -161,6 +161,13 @@
       <Alt ID="sp" Value="Sección Próxima"></Alt>
     </Item>
     <Item ID="m_menuToggleItalics">
+      <Alt ID="sp" Value="Conmutar cursivas/no cursivas"></Alt>
+    </Item>
+    <Item ID="m_menuInsertFootnote">
+      <Alt ID="sp" Value="Insertar Nota de Pie"></Alt>
+    </Item>
+    <Item ID="m_menuDeleteFootnote">
+      <Alt ID="sp" Value="Remover Nota de Pie"></Alt>
     </Item>
     <Item ID="m_menuZoom">
       <Alt ID="sp" Value="Zoom Texto"></Alt>
@@ -219,13 +226,13 @@
       <Alt ID="sp" Value="Nota A &amp;Hacer"></Alt>
     </Item>
     <Item ID="m_menuInsertAskUNS">
-      <Alt ID="sp" Value="Nota &amp;Hablantes que No Conocen la Biblia"></Alt>
+      <Alt ID="sp" Value="Nota para Preguntas a &amp;Hablantes que No Conocen la Biblia"></Alt>
     </Item>
     <Item ID="m_menuInsertDefinition">
       <Alt ID="sp" Value="Nota &amp;Definición"></Alt>
     </Item>
     <Item ID="m_menuInsertOldVersion">
-      <Alt ID="sp" Value="Nota Versión &amp;Anterior"></Alt>
+      <Alt ID="sp" Value="Nota &amp;Versión Anterior"></Alt>
     </Item>
     <Item ID="m_menuInsertReason">
       <Alt ID="sp" Value="Nota &amp;Razonamiento"></Alt>
@@ -240,31 +247,39 @@
       <Alt ID="sp" Value="Insertar Nota Traducción &amp;Inversa"></Alt>
     </Item>
     <Item ID="m_btnDeleteNote">
-      <Alt ID="sp" Value="&amp;Remover Nota..." Tip="Remueve una nota..."></Alt>
+      <Alt ID="sp" Value="&amp;Remover Nota..." Tip="Remueve una nota."></Alt>
     </Item>
   </Group>
   <Group ID="Strings">
     <Item ID="kYes">
+      <Alt ID="sp" Value="Sí"></Alt>
     </Item>
     <Item ID="kNo">
+      <Alt ID="sp" Value="No"></Alt>
     </Item>
     <Item ID="SetupFT_TargetDefinition">
+      <Alt ID="sp" Value="La Traducción Meta es la traducción a la lengua vernácula. Se usa la Traducción Fuente para crear la Traducción Meta. Si está traduciendo a su propia lengua, la Traducción Meta es una traducción a la lengua que Vd. habla."></Alt>
     </Item>
     <Item ID="SetupFT_TargetCreateExpl">
+      <Alt ID="sp" Value="Empiece desde cero a hacer elecciones iniciales para su Traducción Meta. Se le presentarán elecciones en blanco, y tendrá que entra el nombre de la traducción, los de sus libros, etc."></Alt>
     </Item>
     <Item ID="SetupFT_TargetOpenExpl">
+      <Alt ID="sp" Value="Utilice elecciones ya existentes para su Traducción Meta. Si Vd. hizo la definición de la traducción en otro proyecto, la puede volver a usar aquí, evitando así la repetición de informaciones ya entradas."></Alt>
     </Item>
     <Item ID="PropDlgTab_StyleSheet">
+      <Alt ID="sp" Value="Hoja de Estilo"></Alt>
     </Item>
     <Item ID="PropDlgTab_WritingSystems">
+      <Alt ID="sp" Value="Sistemas Ortográficas"></Alt>
     </Item>
     <Item ID="PropDlgTab_PrintOptions">
+      <Alt ID="sp" Value="Opciones para Imprimir"></Alt>
     </Item>
     <Item ID="PropDlgTab_TranslationStages">
       <Alt ID="sp" Value="Etapas de la Traducción"></Alt>
     </Item>
     <Item ID="strCalculatingMatchingSections">
-      <Alt ID="sp" Value="Calculando Cuáles Secciones se Conforman con sus Requisitos..."></Alt>
+      <Alt ID="sp" Value="Calculando cuáles secciones se conforman con sus requisitos..."></Alt>
     </Item>
     <Item ID="strViewingASubset">
       <Alt ID="sp" Value="Mirando un subconjunto"></Alt>
@@ -276,8 +291,10 @@
       <Alt ID="sp" Value="Imprimiendo Páginas..."></Alt>
     </Item>
     <Item ID="NewNote">
+      <Alt ID="sp" Value="NUEVO"></Alt>
     </Item>
     <Item ID="TypeHere">
+      <Alt ID="sp" Value="[Entrar aquí]"></Alt>
     </Item>
     <Group ID="GeneralUI">
       <Item ID="DraftingWindowName">
@@ -293,7 +310,7 @@
         <Alt ID="sp" Value="{0}"></Alt>
       </Item>
       <Item ID="NaturalnessCheckWindowName">
-        <Alt ID="sp" Value="Prueba &amp;Naturalidad"></Alt>
+        <Alt ID="sp" Value="Prueba Nivel de &amp;Naturaleza"></Alt>
       </Item>
       <Item ID="NaturalnessCheckReference">
         <Alt ID="sp" Value="{0} - {1}"></Alt>
@@ -314,54 +331,74 @@
         <Alt ID="sp" Value="Traducciones "></Alt>
       </Item>
       <Item ID="NoDataToDisplay">
-        <Alt ID="sp" Value="(No existen datos para presentar. Use Archivo-Propiedades en el menú para definir la Traducción Fuente y la Traducción Meta.)"></Alt>
+        <Alt ID="sp" Value="(No existen datos para presentar. Use Herramientas-Configurar-Propiedades Esenciales en el menú para definir la Traducción Fuente y la Traducción Meta.)"></Alt>
       </Item>
       <Item ID="BrowseForBackupFolderDescr">
-        <Alt ID="sp" Value="Seleccione la carpeta en donde quiere guardar sus archivos de respaldo. Es preferible que no se guarden en el mismo almacén permanente, sino en una tarjeta flash o una unidad floppy."></Alt>
+        <Alt ID="sp" Value="Seleccione la carpeta en donde quiere guardar sus archivos de respaldo. De preferencia, no los guarde en el mismo almacén permanente, sino en una tarjeta flash o una unidad floppy."></Alt>
       </Item>
     </Group>
     <Group ID="NoteDefs">
       <Item ID="kGeneral">
+        <Alt ID="sp" Value="General"></Alt>
       </Item>
       <Item ID="kHintForDaughter">
+        <Alt ID="sp" Value="Sugerencia para Borrador"></Alt>
       </Item>
       <Item ID="kToDo">
+        <Alt ID="sp" Value="A Hacer"></Alt>
       </Item>
       <Item ID="kAskUns">
+        <Alt ID="sp" Value="Preguntar a Hablantes Nativos que No Conocen la Biblia"></Alt>
       </Item>
       <Item ID="kReason">
+        <Alt ID="sp" Value="Razonamiento"></Alt>
       </Item>
       <Item ID="kFront">
+        <Alt ID="sp" Value="Problema con Traducción Fuente"></Alt>
       </Item>
       <Item ID="kDefinition">
+        <Alt ID="sp" Value="Definiciones"></Alt>
       </Item>
       <Item ID="kOldVersion">
+        <Alt ID="sp" Value="Versiones anteriores"></Alt>
       </Item>
       <Item ID="kBT">
+        <Alt ID="sp" Value="Traducción Inversa"></Alt>
       </Item>
       <Item ID="kGreek">
+        <Alt ID="sp" Value="Griego"></Alt>
       </Item>
       <Item ID="kHebrew">
+        <Alt ID="sp" Value="Hebreo"></Alt>
       </Item>
       <Item ID="kExegesis">
+        <Alt ID="sp" Value="Exégesis"></Alt>
       </Item>
     </Group>
     <Group ID="Notes">
       <Item ID="ToDoDefault">
+        <Alt ID="sp" Value="A Hacer:"></Alt>
       </Item>
       <Item ID="FrontDefault">
+        <Alt ID="sp" Value="Fuente:"></Alt>
       </Item>
       <Item ID="BackTTranslationDefault">
+        <Alt ID="sp" Value="TI:"></Alt>
       </Item>
       <Item ID="AskUnsDefault">
+        <Alt ID="sp" Value="Preguntar a Hablantes Nativos que No Conocen la Biblia:"></Alt>
       </Item>
       <Item ID="HintDefault">
+        <Alt ID="sp" Value="Sugerencia:"></Alt>
       </Item>
       <Item ID="GreekDefault">
+        <Alt ID="sp" Value="Griego:"></Alt>
       </Item>
       <Item ID="HebrewDefault">
+        <Alt ID="sp" Value="Hebreo:"></Alt>
       </Item>
       <Item ID="ExegesisDefault">
+        <Alt ID="sp" Value="Exégesis:"></Alt>
       </Item>
     </Group>
     <Group ID="Files">
@@ -378,41 +415,54 @@
         <Alt ID="sp" Value="Proyecto Nuevo.owp"></Alt>
       </Item>
       <Item ID="DefaultTranslationFileName">
-        <Alt ID="sp" Value="Traducción Nuevo.oTrans"></Alt>
+        <Alt ID="sp" Value="Traducción Nueva.oTrans"></Alt>
       </Item>
       <Item ID="SaveTranslationAsTitle">
+        <Alt ID="sp" Value="Guardar Archivo que Define Traducción como"></Alt>
       </Item>
       <Item ID="OpenTranslationDlgTitle">
         <Alt ID="sp" Value="Abrir Archivo que Define Traducción"></Alt>
       </Item>
       <Item ID="ExportBookSaveAsDlgTitle">
+        <Alt ID="sp" Value="Entrar nombre de archivo a exportar"></Alt>
       </Item>
       <Item ID="ExportBookFileFilter">
+        <Alt ID="sp" Value="Archivo Paratext (*.ptx)|*.ptx"></Alt>
       </Item>
       <Item ID="BrowseForBackupFile">
         <Alt ID="sp" Value="Navegar al Archivo de Respaldo"></Alt>
       </Item>
       <Item ID="OpenTeamSettingsDlgTitle">
+        <Alt ID="sp" Value="Utilizar Archivo de Elecciones Existente"></Alt>
       </Item>
       <Item ID="SaveTeamSettingsDlgTitle">
+        <Alt ID="sp" Value="Guardar Archivo de Elecciones como"></Alt>
       </Item>
     </Group>
     <Group ID="Styles">
       <Item ID="SectionTitle">
+        <Alt ID="sp" Value="Título de Sección"></Alt>
       </Item>
       <Item ID="SectionTitle2">
+        <Alt ID="sp" Value="Título 2 de Sección"></Alt>
       </Item>
       <Item ID="CrossRef">
+        <Alt ID="sp" Value="Remisión"></Alt>
       </Item>
       <Item ID="BookTitle">
+        <Alt ID="sp" Value="Título de Libro"></Alt>
       </Item>
       <Item ID="SubTitle">
+        <Alt ID="sp" Value="Subtítulo"></Alt>
       </Item>
       <Item ID="Header">
+        <Alt ID="sp" Value="Encabezado"></Alt>
       </Item>
       <Item ID="Picture">
+        <Alt ID="sp" Value="Dibujo"></Alt>
       </Item>
       <Item ID="CrossReferences">
+        <Alt ID="sp" Value="Remisiones"></Alt>
       </Item>
     </Group>
     <Group ID="DialogCommon">
@@ -420,10 +470,13 @@
         <Alt ID="sp" Value="Navegar..."></Alt>
       </Item>
       <Item ID="m_btnSaveAs">
+        <Alt ID="sp" Value="Guardar como..."></Alt>
       </Item>
       <Item ID="m_btnOK">
+        <Alt ID="sp" Value="Aceptar"></Alt>
       </Item>
       <Item ID="m_btnClose">
+        <Alt ID="sp" Value="Cerrar"></Alt>
       </Item>
       <Item ID="m_btnCancel">
         <Alt ID="sp" Value="Cancelar"></Alt>
@@ -432,7 +485,7 @@
         <Alt ID="sp" Value="Ayuda..."></Alt>
       </Item>
       <Item ID="m_lblProgramName">
-        <Alt ID="sp" Value="Palabra Nuestra"></Alt>
+        <Alt ID="sp" Value="VozNuestra"></Alt>
       </Item>
       <Item ID="m_lblVersion">
         <Alt ID="sp" Value="Versión {0}"></Alt>
@@ -440,64 +493,76 @@
     </Group>
     <Group ID="UndoRedo">
       <Item ID="UndoTyping_what">
+        <Alt ID="sp" Value="&amp;Deshacer Mecanografía '{0}'"></Alt>
       </Item>
       <Item ID="RedoTyping_what">
+        <Alt ID="sp" Value="&amp;Rehacer Mecanografía '{0}'"></Alt>
       </Item>
       <Item ID="UndoBackspace_what">
+        <Alt ID="sp" Value="&amp;Deshacer Retroceso '{0}'"></Alt>
       </Item>
       <Item ID="RedoBackspace_what">
+        <Alt ID="sp" Value="&amp;Rehacer Retroceso '{0}'"></Alt>
       </Item>
       <Item ID="UndoDelete_what">
+        <Alt ID="sp" Value="&amp;Deshacer Borrar  '{0}'"></Alt>
       </Item>
       <Item ID="RedoDelete_what">
+        <Alt ID="sp" Value="&amp;Rehacer Borrar '{0}'"></Alt>
       </Item>
       <Item ID="UndoCut_what">
+        <Alt ID="sp" Value="&amp;Deshacer Cortar '{0}'"></Alt>
       </Item>
       <Item ID="RedoCut_what">
+        <Alt ID="sp" Value="&amp;Rehacer Cortar '{0}'"></Alt>
       </Item>
       <Item ID="UndoCopy_what">
+        <Alt ID="sp" Value="&amp;Deshacer Copiar '{0}'"></Alt>
       </Item>
       <Item ID="RedoCopy_what">
+        <Alt ID="sp" Value="&amp;Rehacer Copiar '{0}'"></Alt>
       </Item>
       <Item ID="UndoPaste_what">
+        <Alt ID="sp" Value="&amp;Deshacer Pegar '{0}'"></Alt>
       </Item>
       <Item ID="RedoPaste_what">
+        <Alt ID="sp" Value="&amp;Rehacer Pegar '{0}'"></Alt>
       </Item>
       <Item ID="UndoSplitParagraph">
+        <Alt ID="sp" Value="&amp;Deshacer Partición de Párrafo"></Alt>
       </Item>
       <Item ID="RedoSplitParagraph">
+        <Alt ID="sp" Value="&amp;Rehacer Partición de Párrafo"></Alt>
       </Item>
       <Item ID="UndoJoinParagraph">
+        <Alt ID="sp" Value="&amp;Deshacer Unificación de Párrafos"></Alt>
       </Item>
       <Item ID="RedoJoinParagraph">
+        <Alt ID="sp" Value="&amp;Rehacer Unificación de Párrafos"></Alt>
       </Item>
       <Item ID="UndoChangeParagraphStyle_what">
+        <Alt ID="sp" Value="&amp;Deshacer Cambio de Estilo de Párrafo '{0}'"></Alt>
       </Item>
       <Item ID="RedoChangeParagraphStyle_what">
+        <Alt ID="sp" Value="&amp;Rehacer Cambio de Estilo de Párrafo '{0}'"></Alt>
       </Item>
     </Group>
   </Group>
   <Group ID="Messages">
     <Item ID="msgBookIsLocked">
-      <Alt ID="sp" Value="Please discuss suggested changes or improvements with your team advisor. Further changes to {0} cannot be made directly on this computer."></Alt>
-    </Item>
-    <Item ID="msgBookNeedsFolder">
-      <Alt ID="sp" Value="Identifique la Carpeta en que va a guardar los data para este libro."></Alt>
+      <Alt ID="sp" Value="Favor de discutir los cambios sugeridos con el coordinador de su equipo. Más cambios a {0} no se pueden hacer directamente en esta máquina."></Alt>
     </Item>
     <Item ID="msgBookNeedsImportFilename">
       <Alt ID="sp" Value="Nombre del archivo para importar."></Alt>
     </Item>
-    <Item ID="msgBookNeedsName">
-      <Alt ID="sp" Value="Dar el nombre de este libro, por ejemplo «Nü'arisixi»."></Alt>
-    </Item>
     <Item ID="msgCantInsertNoteHere">
-      <Alt ID="sp" Value="No se puede insertar Notas para títulos de libros, leyendas para dibujos, no notas al pie."></Alt>
+      <Alt ID="sp" Value="No se puede insertar Notas para títulos de libros, leyendas de dibujos, ni notas de pie."></Alt>
     </Item>
     <Item ID="msgConfirmChangeFileLanguage">
-      <Alt ID="sp" Value="Al cambiar la lengua de la traducción, aparecen los siguientes efectos:{n}1. Los nombres de Etapas regresarán a los nombres de defectos del programa original,{n}2. Los nombres de los libros cambiarán (con el tiempo, cuando cada libro se guarda)."></Alt>
+      <Alt ID="sp" Value="Al cambiar la lengua de la traducción, aparecen los siguientes efectos:{n}1. Los nombres de Etapas regresarán a los nombres de defectos del programa original,{n}2. Los nombres de los archivos que contienen los libros cambiarán (con el tiempo, cuando cada libro se guarda).{n}{n}¿Está Vd. seguro de que quiere cambia a {0}?"></Alt>
     </Item>
     <Item ID="msgConfirmFileOverwrite">
-      <Alt ID="sp" Value="El archivo {n}    {0}{n}ya existe en el disco. ¿Está seguro que lo quiere reemplacer?"></Alt>
+      <Alt ID="sp" Value="El archivo    {0}{n}ya existe en el disco. ¿Está seguro que lo quiere reemplacer?"></Alt>
     </Item>
     <Item ID="msgConfirmFrontReplace">
       <Alt ID="sp" Value="Esto reemplacerá {0} como su traducción fuente.{n}{n}¿Está Vd. seguro de que quiere hacer esto?"></Alt>
@@ -509,7 +574,7 @@
       <Alt ID="sp" Value="Esto reemplacerá {0} como la traducción que Vd. hace.{n}{n}¿Está Vd. seguro de que quiere hacer esto?"></Alt>
     </Item>
     <Item ID="msgConfirmRemoveTranslationStage">
-      <Alt ID="sp" Value="Vd. está para borrar una de las Etapas de la Traducción. Si algunos de los {n}libros de su traducción están en esa etapa, de aquí en adelante no llevarán{n} el nombre de etapa correcto."></Alt>
+      <Alt ID="sp" Value="Vd. está para borrar una de las Etapas de la Traducción. Si algunos de los {n}libros de su traducción están en esa etapa, de aquí en adelante no llevarán{n} el nombre de etapa correcto.{n}{n}Está Vd. seguro de que quiere borrar '{0}'?"></Alt>
     </Item>
     <Item ID="msgConfirmResetStylesToDefaults">
       <Alt ID="sp" Value="¿Está seguro de que quiere restaurar la hoja de estilo entera a su opción por defecto?"></Alt>
@@ -527,19 +592,19 @@
       <Alt ID="sp" Value="Faltó espacio en la unidad {0} para guardar el archivo de respaldo."></Alt>
     </Item>
     <Item ID="msgMissingChapterRange">
-      <Alt ID="sp" Value="Favor de entrar los números inicial y final, separados por un guión, de los capítulos que desea imprimir."></Alt>
+      <Alt ID="sp" Value="Favor de entrar los números inicial y final, separados por un guión, de los capítulos que desea imprimir. Ejemplo: 3-5"></Alt>
     </Item>
     <Item ID="msgMissingPageRange">
-      <Alt ID="sp" Value="Favor de entrar los números inicial y final, separados por un guión, de las páginas que desea imprimir."></Alt>
+      <Alt ID="sp" Value="Favor de entrar los números inicial y final, separados por un guión, de las páginas que desea imprimir. Ejemplo: 1-10"></Alt>
     </Item>
     <Item ID="msgNeedFloppyForBackup">
-      <Alt ID="sp" Value="No es posible guardar el archivo de respaldo: {n}{n}     {0}}{n}{n}.Asegúarese de que haya algo en la unidad de disco {n}(floppy, o memoria flash, como sea apropiado).}{n}{n}Oprime Aceptar para volver a guardar, o Cancelar para no guardar el archivo de respaldo."></Alt>
+      <Alt ID="sp" Value="No es posible guardar el archivo de respaldo:{n}     {0}}{n}{n}.Asegúrese de que haya algo en la unidad de disco{n} (floppy, o memoria flash, como sea apropiado).}{n}{n}Oprime Aceptar para volver a guardar, o Cancelar para no guardar el archivo de respaldo."></Alt>
     </Item>
     <Item ID="msgNoFilterMatches">
       <Alt ID="sp" Value="Ninguna sección se encajó con sus criterios."></Alt>
     </Item>
     <Item ID="msgNoPermissionToWriteFile">
-      <Alt ID="sp" Value="Usted no tiene permiso para escribir el archivo:{n}{n}    {0}"></Alt>
+      <Alt ID="sp" Value="Usted no tiene permiso para escribir el archivo:{n}    {0}"></Alt>
     </Item>
     <Item ID="msgProjectHasNoFront">
       <Alt ID="sp" Value="No se ha definido la Traducción Fuente para este proyecto. ¿Quiere hacerlo ahora?"></Alt>
@@ -551,57 +616,77 @@
       <Alt ID="sp" Value="Dar una abreviatura para la traducción que va a hacer. Normalmente es el código internacional de ethnologue.com, como «hch»."></Alt>
     </Item>
     <Item ID="msgTranslationNeedsPath">
-      <Alt ID="sp" Value="Archivo Elecciones"></Alt>
+      <Alt ID="sp" Value="Favor de entrar un nombre válido para el Archivo de Elecciones para esta traducción."></Alt>
     </Item>
     <Item ID="msgTranslationNeedsName">
-      <Alt ID="sp" Value="Dar el nombre de la traducción que va a hacer, como «Huichol»"></Alt>
+      <Alt ID="sp" Value="Favor de dar el nombre de la traducción que va a hacer, como «Huichol»"></Alt>
     </Item>
     <Item ID="msgUnableToSaveFile">
       <Alt ID="sp" Value="No se puede guardar el archivo: '{0}.'"></Alt>
     </Item>
     <Item ID="msgVerifyRemoveBook">
-      <Alt ID="sp" Value="¿Desea remover este libro de la traducción? (Remover aquí no borra el archivo que está en el disco. Pero VozNuestra ya no se dará cuenta que existe.)"></Alt>
+      <Alt ID="sp" Value="¿Desea remover este libro de la traducción? (Remover aquí no borra el archivo que está en el disco. Pero VozNuestra ya no se dará cuenta de que existe.)"></Alt>
     </Item>
     <Item ID="msgVerifyRemoveTranslation">
       <Alt ID="sp" Value="¿Desea remover esta traducción del proyecto? (Remover aquí no borra el archivo que está en el disco.)"></Alt>
     </Item>
     <Item ID="msgVerifyRestore">
-      <Alt ID="sp" Value="¿Está seguro que quiere reemplazar el archivo:{n}     {0}{n}con el archivo de respaldo:{n}     {1}?"></Alt>
+      <Alt ID="sp" Value="¿Está seguro de que quiere reemplazar el archivo:{n}     {0}{n}con el archivo de respaldo:{n}     {1}?"></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarker">
+      <Alt ID="sp" Value="Se encontró un número de versículo, pero no hubo indicador de un párrafo dentro del cual el versículo cupiera."></Alt>
     </Item>
     <Item ID="msgMissingVerseNumber">
+      <Alt ID="sp" Value="Se encontró un \\v, pero ningún número de versículo le siguió."></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarkerForNote">
+      <Alt ID="sp" Value="Se encontró una nota del traductor, pero no hubo indicador de un párrafo dentro del cual la nota cupiera."></Alt>
     </Item>
     <Item ID="msgChapterNotInParagraph">
+      <Alt ID="sp" Value="Se entró un \\c, , pero no hubo indicador de un párrafo con el cual el capítulo comenzara."></Alt>
     </Item>
     <Item ID="msgBadChapterNo">
+      <Alt ID="sp" Value="No se pudo abrir el archivo debido a un defecto en el número de capítulo."></Alt>
     </Item>
     <Item ID="msgMissingParagraphMarkerForCF">
+      <Alt ID="sp" Value="Se encontró una referencia cruzada \\cf, pero no hubo indicador de un párrafo dentro del cual la referencia cupiera."></Alt>
     </Item>
     <Item ID="msgNoVerseInSection">
+      <Alt ID="sp" Value="Se encontró una sección (\\s) que no contiene ni un versículo (\\v)."></Alt>
     </Item>
     <Item ID="msgAlreadyRunning">
+      <Alt ID="sp" Value="VozNuestra ya está activada."></Alt>
     </Item>
     <Item ID="msgWillOverwriteFileWarning">
+      <Alt ID="sp" Value="CUIDADO: El archivo '{0}' ya existe en esta carpeta. VozNuestra lo va a reemplacer. Si Vd. quiere preservar el archivo existente, puede colocar el nuevo en otra carpeta, o mover el existente a otra carpeta."></Alt>
     </Item>
     <Item ID="msgSectionTitleAlreadyExists">
+      <Alt ID="sp" Value="No se puede transformar este párrafo en Titulo de Sección, porque esta sección ya tiene un título."></Alt>
     </Item>
     <Item ID="msgSectionTitleCannotHaveVerses">
+      <Alt ID="sp" Value="No se puede transformar este párrafo in Titúlo de Sección, porque un Título de Sección no puede contener números de versículo, números de capítulo, o notas de pie."></Alt>
+    </Item>
+    <Item ID="msgNoAvailableBooksInFront">
+      <Alt ID="sp" Value="La Traducción Fuente no tiene definidos los libros que Vd. quiere Crear o Importar a la Traducción Meta. Primero hay que definir el libro dentro de la Traducción Fuente. Después puede Crear o Importar el libro deseado en la Traducción Meta."></Alt>
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
+        <Alt ID="sp" Value="Párrafo(s)"></Alt>
       </Item>
       <Item ID="picture">
+        <Alt ID="sp" Value="Dibujo"></Alt>
       </Item>
       <Item ID="msgStructureMismatch">
+        <Alt ID="sp" Value="Las estructuras dentro de la sección {0} muestran errores de emparejamiento:{n}   {1} tiene {2},{n}   {3} tiene {4}.{n}{n}"></Alt>
       </Item>
       <Item ID="diagnosis1">
+        <Alt ID="sp" Value="Los versículos escapan de la sincronización en la Sección {0}."></Alt>
       </Item>
       <Item ID="diagnosis2">
+        <Alt ID="sp" Value="{0} tiene secciones adicionales al final."></Alt>
       </Item>
       <Item ID="msgSectionMiscount">
+        <Alt ID="sp" Value="Los dos libros parecen no tener el mismo número de secciones.{n}   {0} tiene {1}; {2} parece tener {3}.{n}{4}"></Alt>
       </Item>
     </Group>
   </Group>
@@ -991,25 +1076,25 @@
       <Alt ID="sp" Value="Borrador"></Alt>
     </Item>
     <Item ID="TeamCheck">
-      <Alt ID="sp" Value="Equipo"></Alt>
+      <Alt ID="sp" Value="Examen por Equipo"></Alt>
     </Item>
     <Item ID="AdvisorCheck">
-      <Alt ID="sp" Value="Coordinador"></Alt>
+      <Alt ID="sp" Value="Examen por Coordinador"></Alt>
     </Item>
     <Item ID="CommunityCheck">
-      <Alt ID="sp" Value="Comunidad"></Alt>
+      <Alt ID="sp" Value="Examen por Comunidad"></Alt>
     </Item>
     <Item ID="BackTranslation">
       <Alt ID="sp" Value="Traducción Inversa"></Alt>
     </Item>
     <Item ID="ConsultantCheck">
-      <Alt ID="sp" Value="Consultante"></Alt>
+      <Alt ID="sp" Value="Examen por Consultor"></Alt>
     </Item>
     <Item ID="FinalForPrinting">
-      <Alt ID="sp" Value="Final para Publicar"></Alt>
+      <Alt ID="sp" Value="Examen Final para Publicar"></Alt>
     </Item>
     <Item ID="FinalRevisions">
-      <Alt ID="sp" Value="Redacción Posterior"></Alt>
+      <Alt ID="sp" Value="Redacción Final"></Alt>
     </Item>
   </Group>
   <Group ID="DialogRestoreFromBackup">
@@ -1023,13 +1108,13 @@
       <Alt ID="sp" Value="Libro para Restaurar:"></Alt>
     </Item>
     <Item ID="m_lblFilename">
-      <Alt ID="sp" Value="Archivo en Vigor:"></Alt>
+      <Alt ID="sp" Value="Nombre del Archivo en Vigor:"></Alt>
     </Item>
     <Item ID="m_lblRestoreFrom">
       <Alt ID="sp" Value="Archivo de Respaldo que se Sustituye para el Archivo en Vigor:"></Alt>
     </Item>
     <Item ID="m_lblBackupFilename">
-      <Alt ID="sp" Value="Archivo de Respaldo:"></Alt>
+      <Alt ID="sp" Value="Nombre del Archivo de Respaldo:"></Alt>
     </Item>
     <Item ID="m_btnOK">
       <Alt ID="sp" Value="Restaurar"></Alt>
@@ -1039,21 +1124,26 @@
     <Item ID="Title">
       <Alt ID="sp" Value="Selección de Habilidades"></Alt>
     </Item>
-    <Item ID="m_btnResetDefaults">
-    </Item>
-    <Item ID="m_btnPasswordProtect">
-      <Alt ID="sp" Value="&amp;Contraseña para Restringir Acceso..."></Alt>
-    </Item>
     <Item ID="m_btnAllOff">
-      <Alt ID="sp" Value="&amp;Eliminar Todas"></Alt>
+      <Alt ID="sp" Value="&amp;Desactivar Todas"></Alt>
     </Item>
     <Item ID="m_btnAllOn">
-      <Alt ID="sp" Value="&amp;Poner Todas"></Alt>
+      <Alt ID="sp" Value="&amp;Activar Todas"></Alt>
+    </Item>
+    <Item ID="m_btnResetDefaults">
+      <Alt ID="sp" Value="Restaurar Valores de &amp;Defecto"></Alt>
+    </Item>
+    <Item ID="m_btnPasswordProtect">
+      <Alt ID="sp" Value="Restringir Acceso por &amp;Contraseña..."></Alt>
+    </Item>
+    <Item ID="m_btnJustTheBasics">
+      <Alt ID="sp" Value="Sólo Lo &amp;Básico"></Alt>
     </Item>
     <Item ID="m_box">
       <Alt ID="sp" Value="Descripción"></Alt>
     </Item>
     <Item ID="m_lblDescription">
+      <Alt ID="sp" Value="(ponga aquí la descripción)"></Alt>
     </Item>
     <Item ID="m_lblInstructions">
       <Alt ID="sp" Value="Ponga palomita para cada habilidad de que quiere tener uso en la interfaz del usuario."></Alt>
@@ -1062,11 +1152,13 @@
       <Alt ID="sp" Value="Tarea de Traducción Inversa"></Alt>
     </Item>
     <Item ID="fJobBT_Description">
-      <Alt ID="sp" Value="Composición que le permite hacer una Traducción Inversa, es decir, una representacion de su traducción hecha en una lengua que el consultante conoce."></Alt>
+      <Alt ID="sp" Value="Composición que le permite hacer una Traducción Inversa, es decir, una representacion de su Traducción Meta, hecha en una lengua que el consultante conozca."></Alt>
     </Item>
     <Item ID="fJobNaturalness_CheckBox">
+      <Alt ID="sp" Value="Tarea de Prueba de Nivel Natural"></Alt>
     </Item>
     <Item ID="fJobNaturalness_Description">
+      <Alt ID="sp" Value="Presentación en que se ve sólo la Traducción Meta, con el find de leerla enfocándose en su nivel de naturaleza, sin influencias de la Traducción Fuente."></Alt>
     </Item>
     <Item ID="fProject_CheckBox">
       <Alt ID="sp" Value="Proyecto Nuevo / Abrir / etc."></Alt>
@@ -1075,7 +1167,7 @@
       <Alt ID="sp" Value="Activar si trabaja con proyectos múltiples"></Alt>
     </Item>
     <Item ID="fPropertiesDialog_CheckBox">
-      <Alt ID="sp" Value="Propiedades"></Alt>
+      <Alt ID="sp" Value="Diálogo para Configurar Propiedades"></Alt>
     </Item>
     <Item ID="fPropertiesDialog_Description">
       <Alt ID="sp" Value="Activar si quiere ajustar las propiedades de un proyecto. "></Alt>
@@ -1084,65 +1176,82 @@
       <Alt ID="sp" Value="Impresión"></Alt>
     </Item>
     <Item ID="fPrint_Description">
+      <Alt ID="sp" Value="Puede establecer el formato del libro e imprimirlo."></Alt>
     </Item>
     <Item ID="fAutoReplace_CheckBox">
-      <Alt ID="sp" Value="AutoSubstitución al entrar datos."></Alt>
+      <Alt ID="sp" Value="Substitución automática para entrar datos."></Alt>
     </Item>
     <Item ID="fAutoReplace_Description">
-      <Alt ID="sp" Value="Activar AutoSubstitución. Cuando entra uno o más caracteres designados, se substituye otro carácter o secuencia de caracteres. Úsese para caracteres especiales, o para extender abreviaciones (como entra JC y aparece Jesucristo)."></Alt>
+      <Alt ID="sp" Value="Activar Autosubstitución. Cuando entra uno o más caracteres designados, se substituye otro carácter o secuencia de caracteres. Úsese para caracteres especiales, o para extender abreviaturas (Ejemplo: entra JC y aparece Jesucristo)."></Alt>
     </Item>
     <Item ID="fRestoreBackup_CheckBox">
       <Alt ID="sp" Value="Restaurar archivos de respaldo"></Alt>
     </Item>
     <Item ID="fRestoreBackup_Description">
-      <Alt ID="sp" Value="Se guardan archivos de respaldo en una tarjeta flash o memoria externa (a través de Herramientas-Opciones). Activando la restauración, el menú Herramientas añade un diálogo mediante el cual puede substituir el contenido de un archivo de respaldo por el archivo en vigor."></Alt>
+      <Alt ID="sp" Value="Los archivos de respaldo deben guardarse en una tarjeta flash o memoria externa (a través de Herramientas-Opciones). Activando la restauración, el menú Herramientas añade un diálogo mediante el cual puede substituir el contenido de un archivo de respaldo por el archivo en vigor."></Alt>
     </Item>
     <Item ID="fCopyBTfromFront_CheckBox">
+      <Alt ID="sp" Value="Iniciar la Traducción Inversa, basándola en la Traducción Fuente en el caso de que las lenguas sean semejantes."></Alt>
     </Item>
     <Item ID="fCopyBTfromFront_Description">
+      <Alt ID="sp" Value="Copia la Traducción Inversa de la Traducción Fuente a la Meta. Esto puede facilitar la construcción de una Traducción Inversa para revisar y editar cuidadosamente, para refleje los detalles de la Traducción Meta."></Alt>
     </Item>
     <Item ID="fFilter_CheckBox">
       <Alt ID="sp" Value="Mostrar únicamente Secciones con (Filtro)"></Alt>
     </Item>
     <Item ID="fFilter_Description">
-      <Alt ID="sp" Value="En el Menú «Ir a», las instrucciones Próximo y Anterior irán únicamente a las secciones que llenan ciertos requisitos, tales como contener ciertas palabra, o contener comillas no emparejadas. Es una manera útil para localizar errores o Notas a Hacer."></Alt>
+      <Alt ID="sp" Value="En el Menú «Ir a», las instrucciones Próximo y Anterior irán únicamente a las secciones que llenan ciertos requisitos, tales como contener ciertas palabras, o contener comillas no emparejadas. Es una manera útil para localizar errores o Notas a Hacer."></Alt>
     </Item>
     <Item ID="fJustTheBasics_CheckBox">
-      <Alt ID="sp" Value="Sólo lo Básico"></Alt>
+      <Alt ID="sp" Value="Sólo Lo Básico"></Alt>
     </Item>
     <Item ID="fJustTheBasics_Description">
-      <Alt ID="sp" Value="Para usuarios sin experience con computadoras, VozNuestra tiene un interfaz que permite un nivel básico da trabajo. Reemplaza al menú con una serie de botones, con dibujos y texto descriptivo. El principiante no tiene que aprender más de una docena de instrucciones."></Alt>
+      <Alt ID="sp" Value="Para usuarios sin mucha experiencia con computadoras, VozNuestra tiene una interfaz que permite un nivel básico pero útil de trabajo. Reemplaza al menú con una serie de botones, con dibujos y texto descriptivo. El principiante no tiene que aprender más de una docena de instrucciones."></Alt>
     </Item>
     <Item ID="fLocalizer_CheckBox">
+      <Alt ID="sp" Value="Diálogo de Localización"></Alt>
     </Item>
     <Item ID="fLocalizer_Description">
+      <Alt ID="sp" Value="Este diálogo, que aparece en el menú Herramientas, le permite traducir la interfaz VozNuestra en otra lengua."></Alt>
     </Item>
     <Item ID="fStructuralEditing_CheckBox">
+      <Alt ID="sp" Value="Edición de Estructuras"></Alt>
     </Item>
     <Item ID="fStructuralEditing_Description">
+      <Alt ID="sp" Value="Permite al traductor partir y unir párrafos, o asignar estilos diferentes a un párrafo. Esto crea diferencias de la estructura de los párrafos de la Traducción Fuente."></Alt>
     </Item>
     <Item ID="fCanDeleteNotes_CheckBox">
+      <Alt ID="sp" Value="¿Puede Remover Notas?"></Alt>
     </Item>
     <Item ID="fCanDeleteNotes_Description">
+      <Alt ID="sp" Value="Permite que el usuario remueva notas. Vd. puede desactivar esta habilidad, en el caso de que Vd. tenga notas que otro usuario puede querer remover sin darse cuenta de su valor."></Alt>
     </Item>
     <Item ID="fMerge_CheckBox">
+      <Alt ID="sp" Value="Fusionamiento"></Alt>
     </Item>
     <Item ID="fMerge_Description">
+      <Alt ID="sp" Value="Activa el Panel de Fusamiento, que le permitir comparar versiones diferentes de un libro para identificar cuáles sean las diferencias, y para fusionar cambios con el archivo maestro."></Alt>
     </Item>
     <Item ID="fDictionary_CheckBox">
+      <Alt ID="sp" Value="Diccionario WeSay"></Alt>
     </Item>
     <Item ID="fDictionary_Description">
+      <Alt ID="sp" Value="Activa el Panel WeSay, que le da acceso a un diccionario del tipo producido por la aplicación WeSay. Puede entrar palabras de la traducción en el diccionario, y puede buscar las correspondencias con el lenguaje de la Traducción Inversa cuando esté en ese modo."></Alt>
     </Item>
     <Item ID="m_checkListFeatures">
-      <Alt ID="sp" Value="Sólo lo Básico"></Alt>
-    </Item>
-    <Item ID="m_btnJustTheBasics">
+      <Alt ID="sp" Value="Sólo Lo Básico"></Alt>
     </Item>
     <Item ID="fGoTo_Chapter_CheckBox">
+      <Alt ID="sp" Value="Botón de Capítulo"></Alt>
     </Item>
     <Item ID="fGoTo_FirstLast_CheckBox">
+      <Alt ID="sp" Value="Botones para Primera y Última &amp;Sección"></Alt>
     </Item>
     <Item ID="fConfigurationDialog_CheckBox">
+      <Alt ID="sp" Value="Diálogo de Configuración"></Alt>
+    </Item>
+    <Item ID="fUndoRedo_CheckBox">
+      <Alt ID="sp" Value="Deshacer"></Alt>
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect">
@@ -1156,7 +1265,7 @@
       <Alt ID="sp" Value="Entrar contraseña:"></Alt>
     </Item>
     <Item ID="m_checkProtect">
-      <Alt ID="sp" Value="Contraseña para Restringir Acceso a la Selección de Habilidades"></Alt>
+      <Alt ID="sp" Value="¿Contraseña para Restringir Acceso a la Selección de Habilidades?"></Alt>
     </Item>
   </Group>
   <Group ID="DialogPassword">
@@ -1164,22 +1273,26 @@
       <Alt ID="sp" Value="Contraseña"></Alt>
     </Item>
     <Item ID="m_lblPrompt">
-      <Alt ID="sp" Value="Entrar su contraseña para Selección de Habilidades."></Alt>
+      <Alt ID="sp" Value="Entrar su contraseña para el diálogo «Selección de Habilidades.»"></Alt>
     </Item>
   </Group>
   <Group ID="DialogBookNames">
     <Item ID="Title">
+      <Alt ID="sp" Value="Redactar Nombres de Libros"></Alt>
     </Item>
     <Item ID="m_lblFrom">
+      <Alt ID="sp" Value="de"></Alt>
     </Item>
     <Item ID="m_btnCopyBookNames">
+      <Alt ID="sp" Value="Copiar Nombres de Libros"></Alt>
     </Item>
     <Item ID="m_lblInstructions">
+      <Alt ID="sp" Value="Entre los nombres de los libros bíblicos en su lengua. Éstas se emplearán para generar referencias cruzadas y a pasajes paralelos."></Alt>
     </Item>
   </Group>
   <Group ID="DialogPrint">
     <Item ID="Title">
-      <Alt ID="sp" Value="Impresión"></Alt>
+      <Alt ID="sp" Value="Imprimir"></Alt>
     </Item>
     <Item ID="m_lblPrinter">
       <Alt ID="sp" Value="Impresora:"></Alt>
@@ -1223,77 +1336,91 @@
     <Item ID="m_btnOK">
       <Alt ID="sp" Value=" Imprimir"></Alt>
     </Item>
-    <Item ID="m_comboLineSpacing">
-    </Item>
-    <Item ID="strSingle">
-    </Item>
-    <Item ID="strMedium">
-    </Item>
-    <Item ID="strDouble">
-    </Item>
   </Group>
   <Group ID="DialogOpenTranslation">
     <Item ID="Title">
+      <Alt ID="sp" Value="Abrir Traducción"></Alt>
     </Item>
     <Item ID="m_btnSettings">
+      <Alt ID="sp" Value="Navegar..."></Alt>
     </Item>
     <Item ID="m_lblSettings">
+      <Alt ID="sp" Value="Nombre del Archivo de Elecciones:"></Alt>
     </Item>
     <Item ID="m_lblSettingsHelp">
+      <Alt ID="sp" Value="Navegue al archivo que contiene las elecciones para una lengua. El nombre del archivo ordinariamente contiene el nombre de la lengua, p.ej. Español."></Alt>
     </Item>
   </Group>
   <Group ID="DialogCreateTranslation">
     <Item ID="Title">
+      <Alt ID="sp" Value="Crear Traducción"></Alt>
     </Item>
     <Item ID="m_lblSettingsHelp">
+      <Alt ID="sp" Value="Navegue a la carpeta en donde quiere guardar el archivo de elecciones. El nombre del archivo ordinariamente contiene el nombre de la lengua, p.ej. 'Español.'"></Alt>
     </Item>
     <Item ID="m_lblAbbrevHelp">
+      <Alt ID="sp" Value="Abreviatura corta del nombre de la lengua. El Ethnologue (ethnologue.com) ofrece abreviaturas de 3 letras (como «hch») para casi todas las lenguas del mundo, conforme al código ISO 639-3."></Alt>
     </Item>
     <Item ID="m_lblNameHelp">
+      <Alt ID="sp" Value="Entre el nombre de la lengua, p.ej. 'Español', 'Huichol.'"></Alt>
     </Item>
     <Item ID="m_btnSettings">
+      <Alt ID="sp" Value="Navegar..."></Alt>
     </Item>
     <Item ID="m_lblSettings">
+      <Alt ID="sp" Value="Archivo de Elecciones:"></Alt>
     </Item>
     <Item ID="m_lblAbbrev">
+      <Alt ID="sp" Value="Abreviatura:"></Alt>
     </Item>
     <Item ID="m_lblName">
+      <Alt ID="sp" Value="Nombre de la Traducción:"></Alt>
     </Item>
   </Group>
   <Group ID="DialogCopyBTConflict">
     <Item ID="Title">
+      <Alt ID="sp" Value="Copiando la Traducción Inversa de la Traducción Meta"></Alt>
     </Item>
     <Item ID="m_labelTargetVernacular">
+      <Alt ID="sp" Value="Vernáculo"></Alt>
     </Item>
     <Item ID="m_labelTargetBT">
+      <Alt ID="sp" Value="Traducción Inversa Existente"></Alt>
     </Item>
     <Item ID="m_checkDoAll">
+      <Alt ID="sp" Value="Haga lo mismo para cualesquier conflictos que se queden."></Alt>
     </Item>
     <Item ID="m_btnAppendFrontToTarget">
+      <Alt ID="sp" Value="Agregue la Traducción Fuente a la Traducción Meta"></Alt>
     </Item>
     <Item ID="m_btnReplaceWithFront">
+      <Alt ID="sp" Value="Reemplazca la Traducción Meta con la Traducción Fuente"></Alt>
     </Item>
     <Item ID="m_btnKeepTarget">
+      <Alt ID="sp" Value="No Haga Nada (Conserve lo Existente)"></Alt>
     </Item>
     <Item ID="m_labelFrontVernacular">
+      <Alt ID="sp" Value="Vernáculo"></Alt>
     </Item>
     <Item ID="m_labelInfo">
+      <Alt ID="sp" Value="Ya existe una Traducción Inversa para este párrafo"></Alt>
     </Item>
     <Item ID="m_labelFrontBT">
+      <Alt ID="sp" Value="Traducción Inversa Propuesta"></Alt>
     </Item>
   </Group>
   <Group ID="DialogHelpAbout">
     <Item ID="Title">
-      <Alt ID="sp" Value="Acerca de Palabra Nuestra"></Alt>
+      <Alt ID="sp" Value="Acerca de VozNuestra"></Alt>
     </Item>
     <Item ID="m_lblCopyright">
-      <Alt ID="sp" Value="Derechos reservados conforme a la ley, 2004-08. Se reservan todos los derechos."></Alt>
+      <Alt ID="sp" Value="Derechos reservados conforme a la ley, 2004-09 por John Wimbish. Se reservan todos los derechos."></Alt>
     </Item>
     <Item ID="m_link">
       <Alt ID="sp" Value="Iniciar Correo Electrónico"></Alt>
     </Item>
     <Item ID="m_lblDescription">
-      <Alt ID="sp" Value="Programa que ayuda a los traductores de la Biblia a su propia lengua meterna, y a su equipo de auxiliares, que hacen uso de una Traducción Fuente de alta calidad"></Alt>
+      <Alt ID="sp" Value="Ayuda para los traductores de la Biblia a su propia lengua materna, así como su equipo de auxiliares, que hacen uso de una Traducción Fuente de alta calidad."></Alt>
     </Item>
   </Group>
   <Group ID="DialogRepairImportBook">
@@ -1304,7 +1431,7 @@
       <Alt ID="sp" Value="Puede rectificar la parte que contiene el error, y hacer clic en el botón Una Vez Más, o puede Cancelar la importación."></Alt>
     </Item>
     <Item ID="m_AnErrorOccured">
-      <Alt ID="sp" Value="Error encontrado al intentar importar el libro &lt;&lt;{0}&gt;&amp;gt;"></Alt>
+      <Alt ID="sp" Value="Error encontrado al intentar importar el libro &quot;{0}&quot;:"></Alt>
     </Item>
     <Item ID="m_btnTryAgain">
       <Alt ID="sp" Value="Una Vez Más"></Alt>
@@ -1313,7 +1440,7 @@
       <Alt ID="sp" Value="Cancelar Importación"></Alt>
     </Item>
     <Item ID="sRemoveWarning">
-      <Alt ID="sp" Value="Si Vd. no corrige el error, {nombredelibro} se borrará de entre las propiedades de {nombredellenguaje}. ¿Está Vd. seguro de que quere cancelar la importación de este libro?"></Alt>
+      <Alt ID="sp" Value="Si Vd. no corrige el error, {0} se borrará de entre las propiedades de {1} ¿Está Vd. seguro de que quere cancelar la importación de este libro?"></Alt>
     </Item>
   </Group>
   <Group ID="DialogFilter">
@@ -1321,31 +1448,31 @@
       <Alt ID="sp" Value="Mostrar Únicamente Secciones Que"></Alt>
     </Item>
     <Item ID="m_labelHeading">
-      <Alt ID="sp" Value="Mostrar Únicamente Secciones Que Tienen"></Alt>
+      <Alt ID="sp" Value="Mostrar Únicamente Secciones Que Tienen..."></Alt>
     </Item>
     <Item ID="m_groupWordOrPhrase">
       <Alt ID="sp" Value="Palabra o Frase"></Alt>
     </Item>
     <Item ID="m_labelInTheVernacular">
-      <Alt ID="sp" Value="En la Lengua de Traducción"></Alt>
+      <Alt ID="sp" Value="...En la Lengua de la Traducción:"></Alt>
     </Item>
     <Item ID="m_labelInTheFront">
-      <Alt ID="sp" Value="En la Versión Fuente"></Alt>
+      <Alt ID="sp" Value="...En la Versión Fuente:"></Alt>
     </Item>
     <Item ID="m_labelInTheBackTranslation">
-      <Alt ID="sp" Value="En la Traducción Inversa"></Alt>
+      <Alt ID="sp" Value="...En la Traducción Inversa:"></Alt>
     </Item>
     <Item ID="m_groupNote">
-      <Alt ID="sp" Value="Nota de Tipo"></Alt>
+      <Alt ID="sp" Value="Nota de Tipo:"></Alt>
     </Item>
     <Item ID="m_checkNoteToDo">
       <Alt ID="sp" Value="A Hacer"></Alt>
     </Item>
     <Item ID="m_checkNoteAskUNS">
-      <Alt ID="sp" Value="Preguntar a Hablantes Nativos que No Conocen las Escrituras"></Alt>
+      <Alt ID="sp" Value="Preguntar a Hablantes Nativos que No Conocen la Biblia"></Alt>
     </Item>
     <Item ID="m_groupProblems">
-      <Alt ID="sp" Value="Problemas Posibles"></Alt>
+      <Alt ID="sp" Value="Problemas Posibles:"></Alt>
     </Item>
     <Item ID="m_checkPunctuationProblem">
       <Alt ID="sp" Value="Puntuación Problemática"></Alt>
@@ -1369,7 +1496,7 @@
       <Alt ID="sp" Value="Párrafo Citado"></Alt>
     </Item>
     <Item ID="m_labelQualifies">
-      <Alt ID="sp" Value="Esta Sección Se Permite Si"></Alt>
+      <Alt ID="sp" Value="Esta Sección Se Permite Si:"></Alt>
     </Item>
     <Item ID="strAnyOneOfThese">
       <Alt ID="sp" Value="Cuando Menos Uno es Verdadero"></Alt>
@@ -1378,427 +1505,622 @@
       <Alt ID="sp" Value="Todos son Verdaderos"></Alt>
     </Item>
     <Item ID="m_btnOK">
+      <Alt ID="sp" Value="Activar"></Alt>
     </Item>
     <Item ID="m_btnCancel">
+      <Alt ID="sp" Value="Desactivar"></Alt>
     </Item>
     <Item ID="m_comboQualifies">
+      <Alt ID="sp" Value="Cualquier de Éstos Sirve"></Alt>
     </Item>
   </Group>
   <Group ID="DialogProperties">
     <Item ID="Title">
+      <Alt ID="sp" Value="Propiedades del Proyecto"></Alt>
     </Item>
     <Item ID="strTitleWithLanguageName">
+      <Alt ID="sp" Value="{0} Propiedades del Proyecto"></Alt>
     </Item>
     <Item ID="m_btnNavTeamSettings">
+      <Alt ID="sp" Value="Elecciones del Equipo"></Alt>
     </Item>
     <Item ID="m_btnNavTranslations">
+      <Alt ID="sp" Value="Traducciones Referencia"></Alt>
     </Item>
     <Item ID="m_btnNavOptions">
+      <Alt ID="sp" Value="Elecciones"></Alt>
     </Item>
     <Item ID="m_btnNavEssentials">
+      <Alt ID="sp" Value="Lo Esencial"></Alt>
     </Item>
     <Group ID="DialogProperties_Page_StyleSheet">
       <Item ID="m_labelStyleSheet">
+        <Alt ID="sp" Value="Hoja de Estilos:"></Alt>
       </Item>
       <Item ID="m_btnRestoreDefaults">
+        <Alt ID="sp" Value="Restaurar Valores de Defecto..."></Alt>
       </Item>
       <Item ID="m_labelInstructions">
+        <Alt ID="sp" Value="Seleccione un estilo de la lista a la izquierda, y edite sus valores debajo. Algunas elecciones requieren que haga clic en el signo más ('+') para editar sus valores."></Alt>
       </Item>
       <Item ID="propCharacterSettings">
+        <Alt ID="sp" Value="Elecciones para Caracteres"></Alt>
       </Item>
       <Item ID="propParagraphSettings">
+        <Alt ID="sp" Value="Elecciones para Párrafos"></Alt>
       </Item>
       <Item ID="propForeColor">
+        <Alt ID="sp" Value="Color" Tip="El color de las letras del texto."></Alt>
       </Item>
       <Item ID="propAlignment">
+        <Alt ID="sp" Value="Alineación" Tip="Especifique alineación Centrada, a la Izquiera, a la Derecha, o Justificada."></Alt>
       </Item>
       <Item ID="option_kLeft">
+        <Alt ID="sp" Value="Izquierda"></Alt>
       </Item>
       <Item ID="option_kRight">
+        <Alt ID="sp" Value="Centrado"></Alt>
       </Item>
       <Item ID="option_kCentered">
+        <Alt ID="sp" Value="Derecha"></Alt>
       </Item>
       <Item ID="option_kJustified">
+        <Alt ID="sp" Value="Justificada"></Alt>
       </Item>
       <Item ID="propKeepWithNext">
+        <Alt ID="sp" Value="¿Mantenga en la Misma Página con el Párrafo Siguiente?" Tip="Si dice que sí, los dos párrafos aparecerán en la misma hoja."></Alt>
       </Item>
       <Item ID="propLeftMargin">
+        <Alt ID="sp" Value="Margen Izquierdo" Tip="El margen izquierdo del párrafo."></Alt>
       </Item>
       <Item ID="propRightMargin">
+        <Alt ID="sp" Value="Margen Derecho" Tip="El margen derecho del párrafo."></Alt>
       </Item>
       <Item ID="propFirstLine">
+        <Alt ID="sp" Value="Sangría de la Primera Línea" Tip="Sangrar la primera línea del párrafo."></Alt>
       </Item>
       <Item ID="propSpaceBefore">
+        <Alt ID="sp" Value="Espacio Antes" Tip="El número de puntos en blanco para agregar antes del párrafo."></Alt>
       </Item>
       <Item ID="propSpaceAfter">
+        <Alt ID="sp" Value="Espacio Después" Tip="El número de puntos en blanco para agregar después del párrafo."></Alt>
       </Item>
       <Item ID="propFontName">
+        <Alt ID="sp" Value="Nombre del Font" Tip="Nombre del font para mostrar el estilo de este sistema ortográfico"></Alt>
       </Item>
       <Item ID="propFontHeight">
+        <Alt ID="sp" Value="Altura" Tip="La altura del font, en puntos."></Alt>
       </Item>
       <Item ID="propBold">
+        <Alt ID="sp" Value="¿Negrita?" Tip="Si dice sí, el font se muestra en negrita."></Alt>
       </Item>
       <Item ID="propItalic">
+        <Alt ID="sp" Value="¿Cursiva?" Tip="Si dice sí, el font se muestra en cursiva."></Alt>
       </Item>
       <Item ID="m_listStyles_col0">
+        <Alt ID="sp" Value="Estilos"></Alt>
       </Item>
       <Item ID="propFonts">
+        <Alt ID="sp" Value="Latín" Tip="Éstas son las elecciones de font para usar en este sistema ortográfico."></Alt>
       </Item>
       <Item ID="propStrikeout">
+        <Alt ID="sp" Value="¿Tachado?" Tip="Si dice sí, el font se muestra con una linea en medio."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_WritingSystems">
       <Item ID="m_btnRemove">
+        <Alt ID="sp" Value="Remover..."></Alt>
       </Item>
       <Item ID="m_btnAdd">
+        <Alt ID="sp" Value="Agregar"></Alt>
       </Item>
       <Item ID="m_labelInstructions">
+        <Alt ID="sp" Value="Seleccione un sistema ortográfico de la lista, y redacte sus elecciones debajo."></Alt>
       </Item>
       <Item ID="m_labelWritingSystems">
+        <Alt ID="sp" Value="Sistemas Ortográficos:"></Alt>
       </Item>
       <Item ID="m_tabWSGeneral">
+        <Alt ID="sp" Value="General"></Alt>
       </Item>
       <Item ID="m_tabWSAutoReplace">
+        <Alt ID="sp" Value="Reemplazo Automático"></Alt>
       </Item>
       <Item ID="propName">
+        <Alt ID="sp" Value="Nombre"></Alt>
       </Item>
       <Item ID="propAbbrev">
+        <Alt ID="sp" Value="Abreviatura o Identificación. Se emplea como identificación en el diccionario WeSay."></Alt>
       </Item>
       <Item ID="propPunctuation">
+        <Alt ID="sp" Value="Puntuación" Tip="Lista de los signos que sirven para puntuación en este sistema ortográfico."></Alt>
       </Item>
       <Item ID="propEndPunctuation">
+        <Alt ID="sp" Value="Puntuación Final" Tip="Lista de signos que indican el fin de una oración."></Alt>
       </Item>
       <Item ID="propKeyboard">
+        <Alt ID="sp" Value="Nombre del Teclado" Tip="Nombre del teclado que se usa para mecanografiar en este sistema ortográfico (Windows IME, Keyman, etc.)"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_AdvancedPrintOptions">
       <Item ID="m_labelTitle">
+        <Alt ID="sp" Value="Opciones Avanzadas para Imprimir"></Alt>
       </Item>
       <Item ID="propOddPages">
+        <Alt ID="sp" Value="Al pie de Páginas IMPARES"></Alt>
       </Item>
       <Item ID="propOddLeft">
+        <Alt ID="sp" Value="Izquierda" Tip="¿Qué quiere imprimir al lado izquierdo, al pie de las páginas impares?"></Alt>
       </Item>
       <Item ID="propOddCenter">
+        <Alt ID="sp" Value="Centro" Tip="¿Qué quiere imprimir en el centro, al pie de las páginas impares?"></Alt>
       </Item>
       <Item ID="propOddRight">
+        <Alt ID="sp" Value="Derecha" Tip="¿Qué quiere imprimir al lado derecho, al pie de las páginas impares?"></Alt>
       </Item>
       <Item ID="propEvenPages">
+        <Alt ID="sp" Value="Al pie de Páginas PARES"></Alt>
       </Item>
       <Item ID="propEvenLeft">
+        <Alt ID="sp" Value="Izquierda" Tip="¿Qué quiere imprimir al lado izquierdo, al pie de las páginas pares?"></Alt>
       </Item>
       <Item ID="propEvenCenter">
+        <Alt ID="sp" Value="Centro" Tip="¿Qué quiere imprimir en el centro, al pie de las páginas pares?"></Alt>
       </Item>
       <Item ID="propEvenRight">
+        <Alt ID="sp" Value="Derecha" Tip="¿Qué quiere imprimir al lado derecho, al pie de las páginas pares?"></Alt>
       </Item>
       <Item ID="propCopyrightNotice">
+        <Alt ID="sp" Value="Noticia de Derechos Reservados" Tip="Noticia de Derechos Reservados para todo el equipo del proyecto. (El diálogo de Propiedades del Libro le permite definir los derechos para libros individuales si son diferentes.)"></Alt>
       </Item>
       <Item ID="option_kBlank">
+        <Alt ID="sp" Value="(dejar en blanco)"></Alt>
       </Item>
       <Item ID="option_kCopyrightNotice">
+        <Alt ID="sp" Value="Noticia de Derechos Reservados"></Alt>
       </Item>
       <Item ID="option_kPageNumber">
+        <Alt ID="sp" Value="Número de la Página"></Alt>
       </Item>
       <Item ID="option_kScriptureReference">
+        <Alt ID="sp" Value="Cita Bíblica"></Alt>
       </Item>
       <Item ID="option_kStageAndDate">
+        <Alt ID="sp" Value="Etapa y Fecha"></Alt>
       </Item>
       <Item ID="option_kLanguageStageAndDate">
+        <Alt ID="sp" Value="Idioma, Etapa y Fecha"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_TeamSettings">
       <Item ID="m_lblCreateNew">
+        <Alt ID="sp" Value="Dé un nombre para el archivo en la cual piensa guardar las elecciones del equipo para este proyect. VozNuestra añade automáticamente la extensión correcta."></Alt>
       </Item>
       <Item ID="m_btnCreateNew">
+        <Alt ID="sp" Value="Crear Nuevo..."></Alt>
       </Item>
       <Item ID="m_lblOpenExisting">
+        <Alt ID="sp" Value="Abre un archivo ya existente que da las elecciones ya hechas para el equipo que lleva al cabo el proyecto."></Alt>
       </Item>
       <Item ID="m_lblActions">
+        <Alt ID="sp" Value="Acciones disponibles:"></Alt>
       </Item>
       <Item ID="m_labelInstructions">
+        <Alt ID="sp" Value="Elecciones para el Equipo se guardan in un archivo que no lleva otro contenido. Eso permite que si hay proyectos múltiples agrupados, todos los proyectos pueden hacer uso de las mismas elecciones. Aquí pueden ser redactados, y la redacción será aplicada a todos los demás proyectos que los usen."></Alt>
       </Item>
       <Item ID="m_btnOpenExisting">
+        <Alt ID="sp" Value="Abrir Existente..."></Alt>
       </Item>
       <Item ID="m_lblTeamSettingsFile">
+        <Alt ID="sp" Value="Archivo de Elecciones del Equipo:"></Alt>
       </Item>
       <Item ID="m_groupTeamSettingsFile">
+        <Alt ID="sp" Value="Archivo de Elecciones del Equipo"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_TranslationStages">
       <Item ID="m_labelStagesTitle">
+        <Alt ID="sp" Value="Etapas del Proceso de Traducción:"></Alt>
       </Item>
       <Item ID="m_labelLanguage">
+        <Alt ID="sp" Value="Idioma Escogido de Defecto:"></Alt>
       </Item>
       <Item ID="m_btnMoveUp">
+        <Alt ID="sp" Value="Mover Para Arriba"></Alt>
       </Item>
       <Item ID="m_btnMoveDown">
+        <Alt ID="sp" Value="Mover Para Abajo"></Alt>
       </Item>
       <Item ID="m_btnAdd">
+        <Alt ID="sp" Value="Agregar"></Alt>
       </Item>
       <Item ID="m_btnRemove">
+        <Alt ID="sp" Value="Remover..."></Alt>
       </Item>
       <Item ID="m_btnRestoreDefaults">
+        <Alt ID="sp" Value="Restaurar Valores Por Defecto..."></Alt>
       </Item>
       <Item ID="m_labelInstructions">
+        <Alt ID="sp" Value="Haga dos click lentamente, en un nombre para editarlo."></Alt>
       </Item>
       <Item ID="m_groupLanguage">
+        <Alt ID="sp" Value="Idioma"></Alt>
       </Item>
       <Item ID="m_labelLanguageExplanation">
+        <Alt ID="sp" Value="Estos Nombres de Etapas se emplean en el Interfaz del Usuario, y para la construcción de nombres de archivos de datos. Éntrelos en el idioma que más convenga para el traductor."></Alt>
       </Item>
       <Item ID="m_listviewStages_col0">
+        <Alt ID="sp" Value="Nombre Corto"></Alt>
       </Item>
       <Item ID="m_listviewStages_col1">
+        <Alt ID="sp" Value="Nombre Pleno"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_OtherTranslations">
       <Item ID="m_lblSetup">
+        <Alt ID="sp" Value="Traducción de Referencia es otra traducción que Vd. desee consultar durante el proceso de traducir, pero que no reproduce las estructuras tipográficas de la Traducción Fuente."></Alt>
       </Item>
       <Item ID="m_lblTranslation">
+        <Alt ID="sp" Value="Traducciones de Referencia en vigor:"></Alt>
       </Item>
       <Item ID="m_lblActions">
+        <Alt ID="sp" Value="Acciones Disponibles:"></Alt>
       </Item>
       <Item ID="m_btnCreate">
+        <Alt ID="sp" Value="Crear..."></Alt>
       </Item>
       <Item ID="m_lblCreate">
+        <Alt ID="sp" Value="Empiece desde cero para determinar las elecciones para una traducción de referencia. Le dará elecciones en blanco, y debe entrar el nombre de la traducción, sus libros, etc."></Alt>
       </Item>
       <Item ID="m_btnOpen">
+        <Alt ID="sp" Value="Abrir..."></Alt>
       </Item>
       <Item ID="m_lblOpen">
+        <Alt ID="sp" Value="Hacer uso de elecciones ya existentes para una traducción de referencia. Si se ha definido la misma traducción en otro proyecto, la puede volver a usar aquí, en vez de entrar de nuevo todas las elecciones."></Alt>
       </Item>
       <Item ID="m_btnRemove">
+        <Alt ID="sp" Value="Remover..."></Alt>
       </Item>
       <Item ID="m_lblRemove">
+        <Alt ID="sp" Value="Remueve la traducción seleccionada de la list de arriba. Esto no remueve el archivo de elecciones del disco duro, sino sólo de este proyecto."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_SetupFT">
       <Item ID="m_lblActions">
+        <Alt ID="sp" Value="Acciones Disponibles:"></Alt>
       </Item>
       <Item ID="m_btnOpen">
+        <Alt ID="sp" Value="Abrir Existente..."></Alt>
       </Item>
       <Item ID="m_btnCreate">
+        <Alt ID="sp" Value="Crear Nuevo..."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_Translation">
       <Item ID="m_tabGeneral">
+        <Alt ID="sp" Value="General"></Alt>
       </Item>
       <Item ID="m_tabBooks">
+        <Alt ID="sp" Value="Libros"></Alt>
       </Item>
       <Item ID="m_tabBookNames">
+        <Alt ID="sp" Value="Nombres de Libros"></Alt>
       </Item>
       <Item ID="m_btnRemoveTranslation">
+        <Alt ID="sp" Value="Remueve Esta Traducción..."></Alt>
       </Item>
       <Item ID="m_lblLanguageName">
+        <Alt ID="sp" Value="Nombre de la Lengua:"></Alt>
       </Item>
       <Item ID="m_btnExport">
+        <Alt ID="sp" Value="Exportar..."></Alt>
       </Item>
       <Item ID="m_listviewBooks_col0">
+        <Alt ID="sp" Value="Abreviatura"></Alt>
       </Item>
       <Item ID="m_listviewBooks_col1">
+        <Alt ID="sp" Value="Nombre del Libro"></Alt>
       </Item>
       <Item ID="m_btnProperties">
+        <Alt ID="sp" Value="Propiedades..."></Alt>
       </Item>
       <Item ID="m_btnCreate">
+        <Alt ID="sp" Value="Crear..."></Alt>
       </Item>
       <Item ID="m_btnRemove">
+        <Alt ID="sp" Value="Remover..."></Alt>
       </Item>
       <Item ID="m_btnImportBook">
+        <Alt ID="sp" Value="Importar..."></Alt>
       </Item>
       <Item ID="m_lblFrom">
+        <Alt ID="sp" Value="de"></Alt>
       </Item>
       <Item ID="m_btnCopyBookNames">
+        <Alt ID="sp" Value="Copiar Nombres de Libros"></Alt>
       </Item>
       <Item ID="propAbbreviation">
+        <Alt ID="sp" Value="Abreviatura para el Nombre de la Lengua" Tip="Típicamente, el Código del Ethnologue (ethnologue.com), código internacional ISO 639-3, de tres letras minúsculas derivadas del nombre de la lengua. Se emplea en la composición de nombres de archivos."></Alt>
       </Item>
       <Item ID="Writing Systems">
+        <Alt ID="sp" Value="Sistemas Ortográficos"></Alt>
       </Item>
       <Item ID="propWSVernacular">
+        <Alt ID="sp" Value="Sistema Ortográfico para el Texto Vernáculo" Tip="El Sistema Ortográfico empleado en la traducción, definido bajo Elecciones de Equipo."></Alt>
       </Item>
       <Item ID="propWSAdvisor">
+        <Alt ID="sp" Value="Sistema Ortográfico para textos que utiliza el Coordinador o Asesor (e.g., la traducción inversa), definido bajo Elecciones del Equipo."></Alt>
       </Item>
       <Item ID="m_listviewBooks_col2">
+        <Alt ID="sp" Value="Nombre del Archivo"></Alt>
       </Item>
       <Item ID="m_editLanguageName">
+        <Alt ID="sp" Value="Nombre de la Traducción"></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options">
       <Item ID="propMaximizeWindowOnStartup">
+        <Alt ID="sp" Value="¿Llenar la Pantalla al Iniciar?" Tip="Si es sí, VozNuestra se inicia extendida sobre la pantalla entera. Esto beneficia a los nuevos usuarios, asegurándoles suficiente campo para hacer su trabajo."></Alt>
       </Item>
       <Item ID="propMakeBackups">
+        <Alt ID="sp" Value="¿Respaldo Automático?" Tip="Si es sí, VozNuestra automáticamente respalda sus archivos en la carpeta que se especifica abajo."></Alt>
       </Item>
       <Item ID="propBackupPath">
+        <Alt ID="sp" Value="Carpeta de Respaldo" Tip="Escoga una carpeta, de preferencia en una ficha de memoria independiente de su computadora."></Alt>
       </Item>
       <Item ID="propPicturesPath">
+        <Alt ID="sp" Value="Carpeta para Dibujos" Tip="Si el texto no contiene información suficiente para localizar un dibujo, VozNuestra busca el archivo en esta carpeta."></Alt>
       </Item>
       <Item ID="propBackgroundColors">
+        <Alt ID="sp" Value="Colores para el Fondo de una Ventana"></Alt>
       </Item>
       <Item ID="propBackColorDraftingWindow">
+        <Alt ID="sp" Value="Borrador" Tip="Color del fondo de la ventana Borrador."></Alt>
       </Item>
       <Item ID="propBackColorBackTranslationWindow">
+        <Alt ID="sp" Value="Traducción Inversa" Tip="Color del fondo de la ventana Traducción Inversa."></Alt>
       </Item>
       <Item ID="propBackColorNaturalnessCheckWindow">
+        <Alt ID="sp" Value="Prueba de Nivel Natural" Tip="Color del fondo de la ventana Prueba de Nivel Natural"></Alt>
       </Item>
       <Item ID="propBackColorNotesWindow">
+        <Alt ID="sp" Value="Notas" Tip="Color del fondo de la ventana Notas."></Alt>
       </Item>
       <Item ID="propBackColorOtherTranslationsWindow">
+        <Alt ID="sp" Value="Otras Traducciones" Tip="Color del fondo de la ventana Otras Traducciones."></Alt>
       </Item>
       <Item ID="propUserInterfaceLanguage">
+        <Alt ID="sp" Value="Lengua de la Interfaz para el Usuario"></Alt>
       </Item>
       <Item ID="propPrimaryLanguage">
+        <Alt ID="sp" Value="Preferida (primaria)" Tip="Lengua a usar para la Interfaz del Usuario."></Alt>
       </Item>
       <Item ID="propSecondaryLanguage">
+        <Alt ID="sp" Value="Lengua De Defecto (secundaria)" Tip="Esta lengua se usa en la Interfaz del Usuario si la lengua de preferencia (primaria) no está disponible."></Alt>
       </Item>
       <Item ID="propZoomFactor">
+        <Alt ID="sp" Value="Porcentaje del Zoom" Tip="El texto en las ventanas puede mostarse más grande (o más chico) por un porcentaje del tamaño del font definido. (El aumento o disminución también se puede cambiar en el fondo del menú Ventana.)"></Alt>
       </Item>
       <Item ID="propSuppressVerses">
+        <Alt ID="sp" Value="¿Esconder números de versículos?" Tip="Si es sí, los números de versículos no aparecerán durante la Prueba de Naturabilidad. Así los números no impiden el flujo del discurso."></Alt>
       </Item>
       <Item ID="propNaturalnessCheck">
+        <Alt ID="sp" Value="Ventana de Prueba de Nivel Natural"></Alt>
       </Item>
       <Item ID="propNCSuppressVerses">
+        <Alt ID="sp" Value="¿Esconder números de versículos?" Tip="Si es sí, los números de los versículos no aparecerán en Pruebas de Naturalidad. Puede ser que esto lo haga más fácil detectar el flujo del discurso sin interrupciones."></Alt>
       </Item>
       <Item ID="propNCShowLineNumbers">
+        <Alt ID="sp" Value="¿Mostrar número para cada línea?" Tip="Si es sí, se muestran los números de las líneas en el margen izquierdo, para hacer referencia a una línea específica en la discusión del texto."></Alt>
       </Item>
       <Item ID="propDictionary">
+        <Alt ID="sp" Value="Diccionario WeSay"></Alt>
       </Item>
       <Item ID="propDictApp">
+        <Alt ID="sp" Value="Ruta a la Aplicación WeSay" Tip="La ruta completa a la aplicación que maneja el diccionario. En este momento, WeSay.App.Exe es la única ruta apoyada."></Alt>
       </Item>
       <Item ID="propDictData">
+        <Alt ID="sp" Value="Ruta al Diccionario LIFT" Tip="La ruta completa a los datos del diccionario manejado por la aplicación WeSay, en un archivo de formato LIFT."></Alt>
+      </Item>
+      <Item ID="propNCLineNumbebrColor">
+        <Alt ID="sp" Value="Color de Números de Línea" Tip="Color de los números de línea en la Prueba de Nivel Natural. Escoja un color que es visible con relación al color del fondo, pero que al mismo tiempo no divierte la atención del lector del pasaje bíblico."></Alt>
       </Item>
     </Group>
     <Group ID="DialogProperties_Page_Notes">
       <Item ID="Show_kGeneral">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas Generales estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kGeneral">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota General en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kHintForDaughter">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas de Sugerencia para Borradores estarán visibles cuando el Pánel de Notas se active, con su contenido en el Pánel de Notas y su icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kHintForDaughter">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota de Sugerencia para Borradores en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="ShowNotesFromFront">
+        <Alt ID="sp" Value="Mostrar Sugerencias provenientes de la Traducción Fuente?" Tip="Si es sí, las Notas de Sugerencia para Borradores que se definieron en la Traducción Fuente estarán visibles cuando el Pánel de Notas se activa, con su contenido en el Pánel de Notas y su icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Show_kToDo">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas a Hacer estarán visibles cuando el Pánel de Notas se active, con su contenido en el Pánel de Notas y su icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kToDo">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota a Hacer en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kAskUns">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas de Preguntas para Hablantes que No Conocen la Biblia estarán visibles cuando el Pánel de Notas se active, con su contenido en el Pánel de Notas y su icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kAskUns">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota de Preguntas para Hablantes que No Conocen la Biblia en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kReason">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas para Explicar Elecciones en la Traducción estarán visibles cuando el Pánel de Notas se active, con su contenido en el Pánel de Notas y su icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kReason">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota para Explicar Elecciones en la Traducción en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kFront">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas de Problemas de la Traducción Fuente estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kFront">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota de Problemas de la Traducción Fuente en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kDefinition">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas para Definiciones estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kDefinition">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota para Definiciones en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kOldVersion">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas sobre Versiones Anteriores estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kOldVersion">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota sobre Versiones Anteriores en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kBT">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas de Traducción Inversa estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kBT">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota de Traducción Inversa en el Pánel de Notas."></Alt>
       </Item>
       <Item ID="Show_kExegesis">
+        <Alt ID="sp" Value="¿Mostrar?" Tip="Si es sí, las Notas Exegéticas estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto."></Alt>
       </Item>
       <Item ID="Color_kExegesis">
+        <Alt ID="sp" Value="Color del Fondo" Tip="Color para el fondo de la Nota Exegética en el Pánel de Notas."></Alt>
       </Item>
     </Group>
   </Group>
   <Group ID="WizImportBook">
     <Item ID="Title">
+      <Alt ID="sp" Value="Importar un Libro de la Biblia"></Alt>
     </Item>
     <Item ID="m_btnFinish">
+      <Alt ID="sp" Value="Terminar"></Alt>
     </Item>
     <Item ID="m_btnPrev">
+      <Alt ID="sp" Value="Anterior"></Alt>
     </Item>
     <Item ID="m_btnNext">
+      <Alt ID="sp" Value="Próximo"></Alt>
     </Item>
     <Group ID="WizImportBook_WizPage_GetFileName">
       <Item ID="strNavTitle">
+        <Alt ID="sp" Value="Nombre del Archivo"></Alt>
       </Item>
       <Item ID="m_labelFileStats">
+        <Alt ID="sp" Value="Favor de esperar mientras VozNuestra examina este archivo..."></Alt>
       </Item>
       <Item ID="m_labelOverview">
+        <Alt ID="sp" Value="Esta guía lo lleva paso a paso por el proceso de importar un archivo existente que contiene un libro bíblico a VozNuestra."></Alt>
       </Item>
       <Item ID="m_labelBrowse">
+        <Alt ID="sp" Value="Navegue al archivo que desea importar:"></Alt>
       </Item>
       <Item ID="strPleaseWait">
+        <Alt ID="sp" Value="Favor de esperar mientras VozNuestra examina este archivo..."></Alt>
       </Item>
       <Item ID="strUnableToAccessFile">
+        <Alt ID="sp" Value="Falla en el acceso al archivo '{0}'"></Alt>
       </Item>
       <Item ID="strNotStandardFormat">
+        <Alt ID="sp" Value="El archivo '{0}' parece no utilizar Formato Estándar, porque no empieza con '\'."></Alt>
       </Item>
       <Item ID="strMore">
+        <Alt ID="sp" Value="(más)"></Alt>
       </Item>
       <Item ID="strUnknownMarkers">
+        <Alt ID="sp" Value="Señales Desconocidos: {0}"></Alt>
       </Item>
       <Item ID="strFileStats">
+        <Alt ID="sp" Value="Archivo: {0}{n}Formato: {1}{n}{2}"></Alt>
       </Item>
       <Item ID="strOpenDialogTitle">
+        <Alt ID="sp" Value="Escoja el archivo que desea importar"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_GetAbbreviation">
       <Item ID="strNavTitle">
+        <Alt ID="sp" Value="Identificar el Libro"></Alt>
       </Item>
       <Item ID="m_labelExplanation">
+        <Alt ID="sp" Value="NOTA: Aquí se muestran únicamente los libros que estén en este momento en condiciones para importar, es decir, que no han sido importados ya, y en el caso de libros de la Traducción Meta, que ya corresponden a libros de la Traducción Fuente."></Alt>
       </Item>
       <Item ID="m_lvBooks_col0">
+        <Alt ID="sp" Value="Abreviatura"></Alt>
       </Item>
       <Item ID="m_lvBooks_col1">
+        <Alt ID="sp" Value="Nombre del Libro"></Alt>
       </Item>
       <Item ID="m_labelWhichBook">
+        <Alt ID="sp" Value="¿Cuál libro desea importar?"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_GetStage">
       <Item ID="strNavTitle">
+        <Alt ID="sp" Value="Identificar la Etapa"></Alt>
       </Item>
       <Item ID="m_labelVersion">
+        <Alt ID="sp" Value="Tiene la opción de entrar un signo de versión como 'A', 'B', etc. para esta etapa."></Alt>
       </Item>
       <Item ID="m_labelStage">
+        <Alt ID="sp" Value="¿En cuál etapa de la traducción está este libro?"></Alt>
       </Item>
       <Item ID="m_labelExplanation">
+        <Alt ID="sp" Value="(NOTA: Todas estas informaciones son facultativas, pero recomendadas si el libro que se importa está todavía en vías de ser traducido.)"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_GetDestinationFolder">
       <Item ID="strNavTitle">
+        <Alt ID="sp" Value="¿En dónde quiere guardar este libro?"></Alt>
       </Item>
       <Item ID="m_labelNote">
+        <Alt ID="sp" Value="(De defecto, VozNuestra utiliza la misma carpeta en que el Archivo a Importar ya está, pero Vd. tiene la opción de cambiarlo a otra parte si quiere.)"></Alt>
       </Item>
       <Item ID="m_labelFolderText">
+        <Alt ID="sp" Value="Favor de indicar la carpeta en que el archivo a Importar debe guardarse:"></Alt>
       </Item>
       <Item ID="m_labelFileNameText">
+        <Alt ID="sp" Value="VozNuestra va a guardar el libro bajo este nombre de archivo:"></Alt>
       </Item>
     </Group>
     <Group ID="WizImportBook_WizPage_Summary">
       <Item ID="strNavTitle">
+        <Alt ID="sp" Value="Resumen"></Alt>
       </Item>
       <Item ID="m_labelFormat">
+        <Alt ID="sp" Value="Formato:"></Alt>
       </Item>
       <Item ID="m_labelDestination">
+        <Alt ID="sp" Value="Destino:"></Alt>
       </Item>
       <Item ID="m_labelStage">
+        <Alt ID="sp" Value="Etapa y Versión:"></Alt>
       </Item>
       <Item ID="m_labelFileName">
+        <Alt ID="sp" Value="Archivo:"></Alt>
       </Item>
       <Item ID="m_labelBook">
+        <Alt ID="sp" Value="Libro:"></Alt>
       </Item>
       <Item ID="m_labelReady">
+        <Alt ID="sp" Value="VozNuestra ya está lista para importar:"></Alt>
       </Item>
       <Item ID="m_labelClickFinish">
+        <Alt ID="sp" Value="Haga clic en el botón Terminar para importar este libro en VozNuestra. Para hacer cambios, haga clic en el botón Anterior."></Alt>
       </Item>
     </Group>
   </Group>
   <Group ID="SplashScreen">
     <Item ID="Title">
+      <Alt ID="sp" Value="Pantalla de Inicio"></Alt>
     </Item>
     <Item ID="sLoadingOurWord">
-      <Alt ID="sp" Value="Cargando Palabra Nuestra..."></Alt>
+      <Alt ID="sp" Value="Cargando VozNuestra..."></Alt>
     </Item>
     <Item ID="sOptionalAdditional">
+      <Alt ID="sp" Value="-"></Alt>
     </Item>
     <Item ID="sLoading">
       <Alt ID="sp" Value="Cargando {0}..."></Alt>
@@ -1806,117 +2128,168 @@
   </Group>
   <Group ID="WizNewProject">
     <Item ID="Title">
+      <Alt ID="sp" Value="Crear Nuevo Proyecto"></Alt>
     </Item>
     <Item ID="m_btnFinish">
+      <Alt ID="sp" Value="Terminar"></Alt>
     </Item>
     <Item ID="m_btnPrev">
+      <Alt ID="sp" Value="Anterior"></Alt>
     </Item>
     <Item ID="m_btnNext">
+      <Alt ID="sp" Value="Próximo"></Alt>
     </Item>
     <Group ID="WizNewProject_WizNew_Introduction">
       <Item ID="m_lblClickNextToStart">
+        <Alt ID="sp" Value="Haga clic sobre 'Próximo' para empezar..."></Alt>
       </Item>
       <Item ID="m_lblDescription2">
+        <Alt ID="sp" Value="Vd. tendrá que identificar informaciones sobre la traducción fuente, el idioma en que va a hacer la traducción, y varias otras cosas de importancia."></Alt>
       </Item>
       <Item ID="m_lblDescription1">
+        <Alt ID="sp" Value="Este guía le guiará por el proceso de crear un proyecto nuevo en VozNuestra."></Alt>
       </Item>
       <Item ID="strIntroduction">
+        <Alt ID="sp" Value="Introducción"></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_ProjectName">
       <Item ID="m_lblProjectName">
+        <Alt ID="sp" Value="Nombre del Proyecto de la Lengua:"></Alt>
       </Item>
       <Item ID="m_lblExplanation">
+        <Alt ID="sp" Value="Aquí se trata del nombre completo del idioma en que va a hacer la traducción. Debe ser el nombre que Vd. y los traductores suelen usar para el idioma. Este nombre volverá a aparecer en varios páneles de VozNuestra. (Por ejemplo, 'Lakota Sioux.')"></Alt>
       </Item>
       <Item ID="m_lblInstruction">
+        <Alt ID="sp" Value="Favor de dar un nombre a este proyecto de la lengua."></Alt>
       </Item>
       <Item ID="strProjectName">
+        <Alt ID="sp" Value="Nombre del Proyecto"></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_TargetInfo">
       <Item ID="m_btnSettings">
+        <Alt ID="sp" Value="Navegar..."></Alt>
       </Item>
       <Item ID="m_lblSettings">
+        <Alt ID="sp" Value="Carpeta para Elecciones:"></Alt>
       </Item>
       <Item ID="m_lblSettingsHelp">
+        <Alt ID="sp" Value="2. Navegue a la carpeta en que desea guardar los archivos de elecciones para esta lengua."></Alt>
       </Item>
       <Item ID="m_lblAbbrevHelp">
+        <Alt ID="sp" Value="1. Abreviatura corta para el nombre de la lengua. El Ethnologue (ethnologue.com) da el código internacional ISO 639-3 de 3 letras minúsculas, correspondiente a casi todas las lenguas del mundo."></Alt>
       </Item>
       <Item ID="m_lblAbbrev">
+        <Alt ID="sp" Value="Abreviatura:"></Alt>
       </Item>
       <Item ID="m_lblDescription">
+        <Alt ID="sp" Value="Se necesitan informaciones adicionales acerca de la lengua '{0}'."></Alt>
       </Item>
       <Item ID="strTargetInfo">
+        <Alt ID="sp" Value="Lengua Meta"></Alt>
       </Item>
       <Item ID="strBrowseTargetFolderDialogTitle">
+        <Alt ID="sp" Value="Escoja la carpeta en que se guardarán las elecciones de este proyecto."></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_FrontInfo">
       <Item ID="m_lblInstructions">
+        <Alt ID="sp" Value="De otra manera, entre las informaciones siguientes para la lengua Fuente, tal como ya hizo para la lengua Meta:"></Alt>
       </Item>
       <Item ID="m_btnUseExisting">
+        <Alt ID="sp" Value="Utilizar lo Existente..."></Alt>
       </Item>
       <Item ID="m_btnSettings">
+        <Alt ID="sp" Value="Navegar..."></Alt>
       </Item>
       <Item ID="m_lblSettings">
+        <Alt ID="sp" Value="Carpeta para Elecciones de la Lengua Fuente:"></Alt>
       </Item>
       <Item ID="m_lblAbbrev">
+        <Alt ID="sp" Value="Abreviatura para la Lengua Fuente:"></Alt>
       </Item>
       <Item ID="m_lblName">
+        <Alt ID="sp" Value="Nombre de la Lengua Fuente:"></Alt>
       </Item>
       <Item ID="m_lblBrowseToExistingFront">
+        <Alt ID="sp" Value="Navegue a un archivo de elecciones para la Lengua Fuente, si ya existe:"></Alt>
       </Item>
       <Item ID="strFrontInfo">
+        <Alt ID="sp" Value="Informaciones de la Lengua Fuente"></Alt>
       </Item>
       <Item ID="strBrowseFrontFolderDialogTitle">
+        <Alt ID="sp" Value="Escoja la carpeta en que va a guardar las elecciones para la Traducción Fuente."></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_TeamSettings">
       <Item ID="m_textCurrentAction">
+        <Alt ID="sp" Value="Acción en Vigor: la de Defecto"></Alt>
       </Item>
       <Item ID="m_lblExplDefault">
+        <Alt ID="sp" Value="La acción de defecto es, que VozNuestra va a crear en archivo TeamSettings.owt en la carpeta de elecciones que Vd. identificó."></Alt>
       </Item>
       <Item ID="m_lblExplSaveAs">
+        <Alt ID="sp" Value="Vd. puede especificar una carpeta y nombre de archivo para un nuevo archivo de Elecciones del Equipo."></Alt>
       </Item>
       <Item ID="m_lblExplUseExisting">
+        <Alt ID="sp" Value="Se puede escoger un archivo para Elecciones del Equipo ya creado."></Alt>
       </Item>
       <Item ID="m_btnDefault">
+        <Alt ID="sp" Value="De Defecto"></Alt>
       </Item>
       <Item ID="m_btnUseExisting">
+        <Alt ID="sp" Value="Utilizar lo Existente..."></Alt>
       </Item>
       <Item ID="m_lblExplanation">
+        <Alt ID="sp" Value="VozNuestra guarda ciertas elecciones, tales como la Hoja de Estilos, en un archivo global para elecciones, asequibles por proyectos en varias lenguas."></Alt>
       </Item>
       <Item ID="strTeamSettings">
+        <Alt ID="sp" Value="Elecciones del Equipo"></Alt>
       </Item>
     </Group>
     <Group ID="WizNewProject_WizNew_Summary">
       <Item ID="m_checkLaunchProperties">
+        <Alt ID="sp" Value="¿Quiere Vd. lanzar el Diálogo de Propiedades para entrar otras elecciones (p.ej. para agregar otros Libros a las traducciones)?"></Alt>
       </Item>
       <Item ID="m_textTeamSettings">
+        <Alt ID="sp" Value="(Elecciones del Equipo)"></Alt>
       </Item>
       <Item ID="m_lblTeamSettings">
+        <Alt ID="sp" Value="Elecciones del Equipo"></Alt>
       </Item>
       <Item ID="m_textSourceTranslation">
+        <Alt ID="sp" Value="(Traducción Fuente)"></Alt>
       </Item>
       <Item ID="m_lblSourceTranslation">
+        <Alt ID="sp" Value="Traducción Fuente:"></Alt>
       </Item>
       <Item ID="m_textSettingsFolder">
+        <Alt ID="sp" Value="(Carpeta de Elecciones)"></Alt>
       </Item>
       <Item ID="m_lblSettingsFolder">
+        <Alt ID="sp" Value="Carpeta de Elecciones:"></Alt>
       </Item>
       <Item ID="m_textAbbreviation">
+        <Alt ID="sp" Value="(Abreviatura)"></Alt>
       </Item>
       <Item ID="m_lblAbbreviation">
+        <Alt ID="sp" Value="Abreviatura:"></Alt>
       </Item>
       <Item ID="m_textLanguageName">
+        <Alt ID="sp" Value="(Nombre de la Lengua)"></Alt>
       </Item>
       <Item ID="m_lblLanguageName">
+        <Alt ID="sp" Value="Nombre de la Lengua:"></Alt>
       </Item>
       <Item ID="m_labelClickFinish">
+        <Alt ID="sp" Value="Haga clic sobre el botón 'Terminar' para crear el nuevo proyecto, o sobre el botón 'Anterior' para permitir hacer cambios."></Alt>
       </Item>
       <Item ID="m_labelReady">
+        <Alt ID="sp" Value="Ahora está lista VozNuestra para crear el nuevo proyecto:"></Alt>
       </Item>
       <Item ID="strSummaryh">
+        <Alt ID="sp" Value="Resumen"></Alt>
       </Item>
     </Group>
   </Group>
