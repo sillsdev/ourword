@@ -25,6 +25,8 @@ using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.View;
+
+using OurWordTests.DataModel;
 #endregion
 
 namespace OurWordTests.Edit
@@ -35,7 +37,7 @@ namespace OurWordTests.Edit
         #region Setup - using T_Section: TestData #4
         [SetUp] public void Setup()
         {
-            EditTest.Setup(DataModel.T_DSection.s_vsRaw4);
+            EditTest.Setup(SectionTestData.BaikenoMark430_ImportVariant);
         }
         #endregion
         #region TearDown

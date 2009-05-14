@@ -261,11 +261,9 @@ namespace OurWordTests.DataModel
             DB.Project.InitialCreation(new NullProgress());
             DTranslation translation = new DTranslation("Waxhaw", "Latin", "Latin");
             DB.Project.FrontTranslation = translation;
-            DBook book = new DBook("GEN");
-            translation.Books.Append(book);
 
             // Create an initial book which we will save as a backup
-            Test_DSection.InitializeBook(book, Test_DSection.m_SectionTest1);
+            DTestBook book = SectionTestData.LoadIntoBook(SectionTestData.BaikenoMark0101_ImportVariant, translation);
             book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idDraft);
             book.Version = "A";
 

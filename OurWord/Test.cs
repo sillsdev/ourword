@@ -347,7 +347,6 @@ namespace OurWord
 		{
 //			(new Test_FileMenuIO()).Run();
 			(new Test_DBookProperties()).Run();
-			(new Test_DSection()).Run();
 			(new Test_Print()).Run();
 
 			Test.WriteHeader("COMPLETED SUCCESSFULLY");

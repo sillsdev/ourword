@@ -1494,7 +1494,7 @@ namespace JWdb.DataModel
         #region VirtMethod: void Merge(DParagraph Parent, DParagraph Theirs)
         public virtual void Merge(DParagraph Parent, DParagraph Theirs)
         {
-            // For now, we assume no changes in structure. If there are changes, it
+            // TODO: For now, we assume no changes in structure. If there are changes, it
             // means we are completely throwing away Theirs. 
             if (StructureCodes != Parent.StructureCodes || Runs.Count != Parent.Runs.Count)
                 return;
