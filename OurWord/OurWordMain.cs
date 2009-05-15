@@ -77,6 +77,8 @@ namespace OurWord
         UndoRedoStack m_URStack;
         #endregion
 
+
+
         // Client Windows --------------------------------------------------------------------
         #region CLIENT WINDOWS
         #region VAttr{g}: bool HasSideWindows

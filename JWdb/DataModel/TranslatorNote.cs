@@ -98,8 +98,8 @@ namespace JWdb.DataModel
             // The Default date is "Today"
             m_dtCreated = DateTime.Now;
 
-            // The Default author
-            Author = DefaultAuthor;
+            // The author
+            Author = DB.UserName;
 
             Debug_VerifyIntegrity();
         }
@@ -222,45 +222,6 @@ namespace JWdb.DataModel
         #endregion
         #endregion
 
-        // Author in Registry ----------------------------------------------------------------
-        const string c_sRegistryName = "AuthorName";
-        #region SAttr{g/s}: string DefaultAuthor
-        static public string DefaultAuthor
-        {
-            get
-            {
-                // Start with the name of the logged-in user
-                string sDefaultName = Environment.UserName;
-                if (string.IsNullOrEmpty(sDefaultName))
-                    sDefaultName = Environment.MachineName;
-
-                // Override it from the registry
-                string sAuthor = JW_Registry.GetValue(
-                    TranslatorNote.c_sRegistrySubkey, c_sRegistryName, sDefaultName);
-
-                // If we came up empty, then force it back to the machine name
-                if (string.IsNullOrEmpty(sAuthor))
-                {
-                    sAuthor = sDefaultName;
-                    JW_Registry.SetValue(
-                        TranslatorNote.c_sRegistrySubkey, c_sRegistryName, sDefaultName);
-                }
-
-                return sAuthor;
-            }
-            set
-            {
-                // Do nothing if we aren't using a reasonable name
-                if (string.IsNullOrEmpty(value))
-                    return;
-
-                // Place it in the registry
-                JW_Registry.SetValue(
-                    TranslatorNote.c_sRegistrySubkey, c_sRegistryName, value);
-            }
-        }
-        #endregion
-
         // View Construction -----------------------------------------------------------------
         #region VAttr{g}: bool IsEditable
         public bool IsEditable
@@ -276,7 +237,7 @@ namespace JWdb.DataModel
                     return false;
 
                 // If the author is someone different from me, it isn't
-                if (Author != DefaultAuthor)
+                if (Author != DB.UserName)
                     return false;
 
                 return true;
@@ -356,7 +317,7 @@ namespace JWdb.DataModel
 
             // If we are here, then we have a conflict. We resolve via the Author.
             // If the author is the person on this machine, then we win.
-            if (Author == DefaultAuthor)
+            if (Author == DB.UserName)
                 return;
             // If the author is someone else, then they win
             CopyParagraphsFrom(Theirs);
@@ -1552,7 +1513,7 @@ namespace JWdb.DataModel
             // Is this an AssignedTo person we want to see?
             if (!ShowAllPeople)
             {
-                if (AssignedTo != Discussion.DefaultAuthor)
+                if (AssignedTo != DB.UserName)
                     return false;
             }
 

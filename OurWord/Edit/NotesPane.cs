@@ -319,7 +319,7 @@ namespace OurWord.Edit
             m_Show.DropDownItems.Add(m_menuShowAllPeople);
 
             // Menu item to only show current user AssignedTo's
-            string sShowJustMe = "Show Notes Assigned to '" + Discussion.DefaultAuthor + "'";
+            string sShowJustMe = "Show Notes Assigned to '" + DB.UserName + "'";
             m_menuShowJustMe = new ToolStripMenuItem(sShowJustMe);
             m_menuShowJustMe.Checked = !TranslatorNote.ShowAllPeople;
             m_menuShowJustMe.Click += new EventHandler(cmdAssignedToClicked);
@@ -678,7 +678,7 @@ namespace OurWord.Edit
 
             // Are we allowed to add a discussion? No, if we have the same
             // author and the same date.
-            if (note.LastDiscussion.Author == Discussion.DefaultAuthor &&
+            if (note.LastDiscussion.Author == DB.UserName &&
                 note.LastDiscussion.Created.Date == DateTime.Today)
                 return;
 

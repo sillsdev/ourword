@@ -487,10 +487,10 @@ namespace OurWordTests.DataModel
 
             // TEST 1: They Win
             // Set the DefaultAuthor to "Mary" so that "They" should win
-            string sDefaultAuthor = Discussion.DefaultAuthor;
-            Discussion.DefaultAuthor = "Mary";
+            string sDefaultAuthor = DB.UserName;
+            DB.UserName = "Mary";
             Mine.Merge(Parent, Theirs);
-            Discussion.DefaultAuthor = sDefaultAuthor;
+            DB.UserName = sDefaultAuthor;
             Assert.AreEqual(
                 "D: Author={John} Created={11/23/2008} + " +
                     "Content={p:<They say Bibit is the correct term.>}",
@@ -500,9 +500,9 @@ namespace OurWordTests.DataModel
             // Go again, but this time with "John" so that "We" win
             Mine = new Discussion("John", new DateTime(2008, 11, 23),
                 "I say Bibit is the wrong term.");
-            Discussion.DefaultAuthor = "John";
+            DB.UserName = "John";
             Mine.Merge(Parent, Theirs);
-            Discussion.DefaultAuthor = sDefaultAuthor;
+            DB.UserName = sDefaultAuthor;
             Assert.AreEqual(
                 "D: Author={John} Created={11/23/2008} + " +
                     "Content={p:<I say Bibit is the wrong term.>}",

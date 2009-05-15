@@ -85,7 +85,6 @@ namespace JWdb.DataModel
 
         // Settings --------------------------------------------------------------------------
         const string c_sRegistrySubkey = "Collaboration";
-        const string c_sRegistryUserName = "UserName";
         const string c_sRegistryRemoteUserName = "RemoteUserName";
         const string c_sRegistryRemotePassword = "RemotePassword";
         const string c_sRegistryMineAlwaysWins = "MineAlwaysWins";
@@ -95,30 +94,6 @@ namespace JWdb.DataModel
             get
             {
                 return c_sRegistrySubkey + "\\" + DB.TeamSettings.DisplayName;
-            }
-        }
-        #endregion
-
-        #region SAttr{g/s}: string UserName - used in, e.g., Commit, to identify this person
-        static public string UserName
-        {
-            get
-            {
-                // The default is the logged-in user name, but hopefully the user will change
-                // this in the options!
-                string sUserName = Environment.UserName;
-                if (string.IsNullOrEmpty(sUserName))
-                    sUserName = Environment.MachineName;
-
-                return JW_Registry.GetValue(c_sRegistrySubkey, c_sRegistryUserName, sUserName);
-            }
-            set
-            {
-                // Don't permit the user name to become empty.
-                if (string.IsNullOrEmpty(value))
-                    return;
-
-                JW_Registry.SetValue(c_sRegistrySubkey, c_sRegistryUserName, value);
             }
         }
         #endregion
@@ -754,7 +729,7 @@ namespace JWdb.DataModel
                 sCommand += (" " + c_sAddRemove);
 
             // User name
-            sCommand += (" " + c_suser + " " + SurroundWithQuotes(UserName));
+            sCommand += (" " + c_suser + " " + SurroundWithQuotes(DB.UserName));
 
             // Commit message
             sCommand += (" " + c_sMessage + " " + SurroundWithQuotes(sMessage));
@@ -1091,7 +1066,7 @@ namespace JWdb.DataModel
             bResult = true;
             if (GetChangedFiles().Count > 0)
             {
-                bResult = Commit("Synching from " + UserName + " " +
+                bResult = Commit("Synching from " + DB.UserName + " " +
                     DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo), true);
             }
             SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(bResult);
@@ -1129,7 +1104,7 @@ namespace JWdb.DataModel
 
             // Commit the result of the merge
             SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetStartState();
-            bResult = Commit("Merged by " + UserName + " " +
+            bResult = Commit("Merged by " + DB.UserName + " " +
                 DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo), 
                 false);
             SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetFinishState(bResult);

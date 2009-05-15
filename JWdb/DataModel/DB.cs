@@ -196,6 +196,41 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        const string c_sRegistryName = "UserName";
+        #region SAttr{g/s}: string UserName
+        static public string UserName
+        {
+            get
+            {
+                // Start with the name of the logged-in user
+                string sDefaultName = Environment.UserName;
+                if (string.IsNullOrEmpty(sDefaultName))
+                    sDefaultName = Environment.MachineName;
+
+                // Override it from the registry
+                string sAuthor = JW_Registry.GetValue(c_sSubKey, c_sRegistryName, sDefaultName);
+
+                // If we came up empty, then force it back to the machine name
+                if (string.IsNullOrEmpty(sAuthor))
+                {
+                    sAuthor = sDefaultName;
+                    JW_Registry.SetValue(c_sSubKey, c_sRegistryName, sDefaultName);
+                }
+
+                return sAuthor;
+            }
+            set
+            {
+                // Do nothing if we aren't using a reasonable name
+                if (string.IsNullOrEmpty(value))
+                    return;
+
+                // Place it in the registry
+                JW_Registry.SetValue(c_sSubKey, c_sRegistryName, value);
+            }
+        }
+        #endregion
+
     }
 
     public class Loc

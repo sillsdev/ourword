@@ -98,7 +98,7 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sDefaultAuthor:
-                    e.Value = Discussion.DefaultAuthor;
+                    e.Value = DB.UserName;
                     break;
 
                 case c_sCategories:
@@ -139,7 +139,7 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sDefaultAuthor:
-                    Discussion.DefaultAuthor = (string)e.Value;
+                    DB.UserName = (string)e.Value;
                     break;
 
                 case c_sCategories:
