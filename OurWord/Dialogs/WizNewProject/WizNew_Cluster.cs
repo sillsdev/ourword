@@ -45,18 +45,6 @@ namespace OurWord.Dialogs.WizNewProject
         }
         #endregion
 
-        /*
-        #region VAttr{g}: List<string> ClusterList
-        public List<string> ClusterList
-        {
-            get
-            {
-                return m_ClusterListView.ClusterList;
-            }
-        }
-        #endregion
-        */
-
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public WizNew_Cluster()

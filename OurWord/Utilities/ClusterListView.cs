@@ -242,13 +242,13 @@ namespace OurWord.Utilities
                 Populate();
                 SelectedCluster = FindClusterInfo(sNewClusterName);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
             }
         }
         #endregion
 
-        #region Cmd: void CreateNewCluster()
+        #region Method: void CreateNewCluster()
         public void CreateNewCluster()
         {
             // Invoke the dialog. The dialog ensure a valid cluster would be created
@@ -276,7 +276,7 @@ namespace OurWord.Utilities
             SelectedCluster = FindClusterInfo(dlg.NewClusterName);
         }
         #endregion
-        #region Cmd: DeleteCluster
+        #region Method: DeleteCluster
         public void DeleteCluster()
         {
             // Retrieve the cluster the user wishes to delete
@@ -319,6 +319,46 @@ namespace OurWord.Utilities
             Populate();
             if (Clusters.Items.Count > 0)
                 SelectedCluster = (Clusters.Items[0].Tag as ClusterInfo);
+        }
+        #endregion
+        #region Method: void MoveCluster()
+        public void MoveCluster()
+        {
+            // Get the currently selected cluster
+            ClusterInfo ci = SelectedCluster;
+            if (null == ci)
+                return;
+
+            // Find out where to move it to
+            var dlg = new DlgMoveCluster();
+            dlg.StoreInMyDocuments = ci.IsInMyDocuments;
+            if (DialogResult.OK != dlg.ShowDialog(this.Parent))
+                return;
+
+            // Don't bother if the destination didn't change
+            if (ci.IsInMyDocuments == dlg.StoreInMyDocuments)
+                return;
+
+            // Get the new destination (Parent Folder)
+            string sParentFolder = (dlg.StoreInMyDocuments) ?
+                JWU.GetMyDocumentsFolder(null) :
+                JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
+
+            try
+            {
+                // Move it
+                ClusterInfo ciNew = new ClusterInfo(ci.Name, sParentFolder);
+                Directory.Move(ci.ClusterFolder, ciNew.ClusterFolder);
+                ci.ParentFolder = ciNew.ParentFolder;
+
+                // Update everything
+                PopulateClusterInfoList();
+                Populate();
+                SelectedCluster = FindClusterInfo(ci.Name);
+            }
+            catch (Exception)
+            {
+            }
         }
         #endregion
     }

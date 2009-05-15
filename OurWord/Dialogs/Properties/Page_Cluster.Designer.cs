@@ -35,6 +35,7 @@ namespace OurWord.Dialogs
             this.m_btnDeleteCluster = new System.Windows.Forms.Button();
             this.m_lblChoose = new System.Windows.Forms.Label();
             this.m_ClusterListView = new OurWord.Utilities.ClusterListView();
+            this.m_btnMoveCluster = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // m_labelDescription
@@ -54,7 +55,7 @@ namespace OurWord.Dialogs
             this.m_btnCreateNewCluster.Name = "m_btnCreateNewCluster";
             this.m_btnCreateNewCluster.Size = new System.Drawing.Size(130, 23);
             this.m_btnCreateNewCluster.TabIndex = 8;
-            this.m_btnCreateNewCluster.Text = "Create New Cluster";
+            this.m_btnCreateNewCluster.Text = "Create New Cluster...";
             this.m_btnCreateNewCluster.Click += new System.EventHandler(this.cmdCreateNewCluster);
             // 
             // m_btnRenameCluster
@@ -98,10 +99,21 @@ namespace OurWord.Dialogs
             this.m_ClusterListView.Size = new System.Drawing.Size(313, 265);
             this.m_ClusterListView.TabIndex = 40;
             // 
+            // m_btnMoveCluster
+            // 
+            this.m_btnMoveCluster.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnMoveCluster.Location = new System.Drawing.Point(325, 187);
+            this.m_btnMoveCluster.Name = "m_btnMoveCluster";
+            this.m_btnMoveCluster.Size = new System.Drawing.Size(130, 23);
+            this.m_btnMoveCluster.TabIndex = 41;
+            this.m_btnMoveCluster.Text = "Move Cluster...";
+            this.m_btnMoveCluster.Click += new System.EventHandler(this.cmdMoveCluster);
+            // 
             // Page_Cluster
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.Controls.Add(this.m_btnMoveCluster);
             this.Controls.Add(this.m_ClusterListView);
             this.Controls.Add(this.m_lblChoose);
             this.Controls.Add(this.m_btnDeleteCluster);
@@ -123,5 +135,6 @@ namespace OurWord.Dialogs
         private System.Windows.Forms.Button m_btnDeleteCluster;
         private System.Windows.Forms.Label m_lblChoose;
         private OurWord.Utilities.ClusterListView m_ClusterListView;
+        private System.Windows.Forms.Button m_btnMoveCluster;
     }
 }

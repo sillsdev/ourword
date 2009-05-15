@@ -106,5 +106,11 @@ namespace OurWord.Dialogs
             m_ClusterListView.DeleteCluster();
         }
         #endregion
+        #region Cmd: cmdMoveCluster
+        private void cmdMoveCluster(object sender, EventArgs e)
+        {
+            m_ClusterListView.MoveCluster();
+        }
+        #endregion
     }
 }

@@ -277,6 +277,7 @@ namespace JWTools
         #endif
 
         // Retrieves the OS-specific data folder for all users
+        #region SMethod: string GetSpecialFolder(Environment.SpecialFolder, sSubFolder)
         static public string GetSpecialFolder(Environment.SpecialFolder special, string sSubFolder)
         {
             string sFolder = Environment.GetFolderPath(special);
@@ -298,6 +299,7 @@ namespace JWTools
 
             return sFolder;
         }
+        #endregion
         #region SMethod: string GetLocalApplicationDataFolder(string sSubFolder)
         static public string GetLocalApplicationDataFolder(string sSubFolder)
         {
@@ -383,6 +385,7 @@ namespace JWTools
 		}
 		#endregion
 
+        #region SMethod: void SafeFolderDelete(string sFolderPath)
         static public void SafeFolderDelete(string sFolderPath)
             // There are certain folders we don't want to permit deletion, e.g., 
             // My Documents (as we know by unpleasane experience)
@@ -413,7 +416,8 @@ namespace JWTools
             if (Directory.Exists(sFolderPath))
                 Directory.Delete(sFolderPath, true);
         }
-	}
+        #endregion
+    }
 
     #region CLASS: JW_Util
     public class JW_Util

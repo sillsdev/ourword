@@ -567,21 +567,40 @@ namespace JWdb.DataModel
         }
         string m_sName;
         #endregion
-        #region Attr{g}: string ParentFolder
+        #region Attr{g/s}: string ParentFolder
         public string ParentFolder
         {
             get
             {
                 return m_sParentFolder;
             }
+            set
+            {
+                m_sParentFolder = value;
+            }
         }
-        readonly string m_sParentFolder;
+        string m_sParentFolder;
+        #endregion
+
+        #region Attr{g}: bool IsInMyDocuments
+        public bool IsInMyDocuments
+        {
+            get
+            {
+                if (ParentFolder == JWU.GetMyDocumentsFolder(null))
+                    return true;
+                return false;
+            }
+        }
         #endregion
         #region VAttr{g}: string Location
         public string Location
         {
             get
             {
+                if (null == DB.Project)
+                    return "Location";
+
                 // My Documents
                 if (ParentFolder == JWU.GetMyDocumentsFolder(null))
                     return Loc.GetString("kMyDocuments", "My Documents");
