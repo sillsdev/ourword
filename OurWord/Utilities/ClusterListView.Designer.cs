@@ -29,10 +29,15 @@
         private void InitializeComponent()
         {
             this.m_lvClusters = new System.Windows.Forms.ListView();
+            this.m_colName = new System.Windows.Forms.ColumnHeader();
+            this.m_colLocation = new System.Windows.Forms.ColumnHeader();
             this.SuspendLayout();
             // 
             // m_lvClusters
             // 
+            this.m_lvClusters.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.m_colName,
+            this.m_colLocation});
             this.m_lvClusters.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_lvClusters.FullRowSelect = true;
             this.m_lvClusters.HideSelection = false;
@@ -44,9 +49,19 @@
             this.m_lvClusters.Size = new System.Drawing.Size(299, 256);
             this.m_lvClusters.TabIndex = 39;
             this.m_lvClusters.UseCompatibleStateImageBehavior = false;
-            this.m_lvClusters.View = System.Windows.Forms.View.List;
+            this.m_lvClusters.View = System.Windows.Forms.View.Details;
             this.m_lvClusters.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.cmdAfterLabelEdit);
             this.m_lvClusters.SelectedIndexChanged += new System.EventHandler(this.cmdSelectedIndexChanged);
+            // 
+            // m_colName
+            // 
+            this.m_colName.Text = "Name";
+            this.m_colName.Width = 98;
+            // 
+            // m_colLocation
+            // 
+            this.m_colLocation.Text = "Location";
+            this.m_colLocation.Width = 183;
             // 
             // ClusterListView
             // 
@@ -62,5 +77,7 @@
         #endregion
 
         private System.Windows.Forms.ListView m_lvClusters;
+        private System.Windows.Forms.ColumnHeader m_colName;
+        private System.Windows.Forms.ColumnHeader m_colLocation;
     }
 }

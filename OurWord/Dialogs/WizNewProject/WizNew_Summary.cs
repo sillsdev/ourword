@@ -84,7 +84,8 @@ namespace OurWord.Dialogs.WizNewProject
 			}
 			else
 			{
-				m_textCluster.Text = Wizard.ChosenCluster;
+                if (null != Wizard.ChosenCluster)
+				    m_textCluster.Text = Wizard.ChosenCluster.Name;
 			}
         }
         #endregion

@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -276,52 +277,46 @@ namespace JWTools
         #endif
 
         // Retrieves the OS-specific data folder for all users
+        static public string GetSpecialFolder(Environment.SpecialFolder special, string sSubFolder)
+        {
+            string sFolder = Environment.GetFolderPath(special);
+
+            if (sFolder[sFolder.Length - 1] != Path.DirectorySeparatorChar)
+                sFolder += Path.DirectorySeparatorChar;
+
+            if (!string.IsNullOrEmpty(sSubFolder))
+                sFolder += (sSubFolder);
+
+            if (sFolder[sFolder.Length - 1] != Path.DirectorySeparatorChar)
+                sFolder += Path.DirectorySeparatorChar;
+
+            if (!string.IsNullOrEmpty(sSubFolder))
+            {
+                if (!Directory.Exists(sFolder))
+                    Directory.CreateDirectory(sFolder);
+            }
+
+            return sFolder;
+        }
+        #region SMethod: string GetLocalApplicationDataFolder(string sSubFolder)
+        static public string GetLocalApplicationDataFolder(string sSubFolder)
+        {
+            return GetSpecialFolder(Environment.SpecialFolder.LocalApplicationData, sSubFolder);
+        }
+        #endregion
         #region SMethod: string GetApplicationDataFolder(string sSubFolder)
         static public string GetApplicationDataFolder(string sSubFolder)
         {
-            // Build the path
-			string sBase;
-			if (Environment.OSVersion.Platform == PlatformID.Unix)
-				sBase = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-			else
-            	sBase = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-            string sPath = sBase + Path.DirectorySeparatorChar + sSubFolder;
-            if (string.IsNullOrEmpty(sBase))
-                return null;
-
-            // If the folder does not exist, then create it
-            if (!Directory.Exists(sPath))
-                Directory.CreateDirectory(sPath);
-            if (!Directory.Exists(sPath))
-                return null;
-
-            return sPath;
+            if (Environment.OSVersion.Platform == PlatformID.Unix)
+                return GetSpecialFolder(Environment.SpecialFolder.ApplicationData, sSubFolder);
+            else
+                return GetSpecialFolder(Environment.SpecialFolder.CommonApplicationData, sSubFolder);
         }
         #endregion
 		#region SMethod: string GetMyDocumentsFolder(string sSubFolder)
 		static public string GetMyDocumentsFolder(string sSubFolder)
 		{
-			// Start with the system's special folder
-			string sBase;
-			if (Environment.OSVersion.Platform == PlatformID.Unix)
-				sBase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-			else
-				sBase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-			if (string.IsNullOrEmpty(sBase))
-				return null;
-
-			// Build the rest of the path
-			string sPath = sBase + Path.DirectorySeparatorChar;
-			if (!string.IsNullOrEmpty(sSubFolder))
-				sPath += (sSubFolder + Path.DirectorySeparatorChar);
-
-			// If the folder does not exist, then create it
-			if (!Directory.Exists(sPath))
-				Directory.CreateDirectory(sPath);
-			if (!Directory.Exists(sPath))
-				return null;
-
-			return sPath;
+            return GetSpecialFolder(Environment.SpecialFolder.MyDocuments, sSubFolder);
 		}
 		#endregion
 		#region SMethod: GetAllUsersDocumentsFolder() - (not currently used)
@@ -387,6 +382,37 @@ namespace JWTools
 			return sFolderName;
 		}
 		#endregion
+
+        static public void SafeFolderDelete(string sFolderPath)
+            // There are certain folders we don't want to permit deletion, e.g., 
+            // My Documents (as we know by unpleasane experience)
+        {
+            // For consistency, put a SeparatorCharacter on the end of the target folder
+            if (sFolderPath[sFolderPath.Length - 1] != Path.DirectorySeparatorChar)
+                sFolderPath += Path.DirectorySeparatorChar;
+
+            // Folders we're protecting
+            var v = new List<string>();
+            v.Add(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments));
+            v.Add(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+            v.Add(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData));
+            v.Add(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+            v.Add(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+            v.Add(Environment.GetFolderPath(Environment.SpecialFolder.Desktop));
+
+            // Loop to make sure we're not trying to delete 
+            foreach (string s in v)
+            {
+                if (s == sFolderPath)
+                    return;
+                if (s + Path.DirectorySeparatorChar == sFolderPath)
+                    return;
+            }
+
+            // We can now delete the file without worry
+            if (Directory.Exists(sFolderPath))
+                Directory.Delete(sFolderPath, true);
+        }
 	}
 
     #region CLASS: JW_Util

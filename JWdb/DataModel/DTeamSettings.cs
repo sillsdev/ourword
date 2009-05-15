@@ -217,8 +217,6 @@ namespace JWdb.DataModel
         public BStringArray m_bsaNotesFrontCategories = null;
         #endregion
 
-        /***
-        ***/
         #region Attr{g/s}: bool RepositoryIsActive - T if source control is turned on
         public bool RepositoryIsActive
         {
@@ -548,32 +546,105 @@ namespace JWdb.DataModel
             return bResult;
         }
         #endregion
-
-        // Disk Directory Operations ---------------------------------------------------------
-		#region SMethod: List<s> GetLanguageListFromDisk(sClusterName)
-		static public List<string> GetLanguageListFromDisk(string sClusterName)
-		{
-			List<string> v = new List<string>();
-
-			// Get the settings folder
-			string sSettingsFolder = JWU.GetMyDocumentsFolder(sClusterName);
-			sSettingsFolder += DTeamSettings.SettingsFolderName +
-				Path.DirectorySeparatorChar;
-
-			// Get the otrans files in the settings folder
-			string[] sFiles = Directory.GetFiles(sSettingsFolder, 
-				"*" + DTranslation.FileExtension,
-				SearchOption.TopDirectoryOnly);
-
-			// The base name of these are the languages
-			foreach (string s in sFiles)
-				v.Add(Path.GetFileNameWithoutExtension(s));
-
-			return v;
-		}
-		#endregion
 	}
 	#endregion
+
+    public class ClusterInfo
+    {
+        public const string c_sLanguageDataFolder = "Language Data";
+
+        #region Attr{g/s}: string Name
+        public string Name
+        {
+            get
+            {
+                return m_sName;
+            }
+            set
+            {
+                m_sName = value;
+            }
+        }
+        string m_sName;
+        #endregion
+        #region Attr{g}: string ParentFolder
+        public string ParentFolder
+        {
+            get
+            {
+                return m_sParentFolder;
+            }
+        }
+        readonly string m_sParentFolder;
+        #endregion
+        #region VAttr{g}: string Location
+        public string Location
+        {
+            get
+            {
+                // My Documents
+                if (ParentFolder == JWU.GetMyDocumentsFolder(null))
+                    return Loc.GetString("kMyDocuments", "My Documents");
+
+                // My Application Data (roaming)
+                // Note: We don't localize c_sLanguageDataFolder, because if the user
+                // changed the UI language, they'd loose track of where their data is.
+                if (ParentFolder == JWU.GetLocalApplicationDataFolder(c_sLanguageDataFolder))
+                    return Loc.GetString("kMyApplicationData", "My Application Data");
+
+                return ParentFolder;
+            }
+        }
+        #endregion
+        #region VAttr{g}: string ClusterFolder
+        public string ClusterFolder
+        {
+            get
+            {
+                string s = ParentFolder;
+                if (s[s.Length - 1] != Path.DirectorySeparatorChar)
+                    s += Path.DirectorySeparatorChar;
+                s += Name;
+                s += Path.DirectorySeparatorChar;
+                return s;
+            }
+        }
+        #endregion
+
+        #region Constructor(sName, sParentFolder)
+        public ClusterInfo(string sName, string sParentFolder)
+        {
+            m_sName = sName;
+            m_sParentFolder = sParentFolder;
+        }
+        #endregion
+
+        #region Method: List<string> GetClusterLanguageList()
+        public List<string> GetClusterLanguageList()
+        {
+            List<string> v = new List<string>();
+
+            // Get the settings folder
+            string sSettingsFolder = ParentFolder +
+                Name + 
+                Path.DirectorySeparatorChar +
+                DTeamSettings.SettingsFolderName +
+                Path.DirectorySeparatorChar;
+
+            // Get the otrans files in the settings folder
+            string[] sFiles = Directory.GetFiles(sSettingsFolder,
+                "*" + DTranslation.FileExtension,
+                SearchOption.TopDirectoryOnly);
+
+            // The base name of these are the languages
+            foreach (string s in sFiles)
+                v.Add(Path.GetFileNameWithoutExtension(s));
+
+            return v;
+        }
+        #endregion
+    }
+
 
 	#region CLASS: DStyleSheet : JStyleSheet
 	public class DStyleSheet : JStyleSheet

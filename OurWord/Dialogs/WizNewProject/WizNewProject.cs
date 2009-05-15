@@ -24,6 +24,7 @@ using Microsoft.Win32;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+using OurWord.Utilities;
 #endregion
 
 namespace OurWord.Dialogs.WizNewProject
@@ -67,32 +68,39 @@ namespace OurWord.Dialogs.WizNewProject
         #endregion
 		#region VAttr{g}: string ChosenCluster
 		public const string c_sRegKeyLastCluster = "LastClusterUsed";
-		public string ChosenCluster
+		public ClusterInfo ChosenCluster
 		{
 			get
 			{
 				// See what we had in the registry, if anything
-				if (string.IsNullOrEmpty(m_sChosenCluster))
+				if (m_ChosenCluster == null)
 				{
-					Debug.Assert(Clusters.Count > 0);
+					Debug.Assert(ClusterInfoList.Count > 0);
 					string sLastTime = JW_Registry.GetValue(c_sRegKeyLastCluster, "");
-					if (Clusters.IndexOf(sLastTime) != -1)
-						m_sChosenCluster = sLastTime;
-					else
-						m_sChosenCluster = Clusters[0];
+
+                    m_ChosenCluster = ClusterInfoList[0];
+                    foreach (ClusterInfo ci in ClusterInfoList)
+                    {
+                        if (ci.Name == sLastTime)
+                        {
+                            m_ChosenCluster = ci;
+                            break;
+                        }
+                    }
 				}
 
-				Debug.Assert(!string.IsNullOrEmpty(m_sChosenCluster));
-				return m_sChosenCluster;
+				return m_ChosenCluster;
 			}
 			set
 			{
-				Debug.Assert(Clusters.IndexOf(value) != -1);
-				m_sChosenCluster = value;
-				JW_Registry.SetValue(c_sRegKeyLastCluster, m_sChosenCluster);
+                m_ChosenCluster = value;
+                if (null != m_ChosenCluster)
+                {
+                    JW_Registry.SetValue(c_sRegKeyLastCluster, m_ChosenCluster.Name);
+                }
 			}
 		}
-		string m_sChosenCluster;
+		ClusterInfo m_ChosenCluster;
 		#endregion
         #region VAttr{g}: bool LaunchPropertiesDialogWhenDone
         public bool LaunchPropertiesDialogWhenDone
@@ -122,14 +130,13 @@ namespace OurWord.Dialogs.WizNewProject
         WizNew_FrontInfo m_pageFrontInfo;
         WizNew_Summary m_pageSummary;
 
-		// Other Attrs we use ----------------------------------------------------------------
-		#region VAttr{g}: List<s> Clusters
-		public List<string> Clusters
+        // Other Attrs we use ----------------------------------------------------------------
+        #region VAttr{g}: List<ClusterInfo> ClusterInfoList
+        public List<ClusterInfo> ClusterInfoList
 		{
 			get
 			{
-                Debug.Assert(null != m_pageCluster);
-                return m_pageCluster.ClusterList;
+                return ClusterListView.ClusterInfoList;
 			}
 		}
 		#endregion
@@ -148,7 +155,10 @@ namespace OurWord.Dialogs.WizNewProject
 		{
 			get
 			{
-				return DTeamSettings.GetLanguageListFromDisk(ChosenCluster);
+                if (null == ChosenCluster)
+                    return new List<string>();
+
+                return ChosenCluster.GetClusterLanguageList();
 			}
 		}
 		#endregion
@@ -174,7 +184,7 @@ namespace OurWord.Dialogs.WizNewProject
 
 			// Clusters: If we have more than one cluster, then we'll need to show the page 
 			// for choosing which one.
-			if (Clusters.Count > 1)
+			if (ClusterListView.ClusterInfoList.Count > 1)
 			{
 				m_bShowClusterChoicePage = true;
 				AddPage(m_pageCluster);

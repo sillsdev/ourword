@@ -77,8 +77,6 @@ namespace OurWord
         UndoRedoStack m_URStack;
         #endregion
 
-
-
         // Client Windows --------------------------------------------------------------------
         #region CLIENT WINDOWS
         #region VAttr{g}: bool HasSideWindows
@@ -2546,7 +2544,7 @@ namespace OurWord
 
             // Team Settings: start with the factory default; load over it if a file already exists,
 			// otherwise create the new cluster
-			project.TeamSettings = new DTeamSettings(wiz.ChosenCluster);
+			project.TeamSettings = new DTeamSettings(wiz.ChosenCluster.Name);
 			project.TeamSettings.EnsureInitialized();
             project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
 

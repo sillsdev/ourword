@@ -66,8 +66,8 @@ namespace OurWord.Dialogs.WizNewProject
 			// For performance, get this list as we enter the page, so that we don't
 			// have to access the disk every time the user types (the cmdProjectNameChanged
 			// command handler.
-			m_vLanguages = DTeamSettings.GetLanguageListFromDisk(Wizard.ChosenCluster);
-			m_vLanguages = Wizard.Languages;
+            if (null != Wizard.ChosenCluster)
+                m_vLanguages = Wizard.ChosenCluster.GetClusterLanguageList();
 
 			// Default to the error not being visible.
 			m_lblError.Visible = false;

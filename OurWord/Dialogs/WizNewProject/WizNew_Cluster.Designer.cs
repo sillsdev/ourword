@@ -64,10 +64,12 @@ namespace OurWord.Dialogs.WizNewProject
             // 
             // m_ClusterListView
             // 
+            this.m_ClusterListView.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_ClusterListView.Location = new System.Drawing.Point(16, 50);
             this.m_ClusterListView.Name = "m_ClusterListView";
             this.m_ClusterListView.SelectedCluster = null;
-            this.m_ClusterListView.Size = new System.Drawing.Size(193, 125);
+            this.m_ClusterListView.Size = new System.Drawing.Size(341, 125);
             this.m_ClusterListView.TabIndex = 12;
             // 
             // WizNew_Cluster

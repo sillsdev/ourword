@@ -25,6 +25,7 @@ using Microsoft.Win32;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+using OurWord.Dialogs;
 #endregion
 #endregion
 
@@ -32,6 +33,63 @@ namespace OurWord.Utilities
 {
     public partial class ClusterListView : UserControl
     {
+        // ClusterInfo List ------------------------------------------------------------------
+        #region SAttr{g}: List<ClusterInfo> ClusterInfoList
+        static public List<ClusterInfo> ClusterInfoList
+        {
+            get
+            {
+                if (null == s_ClusterInfoList)
+                    PopulateClusterInfoList();
+
+                Debug.Assert(null != s_ClusterInfoList);
+                return s_ClusterInfoList;
+            }
+        }
+        static List<ClusterInfo> s_ClusterInfoList;
+        #endregion
+        #region SMethod: void PopulateClusterInfoList()
+        static public void PopulateClusterInfoList()
+        {
+            s_ClusterInfoList = new List<ClusterInfo>();
+
+            // Places where we'll search for clusters
+            var vsPossibleClusterLocations = new List<string>();
+            vsPossibleClusterLocations.Add(JWU.GetMyDocumentsFolder(null));
+            vsPossibleClusterLocations.Add(JWU.GetLocalApplicationDataFolder(
+                ClusterInfo.c_sLanguageDataFolder));
+
+            // Loop to search each location
+            foreach (string sPossibleLocation in vsPossibleClusterLocations)
+            {
+                string[] sPotentialClusterFolders = Directory.GetDirectories(sPossibleLocation);
+
+                foreach(string sFolder in sPotentialClusterFolders)
+                {
+                    string sSettingsFolder = sFolder + Path.DirectorySeparatorChar +
+                        DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
+
+                    if (Directory.Exists(sSettingsFolder))
+                    {
+                        string sClusterName = JWU.ExtractRightmostSubFolder(sFolder);
+                        s_ClusterInfoList.Add( new ClusterInfo(sClusterName, sPossibleLocation));
+                    }
+                }
+            }
+        }
+        #endregion
+        #region SMethod: ClusterInfo FindClusterInfo(string sName)
+        static public ClusterInfo FindClusterInfo(string sName)
+        {
+            foreach (ClusterInfo ci in ClusterInfoList)
+            {
+                if (ci.Name == sName)
+                    return ci;
+            }
+            return null;
+        }
+        #endregion
+
         // List of Clusters ------------------------------------------------------------------
         #region Ctrl: ListView Clusters
         ListView Clusters
@@ -42,20 +100,20 @@ namespace OurWord.Utilities
             }
         }
         #endregion
-        #region Attr{g/s}: string SelectedCluster
-        public string SelectedCluster
+        #region Attr{g/s}: ClusterInfo SelectedCluster
+        public ClusterInfo SelectedCluster
         {
             get
             {
                 if (Clusters.SelectedItems.Count == 1)
-                    return Clusters.SelectedItems[0].Text;
+                    return Clusters.SelectedItems[0].Tag as ClusterInfo;
                 return null;
             }
             set
             {
                 foreach (ListViewItem item in Clusters.Items)
                 {
-                    item.Selected = (item.Text == value);
+                    item.Selected = (item.Tag as ClusterInfo == value);
                 }
             }
         }
@@ -90,19 +148,6 @@ namespace OurWord.Utilities
             return null;
         }
         #endregion
-        #region VAttr{g}: List<s> ClusterList
-        public List<string> ClusterList
-        {
-            get
-            {
-                // We calculate this from what is in the ListView control
-                var v = new List<string>();
-                foreach (ListViewItem item in Clusters.Items)
-                    v.Add(item.Text);
-                return v;
-            }
-        }
-        #endregion
 
         // Initialize List Contents ----------------------------------------------------------
         #region Method: void Populate()
@@ -110,61 +155,15 @@ namespace OurWord.Utilities
         {
             Clusters.Items.Clear();
 
-            var v = GetClusterListFromDisk();
-            foreach (string sCluster in v)
+            foreach (ClusterInfo ci in ClusterInfoList)
             {
-                ListViewItem item = new ListViewItem(sCluster);
+                ListViewItem item = new ListViewItem(ci.Name);
+                item.SubItems.Add(ci.Location);
+                item.Tag = ci;
                 Clusters.Items.Add(item);
             }
         }
         #endregion      
-        #region SMethod: List<s> GetClusterListFromDisk()
-        static public List<string> GetClusterListFromDisk()
-        {
-            List<string> v = new List<string>();
-
-            // Get a collection of all of the folders in My Documents
-            string sMyDocumentsFolder = JWU.GetMyDocumentsFolder(null);
-            string[] sPotentialClusterFolders = Directory.GetDirectories(sMyDocumentsFolder);
-
-            // Work through them, looking for those with a Settings Folder with an OWT file.
-            foreach (string sFolder in sPotentialClusterFolders)
-            {
-                // Get the files in the settings folder
-                string sSettingsFolder = sFolder + Path.DirectorySeparatorChar +
-                    DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
-                if (!Directory.Exists(sSettingsFolder))
-                    continue;
-                string[] sFiles = Directory.GetFiles(sSettingsFolder);
-
-                // If we have an OWT extension, then we have a cluster folder
-                foreach (string sFile in sFiles)
-                {
-                    if (Path.GetExtension(sFile) == DTeamSettings.FileExtension)
-                    {
-                        // Retrieve the right-most folder; its the name of the cluster
-                        string sClusterName = JWU.ExtractRightmostSubFolder(sFolder);
-
-                        // Add it to our list; and we're done with this one.
-                        v.Add(sClusterName);
-                        break;
-                    }
-                }
-            }
-
-            // If we didn't get one, we create one so that we always have a default
-            // cluster to work from.
-            if (v.Count == 0)
-            {
-                DTeamSettings ts = new DTeamSettings();
-                ts.EnsureInitialized();
-                ts.Write(new NullProgress());
-                v.Add(ts.DisplayName);
-            }
-
-            return v;
-        }
-        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -175,17 +174,6 @@ namespace OurWord.Utilities
             // Retrieve the list of clusters currently on the user's computer, and
             // populate the listview with it
             Populate();
-        }
-        #endregion
-
-        // Localizations ---------------------------------------------------------------------
-        #region Attr{g}: string NewClusterName - returns localized "New Cluster"
-        string NewClusterName
-        {
-            get
-            {
-                return Loc.GetString("kNewCluster", "New Cluster");
-            }
         }
         #endregion
 
@@ -215,53 +203,7 @@ namespace OurWord.Utilities
         }
         #endregion
 
-        // Events we go ahead and respond to here --------------------------------------------
-        private void cmdAfterLabelEdit(object sender, LabelEditEventArgs e)
-            // Rename the cluster. This happens in response to a request to rename the cluster,
-            // via InitiateRename, which puts the label into edit mode.
-        {
-            // Retrieve the Old and the proposed New names
-            string sOldClusterName = SelectedCluster;
-            string sNewClusterName = e.Label;
-
-            // Nothing to do if they're the same, or if New is empty
-            if (string.IsNullOrEmpty(sNewClusterName) ||  sNewClusterName == sOldClusterName)
-                return;
-
-            // If it is "New Cluster", then they didn't rename after CreateNewCluster,
-            // so we'll remove it from the list, and assume the user's intent was to
-            // cancel.
-            if (sNewClusterName == NewClusterName)
-            {
-                ListViewItem item = FindItem(NewClusterName);
-                if (null != item)
-                    Clusters.Items.Remove(item);
-                // Select the first item so that the list continues to have something selected
-                if (Clusters.Items.Count > 0)
-                    Clusters.Items[0].Selected = true;
-                return;
-            }
-
-            // If neither the Old nor the New physically exist on the disk, then we're
-            // creating a new Cluster. 
-            var v = GetClusterListFromDisk();
-            if (!v.Contains(sNewClusterName) && !v.Contains(sOldClusterName))
-            {
-                DTeamSettings ts = new DTeamSettings(sNewClusterName);
-                ts.Write(new NullProgress());
-                return;
-            }
-
-            // If we're here, then we're renaming an existing cluster
-            // TODO: Implementation
-            MessageBox.Show("Apologies! Renaming an existing cluster isn't implemented yet.",
-                "OurWord", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-        }
-
-
-
-        // Cluster-Related Operations from Outside -------------------------------------------
+        // Command Handlers for creating, renaming, deleting clusters ------------------------
         #region Method: void InitiateRename()
         public void InitiateRename()
         {
@@ -272,29 +214,114 @@ namespace OurWord.Utilities
             item.BeginEdit();
         }
         #endregion
-        #region Method: void CreateNewCluster()
-        public void CreateNewCluster()
+        #region Cmd: cmdAfterLabelEdit
+        private void cmdAfterLabelEdit(object sender, LabelEditEventArgs e)
+            // Rename the cluster. This happens in response to a request to rename the cluster,
+            // via InitiateRename, which puts the label into edit mode.
         {
-            // If we already have a cluster of this name, then we will just edit it.
-            ListViewItem itemNew = FindItem(NewClusterName);
+            // Retrieve the Old and the proposed New names
+            if (Clusters.SelectedItems.Count != 1)
+                return;
+            string sOldClusterName = Clusters.SelectedItems[0].Text;
+            string sNewClusterName = e.Label;
 
-            // Otherwise, we need to create and add it
-            itemNew = new ListViewItem(NewClusterName);
-            Clusters.Items.Add(itemNew);
+            // Nothing to do if they're the same, or if New is empty
+            if (string.IsNullOrEmpty(sNewClusterName) ||  sNewClusterName == sOldClusterName)
+                return;
 
-            // Select the item, then invokve edit on it. Then, when the user names it 
-            // to something meaningful, we'll create it (via cmdAfterLabelEdit)
-            itemNew.Selected = true;
-            itemNew.BeginEdit();
+            try
+            {
+                // If we're here, then we're renaming an existing cluster
+                ClusterInfo ciOld = SelectedCluster;
+                ClusterInfo ciNew = new ClusterInfo(sNewClusterName, ciOld.ParentFolder);
+                Directory.Move(ciOld.ClusterFolder, ciNew.ClusterFolder);
+                ciOld.Name = sNewClusterName;
+
+                // Update everything
+                PopulateClusterInfoList();
+                Populate();
+                SelectedCluster = FindClusterInfo(sNewClusterName);
+            }
+            catch (Exception ex)
+            {
+            }
         }
         #endregion
 
+        #region Cmd: void CreateNewCluster()
+        public void CreateNewCluster()
+        {
+            // Invoke the dialog. The dialog ensure a valid cluster would be created
+            var dlg = new DlgNewCluster();
+            if (DialogResult.OK != dlg.ShowDialog(this))
+                return;
+
+            // A Cluster is defined as (1) a Cluster Folder, which (2) owns a
+            // Settings folder. 
+            string sParentFolder = (dlg.StoreInMyDocuments) ?
+                JWU.GetMyDocumentsFolder(null) :
+                JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
+            string sSettingsPath =
+                sParentFolder + Path.DirectorySeparatorChar +
+                dlg.NewClusterName + Path.DirectorySeparatorChar +
+                DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
+            if (!Directory.Exists(sSettingsPath))
+                Directory.CreateDirectory(sSettingsPath);
+
+            // Recalculate the list of clusters
+            PopulateClusterInfoList();
+
+            // Recalculate the listview and select the new item
+            Populate();
+            SelectedCluster = FindClusterInfo(dlg.NewClusterName);
+        }
+        #endregion
+        #region Cmd: DeleteCluster
         public void DeleteCluster()
         {
-            // TODO: Implementation
-            MessageBox.Show("Apologies! Deleting an existing cluster isn't implemented yet.",
-                "OurWord", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
+            // Retrieve the cluster the user wishes to delete
+            ClusterInfo ciDelete = SelectedCluster;
+            if (null == ciDelete)
+                return;
 
+            // Display a major warning message
+            bool bProceed = LocDB.Message("kConfirmDeleteCluster",
+                "Are you certain you want to delete cluster \"{0}\"?\n\n" +
+                "This will remove all of the cluster's language data from your disk permanently; " +
+                "the action cannot be undone.",
+                new string[] { ciDelete.Name },
+                LocDB.MessageTypes.WarningYN);
+            if (!bProceed)
+                return;
+
+            // Display a second warning message
+            bProceed = LocDB.Message("kConfirmDeleteCluster2",
+                "Excuse this second query, but we want to make absolutely sure!\n\n" +
+                "Are you certain you want to delete cluster \"{0}\" and " +
+                "all data that goes with it?",
+                new string[] { ciDelete.Name },
+                LocDB.MessageTypes.WarningYN);
+            if (!bProceed)
+                return;
+
+            // If we're here, then they're serious. Delete the folder
+            string sClusterFolder = ciDelete.ParentFolder;
+            if (sClusterFolder[sClusterFolder.Length - 1] != Path.DirectorySeparatorChar)
+                sClusterFolder += Path.DirectorySeparatorChar;
+            sClusterFolder += (ciDelete.Name + Path.DirectorySeparatorChar);
+
+            JWU.SafeFolderDelete(sClusterFolder);
+
+            // Recalculate our list of clusters
+            PopulateClusterInfoList();
+
+            // Recalculate the listview and select the first item
+            Populate();
+            if (Clusters.Items.Count > 0)
+                SelectedCluster = (Clusters.Items[0].Tag as ClusterInfo);
+        }
+        #endregion
     }
+
+
 }

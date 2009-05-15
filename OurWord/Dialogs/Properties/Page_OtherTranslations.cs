@@ -29,6 +29,7 @@ using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.View;
+using OurWord.Utilities;
 #endregion
 #endregion
 
@@ -51,8 +52,8 @@ namespace OurWord.Dialogs
         void BuildAvailableLanguages()
         {
             // Get the list from the current folder contents
-            m_vAvailableLanguages = DTeamSettings.GetLanguageListFromDisk(
-                DB.TeamSettings.DisplayName);
+            ClusterInfo ci = ClusterListView.FindClusterInfo(DB.TeamSettings.DisplayName);
+            m_vAvailableLanguages = ci.GetClusterLanguageList();
 
             // Remove the Front and Target translations
             if (null != DB.FrontTranslation)

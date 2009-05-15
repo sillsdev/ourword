@@ -27,6 +27,7 @@ using JWdb;
 using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
+using OurWord.Utilities;
 using OurWord.View;
 #endregion
 
@@ -215,7 +216,8 @@ namespace OurWord.Dialogs
 			}
 
             // The translation's name cannot conflict with other names in the cluster
-            var vTranslations = DTeamSettings.GetLanguageListFromDisk(DB.TeamSettings.DisplayName);
+            ClusterInfo ci = ClusterListView.FindClusterInfo(DB.TeamSettings.DisplayName);
+            var vTranslations = ci.GetClusterLanguageList();
             string sProposedNameUp = sProposedName.ToUpperInvariant();
             foreach (string s in vTranslations)
             {

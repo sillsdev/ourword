@@ -44,6 +44,8 @@ namespace OurWord.Dialogs.WizNewProject
             }
         }
         #endregion
+
+        /*
         #region VAttr{g}: List<string> ClusterList
         public List<string> ClusterList
         {
@@ -53,6 +55,7 @@ namespace OurWord.Dialogs.WizNewProject
             }
         }
         #endregion
+        */
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -74,7 +77,14 @@ namespace OurWord.Dialogs.WizNewProject
             m_ClusterListView.Populate();
 
             // Select what we've chosen in the wizard (either in this session, or previously)
-            m_ClusterListView.SelectedCluster = Wizard.ChosenCluster;
+            foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+            {
+                if (ci == Wizard.ChosenCluster)
+                {
+                    m_ClusterListView.SelectedCluster = ci;
+                    break;
+                }
+            }
         }
         #endregion
         #region Method: bool CanGoToNextPage()
@@ -101,7 +111,16 @@ namespace OurWord.Dialogs.WizNewProject
         private void cmdSelectedClusterChanged(string sNewCluster)
         {
             if (!string.IsNullOrEmpty(sNewCluster))
-                Wizard.ChosenCluster = sNewCluster;
+            {
+                foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+                {
+                    if (ci.Name == sNewCluster)
+                    {
+                        Wizard.ChosenCluster = ci;
+                        break;
+                    }
+                }
+            }
         }
 		#endregion
 

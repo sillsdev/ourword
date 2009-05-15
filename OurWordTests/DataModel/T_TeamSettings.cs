@@ -125,7 +125,8 @@ namespace OurWordTests.DataModel
 		{
 			string sFolderCluster = JWU.GetMyDocumentsFolder(sCluster);
 			string sSettingsFolder = sFolderCluster +
-                Path.DirectorySeparatorChar + DTeamSettings.SettingsFolderName + 
+                Path.DirectorySeparatorChar +
+                DTeamSettings.SettingsFolderName + 
 				Path.DirectorySeparatorChar;
 
 			foreach (string sLanguage in m_vLanguages)
@@ -154,12 +155,14 @@ namespace OurWordTests.DataModel
 
 			// Set up the sample clusters
 			CreateSampleClusters();
+            ClusterListView.PopulateClusterInfoList();
 		}
 		#endregion
 		#region TearDown
 		[TearDown] public void TearDown()
 		{
 			DeleteSampleClusters();
+            ClusterListView.PopulateClusterInfoList();
 		}
 		#endregion
 
@@ -170,15 +173,21 @@ namespace OurWordTests.DataModel
 			// Teardown: the cluster folders will be deleted
 		{
 			// Get the list of clusters currently on the disk
-			List<string> v = ClusterListView.GetClusterListFromDisk();
+            ClusterListView.PopulateClusterInfoList();
+			List<ClusterInfo> v = ClusterListView.ClusterInfoList;
 
 			// Ours should be included (there will likely be more, as I have my test data
 			// on MyDocuments as well.)
 			Assert.IsTrue(v.Count >= Clusters.Length, "We didn't find enough clusters");
 			foreach (string sCluster in Clusters)
 			{
-				Assert.IsTrue(v.IndexOf(sCluster) != -1, 
-					"Cluster [" + sCluster + "] was not found.");
+                bool bFound = false;
+                foreach (ClusterInfo ci in v)
+                {
+                    if (ci.Name == sCluster)
+                        bFound = true;
+                }
+				Assert.IsTrue(bFound,  "Cluster [" + sCluster + "] was not found.");
 			}
 		}
 		#endregion
@@ -189,7 +198,8 @@ namespace OurWordTests.DataModel
 			CreateSampleLanguages(c_sAru);
 
 			// Get the list of languages there
-			List<string> v = DTeamSettings.GetLanguageListFromDisk(c_sAru);
+            ClusterInfo ci = ClusterListView.FindClusterInfo(c_sAru);
+            List<string> v = ci.GetClusterLanguageList();
 
 			// Should be exactly what we have in Languages
 			Assert.AreEqual(Languages.Length, v.Count);
