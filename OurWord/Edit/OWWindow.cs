@@ -267,6 +267,8 @@ namespace OurWord.Edit
 
             // Registry key for settings
             m_sRegistrySettingsSubKey = _sName;
+            if (_sName.StartsWith("LS-"))
+                m_sRegistrySettingsSubKey = "LiterateSettingsWnd";
 
             // Initialize ScrollBar
             AutoScroll = false;             // Don't use Panel's built-in scrollbar

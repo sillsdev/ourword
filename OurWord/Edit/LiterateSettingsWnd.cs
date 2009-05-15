@@ -98,7 +98,7 @@ namespace OurWord.Edit
 		#region Method: CreateVerbose()
 		void CreateVerbose()
 		{
-			m_wndVerbose = new OWWindow("V-" + Name, 1);
+			m_wndVerbose = new OWWindow("LS-" + Name, 1);
 			m_panelSettingsContainer.Controls.Add(Verbose);
 			Verbose.Dock = DockStyle.Fill;
 			Verbose.Visible = true;
