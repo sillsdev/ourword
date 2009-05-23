@@ -129,7 +129,7 @@ namespace OurWord.Dialogs
                 "Google on \"Mercurial hosting\" to find a host.");
             m_RemoteServerUrl = LS.AddEditText("coUrl",
                 "Central Repository URL:",
-                "The Url for accessing the remove, central respository.)",
+                "The Url for accessing the remote, central respository.)",
                 Repository.RemoteUrl);
             m_RemoteServerUserName = LS.AddEditText("coUserName",
                 "User Name:",

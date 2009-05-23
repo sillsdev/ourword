@@ -188,8 +188,8 @@ namespace JWdb.DataModel
         #endregion
 
         // Supporting Methods ----------------------------------------------------------------
-        #region Method: string SurroundWithQuotes(string s)
-        string SurroundWithQuotes(string sIn)
+        #region SMethod: string SurroundWithQuotes(string s)
+        static string SurroundWithQuotes(string sIn)
         {
             // We need to remove any existing quotes we might have
             string sOut = "";
@@ -201,6 +201,18 @@ namespace JWdb.DataModel
 
             // Now place quotes at beginning and end
             return ("\"" + sOut + "\"");
+        }
+        #endregion
+        #region SMethod: string RemoveSpacesAndStuff(string s)
+        static string RemoveSpacesAndStuff(string s)
+        {
+            string sOut = "";
+            foreach (char ch in s)
+            {
+                if (!char.IsWhiteSpace(ch) && !char.IsPunctuation(ch))
+                    sOut += ch;
+            }
+            return sOut;
         }
         #endregion
 
@@ -339,8 +351,8 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-        #region Method: ExecutionResult Execute(sHgCommand)
-        ExecutionResult Execute(string sHgCommand)
+        #region SMethod: ExecutionResult Execute(string sHgCommand, string sWorkingDir)
+        static ExecutionResult Execute(string sHgCommand, string sWorkingDir)
         {
             // Initialize the process
             Process p = new Process();
@@ -348,14 +360,14 @@ namespace JWdb.DataModel
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WorkingDirectory = HgRepositoryRoot;
+            p.StartInfo.WorkingDirectory = sWorkingDir;
             p.StartInfo.FileName = "hg";
-            p.StartInfo.Arguments = sHgCommand; 
+            p.StartInfo.Arguments = sHgCommand;
 
             // Execute the process
             try
-            { 
-                p.Start(); 
+            {
+                p.Start();
             }
             catch (Exception)
             {
@@ -364,6 +376,12 @@ namespace JWdb.DataModel
 
             // Success, but possibly with messages as stored in the Result
             return new ExecutionResult(p);
+        }
+        #endregion
+        #region Method: ExecutionResult Execute(sHgCommand)
+        ExecutionResult Execute(string sHgCommand)
+        {
+            return Execute(sHgCommand, HgRepositoryRoot);
         }
         #endregion
 
@@ -530,6 +548,38 @@ namespace JWdb.DataModel
                 return v;
             }
             #endregion
+        }
+        #endregion
+
+        // Static version of Operations ------------------------------------------------------
+        #region SMethod: bool CloneTo(string sDestinationPath, string sSourcePath)
+        static public bool CloneTo(string sDestinationPath, string sSourcePath)
+        {
+            string sCommand = c_sClone;
+
+            // Source Repository
+            sCommand += (" " + SurroundWithQuotes(sSourcePath));
+
+            // Destination Path
+            sCommand += (" " + SurroundWithQuotes(sDestinationPath));
+
+            // Do it
+            ExecutionResult result = Execute(sCommand, sSourcePath);
+            return result.Successful;
+        }
+        #endregion
+        #region SMethod: bool Pull(string sSourcePath)
+        static public bool Pull(string sSourcePath)
+        {
+            // Pull
+            string sCommand = c_sPull;
+
+            // Source Repository
+            sCommand += (" " + SurroundWithQuotes(sSourcePath));
+
+            // Do it
+            ExecutionResult result = Execute(sCommand, sSourcePath);
+            return result.Successful;
         }
         #endregion
 
@@ -729,7 +779,8 @@ namespace JWdb.DataModel
                 sCommand += (" " + c_sAddRemove);
 
             // User name
-            sCommand += (" " + c_suser + " " + SurroundWithQuotes(DB.UserName));
+            sCommand += (" " + c_suser + " " +
+                SurroundWithQuotes(RemoveSpacesAndStuff(DB.UserName)));
 
             // Commit message
             sCommand += (" " + c_sMessage + " " + SurroundWithQuotes(sMessage));
@@ -739,6 +790,8 @@ namespace JWdb.DataModel
             return result.Successful;
         }
         #endregion
+
+
         #region Method: bool CloneTo(sDestinationPath)
         public bool CloneTo(string sDestinationPath)
             // If cloning to a path on a computer, the destination path cannot
@@ -971,7 +1024,7 @@ namespace JWdb.DataModel
         }
         #endregion
         #region Method: bool CanAccessInternet()
-        public bool CanAccessInternet()
+        static public bool CanAccessInternet()
             // We'll just ping on Google, since they're up most of the time.
         {
             try

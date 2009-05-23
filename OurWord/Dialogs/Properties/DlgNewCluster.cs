@@ -29,7 +29,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return m_radioMyDocuments.Checked;
+                return m_ClusterLocation.IsInMyDocuments;
             }
         }
         #endregion
@@ -52,7 +52,7 @@ namespace OurWord.Dialogs
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
-            m_radioMyDocuments.Checked = true;
+            m_ClusterLocation.IsInMyDocuments = true;
         }
         #endregion
         #region Cmd: cmdFormClosing

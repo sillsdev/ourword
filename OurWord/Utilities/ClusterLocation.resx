@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="m_labelName.Text" xml:space="preserve">
-    <value>If you are working on a single language, you can just use the name of that language; otherwise, choose a name that represents all of the languages in the cluster. For example, "Halmahera Cluster", or "Timor Languages".</value>
+  <data name="m_labelAppData.Text" xml:space="preserve">
+    <value>The advantage of the Application Data folder is that you reduce the risk that your data might be corrupted through someone's mis-use of Windows Explorer. We strongly recommend this option for less-experienced computer users.</value>
   </data>
 </root>

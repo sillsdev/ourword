@@ -251,6 +251,27 @@ namespace JWdb.DataModel
 			return false;
 		}
 		#endregion
+
+        public static bool operator == (DReference rLeft, DReference rRight)
+        {
+            if (Object.Equals(rLeft, null) && Object.Equals(rRight, null))
+                return true;
+            if (Object.Equals(rLeft, null) || Object.Equals(rRight, null))
+                return false;
+
+            if (rLeft.Chapter != rRight.Chapter)
+                return false;
+
+            if (rLeft.Verse != rRight.Verse)
+                return false;
+
+            return true;
+        }
+        public static bool operator != (DReference rLeft, DReference rRight)
+        {
+            return !(rLeft == rRight);
+        }
+
 	}
 
 	public class DReferenceSpan : JObject
@@ -357,5 +378,24 @@ namespace JWdb.DataModel
 			End.Copy(refSpanSource.End);
 		}
 		#endregion
+
+        public static bool operator ==(DReferenceSpan rLeft, DReferenceSpan rRight)
+        {
+            if (Object.Equals(rLeft, null) && Object.Equals(rRight, null))
+                return true;
+            if (Object.Equals(rLeft, null) || Object.Equals(rRight, null))
+                return false;
+
+            if (rLeft.Start != rRight.Start)
+                return false;
+            if (rLeft.End != rRight.End)
+                return false;
+            return true;
+        }
+        public static bool operator !=(DReferenceSpan rLeft, DReferenceSpan rRight)
+        {
+            return !(rLeft == rRight);
+        }
+
 	}
 }

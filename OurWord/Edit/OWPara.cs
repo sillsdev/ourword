@@ -481,19 +481,53 @@ namespace OurWord.Edit
         }
         #endregion
         #region CLASS: ELiteral
-        class ELiteral : EBlock
+        class ELiteral : EWord 
+            // As a literal of EWord, hyphenation is possible.
         {
             #region Constructor(sText)
             public ELiteral(JFontForWritingSystem f, string sText)
-                : base(f, sText)
+                : base(f, null, sText, FontStyle.Regular)
             {
             }
             #endregion
-
-            #region Method: override void Paint()
+            #region OMethod: EWord Clone()
+            public override EWord Clone()
+            {
+               return new ELiteral(FontForWS, Text);
+            }
+            #endregion
+            #region OMethod: Cursor MouseOverCursor
+            public override Cursor MouseOverCursor
+            {
+                get
+                {
+                    return Cursors.Default;
+                }
+            }
+            #endregion
+            #region OMethod: void Paint()
             public override void Paint()
             {
                 Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+            }
+            #endregion
+            #region OMethod: void cmdLeftMouseClick(PointF pt)
+            public override void cmdLeftMouseClick(PointF pt)
+                // No selection allowed
+            {
+                return;
+            }
+            #endregion
+            #region OMethod: void cmdMouseMove(PointF pt)
+            public override void cmdMouseMove(PointF pt)
+            {
+                return;
+            }
+            #endregion
+            #region OMethod: void cmdLeftMouseDoubleClick(PointF pt)
+            public override void cmdLeftMouseDoubleClick(PointF pt)
+            {
+                return;
             }
             #endregion
         }
@@ -1978,6 +2012,12 @@ namespace OurWord.Edit
                 {
                     verse.NeedsExtraLeadingSpace = true;
                     verse.CalculateWidth(g);
+                }
+
+                if (this.SubItems.Length == 1 && (this.SubItems[0] as EBlock != null
+                    && (this.SubItems[0] as EBlock).Text == "JohnWimbish"))
+                {
+                    Console.WriteLine("Ouch");
                 }
 
                 // Measure the next "chunk" we want to add (this may be more than one EBlock

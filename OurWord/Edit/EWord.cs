@@ -331,7 +331,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: EWord Clone()
-        public EWord Clone()
+        public virtual EWord Clone()
         {
             EWord word = new EWord(
                 FontForWS,

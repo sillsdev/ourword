@@ -329,7 +329,7 @@ namespace JWdb.DataModel
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
-        #region BAttr{g/s}: string Category - adds new ones at runtime if needed
+        #region BAttr{g/s}: string Category 
         public string Category
         {
             get
@@ -457,7 +457,7 @@ namespace JWdb.DataModel
                 Classifications m_Owner;
                 #endregion
 
-                #region Attr{g/s}: bool IsChecked
+                #region Attr{g/s}: bool IsChecked - If T, display it
                 public bool IsChecked
                 {
                     get
@@ -582,8 +582,15 @@ namespace JWdb.DataModel
                 {
                     string s = "";
 
-                    foreach (Classification cl in this)
-                        s += cl.Name + ", ";
+                    // Create a sorted version
+                    var v = new List<string>();
+                    foreach (string sClassificationName in SettingsSource)
+                        v.Add(sClassificationName);
+                    v.Sort();
+
+                    // Create the string
+                    foreach(string sClassificationName in v)
+                        s += (sClassificationName + ", ");
 
                     return s;
                 }
@@ -607,7 +614,7 @@ namespace JWdb.DataModel
                     // Clear out the list, then build it from these new values
                     Clear();
                     foreach (string s in vNames)
-                        AddItem(s);
+                        AddItem(s, true);
 
                     // Scan the book to make sure we haven't deleted anything we need
 					if (null != DB.TargetBook && DB.TargetBook.Loaded)
@@ -617,15 +624,15 @@ namespace JWdb.DataModel
                     // back in.
                     AddFactoryDefaults();
 
-                    // Make sure whatever is out default value is in the list
-                    AddItem(DefaultValue);
+                    // Make sure whatever is our default value is in the list
+                    AddItem(DefaultValue, true);
                 }
             }
             #endregion
 
             // Operations --------------------------------------------------------------------
-            #region Method: void AddItem(sName)
-            public void AddItem(string sName)
+            #region Method: void AddItem(sName, bool bAddToPermanentSettings)
+            public void AddItem(string sName, bool bAddToPermanentSettings)
             {
                 // Don't add any empty names
                 if (string.IsNullOrEmpty(sName))
@@ -639,9 +646,13 @@ namespace JWdb.DataModel
                 Add(new Classification(this, sName));
                 Sort();
 
-                // Add it to the settings. 
-                if (!SettingsSource.Contains(sName))
-                    SettingsSource.Append(sName);
+                // Add it to the settings if requested; otherwise it is only there
+                // because, e.g., the book already had it as a value.
+                if (bAddToPermanentSettings)
+                {
+                    if (!SettingsSource.Contains(sName))
+                        SettingsSource.InsertSortedIfUnique(sName);
+                }
             }
             #endregion
             #region Method: Classification FindItem(sName)
@@ -707,7 +718,7 @@ namespace JWdb.DataModel
                 if (Count == 0 && null != FactoryDefaultMembers)
                 {
                     foreach (string s in FactoryDefaultMembers)
-                        AddItem(s);
+                        AddItem(s, true);
                 }
             }
             #endregion
@@ -719,7 +730,7 @@ namespace JWdb.DataModel
 
                 // Populate with the classifications in the settings source
                 foreach (string s in SettingsSource)
-                    AddItem(s);
+                    AddItem(s, true);
 
                 // If we're still empty, go with the factory defaults
                 AddFactoryDefaults();
@@ -817,14 +828,14 @@ namespace JWdb.DataModel
             {
                 if (bIsTarget)
                 {
-                    Categories.AddItem(tn.Category);
+                    Categories.AddItem(tn.Category, false);
 
-                    People.AddItem(tn.AssignedTo);
+                    People.AddItem(tn.AssignedTo, false);
                     foreach (Discussion d in tn.Discussions)
-                        People.AddItem(d.Author);
+                        People.AddItem(d.Author, false);
                 }
                 else if (tn.ShowInDaughterTranslations)
-                    FrontCategories.AddItem(tn.Category);
+                    FrontCategories.AddItem(tn.Category, false);
             }
         }
         #endregion
@@ -845,6 +856,15 @@ namespace JWdb.DataModel
             get
             {
                 return Loc.GetNotes("kExegesis", "Exegesis");
+            }
+        }
+        #endregion
+        #region SAttr{g}: string CategoryOldVersion
+        static public string CategoryOldVersion
+        {
+            get
+            {
+                return Loc.GetNoteDefs("kOldVersion", "Old Version");
             }
         }
         #endregion
@@ -1141,7 +1161,7 @@ namespace JWdb.DataModel
                     sCategory = Loc.GetNoteDefs("kDefinition", "Definitions"); 
                     break;
                 case "ov":
-                    sCategory = Loc.GetNoteDefs("kOldVersion", "Old Version"); 
+                    sCategory = CategoryOldVersion; 
                     break;
                 case "ntBT":
                     sCategory = Loc.GetNoteDefs("kBT", "Back Translation"); 
@@ -1179,6 +1199,10 @@ namespace JWdb.DataModel
 
             // Remove any reference from the data
             string sData = tn.RemoveInitialReferenceFromText(field.Data);
+
+            // Old data (e.g., \ov's) might have footnotes |fn in them. Remove them, as
+            // we don't allow notes to have footnotes. (We saw this in Manado Malay data.)
+            sData = sData.Replace("|fn", "");
 
             // If there's not data, we're tossing it. Given that it is old-style
             // anyway, there's no need to keep it around if it had no content

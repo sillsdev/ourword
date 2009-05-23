@@ -200,7 +200,7 @@ namespace OurWord.Dialogs.WizImportBook
 			Wizard.BookName = DBook.GetBookName(iBook, Wizard.Translation);
 
             // See that it is either Paratext or Toolbox; and check  for any unknown markers.
-            ArrayList aUnknownMarkers = DB.GetUnnownMarkersInventory();
+            ArrayList aUnknownMarkers = DB.GetUnknownMarkersInventory();
             string sUnrecognizedMarkers = "";
             foreach (string sMkr in aUnknownMarkers)
             {

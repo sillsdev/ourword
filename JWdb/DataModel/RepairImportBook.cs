@@ -502,9 +502,9 @@ namespace JWdb.DataModel
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Error on attempt to read book";
             this.TopMost = true;
-            this.Resize += new System.EventHandler(this.cmdResize);
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
             this.Load += new System.EventHandler(this.cmdLoad);
+            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
+            this.Resize += new System.EventHandler(this.cmdResize);
             ((System.ComponentModel.ISupportInitialize)(this.m_Icon)).EndInit();
             this.ResumeLayout(false);
 
@@ -741,7 +741,7 @@ namespace JWdb.DataModel
 			m_HelpID  = _HelpID;
 		}
 		#endregion
-		#region Constructor(sMessage, nFrontLineNo, int nLineNo)
+		#region Constructor(sMessage, HelpID, nFrontLineNo, int nLineNo)
         public eBookReadException(string _sMessage, HelpSystem.Topic _HelpID, 
 			int _FrontLineNo, int _LineNo)
 			: base("BookReadException")

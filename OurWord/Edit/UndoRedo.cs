@@ -497,7 +497,6 @@ namespace OurWord.Edit
     }
     #endregion
 
-
     // Join / Split Paragraphs ---------------------------------------------------------------
     #region CLASS: SplitJoinParagraphAction : Action
     public class SplitJoinParagraphAction : Action
@@ -578,9 +577,18 @@ namespace OurWord.Edit
                     selection.DBT_iCharLast);
             }
 
+            // If we're at the beginning of a DText, but there is another DText to the left,
+            // with intervening non-edtiable stuff, we need to move to the end of the
+            // preceeding DText, in order for the bookmark restore to perform properly.
+            if (selection.Anchor.iChar == 0 && !selection.IsInsertionPoint_AtParagraphBeginning)
+            {
+                Window.Contents.Select_PrevWord_End(selection);
+                selection = Window.Selection;
+            }
+
             // Get the position where the split will happen
             DBasicText text = selection.DBT;
-            int iPos = selection.DBT_iChar(selection.Anchor);
+            int iPos = selection.DBT_iChar(selection.Anchor);          
 
             // Retrieve the underlying paragraph
             DParagraph para = text.Paragraph;

@@ -292,8 +292,8 @@ namespace OurWordTests.DataModel
             TranslatorNote.InitClassifications();
 
             // Add a category twice
-            TranslatorNote.Categories.AddItem("New Category");
-            TranslatorNote.Categories.AddItem("New Category");
+            TranslatorNote.Categories.AddItem("New Category", false);
+            TranslatorNote.Categories.AddItem("New Category", false);
 
             // We expect to have the default categories plus our new one
             Assert.AreEqual(3, TranslatorNote.Categories.Count);
@@ -309,8 +309,8 @@ namespace OurWordTests.DataModel
             TranslatorNote.InitClassifications();
 
             // Add a few more
-            TranslatorNote.Categories.AddItem("Hebrew");
-            TranslatorNote.Categories.AddItem("Greek");
+            TranslatorNote.Categories.AddItem("Hebrew", true);
+            TranslatorNote.Categories.AddItem("Greek", true);
 
             // Check the produced string
             Assert.AreEqual("Exegesis, Greek, Hebrew, To Do, ",

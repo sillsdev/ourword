@@ -631,6 +631,24 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        string GetSpanMismatchMsg(int iSection, DSection SFront, DSection STarget)
+        {
+            string sBase = Loc.GetStructureMessages("msgSpanMismatch",
+                "Section {0} has different verses.\n" +
+                "  {1} is {2}\n" +
+                "  {3} is {4}");
+
+            string sMsg = LocDB.Insert(sBase, new string[] {
+                (iSection + 1).ToString(),
+                SFront.Book.Translation.DisplayName,
+                SFront.ReferenceSpan.DisplayName,
+                STarget.Book.Translation.DisplayName,
+                STarget.ReferenceSpan.DisplayName }
+                );
+
+            return sMsg;
+        }
+
         #region Method: string GetStructureMismatchMsg(DSection SFront, DSection STarget)
         string GetStructureMismatchMsg(DSection SFront, DSection STarget)
         {
@@ -714,6 +732,15 @@ namespace JWdb.DataModel
             {
                 DSection SFront = BFront.Sections[i] as DSection;
                 DSection STarget = Sections[i] as DSection;
+
+                if (SFront.ReferenceSpan != STarget.ReferenceSpan)
+                {
+                    throw new eBookReadException(
+                        GetSpanMismatchMsg(i, SFront, STarget),
+                        HelpSystem.Topic.kErrStructureSpanMismatch,
+                        SFront.LineNoInFile,
+                        STarget.LineNoInFile);
+                }
 
                 if (SFront.SectionStructure != STarget.SectionStructure)
                 {
@@ -1241,8 +1268,13 @@ namespace JWdb.DataModel
                     if (DialogResult.Cancel == result)
                         goto done;
 
-                    // Prepare to try the import again
+                    // Prepare to try the import again. We have to reinitialize the
+                    // TextReader, because we've already read the file to the end.
+                    // A reorganization of the code might be called for, as this
+                    // seems awkward.
                     Sections.Clear();
+                    tr.Close();
+                    tr = JW_Util.GetTextReader(ref sPath, FileFilter);
                 }
                 catch (Exception e)
                 {

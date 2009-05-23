@@ -163,6 +163,7 @@ namespace JWTools
             kImportBook,
             kErrStructureSectionMiscount,
             kErrStructureMismatch,
+            kErrStructureSpanMismatch,
             kErrMissingParagraphMarkerForNote,
             kErrChapterNotInParagraph,
             kErrBadChapterNo,

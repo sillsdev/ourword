@@ -2150,6 +2150,57 @@ namespace JWdb.DataModel
 			#endregion
 
             // Translator Notes --------------------------------------------------------------
+            #region Method: bool CombineOldStyleNotes(TranslatorNote NoteToAdd)
+            bool CombineOldStyleNotes(TranslatorNote NoteToAdd)
+                // Typical use of \ov, as observed in Manado and Selaru, is to create an
+                // Old Version "ov" note every time a change in made in a verse. So there are
+                // often strings of ov notes 5 or more deep when a book as undergone numerous
+                // revisions. These clutter when imported into OW, as they result in numerous
+                // notes. But talking with the MTTs in Manado, they sure don't want this 
+                // history to dissappear. 
+                //    So to reduce clutter, yet keep the info, I've decided to just 
+                // combine them into a single Note. Each as a separate discussion. In
+                // keeping with their practice, the most recent one is the one on the top
+                // in the input file. I am placing it as the final one in the Note,
+                // as a "Respond" to that note will append one to the end in normal
+                // OW operation.
+            {
+                // Retrieve the place where this will go
+                // If there's noto LastParagraph, just return. Later in the calling method
+                // this will throw an exception, so that the user can deal with the bad data.
+                if (null == LastParagraph)
+                    return false;
+                DText text = LastParagraph.GetOrAddLastDText();
+                if (null == text)
+                    return false;
+
+                // Make sure this is a qualifying note.
+                // Currently, we're only doing OldVersion notes
+                if (NoteToAdd.Category != TranslatorNote.CategoryOldVersion)
+                    return false;
+
+                // If the NoteToAppend has multiple discusions, then it was created in some
+                // other way, and we don't append it
+                if (NoteToAdd.Discussions.Count != 1)
+                    return false;
+
+                // Scan the text and locate an OldVersion note, if any
+                TranslatorNote note = null;
+                foreach (TranslatorNote tn in text.TranslatorNotes)
+                {
+                    if (tn.Category == TranslatorNote.CategoryOldVersion)
+                        note = tn;
+                }
+                if (null == note)
+                    return false;
+
+                // Move the discussion over
+                Discussion disc = NoteToAdd.Discussions[0];
+                NoteToAdd.Discussions.Remove(disc);
+                note.Discussions.InsertAt(0, disc);
+                return true;
+            }
+            #endregion
             #region Method: bool TranslatorNote_in(SfField)
             bool TranslatorNote_in(SfField field)
             {
@@ -2171,6 +2222,8 @@ namespace JWdb.DataModel
                 {
                     tn = TranslatorNote.ImportFromOldStyle(
                         s_nChapter, s_nVerse, field);
+                    if (null != tn && CombineOldStyleNotes(tn))
+                        return true;
                 }
 
                 // If we don't have a note, then we're done processing
@@ -2287,12 +2340,15 @@ namespace JWdb.DataModel
 				// by the time we get here, the calculation of ReferenceSpan has
 				// already happened, so we just get another error (about section
 				// mismatches) down the road, with no good way to correct it.
-				if ( ! Map.IsVernacularParagraph( LastParagraph.StyleAbbrev ) )
-					throw new eBookReadException(
+                DParagraph last = LastParagraph;
+                if (null == last || !Map.IsVernacularParagraph(last.StyleAbbrev))
+                {
+                    throw new eBookReadException(
                         Loc.GetMessages("msgMissingParagraphMarker",
                             "A verse field was encountered but there was no paragraph marker for the verse to go into."),
-						HelpSystem.Topic.kErrMissingParagraphMarker,
-						field.LineNo);
+                        HelpSystem.Topic.kErrMissingParagraphMarker,
+                        field.LineNo);
+                }
 
 				// Create the DRun subclass and add it to the paragraph
 				DVerse verse = DVerse.Create( field.Data );

@@ -29,12 +29,11 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return m_radioMyDocuments.Checked;
+                return m_ClusterLocation.IsInMyDocuments;
             }
             set
             {
-                m_radioMyDocuments.Checked = value;
-                m_radioAppData.Checked = !value;
+                m_ClusterLocation.IsInMyDocuments = value;
             }
         }
         #endregion

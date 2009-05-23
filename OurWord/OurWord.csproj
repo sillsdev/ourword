@@ -219,6 +219,26 @@
       <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_GetClusterName.resx">
+      <DependentUpon>WizRepo_GetClusterName.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_GetLocation.resx">
+      <DependentUpon>WizRepo_GetLocation.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_GetRepoInfo.resx">
+      <DependentUpon>WizRepo_GetRepoInfo.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_Introduction.resx">
+      <DependentUpon>WizRepo_Introduction.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_Summary.resx">
+      <DependentUpon>WizRepo_Summary.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizNewProject\WizNew_FrontInfo.resx">
       <SubType>Designer</SubType>
       <DependentUpon>WizNew_FrontInfo.cs</DependentUpon>
@@ -498,6 +518,39 @@
     <Compile Include="Dialogs\WizImportBook\WizPage_Summary.Designer.cs">
       <DependentUpon>WizPage_Summary.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizInitializeFromRepository.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_GetClusterName.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_GetClusterName.Designer.cs">
+      <DependentUpon>WizRepo_GetClusterName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_GetLocation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_GetLocation.Designer.cs">
+      <DependentUpon>WizRepo_GetLocation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_GetRepoInfo.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_GetRepoInfo.Designer.cs">
+      <DependentUpon>WizRepo_GetRepoInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_Introduction.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_Introduction.Designer.cs">
+      <DependentUpon>WizRepo_Introduction.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_Summary.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\WizInitializeFromRepo\WizRepo_Summary.Designer.cs">
+      <DependentUpon>WizRepo_Summary.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\WizNewProject\WizNewProject.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -592,6 +645,12 @@
     </Compile>
     <Compile Include="Utilities\ClusterListView.Designer.cs">
       <DependentUpon>ClusterListView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Utilities\ClusterLocation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Utilities\ClusterLocation.Designer.cs">
+      <DependentUpon>ClusterLocation.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities\ColorComboQ.cs">
       <SubType>Component</SubType>
@@ -707,6 +766,10 @@
     <EmbeddedResource Include="Res\Tools.ico" />
     <EmbeddedResource Include="Utilities\ClusterListView.resx">
       <DependentUpon>ClusterListView.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Utilities\ClusterLocation.resx">
+      <DependentUpon>ClusterLocation.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Utilities\GroupedTasks.resx">

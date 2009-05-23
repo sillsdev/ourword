@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="m_labelName.Text" xml:space="preserve">
-    <value>If you are working on a single language, you can just use the name of that language; otherwise, choose a name that represents all of the languages in the cluster. For example, "Halmahera Cluster", or "Timor Languages".</value>
+  <data name="m_lblDescription2.Text" xml:space="preserve">
+    <value>We assume that the cluster has already been created on another computer and exists on the Internet, and that you have a live connection to the Internet. You will need the location of the repository (url), your username and your password. The person who originally set up the repository should be able to give you this information.</value>
   </data>
 </root>

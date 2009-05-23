@@ -2630,6 +2630,122 @@ namespace OurWord
         }
 		#endregion
 
+        const string c_sCloneFailedMsg = "Repository.CloneTo() failed.";
+        const string c_sPullFailedMsg = "Repository.Pull() failed.";
+        private void cmdDownloadRepository(Object sender, EventArgs e)
+        {
+            // Is Mercurial Installed?
+            if (!Repository.HgIsInstalled)
+            {
+                LocDB.Message("msgHgNotInstalled",
+                    "It appears that Mercurial is not installed on this computer.\n" +
+                    "Please install it, and then try again.",
+                    null,
+                    LocDB.MessageTypes.Error);
+                return;
+            }
+
+            // We'll contruct the wizard outside of the loop, in case we have to go
+            // back and change settings (e.g., on an error)
+            var wiz = new WizInitializeFromRepository();
+
+            // Loop until success or give up
+            while (true)
+            {
+                // Get the user's settings for the to-be-downloaded cluster
+                if (DialogResult.OK != wiz.ShowDialog(this))
+                    return;
+
+                // Make sure the current project is saved and up-to-date, before we create
+                // the new one. Commit to the Repository, to have a restoreo  point if we need it.
+                OnLeaveProject(true);
+
+                // Create the ClusterInfo object
+                string sParentFolder = (wiz.IsInMyDocuments) ?
+                    JWU.GetMyDocumentsFolder(null) :
+                    JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
+                ClusterInfo ci = new ClusterInfo(wiz.Name, sParentFolder);
+
+                // If the Cluster already exists, we don't continue, else we'd overwrite it.
+                if (Directory.Exists(ci.ClusterFolder))
+                {
+                    bool bTryAgain = LocDB.Message("msgClusterAlreadyExists",
+                        "We cannot create cluster {0} because it already exists.\n\n" + 
+                        "Do you want to try again?",
+                        new string[] { ci.Name },
+                        LocDB.MessageTypes.WarningYN);
+                    if (!bTryAgain)
+                        return;
+                    continue;
+                }
+
+                // Can we access the Internet?
+                if (!Repository.CanAccessInternet())
+                {
+                    bool bTryAgain = LocDB.Message("msgCannotAccessInternet",
+                        "OurWord is unable to access the Internet.\n\n" + 
+                        "Please check that you have an Internet connection, then press " +
+                        "\"Yes\" to try again; or \"No\" to cancel.",
+                        null,
+                        LocDB.MessageTypes.WarningYN);
+                    if (!bTryAgain)
+                        return;
+                    continue;
+                }
+
+                // Make changes to the disk
+                try
+                {
+                    // Create the Cluster Folder
+                    Directory.CreateDirectory(ci.ClusterFolder);
+
+                    // Clone the repository (thus creating the .Hg subfolder)
+                    if (!Repository.CloneTo(ci.ClusterFolder, wiz.Url))
+                        throw new Exception(c_sCloneFailedMsg);
+
+                    // Pull, so that the project folders are all created
+                    if (!Repository.Pull(ci.ClusterFolder))
+                        throw new Exception(c_sPullFailedMsg);
+
+                }
+                catch (Exception ex)
+                {
+                    // Clean Up
+                    if (Directory.Exists(ci.ClusterFolder))
+                        Directory.Delete(ci.ClusterFolder, true);
+
+                    if (ex.Message == c_sCloneFailedMsg)
+                    {
+                        bool bTryAgain = LocDB.Message("msgCloneFailed",
+                            "OurWord was unable to retrieve the data from the Internet.\n\n" +
+                            "Do you wish to try again?",
+                            null,
+                            LocDB.MessageTypes.WarningYN);
+                        if (!bTryAgain)
+                            return;
+                        continue;
+                    }
+
+                    if (ex.Message == c_sPullFailedMsg)
+                    {
+                         bool bTryAgain = LocDB.Message("msgPullFailed",
+                            "OurWord was unable to build folders on your disk.\n\n" +
+                            "Do you wish to try again?",
+                            null,
+                            LocDB.MessageTypes.WarningYN);
+                        if (!bTryAgain)
+                            return;
+                        continue;
+                   }
+                }
+
+                // Display a dialog declaring Success, and giving a choice of which project to open
+
+                // If we fail, tell the user and permit him to try again
+
+            }
+        }
+
         // Edit Dropdown
         #region Cmd: cmdUndo
         private void cmdUndo(object sender, EventArgs e)
