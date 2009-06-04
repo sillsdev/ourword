@@ -28,7 +28,7 @@ namespace OurWord.Edit
     {
         // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: EContainer Header
-        protected EContainer Header
+        public EContainer Header
         {
             get
             {
@@ -107,6 +107,14 @@ namespace OurWord.Edit
             // Save the header
             m_Header = _Header;
             m_Header.Owner = this;
+        }
+        #endregion
+        #region OMethod: void Clear()
+        public override void Clear()
+        {
+            base.Clear();
+            Header.Clear();
+            m_Header = null;
         }
         #endregion
 
@@ -195,6 +203,13 @@ namespace OurWord.Edit
 
             // Otherwise, revert to superclass behavior of looking at subitems
             return base.GetBlockAt(pt);
+        }
+        #endregion
+        #region OMethod: void PaintControls()
+        public override void PaintControls()
+        {
+            base.PaintControls();
+            Header.PaintControls();
         }
         #endregion
     }

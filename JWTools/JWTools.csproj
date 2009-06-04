@@ -124,8 +124,6 @@
     <Compile Include="JW_FeaturesPassword.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="JW_MRU.cs">
-    </Compile>
     <Compile Include="HelpSystem.cs">
       <SubType>Code</SubType>
     </Compile>

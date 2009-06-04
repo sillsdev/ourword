@@ -48,6 +48,7 @@
     <Compile Include="DataModel\T_DBasicText.cs" />
     <Compile Include="DataModel\T_DBook.cs" />
     <Compile Include="DataModel\T_DFootnote.cs" />
+    <Compile Include="DataModel\T_DHistory.cs" />
     <Compile Include="DataModel\T_DParagraph.cs" />
     <Compile Include="DataModel\T_DPhrase.cs" />
     <Compile Include="DataModel\T_DReferenceSpan.cs" />

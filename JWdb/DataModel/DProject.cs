@@ -41,7 +41,7 @@ namespace JWdb.DataModel
 		}
 		private string m_sComment = "";
 		#endregion
-		#region BAttr{g/s}: bool VD_ShowNotesPane - View:Drafting, F is pane is hidden
+		#region BAttr{g/s}: bool VD_ShowNotesPane
 		static public bool VD_ShowNotesPane
 		{
 			get
@@ -55,7 +55,7 @@ namespace JWdb.DataModel
 		}
 		static private bool m_bVD_ShowNotesPane = false;
 		#endregion
-        #region BAttr{g/s}: bool VD_ShowTranslationsPane - View:Drafting, F is pane is hidden
+        #region BAttr{g/s}: bool VD_ShowTranslationsPane
         static public bool VD_ShowTranslationsPane
 		{
 			get
@@ -69,21 +69,19 @@ namespace JWdb.DataModel
 		}
         static private bool m_bVD_ShowTranslationsPane = false;
 		#endregion
-        #region BAttr{g/s}: bool ShowMergePane
-#if FEATURE_MERGE
-        static public bool ShowMergePane
+        #region BAttr{g/s}: bool VD_ShowHistoryPane 
+        static public bool VD_ShowHistoryPane
         {
             get
             {
-                return m_bShowMergePane;
+                return m_bVD_ShowHistoryPane;
             }
             set
             {
-                m_bShowMergePane = value;
+                m_bVD_ShowHistoryPane = value;
             }
         }
-        static private bool m_bShowMergePane = false;
-#endif
+        static private bool m_bVD_ShowHistoryPane = false;
         #endregion
         #region BAttr{g/s}: bool ShowDictionaryPane
 #if FEATURE_WESAY
@@ -167,12 +165,12 @@ namespace JWdb.DataModel
 
 			DefineAttr("vdShowNotes",    ref m_bVD_ShowNotesPane);
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
+            DefineAttr("vdShowHistory",  ref m_bVD_ShowHistoryPane);
 
             DefineAttr("People", ref m_bsaPeople);
 			DefineAttr("Version", ref m_nVersion);
 
-#if (FEAT_WESAY || FEAT_MERGE)
-            DefineAttr("ShowMerge",      ref m_bShowMergePane);
+#if FEAT_WESAY
             DefineAttr("ShowDictionary", ref m_bShowDictionaryPane);
 #endif
         }

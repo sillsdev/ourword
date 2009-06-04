@@ -230,7 +230,6 @@ namespace OurWord.Edit
             if (ShowHeaderWhenExpanded || IsCollapsed)
                 Header.OnPaint(ClipRectangle);
 
-
             // If we're expanded, then show the subitems
             if (!IsCollapsed)
             {

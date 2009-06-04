@@ -185,7 +185,6 @@ namespace OurWord.Edit
         object m_Tag;
         #endregion
 
-
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public EItem()
@@ -458,7 +457,7 @@ namespace OurWord.Edit
                 }
             }
             #endregion
-            #region VAttr{g}:  Brush FillBrush
+            #region VAttr{g}: Brush FillBrush
             protected Brush FillBrush
             {
                 get
@@ -987,18 +986,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region OMethod: void Clear()
-        public override void Clear()
-            // Recursively works down, because we need to dispose of any EControls
-        {
-            foreach (EItem item in SubItems)
-            {
-                item.Clear();
-            }
-
-            m_vSubItems = new EItem[0];
-        }
-        #endregion
         #region Method: int Find(EItem) - returns -1 if not found (doesn't search down the hierarchy)
         public int Find(EItem item)
         {
@@ -1105,6 +1092,18 @@ namespace OurWord.Edit
 
             // Default to an empty border
             m_Border = new BorderBase(this);
+        }
+        #endregion
+        #region OMethod: void Clear()
+        public override void Clear()
+            // Recursively works down, because we need to dispose of any EControls
+        {
+            foreach (EItem item in SubItems)
+            {
+                item.Clear();
+            }
+
+            m_vSubItems = new EItem[0];
         }
         #endregion
 

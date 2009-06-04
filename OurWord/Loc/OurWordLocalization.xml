@@ -17,7 +17,7 @@
       <Tip>Create a brand new project.</Tip>
     </Item>
     <Item ID="m_menuOpenProject" Tip="true">
-      <English>&amp;Open...</English>
+      <English>&amp;Open</English>
       <Key>Ctrl+O</Key>
       <Tip>Open an existing project.</Tip>
     </Item>
@@ -1960,7 +1960,7 @@
         <English>Start from scratch to initialize settings for a reference translation. You will be presented with blank settings, and will need to enter the name of the translation, its books, etc.</English>
       </Item>
       <Item ID="m_btnOpen">
-        <English>Open...</English>
+        <English>Open</English>
       </Item>
       <Item ID="m_lblOpen">
         <English>Make use of existing settings for a reference translation. If you defined the translation in another project, then you can reuse it here, rather than entering the information all over again.</English>

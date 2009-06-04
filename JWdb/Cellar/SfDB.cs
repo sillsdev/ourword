@@ -349,11 +349,12 @@ namespace JWdb
 			return Fields[i] as SfField;
 		}
 		#endregion
-        #region Method: void InsertAt(iPos, SfField)
-        public void InsertAt(int iPos, SfField field)
+        #region Method: SfField InsertAt(iPos, SfField)
+        public SfField InsertAt(int iPos, SfField field)
         {
             if (null != field)
                 Fields.Insert(iPos, field);
+            return field;
         }
         #endregion
 		#region Method: void RemoveAt(i)
@@ -362,11 +363,12 @@ namespace JWdb
 			Fields.RemoveAt(i);
 		}
 		#endregion
-        #region Method: void Append(SfField)
-        public void Append(SfField field)
+        #region Method: SfField Append(SfField)
+        public SfField Append(SfField field)
 		{
 			if (null != field)
 				Fields.Add(field);
+            return field;
 		}
 		#endregion
 		#region Method: void Remove(SfField)

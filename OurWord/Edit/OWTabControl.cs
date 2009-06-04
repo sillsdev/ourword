@@ -20,6 +20,7 @@ using JWTools;
 using JWdb;
 using JWdb.DataModel;
 using OurWord.View;
+using OurWord.Layouts;
 using OurWord.Edit;
 #endregion
 
@@ -83,6 +84,8 @@ namespace OurWord.Edit
                 wndMain.RegisterSecondaryWindow(NotesPane.WndNotes);
             if (HasTranslationsWindow)
                 wndMain.RegisterSecondaryWindow(TranslationsWindow);
+            if (HasHistoryWindow)
+                wndMain.RegisterSecondaryWindow(HistoryPane.WndHistory);
         }
         #endregion
         #region Method: void SetChildrenSizes()
@@ -96,6 +99,9 @@ namespace OurWord.Edit
 
             if (HasDictionaryPane)
                 DictionaryPane.SetSize(DisplayRectangle.Size);
+
+            if (HasHistoryWindow)
+                HistoryPane.SetSize(DisplayRectangle.Size);
         }
         #endregion
         #region Method: void SetZoomFactor(float fZoomFactor)
@@ -105,6 +111,8 @@ namespace OurWord.Edit
                 NotesPane.WndNotes.ZoomFactor = fZoomFactor;
             if (HasTranslationsWindow)
                 TranslationsWindow.ZoomFactor = fZoomFactor;
+            if (HasHistoryWindow)
+                HistoryPane.WndHistory.ZoomFactor = fZoomFactor;
         }
         #endregion
         #region Attr{g}: OWWindow FocusedWindow
@@ -116,6 +124,8 @@ namespace OurWord.Edit
                     return NotesPane.WndNotes;
                 if (HasTranslationsWindow && TranslationsWindow.Focused)
                     return TranslationsWindow;
+                if (HasHistoryWindow && HistoryPane.WndHistory.Focused)
+                    return HistoryPane.WndHistory;
                 return null;
             }
         }
@@ -260,6 +270,37 @@ namespace OurWord.Edit
         public void ActivateDictionaryPane()
         {
             ActivatePane(DictionaryPane);
+        }
+        #endregion
+
+        // History Window --------------------------------------------------------------------
+        #region Attr{g}: HistoryPane HistoryPane
+        public HistoryPane HistoryPane
+        {
+            get
+            {
+                Debug.Assert(null != m_HistoryPane);
+                return m_HistoryPane;
+            }
+        }
+        HistoryPane m_HistoryPane = null;
+        #endregion
+        #region Method: void CreateHistoryWindow()
+        public void CreateHistoryWindow()
+        {
+            // Create a History Window
+            m_HistoryPane = new HistoryPane();
+
+            CreateContainerTabPage(m_HistoryPane, "History", "History");
+        }
+        #endregion
+        #region Attr{g}: bool HasHistoryWindow
+        public bool HasHistoryWindow
+        {
+            get
+            {
+                return (m_HistoryPane != null);
+            }
         }
         #endregion
 

@@ -1003,6 +1003,8 @@ namespace OurWordTests.DataModel
 			"\\p",
 			"\\v 4",
 			"\\p",
+            "\\vt |fn", 
+            "\\btvt |fn",
 			"\\ft",
 			"\\cf 1:4: La'o sai hosi Mesir 3:14, Rai-klaran Foun 4:5",
 			"\\v 5",
@@ -2221,9 +2223,11 @@ namespace OurWordTests.DataModel
             vsExpected = SectionTestData.Insert(vsExpected, 16, string.Copy(vsMine[16]));
             vsExpected = SectionTestData.Insert(vsExpected, 17, string.Copy(vsMine[17]));
 
-            // The second paragraph insertion is just an easy addition between existing elements
-            vsMine = SectionTestData.Insert(vsMine, 21, "\\p");
-            vsExpected = SectionTestData.Insert(vsExpected, 21, "\\p");
+            // The second paragraph insertion is just an easy addition between existing elements,
+            // before v3. That would have been at line 20, but because we've already inserted
+            // 3 lines, it is not at 23.
+            vsMine = SectionTestData.Insert(vsMine, 20+3, "\\p");
+            vsExpected = SectionTestData.Insert(vsExpected, 20+3, "\\p");
 
             //Delete the "\st The Gospel Of" in the title section
             vsMine = SectionTestData.Delete(vsMine, 4);
@@ -2371,7 +2375,7 @@ namespace OurWordTests.DataModel
             string[] vsActual = SectionTestData.ReadSfmFromBookFile(Mine.Book as DTestBook);
 
             // Comment out unless debugging
-            // SectionTestData.ConsoleOut_ShowDiffs("Merge Different Structures", vsActual, vsExpected);
+            SectionTestData.ConsoleOut_ShowDiffs("Merge Different Structures", vsActual, vsExpected);
 
             bool bAreSame = SectionTestData.AreSame(vsExpected, vsActual);
             Assert.IsTrue(bAreSame, "Structures should be the same");

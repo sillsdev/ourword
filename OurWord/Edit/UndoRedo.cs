@@ -19,9 +19,12 @@ using System.Text;
 using System.Timers;
 using System.Threading;
 using System.Windows.Forms;
+
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+using OurWord.Layouts;
+
 #endregion
 
 namespace OurWord.Edit
@@ -546,6 +549,23 @@ namespace OurWord.Edit
         }
         OWBookmark m_bookmark_AfterJoin;
         #endregion
+        #region Attr{g/s}: string FollowingParagraphStyle
+        // If we Join two paragraphs with different styles, we need to rememver the style
+        // of the second one, in case the user does an Undo. Otherwise, the default 
+        // behavior is that the second paragraph will have the same style as the first.
+        string FollowingParagraphStyle
+        {
+            get
+            {
+                return m_sFollowingParagraphStyle;
+            }
+            set
+            {
+                m_sFollowingParagraphStyle = value;
+            }
+        }
+        string m_sFollowingParagraphStyle;
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -604,6 +624,8 @@ namespace OurWord.Edit
             DParagraph paraNew = para.Split(text, iPos);
             if (null == paraNew)
                 return false;
+            if (!string.IsNullOrEmpty(FollowingParagraphStyle))
+                paraNew.StyleAbbrev = FollowingParagraphStyle;
 
             // Reload the window's data. This is time-consuming, but it is the only way to make 
             // paragraphs line up correctly side-by-side.
@@ -633,6 +655,7 @@ namespace OurWord.Edit
             DParagraph p = selection.Paragraph.DataSource as DParagraph;
             if (null == p)
                 return false;
+            FollowingParagraphStyle = p.StyleAbbrev;
 
             // Retrieve the paragraph previous to it
             JOwnSeq<DParagraph> seq = p.GetMyOwningAttr() as JOwnSeq<DParagraph>;
@@ -2518,7 +2541,7 @@ namespace OurWord.Edit
         int m_iNotePos;
         #endregion
 
-        #region Constructor(OWWindow)
+        #region Constructor(OWWindow, TranslatorNote)
         public DeleteNoteAction(OWWindow window, TranslatorNote note)
             : base(window, "Delete Translator Note")
         {
@@ -2691,4 +2714,437 @@ namespace OurWord.Edit
 		#endregion
 	}
 	#endregion
+
+    // History -------------------------------------------------------------------------------
+    #region CLASS: InsertHistoryAction
+    public class InsertHistoryAction : BookmarkedAction
+    {
+        #region Attr[g}: DEvent Event - so we know which to delete on an Undo op
+        protected DEvent Event
+        {
+            get
+            {
+                Debug.Assert(null != m_Event);
+                return m_Event;
+            }
+        }
+        DEvent m_Event;
+        #endregion
+        #region Attr{g/s}: OWBookmark BmMainWnd - keep track of the main window's selection
+        protected OWBookmark BmMainWnd
+        {
+            get
+            {
+                return m_BmMainWnd;
+            }
+            set
+            {
+                m_BmMainWnd = value;
+            }
+        }
+        OWBookmark m_BmMainWnd;
+        #endregion
+
+        #region Constructor(OWWindow)
+        public InsertHistoryAction(OWWindow window)
+            : base(window, "Insert Event")
+        {
+        }
+        #endregion
+
+        #region Method: Dictionary<DEvent, bool> PushCollapseStates()
+        Dictionary<DEvent, bool> PushCollapseStates()
+        {
+            var states = new Dictionary<DEvent, bool>();
+            foreach (DEvent e in DB.TargetSection.History.Events)
+            {
+                var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
+                if (null != container)
+                    states.Add(e, container.IsCollapsed);
+            }
+            return states;
+        }
+        #endregion
+        #region Method: void RestoreStates(Dictionary<DEvent, bool> states)
+        void RestoreStates(Dictionary<DEvent, bool> states)
+        {
+            foreach (DEvent e in DB.TargetSection.History.Events)
+            {
+                var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
+                if (null != container)
+                {
+                    bool b;
+                    if (states.TryGetValue(e, out b))
+                        container.IsCollapsed = b;
+                }
+            }
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Create a "before" bookmark for the main window
+            if (G.App.MainWindow.Focused && G.App.MainWindow.Selection != null)
+                BmMainWnd = G.App.MainWindow.CreateBookmark();
+
+            // Remember the current expand/collapsed states
+            var states = PushCollapseStates();
+
+            // Create the new Event
+            DHistory History = DB.TargetSection.History;
+            string sNewStage = History.MostRecentStage;
+            if (string.IsNullOrEmpty(sNewStage))
+                sNewStage = DB.TeamSettings.TranslationStages[0].Name;
+            m_Event = History.AddEvent(DateTime.Now, sNewStage, "");
+
+            // Recalculate the entire display
+            G.App.ResetWindowContents();
+
+            // Return the Main Window to where it was
+            if (null != BmMainWnd)
+                BmMainWnd.RestoreWindowSelectionAndScrollPosition();
+
+            // Locate the container that has our History, and expand it
+            var eCollapsable = (Window as HistoryWnd).GetCollapsableFromEvent(Event);
+            eCollapsable.IsCollapsed = false;
+
+            // Return the History window to its previous collapse/expand states
+            RestoreStates(states);
+
+            // Re-do the layout
+            Window.DoLayout();
+            Window.Invalidate();
+
+            // Select the new Event and bring the focus to it
+            eCollapsable.Select_LastWord_End();
+            Window.Focus();
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Remove the event from its owner
+            DB.TargetSection.History.Events.Remove(Event);
+
+            // Remember the current expand/collapsed states
+            var states = PushCollapseStates();
+
+            // Recalculate the entire display
+            G.App.ResetWindowContents();
+
+            // Return the History window to its previous collapse/expand states
+            RestoreStates(states);
+            Window.DoLayout();
+            Window.Invalidate();
+
+            // Main window position
+            if (null != BmMainWnd)
+                BmMainWnd.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: DeleteHistoryAction
+    public class DeleteHistoryAction : BookmarkedAction
+    {
+        #region Attr[g}: DEvent Event - We keep it so we can restore on Undo
+        protected DEvent Event
+        {
+            get
+            {
+                Debug.Assert(null != m_Event);
+                return m_Event;
+            }
+        }
+        DEvent m_Event;
+        #endregion
+
+        #region Constructor(OWWindow, DEvent)
+        public DeleteHistoryAction(OWWindow window, DEvent Event)
+            : base(window, "Delete Event")
+        {
+            Debug.Assert(null != Event);
+            m_Event = Event;
+        }
+        #endregion
+
+        #region Method: Dictionary<DEvent, bool> PushCollapseStates()
+        Dictionary<DEvent, bool> PushCollapseStates()
+        {
+            var states = new Dictionary<DEvent, bool>();
+            foreach (DEvent e in DB.TargetSection.History.Events)
+            {
+                var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
+                if (null != container)
+                    states.Add(e, container.IsCollapsed);
+            }
+            return states;
+        }
+        #endregion
+        #region Method: void RestoreStates(Dictionary<DEvent, bool> states)
+        void RestoreStates(Dictionary<DEvent, bool> states)
+        {
+            foreach (DEvent e in DB.TargetSection.History.Events)
+            {
+                var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
+                if (null != container)
+                {
+                    bool b;
+                    if (states.TryGetValue(e, out b))
+                        container.IsCollapsed = b;
+                }
+            }
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Remove the event from its owner
+            DB.TargetSection.History.Events.Remove(Event);
+
+            // Regenerate the windows
+            var states = PushCollapseStates();
+            G.App.ResetWindowContents();
+            RestoreStates(states);
+            Window.DoLayout();
+            Window.Invalidate();
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Re-insert the event
+            DB.TargetSection.History.Events.Append(Event);
+
+            // Recalculate the display
+            var states = PushCollapseStates();
+            G.App.ResetWindowContents();
+            RestoreStates(states);
+
+            // Expand what we just inserted
+            var eCollapsable = (Window as HistoryWnd).GetCollapsableFromEvent(Event);
+            eCollapsable.IsCollapsed = false;
+            Window.DoLayout();
+            Window.Invalidate();
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: ChangeStage
+    public class ChangeStage : BookmarkedAction
+    {
+        #region Attr{g}: DEvent Event
+        DEvent Event
+        {
+            get
+            {
+                Debug.Assert(null != m_Event);
+                return m_Event;
+            }
+        }
+        DEvent m_Event;
+        #endregion
+        #region Attr{g}: ToolStripMenuItem NewStage
+        ToolStripMenuItem NewStage
+        {
+            get
+            {
+                Debug.Assert(null != m_itemNewStage);
+                return m_itemNewStage;
+            }
+        }
+        ToolStripMenuItem m_itemNewStage;
+        #endregion
+        #region Attr{g}: ToolStripMenuItem OriginalStage
+        ToolStripMenuItem OriginalStage
+        {
+            get
+            {
+                Debug.Assert(null != m_itemOriginalStage);
+                return m_itemOriginalStage;
+            }
+        }
+        ToolStripMenuItem m_itemOriginalStage;
+        #endregion
+
+        #region VAttr{g}: ToolStripDropDownButton ParentMenu
+        ToolStripDropDownButton ParentMenu
+        {
+            get
+            {
+                var menu = NewStage.OwnerItem as ToolStripDropDownButton;
+                Debug.Assert(null != menu);
+                return menu;
+            }
+        }
+        #endregion
+        #region VAttr{g}: ToolStripMenuItem CurrentCheckedItem
+        ToolStripMenuItem CurrentCheckedItem
+        {
+            get
+            {
+                foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
+                {
+                    if (item.Checked)
+                        return item;
+                }
+                return null;
+            }
+        }
+        #endregion
+
+        #region Constructor(OWWindow, Event, itemNewStage)
+        public ChangeStage(OWWindow window, DEvent Event, ToolStripMenuItem NewStage)
+            : base(window, "Change Translation Stage to")
+        {
+            m_Event = Event;
+            m_itemNewStage = NewStage;
+            m_itemOriginalStage = CurrentCheckedItem;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            // Check the new item, uncheck the others
+            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
+                item.Checked = (item == NewStage);
+
+            // Update the Stage attribute
+            Event.Stage = NewStage.Text;
+
+            // Update the main menu text
+            ParentMenu.Text = NewStage.Text;
+
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            // Check the new item, uncheck the others
+            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
+                item.Checked = (item == OriginalStage);
+
+            // Update the Category attribute
+            Event.Stage = OriginalStage.Text;
+
+            // Update the main menu text
+            ParentMenu.Text = OriginalStage.Text;
+        }
+        #endregion
+
+        #region OAttr{g}: string Contents - places the new Stage into the Undo menu
+        public override string Contents
+        {
+            get
+            {
+                return NewStage.Text;
+            }
+        }
+        #endregion
+    }
+    #endregion
+    #region CLASS: ChangeEventDate
+    public class ChangeEventDate : BookmarkedAction
+    {
+        #region Attr{g}: DEvent Event
+        DEvent Event
+        {
+            get
+            {
+                Debug.Assert(null != m_Event);
+                return m_Event;
+            }
+        }
+        DEvent m_Event;
+        #endregion
+        #region Attr{g}: DateTime NewDate
+        DateTime NewDate
+        {
+            get
+            {
+                Debug.Assert(null != m_NewDate);
+                return m_NewDate;
+            }
+        }
+        DateTime m_NewDate;
+        #endregion
+        #region Attr{g}: DateTime OriginalDate
+        DateTime OriginalDate
+        {
+            get
+            {
+                Debug.Assert(null != m_OriginalDate);
+                return m_OriginalDate;
+            }
+        }
+        DateTime m_OriginalDate;
+        #endregion
+
+        #region Constructor(OWWindow, Event, DateTimePicker)
+        public ChangeEventDate(OWWindow window, DEvent Event, DateTimePicker dtp)
+            : base(window, "Change Date to")
+        {
+            m_Event = Event;
+            m_NewDate = dtp.Value;
+            m_OriginalDate = Event.Date;
+        }
+        #endregion
+
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            Event.Date = NewDate;
+
+            // Update the date picker
+            var wndHistory = Window as HistoryWnd;
+            if (null == wndHistory)
+                return false;
+            var dtp = wndHistory.GetPickerFromEvent(Event);
+            if (null == dtp)
+                return false;
+
+            dtp.ValueChanged -= new EventHandler(wndHistory.OnDateChanged);
+            dtp.Value = Event.Date;
+            dtp.ValueChanged += new EventHandler(wndHistory.OnDateChanged);
+           
+            return true;
+        }
+        #endregion
+        #region OMethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            Event.Date = OriginalDate;
+
+            // Locate the event and change its value
+            var wndHistory = Window as HistoryWnd;
+            if (null == wndHistory)
+                return;
+            var dtp = wndHistory.GetPickerFromEvent(Event);
+            if (null == dtp)
+                return;
+
+            dtp.ValueChanged -= new EventHandler(wndHistory.OnDateChanged);
+            dtp.Value = Event.Date;
+            dtp.ValueChanged += new EventHandler(wndHistory.OnDateChanged);
+        }
+        #endregion
+
+        #region OAttr{g}: string Contents - places the new date into the Undo menu
+        public override string Contents
+        {
+            get
+            {
+                return NewDate.ToString("yyyy-MM-dd");
+            }
+        }
+        #endregion
+    }
+    #endregion
 }

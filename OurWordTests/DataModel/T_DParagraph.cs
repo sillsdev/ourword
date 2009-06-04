@@ -335,7 +335,6 @@ namespace OurWordTests.DataModel
 
             // The styles we don't allow
             string[] vs = new string[] { 
-                DStyleSheet.c_sfmSectionHead,
                 DStyleSheet.c_StyleAbbrevPictureCaption,
                 DStyleSheet.c_StyleNote,
                 DStyleSheet.c_StyleFootnote

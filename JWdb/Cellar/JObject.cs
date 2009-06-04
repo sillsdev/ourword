@@ -381,9 +381,9 @@ namespace JWdb
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        enum Ops { kSave, kRead, kCount };
-        Ops m_ioOperation = Ops.kSave;
-        XElement m_ioX;
+        protected enum Ops { kSave, kRead, kCount };
+        protected Ops m_ioOperation = Ops.kSave;
+        protected XElement m_ioX;
         #region Methods: void DefineAttr(sName, ref X)
         #region Method: void DefineAttr(sName, ref n)
         protected void DefineAttr(string sName, ref int nValue)

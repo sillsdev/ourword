@@ -252,7 +252,7 @@ namespace JWdb.DataModel
 			}
 
 			// Save the changes the user made.
-			// Note: We don't use the "SaveFile" method, because it is destorying the UTF8.
+			// Note: We don't use the "SaveFile" method, because it is destroying the UTF8.
 			string[] v = DataFile.Lines;
 			TextWriter w = JW_Util.GetTextWriter(PathName);
 			foreach(string s in v)

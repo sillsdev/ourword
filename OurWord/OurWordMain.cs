@@ -29,6 +29,7 @@ using JWdb.DataModel;
 using OurWord.Edit;
 using OurWord.View;
 using OurWord.Dialogs;
+using OurWord.Utilities;
 #endregion
 
 namespace OurWord
@@ -156,6 +157,7 @@ namespace OurWord
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
         private ToolStripMenuItem m_Synchronize;
+        private ToolStripMenuItem m_menuShowHistory;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -304,10 +306,8 @@ namespace OurWord
             if (null != DB.Project && DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
                 SideWindows.CreateTranslationsWindow();
 
-#if FEATURE_MERGE
-            if (G.IsValidProject && s_Features.F_Merge && DProject.ShowMergePane)
-                SideWindows.CreateMergePane();
-#endif
+            if (null != DB.Project && OurWordMain.s_Features.SectionHistory && DProject.VD_ShowHistoryPane)
+                SideWindows.CreateHistoryWindow();
 
 #if FEATURE_WESAY
             if (G.IsValidProject && s_Features.F_Dictionary && DProject.ShowDictionaryPane)
@@ -461,7 +461,6 @@ namespace OurWord
         private ToolStripSeparator m_separatorWindow;
         private ToolStripMenuItem m_menuShowNotesPane;
         private ToolStripMenuItem m_menuShowTranslationsPane;
-        private ToolStripMenuItem m_menuShowMergePane;
         private ToolStripMenuItem m_menuShowDictionaryPane;
         private ToolStripSeparator m_separatorZoom;
         private ToolStripMenuItem m_menuZoom;
@@ -721,13 +720,17 @@ namespace OurWord
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
             bool bShowTranslationsPane = (DB.IsValidProject && DB.Project.OtherTranslations.Count > 0);
-#if (FEATURE_WESAY || FEATURE_MERGE)
+            bool bShowHistoryMenu = (DB.IsValidProject && s_Features.SectionHistory);
+
+#if FEATURE_WESAY
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
-            bool bShowMergePane = (s_Features.F_Merge && G.IsValidProject);
             bool bShowSideWindowsSection = s_Features.TranslatorNotes || bShowTranslationsPane || 
-                bShowDictionaryPane || bShowMergePane;
+                bShowDictionaryPane ;
 #else
-            bool bShowSideWindowsSection = bShowTranslatorNotesMenu || bShowTranslationsPane;
+            bool bShowSideWindowsSection = 
+                bShowTranslatorNotesMenu || 
+                bShowTranslationsPane || 
+                bShowHistoryMenu;
 #endif
             m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
 
@@ -742,13 +745,14 @@ namespace OurWord
             m_menuShowNotesPane.Checked = bShowTranslatorNotesMenu && DProject.VD_ShowNotesPane;
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
-#if (FEATURE_WESAY || FEATURE_MERGE)
-            m_menuShowMergePane.Visible = bShowMergePane;
-            m_menuShowMergePane.Checked = DProject.ShowMergePane;
+
+            m_menuShowHistory.Visible = bShowHistoryMenu;
+            m_menuShowHistory.Checked = bShowHistoryMenu && DProject.VD_ShowHistoryPane;
+
+#if FEATURE_WESAY
             m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
             m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
 #else
-            m_menuShowMergePane.Visible = false;
             m_menuShowDictionaryPane.Visible = false;
 #endif
 
@@ -770,8 +774,6 @@ namespace OurWord
             m_btnEditPaste.Visible = !bEditMenuVisible;
 
             // Clear dropdown subitems so we don't attempt to localize them
-			if (bShowNewOpenEtc)
-			MRU.RemoveMruItems(m_btnProject);
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
             m_btnGoToBook.DropDownItems.Clear();
@@ -781,8 +783,6 @@ namespace OurWord
 
             // Some submenus happen after localization (otherwise, we'd be adding spurious
             // entries into the localization database)
-			if (bShowNewOpenEtc)
-				MRU.BuildPopupMenu(m_btnProject, cmdMRU);
             SetupNavigationButtons();
             DBookGrouping.PopulateGotoBook(m_btnGoToBook, cmdGotoBook);
             m_btnGoToBook.Visible = (m_btnGoToBook.DropDownItems.Count > 1);
@@ -903,19 +903,9 @@ namespace OurWord
 		}
 		#endregion
 		private JW_WindowState  m_WindowState;   // Save/restore state on close/launch of app
-		#region Attr{g}: MRU MRU
-		public MRU MRU
-		{
-			get
-			{
-				Debug.Assert(null != m_Mru);
-				return m_Mru;
-			}
-		}
-		MRU m_Mru;
-		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
+        const string c_sLastProjectOpened = "LastProjectOpened";
 		#region Constructor()
 		public OurWordMain()
 			// Constructor, initializes the application
@@ -938,9 +928,6 @@ namespace OurWord
             // Create the Undo/Redo Stack
             int nUndoRedoMaxDepth = 10;
             m_URStack = new UndoRedoStack(nUndoRedoMaxDepth, m_menuUndo, m_menuRedo);
-
-			// Initialize the MRU
-			m_Mru = new MRU();
 
 			// Initialize to a blank project (if there is a recent project
 			// in the MRU, this will get overridden.)
@@ -1026,12 +1013,12 @@ namespace OurWord
             this.m_menuToggleItalics = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnWindow = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuShowNotesPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuShowMergePane = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuShowHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorZoom = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
@@ -1134,12 +1121,13 @@ namespace OurWord
             this.m_btnProject.Text = "Project";
             this.m_btnProject.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.m_btnProject.ToolTipText = "Shows the menu for working with a project (New, Open, etc.).";
+            this.m_btnProject.DropDownOpening += new System.EventHandler(this.cmdSetupOpening);
             // 
             // m_menuNewProject
             // 
             this.m_menuNewProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNewProject.Image")));
             this.m_menuNewProject.Name = "m_menuNewProject";
-            this.m_menuNewProject.Size = new System.Drawing.Size(155, 22);
+            this.m_menuNewProject.Size = new System.Drawing.Size(152, 22);
             this.m_menuNewProject.Text = "&New...";
             this.m_menuNewProject.ToolTipText = "Create a brand new project.";
             this.m_menuNewProject.Click += new System.EventHandler(this.cmdNewProject);
@@ -1149,17 +1137,16 @@ namespace OurWord
             this.m_menuOpenProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOpenProject.Image")));
             this.m_menuOpenProject.Name = "m_menuOpenProject";
             this.m_menuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.m_menuOpenProject.Size = new System.Drawing.Size(155, 22);
-            this.m_menuOpenProject.Text = "&Open...";
+            this.m_menuOpenProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuOpenProject.Text = "&Open";
             this.m_menuOpenProject.ToolTipText = "Open an existing project.";
-            this.m_menuOpenProject.Click += new System.EventHandler(this.cmdOpenProject);
             // 
             // m_menuSaveProject
             // 
             this.m_menuSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSaveProject.Image")));
             this.m_menuSaveProject.Name = "m_menuSaveProject";
             this.m_menuSaveProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSaveProject.Size = new System.Drawing.Size(155, 22);
+            this.m_menuSaveProject.Size = new System.Drawing.Size(152, 22);
             this.m_menuSaveProject.Text = "&Save";
             this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
             this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
@@ -1557,7 +1544,7 @@ namespace OurWord
             this.m_separatorWindow,
             this.m_menuShowNotesPane,
             this.m_menuShowTranslationsPane,
-            this.m_menuShowMergePane,
+            this.m_menuShowHistory,
             this.m_menuShowDictionaryPane,
             this.m_separatorZoom,
             this.m_menuZoom});
@@ -1579,15 +1566,6 @@ namespace OurWord
             this.m_menuDrafting.ToolTipText = "Set the main window to do Drafting.";
             this.m_menuDrafting.Click += new System.EventHandler(this.cmdJobDrafting);
             // 
-            // m_menuBackTranslation
-            // 
-            this.m_menuBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_menuBackTranslation.Image")));
-            this.m_menuBackTranslation.Name = "m_menuBackTranslation";
-            this.m_menuBackTranslation.Size = new System.Drawing.Size(232, 22);
-            this.m_menuBackTranslation.Text = "&Back Translation";
-            this.m_menuBackTranslation.ToolTipText = "Set the main window to work on the Back Translation.";
-            this.m_menuBackTranslation.Click += new System.EventHandler(this.cmdJobBackTranslation);
-            // 
             // m_menuNaturalnessCheck
             // 
             this.m_menuNaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNaturalnessCheck.Image")));
@@ -1597,6 +1575,15 @@ namespace OurWord
             this.m_menuNaturalnessCheck.ToolTipText = "Set the main window to do a Naturalness Check (where the Front Translation is not" +
                 " displayed.)";
             this.m_menuNaturalnessCheck.Click += new System.EventHandler(this.cmdJobNaturalness);
+            // 
+            // m_menuBackTranslation
+            // 
+            this.m_menuBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_menuBackTranslation.Image")));
+            this.m_menuBackTranslation.Name = "m_menuBackTranslation";
+            this.m_menuBackTranslation.Size = new System.Drawing.Size(232, 22);
+            this.m_menuBackTranslation.Text = "&Back Translation";
+            this.m_menuBackTranslation.ToolTipText = "Set the main window to work on the Back Translation.";
+            this.m_menuBackTranslation.Click += new System.EventHandler(this.cmdJobBackTranslation);
             // 
             // m_separatorWindow
             // 
@@ -1619,14 +1606,13 @@ namespace OurWord
             this.m_menuShowTranslationsPane.ToolTipText = "Show the Other Translations Pane";
             this.m_menuShowTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
             // 
-            // m_menuShowMergePane
+            // m_menuShowHistory
             // 
-            this.m_menuShowMergePane.Name = "m_menuShowMergePane";
-            this.m_menuShowMergePane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowMergePane.Text = "Show &Merge Pane";
-            this.m_menuShowMergePane.ToolTipText = "Show the pane by which you can merge different versions of a file into a single f" +
-                "ile.";
-            this.m_menuShowMergePane.Click += new System.EventHandler(this.cmdToggleMergePane);
+            this.m_menuShowHistory.Name = "m_menuShowHistory";
+            this.m_menuShowHistory.Size = new System.Drawing.Size(232, 22);
+            this.m_menuShowHistory.Text = "Show &History Pane";
+            this.m_menuShowHistory.ToolTipText = "Show the History Pane";
+            this.m_menuShowHistory.Click += new System.EventHandler(this.cmdToggleHistoryPane);
             // 
             // m_menuShowDictionaryPane
             // 
@@ -1954,6 +1940,16 @@ namespace OurWord
                 }
             }
             #endregion
+            #region Attr{g}: bool SectionHistory
+            public bool SectionHistory
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fSectionHistory.ToString());
+                }
+            }
+            #endregion
+
             #region Attr{g}: bool F_Project
 			public bool F_Project
 			{
@@ -2062,18 +2058,6 @@ namespace OurWord
 				}
 			}
 			#endregion
-#if FEATURE_MERGE
-
-            #region Attr{g}: bool F_Merge
-            public bool F_Merge
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fMerge.ToString());
-                }
-            }
-            #endregion
-#endif
 #if FEATURE_WESAY
             #region Attr{g}: bool F_Dictionary
             public bool F_Dictionary
@@ -2133,9 +2117,7 @@ namespace OurWord
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
                 fTranslatorNotes,
-#if FEATURE_MERGE
-                fMerge,
-#endif
+                fSectionHistory,
 #if FEATURE_WESAY
                 fDictionary,
 #endif
@@ -2179,17 +2161,15 @@ namespace OurWord
                     "Translator Notes",
                     "Enables the Translator Notes side window, through which you can make notes " +
                         "about the translation and share them with others on your team.");
-                        
-#if FEATURE_MERGE
-                m_Dlg.Add(ID.fMerge.ToString(),
+
+                m_Dlg.Add(ID.fSectionHistory.ToString(),
                     false,
                     false,
                     c_sNodeWindows,
-                    "Merging",
-                    "Enables the Merge Pane, by which you can compare different versions of a book " +
-                        "to see what is different, and to merge changes into the master copy.");
-#endif
-
+                    "Section History",
+                    "Enables the History side window, which you can use to track the translation stages " +
+                        "for individual sections.");
+                        
 #if FEATURE_WESAY
                 m_Dlg.Add(ID.fDictionary.ToString(),
                     false,
@@ -2385,17 +2365,21 @@ namespace OurWord
             }
         }
         #endregion
+
+
         #region Event: cmdLoad
         private void cmdLoad(object sender, System.EventArgs e)
 		{
 			// Init the Help system
             HelpSystem.Initialize(this, "OurWordMain.chm");
 
-			// Populate the MRU List; read in the project
-			MRU.LoadFromRegistry();
+            // Retrieve the most recent item
+            string sPath = JW_Registry.GetValue(c_sLastProjectOpened, "" );
+
+			// Read in the project
 			DB.Project = new DProject();
-			string sPath = MRU.TopItem;
-			DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+            if (!string.IsNullOrEmpty(sPath))
+			    DB.Project.Load(ref sPath, G.CreateProgressIndicator());
 
             // Initial Splitter Position
             m_SplitContainer.SplitterDistance = (int)((float)m_fSplitterPercent * (float)Width / 100.0F);
@@ -2450,7 +2434,7 @@ namespace OurWord
 			OnLeaveProject(true);
 
 			// Save the current project's registry info
-			MRU.SaveToRegistry();
+            JW_Registry.SetValue(c_sLastProjectOpened, DB.Project.StoragePath);
 			DB.Project.Nav.SavePositionToRegistry();
 			
 			// Save the window position
@@ -2560,8 +2544,7 @@ namespace OurWord
             // Set OW to this project
             DB.Project = project;
 
-            // Save everything, including placing into the MRU
-			MRU.AddAtTop(DB.Project.StoragePath);
+            // Save everything
             DB.Project.Write(G.CreateProgressIndicator());
 
             // Update the UI, views, etc
@@ -2573,61 +2556,106 @@ namespace OurWord
                 cmdConfigure(null, null);
 		}
 		#endregion
-		#region Cmd: cmdOpenProject
+
+        #region Cmd: cmdOpenProject
         private void cmdOpenProject(Object sender, EventArgs e)
-		{
-            // Don't allow if the menu item is hidden (Microsoft allows a Shortcut key to work,
-            // even though the menu command is hidden!)
-            if (!m_btnProject.Visible)
+        {
+            // Get the menu item
+            var m = sender as ToolStripMenuItem;
+            if (null == m)
                 return;
 
-			// Make sure this project is saved and up-to-date
-			OnLeaveProject(true);
+            // Get the path from the tag
+            string sPath = (string)m.Tag;
+            if (string.IsNullOrEmpty(sPath))
+                return;
 
-			// Present the dialog to find the desired settings file
-			OpenFileDialog dlg = new OpenFileDialog();
-			dlg.Filter = "Our Word! Project Files (*.owp)|*.owp";
-			dlg.FilterIndex = 1;
-			dlg.DefaultExt = "owp";
-			if (dlg.ShowDialog() != DialogResult.OK)
-				return;
-			string sPath = dlg.FileName;
-
+            // Open the requested project
+            OnLeaveProject(true);
             DB.Project = new DProject();
             DB.Project.Load(ref sPath, G.CreateProgressIndicator());
-            MRU.MoveToTop(DB.Project.StoragePath);
+            DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
+            OnEnterProject();
+        }
+        #endregion
+        #region Method: BuildClusterSubMenu
+        void BuildClusterSubMenu(
+            ToolStripDropDownItem miParent, 
+            ClusterInfo ci, 
+            EventHandler onClick)
+        {
+            // Get the list of files in this cluster, and sort them
+            var vs = ci.GetClusterLanguageList();
+            vs.Sort();
 
-			// Update the UI, views, etc.
-			OnEnterProject();
-		}
-		#endregion
-		#region Cmd: cmdSaveProject
+            // No items in the list?
+            if (vs.Count == 0)
+            {
+                miParent.DropDownItems.Add("(none defined)");
+                return;
+            }
+
+            // Add them to the menu
+            foreach (string s in vs)
+            {
+                string sPath = ci.ClusterFolder + 
+                    ".Settings" + Path.DirectorySeparatorChar +
+                    s + ".owp";
+
+                var mi = new ToolStripMenuItem(s, null, onClick);
+                mi.Tag = sPath;
+                miParent.DropDownItems.Add(mi);
+            }
+        }
+        #endregion
+        #region Cmd: cmdSetupOpening
+        private void cmdSetupOpening(object sender, EventArgs e)
+        {
+            // Hourglass, while we retrieve clusters from disk
+            Cursor.Current = Cursors.WaitCursor;
+
+            // Clear any subitems from the Open menu
+            m_menuOpenProject.DropDownItems.Clear();
+
+            // Get the list of clusters that we have
+            ClusterListView.PopulateClusterInfoList();
+
+            // If there are no clusters, then there's nothing to open
+            if (ClusterListView.ClusterInfoList.Count == 0)
+            {
+                m_menuOpenProject.DropDownItems.Add("(none defined)");
+            }
+
+            // If there's only one cluster, then just add to the Open menu
+            else if (ClusterListView.ClusterInfoList.Count == 1)
+            {
+                BuildClusterSubMenu(m_menuOpenProject,
+                    ClusterListView.ClusterInfoList[0],
+                    cmdOpenProject);
+            }
+
+            // Otherwise, we go to submenus
+            else
+            {
+                foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+                {
+                    var miCluster = new ToolStripMenuItem(ci.Name);
+                    BuildClusterSubMenu(miCluster, ci, cmdOpenProject);
+                    m_menuOpenProject.DropDownItems.Add(miCluster);
+                }
+            }
+
+            // Restore cursors
+            Cursor.Current = Cursors.Default;
+        }
+        #endregion
+
+        #region Cmd: cmdSaveProject
         private void cmdSaveProject(Object sender, EventArgs e)
 		{
 			OnLeaveSection();
 			DB.Project.Save(G.CreateProgressIndicator());
 		}
-		#endregion
-		#region Cmd: cmdMRU - opens Project from MRU list
-        private void cmdMRU(Object sender, EventArgs e)
-        {
-			ToolStripMenuItem item = (sender as ToolStripMenuItem);
-			if (null == item)
-				return;
-
-			string sPath = (string)item.Tag;
-			if (string.IsNullOrEmpty(sPath))
-				return;
-
-            OnLeaveProject(true);
-
-            DB.Project = new DProject();
-            DB.Project.Load(ref sPath, G.CreateProgressIndicator());
-            MRU.MoveToTop(DB.Project.StoragePath);
-
-            DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
-            OnEnterProject();
-        }
 		#endregion
 
         const string c_sCloneFailedMsg = "Repository.CloneTo() failed.";
@@ -2657,7 +2685,7 @@ namespace OurWord
                     return;
 
                 // Make sure the current project is saved and up-to-date, before we create
-                // the new one. Commit to the Repository, to have a restoreo  point if we need it.
+                // the new one. Commit to the Repository, to have a restore  point if we need it.
                 OnLeaveProject(true);
 
                 // Create the ClusterInfo object
@@ -2737,11 +2765,19 @@ namespace OurWord
                             return;
                         continue;
                    }
+
+                    bool bAgain = LocDB.Message("msgDownloadClusterFailedGeneric",
+                        "OurWord was unable to download / create the cluster on your computer, " +
+                        "for unknown reason.\n\n" +
+                            "Do you wish to try again?",
+                            null,
+                            LocDB.MessageTypes.WarningYN);
+                    if (!bAgain)
+                        return;
+                    continue;
                 }
 
                 // Display a dialog declaring Success, and giving a choice of which project to open
-
-                // If we fail, tell the user and permit him to try again
 
             }
         }
@@ -3029,17 +3065,6 @@ namespace OurWord
             _UpdateSideWindows();
         }
         #endregion
-        #region Cmd: cmdToggleMergePane
-        private void cmdToggleMergePane(object sender, EventArgs e)
-        {
-#if FEATURE_MERGE
-            DProject.ShowMergePane = !DProject.ShowMergePane;
-            _UpdateSideWindows();
-            if (DProject.ShowMergePane)
-                SideWindows.ActivateMergePane();
-#endif
-        }
-        #endregion
         #region Cmd: cmdToggleDictionaryPane
         private void cmdToggleDictionaryPane(object sender, EventArgs e)
         {
@@ -3049,6 +3074,13 @@ namespace OurWord
             if (DProject.ShowDictionaryPane)
                 SideWindows.ActivateDictionaryPane();
 #endif
+        }
+        #endregion
+        #region Cmd: cmdToggleHistoryPane
+        private void cmdToggleHistoryPane(object sender, EventArgs e)
+        {
+            DProject.VD_ShowHistoryPane = !DProject.VD_ShowHistoryPane;
+            _UpdateSideWindows();
         }
         #endregion
 
@@ -3420,6 +3452,7 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
+
         #endregion
     }
 

@@ -87,6 +87,7 @@ namespace OurWord.Edit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.m_toolstripNotes);
             this.Name = "NotesPane";
             this.Size = new System.Drawing.Size(242, 470);
@@ -104,5 +105,6 @@ namespace OurWord.Edit
         private System.Windows.Forms.ToolStripButton m_btnDeleteNote;
         private System.Windows.Forms.ToolStripButton m_btnInsert;
         private System.Windows.Forms.ToolStripDropDownButton m_Show;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
     }
 }

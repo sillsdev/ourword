@@ -231,6 +231,20 @@ namespace JWdb.DataModel
 		}
 		private JOwn<DReferenceSpan> j_ownReferenceSpan = null;
 		#endregion
+        #region JAttr{g/s}: DHistory History
+        public DHistory History
+        {
+            get
+            {
+                return j_ownHistory.Value;
+            }
+            set
+            {
+                j_ownHistory.Value = value;
+            }
+        }
+        private JOwn<DHistory> j_ownHistory = null;
+        #endregion
 
 		// Derived Attributes: Ownership Hiererachy ------------------------------------------
 		#region Attr{g}: DBook Book - returns the book that owns this section
@@ -543,6 +557,9 @@ namespace JWdb.DataModel
             j_ownReferenceSpan = new JOwn<DReferenceSpan>("RefSpan", this);
             ReferenceSpan = new DReferenceSpan();
 
+            // Section History
+            j_ownHistory = new JOwn<DHistory>("History", this);
+            History = new DHistory();
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -2004,6 +2021,7 @@ namespace JWdb.DataModel
 					// If we have a footnote, add it to the database
 					if (null != footnote)
 						Footnote_out(footnote);
+                    footnote = null;
 
 					// Add the Translator Notes
                     foreach (TranslatorNote tn in listTranslatorNotes)
@@ -2124,31 +2142,6 @@ namespace JWdb.DataModel
 			}
 			#endregion
 
-			// Status ------------------------------------------------------------------------
-			#region Method: bool CheckingStatus_in(SfField field)
-			private bool CheckingStatus_in(SfField field)
-			{
-				if (!Map.IsStatusCommentMarker( field.Mkr ) )
-					return false;
-
-				if (Section.StatusComment.Length > 0)
-					Section.StatusComment += " ";
-
-				Section.StatusComment += field.Data;
-
-				return true;
-			}
-			#endregion
-			#region Method: void CheckingStatus_out()
-			private void CheckingStatus_out()
-			{
-				if (Section.StatusComment.Length > 0)
-				{
-					SDB.Append( new SfField(Map.MkrStatusComment, Section.StatusComment));
-				}
-			}
-			#endregion
-
             // Translator Notes --------------------------------------------------------------
             #region Method: bool CombineOldStyleNotes(TranslatorNote NoteToAdd)
             bool CombineOldStyleNotes(TranslatorNote NoteToAdd)
@@ -2249,6 +2242,35 @@ namespace JWdb.DataModel
                 text.TranslatorNotes.Append(tn);
 
                 return true;
+            }
+            #endregion
+
+            // History -----------------------------------------------------------------------
+            #region Method: bool History_In(SfField)
+            private bool History_In(SfField field)
+            {
+                // Old-style status comment: Import it
+                if (Map.IsStatusCommentMarker(field.Mkr))
+                {
+                    if (!string.IsNullOrEmpty(field.Data.Trim()))
+                    {
+                        Section.History.AddEvent(
+                            new DateTime(2009, 1, 1),
+                            Loc.GetString("OldHistory", "Old"),
+                            field.Data);
+                    }
+                    return true;
+                }
+
+                return Section.History.FromSfm(field);
+            }
+            #endregion
+            #region Method: void History_Out()
+            private void History_Out()
+            {
+                SfField f = Section.History.ToSfm();
+                if (null != f)
+                    SDB.Append(f);
             }
             #endregion
 
@@ -2479,10 +2501,10 @@ namespace JWdb.DataModel
                         continue;
 
 					// Checking Status, DateStamp
-					if ( CheckingStatus_in(field) )
-						continue;
 					if ( DateStamp_in(field))
 						continue;
+                    if (History_In(field))
+                        continue;
 
 					// Pictures
 					if ( Picture_in(field) )
@@ -2568,8 +2590,8 @@ namespace JWdb.DataModel
                 }
                 SDB.Append(new SfField(SDB.RecordMkr, Section.RecordKey));
 
-				// Checking status (written only if it has content)
-				CheckingStatus_out();
+                // History
+                History_Out();
 
 				// Which verse we've just written out
 				DReference CurrentReference = new DReference();
@@ -3482,6 +3504,9 @@ namespace JWdb.DataModel
                 // Now that we've accomplished the structure (and potentially chosen their
                 // section over ours), we can merge the notes.
                 MergeNotes();
+
+                // Merge the histories
+                Mine.History.Merge(Parent.History, Theirs.History);
 
                 // Use Diff to reconcile any textual changes
                 MakeNotesOfTextualChanges();

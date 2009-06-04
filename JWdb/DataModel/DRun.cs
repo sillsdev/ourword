@@ -799,13 +799,48 @@ namespace JWdb.DataModel
                 return;
             }
 
-            // For Explanatory footnotes, append the "|fn" marker to the previous verse text
-            SfField LastField = DBS.LastField(DBS.Map.MkrVerseText);
-            if (null != LastField)
+            // Find the \vt field to append to
+            SfField VTField = null;
+            for (int i = DBS.Count - 1; i >= 0; i--)
             {
-                LastField.Data += "|fn";
-                LastField.BT += "|fn";
+                SfField f = DBS.Fields[i] as SfField;
+
+                if (f.Mkr == DBS.Map.MkrVerseText)
+                {
+                    VTField = f;
+                    break;
+                }
+
+                if (DBS.Map.IsVernacularParagraph(f.Mkr) || f.Mkr == DBS.Map.MkrVerse)
+                {
+                    VTField = DBS.InsertAt(i+1, new SfField(DBS.Map.MkrVerseText));
+                    break;
+                }
             }
+            if (null == VTField)
+                VTField = DBS.Append(new SfField(DBS.Map.MkrVerseText));
+            Debug.Assert(null != VTField && DBS.Map.MkrVerseText == VTField.Mkr);
+
+            // Add the markers
+            VTField.Data += "|fn";
+            VTField.BT += "|fn";
+
+
+            /***
+
+////// FIX IS NEEDED HERE ///////
+// Backtrack to a \vt, and add it if missing.
+////////////////////////////////////////////
+
+
+            // For Explanatory footnotes, append the "|fn" marker to the previous verse text
+            SfField LastField = DBS.LastField();
+            if (null == LastField || LastField.Mkr != DBS.Map.MkrVerseText)
+                LastField = DBS.Append(new SfField(DBS.Map.MkrVerseText));
+            Debug.Assert(null != LastField && DBS.Map.MkrVerseText == LastField.Mkr);
+            LastField.Data += "|fn";
+            LastField.BT += "|fn";
+            ***/
 
             // Build the footnote text from its runs and append it to the DB
             string sContents = "";

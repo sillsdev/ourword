@@ -251,7 +251,7 @@ namespace JWdb.DataModel
 			return false;
 		}
 		#endregion
-
+        #region Method: override operator ==
         public static bool operator == (DReference rLeft, DReference rRight)
         {
             if (Object.Equals(rLeft, null) && Object.Equals(rRight, null))
@@ -267,12 +267,15 @@ namespace JWdb.DataModel
 
             return true;
         }
+        #endregion
+        #region Method: override operator !=
         public static bool operator != (DReference rLeft, DReference rRight)
         {
             return !(rLeft == rRight);
         }
+        #endregion
 
-	}
+    }
 
 	public class DReferenceSpan : JObject
 		// Encapsulates a chapter-verse span, e.g., 3:16-17, or "4:5-5:12"
@@ -378,7 +381,7 @@ namespace JWdb.DataModel
 			End.Copy(refSpanSource.End);
 		}
 		#endregion
-
+        #region Method: override operator ==
         public static bool operator ==(DReferenceSpan rLeft, DReferenceSpan rRight)
         {
             if (Object.Equals(rLeft, null) && Object.Equals(rRight, null))
@@ -392,10 +395,13 @@ namespace JWdb.DataModel
                 return false;
             return true;
         }
+        #endregion
+        #region Method: override operator !=
         public static bool operator !=(DReferenceSpan rLeft, DReferenceSpan rRight)
         {
             return !(rLeft == rRight);
         }
+        #endregion
 
-	}
+    }
 }

@@ -160,16 +160,6 @@ namespace JWdb.DataModel
         }
         private JOwnSeq<DSection> j_osSections = null;
         #endregion
-        #region JAttr{g}: JOwnSeq History - seq of paragraphs given notes about translation history
-        public JOwnSeq<DParagraph> History
-        {
-            get
-            {
-                return j_osHistory;
-            }
-        }
-        private JOwnSeq<DParagraph> j_osHistory = null;
-        #endregion
         #region JAttr{g}: JOwnSeq Notes - seq of paragraphs given notes about misc notes
         public JOwnSeq<DParagraph> Notes
         {
@@ -179,6 +169,25 @@ namespace JWdb.DataModel
             }
         }
         private JOwnSeq<DParagraph> j_osNotes = null;
+        #endregion
+        #region JAttr{g/s}: DHistory History
+        public DHistory History
+        {
+            get
+            {
+                // An unload calls Clear; but we want to always make sure we have
+                // an object here for any future load.
+                if (null == j_ownHistory.Value)
+                    j_ownHistory.Value = new DHistory();
+
+                return j_ownHistory.Value;
+            }
+            set
+            {
+                j_ownHistory.Value = value;
+            }
+        }
+        private JOwn<DHistory> j_ownHistory = null;
         #endregion
 
         // Temporary (run-time) attrs --------------------------------------------------------
@@ -485,8 +494,11 @@ namespace JWdb.DataModel
             : base()
         {
             j_osSections = new JOwnSeq<DSection>("Sections", this, true, false);
-            j_osHistory = new JOwnSeq<DParagraph>("History", this, false, false);
             j_osNotes = new JOwnSeq<DParagraph>("Notes", this, false, false);
+
+            // Book History
+            j_ownHistory = new JOwn<DHistory>("History", this);
+            History = new DHistory();
         }
         #endregion
         #region Constructor(sBookAbbrev)
@@ -630,7 +642,7 @@ namespace JWdb.DataModel
             return sMsg;
         }
         #endregion
-
+        #region Method: string GetSpanMismatchMsg(iSection, SFront, STarget)
         string GetSpanMismatchMsg(int iSection, DSection SFront, DSection STarget)
         {
             string sBase = Loc.GetStructureMessages("msgSpanMismatch",
@@ -648,7 +660,7 @@ namespace JWdb.DataModel
 
             return sMsg;
         }
-
+        #endregion
         #region Method: string GetStructureMismatchMsg(DSection SFront, DSection STarget)
         string GetStructureMismatchMsg(DSection SFront, DSection STarget)
         {
@@ -968,22 +980,31 @@ namespace JWdb.DataModel
             #region Method: bool History_in(SfField field)
             private bool History_in(SfField field)
             {
+                // Old-style history: Import it
+                // Note: For any given book, we assume we'll either have an old-style or a
+                // new-style; as once we import it, we write it out as new.
                 if (Map.IsBookHistoryMarker(field.Mkr))
                 {
-                    DParagraph p = new DParagraph();
-                    Book.History.Append(p);
-                    p.StyleAbbrev = "p";
-                    p.SimpleText = field.Data;
+                    Book.History.AddEvent(
+                        new DateTime(2009,1,1), 
+                        Loc.GetString("OldHistory", "Old"),
+                        field.Data);
                     return true;
                 }
-                return false;
+
+                // New style: interpret it
+                return Book.History.FromSfm(field);
             }
             #endregion
             #region Method: void History_out()
             void History_out()
             {
-                foreach (DParagraph p in Book.History)
-                    DBS.Append(new SfField(Map.MkrBookHistory, p.SimpleText));
+                if (Book.History.HasHistory)
+                {
+                    SfField f = Book.History.ToSfm();
+                    if (null != f)
+                        DBS.Append(f);
+                }
             }
             #endregion
 
@@ -1612,6 +1633,9 @@ namespace JWdb.DataModel
         public void Merge(DBook Parent, DBook Theirs)
         {
             //Debug.Fail("Breakpoint");
+
+            // Merge the histories
+            History.Merge(Parent.History, Theirs.History);
 
             // At this point we must assume the same number of sections
             if (Sections.Count != Parent.Sections.Count)

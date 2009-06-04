@@ -264,15 +264,18 @@ namespace JWdb.DataModel
                     Init();
                     RunProcess = process;
 
-                    if (RunProcess.StartInfo.RedirectStandardOutput)
+                    if (RunProcess.StartInfo != null)
                     {
-                        StandardOutputReader = new Thread(new ThreadStart(ReadStandardOutput));
-                        StandardOutputReader.Start();
-                    }
-                    if (RunProcess.StartInfo.RedirectStandardError)
-                    {
-                        StandardErrorReader = new Thread(new ThreadStart(ReadStandardError));
-                        StandardErrorReader.Start();
+                        if (RunProcess.StartInfo.RedirectStandardOutput)
+                        {
+                            StandardOutputReader = new Thread(new ThreadStart(ReadStandardOutput));
+                            StandardOutputReader.Start();
+                        }
+                        if (RunProcess.StartInfo.RedirectStandardError)
+                        {
+                            StandardErrorReader = new Thread(new ThreadStart(ReadStandardError));
+                            StandardErrorReader.Start();
+                        }
                     }
 
                     //RunProcess.WaitForExit();

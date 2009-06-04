@@ -98,20 +98,23 @@ namespace OurWord.Dialogs
         private TabPage m_tabOther;
 		private TabPage m_tabBooks;
         private DataGridView m_gridBooks;
-		private Button m_bProperties;
-		private Button m_bRemove;
-		private Button m_bExport;
-		private Button m_bImport;
-        private Button m_bCreate;
 		private DataGridViewTextBoxColumn m_colAbbreviation;
-		private DataGridViewTextBoxColumn m_colBookName;
-        private ComboBox m_comboLanguage;
-        private Button m_btnCopyBookNames;
+        private DataGridViewTextBoxColumn m_colBookName;
         private RadioButton m_radioStartedBooks;
         private RadioButton m_radioOldTestament;
         private RadioButton m_radioNewTestament;
         private RadioButton m_radioAll;
         private LiterateSettingsWnd m_LiterateSettings;
+        private ToolStrip m_ToolStrip;
+        private ToolStripButton m_bCreate;
+        private ToolStripButton m_bImport;
+        private ToolStripButton m_bExport;
+        private ToolStripButton m_bRemove;
+        private ToolStripButton m_bProperties;
+        private ToolStripDropDownButton m_bCopyNames;
+        private ToolStripButton m_bEditRawFile;
+        private ToolStripSeparator toolStripSeparator1;
+        private ToolStripSeparator toolStripSeparator2;
         private DataGridViewTextBoxColumn m_colStage;
 		#endregion
         #region Constructor(DlgProperties, DTranslation, bSuppressCreateBook)
@@ -152,32 +155,37 @@ namespace OurWord.Dialogs
 		/// </summary>
 		private void InitializeComponent()
 		{
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_Translation));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_lblLanguageName = new System.Windows.Forms.Label();
             this.m_editLanguageName = new System.Windows.Forms.TextBox();
             this.m_btnRemoveTranslation = new System.Windows.Forms.Button();
             this.m_tabctrlTranslation = new System.Windows.Forms.TabControl();
             this.m_tabBooks = new System.Windows.Forms.TabPage();
+            this.m_ToolStrip = new System.Windows.Forms.ToolStrip();
+            this.m_bCreate = new System.Windows.Forms.ToolStripButton();
+            this.m_bImport = new System.Windows.Forms.ToolStripButton();
+            this.m_bExport = new System.Windows.Forms.ToolStripButton();
+            this.m_bRemove = new System.Windows.Forms.ToolStripButton();
+            this.m_bProperties = new System.Windows.Forms.ToolStripButton();
+            this.m_bCopyNames = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_radioStartedBooks = new System.Windows.Forms.RadioButton();
             this.m_radioOldTestament = new System.Windows.Forms.RadioButton();
             this.m_radioNewTestament = new System.Windows.Forms.RadioButton();
             this.m_radioAll = new System.Windows.Forms.RadioButton();
-            this.m_comboLanguage = new System.Windows.Forms.ComboBox();
-            this.m_btnCopyBookNames = new System.Windows.Forms.Button();
-            this.m_bProperties = new System.Windows.Forms.Button();
-            this.m_bRemove = new System.Windows.Forms.Button();
-            this.m_bExport = new System.Windows.Forms.Button();
-            this.m_bImport = new System.Windows.Forms.Button();
-            this.m_bCreate = new System.Windows.Forms.Button();
             this.m_gridBooks = new System.Windows.Forms.DataGridView();
             this.m_colAbbreviation = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_colBookName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_colStage = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_tabOther = new System.Windows.Forms.TabPage();
             this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
+            this.m_bEditRawFile = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_tabctrlTranslation.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
+            this.m_ToolStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).BeginInit();
             this.m_tabOther.SuspendLayout();
             this.SuspendLayout();
@@ -228,17 +236,11 @@ namespace OurWord.Dialogs
             // 
             // m_tabBooks
             // 
+            this.m_tabBooks.Controls.Add(this.m_ToolStrip);
             this.m_tabBooks.Controls.Add(this.m_radioStartedBooks);
             this.m_tabBooks.Controls.Add(this.m_radioOldTestament);
             this.m_tabBooks.Controls.Add(this.m_radioNewTestament);
             this.m_tabBooks.Controls.Add(this.m_radioAll);
-            this.m_tabBooks.Controls.Add(this.m_comboLanguage);
-            this.m_tabBooks.Controls.Add(this.m_btnCopyBookNames);
-            this.m_tabBooks.Controls.Add(this.m_bProperties);
-            this.m_tabBooks.Controls.Add(this.m_bRemove);
-            this.m_tabBooks.Controls.Add(this.m_bExport);
-            this.m_tabBooks.Controls.Add(this.m_bImport);
-            this.m_tabBooks.Controls.Add(this.m_bCreate);
             this.m_tabBooks.Controls.Add(this.m_gridBooks);
             this.m_tabBooks.Location = new System.Drawing.Point(4, 22);
             this.m_tabBooks.Name = "m_tabBooks";
@@ -247,6 +249,90 @@ namespace OurWord.Dialogs
             this.m_tabBooks.TabIndex = 4;
             this.m_tabBooks.Text = "Books";
             this.m_tabBooks.UseVisualStyleBackColor = true;
+            // 
+            // m_ToolStrip
+            // 
+            this.m_ToolStrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_ToolStrip.AutoSize = false;
+            this.m_ToolStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.m_ToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.m_ToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_bCreate,
+            this.m_bImport,
+            this.m_bExport,
+            this.m_bRemove,
+            this.m_bProperties,
+            this.toolStripSeparator1,
+            this.m_bEditRawFile,
+            this.toolStripSeparator2,
+            this.m_bCopyNames});
+            this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
+            this.m_ToolStrip.Location = new System.Drawing.Point(343, 3);
+            this.m_ToolStrip.Name = "m_ToolStrip";
+            this.m_ToolStrip.Size = new System.Drawing.Size(111, 199);
+            this.m_ToolStrip.TabIndex = 113;
+            this.m_ToolStrip.Text = "ToolStrip";
+            // 
+            // m_bCreate
+            // 
+            this.m_bCreate.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bCreate.Image = ((System.Drawing.Image)(resources.GetObject("m_bCreate.Image")));
+            this.m_bCreate.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bCreate.Name = "m_bCreate";
+            this.m_bCreate.Size = new System.Drawing.Size(109, 19);
+            this.m_bCreate.Text = "Create....";
+            this.m_bCreate.Click += new System.EventHandler(this.cmdCreateBook);
+            // 
+            // m_bImport
+            // 
+            this.m_bImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bImport.Image = ((System.Drawing.Image)(resources.GetObject("m_bImport.Image")));
+            this.m_bImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bImport.Name = "m_bImport";
+            this.m_bImport.Size = new System.Drawing.Size(109, 19);
+            this.m_bImport.Text = "Import...";
+            this.m_bImport.Click += new System.EventHandler(this.cmdImportBook);
+            // 
+            // m_bExport
+            // 
+            this.m_bExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bExport.Image = ((System.Drawing.Image)(resources.GetObject("m_bExport.Image")));
+            this.m_bExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bExport.Name = "m_bExport";
+            this.m_bExport.Size = new System.Drawing.Size(109, 19);
+            this.m_bExport.Text = "Export...";
+            this.m_bExport.Click += new System.EventHandler(this.cmdExportBook);
+            // 
+            // m_bRemove
+            // 
+            this.m_bRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bRemove.Image = ((System.Drawing.Image)(resources.GetObject("m_bRemove.Image")));
+            this.m_bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bRemove.Name = "m_bRemove";
+            this.m_bRemove.Size = new System.Drawing.Size(109, 19);
+            this.m_bRemove.Text = "Remove...";
+            this.m_bRemove.Click += new System.EventHandler(this.cmdRemoveBook);
+            // 
+            // m_bProperties
+            // 
+            this.m_bProperties.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bProperties.Image = ((System.Drawing.Image)(resources.GetObject("m_bProperties.Image")));
+            this.m_bProperties.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bProperties.Name = "m_bProperties";
+            this.m_bProperties.Size = new System.Drawing.Size(109, 19);
+            this.m_bProperties.Text = "Properties...";
+            this.m_bProperties.Click += new System.EventHandler(this.cmdBookProperties);
+            // 
+            // m_bCopyNames
+            // 
+            this.m_bCopyNames.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bCopyNames.Image = ((System.Drawing.Image)(resources.GetObject("m_bCopyNames.Image")));
+            this.m_bCopyNames.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bCopyNames.Name = "m_bCopyNames";
+            this.m_bCopyNames.Size = new System.Drawing.Size(109, 19);
+            this.m_bCopyNames.Text = "Copy Names";
+            this.m_bCopyNames.ToolTipText = "Copy book names from  another language (the dropdown shows the possible choices);" +
+                " this is a short cut over having to enter each of the 66 names one-at-a-time.";
             // 
             // m_radioStartedBooks
             // 
@@ -296,74 +382,6 @@ namespace OurWord.Dialogs
             this.m_radioAll.UseVisualStyleBackColor = true;
             this.m_radioAll.CheckedChanged += new System.EventHandler(this.cmdFilterOnAll);
             // 
-            // m_comboLanguage
-            // 
-            this.m_comboLanguage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_comboLanguage.Location = new System.Drawing.Point(343, 192);
-            this.m_comboLanguage.Name = "m_comboLanguage";
-            this.m_comboLanguage.Size = new System.Drawing.Size(111, 21);
-            this.m_comboLanguage.TabIndex = 108;
-            // 
-            // m_btnCopyBookNames
-            // 
-            this.m_btnCopyBookNames.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_btnCopyBookNames.Location = new System.Drawing.Point(343, 155);
-            this.m_btnCopyBookNames.Name = "m_btnCopyBookNames";
-            this.m_btnCopyBookNames.Size = new System.Drawing.Size(111, 36);
-            this.m_btnCopyBookNames.TabIndex = 106;
-            this.m_btnCopyBookNames.Text = "Copy Book Names from";
-            this.m_btnCopyBookNames.Click += new System.EventHandler(this.cmdCopyBookNames);
-            // 
-            // m_bProperties
-            // 
-            this.m_bProperties.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_bProperties.Location = new System.Drawing.Point(343, 114);
-            this.m_bProperties.Name = "m_bProperties";
-            this.m_bProperties.Size = new System.Drawing.Size(111, 23);
-            this.m_bProperties.TabIndex = 13;
-            this.m_bProperties.Text = "Properties...";
-            this.m_bProperties.Click += new System.EventHandler(this.cmdBookProperties);
-            // 
-            // m_bRemove
-            // 
-            this.m_bRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_bRemove.Location = new System.Drawing.Point(343, 87);
-            this.m_bRemove.Name = "m_bRemove";
-            this.m_bRemove.Size = new System.Drawing.Size(111, 23);
-            this.m_bRemove.TabIndex = 12;
-            this.m_bRemove.Text = "Remove...";
-            this.m_bRemove.Click += new System.EventHandler(this.cmdRemoveBook);
-            // 
-            // m_bExport
-            // 
-            this.m_bExport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_bExport.Location = new System.Drawing.Point(343, 60);
-            this.m_bExport.Name = "m_bExport";
-            this.m_bExport.Size = new System.Drawing.Size(111, 23);
-            this.m_bExport.TabIndex = 11;
-            this.m_bExport.Text = "Export...";
-            this.m_bExport.Click += new System.EventHandler(this.cmdExportBook);
-            // 
-            // m_bImport
-            // 
-            this.m_bImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_bImport.Location = new System.Drawing.Point(343, 33);
-            this.m_bImport.Name = "m_bImport";
-            this.m_bImport.Size = new System.Drawing.Size(111, 23);
-            this.m_bImport.TabIndex = 8;
-            this.m_bImport.Text = "Import...";
-            this.m_bImport.Click += new System.EventHandler(this.cmdImportBook);
-            // 
-            // m_bCreate
-            // 
-            this.m_bCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_bCreate.Location = new System.Drawing.Point(343, 6);
-            this.m_bCreate.Name = "m_bCreate";
-            this.m_bCreate.Size = new System.Drawing.Size(111, 23);
-            this.m_bCreate.TabIndex = 7;
-            this.m_bCreate.Text = "Create...";
-            this.m_bCreate.Click += new System.EventHandler(this.cmdCreateBook);
-            // 
             // m_gridBooks
             // 
             this.m_gridBooks.AllowUserToAddRows = false;
@@ -390,8 +408,8 @@ namespace OurWord.Dialogs
             // 
             // m_colAbbreviation
             // 
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle5;
             this.m_colAbbreviation.HeaderText = "Abbrev";
             this.m_colAbbreviation.Name = "m_colAbbreviation";
             this.m_colAbbreviation.ReadOnly = true;
@@ -403,8 +421,8 @@ namespace OurWord.Dialogs
             // 
             // m_colBookName
             // 
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle6;
             this.m_colBookName.HeaderText = "Book Name";
             this.m_colBookName.Name = "m_colBookName";
             this.m_colBookName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -448,6 +466,26 @@ namespace OurWord.Dialogs
             this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
             this.m_LiterateSettings.TabIndex = 7;
             // 
+            // m_bEditRawFile
+            // 
+            this.m_bEditRawFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bEditRawFile.Image = ((System.Drawing.Image)(resources.GetObject("m_bEditRawFile.Image")));
+            this.m_bEditRawFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bEditRawFile.Name = "m_bEditRawFile";
+            this.m_bEditRawFile.Size = new System.Drawing.Size(109, 19);
+            this.m_bEditRawFile.Text = "Edit Raw File...";
+            this.m_bEditRawFile.Click += new System.EventHandler(this.cmdEditRawFile);
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(109, 6);
+            // 
             // Page_Translation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -458,6 +496,8 @@ namespace OurWord.Dialogs
             this.Load += new System.EventHandler(this.cmdLoad);
             this.m_tabctrlTranslation.ResumeLayout(false);
             this.m_tabBooks.ResumeLayout(false);
+            this.m_ToolStrip.ResumeLayout(false);
+            this.m_ToolStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).EndInit();
             this.m_tabOther.ResumeLayout(false);
             this.m_tabOther.PerformLayout();
@@ -706,17 +746,21 @@ namespace OurWord.Dialogs
             m_radioStartedBooks.Checked = (m_FilterOn == FilterOn.kStartedBooks);
 
             // The grid will apply the filter
-            PopulateGrid(SelectedBookAbbrev);
+            PopulateGrid(SelectedBookAbbrev, true);
         }
         #endregion
 
         // Books Data Grid -------------------------------------------------------------------
         #region Method: void PopulateGrid(string sBookAbbrevToSelect)
-        void PopulateGrid(string sBookAbbrevToSelect)
+        void PopulateGrid(string sBookAbbrevToSelect, bool bHarvestExistingBookNames)
 		{
             // In case book names have been changed, we want to harvest them before we
-            // regenerate this.
-            HarvestBookNames();
+            // regenerate this. The exception comes from our CopyBookNamesFrom method,
+            // where we have new names we want to place into the grid; otherwise
+            // HarvestBookNames would overwrite our Newly Copied Names with the 
+            // previous old names.
+            if (bHarvestExistingBookNames)
+                HarvestBookNames();
 
             // Clear out whatever was there
 			m_gridBooks.Rows.Clear();
@@ -845,96 +889,72 @@ namespace OurWord.Dialogs
         #endregion
 
         // Copy Book Names -------------------------------------------------------------------
-        #region ComboBox ComboLanguage
-        ComboBox ComboLanguage
+        #region Method: void AddDropDownItem(sLanguageName)
+        void AddDropDownItem(string sLanguageName)
         {
-            get
+            // Valid item?
+            if (string.IsNullOrEmpty(sLanguageName))
+                return;
+
+            // If it is already there, don't add it
+            foreach (ToolStripItem item in m_bCopyNames.DropDownItems)
             {
-                return m_comboLanguage;
+                if ((string)item.Tag == sLanguageName)
+                    return;
             }
+
+            // Item text
+            string sBase = Loc.GetString("kCopyBookNamesFrom", "...from {0}");
+            string sText = LocDB.Insert(sBase, new string[] { sLanguageName });
+
+            // Add the item
+            ToolStripItem NewItem = m_bCopyNames.DropDownItems.Add(sText);
+            NewItem.Tag = sLanguageName;
+            NewItem.Click += new EventHandler(cmdCopyBookNames);
         }
         #endregion
-        #region Method: bool ComboBoxHasPossiblity(string sLanguageName)
-        bool ComboBoxHasPossiblity(string sPossibility)
+        #region Method: void PopulateCopyNamesPossibilities()
+        void PopulateCopyNamesPossibilities()
         {
-            foreach (string s in ComboLanguage.Items)
-            {
-                if (s == sPossibility)
-                    return true;
-            }
-            return false;
-        }
-        #endregion
-        #region Method: void PopulateComboBoxPossibilities()
-        void PopulateComboBoxPossibilities()
-        {
-            // Start with an empty box
-            ComboLanguage.Items.Clear();
+            // Start with an empty dropdown so we don't double things
+            m_bCopyNames.DropDownItems.Clear();
 
             // Put in English, as a language we always have
-            ComboLanguage.Items.Add("English");
-            ComboLanguage.Text = "English";
+            AddDropDownItem("English");
 
             // UI Languages
             if (null != LocDB.DB.PrimaryLanguage)
-            {
-                if (!ComboBoxHasPossiblity(LocDB.DB.PrimaryLanguage.Name))
-                {
-                    ComboLanguage.Items.Add(LocDB.DB.PrimaryLanguage.Name);
-                    ComboLanguage.Text = LocDB.DB.PrimaryLanguage.Name;
-                }
-            }
+                AddDropDownItem(LocDB.DB.PrimaryLanguage.Name);
             if (null != LocDB.DB.SecondaryLanguage)
-            {
-                if (!ComboBoxHasPossiblity(LocDB.DB.SecondaryLanguage.Name))
-                {
-                    ComboLanguage.Items.Add(LocDB.DB.SecondaryLanguage.Name);
-                }
-            }
+                AddDropDownItem(LocDB.DB.SecondaryLanguage.Name);
 
             // Put in the FileName language (if different)
             DTeamSettings ts = DB.TeamSettings;
             string sFileNameLang = ts.FileNameLanguage;
-            if (!ComboBoxHasPossiblity(sFileNameLang))
-            {
-                ComboLanguage.Items.Add(sFileNameLang);
-                ComboLanguage.Text = sFileNameLang;
-            }
+            AddDropDownItem(ts.FileNameLanguage);
 
             // Put in the Front Translation (if this isn't the Front)
             if (null != DB.Project.FrontTranslation && DB.Project.FrontTranslation != Translation)
-            {
-                string sFrontLang = DB.Project.FrontTranslation.DisplayName;
-                if (!ComboBoxHasPossiblity(sFrontLang))
-                {
-                    ComboLanguage.Items.Add(sFrontLang);
-                    ComboLanguage.Text = sFrontLang;
-                }
-            }
+                AddDropDownItem(DB.Project.FrontTranslation.DisplayName);
 
-            // Put in the Target Translation (if this isn't the Target) but from here
-            // on out, we don't select it in the combo box (thus leaving a Resources
-            // language as the default.
+            // Put in the Target Translation (if this isn't the Target) 
             if (null != DB.Project.TargetTranslation && DB.Project.TargetTranslation != Translation)
-            {
-                string sTargetLang = DB.Project.TargetTranslation.DisplayName;
-                if (!ComboBoxHasPossiblity(sTargetLang))
-                    ComboLanguage.Items.Add(sTargetLang);
-            }
+                AddDropDownItem(DB.Project.TargetTranslation.DisplayName);
 
             // Put in any other translations
             foreach (DTranslation t in DB.Project.OtherTranslations)
-            {
-                if (t != Translation && !ComboBoxHasPossiblity(t.DisplayName))
-                    ComboLanguage.Items.Add(t.DisplayName);
-            }
+                AddDropDownItem(t.DisplayName);
         }
         #endregion
         #region Cmd: cmdCopyBookNames
         private void cmdCopyBookNames(object sender, EventArgs e)
         {
             // Language Desired
-            string sLanguage = ComboLanguage.Text;
+            ToolStripItem item = sender as ToolStripItem;
+            Debug.Assert(null != item);
+            string sLanguage = (string)item.Tag;
+            if (string.IsNullOrEmpty(sLanguage))
+                return;
 
             // We will put the source table here
             string[] vsBookNamesSource = null;
@@ -979,7 +999,7 @@ namespace OurWord.Dialogs
             }
 
             // Recalculate the grid
-            PopulateGrid(SelectedBookAbbrev);
+            PopulateGrid(SelectedBookAbbrev, false);
         }
         #endregion
 
@@ -1007,21 +1027,15 @@ namespace OurWord.Dialogs
                 m_radioNewTestament.Checked = true;
 
 			// Populate the list of books; select the first item in the list
-			PopulateGrid("GEN");
+			PopulateGrid("GEN", false);
 
 			// Hide the CreateBook button if requested (Front books cannot be created,
             // they can only be imported. Move the other buttons up.
             if (SuppressCreateBook)
-            {
                 m_bCreate.Visible = false;
-                m_bProperties.Location = m_bRemove.Location;
-                m_bRemove.Location = m_bExport.Location;
-                m_bExport.Location = m_bImport.Location;
-                m_bImport.Location = m_bCreate.Location;
-            }
 
             // Combo Box Possibilities
-            PopulateComboBoxPossibilities();
+            PopulateCopyNamesPossibilities();
 
             BuildLiterateSettings();
 		}
@@ -1131,7 +1145,7 @@ namespace OurWord.Dialogs
 			Translation.Books.Remove(book);
 
             // Update the property page
-            PopulateGrid(book.BookAbbrev);
+            PopulateGrid(book.BookAbbrev, true);
 		}
 		#endregion
         #region Cmd: cmdBookProperties - either via Button or Double-Click
@@ -1150,7 +1164,7 @@ namespace OurWord.Dialogs
             dlg.ShowDialog();
 
             // Update the property page
-            PopulateGrid(book.BookAbbrev);
+            PopulateGrid(book.BookAbbrev, true);
 		}
 		#endregion
         #region Cmd: cmdImportBook
@@ -1215,7 +1229,7 @@ namespace OurWord.Dialogs
             book.Unload(G.CreateProgressIndicator());    // Writes the file
 
             // Update the property page
-            PopulateGrid(book.BookAbbrev);
+            PopulateGrid(book.BookAbbrev, true);
 		}
 		#endregion
         #region Cmd: cmdCreateBook
@@ -1256,13 +1270,16 @@ namespace OurWord.Dialogs
             book.DisplayName = Translation.BookNamesTable[iBook];
 
             Translation.AddBook(book);
+            Cursor.Current = Cursors.WaitCursor;
             if (false == book.InitializeFromFrontTranslation(G.CreateProgressIndicator()))
             {
                 Translation.Books.Remove(book);
+                Cursor.Current = Cursors.Default;
                 return;
             }
             book.Write(G.CreateProgressIndicator());
-            PopulateGrid(sAbbrev);
+            Cursor.Current = Cursors.Default;
+            PopulateGrid(sAbbrev, true);
         }
 		#endregion
         #region Cmd: cmdExportBook
@@ -1283,7 +1300,22 @@ namespace OurWord.Dialogs
             book.Export(dlg.ExportPathName, ScriptureDB.Formats.kParatext, progress);
         }
         #endregion
+        #region Cmd: cmdEditRawFile
+        private void cmdEditRawFile(object sender, EventArgs e)
+        {
+            if (null == SelectedBook)
+                return;
 
-	}
+            // Put up the dialog and allow the user to edit
+            var dlg = new DlgRawFileEdit(SelectedBook);
+            if (dlg.ShowDialog(this.ParentDlg) != DialogResult.OK)
+                return;
+
+            // If they did edit, we must unload the book so that it will be re-loaded
+            SelectedBook.Unload(new NullProgress());
+        }
+        #endregion
+
+    }
 
 }
