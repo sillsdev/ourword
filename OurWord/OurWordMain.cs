@@ -2618,26 +2618,26 @@ namespace OurWord
             m_menuOpenProject.DropDownItems.Clear();
 
             // Get the list of clusters that we have
-            ClusterListView.PopulateClusterInfoList();
+            ClusterList.ScanForClusters();
 
             // If there are no clusters, then there's nothing to open
-            if (ClusterListView.ClusterInfoList.Count == 0)
+            if (ClusterList.Clusters.Count == 0)
             {
                 m_menuOpenProject.DropDownItems.Add("(none defined)");
             }
 
             // If there's only one cluster, then just add to the Open menu
-            else if (ClusterListView.ClusterInfoList.Count == 1)
+            else if (ClusterList.Clusters.Count == 1)
             {
                 BuildClusterSubMenu(m_menuOpenProject,
-                    ClusterListView.ClusterInfoList[0],
+                    ClusterList.Clusters[0],
                     cmdOpenProject);
             }
 
             // Otherwise, we go to submenus
             else
             {
-                foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+                foreach (ClusterInfo ci in ClusterList.Clusters)
                 {
                     var miCluster = new ToolStripMenuItem(ci.Name);
                     BuildClusterSubMenu(miCluster, ci, cmdOpenProject);

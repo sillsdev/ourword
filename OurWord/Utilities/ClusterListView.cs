@@ -33,63 +33,6 @@ namespace OurWord.Utilities
 {
     public partial class ClusterListView : UserControl
     {
-        // ClusterInfo List ------------------------------------------------------------------
-        #region SAttr{g}: List<ClusterInfo> ClusterInfoList
-        static public List<ClusterInfo> ClusterInfoList
-        {
-            get
-            {
-                if (null == s_ClusterInfoList)
-                    PopulateClusterInfoList();
-
-                Debug.Assert(null != s_ClusterInfoList);
-                return s_ClusterInfoList;
-            }
-        }
-        static List<ClusterInfo> s_ClusterInfoList;
-        #endregion
-        #region SMethod: void PopulateClusterInfoList()
-        static public void PopulateClusterInfoList()
-        {
-            s_ClusterInfoList = new List<ClusterInfo>();
-
-            // Places where we'll search for clusters
-            var vsPossibleClusterLocations = new List<string>();
-            vsPossibleClusterLocations.Add(JWU.GetMyDocumentsFolder(null));
-            vsPossibleClusterLocations.Add(JWU.GetLocalApplicationDataFolder(
-                ClusterInfo.c_sLanguageDataFolder));
-
-            // Loop to search each location
-            foreach (string sPossibleLocation in vsPossibleClusterLocations)
-            {
-                string[] sPotentialClusterFolders = Directory.GetDirectories(sPossibleLocation);
-
-                foreach(string sFolder in sPotentialClusterFolders)
-                {
-                    string sSettingsFolder = sFolder + Path.DirectorySeparatorChar +
-                        DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
-
-                    if (Directory.Exists(sSettingsFolder))
-                    {
-                        string sClusterName = JWU.ExtractRightmostSubFolder(sFolder);
-                        s_ClusterInfoList.Add( new ClusterInfo(sClusterName, sPossibleLocation));
-                    }
-                }
-            }
-        }
-        #endregion
-        #region SMethod: ClusterInfo FindClusterInfo(string sName)
-        static public ClusterInfo FindClusterInfo(string sName)
-        {
-            foreach (ClusterInfo ci in ClusterInfoList)
-            {
-                if (ci.Name == sName)
-                    return ci;
-            }
-            return null;
-        }
-        #endregion
-
         // List of Clusters ------------------------------------------------------------------
         #region Ctrl: ListView Clusters
         ListView Clusters
@@ -155,7 +98,7 @@ namespace OurWord.Utilities
         {
             Clusters.Items.Clear();
 
-            foreach (ClusterInfo ci in ClusterInfoList)
+            foreach (ClusterInfo ci in ClusterList.Clusters)
             {
                 ListViewItem item = new ListViewItem(ci.Name);
                 item.SubItems.Add(ci.Location);
@@ -238,9 +181,9 @@ namespace OurWord.Utilities
                 ciOld.Name = sNewClusterName;
 
                 // Update everything
-                PopulateClusterInfoList();
+                ClusterList.ScanForClusters();
                 Populate();
-                SelectedCluster = FindClusterInfo(sNewClusterName);
+                SelectedCluster = ClusterList.FindClusterInfo(sNewClusterName);
             }
             catch (Exception)
             {
@@ -269,11 +212,11 @@ namespace OurWord.Utilities
                 Directory.CreateDirectory(sSettingsPath);
 
             // Recalculate the list of clusters
-            PopulateClusterInfoList();
+            ClusterList.ScanForClusters();
 
             // Recalculate the listview and select the new item
             Populate();
-            SelectedCluster = FindClusterInfo(dlg.NewClusterName);
+            SelectedCluster = ClusterList.FindClusterInfo(dlg.NewClusterName);
         }
         #endregion
         #region Method: DeleteCluster
@@ -313,7 +256,7 @@ namespace OurWord.Utilities
             JWU.SafeFolderDelete(sClusterFolder);
 
             // Recalculate our list of clusters
-            PopulateClusterInfoList();
+            ClusterList.ScanForClusters();
 
             // Recalculate the listview and select the first item
             Populate();
@@ -343,22 +286,26 @@ namespace OurWord.Utilities
             string sParentFolder = (dlg.StoreInMyDocuments) ?
                 JWU.GetMyDocumentsFolder(null) :
                 JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
-
-            try
-            {
-                // Move it
                 ClusterInfo ciNew = new ClusterInfo(ci.Name, sParentFolder);
-                Directory.Move(ci.ClusterFolder, ciNew.ClusterFolder);
-                ci.ParentFolder = ciNew.ParentFolder;
 
-                // Update everything
-                PopulateClusterInfoList();
-                Populate();
-                SelectedCluster = FindClusterInfo(ci.Name);
-            }
-            catch (Exception)
+            // If the new destination already exists, then we can't do the move
+            if (Directory.Exists(ciNew.ClusterFolder))
             {
+                LocDB.Message("msgFolderAlreadyExists",
+                    "Unable to move the Cluster because a folder of that name already exists.",
+                    null, LocDB.MessageTypes.Error);
+                return;
             }
+
+            // Do the move
+            Cursor.Current = Cursors.WaitCursor;
+            JWU.Move(ci.ClusterFolder, ciNew.ClusterFolder);
+            Cursor.Current = Cursors.Default; ;
+
+            // Update everything
+            ClusterList.ScanForClusters();
+            Populate();
+            SelectedCluster = ClusterList.FindClusterInfo(ci.Name);
         }
         #endregion
     }

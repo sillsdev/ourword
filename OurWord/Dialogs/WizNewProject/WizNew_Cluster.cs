@@ -65,7 +65,7 @@ namespace OurWord.Dialogs.WizNewProject
             m_ClusterListView.Populate();
 
             // Select what we've chosen in the wizard (either in this session, or previously)
-            foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+            foreach (ClusterInfo ci in ClusterList.Clusters)
             {
                 if (ci == Wizard.ChosenCluster)
                 {
@@ -100,7 +100,7 @@ namespace OurWord.Dialogs.WizNewProject
         {
             if (!string.IsNullOrEmpty(sNewCluster))
             {
-                foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+                foreach (ClusterInfo ci in ClusterList.Clusters)
                 {
                     if (ci.Name == sNewCluster)
                     {

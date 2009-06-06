@@ -129,6 +129,10 @@ namespace OurWord.Dialogs
 			// Initialize attributes
 			m_Translation = trans;
 			m_bSuppressCreateBook = bSuppressCreateBook;
+
+            // Set up the Literate Settings contents
+            BuildLiterateSettings();
+
 		}
 		#endregion
 		#region Method: void Dispose(...)
@@ -461,8 +465,7 @@ namespace OurWord.Dialogs
             this.m_LiterateSettings.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.m_LiterateSettings.DontAllowPropertyGrid = false;
             this.m_LiterateSettings.Location = new System.Drawing.Point(9, 38);
-            this.m_LiterateSettings.Name = "m_LiterateSettings";
-            this.m_LiterateSettings.ShowDocumentation = true;
+            this.m_LiterateSettings.Name = "TranslationOther";
             this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
             this.m_LiterateSettings.TabIndex = 7;
             // 
@@ -688,9 +691,6 @@ namespace OurWord.Dialogs
             LS.AddInformation("tr250", Information.PStyleNormal,
                 "If you have more footnotes than you have letters, then OurWord will just roll " +
                 "over back to the beginning. E.g., after 'z' comes 'a'.");
-
-            // Layout, etc
-            LS.LoadContents();
         }
         #endregion
 
@@ -1036,8 +1036,6 @@ namespace OurWord.Dialogs
 
             // Combo Box Possibilities
             PopulateCopyNamesPossibilities();
-
-            BuildLiterateSettings();
 		}
 		#endregion
 		#region Cmd: cmdRemoveTranslation

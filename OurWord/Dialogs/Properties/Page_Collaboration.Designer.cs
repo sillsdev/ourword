@@ -28,36 +28,34 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
+            this.Collaboration = new OurWord.Edit.LiterateSettingsWnd();
             this.SuspendLayout();
             // 
-            // m_LiterateSettings
+            // Collaboration
             // 
-            this.m_LiterateSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.Collaboration.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_LiterateSettings.DontAllowPropertyGrid = false;
-            this.m_LiterateSettings.Location = new System.Drawing.Point(3, 3);
-            this.m_LiterateSettings.Name = "m_LiterateSettings";
-            this.m_LiterateSettings.ShowDocumentation = true;
-            this.m_LiterateSettings.Size = new System.Drawing.Size(444, 351);
-            this.m_LiterateSettings.TabIndex = 0;
+            this.Collaboration.DontAllowPropertyGrid = false;
+            this.Collaboration.Location = new System.Drawing.Point(3, 3);
+            this.Collaboration.Name = "Collaboration";
+            this.Collaboration.Size = new System.Drawing.Size(444, 351);
+            this.Collaboration.TabIndex = 0;
             // 
             // Page_Collaboration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.Controls.Add(this.m_LiterateSettings);
+            this.Controls.Add(this.Collaboration);
             this.Name = "Page_Collaboration";
             this.Size = new System.Drawing.Size(450, 357);
-            this.Load += new System.EventHandler(this.cmdLoad);
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private OurWord.Edit.LiterateSettingsWnd m_LiterateSettings;
+        private OurWord.Edit.LiterateSettingsWnd Collaboration;
     }
 }

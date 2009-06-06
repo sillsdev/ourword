@@ -39,7 +39,7 @@ namespace OurWord.Edit
 	{
 		// Whether or not to show the documentation ------------------------------------------
 		#region VAttr{g/s}: bool ShowDocumentation - T if doc is desired
-		public bool ShowDocumentation
+		bool ShowDocumentation
 		{
 			get
 			{
@@ -54,10 +54,10 @@ namespace OurWord.Edit
 		#region Cmd: cmdShowDocumentationChanged
 		private void cmdShowDocumentationChanged(object sender, EventArgs e)
 		{
+            JW_Registry.SetValue(c_sRegSubKey, Name, ShowDocumentation);
 			LoadContents();
 		}
 		#endregion
-
         #region Attr{g/s}: bool DontAllowPropertyGrid
         public bool DontAllowPropertyGrid
         {
@@ -151,6 +151,9 @@ namespace OurWord.Edit
 		{
 			if (null == TerseGrid)
 				return;
+
+            m_bagTerse = null;
+            TerseGrid.SelectedObject = null;
 
 			m_panelSettingsContainer.Controls.Remove(TerseGrid);
 			TerseGrid.Dispose();
@@ -266,11 +269,10 @@ namespace OurWord.Edit
 		#endregion
 
 		// Scaffolding -----------------------------------------------------------------------
+        public const string c_sRegSubKey = "LiterateSettingsWnd";
 		#region Constructor()
 		public LiterateSettingsWnd()
 		{
-			Name = "LiterateSettingsWnd";
-
 			Information.InitStyleSheet();
 
 			InitializeComponent();
@@ -291,15 +293,19 @@ namespace OurWord.Edit
 		}
 		#endregion
 		#region Method: void LoadContents()
-		public void LoadContents()
+		void LoadContents()
 		{
-            bool bShowVerbose = (DontAllowPropertyGrid) ? 
-                true : m_cbShowDocumentation.Checked;
+            // By default, we start by showing the verbose documentation, as
+            // currently indicated in the combo box
+            bool bShowVerbose = ShowDocumentation;
 
+            // If the programmer has indicated to not allow the property grid, then
+            // Verbose is on, regardless of registry, user decision, etc.
             if (DontAllowPropertyGrid)
             {
                 m_cbShowDocumentation.Visible = false;
                 m_panelSettingsContainer.Height = Height;
+                bShowVerbose = true;
             }
 
 			// Get rid of what we previously had; build the one we want
@@ -324,7 +330,25 @@ namespace OurWord.Edit
 				Verbose.SetSize(Width, Height);
 		}
 		#endregion
-	}
+        #region Cmd: cmdLoad
+        private void cmdLoad(object sender, EventArgs e)
+        {
+            // The initial value of the ShowDocumentation checkbox is stored in the registry;
+            // the default value is to show it. We do this during Load, rather than during
+            // construction, in order to give time for the Name to be changed from the
+            // default, to whatever will be used in the given context.
+            bool bShowVerbose = JW_Registry.GetValue(c_sRegSubKey, Name, true);
+
+            // This is tricky. We have an event handler that fires when the Checked is
+            // changed. Which would result in LoadContents being called twice, which
+            // causes some flaky behavior. So we do it via this convulated manner.
+            if (bShowVerbose == m_cbShowDocumentation.Checked)
+                LoadContents();
+            else
+                m_cbShowDocumentation.Checked = bShowVerbose;
+        }
+        #endregion
+    }
 
 	#region CLASS: Setting
 	public class Setting

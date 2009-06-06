@@ -480,8 +480,12 @@ namespace JWdb.DataModel
 		{
 			get
 			{
-				// The JWU method ensures that the folder exists
-				return JWU.GetMyDocumentsFolder(DisplayName);
+                var ci = ClusterList.FindClusterInfo(DisplayName);
+
+                if (!Directory.Exists(ci.ClusterFolder))
+                    Directory.CreateDirectory(ci.ClusterFolder);
+
+                return ci.ClusterFolder;
 			}
 		}
 		#endregion

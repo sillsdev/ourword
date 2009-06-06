@@ -216,7 +216,7 @@ namespace OurWord.Dialogs
 			}
 
             // The translation's name cannot conflict with other names in the cluster
-            ClusterInfo ci = ClusterListView.FindClusterInfo(DB.TeamSettings.DisplayName);
+            ClusterInfo ci = ClusterList.FindClusterInfo(DB.TeamSettings.DisplayName);
             var vTranslations = ci.GetClusterLanguageList();
             string sProposedNameUp = sProposedName.ToUpperInvariant();
             foreach (string s in vTranslations)

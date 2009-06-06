@@ -495,7 +495,8 @@ namespace JWdb.DataModel
 		{
 			get
 			{
-				return Project.TeamSettings.ClusterFolder + DisplayName + Path.DirectorySeparatorChar;
+				return Project.TeamSettings.ClusterFolder + DisplayName + 
+                    Path.DirectorySeparatorChar;
 			}
 		}
 		#endregion

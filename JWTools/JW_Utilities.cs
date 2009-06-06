@@ -417,6 +417,67 @@ namespace JWTools
                 Directory.Delete(sFolderPath, true);
         }
         #endregion
+
+        static void Copy(string sSourceFolder, string sDestinationFolder)
+        {
+            // Get the info about this folder
+            DirectoryInfo dir = new DirectoryInfo(sSourceFolder);
+
+            // Create the destination folder
+            Directory.CreateDirectory(sDestinationFolder);
+
+            // Copy the files over
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(sDestinationFolder, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // Copy the subfolders over via recursion
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            foreach (DirectoryInfo subdir in dirs)
+            {
+                string temppath = Path.Combine(sDestinationFolder, subdir.Name);
+                Copy(subdir.FullName, temppath);
+            }
+        }
+
+        static public bool Move(string sSourceFolder, string sDestinationFolder)
+            // We want this to be safe, so instead of a strict move, we first do a copy of
+            // everything. If the copy succeeds, then we delete from the source. 
+        {
+            // Abort if the destination already exists
+            if (Directory.Exists(sDestinationFolder))
+                return false;
+
+            // Copy the files over; restore back on any failure
+            try
+            {
+                Copy(sSourceFolder, sDestinationFolder);
+            }
+            catch (Exception e)
+            {
+                Directory.Delete(sDestinationFolder, true);
+                return false;
+            }
+
+            // Remove the source folder; restore back on any failure
+            try
+            {
+                Directory.Delete(sSourceFolder, true);
+            }
+            catch (Exception e)
+            {
+                Copy(sDestinationFolder, sSourceFolder);
+                Directory.Delete(sDestinationFolder, true);
+                return false;
+            }
+
+            return true;
+        }
+
+
     }
 
     #region CLASS: JW_Util

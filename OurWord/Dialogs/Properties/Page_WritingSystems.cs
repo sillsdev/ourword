@@ -143,8 +143,6 @@ namespace OurWord.Dialogs
 				"Secondly, automatic hyphenation is not yet implemented in the Print routine. " +
 				"I know, I know......stay tuned.....and the more voices that request it, the " +
 				"higher this stuff moves up on my To Do list.");
-
-			LS.LoadContents();
 		}
 		#endregion
 
@@ -155,9 +153,11 @@ namespace OurWord.Dialogs
         {
             InitializeComponent();
 
-			m_LiterateSettingsWnd.Name = "Automatic Hyphenation";
-
 			m_WritingSystem = ws;
+
+			// Setup the Hyphenation LiterateSettings control
+			m_LiterateSettingsWnd.Name = "AutomaticHyphenation";
+			BuildHyphenationWindow();
         }
         #endregion
         #region Attr{g}: JWritingSystem WritingSystem
@@ -441,9 +441,6 @@ namespace OurWord.Dialogs
 
 			// Set up the Grid Control
 			SetupPropertyGrid();
-
-			// Setup the Hyphenation LiterateSettings control
-			BuildHyphenationWindow();
 
 			// Set up the AutoReplace control
 			m_ctrlAutoReplace.Initialize(m_WritingSystem.AutoReplaceSource,

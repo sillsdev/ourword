@@ -138,4 +138,65 @@ namespace JWdb.DataModel
         }
         #endregion
     }
+
+    static public class ClusterList
+    {
+        #region SAttr{g}: List<ClusterInfo> Clusters
+        static public List<ClusterInfo> Clusters
+        {
+            get
+            {
+                if (null == s_vClusters)
+                    ScanForClusters();
+                return s_vClusters;
+            }
+        }
+        static List<ClusterInfo> s_vClusters;
+        #endregion
+
+        #region SMethod: void ScanForClusters()
+        static public void ScanForClusters()
+        {
+            s_vClusters = new List<ClusterInfo>();
+
+            // Places where we'll search for clusters
+            var vsPossibleClusterLocations = new List<string>();
+            vsPossibleClusterLocations.Add(JWU.GetMyDocumentsFolder(null));
+            vsPossibleClusterLocations.Add(JWU.GetLocalApplicationDataFolder(
+                ClusterInfo.c_sLanguageDataFolder));
+
+            // Loop to search each location
+            foreach (string sPossibleLocation in vsPossibleClusterLocations)
+            {
+                string[] sPotentialClusterFolders = Directory.GetDirectories(sPossibleLocation);
+
+                foreach (string sFolder in sPotentialClusterFolders)
+                {
+                    string sSettingsFolder = sFolder + Path.DirectorySeparatorChar +
+                        DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
+
+                    if (Directory.Exists(sSettingsFolder))
+                    {
+                        string sClusterName = JWU.ExtractRightmostSubFolder(sFolder);
+                        s_vClusters.Add(new ClusterInfo(sClusterName, sPossibleLocation));
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region SMethod: ClusterInfo FindClusterInfo(string sName)
+        static public ClusterInfo FindClusterInfo(string sName)
+        {
+            foreach (ClusterInfo ci in Clusters)
+            {
+                if (ci.Name == sName)
+                    return ci;
+            }
+            return null;
+        }
+        #endregion
+    }
+
+
 }

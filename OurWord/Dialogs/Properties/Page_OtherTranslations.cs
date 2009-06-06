@@ -52,7 +52,7 @@ namespace OurWord.Dialogs
         void BuildAvailableLanguages()
         {
             // Get the list from the current folder contents
-            ClusterInfo ci = ClusterListView.FindClusterInfo(DB.TeamSettings.DisplayName);
+            ClusterInfo ci = ClusterList.FindClusterInfo(DB.TeamSettings.DisplayName);
             m_vAvailableLanguages = ci.GetClusterLanguageList();
 
             // Remove the Front and Target translations

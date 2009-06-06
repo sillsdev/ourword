@@ -2701,13 +2701,15 @@ namespace OurWord.Edit
                 if (CanRestructureParagraphs)
                 {
                     // If a delete at the end of a paragraph, then join with the next paragraph
-                    if (Window.Selection.IsInsertionPoint_AtParagraphEnding && mode == DeleteMode.kDelete)
+                    if (Window.Selection.IsInsertionPoint_AtParagraphEnding && 
+                        mode == DeleteMode.kDelete)
                     {
                         Window.cmdMoveCharRight();
                         mode = DeleteMode.kBackSpace;
                     }
 
-                    if (Window.Selection.IsInsertionPoint_AtParagraphBeginning && mode == DeleteMode.kBackSpace)
+                    if (Window.Selection.IsInsertionPoint_AtParagraphBeginning && 
+                        mode == DeleteMode.kBackSpace)
                     {
                         if ((new JoinParagraphAction(this.Window)).Do())
                             return true;

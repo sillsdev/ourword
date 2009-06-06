@@ -255,7 +255,7 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
+        #region Constructor(sName, cColumnCount)
         public OWWindow(string _sName, int _cColumnCount)
             : base()
         {
@@ -268,7 +268,7 @@ namespace OurWord.Edit
             // Registry key for settings
             m_sRegistrySettingsSubKey = _sName;
             if (_sName.StartsWith("LS-"))
-                m_sRegistrySettingsSubKey = "LiterateSettingsWnd";
+                m_sRegistrySettingsSubKey = LiterateSettingsWnd.c_sRegSubKey;
 
             // Initialize ScrollBar
             AutoScroll = false;             // Don't use Panel's built-in scrollbar

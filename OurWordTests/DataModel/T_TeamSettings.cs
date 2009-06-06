@@ -155,14 +155,14 @@ namespace OurWordTests.DataModel
 
 			// Set up the sample clusters
 			CreateSampleClusters();
-            ClusterListView.PopulateClusterInfoList();
+            ClusterList.ScanForClusters();
 		}
 		#endregion
 		#region TearDown
 		[TearDown] public void TearDown()
 		{
 			DeleteSampleClusters();
-            ClusterListView.PopulateClusterInfoList();
+            ClusterList.ScanForClusters();
 		}
 		#endregion
 
@@ -173,8 +173,8 @@ namespace OurWordTests.DataModel
 			// Teardown: the cluster folders will be deleted
 		{
 			// Get the list of clusters currently on the disk
-            ClusterListView.PopulateClusterInfoList();
-			List<ClusterInfo> v = ClusterListView.ClusterInfoList;
+            ClusterList.ScanForClusters();
+			List<ClusterInfo> v = ClusterList.Clusters;
 
 			// Ours should be included (there will likely be more, as I have my test data
 			// on MyDocuments as well.)
@@ -198,7 +198,7 @@ namespace OurWordTests.DataModel
 			CreateSampleLanguages(c_sAru);
 
 			// Get the list of languages there
-            ClusterInfo ci = ClusterListView.FindClusterInfo(c_sAru);
+            ClusterInfo ci = ClusterList.FindClusterInfo(c_sAru);
             List<string> v = ci.GetClusterLanguageList();
 
 			// Should be exactly what we have in Languages

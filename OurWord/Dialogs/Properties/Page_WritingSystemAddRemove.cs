@@ -135,9 +135,6 @@ namespace OurWord.Dialogs
                 "Options\" control panel. That is, you probably need to pretend that your " +
                 "keyboard is actually some other language. See " +
                 "http://wesay.org/wiki/Windows_Repeated_Keyboard_Name_Bug for more details.");
-
-			// Layout, etc
-            LS.LoadContents();
         }
 		#endregion
 
@@ -149,7 +146,9 @@ namespace OurWord.Dialogs
 			InitializeComponent();
 
             LS.DontAllowPropertyGrid = true;
-            LS.Name = "Writing Systems";
+            LS.Name = "WritingSystems";
+
+            BuildLiterateSettings();
 		}
 		#endregion
 
@@ -192,12 +191,6 @@ namespace OurWord.Dialogs
 		#endregion
 
 		// Command Handlers ------------------------------------------------------------------
-		#region Cmd: cmdLoad
-		private void cmdLoad(object sender, EventArgs e)
-		{
-            BuildLiterateSettings();
-		}
-		#endregion
 		#region Cmd: cmdAddWritingSystem
 		private void cmdAddWritingSystem(object sender, EventArgs e)
 		{

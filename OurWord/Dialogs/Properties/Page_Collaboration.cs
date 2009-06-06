@@ -44,7 +44,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return m_LiterateSettings;
+                return Collaboration;
             }
         }
         #endregion
@@ -182,9 +182,6 @@ namespace OurWord.Dialogs
                 "When others have edited the same settings, keep mine? Typically Yes for " +
                     "and advisor, No for a translator.",
                 Repository.MineAlwaysWins);
-
-            // Layout, etc
-            LS.LoadContents();
         }
         #endregion
 
@@ -194,6 +191,7 @@ namespace OurWord.Dialogs
             : base(_ParentDlg)
         {
             InitializeComponent();
+            BuildLiterateSettings();
         }
         #endregion
 
@@ -241,14 +239,6 @@ namespace OurWord.Dialogs
             Repository.RemoteUserName = m_RemoteServerUserName.Value;
             Repository.RemotePassword = m_RemoteServerPassword.Value;
             return true;
-        }
-        #endregion
-
-        // Command Handlers ------------------------------------------------------------------
-        #region Cmd: cmdLoad
-        private void cmdLoad(object sender, EventArgs e)
-        {
-            BuildLiterateSettings();
         }
         #endregion
     }

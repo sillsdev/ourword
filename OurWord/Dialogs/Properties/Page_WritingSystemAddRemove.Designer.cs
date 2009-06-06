@@ -50,8 +50,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.m_LiterateSettingsWnd.DontAllowPropertyGrid = false;
             this.m_LiterateSettingsWnd.Location = new System.Drawing.Point(3, 4);
-            this.m_LiterateSettingsWnd.Name = "m_LiterateSettingsWnd";
-            this.m_LiterateSettingsWnd.ShowDocumentation = true;
+            this.m_LiterateSettingsWnd.Name = "AddWritingSystem";
             this.m_LiterateSettingsWnd.Size = new System.Drawing.Size(337, 257);
             this.m_LiterateSettingsWnd.TabIndex = 2;
             // 
@@ -64,7 +63,6 @@
             this.Controls.Add(this.m_btnAdd);
             this.Name = "Page_AddWritingSystem";
             this.Size = new System.Drawing.Size(343, 293);
-            this.Load += new System.EventHandler(this.cmdLoad);
             this.ResumeLayout(false);
 
 		}

@@ -150,8 +150,6 @@ namespace OurWord.Dialogs
                 "Copyright Text:",
                 "Give an optional copyright text for this book, to be used when printing.",
                 Book.Copyright);
-
-            LS.LoadContents();
         }
         #endregion
 
@@ -197,6 +195,9 @@ namespace OurWord.Dialogs
 			m_book = book;
 			m_Translation = translation;
 			m_TFront = tFront;
+
+            // Build the general settings window
+            BuildLsWindow();
 		}
 		#endregion
 		#region Windows Form Designer generated code
@@ -299,8 +300,7 @@ namespace OurWord.Dialogs
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.m_LiterateSettingsWnd.DontAllowPropertyGrid = false;
             this.m_LiterateSettingsWnd.Location = new System.Drawing.Point(3, 3);
-            this.m_LiterateSettingsWnd.Name = "m_LiterateSettingsWnd";
-            this.m_LiterateSettingsWnd.ShowDocumentation = true;
+            this.m_LiterateSettingsWnd.Name = "BookProperties";
             this.m_LiterateSettingsWnd.Size = new System.Drawing.Size(503, 381);
             this.m_LiterateSettingsWnd.TabIndex = 0;
             // 
@@ -356,9 +356,6 @@ namespace OurWord.Dialogs
 		#region Cmd: cmdLoad(...) - the dialog is loading; initialize the control contents
 		private void cmdLoad(object sender, System.EventArgs e)
 		{
-            // Build the general settings window
-            BuildLsWindow();
-
 			// Comment
 			m_textComment.Text = Book.Comment;
 

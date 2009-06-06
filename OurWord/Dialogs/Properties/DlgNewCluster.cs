@@ -67,7 +67,7 @@ namespace OurWord.Dialogs
             }
 
             // Make sure we have a unique name
-            foreach (ClusterInfo ci in ClusterListView.ClusterInfoList)
+            foreach (ClusterInfo ci in ClusterList.Clusters)
             {
                 if (ci.Name == NewClusterName)
                 {

@@ -136,7 +136,7 @@ namespace OurWord.Dialogs.WizNewProject
 		{
 			get
 			{
-                return ClusterListView.ClusterInfoList;
+                return ClusterList.Clusters;
 			}
 		}
 		#endregion
@@ -184,7 +184,7 @@ namespace OurWord.Dialogs.WizNewProject
 
 			// Clusters: If we have more than one cluster, then we'll need to show the page 
 			// for choosing which one.
-			if (ClusterListView.ClusterInfoList.Count > 1)
+			if (ClusterList.Clusters.Count > 1)
 			{
 				m_bShowClusterChoicePage = true;
 				AddPage(m_pageCluster);
