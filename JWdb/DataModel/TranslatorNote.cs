@@ -1498,8 +1498,27 @@ namespace JWdb.DataModel
         }
         static bool s_bShowAllPeople = true;
         #endregion
+        #region VAttr{g}: bool IsUnassigned
+        public bool IsUnassigned
+        {
+            get
+            {
+                return string.IsNullOrEmpty(AssignedTo);
+            }
+        }
+        #endregion
 
         // View Construction -----------------------------------------------------------------
+        #region VAttr{g}: Discussion FirstDiscussion
+        public Discussion FirstDiscussion
+        {
+            get
+            {
+                Debug.Assert(0 != Discussions.Count);
+                return Discussions[0];
+            }
+        }
+        #endregion
         #region VAttr{g}: Discussion LastDiscussion
         public Discussion LastDiscussion
         {
@@ -1537,7 +1556,21 @@ namespace JWdb.DataModel
             // Is this an AssignedTo person we want to see?
             if (!ShowAllPeople)
             {
-                if (AssignedTo != DB.UserName)
+                // Is it assigned to this user?
+                bool bIsAsignedToThisUser = (AssignedTo == DB.UserName);
+
+                // Was it recently created by this user? (The issue is that if the user
+                // has it "Show stuff assigned to me", and they then create the note,
+                // because the note is assigned to no one, it would not show up. So we
+                // give it an hour for the user to assign it to someone.
+                bool bWasJustCreatedByThisUser =
+                    (Discussions.Count == 1 &&
+                    FirstDiscussion.Author == DB.UserName &&
+                    FirstDiscussion.Created > DateTime.Now.AddHours(-1) &&
+                    IsUnassigned);
+
+                // Either criteria works
+                if (!bIsAsignedToThisUser && !bWasJustCreatedByThisUser)
                     return false;
             }
 

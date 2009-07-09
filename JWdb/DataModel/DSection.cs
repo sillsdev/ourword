@@ -2254,10 +2254,11 @@ namespace JWdb.DataModel
                 {
                     if (!string.IsNullOrEmpty(field.Data.Trim()))
                     {
-                        Section.History.AddEvent(
+                        var Event = Section.History.CreateEvent(
                             new DateTime(2009, 1, 1),
                             Loc.GetString("OldHistory", "Old"),
                             field.Data);
+                        Section.History.AddEvent(Event);
                     }
                     return true;
                 }

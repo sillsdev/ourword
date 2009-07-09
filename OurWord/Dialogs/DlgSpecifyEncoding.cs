@@ -119,7 +119,7 @@ namespace OurWord.Dialogs
 
             // Set a large Unicode font so that it is easy to see if the letters appear
             // correctly
-            m_rtbFile.Font = new Font("Arial Unicode MS", 16);
+            m_rtbFile.Font = new Font("Arial Unicode MS", 12);
 
             // Restore to the previous cursor
             Cursor.Current = cursor;
@@ -158,45 +158,6 @@ namespace OurWord.Dialogs
 
             // Load the file
             LoadFileUsingCurrentEncoding();
-        }
-        #endregion
-        #region Cmd: cmdResize
-        int m_nPreviousWidth = -1;
-        int m_nPreviousHeight = -1;
-        private void cmdResize(object sender, EventArgs e)
-        {
-            // Handle horizontal changes 
-            if (m_nPreviousWidth > 0)
-            {
-                int nDeltaWidth = Width - m_nPreviousWidth;
-
-                // Most controls change their width
-                m_labelInstructions.Width += nDeltaWidth;
-                m_comboEncodings.Width += nDeltaWidth;
-                m_labelExamineYourFile.Width += nDeltaWidth;
-                m_rtbFile.Width += nDeltaWidth;
-
-                // The buttons move in order to remain centered
-                m_btnOK.Left += (nDeltaWidth / 2);
-                m_btnCancel.Left += (nDeltaWidth / 2);
-                m_btnHelp.Left += (nDeltaWidth / 2);
-            }
-            m_nPreviousWidth = Width;
-
-            // Handle verticle changes
-            if (m_nPreviousHeight > 0)
-            {
-                int nDeltaHeight = Height - m_nPreviousHeight;
-
-                // The RTF control expands to show more(less) of the file
-                m_rtbFile.Height += nDeltaHeight;
-
-                // The buttons move to make room
-                m_btnOK.Top += nDeltaHeight;
-                m_btnCancel.Top += nDeltaHeight;
-                m_btnHelp.Top += nDeltaHeight;
-            }
-            m_nPreviousHeight = Height;
         }
         #endregion
     }

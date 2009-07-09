@@ -30,8 +30,10 @@ using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
+using OurWord.SideWnd;
 using OurWord.View;
 #endregion
+
 
 namespace OurWord.Dialogs
 {
@@ -167,7 +169,7 @@ namespace OurWord.Dialogs
                     e.Value = WndNaturalness.RegistryBackgroundColor;
                     break;
                 case c_sColorOtherTranslations:
-                    e.Value = TranslationsWindow.RegistryBackgroundColor;
+                    e.Value = TranslationsWnd.RegistryBackgroundColor;
                     break;
             }
         }
@@ -246,7 +248,7 @@ namespace OurWord.Dialogs
                     WndNaturalness.RegistryBackgroundColor = (string)e.Value;
                     break;
                 case c_sColorOtherTranslations:
-                    TranslationsWindow.RegistryBackgroundColor = (string)e.Value;
+                    TranslationsWnd.RegistryBackgroundColor = (string)e.Value;
                     break;
             }
         }

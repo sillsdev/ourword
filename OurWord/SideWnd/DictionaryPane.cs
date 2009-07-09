@@ -1,3 +1,4 @@
+#region ***** DictionaryPane.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    DictionaryPane.cs
@@ -23,38 +24,13 @@ using OurWord.View;
 using OurWord.Edit;
 using Palaso.Services.Dictionary;
 #endregion
+#endregion
 
-namespace OurWord.Edit
+namespace OurWord.SideWnd
 {
-    public partial class DictionaryPane : UserControl
+    public partial class DictionaryPane : UserControl, ISideWnd
     {
-        #region Attr{g/s}: string CurrentID
-        string CurrentID
-        {
-            get
-            {
-                return m_sCurrentID;
-            }
-            set
-            {
-                m_sCurrentID = value;
-            }
-        }
-        string m_sCurrentID;
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public DictionaryPane()
-        {
-            InitializeComponent();
-
-            SetHtmlText("");
-            m_checkExactSearch.Checked = true;
-
-            SetControlVisibility();
-        }
-        #endregion
+        // ISideWnd --------------------------------------------------------------------------
         #region Method: void SetSize(Size sz)
         public void SetSize(Size sz)
         {
@@ -92,6 +68,49 @@ namespace OurWord.Edit
             m_btnAdd.Left = xButton;
             m_btnCancel.Left = xButton;
             m_btnOpenInWeSay.Left = xButton;
+        }
+        #endregion
+        #region Attr{g}: OWWindow Window
+        public OWWindow Window
+        {
+            get
+            {
+                return null;
+            }
+        }
+        #endregion
+        #region Method: void SetControlsEnabling()
+        public void SetControlsEnabling()
+        {
+        }
+        #endregion
+
+
+        #region Attr{g/s}: string CurrentID
+        string CurrentID
+        {
+            get
+            {
+                return m_sCurrentID;
+            }
+            set
+            {
+                m_sCurrentID = value;
+            }
+        }
+        string m_sCurrentID;
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public DictionaryPane()
+        {
+            InitializeComponent();
+
+            SetHtmlText("");
+            m_checkExactSearch.Checked = true;
+
+            SetControlVisibility();
         }
         #endregion
 

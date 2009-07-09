@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{44F1C5F7-3295-4440-ABA6-B9FA827F5EA6}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -76,6 +76,7 @@
     <Compile Include="JWdb\T_JRef.cs" />
     <Compile Include="JWdb\T_JSeq.cs" />
     <Compile Include="JWdb\T_SfDB.cs" />
+    <Compile Include="JWdb\T_StdFmtTransform.cs" />
     <Compile Include="JWdb\T_StyleSheet.cs" />
     <Compile Include="JWTools\T_BackupSystem.cs" />
     <Compile Include="JWTools\T_Localization.cs" />

@@ -23,8 +23,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
-using OurWord.Layouts;
-
+using OurWord.SideWnd;
 #endregion
 
 namespace OurWord.Edit
@@ -2609,54 +2608,37 @@ namespace OurWord.Edit
         }
         TranslatorNote m_Note;
         #endregion
-        #region Attr{g}: ToolStripMenuItem NewClassification
-        ToolStripMenuItem NewClassification
+
+        #region Attr{g}: string NewClassification
+        string NewClassification
         {
             get
             {
-                Debug.Assert(null != m_itemNewClassification);
-                return m_itemNewClassification;
+                return m_sNewClassification;
             }
         }
-        ToolStripMenuItem m_itemNewClassification;
+        string m_sNewClassification;
         #endregion
-        #region Attr{g}: ToolStripMenuItem OriginalClassification
-        ToolStripMenuItem OriginalClassification
+        #region Attr{g}: string OriginalClassification
+        string OriginalClassification
         {
             get
             {
-                Debug.Assert(null != m_itemOriginalClassification);
-                return m_itemOriginalClassification;
+                return m_sOriginalClassification;
             }
         }
-        ToolStripMenuItem m_itemOriginalClassification;
+        string m_sOriginalClassification;
         #endregion
 
-        #region VAttr{g}: ToolStripDropDownButton ParentMenu
-        ToolStripDropDownButton ParentMenu
+        #region Attr{g}: string WhichOne
+        string WhichOne
         {
             get
             {
-                ToolStripDropDownButton menu = NewClassification.OwnerItem as ToolStripDropDownButton;
-                Debug.Assert(null != menu);
-                return menu;
-
+                return m_sWhichOne;
             }
         }
-        #endregion
-        #region VAttr{g}: ToolStripMenuItem CurrentCheckedItem
-        ToolStripMenuItem CurrentCheckedItem
-        {
-            get
-            {
-                foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
-                {
-                    if (item.Checked)
-                        return item;
-                }
-                return null;
-            }
-        }
+        string m_sWhichOne;
         #endregion
 
         #region Constructor(OWWindow, Note, ToolStripMenuItem newPerson)
@@ -2667,23 +2649,38 @@ namespace OurWord.Edit
             : base(window, sActionName)
         {
             m_Note = note;
-            m_itemNewClassification = itemNewClassification;
-            m_itemOriginalClassification = CurrentCheckedItem;
+
+            // Save what the new classification text will be
+            m_sNewClassification = itemNewClassification.Text;
+
+            // Remember what the current (original) classification is
+            var parent = itemNewClassification.OwnerItem as ToolStripDropDownButton;
+            Debug.Assert(null != parent);
+            m_sOriginalClassification = parent.Text;
+
+            // Is it AssignTo or Category?
+            m_sWhichOne = parent.Name;
         }
         #endregion
 
         #region OMethod: bool PerformAction()
         protected override bool PerformAction()
         {
-            // Check the new item, uncheck the others
-            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
-                item.Checked = (item == NewClassification);
+            // Set the appropriate Note attribute
+            if (WhichOne == NotesWnd.c_sAssignedTo)
+                Note.AssignedTo = NewClassification;
+            else
+                Note.Category = NewClassification;
 
-            // Update the Category attribute
-            Note.AssignedTo = NewClassification.Text;
+            // Update the dropdown button text and check the correct item within
+            var DropDownButton = (Window as NotesWnd).GetDropDownButton(Note, WhichOne);
+            if (null == DropDownButton)
+                return false;
 
-            // Update the main menu text
-            ParentMenu.Text = NewClassification.Text;
+            DropDownButton.Text = NewClassification;
+
+            foreach (ToolStripMenuItem item in DropDownButton.DropDownItems)
+                item.Checked = (item.Text == NewClassification);
 
             return true;
         }
@@ -2691,15 +2688,21 @@ namespace OurWord.Edit
         #region Omethod: void ReverseAction()
         protected override void ReverseAction()
         {
-            // Check the new item, uncheck the others
-            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
-                item.Checked = (item == OriginalClassification);
+            // Set the appropriate Note attribute
+            if (WhichOne == NotesWnd.c_sAssignedTo)
+                Note.AssignedTo = OriginalClassification;
+            else
+                Note.Category = OriginalClassification;
 
-            // Update the Category attribute
-            Note.AssignedTo = OriginalClassification.Text;
+            // Update the dropdown button text and check the correct item within
+            var DropDownButton = (Window as NotesWnd).GetDropDownButton(Note, WhichOne);
+            if (null == DropDownButton)
+                return;
 
-            // Update the main menu text
-            ParentMenu.Text = OriginalClassification.Text;
+            DropDownButton.Text = OriginalClassification;
+
+            foreach (ToolStripMenuItem item in DropDownButton.DropDownItems)
+                item.Checked = (item.Text == OriginalClassification);
         }
         #endregion
 
@@ -2708,7 +2711,7 @@ namespace OurWord.Edit
 		{
 			get
 			{
-				return NewClassification.Text;
+				return NewClassification;
 			}
 		}
 		#endregion
@@ -2749,6 +2752,12 @@ namespace OurWord.Edit
         public InsertHistoryAction(OWWindow window)
             : base(window, "Insert Event")
         {
+            // Create the Event, and thus remember it here, so that Undo/Redo will work.
+            DHistory History = DB.TargetSection.History;
+            string sNewStage = History.MostRecentStage;
+            if (string.IsNullOrEmpty(sNewStage))
+                sNewStage = DB.TeamSettings.TranslationStages[0].Name;
+            m_Event = History.CreateEvent(DateTime.Now, sNewStage, "");
         }
         #endregion
 
@@ -2791,12 +2800,8 @@ namespace OurWord.Edit
             // Remember the current expand/collapsed states
             var states = PushCollapseStates();
 
-            // Create the new Event
-            DHistory History = DB.TargetSection.History;
-            string sNewStage = History.MostRecentStage;
-            if (string.IsNullOrEmpty(sNewStage))
-                sNewStage = DB.TeamSettings.TranslationStages[0].Name;
-            m_Event = History.AddEvent(DateTime.Now, sNewStage, "");
+            // Add the new Event
+            DB.TargetSection.History.AddEvent(Event);
 
             // Recalculate the entire display
             G.App.ResetWindowContents();
@@ -2949,77 +2954,65 @@ namespace OurWord.Edit
         }
         DEvent m_Event;
         #endregion
-        #region Attr{g}: ToolStripMenuItem NewStage
-        ToolStripMenuItem NewStage
+        #region Attr{g}: string NewStage
+        string NewStage
         {
             get
             {
-                Debug.Assert(null != m_itemNewStage);
-                return m_itemNewStage;
+                return m_sNewStage;
             }
         }
-        ToolStripMenuItem m_itemNewStage;
+        string m_sNewStage;
         #endregion
-        #region Attr{g}: ToolStripMenuItem OriginalStage
-        ToolStripMenuItem OriginalStage
+        #region Attr{g}: string OriginalStage
+        string OriginalStage
         {
             get
             {
-                Debug.Assert(null != m_itemOriginalStage);
-                return m_itemOriginalStage;
+                return m_sOriginalStage;
             }
         }
-        ToolStripMenuItem m_itemOriginalStage;
-        #endregion
-
-        #region VAttr{g}: ToolStripDropDownButton ParentMenu
-        ToolStripDropDownButton ParentMenu
-        {
-            get
-            {
-                var menu = NewStage.OwnerItem as ToolStripDropDownButton;
-                Debug.Assert(null != menu);
-                return menu;
-            }
-        }
-        #endregion
-        #region VAttr{g}: ToolStripMenuItem CurrentCheckedItem
-        ToolStripMenuItem CurrentCheckedItem
-        {
-            get
-            {
-                foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
-                {
-                    if (item.Checked)
-                        return item;
-                }
-                return null;
-            }
-        }
+        string m_sOriginalStage;
         #endregion
 
         #region Constructor(OWWindow, Event, itemNewStage)
-        public ChangeStage(OWWindow window, DEvent Event, ToolStripMenuItem NewStage)
+        public ChangeStage(OWWindow window, DEvent Event, ToolStripMenuItem itemNewStage)
             : base(window, "Change Translation Stage to")
         {
             m_Event = Event;
-            m_itemNewStage = NewStage;
-            m_itemOriginalStage = CurrentCheckedItem;
+
+            // Get the stage we want to get set to
+            m_sNewStage = itemNewStage.Text;
+
+            // Get the stage we are currently
+            m_sOriginalStage = Event.Stage;
+        }
+        #endregion
+        #region Method: ToolStripDropDownButton GetStagesDropDown()
+        ToolStripDropDownButton GetStagesDropDown()
+        {
+            var wndHistory = Window as HistoryWnd;
+            if (null == wndHistory)
+                return null;
+            return wndHistory.GetStageDropDownFromEvent(Event);
         }
         #endregion
 
         #region OMethod: bool PerformAction()
         protected override bool PerformAction()
         {
-            // Check the new item, uncheck the others
-            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
-                item.Checked = (item == NewStage);
+            // Set the event's stage
+            Event.Stage = NewStage;
 
-            // Update the Stage attribute
-            Event.Stage = NewStage.Text;
+            // Update the menu
+            var StagesDropDown = GetStagesDropDown();
+            if (null == StagesDropDown)
+                return false;
 
-            // Update the main menu text
-            ParentMenu.Text = NewStage.Text;
+            foreach (ToolStripMenuItem item in StagesDropDown.DropDownItems)
+                item.Checked = (item.Text == Event.Stage);
+
+            StagesDropDown.Text = Event.Stage;
 
             return true;
         }
@@ -3027,15 +3020,18 @@ namespace OurWord.Edit
         #region OMethod: void ReverseAction()
         protected override void ReverseAction()
         {
-            // Check the new item, uncheck the others
-            foreach (ToolStripMenuItem item in ParentMenu.DropDownItems)
-                item.Checked = (item == OriginalStage);
+            // Re-set the event's stage
+            Event.Stage = OriginalStage;
 
-            // Update the Category attribute
-            Event.Stage = OriginalStage.Text;
+            // Update the menu
+            var StagesDropDown = GetStagesDropDown();
+            if (null == StagesDropDown)
+                return;
 
-            // Update the main menu text
-            ParentMenu.Text = OriginalStage.Text;
+            foreach (ToolStripMenuItem item in StagesDropDown.DropDownItems)
+                item.Checked = (item.Text == NewStage);
+
+            StagesDropDown.Text = Event.Stage;
         }
         #endregion
 
@@ -3044,7 +3040,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return NewStage.Text;
+                return NewStage;
             }
         }
         #endregion

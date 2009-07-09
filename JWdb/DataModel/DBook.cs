@@ -985,10 +985,11 @@ namespace JWdb.DataModel
                 // new-style; as once we import it, we write it out as new.
                 if (Map.IsBookHistoryMarker(field.Mkr))
                 {
-                    Book.History.AddEvent(
+                    var Event = Book.History.CreateEvent(
                         new DateTime(2009,1,1), 
                         Loc.GetString("OldHistory", "Old"),
                         field.Data);
+                    Book.History.AddEvent(Event);
                     return true;
                 }
 

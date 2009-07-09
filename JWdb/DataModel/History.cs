@@ -296,6 +296,34 @@ namespace JWdb.DataModel
         #endregion
 
         // Methods ---------------------------------------------------------------------------
+        #region Method: DEvent CreateEvent(DateTime, sStage, sDescription)
+        public DEvent CreateEvent(DateTime dtDate, string sStage, string sDescription)
+        {
+            DEvent e = new DEvent();
+            e.Date = dtDate;
+            e.Stage = sStage;
+            e.Description.SimpleText = sDescription;
+
+            return e;
+        }
+        #endregion
+        #region Method: DEvent AddEvent(DEvent)
+        public DEvent AddEvent(DEvent Event)
+        {
+            // If allready there, just update it to the new description, but don't add a
+            // duplicate
+            int i = Events.Find(Event.SortKey);
+            if (i != -1)
+            {
+                Events[i].Description.SimpleText = Event.Description.SimpleText;
+                return Events[i];
+            }
+
+            // Otherwise append the new one
+            Events.Append(Event);
+            return Event;
+        }
+        #endregion
         #region Method: DEvent AddEvent(DateTime dtDate, string sStage, string sDescription)
         public DEvent AddEvent(DateTime dtDate, string sStage, string sDescription)
         {
@@ -304,18 +332,7 @@ namespace JWdb.DataModel
             e.Stage = sStage;
             e.Description.SimpleText = sDescription;
 
-            // If allready there, just update it to the new description, but don't add a
-            // duplicate
-            int i = Events.Find(e.SortKey);
-            if (i != -1)
-            {
-                Events[i].Description.SimpleText = sDescription;
-                return Events[i];
-            }
-
-            // Otherwise append the new one
-            Events.Append(e);
-            return e;
+            return AddEvent(e);
         }
         #endregion
 

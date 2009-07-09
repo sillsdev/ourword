@@ -29,35 +29,11 @@ using OurWord.Edit;
 #endregion
 #endregion
 
-namespace OurWord.Layouts
+namespace OurWord.SideWnd
 {
-    public partial class HistoryPane : UserControl
+    public partial class HistoryPane : UserControl, ISideWnd
     {
-        // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: HistoryWnd WndHistory
-        public HistoryWnd WndHistory
-        {
-            get
-            {
-                return m_wndHistory;
-            }
-        }
-        HistoryWnd m_wndHistory;
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public HistoryPane()
-        {
-            InitializeComponent();
-
-            // Create and add the History OWWindow
-            m_wndHistory = new HistoryWnd(this);
-            Controls.Add(m_wndHistory);
-        }
-        #endregion
-
-        // Layout ----------------------------------------------------------------------------
+        // ISideWnd --------------------------------------------------------------------------
         #region Method: void SetSize(Size sz)
         public void SetSize(Size sz)
         {
@@ -68,9 +44,19 @@ namespace OurWord.Layouts
             m_toolstripHistory.Width = sz.Width;
 
             // Position the History Window
-            WndHistory.Location = new Point(0, m_toolstripHistory.Height);
-            WndHistory.SetSize(sz.Width, sz.Height - m_toolstripHistory.Height);
+            Window.Location = new Point(0, m_toolstripHistory.Height);
+            Window.SetSize(sz.Width, sz.Height - m_toolstripHistory.Height);
         }
+        #endregion
+        #region Attr{g}: OWWindow Window
+        public OWWindow Window
+        {
+            get
+            {
+                return m_Window;
+            }
+        }
+        HistoryWnd m_Window;
         #endregion
         #region Method: void SetControlsEnabling()
         public void SetControlsEnabling()
@@ -78,7 +64,19 @@ namespace OurWord.Layouts
         // not when we are in the notes pane. And we can only delete notes if
         // we are in the notes pane.
         {
-            m_bDelete.Enabled = WndHistory.Focused;
+            m_bDelete.Enabled = Window.Focused;
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public HistoryPane()
+        {
+            InitializeComponent();
+
+            // Create and add the History OWWindow
+            m_Window = new HistoryWnd(this);
+            Controls.Add(m_Window);
         }
         #endregion
 
@@ -86,7 +84,7 @@ namespace OurWord.Layouts
         #region Cmd: cmdAddEvent
         private void cmdAddEvent(object sender, EventArgs e)
         {
-            (new InsertHistoryAction(WndHistory)).Do();
+            (new InsertHistoryAction(Window as HistoryWnd)).Do();
         }
         #endregion
         #region Cmd: cmdDeleteEvent
@@ -97,7 +95,7 @@ namespace OurWord.Layouts
                 return;
 
             // Get the Event we wish to delete
-            DEvent Event = WndHistory.GetSelectedEvent();
+            DEvent Event = (Window as HistoryWnd).GetSelectedEvent();
             if (Event == null)
                 return;
 
@@ -115,7 +113,7 @@ namespace OurWord.Layouts
             }
 
             // Delete it
-            (new DeleteHistoryAction(WndHistory, Event)).Do();
+            (new DeleteHistoryAction(Window as HistoryWnd, Event)).Do();
         }
         #endregion
         #region Cmd: cmdLoad
@@ -234,8 +232,8 @@ namespace OurWord.Layouts
             return null;
         }
         #endregion
-        #region Method: DateTimePicker GetPickerFromEvent(DEvent Event)
-        public DateTimePicker GetPickerFromEvent(DEvent Event)
+        #region Method: EToolStrip GetToolStripFromEvent(DEvent Event)
+        ToolStrip GetToolStripFromEvent(DEvent Event)
         {
             var container = GetCollapsableFromEvent(Event);
             if (null == container)
@@ -246,17 +244,42 @@ namespace OurWord.Layouts
                 return null;
 
             var cToolStrip = cHeader.SubItems[0] as EToolStrip;
-            if (null == cToolStrip || 
-                cToolStrip.ToolStrip == null || 
-                cToolStrip.ToolStrip.Items.Count == 0)
+            if (null == cToolStrip)
+                return null;
+            return cToolStrip.ToolStrip;
+        }
+        #endregion
+        #region Method: ToolStripDropDownButton GetStageDropDownFromEvent(DEvent)
+        public ToolStripDropDownButton GetStageDropDownFromEvent(DEvent Event)
+        {
+            var ts = GetToolStripFromEvent(Event);
+            if (null == ts)
                 return null;
 
-            var cHost = cToolStrip.ToolStrip.Items[0] as ToolStripControlHost;
-            if (null == cHost)
+            foreach (ToolStripItem tsi in ts.Items)
+            {
+                if (tsi as ToolStripDropDownButton != null)
+                    return tsi as ToolStripDropDownButton;
+            }
+
+            return null;
+        }
+        #endregion
+        #region Method: DateTimePicker GetPickerFromEvent(DEvent Event)
+        public DateTimePicker GetPickerFromEvent(DEvent Event)
+        {
+            var ts = GetToolStripFromEvent(Event);
+            if (null == ts)
                 return null;
 
-            var dtp = cHost.Control as DateTimePicker;
-            return dtp;
+            foreach (ToolStripItem tsi in ts.Items)
+            {
+                var cHost = tsi as ToolStripControlHost;
+                if (cHost != null)
+                    return cHost.Control as DateTimePicker;
+            }
+
+            return null;
         }
         #endregion
 
@@ -373,9 +396,6 @@ namespace OurWord.Layouts
 
             // Add the Date
             ts.Items.Add(BuildDatePicker(Event));
-
-//            var labelDate = new ToolStripLabel(Event.Date.ToShortDateString());
- //           ts.Items.Add(labelDate);
 
             // Some space in-between
             ts.Items.Add(new ToolStripLabel("   "));

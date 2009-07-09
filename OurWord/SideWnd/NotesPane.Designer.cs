@@ -1,4 +1,4 @@
-namespace OurWord.Edit
+namespace OurWord.SideWnd
 {
     partial class NotesPane
     {

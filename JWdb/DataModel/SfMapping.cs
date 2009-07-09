@@ -10,6 +10,7 @@
 using System;
 using System.Diagnostics;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
@@ -780,6 +781,7 @@ namespace JWdb.DataModel
 			return ( sMarker == MkrVerseTextBT );
 		}
 		#endregion
+
 		#region Attr{g}: bool IsVernacularParagraph(string sMarker)
 		public bool IsVernacularParagraph(string sMarker)
 		{
@@ -791,8 +793,23 @@ namespace JWdb.DataModel
 			return false;
 		}
 		#endregion
-		#region Attr{g}: bool IsDiscardedField(string sMarker)
-		public bool IsDiscardedField(string sMarker)
+        #region VAttr{g}: List<string> VernacularParagraphMarkers
+        public List<string> VernacularParagraphMarkers
+        {
+            get
+            {
+                var v = new List<string>();
+
+                foreach (string s in m_rgParagraphMkrs)
+                    v.Add(s);
+
+                return v;
+            }
+        }
+        #endregion
+
+        #region Attr{g}: bool IsDiscardedField(string sMarker)
+        public bool IsDiscardedField(string sMarker)
 		{
 			foreach ( string s in m_rgDiscardMrks )
 			{
@@ -1130,9 +1147,9 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor()
-		public DSFMapping()
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public DSFMapping()
 			: base()
 		{
 			// TODO: Need to persist these array values

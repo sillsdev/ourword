@@ -29,6 +29,7 @@ using JWdb.DataModel;
 using OurWord.Edit;
 using OurWord.View;
 using OurWord.Dialogs;
+using OurWord.SideWnd;
 using OurWord.Utilities;
 #endregion
 
@@ -85,7 +86,7 @@ namespace OurWord
         {
             get
             {
-                return (SideWindows.PagesCount > 0);
+                return SideWindows.HasSideWindows;
             }
         }
         #endregion
@@ -156,8 +157,6 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
-        private ToolStripMenuItem m_Synchronize;
-        private ToolStripMenuItem m_menuShowHistory;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -298,21 +297,24 @@ namespace OurWord
         #region Method: void SetupSideWindows() - called whenever different SideWindows are desired (startup, Tools-Options)
         void SetupSideWindows()
         {
-            SideWindows.Clear();
+            SideWindows.ClearPages();
 
-            if (DB.IsValidProject && OurWordMain.s_Features.TranslatorNotes && DProject.VD_ShowNotesPane)
-                SideWindows.CreateNotesWindow();
+            if (DB.IsValidProject)
+            {
+                if (OurWordMain.s_Features.TranslatorNotes && DProject.VD_ShowNotesPane)
+                    SideWindows.AddPage(new NotesPane(), "Notes");
 
-            if (null != DB.Project && DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
-                SideWindows.CreateTranslationsWindow();
+                if (DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
+                    SideWindows.AddPage(new TranslationsPane(), "Translations");
 
-            if (null != DB.Project && OurWordMain.s_Features.SectionHistory && DProject.VD_ShowHistoryPane)
-                SideWindows.CreateHistoryWindow();
+                if (OurWordMain.s_Features.SectionHistory && DProject.VD_ShowHistoryPane)
+                    SideWindows.AddPage(new HistoryPane(), "History");
 
 #if FEATURE_WESAY
-            if (G.IsValidProject && s_Features.F_Dictionary && DProject.ShowDictionaryPane)
-                SideWindows.CreateDictionaryPane();
+                if (s_Features.F_Dictionary && DProject.ShowDictionaryPane)
+                    SideWindows.CreateDictionaryPane();
 #endif
+            }
 
             // Tell the system which side windows are being displayed; thereafter events will be 
             // automatically routed to these windows.
@@ -451,6 +453,7 @@ namespace OurWord
         private ToolStripSeparator m_separatorDebug;
         private ToolStripMenuItem m_menuRunDebugTestSuite;
         private ToolStripMenuItem m_menuOnlyShowSectionsThat;
+        private ToolStripMenuItem m_Synchronize;
         private ToolStripMenuItem m_menuLocalizerTool;
         private ToolStripButton m_btnGotoFirstSection;
         private ToolStripButton m_btnGotoLastSection;
@@ -460,6 +463,7 @@ namespace OurWord
         private ToolStripMenuItem m_menuNaturalnessCheck;
         private ToolStripSeparator m_separatorWindow;
         private ToolStripMenuItem m_menuShowNotesPane;
+        private ToolStripMenuItem m_menuShowHistory;
         private ToolStripMenuItem m_menuShowTranslationsPane;
         private ToolStripMenuItem m_menuShowDictionaryPane;
         private ToolStripSeparator m_separatorZoom;
@@ -648,9 +652,8 @@ namespace OurWord
             m_menuInsertFootnote.Enabled = bCanEdit;
             m_menuDeleteFootnote.Enabled = bCanEdit;
 
-            // Notes
-            if (SideWindows.HasNotesWindow)
-                SideWindows.NotesPane.SetControlsEnabling();
+            // Side Windows controls
+            SideWindows.SetControlsEnabling();
 
             // Go To menu
             bool bIsAtFirstSection = bValidProjectWithData && DB.Project.Nav.IsAtFirstSection;

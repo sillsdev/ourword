@@ -1,4 +1,4 @@
-﻿namespace OurWord.Layouts
+﻿namespace OurWord.SideWnd
 {
     partial class HistoryPane
     {

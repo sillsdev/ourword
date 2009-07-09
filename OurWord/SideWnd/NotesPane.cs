@@ -1,3 +1,4 @@
+#region ***** NotesPane.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    NotesPane.cs
@@ -24,36 +25,13 @@ using JWdb.DataModel;
 using OurWord.View;
 using OurWord.Edit;
 #endregion
+#endregion
 
-namespace OurWord.Edit
+namespace OurWord.SideWnd
 {
-    public partial class NotesPane : UserControl
+    public partial class NotesPane : UserControl, ISideWnd
     {
-        // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: NotesWnd WndNotes
-        public NotesWnd WndNotes
-        {
-            get
-            {
-                return m_wndNotes;
-            }
-        }
-        NotesWnd m_wndNotes;
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public NotesPane()
-        {
-            InitializeComponent();
-
-            // Create and add the Notes OWWindow
-            m_wndNotes = new NotesWnd(this);
-            Controls.Add(WndNotes);
-        }
-        #endregion
-
-        // Layout ----------------------------------------------------------------------------
+        // ISideWnd --------------------------------------------------------------------------
         #region Method: void SetSize(Size sz)
         public void SetSize(Size sz)
         {
@@ -64,8 +42,40 @@ namespace OurWord.Edit
             m_toolstripNotes.Width = sz.Width;
 
             // Position the Notes Window
-            WndNotes.Location = new Point(0, m_toolstripNotes.Height);
-            WndNotes.SetSize(sz.Width, sz.Height - m_toolstripNotes.Height);
+            Window.Location = new Point(0, m_toolstripNotes.Height);
+            Window.SetSize(sz.Width, sz.Height - m_toolstripNotes.Height);
+        }
+        #endregion
+        #region Attr{g}: OWWindow Window
+        public OWWindow Window
+        {
+            get
+            {
+                return m_Window;
+            }
+        }
+        NotesWnd m_Window;
+        #endregion
+        #region Method: void SetControlsEnabling()
+        public void SetControlsEnabling()
+            // The idea is that we insert notes when we are in the main window, but
+            // not when we are in the notes pane. And we can only delete notes if
+            // we are in the notes pane.
+        {
+            m_btnInsert.Enabled = canInsertNote;
+            m_btnDeleteNote.Enabled = canDeleteNote;
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public NotesPane()
+        {
+            InitializeComponent();
+
+            // Create and add the Notes OWWindow
+            m_Window = new NotesWnd(this);
+            Controls.Add(Window);
         }
         #endregion
 
@@ -94,7 +104,7 @@ namespace OurWord.Edit
             if (!canInsertNote)
                 return;
 
-            (new InsertNoteAction(WndNotes)).Do();
+            (new InsertNoteAction(Window as NotesWnd)).Do();
         }
         #endregion
 
@@ -109,7 +119,7 @@ namespace OurWord.Edit
                 // By implication, if there is focus here, then it means
                 // we have an InsertionPoint, which thus means we have
                 // a Note that can conceivably be deleted.
-                if (!WndNotes.Focused)
+                if (!Window.Focused)
                     return false;
 
                 // Otherwise, we return a tentative "true", recognizing that the
@@ -126,8 +136,9 @@ namespace OurWord.Edit
                 return;
 
             // Request the targeted TranslatorNote from the NotesWnd
-            Debug.Assert(null != WndNotes);
-            TranslatorNote tn = WndNotes.GetSelectedNote();
+            NotesWnd wnd = Window as NotesWnd;
+            Debug.Assert(null != wnd);
+            TranslatorNote tn = wnd.GetSelectedNote();
             if (null == tn)
                 return;
 
@@ -143,7 +154,7 @@ namespace OurWord.Edit
                     return;
 
                 // Remove it
-                (new RemoveDiscussionAction(WndNotes, tn)).Do();
+                (new RemoveDiscussionAction(wnd, tn)).Do();
                 return;
             }
 
@@ -156,9 +167,10 @@ namespace OurWord.Edit
                 return;
 
             // Remove it
-            (new DeleteNoteAction(WndNotes, tn)).Do();
+            (new DeleteNoteAction(wnd, tn)).Do();
         }
         #endregion
+
         #region Cmd: cmdLoad - Localize the toolstrip
         private void cmdLoad(object sender, EventArgs e)
         {
@@ -172,16 +184,6 @@ namespace OurWord.Edit
         #endregion
 
         // Visibility and Enabling -----------------------------------------------------------
-        #region Method: void SetControlsEnabling()
-        public void SetControlsEnabling()
-            // The idea is that we insert notes when we are in the main window, but
-            // not when we are in the notes pane. And we can only delete notes if
-            // we are in the notes pane.
-        {
-            m_btnInsert.Enabled = canInsertNote;
-            m_btnDeleteNote.Enabled = canDeleteNote;
-        }
-        #endregion
         #region Method: void SetupShowDropdown()
         public void SetupShowDropdown()
         {
@@ -588,7 +590,7 @@ namespace OurWord.Edit
             if (null == note)
                 return;
 
-            (new ChangeClassification(NotesPane.WndNotes,
+            (new ChangeClassification(this,
                note, sender as ToolStripMenuItem, "Change Category to")).Do();
         }
         #endregion
@@ -603,7 +605,7 @@ namespace OurWord.Edit
             if (null == note)
                 return;
 
-            (new ChangeClassification(NotesPane.WndNotes,
+            (new ChangeClassification(this,
                 note, sender as ToolStripMenuItem, "Assign to")).Do();
         }
         #endregion
@@ -618,11 +620,14 @@ namespace OurWord.Edit
             if (null == note)
                 return;
 
-            (new AddDiscussionAction(NotesPane.WndNotes, note)).Do();
+            (new AddDiscussionAction(this, note)).Do();
         }
         #endregion
 
         // View Building ---------------------------------------------------------------------
+        public const string c_sAssignedTo = "AssignedTo";
+        public const string c_sCategory = "Category";
+
         #region SMethod: TranslatorNote GetNoteFromContainer(EContainer)
         static TranslatorNote GetNoteFromContainer(EContainer container)
             // The container can be any subcontainer in the view hierarchy
@@ -669,6 +674,31 @@ namespace OurWord.Edit
         }
         #endregion
 
+        public ToolStripDropDownButton GetDropDownButton(TranslatorNote note, string sWhich)
+        {
+            // Get the major container for this note
+            var eContainer = GetCollapsableFromNote(note);
+            if (null == eContainer)
+                return null;
+
+            // Loop through its subitems for the EToolStrip; then scan its items for the
+            // target one.
+            foreach (EItem item in eContainer.SubItems)
+            {
+                EToolStrip ts = item as EToolStrip;
+                if (null == ts)
+                    continue;
+
+                foreach (ToolStripItem tsi in ts.ToolStrip.Items)
+                {
+                    if (tsi as ToolStripDropDownButton != null && tsi.Name == sWhich)
+                        return tsi as ToolStripDropDownButton;
+                }
+            }
+
+            return null;
+        }
+
         #region Method: void BuildAddButton(TranslatorNote, ToolStrip)
         void BuildAddButton(TranslatorNote note, ToolStrip ts)
         {
@@ -712,6 +742,7 @@ namespace OurWord.Edit
                 ts.Items.Add(new ToolStripLabel("  "));
 
                 ToolStripDropDownButton menuCategory = new ToolStripDropDownButton(note.Category);
+                menuCategory.Name = c_sCategory;
                 foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
                 {
                     if (cat.IsChecked)
@@ -753,6 +784,7 @@ namespace OurWord.Edit
             // Place the AssignedTo as a drop-down button
             string sMenuName = Loc.GetNotes("kAssignTo", "Assign To");
             ToolStripDropDownButton menuAssignedTo = new ToolStripDropDownButton(sMenuName);
+            menuAssignedTo.Name = c_sAssignedTo;
             foreach (TranslatorNote.Classifications.Classification cl in TranslatorNote.People)
             {
                 // Don't let it be assigned to "Unknown Author"
@@ -930,7 +962,6 @@ namespace OurWord.Edit
             return eMainContainer;
         }
         #endregion
-
     }
 
 }

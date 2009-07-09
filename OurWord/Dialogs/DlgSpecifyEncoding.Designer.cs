@@ -41,9 +41,10 @@ namespace OurWord.Dialogs
             // 
             // m_btnHelp
             // 
+            this.m_btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(267, 362);
+            this.m_btnHelp.Location = new System.Drawing.Point(346, 404);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 20;
@@ -51,8 +52,9 @@ namespace OurWord.Dialogs
             // 
             // m_btnCancel
             // 
+            this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(179, 362);
+            this.m_btnCancel.Location = new System.Drawing.Point(258, 404);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 19;
@@ -60,8 +62,9 @@ namespace OurWord.Dialogs
             // 
             // m_btnOK
             // 
+            this.m_btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(91, 362);
+            this.m_btnOK.Location = new System.Drawing.Point(170, 404);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 18;
@@ -69,20 +72,24 @@ namespace OurWord.Dialogs
             // 
             // m_labelInstructions
             // 
+            this.m_labelInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_labelInstructions.Location = new System.Drawing.Point(12, 9);
             this.m_labelInstructions.Name = "m_labelInstructions";
-            this.m_labelInstructions.Size = new System.Drawing.Size(415, 70);
+            this.m_labelInstructions.Size = new System.Drawing.Size(573, 70);
             this.m_labelInstructions.TabIndex = 21;
             this.m_labelInstructions.Text = resources.GetString("m_labelInstructions.Text");
             this.m_labelInstructions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // m_comboEncodings
             // 
+            this.m_comboEncodings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_comboEncodings.FormattingEnabled = true;
             this.m_comboEncodings.Location = new System.Drawing.Point(118, 82);
             this.m_comboEncodings.MaxDropDownItems = 30;
             this.m_comboEncodings.Name = "m_comboEncodings";
-            this.m_comboEncodings.Size = new System.Drawing.Size(309, 21);
+            this.m_comboEncodings.Size = new System.Drawing.Size(467, 21);
             this.m_comboEncodings.TabIndex = 23;
             this.m_comboEncodings.SelectedIndexChanged += new System.EventHandler(this.cmdNewEncodingChosen);
             // 
@@ -97,10 +104,13 @@ namespace OurWord.Dialogs
             // 
             // m_rtbFile
             // 
+            this.m_rtbFile.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_rtbFile.Location = new System.Drawing.Point(15, 132);
             this.m_rtbFile.Name = "m_rtbFile";
             this.m_rtbFile.ReadOnly = true;
-            this.m_rtbFile.Size = new System.Drawing.Size(412, 224);
+            this.m_rtbFile.Size = new System.Drawing.Size(570, 266);
             this.m_rtbFile.TabIndex = 24;
             this.m_rtbFile.Text = "";
             // 
@@ -119,7 +129,7 @@ namespace OurWord.Dialogs
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(439, 397);
+            this.ClientSize = new System.Drawing.Size(597, 439);
             this.Controls.Add(this.m_labelExamineYourFile);
             this.Controls.Add(this.m_rtbFile);
             this.Controls.Add(this.m_comboEncodings);
@@ -136,7 +146,6 @@ namespace OurWord.Dialogs
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Specify Encoding";
-            this.Resize += new System.EventHandler(this.cmdResize);
             this.Load += new System.EventHandler(this.cmdLoad);
             this.ResumeLayout(false);
 
