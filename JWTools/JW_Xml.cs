@@ -1536,9 +1536,12 @@ namespace JWTools
 
 			// Read until we get a line with a field marker in it
 			string sLine = "";
-			while ( (sLine = m_reader.ReadLine()) != null)
+			while ( (sLine = m_reader.ReadLine() ) != null)
 			{
 				++LineNumber;
+
+                // We found data with leadinig spaces, e.g., " \v"; this cures such ills.
+                sLine = sLine.Trim();
 
 				if (sLine.Length > 1 && sLine[0] == '\\')
 					break;
