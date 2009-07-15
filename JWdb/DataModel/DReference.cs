@@ -114,9 +114,9 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		// Parsing Methods -------------------------------------------------------------------
-		#region Method: int _ParseFirstNumber(string) - given "2" or "2-4", returns "2"
-		private int _ParseFirstNumber(string s)
+        // Parsing Methods -------------------------------------------------------------------
+        #region Method: int ParseFirstBridgeNumber(string) - given "2" or "2-4", returns "2"
+        static public int ParseFirstBridgeNumber(string s)
 		{
 			string sVerse = "";
 			int i = 0;
@@ -132,15 +132,17 @@ namespace JWdb.DataModel
 			return Convert.ToInt16(sVerse);  
 		}
 		#endregion
-		#region Method: int _ParseFinalNumber(string) - given "4" or "2-4", returns "4"
-		public int _ParseFinalNumber(string s)
+		#region Method: int ParseFinalBridgeNumber(string) - given "4" or "2-4", returns "4"
+        static public int ParseFinalBridgeNumber(string s)
 		{
-			int nVerse = _ParseFirstNumber(s);
+            int nVerse = ParseFirstBridgeNumber(s);
 			int nHyphen = s.IndexOf("-");
 			if (nHyphen > 0)
 			{
-				string sLastVerse = s.Substring(nHyphen + 1);
-				nVerse = _ParseFirstNumber(sLastVerse);
+				string sLastVerse = s.Substring(nHyphen + 1).Trim();
+                if (sLastVerse.Length == 0 || !char.IsDigit(sLastVerse[0]))
+                    return nVerse;
+                nVerse = ParseFirstBridgeNumber(sLastVerse);
 			}
 			return nVerse;
 		}
@@ -148,7 +150,9 @@ namespace JWdb.DataModel
 		#region Method: void UpdateVerse(string sVerseNo, bool bFirstInBridge)
 		public void UpdateVerse(string sVerseNo, bool bFirst)
 		{
-			Verse = (bFirst) ? _ParseFirstNumber(sVerseNo) : _ParseFinalNumber(sVerseNo); 
+            Verse = (bFirst) ? 
+                ParseFirstBridgeNumber(sVerseNo) : 
+                ParseFinalBridgeNumber(sVerseNo); 
 		}
 		#endregion
 		#region Method: void UpdateChapter(sChapterNo) - sets Chapter to the number in the string

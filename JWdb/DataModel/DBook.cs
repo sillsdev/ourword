@@ -1227,29 +1227,47 @@ namespace JWdb.DataModel
                 return true;
             }
             #endregion
-            #region Method: void Export(sPathName, ScriptureDB.Formats)
-            public void Export(string sPathName, 
-                ScriptureDB.Formats format)
+            #region Method: void ExportToParatext(sPathName)
+            public void ExportToParatext(string sPathName)
             {
                 StartProgress("Exporting", Book.Sections.Count);
 
                 DBS = _CreateDB();
-                DBS.Format = format;
+                DBS.Format = ScriptureDB.Formats.kParatext;
 
                 DBS.Write(sPathName);
 
                 m_Progress.End();
             }
             #endregion
+            #region Method: void ExportToGoBible(sPathName)
+            public void ExportToGoBible(string sPathName)
+            {
+                StartProgress("Exporting", Book.Sections.Count);
 
+                DBS = _CreateDB();
+                DBS.Format = ScriptureDB.Formats.kGoBibleCreator;
+
+                DBS.Write(sPathName);
+
+                m_Progress.End();
+            }
+            #endregion
         } // End: Embedded Class IO
         #endregion
-        #region Method: void Export(string sPathName, ScriptureDB.Formats, IProgressIndicator)
-        public void Export(string sPathName, ScriptureDB.Formats format, IProgressIndicator progress)
+        #region Method: void ExportToParatext(sPathName, IProgressIndicator)
+        public void ExportToParatext(string sPathName, IProgressIndicator progress)
         {
-            (new IO(this, progress)).Export(sPathName, format);
+            (new IO(this, progress)).ExportToParatext(sPathName);
         }
         #endregion
+        #region Method: void ExportToGoBible(sPathName, IProgressIndicator)
+        public void ExportToGoBible(string sPathName, IProgressIndicator progress)
+        {
+            (new IO(this, progress)).ExportToGoBible(sPathName);
+        }
+        #endregion
+
         #region Method: override void OnLoad(TextReader) - overridden to read Std Format
         protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
         {
@@ -1588,7 +1606,7 @@ namespace JWdb.DataModel
 
         // I/O -------------------------------------------------------------------------------
         #region Attr{g}: string BaseName
-        string BaseName
+        public string BaseName
         // "01 GEN - Amarasi"
         {
             get

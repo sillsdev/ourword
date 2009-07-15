@@ -26,7 +26,7 @@ using JWdb;
 namespace OurWordTests.JWdb
 {
     [TestFixture]
-    public class T_StdFmrTransform
+    public class T_StdFmtTransform
     {
         #region Setup
         [SetUp] public void Setup()
@@ -103,5 +103,57 @@ namespace OurWordTests.JWdb
             CompareStringArrays(vsExpected, vsActual);
         }
         #endregion
+
+        #region Test: RemoveVerseBridgesForGoBible
+        [Test] public void RemoveVerseBridgesForGoBible()
+        {
+            var vsIn = new string[] {
+                "\\v 20a-22c Syare wapa ana wapo rave mamo maisyare Ayao Amisye ama ananyao so rai:",
+                "\\v 23 <<Ranivara nya marova maror, nyo anaisye raunanto po raisy, \\q2 muno awa ngkangkamandi, nyo mana raunanto po ramanam. \\q1 Nya ana nyo rave tai maisy, weamo nya marova so "
+            };
+            var vsExpected = new string[] {
+                "\\v 20 Syare wapa ana wapo rave mamo maisyare Ayao Amisye ama ananyao so rai:",
+                "\\v 21",
+                "\\v 22",
+                "\\v 23 <<Ranivara nya marova maror, nyo anaisye raunanto po raisy, \\q2 muno awa ngkangkamandi, nyo mana raunanto po ramanam. \\q1 Nya ana nyo rave tai maisy, weamo nya marova so "
+            };
+
+            // Create a DB with the problem input stream
+            ScriptureDB DB = new ScriptureDB();
+            DB.Initialize(vsIn);
+            DB.Format = ScriptureDB.Formats.kGoBibleCreator;
+
+            // Run the method
+            DB.RemoveVerseBridgesForGoBible();
+
+            // Is the result what we expected?
+            var vsActual = DB.ExtractData();
+            CompareStringArrays(vsExpected, vsActual);
+        }
+        #endregion
+        #region Test: ConvertSmartQuotesToOrdinary
+        [Test]  public void ConvertSmartQuotesToOrdinary()
+        {
+            var vsIn = new string[] {
+                "\\v 20 Syare <<<wapa ana> wapo>> rave mamo maisyare <Ayao> Amisye ama <<<ananyao>>> so rai:",
+            };
+            var vsExpected = new string[] {
+                "\\v 20 Syare “‘wapa ana’ wapo” rave mamo maisyare ‘Ayao’ Amisye ama “‘ananyao’” so rai:",
+            };
+
+            // Create a DB with the problem input stream
+            ScriptureDB DB = new ScriptureDB();
+            DB.Initialize(vsIn);
+            DB.Format = ScriptureDB.Formats.kGoBibleCreator;
+
+            // Run the method
+            DB.ConvertSmartQuotesToOrdinary();
+
+            // Is the result what we expected?
+            var vsActual = DB.ExtractData();
+            CompareStringArrays(vsExpected, vsActual);
+        }
+        #endregion
+
     }
 }

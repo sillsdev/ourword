@@ -1048,6 +1048,27 @@ namespace JWdb.DataModel
             return false;
         }
         #endregion
+        #region Method: bool IsGoBibleExportMarker(string sMarker)
+        public bool IsGoBibleExportMarker(string sMarker)
+            // GoBibleCreator does not support the full set of USFM. So we first
+            // check it for USFM, then eliminate the things GB doesn't support.
+        {
+            // If not USFM, then we know we don't want it
+            if (!IsUSFMExportMarker(sMarker))
+                return false;
+
+            // USFM markers that GoBibleCreator doesn't support:
+            if (IsCrossRef(sMarker)) 
+                return false;
+            if (IsPicture(sMarker)) 
+                return false;
+            if (IsSeeAlso(sMarker)) 
+                return false;
+
+            // Didn't find it in our list
+            return true;
+        }
+        #endregion
 
         // Character Style Mappings ----------------------------------------------------------
 		#region Method: bool IsItalicBegin(string s, int iPos)

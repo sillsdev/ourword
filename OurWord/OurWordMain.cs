@@ -157,6 +157,7 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
+        private ToolStripMenuItem m_menuExportProject;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -683,9 +684,12 @@ namespace OurWord
             //      NotVisible always. They exist only to provide the ShortcutKey methods
             //      of quickly going to Next/Previous sections.
         {
-            // Project - If we have an invalid project, we turn this on regardless
+            // Project - If we have an invalid project, we turn the Project menu on regardless
+            // of the user setting. As for Export, we don't turn it on unless we do have
+            // a valid project.
             bool bShowNewOpenEtc = (!DB.IsValidProject || OurWordMain.Features.F_Project);
             m_btnProject.Visible = bShowNewOpenEtc;
+            m_menuExportProject.Visible = (DB.IsValidProject && DB.TargetTranslation.Books.Count > 0);
 
             // Print
             m_btnPrint.Visible = OurWordMain.Features.F_Print;
@@ -974,6 +978,7 @@ namespace OurWord
             this.m_menuNewProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOpenProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSaveProject = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuExportProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnPrint = new System.Windows.Forms.ToolStripButton();
             this.m_separator1 = new System.Windows.Forms.ToolStripSeparator();
             this.m_btnEditCut = new System.Windows.Forms.ToolStripButton();
@@ -1116,7 +1121,8 @@ namespace OurWord
             this.m_btnProject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_menuNewProject,
             this.m_menuOpenProject,
-            this.m_menuSaveProject});
+            this.m_menuSaveProject,
+            this.m_menuExportProject});
             this.m_btnProject.Image = ((System.Drawing.Image)(resources.GetObject("m_btnProject.Image")));
             this.m_btnProject.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_btnProject.Name = "m_btnProject";
@@ -1153,6 +1159,13 @@ namespace OurWord
             this.m_menuSaveProject.Text = "&Save";
             this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
             this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
+            // 
+            // m_menuExportProject
+            // 
+            this.m_menuExportProject.Name = "m_menuExportProject";
+            this.m_menuExportProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuExportProject.Text = "Export...";
+            this.m_menuExportProject.Click += new System.EventHandler(this.cmdExportProject);
             // 
             // m_btnPrint
             // 
@@ -2660,6 +2673,69 @@ namespace OurWord
 			DB.Project.Save(G.CreateProgressIndicator());
 		}
 		#endregion
+        #region Cmd: cmdExportProject
+        private void cmdExportProject(object sender, EventArgs e)
+        {
+            // If we don't have an active project, with at least one book in
+            // the target translation, then abort
+            if (!DB.IsValidProject)
+                return;
+            if (DB.TargetTranslation.Books.Count == 0)
+                return;
+
+            // Get the user's desires (or cancel)
+            DialogExport dlgDesires = new DialogExport();
+            if (DialogResult.OK != dlgDesires.ShowDialog(this))
+                return;
+
+            // Create and display the progress dialog
+            DlgExportProgress.Start();
+            DlgExportProgress.SetCurrentBook("Setting up...");
+
+            // Loop through the books of the requested translation
+            foreach (DBook book in DB.TargetTranslation.Books)
+            {
+                // Does the user wish to cancel?
+                if (DlgExportProgress.UserSaysCancel)
+                    break;
+
+                // Upload the status dialog with the correct book
+                DlgExportProgress.SetCurrentBook(DB.TargetTranslation.DisplayName + " - " +
+                    book.DisplayName);
+
+                // Load the book if not already in memory
+                bool bIsLoaded = book.Loaded;
+                book.Load(G.CreateProgressIndicator());
+                if (!book.Loaded)
+                    continue;
+
+                // Compute the file name
+                string sExportPath = JWU.GetMyDocumentsFolder(dlgDesires.ExportSubFolderName);
+                sExportPath += book.BaseName;
+
+                // Export it to paratext if requested
+                if (dlgDesires.ExportToParatext)
+                {
+                    book.ExportToParatext(sExportPath + ".ptx", G.CreateProgressIndicator());
+                }
+
+                // Export it to GoBibleCreator if requested
+                if (dlgDesires.ExportToGoBibleCreator)
+                {
+                    book.ExportToGoBible(sExportPath + ".GoBible.Ptx", G.CreateProgressIndicator());
+                }
+
+                // Unload the book if it was previously unloaded, so that we don't clog
+                // up memory
+                if (!bIsLoaded)
+                    book.Unload(new NullProgress());
+            }
+
+            // Done with the progress dialog
+            DlgExportProgress.Stop();
+
+        }
+        #endregion
 
         const string c_sCloneFailedMsg = "Repository.CloneTo() failed.";
         const string c_sPullFailedMsg = "Repository.Pull() failed.";
@@ -3455,6 +3531,8 @@ namespace OurWord
 			dlg.ShowDialog(this);
 		}
 		#endregion
+
+
 
         #endregion
     }

@@ -108,7 +108,6 @@ namespace OurWord.Dialogs
         private ToolStrip m_ToolStrip;
         private ToolStripButton m_bCreate;
         private ToolStripButton m_bImport;
-        private ToolStripButton m_bExport;
         private ToolStripButton m_bRemove;
         private ToolStripButton m_bProperties;
         private ToolStripDropDownButton m_bCopyNames;
@@ -160,8 +159,8 @@ namespace OurWord.Dialogs
 		private void InitializeComponent()
 		{
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_Translation));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.m_lblLanguageName = new System.Windows.Forms.Label();
             this.m_editLanguageName = new System.Windows.Forms.TextBox();
             this.m_btnRemoveTranslation = new System.Windows.Forms.Button();
@@ -170,9 +169,11 @@ namespace OurWord.Dialogs
             this.m_ToolStrip = new System.Windows.Forms.ToolStrip();
             this.m_bCreate = new System.Windows.Forms.ToolStripButton();
             this.m_bImport = new System.Windows.Forms.ToolStripButton();
-            this.m_bExport = new System.Windows.Forms.ToolStripButton();
             this.m_bRemove = new System.Windows.Forms.ToolStripButton();
             this.m_bProperties = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.m_bEditRawFile = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_bCopyNames = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_radioStartedBooks = new System.Windows.Forms.RadioButton();
             this.m_radioOldTestament = new System.Windows.Forms.RadioButton();
@@ -184,9 +185,6 @@ namespace OurWord.Dialogs
             this.m_colStage = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_tabOther = new System.Windows.Forms.TabPage();
             this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
-            this.m_bEditRawFile = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_tabctrlTranslation.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
             this.m_ToolStrip.SuspendLayout();
@@ -263,7 +261,6 @@ namespace OurWord.Dialogs
             this.m_ToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_bCreate,
             this.m_bImport,
-            this.m_bExport,
             this.m_bRemove,
             this.m_bProperties,
             this.toolStripSeparator1,
@@ -271,9 +268,9 @@ namespace OurWord.Dialogs
             this.toolStripSeparator2,
             this.m_bCopyNames});
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
-            this.m_ToolStrip.Location = new System.Drawing.Point(343, 3);
+            this.m_ToolStrip.Location = new System.Drawing.Point(343, 4);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(111, 199);
+            this.m_ToolStrip.Size = new System.Drawing.Size(111, 184);
             this.m_ToolStrip.TabIndex = 113;
             this.m_ToolStrip.Text = "ToolStrip";
             // 
@@ -297,16 +294,6 @@ namespace OurWord.Dialogs
             this.m_bImport.Text = "Import...";
             this.m_bImport.Click += new System.EventHandler(this.cmdImportBook);
             // 
-            // m_bExport
-            // 
-            this.m_bExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bExport.Image = ((System.Drawing.Image)(resources.GetObject("m_bExport.Image")));
-            this.m_bExport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bExport.Name = "m_bExport";
-            this.m_bExport.Size = new System.Drawing.Size(109, 19);
-            this.m_bExport.Text = "Export...";
-            this.m_bExport.Click += new System.EventHandler(this.cmdExportBook);
-            // 
             // m_bRemove
             // 
             this.m_bRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -327,6 +314,26 @@ namespace OurWord.Dialogs
             this.m_bProperties.Text = "Properties...";
             this.m_bProperties.Click += new System.EventHandler(this.cmdBookProperties);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
+            // 
+            // m_bEditRawFile
+            // 
+            this.m_bEditRawFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_bEditRawFile.Image = ((System.Drawing.Image)(resources.GetObject("m_bEditRawFile.Image")));
+            this.m_bEditRawFile.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_bEditRawFile.Name = "m_bEditRawFile";
+            this.m_bEditRawFile.Size = new System.Drawing.Size(109, 19);
+            this.m_bEditRawFile.Text = "Edit Raw File...";
+            this.m_bEditRawFile.Click += new System.EventHandler(this.cmdEditRawFile);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(109, 6);
+            // 
             // m_bCopyNames
             // 
             this.m_bCopyNames.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -341,7 +348,7 @@ namespace OurWord.Dialogs
             // m_radioStartedBooks
             // 
             this.m_radioStartedBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioStartedBooks.Location = new System.Drawing.Point(343, 285);
+            this.m_radioStartedBooks.Location = new System.Drawing.Point(343, 265);
             this.m_radioStartedBooks.Name = "m_radioStartedBooks";
             this.m_radioStartedBooks.Size = new System.Drawing.Size(111, 17);
             this.m_radioStartedBooks.TabIndex = 112;
@@ -353,7 +360,7 @@ namespace OurWord.Dialogs
             // m_radioOldTestament
             // 
             this.m_radioOldTestament.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioOldTestament.Location = new System.Drawing.Point(343, 267);
+            this.m_radioOldTestament.Location = new System.Drawing.Point(343, 247);
             this.m_radioOldTestament.Name = "m_radioOldTestament";
             this.m_radioOldTestament.Size = new System.Drawing.Size(111, 17);
             this.m_radioOldTestament.TabIndex = 111;
@@ -365,7 +372,7 @@ namespace OurWord.Dialogs
             // m_radioNewTestament
             // 
             this.m_radioNewTestament.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioNewTestament.Location = new System.Drawing.Point(343, 249);
+            this.m_radioNewTestament.Location = new System.Drawing.Point(343, 229);
             this.m_radioNewTestament.Name = "m_radioNewTestament";
             this.m_radioNewTestament.Size = new System.Drawing.Size(111, 17);
             this.m_radioNewTestament.TabIndex = 110;
@@ -377,7 +384,7 @@ namespace OurWord.Dialogs
             // m_radioAll
             // 
             this.m_radioAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioAll.Location = new System.Drawing.Point(343, 231);
+            this.m_radioAll.Location = new System.Drawing.Point(343, 211);
             this.m_radioAll.Name = "m_radioAll";
             this.m_radioAll.Size = new System.Drawing.Size(111, 17);
             this.m_radioAll.TabIndex = 109;
@@ -412,8 +419,8 @@ namespace OurWord.Dialogs
             // 
             // m_colAbbreviation
             // 
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle1;
             this.m_colAbbreviation.HeaderText = "Abbrev";
             this.m_colAbbreviation.Name = "m_colAbbreviation";
             this.m_colAbbreviation.ReadOnly = true;
@@ -425,8 +432,8 @@ namespace OurWord.Dialogs
             // 
             // m_colBookName
             // 
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle2;
             this.m_colBookName.HeaderText = "Book Name";
             this.m_colBookName.Name = "m_colBookName";
             this.m_colBookName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
@@ -465,29 +472,9 @@ namespace OurWord.Dialogs
             this.m_LiterateSettings.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.m_LiterateSettings.DontAllowPropertyGrid = false;
             this.m_LiterateSettings.Location = new System.Drawing.Point(9, 38);
-            this.m_LiterateSettings.Name = "TranslationOther";
+            this.m_LiterateSettings.Name = "m_LiterateSettings";
             this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
             this.m_LiterateSettings.TabIndex = 7;
-            // 
-            // m_bEditRawFile
-            // 
-            this.m_bEditRawFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bEditRawFile.Image = ((System.Drawing.Image)(resources.GetObject("m_bEditRawFile.Image")));
-            this.m_bEditRawFile.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bEditRawFile.Name = "m_bEditRawFile";
-            this.m_bEditRawFile.Size = new System.Drawing.Size(109, 19);
-            this.m_bEditRawFile.Text = "Edit Raw File...";
-            this.m_bEditRawFile.Click += new System.EventHandler(this.cmdEditRawFile);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(109, 6);
             // 
             // Page_Translation
             // 
@@ -1120,7 +1107,6 @@ namespace OurWord.Dialogs
 			// Disable/Enable buttons accordingly
 			m_bCreate.Enabled = (book == null);
 			m_bImport.Enabled = (book == null);
-			m_bExport.Enabled = (book != null);
 			m_bRemove.Enabled = (book != null);
 			m_bProperties.Enabled = (book != null);
 		}
@@ -1280,24 +1266,6 @@ namespace OurWord.Dialogs
             PopulateGrid(sAbbrev, true);
         }
 		#endregion
-        #region Cmd: cmdExportBook
-        private void cmdExportBook(object sender, EventArgs e)
-        {
-            // Get the selection
-            DBook book = SelectedBook;
-            if (null == book)
-                return;
-
-            // Get the user's desired destination (or cancel)
-            DialogExportBook dlg = new DialogExportBook(book);
-            if (DialogResult.OK != dlg.ShowDialog(ParentDlg))
-                return;
-
-            // Export the book
-            IProgressIndicator progress = G.CreateProgressIndicator();
-            book.Export(dlg.ExportPathName, ScriptureDB.Formats.kParatext, progress);
-        }
-        #endregion
         #region Cmd: cmdEditRawFile
         private void cmdEditRawFile(object sender, EventArgs e)
         {
