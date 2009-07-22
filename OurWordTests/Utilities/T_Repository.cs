@@ -57,18 +57,18 @@ namespace OurWordTests.Utilities
         {
             JWU.NUnit_Setup();
 
-            DB.Project = new DProject();
+            // Get rid of any remnants of our Test Cluster, e.g., from debugging.
+            JWU.NUnit_TeardownClusterFolder();
 
-            DB.Project.TeamSettings = new DTeamSettings("RepositoryTestCluster");
+            // Create the empty cluster folder
+            JWU.NUnit_SetupClusterFolder();
+
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
             DB.TeamSettings.EnsureInitialized();
             DB.TeamSettings.Repository.Active = true;
 
             DB.Project.DisplayName = "RepositoryTestProject";
-
-            // Get rid of any remnants of our Test Cluster, e.g., from debugging.
-            if (Directory.Exists(DB.Project.TeamSettings.ClusterFolder))
-                Directory.Delete(DB.Project.TeamSettings.ClusterFolder, true);
-
 
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK");
@@ -83,8 +83,7 @@ namespace OurWordTests.Utilities
         [TearDown] public void TearDown()
         {
             // Get rid of our Test Cluster
-            if (Directory.Exists(DB.Project.TeamSettings.ClusterFolder))
-                Directory.Delete(DB.Project.TeamSettings.ClusterFolder, true);
+            JWU.NUnit_TeardownClusterFolder();
 
             // Remove the Clone/PushTo Cluster
             if (Directory.Exists(ClonePath))
@@ -150,19 +149,6 @@ namespace OurWordTests.Utilities
             // out both if installed and not installed.
         {
             Assert.IsTrue( Repository.HgIsInstalled, "Hg Should Be Installed");
-        }
-        #endregion
-        #region Test: ExistsAndCreate
-        [Test] public void ExistsAndCreate()
-        {
-            // At this point, we've defined a new cluster/project, but haven't created
-            // the repository on the disk
-            Assert.IsFalse(Repository.Exists, "Should not exist yet.");
-
-            // Now create it
-            Repository.Create();
-            Assert.IsTrue(Repository.Exists, "Should exist now.");
-
         }
         #endregion
         #region Test: GetChangedFiles
@@ -294,16 +280,6 @@ namespace OurWordTests.Utilities
         }
         #endregion
 
-        public void PushToRemote()
-        {
-            // Create the local Repository
-            Repository.Create();
-            Repository.Commit("Push Test", true);
-
-            // Verify that we have a change to make
-
-
-        }
         // Merging ---------------------------------------------------------------------------
         #region Method: void WriteFile(string sPath, string[] vs)
         void WriteFile(string sPath, string[] vs)

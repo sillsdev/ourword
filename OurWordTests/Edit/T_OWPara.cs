@@ -903,7 +903,7 @@ namespace OurWordTests.Edit
         {
             // Backspace at "...everlasting life.|"
             OWWindow.Sel selection = OWWindow.Sel.CreateSel(OP, DBT2, 75);
-            Console.WriteLine(selection.Anchor.Word.Text);
+            // Console.WriteLine(selection.Anchor.Word.Text);
             Wnd.Selection = OP.NormalizeSelection(selection);
             Wnd.cmdBackspace();
 

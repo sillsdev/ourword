@@ -2255,7 +2255,7 @@ namespace JWdb.DataModel
                     if (!string.IsNullOrEmpty(field.Data.Trim()))
                     {
                         var Event = Section.History.CreateEvent(
-                            new DateTime(2009, 1, 1),
+                            DEvent.DefaultDate,
                             Loc.GetString("OldHistory", "Old"),
                             field.Data);
                         Section.History.AddEvent(Event);
@@ -2754,16 +2754,6 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		#region Method: bool SectionMatchesFront(DSection SFront) - T if a true daughter matching section
-		public bool SectionMatchesFront(DSection SFront)
-		{
-			if (!SFront.ReferenceSpan.ContentEquals(this.ReferenceSpan))
-				return false;
-			if (SFront.Paragraphs.Count != this.Paragraphs.Count)
-				return false;
-			return true;
-		}
-		#endregion
 		#region Method: DPicture GetCorrespondingFrontPicture(DPicture picture)
 		DPicture GetCorrespondingFrontPicture(DPicture picture)
 		{
@@ -2842,7 +2832,7 @@ namespace JWdb.DataModel
                 }
             }
 
-            Debug.Assert(false, "GetReferenceAt was called for a section that does not have the runTarget");
+            // Happens if we have a footnote
             return null;
         }
         #endregion
@@ -2967,10 +2957,11 @@ namespace JWdb.DataModel
                         TheirNotes.Remove(TheirNote);
                 }
 
-                // So what's left in TheirNotes are what we need to add into this section.
+                // So what's left in TheirNotes are notes that "they" created, what we need 
+                // to add into this section.
                 foreach (TranslatorNote TheirNote in TheirNotes)
                 {
-                    // Get the corresponding DText in OurNotes
+                    // Get their context (DText, paragraph, etc.)
                     DText TheirDText = TheirNote.Owner as DText;
                     Debug.Assert(null != TheirDText);
                     DParagraph TheirParagraph = TheirDText.Paragraph;
@@ -2980,11 +2971,45 @@ namespace JWdb.DataModel
                     Debug.Assert(-1 != iText);
                     Debug.Assert(-1 != iParagraph);
 
-                    DParagraph OurParagraph = Mine.Paragraphs[iParagraph];
-                    DText OurDText = OurParagraph.Runs[iText] as DText;
-
+                    // Make a copy of their note that we can add
                     TranslatorNote note = TheirNote.Clone();
-                    OurDText.TranslatorNotes.Append(note);
+
+                    // If the sections match in structure, then we can place the note in
+                    // the same place
+                    if (StructuresAreSame(Mine, Theirs))
+                    {
+                        DParagraph OurParagraph = Mine.Paragraphs[iParagraph];
+                        Debug.Assert(null != OurParagraph);
+                        DText OurDText = OurParagraph.Runs[iText] as DText;
+                        Debug.Assert(null != OurDText);
+                        OurDText.TranslatorNotes.Append(note);
+                        continue;
+                    }
+
+                    // If here, the sections don't match in structure. (Once we go to a form
+                    // of OXES with unique id's for paragraphs, this problem should get easier
+                    if (iParagraph > Mine.Paragraphs.Count - 1)
+                    {
+                        iParagraph = Mine.Paragraphs.Count - 1;
+                        iText = Mine.Paragraphs[iParagraph].Runs.Count - 1;
+                    }
+                    while (null == Mine.Paragraphs[iParagraph].Runs[iText] as DText)
+                    {
+                        --iText;
+                        if (iText < 0)
+                        {
+                            --iParagraph;
+                            if (iParagraph < 0)
+                                break;
+                            iText = Mine.Paragraphs[iParagraph].Runs.Count - 1;
+                        }
+                    }
+                    if (iParagraph >= 0 && iText >= 0)
+                    {
+                        DText OurDText = Mine.Paragraphs[iParagraph].Runs[iText] as DText;
+                        if (null != OurDText)
+                            OurDText.TranslatorNotes.Append(note);
+                    }
                 }
             }
             #endregion
@@ -3279,6 +3304,9 @@ namespace JWdb.DataModel
                 const int c_cContextCount = 7;
                 string GetContextString()
                 {
+                    if (null == MyRun)
+                        return "";
+
                     if (!IsDTextChange)
                         return MyRun.AsString;
 
@@ -3336,7 +3364,8 @@ namespace JWdb.DataModel
                         }
                     }
 
-                    Debug.Assert(false);
+                    // If here, it means we were appending to the end, and there is
+                    // no corresponding run to attach to.
                     return null;
                 }
                 #endregion
@@ -3362,33 +3391,6 @@ namespace JWdb.DataModel
                         "The other version had \"{0}\".",
                         null,
                         new string[] { TheirRun.AsString } );
-
-                    /***
-                    // Ohter version inserted text
-                    if (Item.deletedA == 0 && Item.insertedB > 0)
-                    {
-                        string sSource = TheirRun.AsString;
-                        if (TheirRun as DText != null)
-                            sSource += TheirRun.ProseBTAsString;
-
-                        string sInserted = "";
-                        for (int i = 0, k = PosInMyRun;
-                            (i < Item.insertedB) && (k < sSource.Length);
-                            i++, k++)
-                        {
-                            sInserted += sSource[k];
-                        }
-
-                        return LocDB.GetValue(
-                            new string[] { "Strings" },
-                            "mergeInsertion",
-                            "The other version inserted \"{0}\" at \"{1}\".",
-                            null,
-                            new string[] {sInserted, Context});
-                    }
-
-                    return "The other version did something unknown.";
-                    ***/
                 }
                 #endregion
                 #region Method: void ConsoleOut()
@@ -3449,8 +3451,19 @@ namespace JWdb.DataModel
                     // For Debugging
                     // itemx.ConsoleOut();
 
+                    // Get the closest DText to append a note to. Normally this will
+                    // be done by casting MyRun to a DText. That fails, though, in 
+                    // the case of a footnote, in which case we just ignore the
+                    // change. (TODO: handles it when MyRun is a DFoot). 
+                    DText AttachTo = itemx.MyRun as DText;
+                    if (null == AttachTo)
+                        continue;
+                    
                     TranslatorNote note = new TranslatorNote();
-                    note.Reference = Mine.GetReferenceAt( itemx.MyRun ).ParseableName;
+                    DReference reference = Mine.GetReferenceAt(itemx.MyRun);
+                    if (null == reference)
+                        continue;
+                    note.Reference = reference.ParseableName;
                     note.Context = itemx.Context;
                     note.Category = TranslatorNote.ToDo;
                     Discussion disc = new Discussion(
@@ -3459,16 +3472,8 @@ namespace JWdb.DataModel
                         itemx.NoteText);
                     note.Discussions.Append(disc);
 
-                    // Get the closest DText to append this note to; We think this is 
-                    // always accomplished by casting MyRun to a DText; but for now
-                    // putting the assertion in just in case. If this fires, then it
-                    // means we don't have anything to attach to, and must find the
-                    // closest DText in Mine.
-                    DText AttachTo = itemx.MyRun as DText;
-                    Debug.Assert(null != AttachTo);
-
                     // We are just doing a generic note for now, rather than showing
-                    // diffs, so we only do t his once for a given MyRun.
+                    // diffs, so we only do this once for a given MyRun.
                     if (AttachTo == LastNoteAttachedTo)
                         continue;
                     LastNoteAttachedTo = AttachTo;

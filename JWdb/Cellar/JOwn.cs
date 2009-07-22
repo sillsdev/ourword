@@ -218,6 +218,7 @@ namespace JWdb
         #endregion
 
         // Merge -----------------------------------------------------------------------------
+        #region OMethod: void Merge(JAttr Parent, JAttr Theirs, bool bWeWin)
         public override void Merge(JAttr Parent, JAttr Theirs, bool bWeWin)
             // An owning attr, as used in OW, generally either owns an object or is
             // clear. I think merging is mostly a matter of checking whether it should
@@ -253,6 +254,7 @@ namespace JWdb
             if (null != ownParent.Value && null != ownTheirs.Value && null != Value)
                 Value.Merge(ownParent.Value, ownTheirs.Value, true);
         }
+        #endregion
     }
 
 }

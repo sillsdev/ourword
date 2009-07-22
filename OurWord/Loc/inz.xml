@@ -618,6 +618,12 @@
     <Item ID="msgSectionTitleCannotHaveVerses">
       <Alt ID="inz" Value="Alinea ini tidak bisa dirobah menjadi Judul Perikop (\s), oleh karena sebuah Judul Perikop tidak bisa mempunyai ayat, pasal, atau catatan kaki di dalamnya."></Alt>
     </Item>
+    <Item ID="msgNoInternetConnection">
+      <Alt ID="inz" Value="Sabda Kita tidak dapat terhubung dengan Internet.{n}{n}Periksalah apakah anda terhubung secara aktif dengan Internet, lalu coba lagi."></Alt>
+    </Item>
+    <Item ID="msgUnableToPull">
+      <Alt ID="inz" Value="Sabda Kita tidak bisa menirimah dari Internet.{n}{n}Computer yang ada di America mungkin tidak jalan. Tungguh dulu, lalu coba lagi."></Alt>
+    </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
         <Alt ID="inz" Value="Alinea"></Alt>

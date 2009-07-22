@@ -243,8 +243,8 @@ namespace JWdb
 			{
 				if (o.ContentEquals(obj))
 				{
-					if (ComplainIfDuplicateAttempted)
-						throw new eContentDuplication("Validate...");
+                    if (ComplainIfDuplicateAttempted)
+                        throw new eContentDuplication("Validate...");
 					return;
 				}
 			}

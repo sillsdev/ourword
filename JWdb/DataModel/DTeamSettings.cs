@@ -318,7 +318,7 @@ namespace JWdb.DataModel
 		public DTeamSettings()
 			: base()
 		{
-			// Our Default Display Name is simply "Our Word." Since this is the namem of the
+			// Our Default Display Name is simply "Our Word." Since this is the name of the
 			// cluster, users will likely change it to something more meaningful, like "Timor"
             DisplayName = LanguageResources.AppTitle;
 

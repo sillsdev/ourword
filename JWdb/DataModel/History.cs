@@ -46,6 +46,9 @@ namespace JWdb.DataModel
         {
             get
             {
+                if (m_dtDate.CompareTo(DefaultDate) == 0)
+                    m_dtDate = DateCreated;
+
                 return m_dtDate;
             }
             set
@@ -100,6 +103,15 @@ namespace JWdb.DataModel
             get
             {
                 return Owner as DHistory;
+            }
+        }
+        #endregion
+        #region VAttr{g}: DateTime DefaultDate - default for the Date attr
+        public static DateTime DefaultDate
+        {
+            get
+            {
+                return new DateTime(2009, 1, 1);
             }
         }
         #endregion
@@ -363,7 +375,13 @@ namespace JWdb.DataModel
                 if (null == GetCorresponding(Parent, vTheirs[i].DateCreated))
                 {
                     Theirs.Events.Remove(vTheirs[i]);
-                    this.Events.Append(vTheirs[i]);
+
+                    // In theory this condition should never happen; but it did once,
+                    // because I think files were manually copied into a folder which
+                    // would have bypassed the Parent mechanism.
+                    if (null == GetCorresponding(this, vTheirs[i].DateCreated))
+                        this.Events.Append(vTheirs[i]);
+
                     vTheirs.RemoveAt(i);
                 }
                 else

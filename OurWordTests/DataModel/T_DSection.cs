@@ -1425,14 +1425,19 @@ namespace OurWordTests.DataModel
     [TestFixture] public class T_DSection
     {
         // Helper Methods --------------------------------------------------------------------
-        #region Method: void Setup()
-        [SetUp]
-        public void Setup()
+        #region Setup
+        [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
+            JWU.NUnit_SetupClusterFolder();
         }
         #endregion
-
+        #region TearDown
+        [TearDown] public void TearDown()
+        {
+            JWU.NUnit_TeardownClusterFolder();
+        }
+        #endregion
         #region Method: string GetTestPathName(string sBaseName)
         string GetTestPathName(string sBaseName)
         {
@@ -1484,7 +1489,7 @@ namespace OurWordTests.DataModel
         {
             // Preliminary: Create the superstructure we need for a DBook
             DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings();
+            DB.Project.TeamSettings = new DTeamSettings( JWU.NUnit_ClusterFolderName );
             DB.TeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
@@ -1528,6 +1533,8 @@ namespace OurWordTests.DataModel
 
             // Compare what was written (vsResult) with what we expect (vsSav)
             _Compare("PART TWO", vsResult, vsSav);
+
+            JWU.NUnit_TeardownClusterFolder();
         }
         #endregion
 
@@ -1915,7 +1922,7 @@ namespace OurWordTests.DataModel
         DSection CreateSection(string[] vs)
         {
             DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings();
+            DB.Project.TeamSettings = new DTeamSettings( JWU.NUnit_ClusterFolderName );
             DB.TeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DB.Project.TargetTranslation = new DTranslation("Translation", "Latin", "Latin");
@@ -2375,7 +2382,7 @@ namespace OurWordTests.DataModel
             string[] vsActual = SectionTestData.ReadSfmFromBookFile(Mine.Book as DTestBook);
 
             // Comment out unless debugging
-            SectionTestData.ConsoleOut_ShowDiffs("Merge Different Structures", vsActual, vsExpected);
+            //SectionTestData.ConsoleOut_ShowDiffs("Merge Different Structures", vsActual, vsExpected);
 
             bool bAreSame = SectionTestData.AreSame(vsExpected, vsActual);
             Assert.IsTrue(bAreSame, "Structures should be the same");

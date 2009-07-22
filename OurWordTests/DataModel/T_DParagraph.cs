@@ -365,10 +365,10 @@ namespace OurWordTests.DataModel
             DFoot foot = p.InsertFootnote(dbt, iPosWithinRun);
 
             // Debugging optional
-            Console.WriteLine("Expected    = <" + sExpectedAfterInsert + ">");
-            Console.WriteLine("Actual      = <" + p.DebugString + ">");
-            Console.WriteLine("Expected BT = <" + sExpectedAfterInsertBT + ">");
-            Console.WriteLine("Actual   BT = <" + p.ProseBTAsString + ">");
+            //Console.WriteLine("Expected    = <" + sExpectedAfterInsert + ">");
+            //Console.WriteLine("Actual      = <" + p.DebugString + ">");
+            //Console.WriteLine("Expected BT = <" + sExpectedAfterInsertBT + ">");
+            //Console.WriteLine("Actual   BT = <" + p.ProseBTAsString + ">");
 
             // Test
             Assert.AreEqual(sExpectedAfterInsert, p.DebugString, "Insert Footnote");

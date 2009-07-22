@@ -1253,6 +1253,19 @@ namespace JWdb.DataModel
                 m_Progress.End();
             }
             #endregion
+            #region Method: void ExportToToolbox(sPathName) - (used in ChorusMerge)
+            public void ExportToToolbox(string sPathName)
+            {
+                StartProgress("Exporting", Book.Sections.Count);
+
+                DBS = _CreateDB();
+                DBS.Format = ScriptureDB.Formats.kToolbox;
+
+                DBS.Write(sPathName);
+
+                m_Progress.End();
+            }
+            #endregion
         } // End: Embedded Class IO
         #endregion
         #region Method: void ExportToParatext(sPathName, IProgressIndicator)
@@ -1263,6 +1276,12 @@ namespace JWdb.DataModel
         #endregion
         #region Method: void ExportToGoBible(sPathName, IProgressIndicator)
         public void ExportToGoBible(string sPathName, IProgressIndicator progress)
+        {
+            (new IO(this, progress)).ExportToGoBible(sPathName);
+        }
+        #endregion
+        #region Method: void ExportToToolbox(sPathName, IProgressIndicator)
+        public void ExportToToolbox(string sPathName, IProgressIndicator progress)
         {
             (new IO(this, progress)).ExportToGoBible(sPathName);
         }
@@ -1651,7 +1670,7 @@ namespace JWdb.DataModel
         #region Method: void Merge(DBook Parent, DBook Theirs)
         public void Merge(DBook Parent, DBook Theirs)
         {
-            //Debug.Fail("Breakpoint");
+            // Debug.Fail("Breakpoint");
 
             // Merge the histories
             History.Merge(Parent.History, Theirs.History);
@@ -1666,7 +1685,6 @@ namespace JWdb.DataModel
             for (int i = 0; i < Sections.Count; i++)
             {
                 Sections[i].Merge(Parent.Sections[i], Theirs.Sections[i]);
-                Console.WriteLine("Merging section: " + i.ToString());
             }
         }
         #endregion

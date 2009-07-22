@@ -255,34 +255,34 @@ namespace OurWordTests.Edit
             // P: "|te, ..."
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4);
             EditTest.Wnd.cmdSplitParagraph();
-            Console.WriteLine("1 = <" + EditTest.Wnd.Selection.DBT.AsString.Substring(0,15) + ">, expecting <te, ...>"); 
+            // Console.WriteLine("1 = <" + EditTest.Wnd.Selection.DBT.AsString.Substring(0,15) + ">, expecting <te, ...>"); 
 
             // Now, do a split again, so we have
             // P: "Oke "
             // P: ""
             // P: "|te, ..."
             EditTest.Wnd.cmdSplitParagraph();
-            Console.WriteLine("2 = <" + EditTest.Wnd.Selection.DBT.AsString.Substring(0, 15) + ">, expecting <te, ...>"); 
+            // Console.WriteLine("2 = <" + EditTest.Wnd.Selection.DBT.AsString.Substring(0, 15) + ">, expecting <te, ...>"); 
 
             // Move to the previous paragraph
             // P: "Oke "
             // P: "|"
             // P: "te, ..."
             EditTest.Wnd.cmdMoveCharLeft();
-            Console.WriteLine("3 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting <>"); 
+            // Console.WriteLine("3 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting <>"); 
 
             // Type a blank space
             // P: "Oke "
             // P: " |"
             // P: "te, ..."
             (new TypingAction(EditTest.Wnd, ' ')).Do();
-            Console.WriteLine("4 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < >"); 
+            // Console.WriteLine("4 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < >"); 
 
             // Finally, do a Delete to join the paragraphs
             // P: "Oke "
             // P: " |te, ..."
             EditTest.Wnd.cmdDelete();
-            Console.WriteLine("5 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < te, ...>"); 
+            // Console.WriteLine("5 = <" + EditTest.Wnd.Selection.DBT.AsString + ">, expecting < te, ...>"); 
 
             // Verify the resulting paragraph/selection is " |te, ..."
             Assert.IsTrue(EditTest.Wnd.Selection.IsInsertionPoint, "Should be a point, not a content selection");

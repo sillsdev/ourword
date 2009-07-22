@@ -188,6 +188,12 @@ namespace JWdb.DataModel
         #region SMethod: ClusterInfo FindClusterInfo(string sName)
         static public ClusterInfo FindClusterInfo(string sName)
         {
+            // It is always safest, albeit time consuming, to re-scan, because
+            // we never know where changes might have happened. (Without the re-scan,
+            // our Unit tests all fail, because they create and delete the test cluster
+            // folders.)
+            ScanForClusters();
+
             foreach (ClusterInfo ci in Clusters)
             {
                 if (ci.Name == sName)

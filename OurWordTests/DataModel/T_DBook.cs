@@ -56,14 +56,13 @@ namespace OurWordTests.DataModel
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
+            JWU.NUnit_SetupClusterFolder();
         }
         #endregion
         #region Method: void TearDown()
         [TearDown] public void TearDown()
         {
-            string sWaxhawClusterPath = JWU.GetMyDocumentsFolder("Waxhaw");
-            if (Directory.Exists(sWaxhawClusterPath))
-                Directory.Delete(sWaxhawClusterPath, true);
+            JWU.NUnit_TeardownClusterFolder();
         }
         #endregion
 
@@ -256,7 +255,7 @@ namespace OurWordTests.DataModel
 
             // Setup a project/translation/book
             DB.Project = new DProject("Waxhaw");
-            DB.Project.TeamSettings = new DTeamSettings("Waxhaw");
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
             DB.TeamSettings.EnsureInitialized();
             DB.Project.InitialCreation(new NullProgress());
             DTranslation translation = new DTranslation("Waxhaw", "Latin", "Latin");

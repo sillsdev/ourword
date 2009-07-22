@@ -736,6 +736,15 @@
       <English>There are no books defined in the Front for which you can Create or Import in the Target. You need to first define the book in the Front; only then will you be able to add it (via Create or Import) to the Target.</English>
       <Info>This message is displayed when the user attempts to Create or Import a book into the Target translation, when there is no corresponding book available in the Front.</Info>
     </Item>
+    <Item ID="msgNoInternetConnection">
+      <English>OurWord is unable to connect to the Internet.{n}{n}Please check that you have an active Internet connection, then try again.</English>
+      <Info>This message is displayed when the user attempts to access the Internet, e.g., via the Synchronize command.</Info>
+    </Item>
+    <Item ID="msgUnableToPull">
+      <English>OurWord is unable to retrieve changes from the Internet.{n}{n}The remote computer may not be working. Please try again sometime later.</English>
+      <Info>This message is displayed when the user attempts to pull changes from the remote repository via the Internet via the Synchronize command.</Info>
+    </Item>    
+    
     <Group ID="FileStructureMessages" Title="005 - File Structure Messages" Translator="false">
       <Item ID="paragraphs">
         <English>Paragraph(s)</English>

@@ -274,6 +274,31 @@ namespace JWTools
             return tr;
         }
         #endregion
+        #region SAttr{g}: string NUnit_ClusterFolderName
+        static public string NUnit_ClusterFolderName
+        {
+            get
+            {
+                return "UnitTest";
+            }
+        }
+        #endregion
+        #region SMethod: void NUnit_SetupClusterFolder()
+        static public void NUnit_SetupClusterFolder()
+        {
+            string s = NUnit_ClusterFolderName + Path.DirectorySeparatorChar + ".Settings";
+            GetMyDocumentsFolder(s);
+        }
+        #endregion
+        #region SMethod: void NUnit_TeardownClusterFolder()
+        static public void NUnit_TeardownClusterFolder()
+        {
+            string sFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            sFolder += (Path.DirectorySeparatorChar + NUnit_ClusterFolderName);
+            if (Directory.Exists(sFolder))
+                Directory.Delete(sFolder, true);
+        }
+        #endregion
         #endif
 
         // Retrieves the OS-specific data folder for all users

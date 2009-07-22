@@ -2045,9 +2045,18 @@ namespace JWdb.DataModel
                 return;
             }
 
-            // If we're here, then both changed, and we have a Conflict. So we want to keep
-            // Ours (as this is less confusing for the user), and generate a TranslatorNote
-            // indicating the nature of the conflict.
+            // If we're here, then both changed, and we have a conflict.
+
+            // If its a footnote, we aren't prepared to do anything, and just keep ours.
+            // (1) If a \cf, it really doesn't matter as these get re-generated.
+            // (2) But if a \fn, we will loose info. (TODO: figure out how to save the change)
+            if (Paragraph as DFootnote != null)
+            {
+                return;
+            }
+
+            // We want to keep Ours (as this is less confusing for the user), and generate 
+            // a TranslatorNote indicating the nature of the conflict.
             TranslatorNote note = new TranslatorNote();
             note.Reference = Section.GetReferenceAt(this).ParseableName;
             note.Context = GetNoteContext(ContentsAsString, Theirs.ContentsAsString);

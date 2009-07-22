@@ -912,6 +912,26 @@ namespace JWdb.DataModel
         #endregion
 
         // Methods ---------------------------------------------------------------------------
+        #region Method: void CheckTeamSettingsName(DTeamSettings, sPath)
+        void CheckTeamSettingsName(DTeamSettings ts, string sPath)
+             // Does the name equal what's in the path? (or has the folder been moved?)
+       {
+            string[] vItemsInPath = sPath.Split(new char[] { Path.DirectorySeparatorChar });
+
+            int c = vItemsInPath.Length;
+
+            if (c > 3)
+            {
+                string sClusterName = vItemsInPath[c - 3];
+                Console.WriteLine("Cluster = " + sClusterName);
+                Console.WriteLine("Path    = " + sPath);
+                Console.WriteLine("Name    = " + DisplayName);
+                Console.WriteLine("---------");
+
+                ts.DisplayName = sClusterName;
+            }
+       }
+        #endregion
         #region OMethod: bool OnLoad(TextReader, IProgressIndicator)
         protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
         {
@@ -920,6 +940,7 @@ namespace JWdb.DataModel
                 return false;
 
             // Initialize the Team Settings file
+            CheckTeamSettingsName(TeamSettings, sPath);
 			if (File.Exists(TeamSettings.StoragePath))
                 TeamSettings.Load(progress);
 			else

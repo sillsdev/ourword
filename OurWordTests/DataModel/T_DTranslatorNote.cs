@@ -52,7 +52,7 @@ namespace OurWordTests.DataModel
         {
             JWU.NUnit_Setup();
             DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings();
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
             DB.TeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Test Project";
             DB.Project.TargetTranslation = new DTranslation();
@@ -62,8 +62,17 @@ namespace OurWordTests.DataModel
 
             m_Section = new DSection(1);
             book.Sections.Append(m_Section);
+
+            JWU.NUnit_SetupClusterFolder();
         }
         #endregion
+        #region TearDown
+        [TearDown] public void TearDown()
+        {
+            JWU.NUnit_TeardownClusterFolder();
+        }
+        #endregion
+
         #region Method: TranslatorNote CreateTestTranslatorNote()
         TranslatorNote CreateTestTranslatorNote()
         {

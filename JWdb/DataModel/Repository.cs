@@ -175,6 +175,16 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region VAttr{g}: string PathToChorusMerge
+        string PathToChorusMerge
+        {
+            get
+            {
+                return SurroundWithQuotes(
+                    Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
+            }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(Cluster)
@@ -586,6 +596,154 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        // Heads ----------------------------------------------------------------------------
+        #region CLASS: Head
+        class Head
+        {
+            #region Attr{g/s}: string ChangeSet
+            public string ChangeSet
+            {
+                get
+                {
+                    return m_sChangeSet;
+                }
+                set
+                {
+                    m_sChangeSet = value;
+                }
+            }
+            string m_sChangeSet;
+            #endregion
+            #region Attr{g/s}: string Tag
+            public string Tag
+            {
+                get
+                {
+                    return m_sTag;
+                }
+                set
+                {
+                    m_sTag = value;
+                }
+            }
+            string m_sTag;
+            #endregion
+            #region Attr{g/s}: string User
+            public string User
+            {
+                get
+                {
+                    return m_sUser;
+                }
+                set
+                {
+                    m_sUser = value;
+                }
+            }
+            string m_sUser;
+            #endregion
+            #region Attr{g/s}: string Date
+            public string Date
+            {
+                get
+                {
+                    return m_sDate;
+                }
+                set
+                {
+                    m_sDate = value;
+                }
+            }
+            string m_sDate;
+            #endregion
+            #region Attr{g/s}: string Summary
+            public string Summary
+            {
+                get
+                {
+                    return m_sSummary;
+                }
+                set
+                {
+                    m_sSummary = value;
+                }
+            }
+            string m_sSummary;
+            #endregion
+
+            #region Constructor(sChangeSet, sTag, sUser, sDate, sSummary)
+            public Head(string _sChangeSet, string _sTag, string _sUser, string _sDate, string _sSummary)
+            {
+                m_sChangeSet = _sChangeSet;
+                m_sTag = _sTag;
+                m_sUser = _sUser;
+                m_sDate = _sDate;
+                m_sSummary = _sSummary;
+            }
+            #endregion
+        }
+        #endregion
+        #region Method: List<Head> GetHeads()
+        List<Head> GetHeads()
+        {
+            var v = new List<Head>();
+
+            if (!Active)
+                return v;
+
+            // Request the information from Mercurial
+            var result = Execute(c_sHeads);
+            if (null == result)
+                return null;
+
+            string[] vsLines = result.StandardOutput.Split('\n');
+
+            string sChangeSet = "";
+            string sTag = "";
+            string sUser = "";
+            string sDate = "";
+            string sSummary = "";
+
+            int iPosData = 14;
+
+            foreach (string s in vsLines)
+            {
+                if (s.StartsWith("changeset:") && s.Length > iPosData)
+                {
+                    sChangeSet = s.Substring(iPosData);
+                    sTag = "";
+                    sUser = "";
+                    sDate = "";
+                    sSummary = "";
+                }
+
+                if (s.StartsWith("tag:") && s.Length > iPosData)
+                    sTag = s.Substring(iPosData);
+                if (s.StartsWith("user:") && s.Length > iPosData)
+                    sUser = s.Substring(iPosData);
+                if (s.StartsWith("date:") && s.Length > iPosData)
+                    sDate = s.Substring(iPosData);
+
+                if (s.StartsWith("summary:") && s.Length > iPosData)
+                {
+                    sSummary = s.Substring(iPosData);
+                    v.Add( new Head(sChangeSet, sTag, sUser, sDate, sSummary));
+                }
+            }
+
+            return v;
+        }
+        #endregion
+        #region Method: int GetHeadsCount()
+        int GetHeadsCount()
+        {
+            if (!Active)
+                return 0;
+
+            return GetHeads().Count;
+        }
+        #endregion
+
         // Operations ------------------------------------------------------------------------
         #region SAttr{g}: bool HgIsInstalled
         static public bool HgIsInstalled
@@ -610,33 +768,6 @@ namespace JWdb.DataModel
                 }
                 return true;
             }
-        }
-        #endregion
-        #region Method: int GetHeadsCount()
-        int GetHeadsCount()
-        {
-            if (!Active)
-                return 0;
-
-            ExecutionResult result = Execute(c_sHeads);
-            if (null == result)
-                return 0;
-
-            string[] vsLines = result.StandardOutput.Split('\n');
-
-            int c = 0;
-            string sLookFor = "changeset:";
-
-            foreach (string s in vsLines)
-            {
-                if (s.Length > sLookFor.Length &&
-                    s.Substring(0, sLookFor.Length) == sLookFor)
-                {
-                    c++;
-                }
-            }
-
-            return c;
         }
         #endregion
         #region VAttr{g}: bool Exists
@@ -1043,36 +1174,330 @@ namespace JWdb.DataModel
             return false;
         }
         #endregion
-
-        #region TRIED JH'S CODE HERE
-        public void Repair()
+        #region Attr{g}: bool HasUnresolvedFiles
+        bool HasUnresolvedFiles
         {
-            // Let's try this JH's way
-            HgRepository hgr = new HgRepository(
-                HgRepositoryRoot, 
-                new Chorus.Utilities.NullProgress());
-
-            SyncResults results = new SyncResults();
-            IList<string> peopleWeMergedWith = hgr.MergeHeads(
-                new Chorus.Utilities.NullProgress(), results);
-
-            if (peopleWeMergedWith.Count > 0)
+            get
             {
-                string message = "Merged with ";
-                foreach (string id in peopleWeMergedWith)
+                var result = Execute("resolve -l");
+                string[] vsLines = result.StandardOutput.Split('\n');
+
+                foreach (string s in vsLines)
                 {
-                    message += id + ", ";
+                    if (s.Length > 2 && s[0] == 'U' && s[1] == ' ')
+                        return true;
                 }
-                message = message.Remove(message.Length - 2); //chop off the trailing comma
-                Commit(message, true);
+
+                return false;
             }
         }
         #endregion
 
+        // Main Synchronize Helper Methods ---------------------------------------------------
+        // TODO: Error messages on everything; and incorporate the Hg's error text into our error dialog.
+        #region Method: void LaunchSynchProgressDialog()
+        void LaunchSynchProgressDialog()
+            // Launch the Progress dialog in a separate thread so that it will update.
+            // We loop until we know it is created, and then waiti an addition couple
+            // of seconds to make sure it is showing.
+        {
+            SynchProgressDlg.Start();
+            while (!SynchProgressDlg.IsCreated)
+                Thread.Sleep(500);
+            Thread.Sleep(2000);
+        }
+        #endregion
+        #region Method: bool CheckInternetAccess()
+        bool CheckInternetAccess()
+        {
+            SynchProgressDlg.InternetAccess = SynchProgressDlg.GetStartState();
+
+            if (!CanAccessInternet())
+            {
+                SynchProgressDlg.InternetAccess = SynchProgressDlg.GetFinishState(false);
+
+                SynchProgressDlg.ShowError("kNoInternetConnection",
+                    "OurWord is unable to connect to the Internet. \n\n" +
+                    "Please check that you have an active Internet connection, then try again.");
+
+                return false;
+            }
+
+            SynchProgressDlg.InternetAccess = SynchProgressDlg.GetFinishState(true);
+            return true;
+        }
+        #endregion
+        #region Method: bool CheckMercurialPresent()
+        bool CheckMercurialPresent()
+        {
+            // Issue the Mercurial command to get the number of heads in the repo
+            int cHeads = GetHeadsCount();
+
+            // If it returns zero, we interpret this to mean Mercurial is not properly installed.
+            if (cHeads == 0)
+            {
+                SynchProgressDlg.ShowError("msgNoMercurial",
+                    "The external program Mercurial did not respond.\n\n" +
+                    "Either it is not installed, or you have a corrupt repository. Refer to the Help file.");
+                return false;
+            }
+
+            return true;
+        }
+        #endregion
+        #region Method: bool CheckLocalIntegrity()
+        bool CheckLocalIntegrity()
+        {
+            SynchProgressDlg.Integrity = SynchProgressDlg.GetStartState();
+
+            // Issue a command just to make certain that Mercurial is installed
+            if (!CheckMercurialPresent())
+            {
+                SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(false);
+                return false;
+            }
+
+            // If we had an interrupted transaction, then we need to recover from it. This
+            // command has  no effect if the repositiory is in good shape; but it repairs the
+            // repositiory if a transaction was interrupted.
+            Execute("Recover");
+
+            // Do we have unresolved files?
+            if (HasUnresolvedFiles)
+            {
+                // Attempt to resolve them. Most likely this will fail, because unresolved files are 
+                // generally due to a bug in the merge code; but if the user has installed a later
+                // version of OW, then perhaps the bug will have been fixed.
+                using (new ShortTermEnvironmentalVariable("HGMERGE", PathToChorusMerge))
+                {
+                    var result = Execute("resolve -a");
+                    if (result.Successful)
+                        Commit("Repaired an unresolved merge.", false);
+                }
+
+                // If we still have unresolved files, then report the problem to the user
+                // TODO: Offer the user the opportunity to choose Repo vs Local versions for the problem files
+                if (HasUnresolvedFiles)
+                {
+                    SynchProgressDlg.ShowError("msgRepositoryProblem",
+                        "We're sorry, but there is apparently a bug in OurWord related to synchronization.\n\n" +
+                        "Please contact us at http://ourword.TheSeedCompany.org for information " +
+                        "on how to solve this problem.");
+                    SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(false);
+                    return false;
+                }
+            }
+
+            SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(true);
+            return true;
+        }
+        #endregion
+        #region Method: bool CommitAnyChangedFiles()
+        bool CommitAnyChangedFiles()
+        {
+            string[] vsExtensions = new string[] { ".owp", ".otrans", ".owt", ".db" };
+
+            SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetStartState();
+
+            // Get a list of the files that have changed
+            var vsChangedFiles = GetChangedFiles();
+            if (vsChangedFiles.Count == 0)
+                goto Done;
+
+            // Remove any that we don't recognize, so that they don't get added to the repo.
+            // (If they were already in the repo, then this will resort in their being
+            // removed.)
+            foreach (string s in vsChangedFiles)
+            {
+                string sPath = HgRepositoryRoot + Path.DirectorySeparatorChar + s;
+
+                string sExtension = Path.GetExtension(sPath).ToLower();
+                bool bExtensionFound = false;
+                foreach (string sExt in vsExtensions)
+                {
+                    if (sExtension == sExt)
+                        bExtensionFound = true;
+                }
+
+                if (!bExtensionFound)
+                {
+                    File.Delete(sPath);
+                    if (File.Exists(sPath))
+                    {
+                        LocDB.Message("msgCantDeleteFileBeforeCommit",
+                            "An unrecognized file, \"{0}\", is in your data folder.{n}{n} " +
+                                "OurWord was unable to delete it. Perhaps you have some other " +
+                                "software running which is using that file. Please delete the " +
+                                "file, then try again.",
+                            new string[] { s },
+                            LocDB.MessageTypes.Error);
+                        SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(false);
+                        return false;
+                    }
+                }
+            }
+
+            // Rebuild our list, to make sure we still have something to commit
+            vsChangedFiles = GetChangedFiles();
+            if (vsChangedFiles.Count == 0)
+                goto Done;
+
+            // Commit the changed files
+            bool bResult = Commit("Synching from " + DB.UserName + " " +
+                DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo), true);
+
+            // Report failure
+            if (!bResult)
+            {
+                 SynchProgressDlg.ShowError("msgCantCommitRecentChanges",
+                     "OurWord was unable to place your most recent changes into the local Repository.\n\n" +
+                    "Please try again. If the problem continues, please contact us at " +
+                     "http://ourword.TheSeedCompany.org so that we can determine how to " +
+                     "solve this problem.");
+                 SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(false);
+                 return false;
+            }
+
+        Done:
+            SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(true);
+            return true;
+        }
+        #endregion
+        #region Method: bool PullRemoteChanges(string sTheirPath)
+        bool PullRemoteChanges(string sTheirPath)
+        {
+            SynchProgressDlg.Pulling = SynchProgressDlg.GetStartState();
+
+            if (!PullFrom(sTheirPath))
+            {
+                SynchProgressDlg.ShowError("msgUnableToPull",
+                    "OurWord is unable to retrieve changes from the Internet. \n\n" +
+                    "The remote computer may not be working. Please try again sometime later.");
+
+                SynchProgressDlg.Pulling = SynchProgressDlg.GetFinishState(false);
+                return false;
+            }
+
+            SynchProgressDlg.Pulling = SynchProgressDlg.GetFinishState(true);
+            return true;
+        }
+        #endregion
+        #region Method: bool MergeOurChanges()
+        bool MergeOurChanges()
+            // Hg's Merge gives strange error messages. E.g., its an error if there was
+            // nothing to merge. So we're ignoring the error message returned from 
+            // the Execute command.
+            // 
+            // TODO: Figure out if the Merge was unsuccessful and display an error message
+        {
+            SynchProgressDlg.Merging = SynchProgressDlg.GetStartState();
+
+            using (new ShortTermEnvironmentalVariable("HGMERGE", PathToChorusMerge))
+            {
+                ExecutionResult result = Execute(c_sMerge);
+            }
+
+            SynchProgressDlg.Merging = SynchProgressDlg.GetFinishState(true);
+            return true;
+        }
+        #endregion
+        #region Method: bool CommitTheMerge()
+        bool CommitTheMerge()
+            // TODO: Cam Commit return a false error? E.g., saying it didn't commit when
+            // in actuality it was because there was nothing to commit?
+        {
+            SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetStartState();
+
+            bool bOK = Commit("Merged by " + DB.UserName + " " +
+                DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo),
+                false);
+
+            if (!bOK)
+            {
+                SynchProgressDlg.ShowError("msgUnableToCommitMerge",
+                    "OurWord was unable to store the results of the merge. \n\n" +
+                    "This is an odd thing to happen. If it continues, please contact us at http://ourword.TheSeedCompany.org so that we can work with you to solve the problem.");
+
+                SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetFinishState(false);
+                return false;
+            }
+
+            SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetFinishState(true);
+            return true;
+        }
+        #endregion
+        #region Method: bool PushToRemote(sTheirPath)
+        bool PushToRemote(string sTheirPath)
+        {
+            SynchProgressDlg.Pushing = SynchProgressDlg.GetStartState();
+
+            bool bResult = PushTo(sTheirPath);
+
+            SynchProgressDlg.Pushing = SynchProgressDlg.GetFinishState(bResult);
+
+            return bResult;
+        }
+        #endregion
+        #region Method: bool SynchronizeWith(string sTheirPath)
+        public bool SynchronizeWith(string sTheirPath)
+            // Returns true if succeeded, false on failure
+        {
+            // Only proceed if Source Control has been turned on
+            if (!Active)
+                return false;
+
+            // Launch the Progress dialog (in another thread)
+            LaunchSynchProgressDialog();
+            bool bOK = true;
+
+            // Do we have an Internet connection? Display a message if not and give up
+            if (!CheckInternetAccess())
+                bOK = false;
+
+            // Check for any problems in the local setup (e.g., unresolved merges), and fix them.
+            if (bOK && !CheckLocalIntegrity())
+                bOK = false;
+
+            // Commit any files we've changed
+            if (bOK && !CommitAnyChangedFiles())
+                bOK = false;
+
+            // Pull any changes from the remote server
+            if (bOK && !PullRemoteChanges(sTheirPath))
+                bOK = false;
+
+            // Merge our changes with what we've just pulled
+            if (bOK && !MergeOurChanges())
+                bOK = false;
+
+            // Commit the merge we've just done
+            if (bOK && !CommitTheMerge())
+                bOK = false;
+
+            // Push the merge to the destination repository
+            if (bOK && !PushToRemote(sTheirPath))
+                bOK = false;
+
+            // Update our current working directory
+            if (bOK && !Update())
+                bOK = false;
+
+            // Done with the Progress dialog
+            SynchProgressDlg.Stop();
+            return bOK;
+        }
+        #endregion
+
+        #region REWORKED 22jul09 - Delete when confident rework is ok
+        /****
         #region Method: bool SynchronizeWith(string sTheirPath)
         public bool SynchronizeWith(string sTheirPath)
             // We Pull, Merge, then Push
         {
+            return SynchWith(sTheirPath);
+
+            bool bResult = true;
+
             if (!Active)
                 return false;
 
@@ -1119,7 +1544,6 @@ namespace JWdb.DataModel
                 
             // Commit if we have any changed files
             SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetStartState();
-            bResult = true;
             if (GetChangedFiles().Count > 0)
             {
                 bResult = Commit("Synching from " + DB.UserName + " " +
@@ -1181,6 +1605,8 @@ namespace JWdb.DataModel
                 SynchProgressDlg.EnableOkButton();
             return true;
         }
+        #endregion
+        ****/
         #endregion
     }
 

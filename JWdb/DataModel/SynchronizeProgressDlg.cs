@@ -59,6 +59,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
+
         #region SAttr{s}: states InternetAccess
         static public states InternetAccess
         {
