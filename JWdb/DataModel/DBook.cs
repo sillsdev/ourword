@@ -1283,7 +1283,7 @@ namespace JWdb.DataModel
         #region Method: void ExportToToolbox(sPathName, IProgressIndicator)
         public void ExportToToolbox(string sPathName, IProgressIndicator progress)
         {
-            (new IO(this, progress)).ExportToGoBible(sPathName);
+            (new IO(this, progress)).ExportToToolbox(sPathName);
         }
         #endregion
 

@@ -1050,23 +1050,20 @@ namespace JWdb.DataModel
         #endregion
         #region Method: bool IsGoBibleExportMarker(string sMarker)
         public bool IsGoBibleExportMarker(string sMarker)
-            // GoBibleCreator does not support the full set of USFM. So we first
-            // check it for USFM, then eliminate the things GB doesn't support.
+            // GoBibleCreator does not support the full set of USFM. So we just
+            // check against the markers that it does support.
         {
-            // If not USFM, then we know we don't want it
-            if (!IsUSFMExportMarker(sMarker))
-                return false;
+            string[] vsGoBibleMarkers = { 
+                "id", "h", "mt", "p", "q", "q2", "q3", "q4", "qc", "s", "c", "v", "vt" };
 
-            // USFM markers that GoBibleCreator doesn't support:
-            if (IsCrossRef(sMarker)) 
-                return false;
-            if (IsPicture(sMarker)) 
-                return false;
-            if (IsSeeAlso(sMarker)) 
-                return false;
+            foreach (string s in vsGoBibleMarkers)
+            {
+                if (s == sMarker)
+                    return true;
+            }
 
             // Didn't find it in our list
-            return true;
+            return false;
         }
         #endregion
 

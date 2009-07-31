@@ -1619,9 +1619,13 @@ namespace JWTools
 		#endregion
 
 		// Methods ---------------------------------------------------------------------------
+        public const string c_sOmitMarker = "(OmitMarker)";
 		#region Method: string PrepareFullMarker(string sMarker) - turns "mkr" into "\mkr "
 		private string PrepareFullMarker(string sMarker)
 		{
+            if (sMarker == c_sOmitMarker)
+                return "";
+
 			// No blank spaces in the marker for starters
 			sMarker = sMarker.Trim();
 

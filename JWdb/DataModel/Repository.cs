@@ -1257,6 +1257,25 @@ namespace JWdb.DataModel
                 return false;
             }
 
+            // An interruption could somehow leave the repository locked. We assume that no one
+            // has access to our Repo but us, and thus remove any indication of locking. 
+            string sLockFile = RepositoryStore + "wlock";
+            if (File.Exists(sLockFile))
+            {
+                Thread.Sleep(5000);
+                if (File.Exists(sLockFile))
+                    File.Delete(sLockFile);
+                if (File.Exists(sLockFile))
+                {
+                    SynchProgressDlg.ShowError("msgRepositoryLocked",
+                        "The Repository is in use by another process. Please wait, then try again.\n\n" +
+                        "Please contact us at http://ourword.TheSeedCompany.org for information " +
+                        "on how to solve this problem, if restarting your computer does not help.");
+                    SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(false);
+                    return false;
+                }
+            }
+
             // If we had an interrupted transaction, then we need to recover from it. This
             // command has  no effect if the repositiory is in good shape; but it repairs the
             // repositiory if a transaction was interrupted.

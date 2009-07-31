@@ -27,6 +27,7 @@ using OurWord.View;
 
 namespace OurWordTests.DataModel
 {
+    #region CLASS: SectionTestData - import/export data
     public class SectionTestData
     {
         // Data in Toolbox SFM ---------------------------------------------------------------
@@ -407,7 +408,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 4. Baikeno Mark 4:30-34
-        #region TestData #4: BaikenoMark430_ImportVariant
+        #region TestData #4 - BaikenoMark430_ImportVariant
         static public string[] BaikenoMark430_ImportVariant = new string[] 
 	    {
 		    "\\_sh v3.0 2 SHW-Scripture", 
@@ -460,7 +461,7 @@ namespace OurWordTests.DataModel
 		    "\\ud 17/Jun/2003"		
 	    };
         #endregion
-        #region TestData #4: BaikenoMark430_Cannonical
+        #region TestData #4 - BaikenoMark430_Cannonical
         static public string[] BaikenoMark430_Cannonical = new string[] 
 		    {
 			    "\\_sh v3.0 2 SHW-Scripture", 
@@ -513,7 +514,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 5. Pura Mark 14:03-14:09
-        #region TestData #5: PuraMark14_ImportVariant
+        #region TestData #5 - PuraMark14_ImportVariant
         static public string[] PuraMark14_ImportVariant = new string[] 
 		    {
 			    "\\_sh v3.0 2 SHW-Scripture", 
@@ -582,7 +583,7 @@ namespace OurWordTests.DataModel
 			    "\\btvt A final backtranslation to end it all."
 		    };
         #endregion
-        #region TestData #5: PuraMark14_Cannonical
+        #region TestData #5 - PuraMark14_Cannonical
         static public string[] PuraMark14_Cannonical = new string[] 
 		    {
 			    "\\_sh v3.0 2 SHW-Scripture", 
@@ -652,7 +653,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 6. Helong Acts 4:01-4:04
-        #region TestData #6: HelongActs04_ImportVariant
+        #region TestData #6 - HelongActs04_ImportVariant
         static public string[] HelongActs04_ImportVariant = new string[] 
 		    {
 			    "\\_sh v3.0 2 SHW-Scripture", 
@@ -716,7 +717,7 @@ namespace OurWordTests.DataModel
 			    "\\btcap The leaders accuse/criticise Petrus and his friends"
 		    };
         #endregion
-        #region TestData #6: HelongActs04_Cannonical
+        #region TestData #6 - HelongActs04_Cannonical
         static public string[] HelongActs04_Cannonical = new string[] 
 		    {
 			    "\\_sh v3.0 2 SHW-Scripture", 
@@ -953,7 +954,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 8. Helong Rev 1:4-8 (empty shell)
-        #region TextData #8 - HelongRev0104_ImportVariant
+        #region TestData #8 - HelongRev0104_ImportVariant
         static public string[] HelongRev0104_ImportVariant = new string[] 
 		{
 			"\\rcrd REV 01.04-01.08",
@@ -990,7 +991,7 @@ namespace OurWordTests.DataModel
 			"\\cf 1:8: Rai-klaran Foun 22:13, La'o sai hosi Mesir 3:14"
 		};
         #endregion
-        #region TextData #8 - HelongRev0104_Cannonical
+        #region TestData #8 - HelongRev0104_Cannonical
         static public string[] HelongRev0104_Cannonical = new string[] 
 		{
             "\\_sh v3.0 2 SHW-Scripture", 
@@ -1032,7 +1033,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 9. Manado Mark 13:14 (two footnotes)
-        #region TextData #9 - ManadoMark013014_ImportVariant
+        #region TestData #9 - ManadoMark013014_ImportVariant
         static public string[] ManadoMark013014_ImportVariant = new string[] 
 		{
 			"\\rcrd mrk13.14-23",
@@ -1056,7 +1057,7 @@ namespace OurWordTests.DataModel
 			"ruma, mar turung kong lari jo."
 		};
         #endregion
-        #region TextData #9 - ManadoMark013014_Cannonical
+        #region TestData #9 - ManadoMark013014_Cannonical
         static public string[] ManadoMark013014_Cannonical = new string[] 
 		{
             "\\_sh v3.0 2 SHW-Scripture", 
@@ -1091,7 +1092,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 10. Tombulu Acts 9:32-35 (empty section)
-        #region TextData #10 - TombuluActs009032_ImportVariant
+        #region TestData #10 - TombuluActs009032_ImportVariant
         static public string[] TombuluActs009032_ImportVariant = new string[] 
 		{
 			"\\rcrd act 09.32-35",
@@ -1109,7 +1110,7 @@ namespace OurWordTests.DataModel
 			"\\ud 12/Apr/2006"
 		};
         #endregion
-        #region TextData #10 - TombuluActs009032_Cannonical
+        #region TestData #10 - TombuluActs009032_Cannonical
         static public string[] TombuluActs009032_Cannonical = new string[] 
 		{
             "\\_sh v3.0 2 SHW-Scripture", 
@@ -1130,7 +1131,7 @@ namespace OurWordTests.DataModel
         #endregion
 
         // 11. English (\mr, \ms)
-        #region TextData #11 - English_ImportVariant
+        #region TestData #11 - English_ImportVariant
         static public string[] English_ImportVariant = new string[] 
         {
             "\\rcrd JER 001",
@@ -1145,7 +1146,7 @@ namespace OurWordTests.DataModel
 		    "\\vt The Lord gave another message to Jeremiah."
        };
         #endregion
-        #region TestData #11: English_Cannonical
+        #region TestData #11 - English_Cannonical
         static public string[] English_Cannonical = new string[] 
         {
             "\\_sh v3.0 2 SHW-Scripture", 
@@ -1223,6 +1224,111 @@ namespace OurWordTests.DataModel
 				    "[was] spot.on correct. That's.why their people increased a lot " +
 				    "approximately to five thousand people."
 		    };
+        #endregion
+
+        // GoBible
+        #region TestData - GoBible_Import
+        static public string[] GoBible_Import = new string[] 
+        {
+            "\\_sh v3.0 96 SHW-Scripture",
+            "\\_DateStampHasFourDigitYear",
+
+            "\\rcrd MRK",
+            "\\h Markus",
+            "\\st Tuhan Yesus pung Carita Bae,",
+            "\\btst Lord Yesus' *Gospel1 (Good Story)",
+            "\\st iko",
+            "\\btst according to",
+            "\\mt Markus",
+            "\\btmt Markus",
+            "\\id MRK Injil Markus dalam bahasa Melayu Kupang, NTT, Indonesia; ISO code mkn-IDN",
+
+            "\\rcrd MRK 1.1-1.8",
+            "\\p",
+            "\\c 1",
+            "\\v 1",
+            "\\vt Ini carita bae. Ini, Tuhan Allah pung Ana|fn",
+            "\\btvt This is a good story. It is the story of God's Child.",
+            "\\ft 1:1: Kata <Tuhan Allah pung Ana> sonde ada di dalam tulisan asli saparu.",
+            "\\btft 1:1: The words 'God's child' are not in some original writings.",
+            "\\vt pung carita. Dia pung nama Yesus Kristus, yang Tuhan Allah su tunju memang dari dolu. Dia pung carita mulai bagini:",
+            "\\btvt His name was Yesus Kristus, whom God had already appointed from long ago. His story begins like this:",
+            "\\s Yohanis Tukang Sarani buka jalan kasi Tuhan Yesus",
+            "\\bts Yohanis, the.One.who.habitually *Baptizes, opens the way/path for the Lord Yesus",
+            "\\r (Mateos 3:1-12; Lukas 3:1-18; Yohanis 1:19-28)",
+            "\\p",
+            "\\v 2",
+            "\\vt Yesus balóm mulai Dia pung karjá, te Tuhan Allah su utus satu orang, nama Yohanis. Yohanis musti pi sadia jalan kasi Yesus pung datang. Te dolu sakali, Tuhan Allah su pake Dia pung jubir, nama ba'i Yesaya. Dia su tulis memang, bilang:",
+            "\\btvt Yesus had not yet begun His work, {te} God had ordered (to do s.t.) a person, named Yohanis. Yohanis had to go prepare the way for Yesus' coming. Cuz (elaboration) long before, God had already used His *prophet1 (spokesperson), named was grandfather/forefather Yesaya. He wrote beforehand (= wrote before the event), saying:",
+            "\\q", 
+            "\\vt <<Dengar, ó! Beta suru Beta pung orang, ko pi buka jalan kasi sang Lu.",
+            "\\btvt <<Listen! I am ordering/commanding a person of Mine, to go open the way for You.",
+            "\\cf 1:2: Maleaki 3:1",
+            "\\q", 
+            "\\v 3",
+            "\\vt Itu orang nanti pi di tampa yang sonde ada orang, ko batarea, bilang:",
+            "\\btvt That person will go to a place where there are no people, to shout, saying:",
+            "\\q2", 
+            "\\vt <Samua orang siap-siap bekin bae jalan, ko tarima Tuhan pung datang!",
+            "\\btvt <All people prepare to make good/fix the way/path, to receive the Lord/Master's coming!",
+            "\\q2", 
+            "\\vt Bekin lurus jalan ko sambut sang Dia.>>>",
+            "\\btvt Make straight the path to greet Him.>>> [NOTE: ‘straight’ has both physical and moral overtones.]",
+            "\\ov Bekin rata jalan ko sambut sang Dia.",
+            "\\cf 1:3: Yesaya 40:3",
+            "\\p", 
+            "\\v 4-6",
+            "\\vt Orang biasa pange sang Yohanis, Tukang Sarani. Dia tenga di tampa sunyi. Dia pung pakean bekin dari onta pung bulu. Dia pung ika pinggang bekin dari binatang pung kulit. Dia pung makanan, kalamak deng madu utan. [Yohanis pung cara idop ni, sama ke ba'i Elia dolu-dolu.]",
+            "\\btvt People usually called Yohanis, One.who.habitually *Baptizes. He lived in a lonely place (=no people around). His clothes were made from camel's (loan:onta) fur. His belt was made from animal skin. His food, grasshoppers and wild honey. [This way of life of Yohanis, was like Grandfather Elia long ago.] [EXEG: High-level book-level theme from 1:1 (Jesus is the Christ; Elijah will come before the Christ comes) that was obvious to a reasonaly informed Jewish audience, but is not accessible or retrieveable by Timor audiences.]",
+            "\\cf 1:6: 2 Raja-raja dong 1:8",
+            "\\p", 
+            "\\vt Itu waktu, banya orang dari kota Yerusalem, deng propinsi Yudea pung isi samua, datang katumu deng Yohanis di dia pung tampa tu. Dong datang ko mau lia sang Yohanis deng mau dengar dia pung ajaran. Yohanis kasi tau sang dong, bilang, <<Bosong musti mangaku deng kasi tenga bosong pung sala samua, ko biar Tuhan Allah hapus buang itu sala dong. Ais bosong musti sarani dolo, ko jadi tanda, bilang, bosong su babae deng Tuhan.>>",
+            "\\btvt At that time, many people from Yerusalem city (loan: kota), and all the contents of Yudea province (loan:propinsi), came to meet with Yohanis at that place of his. They came because they wanted to see Yohanis and wanted to hear his teaching. He told them, saying, <<You-pl must *confess and leave behind all your *wrongs, in.order.that *God *forgive1 (erase throw.away) those *wrongs. Then you-pl must get *baptized, as a sign that you are already again RECIP-good (=in a good relationship) with the *Lord.>>",
+            "\\nt mangaku sala has element of both confess and stop doing; po'a buang (focus on inside); angka buang",
+            "\\ntgk pantes: not necessarily every last person, but lots, by a hyperbole common in Greek. Could be \"plenny plenny,\" but \"all\" is OK.",
+            "\\cat c:\\graphics\\HK-LB\\LB00296C.tif",
+            "\\ref width:5.0cm;textWrapping:around;horizontalPosition:right",
+            "\\cap Yohanis, Tukang Sarani",
+            "\\btcap Yohanis, The Habitual Baptizer",
+            "\\p", 
+            "\\vt Abis dong mangaku sala, ju dia sarani sang dong di kali Yarden.",
+            "\\btvt After they *confessed their *sins, then he *baptised them in the Yarden stream/river.",
+            "\\nt calop ko sarani ; sunge (implies always water) vs. kali (can have water or be just the bed) > kali mati and parigi mati = dry",
+            "\\p", 
+            "\\v 7",
+            "\\vt Dia kasi tau, bilang, <<Nanti ada satu Orang yang lebe hebat dari beta mau datang. Biar cuma jadi Dia pung tukang suru-suru sa ju, beta sonde pantas.|fn",
+            "\\btvt He told them saying like.this, <<Later there is a Person who is more noteworthy than me going to come. Even to just be his *slave (person who is habitually ordered about), I'm not fitting/appropriate.",
+            "\\ft 1:7: Tulisan bahasa Yunani asli tulis, bilang, <<tondo ko buka dia pung tali sapatu sa ju beta sonde pantas.>> Dia pung arti, bilang, Yohanis cuma orang kici sa, biar jadi Tuhan Yesus pung tukang suru-suru sa ju, dia sonde pantas.",
+            "\\btft 1:7: The original Greek language writings, says, 'to just bow.down in.order.to undo his shoe strap, it's not fitting/appropriate for me.' It's meaning is Yohanis was just a little person (social status), even.if {biar} he just became Lord Yesus' *slave/servant, he wasn't fitting/appropriate.",
+            "\\v 8",
+            "\\vt Beta cuma bisa sarani sang bosong pake aer sa, ma nanti Dia bekin lebe dari beta, te Dia bekin ponu bosong pung hati deng Tuhan pung Roh yang Barisi.>>",
+            "\\btvt I'm only able to *baptize you with water, but later He will do more than me, cuz (elaboration) He will make your(pl) hearts(livers) full with *Lord's *Holy Spirit (=clean, free from impurities, undefiled, holy).>>",
+            "\\nt rasuk: evil spirits control supernaturally, but negative or destructive associations; topang (BI) = senda (KM) -support; setan naik; takana setan; Rote/Timor-sumanak/smanan; baras barisi/ hati barisi",
+            "\\ntgk Collocation of \"baptize\" and \"Spirit\" is opaque; spelled out here.",
+            "\\ud 18/Feb/2009"
+       };
+        #endregion
+        #region TestData - GoBible_Export
+        static public string[] GoBible_Export = new string[] 
+        {
+            "\\id MRK",
+            "\\h Markus",
+            "\\mt Markus",
+            "\\c 1",
+            "\\v 1 Ini carita bae. Ini, Tuhan Allah pung Ana pung carita. Dia pung nama Yesus Kristus, yang Tuhan Allah su tunju memang dari dolu. Dia pung carita mulai bagini:",
+            "\\v 2 \\wj Yohanis Tukang Sarani buka jalan kasi Tuhan Yesus\\wj* Yesus balóm mulai Dia pung karjá, te Tuhan Allah su utus satu orang, nama Yohanis. Yohanis musti pi sadia jalan kasi Yesus pung datang. Te dolu sakali, Tuhan Allah su pake Dia pung jubir, nama ba'i Yesaya. Dia su tulis memang, bilang:",
+            "“Dengar, ó! Beta suru Beta pung orang, ko pi buka jalan kasi sang Lu.",
+            "\\v 3 Itu orang nanti pi di tampa yang sonde ada orang, ko batarea, bilang:",
+            "‘Samua orang siap-siap bekin bae jalan, ko tarima Tuhan pung datang!",
+            "Bekin lurus jalan ko sambut sang Dia.’”",
+            "\\v 4 -6 Orang biasa pange sang Yohanis, Tukang Sarani. Dia tenga di tampa sunyi. Dia pung pakean bekin dari onta pung bulu. Dia pung ika pinggang bekin dari binatang pung kulit. Dia pung makanan, kalamak deng madu utan. [Yohanis pung cara idop ni, sama ke ba'i Elia dolu-dolu.]",
+            "Itu waktu, banya orang dari kota Yerusalem, deng propinsi Yudea pung isi samua, datang katumu deng Yohanis di dia pung tampa tu. Dong datang ko mau lia sang Yohanis deng mau dengar dia pung ajaran. Yohanis kasi tau sang dong, bilang, “Bosong musti mangaku deng kasi tenga bosong pung sala samua, ko biar Tuhan Allah hapus buang itu sala dong. Ais bosong musti sarani dolo, ko jadi tanda, bilang, bosong su babae deng Tuhan.”",
+            "Abis dong mangaku sala, ju dia sarani sang dong di kali Yarden.",
+            "\\v 5",
+            "\\v 6",
+            "\\v 7 Dia kasi tau, bilang, “Nanti ada satu Orang yang lebe hebat dari beta mau datang. Biar cuma jadi Dia pung tukang suru-suru sa ju, beta sonde pantas.",
+            "\\v 8 Beta cuma bisa sarani sang bosong pake aer sa, ma nanti Dia bekin lebe dari beta, te Dia bekin ponu bosong pung hati deng Tuhan pung Roh yang Barisi.”"
+        };
         #endregion
 
         // Manipulations ---------------------------------------------------------------------
@@ -1421,7 +1527,9 @@ namespace OurWordTests.DataModel
         }
         #endregion
     }
+    #endregion
 
+    #region CLASS: T_DSection
     [TestFixture] public class T_DSection
     {
         // Helper Methods --------------------------------------------------------------------
@@ -2389,5 +2497,47 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        // GoBible ---------------------------------------------------------------------------
+        #region Test: GoBibleExport
+        [Test] public void GoBibleExport()
+        {
+            // Preliminary: Create the superstructure we need for a DBook
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings( JWU.NUnit_ClusterFolderName );
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
+            DB.Project.TargetTranslation = Translation;
+
+            // Load the Raw data into a book
+            DTestBook Book = SectionTestData.LoadIntoBook(
+                SectionTestData.GoBible_Import, Translation);
+
+            // Export in GoBible format
+            string sGoBiblePath = JWU.NUnit_TestFileFolder + 
+                Path.DirectorySeparatorChar + "Test.GoBible";
+            Book.ExportToGoBible(sGoBiblePath, new NullProgress());
+
+            // Read back in as raw string array
+            var vs = new List<string>();
+            TextReader tr = JWU.NUnit_OpenTextReader("Test.GoBible");
+            do
+            {
+                string s = tr.ReadLine();
+                if (null == s)
+                    break;
+                vs.Add(s);
+            } while (true);
+            tr.Close();
+            string[] vsActual = vs.ToArray();
+
+            // Compare
+            //SectionTestData.ConsoleOut_ShowDiffs("GoBible Results", vsActual, 
+            //    SectionTestData.GoBible_Export);
+            Assert.IsTrue(SectionTestData.AreSame(vsActual, SectionTestData.GoBible_Export),
+                "GoBible Export does not equal what was expected.");
+        }
+        #endregion
     }
+    #endregion
 }
