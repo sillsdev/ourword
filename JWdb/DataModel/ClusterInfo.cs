@@ -125,9 +125,9 @@ namespace JWdb.DataModel
                 DTeamSettings.SettingsFolderName +
                 Path.DirectorySeparatorChar;
 
-            // Get the otrans files in the settings folder
+            // Get the owp files in the settings folder
             string[] sFiles = Directory.GetFiles(sSettingsFolder,
-                "*" + DTranslation.FileExtension,
+                "*" + DProject.FileExtension,
                 SearchOption.TopDirectoryOnly);
 
             // The base name of these are the languages

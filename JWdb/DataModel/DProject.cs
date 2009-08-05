@@ -1004,12 +1004,21 @@ namespace JWdb.DataModel
 		#endregion
 
 		// I/O -------------------------------------------------------------------------------
+        #region SAttr{g}: string FileExtension
+        static public string FileExtension
+        {
+            get
+            {
+                return ".owp";
+            }
+        }
+        #endregion
         #region VAttr{g}: override string DefaultFileExtension
         public override string DefaultFileExtension
         {
             get
             {
-                return ".owp";
+                return FileExtension;
             }
         }
         #endregion

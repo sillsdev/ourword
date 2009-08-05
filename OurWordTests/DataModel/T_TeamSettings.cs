@@ -136,9 +136,9 @@ namespace OurWordTests.DataModel
 					Path.DirectorySeparatorChar + sLanguage;
 				Directory.CreateDirectory(sFolderLanguage);
 
-				// Create a otrans settings file
+				// Create a owp settings file
 				StreamWriter w = new StreamWriter(sSettingsFolder + sLanguage + 
-					DTranslation.FileExtension);
+					DProject.FileExtension);
 				w.WriteLine(sLanguage);
 				w.Close();
 			}
