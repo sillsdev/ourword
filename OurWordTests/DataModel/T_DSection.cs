@@ -1227,8 +1227,8 @@ namespace OurWordTests.DataModel
         #endregion
 
         // GoBible
-        #region TestData - GoBible_Import
-        static public string[] GoBible_Import = new string[] 
+        #region TestData - GoBible_Import1
+        static public string[] GoBible_Import1 = new string[] 
         {
             "\\_sh v3.0 96 SHW-Scripture",
             "\\_DateStampHasFourDigitYear",
@@ -1258,7 +1258,7 @@ namespace OurWordTests.DataModel
             "\\r (Mateos 3:1-12; Lukas 3:1-18; Yohanis 1:19-28)",
             "\\p",
             "\\v 2",
-            "\\vt Yesus balóm mulai Dia pung karjá, te Tuhan Allah su utus satu orang, nama Yohanis. Yohanis musti pi sadia jalan kasi Yesus pung datang. Te dolu sakali, Tuhan Allah su pake Dia pung jubir, nama ba'i Yesaya. Dia su tulis memang, bilang:",
+            "\\vt Yesus balóm mulai Dia pung karjá, te ||iTuhan Allah||r su utus satu orang, nama Yohanis. Yohanis musti pi sadia jalan kasi Yesus pung datang. Te dolu sakali, Tuhan Allah su pake Dia pung jubir, nama ba'i Yesaya. Dia su tulis memang, bilang:",
             "\\btvt Yesus had not yet begun His work, {te} God had ordered (to do s.t.) a person, named Yohanis. Yohanis had to go prepare the way for Yesus' coming. Cuz (elaboration) long before, God had already used His *prophet1 (spokesperson), named was grandfather/forefather Yesaya. He wrote beforehand (= wrote before the event), saying:",
             "\\q", 
             "\\vt <<Dengar, ó! Beta suru Beta pung orang, ko pi buka jalan kasi sang Lu.",
@@ -1308,8 +1308,8 @@ namespace OurWordTests.DataModel
             "\\ud 18/Feb/2009"
        };
         #endregion
-        #region TestData - GoBible_Export
-        static public string[] GoBible_Export = new string[] 
+        #region TestData - GoBible_Export1
+        static public string[] GoBible_Export1 = new string[] 
         {
             "\\id MRK",
             "\\h Markus",
@@ -1321,7 +1321,7 @@ namespace OurWordTests.DataModel
             "\\v 3 Itu orang nanti pi di tampa yang sonde ada orang, ko batarea, bilang:",
             "‘Samua orang siap-siap bekin bae jalan, ko tarima Tuhan pung datang!",
             "Bekin lurus jalan ko sambut sang Dia.’”",
-            "\\v 4 -6 Orang biasa pange sang Yohanis, Tukang Sarani. Dia tenga di tampa sunyi. Dia pung pakean bekin dari onta pung bulu. Dia pung ika pinggang bekin dari binatang pung kulit. Dia pung makanan, kalamak deng madu utan. [Yohanis pung cara idop ni, sama ke ba'i Elia dolu-dolu.]",
+            "\\v 4 (4-6) Orang biasa pange sang Yohanis, Tukang Sarani. Dia tenga di tampa sunyi. Dia pung pakean bekin dari onta pung bulu. Dia pung ika pinggang bekin dari binatang pung kulit. Dia pung makanan, kalamak deng madu utan. [Yohanis pung cara idop ni, sama ke ba'i Elia dolu-dolu.]",
             "Itu waktu, banya orang dari kota Yerusalem, deng propinsi Yudea pung isi samua, datang katumu deng Yohanis di dia pung tampa tu. Dong datang ko mau lia sang Yohanis deng mau dengar dia pung ajaran. Yohanis kasi tau sang dong, bilang, “Bosong musti mangaku deng kasi tenga bosong pung sala samua, ko biar Tuhan Allah hapus buang itu sala dong. Ais bosong musti sarani dolo, ko jadi tanda, bilang, bosong su babae deng Tuhan.”",
             "Abis dong mangaku sala, ju dia sarani sang dong di kali Yarden.",
             "\\v 5",
@@ -2511,7 +2511,7 @@ namespace OurWordTests.DataModel
 
             // Load the Raw data into a book
             DTestBook Book = SectionTestData.LoadIntoBook(
-                SectionTestData.GoBible_Import, Translation);
+                SectionTestData.GoBible_Import1, Translation);
 
             // Export in GoBible format
             string sGoBiblePath = JWU.NUnit_TestFileFolder + 
@@ -2533,8 +2533,8 @@ namespace OurWordTests.DataModel
 
             // Compare
             //SectionTestData.ConsoleOut_ShowDiffs("GoBible Results", vsActual, 
-            //    SectionTestData.GoBible_Export);
-            Assert.IsTrue(SectionTestData.AreSame(vsActual, SectionTestData.GoBible_Export),
+            //    SectionTestData.GoBible_Export1);
+            Assert.IsTrue(SectionTestData.AreSame(vsActual, SectionTestData.GoBible_Export1),
                 "GoBible Export does not equal what was expected.");
         }
         #endregion

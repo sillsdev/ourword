@@ -115,6 +115,87 @@ namespace JWdb.DataModel
 		#endregion
 
         // Parsing Methods -------------------------------------------------------------------
+        #region SMethod: void ParseParts(string s, o nVerse1, o chLetter 1, o nVerse2, o chLetter2, o sRemainder)
+        static public void ParseParts(string s, 
+            out int nVerse1, out char chLetter1,
+            out int nVerse2, out char chLetter2,
+            out string sRemainder)
+            // Breaks a reference, including verse bridges, into their component parts.
+        {
+            int i = 0;
+
+            // Defaults
+            nVerse1 = -1;
+            chLetter1 = ' ';
+            nVerse2 = -1;
+            chLetter2 = ' ';
+            sRemainder = s;
+
+            try
+            {
+                // First verse number
+                string sVerse = "";
+                while (i < s.Length && Char.IsDigit(s[i]))
+                {
+                    sVerse += s[i];
+                    i++;
+                }
+                nVerse1 = Convert.ToInt16(sVerse);
+
+                // First verse letter
+                if (i < s.Length && Char.IsLetter(s[i]))
+                {
+                    chLetter1 = s[i];
+                    i++;
+                }
+
+                // Move past white space, if any
+                while (i < s.Length && s[i] == ' ')
+                    i++;
+
+                // Do we have a verse bridge?
+                if (i < s.Length && s[i] == '-')
+                {
+                    // Move past the hyphen
+                    i++;
+
+                    // Move past white space, if any
+                    while (i < s.Length && s[i] == ' ')
+                        i++;
+
+                    // Second verse number
+                    sVerse = "";
+                    while (i < s.Length && Char.IsDigit(s[i]))
+                    {
+                        sVerse += s[i];
+                        i++;
+                    }
+                    nVerse2 = Convert.ToInt16(sVerse);
+
+                    // Second verse letter
+                    if (i < s.Length && Char.IsLetter(s[i]))
+                    {
+                        chLetter2 = s[i];
+                        i++;
+                    }
+                }
+
+                // Move past white space, if any
+                while (i < s.Length && s[i] == ' ')
+                    i++;
+
+                // Extract the verse text
+                if (i < s.Length)
+                    sRemainder = s.Substring(i);
+                else
+                    sRemainder = "";
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Exception in DReference.ParseParts: " + e.Message);
+            }
+        }
+        #endregion
         #region Method: int ParseFirstBridgeNumber(string) - given "2" or "2-4", returns "2"
         static public int ParseFirstBridgeNumber(string s)
 		{

@@ -54,5 +54,51 @@ namespace OurWordTests.DataModel
             Assert.AreEqual(121, r.Verse);
         }
         #endregion
+
+        #region Test: ParseParts
+        [Test] public void ParseParts()
+        {
+            int nVerse1 = 0;
+            char chLetter1 = ' ';
+            int nVerse2 = 0;
+            char chLetter2 = ' ';
+            string sRemainder;
+
+            DReference.ParseParts("16 For God so", out nVerse1, out chLetter1, out nVerse2, out chLetter2, out sRemainder);
+            Assert.AreEqual(16, nVerse1);
+            Assert.AreEqual(' ', chLetter1);
+            Assert.AreEqual(-1, nVerse2);
+            Assert.AreEqual(' ', chLetter2);
+            Assert.AreEqual("For God so", sRemainder);
+
+            DReference.ParseParts("16b-17a For God so", out nVerse1, out chLetter1, out nVerse2, out chLetter2, out sRemainder);
+            Assert.AreEqual(16, nVerse1);
+            Assert.AreEqual('b', chLetter1);
+            Assert.AreEqual(17, nVerse2);
+            Assert.AreEqual('a', chLetter2);
+            Assert.AreEqual("For God so", sRemainder);
+
+            DReference.ParseParts("15-17a", out nVerse1, out chLetter1, out nVerse2, out chLetter2, out sRemainder);
+            Assert.AreEqual(15, nVerse1);
+            Assert.AreEqual(' ', chLetter1);
+            Assert.AreEqual(17, nVerse2);
+            Assert.AreEqual('a', chLetter2);
+            Assert.AreEqual("", sRemainder);
+
+            DReference.ParseParts("15 - 17", out nVerse1, out chLetter1, out nVerse2, out chLetter2, out sRemainder);
+            Assert.AreEqual(15, nVerse1);
+            Assert.AreEqual(' ', chLetter1);
+            Assert.AreEqual(17, nVerse2);
+            Assert.AreEqual(' ', chLetter2);
+            Assert.AreEqual("", sRemainder);
+
+            DReference.ParseParts("15 17 soldiers came.", out nVerse1, out chLetter1, out nVerse2, out chLetter2, out sRemainder);
+            Assert.AreEqual(15, nVerse1);
+            Assert.AreEqual(' ', chLetter1);
+            Assert.AreEqual(-1, nVerse2);
+            Assert.AreEqual(' ', chLetter2);
+            Assert.AreEqual("17 soldiers came.", sRemainder);
+        }
+        #endregion
     }
 }

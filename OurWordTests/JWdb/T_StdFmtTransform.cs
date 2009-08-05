@@ -215,15 +215,84 @@ namespace OurWordTests.JWdb
             CompareStringArrays(vsExpected, vsActual);
         }
         #endregion
-        #region Test: RemoveVerseBridgesForGoBible
-        [Test] public void RemoveVerseBridgesForGoBible()
+
+        #region Test: XForm_GoBibleRemoveCharacterFormating
+        [Test] public void XForm_GoBibleRemoveCharacterFormating()
+        {
+            var vsIn = new string[] {
+                "\\v 20 ||bSyare wapa ana||r wapo rave mamo maisyare ||iAyao||r Amisye ||iama.||r" 
+            };
+            var vsExpected = new string[] {
+                "\\v 20 Syare wapa ana wapo rave mamo maisyare Ayao Amisye ama.",
+            };
+
+            // Create a DB with the problem input stream
+            ScriptureDB DB = new ScriptureDB();
+            DB.Initialize(vsIn);
+            DB.Format = ScriptureDB.Formats.kGoBibleCreator;
+
+            // Run the method
+            var transform = new XForm_GoBibleExport(DB);
+            transform.RemoveCharacterFormating();
+
+            // Is the result what we expected?
+            var vsActual = DB.ExtractData();
+            CompareStringArrays(vsExpected, vsActual);
+        }
+        #endregion
+        #region Test: RemoveVerseBridgesForGoBible1
+        [Test] public void RemoveVerseBridgesForGoBible1()
+        {
+            var vsIn = new string[] {
+                "\\c 8",
+                "\\v 1a \\wj Saulus paj'èra dhèu unu Lamatua Yesus sèra\\wj* Aa Saulus oo ètu era èèna kahèi, ka nèngu dèi kahèi ra pamadhe Stefanus.",
+                "\\v 1b-2 Lod'o Stefanus madhe èèna, abhu dhèu pèri dhu dèi padètu dènge Lamatua. Lasi rare ngi'u aae Stefanus ho ra padhane. Ka ra tangi ne.",
+                "\\v 3 Nèti lod'o èèna ka, dhèu paj'èra dhèu unu Lamatua Yesus ètu kota",
+                "\\v 4a Dai sange ne'e ka, lii lolo Ama Lamatua paj'aj'i dedha-liru dènge rai-haha ne.",
+                "\\v 4b Lod'o Ama LAMATUA heka paj'aj'i dedha-liru dènge rai-haha èèna,",
+                "\\v 5-7a dhae abhu mèka ana aaj'u, lula Na papuru mèka èj'i.",
+                "\\v 7b dhoka sèbu èi di, mai nèti dara rai ho pabasa"
+            };
+            var vsExpected = new string[] {
+                "\\c 8",
+                "\\v 1 (1a) \\wj Saulus paj'èra dhèu unu Lamatua Yesus sèra\\wj* Aa Saulus oo ètu era èèna kahèi, ka nèngu dèi kahèi ra pamadhe Stefanus.",
+                "(1b-2) Lod'o Stefanus madhe èèna, abhu dhèu pèri dhu dèi padètu dènge Lamatua. Lasi rare ngi'u aae Stefanus ho ra padhane. Ka ra tangi ne.",
+                "\\v 2",
+                "\\v 3 Nèti lod'o èèna ka, dhèu paj'èra dhèu unu Lamatua Yesus ètu kota",
+                "\\v 4 (4a) Dai sange ne'e ka, lii lolo Ama Lamatua paj'aj'i dedha-liru dènge rai-haha ne.",
+                "(4b) Lod'o Ama LAMATUA heka paj'aj'i dedha-liru dènge rai-haha èèna,",
+                "\\v 5 (5-7a) dhae abhu mèka ana aaj'u, lula Na papuru mèka èj'i.",
+                "\\v 6",
+                "\\v 7",
+                "(7b) dhoka sèbu èi di, mai nèti dara rai ho pabasa"
+            };
+
+            // Create a DB with the problem input stream
+            ScriptureDB DB = new ScriptureDB();
+            DB.Initialize(vsIn);
+            DB.Format = ScriptureDB.Formats.kGoBibleCreator;
+
+            // Run the method
+            DB.RemoveVerseBridgesForGoBible();
+            var vsActual = DB.ExtractData();
+            for(int i = 0; i<vsActual.Length; i++)
+                vsActual[i] = vsActual[i].Replace("\\(OmitMarker) ", "");
+
+            // Is the result what we expected?
+            //foreach (string s in vsActual)
+            //    Console.WriteLine(s);
+            CompareStringArrays(vsExpected, vsActual);
+        }
+        #endregion
+        #region Test: RemoveVerseBridgesForGoBible2
+        [Test] public void RemoveVerseBridgesForGoBible2()
         {
             var vsIn = new string[] {
                 "\\v 20a-22c Syare wapa ana wapo rave mamo maisyare Ayao Amisye ama ananyao so rai:",
                 "\\v 23 <<Ranivara nya marova maror, nyo anaisye raunanto po raisy, \\q2 muno awa ngkangkamandi, nyo mana raunanto po ramanam. \\q1 Nya ana nyo rave tai maisy, weamo nya marova so "
             };
             var vsExpected = new string[] {
-                "\\v 20 a-22c Syare wapa ana wapo rave mamo maisyare Ayao Amisye ama ananyao so rai:",
+                "\\v 20 (20a-22c) Syare wapa ana wapo rave mamo maisyare Ayao Amisye ama ananyao so rai:",
                 "\\v 21",
                 "\\v 22",
                 "\\v 23 <<Ranivara nya marova maror, nyo anaisye raunanto po raisy, \\q2 muno awa ngkangkamandi, nyo mana raunanto po ramanam. \\q1 Nya ana nyo rave tai maisy, weamo nya marova so "
