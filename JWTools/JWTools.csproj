@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -179,6 +179,7 @@
     <Compile Include="Localizer\NewLanguageDlg.Designer.cs">
       <DependentUpon>NewLanguageDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="OurWordXmlDocument.cs" />
     <Compile Include="PathConverter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

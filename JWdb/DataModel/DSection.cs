@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 using JWTools;
 using JWdb;
 #endregion
@@ -2707,6 +2708,15 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+
+
+        public void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+        {
+            foreach (DParagraph p in Paragraphs)
+            {
+                p.AddToOxesBook(oxes, nodeBook);
+            }
+        }
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: DParagraph[] GetParagraphs(DReferenceSpan span)

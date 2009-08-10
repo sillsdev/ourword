@@ -1666,28 +1666,43 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        // Merging ---------------------------------------------------------------------------
-        #region Method: void Merge(DBook Parent, DBook Theirs)
-        public void Merge(DBook Parent, DBook Theirs)
+
+        public int GetID()
         {
-            // Debug.Fail("Breakpoint");
+            int nID = m_NextID;
 
-            // Merge the histories
-            History.Merge(Parent.History, Theirs.History);
+            m_NextID++;
 
-            // At this point we must assume the same number of sections
-            if (Sections.Count != Parent.Sections.Count)
-                return;
-            if (Sections.Count != Theirs.Sections.Count)
-                return;
+            return nID;
+        }
+        public int m_NextID = 0;
 
-            // Merge the sections
-            for (int i = 0; i < Sections.Count; i++)
+        public OurWordXmlDocument ToOxesDocument
+        {
+            get
             {
-                Sections[i].Merge(Parent.Sections[i], Theirs.Sections[i]);
+                var oxes = new OurWordXmlDocument();
+                oxes.AddXmlDeclaration();
+
+                // Bible Node
+                var nodeBible = oxes.AddNode(null, "bible");
+                oxes.AddAttr(nodeBible, "xml:lang", "bko");
+                oxes.AddAttr(nodeBible, "backtTranslaltionDefaultLanguage", "en");
+                oxes.AddAttr(nodeBible, "oxes", "2.0");
+
+                // Book Node
+                var nodeBook = oxes.AddNode(nodeBible, "book");
+                oxes.AddAttr(nodeBook, "id", BookAbbrev);
+
+                // Add the Sections
+                foreach (DSection section in Sections)
+                    section.AddToOxesBook(oxes, nodeBook);
+
+                return oxes;
             }
         }
-        #endregion
+
+        // Merging ---------------------------------------------------------------------------
         #region OMethod: void Merge(JObject Parent, JObject Theirs, bool bWeWin)
         public override void Merge(JObject Parent, JObject Theirs, bool bWeWin)
         {

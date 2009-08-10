@@ -16,6 +16,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 
 using JWTools;
 using JWdb;
@@ -1488,6 +1489,35 @@ namespace JWdb.DataModel
                 text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
         }
         #endregion
+
+        int ID
+        {
+            get
+            {
+                if (m_nID == -1 && null != Book)
+                    m_nID = Book.GetID();
+                return m_nID;
+            }
+        }
+        int m_nID = -1;
+
+        public void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+        {
+            var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
+            Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
+
+            var node = oxes.AddNode(nodeBook, "p");
+            oxes.AddAttr(node, "style", map.Name);
+            oxes.AddAttr(node, "usfm", map.Usfm);
+            oxes.AddAttr(node, "id", oxes.IntToID(ID));
+
+            foreach (DRun run in Runs)
+            {
+                run.AddToOxesBook(oxes, node);
+            }
+
+
+        }
 
         // Merging ---------------------------------------------------------------------------
         #region VirtMethod: void Merge(DParagraph Parent, DParagraph Theirs)

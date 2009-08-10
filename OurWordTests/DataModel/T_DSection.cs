@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 
 using NUnit.Framework;
 
@@ -138,6 +139,59 @@ namespace OurWordTests.DataModel
 			"\\btvt That man will go to an uninhabited place, to shout.words, saying:"
 		};
         #endregion
+        static public string[] BaikenoMark0101_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Main Title\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"B\">",
+                    "<c n=\"1\"/>",
+                    "<v n=\"1\"/>",
+                    "Ije lais alekot. Ije Uis-neno In Anmone",
+                    "<bt>This is a good story/matter. This is *God's Son's</bt>",
+                    "<note reference=\"1:1\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "Lasi &lt;Uis-neno In Anmone&gt; ka nmui' fa matu'i mane'o bian.",
+                        "<bt>The words &lt;God's Son&gt; is not there in some of the old writings.</bt>",
+                    "</note>",
+                    "in na' monin. In kana, Jesus Kristus, es Uis-neno nleek nani na'ko un-unu'. In lasi nane, nahuun nak on ii:",
+                    "<bt>life. His name is Jesus Kristus, who God designated beforehand from long ago. His story/issue begins like this:</bt>",
+                "</p>",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
+                    "Nai' Joao Aslain Atoni, naleko' lalan neu Usif Jesus",
+                    "<bt>Sir Joao the *Baptiser of People, fix/prepares the way/path for the *Lord Jesus</bt>",
+                "</p>",
+
+                "<p te=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
+                    "(Mateus 3:1-12; Lukas 3:1-18; Joao 1:19-28)",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                    "<v n=\"2\"/>",
+                    "Jesus fe' ka nanaob In mepu, mes Uis-neno nsonu' nahuun In atoni mese', in kanan nai' Joao. Nai' Joao musti nao naleko' lalan neu Jesus In amneman. Fun natuin na'ko un-unu', Uis-neno anpaek nalail In mafeef' es. Mafefa' nane, in kanan Na'i Yesaya. In ntui nani, nak on ii:",
+                    "<bt>Jesus had not yet begun His work, but God sent beforehand one of His men, whose name as sir Joao. Sir Joao must fix/prepare the path/way for Jesus' coming. Because from long ago, God had used one of His mouth (=spokesperson). That spokesperson was named Grandfather/ancestor Yesaya. He had written like this:</bt>",
+                "</p>",
+
+                "<p style=\"line1\" usfm=\"q1\" id=\"F\">",
+                    "&lt;&lt;Mneen nai, he! Au 'leul Au 'haef ma 'nimaf, henati nao naleko' lalan neu Ko",
+                    "<bt>&lt;&lt;Listen up, he! I send My foot and hand (=trusty servant) to go fix/prepare the way/path for You.</bt>",
+                    "<note reference=\"1:2\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Maleakhi 3:1</note>",
+                "</p>",
+
+                "<p style=\"line1\" usfm=\"q1\" id=\"G\">",
+                     "<v n=\"3\"/>",
+                     "Le atoni nane lof in anao mbi bael sona' es, he in nkoa', mnak:",
+                     "<bt>That man will go to an uninhabited place, to shout.words, saying:</bt>",
+               "</p>",
+
+
+            "</book>",
+            "</bible>"
+        };
+
 
         // 2. Baikeno Mark 1:9
         #region TestData #2 - BaikenoMark0109_ImportVariant
@@ -1648,7 +1702,7 @@ namespace OurWordTests.DataModel
 
         // Individual Tests (each has a different data set) ----------------------------------
         #region TEST: IO_DataSet01 - Baikeno Mark 1:1
-        [Test] public void IO_DataSet01()
+        [Test] public void IO_DataSet01(string[] vsRaw, string[] vsSav)
         {
             IO_TestEngine(
                 SectionTestData.BaikenoMark0101_ImportVariant,
@@ -2538,6 +2592,39 @@ namespace OurWordTests.DataModel
                 "GoBible Export does not equal what was expected.");
         }
         #endregion
+
+        // Oxes ------------------------------------------------------------------------------
+        [Test] void OxesTestEngine(string sTest, string[] vsToolbox, string[] vsOxesExpected)
+        {
+            // Preliminary: Create the superstructure we need for a DBook
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
+            DB.Project.TargetTranslation = Translation;
+
+            // Load the data into the book
+            DBook Book = SectionTestData.LoadIntoBook(vsToolbox, Translation);
+
+            // Create the oxes xml objects
+            var xActual = Book.ToOxesDocument;
+
+            // Compare with what we expect
+            var xExpected = new OurWordXmlDocument(vsOxesExpected);
+            xActual.WriteToConsole("Actual");
+            xExpected.WriteToConsole("Expected");
+            Assert.IsTrue(xExpected.IsSame(xActual), "Oxes should be same for Oxes Test #" + sTest);
+
+        }
+
+        [Test] public void Oxes1()
+        {
+            OxesTestEngine( "1",
+                SectionTestData.BaikenoMark0101_Cannonical,
+                SectionTestData.BaikenoMark0101_oxes);
+        }
+
     }
     #endregion
 }

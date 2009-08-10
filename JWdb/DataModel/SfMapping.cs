@@ -20,8 +20,87 @@ using JWdb;
 
 namespace JWdb.DataModel
 {
+    public class StyleMapping
+    {
+        #region Attr{g/s}: string OurWord
+        public string OurWord
+        {
+            get
+            {
+                return m_sOurWord;
+            }
+            set
+            {
+                m_sOurWord = value;
+            }
+        }
+        string m_sOurWord;
+        #endregion
+        #region Attr{g/s}: string Usfm
+        public string Usfm
+        {
+            get
+            {
+                return m_sUsfm;
+            }
+            set
+            {
+                m_sUsfm = value;
+            }
+        }
+        string m_sUsfm;
+        #endregion
+        #region Attr{g/s}: string Name
+        public string Name
+        {
+            get
+            {
+                return m_sName;
+            }
+            set
+            {
+                m_sName = value;
+            }
+        }
+        string m_sName;
+        #endregion
+
+        #region Constructor(sOurWord, sUsfm, sName)
+        public StyleMapping(string sOurWord, string sUsfm, string sName)
+        {
+            m_sOurWord = sOurWord;
+            m_sUsfm = sUsfm;
+            m_sName = sName;
+        }
+        #endregion
+    }
+
+
 	public class DSFMapping : JObject
-	{
+    {
+        #region Attr{g}: List<StyleMapping> StyleMappings
+        public List<StyleMapping> StyleMappings
+        {
+            get
+            {
+                Debug.Assert(null != m_vStyleMappings);
+                return m_vStyleMappings;
+            }
+        }
+        List<StyleMapping> m_vStyleMappings;
+        #endregion
+        #region Method: StyleMapping FindMappingFromOurWord(sOurWordStyle)
+        public StyleMapping FindMappingFromOurWord(string sOurWord)
+        {
+            foreach (StyleMapping sm in StyleMappings)
+            {
+                if (sm.OurWord == sOurWord)
+                    return sm;
+            }
+            return null;
+        }
+        #endregion
+
         // Constants -------------------------------------------------------------------------
 		public const string c_sMkrID = "id";
         public const string c_sMkrPictureCaption = "cap";  // Vernacular caption
@@ -1170,6 +1249,14 @@ namespace JWdb.DataModel
         public DSFMapping()
 			: base()
 		{
+            m_vStyleMappings = new List<StyleMapping>();
+            StyleMappings.Add(new StyleMapping("mt", "mt", "Main Title"));
+            StyleMappings.Add(new StyleMapping("p", "p", "Paragraph"));
+            StyleMappings.Add(new StyleMapping("s", "s1", "Section Head"));
+            StyleMappings.Add(new StyleMapping("r", "r", "Parallel Passage Reference"));
+            StyleMappings.Add(new StyleMapping("q", "q1", "Line 1"));
+
+
 			// TODO: Need to persist these array values
 
 			// Markers that signal a vernacular paragraph

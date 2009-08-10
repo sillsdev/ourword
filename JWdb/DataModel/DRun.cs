@@ -14,10 +14,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
-using System.Windows.Forms;
+using System.Xml;
 
 using JWTools;
 using JWdb;
@@ -170,6 +171,11 @@ namespace JWdb.DataModel
 			return null;
 		}
 		#endregion
+
+        public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+        }
+
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: virtual void CopyBackTranslationsFromFront(DRun RFront)
@@ -353,6 +359,13 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
+        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            var node = oxes.AddNode(nodeParent, "v");
+            oxes.AddAttr(node, "n", Text);
+        }
+
+
 		// Methods ---------------------------------------------------------------------------
 		#region Method: override void ToSfm(ScriptureDB DBS)
 		public override void ToSfm(ScriptureDB DBS)
@@ -487,6 +500,12 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+
+        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            var node = oxes.AddNode(nodeParent, "c");
+            oxes.AddAttr(node, "n", Text);
+        }
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: override void ToSfm(ScriptureDB DBS)
@@ -787,6 +806,16 @@ namespace JWdb.DataModel
             return v;
         }
         #endregion
+
+        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            var node = oxes.AddNode(nodeParent, "note");
+            oxes.AddAttr(node, "reference", "To Do");
+            oxes.AddAttr(node, "style",
+                IsSeeAlso ? "Note Cross Reference Paragraph" : "Note General Paragraph");
+            oxes.AddAttr(node, "usfm",
+                IsSeeAlso ? "x" : "f");
+        }
 
         // Methods ---------------------------------------------------------------------------
         #region OMethod: void ToSfm(ScriptureDB DBS)
@@ -1533,6 +1562,11 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+
+        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            //oxes.AddText(nodeParent, ContentsAsString);
+        }
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: override void EliminateSpuriousSpaces()
