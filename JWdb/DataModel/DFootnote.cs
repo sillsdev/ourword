@@ -45,29 +45,30 @@ namespace JWdb.DataModel
 		}
 		private int m_nNoteType = (int)Types.kSeeAlso;
 		#endregion
+        #region BAttr{g/s}: string VerseReference 
+        public string VerseReference
+        {
+            get
+            {
+                return m_sVerseReference;
+            }
+            set
+            {
+                // By default, we'll have a reference; we don't want this to be set
+                // to null. (See the constructors, which always set a reference.)
+                if (!string.IsNullOrEmpty(value))
+                    SetValue(ref m_sVerseReference, value);
+            }
+        }
+        private string m_sVerseReference = "";
+        #endregion
 		#region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
 			DefineAttr("NoteType", ref m_nNoteType);
-		}
-		#endregion
-
-		// JAttrs ----------------------------------------------------------------------------
-		#region Attr{g}: DReference Reference
-		public DReference Reference
-		{
-			get
-			{
-				return j_reference.Value;
-			}
-			set
-			{
-				Debug.Assert(null != value);
-				j_reference.Value.Copy(value);
-			}
-		}
-		private JOwn<DReference> j_reference = null;
+            DefineAttr("VerseRef", ref m_sVerseReference);
+        }
 		#endregion
 
         // Content Attrs ---------------------------------------------------------------------
@@ -86,23 +87,6 @@ namespace JWdb.DataModel
         }
         DFoot m_Foot;
         #endregion
-
-        // Static Attrs ----------------------------------------------------------------------
-		#region SAttr{g/s}: enum RefLabelTypes RefLabelType - Label (kNone, kStandard (def))
-		public enum RefLabelTypes { kNone, kStandard };
-		static public RefLabelTypes RefLabelType
-		{
-			get
-			{
-				return (RefLabelTypes)m_nRefLabelType;
-			}
-			set
-			{
-				m_nRefLabelType = (int)value;
-			}
-		}
-		static private int m_nRefLabelType = (int)RefLabelTypes.kStandard;
-		#endregion
 
 		// Derived Attrs ---------------------------------------------------------------------
 		#region VAttr{g}: override bool IsUserEditable
@@ -149,15 +133,13 @@ namespace JWdb.DataModel
         private DFootnote()
             : base()
         {
-            j_reference = new JOwn<DReference>("Reference", this);
-            j_reference.Value = new DReference();
         }
         #endregion
         #region Constructor(DFootnote FnFront)
         public DFootnote(DFootnote FnFront)
 			: this()
 		{
-			Reference  = FnFront.Reference;
+            VerseReference = FnFront.VerseReference;
 			NoteType = FnFront.NoteType;
 		}
 		#endregion
@@ -165,8 +147,8 @@ namespace JWdb.DataModel
 		public DFootnote(int nChapter, int nVerse, Types nNoteType)
 			: this()
 		{
-			Reference = new DReference(nChapter, nVerse);
-
+            if (nChapter>0 && nVerse>0)
+                VerseReference = nChapter.ToString() + ":" + nVerse.ToString();
             NoteType = nNoteType;
 		}
 		#endregion
@@ -191,14 +173,8 @@ namespace JWdb.DataModel
 			if (fnFront.NoteType != Types.kSeeAlso)
 				return;
 
-			// Clear out the Target's data. We'll be rebuilding from scratch
-			Runs.Clear();
-
 			// Convert the source
-			string sDest = Translation.ConvertCrossReferences( fnFront ); 
-
-			// This becomes the footnote's contents
-			SimpleText = sDest;
+			Translation.ConvertCrossReferences( fnFront, this ); 
 		}
 		#endregion
 
@@ -236,11 +212,7 @@ namespace JWdb.DataModel
 		{
 			sLabel = "";
 
-			// If we don't want a label, then there is nothing here to do
-			if (RefLabelType == RefLabelTypes.kNone)
-				return s;
-
-			// The kStandard option is for a verse reference. We expect a somewhat
+			// We want to extract the verse reference. We expect a somewhat
 			// unpredictable sequence of numbers and certain types of punctuation. 
 			int i = 0;
 			string sPunctChars = ":;.-";
@@ -281,8 +253,15 @@ namespace JWdb.DataModel
                 // If not a reference part, then we're done
 				if (!bIsDigit && !bIsPunct && !bIsLetter & !bIsSpace)
 					break;
-
 			}
+
+            // Remove the trailing colon; we'll add that programatically
+            if (!string.IsNullOrEmpty(sLabel))
+            {
+                int k = sLabel.Length - 1;
+                if(sLabel[k] == ':' || sLabel[k] == ';')
+                    sLabel = sLabel.Substring(0, sLabel.Length - 1);
+            }
 
 			return s.Substring(i).Trim();
 		}

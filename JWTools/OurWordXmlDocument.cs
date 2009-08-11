@@ -40,10 +40,10 @@ namespace JWTools
             string sXml = "";
             foreach (string s in vsInitializeFrom)
                 sXml += s;
+            //Console.WriteLine(sXml);
             LoadXml(sXml);
         }
         #endregion
-
 
         public string IntToID(int n)
         {
@@ -102,11 +102,58 @@ namespace JWTools
 
 
         // For Unit Testing ------------------------------------------------------------------
+        #region Method: bool IsSame(OurWordXmlDocument other)
         public bool IsSame(OurWordXmlDocument other)
         {
-            return (this.InnerText == other.InnerText);
-        }
+            var sbThis = new StringBuilder();
+            this.Save(new StringWriter(sbThis));
+            string sThis = sbThis.ToString();
 
+            var sbOther = new StringBuilder();
+            other.Save(new StringWriter(sbOther));
+            string sOther = sbOther.ToString();
+
+           return (sThis == sOther);
+        }
+        #endregion
+        #region SMethod: void DisplayDifferences(xActual, xExpected)
+        static public void DisplayDifferences(OurWordXmlDocument xActual, OurWordXmlDocument xExpected)
+        {
+            var sbActual = new StringBuilder();
+            xActual.Save(new StringWriter(sbActual));
+            string sActual = sbActual.ToString();
+
+            var sbExpected = new StringBuilder();
+            xExpected.Save(new StringWriter(sbExpected));
+            string sExpected = sbExpected.ToString();
+
+            bool bIsSame = (sActual == sExpected);
+
+            if (bIsSame)
+                return;
+
+            int iMax = Math.Min(sActual.Length, sExpected.Length);
+            for (int i = 0; i < iMax; i++)
+            {
+                if (sActual[i] != sExpected[i])
+                {
+                    Console.WriteLine("The strings first diffet at position " + i.ToString());
+                    int iStart = Math.Max(i - 20, 0);
+                    int len = Math.Min(iMax - i, 60);
+
+                    string sPad = "          ";
+                    for (int k = iStart; k < i; k++)
+                        sPad += ' ';
+                    Console.WriteLine(sPad + "v");
+
+                    Console.WriteLine("Actual   =>" + sActual.Substring(iStart, len));
+                    Console.WriteLine("Expected =>" + sExpected.Substring(iStart, len));
+                    break;
+                }
+            }
+        }
+        #endregion
+        #region Method: void WriteToConsole(string sMessage)
         public void WriteToConsole(string sMessage)
             // Breaks it down into meaningful lines as it will appear in the file,
             // as opposed to InnerText, which has no line breaks.
@@ -119,5 +166,6 @@ namespace JWTools
 
             Console.WriteLine("");
         }
+        #endregion
     }
 }

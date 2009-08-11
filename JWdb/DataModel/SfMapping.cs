@@ -1250,12 +1250,17 @@ namespace JWdb.DataModel
 			: base()
 		{
             m_vStyleMappings = new List<StyleMapping>();
-            StyleMappings.Add(new StyleMapping("mt", "mt", "Main Title"));
+            StyleMappings.Add(new StyleMapping("h", "h", "Header"));
+            StyleMappings.Add(new StyleMapping("mt", "mt", "Title Main"));
+            StyleMappings.Add(new StyleMapping("st", "mt2", "Title Secondary"));
             StyleMappings.Add(new StyleMapping("p", "p", "Paragraph"));
             StyleMappings.Add(new StyleMapping("s", "s1", "Section Head"));
             StyleMappings.Add(new StyleMapping("r", "r", "Parallel Passage Reference"));
             StyleMappings.Add(new StyleMapping("q", "q1", "Line 1"));
-
+            StyleMappings.Add(new StyleMapping("q2", "q2", "Line 2"));
+            StyleMappings.Add(new StyleMapping("cap", "fig", "Caption"));
+            StyleMappings.Add(new StyleMapping("ms", "ms", "Major Section Head"));
+            StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range"));
 
 			// TODO: Need to persist these array values
 

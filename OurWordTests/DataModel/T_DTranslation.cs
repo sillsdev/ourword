@@ -21,7 +21,7 @@ using JWdb;
 using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 
 namespace OurWordTests.DataModel
@@ -51,12 +51,19 @@ namespace OurWordTests.DataModel
             DB.Project.FrontTranslation = new DTranslation("Front", "Latin", "Latin");
             DB.Project.TargetTranslation = new DTranslation("Target", "Latin", "Latin");
 
-            DBook book = new DBook();
-            DB.Project.FrontTranslation.Books.Append(book);
-            DSection section = new DSection(1);
-            book.Sections.Append(section);
-            DParagraph para = new DParagraph();
-            section.Paragraphs.Append(para);
+            DBook bookFront = new DBook();
+            DB.Project.FrontTranslation.Books.Append(bookFront);
+            DSection sectionFront = new DSection(1);
+            bookFront.Sections.Append(sectionFront);
+            DParagraph paraFront = new DParagraph();
+            sectionFront.Paragraphs.Append(paraFront);
+
+            DBook bookTarget = new DBook();
+            DB.Project.TargetTranslation.Books.Append(bookTarget);
+            DSection sectionTarget = new DSection(1);
+            bookTarget.Sections.Append(sectionTarget);
+            DParagraph paraTarget = new DParagraph();
+            sectionTarget.Paragraphs.Append(paraTarget);
 
             DB.Project.FrontTranslation.BookNamesTable.Clear();
             DB.Project.FrontTranslation.BookNamesTable.Append("Genesis");
@@ -80,11 +87,11 @@ namespace OurWordTests.DataModel
                 "Genesissy 23:4; 2 Kings 13:3; Carita (Mula-Mula) 5:5, 23";
             string sExpected = "(Kejadian 3:4; Keluaran 12:4, 3; Ex 3:4, " +
                 "Genesissy 23:4; 2 Raja-Raja 13:3; Kejadian 5:5, 23";
-            para.SimpleText = sSource;
+            paraFront.SimpleText = sSource;
 
-            string sActual = DB.Project.TargetTranslation.ConvertCrossReferences(para);
+            DB.Project.TargetTranslation.ConvertCrossReferences(paraFront, paraTarget);
 
-            Assert.AreEqual(sExpected, sActual);
+            Assert.AreEqual(sExpected, paraTarget.SimpleText);
         }
         #endregion
 

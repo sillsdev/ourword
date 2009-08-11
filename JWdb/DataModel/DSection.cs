@@ -657,7 +657,7 @@ namespace JWdb.DataModel
 				DParagraph pTarget = vTarget[i] as DParagraph;
 				DParagraph pFront  = vFront[i]  as DParagraph;
 
-				pTarget.SimpleText = pTarget.Translation.ConvertCrossReferences(pFront);
+				pTarget.Translation.ConvertCrossReferences(pFront, pTarget);
 			}
 		}
 		#endregion
@@ -665,9 +665,6 @@ namespace JWdb.DataModel
 		void _UpdateExplanatoryLabels(ArrayList vFront, ArrayList vTarget)
 		{
 			if (vFront.Count != vTarget.Count)
-				return;
-
-			if (DFootnote.RefLabelTypes.kNone == DFootnote.RefLabelType)
 				return;
 
 			for(int i=0; i<vFront.Count; i++)
@@ -1977,6 +1974,14 @@ namespace JWdb.DataModel
 					string sContents = "";
 					string sProseBT  = "";
 					string sIntBT    = "";
+                  
+                    // If what we're working on is itself a footnote, then we need its verse)
+                    if (p as DFootnote != null && 
+                        !string.IsNullOrEmpty((p as DFootnote).VerseReference))
+                    {
+                        sContents += (p as DFootnote).VerseReference + ": ";
+                        sProseBT += (p as DFootnote).VerseReference + ": ";
+                    }
 
 					// If we encounter a footnote, we'll remember it here, so that we can
 					// output it after the \vt
@@ -2118,14 +2123,11 @@ namespace JWdb.DataModel
 					// (or alternatively, a |fn will be added.)
                     LastParagraph.ConnectFootnote(footnote);
 
-					// Footnote label
-					string sLabel;
-					field.BT = DFootnote.ParseLabel(field.BT, out sLabel);
-					field.Data = DFootnote.ParseLabel(field.Data, out sLabel);
-					if (sLabel.Length > 0)
-					{
-						footnote.Runs.Append( new DLabel(sLabel) );
-					}
+					// Verse Reference
+					string sVerseReference;
+                    field.BT = DFootnote.ParseLabel(field.BT, out sVerseReference);
+                    field.Data = DFootnote.ParseLabel(field.Data, out sVerseReference);
+                    footnote.VerseReference = sVerseReference;
 
 					// Populate the Contents and ProseBT of the footnote
                     AddParagraphText(footnote, field);
@@ -2439,13 +2441,20 @@ namespace JWdb.DataModel
 				field.Data = s;
 
 				// Create a footnote containing the text
-				DFootnote fn = new DFootnote(s_nChapter, s_nVerse,
+                DFootnote footnote = new DFootnote(s_nChapter, s_nVerse,
                     DFootnote.Types.kSeeAlso);
-				Section.Footnotes.Append(fn);
-				AddParagraphText(fn, field);
+                Section.Footnotes.Append(footnote);
+
+                // Verse Reference
+                string sVerseReference;
+                field.Data = DFootnote.ParseLabel(field.Data, out sVerseReference);
+                footnote.VerseReference = sVerseReference;
+
+                // Populate the Contents of the footnote
+                AddParagraphText(footnote, field);
 
 				// Add the See Also text to the paragraph
-				LastParagraph.ConnectFootnote(fn);
+                LastParagraph.ConnectFootnote(footnote);
 
 				return true;
 			}
@@ -3162,6 +3171,10 @@ namespace JWdb.DataModel
             string GetParagraphContentsAsFlatString(DParagraph p)
             {
                 string s = "";
+
+                if (null != p as DFootnote && !string.IsNullOrEmpty((p as DFootnote).VerseReference))
+                    s += (p as DFootnote).VerseReference + ":";
+
                 foreach (DRun run in p.Runs)
                 {
                     s += run.AsString;

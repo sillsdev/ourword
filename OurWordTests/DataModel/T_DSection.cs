@@ -23,7 +23,7 @@ using JWdb;
 using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 
 namespace OurWordTests.DataModel
@@ -139,13 +139,14 @@ namespace OurWordTests.DataModel
 			"\\btvt That man will go to an uninhabited place, to shout.words, saying:"
 		};
         #endregion
+        #region TestData #1 - BaikenoMark0101_oxes
         static public string[] BaikenoMark0101_oxes = new string[]
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Main Title\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
 
                 "<p style=\"Paragraph\" usfm=\"p\" id=\"B\">",
                     "<c n=\"1\"/>",
@@ -165,7 +166,7 @@ namespace OurWordTests.DataModel
                     "<bt>Sir Joao the *Baptiser of People, fix/prepares the way/path for the *Lord Jesus</bt>",
                 "</p>",
 
-                "<p te=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
                     "(Mateus 3:1-12; Lukas 3:1-18; Joao 1:19-28)",
                 "</p>",
 
@@ -175,13 +176,13 @@ namespace OurWordTests.DataModel
                     "<bt>Jesus had not yet begun His work, but God sent beforehand one of His men, whose name as sir Joao. Sir Joao must fix/prepare the path/way for Jesus' coming. Because from long ago, God had used one of His mouth (=spokesperson). That spokesperson was named Grandfather/ancestor Yesaya. He had written like this:</bt>",
                 "</p>",
 
-                "<p style=\"line1\" usfm=\"q1\" id=\"F\">",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"F\">",
                     "&lt;&lt;Mneen nai, he! Au 'leul Au 'haef ma 'nimaf, henati nao naleko' lalan neu Ko",
                     "<bt>&lt;&lt;Listen up, he! I send My foot and hand (=trusty servant) to go fix/prepare the way/path for You.</bt>",
                     "<note reference=\"1:2\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Maleakhi 3:1</note>",
                 "</p>",
 
-                "<p style=\"line1\" usfm=\"q1\" id=\"G\">",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"G\">",
                      "<v n=\"3\"/>",
                      "Le atoni nane lof in anao mbi bael sona' es, he in nkoa', mnak:",
                      "<bt>That man will go to an uninhabited place, to shout.words, saying:</bt>",
@@ -191,7 +192,7 @@ namespace OurWordTests.DataModel
             "</book>",
             "</bible>"
         };
-
+        #endregion
 
         // 2. Baikeno Mark 1:9
         #region TestData #2 - BaikenoMark0109_ImportVariant
@@ -287,6 +288,58 @@ namespace OurWordTests.DataModel
 			"\\btcap Joao has finished baptising the Lord Yesus",
 			"\\p"
 		};
+        #endregion
+        #region TestData #2 - BaikenoMark0109_oxes
+        static public string[] BaikenoMark0109_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                    "Nai' Joao naslain Usif Jesus",
+                    "<bt>Sirr Joao baptises the Lord Jesus</bt>",
+                "</p>",
+
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"C\">",
+                    "(Mateus 3:13-17; Lukas 3:21-22)",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                    "<v n=\"9\"/>",
+                    "Mbi neno nane, Jesus neem na'ko kuan Najaret, mbi profinsia Galilea, ma he na'euk nok nai' Joao. Ma nai' Joao naslani Ee mbi noel Jordan.",
+                    "<bt>At that time, Jesus came from the village of Najaret, in the profinsia of Galilea, and he met with sir Joao. And sir Joao *baptised Him in the Jordan river.</bt>",
+                    "<v n=\"10\"/>",
+                    "Olas Jesus mpoi na'ko oel, suk naskeek, napeen niit neno-tunan natfei'. Nalali te, Uis-neno In Smana Knino' nsaon neem neu Ne, namnees onle' kol-pani.",
+                    "<bt>When Jesus came out from the water, suddenly, was seen the heaven/sky opened (=no Actor). Then God's *Spirit descended coming to Him, like a dove.</bt>",
+                    "<v n=\"11\"/>",
+                    "Ma on nane te, neen Uis-neno In hanan na'ko neno-tunan, nak,",
+                    "<bt>And then was heard (=no Actor) God's voice from the sky, saying,</bt>",
+                "</p>",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"E\">",
+                    "&lt;&lt;Ho le' ii, Au An-Honi'.",
+                    "<bt>&lt;&lt;You here, are My 1) very own Child, 2) beloved Child [ambiguous].</bt>",
+                "</p>",
+
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"F\">",
+                    "Ho es meki mhaliin Kau, Au nekak.&gt;&gt;",
+                    "<bt>You are the one who pleases my liver.&gt;&gt;</bt>",
+                    "<note reference=\"1:11\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Kejadian 22:2, Mazmur 2:7, Yesaya 42:1, Mateus 3:17, 12:18, Markus 9:7, Lukas 3:22</note>",
+                "</p>",
+
+                "<fig path=\"c:\\graphics\\cook\\cnt\\cn01656b.tif\" msword=\"width:9.0cm\" id=\"G\">",
+                    "Joao naslain nalail Usif Jesus",
+                    "<bt>Joao has finished baptising the Lord Yesus</bt>",
+                "</fig>",
+
+               "<p style=\"Paragraph\" usfm=\"p\" id=\"H\" />",
+
+            "</book>",
+            "</bible>"
+        };
         #endregion
 
         // 3.  Baikeno Mark 16:19
@@ -460,6 +513,72 @@ namespace OurWordTests.DataModel
             "\\cap"
 		};
         #endregion
+        #region TestData #3 - BaikenoMark16_oxes
+        static public string[] BaikenoMark16_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                    "Usif Jesus ansae on neno-tunan",
+                    "<bt>The Lord Jesus ascends to heaven</bt>",
+                "</p>",
+
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"C\">",
+                    "(Lukas 24:50-53; Haefin 1:9-11)",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                    "<v n=\"19\"/>",
+                    "Namolok nalail nok In atopu'-noina' sin, Uis-neno na'aiti' nasaeb Usif Jesus on sonaf neno-tunan. Mbi nane, In ntook mbi Uis-neno In banapan a'ne'u, ma sin nhuuk plenat nabuan.",
+                    "<bt>After having spoken with His disciples, God took up the Lord Jesus to the palace/kingdom in heaven. There, He sits at God's right side, and they hold rule together.</bt>",
+                    "<note reference=\"16:19\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Kisah Para Rasul 1:9-11</note>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                    "<v n=\"20\"/>",
+                    "Nalali te, In atopu'-noina' sin nanaoba In aplenat. Sin naon neu pah-pah, ma natonan Usif Jesus In Lais Alekot neu atoni ok-oke'. Ma Uis-neno nfee sin kuasat, henati sin anmo'en lasi mkakat ok-oke' le' Usif Jesus natoon nalail neu sin. Ma nalail, nmui' atoni namfau le' npalsai neu Usif Jesus, fun sin nahinen nak, Lais Alekot nane, namneo.",
+                    "<bt>After that, His disciples carried out His commands. They went to various lands and told the Lord Jesus' Good News to all people. And God gave them power so that they did all the miracles that the Lord Jesus had foretold to them. And then, there were many people who believed in the Lord Jesus, cause they knew that the Good News was true.</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\" />",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"H\">",
+                    "NAI' MARKUS NAHEUB IN MOLOK, NATUIN LULAT UN-UNU' BIAN",
+                    "<bt>Sir Markus ends his story, according to other old writings</bt>",
+                    "<note reference=\"16:9-10\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "Tuis uab Yunani le' ahun-hunut ma le' naleko neis, na'tu'bon es ela' 8. Nai' Markus in Tonas namsoup be neik lasi nono' nua. Es amnanu (Markus 16:9-20), ma esa na'paal (Markus 16:9-10). Natuin atoin ahinet sin, le' nahiin mane'o-mane'o Nai' Markus in Tonas ii, sin nak lasi nono' nua in ii, le' sin nluul namunib. Lasi nono' nua in nane, naleta' neu Usif Jesus nmoni nfain na'ko In a'maten, ma mepu plenat neu atoni le' anpalsai neu Jesus.",
+                        "<bt>The oldest writings in the Yunani language that are better, finish at verse 8. Sir Markus' Story ends with two story versions. One is long (Markus 16:9-20), and one is short (Markus 16:9-10). According to knowledgable people, who really understand this Story of Sir Markus, they say that both of these versions were written later. Both of those versions tell about the Lord Jesus living again from His death, and the work orders to people who believe in Jesus.</bt>",
+                    "</note>",
+                "</p>",
+               
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"I\">",
+                    "<v n=\"9\"/>",
+                    "Olas bifeel teun in nane, naon ntenuk sin Pedru, sin natonan ok-oke' le' alelo sin niit li'an munif nane, le' namolok nok sin mbi bol fatu.",
+                    "<bt>When those three women went arriving at Pedru, they told everything that they had just seen of that young man, which he had told them at the rock hole.</bt>",
+                    "<v n=\"10\"/>",
+                    "Oke te, Usif Jesus naplenat kun In atopu'-noina' sin, he naon natonan In Lais Alekot ii neu pah-pah ok-oke', tal antee pah-pinan fun am nateef. Lais Alekot ije nalekan lalan henati Uis-neno nsaok atoni amfau tin na'ko sin sanat ma penu, ma he nmoin piut nok Uis-neno.",
+                    "<bt>Then the Lord Jesus himself commanded His disciples to go tell this Good News of His in all lands/countries, until the far corners of the earth. This Good News shows the way so that God can wipe away the sins1 and wrongs1 of many people, and so they can live continually with God.</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\">",
+                    "Lais Alekot ije, namneo on naan. Es nane te, Lais Alekot ii nhaek piut, tal antee nabal-baal. Amen.",
+                    "<bt>This Good News is really true. That is why this Good News continues to stand, forever. Amen.</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"K\" />",
+
+                "<fig path=\"c:\\graphics\\maps\\bible\\palestinTP.jpg\" msword=\"width:10.5cm\" id=\"L\" />",
+
+            "</book>",
+            "</bible>"
+        };
+        #endregion
 
         // 4. Baikeno Mark 4:30-34
         #region TestData #4 - BaikenoMark430_ImportVariant
@@ -566,6 +685,62 @@ namespace OurWordTests.DataModel
 			    "\\ud 17/Jun/2003"		
             };
         #endregion
+        #region TestData #4 - BaikenoMark430_oxes
+        static public string[] BaikenoMark430_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Header\" usfm=\"h\" id=\"A\">",
+                    "Mark",
+                "</p>",
+
+                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"B\">",
+                    "The Gospel Of",
+                "</p>",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"C\">",
+                    "Mark",
+                "</p>",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                    "Usif Jesus naleta' neu fini le' in nesan an-ana' neis",
+                    "<bt>The Lord Jesus give an example of a seed that is extremely tiny</bt>",
+                "</p>",
+
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"E\">",
+                    "(Mateus 13:31-32, 34; Lukas 13:18-19)",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                    "<v n=\"30\"/>",
+                    "Oke te, <span style=\"Italic\">Jesus namolok</span> antein, mnak, &lt;&lt;Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok.",
+                    "<bt>Then Jesus spoke again, saying, &lt;&lt;I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                    "<v n=\"31\"/>",
+                    "Nane namnees onle' fini le' in nesan an-ana' neis.",
+                    "<bt>That is like a seed that is very tiny.</bt>",
+                    "<v n=\"32\"/>",
+                    "Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof kolo neem namin mafo', ma nmo'en kuna' neu ne.&gt;&gt;",
+                    "<bt>If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.&gt;&gt;</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
+                    "<v n=\"33\"/>",
+                    "Jesus In na'noina' in ma'mo'en natuin sin hiin kini.",
+                    "<bt>Jesus' way of teaching was according to their understanding.</bt>",
+                    "<v n=\"34\"/>",
+                    "In na'noina' atoni neki haa lais leta'. Mes kalu nok In atopu'-noina' sin, In natoon lais leta' nane in na' naon ok-oke'.",
+                    "<bt>He taught people using only examples. But with His *disciples, He told the meaning of all the examples.</bt>",
+                "</p>",
+
+            "</book>",
+            "</bible>"
+        };
+        #endregion
 
         // 5. Pura Mark 14:03-14:09
         #region TestData #5 - PuraMark14_ImportVariant
@@ -662,8 +837,9 @@ namespace OurWordTests.DataModel
 			    "hoa Aing dapa. Ana ue botol nu pina ba ini var ma ening. ||Mina " +
 			    "nemema asli ba mi evili talalu ele.|fn",
 			    "\\btvt This is some more back translation.|fn",
-			    "\\ft This is a footnote.",
-                "\\vt Seng, nebe jangu angu botol ememng angu||fn ma vil bue ening kivita. " +
+			    "\\ft 1:1: This is a footnote.",
+ 			    "\\btft 1:1:",
+               "\\vt Seng, nebe jangu angu botol ememng angu||fn ma vil bue ening kivita. " +
                 "Mu ana boal ening to tu tahang-tahang mina angu ma Yesus ong tang||, e jadi " +
                 "tanda Yesus Aing ta janing",
 			    "\\p",
@@ -688,7 +864,8 @@ namespace OurWordTests.DataModel
 			    "\\vt Ne kasiang anaung salalu ae ing veng. Jadi, ini bisa taveding " +
 			    "di ini ing tulung. Ba kalo Naing,|fn",
 			    "\\btvt Some back translating for verse 5|fn",
-                "\\ft A footnote for verse 5",
+                "\\ft 1:5: A footnote for verse 5",
+ 			    "\\btft 1:5:",
                 "\\vt lung niang ila, se Na ing veng hama-hama niang ila.",
 			    "\\cf 14:7: Ulangan 15:11",
 			    "\\v 6",
@@ -697,13 +874,96 @@ namespace OurWordTests.DataModel
 			    "veng bunga me at ila.|fn",
 			    "\\btvt And verse six reads as so.|fn",
                 "\\nt And this is a translator note",
-                "\\ft Verse six footnote",
+                "\\ft 1:6: Verse six footnote",
+ 			    "\\btft 1:6:",
 			    "\\v 7",
 			    "\\vt Benganit aung-aung, o`! Ta ang mi ba Tuhang Lahatala E Sirinta " +
 			    "Aung ila alamula anga goleng, indi pasti nehe jangu e aung anga " +
 			    "veng sirinta! E biar ne emampi aing vengani.>>",
 			    "\\btvt A final backtranslation to end it all."
 		    };
+        #endregion
+        #region TestData #5 - PuraMark14_oxes
+        static public string[] PuraMark14_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Header\" usfm=\"h\" id=\"A\">",
+                    "Mark",
+                "</p>",
+
+                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"B\">",
+                    "The Gospel Of",
+                "</p>",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"C\">",
+                    "Mark",
+                "</p>",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                    "Ne he jangu ba mina menema e vili ele boal, ma Tuhang Yesus enang",
+                "</p>",
+
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"E\">",
+                    "(Matius 26:6-13; Yohanis 12:1-8)",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                   "<c n=\"1\"/>",
+                   "<v n=\"1\"/>",
+                    "Abang Betania mi, ne nu ue ene Simon. Turang mi, ne ava aing veng ororing, tagal dirang hapeburang aing veng. Ba sakarang, ana aung ila.",
+                    "<bt>This is some back translation.</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                    "Seng angu mu, o|ras angu ve|d-ved aung hoa jedung, Yesus ini ue ila Simon e hava mi nana. |Oras |ini nana, nehe jangu nu Yesus evele hoa Aing dapa. Ana ue botol nu pina ba ini var ma ening. |Mina nemema asli ba mi evili talalu ele.",
+                    "<bt>This is some more back translation.</bt>",
+                    "<note reference=\"1:1\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "This is a footnote.",
+                    "</note>",
+                    "Seng, nebe jangu angu botol ememng angu|fn ma vil bue ening kivita. Mu ana boal ening to tu tahang-tahang mina angu ma Yesus ong tang|, e jadi tanda Yesus Aing ta janing",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
+                   "<v n=\"2\"/>",
+                    "Ba ne }}ebeung iva di {{ue umurung}} nana. Oras ini eteing nehe jangu " +
+			    "angu ening ula{{{{ng angu, mi ini ili il, e ini i ta tu}}tuk sombong " +
+			    "hula, &lt;&lt;Hmm! Ne he {{jangu na ba {{ba anga, e ana ila mina}} menema " +
+			    "e vili ele angu viat parsuma.",
+                    "<bt>Some back translation for verse two.</bt>",
+                    "<v n=\"3\"/>",
+                    "Lebe aung mina angu ana avali ba! E ila e hoang toang angu paul, ma ne malarat anaung ing enang! Se mina menema angu e vili veng, ma nenu e gaji tung nu veng hama.&gt;&gt;",
+                    "<bt>Forescore and seven years ago,</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"I\">",
+                   "<v n=\"4\"/>",
+                    "Ba Yesus balas hula, &lt;&lt;Ini ake nehe jangu anga ening susa! Mang aing kilang ba! Na sanang, tagal mina menema anga ana ma Noboa veng obokong ila.",
+                    "<bt>our forefathers brought forth on this continant</bt>",
+                    "<v n=\"5\"/>",
+                    "Ne kasiang anaung salalu ae ing veng. Jadi, ini bisa taveding di ini ing tulung. Ba kalo Naing,",
+                    "<bt>Some back translating for verse 5</bt>",
+                    "<note reference=\"1:5\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "A footnote for verse 5",
+                    "</note>",
+                    "lung niang ila, se Na ing veng hama-hama niang ila.",
+                    "<note reference=\"14:7\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Ulangan 15:11</note>",
+                    "<v n=\"6\"/>",
+                    "Ne e vetang lung niang ila. Mang nehe jangu anga vede mina obokong anga, ana sidiat ila ma Neboa veng etura, emang hula ana Ne baring veng bunga me at ila.",
+                    "<bt>And verse six reads as so.</bt>",
+                    "<note reference=\"1:6\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "Verse six footnote",
+                    "</note>",
+                    "<v n=\"7\"/>",
+                    "Benganit aung-aung, o`! Ta ang mi ba Tuhang Lahatala E Sirinta Aung ila alamula anga goleng, indi pasti nehe jangu e aung anga veng sirinta! E biar ne emampi aing vengani.&gt;&gt;",
+                    "<bt>A final backtranslation to end it all.</bt>",
+                "</p>",
+
+                "</book>",
+            "</bible>"
+        };
         #endregion
 
         // 6. Helong Acts 4:01-4:04
@@ -727,7 +987,7 @@ namespace OurWordTests.DataModel
 			    "\\v 1",
 			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
 				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
-				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai " +
 				    "agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
 			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
 				    "several big/important people came. Those them(=They in focus), " +
@@ -789,7 +1049,7 @@ namespace OurWordTests.DataModel
 			    "\\v 1",
 			    "\\vt Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, " +
 				    "atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol " +
-				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai" +
+				    "tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai " +
 				    "agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
 			    "\\btvt At that time, Petrus and Yohanis still were talking with those people, " +
 				    "several big/important people came. Those them(=They in focus), " +
@@ -832,6 +1092,59 @@ namespace OurWordTests.DataModel
 			    "\\cap Atuil-atuil tene kas klaa Petrus nol tapang ngas",
 			    "\\btcap The leaders accuse/criticise Petrus and his friends"
 		    };
+        #endregion
+        #region TestData #6 - HelongActs04_oxes
+        static public string[] HelongActs04_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Header\" usfm=\"h\" id=\"A\">",
+                    "Mark",
+                "</p>",
+
+                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"B\">",
+                    "The Gospel Of",
+                "</p>",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"C\">",
+                    "Mark",
+                "</p>",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                    "Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
+                    "<bt>The heads of religion summon Petrus and Yohanis to come appear.before [them]</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                   "<c n=\"4\" />",
+                   "<v n=\"1\" />",
+                    "Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
+                    "<bt>At that time, Petrus and Yohanis still were talking with those people, several big/important people came. Those them(=They in focus), [were] heads of the Yahudi religion, and the head of guarding the *Temple, and people from the religious party Saduki. They came angry to scream at Petrus and Yohanis.</bt>",
+                    "<v n=\"2\"/>",
+                    "Oen komali lole Petrus nol Yohanis na mo, kom isi le tek atuli-atuli las to-toang, noan, &lt;&lt;Yesus nuli pait son, deng Un in mate ka! Tiata ela Un sai lalan bel atuil in mateng ngas, le oen kon haup in nuli pait kon.&gt;&gt;",
+                    "<bt>They were angry because that Petrus and Yohanis, like to tell all people, saying, \"Yesus has lived again from His death! With that, He opened the path for dead people so that they also could live again.\" (check two kon)</bt>",
+                    "<note reference=\"4:1-2\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "Atuil deng partai agama Saduki, oen sium in tui na lo man noen atuil mate haup in nuli pait.",
+                        "<bt>People from the religious party Saduki, they did not accept that teaching that says dead people can live again.</bt>",
+                    "</note>",
+                    "<v n=\"3\" />",
+                    "Hidi kon oen tadu oen atulin nas le laok daek nal oen duas. Mo un deng lelo la dene, kon oen hutun tamang oen duas lakos bui dalen. Le ola ka halas-sam, oen nehan dais na.",
+                    "<bt>And so they ordered their people to go capture the two of them. But because the sun already wanted to set, then they pushed [&amp;] entered the two of them in jail. So.that the next day, they could take.care.of that affair/litigation/problem.</bt>",
+                    "<v n=\"4\" />",
+                    "Mo deng atuli-atuil man kom in ming deng an in nutus sas, tiata atuili mamo hao noan asa man oen tui ka tom bak tebes. Undeng na, tiata oen atulin nas oen taplaeng mamo, nataka le atuli lihu lima.",
+                    "<bt>But from the people who liked to hear from those apostles, therefore many people had already acknowledged that that which they taught, [was] spot.on correct. That's.why their people increased a lot approximately to five thousand people.</bt>",
+                "</p>",
+
+                "<fig path=\"c:\\graphics\\cook\\cnt\\cn01901b.tif\" msword=\"width:7.0cm;textWrapping:around;horizontalPosition:right\" id=\"F\">",
+                    "Atuil-atuil tene kas klaa Petrus nol tapang ngas",
+                    "<bt>The leaders accuse/criticise Petrus and his friends</bt>",
+                "</fig>",
+
+                "</book>",
+            "</bible>"
+        };
         #endregion
 
         // 7. Helong Acts 7:54-8:01a
@@ -1006,6 +1319,66 @@ namespace OurWordTests.DataModel
 			"\\ud 24/Jan/2005"
 		};
         #endregion
+        #region TestData #7 - HelongActs0754_oxes
+        static public string[] HelongActs0754_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                    "Oen pasang tele Stefanus",
+                    "<bt>They throw killing Stefanus</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
+                    "<v n=\"54\" />",
+                    "Atuil man dad le nehan dasi la, ming Stefanus in dehet ta, oen tan meman noan un soleng bel oen kula ka. Hidim oen dalen ili le duu-duu siin nol Stefanus.",
+                    "<bt>The person (pl?) who were sitting to take.care of the litigation heard that speaking of Stefanus', they knew that he was throwing_out giving their wrongs. So they were very angry [lit. sick insides] to ate/ground their teeth for Stefanus.</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                    "<v n=\"55\" />",
+                    "Mo Stefanus man hapu Ama Lamtua Ko Niu' ka, botas ngat laok el apan nua. Se la, un ngat net Ama Lamtua Allah dui to-toang nol Ama Lamtua Yesus dil se Ama Lamtua Allah halin kanan na, se man in todan dui ka.",
+                    "<bt>But Stefanus who had obtained that Holy Spirit of the Lord's, lifted his eyes to look at the sky. There, he saw all the Lord God's greaterness, and the Lord Yesus standing at the Lord God's right side in that place which is more honorable.</bt>",
+                    "<v n=\"56\" />",
+                    "Kon Stefanus dehet noan, &lt;&lt;Elia! Ama-amas to-toang. Auk ngat net apan nu hol sai, nol An Atuli la dil ne man in todan lahing isi ka se Ama Lamtua Allah halin kanan na.&gt;&gt;",
+                    "<bt>And Stefanus spoke saying, &lt;&lt;Like this!, All fathers. I am seeing the sky open, and Humanity's Child standing at that place which is most honorable at the Lord God's right side.&gt;&gt;</bt>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                    "<v n=\"57\" />",
+                    "Ming ela kon, atuil in nehan dasi la ka oen kuim hngilans. Hidim oen kidu ahan le tek Stefanus noan boel lobo lo. Kon oen tukin haung pul leo-leo le pisu sisin Stefanus.",
+                    "<bt>Hearing that then, the people who take care of that litigation shut? their ears. Then they yelled screaming to order Stefanus to shut (his) mouth. And they all jumped up quickly with.alot.of.excitement in.order.to tear apart Stefanus.</bt>",
+                    "<v n=\"58\" />",
+                    "Hidi kon oen pela lakang un puti lako likun deng kota la. Ela kon saksi-saksi las oen kolong oen kaod likun nas, le bel tana muda mesa le kilas. Un ngala ka Saulus. Hidi kon, oen lakos pasang tele Stefanus nini batu.",
+                    "<bt>Then they forced him out going outside the city. Next the witnesses took off their outside clothes, to give them to a young person to hold. His name Saulus, he was their inciter (lit. fanner). And then, they went to throw kill Stefanus using stones.</bt>",
+                "</p>",
+
+                "<fig path=\"c:\\graphics\\cook\\cnt\\cn02154b.tif\" msword=\"width:11.0cm;verticalPosition:top;horizontalPosition:center\" id=\"F\">",
+                    "Oen pasang tele Stefanus",
+                    "<bt>They throw killing Stefanus</bt>",
+                "</fig>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                    "<v n=\"59\" />",
+                    "Oen pasang Stefanus nabael ela kon, un haman mu-muun le tek noan, &lt;&lt;Ama Lamtua Yesus! Auk oras sa da-dani son. Sium auk tia!&gt;&gt;",
+                    "<bt>They were throwing at Stefanus, then he yelled with a loud voice saying, &lt;&lt;Lord Yesus! My time is very close. Receive Me (imperative)!&gt;&gt;</bt>",
+                    "<v n=\"60\" />",
+                    "Hidi kon un lea holimit hai buku ka, le un ahan pait nol fala mu-muun tek noan, &lt;&lt;Ama, beles oen lepa hal kula-sala nia deken!&gt;&gt; Hidi na, un hngasa ka nutus, kon mate.",
+                    "<bt>Then he fell folding his knees? in.order.to yell again with a loud voice, saying, &lt;&lt;Father, don't shoulder.carry this sin!&gt;&gt; And then his breath was cut.off/stopped and [he]died.</bt>",
+                    "<c n=\"8\" />",
+                    "<v n=\"1a\" />",
+                    "Nol Saulus kon bab se man na, un sium banan nol in pasang tele Stefanus son na.",
+                    "<bt>And Saulus was also at that place, he accepted well [the fact that] they threw murdered that Stefanus.</bt>",
+                "</p>",
+
+                "</book>",
+            "</bible>"
+        };
+        #endregion
 
         // 8. Helong Rev 1:4-8 (empty shell)
         #region TestData #8 - HelongRev0104_ImportVariant
@@ -1085,6 +1458,73 @@ namespace OurWordTests.DataModel
 			"\\cf 1:8: Rai-klaran Foun 22:13, La'o sai hosi Mesir 3:14"
 		};
         #endregion
+        #region TestData #8 - HelongRev0104_oxes
+        static public string[] HelongRev0104_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\" />",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
+                    "<v n=\"4\" />",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                    "<note style=\"Note General Paragraph\" usfm=\"f\" />",
+                    "<note reference=\"1:4\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
+                        "La'o sai hosi Mesir 3:14, Rai-klaran Foun 4:5",
+                    "</note>",
+                    "<v n=\"5\" />",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                    "<note reference=\"1:5\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
+                        "Yesaya 55:4, Kananuk sia 89:27",
+                    "</note>",
+                    "<v n=\"6\" />",
+                    "<note reference=\"1:6\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
+                        "La'o sai hosi Mesir 19:6, Rai-klaran Foun 5:10",
+                    "</note>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                    "<v n=\"7\" />",
+                    "<note reference=\"1:7\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
+                        "Daniel 7:13, Santo Mateus 24:30, Santo Markus 13:26, Santo Lukas 21:27, 1 Tesalonika 4:17, Sakarias 12:10, Santo Yohanis 19:34, 37",
+                    "</note>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                    "<v n=\"8\" />",
+                "</p>",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"H\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"I\" />",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"J\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"K\" />",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"L\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"M\" />",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"N\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"O\" />",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"P\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"Q\">",
+                    "<note reference=\"1:8\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
+                        "Rai-klaran Foun 22:13, La'o sai hosi Mesir 3:14",
+                    "</note>",
+                "</p>",
+
+                "</book>",
+            "</bible>"
+        };
+        #endregion
 
         // 9. Manado Mark 13:14 (two footnotes)
         #region TestData #9 - ManadoMark013014_ImportVariant
@@ -1130,8 +1570,8 @@ namespace OurWordTests.DataModel
             "\\btft 13:14a:",
 			"\\vt mo datang. Orang ini mo badiri di tampa yang nyanda cocok for dia.|fn",
             "\\btvt |fn",
-			"\\ft 13:14b Tu tampa itu Ruma Ibada Pusat [lia Matius 24:15].",
-            "\\btft 13:14b",
+			"\\ft 13:14b: Tu tampa itu Ruma Ibada Pusat [lia Matius 24:15].",
+            "\\btft 13:14b:",
             "\\vt (Sapa yang baca ini, taru kira akang bae-bae). Kong kalu ngoni lia tu orang " +
 			    "itu so badiri di tampa itu, lebe bae orang-orang yang ada di Yudea " +
 			    "manyingkir jo ka gunung.",
@@ -1143,6 +1583,46 @@ namespace OurWordTests.DataModel
 			"\\vt Tu orang yang ada di atas ruma, jang pi ambe tu barang di dalam " +
 			    "ruma, mar turung kong lari jo."
 		};
+        #endregion
+        #region TestData #9 - ManadoMark013014_oxes
+        static public string[] ManadoMark013014_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                    "Yesus kase tau samua tu mo jadi di hari-hari siksa",
+                "</p>",
+
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"C\">",
+                    "(Matius 24:15-28; Lukas 21:20-24)",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                    "<v n=\"14\" />",
+                    "Yesus bilang, &quot;Satu orang yang paling jaha",
+                    "<note reference=\"13:14a\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "Tu orang ini Allah pe musu [lia Daniel 9:27; 11:31; 12:11].",
+                    "</note>",
+                    "mo datang. Orang ini mo badiri di tampa yang nyanda cocok for dia.",
+                    "<note reference=\"13:14b\" style=\"Note General Paragraph\" usfm=\"f\">",
+                        "Tu tampa itu Ruma Ibada Pusat [lia Matius 24:15].",
+                    "</note>",
+                    "(Sapa yang baca ini, taru kira akang bae-bae). Kong kalu ngoni lia tu orang itu so badiri di tampa itu, lebe bae orang-orang yang ada di Yudea manyingkir jo ka gunung.",
+                    "<note reference=\"13:14\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Daniel 9:27, 11:31, 12:11</note>",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                    "<v n=\"15\" />",
+                    "Tu orang yang ada di atas ruma, jang pi ambe tu barang di dalam ruma, mar turung kong lari jo.",
+                "</p>",
+
+                "</book>",
+            "</bible>"
+        };
         #endregion
 
         // 10. Tombulu Acts 9:32-35 (empty section)
@@ -1183,6 +1663,33 @@ namespace OurWordTests.DataModel
 			"\\ud 12/Apr/2006"
 		};
         #endregion
+        #region TestData #10 - TombuluActs009032_oxes
+        static public string[] TombuluActs009032_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                    "Si Enéas é liné'os ni Petrus",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
+                    "<v n=\"32\" />",
+                    "<v n=\"33\" />",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                    "<v n=\"34\" />",
+                    "<v n=\"35\" />",
+                "</p>",
+
+                "</book>",
+            "</bible>"
+        };
+        #endregion
 
         // 11. English (\mr, \ms)
         #region TestData #11 - English_ImportVariant
@@ -1219,6 +1726,41 @@ namespace OurWordTests.DataModel
 		    "\\v 2",
 		    "\\vt The Lord gave another message to Jeremiah."
        };
+        #endregion
+        #region TestData #11 - English_oxes
+        static public string[] English_oxes = new string[]
+        {
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
+            "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+            "<book id=\"MRK\">",
+
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+
+                "<p style=\"Major Section Head\" usfm=\"ms\" id=\"B\">",
+                    "Judah in Trouble",
+                "</p>",
+
+                "<p style=\"Major Section Range\" usfm=\"mr\" id=\"C\">",
+                    "(Psalm 123:5)",
+                "</p>",
+
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                    "Jeremiah's Prayer",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                    "<v n=\"1\" />",
+                    "I know, Lord, that our lives are not our own.",
+                "</p>",
+
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                    "<v n=\"2\" />",
+                    "The Lord gave another message to Jeremiah.",
+                "</p>",
+
+                "</book>",
+            "</bible>"
+        };
         #endregion
 
         // Merge
@@ -1702,7 +2244,7 @@ namespace OurWordTests.DataModel
 
         // Individual Tests (each has a different data set) ----------------------------------
         #region TEST: IO_DataSet01 - Baikeno Mark 1:1
-        [Test] public void IO_DataSet01(string[] vsRaw, string[] vsSav)
+        [Test] public void IO_DataSet01()
         {
             IO_TestEngine(
                 SectionTestData.BaikenoMark0101_ImportVariant,
@@ -2049,8 +2591,8 @@ namespace OurWordTests.DataModel
 
             // Check for xref footnote (the first one) to be appropriately converted
             Assert.AreEqual(1, TargetSection.Footnotes.Count);
-            string sFootnoteAct = (TargetSection.Footnotes[0] as DFootnote).SimpleText;
-            string sFootnoteExp = "1:11: Kejadian 22:2, Mazmur 2:7, Isaiah 42:1, " +
+            string sFootnoteAct = (TargetSection.Footnotes[0] as DFootnote).DebugString;
+            string sFootnoteExp = "Kejadian 22:2, Mazmur 2:7, Isaiah 42:1, " +
                 "Matthew 3:17, 12:18, Markus 9:7, Luke 3:22";
             Assert.AreEqual(sFootnoteExp, sFootnoteAct);
 
@@ -2594,7 +3136,8 @@ namespace OurWordTests.DataModel
         #endregion
 
         // Oxes ------------------------------------------------------------------------------
-        [Test] void OxesTestEngine(string sTest, string[] vsToolbox, string[] vsOxesExpected)
+        #region Method: void OxesTestEngine(...)
+        void OxesTestEngine(string sTest, string[] vsToolbox, string[] vsOxesExpected)
         {
             // Preliminary: Create the superstructure we need for a DBook
             DB.Project = new DProject();
@@ -2612,19 +3155,104 @@ namespace OurWordTests.DataModel
 
             // Compare with what we expect
             var xExpected = new OurWordXmlDocument(vsOxesExpected);
-            xActual.WriteToConsole("Actual");
-            xExpected.WriteToConsole("Expected");
-            Assert.IsTrue(xExpected.IsSame(xActual), "Oxes should be same for Oxes Test #" + sTest);
-
+            bool bIsSame = xExpected.IsSame(xActual);
+            if (!bIsSame)
+            {
+                xActual.WriteToConsole("Actual");
+                xExpected.WriteToConsole("Expected");
+                OurWordXmlDocument.DisplayDifferences(xActual, xExpected);
+            }
+            Assert.IsTrue(bIsSame, "Oxes should be same for Oxes Test #" + sTest);
         }
-
-        [Test] public void Oxes1()
+        #endregion
+        #region Test: Oxes01
+        [Test] public void Oxes01()
         {
             OxesTestEngine( "1",
                 SectionTestData.BaikenoMark0101_Cannonical,
                 SectionTestData.BaikenoMark0101_oxes);
         }
-
+        #endregion
+        #region Test: Oxes02
+        [Test] public void Oxes02()
+        {
+            OxesTestEngine("2",
+                SectionTestData.BaikenoMark0109_Cannonical,
+                SectionTestData.BaikenoMark0109_oxes);
+        }
+        #endregion
+        #region Test: Oxes03
+        [Test] public void Oxes03()
+        {
+            OxesTestEngine("3",
+                SectionTestData.BaikenoMark16_Cannonical,
+                SectionTestData.BaikenoMark16_oxes);
+        }
+        #endregion
+        #region Test: Oxes04
+        [Test] public void Oxes04()
+        {
+            OxesTestEngine("4",
+                SectionTestData.BaikenoMark430_Cannonical,
+                SectionTestData.BaikenoMark430_oxes);
+        }
+        #endregion
+        #region Test: Oxes05
+        [Test] public void Oxes05()
+        {
+            OxesTestEngine("5",
+                SectionTestData.PuraMark14_Cannonical,
+                SectionTestData.PuraMark14_oxes);
+        }
+        #endregion
+        #region Test: Oxes06
+        [Test] public void Oxes06()
+        {
+            OxesTestEngine("6",
+                SectionTestData.HelongActs04_Cannonical,
+                SectionTestData.HelongActs04_oxes);
+        }
+        #endregion
+        #region Test: Oxes07
+        [Test] public void Oxes07()
+        {
+            OxesTestEngine("7",
+                SectionTestData.HelongActs0754_Cannonical,
+                SectionTestData.HelongActs0754_oxes);
+        }
+        #endregion
+        #region Test: Oxes08
+        [Test] public void Oxes08()
+        {
+            OxesTestEngine("8",
+                SectionTestData.HelongRev0104_Cannonical,
+                SectionTestData.HelongRev0104_oxes);
+        }
+        #endregion
+        #region Test: Oxes09
+        [Test] public void Oxes09()
+        {
+            OxesTestEngine("9",
+                SectionTestData.ManadoMark013014_Cannonical,
+                SectionTestData.ManadoMark013014_oxes);
+        }
+        #endregion
+        #region Test: Oxes10
+        [Test] public void Oxes10()
+        {
+            OxesTestEngine("10",
+                SectionTestData.TombuluActs009032_Cannonical,
+                SectionTestData.TombuluActs009032_oxes);
+        }
+        #endregion
+        #region Test: Oxes11
+        [Test] public void Oxes11()
+        {
+            OxesTestEngine("11",
+                SectionTestData.English_Cannonical,
+                SectionTestData.English_oxes);
+        }
+        #endregion
     }
     #endregion
 }

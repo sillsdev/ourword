@@ -20,7 +20,7 @@ using JWdb;
 using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 #region Doc: Paratext7's Notes xml format
    /* Per email from Nathan (Nov 08), Paratext7's notes will be stored as:

@@ -1309,7 +1309,7 @@ namespace JWdb.DataModel
 			// If a cross reference, then convert it
 			if (DB.TeamSettings.SFMapping.IsCrossRef( StyleAbbrev ) )
 			{
-				SimpleText = Translation.ConvertCrossReferences(pFront);
+				Translation.ConvertCrossReferences(pFront, this);
 				return;
 			}
 
@@ -1490,7 +1490,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        int ID
+        protected int ID
         {
             get
             {
@@ -1501,7 +1501,7 @@ namespace JWdb.DataModel
         }
         int m_nID = -1;
 
-        public void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+        public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
         {
             var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
             Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
@@ -1512,9 +1512,7 @@ namespace JWdb.DataModel
             oxes.AddAttr(node, "id", oxes.IntToID(ID));
 
             foreach (DRun run in Runs)
-            {
                 run.AddToOxesBook(oxes, node);
-            }
 
 
         }

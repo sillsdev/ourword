@@ -30,7 +30,7 @@ using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 using OurWord.Utilities;
 #endregion
 

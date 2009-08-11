@@ -27,7 +27,7 @@ using JWdb;
 using JWdb.DataModel;
 
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 using OurWord.Dialogs;
 using OurWord.SideWnd;
 using OurWord.Utilities;

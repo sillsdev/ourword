@@ -27,7 +27,7 @@ using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 
 /* TODO: Make sure we can't get duplicate book names. We formerly had this as a 

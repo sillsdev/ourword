@@ -22,7 +22,7 @@ using JWdb;
 using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 
 namespace OurWordTests.Dialogs

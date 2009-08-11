@@ -607,6 +607,9 @@
     <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.Designer.cs">
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\Layout.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="SideWnd\DictionaryPane.cs">
       <SubType>UserControl</SubType>
     </Compile>

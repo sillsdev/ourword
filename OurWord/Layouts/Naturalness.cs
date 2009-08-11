@@ -19,14 +19,14 @@ using System.IO;
 
 using JWdb.DataModel;
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 using JWdb;
 using JWTools;
 #endregion
 
-namespace OurWord.View
+namespace OurWord.Layouts
 {
-    class WndNaturalness : OWWindow
+    class WndNaturalness : Layout
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "Naturalness";
@@ -235,11 +235,8 @@ namespace OurWord.View
                 else
                     options |= OWPara.Flags.CanItalic;
 
-
-                OWPara op = new OWPara(
+                OWPara op = CreateFootnotePara(fn,
                     fn.Translation.WritingSystemVernacular,
-                    fn.Style,
-                    fn,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
 

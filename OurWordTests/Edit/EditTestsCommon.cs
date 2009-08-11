@@ -25,7 +25,7 @@ using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 
 namespace OurWordTests.Edit

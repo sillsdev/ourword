@@ -21,7 +21,7 @@ using JWTools;
 using JWdb;
 using JWdb.DataModel;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 using OurWord.Edit;
 #endregion
 #region TODO

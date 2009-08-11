@@ -18,15 +18,15 @@ using System.IO;
 
 using JWdb.DataModel;
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 using JWdb;
 using JWTools;
 #endregion
 
-namespace OurWord.View
+namespace OurWord.Layouts
 {
 
-    public class WndBackTranslation : OWWindow
+    public class WndBackTranslation : Layout
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "BT";
@@ -160,7 +160,12 @@ namespace OurWord.View
                     continue;
 
                 // Add the vernacular paragraph to the left; we don't edit it
-                OWPara op = CreateVernacularPara(p);
+                var op =  new OWPara(
+                    p.Translation.WritingSystemVernacular,
+                    p.Style,
+                    p,
+                    BackColor,
+                    OWPara.Flags.None);
                 colVernacular.Append(op);
 
                 // For certain types of paragraphs, we just display them on the BT side, rather
@@ -216,12 +221,11 @@ namespace OurWord.View
                 }
 
                 // Create and add the display paragraph
-                op = new OWPara(
+                op = CreateFootnotePara(fn,
                     fn.Translation.WritingSystemConsultant,
-                    fn.Style,
-                    fn,
                     ((fn.IsUserEditable) ? EditableBackgroundColor : BackColor),
                     options);
+
                 colBackTranslation.Append(op);
             }
 

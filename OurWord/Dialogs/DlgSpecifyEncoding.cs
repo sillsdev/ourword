@@ -20,7 +20,7 @@ using System.IO;
 using JWTools;
 using JWdb;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 using OurWord.Edit;
 #endregion
 

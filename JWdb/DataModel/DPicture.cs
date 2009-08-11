@@ -246,6 +246,21 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
+        public override void AddToOxesBook(OurWordXmlDocument oxes, System.Xml.XmlNode nodeBook)
+        {
+            var node = oxes.AddNode(nodeBook, "fig");
+
+            oxes.AddAttr(node, "path", PathName);
+
+            if (!string.IsNullOrEmpty(WordRtfInfo))
+                oxes.AddAttr(node, "msword", WordRtfInfo);
+
+            oxes.AddAttr(node, "id", oxes.IntToID(ID));
+
+            foreach (DRun run in Runs)
+                run.AddToOxesBook(oxes, node);        
+        }
+
 
 	}
 }

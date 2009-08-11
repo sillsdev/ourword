@@ -403,44 +403,25 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		// Misc ------------------------------------------------------------------------------
-		#region Method: string ConvertCrossReferences(DParagraph pSource)
-		public string ConvertCrossReferences(DParagraph pSource)
-		{
-			DTranslation TSource = pSource.Translation;
-			Debug.Assert(null != TSource);
+        // Misc ------------------------------------------------------------------------------
+        #region Method: void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
+        public void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
+        {
+            pDest.Runs.Clear();
 
-			// We are assuming a single Text from the source with a single phrases; thus
-			// not supporting italics, or other such phrase or run types.
-			string sSource = pSource.SimpleText;
+            foreach (DRun run in pSource.Runs)
+            {
+                DRun runDest = run.ConvertCrossRefs(
+                    pSource.Translation.BookNamesTable,
+                    pDest.Translation.BookNamesTable);
 
-			// Create the converted string
-			int i = 0;
-			string sDest = "";
-
-			// Loop through the source string, comparing for matches
-			while( i < sSource.Length )
-			{
-				// Look for a match from amongst the book names
-				int iBookName = TSource.BookNamesTable.FindSubstringMatch(sSource, i, true);
-
-				// If not found, add the current character and move on to the next one
-				if (-1 == iBookName)
-				{
-					sDest += sSource[i++];
-					continue;
-				}
-
-				// Else it was found; so make the substitution.
-				sDest += this.BookNamesTable[iBookName];
-				i += TSource.BookNamesTable[iBookName].Length;
-			}
-
-			return sDest;
-		}
-		#endregion
-		#region Method: void UpdateFromFront()
-		public void UpdateFromFront()
+                if (null != runDest)
+                    pDest.Runs.Append(runDest);
+            }
+        }
+        #endregion
+        #region Method: void UpdateFromFront()
+        public void UpdateFromFront()
 		{
 			foreach(DBook book in Books)
 			{

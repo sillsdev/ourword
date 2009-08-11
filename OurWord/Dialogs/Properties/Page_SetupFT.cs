@@ -26,7 +26,7 @@ using JWdb;
 using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
-using OurWord.View;
+using OurWord.Layouts;
 #endregion
 
 namespace OurWord.Dialogs

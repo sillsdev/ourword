@@ -151,9 +151,23 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+        #region VMethod: DRun ConvertCrossRefs(bsaSourceSubs, bsaDestSubs)
+        public virtual DRun ConvertCrossRefs(
+            BStringArray bsaSourceSubstitutions, 
+            BStringArray bsaDestSubstitutions)
+        {
+            return null;
+        }
+        #endregion
 
-		#region Method: virtual void EliminateSpuriousSpaces()
-		public virtual void EliminateSpuriousSpaces()
+        #region virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+        }
+        #endregion
+
+        #region Method: virtual void EliminateSpuriousSpaces()
+        public virtual void EliminateSpuriousSpaces()
 		{
 		}
 		#endregion
@@ -171,10 +185,6 @@ namespace JWdb.DataModel
 			return null;
 		}
 		#endregion
-
-        public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
-        {
-        }
 
 
 		// Methods ---------------------------------------------------------------------------
@@ -807,14 +817,18 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+       public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, "note");
-            oxes.AddAttr(node, "reference", "To Do");
+            if (!string.IsNullOrEmpty(Footnote.VerseReference))
+                oxes.AddAttr(node, "reference", Footnote.VerseReference);
             oxes.AddAttr(node, "style",
                 IsSeeAlso ? "Note Cross Reference Paragraph" : "Note General Paragraph");
             oxes.AddAttr(node, "usfm",
                 IsSeeAlso ? "x" : "f");
+
+            foreach (DRun run in Footnote.Runs)
+                run.AddToOxesBook(oxes, node);
         }
 
         // Methods ---------------------------------------------------------------------------
@@ -824,7 +838,12 @@ namespace JWdb.DataModel
             // SeeAlso's are simple
             if (IsSeeAlso)
             {
-                DBS.Append(new SfField(DBS.Map.MkrSeeAlso, Footnote.SimpleText));
+                string sText = "";
+                if (!string.IsNullOrEmpty(Footnote.VerseReference))
+                    sText = Footnote.VerseReference + ": ";
+                sText += Footnote.SimpleText;
+
+                DBS.Append(new SfField(DBS.Map.MkrSeeAlso, sText));
                 return;
             }
 
@@ -854,26 +873,14 @@ namespace JWdb.DataModel
             VTField.Data += "|fn";
             VTField.BT += "|fn";
 
-
-            /***
-
-////// FIX IS NEEDED HERE ///////
-// Backtrack to a \vt, and add it if missing.
-////////////////////////////////////////////
-
-
-            // For Explanatory footnotes, append the "|fn" marker to the previous verse text
-            SfField LastField = DBS.LastField();
-            if (null == LastField || LastField.Mkr != DBS.Map.MkrVerseText)
-                LastField = DBS.Append(new SfField(DBS.Map.MkrVerseText));
-            Debug.Assert(null != LastField && DBS.Map.MkrVerseText == LastField.Mkr);
-            LastField.Data += "|fn";
-            LastField.BT += "|fn";
-            ***/
-
             // Build the footnote text from its runs and append it to the DB
             string sContents = "";
             string sProseBT = "";
+            if (!string.IsNullOrEmpty(Footnote.VerseReference))
+            {
+                sContents += Footnote.VerseReference + ": ";
+                sProseBT += Footnote.VerseReference + ": ";
+            }
             foreach (DRun run in Footnote.Runs)
             {
                 sContents += run.ContentsSfmSaveString;
@@ -956,7 +963,7 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
-		#region Method: override void EliminateSpuriousSpaces()
+		#region OMethod: void EliminateSpuriousSpaces()
 		public override void EliminateSpuriousSpaces()
 			// There should be no spaces at all within a label
 		{
@@ -972,8 +979,8 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		#region method: override PWord[] GetPWords()
-		public override PWord[] GetPWords()
+        #region method: override PWord[] GetPWords()
+        public override PWord[] GetPWords()
 		{
 			PWord[] v = new PWord[1];
             v[0] = new PWord(Text,
@@ -1562,10 +1569,56 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+        #region OMethod: DRun ConvertCrossRefs(bsaSourceSubs, bsaDestSubs)
+        public override DRun ConvertCrossRefs(
+            BStringArray bsaSourceSubstitutions,
+            BStringArray bsaDestSubstitutions)
+        {
+            // We assume a simple, one-phrase text
+            string sSource = "";
+            foreach (DPhrase phr in Phrases)
+                sSource += phr.Text;
+
+            // Create the converted string
+            int i = 0;
+            string sDest = "";
+
+            // Loop through the source string, comparing for matches
+            while (i < sSource.Length)
+            {
+                // Look for a match from amongst the book names
+                int iBookName = bsaSourceSubstitutions.FindSubstringMatch(sSource, i, true);
+
+                // If not found, add the current character and move on to the next one
+                if (-1 == iBookName)
+                {
+                    sDest += sSource[i++];
+                    continue;
+                }
+
+                // Else it was found; so make the substitution.
+                sDest += bsaDestSubstitutions[iBookName];
+                i += bsaSourceSubstitutions[iBookName].Length;
+            }
+
+            return DText.CreateSimple(sDest);
+        }
+        #endregion
 
         public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
-            //oxes.AddText(nodeParent, ContentsAsString);
+            if (Phrases.Count > 0 && !string.IsNullOrEmpty(AsString))
+            {
+                foreach (DPhrase p in Phrases)
+                    p.AddToOxesBook(oxes, nodeParent);
+            }
+
+            if (PhrasesBT.Count > 0 && !string.IsNullOrEmpty(ProseBTAsString))
+            {
+                var nodeBT = oxes.AddNode(nodeParent, "bt");
+                foreach (DPhrase pBT in PhrasesBT)
+                    pBT.AddToOxesBook(oxes, nodeBT);
+            }
         }
 
 		// Methods ---------------------------------------------------------------------------
@@ -2335,6 +2388,27 @@ namespace JWdb.DataModel
 			return sOut;
 		}
 		#endregion
+
+        public void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
+            {
+                nodeParent = oxes.AddNode(nodeParent, "span");
+
+                string sStyleName = CharacterStyleAbbrev;
+
+                if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
+                    sStyleName = "Italic";
+                if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
+                    sStyleName = "Bold";
+
+                oxes.AddAttr(nodeParent, "style", sStyleName);
+            }
+
+            oxes.AddText(nodeParent, Text);
+        }
+
+
 
 		#region method: override PWord[] GetPWords()
 		public PWord[] GetPWords()

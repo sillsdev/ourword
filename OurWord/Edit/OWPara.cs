@@ -461,11 +461,11 @@ namespace OurWord.Edit
         }
         #endregion
         #region CLASS: ELabel
-        class ELabel : EBlock
+        public class ELabel : EBlock
         {
             public const string c_Spaces = "\u00A0\u00A0";
 
-            #region Constructor(DLabel)
+            #region Constructor(JFontForWritingSystem, DLabel)
             public ELabel(JFontForWritingSystem f, DLabel label)
                 : base(f, label.Text + c_Spaces)
             {

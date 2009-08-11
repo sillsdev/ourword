@@ -17,15 +17,15 @@ using System.Data;
 using System.IO;
 
 using OurWord.Edit;
-using OurWord.View;
+using OurWord.Layouts;
 using JWdb;
 using JWdb.DataModel;
 using JWTools;
 #endregion
 
-namespace OurWord.View
+namespace OurWord.Layouts
 {
-    public class WndDrafting : OWWindow
+    public class WndDrafting : Layout
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "Draft";
@@ -394,12 +394,22 @@ namespace OurWord.View
         #region Method: OWPara CreateFrontPara(DParagraph)
         OWPara CreateFrontPara(DParagraph p)
         {
-            return new OWPara(
-                p.Translation.WritingSystemVernacular,
-                p.Style,
-                p,
-                BackColor,
-                OWPara.Flags.None);
+            if (null != p as DFootnote)
+            {
+                return CreateFootnotePara(p as DFootnote,
+                    p.Translation.WritingSystemVernacular,
+                    BackColor, 
+                    OWPara.Flags.None);
+            }
+            else
+            {
+                return new OWPara(
+                    p.Translation.WritingSystemVernacular,
+                    p.Style,
+                    p,
+                    BackColor,
+                    OWPara.Flags.None);
+            }
         }
         #endregion
         #region Method: OWPara CreateTargetPara(DParagrap, bAllowItalics)
@@ -424,12 +434,22 @@ namespace OurWord.View
                 color = BackColor;
 
             // Add the paragraph
-            return new OWPara(
-                p.Translation.WritingSystemVernacular,
-                p.Style,
-                p,
-                color,
-                DraftingOptions);
+            if (null != p as DFootnote)
+            {
+                return CreateFootnotePara(p as DFootnote, 
+                    p.Translation.WritingSystemVernacular,
+                    color, 
+                    DraftingOptions);
+            }
+            else
+            {
+                return new OWPara(
+                    p.Translation.WritingSystemVernacular,
+                    p.Style,
+                    p,
+                    color,
+                    DraftingOptions);
+            }
         }
         #endregion
         #region Method: ERowOfColumns CreateRow(Container, out colLeft, out colRight, bIncludeSeparator)
