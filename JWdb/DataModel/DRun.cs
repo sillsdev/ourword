@@ -160,9 +160,10 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
-        public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        #region virtual XmlNode AddToOxesDoc(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public virtual XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
+            return null;
         }
         #endregion
 
@@ -369,14 +370,32 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        // Oxes ------------------------------------------------------------------------------
+        public const string c_sNodeTag = "v";
+        const string c_sAttrText = "n";
+        #region SMethod: DVerse Create(XmlNode node)
+        static public DVerse Create(XmlNode node)
         {
-            var node = oxes.AddNode(nodeParent, "v");
-            oxes.AddAttr(node, "n", Text);
+            if (node.Name == c_sNodeTag)
+            {
+                string sText = OurWordXmlDocument.GetAttrValue(node, c_sAttrText, "");
+                if (string.IsNullOrEmpty(sText))
+                    throw new OurWordXmlDocumentException("Missing verse number");
+                return new DVerse(sText);
+            }
+            return null;
         }
+        #endregion
+        #region OMethod: XmlNode AddToOxesBook(oxes, nodeParent)
+        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            var node = oxes.AddNode(nodeParent, c_sNodeTag);
+            oxes.AddAttr(node, c_sAttrText, Text);
+            return node;
+        }
+        #endregion
 
-
-		// Methods ---------------------------------------------------------------------------
+        // Methods ---------------------------------------------------------------------------
 		#region Method: override void ToSfm(ScriptureDB DBS)
 		public override void ToSfm(ScriptureDB DBS)
 		{
@@ -511,13 +530,33 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        // Oxes ------------------------------------------------------------------------------
+        public const string c_sNodeTag = "c";
+        const string c_sAttrText = "n";
+        #region SMethod: DChapter Create(XmlNode node)
+        static public DChapter Create(XmlNode node)
         {
-            var node = oxes.AddNode(nodeParent, "c");
-            oxes.AddAttr(node, "n", Text);
-        }
+            if (node.Name == c_sNodeTag)
+            {
+                int nChapterNo = OurWordXmlDocument.GetAttrValue(node, c_sAttrText, 0);
+                if (0 == nChapterNo)
+                    throw new OurWordXmlDocumentException("Bad or missing chapter number in oxes data.");
 
-		// Methods ---------------------------------------------------------------------------
+                return new DChapter(nChapterNo);
+            }
+            return null;
+        }
+        #endregion
+        #region OMethod: XmlNode AddToOxesBook(oxes, nodeParent)
+        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            var node = oxes.AddNode(nodeParent, c_sNodeTag);
+            oxes.AddAttr(node, c_sAttrText, Text);
+            return node;
+        }
+        #endregion
+
+        // Methods ---------------------------------------------------------------------------
 		#region Method: override void ToSfm(ScriptureDB DBS)
 		public override void ToSfm(ScriptureDB DBS)
 		{
@@ -817,18 +856,37 @@ namespace JWdb.DataModel
         }
         #endregion
 
-       public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        // Oxes ------------------------------------------------------------------------------
+        public const string c_sNodeTag = "note";
+        #region SMethod: DFoot Create(XmlNode node)
+        static public DFoot Create(XmlNode node)
         {
-            var node = oxes.AddNode(nodeParent, "note");
+            if (node.Name != c_sNodeTag)
+                return null;
+
+            // TODO!
+
+            return null;
+        }
+        #endregion
+
+        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        {
+            var node = oxes.AddNode(nodeParent, c_sNodeTag);
+
             if (!string.IsNullOrEmpty(Footnote.VerseReference))
                 oxes.AddAttr(node, "reference", Footnote.VerseReference);
+
             oxes.AddAttr(node, "style",
                 IsSeeAlso ? "Note Cross Reference Paragraph" : "Note General Paragraph");
+
             oxes.AddAttr(node, "usfm",
                 IsSeeAlso ? "x" : "f");
 
             foreach (DRun run in Footnote.Runs)
                 run.AddToOxesBook(oxes, node);
+
+            return node;
         }
 
         // Methods ---------------------------------------------------------------------------
@@ -1605,20 +1663,22 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        public override void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParagraph)
         {
             if (Phrases.Count > 0 && !string.IsNullOrEmpty(AsString))
             {
                 foreach (DPhrase p in Phrases)
-                    p.AddToOxesBook(oxes, nodeParent);
+                    p.AddToOxesDoc(oxes, nodeParagraph);
             }
 
             if (PhrasesBT.Count > 0 && !string.IsNullOrEmpty(ProseBTAsString))
             {
-                var nodeBT = oxes.AddNode(nodeParent, "bt");
+                var nodeBT = oxes.AddNode(nodeParagraph, "bt");
                 foreach (DPhrase pBT in PhrasesBT)
-                    pBT.AddToOxesBook(oxes, nodeBT);
+                    pBT.AddToOxesDoc(oxes, nodeBT);
             }
+
+            return nodeParagraph;
         }
 
 		// Methods ---------------------------------------------------------------------------
@@ -2388,28 +2448,6 @@ namespace JWdb.DataModel
 			return sOut;
 		}
 		#endregion
-
-        public void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
-        {
-            if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-            {
-                nodeParent = oxes.AddNode(nodeParent, "span");
-
-                string sStyleName = CharacterStyleAbbrev;
-
-                if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
-                    sStyleName = "Italic";
-                if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
-                    sStyleName = "Bold";
-
-                oxes.AddAttr(nodeParent, "style", sStyleName);
-            }
-
-            oxes.AddText(nodeParent, Text);
-        }
-
-
-
 		#region method: override PWord[] GetPWords()
 		public PWord[] GetPWords()
 		{
@@ -2462,6 +2500,39 @@ namespace JWdb.DataModel
 			return v;
 		}
 		#endregion
+
+        // Oxes ------------------------------------------------------------------------------
+
+        static public DPhrase CreateFromOxesDoc(OurWordXmlDocument oxes, XmlNode node)
+        {
+            return null;
+        }
+
+        public void AddToOxesDoc(OurWordXmlDocument oxes, XmlNode nodeParent)
+            // Adds the phrase's text to the parent node. For anything other than normal
+            // style, the text is placed within a span to indicate the style.
+            //
+            // nodeParent - for the vernacular, this is the paragraph; for a back translation,
+            //     this is a BT node.
+        {
+            if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
+            {
+                nodeParent = oxes.AddNode(nodeParent, "span");
+
+                string sStyleName = CharacterStyleAbbrev;
+
+                if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
+                    sStyleName = "Italic";
+                if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
+                    sStyleName = "Bold";
+
+                oxes.AddAttr(nodeParent, "style", sStyleName);
+            }
+
+            oxes.AddText(nodeParent, Text);
+        }
+
+
 
 	}
 	#endregion

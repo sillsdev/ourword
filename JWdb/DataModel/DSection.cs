@@ -438,25 +438,33 @@ namespace JWdb.DataModel
 		#region Method: bool CheckAllParagraphsMatch(DSection SFront)
 		public bool CheckAllParagraphsMatch(DSection SFront)
 		{
-			// Are the paragraph and footnote counts the same?
-			if (SFront.Paragraphs.Count != Paragraphs.Count)
-				return false;
-			if (SFront.Footnotes.Count != Footnotes.Count)
-				return false;
+            // Should havw the same number of paragraphs
+            if (SFront.Paragraphs.Count != Paragraphs.Count)
+                return false;
 
-			// Do we have the same styles in the paragraphs & footnotes?
-			for(int i=0; i < Paragraphs.Count; i++)
-			{
-				DParagraph PFront = SFront.Paragraphs[i] as DParagraph;
-				if (PFront.StyleAbbrev != (Paragraphs[i] as DParagraph).StyleAbbrev)
-					return false;
-			}
-			for(int i=0; i < Footnotes.Count; i++)
-			{
-				DParagraph PFront = SFront.Footnotes[i] as DParagraph;
-				if (PFront.StyleAbbrev != (Footnotes[i] as DParagraph).StyleAbbrev)
-					return false;
-			}
+            // Examine the internals
+            for (int i = 0; i < Paragraphs.Count; i++)
+            {
+                var PFront = SFront.Paragraphs[i];
+                var PThis = this.Paragraphs[i];
+
+                // Are the styles the same?
+                if (PFront.StyleAbbrev != PThis.StyleAbbrev)
+                    return false;
+
+                // Collect the footnotes
+                var FrontFoots = PFront.AllFootnotes;
+                var ThisFoots = PThis.AllFootnotes;
+
+                // Should have same count and styles
+                if (FrontFoots.Count != ThisFoots.Count)
+                    return false;
+                for (int k = 0; k < ThisFoots.Count; k++)
+                {
+                    if (FrontFoots[k].StyleAbbrev != ThisFoots[k].StyleAbbrev)
+                        return false;
+                }
+            }
 
 			// If we made it here, then they are the same
 			return true;
@@ -504,10 +512,13 @@ namespace JWdb.DataModel
             var v = new List<TranslatorNote>();
 
             foreach (DParagraph p in Paragraphs)
+            {
                 v.AddRange(p.AllNotes);
 
-            foreach (DParagraph p in Footnotes)
-                v.AddRange(p.AllNotes);
+                var vFoots = p.AllFootnotes;
+                foreach (DFootnote f in vFoots)
+                    v.AddRange(f.AllNotes);
+            }
 
             return v;
         }
@@ -535,6 +546,20 @@ namespace JWdb.DataModel
                 var v = new List<TranslatorNote>();
                 foreach (DParagraph p in Paragraphs)
                     v.AddRange(p.AllNotes);
+                return v;
+            }
+        }
+        #endregion
+        #region VAttr{g}: List<DFootnote> AllFootnotes
+        public List<DFootnote> AllFootnotes
+        {
+            get
+            {
+                var v = new List<DFootnote>();
+
+                foreach (DParagraph p in Paragraphs)
+                    v.AddRange(p.AllFootnotes);
+
                 return v;
             }
         }
@@ -3048,7 +3073,7 @@ namespace JWdb.DataModel
                         return false;
                 }
 
-                if (one.Footnotes.Count != two.Footnotes.Count)
+                if (one.AllFootnotes.Count != two.AllFootnotes.Count)
                     return false;
 
                 return true;

@@ -196,7 +196,8 @@ namespace OurWord.Layouts
 
             // Load the footnotes
             bool bFirstFootnote = true;
-            foreach (DFootnote fn in DB.TargetSection.Footnotes)
+            var vFootnotes = DB.TargetSection.AllFootnotes;
+            foreach (DFootnote fn in vFootnotes)
             {
                 EColumn colVernacular;
                 EColumn colBackTranslation;

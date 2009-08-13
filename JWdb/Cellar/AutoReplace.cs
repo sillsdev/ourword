@@ -199,7 +199,7 @@ namespace JWdb
 			{
 				char chSource = sSource[iPos];
 
-				// Search through the letters in this node
+				// Search through the letters in this nodeParagraph
 				int iTop = 0;                                       // e.g., 'a'
 				int iBottom = m_rgLetter.Length - 1;                // e.g., 'z'
 

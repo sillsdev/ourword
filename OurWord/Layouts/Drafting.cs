@@ -369,19 +369,19 @@ namespace OurWord.Layouts
             // Determines if the footnotes can each have their own row, or if they all are
             // lumped together on a single row.
         {
+            var FrontFootnotes = DB.FrontSection.AllFootnotes;
+            var TargetFootnotes = DB.TargetSection.AllFootnotes;
+
             // If the two sections do not have the same number of footnotes, then
             // they cannot appear in the side-by-side mode.
-            if (DB.FrontSection.Footnotes.Count != DB.TargetSection.Footnotes.Count)
+            if (FrontFootnotes.Count != TargetFootnotes.Count)
                 return false;
 
             // If the individual footnotes do not have the same types, then 
             // they cannot appear in the side-by-side mode.
-            for (int i = 0; i < DB.FrontSection.Footnotes.Count; i++)
+            for (int i = 0; i < TargetFootnotes.Count; i++)
             {
-                DFootnote fnFront = DB.FrontSection.Footnotes[i] as DFootnote;
-                DFootnote fnTarget = DB.TargetSection.Footnotes[i] as DFootnote;
-
-                if (fnFront.NoteType != fnTarget.NoteType)
+                if (FrontFootnotes[i].NoteType != TargetFootnotes[i].NoteType)
                     return false;
             }
 
@@ -479,8 +479,11 @@ namespace OurWord.Layouts
         #region Method: void LoadFootnotes()
         void LoadFootnotes()
         {
+            var FrontFootnotes = DB.FrontSection.AllFootnotes;
+            var TargetFootnotes = DB.TargetSection.AllFootnotes;
+
             // Anything to load?
-            if (DB.FrontSection.Footnotes.Count == 0 && DB.TargetSection.Footnotes.Count == 0)
+            if (FrontFootnotes.Count == 0 && TargetFootnotes.Count == 0)
                 return;
 
             // Load them all in a single row if we must
@@ -492,32 +495,30 @@ namespace OurWord.Layouts
                 CreateRow(Contents, out colFront, out colTarget, true);
 
                 // All Front Footnotes
-                for (int kF = 0; kF < DB.FrontSection.Footnotes.Count; kF++)
-                    colFront.Append(CreateFrontPara(DB.FrontSection.Footnotes[kF]));
+                foreach (DFootnote f in FrontFootnotes)
+                    colFront.Append(CreateFrontPara(f));
 
                 // All Target Footnotes
-                for (int kT = 0; kT < DB.TargetSection.Footnotes.Count; kT++)
-                    colTarget.Append(CreateTargetPara(DB.TargetSection.Footnotes[kT], true));
+                foreach (DFootnote f in TargetFootnotes)
+                    colTarget.Append(CreateTargetPara(f, true));
 
                 return;
             }
 
             // Otherwise, they are on individual parallel rows
-            for (int k = 0; k < DB.FrontSection.Footnotes.Count; k++)
+            for (int k = 0; k < FrontFootnotes.Count; k++)
             {
                 // A single row with two columns
                 EColumn colFront;
                 EColumn colTarget;
                 CreateRow(Contents, out colFront, out colTarget, k == 0);
 
-                // Ensure place to type
-                DFootnote fFront = DB.FrontSection.Footnotes[k] as DFootnote;
-                DFootnote fTarget = DB.TargetSection.Footnotes[k] as DFootnote;
-                fTarget.SynchRunsToModelParagraph(fFront);
+                // Ensure a place to type
+                TargetFootnotes[k].SynchRunsToModelParagraph(FrontFootnotes[k]);
 
                 // Append the two
-                colFront.Append(CreateFrontPara(fFront));
-                colTarget.Append(CreateTargetPara(fTarget, fFront.HasItalics));
+                colFront.Append( CreateFrontPara( FrontFootnotes[k] ));
+                colTarget.Append( CreateTargetPara( TargetFootnotes[k], FrontFootnotes[k].HasItalics));
             }
         }
         #endregion

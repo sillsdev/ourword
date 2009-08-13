@@ -24,6 +24,16 @@ using System.Xml;
 
 namespace JWTools
 {
+    public class OurWordXmlDocumentException : Exception
+    {
+        #region Constructor(sErrorMessage)
+        public OurWordXmlDocumentException(string sMessage)
+            : base(sMessage)
+        {
+        }
+        #endregion
+    }
+
     public class OurWordXmlDocument : XmlDocument
     {
         // Constructors ----------------------------------------------------------------------
@@ -98,6 +108,32 @@ namespace JWTools
             XmlText text = CreateTextNode(sValue);
             node.AppendChild(text);
             return text;
+        }
+
+        static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
+        {
+            foreach (XmlAttribute attr in node.Attributes)
+            {
+                if (attr.Name == sAttrName)
+                    return attr.Value;
+            }
+
+            if (null == sDefaultValue)
+                return "";
+            return sDefaultValue;
+        }
+        static public int GetAttrValue(XmlNode node, string sAttrName, int nDefaultValue)
+        {
+            string sValue = GetAttrValue(node, sAttrName, nDefaultValue.ToString());
+
+            try
+            {
+                return Convert.ToInt16(sValue);
+            }
+            catch (Exception e)
+            {
+                throw new OurWordXmlDocumentException("Bad integer data in oxes file: " + e.Message);
+            }
         }
 
 

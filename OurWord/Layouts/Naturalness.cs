@@ -213,9 +213,11 @@ namespace OurWord.Layouts
 
             // Load the footnotes
             bool bFirstFootnote = true;
-            for (int iFn = 0; iFn < DB.TargetSection.Footnotes.Count; iFn++)
+            var TargetFootnotes = DB.TargetSection.AllFootnotes;
+            var FrontFootnotes = DB.FrontSection.AllFootnotes;
+            for (int iFn = 0; iFn < TargetFootnotes.Count; iFn++)
             {
-                DFootnote fn = DB.TargetSection.Footnotes[iFn] as DFootnote;
+                DFootnote fn = TargetFootnotes[iFn] as DFootnote;
 
                 OWPara.Flags options = OWPara.Flags.None;
                 if (fn.IsUserEditable)
@@ -228,8 +230,7 @@ namespace OurWord.Layouts
                 // Italics?
                 if (bAllParagraphsMatchFront)
                 {
-                    DFootnote fnFront = DB.FrontSection.Footnotes[iFn] as DFootnote;
-                    if (fnFront.HasItalics)
+                    if (FrontFootnotes[iFn].HasItalics)
                         options |= OWPara.Flags.CanItalic;
                 }
                 else

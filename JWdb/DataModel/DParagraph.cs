@@ -563,6 +563,22 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        public List<DFootnote> AllFootnotes
+        {
+            get
+            {
+                var v = new List<DFootnote>();
+
+                foreach (DRun run in Runs)
+                {
+                    if (run as DFoot != null)
+                        v.Add((run as DFoot).Footnote);
+                }
+
+                return v;
+            }
+        }
+
         // REVISION =============
 
 		#region Method: void AddRun(DRun)
@@ -1501,18 +1517,50 @@ namespace JWdb.DataModel
         }
         int m_nID = -1;
 
+        static public DParagraph CreateFromOxesDoc(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+        {
+            var p = new DParagraph();
+
+            foreach (XmlNode node in nodeParagraph.ChildNodes)
+            {
+                switch (node.Name)
+                {
+                    case DVerse.c_sNodeTag:
+                        p.Runs.Append(DVerse.Create(node));
+                        break;
+
+                    case DChapter.c_sNodeTag:
+                        p.Runs.Append(DChapter.Create(node));
+                        break;
+
+                    case DFoot.c_sNodeTag:
+                        p.Runs.Append(DFoot.Create(node));
+                        break;
+
+                }
+
+ //               DRun run = null;
+ //               if (null != node as XmlText)
+ //                   run = DPhrase.CreateFromOxesDoc(oxes, node as XmlText);
+            }
+
+            return null;
+        }
+
+
+
         public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
         {
             var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
             Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
 
-            var node = oxes.AddNode(nodeBook, "p");
-            oxes.AddAttr(node, "style", map.Name);
-            oxes.AddAttr(node, "usfm", map.Usfm);
-            oxes.AddAttr(node, "id", oxes.IntToID(ID));
+            var nodeParagraph = oxes.AddNode(nodeBook, "p");
+            oxes.AddAttr(nodeParagraph, "style", map.Name);
+            oxes.AddAttr(nodeParagraph, "usfm", map.Usfm);
+            oxes.AddAttr(nodeParagraph, "id", oxes.IntToID(ID));
 
             foreach (DRun run in Runs)
-                run.AddToOxesBook(oxes, node);
+                run.AddToOxesBook(oxes, nodeParagraph);
 
 
         }

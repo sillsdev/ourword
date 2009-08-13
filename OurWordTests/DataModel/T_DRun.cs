@@ -586,4 +586,67 @@ namespace OurWordTests.DataModel
         #endregion
     }
     #endregion
+
+    [TestFixture] public class T_DVerse
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: OxesIO
+        [Test] public void OxesIO()
+        {
+            var oxes = new OurWordXmlDocument();
+            var node = oxes.AddNode(null, "para");
+
+            // Create a verse
+            var verseIn = new DVerse("13b");
+
+            // Output it to an xml node
+            var nodeVerse = verseIn.AddToOxesBook(oxes, node);
+
+            // Create a new verse from that xml node
+            var verseOut = DVerse.Create(nodeVerse);
+
+            // Should have a verse whose text is the same as the original one
+            Assert.IsNotNull(verseOut);
+            Assert.AreEqual("13b", verseOut.Text);
+        }
+        #endregion
+    }
+
+    [TestFixture] public class T_DChapter
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: OxesIO
+        [Test] public void OxesIO()
+        {
+            var oxes = new OurWordXmlDocument();
+            var node = oxes.AddNode(null, "para");
+
+            // Create a chapter
+            var chapterIn = DChapter.Create("5");
+
+            // Output it to an xml node
+            var nodeChapter = chapterIn.AddToOxesBook(oxes, node);
+
+            // Create a new chapter from that xml node
+            var chapterOut = DChapter.Create(nodeChapter);
+
+            // Should have a chapter whose nmber is the same as the original one
+            Assert.IsNotNull(chapterOut);
+            Assert.AreEqual("5", chapterOut.Text);
+        }
+        #endregion
+    }
+
 }
