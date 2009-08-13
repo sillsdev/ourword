@@ -1057,29 +1057,51 @@ namespace OurWord
         #region Method: bool IncrementParagraph(IProgressIndicator)
         public bool IncrementParagraph(IProgressIndicator progress)
 		{
-			// Get the JOwnSeq attribute that holds this paragraph
-			JOwnSeq<DParagraph> OwnSeq = (null == Paragraph as DFootnote) ? 
-				Section.Paragraphs :
-				Section.Footnotes  ;
+            // Footnote
+            if (null == Paragraph as DFootnote)
+            {
+                var Footnotes = Section.AllFootnotes;
+
+                // Find the footnote's index within all of them
+                int iFootnote = 0;
+                foreach (DFootnote f in Footnotes)
+                {
+                    if (f == Paragraph as DFootnote)
+                        break;
+                    iFootnote++;
+                }
+                Debug.Assert(iFootnote < Footnotes.Count);
+
+                // If there are no more in this section, we must increment to the next section
+                if (iFootnote >= Footnotes.Count - 1)
+                    return IncrementSection(progress);
+
+                // Increment to the next footnote
+                iFootnote++;
+                m_Paragraph = Footnotes[iFootnote] as DParagraph;
+                InitializeParagraph();
+                m_iWord = 0;
+                return true;
+            }
 
 			// Find the paragraph's index within the JOwnSeq
 			int iParagraph = 0;
-			foreach(DParagraph p in OwnSeq)
+            foreach (DParagraph p in Section.Paragraphs)
 			{
 				if (p == Paragraph)
 					break;
 				iParagraph++;
 			}
-			Debug.Assert(iParagraph < OwnSeq.Count);
+            Debug.Assert(iParagraph < Section.Paragraphs.Count);
 
 			// If there are no more paragraphs in this section, then we must 
 			// increment to the next section.
-			if (iParagraph >= OwnSeq.Count - 1)
+            if (iParagraph >= Section.Paragraphs.Count - 1)
                 return IncrementSection(progress);
 
 			// Increment to the next paragraph
 			++iParagraph;
-			m_Paragraph = OwnSeq[iParagraph] as DParagraph;
+            m_Paragraph = Section.Paragraphs[iParagraph];
 			InitializeParagraph();
 			m_iWord = 0;
 
@@ -1142,13 +1164,23 @@ namespace OurWord
 				if (iWord < PWords.Length - 1)
 					return true;
 
+                // Do we have more footnotes? We scan through the list of all but the last
+                // footnote; if we encounter our currentn Paragraph, then we know we have
+                // at least one more footnote following it.
+                if (null == Paragraph as DFootnote)
+                {
+                    var AllFootnotes = Section.AllFootnotes;
+                    for (int i = 0; i < AllFootnotes.Count - 1; i++)
+                    {
+                        if (AllFootnotes[i] == Paragraph as DFootnote)
+                            return true;
+                    }
+                }
+
 				// Do we have more paragraphs?
-				JOwnSeq<DParagraph> OwnSeq = (null == Paragraph as DFootnote) ? 
-					Section.Paragraphs :
-					Section.Footnotes  ;
-				int iPara = OwnSeq.FindObj(Paragraph);
-				if (iPara < OwnSeq.Count - 1)
-					return true;
+                int iPara = Section.Paragraphs.FindObj(Paragraph);
+                if (iPara < Section.Paragraphs.Count - 1)
+                    return true;
 
 				// Do we have more sections?
 				if (!JustPrintOneSection)

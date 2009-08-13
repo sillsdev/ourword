@@ -2590,8 +2590,8 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("(Matthew 3:13-17; Luke 3:21-22)", sCrossRefActual);
 
             // Check for xref footnote (the first one) to be appropriately converted
-            Assert.AreEqual(1, TargetSection.Footnotes.Count);
-            string sFootnoteAct = (TargetSection.Footnotes[0] as DFootnote).DebugString;
+            Assert.AreEqual(1, TargetSection.AllFootnotes.Count);
+            string sFootnoteAct = TargetSection.AllFootnotes[0].DebugString;
             string sFootnoteExp = "Kejadian 22:2, Mazmur 2:7, Isaiah 42:1, " +
                 "Matthew 3:17, 12:18, Markus 9:7, Luke 3:22";
             Assert.AreEqual(sFootnoteExp, sFootnoteAct);

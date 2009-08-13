@@ -570,6 +570,22 @@ namespace JWdb.DataModel
     #region CLass: DFoot
     public class DFoot : DRun
     {
+        // ZAttrs ----------------------------------------------------------------------------
+        #region JAttr{g/s}: DFootnote Footnote
+        public DFootnote Footnote
+        {
+            get
+            {
+                return j_Footnote.Value;
+            }
+            set
+            {
+                j_Footnote.Value = value;
+            }
+        }
+        JOwn<DFootnote> j_Footnote = null;
+        #endregion
+
         // Footnote Letter -------------------------------------------------------------------
         public enum FootnoteSequenceTypes { abc=0, iv, custom };
         #region SAttr{g}: string[] FootnoteSequenceChoices
@@ -694,25 +710,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g/s}: DFootnote Footnote
-        public DFootnote Footnote
-        {
-            get
-            {
-                return m_footnote;
-            }
-            set
-            {
-                m_footnote = value;
-
-                if (null != m_footnote)
-                    m_footnote.Foot = this;
-            }
-        }
-        DFootnote m_footnote = null;
-        #endregion
-
         // VAttrs ----------------------------------------------------------------------------
 		#region VAttr{g}: string Text - returns the callout letter for the footnote
 		public string Text
@@ -770,7 +767,8 @@ namespace JWdb.DataModel
         public DFoot(DFootnote footnote)
             : base()
         {
-            Footnote = footnote;
+            j_Footnote = new JOwn<DFootnote>("Footnote", this);
+            j_Footnote.Value = footnote;
         }
         #endregion
         #region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -787,12 +785,14 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
+        /*
         #region SMethod: DFoot Copy(DFootnote)
         static public DFoot Copy(DFootnote footnote)
         {
             return new DFoot(footnote);
         }
         #endregion
+        **/
 
         // DRun Override Scaffolding ---------------------------------------------------------
 		#region OAttr{g}: override string AsString

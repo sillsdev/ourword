@@ -157,18 +157,24 @@ namespace OurWord.SideWnd
             if (!SSibling.AllParagraphsMatchFront)
                 return null;
 
-            // Find which vernacular paragraph contains the basic text
+            // Find the corresponding paragraph to the paragraph which contains the basic text
             DParagraph pOwner = dbt.Paragraph;
-            int iP = pOwner.Section.Paragraphs.FindObj(pOwner);
-            int iF = pOwner.Section.Footnotes.FindObj(pOwner);
-
-            // Find the corresponding sibling paragraph
             DParagraph pSibling = null;
-            if (iP != -1)
-                pSibling = SSibling.Paragraphs[iP] as DParagraph;
-            if (iF != -1)
-                pSibling = SSibling.Footnotes[iF] as DParagraph;
-            if (pSibling == null)
+            int iP = pOwner.Section.Paragraphs.FindObj(pOwner);
+            if (-1 != iP)
+            {
+                pSibling = SSibling.Paragraphs[iP];
+            }
+            else
+            {
+                var VernacularFootnotes = pOwner.Section.AllFootnotes;
+                for (int i = 0; i < VernacularFootnotes.Count; i++)
+                {
+                    if (VernacularFootnotes[i] == pOwner)
+                        pSibling = SSibling.AllFootnotes[i];
+                }
+            }
+            if (null == pSibling)
                 return null;
 
             // Find the corresponding DBasicText

@@ -197,14 +197,15 @@ namespace OurWord.Dialogs
         #region Method: bool DoFootnotesMatch(...)
         private bool DoFootnotesMatch(DSection SFront, DSection STarget)
         {
-            if (SFront.Footnotes.Count != STarget.Footnotes.Count)
+            var FrontFootnotes = SFront.AllFootnotes;
+            var TargetFootnotes = STarget.AllFootnotes;
+
+            if (FrontFootnotes.Count != TargetFootnotes.Count)
                 return false;
 
-            for (int i = 0; i < STarget.Footnotes.Count; i++)
+            for (int i = 0; i < TargetFootnotes.Count; i++)
             {
-                DParagraph PFront = SFront.Footnotes[i] as DParagraph;
-                DParagraph PTarget = STarget.Footnotes[i] as DParagraph;
-                if (PFront.StyleAbbrev != PTarget.StyleAbbrev)
+                if (FrontFootnotes[i].StyleAbbrev != TargetFootnotes[i].StyleAbbrev)
                     return false;
             }
 
@@ -369,15 +370,15 @@ namespace OurWord.Dialogs
             // Footnotes: copy provided we have the same count and styles
             if (DoFootnotesMatch(SFront, STarget))
             {
-                for (int i = 0; i < STarget.Footnotes.Count; i++)
-                {
-                    DFootnote FFront = SFront.Footnotes[i] as DFootnote;
-                    DFootnote FTarget = STarget.Footnotes[i] as DFootnote;
+                var FrontFootnotes = SFront.AllFootnotes;
+                var TargetFoornotes = STarget.AllFootnotes;
 
-                    if (FFront.NoteType == DFootnote.Types.kSeeAlso)
+                for (int i = 0; i < TargetFoornotes.Count; i++)
+                {
+                    if (FrontFootnotes[i].NoteType == DFootnote.Types.kSeeAlso)
                         continue;
 
-                    CopyParagraph(FFront, FTarget);
+                    CopyParagraph(FrontFootnotes[i], TargetFoornotes[i]);
 
                     if (DialogCopyBTConflict.Actions.kCancel == DialogCopyBTConflict.CopyBTAction)
                         return false;

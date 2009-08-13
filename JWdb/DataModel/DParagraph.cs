@@ -562,7 +562,7 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-
+        #region VAttr{g}: List<DFootnote> AllFootnotes
         public List<DFootnote> AllFootnotes
         {
             get
@@ -578,6 +578,7 @@ namespace JWdb.DataModel
                 return v;
             }
         }
+        #endregion
 
         // REVISION =============
 
@@ -1206,14 +1207,10 @@ namespace JWdb.DataModel
             DFootnote footnote = new DFootnote(nChapter, nVerse, 
                 DFootnote.Types.kExplanatory);
             footnote.SimpleText = "";         // Insert some text so we have a place to type
-            Section.Footnotes.Append(footnote);
 
             // Create the footletter for it to go into, and insert it
             DFoot foot = new DFoot(footnote);
             Runs.InsertAt(iInsertPosition, foot);
-
-            // Re-letter all footletters
-            Section.UpdateFootnoteOrder();
 
             return foot;
         }
@@ -1222,12 +1219,8 @@ namespace JWdb.DataModel
         public void RemoveFootnote(DFoot foot)
         {
             // Remove the footnote
-            Section.Footnotes.Remove(foot.Footnote);
             Runs.Remove(foot);
             CombineAdjacentDTexts(false);
-
-            // Re-letter all footletters
-            Section.UpdateFootnoteOrder();
         }
         #endregion
 
@@ -1354,13 +1347,12 @@ namespace JWdb.DataModel
                 if (null != foot)
                 {
                     DFootnote fnFront = foot.Footnote;
-                    DFootnote fnTarget = new DFootnote(fnFront);
-                    Section.Footnotes.Append(fnTarget);
+                    DFootnote fnTarget = new DFootnote(fnFront.VerseReference, fnFront.NoteType);
+
+                    Runs.Append(new DFoot(fnTarget));
 
                     if (foot.IsSeeAlso)
                         fnTarget.ConvertCrossReferences(fnFront);
-
-                    Runs.Append(DFoot.Copy(fnTarget));
 
                     continue;
                 }

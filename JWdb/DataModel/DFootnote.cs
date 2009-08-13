@@ -71,23 +71,6 @@ namespace JWdb.DataModel
         }
 		#endregion
 
-        // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g}: DFoot Foot - Owner
-        public DFoot Foot
-        {
-            get
-            {
-                Debug.Assert(null != m_Foot);
-                return m_Foot;
-            }
-            set
-            {
-                m_Foot = value;
-            }
-        }
-        DFoot m_Foot;
-        #endregion
-
 		// Derived Attrs ---------------------------------------------------------------------
 		#region VAttr{g}: override bool IsUserEditable
 		public override bool IsUserEditable
@@ -127,6 +110,15 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region VAttr{g}: DFoot Foot - the owner
+        DFoot Foot
+        {
+            get
+            {
+                return Owner as DFoot;
+            }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region private Constructor()
@@ -135,12 +127,12 @@ namespace JWdb.DataModel
         {
         }
         #endregion
-        #region Constructor(DFootnote FnFront)
-        public DFootnote(DFootnote FnFront)
+        #region Constructor(sVerseReference, kNoteType)
+        public DFootnote(string sVerseReference, Types kNoteType)
 			: this()
 		{
-            VerseReference = FnFront.VerseReference;
-			NoteType = FnFront.NoteType;
+            VerseReference = sVerseReference;
+			NoteType = kNoteType;
 		}
 		#endregion
 		#region Constructor(nChapter, nVerse, DTranslation)
@@ -266,8 +258,6 @@ namespace JWdb.DataModel
 			return s.Substring(i).Trim();
 		}
 		#endregion
-
-
 	}
 
 }

@@ -2095,7 +2095,7 @@ namespace OurWord.Edit
             Window.Contents.OnSelectAndScrollFrom(footnote);
             m_bookmark_PositionOfFootnoteLetter = Window.CreateBookmark();
             // Make a copy of the footnote
-            m_CopyOfDeletedFootnote = new DFootnote(footnote);
+            m_CopyOfDeletedFootnote = new DFootnote(footnote.VerseReference, footnote.NoteType);
             m_CopyOfDeletedFootnote.CopyFrom(footnote, false);
 
             // Retrieve the paragraph and run that refers to it; and remove
@@ -2112,7 +2112,6 @@ namespace OurWord.Edit
                     if (foot.Footnote != footnote)
                         continue;
 
-                    footnote.Section.Footnotes.Remove(footnote);
                     p.RemoveFootnote(foot);
                     bRemoved = true;
                     break;

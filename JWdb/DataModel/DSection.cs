@@ -201,16 +201,6 @@ namespace JWdb.DataModel
 		#endregion
 
         // JAttrs ----------------------------------------------------------------------------
-		#region JAttr{g}: JOwnSeq Footnotes - Includes footnotes and SeeAlso's
-        public JOwnSeq<DParagraph> Footnotes
-		{
-			get
-			{
-				return m_osFootnotes;
-			}
-		}
-        private JOwnSeq<DParagraph> m_osFootnotes;
-		#endregion
 		#region JAttr{g}: JOwnSeq Paragraphs - a paragraph, its BT, IBT, etc.
 		public JOwnSeq<DParagraph> Paragraphs
 		{
@@ -573,11 +563,10 @@ namespace JWdb.DataModel
 		{
 			m_nSectionNo = nSectionNo;
 
-            // Paragraphs and Footnotes: flags are
+            // Paragraphs: flags are
             // - Don't check for duplicates
             // - Don't sort
             m_osParagraphs = new JOwnSeq<DParagraph>("Paras", this, false, false);
-            m_osFootnotes = new JOwnSeq<DParagraph>("Footnotes", this, false, false);
 
             // Scripture Reference Span
             j_ownReferenceSpan = new JOwn<DReferenceSpan>("RefSpan", this);
@@ -600,15 +589,13 @@ namespace JWdb.DataModel
 		#endregion
 		#region Method: void InitializeFromFrontSection(DSection SFront)
 		public void InitializeFromFrontSection(DSection SFront)
+            // Create a blank template for editing
 		{
 			m_nSectionNo = SFront.m_nSectionNo;
 
 			// Duplicate the Front's reference
 			Debug.Assert(SFront.ReferenceSpan.Start.Chapter > 0);
 			ReferenceSpan.CopyFrom(SFront.ReferenceSpan);
-
-			// Clear out the footnotes; they will be created as the paragraphs are created
-			Footnotes.Clear();
 
 			// Duplicate the Front's paragraphs
 			Paragraphs.Clear();
@@ -663,7 +650,7 @@ namespace JWdb.DataModel
 		ArrayList _GetCrossRefFootnotes(DSection section, DFootnote.Types fnType)
 		{
 			ArrayList v = new ArrayList();
-			foreach(DFootnote fn in section.Footnotes)
+			foreach(DFootnote fn in section.AllFootnotes)
 			{
 				if (fn.NoteType == fnType)
 					v.Add(fn);
@@ -2142,7 +2129,6 @@ namespace JWdb.DataModel
 					// Create and append a footnote into the Section's sequence
 					DFootnote footnote = new DFootnote(s_nChapter, s_nVerse,
                         DFootnote.Types.kExplanatory);
-                    Section.Footnotes.Append(footnote);
 
 					// Connect up the DRun in the most recent paragraph to this footnote
 					// (or alternatively, a |fn will be added.)
@@ -2468,7 +2454,6 @@ namespace JWdb.DataModel
 				// Create a footnote containing the text
                 DFootnote footnote = new DFootnote(s_nChapter, s_nVerse,
                     DFootnote.Types.kSeeAlso);
-                Section.Footnotes.Append(footnote);
 
                 // Verse Reference
                 string sVerseReference;
@@ -2895,28 +2880,6 @@ namespace JWdb.DataModel
             return c;
         }
         #endregion
-        #region Method: void UpdateFootnoteOrder()
-        public void UpdateFootnoteOrder()
-        {
-            int i = 0;
-
-            foreach (DParagraph p in Paragraphs)
-            {
-                foreach (DRun r in p.Runs)
-                {
-                    // Retrieve the run; skip if not of the right type
-                    DFoot foot = r as DFoot;
-                    if (null == foot)
-                        continue;
-
-                    // Make sure the footnotes are in the correct order
-                    int iCurrentFootnotePos = Footnotes.FindObj(foot.Footnote);
-                    Footnotes.MoveTo(iCurrentFootnotePos, i);
-                    i++;
-                }
-            }
-        }
-        #endregion
 
         // Merging ---------------------------------------------------------------------------
         #region CLASS: MergeMethod
@@ -3091,8 +3054,8 @@ namespace JWdb.DataModel
                 // Take care of the paragraphs & Footnotes 
                 for (int i = 0; i < Mine.Paragraphs.Count; i++)
                     Mine.Paragraphs[i].Merge(Parent.Paragraphs[i], Theirs.Paragraphs[i]);
-                for (int i = 0; i < Mine.Footnotes.Count; i++)
-                    Mine.Footnotes[i].Merge(Parent.Footnotes[i], Theirs.Footnotes[i]);
+                for (int i = 0; i < Mine.AllFootnotes.Count; i++)
+                    Mine.AllFootnotes[i].Merge(Parent.AllFootnotes[i], Theirs.AllFootnotes[i]);
 
                 return true;
             }
@@ -3217,7 +3180,7 @@ namespace JWdb.DataModel
                 foreach (DParagraph p in section.Paragraphs)
                     s += GetParagraphContentsAsFlatString(p);
 
-                foreach (DFootnote fn in section.Footnotes)
+                foreach (DFootnote fn in section.AllFootnotes)
                     s += GetParagraphContentsAsFlatString(fn);
 
                 return s;
@@ -3249,7 +3212,7 @@ namespace JWdb.DataModel
                         return run;
                 }
 
-                foreach (DFootnote fn in section.Footnotes)
+                foreach (DFootnote fn in section.AllFootnotes)
                 {
                     DRun run = PositionToRun(fn, ref iPos);
                     if (null != run)
@@ -3393,7 +3356,7 @@ namespace JWdb.DataModel
                     var v = new List<DParagraph>();
                     foreach (DParagraph p in section.Paragraphs)
                         v.Add(p);
-                    foreach (DFootnote fn in section.Footnotes)
+                    foreach (DFootnote fn in section.AllFootnotes)
                         v.Add(fn);
 
                     // Scan each paragraph/footnote
