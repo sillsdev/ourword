@@ -2729,12 +2729,10 @@ namespace JWdb.DataModel
 		#endregion
 
 
-        public void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+        public void SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
         {
             foreach (DParagraph p in Paragraphs)
-            {
-                p.AddToOxesBook(oxes, nodeBook);
-            }
+                p.SaveToOxesBook(oxes, nodeBook);
         }
 
 		// Methods ---------------------------------------------------------------------------

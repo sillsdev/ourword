@@ -100,6 +100,17 @@ namespace JWdb.DataModel
             return null;
         }
         #endregion
+        #region Method: StyleMapping FindMappingFromUsfm(sUsfm)
+        public StyleMapping FindMappingFromUsfm(string sUsfm)
+        {
+            foreach (StyleMapping sm in StyleMappings)
+            {
+                if (sm.Usfm == sUsfm)
+                    return sm;
+            }
+            return null;
+        }
+        #endregion
 
         // Constants -------------------------------------------------------------------------
 		public const string c_sMkrID = "id";
@@ -1261,6 +1272,8 @@ namespace JWdb.DataModel
             StyleMappings.Add(new StyleMapping("cap", "fig", "Caption"));
             StyleMappings.Add(new StyleMapping("ms", "ms", "Major Section Head"));
             StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range"));
+            StyleMappings.Add(new StyleMapping("cf", "x", "Note Cross Reference Paragraph"));
+            StyleMappings.Add(new StyleMapping("fn", "f", "Note General Paragraph"));
 
 			// TODO: Need to persist these array values
 

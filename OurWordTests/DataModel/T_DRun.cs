@@ -424,6 +424,69 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("*", DFoot.GetFootnoteLetter_bsa(8, bsa));
         }
         #endregion
+
+        #region Test: OxesIO_Simple
+        [Test] public void OxesIO_Simple()
+        {
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
+            DB.TeamSettings.EnsureInitialized();
+
+            var oxes = new OurWordXmlDocument();
+            var node = oxes.AddNode(null, "para");
+
+            // Create a footnote
+            string sFootnoteText = "One of the key verses in the Bible.";
+            var footnoteIn = new DFootnote("3:16b", DFootnote.Types.kExplanatory);
+            footnoteIn.SimpleText = sFootnoteText;
+            var footIn = new DFoot(footnoteIn);
+
+            // Output it to an xml node
+            var nodeFoot = footIn.SaveToOxesBook(oxes, node);
+
+            // Create a new footnote from that xml node
+            var footOut = DFoot.Create(nodeFoot);
+
+            // Should be identical
+            Assert.IsNotNull(footOut);
+            Assert.AreEqual("3:16b", footOut.Footnote.VerseReference);
+            Assert.AreEqual(DFootnote.Types.kExplanatory, footOut.Footnote.NoteType);
+            Assert.AreEqual(sFootnoteText, footOut.Footnote.SimpleText);
+        }
+        #endregion
+        #region Test: OxesIO_MultiplePhrases
+        [Test] public void OxesIO_MultiplePhrases()
+        {
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
+            DB.TeamSettings.EnsureInitialized();
+
+            var oxes = new OurWordXmlDocument();
+            var node = oxes.AddNode(null, "para");
+
+            // Create a footnote
+            var footnoteIn = new DFootnote("1:2", DFootnote.Types.kExplanatory);
+            var text = new DText();
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "This is "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "very, very "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevBold, "cool "));
+            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "indeed!"));
+            footnoteIn.Runs.Append(text);
+            var footIn = new DFoot(footnoteIn);
+
+            // Output it to an xml node
+            var nodeFoot = footIn.SaveToOxesBook(oxes, node);
+
+            // Create a new footnote from that xml node
+            var footOut = DFoot.Create(nodeFoot);
+
+            // Should be identical
+            Assert.IsNotNull(footOut);
+            Assert.AreEqual("1:2", footOut.Footnote.VerseReference);
+            Assert.AreEqual(DFootnote.Types.kExplanatory, footOut.Footnote.NoteType);
+            Assert.AreEqual("This is |ivery, very |r|bcool |rindeed!", footOut.Footnote.DebugString);
+        }
+        #endregion
     }
     #endregion
 
@@ -587,6 +650,7 @@ namespace OurWordTests.DataModel
     }
     #endregion
 
+    #region CLASS: T_DVerse
     [TestFixture] public class T_DVerse
     {
         #region Setup
@@ -606,7 +670,7 @@ namespace OurWordTests.DataModel
             var verseIn = new DVerse("13b");
 
             // Output it to an xml node
-            var nodeVerse = verseIn.AddToOxesBook(oxes, node);
+            var nodeVerse = verseIn.SaveToOxesBook(oxes, node);
 
             // Create a new verse from that xml node
             var verseOut = DVerse.Create(nodeVerse);
@@ -617,7 +681,9 @@ namespace OurWordTests.DataModel
         }
         #endregion
     }
+    #endregion
 
+    #region CLASS: T_DChapter
     [TestFixture] public class T_DChapter
     {
         #region Setup
@@ -637,7 +703,7 @@ namespace OurWordTests.DataModel
             var chapterIn = DChapter.Create("5");
 
             // Output it to an xml node
-            var nodeChapter = chapterIn.AddToOxesBook(oxes, node);
+            var nodeChapter = chapterIn.SaveToOxesBook(oxes, node);
 
             // Create a new chapter from that xml node
             var chapterOut = DChapter.Create(nodeChapter);
@@ -648,5 +714,5 @@ namespace OurWordTests.DataModel
         }
         #endregion
     }
-
+    #endregion
 }

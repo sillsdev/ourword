@@ -1696,7 +1696,7 @@ namespace JWdb.DataModel
 
                 // Add the Sections
                 foreach (DSection section in Sections)
-                    section.AddToOxesBook(oxes, nodeBook);
+                    section.SaveToOxesBook(oxes, nodeBook);
 
                 return oxes;
             }

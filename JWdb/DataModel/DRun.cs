@@ -160,8 +160,8 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region virtual XmlNode AddToOxesDoc(OurWordXmlDocument oxes, XmlNode nodeParent)
-        public virtual XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        #region virtual XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public virtual XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
             return null;
         }
@@ -196,6 +196,7 @@ namespace JWdb.DataModel
 		#endregion
 	}
 	#endregion
+
 	#region Class: DVerse
 	public class DVerse : DRun
 	{
@@ -386,8 +387,8 @@ namespace JWdb.DataModel
             return null;
         }
         #endregion
-        #region OMethod: XmlNode AddToOxesBook(oxes, nodeParent)
-        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParent)
+        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, c_sNodeTag);
             oxes.AddAttr(node, c_sAttrText, Text);
@@ -404,6 +405,7 @@ namespace JWdb.DataModel
 		#endregion
 	}
 	#endregion
+
 	#region Class: DChapter
 	public class DChapter : DRun
 	{
@@ -547,8 +549,8 @@ namespace JWdb.DataModel
             return null;
         }
         #endregion
-        #region OMethod: XmlNode AddToOxesBook(oxes, nodeParent)
-        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParent)
+        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, c_sNodeTag);
             oxes.AddAttr(node, c_sAttrText, Text);
@@ -785,14 +787,6 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        /*
-        #region SMethod: DFoot Copy(DFootnote)
-        static public DFoot Copy(DFootnote footnote)
-        {
-            return new DFoot(footnote);
-        }
-        #endregion
-        **/
 
         // DRun Override Scaffolding ---------------------------------------------------------
 		#region OAttr{g}: override string AsString
@@ -858,36 +852,67 @@ namespace JWdb.DataModel
 
         // Oxes ------------------------------------------------------------------------------
         public const string c_sNodeTag = "note";
+        const string c_sAttrVerseRef = "reference";
+        const string c_sAttrStyle = "style";
+        const string c_sAttrUsfm = "usfm";
         #region SMethod: DFoot Create(XmlNode node)
         static public DFoot Create(XmlNode node)
         {
             if (node.Name != c_sNodeTag)
                 return null;
 
-            // TODO!
+            // Retrieve the attributes; complain if missing or empty
+            string sVerseReference = OurWordXmlDocument.GetAttrValue(node, c_sAttrVerseRef, "");
+            if (string.IsNullOrEmpty(sVerseReference))
+                throw new OurWordXmlDocumentException("Missing Reference attribute in oxes read.");
 
-            return null;
+            string sStyle = OurWordXmlDocument.GetAttrValue(node, c_sAttrStyle, "");
+            if (string.IsNullOrEmpty(sStyle))
+                throw new OurWordXmlDocumentException("Missing Style attribute in oxes read.");
+
+            string sUsfm = OurWordXmlDocument.GetAttrValue(node, c_sAttrUsfm, "");
+            if (string.IsNullOrEmpty(sUsfm))
+                throw new OurWordXmlDocumentException("Missing Usfm attribute in oxes read.");
+
+            // The Usfm and the Style should match up; if they don't, we hardly know which
+            // one the user wanted.
+            var map = DB.Map.FindMappingFromUsfm(sUsfm);
+            if (null == map || map.Name != sStyle)
+                throw new OurWordXmlDocumentException("Style and Usfm data do not match.");
+
+            // Create the empty footnote, and place it into a DFoot object
+            var footnote = new DFootnote(
+                sVerseReference, 
+                ((sUsfm == "x") ? DFootnote.Types.kSeeAlso : DFootnote.Types.kExplanatory));
+            var foot = new DFoot(footnote);
+
+            // Buld the footnote content
+            foreach (XmlNode child in node.ChildNodes)
+                footnote.ReadOxesPhrase(child);
+
+            return foot;
         }
         #endregion
-
-        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParent)
+        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, c_sNodeTag);
 
             if (!string.IsNullOrEmpty(Footnote.VerseReference))
-                oxes.AddAttr(node, "reference", Footnote.VerseReference);
+                oxes.AddAttr(node, c_sAttrVerseRef, Footnote.VerseReference);
 
-            oxes.AddAttr(node, "style",
+            oxes.AddAttr(node, c_sAttrStyle,
                 IsSeeAlso ? "Note Cross Reference Paragraph" : "Note General Paragraph");
 
-            oxes.AddAttr(node, "usfm",
+            oxes.AddAttr(node, c_sAttrUsfm,
                 IsSeeAlso ? "x" : "f");
 
             foreach (DRun run in Footnote.Runs)
-                run.AddToOxesBook(oxes, node);
+                run.SaveToOxesBook(oxes, node);
 
             return node;
         }
+        #endregion
 
         // Methods ---------------------------------------------------------------------------
         #region OMethod: void ToSfm(ScriptureDB DBS)
@@ -1369,6 +1394,67 @@ namespace JWdb.DataModel
                     Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
             }
             #endregion
+
+            // Oxes --------------------------------------------------------------------------
+            #region Oxes Constants
+            const string c_sTagSpan = "span";
+            const string c_sAttrStyle = "style";
+
+            const string c_sStyleNameItalic = "Italic";
+            const string c_sStyleNameBold = "Bold";
+            #endregion
+            #region Method: void ReadOxesPhrase(XmlNode)
+            public void ReadOxesPhrase(XmlNode node)
+            {
+                // If we have a Span, then get its style
+                string sStyle = DStyleSheet.c_sfmParagraph;
+                if (node.Name == c_sTagSpan)
+                {
+                    var sStyleName = OurWordXmlDocument.GetAttrValue(node, c_sAttrStyle, 
+                        DStyleSheet.c_sfmParagraph);
+                    switch (sStyleName)
+                    {
+                        case c_sStyleNameItalic:
+                            sStyle = DStyleSheet.c_StyleAbbrevItalic;
+                            break;
+                        case c_sStyleNameBold:
+                            sStyle = DStyleSheet.c_StyleAbbrevBold;
+                            break;
+                    }
+                }
+
+                // Create the new phrase
+                var phrase = new DPhrase(sStyle, node.InnerText);
+                Append(phrase);
+            }
+            #endregion
+            #region Method: XmlNode SaveToOxesBook(oxes, nodeParagraph)
+            public void SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+            {
+                if (Count == 0 || string.IsNullOrEmpty(AsString))
+                    return;
+
+                foreach (DPhrase p in this)
+                {
+                    XmlNode nodeParent = nodeParagraph;
+
+                    if (p.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
+                    {
+                        nodeParent = oxes.AddNode(nodeParent, c_sTagSpan);
+
+                        string sStyleName = p.CharacterStyleAbbrev;
+                        if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
+                            sStyleName = c_sStyleNameItalic;
+                        if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
+                            sStyleName = c_sStyleNameBold;
+
+                        oxes.AddAttr(nodeParent, c_sAttrStyle, sStyleName);
+                    }
+
+                    oxes.AddText(nodeParent, p.Text);
+                }
+            }
+            #endregion
         }
         #endregion
         #region JAttr{g}: DPhrases Phrases
@@ -1663,25 +1749,41 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        public override XmlNode AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+        // Oxes ------------------------------------------------------------------------------
+        const string c_sAttrBackTranslation = "bt";
+        #region Method: void ReadOxesPhrase(XmlNode node)
+        public void ReadOxesPhrase(XmlNode node)
+            // With well-formed data, we always expect to be adding a phrase here, as opposed
+            // to appending data to an existing phrase.
         {
-            if (Phrases.Count > 0 && !string.IsNullOrEmpty(AsString))
+            // Back translation
+            if (node.Name == c_sAttrBackTranslation)
             {
-                foreach (DPhrase p in Phrases)
-                    p.AddToOxesDoc(oxes, nodeParagraph);
+                foreach (XmlNode child in node.ChildNodes)
+                    PhrasesBT.ReadOxesPhrase(child);
+                return;
             }
+
+            // Vernacular text
+            Phrases.ReadOxesPhrase(node);
+        }
+        #endregion
+        #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParagraph)
+        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+        {
+            Phrases.SaveToOxesBook(oxes, nodeParagraph);
 
             if (PhrasesBT.Count > 0 && !string.IsNullOrEmpty(ProseBTAsString))
             {
-                var nodeBT = oxes.AddNode(nodeParagraph, "bt");
-                foreach (DPhrase pBT in PhrasesBT)
-                    pBT.AddToOxesDoc(oxes, nodeBT);
+                var nodeBT = oxes.AddNode(nodeParagraph, c_sAttrBackTranslation);
+                PhrasesBT.SaveToOxesBook(oxes, nodeBT);
             }
 
             return nodeParagraph;
         }
+        #endregion
 
-		// Methods ---------------------------------------------------------------------------
+        // Methods ---------------------------------------------------------------------------
 		#region Method: override void EliminateSpuriousSpaces()
 		public override void EliminateSpuriousSpaces()
 		{
@@ -2500,39 +2602,6 @@ namespace JWdb.DataModel
 			return v;
 		}
 		#endregion
-
-        // Oxes ------------------------------------------------------------------------------
-
-        static public DPhrase CreateFromOxesDoc(OurWordXmlDocument oxes, XmlNode node)
-        {
-            return null;
-        }
-
-        public void AddToOxesDoc(OurWordXmlDocument oxes, XmlNode nodeParent)
-            // Adds the phrase's text to the parent node. For anything other than normal
-            // style, the text is placed within a span to indicate the style.
-            //
-            // nodeParent - for the vernacular, this is the paragraph; for a back translation,
-            //     this is a BT node.
-        {
-            if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-            {
-                nodeParent = oxes.AddNode(nodeParent, "span");
-
-                string sStyleName = CharacterStyleAbbrev;
-
-                if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
-                    sStyleName = "Italic";
-                if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
-                    sStyleName = "Bold";
-
-                oxes.AddAttr(nodeParent, "style", sStyleName);
-            }
-
-            oxes.AddText(nodeParent, Text);
-        }
-
-
 
 	}
 	#endregion

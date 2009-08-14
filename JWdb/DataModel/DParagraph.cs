@@ -1509,39 +1509,54 @@ namespace JWdb.DataModel
         }
         int m_nID = -1;
 
-        static public DParagraph CreateFromOxesDoc(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+        #region Method: void ReadOxesPhrase(XmlNode)
+        public void ReadOxesPhrase(XmlNode node)
+        {
+            // We want to add the node's data (which will be a phrase) to a DText. If the 
+            // last Run isn't a DText, then append an empty one.
+            if (0 == Runs.Count || null == Runs[Runs.Count - 1] as DText)
+                Runs.Append(new DText());
+            var text = Runs[Runs.Count - 1] as DText;
+            Debug.Assert(null != text);
+
+            // Let the DText place it where it belongs (e.g., back translation, italic phrase,
+            // varnacular text, whatever.
+            text.ReadOxesPhrase(node);
+        }
+        #endregion
+
+        static public DParagraph Create(OurWordXmlDocument oxes, XmlNode nodeParagraph)
         {
             var p = new DParagraph();
 
-            foreach (XmlNode node in nodeParagraph.ChildNodes)
+            foreach (XmlNode child in nodeParagraph.ChildNodes)
             {
-                switch (node.Name)
+                switch (child.Name)
                 {
                     case DVerse.c_sNodeTag:
-                        p.Runs.Append(DVerse.Create(node));
+                        p.Runs.Append(DVerse.Create(child));
                         break;
 
                     case DChapter.c_sNodeTag:
-                        p.Runs.Append(DChapter.Create(node));
+                        p.Runs.Append(DChapter.Create(child));
                         break;
 
                     case DFoot.c_sNodeTag:
-                        p.Runs.Append(DFoot.Create(node));
+                        p.Runs.Append(DFoot.Create(child));
                         break;
 
+                    default:
+                        p.ReadOxesPhrase(child);
+                        break;
                 }
-
- //               DRun run = null;
- //               if (null != node as XmlText)
- //                   run = DPhrase.CreateFromOxesDoc(oxes, node as XmlText);
             }
 
             return null;
         }
 
-
-
-        public virtual void AddToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+        #region VMethod: void SaveToOxesBook(oxes, nodeBook)
+        public virtual void SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+            // Saves the paragraph to the oxes document.
         {
             var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
             Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
@@ -1552,10 +1567,9 @@ namespace JWdb.DataModel
             oxes.AddAttr(nodeParagraph, "id", oxes.IntToID(ID));
 
             foreach (DRun run in Runs)
-                run.AddToOxesBook(oxes, nodeParagraph);
-
-
+                run.SaveToOxesBook(oxes, nodeParagraph);
         }
+        #endregion
 
         // Merging ---------------------------------------------------------------------------
         #region VirtMethod: void Merge(DParagraph Parent, DParagraph Theirs)

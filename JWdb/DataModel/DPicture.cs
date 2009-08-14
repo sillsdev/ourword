@@ -246,7 +246,12 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-        public override void AddToOxesBook(OurWordXmlDocument oxes, System.Xml.XmlNode nodeBook)
+        // Oxes ------------------------------------------------------------------------------
+
+        // TODO: Corresponding read method
+
+        #region OMethod: void SaveToOxesBook(oxes, nodeBook)
+        public override void SaveToOxesBook(OurWordXmlDocument oxes, System.Xml.XmlNode nodeBook)
         {
             var node = oxes.AddNode(nodeBook, "fig");
 
@@ -258,9 +263,10 @@ namespace JWdb.DataModel
             oxes.AddAttr(node, "id", oxes.IntToID(ID));
 
             foreach (DRun run in Runs)
-                run.AddToOxesBook(oxes, node);        
+                run.SaveToOxesBook(oxes, node);
         }
+        #endregion
 
 
-	}
+    }
 }
