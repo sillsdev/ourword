@@ -1703,6 +1703,27 @@ namespace JWdb.DataModel
         }
 
         // Merging ---------------------------------------------------------------------------
+        #region Method: void Merge(DBook Parent, DBook Theirs)
+        public void Merge(DBook Parent, DBook Theirs)
+        {
+            // Debug.Fail("Breakpoint");
+
+            // Merge the histories
+            History.Merge(Parent.History, Theirs.History);
+
+            // At this point we must assume the same number of sections
+            if (Sections.Count != Parent.Sections.Count)
+                return;
+            if (Sections.Count != Theirs.Sections.Count)
+                return;
+
+            // Merge the sections
+            for (int i = 0; i < Sections.Count; i++)
+            {
+                Sections[i].Merge(Parent.Sections[i], Theirs.Sections[i]);
+            }
+        }
+        #endregion
         #region OMethod: void Merge(JObject Parent, JObject Theirs, bool bWeWin)
         public override void Merge(JObject Parent, JObject Theirs, bool bWeWin)
         {
