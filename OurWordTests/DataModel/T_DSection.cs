@@ -146,9 +146,9 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"B\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
                     "<c n=\"1\"/>",
                     "<v n=\"1\"/>",
                     "Ije lais alekot. Ije Uis-neno In Anmone",
@@ -161,28 +161,28 @@ namespace OurWordTests.DataModel
                     "<bt>life. His name is Jesus Kristus, who God designated beforehand from long ago. His story/issue begins like this:</bt>",
                 "</p>",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
                     "Nai' Joao Aslain Atoni, naleko' lalan neu Usif Jesus",
                     "<bt>Sir Joao the *Baptiser of People, fix/prepares the way/path for the *Lord Jesus</bt>",
                 "</p>",
 
-                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"F\">",
                     "(Mateus 3:1-12; Lukas 3:1-18; Joao 1:19-28)",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                     "<v n=\"2\"/>",
                     "Jesus fe' ka nanaob In mepu, mes Uis-neno nsonu' nahuun In atoni mese', in kanan nai' Joao. Nai' Joao musti nao naleko' lalan neu Jesus In amneman. Fun natuin na'ko un-unu', Uis-neno anpaek nalail In mafeef' es. Mafefa' nane, in kanan Na'i Yesaya. In ntui nani, nak on ii:",
                     "<bt>Jesus had not yet begun His work, but God sent beforehand one of His men, whose name as sir Joao. Sir Joao must fix/prepare the path/way for Jesus' coming. Because from long ago, God had used one of His mouth (=spokesperson). That spokesperson was named Grandfather/ancestor Yesaya. He had written like this:</bt>",
                 "</p>",
 
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"F\">",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"H\">",
                     "&lt;&lt;Mneen nai, he! Au 'leul Au 'haef ma 'nimaf, henati nao naleko' lalan neu Ko",
                     "<bt>&lt;&lt;Listen up, he! I send My foot and hand (=trusty servant) to go fix/prepare the way/path for You.</bt>",
                     "<note reference=\"1:2\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Maleakhi 3:1</note>",
                 "</p>",
 
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"G\">",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"J\">",
                      "<v n=\"3\"/>",
                      "Le atoni nane lof in anao mbi bael sona' es, he in nkoa', mnak:",
                      "<bt>That man will go to an uninhabited place, to shout.words, saying:</bt>",
@@ -296,18 +296,18 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
                     "Nai' Joao naslain Usif Jesus",
                     "<bt>Sirr Joao baptises the Lord Jesus</bt>",
                 "</p>",
 
-                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"C\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
                     "(Mateus 3:13-17; Lukas 3:21-22)",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
                     "<v n=\"9\"/>",
                     "Mbi neno nane, Jesus neem na'ko kuan Najaret, mbi profinsia Galilea, ma he na'euk nok nai' Joao. Ma nai' Joao naslani Ee mbi noel Jordan.",
                     "<bt>At that time, Jesus came from the village of Najaret, in the profinsia of Galilea, and he met with sir Joao. And sir Joao *baptised Him in the Jordan river.</bt>",
@@ -319,23 +319,23 @@ namespace OurWordTests.DataModel
                     "<bt>And then was heard (=no Actor) God's voice from the sky, saying,</bt>",
                 "</p>",
 
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"E\">",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"G\">",
                     "&lt;&lt;Ho le' ii, Au An-Honi'.",
                     "<bt>&lt;&lt;You here, are My 1) very own Child, 2) beloved Child [ambiguous].</bt>",
                 "</p>",
 
-                "<p style=\"Line 2\" usfm=\"q2\" id=\"F\">",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"H\">",
                     "Ho es meki mhaliin Kau, Au nekak.&gt;&gt;",
                     "<bt>You are the one who pleases my liver.&gt;&gt;</bt>",
                     "<note reference=\"1:11\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Kejadian 22:2, Mazmur 2:7, Yesaya 42:1, Mateus 3:17, 12:18, Markus 9:7, Lukas 3:22</note>",
                 "</p>",
 
-                "<fig path=\"c:\\graphics\\cook\\cnt\\cn01656b.tif\" msword=\"width:9.0cm\" id=\"G\">",
+                "<fig path=\"c:\\graphics\\cook\\cnt\\cn01656b.tif\" rtfInfo=\"width:9.0cm\" id=\"J\">",
                     "Joao naslain nalail Usif Jesus",
                     "<bt>Joao has finished baptising the Lord Yesus</bt>",
                 "</fig>",
 
-               "<p style=\"Paragraph\" usfm=\"p\" id=\"H\" />",
+               "<p style=\"Paragraph\" usfm=\"p\" id=\"K\" />",
 
             "</book>",
             "</bible>"
@@ -520,35 +520,35 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
                     "Usif Jesus ansae on neno-tunan",
                     "<bt>The Lord Jesus ascends to heaven</bt>",
                 "</p>",
 
-                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"C\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
                     "(Lukas 24:50-53; Haefin 1:9-11)",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
                     "<v n=\"19\"/>",
                     "Namolok nalail nok In atopu'-noina' sin, Uis-neno na'aiti' nasaeb Usif Jesus on sonaf neno-tunan. Mbi nane, In ntook mbi Uis-neno In banapan a'ne'u, ma sin nhuuk plenat nabuan.",
                     "<bt>After having spoken with His disciples, God took up the Lord Jesus to the palace/kingdom in heaven. There, He sits at God's right side, and they hold rule together.</bt>",
                     "<note reference=\"16:19\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Kisah Para Rasul 1:9-11</note>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                     "<v n=\"20\"/>",
                     "Nalali te, In atopu'-noina' sin nanaoba In aplenat. Sin naon neu pah-pah, ma natonan Usif Jesus In Lais Alekot neu atoni ok-oke'. Ma Uis-neno nfee sin kuasat, henati sin anmo'en lasi mkakat ok-oke' le' Usif Jesus natoon nalail neu sin. Ma nalail, nmui' atoni namfau le' npalsai neu Usif Jesus, fun sin nahinen nak, Lais Alekot nane, namneo.",
                     "<bt>After that, His disciples carried out His commands. They went to various lands and told the Lord Jesus' Good News to all people. And God gave them power so that they did all the miracles that the Lord Jesus had foretold to them. And then, there were many people who believed in the Lord Jesus, cause they knew that the Good News was true.</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\" />",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\" />",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\" />",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"H\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"K\">",
                     "NAI' MARKUS NAHEUB IN MOLOK, NATUIN LULAT UN-UNU' BIAN",
                     "<bt>Sir Markus ends his story, according to other old writings</bt>",
                     "<note reference=\"16:9-10\" style=\"Note General Paragraph\" usfm=\"f\">",
@@ -557,7 +557,7 @@ namespace OurWordTests.DataModel
                     "</note>",
                 "</p>",
                
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"I\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"L\">",
                     "<v n=\"9\"/>",
                     "Olas bifeel teun in nane, naon ntenuk sin Pedru, sin natonan ok-oke' le' alelo sin niit li'an munif nane, le' namolok nok sin mbi bol fatu.",
                     "<bt>When those three women went arriving at Pedru, they told everything that they had just seen of that young man, which he had told them at the rock hole.</bt>",
@@ -566,14 +566,14 @@ namespace OurWordTests.DataModel
                     "<bt>Then the Lord Jesus himself commanded His disciples to go tell this Good News of His in all lands/countries, until the far corners of the earth. This Good News shows the way so that God can wipe away the sins1 and wrongs1 of many people, and so they can live continually with God.</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"M\">",
                     "Lais Alekot ije, namneo on naan. Es nane te, Lais Alekot ii nhaek piut, tal antee nabal-baal. Amen.",
                     "<bt>This Good News is really true. That is why this Good News continues to stand, forever. Amen.</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"K\" />",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"N\" />",
 
-                "<fig path=\"c:\\graphics\\maps\\bible\\palestinTP.jpg\" msword=\"width:10.5cm\" id=\"L\" />",
+                "<fig path=\"c:\\graphics\\maps\\bible\\palestinTP.jpg\" rtfInfo=\"width:10.5cm\" id=\"P\" />",
 
             "</book>",
             "</bible>"
@@ -692,34 +692,34 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Header\" usfm=\"h\" id=\"A\">",
+                "<p style=\"Header\" usfm=\"h\" id=\"B\">",
                     "Mark",
                 "</p>",
 
-                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"B\">",
+                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"C\">",
                     "The Gospel Of",
                 "</p>",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"C\">",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"D\">",
                     "Mark",
                 "</p>",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"F\">",
                     "Usif Jesus naleta' neu fini le' in nesan an-ana' neis",
                     "<bt>The Lord Jesus give an example of a seed that is extremely tiny</bt>",
                 "</p>",
 
-                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"E\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"G\">",
                     "(Mateus 13:31-32, 34; Lukas 13:18-19)",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
                     "<v n=\"30\"/>",
                     "Oke te, <span style=\"Italic\">Jesus namolok</span> antein, mnak, &lt;&lt;Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok.",
                     "<bt>Then Jesus spoke again, saying, &lt;&lt;I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\">",
                     "<v n=\"31\"/>",
                     "Nane namnees onle' fini le' in nesan an-ana' neis.",
                     "<bt>That is like a seed that is very tiny.</bt>",
@@ -728,7 +728,7 @@ namespace OurWordTests.DataModel
                     "<bt>If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.&gt;&gt;</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"K\">",
                     "<v n=\"33\"/>",
                     "Jesus In na'noina' in ma'mo'en natuin sin hiin kini.",
                     "<bt>Jesus' way of teaching was according to their understanding.</bt>",
@@ -890,34 +890,34 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Header\" usfm=\"h\" id=\"A\">",
+                "<p style=\"Header\" usfm=\"h\" id=\"B\">",
                     "Mark",
                 "</p>",
 
-                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"B\">",
+                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"C\">",
                     "The Gospel Of",
                 "</p>",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"C\">",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"D\">",
                     "Mark",
                 "</p>",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"F\">",
                     "Ne he jangu ba mina menema e vili ele boal, ma Tuhang Yesus enang",
                 "</p>",
 
-                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"E\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"G\">",
                     "(Matius 26:6-13; Yohanis 12:1-8)",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
                    "<c n=\"1\"/>",
                    "<v n=\"1\"/>",
                     "Abang Betania mi, ne nu ue ene Simon. Turang mi, ne ava aing veng ororing, tagal dirang hapeburang aing veng. Ba sakarang, ana aung ila.",
                     "<bt>This is some back translation.</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\">",
                     "Seng angu mu, o|ras angu ve|d-ved aung hoa jedung, Yesus ini ue ila Simon e hava mi nana. |Oras |ini nana, nehe jangu nu Yesus evele hoa Aing dapa. Ana ue botol nu pina ba ini var ma ening. |Mina nemema asli ba mi evili talalu ele.",
                     "<bt>This is some more back translation.</bt>",
                     "<note reference=\"1:1\" style=\"Note General Paragraph\" usfm=\"f\">",
@@ -926,7 +926,7 @@ namespace OurWordTests.DataModel
                     "Seng, nebe jangu angu botol ememng angu|fn ma vil bue ening kivita. Mu ana boal ening to tu tahang-tahang mina angu ma Yesus ong tang|, e jadi tanda Yesus Aing ta janing",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"K\">",
                    "<v n=\"2\"/>",
                     "Ba ne }}ebeung iva di {{ue umurung}} nana. Oras ini eteing nehe jangu " +
 			    "angu ening ula{{{{ng angu, mi ini ili il, e ini i ta tu}}tuk sombong " +
@@ -938,7 +938,7 @@ namespace OurWordTests.DataModel
                     "<bt>Forescore and seven years ago,</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"I\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"L\">",
                    "<v n=\"4\"/>",
                     "Ba Yesus balas hula, &lt;&lt;Ini ake nehe jangu anga ening susa! Mang aing kilang ba! Na sanang, tagal mina menema anga ana ma Noboa veng obokong ila.",
                     "<bt>our forefathers brought forth on this continant</bt>",
@@ -1100,24 +1100,24 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Header\" usfm=\"h\" id=\"A\">",
+                "<p style=\"Header\" usfm=\"h\" id=\"B\">",
                     "Mark",
                 "</p>",
 
-                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"B\">",
+                "<p style=\"Title Secondary\" usfm=\"mt2\" id=\"C\">",
                     "The Gospel Of",
                 "</p>",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"C\">",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"D\">",
                     "Mark",
                 "</p>",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"F\">",
                     "Tulu-tulu agama las haman Petrus nol Yohanis maas tala",
                     "<bt>The heads of religion summon Petrus and Yohanis to come appear.before [them]</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                    "<c n=\"4\" />",
                    "<v n=\"1\" />",
                     "Dedeng na, Petrus nol Yohanis nahdeh nabael nol atuli las sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in Kohe kanas Tene ka, nol atuil deng partai agama Saduki. Oen maas komali le ahan Petrus nol Yohanis.",
@@ -1137,7 +1137,7 @@ namespace OurWordTests.DataModel
                     "<bt>But from the people who liked to hear from those apostles, therefore many people had already acknowledged that that which they taught, [was] spot.on correct. That's.why their people increased a lot approximately to five thousand people.</bt>",
                 "</p>",
 
-                "<fig path=\"c:\\graphics\\cook\\cnt\\cn01901b.tif\" msword=\"width:7.0cm;textWrapping:around;horizontalPosition:right\" id=\"F\">",
+                "<fig path=\"c:\\graphics\\cook\\cnt\\cn01901b.tif\" rtfInfo=\"width:7.0cm;textWrapping:around;horizontalPosition:right\" id=\"H\">",
                     "Atuil-atuil tene kas klaa Petrus nol tapang ngas",
                     "<bt>The leaders accuse/criticise Petrus and his friends</bt>",
                 "</fig>",
@@ -1326,20 +1326,20 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
                     "Oen pasang tele Stefanus",
                     "<bt>They throw killing Stefanus</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
                     "<v n=\"54\" />",
                     "Atuil man dad le nehan dasi la, ming Stefanus in dehet ta, oen tan meman noan un soleng bel oen kula ka. Hidim oen dalen ili le duu-duu siin nol Stefanus.",
                     "<bt>The person (pl?) who were sitting to take.care of the litigation heard that speaking of Stefanus', they knew that he was throwing_out giving their wrongs. So they were very angry [lit. sick insides] to ate/ground their teeth for Stefanus.</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
                     "<v n=\"55\" />",
                     "Mo Stefanus man hapu Ama Lamtua Ko Niu' ka, botas ngat laok el apan nua. Se la, un ngat net Ama Lamtua Allah dui to-toang nol Ama Lamtua Yesus dil se Ama Lamtua Allah halin kanan na, se man in todan dui ka.",
                     "<bt>But Stefanus who had obtained that Holy Spirit of the Lord's, lifted his eyes to look at the sky. There, he saw all the Lord God's greaterness, and the Lord Yesus standing at the Lord God's right side in that place which is more honorable.</bt>",
@@ -1348,7 +1348,7 @@ namespace OurWordTests.DataModel
                     "<bt>And Stefanus spoke saying, &lt;&lt;Like this!, All fathers. I am seeing the sky open, and Humanity's Child standing at that place which is most honorable at the Lord God's right side.&gt;&gt;</bt>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                     "<v n=\"57\" />",
                     "Ming ela kon, atuil in nehan dasi la ka oen kuim hngilans. Hidim oen kidu ahan le tek Stefanus noan boel lobo lo. Kon oen tukin haung pul leo-leo le pisu sisin Stefanus.",
                     "<bt>Hearing that then, the people who take care of that litigation shut? their ears. Then they yelled screaming to order Stefanus to shut (his) mouth. And they all jumped up quickly with.alot.of.excitement in.order.to tear apart Stefanus.</bt>",
@@ -1357,12 +1357,12 @@ namespace OurWordTests.DataModel
                     "<bt>Then they forced him out going outside the city. Next the witnesses took off their outside clothes, to give them to a young person to hold. His name Saulus, he was their inciter (lit. fanner). And then, they went to throw kill Stefanus using stones.</bt>",
                 "</p>",
 
-                "<fig path=\"c:\\graphics\\cook\\cnt\\cn02154b.tif\" msword=\"width:11.0cm;verticalPosition:top;horizontalPosition:center\" id=\"F\">",
+                "<fig path=\"c:\\graphics\\cook\\cnt\\cn02154b.tif\" rtfInfo=\"width:11.0cm;verticalPosition:top;horizontalPosition:center\" id=\"H\">",
                     "Oen pasang tele Stefanus",
                     "<bt>They throw killing Stefanus</bt>",
                 "</fig>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\">",
                     "<v n=\"59\" />",
                     "Oen pasang Stefanus nabael ela kon, un haman mu-muun le tek noan, &lt;&lt;Ama Lamtua Yesus! Auk oras sa da-dani son. Sium auk tia!&gt;&gt;",
                     "<bt>They were throwing at Stefanus, then he yelled with a loud voice saying, &lt;&lt;Lord Yesus! My time is very close. Receive Me (imperative)!&gt;&gt;</bt>",
@@ -1465,15 +1465,15 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\" />",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\" />",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
                     "<v n=\"4\" />",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
                     "<note style=\"Note General Paragraph\" usfm=\"f\" />",
                     "<note reference=\"1:4\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
                         "La'o sai hosi Mesir 3:14, Rai-klaran Foun 4:5",
@@ -1481,7 +1481,7 @@ namespace OurWordTests.DataModel
                     "<v n=\"5\" />",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                     "<note reference=\"1:5\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
                         "Yesaya 55:4, Kananuk sia 89:27",
                     "</note>",
@@ -1491,31 +1491,31 @@ namespace OurWordTests.DataModel
                     "</note>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
                     "<v n=\"7\" />",
                     "<note reference=\"1:7\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
                         "Daniel 7:13, Santo Mateus 24:30, Santo Markus 13:26, Santo Lukas 21:27, 1 Tesalonika 4:17, Sakarias 12:10, Santo Yohanis 19:34, 37",
                     "</note>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"J\">",
                     "<v n=\"8\" />",
                 "</p>",
 
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"H\" />",
-                "<p style=\"Line 2\" usfm=\"q2\" id=\"I\" />",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"K\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"L\" />",
 
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"J\" />",
-                "<p style=\"Line 2\" usfm=\"q2\" id=\"K\" />",
-
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"L\" />",
-                "<p style=\"Line 2\" usfm=\"q2\" id=\"M\" />",
-
-                "<p style=\"Line 1\" usfm=\"q1\" id=\"N\" />",
-                "<p style=\"Line 2\" usfm=\"q2\" id=\"O\" />",
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"M\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"N\" />",
 
                 "<p style=\"Line 1\" usfm=\"q1\" id=\"P\" />",
-                "<p style=\"Line 2\" usfm=\"q2\" id=\"Q\">",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"Q\" />",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"R\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"S\" />",
+
+                "<p style=\"Line 1\" usfm=\"q1\" id=\"T\" />",
+                "<p style=\"Line 2\" usfm=\"q2\" id=\"V\">",
                     "<note reference=\"1:8\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">",
                         "Rai-klaran Foun 22:13, La'o sai hosi Mesir 3:14",
                     "</note>",
@@ -1591,17 +1591,17 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
                     "Yesus kase tau samua tu mo jadi di hari-hari siksa",
                 "</p>",
 
-                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"C\">",
+                "<p style=\"Parallel Passage Reference\" usfm=\"r\" id=\"D\">",
                     "(Matius 24:15-28; Lukas 21:20-24)",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
                     "<v n=\"14\" />",
                     "Yesus bilang, &quot;Satu orang yang paling jaha",
                     "<note reference=\"13:14a\" style=\"Note General Paragraph\" usfm=\"f\">",
@@ -1615,7 +1615,7 @@ namespace OurWordTests.DataModel
                     "<note reference=\"13:14\" style=\"Note Cross Reference Paragraph\" usfm=\"x\">Daniel 9:27, 11:31, 12:11</note>",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                     "<v n=\"15\" />",
                     "Tu orang yang ada di atas ruma, jang pi ambe tu barang di dalam ruma, mar turung kong lari jo.",
                 "</p>",
@@ -1670,18 +1670,18 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"B\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"C\">",
                     "Si Enéas é liné'os ni Petrus",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"C\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
                     "<v n=\"32\" />",
                     "<v n=\"33\" />",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"D\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
                     "<v n=\"34\" />",
                     "<v n=\"35\" />",
                 "</p>",
@@ -1734,26 +1734,26 @@ namespace OurWordTests.DataModel
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
             "<book id=\"MRK\">",
 
-                "<p style=\"Title Main\" usfm=\"mt\" id=\"A\" />",
+                "<p style=\"Title Main\" usfm=\"mt\" id=\"B\" />",
 
-                "<p style=\"Major Section Head\" usfm=\"ms\" id=\"B\">",
+                "<p style=\"Major Section Head\" usfm=\"ms\" id=\"C\">",
                     "Judah in Trouble",
                 "</p>",
 
-                "<p style=\"Major Section Range\" usfm=\"mr\" id=\"C\">",
+                "<p style=\"Major Section Range\" usfm=\"mr\" id=\"D\">",
                     "(Psalm 123:5)",
                 "</p>",
 
-                "<p style=\"Section Head\" usfm=\"s1\" id=\"D\">",
+                "<p style=\"Section Head\" usfm=\"s1\" id=\"F\">",
                     "Jeremiah's Prayer",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"E\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"G\">",
                     "<v n=\"1\" />",
                     "I know, Lord, that our lives are not our own.",
                 "</p>",
 
-                "<p style=\"Paragraph\" usfm=\"p\" id=\"F\">",
+                "<p style=\"Paragraph\" usfm=\"p\" id=\"H\">",
                     "<v n=\"2\" />",
                     "The Lord gave another message to Jeremiah.",
                 "</p>",
@@ -3154,13 +3154,13 @@ namespace OurWordTests.DataModel
             var xActual = Book.ToOxesDocument;
 
             // Compare with what we expect
-            var xExpected = new OurWordXmlDocument(vsOxesExpected);
+            var xExpected = new XmlDoc(vsOxesExpected);
             bool bIsSame = xExpected.IsSame(xActual);
             if (!bIsSame)
             {
                 xActual.WriteToConsole("Actual");
                 xExpected.WriteToConsole("Expected");
-                OurWordXmlDocument.DisplayDifferences(xActual, xExpected);
+                XmlDoc.DisplayDifferences(xActual, xExpected);
             }
             Assert.IsTrue(bIsSame, "Oxes should be same for Oxes Test #" + sTest);
         }

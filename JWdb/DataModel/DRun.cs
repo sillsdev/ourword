@@ -160,8 +160,8 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region virtual XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
-        public virtual XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        #region virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParent)
+        public virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParent)
         {
             return null;
         }
@@ -379,16 +379,16 @@ namespace JWdb.DataModel
         {
             if (node.Name == c_sNodeTag)
             {
-                string sText = OurWordXmlDocument.GetAttrValue(node, c_sAttrText, "");
+                string sText = XmlDoc.GetAttrValue(node, c_sAttrText, "");
                 if (string.IsNullOrEmpty(sText))
-                    throw new OurWordXmlDocumentException("Missing verse number");
+                    throw new XmlDocException("Missing verse number");
                 return new DVerse(sText);
             }
             return null;
         }
         #endregion
         #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParent)
-        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, c_sNodeTag);
             oxes.AddAttr(node, c_sAttrText, Text);
@@ -540,9 +540,9 @@ namespace JWdb.DataModel
         {
             if (node.Name == c_sNodeTag)
             {
-                int nChapterNo = OurWordXmlDocument.GetAttrValue(node, c_sAttrText, 0);
+                int nChapterNo = XmlDoc.GetAttrValue(node, c_sAttrText, 0);
                 if (0 == nChapterNo)
-                    throw new OurWordXmlDocumentException("Bad or missing chapter number in oxes data.");
+                    throw new XmlDocException("Bad or missing chapter number in oxes data.");
 
                 return new DChapter(nChapterNo);
             }
@@ -550,7 +550,7 @@ namespace JWdb.DataModel
         }
         #endregion
         #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParent)
-        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, c_sNodeTag);
             oxes.AddAttr(node, c_sAttrText, Text);
@@ -862,23 +862,23 @@ namespace JWdb.DataModel
                 return null;
 
             // Retrieve the attributes; complain if missing or empty
-            string sVerseReference = OurWordXmlDocument.GetAttrValue(node, c_sAttrVerseRef, "");
+            string sVerseReference = XmlDoc.GetAttrValue(node, c_sAttrVerseRef, "");
             if (string.IsNullOrEmpty(sVerseReference))
-                throw new OurWordXmlDocumentException("Missing Reference attribute in oxes read.");
+                throw new XmlDocException("Missing Reference attribute in oxes read.");
 
-            string sStyle = OurWordXmlDocument.GetAttrValue(node, c_sAttrStyle, "");
+            string sStyle = XmlDoc.GetAttrValue(node, c_sAttrStyle, "");
             if (string.IsNullOrEmpty(sStyle))
-                throw new OurWordXmlDocumentException("Missing Style attribute in oxes read.");
+                throw new XmlDocException("Missing Style attribute in oxes read.");
 
-            string sUsfm = OurWordXmlDocument.GetAttrValue(node, c_sAttrUsfm, "");
+            string sUsfm = XmlDoc.GetAttrValue(node, c_sAttrUsfm, "");
             if (string.IsNullOrEmpty(sUsfm))
-                throw new OurWordXmlDocumentException("Missing Usfm attribute in oxes read.");
+                throw new XmlDocException("Missing Usfm attribute in oxes read.");
 
             // The Usfm and the Style should match up; if they don't, we hardly know which
             // one the user wanted.
             var map = DB.Map.FindMappingFromUsfm(sUsfm);
             if (null == map || map.Name != sStyle)
-                throw new OurWordXmlDocumentException("Style and Usfm data do not match.");
+                throw new XmlDocException("Style and Usfm data do not match.");
 
             // Create the empty footnote, and place it into a DFoot object
             var footnote = new DFootnote(
@@ -894,7 +894,7 @@ namespace JWdb.DataModel
         }
         #endregion
         #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParent)
-        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParent)
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParent)
         {
             var node = oxes.AddNode(nodeParent, c_sNodeTag);
 
@@ -1410,7 +1410,7 @@ namespace JWdb.DataModel
                 string sStyle = DStyleSheet.c_sfmParagraph;
                 if (node.Name == c_sTagSpan)
                 {
-                    var sStyleName = OurWordXmlDocument.GetAttrValue(node, c_sAttrStyle, 
+                    var sStyleName = XmlDoc.GetAttrValue(node, c_sAttrStyle, 
                         DStyleSheet.c_sfmParagraph);
                     switch (sStyleName)
                     {
@@ -1429,7 +1429,7 @@ namespace JWdb.DataModel
             }
             #endregion
             #region Method: XmlNode SaveToOxesBook(oxes, nodeParagraph)
-            public void SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+            public void SaveToOxesBook(XmlDoc oxes, XmlNode nodeParagraph)
             {
                 if (Count == 0 || string.IsNullOrEmpty(AsString))
                     return;
@@ -1769,7 +1769,7 @@ namespace JWdb.DataModel
         }
         #endregion
         #region OMethod: XmlNode SaveToOxesBook(oxes, nodeParagraph)
-        public override XmlNode SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeParagraph)
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParagraph)
         {
             Phrases.SaveToOxesBook(oxes, nodeParagraph);
 

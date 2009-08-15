@@ -1498,7 +1498,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        protected int ID
+        public int ID
         {
             get
             {
@@ -1525,37 +1525,49 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        static public DParagraph Create(OurWordXmlDocument oxes, XmlNode nodeParagraph)
-        {
-            var p = new DParagraph();
+        const string c_sAttrID = "id";
 
+        protected void ReadOxes(XmlNode nodeParagraph)
+            // Note that DPicture.CreatePicture calls this, too.
+        {
+            // Get the ID attribute, creating a valid one if it is missing
+            m_nID = XmlDoc.GetAttrID(nodeParagraph, c_sAttrID);
+            if (-1 == m_nID)
+                m_nID = Book.GetID();
+
+            // Populate the runs from the child nodes
             foreach (XmlNode child in nodeParagraph.ChildNodes)
             {
                 switch (child.Name)
                 {
                     case DVerse.c_sNodeTag:
-                        p.Runs.Append(DVerse.Create(child));
+                        Runs.Append(DVerse.Create(child));
                         break;
 
                     case DChapter.c_sNodeTag:
-                        p.Runs.Append(DChapter.Create(child));
+                        Runs.Append(DChapter.Create(child));
                         break;
 
                     case DFoot.c_sNodeTag:
-                        p.Runs.Append(DFoot.Create(child));
+                        Runs.Append(DFoot.Create(child));
                         break;
 
                     default:
-                        p.ReadOxesPhrase(child);
+                        ReadOxesPhrase(child);
                         break;
                 }
             }
-
-            return null;
         }
 
-        #region VMethod: void SaveToOxesBook(oxes, nodeBook)
-        public virtual void SaveToOxesBook(OurWordXmlDocument oxes, XmlNode nodeBook)
+        static public DParagraph CreateParagraph(XmlNode nodeParagraph)
+        {
+            var p = new DParagraph();
+            p.ReadOxes(nodeParagraph);
+            return p;
+        }
+
+        #region VMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
+        public virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
             // Saves the paragraph to the oxes document.
         {
             var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
@@ -1564,10 +1576,12 @@ namespace JWdb.DataModel
             var nodeParagraph = oxes.AddNode(nodeBook, "p");
             oxes.AddAttr(nodeParagraph, "style", map.Name);
             oxes.AddAttr(nodeParagraph, "usfm", map.Usfm);
-            oxes.AddAttr(nodeParagraph, "id", oxes.IntToID(ID));
+            oxes.AddAttr(nodeParagraph, c_sAttrID, XmlDoc.IntToID(ID));
 
             foreach (DRun run in Runs)
                 run.SaveToOxesBook(oxes, nodeParagraph);
+
+            return nodeParagraph;
         }
         #endregion
 

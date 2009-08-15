@@ -8,13 +8,15 @@
  *********************************************************************************************/
 #region Using
 using System;
+using System.ComponentModel;
+using System.Collections;
+using System.Collections.Generic;
+using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 
 using JWTools;
 using JWdb;
@@ -247,23 +249,48 @@ namespace JWdb.DataModel
 		#endregion
 
         // Oxes ------------------------------------------------------------------------------
-
-        // TODO: Corresponding read method
-
-        #region OMethod: void SaveToOxesBook(oxes, nodeBook)
-        public override void SaveToOxesBook(OurWordXmlDocument oxes, System.Xml.XmlNode nodeBook)
+        const string c_sTagPicture = "fig";
+        const string c_sAttrPath = "path";
+        const string c_sAttrRtf = "rtfInfo";
+        static public DPicture CreatePicture(XmlNode nodePicture)
         {
-            var node = oxes.AddNode(nodeBook, "fig");
+            if (nodePicture.Name != c_sTagPicture)
+                return null;
 
-            oxes.AddAttr(node, "path", PathName);
+            // Create the new picture object
+            var picture = new DPicture();
+
+            // We expect to have a path name
+            picture.PathName = XmlDoc.GetAttrValue(nodePicture, c_sAttrPath, "");
+            if (string.IsNullOrEmpty(picture.PathName))
+                throw new XmlDocException("Missing picture path in oxes file.");
+
+            // The Rtf info is optional
+            picture.WordRtfInfo = XmlDoc.GetAttrValue(nodePicture, c_sAttrRtf, "");
+
+            // The superclass takes care of the rest of it
+            picture.ReadOxes(nodePicture);
+
+            return picture;
+        }
+
+
+        #region OMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, System.Xml.XmlNode nodeBook)
+        {
+            var nodePicture = oxes.AddNode(nodeBook, c_sTagPicture);
+
+            oxes.AddAttr(nodePicture, c_sAttrPath, PathName);
 
             if (!string.IsNullOrEmpty(WordRtfInfo))
-                oxes.AddAttr(node, "msword", WordRtfInfo);
+                oxes.AddAttr(nodePicture, c_sAttrRtf, WordRtfInfo);
 
-            oxes.AddAttr(node, "id", oxes.IntToID(ID));
+            oxes.AddAttr(nodePicture, "id", XmlDoc.IntToID(ID));
 
             foreach (DRun run in Runs)
-                run.SaveToOxesBook(oxes, node);
+                run.SaveToOxesBook(oxes, nodePicture);
+
+            return nodePicture;
         }
         #endregion
 

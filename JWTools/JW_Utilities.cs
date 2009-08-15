@@ -481,7 +481,7 @@ namespace JWTools
             {
                 Copy(sSourceFolder, sDestinationFolder);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Directory.Delete(sDestinationFolder, true);
                 return false;
@@ -492,7 +492,7 @@ namespace JWTools
             {
                 Directory.Delete(sSourceFolder, true);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 Copy(sDestinationFolder, sSourceFolder);
                 Directory.Delete(sDestinationFolder, true);

@@ -1677,11 +1677,11 @@ namespace JWdb.DataModel
         }
         public int m_NextID = 0;
 
-        public OurWordXmlDocument ToOxesDocument
+        public XmlDoc ToOxesDocument
         {
             get
             {
-                var oxes = new OurWordXmlDocument();
+                var oxes = new XmlDoc();
                 oxes.AddXmlDeclaration();
 
                 // Bible Node

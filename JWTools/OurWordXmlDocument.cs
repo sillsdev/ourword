@@ -1,6 +1,6 @@
 ﻿/**********************************************************************************************
  * Project: Our Word!
- * File:    OurWordXmlDocument.cs
+ * File:    XmlDoc.cs
  * Author:  John Wimbish
  * Created: 6 Aug 2009
  * Purpose: Useful additions to XmlDocument
@@ -24,27 +24,27 @@ using System.Xml;
 
 namespace JWTools
 {
-    public class OurWordXmlDocumentException : Exception
+    public class XmlDocException : Exception
     {
         #region Constructor(sErrorMessage)
-        public OurWordXmlDocumentException(string sMessage)
+        public XmlDocException(string sMessage)
             : base(sMessage)
         {
         }
         #endregion
     }
 
-    public class OurWordXmlDocument : XmlDocument
+    public class XmlDoc : XmlDocument
     {
         // Constructors ----------------------------------------------------------------------
         #region Constructor()
-        public OurWordXmlDocument()
+        public XmlDoc()
             : base()
         {
         }
         #endregion
         #region Constructor(string[] vsInitializeFrom)
-        public OurWordXmlDocument(string[] vsInitializeFrom)
+        public XmlDoc(string[] vsInitializeFrom)
             : this()
         {
             string sXml = "";
@@ -55,25 +55,98 @@ namespace JWTools
         }
         #endregion
 
-        public string IntToID(int n)
+        // IDs -------------------------------------------------------------------------------
+        #region ID's Documentation
+        /* Doc - Xml requires an id to begin with a letter. So I'm using all of the letters
+         * of the alphabet, both upper and lower case, but without vowels so as to not risk
+         * any swear words appearing. So 26 letters minus 5 vowels times two cases results in
+         * 42 letters; or thus Base 42.
+         * 
+         * In base 41, two digits is sufficient for 1764 IDs, and three digits for 74000. 
+         * Thus we have a fairly compact method of doing IDs. Further, because these are
+         * not mnemonic in any way, I am hopefully that people who bring oxes into an editor
+         * will not be tempted to mess with them.
+         * 
+         * Thinking in base 42 is a bit tricky. "B" is zero, "C" is one. So the next thing
+         * after "z" is not "BB", but rather, "CB". In base ten, it is equivalent to saying
+         * the next thing after '9' is not '00', but rather '10'. 
+         * 
+         * Although the default is base 42, I've made it changeable via thte Digits attribute.
+         * In the test code, I do a test with base 10, where the digits are "0123456789", to
+         * verify that the algorithm is multi-base capable.
+        */
+        #endregion
+        #region SAttr{g/s}: string Digits
+        static public string Digits
+        {
+            get
+            {
+                return m_sDigits;
+            }
+            set
+            {
+                m_sDigits = value;
+            }
+        }
+        static string m_sDigits = "BCDFGHJKLMNPQRSTVWXYZbcdfghjklmnpqrstvwxyz";
+        #endregion
+        #region SMethod: string IntToID(int n)
+        static public string IntToID(int n)
         {
             if (n < 0)
                 return "err";
             if (n == 0)
-                return "A";
+                return Digits[0].ToString();
 
+            // E.g., not base 10, but in this case, base 42.
+            int cBase = Digits.Length;
+            //Console.WriteLine("Base=" + cBase.ToString());
+
+            // We'll build the string here
             string sID = "";
 
+            // Loop through the number, dividing by the Base, figuring each digit via the remainder
             while (n != 0)
             {
-                int nRemainder = n % 26;
-                n /= 26;
+                int nRemainder = n % cBase;
+                n /= cBase;
 
-                sID = ((char)('A' + nRemainder)).ToString() + sID;
+                sID = Digits[nRemainder].ToString() + sID;
             }
 
             return sID;
         }
+        #endregion
+        #region SMethod: int IdToInt(string sID)
+        static public int IdToInt(string sID)
+        {
+            // E.g., not base 10, but in this case, base 42.
+            int cBase = Digits.Length;
+
+            int n = 0;
+            for (int i = 0; i < sID.Length; i++)
+            {
+                // Convert the letter to a digit
+                int nDigit = Digits.IndexOf(sID[i]);
+                if (-1 == nDigit)
+                    return -1;
+
+                // Get the position (e.g., in base 10, thousands, hundreds, tens, one, etc.)
+                // The 'ones' position should equal zero.
+                int nPosition = (sID.Length - 1) - i;
+                int nMultiplier = 1;
+                while (nPosition > 0)
+                {
+                    nMultiplier *= cBase;
+                    nPosition--;
+                }
+
+                n += (nDigit * nMultiplier);
+            }
+
+            return n;
+        }
+        #endregion
 
 
         public void AddXmlDeclaration()
@@ -110,6 +183,8 @@ namespace JWTools
             return text;
         }
 
+        // Retrieve attr values of different types
+        #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
         {
             foreach (XmlAttribute attr in node.Attributes)
@@ -122,6 +197,8 @@ namespace JWTools
                 return "";
             return sDefaultValue;
         }
+        #endregion
+        #region SMethod: int GetAttrValue(node, attr, nDefaultValue)
         static public int GetAttrValue(XmlNode node, string sAttrName, int nDefaultValue)
         {
             string sValue = GetAttrValue(node, sAttrName, nDefaultValue.ToString());
@@ -132,14 +209,24 @@ namespace JWTools
             }
             catch (Exception e)
             {
-                throw new OurWordXmlDocumentException("Bad integer data in oxes file: " + e.Message);
+                throw new XmlDocException("Bad integer data in oxes file: " + e.Message);
             }
         }
+        #endregion
 
+        static public int GetAttrID(XmlNode node, string sAttrName)
+        {
+            // Retrieve the string value
+            string sID = GetAttrValue(node, sAttrName, "");
+            if (string.IsNullOrEmpty(sID))
+                return -1;
+
+            return IdToInt(sID);
+        }
 
         // For Unit Testing ------------------------------------------------------------------
-        #region Method: bool IsSame(OurWordXmlDocument other)
-        public bool IsSame(OurWordXmlDocument other)
+        #region Method: bool IsSame(XmlDoc other)
+        public bool IsSame(XmlDoc other)
         {
             var sbThis = new StringBuilder();
             this.Save(new StringWriter(sbThis));
@@ -153,7 +240,7 @@ namespace JWTools
         }
         #endregion
         #region SMethod: void DisplayDifferences(xActual, xExpected)
-        static public void DisplayDifferences(OurWordXmlDocument xActual, OurWordXmlDocument xExpected)
+        static public void DisplayDifferences(XmlDoc xActual, XmlDoc xExpected)
         {
             var sbActual = new StringBuilder();
             xActual.Save(new StringWriter(sbActual));

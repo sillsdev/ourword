@@ -432,7 +432,7 @@ namespace OurWordTests.DataModel
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
             DB.TeamSettings.EnsureInitialized();
 
-            var oxes = new OurWordXmlDocument();
+            var oxes = new XmlDoc();
             var node = oxes.AddNode(null, "para");
 
             // Create a footnote
@@ -461,7 +461,7 @@ namespace OurWordTests.DataModel
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
             DB.TeamSettings.EnsureInitialized();
 
-            var oxes = new OurWordXmlDocument();
+            var oxes = new XmlDoc();
             var node = oxes.AddNode(null, "para");
 
             // Create a footnote
@@ -663,7 +663,7 @@ namespace OurWordTests.DataModel
         #region Test: OxesIO
         [Test] public void OxesIO()
         {
-            var oxes = new OurWordXmlDocument();
+            var oxes = new XmlDoc();
             var node = oxes.AddNode(null, "para");
 
             // Create a verse
@@ -696,7 +696,7 @@ namespace OurWordTests.DataModel
         #region Test: OxesIO
         [Test] public void OxesIO()
         {
-            var oxes = new OurWordXmlDocument();
+            var oxes = new XmlDoc();
             var node = oxes.AddNode(null, "para");
 
             // Create a chapter
