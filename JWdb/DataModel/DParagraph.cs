@@ -1509,6 +1509,10 @@ namespace JWdb.DataModel
         }
         int m_nID = -1;
 
+        // Oxes ------------------------------------------------------------------------------
+        const string c_sAttrID = "id";
+        const string c_sAttrStyle = "class";
+        const string c_sAttrUsfm = "usfm";
         #region Method: void ReadOxesPhrase(XmlNode)
         public void ReadOxesPhrase(XmlNode node)
         {
@@ -1524,9 +1528,7 @@ namespace JWdb.DataModel
             text.ReadOxesPhrase(node);
         }
         #endregion
-
-        const string c_sAttrID = "id";
-
+        #region Method:  void ReadOxes(nodeParagraph)
         protected void ReadOxes(XmlNode nodeParagraph)
             // Note that DPicture.CreatePicture calls this, too.
         {
@@ -1534,6 +1536,13 @@ namespace JWdb.DataModel
             m_nID = XmlDoc.GetAttrID(nodeParagraph, c_sAttrID);
             if (-1 == m_nID)
                 m_nID = Book.GetID();
+
+            // Style attribute
+            string sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
+            var map = DB.Map.FindMappingFromName(sStyleName);
+            if (null == map)
+                throw (new XmlDocException("Missing or unknown paragraph style name."));
+            StyleAbbrev = map.OurWord;
 
             // Populate the runs from the child nodes
             foreach (XmlNode child in nodeParagraph.ChildNodes)
@@ -1558,13 +1567,17 @@ namespace JWdb.DataModel
                 }
             }
         }
-
+        #endregion
+        #region SMethod: DParagraph CreateParagraph(nodeParagraph)
         static public DParagraph CreateParagraph(XmlNode nodeParagraph)
         {
             var p = new DParagraph();
             p.ReadOxes(nodeParagraph);
             return p;
         }
+        #endregion
+
+        // TODO: Read/Create needs to handle the style and usfm attrs
 
         #region VMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
         public virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
@@ -1574,8 +1587,8 @@ namespace JWdb.DataModel
             Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
 
             var nodeParagraph = oxes.AddNode(nodeBook, "p");
-            oxes.AddAttr(nodeParagraph, "style", map.Name);
-            oxes.AddAttr(nodeParagraph, "usfm", map.Usfm);
+            oxes.AddAttr(nodeParagraph, c_sAttrStyle, map.Name);
+            oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
             oxes.AddAttr(nodeParagraph, c_sAttrID, XmlDoc.IntToID(ID));
 
             foreach (DRun run in Runs)

@@ -111,6 +111,17 @@ namespace JWdb.DataModel
             return null;
         }
         #endregion
+        #region Method: StyleMapping FindMappingFromName(sName)
+        public StyleMapping FindMappingFromName(string sName)
+        {
+            foreach (StyleMapping sm in StyleMappings)
+            {
+                if (sm.Name == sName)
+                    return sm;
+            }
+            return null;
+        }
+        #endregion
 
         // Constants -------------------------------------------------------------------------
 		public const string c_sMkrID = "id";

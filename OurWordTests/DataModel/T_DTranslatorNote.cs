@@ -60,7 +60,7 @@ namespace OurWordTests.DataModel
             DBook book = new DBook("LUK");
             DB.Project.TargetTranslation.Books.Append(book);
 
-            m_Section = new DSection(1);
+            m_Section = new DSection();
             book.Sections.Append(m_Section);
 
             JWU.NUnit_SetupClusterFolder();

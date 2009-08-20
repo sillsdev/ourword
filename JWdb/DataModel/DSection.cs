@@ -556,13 +556,10 @@ namespace JWdb.DataModel
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-		public int m_nSectionNo = -1;
 		#region Constructor()
-		public DSection(int nSectionNo)
+		public DSection()
 			: base()
 		{
-			m_nSectionNo = nSectionNo;
-
             // Paragraphs: flags are
             // - Don't check for duplicates
             // - Don't sort
@@ -584,15 +581,14 @@ namespace JWdb.DataModel
 				return false;
 
 			DSection objSection = (DSection)obj;
-			return m_nSectionNo == objSection.m_nSectionNo;
+
+            return (objSection == this);
 		}
 		#endregion
 		#region Method: void InitializeFromFrontSection(DSection SFront)
 		public void InitializeFromFrontSection(DSection SFront)
             // Create a blank template for editing
 		{
-			m_nSectionNo = SFront.m_nSectionNo;
-
 			// Duplicate the Front's reference
 			Debug.Assert(SFront.ReferenceSpan.Start.Chapter > 0);
 			ReferenceSpan.CopyFrom(SFront.ReferenceSpan);
@@ -2729,6 +2725,7 @@ namespace JWdb.DataModel
 		#endregion
 
 
+        // Oxes ------------------------------------------------------------------------------
         public void SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
         {
             foreach (DParagraph p in Paragraphs)

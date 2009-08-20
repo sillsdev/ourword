@@ -592,7 +592,7 @@ namespace OurWordTests.DataModel
 
             // Because we're creating a Note, we need for Ours to be owned so that a
             // Reference can be calculated.
-            DSection section = new DSection(1);
+            DSection section = new DSection();
             section.ReferenceSpan = new DReferenceSpan();
             section.ReferenceSpan.Start = new DReference(3, 8);
             section.ReferenceSpan.End = new DReference(3, 15);

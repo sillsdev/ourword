@@ -307,6 +307,7 @@ namespace OurWordTests.DataModel
             LocDB.Reset();
         }
         #endregion
+
     }
 
 }

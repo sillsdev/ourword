@@ -73,7 +73,7 @@ namespace OurWordTests.Utilities
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK");
             DB.Project.TargetTranslation.AddBook(book);
-            DSection section = new DSection(1);
+            DSection section = new DSection();
             book.Sections.Append(section);
             DB.Project.Write(new NullProgress());
 

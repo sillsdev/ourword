@@ -42,7 +42,7 @@ namespace OurWordTests.DataModel
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK");
             DB.Project.TargetTranslation.AddBook(book);
-            m_section = new DSection(1);
+            m_section = new DSection();
             book.Sections.Append(m_section);
         }
         #endregion
@@ -649,6 +649,49 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        #region Test: oxesIO
+        [Test] public void oxesIO()
+        {
+            // Set up a hierarchy all the way down to our paragraph
+            DB.Project = new DProject();
+            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
+            DB.TeamSettings.EnsureInitialized();
+            DB.Project.DisplayName = "Project";
+            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
+            DB.Project.TargetTranslation = Translation;
+            var Book = new DBook("MRK");
+            Translation.Books.Append(Book);
+            var Section = new DSection();
+            Book.Sections.Append(Section);
 
+            // Create the xml doc
+            var oxes = new XmlDoc();
+            var nodeBook = oxes.AddNode(null, "book");
+
+            // Attribute data
+            string sText = "Ini adalah sesuatu paragraph";
+            string sBT = "This is a paragraph.";
+            string sStyle = "q2";
+
+            // Create a paragraph. The ID will be automatically set to 0.
+            var paragraphIn = new DParagraph();
+            Section.Paragraphs.Append(paragraphIn);
+            paragraphIn.SimpleText = sText;
+            paragraphIn.SimpleTextBT = sBT;
+            paragraphIn.StyleAbbrev = sStyle;
+
+            // Save it to an xml node
+            var nodeParagraph = paragraphIn.SaveToOxesBook(oxes, nodeBook);
+
+            // Create a new paragraph from that node
+            var paragraphOut = DParagraph.CreateParagraph(nodeParagraph);
+
+            // Should be identical
+            Assert.AreEqual(sText, paragraphOut.SimpleText);
+            Assert.AreEqual(sBT, paragraphOut.SimpleTextBT);
+            Assert.AreEqual(sStyle, paragraphOut.StyleAbbrev);
+            Assert.IsTrue(paragraphOut.ContentEquals(paragraphIn), "Paras are the same");
+        }
+        #endregion
     }
 }

@@ -53,14 +53,14 @@ namespace OurWordTests.DataModel
 
             DBook bookFront = new DBook();
             DB.Project.FrontTranslation.Books.Append(bookFront);
-            DSection sectionFront = new DSection(1);
+            DSection sectionFront = new DSection();
             bookFront.Sections.Append(sectionFront);
             DParagraph paraFront = new DParagraph();
             sectionFront.Paragraphs.Append(paraFront);
 
             DBook bookTarget = new DBook();
             DB.Project.TargetTranslation.Books.Append(bookTarget);
-            DSection sectionTarget = new DSection(1);
+            DSection sectionTarget = new DSection();
             bookTarget.Sections.Append(sectionTarget);
             DParagraph paraTarget = new DParagraph();
             sectionTarget.Paragraphs.Append(paraTarget);

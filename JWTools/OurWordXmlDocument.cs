@@ -183,6 +183,17 @@ namespace JWTools
             return text;
         }
 
+        static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
+        {
+            foreach (XmlNode node in nodeParent.ChildNodes)
+            {
+                if (node.Name == sChildName)
+                    return node;
+            }
+
+            return null;
+        }
+
         // Retrieve attr values of different types
         #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)

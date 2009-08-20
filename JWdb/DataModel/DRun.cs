@@ -853,7 +853,7 @@ namespace JWdb.DataModel
         // Oxes ------------------------------------------------------------------------------
         public const string c_sNodeTag = "note";
         const string c_sAttrVerseRef = "reference";
-        const string c_sAttrStyle = "style";
+        const string c_sAttrStyle = "class";
         const string c_sAttrUsfm = "usfm";
         #region SMethod: DFoot Create(XmlNode node)
         static public DFoot Create(XmlNode node)
@@ -861,10 +861,8 @@ namespace JWdb.DataModel
             if (node.Name != c_sNodeTag)
                 return null;
 
-            // Retrieve the attributes; complain if missing or empty
+            // Retrieve the attributes; complain if missing or empty if appropriate
             string sVerseReference = XmlDoc.GetAttrValue(node, c_sAttrVerseRef, "");
-            if (string.IsNullOrEmpty(sVerseReference))
-                throw new XmlDocException("Missing Reference attribute in oxes read.");
 
             string sStyle = XmlDoc.GetAttrValue(node, c_sAttrStyle, "");
             if (string.IsNullOrEmpty(sStyle))
@@ -1398,7 +1396,7 @@ namespace JWdb.DataModel
             // Oxes --------------------------------------------------------------------------
             #region Oxes Constants
             const string c_sTagSpan = "span";
-            const string c_sAttrStyle = "style";
+            const string c_sAttrStyle = "class";
 
             const string c_sStyleNameItalic = "Italic";
             const string c_sStyleNameBold = "Bold";

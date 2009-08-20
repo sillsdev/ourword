@@ -154,7 +154,7 @@ namespace OurWordTests.Edit
             DB.Project.TargetTranslation.AddBook(book);
             G.URStack.Clear();
 
-            m_section = new DSection(1);
+            m_section = new DSection();
             book.Sections.Append(m_section);
 
             m_Window = new OWWindow("TestWindow", 1);

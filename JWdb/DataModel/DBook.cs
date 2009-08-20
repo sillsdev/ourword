@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.Threading;
 using System.IO;
+using System.Xml;
 using JWTools;
 using JWdb;
 #endregion
@@ -555,10 +556,9 @@ namespace JWdb.DataModel
             if (!FrontBook.Loaded)
                 return false;
 
-            int i = 1;
             foreach (DSection sfront in FrontBook.Sections)
             {
-                DSection starget = new DSection(i++);
+                DSection starget = new DSection();
                 Sections.Append(starget);
                 starget.InitializeFromFrontSection(sfront);
             }
@@ -1160,10 +1160,9 @@ namespace JWdb.DataModel
                 }
 
                 // Read in the sections
-                int nSectionNumber = 1;
                 while (null != DBS.GetCurrentField())
                 {
-                    DSection section = new DSection(nSectionNumber++);
+                    DSection section = new DSection();
                     section.LineNoInFile = DBS.GetCurrentField().LineNo;
                     Book.Sections.Append(section);
 
@@ -1677,6 +1676,62 @@ namespace JWdb.DataModel
         }
         public int m_NextID = 0;
 
+        // Oxes ------------------------------------------------------------------------------
+        const string c_sTagBible = "bible";
+        const string c_sAttrOxes = "oxes";
+
+        const string c_sTagBook = "book";
+        const string c_sAttrID = "id";
+
+        static public DBook CreateBook(XmlDoc xml)
+        {
+            // Find the Bible node
+            var nodeBible = XmlDoc.FindNode(xml, c_sTagBible);
+            if (null == nodeBible)
+                return null;
+
+            // Make sure it is a version of Oxes that we handle
+            string sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
+            if (sOxes != "2.0")
+                throw new XmlDocException("OurWord can only handle Oxes 2.0.");
+
+            // Find the Book node
+            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
+            if (null == nodeBook)
+                return null;
+
+            // Get the Book's three-letter ID
+            string sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+            if (string.IsNullOrEmpty(sBookID))
+                return null;
+
+            // Create the new, empty book
+            var book = new DBook(sBookID);
+
+            // Read in the paragraphs
+            DSection section = null;
+            foreach (XmlNode nodeParagraph in nodeBook.ChildNodes)
+            {
+                // Create the paragraph or picture
+                DParagraph paragraph = DPicture.CreatePicture(nodeParagraph);
+                if (null == paragraph)
+                    paragraph = DParagraph.CreateParagraph(nodeParagraph);
+
+                // A section for it to go into
+                if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
+                {
+                    section = new DSection();
+                    book.Sections.Append(section);
+                }
+
+                // Add the paragraph
+                section.Paragraphs.Append(paragraph);
+            }
+
+            // Done
+            return book;
+        }
+
         public XmlDoc ToOxesDocument
         {
             get
@@ -1685,14 +1740,14 @@ namespace JWdb.DataModel
                 oxes.AddXmlDeclaration();
 
                 // Bible Node
-                var nodeBible = oxes.AddNode(null, "bible");
+                var nodeBible = oxes.AddNode(null, c_sTagBible);
                 oxes.AddAttr(nodeBible, "xml:lang", "bko");
                 oxes.AddAttr(nodeBible, "backtTranslaltionDefaultLanguage", "en");
-                oxes.AddAttr(nodeBible, "oxes", "2.0");
+                oxes.AddAttr(nodeBible, c_sAttrOxes, "2.0");
 
                 // Book Node
-                var nodeBook = oxes.AddNode(nodeBible, "book");
-                oxes.AddAttr(nodeBook, "id", BookAbbrev);
+                var nodeBook = oxes.AddNode(nodeBible, c_sTagBook);
+                oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
 
                 // Add the Sections
                 foreach (DSection section in Sections)

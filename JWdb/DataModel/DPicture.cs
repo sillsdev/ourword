@@ -80,8 +80,6 @@ namespace JWdb.DataModel
 		private JOwn<DReference> j_Reference = null;
 		#endregion
 
-		// Derived Attributes ----------------------------------------------------------------
-
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DPicture()
@@ -113,7 +111,6 @@ namespace JWdb.DataModel
 			return true;
 		}
 		#endregion
-
         #region Method: override void CopyFrom(DParagraph pFront, bTruncateText))
         public override void CopyFrom(DParagraph pFront, bool bTruncateText)
 		{
@@ -205,7 +202,6 @@ namespace JWdb.DataModel
             return false;
         }
         #endregion
-
         #region Method: Bitmap GetBitmap(int nMaxDimension)
         public Bitmap GetBitmap(int nMaxDimension)
 		{
@@ -251,7 +247,8 @@ namespace JWdb.DataModel
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagPicture = "fig";
         const string c_sAttrPath = "path";
-        const string c_sAttrRtf = "rtfInfo";
+        const string c_sAttrRtf = "rtfFormat";
+        #region SMethod: DPicture CreatePicture(nodePicture)
         static public DPicture CreatePicture(XmlNode nodePicture)
         {
             if (nodePicture.Name != c_sTagPicture)
@@ -271,10 +268,12 @@ namespace JWdb.DataModel
             // The superclass takes care of the rest of it
             picture.ReadOxes(nodePicture);
 
+            // Except that we override the style with out own
+            picture.StyleAbbrev = DB.TeamSettings.SFMapping.StylePicCaption;
+
             return picture;
         }
-
-
+        #endregion
         #region OMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
         public override XmlNode SaveToOxesBook(XmlDoc oxes, System.Xml.XmlNode nodeBook)
         {
@@ -293,7 +292,6 @@ namespace JWdb.DataModel
             return nodePicture;
         }
         #endregion
-
 
     }
 }

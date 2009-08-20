@@ -53,7 +53,7 @@ namespace OurWordTests.DataModel
             DB.Project.TargetTranslation = Translation;
             var Book = new DBook("MRK");
             Translation.Books.Append(Book);
-            var Section = new DSection(0);
+            var Section = new DSection();
             Book.Sections.Append(Section);
 
             // Create the xml doc
