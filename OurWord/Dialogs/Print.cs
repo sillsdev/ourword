@@ -1058,7 +1058,7 @@ namespace OurWord
         public bool IncrementParagraph(IProgressIndicator progress)
 		{
             // Footnote
-            if (null == Paragraph as DFootnote)
+            if (null != Paragraph as DFootnote)
             {
                 var Footnotes = Section.AllFootnotes;
 
