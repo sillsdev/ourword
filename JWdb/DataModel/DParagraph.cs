@@ -1502,14 +1502,20 @@ namespace JWdb.DataModel
         {
             get
             {
-                if (m_nID == -1 && null != Book)
-                    m_nID = Book.GetID();
+                EnsureHasID();
                 return m_nID;
             }
         }
         int m_nID = -1;
+        public void EnsureHasID()
+        {
+            if (m_nID == -1)
+                m_nID = Book.GetID();
+            Debug.Assert(m_nID > -1);
+        }
 
         // Oxes ------------------------------------------------------------------------------
+        const string c_sTagParagraph = "p";
         const string c_sAttrID = "id";
         const string c_sAttrStyle = "class";
         const string c_sAttrUsfm = "usfm";
@@ -1532,10 +1538,11 @@ namespace JWdb.DataModel
         protected void ReadOxes(XmlNode nodeParagraph)
             // Note that DPicture.CreatePicture calls this, too.
         {
-            // Get the ID attribute, creating a valid one if it is missing
+            // Get the ID attribute. We don't create one if one is missing,
+            // because this newly-created paragraph is likely not yet
+            // connected in the ownership hierarchy to a DBook, which we would
+            // need to get the ID from.
             m_nID = XmlDoc.GetAttrID(nodeParagraph, c_sAttrID);
-            if (-1 == m_nID)
-                m_nID = Book.GetID();
 
             // Style attribute
             string sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
@@ -1571,24 +1578,29 @@ namespace JWdb.DataModel
         #region SMethod: DParagraph CreateParagraph(nodeParagraph)
         static public DParagraph CreateParagraph(XmlNode nodeParagraph)
         {
+            if (null == nodeParagraph || nodeParagraph.Name != c_sTagParagraph)
+                return null;
+
             var p = new DParagraph();
             p.ReadOxes(nodeParagraph);
             return p;
         }
         #endregion
 
-        // TODO: Read/Create needs to handle the style and usfm attrs
-
-        #region VMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
+        #region VMethod: XmlNode SaveToOxesBook(oxes, nodeBook, bIncludeID)
         public virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
             // Saves the paragraph to the oxes document.
         {
             var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
             Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
 
-            var nodeParagraph = oxes.AddNode(nodeBook, "p");
+            var nodeParagraph = oxes.AddNode(nodeBook, c_sTagParagraph);
+
             oxes.AddAttr(nodeParagraph, c_sAttrStyle, map.Name);
-            oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
+
+            if (!string.IsNullOrEmpty(map.Usfm))
+                oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
+
             oxes.AddAttr(nodeParagraph, c_sAttrID, XmlDoc.IntToID(ID));
 
             foreach (DRun run in Runs)

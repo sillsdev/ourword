@@ -42,7 +42,7 @@ using OurWord.Layouts;
 
 namespace OurWordTests.DataModel
 {
-    [TestFixture] public class T_DTranslatorNote
+    [TestFixture] public class T_DTranslatorNote : TestCommon
     {
         DSection m_Section;
 
@@ -291,6 +291,45 @@ namespace OurWordTests.DataModel
             // Do the test
             T_DSection t = new T_DSection();
             t.IO_TestEngine(vs, vs);
+        }
+        #endregion
+
+        // Oxes IO
+        #region Test: OxesIO_Discussion
+        [Test] public void OxesIO_Discussion()
+        {
+            // Cannonical form of a Discussion object
+            string[] vsOxesExpected = new string[] { 
+                "<Discussion author=\"John\" created=\"2008-11-23 00:00:00Z\">" ,
+                    "<p class=\"Note Discussion\" id=\"B\">",
+                        "Is <span class=\"Italic\">bibit </span>the correct term for seed here?",
+                        "<bt>Memang mau pakai bibit di sini?</bt>",
+                    "</p>",
+                "</Discussion>"
+            };
+
+            // Create the XmlDoc
+            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
+            var nodeDiscussion = XmlDoc.FindNode(xmlOxesExpected, Discussion.c_sTagDiscussion);
+            //xmlOxesExpected.WriteToConsole("Expected");
+
+            // Create the Discussion object
+            var discussion = Discussion.Create(nodeDiscussion);
+
+            // We need to place the discussion we're about to create into a hierarchy
+            // in order for the save to work properly
+            var paragraph = CreateHierarchyThroughTargetParagraph("MRK", "Hi");
+            var note = new TranslatorNote();
+            (paragraph.Runs[0] as DText).TranslatorNotes.Append(note);
+            note.Discussions.Append(discussion);
+
+            // Save the Discussion to oxes
+            var xmlOxesActual = new XmlDoc();
+            discussion.Save(xmlOxesActual, xmlOxesActual);
+
+            // Are they the same?
+            bool bIxSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            Assert.IsTrue(bIxSame, "Discussion xmls should be the same.");
         }
         #endregion
 

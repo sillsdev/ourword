@@ -1,4 +1,5 @@
-﻿/**********************************************************************************************
+﻿#region ***** XmlDoc.cs *****
+/**********************************************************************************************
  * Project: Our Word!
  * File:    XmlDoc.cs
  * Author:  John Wimbish
@@ -14,13 +15,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Windows.Forms;
 using System.Text;
 using System.Threading;
 using System.IO;
 using System.Xml;
 #endregion
-
+#endregion
 
 namespace JWTools
 {
@@ -148,56 +150,36 @@ namespace JWTools
         }
         #endregion
 
-
-        public void AddXmlDeclaration()
-            // Creates "<?xml version="1.0" encoding="utf-16"?>"  
+        // Attrs -----------------------------------------------------------------------------
+        #region Method: XmlAttribute AddAttr(node, sAttrName, string sValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, string sValue)
         {
-            var decl = CreateXmlDeclaration("1.0", null, null);
-            var root = DocumentElement;
-            InsertBefore(decl, root);
-        }
-
-        public XmlNode AddNode(XmlNode nodeParent, string sName)
-        {
-            var node = CreateNode(XmlNodeType.Element, sName, null);
-
-            if (nodeParent == null)
-                nodeParent = this;
-
-            nodeParent.AppendChild(node);
-            return node;
-        }
-
-        public XmlAttribute AddAttr(XmlNode node, string sName, string sValue)
-        {
-            var attr = CreateAttribute(sName);
+            var attr = CreateAttribute(sAttrName);
             attr.Value = sValue;
             node.Attributes.Append(attr);
             return attr;
         }
-
-        public XmlText AddText(XmlNode node, string sValue)
+        #endregion
+        #region Method: XmlAttribute AddAttr(node, sAttrName, int nValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, int nValue)
         {
-            XmlText text = CreateTextNode(sValue);
-            node.AppendChild(text);
-            return text;
+            return AddAttr(node, sAttrName, nValue.ToString());
         }
-
-        static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
+        #endregion
+        #region Method: XmlAttribute AddAttr(node, sAttrName, DateTime dtValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, DateTime dtValue)
         {
-            foreach (XmlNode node in nodeParent.ChildNodes)
-            {
-                if (node.Name == sChildName)
-                    return node;
-            }
-
-            return null;
+            string sDate = dtValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
+            return AddAttr(node, sAttrName, sDate);
         }
+        #endregion
 
-        // Retrieve attr values of different types
         #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
         {
+            if (null == node || string.IsNullOrEmpty(sAttrName))
+                return sDefaultValue;
+
             foreach (XmlAttribute attr in node.Attributes)
             {
                 if (attr.Name == sAttrName)
@@ -224,7 +206,62 @@ namespace JWTools
             }
         }
         #endregion
+        #region SMethod: DateTime GetAttrValue(node, attr, dtDefaultValue)
+        static public DateTime GetAttrValue(XmlNode node, string sAttrName, DateTime dtDefaultValue)
+        {
+            string sDefault = "";
+            if (null != dtDefaultValue)
+                sDefault = dtDefaultValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
 
+            string sValue = GetAttrValue(node, sAttrName, sDefault);
+            if (string.IsNullOrEmpty(sValue))
+                return DateTime.Now;
+
+            return DateTime.ParseExact(sValue, "u",
+                DateTimeFormatInfo.InvariantInfo);
+        }
+        #endregion
+
+
+        public void AddXmlDeclaration()
+            // Creates "<?xml version="1.0" encoding="utf-16"?>"  
+        {
+            var decl = CreateXmlDeclaration("1.0", null, null);
+            var root = DocumentElement;
+            InsertBefore(decl, root);
+        }
+
+        public XmlNode AddNode(XmlNode nodeParent, string sName)
+        {
+            var node = CreateNode(XmlNodeType.Element, sName, null);
+
+            if (nodeParent == null)
+                nodeParent = this;
+
+            nodeParent.AppendChild(node);
+            return node;
+        }
+
+
+        public XmlText AddText(XmlNode node, string sValue)
+        {
+            XmlText text = CreateTextNode(sValue);
+            node.AppendChild(text);
+            return text;
+        }
+
+        static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
+        {
+            foreach (XmlNode node in nodeParent.ChildNodes)
+            {
+                if (node.Name == sChildName)
+                    return node;
+            }
+
+            return null;
+        }
+
+        // Retrieve attr values of different types
         static public int GetAttrID(XmlNode node, string sAttrName)
         {
             // Retrieve the string value
@@ -301,5 +338,19 @@ namespace JWTools
             Console.WriteLine("");
         }
         #endregion
+        #region Method: bool Compare(xmlExpected, xmlActual)
+        static public bool Compare(XmlDoc xmlExpected, XmlDoc xmlActual)
+        {
+            bool bIsSame = xmlExpected.IsSame(xmlActual);
+            if (!bIsSame)
+            {
+                xmlActual.WriteToConsole("Actual");
+                xmlExpected.WriteToConsole("Expected");
+                XmlDoc.DisplayDifferences(xmlActual, xmlExpected);
+            }
+            return bIsSame;
+        }
+        #endregion
+
     }
 }

@@ -1285,6 +1285,7 @@ namespace JWdb.DataModel
             StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range"));
             StyleMappings.Add(new StyleMapping("cf", "x", "Note Cross Reference Paragraph"));
             StyleMappings.Add(new StyleMapping("fn", "f", "Note General Paragraph"));
+            StyleMappings.Add(new StyleMapping(DStyleSheet.c_StyleNoteDiscussion, "", "Note Discussion"));
 
 			// TODO: Need to persist these array values
 

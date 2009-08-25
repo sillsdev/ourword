@@ -1,3 +1,4 @@
+#region ***** T_DSection.cs *****
 /**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_DSection.cs
@@ -24,6 +25,7 @@ using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+#endregion
 #endregion
 
 namespace OurWordTests.DataModel
@@ -2126,7 +2128,7 @@ namespace OurWordTests.DataModel
     #endregion
 
     #region CLASS: T_DSection
-    [TestFixture] public class T_DSection
+    [TestFixture] public class T_DSection : TestCommon
     {
         // Helper Methods --------------------------------------------------------------------
         #region Setup
@@ -3136,29 +3138,11 @@ namespace OurWordTests.DataModel
         #endregion
 
         // Oxes ------------------------------------------------------------------------------
-        #region Method: void OxesCompare(xmlExpected, xmlActual, sMessage)
-        void OxesCompare(XmlDoc xmlExpected, XmlDoc xmlActual, string sMessage)
-        {
-            bool bIsSame = xmlExpected.IsSame(xmlActual);
-            if (!bIsSame)
-            {
-                xmlActual.WriteToConsole("Actual");
-                xmlExpected.WriteToConsole("Expected");
-                XmlDoc.DisplayDifferences(xmlActual, xmlExpected);
-            }
-            Assert.IsTrue(bIsSame, sMessage);
-        }
-        #endregion
         #region Method: void OxesTestEngine(...)
         void OxesTestEngine(string sTest, string[] vsToolbox, string[] vsOxesExpected)
         {
             // Preliminary: Create the superstructure we need for a DBook
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
-            DB.Project.DisplayName = "Project";
-            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
-            DB.Project.TargetTranslation = Translation;
+            var Translation = CreateHierarchyThroughTargetTranslation();
 
             // Load in our Expected Xml from the string array
             var xmlExpected = new XmlDoc(vsOxesExpected);
@@ -3171,7 +3155,7 @@ namespace OurWordTests.DataModel
             var xmlActual = Book.ToOxesDocument;
 
             // Compare with what we expect
-            OxesCompare(xmlExpected, xmlActual, 
+            Assert.IsTrue(XmlDoc.Compare(xmlExpected, xmlActual),
                 "Oxes should be same for Test #" + sTest + " - Part 1");
 
             // PART 2 - ROUND-TRIP OXES
@@ -3182,7 +3166,7 @@ namespace OurWordTests.DataModel
             xmlActual = bookNew.ToOxesDocument;
 
             // Compare
-            OxesCompare(xmlExpected, xmlActual,
+            Assert.IsTrue(XmlDoc.Compare(xmlExpected, xmlActual),
                 "Oxes should be same for Test #" + sTest + " - Part 2");
         }
         #endregion

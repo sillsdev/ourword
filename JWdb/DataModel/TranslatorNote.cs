@@ -1,3 +1,4 @@
+#region ***** TranslatorNote.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    TranslatorNote.cs
@@ -17,9 +18,11 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 // TODO: Do we want a Context for the vernacular, and another for the BT? Thus different things
@@ -268,6 +271,55 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        // Oxes ------------------------------------------------------------------------------
+        #region Constants
+        public const string c_sTagDiscussion = "Discussion";
+        const string c_sTagAuthor = "author";
+        const string c_sTagCreated = "created";
+        #endregion
+        #region SMethod: Discussion Create(nodeDiscussion)
+        static public Discussion Create(XmlNode nodeDiscussion)
+        {
+            if (nodeDiscussion.Name != c_sTagDiscussion)
+                return null;
+
+            // Create the new picture object. Delete the paragraph that the constructor will
+            // have otherwise created.
+            var discussion = new Discussion();
+            discussion.Paragraphs.Clear();
+
+            // Attrs
+            discussion.Author = XmlDoc.GetAttrValue(nodeDiscussion, c_sTagAuthor, "");
+            discussion.Created = XmlDoc.GetAttrValue(nodeDiscussion, c_sTagCreated, DateTime.Now);
+
+            // Paragraphs
+            foreach (XmlNode nodeParagraph in nodeDiscussion.ChildNodes)
+            {
+                var paragraph = DParagraph.CreateParagraph(nodeParagraph);
+                if (null != paragraph)
+                    discussion.Paragraphs.Append(paragraph);
+            }
+
+            return discussion;
+        }
+        #endregion
+        #region Method: XmlNode Save(oxes, nodeAnnotation)
+        public XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
+        {
+            var nodeDiscussion = oxes.AddNode(nodeAnnotation, c_sTagDiscussion);
+
+            // Attrs
+            oxes.AddAttr(nodeDiscussion, c_sTagAuthor, Author);
+            oxes.AddAttr(nodeDiscussion, c_sTagCreated,Created);
+
+            // Paragraphs
+            foreach (DParagraph p in Paragraphs)
+                p.SaveToOxesBook(oxes, nodeDiscussion);
+
+            return nodeDiscussion;
+        }
+        #endregion
+
         // Merging ---------------------------------------------------------------------------
         #region Method: bool IsSameOriginAs(Theirs)
         public bool IsSameOriginAs(Discussion Theirs)
@@ -326,6 +378,7 @@ namespace JWdb.DataModel
     }
     #endregion
 
+    #region CLASS: TranslatorNote
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
@@ -1677,5 +1730,5 @@ namespace JWdb.DataModel
         }
         #endregion
     }
-
+    #endregion
 }
