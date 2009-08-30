@@ -123,7 +123,7 @@ namespace JWdb.DataModel
         {
             m_ownDescription = new JOwn<DParagraph>("Description", this);
             Description = new DParagraph();
-            Description.StyleAbbrev = DStyleSheet.c_StyleNoteDiscussion;
+            Description.StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
 
             m_dtDateCreated = DateTime.Now;
         }

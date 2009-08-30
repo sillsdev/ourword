@@ -639,8 +639,8 @@ namespace JWdb.DataModel
         // Translator Notes
         public const string c_StyleNoteHeader             = "NoteHeader";
         public const string c_StyleNoteDate               = "NoteDate";
-        public const string c_StyleNoteDiscussion         = "NoteDiscussion";
-        public const string c_StyleNote                   = "nt";   // Note Discussion Paragraph
+        public const string c_StyleAnnotationMessage      = "NoteMessage";
+        public const string c_StyleNote                   = "nt";   
 
         // User-Interface Only
         public const string c_PStyleMergeHeader = "MergeHeader";
@@ -884,9 +884,9 @@ namespace JWdb.DataModel
                 style.SetFonts(true, 9, false);
             }
             // Note Discussion
-            if (null == FindParagraphStyle(c_StyleNoteDiscussion))
+            if (null == FindParagraphStyle(c_StyleAnnotationMessage))
             {
-                style = AddParagraphStyle(c_StyleNoteDiscussion, "Note Discussion");
+                style = AddParagraphStyle(c_StyleAnnotationMessage, "Note Discussion");
                 style.IsJustified = true;
                 style.SpaceBefore = 3;
                 style.SpaceAfter = 3;

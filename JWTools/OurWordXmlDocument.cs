@@ -57,6 +57,14 @@ namespace JWTools
         }
         #endregion
 
+        #region Constructor(string sInitializeFrom)
+        public XmlDoc(string sInitializeFrom)
+            : this()
+        {
+            LoadXml(sInitializeFrom);
+        }
+        #endregion
+
         // IDs -------------------------------------------------------------------------------
         #region ID's Documentation
         /* Doc - Xml requires an id to begin with a letter. So I'm using all of the letters
@@ -173,6 +181,13 @@ namespace JWTools
             return AddAttr(node, sAttrName, sDate);
         }
         #endregion
+        #region Method: XmlAttribute AddAttr(node, sAttrName, bool bValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, bool bValue)
+        {
+            string sValue = (bValue) ? "true" : "false";
+            return AddAttr(node, sAttrName, sValue);
+        }
+        #endregion
 
         #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
@@ -182,7 +197,7 @@ namespace JWTools
 
             foreach (XmlAttribute attr in node.Attributes)
             {
-                if (attr.Name == sAttrName)
+                if (attr.Name.ToUpper() == sAttrName.ToUpper())
                     return attr.Value;
             }
 
@@ -221,6 +236,26 @@ namespace JWTools
                 DateTimeFormatInfo.InvariantInfo);
         }
         #endregion
+        #region SMethod: bool GetAttrValue(node, attr, bDefaultValue)
+        static public bool GetAttrValue(XmlNode node, string sAttrName, bool bDefaultValue)
+        {
+            string sDefaultValue = (bDefaultValue) ? "true" : "false";
+
+            string sValue = GetAttrValue(node, sAttrName, sDefaultValue);
+
+            if (sValue.ToUpper() == "TRUE")
+                return true;
+            return false;
+        }
+        #endregion
+
+
+        static public bool IsNode(XmlNode node, string sName)
+        {
+            if (node.Name.ToUpper() == sName.ToUpper())
+                return true;
+            return false;
+        }
 
 
         public void AddXmlDeclaration()
@@ -254,7 +289,7 @@ namespace JWTools
         {
             foreach (XmlNode node in nodeParent.ChildNodes)
             {
-                if (node.Name == sChildName)
+                if (IsNode(node, sChildName))
                     return node;
             }
 
@@ -272,31 +307,39 @@ namespace JWTools
             return IdToInt(sID);
         }
 
+        public string OneLiner()
+        {
+            var sb = new StringBuilder();
+            this.Save(new StringWriter(sb));
+            return sb.ToString();
+        }
+
+        static public string OneLiner(XmlNode node)
+        {
+            return node.OuterXml;
+
+            /**
+            var sb = new StringBuilder();
+            var w = new XmlTextWriter(new StringWriter(sb));
+            node.WriteContentTo(w);
+            return sb.ToString();
+            **/
+        }
+
         // For Unit Testing ------------------------------------------------------------------
         #region Method: bool IsSame(XmlDoc other)
         public bool IsSame(XmlDoc other)
         {
-            var sbThis = new StringBuilder();
-            this.Save(new StringWriter(sbThis));
-            string sThis = sbThis.ToString();
-
-            var sbOther = new StringBuilder();
-            other.Save(new StringWriter(sbOther));
-            string sOther = sbOther.ToString();
-
-           return (sThis == sOther);
+            string sThis = OneLiner();
+            string sOther = other.OneLiner();
+            return (sThis == sOther);
         }
         #endregion
         #region SMethod: void DisplayDifferences(xActual, xExpected)
         static public void DisplayDifferences(XmlDoc xActual, XmlDoc xExpected)
         {
-            var sbActual = new StringBuilder();
-            xActual.Save(new StringWriter(sbActual));
-            string sActual = sbActual.ToString();
-
-            var sbExpected = new StringBuilder();
-            xExpected.Save(new StringWriter(sbExpected));
-            string sExpected = sbExpected.ToString();
+            string sActual = xActual.OneLiner();
+            string sExpected = xExpected.OneLiner();
 
             bool bIsSame = (sActual == sExpected);
 
@@ -330,11 +373,7 @@ namespace JWTools
             // as opposed to InnerText, which has no line breaks.
         {
             Console.WriteLine("----- " + sMessage + " -----");
-
-            var sb = new StringBuilder();
-            Save(new StringWriter(sb));
-            Console.WriteLine(sb.ToString());
-
+            Console.WriteLine(OneLiner());
             Console.WriteLine("");
         }
         #endregion
@@ -351,6 +390,8 @@ namespace JWTools
             return bIsSame;
         }
         #endregion
+
+
 
     }
 }

@@ -33,8 +33,8 @@ using JWdb;
 
 namespace JWdb.DataModel
 {
-    #region Class: Discussion : JObject
-    public class Discussion : JObject
+    #region Class: DMessage : DParagraph
+    public class DMessage : DParagraph
     {
         // Content Attrs ---------------------------------------------------------------------
         #region BAttr{g/s}: string Author
@@ -65,15 +65,26 @@ namespace JWdb.DataModel
         }
         private DateTime m_dtCreated;
         #endregion
-        #region JAttr{g}: JOwnSeq<DParagraph> Paragraphs
-        public JOwnSeq<DParagraph> Paragraphs
+        #region BAttr{g/s}: string Status
+        public string Status
         {
             get
             {
-                return m_osParagraphs;
+                if (string.IsNullOrEmpty(m_sStatus))
+                    return Closed;
+
+                return m_sStatus;
+            }
+            set
+            {
+                string sValue = value;
+                if (sValue == Closed)
+                    sValue = "";
+
+                SetValue(ref m_sStatus, value);
             }
         }
-        JOwnSeq<DParagraph> m_osParagraphs;
+        private string m_sStatus = "";
         #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
@@ -81,22 +92,20 @@ namespace JWdb.DataModel
             base.DeclareAttrs();
             DefineAttr("Author", ref m_sAuthor);
             DefineAttr("Created", ref m_dtCreated);
+            DefineAttr("Status", ref m_sStatus);
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
-        public Discussion()
+        public DMessage()
             : base()
         {
-            // Create the Paragraph attribute
-            m_osParagraphs = new JOwnSeq<DParagraph>("paras", this, false, false);
+            // This paragraph will always have the Message style
+            StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
 
-            // Put an empty paragraph in it, with the default style
-            DParagraph p = new DParagraph();
-            p.StyleAbbrev = DStyleSheet.c_StyleNoteDiscussion;
-            p.SimpleText = "";
-            Paragraphs.Append(p);
+            // Start with a simple, empty text
+            SimpleText = "";
 
             // The Default date is "Today"
             m_dtCreated = DateTime.Now;
@@ -107,60 +116,60 @@ namespace JWdb.DataModel
             Debug_VerifyIntegrity();
         }
         #endregion
-        #region Constructor(sAuthor, string sSimpleText)
-        public Discussion(string sAuthor, DateTime dtCreated, string sSimpleText)
+        #region Constructor(sAuthor, dtCreated, sStatus, string sSimpleText)
+        public DMessage(string sAuthor, DateTime dtCreated, string sStatus, string sSimpleText)
             : this()
         {
             Author = sAuthor;
             Created = dtCreated;
+            Status = sStatus;
 
             // Temporary kludge: remove ||'s that we've  been inserting by mistake
             string sFixed = DSection.IO.EatSpuriousVerticleBars(sSimpleText);
 
-            // Parse the string into phrases
+            // Parse the string into phrases and add them
+            Runs.Clear();
             List<DRun> vRuns = DSection.IO.CreateDRunsFromInputText(sFixed);
-
-            // Add the phrases to our one-and-only paragraph
-            // TODO: Multiple paragraphs, of course!
-            Debug.Assert(1 == Paragraphs.Count);
-            Paragraphs[0].Runs.Clear();
             foreach (DRun run in vRuns)
             {
                 DText text = run as DText;
                 if (text != null && text.PhrasesBT.Count == 0)
                     text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
-                Paragraphs[0].Runs.Append(run);
+                Runs.Append(run);
             }
 
             Debug_VerifyIntegrity();
         }
         #endregion
-        #region OMethod: bool ContentEquals(Discussion)
+        #region OMethod: bool ContentEquals(DMessage)
  		public override bool ContentEquals(JObject obj)
         {
-            Discussion discussion = obj as Discussion;
-            if (null == discussion)
+            var message = obj as DMessage;
+            if (null == message)
                 return false;
 
-            if (discussion.Author != Author)
+            if (message.Author != Author)
                 return false;
-            if (discussion.Created.CompareTo(Created) != 0)
+            if (message.Created.CompareTo(Created) != 0)
+                return false;
+            if (message.Status != Status)
                 return false;
 
-            if (!discussion.Paragraphs.ContentEquals(Paragraphs))
+            if (!base.ContentEquals(message))
                 return false;
 
             return true;
         }
         #endregion
-        #region Method: Discussion Clone()
-        public Discussion Clone()
+        #region Method: DMessage Clone()
+        public DMessage Clone()
         {
-            Discussion d = new Discussion();
-            d.Author = Author;
-            d.Created = Created;
-            d.CopyParagraphsFrom(this);
-            return d;
+            var message = new DMessage();
+            message.Author = Author;
+            message.Created = Created;
+            message.Status = Status;
+            message.CopyFrom(this, false);
+            return message;
         }
         #endregion
         #region OAttr{g}: string SortKey
@@ -179,50 +188,67 @@ namespace JWdb.DataModel
         {
             get
             {
-                TranslatorNote tn = Owner as TranslatorNote;
+                var tn = Owner as TranslatorNote;
                 Debug.Assert(null != tn);
                 return tn;
             }
         }
         #endregion
         #region DEBUG SUPPORT
+        #region Method: void Debug_VerifyIntegrity()
         public void Debug_VerifyIntegrity()
         {
         #if DEBUG
-            foreach (DParagraph p in Paragraphs)
+            // Make sure we have a DText in every paragraph
+            Debug.Assert(Runs.Count > 0);
+            DText text = null;
+            foreach (DRun r in Runs)
             {
-                // Make sure we have a DText in every paragraph
-                Debug.Assert(p.Runs.Count > 0);
-                DText text = null;
-                foreach (DRun r in p.Runs)
-                {
-                    text = r as DText;
-                    if (null != text)
-                        break;
-                }
-                Debug.Assert(null != text);
-
-                // Make sure we have a phrase in the DText
-                Debug.Assert(text.Phrases.Count > 0);
+                text = r as DText;
+                if (null != text)
+                    break;
             }
+            Debug.Assert(null != text);
+
+            // Make sure we have a phrase in the DText
+            Debug.Assert(text.Phrases.Count > 0);
         #endif
         }
+        #endregion
         #region Attr{g}: string DebugString
-        public string DebugString
+        public override string DebugString
         {
             get
             {
-                string s = "D: Author={" + Author + "} Created={" + Created.ToShortDateString() +
-                    "} + Content={";
-
-                foreach(DParagraph p in Paragraphs)
-                    s += ("p:<" + p.DebugString + ">");
-
-                s += "}";
+                string s = "M: "+
+                    "Author={" + Author + "} " +
+                    "Created={" + Created.ToShortDateString() + "} " +
+                    "Status={" + Status + "} " +
+                    "Content={" + base.DebugString + "}";
                 return s;
             }
         }
         #endregion
+        #endregion
+
+        // Localized Status Values -----------------------------------------------------------
+        #region SAttr{g}: string Anyone
+        static public string Anyone
+        {
+            get
+            {
+                return Loc.GetNotes("kAnyone", "Anyone");
+            }
+        }
+        #endregion
+        #region SAttr{g}: string Closed
+        static public string Closed
+        {
+            get
+            {
+                return Loc.GetNotes("kClosed", "Closed");
+            }
+        }
         #endregion
 
         // View Construction -----------------------------------------------------------------
@@ -231,12 +257,12 @@ namespace JWdb.DataModel
         {
             get
             {
-                // If the owning Note isn't editable, then this discussion isn't.
+                // If the owning Annotation isn't editable, then this Message isn't.
                 if (!Note.IsEditable)
                     return false;
 
-                // If not the last one in the Note, it isn't
-                if (this != Note.LastDiscussion)
+                // If not the last one in the Annotation, it isn't
+                if (this != Note.LastMessage)
                     return false;
 
                 // If the author is someone different from me, it isn't
@@ -247,83 +273,93 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-        #region VAttr{g}: DParagraph FirstParagraph
-        public DParagraph FirstParagraph
-        {
-            get
-            {
-                Debug.Assert(0 < Paragraphs.Count);
-                return Paragraphs[0];
-            }
-        }
-        #endregion       
-        #region VAttr{g}: DParagraph LastParagraph
-        public DParagraph LastParagraph
-        {
-            get
-            {
-                int c = Paragraphs.Count;
-                Debug.Assert(0 != c);
-                DParagraph p = Paragraphs[c - 1];
-                Debug.Assert(null != p);
-                return p;
-            }
-        }
-        #endregion
 
-        // Oxes ------------------------------------------------------------------------------
+        // Oxes I/O --------------------------------------------------------------------------
         #region Constants
-        public const string c_sTagDiscussion = "Discussion";
-        const string c_sTagAuthor = "author";
-        const string c_sTagCreated = "created";
+        public const string c_sTagMessage = "Message";
+        const string c_sAttrAuthor = "author";
+        const string c_sAttrCreated = "created";
+        const string c_sAttrStatus = "status";
         #endregion
-        #region SMethod: Discussion Create(nodeDiscussion)
-        static public Discussion Create(XmlNode nodeDiscussion)
+        #region Method: bool ImportOldToolboxXmlParagraphContents(XmlNode nodeMessage)
+        bool ImportOldToolboxXmlParagraphContents(XmlNode nodeMessage)
         {
-            if (nodeDiscussion.Name != c_sTagDiscussion)
-                return null;
+            // Our clue it is old format is if we have an "ownseq" child node
+            var nodeOwnSeq = XmlDoc.FindNode(nodeMessage, "ownseq");
+            if (null == nodeOwnSeq)
+                return false;
 
-            // Create the new picture object. Delete the paragraph that the constructor will
-            // have otherwise created.
-            var discussion = new Discussion();
-            discussion.Paragraphs.Clear();
+            // Retrieve the paragraph node
+            var nodeParagraph = XmlDoc.FindNode(nodeOwnSeq, "DParagraph");
+            if (null == nodeParagraph)
+                return false;
+
+            // If the paragraph has an ownseq node, then we have something more
+            // complicated going on. I'm hoping there's none in the data. If there
+            // is, then I'll need to have the JObject's FromXml code execute here.
+            var nodeUhOh = XmlDoc.FindNode(nodeParagraph, "ownseq");
+            Debug.Assert(null == nodeUhOh);
+
+            // The text is the contents attr of that node
+            SimpleText = XmlDoc.GetAttrValue(nodeParagraph, "Contents", "");
+
+            return true;
+        }
+        #endregion
+        #region SMethod: DMessage Create(nodeMessage)
+        static public DMessage Create(XmlNode nodeMessage)
+        {
+            // Is it a Message node? (Old-style were called Discussion)
+            if (!XmlDoc.IsNode(nodeMessage, c_sTagMessage) &&
+                !XmlDoc.IsNode(nodeMessage, "Discussion"))
+            {
+                return null;
+            }
+
+            // Create the new Message object. 
+            var message = new DMessage();
 
             // Attrs
-            discussion.Author = XmlDoc.GetAttrValue(nodeDiscussion, c_sTagAuthor, "");
-            discussion.Created = XmlDoc.GetAttrValue(nodeDiscussion, c_sTagCreated, DateTime.Now);
+            message.Author = XmlDoc.GetAttrValue(nodeMessage, c_sAttrAuthor, "");
+            message.Created = XmlDoc.GetAttrValue(nodeMessage, c_sAttrCreated, DateTime.Now);
+            message.Status = XmlDoc.GetAttrValue(nodeMessage, c_sAttrStatus, "");
 
-            // Paragraphs
-            foreach (XmlNode nodeParagraph in nodeDiscussion.ChildNodes)
-            {
-                var paragraph = DParagraph.CreateParagraph(nodeParagraph);
-                if (null != paragraph)
-                    discussion.Paragraphs.Append(paragraph);
-            }
+            // Import old-style paragraph contents; if successful, we're done.
+            if (message.ImportOldToolboxXmlParagraphContents(nodeMessage))
+                return message;
 
-            return discussion;
+            // Paragraph contents
+            message.ReadOxes(nodeMessage);
+
+            return message;
         }
         #endregion
         #region Method: XmlNode Save(oxes, nodeAnnotation)
         public XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
         {
-            var nodeDiscussion = oxes.AddNode(nodeAnnotation, c_sTagDiscussion);
+            var nodeMessage = oxes.AddNode(nodeAnnotation, c_sTagMessage);
 
             // Attrs
-            oxes.AddAttr(nodeDiscussion, c_sTagAuthor, Author);
-            oxes.AddAttr(nodeDiscussion, c_sTagCreated,Created);
+            oxes.AddAttr(nodeMessage, c_sAttrAuthor, Author);
+            oxes.AddAttr(nodeMessage, c_sAttrCreated, Created);
 
-            // Paragraphs
-            foreach (DParagraph p in Paragraphs)
-                p.SaveToOxesBook(oxes, nodeDiscussion);
+            // An empty Status is interpreted as "closed", so we want to not
+            // att the status attr unless we have content.
+            if (!string.IsNullOrEmpty(Status) && Status != Closed)
+                oxes.AddAttr(nodeMessage, c_sAttrStatus, Status);
 
-            return nodeDiscussion;
+            // Paragraph contents
+            foreach (DRun run in Runs)
+                run.SaveToOxesBook(oxes, nodeMessage);
+
+            return nodeMessage;
         }
         #endregion
 
         // Merging ---------------------------------------------------------------------------
         #region Method: bool IsSameOriginAs(Theirs)
-        public bool IsSameOriginAs(Discussion Theirs)
-            // Two discussions started out the same if they have the same Author and 
+        public bool IsSameOriginAs(DMessage Theirs)
+            // Two messages started out the same if they have the same Author and 
             // Create date.
         {
             if (0 != Created.CompareTo(Theirs.Created))
@@ -333,24 +369,12 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        #region Method: void CopyParagraphsFrom(Discussion source)
-        void CopyParagraphsFrom(Discussion source)
-        {
-            Paragraphs.Clear();
-            foreach(DParagraph p in source.Paragraphs)
-            {
-                DParagraph pCopy = new DParagraph();
-                pCopy.CopyFrom(p, false);
-                Paragraphs.Append(pCopy);
-            }
-        }
-        #endregion
-        #region Method: void Merge(Discussion Parent, Discussion Theirs)
-        public void Merge(Discussion Parent, Discussion Theirs)
+        #region Method: void Merge(Parent, Theirs)
+        public void Merge(DMessage Parent, DMessage Theirs)
         {
             // The caller needs to make sure these are the same Author and Created
-            Debug.Assert(IsSameOriginAs(Theirs), "Theirs wasn't the same discussion");
-            Debug.Assert(IsSameOriginAs(Parent), "Parent wasn't the same discussion");
+            Debug.Assert(IsSameOriginAs(Theirs), "Theirs wasn't the same message");
+            Debug.Assert(IsSameOriginAs(Parent), "Parent wasn't the same message");
 
             // If they are the same, we're done
             if (ContentEquals(Theirs))
@@ -359,7 +383,8 @@ namespace JWdb.DataModel
             // If we equal the parent, but they don't, then keep theirs
             if (ContentEquals(Parent) && !Theirs.ContentEquals(Parent))
             {
-                CopyParagraphsFrom(Theirs);
+                Status = Theirs.Status;
+                CopyFrom(Theirs, false);
                 return;
             }
 
@@ -372,7 +397,9 @@ namespace JWdb.DataModel
             if (Author == DB.UserName)
                 return;
             // If the author is someone else, then they win
-            CopyParagraphsFrom(Theirs);
+            Status = Theirs.Status;
+            CopyFrom(Theirs, false);
+            Status = Theirs.Status;
         }
         #endregion
     }
@@ -382,6 +409,20 @@ namespace JWdb.DataModel
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
+        #region BAttr{g/s}: string Class
+        public string Class
+        {
+            get
+            {
+                return m_sClass;
+            }
+            set
+            {
+                SetValue(ref m_sClass, value);
+            }
+        }
+        private string m_sClass;
+        #endregion
         #region BAttr{g/s}: string Category 
         public string Category
         {
@@ -395,20 +436,6 @@ namespace JWdb.DataModel
             }
         }
         private string m_sCategory;
-        #endregion
-        #region BAttr{g/s}: string AssignedTo
-        public string AssignedTo
-        {
-            get
-            {
-                return m_sAssignedTo;
-            }
-            set
-            {
-                SetValue(ref m_sAssignedTo, value);
-            }
-        }
-        private string m_sAssignedTo = "";
         #endregion
         #region BAttr{g/s}: string Context
         public string Context
@@ -456,26 +483,73 @@ namespace JWdb.DataModel
         }
         bool m_bShowInDaughterTranslations = false;
         #endregion
-        #region JAttr{g}: JOwnSeq<Discussion> Discussions
-        public JOwnSeq<Discussion> Discussions
+        #region JAttr{g}: JOwnSeq<DMessage> Messages
+        public JOwnSeq<DMessage> Messages
         {
             get
             {
-                Debug.Assert(null != m_osDiscussions);
-                return m_osDiscussions;
+                Debug.Assert(null != m_osMessages);
+                return m_osMessages;
             }
         }
-        JOwnSeq<Discussion> m_osDiscussions;
+        JOwnSeq<DMessage> m_osMessages;
         #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
+            DefineAttr("Class", ref m_sClass);
             DefineAttr("Category", ref m_sCategory);
-            DefineAttr("AssignedTo", ref m_sAssignedTo);
             DefineAttr("Context", ref m_sContext);
             DefineAttr("Reference", ref m_sReference);
             DefineAttr("ShowInDaughter", ref m_bShowInDaughterTranslations);
+        }
+        #endregion
+
+        // Classes ---------------------------------------------------------------------------
+        const string c_sClassGeneral = "General";
+        const string c_sClassExegetical = "Exegetical";
+        const string c_sClassHintForDrafting = "HintForDrafting";
+        #region VAttr{g}: bool IsGeneralNote
+        public bool IsGeneralNote
+        {
+            get
+            {
+                return (Class == c_sClassGeneral);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsExegeticalNote
+        public bool IsExegeticalNote
+        {
+            get
+            {
+                return (Class == c_sClassExegetical);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsHintForDraftingNote
+        public bool IsHintForDraftingNote
+        {
+            get
+            {
+                return (Class == c_sClassHintForDrafting);
+            }
+        }
+        #endregion
+
+        // Virtual Attrs ---------------------------------------------------------------------
+        #region VAttr{g/s}: string Status
+        public string Status
+        {
+            get
+            {
+                return LastMessage.Status;
+            }
+            set
+            {
+                LastMessage.Status = value;
+            }
         }
         #endregion
 
@@ -819,20 +893,7 @@ namespace JWdb.DataModel
         }
         static Classifications s_vFrontCategories;
         #endregion
-        #region SAttr{g}: Classifications People
-        static public Classifications People
-        {
-            get
-            {
-                if (null == s_vPeople)
-                    InitClassifications();
 
-                Debug.Assert(null != s_vPeople);
-                return s_vPeople;
-            }
-        }
-        static Classifications s_vPeople;
-        #endregion
         #region SMethod: void InitClassifications()
         static public void InitClassifications()
             // Initialize the classifcations, both from their data source, and their
@@ -851,11 +912,6 @@ namespace JWdb.DataModel
                 DB.TeamSettings.NotesFrontCategories,
                 new string[] { DraftingHelp, Exegesis },
                 Exegesis);
-
-            s_vPeople = new Classifications("People", 
-                DB.Project.People,
-                new string[] { "Translator", "Advisor", "Consultant", "None" },
-                "None");
         }
         #endregion
         #region SMethod: void ScanBookForNewClassifications(DBook book)
@@ -880,13 +936,7 @@ namespace JWdb.DataModel
             foreach (TranslatorNote tn in v)
             {
                 if (bIsTarget)
-                {
                     Categories.AddItem(tn.Category, false);
-
-                    People.AddItem(tn.AssignedTo, false);
-                    foreach (Discussion d in tn.Discussions)
-                        People.AddItem(d.Author, false);
-                }
                 else if (tn.ShowInDaughterTranslations)
                     FrontCategories.AddItem(tn.Category, false);
             }
@@ -967,29 +1017,29 @@ namespace JWdb.DataModel
         }
         static Color s_BorderColor = Color.Empty;
         #endregion
-        #region Attr{g/s}: Color DiscussionHeaderColor
-        static public Color DiscussionHeaderColor
+        #region Attr{g/s}: Color MessageHeaderColor
+        static public Color MessageHeaderColor
         {
             get
             {
-                if (Color.Empty == s_DiscussionHeaderColor)
+                if (Color.Empty == s_MessageHeaderColor)
                 {
                     string s = JW_Registry.GetValue(c_sRegistrySubkey, 
-                        "DiscussionHeaderColor", "LightGreen");
-                    s_DiscussionHeaderColor = Color.FromName(s);
+                        "MessageHeaderColor", "LightGreen");
+                    s_MessageHeaderColor = Color.FromName(s);
                 }
-                Debug.Assert(Color.Empty != s_DiscussionHeaderColor);
-                return s_DiscussionHeaderColor;
+                Debug.Assert(Color.Empty != s_MessageHeaderColor);
+                return s_MessageHeaderColor;
             }
             set
             {
-                s_DiscussionHeaderColor = value;
-                Debug.Assert(Color.Empty != s_DiscussionHeaderColor);
-                JW_Registry.SetValue(c_sRegistrySubkey, 
-                    "DiscussionHeaderColor", value.Name);
+                s_MessageHeaderColor = value;
+                Debug.Assert(Color.Empty != s_MessageHeaderColor);
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "MessageHeaderColor", value.Name);
             }
         }
-        static Color s_DiscussionHeaderColor = Color.Empty;
+        static Color s_MessageHeaderColor = Color.Empty;
         #endregion
         #region Attr{g/s}: Color UneditableColor
         static public Color UneditableColor
@@ -1051,8 +1101,11 @@ namespace JWdb.DataModel
         public TranslatorNote()
             : base()
         {
-            // Discussions, sorted by date
-            m_osDiscussions = new JOwnSeq<Discussion>("Discussions", this, false, true);
+            // Default is General class
+            m_sClass = c_sClassGeneral;
+
+            // Messages, sorted by date
+            m_osMessages = new JOwnSeq<DMessage>("Messages", this, false, true);
 
             // Set the category to the default
             Category = Categories.DefaultValue;
@@ -1079,19 +1132,17 @@ namespace JWdb.DataModel
 
             if (tn.Category != Category)
                 return false;
-            if (tn.AssignedTo != AssignedTo)
-                return false;
             if (tn.Context != Context)
                 return false;
             if (tn.Reference != Reference)
                 return false;
 
-            if (Discussions.Count != tn.Discussions.Count)
+            if (Messages.Count != tn.Messages.Count)
                 return false;
 
-            for (int i = 0; i < Discussions.Count; i++)
+            for (int i = 0; i < Messages.Count; i++)
             {
-                if (!Discussions[i].ContentEquals(tn.Discussions[i]))
+                if (!Messages[i].ContentEquals(tn.Messages[i]))
                     return false;
             }
 
@@ -1105,11 +1156,8 @@ namespace JWdb.DataModel
             {
                 string s = Reference;
 
-                if (Discussions.Count > 0)
-                {
-                    Discussion discussion = Discussions[0] as Discussion;
-                    s += discussion.SortKey;
-                }
+                if (Messages.Count > 0)
+                    s += Messages[0].SortKey;
 
                 return s;
             }
@@ -1127,13 +1175,12 @@ namespace JWdb.DataModel
             TranslatorNote note = new TranslatorNote();
 
             note.Category = Category;
-            note.AssignedTo = AssignedTo;
             note.Context = Context;
             note.Reference = Reference;
             note.ShowInDaughterTranslations = ShowInDaughterTranslations;
 
-            foreach (Discussion d in Discussions)
-                note.Discussions.Append(d.Clone());
+            foreach (DMessage m in Messages)
+                note.Messages.Append(m.Clone());
 
             return note;
         }
@@ -1164,9 +1211,9 @@ namespace JWdb.DataModel
         public void Debug_VerifyIntegrity()
         {
         #if DEBUG
-            Debug.Assert(Discussions.Count > 0);
-            foreach (Discussion d in Discussions)
-                d.Debug_VerifyIntegrity();
+            Debug.Assert(Messages.Count > 0);
+            foreach (DMessage m in Messages)
+                m.Debug_VerifyIntegrity();
         #endif
         }
         #endregion
@@ -1267,9 +1314,9 @@ namespace JWdb.DataModel
             // expanded, unless we clear the ShowHeaderWhenExpanded flag.
             tn.Context = GetWordsRight(sData, 0, 5);
 
-            // Add the discussion
-            Discussion disc = new Discussion(sAuthor, dtCreated, sData);
-            tn.Discussions.Append(disc);          
+            // Add the Message
+            var message = new DMessage(sAuthor, dtCreated, "", sData);
+            tn.Messages.Append(message);          
 
             // Done
             tn.Debug_VerifyIntegrity();
@@ -1299,23 +1346,19 @@ namespace JWdb.DataModel
             // I do want to delete this at some point, and just convert everyone
             // to the new style. But best not to make too many waves while testing.
         {
-            // The old style has exactly one discussion
-            if (Discussions.Count != 1)
-                return null;
-
-            // The old style has exactly one paragraph
-            if (Discussions[0].Paragraphs.Count != 1)
+            // The old style has exactly one message
+            if (Messages.Count != 1)
                 return null;
 
             // The old style has exactly one DText
-            if (Discussions[0].Paragraphs[0].Runs.Count != 1)
+            if (Messages[0].Runs.Count != 1)
                 return null;
-            if (Discussions[0].Paragraphs[0].Runs[0] as DText == null)
+            if (Messages[0].Runs[0] as DText == null)
                 return null;
 
             // The old style's author is "Unknown Author"
             string sAuthor = Loc.GetString("kUnknownAuthor", "Unknown Author");
-            if (Discussions[0].Author != sAuthor)
+            if (Messages[0].Author != sAuthor)
                 return null;
 
             // Figure out the marker from the category. This is ugly, but it IS going away.
@@ -1344,15 +1387,23 @@ namespace JWdb.DataModel
                 sMkr = "ntcn";
 
             // Create the note
-            return new SfField(sMkr, Discussions[0].Paragraphs[0].Runs[0].ContentsSfmSaveString);
+            return new SfField(sMkr, Messages[0].Runs[0].ContentsSfmSaveString);
         }
         #endregion
         #region Method: void AddToSfmDB(ScriptureDB DB)
         public void AddToSfmDB(ScriptureDB DB)
         {
+            // Attempt to write to the old style. Fails if the note is too complicated.
             SfField f = ToSfField();
+
+            // Failed. Must do a new style
             if (null == f)
-                f = new SfField(DSFMapping.c_sMkrTranslatorNote, ToXml(true).OneLiner);
+            {
+                var oxes = new XmlDoc();
+                var node = Save(oxes, oxes);
+                f = new SfField(DSFMapping.c_sMkrTranslatorNote, XmlDoc.OneLiner(node));
+            }
+
             DB.Append(f);
         }
         #endregion
@@ -1397,6 +1448,77 @@ namespace JWdb.DataModel
             sIn = (iPos < sIn.Length) ?
                 sIn.Substring(iPos) : "";
             return sIn;
+        }
+        #endregion
+
+        // Oxes I/O --------------------------------------------------------------------------
+        #region Constants
+        public const string c_sTagTranslatorNote = "TranslatorNote";
+        const string c_sAttrClass = "class";
+        const string c_sAttrCategory = "category";
+        const string c_sAttrAssignedTo = "assignedTo";
+        const string c_sAttrContext = "context";
+        const string c_sAttrReference = "reference";
+        const string c_sAttrShowInDaughter = "showInDaughter";
+        #endregion
+        #region SMethod: TranslatorNote Create(nodeNote)
+        static public TranslatorNote Create(XmlNode nodeNote)
+        {
+            if (nodeNote.Name != c_sTagTranslatorNote)
+                return null;
+
+            // Create the new note
+            var note = new TranslatorNote();
+
+            // Attrs
+            note.Class = XmlDoc.GetAttrValue(nodeNote, c_sAttrClass, c_sClassGeneral);
+            note.Category = XmlDoc.GetAttrValue(nodeNote, c_sAttrCategory, "");
+            note.Context = XmlDoc.GetAttrValue(nodeNote, c_sAttrContext, "");
+            note.Reference = XmlDoc.GetAttrValue(nodeNote, c_sAttrReference, "");
+            note.ShowInDaughterTranslations = XmlDoc.GetAttrValue(nodeNote, c_sAttrShowInDaughter, false);
+
+            // Toolbox old style had an AssignedTo attribute. We want that to be the
+            // Status of the LastMessage.
+            string sAssignedTo = XmlDoc.GetAttrValue(nodeNote, c_sAttrAssignedTo, "");
+
+            // Toolbox old style had a <ownseq node above the messages; so if we see this,
+            // we simply move down to it prior to iterating through the Message nodes.
+            var nodeParent = XmlDoc.FindNode(nodeNote, "ownseq");
+            if (null == nodeParent)
+                nodeParent = nodeNote;
+
+            // Messages
+            foreach (XmlNode child in nodeParent.ChildNodes)
+            {
+                var message = DMessage.Create(child);
+                if (null != message)
+                    note.Messages.Append(message);
+            }
+
+            // Handle old-style AssignedTo
+            if (!string.IsNullOrEmpty(sAssignedTo))
+                note.LastMessage.Status = sAssignedTo;
+
+            return note;
+        }
+        #endregion
+        #region Method: XmlNode Save(oxes, nodeAnnotation)
+        public XmlNode Save(XmlDoc oxes, XmlNode nodeParent)
+        {
+            var nodeNote = oxes.AddNode(nodeParent, c_sTagTranslatorNote);
+
+            // Attrs
+            oxes.AddAttr(nodeNote, c_sAttrClass, Class);
+            oxes.AddAttr(nodeNote, c_sAttrCategory, Category);
+            oxes.AddAttr(nodeNote, c_sAttrContext, Context);
+            oxes.AddAttr(nodeNote, c_sAttrReference, Reference);
+            oxes.AddAttr(nodeNote, c_sAttrShowInDaughter, ShowInDaughterTranslations);
+
+            // Message objects
+            foreach (DMessage m in Messages)
+                m.Save(oxes, nodeNote);
+
+            return nodeNote;
         }
         #endregion
 
@@ -1551,6 +1673,8 @@ namespace JWdb.DataModel
         }
         static bool s_bShowAllPeople = true;
         #endregion
+
+        /***
         #region VAttr{g}: bool IsUnassigned
         public bool IsUnassigned
         {
@@ -1560,46 +1684,26 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        ***/
 
         // View Construction -----------------------------------------------------------------
-        #region VAttr{g}: Discussion FirstDiscussion
-        public Discussion FirstDiscussion
+        #region VAttr{g}: Message FirstMessage
+        public DMessage FirstMessage
         {
             get
             {
-                Debug.Assert(0 != Discussions.Count);
-                return Discussions[0];
+                Debug.Assert(0 != Messages.Count);
+                return Messages[0];
             }
         }
         #endregion
-        #region VAttr{g}: Discussion LastDiscussion
-        public Discussion LastDiscussion
+        #region VAttr{g}: Message LastMessage
+        public DMessage LastMessage
         {
             get
             {
-                Debug.Assert(0 != Discussions.Count);
-                return Discussions[Discussions.Count - 1];
-            }
-        }
-        #endregion
-        #region VAttr{g}: DParagraph FirstParagraph - first paragraph in the first discussion obj
-        public DParagraph FirstParagraph
-        {
-            get
-            {
-                Debug.Assert(0 < Discussions.Count);
-                return Discussions[0].FirstParagraph;
-            }
-        }
-        #endregion
-        #region VAttr{g}: DParagraph LastParagraph - last paragraph in the last discussion obj
-        public DParagraph LastParagraph
-        {
-            get
-            {
-                DParagraph p = LastDiscussion.LastParagraph;
-                Debug.Assert(null != p);
-                return p;
+                Debug.Assert(0 != Messages.Count);
+                return Messages[Messages.Count - 1];
             }
         }
         #endregion
@@ -1610,17 +1714,17 @@ namespace JWdb.DataModel
             if (!ShowAllPeople)
             {
                 // Is it assigned to this user?
-                bool bIsAsignedToThisUser = (AssignedTo == DB.UserName);
+                bool bIsAsignedToThisUser = (Status == DB.UserName);
 
                 // Was it recently created by this user? (The issue is that if the user
                 // has it "Show stuff assigned to me", and they then create the note,
                 // because the note is assigned to no one, it would not show up. So we
                 // give it an hour for the user to assign it to someone.
                 bool bWasJustCreatedByThisUser =
-                    (Discussions.Count == 1 &&
-                    FirstDiscussion.Author == DB.UserName &&
-                    FirstDiscussion.Created > DateTime.Now.AddHours(-1) &&
-                    IsUnassigned);
+                    (Messages.Count == 1 &&
+                    FirstMessage.Author == DB.UserName &&
+                    FirstMessage.Created > DateTime.Now.AddHours(-1) &&
+                    Status == DMessage.Anyone);
 
                 // Either criteria works
                 if (!bIsAsignedToThisUser && !bWasJustCreatedByThisUser)
@@ -1672,22 +1776,22 @@ namespace JWdb.DataModel
         // Merging ---------------------------------------------------------------------------
         #region Method: bool IsSameOriginAs(Theirs)
         public bool IsSameOriginAs(TranslatorNote Theirs)
-            // Two Notes started out the same IFF the Author and Created of the first discussion
+            // Two Notes started out the same IFF the Author and Created of the first message
             // are the same.
         {
-            Debug.Assert(Discussions.Count > 0);
-            Debug.Assert(Theirs.Discussions.Count > 0);
+            Debug.Assert(Messages.Count > 0);
+            Debug.Assert(Theirs.Messages.Count > 0);
 
-            return Discussions[0].IsSameOriginAs(Theirs.Discussions[0]);
+            return Messages[0].IsSameOriginAs(Theirs.Messages[0]);
         }
         #endregion
-        #region Method: Discussion FindInParent(TranslatorNote Parent, Discussion)
-        Discussion FindInParent(TranslatorNote Parent, Discussion d)
+        #region Method: DMessage FindInParent(TranslatorNote Parent, DMessage)
+        DMessage FindInParent(TranslatorNote Parent, DMessage message)
         {
-            foreach (Discussion discParent in Parent.Discussions)
+            foreach (DMessage m in Parent.Messages)
             {
-                if (discParent.IsSameOriginAs(d))
-                    return discParent;
+                if (m.IsSameOriginAs(message))
+                    return m;
             }
             return null;
         }
@@ -1695,29 +1799,28 @@ namespace JWdb.DataModel
         #region Method: void Merge(TranslatorNote Parent, TranslatorNote Theirs)
         public void Merge(TranslatorNote Parent, TranslatorNote Theirs)
         {
-            // Find out who had the most recent discussion. They will be the
+            // Find out who had the most recent message. They will be the
             // winner for the basic attrs. (Thus if it was them, copy the values
             // over; otherwise by default we just keep ours.)
-            if (Theirs.LastDiscussion.Created.CompareTo(LastDiscussion.Created) > 1)
+            if (Theirs.LastMessage.Created.CompareTo(LastMessage.Created) > 1)
             {
                 Category = Theirs.Category;
-                AssignedTo = Theirs.AssignedTo;
                 Context = Theirs.Context;
                 Reference = Theirs.Reference;
                 ShowInDaughterTranslations = Theirs.ShowInDaughterTranslations;
             }
 
-            // Go through their discussions. Anything that we have, we merge; everything
-            // else, we add. Thus the result is a superset of all Discussion objects.
-            foreach (Discussion discTheirs in Theirs.Discussions)
+            // Go through their messages. Anything that we have, we merge; everything
+            // else, we add. Thus the result is a superset of all Message objects.
+            foreach (DMessage msgTheirs in Theirs.Messages)
             {
                 // If we have it, then merge the two
                 bool bFound = false;
-                foreach (Discussion discOurs in Discussions)
+                foreach (DMessage msgOurs in Messages)
                 {
-                    if (discTheirs.IsSameOriginAs(discOurs))
+                    if (msgTheirs.IsSameOriginAs(msgOurs))
                     {
-                        discOurs.Merge(FindInParent(Parent, discOurs), discTheirs);
+                        msgOurs.Merge(FindInParent(Parent, msgOurs), msgTheirs);
                         bFound = true;
                         break;
                     }
@@ -1725,7 +1828,7 @@ namespace JWdb.DataModel
 
                 // Otherwise, add theirs to our sequence
                 if (!bFound)
-                    Discussions.Append( discTheirs.Clone() );
+                    Messages.Append( msgTheirs.Clone() );
             }
         }
         #endregion

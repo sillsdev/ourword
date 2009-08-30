@@ -144,17 +144,17 @@ namespace OurWord.SideWnd
 
             // If we have more than one discussion, then we just want to remove that
             // last discussion, not the entire note
-            if (tn.Discussions.Count > 1)
+            if (tn.Messages.Count > 1)
             {
                 // Give the user the opportunity to change his/her mind
-                string sRemoveDiscussionMsg = tn.LastDiscussion.Paragraphs[0].AsString;
-                if (sRemoveDiscussionMsg.Length > 40)
-                    sRemoveDiscussionMsg = sRemoveDiscussionMsg.Substring(0, 40) + "...";
-                if (false == Messages.ConfirmDiscussionDeletion("\n\n\"" + sRemoveDiscussionMsg + "\""))
+                string sRemoveMessage = tn.LastMessage.AsString;
+                if (sRemoveMessage.Length > 40)
+                    sRemoveMessage = sRemoveMessage.Substring(0, 40) + "...";
+                if (false == Messages.ConfirmDiscussionDeletion("\n\n\"" + sRemoveMessage + "\""))
                     return;
 
                 // Remove it
-                (new RemoveDiscussionAction(wnd, tn)).Do();
+                (new RemoveMessageAction(wnd, tn)).Do();
                 return;
             }
 
@@ -395,7 +395,7 @@ namespace OurWord.SideWnd
         #region Method: override void OnSelectAndScrollToNote(TranslatorNote)
         public override void OnSelectAndScrollToNote(TranslatorNote note)
         {
-            EContainer container = Contents.FindContainerOfDataSource(note.FirstParagraph);
+            EContainer container = Contents.FindContainerOfDataSource(note.FirstMessage);
             if (null != container)
             {
                 if (container.Select_FirstWord())
@@ -411,20 +411,41 @@ namespace OurWord.SideWnd
             if (Selection == null)
                 return null;
 
-            DParagraph p = Selection.Paragraph.DataSource as DParagraph;
-            Debug.Assert(null != p);
-
-            Discussion d = p.Owner as Discussion;
-            if (null == d)
+            var message = Selection.Paragraph.DataSource as DMessage;
+            if (null == message)
                 return null;
 
-            TranslatorNote tn = d.Owner as TranslatorNote;
+            TranslatorNote tn = message.Owner as TranslatorNote;
             return tn;
         }
         #endregion
 
+        static public bool ShouldDisplayNote(TranslatorNote note)
+        {
+            // Determine, based on current conditions, which classes of notes we want to display
+            // We always show General Notes
+            bool bShowGeneral = true;   
+            // We only show Exegetical Notes in the BT view
+            bool bShowExegetical = OurWordMain.App.MainWindowIsBackTranslation;
+            // We only show HintsForDrafting Notes in the BT view
+            bool bShowHintsForDrafting = OurWordMain.App.MainWindowIsBackTranslation;
+
+            // Check to see if this note qualifies
+            if (bShowGeneral && note.IsGeneralNote)
+                return true;
+            if (bShowExegetical && note.IsExegeticalNote)
+                 return true;
+            if (bShowHintsForDrafting && note.IsHintForDraftingNote)
+                return true;
+            return false;
+        }
+
         #region OMethod: void LoadData()
         public override void LoadData()
+            /* Determining notes to display:
+             *   General notes - display in all views
+             *   Exegetical and Hints - only in BT
+             */
         {
             // Start with an empty window
             Clear();
@@ -433,15 +454,20 @@ namespace OurWord.SideWnd
             if (!DB.Project.HasDataToDisplay)
                 return;
 
-            // Retrieve the notes that we will be showing, from both Front and Target
-            List<TranslatorNote> vNotes = DB.TargetSection.GetAllShownTranslatorNotes();
-            vNotes.AddRange(DB.FrontSection.GetAllShownTranslatorNotes());
+            // Determine all of the notes that qualify
+            var vNotesToDisplay = new List<TranslatorNote>();
+            var vAllTranslatorNotes = DB.TargetSection.GetAllTranslatorNotes();
+            foreach (var note in vAllTranslatorNotes)
+            {
+                if (ShouldDisplayNote(note))
+                    vNotesToDisplay.Add(note);
+            }
 
             // Sort (the IComparer will do this by reference)
-            vNotes.Sort();
+            vNotesToDisplay.Sort();
             
             // Place them into the window
-            foreach (TranslatorNote note in vNotes)
+            foreach (TranslatorNote note in vNotesToDisplay)
                 Contents.Append( BuildView(note) );
 
             // Tell the superclass to finish loading, which involves laying out the window 
@@ -620,7 +646,7 @@ namespace OurWord.SideWnd
             if (null == note)
                 return;
 
-            (new AddDiscussionAction(this, note)).Do();
+            (new AddMessageAction(this, note)).Do();
         }
         #endregion
 
@@ -638,9 +664,9 @@ namespace OurWord.SideWnd
                 DParagraph pSource = para.DataSource as DParagraph;
                 if (null != pSource)
                 {
-                    Discussion discussion = pSource.Owner as Discussion;
-                    if (null != discussion)
-                        return discussion.Note;
+                    var message = pSource.Owner as DMessage;
+                    if (null != message)
+                        return message.Note;
                 }
             }
 
@@ -673,7 +699,7 @@ namespace OurWord.SideWnd
             return null;
         }
         #endregion
-
+        #region Method: ToolStripDropDownButton GetDropDownButton(note, sWhich)
         public ToolStripDropDownButton GetDropDownButton(TranslatorNote note, string sWhich)
         {
             // Get the major container for this note
@@ -698,6 +724,7 @@ namespace OurWord.SideWnd
 
             return null;
         }
+        #endregion
 
         #region Method: void BuildAddButton(TranslatorNote, ToolStrip)
         void BuildAddButton(TranslatorNote note, ToolStrip ts)
@@ -708,8 +735,8 @@ namespace OurWord.SideWnd
 
             // Are we allowed to add a discussion? No, if we have the same
             // author and the same date.
-            if (note.LastDiscussion.Author == DB.UserName &&
-                note.LastDiscussion.Created.Date == DateTime.Today)
+            if (note.LastMessage.Author == DB.UserName &&
+                note.LastMessage.Created.Date == DateTime.Today)
                 return;
 
             // If here, we can go ahead and create the Respond button
@@ -768,6 +795,19 @@ namespace OurWord.SideWnd
         }
         #endregion
         #region Method: void BuildAssignedToControl(note, ToolStrip)
+
+        ToolStripMenuItem BuildAssignToItem(TranslatorNote note, string sDisplayValue)
+        {
+            var item = new ToolStripMenuItem(sDisplayValue);
+            item.Tag = note;
+            item.Click += new EventHandler(OnChangeAssignedTo);
+
+            if (sDisplayValue == note.Status)
+                item.Checked = true;
+
+            return item;
+        }
+
         void BuildAssignedToControl(TranslatorNote note, ToolStrip ts)
         {
             // If this is turned off, don't show anything
@@ -781,27 +821,25 @@ namespace OurWord.SideWnd
             // We need a touch of space between controls
             ts.Items.Add(new ToolStripLabel("  "));
 
-            // Place the AssignedTo as a drop-down button
+            // Create the AssignedTo control as a drop-down button
             string sMenuName = Loc.GetNotes("kAssignTo", "Assign To");
             ToolStripDropDownButton menuAssignedTo = new ToolStripDropDownButton(sMenuName);
             menuAssignedTo.Name = c_sAssignedTo;
-            foreach (TranslatorNote.Classifications.Classification cl in TranslatorNote.People)
-            {
-                // Don't let it be assigned to "Unknown Author"
-                if (cl.Name == TranslatorNote.UnknownAuthor)
-                    continue;
 
-                // Create the menu item
-                ToolStripMenuItem item = new ToolStripMenuItem(cl.Name);
-                item.Tag = note;
-                item.Click += new EventHandler(OnChangeAssignedTo);
-                if (cl.Name == note.AssignedTo)
-                {
-                    item.Checked = true;
-                    menuAssignedTo.Text = cl.Name;
-                }
-                menuAssignedTo.DropDownItems.Add(item);
-            }
+            menuAssignedTo.DropDownItems.Add(
+                BuildAssignToItem(note, DMessage.Anyone));
+            menuAssignedTo.DropDownItems.Add(
+                BuildAssignToItem(note, DMessage.Closed));
+
+            if (DB.Project.People.Length > 0)
+                menuAssignedTo.DropDownItems.Add(new ToolStripSeparator());
+
+            foreach (string sPerson in DB.Project.People)
+                menuAssignedTo.DropDownItems.Add(BuildAssignToItem(note, sPerson));
+
+            menuAssignedTo.Text = note.Status;
+
+            // Add the AssignedTo control to the toolbar
             ts.Items.Add(menuAssignedTo);
         }
         #endregion
@@ -860,8 +898,8 @@ namespace OurWord.SideWnd
             eHeader.Border.Padding.Bottom = 5;
 
             // Add the Discussions
-            foreach (Discussion disc in note.Discussions)
-                eHeader.Append(BuildView(disc));
+            foreach (DMessage message in note.Messages)
+                eHeader.Append(BuildView(message));
 
             // Add the Category and AssignedTo, if turned on
             if (note.IsOwnedInTargetTranslation)
@@ -877,18 +915,18 @@ namespace OurWord.SideWnd
         }
         #endregion
 
-        #region Method: EContainer BuildView(Discussion)
-        public EContainer BuildView(Discussion discussion)
+        #region Method: EContainer BuildView(DMessage)
+        public EContainer BuildView(DMessage message)
         // We'll put this Discussion into a HeaderColumn. The header will be the
         // author and date, the body will be the paragraphs
         {
-            discussion.Debug_VerifyIntegrity();
+            message.Debug_VerifyIntegrity();
 
             int nRoundedCornerInset = 8;
 
             // We don't bother with showing the date for Notes from the Front Translation,
             // figuring that this is less relevant (and therefore clutter)
-            bool bIsFromTargetTranslation = discussion.Note.IsOwnedInTargetTranslation;
+            bool bIsFromTargetTranslation = message.Note.IsOwnedInTargetTranslation;
             int cHeaderColumns = (bIsFromTargetTranslation) ? 2 : 1;
 
             // Define the Header. Insert the left/right margins so that they do not overlap
@@ -900,7 +938,7 @@ namespace OurWord.SideWnd
             OWPara pAuthor = new OWPara(
                 DB.TargetTranslation.WritingSystemVernacular,
                 DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
-                discussion.Author);
+                message.Author);
             eHeader.Append(pAuthor);
 
             // Define the author
@@ -909,7 +947,7 @@ namespace OurWord.SideWnd
                 OWPara pDate = new OWPara(
                     DB.TargetTranslation.WritingSystemVernacular,
                     DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDate),
-                    discussion.Created.ToShortDateString());
+                    message.Created.ToShortDateString());
                 eHeader.Append(pDate);
             }
 
@@ -917,14 +955,14 @@ namespace OurWord.SideWnd
             EHeaderColumn eMainContainer = new EHeaderColumn(eHeader);
             eMainContainer.Border = new EContainer.RoundedBorder(eMainContainer, 12);
             eMainContainer.Border.BorderColor = TranslatorNote.BorderColor;
-            eMainContainer.Border.FillColor = TranslatorNote.DiscussionHeaderColor;
+            eMainContainer.Border.FillColor = TranslatorNote.MessageHeaderColor;
             // The contents of the HeaderColumn are inset from the edges
             eMainContainer.Border.Padding.Left = 3;
             eMainContainer.Border.Padding.Right = 2;
             eMainContainer.Border.Padding.Bottom = 2;
 
             // Color depends on editability
-            Color clrBackground = (discussion.IsEditable) ? Color.White : TranslatorNote.UneditableColor;
+            Color clrBackground = (message.IsEditable) ? Color.White : TranslatorNote.UneditableColor;
 
             // Create a Column to hold the discussion paragraphs. Insert the left/right
             // margins so nothing overlaps the rounded corners.
@@ -938,26 +976,22 @@ namespace OurWord.SideWnd
 
             // Paragraph editing options
             OWPara.Flags options = OWPara.Flags.None;
-            if (discussion.IsEditable)
+            if (message.IsEditable)
                 options |= (OWPara.Flags.IsEditable | OWPara.Flags.CanItalic);
             if (OurWordMain.Features.F_StructuralEditing)
                 options |= OWPara.Flags.CanRestructureParagraphs;
 
-            // Add the paragraphs to the Discussion Holder
-            foreach (DParagraph para in discussion.Paragraphs)
-            {
-                // Create the OWPara and add it to its container
-                OWPara pDiscussion = new OWPara(
-                    DB.TargetTranslation.WritingSystemVernacular,
-                    DB.StyleSheet.FindParagraphStyle(para.StyleAbbrev),
-                    para,
-                    clrBackground,
-                    options
-                    );
-                if (!discussion.IsEditable)
-                    pDiscussion.NonEditableBackgroundColor = clrBackground;
-                eDiscussionHolder.Append(pDiscussion);
-            }
+            // Create the OWPara and add it to its container
+            OWPara pMessage = new OWPara(
+                DB.TargetTranslation.WritingSystemVernacular,
+                DB.StyleSheet.FindParagraphStyle(message.StyleAbbrev),
+                message,
+                clrBackground,
+                options
+                );
+            if (!message.IsEditable)
+                pMessage.NonEditableBackgroundColor = clrBackground;
+            eDiscussionHolder.Append(pMessage);
 
             return eMainContainer;
         }

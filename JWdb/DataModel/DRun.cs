@@ -2313,9 +2313,9 @@ namespace JWdb.DataModel
             // TODO: Assign it to this user? Or, perhaps this should be a merge setting.
             // I guess for now it just stays unassigned.
 
-            Discussion disc = new Discussion(TranslatorNote.MergeAuthor, 
-                DateTime.Now, Theirs.ContentsAsString);
-            note.Discussions.Append(disc);
+            var message = new DMessage(TranslatorNote.MergeAuthor, 
+                DateTime.Now, DMessage.Anyone, Theirs.ContentsAsString);
+            note.Messages.Append(message);
 
             TranslatorNotes.Append(note);
         }

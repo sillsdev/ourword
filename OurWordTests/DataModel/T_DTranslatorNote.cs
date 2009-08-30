@@ -42,6 +42,186 @@ using OurWord.Layouts;
 
 namespace OurWordTests.DataModel
 {
+    #region T_DMessage
+    [TestFixture] public class T_DMessage : TestCommon
+    {
+        DSection m_Section;
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+            m_Section = CreateHierarchyThroughTargetSection("MRK");
+        }
+        #endregion
+
+        // General
+        #region Test: ContentEquals
+        [Test] public void ContentEquals()
+        {
+            // Create a base Message object
+            var sAuthor = "John";
+            var dt = new DateTime(2008, 11, 23);
+            var sStatus = "David";
+            var sMessage = "Is bibit the correct term for seed here?";
+            var message = new DMessage(sAuthor, dt, sStatus, sMessage);
+
+            // Test equality
+            Assert.IsTrue(message.ContentEquals(message));
+
+            // Test if author gets changed
+            var m2 = new DMessage("Sandra", dt, sStatus, sMessage);
+            Assert.IsFalse(message.ContentEquals(m2));
+
+            // Test if date gets changed
+            var m3 = new DMessage(sAuthor, DateTime.Now, sStatus, sMessage);
+            Assert.IsFalse(message.ContentEquals(m3));
+
+            // Test if status gets changed
+            var m4 = new DMessage(sAuthor, dt, "Emily", sMessage);
+            Assert.IsFalse(message.ContentEquals(m3));
+
+            // Test if content gets changed
+            var m5 = new DMessage(sAuthor, dt, sStatus, "This is different");
+            Assert.IsFalse(message.ContentEquals(m4));
+        }
+        #endregion
+
+        // I/O
+        #region Test: ImportMessageFromToolboxXml_Simple
+        [Test] public void ImportMessageFromToolboxXml_Simple()
+            // Simple is the shortened version, where a paragraph has a single SimpleText.
+            // Complex would be where there are multiple runs for, e.g., Italic.
+        {
+            var vsToImport = new string[] {
+                "<Discussion Author=\"Ibu Linda\" Created=\"2009-05-07 09:27:24Z\">",
+                    "<ownseq Name=\"paras\">",
+                        "<DParagraph Abbrev=\"NoteDiscussion\" Contents=\"Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai, weramu syare wamo raporar taiso: &quot;mbambunin ai&quot;.\"/>",
+                    "</ownseq>",
+                "</Discussion>",
+            };
+            var vsOxesExpected = new string[] {
+                "<Message author=\"Ibu Linda\" created=\"2009-05-07 09:27:24Z\">",
+                     "Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai, weramu syare wamo raporar taiso: &quot;mbambunin ai&quot;.",
+                "</Message>",
+           };
+
+            // Create an Oxes object for Expected
+            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
+
+            // Import into a Message object
+            var xmlImported = new XmlDoc(vsToImport);
+            var nodeMessage = XmlDoc.FindNode(xmlImported, "Discussion");
+            var message = DMessage.Create(nodeMessage);
+
+            // Create an Oxes object for saving
+            var xmlOxesActual = new XmlDoc();
+            message.Save(xmlOxesActual, xmlOxesActual);
+
+            // Are they the same?
+            bool bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            Assert.IsTrue(bIsSame, "Message xmls should be the same.");
+        }
+        #endregion
+        #region Test: OxesIO
+        [Test] public void OxesIO()
+        {
+            // Cannonical form of a Message object
+            string[] vsOxesExpected = new string[] { 
+                "<Message author=\"John\" created=\"2008-11-23 00:00:00Z\">" ,
+                    "Is <span class=\"Italic\">bibit </span>the correct term for seed here?",
+                    "<bt>Memang mau pakai bibit di sini?</bt>",
+                "</Message>"
+            };
+
+            // Create the XmlDoc
+            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
+            var nodeMessage = XmlDoc.FindNode(xmlOxesExpected, DMessage.c_sTagMessage);
+            //xmlOxesExpected.WriteToConsole("Expected");
+
+            // Create the Message object from the Xml node
+            var message = DMessage.Create(nodeMessage);
+
+            // Save this new Message to oxes
+            var xmlOxesActual = new XmlDoc();
+            message.Save(xmlOxesActual, xmlOxesActual);
+
+            // Are they the same?
+            bool bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            Assert.IsTrue(bIsSame, "Message xmls should be the same.");
+        }
+        #endregion
+
+        // Merge
+        #region Test: MergeMessage_WeChanged
+        [Test] public void MergeMessage_WeChanged()
+        {
+            var Parent = new DMessage("John", new DateTime(2008, 11, 23), "David",
+                "Is bibit the correct term for seed here?");
+            var Mine = new DMessage("John", new DateTime(2008, 11, 23), "Emily",
+                "I say Bibit is the correct term.");
+            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), "David",
+                "Is bibit the correct term for seed here?");
+
+            Mine.Merge(Parent, Theirs);
+
+            Assert.AreEqual(
+                "M: Author={John} Created={11/23/2008} Status={Emily} Content={I say Bibit is the correct term.}",
+                Mine.DebugString);
+        }
+        #endregion
+        #region Test: MergeMessage_TheyChanged
+        [Test] public void MergeMessage_TheyChanged()
+        {
+            var Parent = new DMessage("John", new DateTime(2008, 11, 23), "David",
+                "Is bibit the correct term for seed here?");
+            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), "Emily",
+                "They say Bibit is the correct term.");
+            var Mine = new DMessage("John", new DateTime(2008, 11, 23), "David",
+                "Is bibit the correct term for seed here?");
+
+            Mine.Merge(Parent, Theirs);
+
+            Assert.AreEqual(
+                "M: Author={John} Created={11/23/2008} Status={Emily} Content={They say Bibit is the correct term.}",
+                Mine.DebugString);
+        }
+        #endregion
+        #region Test: MergeMessage_BothChanged
+        [Test] public void MergeMessage_BothChanged()
+        {
+            var Parent = new DMessage("John", new DateTime(2008, 11, 23), "David",
+                "Is bibit the correct term for seed here?");
+            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), "Emily",
+                "They say Bibit is the correct term.");
+            var Mine = new DMessage("John", new DateTime(2008, 11, 23), "Robert",
+                "I say Bibit is the wrong term.");
+
+            // TEST 1: They Win
+            // Set the DefaultAuthor to "Mary" so that "They" should win
+            string sDefaultAuthor = DB.UserName;
+            DB.UserName = "Mary";
+            Mine.Merge(Parent, Theirs);
+            DB.UserName = sDefaultAuthor;
+            Assert.AreEqual(
+                "M: Author={John} Created={11/23/2008} Status={Emily} Content={They say Bibit is the correct term.}",
+                Mine.DebugString);
+
+            // TEST 2: We Win
+            // Go again, but this time with "John" so that "We" win
+            Mine = new DMessage("John", new DateTime(2008, 11, 23), "Robert",
+                "I say Bibit is the wrong term.");
+            DB.UserName = "John";
+            Mine.Merge(Parent, Theirs);
+            DB.UserName = sDefaultAuthor;
+            Assert.AreEqual(
+                "M: Author={John} Created={11/23/2008} Status={Robert} Content={I say Bibit is the wrong term.}",
+                Mine.DebugString);
+        }
+        #endregion
+    }
+    #endregion
+
+    #region T_DTranslatorNote
     [TestFixture] public class T_DTranslatorNote : TestCommon
     {
         DSection m_Section;
@@ -78,97 +258,39 @@ namespace OurWordTests.DataModel
         {
             TranslatorNote tn = new TranslatorNote("003:016", "so loved the world");
             tn.Category = "To Do";
-            tn.AssignedTo = "John";
-            tn.Discussions.Append(new Discussion("John", new DateTime(2008, 11, 1), 
+            tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), "Sandra",
                 "Check exegesis here."));
-            tn.Discussions.Append(new Discussion("Sandra", new DateTime(2008, 11, 3), 
+            tn.Messages.Append(new DMessage("Sandra", new DateTime(2008, 11, 3), DMessage.Closed,
                 "Exegesis is fine."));
             return tn;
-        }
-        #endregion
-        #region Method: string GetExpectedParagraphString(string sText)
-        string GetExpectedParagraphString(string sText)
-        {
-            /***
-             * This code represents the XML of a complete paragraph, with runs, dtext,
-             * etc. In order to keep files human-readable and sizes down, I made it
-             * possible for some of the simple paragraphs to be presented in a 
-             * more abbreviated manner. But I keep this around both as a reminder,
-             * and in case I have to go back at some point.
-             * 
-            string s = "<ownseq Name=\"paras\">";
-            s += "<DParagraph Abbrev=\"NoteDiscussion\">";
-            s += "<ownseq Name=\"Runs\">";
-            s += "<DText>";
-
-            s += "<ownseq Name=\"Phrase\">";
-            s += "<DPhrase Text=\"" + sText + "\" Style=\"p\"/>";
-            s += "</ownseq>";
-
-            s += "</DText>";
-            s += "</ownseq>";
-            s += "</DParagraph>";
-            s += "</ownseq>";
-            ***/
-
-            string s = "<ownseq Name=\"paras\">";
-            s += "<DParagraph Abbrev=\"NoteDiscussion\" ";
-            s += "Contents=\"" + sText + "\"/>";
-            s += "</ownseq>";
-
-            return s;
         }
         #endregion
         #region Method: TranslatorNote CreateFromXmlString(string s)
         TranslatorNote CreateFromXmlString(string s)
         {
-            XElement x = XElement.CreateFrom(s)[0];
-            TranslatorNote note = new TranslatorNote();
-            note.FromXml(x);
-            return note;
+            var oxes = new XmlDoc(s);
+            var node = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
+            return TranslatorNote.Create(node);
         }
         #endregion
+
         // Content Equals
-        #region Test: ContentEquals_Discussion
-        [Test] public void ContentEquals_Discussion()
-        {
-            // Create a base discussion object
-            Discussion discussion = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
-
-            // Test equality
-            Assert.IsTrue(discussion.ContentEquals(discussion));
-
-            // Test if author gets changed
-            Discussion d2 = new Discussion("Sandra", discussion.Created,
-                "Is bibit the correct term for seed here?");
-            Assert.IsFalse(discussion.ContentEquals(d2));
-
-            // Test if date gets changed
-            Discussion d3 = new Discussion("John", DateTime.Now,
-                "Is bibit the correct term for seed here?");
-            Assert.IsFalse(discussion.ContentEquals(d3));
-
-            // Test if content gets changed
-            Discussion d4 = new Discussion("John", discussion.Created,
-                "This is different");
-            Assert.IsFalse(discussion.ContentEquals(d4));
-        }
-        #endregion
         #region Test: ContentEquals_Note
         [Test] public void ContentEquals_Note()
         {
             // Set up a Translator Note
             TranslatorNote tn1 = new TranslatorNote("003:016", "so loved the world");
             tn1.Category = "To Do";
-            tn1.AssignedTo = "John";
-            tn1.Discussions.Append(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
+            tn1.Messages.Append(
+                new DMessage("John", new DateTime(2008, 11, 1), "David",
+                    "Check exegesis here."));
 
             // Set up a duplicate
             TranslatorNote tn2 = new TranslatorNote("003:016", "so loved the world");
             tn2.Category = "To Do";
-            tn2.AssignedTo = "John";
-            tn2.Discussions.Append(new Discussion("John", new DateTime(2008, 11, 1), "Check exegesis here."));
+            tn2.Messages.Append(
+                new DMessage("John", new DateTime(2008, 11, 1), "David",
+                    "Check exegesis here."));
 
             // Equality
             Assert.IsTrue(tn1.ContentEquals(tn2));
@@ -179,9 +301,9 @@ namespace OurWordTests.DataModel
             tn2.Category = tn1.Category;
 
             // AssignedTo differs
-            tn2.AssignedTo = "Sandra";
+            tn2.Status = "Sandra";
             Assert.IsFalse(tn1.ContentEquals(tn2));
-            tn2.AssignedTo = tn1.AssignedTo;
+            tn2.Status = tn1.Status;
 
             // Context differs
             tn2.Context = "loved the world";
@@ -193,63 +315,74 @@ namespace OurWordTests.DataModel
             Assert.IsFalse(tn1.ContentEquals(tn2));
             tn2.Reference = tn1.Reference;
 
-            // Discussion differs
-            tn2.Discussions.Clear();
+            // Message differs
+            tn2.Messages.Clear();
             Assert.IsFalse(tn1.ContentEquals(tn2));
         }
         #endregion
 
         // I/O
-        #region Test: IO_Discussion
-        [Test] public void IO_Discussion()
+        #region Test: ImportNoteFromToolboxXml
+        [Test] public void ImportNoteFromToolboxXml()
         {
-            // Create a discussion object with attributes
-            Discussion discussion = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
+            var vsToImport = new string[] {
+                "<TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"mbambuninda\" Reference=\"001:005\" ShowInDaughter=\"false\">",
+                    "<ownseq Name=\"Discussions\">",
+                        "<Discussion Author=\"Mandowen\" Created=\"2009-04-29 02:32:42Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"ratoe tumaimbe &quot;mbambuninda&quot;=yara gwaravainy=&quot;mbambunin indamu&quot; weramu tumainy ngkov.\"/></ownseq></Discussion>",
+                        "<Discussion Author=\"Ibu Linda\" Created=\"2009-05-07 09:27:24Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai,  weramu syare wamo raporar taiso: &quot;mbambunin dai&quot;.\"/></ownseq></Discussion>",
+                        "<Discussion Author=\"Mandowen\" Created=\"2009-05-22 04:06:54Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"wamo ratoe &quot;mbambunin da.&quot; yara vemo ratoe &quot;mbambunin dai&quot; wenora.\"/></ownseq></Discussion>",
+                    "</ownseq>",
+                "</TranslatorNote>"
+            };
+            var vsOxesExpected = new string[] {
+                "<TranslatorNote category=\"To Do\" context=\"mbambuninda\" reference=\"001:005\" showInDaughter=\"false\">",
+                    "<Message author=\"Mandowen\" created=\"2009-04-29 02:32:42Z\">ratoe tumaimbe &quot;mbambuninda&quot;=yara gwaravainy=&quot;mbambunin indamu&quot; weramu tumainy ngkov.</Message>",
+                    "<Message author=\"Ibu Linda\" created=\"2009-05-07 09:27:24Z\">Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai,  weramu syare wamo raporar taiso: &quot;mbambunin dai&quot;.</Message>",
+                    "<Message author=\"Mandowen\" created=\"2009-05-22 04:06:54Z\">wamo ratoe &quot;mbambunin da.&quot; yara vemo ratoe &quot;mbambunin dai&quot; wenora.</Message>",
+                "</TranslatorNote>"
+           };
 
-            // Get the Xml element
-            XElement x = discussion.ToXml(true);
+            // Create an Oxes object for Expected
+            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
 
-            // Is it what we expect?
-            Assert.AreEqual(
-                "<Discussion Author=\"John\" Created=\"2008-11-23 00:00:00Z\">" +
-                    GetExpectedParagraphString("Is bibit the correct term for seed here?") +
-                    "</Discussion>", 
-                 x.OneLiner);
+            // Import into a TranslatorNote object
+            var xmlImported = new XmlDoc(vsToImport);
+            var nodeNote = XmlDoc.FindNode(xmlImported, TranslatorNote.c_sTagTranslatorNote);
+            var note = TranslatorNote.Create(nodeNote);
 
-            // Create a Discussion object from this Xml element
-            Discussion discussionRead = new Discussion();
-            discussionRead.FromXml(x);
+            // Create an new Oxes object for saving
+            var xmlOxesActual = new XmlDoc();
+            note.Save(xmlOxesActual, xmlOxesActual);
 
-            // They should be identical
-            Assert.IsNotNull(discussionRead, "is not null: discussionRead");
-            Assert.IsTrue(discussion.ContentEquals(discussionRead), "ContentEquals");
+            // Are they the same?
+            bool bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            Assert.IsTrue(bIsSame, "Note xmls should be the same.");
         }
         #endregion
-        #region Test: IO_Note
-        [Test] public void IO_Note()
+        #region Test: OxesIO
+        [Test] public void OxesIO()
         {
             // Set up a Translator Note
             TranslatorNote tn = CreateTestTranslatorNote();
 
             // Do we get the XML save that we expect?
-            XElement x = tn.ToXml(true);
+            var oxes = new XmlDoc();
+            tn.Save(oxes, oxes);
+            var nodeNote = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
+            string sSaved = XmlDoc.OneLiner(nodeNote);
             Assert.AreEqual(
-                "<TranslatorNote Category=\"To Do\" AssignedTo=\"John\" " +
-                    "Context=\"so loved the world\" Reference=\"003:016\" " +
-                     "ShowInDaughter=\"false\">" +
-                    "<ownseq Name=\"Discussions\">" +
-                    "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
-                        GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
-                    "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
-                        GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
-                    "</ownseq></TranslatorNote>",
-                x.OneLiner);
+                "<TranslatorNote category=\"To Do\" context=\"so loved the world\" reference=\"003:016\" showInDaughter=\"false\">" +
+                    "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\" status=\"Sandra\">Check exegesis here.</Message>" +
+                    "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
+                "</TranslatorNote>",
+                sSaved);
 
-            // Create a new Translator Note from this Xml element; they should be identical
-            TranslatorNote tnNew = new TranslatorNote();
-            tnNew.FromXml(x);
-            Assert.IsTrue(tn.ContentEquals(tnNew), "Should be identical");
+            // Create a new Translator Note from this Oxes element; they should be identical
+            var tnNew = TranslatorNote.Create(nodeNote);
+            var oxesNew = new XmlDoc();
+            tnNew.Save(oxesNew, oxesNew);
+            var bIsSame = XmlDoc.Compare(oxes, oxesNew);
+            Assert.IsTrue(bIsSame, "TranslatorNote xmls should be the same.");
         }
         #endregion
         #region Test: IO_Section
@@ -257,6 +390,8 @@ namespace OurWordTests.DataModel
         {
             // Create the note we'll test
             TranslatorNote tn = CreateTestTranslatorNote();
+            var oxes = new XmlDoc();
+            var nodeNote = tn.Save(oxes, oxes);
 
             // Standard Format representation of a tiny Section
             string[] vs = new string[]
@@ -283,7 +418,7 @@ namespace OurWordTests.DataModel
 				    "angry to scream at Petrus and Yohanis.",
 			    "\\tn ",
             };
-            vs[vs.Length - 1] += tn.ToXml(true).OneLiner;
+            vs[vs.Length - 1] += XmlDoc.OneLiner(nodeNote);
 
             // Make sure we have something that looks like a note
             Assert.AreEqual("\\tn <Trans", vs[vs.Length-1].Substring(0, 10));
@@ -291,45 +426,6 @@ namespace OurWordTests.DataModel
             // Do the test
             T_DSection t = new T_DSection();
             t.IO_TestEngine(vs, vs);
-        }
-        #endregion
-
-        // Oxes IO
-        #region Test: OxesIO_Discussion
-        [Test] public void OxesIO_Discussion()
-        {
-            // Cannonical form of a Discussion object
-            string[] vsOxesExpected = new string[] { 
-                "<Discussion author=\"John\" created=\"2008-11-23 00:00:00Z\">" ,
-                    "<p class=\"Note Discussion\" id=\"B\">",
-                        "Is <span class=\"Italic\">bibit </span>the correct term for seed here?",
-                        "<bt>Memang mau pakai bibit di sini?</bt>",
-                    "</p>",
-                "</Discussion>"
-            };
-
-            // Create the XmlDoc
-            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
-            var nodeDiscussion = XmlDoc.FindNode(xmlOxesExpected, Discussion.c_sTagDiscussion);
-            //xmlOxesExpected.WriteToConsole("Expected");
-
-            // Create the Discussion object
-            var discussion = Discussion.Create(nodeDiscussion);
-
-            // We need to place the discussion we're about to create into a hierarchy
-            // in order for the save to work properly
-            var paragraph = CreateHierarchyThroughTargetParagraph("MRK", "Hi");
-            var note = new TranslatorNote();
-            (paragraph.Runs[0] as DText).TranslatorNotes.Append(note);
-            note.Discussions.Append(discussion);
-
-            // Save the Discussion to oxes
-            var xmlOxesActual = new XmlDoc();
-            discussion.Save(xmlOxesActual, xmlOxesActual);
-
-            // Are they the same?
-            bool bIxSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
-            Assert.IsTrue(bIxSame, "Discussion xmls should be the same.");
         }
         #endregion
 
@@ -387,8 +483,8 @@ namespace OurWordTests.DataModel
             TranslatorNote tn = TranslatorNote.ImportFromOldStyle(2, 15, f);
 
             Assert.AreEqual("002:015", tn.Reference);
-            Assert.AreEqual(sNoteText, tn.Discussions[0].Paragraphs[0].SimpleText);
-            Assert.AreEqual("Unknown Author", tn.Discussions[0].Author);
+            Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
+            Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
             Assert.AreEqual("General", tn.Category);
         }
         #endregion
@@ -401,8 +497,8 @@ namespace OurWordTests.DataModel
             TranslatorNote tn = TranslatorNote.ImportFromOldStyle(2, 15, f);
 
             Assert.AreEqual("002:015", tn.Reference);
-            Assert.AreEqual(sNoteText, tn.Discussions[0].Paragraphs[0].SimpleText);
-            Assert.AreEqual("Unknown Author", tn.Discussions[0].Author);
+            Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
+            Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
             Assert.AreEqual("To Do", tn.Category);
         }
         #endregion
@@ -489,110 +585,30 @@ namespace OurWordTests.DataModel
         #endregion
 
         // Merge
-        #region Test: MergeDiscussion_WeChanged
-        [Test] public void MergeDiscussion_WeChanged()
-        {
-            Discussion Parent = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
-            Discussion Mine = new Discussion("John", new DateTime(2008, 11, 23),
-                "I say Bibit is the correct term.");
-            Discussion Theirs = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
-
-            Mine.Merge(Parent, Theirs);
-
-            Assert.AreEqual(
-                "D: Author={John} Created={11/23/2008} + Content={p:<I say Bibit is the correct term.>}",
-                Mine.DebugString);
-        }
-        #endregion
-        #region Test: MergeDiscussion_TheyChanged
-        [Test] public void MergeDiscussion_TheyChanged()
-        {
-            Discussion Parent = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
-            Discussion Theirs = new Discussion("John", new DateTime(2008, 11, 23),
-                "They say Bibit is the correct term.");
-            Discussion Mine = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
-
-            Mine.Merge(Parent, Theirs);
-
-            Assert.AreEqual(
-                "D: Author={John} Created={11/23/2008} + Content={p:<They say Bibit is the correct term.>}",
-                Mine.DebugString);
-        }
-        #endregion
-        #region Test: MergeDiscussion_BothChanged
-        [Test] public void MergeDiscussion_BothChanged()
-        {
-            Discussion Parent = new Discussion("John", new DateTime(2008, 11, 23),
-                "Is bibit the correct term for seed here?");
-            Discussion Theirs = new Discussion("John", new DateTime(2008, 11, 23),
-                "They say Bibit is the correct term.");
-            Discussion Mine = new Discussion("John", new DateTime(2008, 11, 23),
-                "I say Bibit is the wrong term.");
-
-            // TEST 1: They Win
-            // Set the DefaultAuthor to "Mary" so that "They" should win
-            string sDefaultAuthor = DB.UserName;
-            DB.UserName = "Mary";
-            Mine.Merge(Parent, Theirs);
-            DB.UserName = sDefaultAuthor;
-            Assert.AreEqual(
-                "D: Author={John} Created={11/23/2008} + " +
-                    "Content={p:<They say Bibit is the correct term.>}",
-                Mine.DebugString);
-
-            // TEST 2: We Win
-            // Go again, but this time with "John" so that "We" win
-            Mine = new Discussion("John", new DateTime(2008, 11, 23),
-                "I say Bibit is the wrong term.");
-            DB.UserName = "John";
-            Mine.Merge(Parent, Theirs);
-            DB.UserName = sDefaultAuthor;
-            Assert.AreEqual(
-                "D: Author={John} Created={11/23/2008} + " +
-                    "Content={p:<I say Bibit is the wrong term.>}",
-                Mine.DebugString);
-        }
-        #endregion
         #region Test: void MergeNote()
         [Test] public void MergeNote()
             // Tests that:
-            // - Both Mine and Theirs created a new Discussion; tests that both were
-            //     added.
+            // - Both Mine and Theirs created a new Message; tests that both were added.
             // - Both Mine and Theirs changed the AssignedTo, but since Mine was the
-            //    most recent Discussion, the result should use Mine's AssignedTo.
+            //    most recent Message, the result should use Mine's AssignedTo.
         {
-            string sParent = "<TranslatorNote Category=\"To Do\" AssignedTo=\"John\" " +
+            string sParent = "<TranslatorNote Category=\"To Do\" " +
                 "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
-                "<ownseq Name=\"Discussions\">" +
-                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
-                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
-                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
-                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
-                "</ownseq></TranslatorNote>";
-            string sMine = "<TranslatorNote Category=\"To Do\" AssignedTo=\"Sandra\" " +
+                  "<Message Author=\"John\" Created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
+                  "<Message Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
+                "</TranslatorNote>";
+            string sMine = "<TranslatorNote Category=\"To Do\" " +
                 "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
-                "<ownseq Name=\"Discussions\">" +
-                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
-                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
-                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
-                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
-                  "<Discussion Author=\"John\" Created=\"2008-11-15 00:00:00Z\">" +
-                    GetExpectedParagraphString("I'm not convinced.") + "</Discussion>" +
-                "</ownseq></TranslatorNote>";
-            string sTheirs = "<TranslatorNote Category=\"To Do\" AssignedTo=\"Emily\" " +
+                  "<Message Author=\"John\" Created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
+                  "<Message Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
+                  "<Message Author=\"John\" Created=\"2008-11-15 00:00:00Z\">I'm not convinced.</Message>" +
+                "</TranslatorNote>";
+            string sTheirs = "<TranslatorNote Category=\"To Do\" " +
                 "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
-                "<ownseq Name=\"Discussions\">" +
-                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
-                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
-                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
-                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
-                  "<Discussion Author=\"Sandra\" Created=\"2008-11-14 00:00:00Z\">" +
-                    GetExpectedParagraphString("Really, it is!") + "</Discussion>" +
-                "</ownseq></TranslatorNote>";
+                  "<Message Author=\"John\" Created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
+                  "<Message Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
+                  "<Message Author=\"Sandra\" Created=\"2008-11-14 00:00:00Z\">Really, it is!</Message>" +
+                "</TranslatorNote>";
 
             TranslatorNote Parent = CreateFromXmlString(sParent);
             TranslatorNote Mine = CreateFromXmlString(sMine);
@@ -600,24 +616,20 @@ namespace OurWordTests.DataModel
 
             Mine.Merge(Parent, Theirs);
 
-            string sExpected = "<TranslatorNote Category=\"To Do\" AssignedTo=\"Sandra\" " +
-                "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
-                "<ownseq Name=\"Discussions\">" +
-                  "<Discussion Author=\"John\" Created=\"2008-11-01 00:00:00Z\">" +
-                    GetExpectedParagraphString("Check exegesis here.") + "</Discussion>" +
-                  "<Discussion Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">" +
-                    GetExpectedParagraphString("Exegesis is fine.") + "</Discussion>" +
-                  "<Discussion Author=\"Sandra\" Created=\"2008-11-14 00:00:00Z\">" +
-                    GetExpectedParagraphString("Really, it is!") + "</Discussion>" +
-                  "<Discussion Author=\"John\" Created=\"2008-11-15 00:00:00Z\">" +
-                    GetExpectedParagraphString("I'm not convinced.") + "</Discussion>" +
-                "</ownseq></TranslatorNote>";
-
-            XElement xOut = Mine.ToXml(true);
-            string sOut = xOut.OneLiner;
+            // Save the result; is it what we expect?
+            var oxes = new XmlDoc();
+            var nodeOut = Mine.Save(oxes, oxes);
+            var sOut = XmlDoc.OneLiner(nodeOut);
+            string sExpected = "<TranslatorNote category=\"To Do\" " +
+                "context=\"so loved the world\" reference=\"003:016\" showInDaughter=\"false\">" +
+                  "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
+                  "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
+                  "<Message author=\"Sandra\" created=\"2008-11-14 00:00:00Z\">Really, it is!</Message>" +
+                  "<Message author=\"John\" created=\"2008-11-15 00:00:00Z\">I'm not convinced.</Message>" +
+                "</TranslatorNote>";
             Assert.AreEqual(sExpected, sOut);
         }
         #endregion
-
     }
+    #endregion
 }

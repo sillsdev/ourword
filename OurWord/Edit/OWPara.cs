@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+using OurWord.SideWnd;
 #endregion
 
 namespace OurWord.Edit
@@ -793,10 +794,11 @@ namespace OurWord.Edit
         #region Method: void InitializeNoteIcons(DText)
         void InitializeNoteIcons(DText text)
         {
-            foreach (TranslatorNote tn in text.TranslatorNotes)
+            foreach (TranslatorNote note in text.TranslatorNotes)
             {
-                if (tn.IsShown())
-                    Append( new ENote(tn) );
+                if (NotesWnd.ShouldDisplayNote(note))
+//                if (note.IsShown())
+                    Append(new ENote(note));
             }
         }
         #endregion

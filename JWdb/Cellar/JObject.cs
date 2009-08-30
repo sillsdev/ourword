@@ -360,8 +360,6 @@ namespace JWdb
 			DeclareDirty();
 		}
 		#endregion
-		protected const int TAttrBase = 20; // Temporary basic attrs within subclasses
-		protected const int BAttrBase = 30; // Persisted basic attrs within subclasses
         #region Attr{g}: int BAttrCount
         public int BAttrCount
         {

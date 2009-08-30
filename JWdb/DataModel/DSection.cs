@@ -496,48 +496,15 @@ namespace JWdb.DataModel
 		}
 		int m_nLineNoInFile;
 		#endregion
-        #region VAttr{g}: List<TranslatorNote> GetAllTranslatorNotes
+        #region Method: List<TranslatorNote> GetAllTranslatorNotes()
         public List<TranslatorNote> GetAllTranslatorNotes()
         {
             var v = new List<TranslatorNote>();
 
             foreach (DParagraph p in Paragraphs)
-            {
-                v.AddRange(p.AllNotes);
-
-                var vFoots = p.AllFootnotes;
-                foreach (DFootnote f in vFoots)
-                    v.AddRange(f.AllNotes);
-            }
+                v.AddRange(p.GetAllTranslatorNotes());
 
             return v;
-        }
-        #endregion
-        #region VAttr{g}: List<TranslatorNote> GetAllShownTranslatorNotes
-        public List<TranslatorNote> GetAllShownTranslatorNotes()
-        {
-            var vAll = GetAllTranslatorNotes();
-
-            var vShown = new List<TranslatorNote>();
-            foreach (TranslatorNote tn in vAll)
-            {
-                if (tn.IsShown())
-                    vShown.Add(tn);
-            }
-
-            return vShown;
-        }
-        #endregion
-        #region VAttr{g}: List<TranslatorNote> AllNotes
-        public List<TranslatorNote> AllNotes
-        {
-            get
-            {
-                var v = new List<TranslatorNote>();
-                foreach (DParagraph p in Paragraphs)
-                    v.AddRange(p.AllNotes);
-                return v;
-            }
         }
         #endregion
         #region VAttr{g}: List<DFootnote> AllFootnotes
@@ -693,13 +660,13 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
-
+        #region Helper Method: void RemoveDuplicateNotes(SFront)
         void RemoveDuplicateNotes(DSection SFront)
             // Remove identical exegetical notes from the target; we no longer want
             // to actually put them in there
         {
             // Get the front notes that have the ShowInDaughter set
-            var vAllFrontNotes = SFront.AllNotes;
+            var vAllFrontNotes = SFront.GetAllTranslatorNotes();
             var vFrontNotes = new List<TranslatorNote>();
             foreach (TranslatorNote tn in vAllFrontNotes)
             {
@@ -709,7 +676,7 @@ namespace JWdb.DataModel
 
             // Likewise the Target notes, as these are the way the Exegetical notes were
             // handled in reading in.
-            var vAllTargetNotes = AllNotes;
+            var vAllTargetNotes = GetAllTranslatorNotes();
             var vTargetNotes = new List<TranslatorNote>();
             foreach (TranslatorNote tn in vAllTargetNotes)
             {
@@ -721,9 +688,7 @@ namespace JWdb.DataModel
             foreach (TranslatorNote tn in vTargetNotes)
             {
                 // If discussions have been added, then we don't want to delete it.
-                if (tn.Discussions.Count > 1)
-                    continue;
-                if (tn.Discussions[0].Paragraphs.Count > 1)
+                if (tn.Messages.Count > 1)
                     continue;
 
                 // Loop through the front notes, looking for duplicates
@@ -733,7 +698,7 @@ namespace JWdb.DataModel
                         continue;
                     if (tn.Context != fn.Context)
                         continue;
-                    if (tn.LastParagraph.SimpleText != fn.LastParagraph.SimpleText)
+                    if (tn.LastMessage.SimpleText != fn.LastMessage.SimpleText)
                         continue;
 
                     // Remove the note, then loop to the next one
@@ -742,10 +707,10 @@ namespace JWdb.DataModel
                 }
             }
         }
+        #endregion
+        #endregion
 
-		#endregion
-
-		// Filters ---------------------------------------------------------------------------
+        // Filters ---------------------------------------------------------------------------
 		#region Attr{g/s}: bool MatchesFilter - T if DSection has passed current Filter test
 		public bool MatchesFilter
 		{
@@ -2184,7 +2149,7 @@ namespace JWdb.DataModel
 
                 // If the NoteToAppend has multiple discusions, then it was created in some
                 // other way, and we don't append it
-                if (NoteToAdd.Discussions.Count != 1)
+                if (NoteToAdd.Messages.Count != 1)
                     return false;
 
                 // Scan the text and locate an OldVersion note, if any
@@ -2198,9 +2163,9 @@ namespace JWdb.DataModel
                     return false;
 
                 // Move the discussion over
-                Discussion disc = NoteToAdd.Discussions[0];
-                NoteToAdd.Discussions.Remove(disc);
-                note.Discussions.InsertAt(0, disc);
+                var message = NoteToAdd.Messages[0];
+                NoteToAdd.Messages.Remove(message);
+                note.Messages.InsertAt(0, message);
                 return true;
             }
             #endregion
@@ -2212,12 +2177,18 @@ namespace JWdb.DataModel
                 // Is this field a TranslatorNote?
                 if (DSFMapping.c_sMkrTranslatorNote == field.Mkr)
                 {
+                    var oxes = new XmlDoc(field.Data);
+                    var node = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
+                    tn = TranslatorNote.Create(node);
+
+                    /*
                     XElement[] x = XElement.CreateFrom(field.Data);
                     if (x.Length == 1)
                     {
                         tn = new TranslatorNote();
                         tn.FromXml(x[0]);
                     }
+                    */
                 }
 
                 // Otherwise, is it an old-style (pre version 1.1) note?
@@ -2579,7 +2550,7 @@ namespace JWdb.DataModel
 					p.Cleanup();
 
                 /////// SEARCHING for a bug, can delete once found
-                foreach (TranslatorNote tn in Section.AllNotes)
+                foreach (TranslatorNote tn in Section.GetAllTranslatorNotes())
                     tn.Debug_VerifyIntegrity();
                 /////// END BUG
 
@@ -3141,9 +3112,9 @@ namespace JWdb.DataModel
                         "This section's paragraphing was changed by more than one user. " +
                         "We kept one; you'll need to look at Mercurial's history to see " +
                         "what the other user did; we were not able to keep their changes.");
-                    Discussion disc = new Discussion(TranslatorNote.MergeAuthor,
-                        DateTime.Now, sMessage);
-                    note.Discussions.Append(disc);
+                    var message = new DMessage(TranslatorNote.MergeAuthor,
+                        DateTime.Now, DMessage.Anyone, sMessage);
+                    note.Messages.Append(message);
                     text.TranslatorNotes.Append(note);
                 }
             }
@@ -3472,11 +3443,12 @@ namespace JWdb.DataModel
                     note.Reference = reference.ParseableName;
                     note.Context = itemx.Context;
                     note.Category = TranslatorNote.ToDo;
-                    Discussion disc = new Discussion(
+                    var message = new DMessage(
                         TranslatorNote.MergeAuthor,
                         DateTime.Now,
+                        DMessage.Anyone,
                         itemx.NoteText);
-                    note.Discussions.Append(disc);
+                    note.Messages.Append(message);
 
                     // We are just doing a generic note for now, rather than showing
                     // diffs, so we only do this once for a given MyRun.

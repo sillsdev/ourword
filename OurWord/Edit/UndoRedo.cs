@@ -2236,8 +2236,8 @@ namespace OurWord.Edit
     #endregion
 
     // Translator Notes ----------------------------------------------------------------------
-    #region CLASS: AddDiscussionAction
-    public class AddDiscussionAction : BookmarkedAction
+    #region CLASS: AddMessageAction
+    public class AddMessageAction : BookmarkedAction
     {
         #region Attr[g}: TranslatorNote Note
         protected TranslatorNote Note
@@ -2251,7 +2251,7 @@ namespace OurWord.Edit
         TranslatorNote m_Note;
         #endregion
         #region Constructor(OWWindow, Note)
-        public AddDiscussionAction(OWWindow window, TranslatorNote note)
+        public AddMessageAction(OWWindow window, TranslatorNote note)
             : base(window, "Add Response to Note")
         {
             m_Note = note;
@@ -2260,11 +2260,11 @@ namespace OurWord.Edit
 
         #region OMethod: bool PerformAction()
         protected override bool PerformAction()
-            // Create and add a new discussion item
+            // Create and add a new Message item
         {
-            // Create a new Discussion object and add it to the note
-            Discussion d = new Discussion();
-            Note.Discussions.Append(d);
+            // Create a new Message object and add it to the note
+            var message = new DMessage();
+            Note.Messages.Append(message);
             Note.Debug_VerifyIntegrity();
 
             // Reload the Window, and recalculate its display
@@ -2274,7 +2274,7 @@ namespace OurWord.Edit
             (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
 
             // Select the new discussion
-            EContainer container = Window.Contents.FindContainerOfDataSource(d.LastParagraph);
+            EContainer container = Window.Contents.FindContainerOfDataSource(message);
             container.Select_LastWord_End();
             Window.Focus();
 
@@ -2285,10 +2285,10 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             // Retrieve the last discussion
-            Discussion d = Note.LastDiscussion;
+            var message = Note.LastMessage;
 
             // Remove it from the note
-            Note.Discussions.Remove(d);
+            Note.Messages.Remove(message);
             Note.Debug_VerifyIntegrity();
 
             // Reload the Window, and recalculate its display
@@ -2297,8 +2297,8 @@ namespace OurWord.Edit
         #endregion
     }
     #endregion
-    #region CLASS: RemoveDiscussionAction
-    public class RemoveDiscussionAction : BookmarkedAction
+    #region CLASS: RemoveMessageAction
+    public class RemoveMessageAction : BookmarkedAction
     {
         #region Attr[g}: TranslatorNote Note
         protected TranslatorNote Note
@@ -2311,25 +2311,25 @@ namespace OurWord.Edit
         }
         TranslatorNote m_Note;
         #endregion
-        #region Attr{g}: Discussion RemovedDiscussion
-        Discussion RemovedDiscussion
+        #region Attr{g}: DMessage RemovedMessage
+        DMessage RemovedMessage
         {
             get
             {
-                Debug.Assert(null != m_RemovedDiscussion);
-                return m_RemovedDiscussion;
+                Debug.Assert(null != m_RemovedMessage);
+                return m_RemovedMessage;
             }
             set
             {
                 Debug.Assert(null != value);
-                m_RemovedDiscussion = value;
+                m_RemovedMessage = value;
             }
         }
-        Discussion m_RemovedDiscussion;
+        DMessage m_RemovedMessage;
         #endregion
 
         #region Constructor(OWWindow, Note)
-        public RemoveDiscussionAction(OWWindow window, TranslatorNote note)
+        public RemoveMessageAction(OWWindow window, TranslatorNote note)
             : base(window, "Remove Response to Note")
         {
             m_Note = note;
@@ -2340,14 +2340,14 @@ namespace OurWord.Edit
         protected override bool PerformAction()
         {
             // Removing the only discussion is the same as deleting the note
-            if (Note.Discussions.Count < 2)
+            if (Note.Messages.Count < 2)
                 return false;
 
             // Remember it so we can undo it
-            RemovedDiscussion = Note.LastDiscussion;
+            RemovedMessage = Note.LastMessage;
 
             // Remove it from the note
-            Note.Discussions.Remove(Note.LastDiscussion);
+            Note.Messages.Remove(Note.LastMessage);
             Note.Debug_VerifyIntegrity();
 
             // Reload the Window, and recalculate its display
@@ -2361,7 +2361,7 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             // AddParagraph the removed discussion
-            Note.Discussions.Append(RemovedDiscussion);
+            Note.Messages.Append(RemovedMessage);
             Note.Debug_VerifyIntegrity();
 
             // Reload the Window, and recalculate its display
@@ -2431,7 +2431,8 @@ namespace OurWord.Edit
                 text.Section.GetReferenceAt(text).ParseableName,
                 G.App.MainWindow.Selection.SelectionString
                 );
-            Note.Discussions.Append(new Discussion());
+            Note.Messages.Append(new DMessage());
+            Note.Status = DMessage.Anyone;
             text.TranslatorNotes.Append(Note);
 
             // Recalculate the entire display
@@ -2667,7 +2668,7 @@ namespace OurWord.Edit
         {
             // Set the appropriate Note attribute
             if (WhichOne == NotesWnd.c_sAssignedTo)
-                Note.AssignedTo = NewClassification;
+                Note.Status = NewClassification;
             else
                 Note.Category = NewClassification;
 
@@ -2678,8 +2679,12 @@ namespace OurWord.Edit
 
             DropDownButton.Text = NewClassification;
 
-            foreach (ToolStripMenuItem item in DropDownButton.DropDownItems)
-                item.Checked = (item.Text == NewClassification);
+            foreach (ToolStripItem item in DropDownButton.DropDownItems)
+            {
+                var menuItem = item as ToolStripMenuItem;
+                if (null != menuItem)
+                    menuItem.Checked = (menuItem.Text == NewClassification);
+            }
 
             return true;
         }
@@ -2689,7 +2694,7 @@ namespace OurWord.Edit
         {
             // Set the appropriate Note attribute
             if (WhichOne == NotesWnd.c_sAssignedTo)
-                Note.AssignedTo = OriginalClassification;
+                Note.Status = OriginalClassification;
             else
                 Note.Category = OriginalClassification;
 

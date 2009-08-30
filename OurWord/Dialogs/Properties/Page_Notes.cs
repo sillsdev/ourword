@@ -92,7 +92,7 @@ namespace OurWord.Dialogs
                     e.Value = TranslatorNote.BorderColor.Name;
                     break;
                 case c_sNotesHeaderColor:
-                    e.Value = TranslatorNote.DiscussionHeaderColor.Name;
+                    e.Value = TranslatorNote.MessageHeaderColor.Name;
                     break;
                 case c_sNotesUneditableColor:
                     e.Value = TranslatorNote.UneditableColor.Name;
@@ -111,7 +111,7 @@ namespace OurWord.Dialogs
                     e.Value = ShowCategoriesPS.GetBoolString(TranslatorNote.ShowCategories);
                     break;
                 case c_sPeople:
-                    e.Value = TranslatorNote.People.CommaDelimitedString;
+                    e.Value = DB.Project.PeopleAsCommaDelimitedString;
                     break;
                 case c_sShowAssignedTo:
                     YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
@@ -133,7 +133,7 @@ namespace OurWord.Dialogs
                     TranslatorNote.BorderColor = Color.FromName( (string)e.Value );
                     break;
                 case c_sNotesHeaderColor:
-                    TranslatorNote.DiscussionHeaderColor = Color.FromName((string)e.Value);
+                    TranslatorNote.MessageHeaderColor = Color.FromName((string)e.Value);
                     break;
                 case c_sNotesUneditableColor:
                     TranslatorNote.UneditableColor = Color.FromName((string)e.Value);
@@ -152,7 +152,7 @@ namespace OurWord.Dialogs
                     TranslatorNote.ShowCategories = ShowCategoriesPS.IsTrue(e.Value);
                     break;
                 case c_sPeople:
-                    TranslatorNote.People.CommaDelimitedString = (string)e.Value;
+                    DB.Project.PeopleAsCommaDelimitedString = (string)e.Value;
                     break;
                 case c_sShowAssignedTo:
                     YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
