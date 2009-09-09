@@ -59,10 +59,9 @@ namespace OurWord.Dialogs
 
         const string c_sGroupMisc = "Misc";
         const string c_sDefaultAuthor = "propDefaultAuthor";
+        const string c_sCanDeleteAnything = "propCanDeleteAnything";
 
-        const string c_sGroupClassifications = "Categories & People";
-        const string c_sCategories = "propCategories";
-        const string c_sShowCategories = "propShowCategories";
+        const string c_sGroupClassifications = "People";
         const string c_sPeople = "propPeople";
         const string c_sShowAssignedTo = "propShowAssignedTo";
 
@@ -101,17 +100,14 @@ namespace OurWord.Dialogs
                 case c_sDefaultAuthor:
                     e.Value = DB.UserName;
                     break;
+                case c_sCanDeleteAnything:
+                    YesNoPropertySpec CanDeleteAnythingPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != CanDeleteAnythingPS);
+                    e.Value = CanDeleteAnythingPS.GetBoolString(TranslatorNote.CanDeleteAnything);
+                    break;
 
-                case c_sCategories:
-                    e.Value = TranslatorNote.Categories.CommaDelimitedString;
-                    break;
-                case c_sShowCategories:
-                    YesNoPropertySpec ShowCategoriesPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ShowCategoriesPS);
-                    e.Value = ShowCategoriesPS.GetBoolString(TranslatorNote.ShowCategories);
-                    break;
                 case c_sPeople:
-                    e.Value = DB.Project.PeopleAsCommaDelimitedString;
+                    e.Value = DB.Project.People.ToCommaDelimitedString();
                     break;
                 case c_sShowAssignedTo:
                     YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
@@ -142,17 +138,14 @@ namespace OurWord.Dialogs
                 case c_sDefaultAuthor:
                     DB.UserName = (string)e.Value;
                     break;
+                case c_sCanDeleteAnything:
+                    YesNoPropertySpec CanDeleteAnythingPS = e.Property as YesNoPropertySpec;
+                    Debug.Assert(null != CanDeleteAnythingPS);
+                    TranslatorNote.CanDeleteAnything = CanDeleteAnythingPS.IsTrue(e.Value);
+                    break;
 
-                case c_sCategories:
-                    TranslatorNote.Categories.CommaDelimitedString = (string)e.Value;
-                    break;
-                case c_sShowCategories:
-                    YesNoPropertySpec ShowCategoriesPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ShowCategoriesPS);
-                    TranslatorNote.ShowCategories = ShowCategoriesPS.IsTrue(e.Value);
-                    break;
                 case c_sPeople:
-                    DB.Project.PeopleAsCommaDelimitedString = (string)e.Value;
+                    DB.Project.People.FromCommaDelimitedString((string)e.Value);
                     break;
                 case c_sShowAssignedTo:
                     YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
@@ -199,28 +192,7 @@ namespace OurWord.Dialogs
             #endregion
 
             // Categories & People
-            #region Categories & People
-            Bag.Properties.Add(new PropertySpec(
-                c_sCategories,
-                "Categories of Notes",
-                typeof(string),
-                c_sGroupClassifications,
-                "Provide a list of the categories of notes, separated by commas. Note that any " +
-                    "existing categories in the current book will be automatically added back " +
-                    "into this list.",
-                "",
-                "",
-                null
-                ));
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sShowCategories,
-                "Show Categories combobox?",
-                c_sGroupClassifications,
-                "If Yes, you will have the ability to classify a note according to its " +
-                    "category, and to then turn the display of categorized notes on and off.",
-                false
-                ));
-
+            #region People
             Bag.Properties.Add(new PropertySpec(
                 c_sPeople,
                 "People we can Assign To",
@@ -257,6 +229,16 @@ namespace OurWord.Dialogs
                 "",
                 null
                 ));
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sCanDeleteAnything,
+                "Can Delete Other's Notes & Messages?",
+                c_sGroupMisc,
+                "If Yes, you will have the ability to delete notes and messages written by " +
+                    "other people; e.g., to clean up exegetical notes after all others have " +
+                    "finished commenting on them.",
+                false
+                ));
+
             #endregion
 
             // Localize the bag

@@ -158,6 +158,8 @@ namespace JWTools
         }
         #endregion
 
+        // Uri Parsing -----------------------------------------------------------------------
+
         // Attrs -----------------------------------------------------------------------------
         #region Method: XmlAttribute AddAttr(node, sAttrName, string sValue)
         public XmlAttribute AddAttr(XmlNode node, string sAttrName, string sValue)
@@ -248,7 +250,19 @@ namespace JWTools
             return false;
         }
         #endregion
+        #region SMethod: string GetAttrValue(node, vsAttr, sDefaultValue)
+        static public string GetAttrValue(XmlNode node, string[] vsAttrName, string sDefaultValue)
+        {
+            foreach (string sAttrName in vsAttrName)
+            {
+                string sOut = GetAttrValue(node, sAttrName, sDefaultValue);
+                if (!string.IsNullOrEmpty(sOut))
+                    return sOut;
+            }
 
+            return sDefaultValue;
+        }
+        #endregion
 
         static public bool IsNode(XmlNode node, string sName)
         {
@@ -390,8 +404,157 @@ namespace JWTools
             return bIsSame;
         }
         #endregion
-
-
-
     }
+
+
+    public class UrlAttr
+    {
+        #region Attr{g}: string Name
+        public string Name
+        {
+            get
+            {
+                return m_sName;
+            }
+        }
+        string m_sName;
+        #endregion
+        #region Attr{g}: string Valuel
+        public string Value
+        {
+            get
+            {
+                return m_sValue;
+            }
+        }
+        string m_sValue;
+        #endregion
+
+        #region Constructor(sName, sValue)
+        public UrlAttr(string sName, string sValue)
+        {
+            m_sName = sName;
+            m_sValue = sValue;
+        }
+        #endregion
+    }
+
+    public class UrlAttrList : List<UrlAttr>
+    {
+        #region Attr{g}: string IsOxesUrl
+        public bool IsOxesUrl
+        {
+            get
+            {
+                return m_bIsOxesUrl;
+            }
+        }
+        bool m_bIsOxesUrl = false;
+        #endregion
+        #region Attr{g}: string OxesFilePath
+        public string OxesFilePath
+        {
+            get
+            {
+                return m_sOxesFilePath;
+            }
+        }
+        string m_sOxesFilePath;
+        #endregion
+
+        #region Constructor
+        public UrlAttrList()
+        {
+        }
+        #endregion
+        #region Constructor(sUrl)
+        public UrlAttrList(string sUrl)
+            : this()
+        {
+            // Start with the assumption that we don't have a good Oxes Url
+            m_bIsOxesUrl = false;
+
+            // Bad Url
+            if (string.IsNullOrEmpty(sUrl))
+                return;
+
+            // Make sure it is an Oxes url; otherwise we can't identify it
+            if (!sUrl.StartsWith("oxes://", true, CultureInfo.InvariantCulture))
+                return;
+
+            // We want to consider what's to the right of the Oxes part.
+            string sUrlData = sUrl.Substring(7);
+            var vsSections = sUrlData.Split(new char[] { '/' });
+            if (vsSections.Length == 0 || vsSections.Length > 2)
+                return;
+            string m_sOxesFilePath = (vsSections.Length == 2) ? vsSections[0] : "";
+            string sAttributes = (vsSections.Length == 1) ? vsSections[0] : vsSections[1];
+
+            // Parse into name/value pairs
+            if (string.IsNullOrEmpty(sAttributes))
+                return;
+            var vsParts = sAttributes.Split(new char[] { '&' });
+            if (vsParts.Length == 0)
+                return;
+
+            // If we're here, then we've got a Url we can work with 
+            m_bIsOxesUrl = true;
+
+            // Read each one into UrlAttrs
+            foreach (string s in vsParts)
+            {
+                int k = s.IndexOf('=');
+                if (-1 == k || s.Length == k)
+                    continue;
+
+                string sName = s.Substring(0, k);
+                string sValue = s.Substring(k+1);
+
+                int n = sValue.Length;
+                if (n > 2 && (sValue[0] == '\'' && sValue[n-1] == '\''))
+                    sValue = sValue.Substring(1, n-2);
+
+                Add(new UrlAttr(sName, sValue));
+            }
+        }
+        #endregion
+
+        #region Method: string GetValueFor(string sName)
+        public string GetValueFor(string sName)
+        {
+            foreach (var ua in this)
+            {
+                if (ua.Name == sName)
+                    return ua.Value;
+            }
+
+            return null;
+        }
+        #endregion
+        #region Method: string MakeUrl()
+        public string MakeUrl()
+        {
+            string sUrl = "oxes://";
+
+            if (!string.IsNullOrEmpty(OxesFilePath))
+                sUrl += (OxesFilePath + "/");
+
+            bool bAmpersand = false;
+
+            foreach (var ua in this)
+            {
+                if (bAmpersand)
+                    sUrl += '&';
+                bAmpersand = true;
+
+                sUrl += ua.Name;
+                sUrl += '=';
+                sUrl += ua.Value;
+            }
+
+            return sUrl;
+        }
+        #endregion
+    }
+
 }

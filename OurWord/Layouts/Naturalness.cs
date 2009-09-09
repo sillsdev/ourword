@@ -259,5 +259,19 @@ namespace OurWord.Layouts
             base.LineNumberAttrs.Brush = new SolidBrush(clr);
         }
         #endregion
+        #region OMethod: bool ShowNoteIcon(TranslatorNote, bShowingBT)
+        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
+        {
+            // Naturalness only deals with the Target Translation
+            if (!note.IsTargetTranslationNote)
+                return false;
+
+            // For now, I'm thinking only the General notes
+            if (!note.IsGeneralNote)
+                return false;
+
+            return true;
+        }
+        #endregion
     }
 }

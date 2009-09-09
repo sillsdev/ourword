@@ -62,5 +62,14 @@ namespace OurWord.Layouts
         }
         #endregion
 
+        #region VMethod: void SetupInsertNoteDropdown(btnInsertNote)
+        public virtual void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
+            // Default is that we just insert a General Note, thus no dropdown items
+        {
+            foreach (ToolStripItem item in btnInsertNote.DropDownItems)
+                item.Visible = false;
+            btnInsertNote.ShowDropDownArrow = false;
+        }
+        #endregion
     }
 }

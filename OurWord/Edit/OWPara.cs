@@ -183,12 +183,12 @@ namespace OurWord.Edit
         #endregion
 
         // Content Attrs ---------------------------------------------------------------------
-        #region Attr{g}: JObject DataSource - the DParagraph or DNote behind this OWPara
+        #region Attr{g}: JObject DataSource - the DParagraph behind this OWPara
         public JObject DataSource
         {
             get
             {
-                // Because I allowo literals, sometimes paragraphs to not have data sources.
+                // Because I allow literals, sometimes paragraphs to not have data sources.
                 // EContainer.FindContainerOfDataSource, e.g., needs DataSource to return
                 // null, rather than fire an assertion.
                 //    Once I get all OWPara's to have a data source, then I should
@@ -533,95 +533,6 @@ namespace OurWord.Edit
             #endregion
         }
         #endregion
-        #region CLASS: ENote
-        public class ENote : EBlock
-        {
-            #region Attr{g}: TranslatorNote Note
-            public TranslatorNote Note
-            {
-                get
-                {
-                    Debug.Assert(null != m_Note);
-                    return m_Note;
-                }
-            }
-            TranslatorNote m_Note = null;
-            #endregion
-            #region Attr{g}: Bitmap Bmp - the note's bitmap
-            Bitmap Bmp
-            {
-                get
-                {
-                    // Get this when we first need it. We previously had this in
-                    // the constructor; but the problem was that we do not
-                    // have access to the Window at the time of construction.
-                    if (null == m_bmp)
-                        m_bmp = TranslatorNote.GetBitmap(Window.BackColor);
-
-                    Debug.Assert(null != m_bmp);
-                    return m_bmp;
-                }
-            }
-            Bitmap m_bmp = null;
-            #endregion
-            #region OAttr{g}: float Width
-            public override float Width
-            {
-                get
-                {
-                    return Bmp.Width;
-                }
-                set
-                {
-                    // Can't be set; its the nature of the bitmap
-                }
-            }
-            #endregion
-
-            #region Constructor(TranslatorNote)
-            public ENote(TranslatorNote _Note)
-                : base(null, "")
-            {
-                m_Note = _Note;
-            }
-            #endregion
-            #region OMethod: void CalculateWidth(Graphics g)
-            public override void CalculateWidth(Graphics g)
-            {
-                // Do-nothing override
-            }
-            #endregion
-
-            #region Method: override void Paint()
-            public override void Paint()
-            {
-                Draw.Image(Bmp, Position);
-            }
-            #endregion
-
-            #region Attr{g}: Cursor MouseOverCursor - Indicates what a Left-Click will do
-            public override Cursor MouseOverCursor
-            {
-                get
-                {
-                    return Cursors.Hand;
-                }
-            }
-            #endregion
-
-            #region Method: override void cmdLeftMouseClick(PointF pt)
-            public override void cmdLeftMouseClick(PointF pt)
-            {
-                // Update the secondary windows, if any
-                Window.Secondary_SelectAndScrollToNote(Note);
-
-                // Update the main window (if this isn't the main)
-                if (null != Window.MainWindow)
-                    Window.MainWindow.Contents.OnSelectAndScrollFrom(Note);
-            }
-            #endregion
-        }
-        #endregion
         #region CLASS: EFootnoteLabel
         class EFootnoteLabel : EBlock
         {
@@ -792,13 +703,16 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: void InitializeNoteIcons(DText)
-        void InitializeNoteIcons(DText text)
+        void InitializeNoteIcons(DText text, bool bShowingBT)
         {
             foreach (TranslatorNote note in text.TranslatorNotes)
             {
-                if (NotesWnd.ShouldDisplayNote(note))
-//                if (note.IsShown())
-                    Append(new ENote(note));
+                OWWindow wnd = OurWordMain.App.MainWindow;
+                if (null != wnd)
+                {
+                    if (wnd.ShowNoteIcon(note, bShowingBT))
+                        Append(new ENote(note));
+                }
             }
         }
         #endregion
@@ -883,7 +797,7 @@ namespace OurWord.Edit
                     case "DText":
                         _InitializeBasicTextWords(r as DBasicText, null);
                         if (G.App.HasSideWindows && G.App.SideWindows.HasNotesWindow)
-                            InitializeNoteIcons(r as DText);
+                            InitializeNoteIcons(r as DText, DisplayBT);
                         break;
                     default:
                         Console.WriteLine("Unknown type in OWPara.Initialize...Name=" + 

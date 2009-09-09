@@ -1191,9 +1191,6 @@ namespace JWdb.DataModel
                     Book.UpdateFromFront(Book.FrontBook);
                 }
 
-                // Add any Note Categories we might not yet have
-                TranslatorNote.ScanBookForNewClassifications(Book);
-
                 // Done
                 return true;
             }

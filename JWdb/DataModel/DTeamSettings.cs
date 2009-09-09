@@ -196,27 +196,6 @@ namespace JWdb.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
-        #region BAttr{g}: BStringArray NotesCategories
-        public BStringArray NotesCategories
-        {
-            get
-            {
-                return m_bsaNotesCategories;
-            }
-        }
-        public BStringArray m_bsaNotesCategories = null;
-        #endregion
-        #region BAttr{g}: BStringArray NotesFrontCategories
-        public BStringArray NotesFrontCategories
-        {
-            get
-            {
-                return m_bsaNotesFrontCategories;
-            }
-        }
-        public BStringArray m_bsaNotesFrontCategories = null;
-        #endregion
-
         #region Attr{g/s}: bool RepositoryIsActive - T if source control is turned on
         public bool RepositoryIsActive
         {
@@ -249,10 +228,6 @@ namespace JWdb.DataModel
 			DefineAttr("EvenLeft",     ref m_EvenLeft);
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
-
-            // Translator Notes
-            DefineAttr("NotesCategories", ref m_bsaNotesCategories);
-            DefineAttr("NotesFrontCategories", ref m_bsaNotesFrontCategories);
 
             DefineAttr("Repository", ref m_bRepositoryIsActive);
         }
@@ -350,10 +325,6 @@ namespace JWdb.DataModel
 				CopyrightNotice = "Copyright © " + 
 					DateTime.Today.Year.ToString() + ".";
 			}
-
-            // Translator Notes Categories
-            m_bsaNotesCategories = new BStringArray();
-            m_bsaNotesFrontCategories = new BStringArray();
 
             // Local Repository
             m_Repository = new Repository(this, RepositoryIsActive);
@@ -640,7 +611,13 @@ namespace JWdb.DataModel
         public const string c_StyleNoteHeader             = "NoteHeader";
         public const string c_StyleNoteDate               = "NoteDate";
         public const string c_StyleAnnotationMessage      = "NoteMessage";
-        public const string c_StyleNote                   = "nt";   
+        public const string c_StyleNote                   = "nt";
+
+        public const string c_StyleToolTipText            = "ToolTipText";
+        public const string c_StyleToolTipHeader          = "ToolTipHeader";
+
+        public const string c_StyleMessageContent         = "MessageContent";
+        public const string c_StyleMessageHeader          = "MessageHeader";
 
         // User-Interface Only
         public const string c_PStyleMergeHeader = "MergeHeader";
@@ -1032,6 +1009,40 @@ namespace JWdb.DataModel
                 style.SetFonts(true, 10, false);
                 style.Alignment = JParagraphStyle.AlignType.kJustified;
             }
+
+            // ToolTip: Header
+            if (null == FindParagraphStyle(c_StyleToolTipHeader))
+            {
+                style = AddParagraphStyle(c_StyleToolTipHeader, "ToolTip Header");
+                style.SetFonts(false, 10, false);
+                style.SpaceAfter = 0;
+                style.SpaceBefore = 0;
+            }
+            // ToolTip: Text
+            if (null == FindParagraphStyle(c_StyleToolTipText))
+            {
+                style = AddParagraphStyle(c_StyleToolTipText, "ToolTip Text");
+                style.SetFonts(false, 9, true);
+                style.SpaceAfter = 0;
+                style.SpaceBefore = 5;
+            }
+            // General Translator Notes
+            if (null == FindParagraphStyle(c_StyleMessageContent))
+            {
+                style = AddParagraphStyle(c_StyleMessageContent, "Message Content");
+                style.SetFonts(false, 9, true);
+                style.SpaceBefore = 0;
+                style.SpaceAfter = 0;
+                style.LeftMargin = 0.1;
+            }
+            if (null == FindParagraphStyle(c_StyleMessageHeader))
+            {
+                style = AddParagraphStyle(c_StyleMessageHeader, "Message Header");
+                style.SetFonts(false, 9, true);
+                style.SpaceBefore = 10;
+                style.SpaceAfter = 0;
+            }
+
         }
         #endregion
         #region Method: void _InitializeUICharacterStyles()

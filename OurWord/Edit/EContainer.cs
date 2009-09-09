@@ -1,3 +1,4 @@
+#region ***** EContainer.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    EContainer.cs
@@ -19,6 +20,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+#endregion
 #endregion
 
 // TODO: Implement Left and Right Borders
@@ -594,6 +596,9 @@ namespace OurWord.Edit
                 Pen pen = BorderPen;
                 OWWindow.DrawBuffer d = Draw;
 
+                if (Color.Empty != FillColor)
+                    Draw.FillRectangle(FillColor, BorderRectangle);
+
                 PointF LeftTop = new PointF(LeftBorder, TopBorder);
                 PointF LeftBottom = new PointF(LeftBorder, BottomBorder);
                 PointF RightTop = new PointF(RightBorder, TopBorder);
@@ -879,13 +884,13 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region VirtMethod: void AddParagraph(EItem)
+        #region VirtMethod: void Append(EItem)
         public virtual void Append(EItem item)
         {
             InsertAt(SubItems.Length, item);
         }
         #endregion
-        #region Method: void AddParagraph(EItem[] vAppend)
+        #region Method: void Append(EItem[] vAppend)
         public void Append(EItem[] vAppend)
         {
             InsertAt(SubItems.Length, vAppend);
@@ -1079,6 +1084,25 @@ namespace OurWord.Edit
             foreach (EItem item in SubItems)
             {
                 item.SetOwnedControlsVisibility(bVisible);
+            }
+        }
+        #endregion
+        #region Attr{g}: List<OWPara> AllParagraphs
+        public List<OWPara> AllParagraphs
+        {
+            get
+            {
+                var v = new List<OWPara>();
+
+                foreach (EItem item in SubItems)
+                {
+                    if (item as OWPara != null)
+                        v.Add(item as OWPara);
+                    if (item as EContainer != null)
+                        v.AddRange( (item as EContainer).AllParagraphs );
+                }
+
+                return v;
             }
         }
         #endregion
@@ -1333,7 +1357,7 @@ namespace OurWord.Edit
                 bool bSelectionFound = false;
 
                 // Do we have a Translator Note?
-                OWPara.ENote n = item as OWPara.ENote;
+                ENote n = item as ENote;
                 if (n != null && note != null && n.Note == note)
                     bSelectionFound = true;
 
@@ -1811,7 +1835,8 @@ namespace OurWord.Edit
         {
             // The width of this root container is the width of the window, less the
             // left and right margins.
-            Width = Window.Width - Window.m_ScrollBar.Width - Window.WindowMargins.Width * 2;
+            int nScroolBarWidth = (null == Window.m_ScrollBar) ? 0 : Window.m_ScrollBar.Width;
+            Width = Window.Width - nScroolBarWidth - Window.WindowMargins.Width * 2;
 
             // The Left is the margin width
             Position = new PointF(Window.WindowMargins.Width, Position.Y);

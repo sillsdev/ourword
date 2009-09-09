@@ -2175,7 +2175,7 @@ namespace OurWordTests.DataModel
             bool bConsoleOut = false;
             if (bConsoleOut)
             {
-                SectionTestData.ConsoleOut_ShowDiffs("Test_DSectionIO",
+                SectionTestData.ConsoleOut_ShowDiffs("Test_DSectionIO " + sTitle,
                     vsActual, vsExpected);
             }
 
@@ -2965,32 +2965,32 @@ namespace OurWordTests.DataModel
             // But there will be Notes in Expected to show all of the textual changes
             // made by Theirs
             vsExpected = SectionTestData.Insert(vsExpected, 5, 
-                "\\tn <TranslatorNote category=\"To Do\" context=\"*Mark\" reference=\"004:001\" showInDaughter=\"false\">" +
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"*Mark\" reference=\"004:001\">" +
                 "<Message author=\"From Merge\" created=\"2009-05-14 17:02:20Z\" status=\"Anyone\">The other version had \"The Gospel Of\".</Message>" +
                 "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 11,
-                "\\tn <TranslatorNote category=\"To Do\" context=\"an Petr*rus nol\" reference=\"004:001\" showInDaughter=\"false\">" +
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"an Petr*rus nol\" reference=\"004:001\">" +
                 "<Message author=\"From Merge\" created=\"2009-05-14 19:24:14Z\" status=\"Anyone\">The other version " +
                     "had \"Tulu-tulu agama las haman Peter nol Yohanis maas tala\".</Message>" +
                 "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 16,
-                "\\tn <TranslatorNote category=\"To Do\" context=\"a, Petr*rus nol\" reference=\"004:001\" showInDaughter=\"false\">" +
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"a, Petr*rus nol\" reference=\"004:001\">" +
                 "<Message author=\"From Merge\" created=\"2009-05-14 19:26:56Z\" status=\"Anyone\">The other version had \"Dedeng na, Peter nol Yohanis nahdeh " +
                     "nabael nol atuli las sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in Kohe " +
                     "kanas Tene ka, nol atuil deng partaiagama Saduki. Oen maas komali le ahan Peter nol Yohanis.\".</Message>" +
                 "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 20,
-                "\\tn <TranslatorNote category=\"To Do\" context=\"*Oen maa\" reference=\"004:001\" showInDaughter=\"false\">" +
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"*Oen maa\" reference=\"004:001\">" +
                 "<Message author=\"From Merge\" created=\"2009-05-14 19:30:02Z\" status=\"Anyone\">The other version had \"Dedeng na, Peter nol Yohanis " +
                     "nahdeh nabael nol atuli las sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in " +
                     "Kohe kanas Tene ka, nol atuil deng partaiagama Saduki. Oen maas komali le ahan Peter nol Yohanis.\".</Message>" +
                 "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 24,
-                "\\tn <TranslatorNote category=\"To Do\" context=\"le Petr*rus nol\" reference=\"004:002\" showInDaughter=\"false\">" +
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"le Petr*rus nol\" reference=\"004:002\">" +
                 "<Message author=\"From Merge\" created=\"2009-05-14 19:32:31Z\" status=\"Anyone\">The other version had \"Oen komali lole Peter nol " +
                     "Yohanis na mo, kom isi le tek atuli-atuli las to-toang, noan, &lt;&lt;Yesus nuli pait son, deng Un in mate ka! Tiata " +
                     "ela Un sai lalan bel atuil in mateng ngas, le oen kon haup in nuli pait kon.&gt;&gt;\".</Message>" + 

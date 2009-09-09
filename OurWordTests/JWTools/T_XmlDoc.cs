@@ -108,7 +108,67 @@ namespace OurWordTests.JWTools
         }
         #endregion
 
+        #region Test: UrlAttrList_Parsing1
+        [Test] public void UrlAttrList_Parsing1()
+        {
+            string sUrl = "oxes://book=Mrk&Chapter=3&Verse=2&selectedWord=carakiau";
 
+            var v = new UrlAttrList(sUrl);
 
+            Assert.AreEqual(4, v.Count);
+
+            Assert.AreEqual("book", v[0].Name);
+            Assert.AreEqual("Mrk",  v[0].Value);
+
+            Assert.AreEqual("Chapter", v[1].Name);
+            Assert.AreEqual("3", v[1].Value);
+
+            Assert.AreEqual("Verse", v[2].Name);
+            Assert.AreEqual("2", v[2].Value);
+
+            Assert.AreEqual("selectedWord", v[3].Name);
+            Assert.AreEqual("carakiau", v[3].Value);
+        }
+        #endregion
+        #region Test: UrlAttrList_Parsing2
+        [Test] public void UrlAttrList_Parsing2()
+        {
+            string sUrl = "oxes://testChorus.lift/entryguid='8bbee099-1a7e-44a2-99fc-fbbc6ad20894'";
+
+            var v = new UrlAttrList(sUrl);
+
+            Assert.AreEqual(1, v.Count);
+
+            Assert.AreEqual("entryguid", v[0].Name);
+            Assert.AreEqual("8bbee099-1a7e-44a2-99fc-fbbc6ad20894", v[0].Value);
+        }
+        #endregion
+        #region Test: UrlAttrList_Finding
+        [Test] public void UrlAttrList_Finding()
+        {
+            string sUrl = "oxes://book=Mrk&Chapter=3&Verse=2&selectedWord=carakiau";
+
+            var v = new UrlAttrList(sUrl);
+
+            Assert.AreEqual("Mrk", v.GetValueFor("book"));
+            Assert.AreEqual("3", v.GetValueFor("Chapter"));
+            Assert.AreEqual("2", v.GetValueFor("Verse"));
+            Assert.AreEqual("carakiau", v.GetValueFor("selectedWord"));
+        }
+        #endregion
+        #region Test: MakeUrl
+        [Test] public void MakeUrl()
+        {
+            var ua = new UrlAttrList();
+
+            ua.Add(new UrlAttr("book", "John"));
+            ua.Add(new UrlAttr("chapter", "3"));
+            ua.Add(new UrlAttr("verse", "16"));
+
+            string sUrl = ua.MakeUrl();
+
+            Assert.AreEqual("oxes://book=John&chapter=3&verse=16", sUrl, "Should be identical.");
+        }
+        #endregion
     }
 }

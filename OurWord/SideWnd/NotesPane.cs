@@ -104,7 +104,7 @@ namespace OurWord.SideWnd
             if (!canInsertNote)
                 return;
 
-            (new InsertNoteAction(Window as NotesWnd)).Do();
+            ///(new InsertNoteAction(Window as NotesWnd)).Do();
         }
         #endregion
 
@@ -154,12 +154,12 @@ namespace OurWord.SideWnd
                     return;
 
                 // Remove it
-                (new RemoveMessageAction(wnd, tn)).Do();
+ //               (new RemoveMessageAction(wnd, tn)).Do();
                 return;
             }
 
             // Give the user the opportunity to change his/her mind
-            string sText = tn.Context;
+            string sText = tn.SelectedText;
             if (sText.Length > 40)
                 sText = sText.Substring(0, 40) + "...";
             string sMsgAddition = "\n\n\"" + sText + "\"";
@@ -175,157 +175,6 @@ namespace OurWord.SideWnd
         private void cmdLoad(object sender, EventArgs e)
         {
             LocDB.Localize(m_toolstripNotes);
-
-            // Set this up after calling Localize, as we don't want to change these
-            // from what the advisor will typically have set up. Those few items
-            // in the menu that need to be localized are done by the method.
-            SetupShowDropdown();
-        }
-        #endregion
-
-        // Visibility and Enabling -----------------------------------------------------------
-        #region Method: void SetupShowDropdown()
-        public void SetupShowDropdown()
-        {
-            // Start with an empty list
-            m_Show.DropDownItems.Clear();
-
-            // Add the categories
-            if (TranslatorNote.ShowCategories)
-            {
-                foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
-                {
-                    ToolStripMenuItem item = cat.CreateMenuItem(
-                        new EventHandler(cmdToggleClassificationChecked));
-
-                    m_Show.DropDownItems.Add(item);
-                }
-
-                // Add a menu item to show all of the categories
-                string sShowAllCategories = Loc.GetNotes("ShowAllCategories", "Show All Categories");
-                ToolStripMenuItem itemAll = new ToolStripMenuItem(sShowAllCategories);
-                itemAll.Click += new System.EventHandler(cmdTurnOnAllClassifications);
-                m_Show.DropDownItems.Add(itemAll);
-
-                // Categories from the Front Translation
-                if (TranslatorNote.FrontCategories.Count > 0)
-                {
-                    // Add a separator
-                    if (m_Show.DropDownItems.Count > 0)
-                        m_Show.DropDownItems.Add(new ToolStripSeparator());
-
-                    // Add a menu item for the Front Translation notes we want to see
-                    string sFrontCategories = Loc.GetNoteDefs("FrontCategories", "Notes From Front Translation");
-                    ToolStripMenuItem itemFromFront = new ToolStripMenuItem(sFrontCategories);
-                    m_Show.DropDownItems.Add(itemFromFront);
-
-                    // Add the Front Translation Categories to this submenu
-                    foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.FrontCategories)
-                    {
-                        ToolStripMenuItem item = cat.CreateMenuItem(
-                            new EventHandler(cmdToggleClassificationChecked));
-
-                        itemFromFront.DropDownItems.Add(item);
-                    }
-                }
-            }
-
-            // "Assigned To" choice
-            AddAssignedTo();
-
-            // If nothing was added, then we don't show this in the notes pane
-            m_Show.Visible = (m_Show.DropDownItems.Count > 0);
-        }
-        #endregion
-        #region Cmd: cmdTurnOnAllClassifications
-        private void cmdTurnOnAllClassifications(object sender, EventArgs e)
-        {
-            // Make sure all Category menu items are checked
-            foreach (ToolStripItem item in m_Show.DropDownItems)
-            {
-                // Cast to a menu item, if possible
-                ToolStripMenuItem menuItem = item as ToolStripMenuItem;
-                if (null == menuItem)
-                    continue;
-
-                // Get the Classification from the tag
-                TranslatorNote.Classifications.Classification classification =
-                    menuItem.Tag as TranslatorNote.Classifications.Classification;
-                if (null == classification)
-                    continue;
-
-                // Check both the menu and the Classification
-                menuItem.Checked = true;
-                classification.IsChecked = true;
-            }
-
-            // Regenerate the window display
-            G.App.ResetWindowContents();
-        }
-        #endregion
-        #region Cmd: cmdToggleClassificationChecked
-        private void cmdToggleClassificationChecked(object sender, EventArgs e)
-        {
-            // Retrieve the menu item
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            if (null == item)
-                return;
-
-            // Retrieve the Category from the tag
-            TranslatorNote.Classifications.Classification classification =
-                item.Tag as TranslatorNote.Classifications.Classification;
-            if (null == classification)
-                return;
-
-            // Toggle the checked state and reset the menu item
-            bool bDisplayThisCategory = !item.Checked;
-            item.Checked = bDisplayThisCategory;
-            classification.IsChecked = bDisplayThisCategory;
-
-            // Regenerate the window display
-            G.App.ResetWindowContents();
-        }
-        #endregion
-
-        // AssignedTo Menu Items -------------------------------------------------------------
-        ToolStripMenuItem m_menuShowAllPeople;
-        ToolStripMenuItem m_menuShowJustMe;
-        #region Cmd: cmdAssignedToClicked
-        private void cmdAssignedToClicked(object sender, EventArgs e)
-        {
-            // Check the menu items as requested
-            m_menuShowAllPeople.Checked = (sender == m_menuShowAllPeople);
-            m_menuShowJustMe.Checked = (sender == m_menuShowJustMe);
-
-            // Update the setting this affects
-            TranslatorNote.ShowAllPeople = m_menuShowAllPeople.Checked;
-
-            // Regenerate the window display
-            G.App.ResetWindowContents();
-        }
-        #endregion
-        #region Method: void AddAssignedTo()
-        void AddAssignedTo()
-        {
-            if (!TranslatorNote.ShowAssignedTo)
-                return;
-
-            // Add a separator
-            if (m_Show.DropDownItems.Count > 0)
-                m_Show.DropDownItems.Add(new ToolStripSeparator());
-
-            // Menu item to Show All
-            m_menuShowAllPeople = new ToolStripMenuItem("Show Notes Assigned to Anyone");
-            m_menuShowAllPeople.Checked = TranslatorNote.ShowAllPeople;
-            m_menuShowAllPeople.Click += new EventHandler(cmdAssignedToClicked);
-            m_Show.DropDownItems.Add(m_menuShowAllPeople);
-
-            // Menu item to only show current user AssignedTo's
-            string sShowJustMe = "Show Notes Assigned to '" + DB.UserName + "'";
-            m_menuShowJustMe = new ToolStripMenuItem(sShowJustMe);
-            m_menuShowJustMe.Checked = !TranslatorNote.ShowAllPeople;
-            m_menuShowJustMe.Click += new EventHandler(cmdAssignedToClicked);
-            m_Show.DropDownItems.Add(m_menuShowJustMe);
         }
         #endregion
     }
@@ -421,22 +270,47 @@ namespace OurWord.SideWnd
         #endregion
 
         static public bool ShouldDisplayNote(TranslatorNote note)
-        {
             // Determine, based on current conditions, which classes of notes we want to display
-            // We always show General Notes
-            bool bShowGeneral = true;   
-            // We only show Exegetical Notes in the BT view
-            bool bShowExegetical = OurWordMain.App.MainWindowIsBackTranslation;
-            // We only show HintsForDrafting Notes in the BT view
-            bool bShowHintsForDrafting = OurWordMain.App.MainWindowIsBackTranslation;
+        {
+            // Is this a note from the Target translation? (otherwise, it is the front)
+            bool bIsTargetTranslationNote = note.IsTargetTranslationNote;
 
-            // Check to see if this note qualifies
-            if (bShowGeneral && note.IsGeneralNote)
-                return true;
-            if (bShowExegetical && note.IsExegeticalNote)
-                 return true;
-            if (bShowHintsForDrafting && note.IsHintForDraftingNote)
-                return true;
+            // General Notes: All views, but only for the Target Translation notes.
+            if (note.IsGeneralNote)
+            {
+                if (bIsTargetTranslationNote)
+                    return true;
+                return false;
+            }
+
+            // HintsForDrafting notes: we only show the ones we've introduced, which will
+            // be in our BT view
+            if (note.IsHintForDraftingNote)
+            {
+                // If BT View, show only Target Notes (i.e., notes we've created to
+                // help with future daughter translations.)
+                if (OurWordMain.App.MainWindowIsBackTranslation && bIsTargetTranslationNote)
+                    return true;
+                return false;
+            }
+
+            // Consultant Notes: only for Target notes in the BT view
+            if (note.IsConsultantNote)
+            {
+                if (OurWordMain.App.MainWindowIsBackTranslation)
+                    return true;
+                return false;
+            }
+
+            // Exegetical Notes: Pull in notes from both Front and Target, but only
+            // show in the BackTranslation view
+            if (note.IsExegeticalNote)
+            {
+                if (OurWordMain.App.MainWindowIsBackTranslation)
+                    return true;
+                return false;
+            }
+
             return false;
         }
 
@@ -454,10 +328,12 @@ namespace OurWord.SideWnd
             if (!DB.Project.HasDataToDisplay)
                 return;
 
-            // Determine all of the notes that qualify
+            // Determine all of the notes that qualify. We'll pull notes from both the
+            // Target and the Front sections
             var vNotesToDisplay = new List<TranslatorNote>();
-            var vAllTranslatorNotes = DB.TargetSection.GetAllTranslatorNotes();
-            foreach (var note in vAllTranslatorNotes)
+            var vAllPotentialNotes = DB.TargetSection.GetAllTranslatorNotes();
+            vAllPotentialNotes.AddRange(DB.FrontSection.GetAllTranslatorNotes());
+            foreach (var note in vAllPotentialNotes)
             {
                 if (ShouldDisplayNote(note))
                     vNotesToDisplay.Add(note);
@@ -605,21 +481,7 @@ namespace OurWord.SideWnd
         #endregion
 
         // Command Handlers ------------------------------------------------------------------
-        #region Cmd: OnChangeCategory - user has responded to the Category dropdown
-        public void OnChangeCategory(object sender, EventArgs e)
-        {
-            ToolStripMenuItem item = sender as ToolStripMenuItem;
-            if (null == item)
-                return;
-
-            TranslatorNote note = item.Tag as TranslatorNote;
-            if (null == note)
-                return;
-
-            (new ChangeClassification(this,
-               note, sender as ToolStripMenuItem, "Change Category to")).Do();
-        }
-        #endregion
+        /**
         #region Cmd: OnChangeAssignedTo - user has responded to the AssignedTo dropdown
         public void OnChangeAssignedTo(object sender, EventArgs e)
         {
@@ -631,10 +493,10 @@ namespace OurWord.SideWnd
             if (null == note)
                 return;
 
-            (new ChangeClassification(this,
-                note, sender as ToolStripMenuItem, "Assign to")).Do();
+            (new ChangeStatus(this, note, sender as ToolStripMenuItem)).Do();
         }
         #endregion
+        **/
         #region Cmd: OnAddResponse
         public void OnAddResponse(object sender, EventArgs e)
         {
@@ -646,7 +508,7 @@ namespace OurWord.SideWnd
             if (null == note)
                 return;
 
-            (new AddMessageAction(this, note)).Do();
+            //(new AddMessageAction(this, note)).Do();
         }
         #endregion
 
@@ -699,8 +561,8 @@ namespace OurWord.SideWnd
             return null;
         }
         #endregion
-        #region Method: ToolStripDropDownButton GetDropDownButton(note, sWhich)
-        public ToolStripDropDownButton GetDropDownButton(TranslatorNote note, string sWhich)
+        #region Method: ToolStripDropDownButton GetDropDownButton(note)
+        public ToolStripDropDownButton GetDropDownButton(TranslatorNote note)
         {
             // Get the major container for this note
             var eContainer = GetCollapsableFromNote(note);
@@ -717,7 +579,7 @@ namespace OurWord.SideWnd
 
                 foreach (ToolStripItem tsi in ts.ToolStrip.Items)
                 {
-                    if (tsi as ToolStripDropDownButton != null && tsi.Name == sWhich)
+                    if (tsi as ToolStripDropDownButton != null)
                         return tsi as ToolStripDropDownButton;
                 }
             }
@@ -748,59 +610,13 @@ namespace OurWord.SideWnd
             ts.Items.Add(btnAddResponse);
         }
         #endregion
-        #region Method: void BuildCategoryControl(note, ToolStrip)
-        void BuildCategoryControl(TranslatorNote note, ToolStrip ts)
-        {
-            // If this is turned off, don't show anything
-            if (!TranslatorNote.ShowCategories)
-                return;
-
-            // Determine if the category is changeable by this user
-            // Default to "yes"
-            bool bCategoryIsChangeable = true;
-            // Can't change it if it is the front translation
-            if (!note.IsOwnedInTargetTranslation)
-                bCategoryIsChangeable = false;
-
-            // If editable, then we buld a dropdown control
-            if (bCategoryIsChangeable)
-            {
-                // We need a touch of space between controls
-                ts.Items.Add(new ToolStripLabel("  "));
-
-                ToolStripDropDownButton menuCategory = new ToolStripDropDownButton(note.Category);
-                menuCategory.Name = c_sCategory;
-                foreach (TranslatorNote.Classifications.Classification cat in TranslatorNote.Categories)
-                {
-                    if (cat.IsChecked)
-                    {
-                        ToolStripMenuItem item = new ToolStripMenuItem(cat.Name);
-                        item.Tag = note;
-                        item.Click += new EventHandler(OnChangeCategory);
-                        if (cat.Name == note.Category)
-                        {
-                            item.Checked = true;
-                            menuCategory.Text = cat.Name;
-                        }
-                        menuCategory.DropDownItems.Add(item);
-                    }
-                }
-                ts.Items.Add(menuCategory);
-                return;
-            }
-
-            // Otherwise, we just display it
-            ToolStripLabel labelCategory = new ToolStripLabel(note.Category);
-            ts.Items.Add(labelCategory);
-        }
-        #endregion
         #region Method: void BuildAssignedToControl(note, ToolStrip)
 
         ToolStripMenuItem BuildAssignToItem(TranslatorNote note, string sDisplayValue)
         {
             var item = new ToolStripMenuItem(sDisplayValue);
             item.Tag = note;
-            item.Click += new EventHandler(OnChangeAssignedTo);
+           // item.Click += new EventHandler(OnChangeAssignedTo);
 
             if (sDisplayValue == note.Status)
                 item.Checked = true;
@@ -854,9 +670,6 @@ namespace OurWord.SideWnd
             // Add the "Add" button
             BuildAddButton(note, ts);
 
-            // Add the Category Control
-            BuildCategoryControl(note, ts);
-
             // Add the AssignedTo Control
             BuildAssignedToControl(note, ts);
 
@@ -876,7 +689,7 @@ namespace OurWord.SideWnd
             // plus/minus icon to see the entire note or not.
         {
             // Create a header paragraph, to show when the note is collapsed
-            DBasicText textHeader = note.GetCollapsableHeaderText("");
+            DBasicText textHeader = new DBasicText("Broken now"); // note.GetCollapsableHeaderText("");
             OWPara pHeader = new OWPara(
                 DB.TargetTranslation.WritingSystemVernacular,
                 DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
@@ -935,13 +748,14 @@ namespace OurWord.SideWnd
             eHeader.Border.Padding.Left = nRoundedCornerInset;
             eHeader.Border.Padding.Right = nRoundedCornerInset;
 
+            // Define the author
             OWPara pAuthor = new OWPara(
                 DB.TargetTranslation.WritingSystemVernacular,
                 DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteHeader),
                 message.Author);
             eHeader.Append(pAuthor);
 
-            // Define the author
+            // Define the date
             if (bIsFromTargetTranslation)
             {
                 OWPara pDate = new OWPara(

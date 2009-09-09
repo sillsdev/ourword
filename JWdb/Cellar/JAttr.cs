@@ -669,6 +669,39 @@ namespace JWdb
         }
         #endregion
 
+        #region Method: string ToCommaDelimitedString()
+        public string ToCommaDelimitedString()
+        {
+            string sOut = "";
+            foreach (string s in this)
+            {
+                if (sOut.Length > 0)
+                    sOut += ", ";
+                sOut += s;
+            }
+            return sOut;
+        }
+        #endregion
+        #region Method: void FromCommaDelimitedString(string sIn)
+        public void FromCommaDelimitedString(string sIn)
+        {
+            if (string.IsNullOrEmpty(sIn))
+                return;
+
+            // Parse the string into its parts
+            string[] vs = sIn.Split(new char[] { ',' });
+
+            // Remove any spaces
+            for (int i = 0; i < vs.Length; i++)
+                vs[i] = vs[i].Trim();
+
+            // Clear out the list, then build it from these new values
+            Clear();
+            foreach (string s in vs)
+                InsertSortedIfUnique(s);
+        }
+        #endregion
+
         // Find a match somewhere within a string --------------------------------------------
         #region Method: int FindSubstringMatch(sLongString)
         public int FindSubstringMatch(string sLongString)

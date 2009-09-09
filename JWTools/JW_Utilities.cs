@@ -175,6 +175,26 @@ namespace JWTools
 			return new Icon(stream);
 		}
 		#endregion
+        #region SMethod: Bitmap ChangeBitmapBackground(Bitmap, clrBackground)
+        static public Bitmap ChangeBitmapBackground(Bitmap bmp, Color clrBackground)
+        {
+            Debug.Assert(null != bmp);
+
+            // Set its transparent color to the background color. We assume that the
+            // pixel at 0,0 is a background pixel.
+            Color clrTransparent = bmp.GetPixel(0, 0);
+            for (int h = 0; h < bmp.Height; h++)
+            {
+                for (int w = 0; w < bmp.Width; w++)
+                {
+                    if (bmp.GetPixel(w, h) == clrTransparent)
+                        bmp.SetPixel(w, h, clrBackground);
+                }
+            }
+
+            return bmp;
+        }
+        #endregion
 
         // Round a float up to the nearest int value
         #region Method: int RoundUpToInt(float f)

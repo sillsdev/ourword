@@ -617,6 +617,26 @@ namespace OurWord.Layouts
         }
         #endregion
 
+        #region OMethod: bool ShowNoteIcon(TranslatorNote, bShowingBT)
+        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
+        {
+            // Front Translation: only show the HintForDrafting notes
+            if (note.IsFrontTranslationNote)
+            {
+                if (note.IsHintForDraftingNote)
+                    return true;
+            }
+
+            // Target Translation: only show the General notes
+            if (note.IsTargetTranslationNote)
+            {
+                if (note.IsGeneralNote)
+                    return true;
+            }
+
+            return false;
+        }
+        #endregion
     }
 
 }

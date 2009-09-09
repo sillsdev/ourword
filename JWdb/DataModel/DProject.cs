@@ -344,41 +344,6 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-        #region VAttr{g/s}: string PeopleAsCommaDelimitedString
-        public string PeopleAsCommaDelimitedString
-        {
-            get
-            {
-                // Makes sure our list is sorted
-                // TODO
-
-                // Create the string
-                string sOut = "";
-                foreach (string sPerson in People)
-                    sOut += (sPerson + ", ");
-
-                return sOut;
-            }
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                    return;
-
-                // Parse the string into its parts
-                string[] vNames = value.Split(new char[] { ',' });
-
-                // Remove any spaces
-                for (int i = 0; i < vNames.Length; i++)
-                    vNames[i] = vNames[i].Trim();
-
-                // Clear out the list, then build it from these new values
-                People.Clear();
-                foreach (string sPerson in vNames)
-                    People.InsertSortedIfUnique(sPerson);
-            }
-        }
-        #endregion
-
 
 		// Dictionary ------------------------------------------------------------------------
 		#region WESAY STUFF
@@ -958,10 +923,10 @@ namespace JWdb.DataModel
             if (c > 3)
             {
                 string sClusterName = vItemsInPath[c - 3];
-                Console.WriteLine("Cluster = " + sClusterName);
-                Console.WriteLine("Path    = " + sPath);
-                Console.WriteLine("Name    = " + DisplayName);
-                Console.WriteLine("---------");
+                //Console.WriteLine("Cluster = " + sClusterName);
+                //Console.WriteLine("Path    = " + sPath);
+                //Console.WriteLine("Name    = " + DisplayName);
+                //Console.WriteLine("---------");
 
                 ts.DisplayName = sClusterName;
             }
@@ -1010,9 +975,6 @@ namespace JWdb.DataModel
                 else
                     i++;
             }
-
-            // Re-initialize the Annotations
-            TranslatorNote.InitClassifications();
 
 			// Convert to the Version 2 file system if necessary
 			//ConvertFileSystem();
@@ -1083,8 +1045,6 @@ namespace JWdb.DataModel
             Write(progress);
         }
         #endregion
-
-
 	}
 
 }

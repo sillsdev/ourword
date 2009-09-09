@@ -257,7 +257,7 @@ namespace OurWordTests.DataModel
         TranslatorNote CreateTestTranslatorNote()
         {
             TranslatorNote tn = new TranslatorNote("003:016", "so loved the world");
-            tn.Category = "To Do";
+            tn.Class = TranslatorNote.NoteClass.General;
             tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), "Sandra",
                 "Check exegesis here."));
             tn.Messages.Append(new DMessage("Sandra", new DateTime(2008, 11, 3), DMessage.Closed,
@@ -280,14 +280,14 @@ namespace OurWordTests.DataModel
         {
             // Set up a Translator Note
             TranslatorNote tn1 = new TranslatorNote("003:016", "so loved the world");
-            tn1.Category = "To Do";
+            tn1.Class = TranslatorNote.NoteClass.General;
             tn1.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), "David",
                     "Check exegesis here."));
 
             // Set up a duplicate
             TranslatorNote tn2 = new TranslatorNote("003:016", "so loved the world");
-            tn2.Category = "To Do";
+            tn2.Class = TranslatorNote.NoteClass.General;
             tn2.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), "David",
                     "Check exegesis here."));
@@ -296,9 +296,9 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(tn1.ContentEquals(tn2));
 
             // Category differs
-            tn2.Category = "Old Version";
+            tn2.Class = TranslatorNote.NoteClass.Exegetical;
             Assert.IsFalse(tn1.ContentEquals(tn2));
-            tn2.Category = tn1.Category;
+            tn2.Class = tn1.Class;
 
             // AssignedTo differs
             tn2.Status = "Sandra";
@@ -306,9 +306,9 @@ namespace OurWordTests.DataModel
             tn2.Status = tn1.Status;
 
             // Context differs
-            tn2.Context = "loved the world";
+            tn2.SelectedText = "loved the world";
             Assert.IsFalse(tn1.ContentEquals(tn2));
-            tn2.Context = tn1.Context;
+            tn2.SelectedText = tn1.SelectedText;
 
             // Reference differs
             tn2.Reference = "004:016";
@@ -335,7 +335,7 @@ namespace OurWordTests.DataModel
                 "</TranslatorNote>"
             };
             var vsOxesExpected = new string[] {
-                "<TranslatorNote category=\"To Do\" context=\"mbambuninda\" reference=\"001:005\" showInDaughter=\"false\">",
+                "<TranslatorNote class=\"General\" selectedText=\"mbambuninda\" reference=\"001:005\">",
                     "<Message author=\"Mandowen\" created=\"2009-04-29 02:32:42Z\">ratoe tumaimbe &quot;mbambuninda&quot;=yara gwaravainy=&quot;mbambunin indamu&quot; weramu tumainy ngkov.</Message>",
                     "<Message author=\"Ibu Linda\" created=\"2009-05-07 09:27:24Z\">Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai,  weramu syare wamo raporar taiso: &quot;mbambunin dai&quot;.</Message>",
                     "<Message author=\"Mandowen\" created=\"2009-05-22 04:06:54Z\">wamo ratoe &quot;mbambunin da.&quot; yara vemo ratoe &quot;mbambunin dai&quot; wenora.</Message>",
@@ -371,7 +371,7 @@ namespace OurWordTests.DataModel
             var nodeNote = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
             string sSaved = XmlDoc.OneLiner(nodeNote);
             Assert.AreEqual(
-                "<TranslatorNote category=\"To Do\" context=\"so loved the world\" reference=\"003:016\" showInDaughter=\"false\">" +
+                "<TranslatorNote class=\"General\" selectedText=\"so loved the world\" reference=\"003:016\">" +
                     "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\" status=\"Sandra\">Check exegesis here.</Message>" +
                     "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
                 "</TranslatorNote>",
@@ -429,50 +429,6 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
-        // Categories
-        #region Test: Categories
-        [Test] public void Categories()
-        {
-            TranslatorNote.InitClassifications();
-
-            // Add a category twice
-            TranslatorNote.Categories.AddItem("New Category", false);
-            TranslatorNote.Categories.AddItem("New Category", false);
-
-            // We expect to have the default categories plus our new one
-            Assert.AreEqual(3, TranslatorNote.Categories.Count);
-            Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("Exegesis"));
-            Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("To Do"));
-            Assert.AreNotEqual(null, TranslatorNote.Categories.FindItem("New Category"));
-        }
-        #endregion
-        #region Test: CommaDelimitedString
-        [Test] public void CommaDelimitedString()
-        {
-            // Initialize Categories to "To Do" and "Exegesis". 
-            TranslatorNote.InitClassifications();
-
-            // Add a few more
-            TranslatorNote.Categories.AddItem("Hebrew", true);
-            TranslatorNote.Categories.AddItem("Greek", true);
-
-            // Check the produced string
-            Assert.AreEqual("Exegesis, Greek, Hebrew, To Do, ",
-                TranslatorNote.Categories.CommaDelimitedString,
-                "Get CommaDelimitedString");
-
-            // Create a different string
-            string sCategories = "Emily, David, Robert, Christiane, Sandra, John, ";
-            TranslatorNote.Categories.CommaDelimitedString = sCategories;
-
-            // If it loaded correctly, we will have a rearranged string; plus "To Do"
-            // added back in as the DefaultValue
-            Assert.AreEqual("Christiane, David, Emily, John, Robert, Sandra, To Do, ",
-                TranslatorNote.Categories.CommaDelimitedString,
-                "Set CommaDelimitedString");
-        }
-        #endregion
-
         // Conversion from 1.0-styled notes
         #region Test: OldStyleNotesConversion_General
         [Test] public void OldStyleNotesConversion_General()
@@ -485,7 +441,8 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("002:015", tn.Reference);
             Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
             Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
-            Assert.AreEqual("General", tn.Category);
+            Assert.AreEqual(TranslatorNote.NoteClass.General, tn.Class);
+            Assert.AreEqual("nt", tn.SfmMarker);
         }
         #endregion
         #region Test: OldStyleNotesConversion_ToDo
@@ -499,7 +456,8 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("002:015", tn.Reference);
             Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
             Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
-            Assert.AreEqual("To Do", tn.Category);
+            Assert.AreEqual(TranslatorNote.NoteClass.General, tn.Class);
+            Assert.AreEqual("ntck", tn.SfmMarker);
         }
         #endregion
 
@@ -544,6 +502,7 @@ namespace OurWordTests.DataModel
                 TranslatorNote.GetWordsRight(s, 42, 4), "3");
         }
         #endregion
+        /*
         #region Test: ComputeHeader
         [Test] public void ComputeHeader()
         {
@@ -561,11 +520,12 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("3:16:" + chSpace + "loved", text.AsString);
 
             // Case 3 - No Context
-            tn.Context = "";
+            tn.SelectedText = "";
             text = tn.GetCollapsableHeaderText("");
             Assert.AreEqual("3:16:" + chSpace, text.AsString);
         }
         #endregion
+        */
         #region Test: RemoveInitialRefFromText
         [Test] public void RemoveInitialRefFromText()
         {
@@ -592,18 +552,18 @@ namespace OurWordTests.DataModel
             // - Both Mine and Theirs changed the AssignedTo, but since Mine was the
             //    most recent Message, the result should use Mine's AssignedTo.
         {
-            string sParent = "<TranslatorNote Category=\"To Do\" " +
+            string sParent = "<TranslatorNote class=\"General\" " +
                 "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
                   "<Message Author=\"John\" Created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
                   "<Message Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
                 "</TranslatorNote>";
-            string sMine = "<TranslatorNote Category=\"To Do\" " +
+            string sMine = "<TranslatorNote class=\"General\" " +
                 "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
                   "<Message Author=\"John\" Created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
                   "<Message Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
                   "<Message Author=\"John\" Created=\"2008-11-15 00:00:00Z\">I'm not convinced.</Message>" +
                 "</TranslatorNote>";
-            string sTheirs = "<TranslatorNote Category=\"To Do\" " +
+            string sTheirs = "<TranslatorNote class=\"General\" " +
                 "Context=\"so loved the world\" Reference=\"003:016\" ShowInDaughter=\"false\">" +
                   "<Message Author=\"John\" Created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
                   "<Message Author=\"Sandra\" Created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
@@ -620,8 +580,7 @@ namespace OurWordTests.DataModel
             var oxes = new XmlDoc();
             var nodeOut = Mine.Save(oxes, oxes);
             var sOut = XmlDoc.OneLiner(nodeOut);
-            string sExpected = "<TranslatorNote category=\"To Do\" " +
-                "context=\"so loved the world\" reference=\"003:016\" showInDaughter=\"false\">" +
+            string sExpected = "<TranslatorNote class=\"General\" selectedText=\"so loved the world\" reference=\"003:016\">" +
                   "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
                   "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
                   "<Message author=\"Sandra\" created=\"2008-11-14 00:00:00Z\">Really, it is!</Message>" +
