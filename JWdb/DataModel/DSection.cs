@@ -496,48 +496,15 @@ namespace JWdb.DataModel
 		}
 		int m_nLineNoInFile;
 		#endregion
-        #region VAttr{g}: List<TranslatorNote> GetAllTranslatorNotes
+        #region Method: List<TranslatorNote> GetAllTranslatorNotes()
         public List<TranslatorNote> GetAllTranslatorNotes()
         {
             var v = new List<TranslatorNote>();
 
             foreach (DParagraph p in Paragraphs)
-            {
-                v.AddRange(p.AllNotes);
-
-                var vFoots = p.AllFootnotes;
-                foreach (DFootnote f in vFoots)
-                    v.AddRange(f.AllNotes);
-            }
+                v.AddRange(p.GetAllTranslatorNotes());
 
             return v;
-        }
-        #endregion
-        #region VAttr{g}: List<TranslatorNote> GetAllShownTranslatorNotes
-        public List<TranslatorNote> GetAllShownTranslatorNotes()
-        {
-            var vAll = GetAllTranslatorNotes();
-
-            var vShown = new List<TranslatorNote>();
-            foreach (TranslatorNote tn in vAll)
-            {
-                if (tn.IsShown())
-                    vShown.Add(tn);
-            }
-
-            return vShown;
-        }
-        #endregion
-        #region VAttr{g}: List<TranslatorNote> AllNotes
-        public List<TranslatorNote> AllNotes
-        {
-            get
-            {
-                var v = new List<TranslatorNote>();
-                foreach (DParagraph p in Paragraphs)
-                    v.AddRange(p.AllNotes);
-                return v;
-            }
         }
         #endregion
         #region VAttr{g}: List<DFootnote> AllFootnotes
@@ -626,9 +593,6 @@ namespace JWdb.DataModel
 			vTarget = _GetCrossRefFootnotes(this,   DFootnote.Types.kExplanatory);
 			vFront  = _GetCrossRefFootnotes(SFront, DFootnote.Types.kExplanatory);
 			_UpdateExplanatoryLabels(vFront, vTarget);
-
-            // Remove notes that we once used to copy in in older versions (1.x)
-            RemoveDuplicateNotes(SFront);
         }
 		#region Helper Method: ArrayList _GetCrossRefParagraphs(DSection)
 		ArrayList _GetCrossRefParagraphs(DSection section)
@@ -693,59 +657,9 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
+        #endregion
 
-        void RemoveDuplicateNotes(DSection SFront)
-            // Remove identical exegetical notes from the target; we no longer want
-            // to actually put them in there
-        {
-            // Get the front notes that have the ShowInDaughter set
-            var vAllFrontNotes = SFront.AllNotes;
-            var vFrontNotes = new List<TranslatorNote>();
-            foreach (TranslatorNote tn in vAllFrontNotes)
-            {
-                if (tn.ShowInDaughterTranslations)
-                    vFrontNotes.Add(tn);
-            }
-
-            // Likewise the Target notes, as these are the way the Exegetical notes were
-            // handled in reading in.
-            var vAllTargetNotes = AllNotes;
-            var vTargetNotes = new List<TranslatorNote>();
-            foreach (TranslatorNote tn in vAllTargetNotes)
-            {
-                if (tn.ShowInDaughterTranslations)
-                    vTargetNotes.Add(tn);
-            }
-
-            // Look through and delete duplicates
-            foreach (TranslatorNote tn in vTargetNotes)
-            {
-                // If discussions have been added, then we don't want to delete it.
-                if (tn.Discussions.Count > 1)
-                    continue;
-                if (tn.Discussions[0].Paragraphs.Count > 1)
-                    continue;
-
-                // Loop through the front notes, looking for duplicates
-                foreach (TranslatorNote fn in vFrontNotes)
-                {
-                    if (tn.Reference != fn.Reference)
-                        continue;
-                    if (tn.Context != fn.Context)
-                        continue;
-                    if (tn.LastParagraph.SimpleText != fn.LastParagraph.SimpleText)
-                        continue;
-
-                    // Remove the note, then loop to the next one
-                    tn.Text.TranslatorNotes.Remove(tn);
-                    break;
-                }
-            }
-        }
-
-		#endregion
-
-		// Filters ---------------------------------------------------------------------------
+        // Filters ---------------------------------------------------------------------------
 		#region Attr{g/s}: bool MatchesFilter - T if DSection has passed current Filter test
 		public bool MatchesFilter
 		{
@@ -2153,57 +2067,6 @@ namespace JWdb.DataModel
 			#endregion
 
             // Translator Notes --------------------------------------------------------------
-            #region Method: bool CombineOldStyleNotes(TranslatorNote NoteToAdd)
-            bool CombineOldStyleNotes(TranslatorNote NoteToAdd)
-                // Typical use of \ov, as observed in Manado and Selaru, is to create an
-                // Old Version "ov" note every time a change in made in a verse. So there are
-                // often strings of ov notes 5 or more deep when a book as undergone numerous
-                // revisions. These clutter when imported into OW, as they result in numerous
-                // notes. But talking with the MTTs in Manado, they sure don't want this 
-                // history to dissappear. 
-                //    So to reduce clutter, yet keep the info, I've decided to just 
-                // combine them into a single Note. Each as a separate discussion. In
-                // keeping with their practice, the most recent one is the one on the top
-                // in the input file. I am placing it as the final one in the Note,
-                // as a "Respond" to that note will append one to the end in normal
-                // OW operation.
-            {
-                // Retrieve the place where this will go
-                // If there's noto LastParagraph, just return. Later in the calling method
-                // this will throw an exception, so that the user can deal with the bad data.
-                if (null == LastParagraph)
-                    return false;
-                DText text = LastParagraph.GetOrAddLastDText();
-                if (null == text)
-                    return false;
-
-                // Make sure this is a qualifying note.
-                // Currently, we're only doing OldVersion notes
-                if (NoteToAdd.Category != TranslatorNote.CategoryOldVersion)
-                    return false;
-
-                // If the NoteToAppend has multiple discusions, then it was created in some
-                // other way, and we don't append it
-                if (NoteToAdd.Discussions.Count != 1)
-                    return false;
-
-                // Scan the text and locate an OldVersion note, if any
-                TranslatorNote note = null;
-                foreach (TranslatorNote tn in text.TranslatorNotes)
-                {
-                    if (tn.Category == TranslatorNote.CategoryOldVersion)
-                        note = tn;
-                }
-                if (null == note)
-                    return false;
-
-                // Move the discussion over
-                Discussion disc = NoteToAdd.Discussions[0];
-                NoteToAdd.Discussions.Remove(disc);
-                note.Discussions.InsertAt(0, disc);
-                return true;
-            }
-            #endregion
             #region Method: bool TranslatorNote_in(SfField)
             bool TranslatorNote_in(SfField field)
             {
@@ -2212,21 +2075,15 @@ namespace JWdb.DataModel
                 // Is this field a TranslatorNote?
                 if (DSFMapping.c_sMkrTranslatorNote == field.Mkr)
                 {
-                    XElement[] x = XElement.CreateFrom(field.Data);
-                    if (x.Length == 1)
-                    {
-                        tn = new TranslatorNote();
-                        tn.FromXml(x[0]);
-                    }
+                    var oxes = new XmlDoc(field.Data);
+                    var node = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
+                    tn = TranslatorNote.Create(node);
                 }
 
                 // Otherwise, is it an old-style (pre version 1.1) note?
                 else
                 {
-                    tn = TranslatorNote.ImportFromOldStyle(
-                        s_nChapter, s_nVerse, field);
-                    if (null != tn && CombineOldStyleNotes(tn))
-                        return true;
+                    tn = TranslatorNote.ImportFromOldStyle(s_nChapter, s_nVerse, field);
                 }
 
                 // If we don't have a note, then we're done processing
@@ -2520,7 +2377,7 @@ namespace JWdb.DataModel
 					// Checking Status, DateStamp
 					if ( DateStamp_in(field))
 						continue;
-                    if (History_In(field))
+                    if ( History_In(field))
                         continue;
 
 					// Pictures
@@ -2538,7 +2395,7 @@ namespace JWdb.DataModel
 						continue;
 
 					// Notes, Footnotes, See Also's
-                    if (TranslatorNote_in(field))
+                    if ( TranslatorNote_in(field))
                         continue;
 					if ( Footnote_in(field))
 						continue;
@@ -2579,7 +2436,7 @@ namespace JWdb.DataModel
 					p.Cleanup();
 
                 /////// SEARCHING for a bug, can delete once found
-                foreach (TranslatorNote tn in Section.AllNotes)
+                foreach (TranslatorNote tn in Section.GetAllTranslatorNotes())
                     tn.Debug_VerifyIntegrity();
                 /////// END BUG
 
@@ -2723,7 +2580,6 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
-
 
         // Oxes ------------------------------------------------------------------------------
         public void SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
@@ -3135,15 +2991,15 @@ namespace JWdb.DataModel
                     // Create our note
                     TranslatorNote note = new TranslatorNote();
                     note.Reference = Mine.GetReferenceAt(text).ParseableName;
-                    note.Context = TranslatorNote.MergeAuthor;
-                    note.Category = TranslatorNote.ToDo;
+                    note.SelectedText = TranslatorNote.MergeAuthor;
+                    note.Class = TranslatorNote.NoteClass.General;
                     string sMessage = Loc.GetString("kStructureConflictInMerge",
                         "This section's paragraphing was changed by more than one user. " +
                         "We kept one; you'll need to look at Mercurial's history to see " +
                         "what the other user did; we were not able to keep their changes.");
-                    Discussion disc = new Discussion(TranslatorNote.MergeAuthor,
-                        DateTime.Now, sMessage);
-                    note.Discussions.Append(disc);
+                    var message = new DMessage(TranslatorNote.MergeAuthor,
+                        DateTime.Now, DMessage.Anyone, sMessage);
+                    note.Messages.Append(message);
                     text.TranslatorNotes.Append(note);
                 }
             }
@@ -3470,13 +3326,14 @@ namespace JWdb.DataModel
                     if (null == reference)
                         continue;
                     note.Reference = reference.ParseableName;
-                    note.Context = itemx.Context;
-                    note.Category = TranslatorNote.ToDo;
-                    Discussion disc = new Discussion(
+                    note.SelectedText = itemx.Context;
+                    note.Class = TranslatorNote.NoteClass.General;
+                    var message = new DMessage(
                         TranslatorNote.MergeAuthor,
                         DateTime.Now,
+                        DMessage.Anyone,
                         itemx.NoteText);
-                    note.Discussions.Append(disc);
+                    note.Messages.Append(message);
 
                     // We are just doing a generic note for now, rather than showing
                     // diffs, so we only do this once for a given MyRun.

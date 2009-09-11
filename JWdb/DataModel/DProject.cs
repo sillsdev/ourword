@@ -167,7 +167,7 @@ namespace JWdb.DataModel
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
             DefineAttr("vdShowHistory",  ref m_bVD_ShowHistoryPane);
 
-            DefineAttr("People", ref m_bsaPeople);
+            DefineAttr("Persons", ref m_bsaPeople);
 			DefineAttr("Version", ref m_nVersion);
 
 #if FEAT_WESAY
@@ -923,10 +923,10 @@ namespace JWdb.DataModel
             if (c > 3)
             {
                 string sClusterName = vItemsInPath[c - 3];
-                Console.WriteLine("Cluster = " + sClusterName);
-                Console.WriteLine("Path    = " + sPath);
-                Console.WriteLine("Name    = " + DisplayName);
-                Console.WriteLine("---------");
+                //Console.WriteLine("Cluster = " + sClusterName);
+                //Console.WriteLine("Path    = " + sPath);
+                //Console.WriteLine("Name    = " + DisplayName);
+                //Console.WriteLine("---------");
 
                 ts.DisplayName = sClusterName;
             }
@@ -975,9 +975,6 @@ namespace JWdb.DataModel
                 else
                     i++;
             }
-
-            // Re-initialize the Translator Notes
-            TranslatorNote.InitClassifications();
 
 			// Convert to the Version 2 file system if necessary
 			//ConvertFileSystem();
@@ -1048,8 +1045,6 @@ namespace JWdb.DataModel
             Write(progress);
         }
         #endregion
-
-
 	}
 
 }

@@ -363,7 +363,7 @@ namespace OurWord.SideWnd
             // Place the description into its main area
             OWPara pDescription = new OWPara(
                 DB.TargetTranslation.WritingSystemConsultant,
-                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleNoteDiscussion),
+                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleAnnotationMessage),
                 e.Description,
                 Color.White,
                 OWPara.Flags.IsEditable);

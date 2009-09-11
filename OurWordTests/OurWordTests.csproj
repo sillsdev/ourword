@@ -70,6 +70,7 @@
     <Compile Include="Edit\T_OWWindow.cs">
     </Compile>
     <Compile Include="JWdb\T_AutoReplace.cs" />
+    <Compile Include="JWdb\T_JAttr.cs" />
     <Compile Include="JWdb\T_JObject.cs" />
     <Compile Include="JWdb\T_JObjectOnDemand.cs" />
     <Compile Include="JWdb\T_JOwn.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="JWTools\T_Xml.cs" />
     <Compile Include="JWTools\T_XmlDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestCommon.cs" />
     <Compile Include="Utilities\T_Repository.cs" />
   </ItemGroup>
   <ItemGroup>

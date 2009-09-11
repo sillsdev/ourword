@@ -266,6 +266,9 @@
       <SubType>Designer</SubType>
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Edit\OWToolTip.resx">
+      <DependentUpon>OWToolTip.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SideWnd\DictionaryPane.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DictionaryPane.cs</DependentUpon>
@@ -292,6 +295,7 @@
     <EmbeddedResource Include="Res\Expand.ico" />
     <EmbeddedResource Include="Res\Check.ico" />
     <EmbeddedResource Include="Res\Failure.ico" />
+    <EmbeddedResource Include="Res\Delete.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
       <SubType>Designer</SubType>
@@ -325,7 +329,19 @@
     <None Include="Res\MergePrevDiff.bmp" />
     <None Include="Res\MergNextDiff.bmp" />
     <None Include="Res\MoveDown.GIF" />
+    <EmbeddedResource Include="Res\NoteConsultant_Anyone.ico" />
+    <EmbeddedResource Include="Res\NoteConsultant_Closed.ico" />
+    <EmbeddedResource Include="Res\NoteConsultant_Me.ico" />
     <Content Include="Res\NoteEdit.ico" />
+    <EmbeddedResource Include="Res\NoteExegesis_Anyone.ico" />
+    <EmbeddedResource Include="Res\NoteExegesis_Closed.ico" />
+    <EmbeddedResource Include="Res\NoteExegesis_Me.ico" />
+    <EmbeddedResource Include="Res\NoteGeneric_Anyone.ico" />
+    <EmbeddedResource Include="Res\NoteGeneric_Closed.ico" />
+    <EmbeddedResource Include="Res\NoteGeneric_Me.ico" />
+    <EmbeddedResource Include="Res\NoteHint_Anyone.ico" />
+    <EmbeddedResource Include="Res\NoteHint_Closed.ico" />
+    <EmbeddedResource Include="Res\NoteHint_Me.ico" />
     <Content Include="Res\NoteInsert.ico" />
     <Content Include="Res\NoteMerge.ico" />
     <None Include="Res\OurWord.png" />
@@ -606,6 +622,14 @@
     </Compile>
     <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.Designer.cs">
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Edit\EIcon.cs" />
+    <Compile Include="Edit\ENote.cs" />
+    <Compile Include="Edit\OWToolTip.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Edit\OWToolTip.Designer.cs">
+      <DependentUpon>OWToolTip.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\Layout.cs">
       <SubType>Component</SubType>

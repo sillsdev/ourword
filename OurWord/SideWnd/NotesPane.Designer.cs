@@ -32,7 +32,6 @@ namespace OurWord.SideWnd
             this.m_toolstripNotes = new System.Windows.Forms.ToolStrip();
             this.m_btnInsert = new System.Windows.Forms.ToolStripButton();
             this.m_btnDeleteNote = new System.Windows.Forms.ToolStripButton();
-            this.m_Show = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_toolstripNotes.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -41,8 +40,7 @@ namespace OurWord.SideWnd
             this.m_toolstripNotes.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.m_toolstripNotes.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_btnInsert,
-            this.m_btnDeleteNote,
-            this.m_Show});
+            this.m_btnDeleteNote});
             this.m_toolstripNotes.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Flow;
             this.m_toolstripNotes.Location = new System.Drawing.Point(0, 0);
             this.m_toolstripNotes.Name = "m_toolstripNotes";
@@ -73,21 +71,11 @@ namespace OurWord.SideWnd
             this.m_btnDeleteNote.ToolTipText = "Delete this Discussion (or Note if there is only one Discussion item)...";
             this.m_btnDeleteNote.Click += new System.EventHandler(this.cmdDeleteNote);
             // 
-            // m_Show
-            // 
-            this.m_Show.Image = ((System.Drawing.Image)(resources.GetObject("m_Show.Image")));
-            this.m_Show.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_Show.Name = "m_Show";
-            this.m_Show.Size = new System.Drawing.Size(49, 35);
-            this.m_Show.Text = "Show";
-            this.m_Show.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            this.m_Show.ToolTipText = "Choose which notes to display, based on categories and/or other criteria.";
-            // 
             // NotesPane
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.dateTimePicker1);
+//            this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.m_toolstripNotes);
             this.Name = "NotesPane";
             this.Size = new System.Drawing.Size(242, 470);
@@ -104,7 +92,6 @@ namespace OurWord.SideWnd
         private System.Windows.Forms.ToolStrip m_toolstripNotes;
         private System.Windows.Forms.ToolStripButton m_btnDeleteNote;
         private System.Windows.Forms.ToolStripButton m_btnInsert;
-        private System.Windows.Forms.ToolStripDropDownButton m_Show;
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
     }
 }

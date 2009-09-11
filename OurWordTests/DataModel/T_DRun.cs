@@ -610,7 +610,7 @@ namespace OurWordTests.DataModel
             Assert.AreEqual(1, Ours.TranslatorNotes.Count);
             TranslatorNote note = Ours.TranslatorNotes[0];
             Assert.AreEqual("003:008", note.Reference);
-            Assert.AreEqual("not", note.Context);
+            Assert.AreEqual("not", note.SelectedText);
         }
         #endregion
         #region Test: GetNoteContext

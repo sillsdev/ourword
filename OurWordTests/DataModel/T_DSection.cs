@@ -1,3 +1,4 @@
+#region ***** T_DSection.cs *****
 /**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_DSection.cs
@@ -24,6 +25,7 @@ using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+#endregion
 #endregion
 
 namespace OurWordTests.DataModel
@@ -1973,7 +1975,7 @@ namespace OurWordTests.DataModel
 
             while (true)
             {
-                int i = s.IndexOf("Created=");
+                int i = s.IndexOf("created=");
                 if (-1 == i)
                     return s;
 
@@ -2126,7 +2128,7 @@ namespace OurWordTests.DataModel
     #endregion
 
     #region CLASS: T_DSection
-    [TestFixture] public class T_DSection
+    [TestFixture] public class T_DSection : TestCommon
     {
         // Helper Methods --------------------------------------------------------------------
         #region Setup
@@ -2173,7 +2175,7 @@ namespace OurWordTests.DataModel
             bool bConsoleOut = false;
             if (bConsoleOut)
             {
-                SectionTestData.ConsoleOut_ShowDiffs("Test_DSectionIO",
+                SectionTestData.ConsoleOut_ShowDiffs("Test_DSectionIO " + sTitle,
                     vsActual, vsExpected);
             }
 
@@ -2963,50 +2965,36 @@ namespace OurWordTests.DataModel
             // But there will be Notes in Expected to show all of the textual changes
             // made by Theirs
             vsExpected = SectionTestData.Insert(vsExpected, 5, 
-                "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"*Mark\" " +
-                "Reference=\"004:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                "<Discussion Author=\"From Merge\" Created=\"2009-05-14 17:02:20Z\"><ownseq " +
-                "Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"The other " +
-                "version had &quot;The Gospel Of&quot;.\"/></ownseq>" +
-                "</Discussion></ownseq></TranslatorNote>");
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"*Mark\" reference=\"004:001\">" +
+                "<Message author=\"From Merge\" created=\"2009-05-14 17:02:20Z\" status=\"Anyone\">The other version had \"The Gospel Of\".</Message>" +
+                "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 11,
-                "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"an Petr*rus nol\" " +
-                "Reference=\"004:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                "<Discussion Author=\"From Merge\" Created=\"2009-05-14 19:24:14Z\"><ownseq " +
-                "Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"The other version " +
-                "had &quot;Tulu-tulu agama las haman Peter nol Yohanis maas tala&quot;.\"/>" +
-                "</ownseq></Discussion></ownseq></TranslatorNote>");
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"an Petr*rus nol\" reference=\"004:001\">" +
+                "<Message author=\"From Merge\" created=\"2009-05-14 19:24:14Z\" status=\"Anyone\">The other version " +
+                    "had \"Tulu-tulu agama las haman Peter nol Yohanis maas tala\".</Message>" +
+                "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 16,
-                "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"a, Petr*rus nol\" " +
-                "Reference=\"004:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                "<Discussion Author=\"From Merge\" Created=\"2009-05-14 19:26:56Z\"><ownseq " +
-                "Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"The other version " +
-                "had &quot;Dedeng na, Peter nol Yohanis nahdeh nabael nol atuli las sam, atuil tene " +
-                "kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in Kohe " +
-                "kanas Tene ka, nol atuil deng partaiagama Saduki. Oen maas komali le ahan Peter " +
-                "nol Yohanis.&quot;.\"/></ownseq></Discussion></ownseq></TranslatorNote>");
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"a, Petr*rus nol\" reference=\"004:001\">" +
+                "<Message author=\"From Merge\" created=\"2009-05-14 19:26:56Z\" status=\"Anyone\">The other version had \"Dedeng na, Peter nol Yohanis nahdeh " +
+                    "nabael nol atuli las sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in Kohe " +
+                    "kanas Tene ka, nol atuil deng partaiagama Saduki. Oen maas komali le ahan Peter nol Yohanis.\".</Message>" +
+                "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 20,
-                "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"*Oen maa\" " +
-                "Reference=\"004:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                "<Discussion Author=\"From Merge\" Created=\"2009-05-14 19:30:02Z\"><ownseq " +
-                "Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"The other " +
-                "version had &quot;Dedeng na, Peter nol Yohanis nahdeh nabael nol atuli las " +
-                "sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in " +
-                "doh Um in Kohe kanas Tene ka, nol atuil deng partaiagama Saduki. Oen maas komali " +
-                "le ahan Peter nol Yohanis.&quot;.\"/></ownseq></Discussion></ownseq></TranslatorNote>");
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"*Oen maa\" reference=\"004:001\">" +
+                "<Message author=\"From Merge\" created=\"2009-05-14 19:30:02Z\" status=\"Anyone\">The other version had \"Dedeng na, Peter nol Yohanis " +
+                    "nahdeh nabael nol atuli las sam, atuil tene kas at ila lo maas. Oen nas tulu-tulu Agama Yahudi, nol tulu in doh Um in " +
+                    "Kohe kanas Tene ka, nol atuil deng partaiagama Saduki. Oen maas komali le ahan Peter nol Yohanis.\".</Message>" +
+                "</TranslatorNote>");
 
             vsExpected = SectionTestData.Insert(vsExpected, 24,
-                "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"le Petr*rus nol\" " +
-                "Reference=\"004:002\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                "<Discussion Author=\"From Merge\" Created=\"2009-05-14 19:32:31Z\"><ownseq " +
-                "Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"The other version " +
-                "had &quot;Oen komali lole Peter nol Yohanis na mo, kom isi le tek atuli-atuli las " +
-                "to-toang, noan, &lt;&lt;Yesus nuli pait son, deng Un in mate ka! Tiata ela Un sai " +
-                "lalan bel atuil in mateng ngas, le oen kon haup in nuli pait kon.&gt;&gt;&quot;.\"/>" +
-                "</ownseq></Discussion></ownseq></TranslatorNote>");
+                "\\tn <TranslatorNote class=\"General\" selectedText=\"le Petr*rus nol\" reference=\"004:002\">" +
+                "<Message author=\"From Merge\" created=\"2009-05-14 19:32:31Z\" status=\"Anyone\">The other version had \"Oen komali lole Peter nol " +
+                    "Yohanis na mo, kom isi le tek atuli-atuli las to-toang, noan, &lt;&lt;Yesus nuli pait son, deng Un in mate ka! Tiata " +
+                    "ela Un sai lalan bel atuil in mateng ngas, le oen kon haup in nuli pait kon.&gt;&gt;\".</Message>" + 
+                "</TranslatorNote>");
 
             // Read in the sections
             DSection Parent = CreateSection(vsParent);
@@ -3136,29 +3124,11 @@ namespace OurWordTests.DataModel
         #endregion
 
         // Oxes ------------------------------------------------------------------------------
-        #region Method: void OxesCompare(xmlExpected, xmlActual, sMessage)
-        void OxesCompare(XmlDoc xmlExpected, XmlDoc xmlActual, string sMessage)
-        {
-            bool bIsSame = xmlExpected.IsSame(xmlActual);
-            if (!bIsSame)
-            {
-                xmlActual.WriteToConsole("Actual");
-                xmlExpected.WriteToConsole("Expected");
-                XmlDoc.DisplayDifferences(xmlActual, xmlExpected);
-            }
-            Assert.IsTrue(bIsSame, sMessage);
-        }
-        #endregion
         #region Method: void OxesTestEngine(...)
         void OxesTestEngine(string sTest, string[] vsToolbox, string[] vsOxesExpected)
         {
             // Preliminary: Create the superstructure we need for a DBook
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
-            DB.Project.DisplayName = "Project";
-            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
-            DB.Project.TargetTranslation = Translation;
+            var Translation = CreateHierarchyThroughTargetTranslation();
 
             // Load in our Expected Xml from the string array
             var xmlExpected = new XmlDoc(vsOxesExpected);
@@ -3171,7 +3141,7 @@ namespace OurWordTests.DataModel
             var xmlActual = Book.ToOxesDocument;
 
             // Compare with what we expect
-            OxesCompare(xmlExpected, xmlActual, 
+            Assert.IsTrue(XmlDoc.Compare(xmlExpected, xmlActual),
                 "Oxes should be same for Test #" + sTest + " - Part 1");
 
             // PART 2 - ROUND-TRIP OXES
@@ -3182,7 +3152,7 @@ namespace OurWordTests.DataModel
             xmlActual = bookNew.ToOxesDocument;
 
             // Compare
-            OxesCompare(xmlExpected, xmlActual,
+            Assert.IsTrue(XmlDoc.Compare(xmlExpected, xmlActual),
                 "Oxes should be same for Test #" + sTest + " - Part 2");
         }
         #endregion

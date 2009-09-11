@@ -272,7 +272,7 @@ namespace OurWord.Edit
         #region Method: void Push(Action) - Insert a new edit action onto the stack
         public void Push(Action action)
         {
-            // AddParagraph the new action to the Undo stack
+            // Add the new action to the Undo stack
             _PushAction(ref m_vUndoStack, action);
 
             // Clear out the Redo Stack
@@ -329,6 +329,35 @@ namespace OurWord.Edit
                     return RedoStack[RedoStack.Length - 1];
                 return null;
             }
+        }
+        #endregion
+
+        // Bookmark the stack, so we can remove just a portion of the Actions ----------------
+        int m_nBookmarkPosition = -1;
+        #region Method: void BookmarkStack()
+        public void BookmarkStack()
+        {
+            // This causes ReDo stack to clear. Thus when we Bookmark the stack, we
+            // should do so purposefully.
+            _Clear(ref m_vRedoStack);
+
+            m_nBookmarkPosition = UndoStack.Length;
+        }
+        #endregion
+        #region Method: oid RestoreBookmarkedStack()
+        public void RestoreBookmarkedStack()
+        {
+            Debug.Assert(m_nBookmarkPosition != -1);
+            Debug.Assert(m_nBookmarkPosition <= m_vUndoStack.Length);
+
+            _Clear(ref m_vRedoStack);
+
+            while (m_vUndoStack.Length > m_nBookmarkPosition)
+                _PopAction(ref m_vUndoStack);
+
+            m_nBookmarkPosition = -1;
+
+            SetMenuText();
         }
         #endregion
 
@@ -2236,47 +2265,62 @@ namespace OurWord.Edit
     #endregion
 
     // Translator Notes ----------------------------------------------------------------------
-    #region CLASS: AddDiscussionAction
-    public class AddDiscussionAction : BookmarkedAction
+    #region CLASS: AddMessageAction
+    public class AddMessageAction : BookmarkedAction
     {
-        #region Attr[g}: TranslatorNote Note
-        protected TranslatorNote Note
+        #region Attr{g}: ENote ENote
+        ENote ENote
         {
             get
             {
-                Debug.Assert(null != m_Note);
-                return m_Note;
+                Debug.Assert(null != m_ENote);
+                return m_ENote;
             }
         }
-        TranslatorNote m_Note;
+        ENote m_ENote;
         #endregion
-        #region Constructor(OWWindow, Note)
-        public AddDiscussionAction(OWWindow window, TranslatorNote note)
+        #region VAttr{g}: TranslatorNote Note
+        TranslatorNote Note
+        {
+            get
+            {
+                TranslatorNote note = ENote.Note;
+                Debug.Assert(null != note);
+                return note;
+            }
+        }
+        #endregion
+
+        #region Constructor(OWWindow, ENote)
+        public AddMessageAction(OWWindow window, ENote _ENote)
             : base(window, "Add Response to Note")
         {
-            m_Note = note;
+            m_ENote = _ENote;
         }
         #endregion
 
         #region OMethod: bool PerformAction()
         protected override bool PerformAction()
-            // Create and add a new discussion item
+            // Create and add a new Message item
         {
-            // Create a new Discussion object and add it to the note
-            Discussion d = new Discussion();
-            Note.Discussions.Append(d);
+            // Create a new Message object and add it to the note
+            var message = new DMessage();
+            Note.Messages.Append(message);
+            Note.Status = DMessage.Anyone;
             Note.Debug_VerifyIntegrity();
 
             // Reload the Window, and recalculate its display
-            Window.LoadData();
+            var wnd = OWToolTip.ToolTip.ContentWindow;
+            wnd.LoadData();
 
-            // This will re-layout the window with Notes properly expanded/collapsed
-            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+            // Update the underlying window's icon in case the status is now different
+            ENote.CauseBmpReset();
+            Window.Invalidate();
 
             // Select the new discussion
-            EContainer container = Window.Contents.FindContainerOfDataSource(d.LastParagraph);
+            var container = wnd.Contents.FindContainerOfDataSource(message);
             container.Select_LastWord_End();
-            Window.Focus();
+            wnd.Focus();
 
             return true;
         }
@@ -2285,54 +2329,59 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             // Retrieve the last discussion
-            Discussion d = Note.LastDiscussion;
+            var message = Note.LastMessage;
 
             // Remove it from the note
-            Note.Discussions.Remove(d);
+            Note.Messages.Remove(message);
             Note.Debug_VerifyIntegrity();
 
             // Reload the Window, and recalculate its display
-            Window.LoadData();
+            var wnd = OWToolTip.ToolTip.ContentWindow;
+            wnd.LoadData();
+
+            // Update the underlying window's icon
+            ENote.CauseBmpReset();
+            Window.Invalidate();
         }
         #endregion
     }
     #endregion
-    #region CLASS: RemoveDiscussionAction
-    public class RemoveDiscussionAction : BookmarkedAction
+    #region CLASS: RemoveMessageAction
+    public class RemoveMessageAction : BookmarkedAction
     {
-        #region Attr[g}: TranslatorNote Note
+        #region VAttr[g}: TranslatorNote Note
         protected TranslatorNote Note
         {
             get
             {
-                Debug.Assert(null != m_Note);
-                return m_Note;
+                return m_nNote;
             }
         }
-        TranslatorNote m_Note;
+        TranslatorNote m_nNote;
         #endregion
-        #region Attr{g}: Discussion RemovedDiscussion
-        Discussion RemovedDiscussion
+        #region Attr{g}: DMessage RemovedMessage
+        DMessage RemovedMessage
         {
             get
             {
-                Debug.Assert(null != m_RemovedDiscussion);
-                return m_RemovedDiscussion;
+                Debug.Assert(null != m_RemovedMessage);
+                return m_RemovedMessage;
             }
             set
             {
                 Debug.Assert(null != value);
-                m_RemovedDiscussion = value;
+                m_RemovedMessage = value;
             }
         }
-        Discussion m_RemovedDiscussion;
+        DMessage m_RemovedMessage;
         #endregion
 
-        #region Constructor(OWWindow, Note)
-        public RemoveDiscussionAction(OWWindow window, TranslatorNote note)
+        #region Constructor(OWWindow, DMessage)
+        public RemoveMessageAction(OWWindow window, DMessage message)
             : base(window, "Remove Response to Note")
         {
-            m_Note = note;
+            m_RemovedMessage = message;
+            m_nNote = message.Note;
         }
         #endregion
 
@@ -2340,19 +2389,15 @@ namespace OurWord.Edit
         protected override bool PerformAction()
         {
             // Removing the only discussion is the same as deleting the note
-            if (Note.Discussions.Count < 2)
+            if (Note.Messages.Count < 2)
                 return false;
 
-            // Remember it so we can undo it
-            RemovedDiscussion = Note.LastDiscussion;
-
             // Remove it from the note
-            Note.Discussions.Remove(Note.LastDiscussion);
+            Note.Messages.Remove(RemovedMessage);
             Note.Debug_VerifyIntegrity();
 
-            // Reload the Window, and recalculate its display
-            Window.LoadData();
-            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
+            // Recalc the window
+            OWToolTip.ToolTip.ContentWindow.LoadData();
 
             return true;
         }
@@ -2361,11 +2406,11 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             // AddParagraph the removed discussion
-            Note.Discussions.Append(RemovedDiscussion);
+            Note.Messages.Append(RemovedMessage);
             Note.Debug_VerifyIntegrity();
 
-            // Reload the Window, and recalculate its display
-            Window.LoadData();
+            // Recalc the window
+            OWToolTip.ToolTip.ContentWindow.LoadData();
         }
         #endregion
     }
@@ -2395,8 +2440,8 @@ namespace OurWord.Edit
         }
         OWBookmark m_BmMainWnd;
         #endregion
-        #region Attr[g}: TranslatorNote Note - so we know which to delete on an Undo op
-        protected TranslatorNote Note
+        #region Attr[g}: TranslatorNote Note - so we know which to delete on an Undo on
+        public TranslatorNote Note
         {
             get
             {
@@ -2406,11 +2451,22 @@ namespace OurWord.Edit
         }
         TranslatorNote m_Note;
         #endregion
+        #region Attr{g}: TranslatorNote.NoteClass NoteClass
+        TranslatorNote.NoteClass NoteClass
+        {
+            get
+            {
+                return m_eNoteClass;
+            }
+        }
+        TranslatorNote.NoteClass m_eNoteClass = TranslatorNote.NoteClass.General;
+        #endregion
 
         #region Constructor(OWWindow)
-        public InsertNoteAction(OWWindow window)
+        public InsertNoteAction(OWWindow window, TranslatorNote.NoteClass eClass)
             : base(window, "Insert Translator Note")
         {
+            m_eNoteClass = eClass;
         }
         #endregion
 
@@ -2431,7 +2487,9 @@ namespace OurWord.Edit
                 text.Section.GetReferenceAt(text).ParseableName,
                 G.App.MainWindow.Selection.SelectionString
                 );
-            Note.Discussions.Append(new Discussion());
+            Note.Class = NoteClass;
+            Note.Messages.Append(new DMessage());
+            Note.Status = DMessage.Anyone;
             text.TranslatorNotes.Append(Note);
 
             // Recalculate the entire display
@@ -2439,18 +2497,6 @@ namespace OurWord.Edit
 
             // Return the Main Window to where it was
             BmMainWnd.RestoreWindowSelectionAndScrollPosition();
-
-            // Locate the container that has our note, and expand it
-            var collapsable = (Window as NotesWnd).GetCollapsableFromNote(Note);
-            Debug.Assert(null != collapsable);
-            collapsable.IsCollapsed = false;
-
-            // Return the notes window to its previous collapse/expand states
-            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
-
-            // Select the new note and bring the focus to it
-            collapsable.Select_LastWord_End();
-            Window.Focus();
 
             return true;
         }
@@ -2470,6 +2516,7 @@ namespace OurWord.Edit
             BmMainWnd.RestoreWindowSelectionAndScrollPosition();
         }
         #endregion
+        /*
         #region OMethod: void UndoFinishing()
         protected override void UndoFinishing()
         {
@@ -2478,6 +2525,7 @@ namespace OurWord.Edit
             G.App.MainWindow.Focus();
         }
         #endregion
+        */
     }
     #endregion
     #region CLASS: DeleteNoteAction
@@ -2552,24 +2600,21 @@ namespace OurWord.Edit
         protected override bool PerformAction()
         {
             // Get the owning DText
-            DText text = Note.Text;
-            Debug.Assert(null != text);
+            DText OwningText = Note.Text;
+            Debug.Assert(null != OwningText);
 
             // Save the path to it, so we can recover it on an undo. (We can't just
             // store the DText, because subsequent actions could have destroyed it.)
             m_Root = Note.RootOwner;
-            m_sPathToDBTFromRoot = text.GetPathFromRoot();
-            NotePos = text.TranslatorNotes.FindObj(Note);
+            m_sPathToDBTFromRoot = OwningText.GetPathFromRoot();
+            NotePos = OwningText.TranslatorNotes.FindObj(Note);
             Debug.Assert(-1 != NotePos);
 
             // Remove the note from its owning DText
-            text.TranslatorNotes.Remove(Note);
+            OwningText.TranslatorNotes.Remove(Note);
 
             // Regenerate all of the windows
             G.App.ResetWindowContents();
-
-            // Return the notes window to its previous collapse/expand states
-            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
 
             return true;
         }
@@ -2586,134 +2631,140 @@ namespace OurWord.Edit
 
             // Recalculate the entire display
             G.App.ResetWindowContents();
-
-            // Return the notes window to its previous collapse/expand states
-            (BmBefore as NotesWnd.NotesBookmark).RestoreCollapseStates();
         }
         #endregion
     }
     #endregion
-	#region CLASS: ChangeClassification
-	class ChangeClassification : BookmarkedAction
+	#region CLASS: ChangeStatus
+	class ChangeStatus : BookmarkedAction
     {
-        #region Attr{g}: TranslatorNote Note
+        // Attrs -----------------------------------------------------------------------------
+        #region Attr{g}: ENote ENote
+        ENote ENote
+        {
+            get
+            {
+                Debug.Assert(null != m_ENote);
+                return m_ENote;
+            }
+        }
+        ENote m_ENote;
+        #endregion
+        #region VAttr{g}: TranslatorNote Note
         TranslatorNote Note
         {
             get
             {
-                Debug.Assert(null != m_Note);
-                return m_Note;
+                TranslatorNote note = ENote.Note;
+                Debug.Assert(null != note);
+                return note;
             }
         }
-        TranslatorNote m_Note;
         #endregion
-
-        #region Attr{g}: string NewClassification
-        string NewClassification
+        #region Attr{g}: ToolStripDropDownButton DropDownButton
+        public ToolStripDropDownButton DropDownButton
         {
             get
             {
-                return m_sNewClassification;
+                return m_DropDownButton;
             }
         }
-        string m_sNewClassification;
+        ToolStripDropDownButton m_DropDownButton;
         #endregion
-        #region Attr{g}: string OriginalClassification
-        string OriginalClassification
+        #region Attr{g}: string NewStatus
+        string NewStatus
         {
             get
             {
-                return m_sOriginalClassification;
+                return m_sNewStatus;
             }
         }
-        string m_sOriginalClassification;
+        string m_sNewStatus;
         #endregion
-
-        #region Attr{g}: string WhichOne
-        string WhichOne
+        #region Attr{g}: string OriginalStatus
+        string OriginalStatus
         {
             get
             {
-                return m_sWhichOne;
+                return m_sOriginalStatus;
             }
         }
-        string m_sWhichOne;
+        string m_sOriginalStatus;
         #endregion
 
-        #region Constructor(OWWindow, Note, ToolStripMenuItem newPerson)
-        public ChangeClassification(OWWindow window, 
-            TranslatorNote note,
-            ToolStripMenuItem itemNewClassification,
-            string sActionName)
-            : base(window, sActionName)
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(OWWindow, ENote, ToolStripMenuItem newPerson)
+        public ChangeStatus(OWWindow window, 
+            ENote _ENote,
+            ToolStripMenuItem itemNewStatus)
+            : base(window, "Assign to")
         {
-            m_Note = note;
+            m_ENote = _ENote;
+
+            // Save a pointer to the owning DropDown button which owns this item
+            m_DropDownButton = itemNewStatus.OwnerItem as ToolStripDropDownButton;
+            Debug.Assert(null != m_DropDownButton);
 
             // Save what the new classification text will be
-            m_sNewClassification = itemNewClassification.Text;
+            m_sNewStatus = itemNewStatus.Text;
 
-            // Remember what the current (original) classification is
-            var parent = itemNewClassification.OwnerItem as ToolStripDropDownButton;
-            Debug.Assert(null != parent);
-            m_sOriginalClassification = parent.Text;
-
-            // Is it AssignTo or Category?
-            m_sWhichOne = parent.Name;
+            // Remember what the current (original) status is
+            m_sOriginalStatus = DropDownButton.Text;
         }
         #endregion
+		#region OAttr{g}: string Contents - Places the name we assigned to, into the Undo menu
+		public override string Contents
+		{
+			get
+			{
+				return NewStatus;
+			}
+		}
+		#endregion
 
+        // Action ----------------------------------------------------------------------------
+        #region Method: void SetStatus(string sStatus)
+        void SetStatus(string sStatus)
+        {
+            // Save the new status
+            Note.Status = sStatus;
+
+            // Update the dropdown button text
+            DropDownButton.Text = sStatus;
+
+            // Check the correct item within
+            foreach (ToolStripItem item in DropDownButton.DropDownItems)
+            {
+                var menuItem = item as ToolStripMenuItem;
+                if (null != menuItem)
+                    menuItem.Checked = (menuItem.Text == sStatus);
+            }
+
+            // Handle the item's tooltip
+            ENote.SetStatusToolTip(DropDownButton);
+
+            // Reload the Window, and recalculate its display, in order to update the icon
+            var wnd = OWToolTip.ToolTip.ContentWindow;
+            wnd.LoadData();
+
+            // Update the underlying window's icon
+            ENote.CauseBmpReset();
+            Window.Invalidate();
+        }
+        #endregion
         #region OMethod: bool PerformAction()
         protected override bool PerformAction()
         {
-            // Set the appropriate Note attribute
-            if (WhichOne == NotesWnd.c_sAssignedTo)
-                Note.AssignedTo = NewClassification;
-            else
-                Note.Category = NewClassification;
-
-            // Update the dropdown button text and check the correct item within
-            var DropDownButton = (Window as NotesWnd).GetDropDownButton(Note, WhichOne);
-            if (null == DropDownButton)
-                return false;
-
-            DropDownButton.Text = NewClassification;
-
-            foreach (ToolStripMenuItem item in DropDownButton.DropDownItems)
-                item.Checked = (item.Text == NewClassification);
-
+            SetStatus(NewStatus);
             return true;
         }
         #endregion
         #region Omethod: void ReverseAction()
         protected override void ReverseAction()
         {
-            // Set the appropriate Note attribute
-            if (WhichOne == NotesWnd.c_sAssignedTo)
-                Note.AssignedTo = OriginalClassification;
-            else
-                Note.Category = OriginalClassification;
-
-            // Update the dropdown button text and check the correct item within
-            var DropDownButton = (Window as NotesWnd).GetDropDownButton(Note, WhichOne);
-            if (null == DropDownButton)
-                return;
-
-            DropDownButton.Text = OriginalClassification;
-
-            foreach (ToolStripMenuItem item in DropDownButton.DropDownItems)
-                item.Checked = (item.Text == OriginalClassification);
+            SetStatus(OriginalStatus);
         }
         #endregion
-
-		#region OAttr{g}: string Contents - Places the name we assigned to, into the Undo menu
-		public override string Contents
-		{
-			get
-			{
-				return NewClassification;
-			}
-		}
-		#endregion
 	}
 	#endregion
 

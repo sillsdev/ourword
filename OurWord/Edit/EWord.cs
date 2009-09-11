@@ -1,3 +1,4 @@
+#region ***** EWord.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    EWord.cs
@@ -19,6 +20,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+#endregion
 #endregion
 
 namespace OurWord.Edit
@@ -221,9 +223,22 @@ namespace OurWord.Edit
         {
         }
         #endregion
-
         #region Cmd: cmdMouseMove
         public virtual void cmdMouseMove(PointF pt)
+        {
+        }
+        #endregion
+
+        // Tooltips
+        #region Attr{g}: HasTooltip
+        virtual public bool HasToolTip()
+        {
+            // Return false if no tooltip is desired
+            return false;
+        }
+        #endregion
+        #region Method: void LoadToolTip(ToolTipContents)
+        virtual public void LoadToolTip(ToolTipContents wnd)
         {
         }
         #endregion

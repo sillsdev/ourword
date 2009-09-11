@@ -245,9 +245,11 @@ namespace JWdb.DataModel
 		#endregion
 
         // Oxes ------------------------------------------------------------------------------
+        #region Constants
         const string c_sTagPicture = "fig";
         const string c_sAttrPath = "path";
         const string c_sAttrRtf = "rtfFormat";
+        #endregion
         #region SMethod: DPicture CreatePicture(nodePicture)
         static public DPicture CreatePicture(XmlNode nodePicture)
         {

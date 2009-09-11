@@ -1,4 +1,5 @@
-﻿/**********************************************************************************************
+﻿#region ***** XmlDoc.cs *****
+/**********************************************************************************************
  * Project: Our Word!
  * File:    XmlDoc.cs
  * Author:  John Wimbish
@@ -14,13 +15,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Windows.Forms;
 using System.Text;
 using System.Threading;
 using System.IO;
 using System.Xml;
 #endregion
-
+#endregion
 
 namespace JWTools
 {
@@ -52,6 +54,14 @@ namespace JWTools
                 sXml += s;
             //Console.WriteLine(sXml);
             LoadXml(sXml);
+        }
+        #endregion
+
+        #region Constructor(string sInitializeFrom)
+        public XmlDoc(string sInitializeFrom)
+            : this()
+        {
+            LoadXml(sInitializeFrom);
         }
         #endregion
 
@@ -148,59 +158,48 @@ namespace JWTools
         }
         #endregion
 
+        // Uri Parsing -----------------------------------------------------------------------
 
-        public void AddXmlDeclaration()
-            // Creates "<?xml version="1.0" encoding="utf-16"?>"  
+        // Attrs -----------------------------------------------------------------------------
+        #region Method: XmlAttribute AddAttr(node, sAttrName, string sValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, string sValue)
         {
-            var decl = CreateXmlDeclaration("1.0", null, null);
-            var root = DocumentElement;
-            InsertBefore(decl, root);
-        }
-
-        public XmlNode AddNode(XmlNode nodeParent, string sName)
-        {
-            var node = CreateNode(XmlNodeType.Element, sName, null);
-
-            if (nodeParent == null)
-                nodeParent = this;
-
-            nodeParent.AppendChild(node);
-            return node;
-        }
-
-        public XmlAttribute AddAttr(XmlNode node, string sName, string sValue)
-        {
-            var attr = CreateAttribute(sName);
+            var attr = CreateAttribute(sAttrName);
             attr.Value = sValue;
             node.Attributes.Append(attr);
             return attr;
         }
-
-        public XmlText AddText(XmlNode node, string sValue)
+        #endregion
+        #region Method: XmlAttribute AddAttr(node, sAttrName, int nValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, int nValue)
         {
-            XmlText text = CreateTextNode(sValue);
-            node.AppendChild(text);
-            return text;
+            return AddAttr(node, sAttrName, nValue.ToString());
         }
-
-        static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
+        #endregion
+        #region Method: XmlAttribute AddAttr(node, sAttrName, DateTime dtValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, DateTime dtValue)
         {
-            foreach (XmlNode node in nodeParent.ChildNodes)
-            {
-                if (node.Name == sChildName)
-                    return node;
-            }
-
-            return null;
+            string sDate = dtValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
+            return AddAttr(node, sAttrName, sDate);
         }
+        #endregion
+        #region Method: XmlAttribute AddAttr(node, sAttrName, bool bValue)
+        public XmlAttribute AddAttr(XmlNode node, string sAttrName, bool bValue)
+        {
+            string sValue = (bValue) ? "true" : "false";
+            return AddAttr(node, sAttrName, sValue);
+        }
+        #endregion
 
-        // Retrieve attr values of different types
         #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
         {
+            if (null == node || string.IsNullOrEmpty(sAttrName))
+                return sDefaultValue;
+
             foreach (XmlAttribute attr in node.Attributes)
             {
-                if (attr.Name == sAttrName)
+                if (attr.Name.ToUpper() == sAttrName.ToUpper())
                     return attr.Value;
             }
 
@@ -224,7 +223,94 @@ namespace JWTools
             }
         }
         #endregion
+        #region SMethod: DateTime GetAttrValue(node, attr, dtDefaultValue)
+        static public DateTime GetAttrValue(XmlNode node, string sAttrName, DateTime dtDefaultValue)
+        {
+            string sDefault = "";
+            if (null != dtDefaultValue)
+                sDefault = dtDefaultValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
 
+            string sValue = GetAttrValue(node, sAttrName, sDefault);
+            if (string.IsNullOrEmpty(sValue))
+                return DateTime.Now;
+
+            return DateTime.ParseExact(sValue, "u",
+                DateTimeFormatInfo.InvariantInfo);
+        }
+        #endregion
+        #region SMethod: bool GetAttrValue(node, attr, bDefaultValue)
+        static public bool GetAttrValue(XmlNode node, string sAttrName, bool bDefaultValue)
+        {
+            string sDefaultValue = (bDefaultValue) ? "true" : "false";
+
+            string sValue = GetAttrValue(node, sAttrName, sDefaultValue);
+
+            if (sValue.ToUpper() == "TRUE")
+                return true;
+            return false;
+        }
+        #endregion
+        #region SMethod: string GetAttrValue(node, vsAttr, sDefaultValue)
+        static public string GetAttrValue(XmlNode node, string[] vsAttrName, string sDefaultValue)
+        {
+            foreach (string sAttrName in vsAttrName)
+            {
+                string sOut = GetAttrValue(node, sAttrName, sDefaultValue);
+                if (!string.IsNullOrEmpty(sOut))
+                    return sOut;
+            }
+
+            return sDefaultValue;
+        }
+        #endregion
+
+        static public bool IsNode(XmlNode node, string sName)
+        {
+            if (node.Name.ToUpper() == sName.ToUpper())
+                return true;
+            return false;
+        }
+
+
+        public void AddXmlDeclaration()
+            // Creates "<?xml version="1.0" encoding="utf-16"?>"  
+        {
+            var decl = CreateXmlDeclaration("1.0", null, null);
+            var root = DocumentElement;
+            InsertBefore(decl, root);
+        }
+
+        public XmlNode AddNode(XmlNode nodeParent, string sName)
+        {
+            var node = CreateNode(XmlNodeType.Element, sName, null);
+
+            if (nodeParent == null)
+                nodeParent = this;
+
+            nodeParent.AppendChild(node);
+            return node;
+        }
+
+
+        public XmlText AddText(XmlNode node, string sValue)
+        {
+            XmlText text = CreateTextNode(sValue);
+            node.AppendChild(text);
+            return text;
+        }
+
+        static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
+        {
+            foreach (XmlNode node in nodeParent.ChildNodes)
+            {
+                if (IsNode(node, sChildName))
+                    return node;
+            }
+
+            return null;
+        }
+
+        // Retrieve attr values of different types
         static public int GetAttrID(XmlNode node, string sAttrName)
         {
             // Retrieve the string value
@@ -235,31 +321,39 @@ namespace JWTools
             return IdToInt(sID);
         }
 
+        public string OneLiner()
+        {
+            var sb = new StringBuilder();
+            this.Save(new StringWriter(sb));
+            return sb.ToString();
+        }
+
+        static public string OneLiner(XmlNode node)
+        {
+            return node.OuterXml;
+
+            /**
+            var sb = new StringBuilder();
+            var w = new XmlTextWriter(new StringWriter(sb));
+            node.WriteContentTo(w);
+            return sb.ToString();
+            **/
+        }
+
         // For Unit Testing ------------------------------------------------------------------
         #region Method: bool IsSame(XmlDoc other)
         public bool IsSame(XmlDoc other)
         {
-            var sbThis = new StringBuilder();
-            this.Save(new StringWriter(sbThis));
-            string sThis = sbThis.ToString();
-
-            var sbOther = new StringBuilder();
-            other.Save(new StringWriter(sbOther));
-            string sOther = sbOther.ToString();
-
-           return (sThis == sOther);
+            string sThis = OneLiner();
+            string sOther = other.OneLiner();
+            return (sThis == sOther);
         }
         #endregion
         #region SMethod: void DisplayDifferences(xActual, xExpected)
         static public void DisplayDifferences(XmlDoc xActual, XmlDoc xExpected)
         {
-            var sbActual = new StringBuilder();
-            xActual.Save(new StringWriter(sbActual));
-            string sActual = sbActual.ToString();
-
-            var sbExpected = new StringBuilder();
-            xExpected.Save(new StringWriter(sbExpected));
-            string sExpected = sbExpected.ToString();
+            string sActual = xActual.OneLiner();
+            string sExpected = xExpected.OneLiner();
 
             bool bIsSame = (sActual == sExpected);
 
@@ -293,13 +387,174 @@ namespace JWTools
             // as opposed to InnerText, which has no line breaks.
         {
             Console.WriteLine("----- " + sMessage + " -----");
-
-            var sb = new StringBuilder();
-            Save(new StringWriter(sb));
-            Console.WriteLine(sb.ToString());
-
+            Console.WriteLine(OneLiner());
             Console.WriteLine("");
         }
         #endregion
+        #region Method: bool Compare(xmlExpected, xmlActual)
+        static public bool Compare(XmlDoc xmlExpected, XmlDoc xmlActual)
+        {
+            bool bIsSame = xmlExpected.IsSame(xmlActual);
+            if (!bIsSame)
+            {
+                xmlActual.WriteToConsole("Actual");
+                xmlExpected.WriteToConsole("Expected");
+                XmlDoc.DisplayDifferences(xmlActual, xmlExpected);
+            }
+            return bIsSame;
+        }
+        #endregion
     }
+
+
+    public class UrlAttr
+    {
+        #region Attr{g}: string Name
+        public string Name
+        {
+            get
+            {
+                return m_sName;
+            }
+        }
+        string m_sName;
+        #endregion
+        #region Attr{g}: string Valuel
+        public string Value
+        {
+            get
+            {
+                return m_sValue;
+            }
+        }
+        string m_sValue;
+        #endregion
+
+        #region Constructor(sName, sValue)
+        public UrlAttr(string sName, string sValue)
+        {
+            m_sName = sName;
+            m_sValue = sValue;
+        }
+        #endregion
+    }
+
+    public class UrlAttrList : List<UrlAttr>
+    {
+        #region Attr{g}: string IsOxesUrl
+        public bool IsOxesUrl
+        {
+            get
+            {
+                return m_bIsOxesUrl;
+            }
+        }
+        bool m_bIsOxesUrl = false;
+        #endregion
+        #region Attr{g}: string OxesFilePath
+        public string OxesFilePath
+        {
+            get
+            {
+                return m_sOxesFilePath;
+            }
+        }
+        string m_sOxesFilePath;
+        #endregion
+
+        #region Constructor
+        public UrlAttrList()
+        {
+        }
+        #endregion
+        #region Constructor(sUrl)
+        public UrlAttrList(string sUrl)
+            : this()
+        {
+            // Start with the assumption that we don't have a good Oxes Url
+            m_bIsOxesUrl = false;
+
+            // Bad Url
+            if (string.IsNullOrEmpty(sUrl))
+                return;
+
+            // Make sure it is an Oxes url; otherwise we can't identify it
+            if (!sUrl.StartsWith("oxes://", true, CultureInfo.InvariantCulture))
+                return;
+
+            // We want to consider what's to the right of the Oxes part.
+            string sUrlData = sUrl.Substring(7);
+            var vsSections = sUrlData.Split(new char[] { '/' });
+            if (vsSections.Length == 0 || vsSections.Length > 2)
+                return;
+            string m_sOxesFilePath = (vsSections.Length == 2) ? vsSections[0] : "";
+            string sAttributes = (vsSections.Length == 1) ? vsSections[0] : vsSections[1];
+
+            // Parse into name/value pairs
+            if (string.IsNullOrEmpty(sAttributes))
+                return;
+            var vsParts = sAttributes.Split(new char[] { '&' });
+            if (vsParts.Length == 0)
+                return;
+
+            // If we're here, then we've got a Url we can work with 
+            m_bIsOxesUrl = true;
+
+            // Read each one into UrlAttrs
+            foreach (string s in vsParts)
+            {
+                int k = s.IndexOf('=');
+                if (-1 == k || s.Length == k)
+                    continue;
+
+                string sName = s.Substring(0, k);
+                string sValue = s.Substring(k+1);
+
+                int n = sValue.Length;
+                if (n > 2 && (sValue[0] == '\'' && sValue[n-1] == '\''))
+                    sValue = sValue.Substring(1, n-2);
+
+                Add(new UrlAttr(sName, sValue));
+            }
+        }
+        #endregion
+
+        #region Method: string GetValueFor(string sName)
+        public string GetValueFor(string sName)
+        {
+            foreach (var ua in this)
+            {
+                if (ua.Name == sName)
+                    return ua.Value;
+            }
+
+            return null;
+        }
+        #endregion
+        #region Method: string MakeUrl()
+        public string MakeUrl()
+        {
+            string sUrl = "oxes://";
+
+            if (!string.IsNullOrEmpty(OxesFilePath))
+                sUrl += (OxesFilePath + "/");
+
+            bool bAmpersand = false;
+
+            foreach (var ua in this)
+            {
+                if (bAmpersand)
+                    sUrl += '&';
+                bAmpersand = true;
+
+                sUrl += ua.Name;
+                sUrl += '=';
+                sUrl += ua.Value;
+            }
+
+            return sUrl;
+        }
+        #endregion
+    }
+
 }

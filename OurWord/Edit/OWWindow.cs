@@ -253,8 +253,45 @@ namespace OurWord.Edit
                 Focus();
         }
         #endregion
+        #region VMethod: bool ShowNoteIcon(TranslatorNote note, bShowingBT)
+        public virtual bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
+            // By default we'll indescriminately show them all; and rely on the subclasses to
+            // show a bit more restraint!
+        {
+            return true;
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
+        public enum WindowClass { Tooltip };
+        #region Constructor(WindowClass)
+        public OWWindow(WindowClass wc)
+        {
+            if (wc != WindowClass.Tooltip)
+            {
+                Debug.Assert(false, "This constructor is only for tooltips.");
+                return;
+            }
+
+            // General setup
+            m_cColumnCount = 1;
+            Name = "ToolTip";
+            m_sRegistrySettingsSubKey = Name;
+            m_Contents = new ERoot(this);
+            WindowMargins = new SizeF(7, 5);
+            m_vSecondaryWindows = new OWWindow[0];
+            m_LineUpDownX = new LineUpDownX();
+
+            // Typical tooltip color
+            SetRegistryBackgroundColor(Name, "Cornsilk");
+
+            // Double buffer for flicker-free painting 
+            SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+
+            // Single line for the border
+            BorderStyle = BorderStyle.FixedSingle;
+        }
+        #endregion
         #region Constructor(sName, cColumnCount)
         public OWWindow(string _sName, int _cColumnCount)
             : base()
@@ -296,7 +333,10 @@ namespace OurWord.Edit
             BorderStyle = BorderStyle.Fixed3D;
 
             // Vector of secondary windows
-            m_vSecondaryWindows = new OWWindow[0];           
+            m_vSecondaryWindows = new OWWindow[0];
+
+            // Initialize the tooltips
+            m_ToolTip = OWToolTip.ToolTip;
         }
         #endregion
         #region Method: void TypingErrorBeep()
@@ -307,14 +347,19 @@ namespace OurWord.Edit
             Console.Beep(frequency, duration);
         }
         #endregion
-        #region Method: override void OnCreateControl()
+        #region OBSOLETE 5sep09 - override void OnCreateControl()
+        /**
+         * Removed on 5 Sep 09, on working to create the ToolTip window, because it
+         * was causing the data to be loaded twice. I have no memory of why this is
+         * here, and so am not removing it entirely in case the reason shows up soon.
         protected override void OnCreateControl()
         {
-            //Console.WriteLine("ON CREATE CONTROL");
+            Console.WriteLine("OnCreateControl LOADDATA");
             base.OnCreateControl();
 
             LoadData();
         }
+        **/
         #endregion
         #region Attr{g}: virtual string WindowName - override, e.g., "Drafting"
         public virtual string WindowName
@@ -664,7 +709,7 @@ namespace OurWord.Edit
         }
         DrawBuffer m_Draw = null;
         #endregion
-        #region Attr{g/s}: The background color for words which can be edited. Default is White
+        #region Attr{g/s}: EditableBackgroundColor - The background color for words which can be edited. Default is White
         public Color EditableBackgroundColor
         {
             get
@@ -680,7 +725,7 @@ namespace OurWord.Edit
         #endregion
 
         #region Method: DoLayout()
-        public void DoLayout()
+        public virtual void DoLayout()
         {
             // Make certain OnLoad() was called already (and thus, that we have a
             // Draw object, and that the EBlocks were all measured.
@@ -896,7 +941,6 @@ namespace OurWord.Edit
         {
             get
             {
-                Debug.Assert(null != m_ScrollBar);
                 return m_ScrollBar;
             }
         }
@@ -922,10 +966,16 @@ namespace OurWord.Edit
         {
             get
             {
+                if (null == ScrollBar)
+                    return 0;
+
                 return (float)ScrollBar.Value;
             }
             set
             {
+                if (null == ScrollBar)
+                    return;
+
                 int nRequested = (int)value;
 
                 // Don't let it go beyond the possible range
@@ -942,6 +992,9 @@ namespace OurWord.Edit
         #region Method: void Layout_SetupScrollBar(int yTotalHeight)
         void Layout_SetupScrollBar(int yTotalHeight)
         {
+            if (null == ScrollBar)
+                return;
+
             // We'll set the range to include a little padding, to make sure we
             // can always scroll everything into view.
             ScrollBarRange = yTotalHeight + 30;
@@ -985,6 +1038,9 @@ namespace OurWord.Edit
         #region Method: void ScrollSelectionIntoView()
         void ScrollSelectionIntoView()
         {
+            if (null == ScrollBar)
+                return;
+
             // Determine which point we need to be able to see
             if (null == Selection)
                 return;
@@ -2292,9 +2348,17 @@ namespace OurWord.Edit
             {
                 EBlock block = Contents.GetBlockAt(pt);
                 if (null != block)
+                {
                     Cursor = block.MouseOverCursor;
+                    if (null != m_ToolTip)
+                        m_ToolTip.SetBlock(block);
+                }
                 else
+                {
                     Cursor = Cursors.Default;
+                    if (null != m_ToolTip)
+                        m_ToolTip.ClearBlock();
+                }
             }
 
             if (m_MouseState == MouseStates.kSelectingText)
@@ -2357,6 +2421,9 @@ namespace OurWord.Edit
         #region Cmd: OnMouseWheel
         protected override void OnMouseWheel(MouseEventArgs e)
         {
+            if (null == m_ScrollBar)
+                return;
+
             // We'll take a Wheel Delta as being the equivalent of one line of text multipled
             // by this figure
             int nWheelMultiplier = 5;
@@ -2370,6 +2437,7 @@ namespace OurWord.Edit
             base.OnMouseWheel(e);
         }
         #endregion
+        OWToolTip m_ToolTip;
 
         // Movement --------------------------------------------------------------------------
         #region Selection Movement & Extend Commands
@@ -2800,5 +2868,6 @@ namespace OurWord.Edit
         #endregion
         #endregion
     }
+
 
 }

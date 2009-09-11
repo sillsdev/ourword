@@ -31,7 +31,7 @@ using OurWord.Layouts;
 namespace OurWordTests.DataModel
 {
     [TestFixture]
-    public class T_DPicture
+    public class T_DPicture : TestCommon
     {
         #region Setup
         [SetUp]
@@ -44,17 +44,8 @@ namespace OurWordTests.DataModel
         #region Test: OxesIO
         [Test] public void OxesIO()
         {
-            // Set up a hierarchy all the way down to our paragraph
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
-            DB.Project.DisplayName = "Project";
-            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
-            DB.Project.TargetTranslation = Translation;
-            var Book = new DBook("MRK");
-            Translation.Books.Append(Book);
-            var Section = new DSection();
-            Book.Sections.Append(Section);
+            // Set up a hierarchy all the way down to our picture
+            var section = CreateHierarchyThroughTargetSection("MRK");
 
             // Create the xml doc
             var oxes = new XmlDoc();
@@ -66,13 +57,14 @@ namespace OurWordTests.DataModel
             string sCap = "Ini adalah sesuatu wineskin.";
             string sCapBT = "This is a wineskin.";
 
-            // Create a picture. The ID will be automatically set to 0.
+            // Create a picture. 
             var pictureIn = new DPicture();
+            section.Paragraphs.Append(pictureIn);
+            pictureIn.EnsureHasID();
             pictureIn.PathName = sPath;
             pictureIn.WordRtfInfo = sRtf;
             pictureIn.SimpleText = sCap;
             pictureIn.SimpleTextBT = sCapBT;
-            Section.Paragraphs.Append(pictureIn);
 
             // Save it to an xml node
             var nodePicture = pictureIn.SaveToOxesBook(oxes, nodeBook);

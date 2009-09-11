@@ -2306,16 +2306,15 @@ namespace JWdb.DataModel
             // a TranslatorNote indicating the nature of the conflict.
             TranslatorNote note = new TranslatorNote();
             note.Reference = Section.GetReferenceAt(this).ParseableName;
-            note.Context = GetNoteContext(ContentsAsString, Theirs.ContentsAsString);
-            // TODO: Back Translation Context as well
-            note.Category = TranslatorNote.ToDo;
+            note.SelectedText = GetNoteContext(ContentsAsString, Theirs.ContentsAsString);
+            note.Class = TranslatorNote.NoteClass.General;
 
             // TODO: Assign it to this user? Or, perhaps this should be a merge setting.
             // I guess for now it just stays unassigned.
 
-            Discussion disc = new Discussion(TranslatorNote.MergeAuthor, 
-                DateTime.Now, Theirs.ContentsAsString);
-            note.Discussions.Append(disc);
+            var message = new DMessage(TranslatorNote.MergeAuthor, 
+                DateTime.Now, DMessage.Anyone, Theirs.ContentsAsString);
+            note.Messages.Append(message);
 
             TranslatorNotes.Append(note);
         }
@@ -2934,9 +2933,3 @@ namespace JWdb.DataModel
     #endregion
 
 }
-
-
-
-
-
-

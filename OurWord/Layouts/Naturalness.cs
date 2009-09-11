@@ -168,12 +168,6 @@ namespace OurWord.Layouts
             {
                 DParagraph p = DB.TargetSection.Paragraphs[ip] as DParagraph;
 
-                // Retrieve the bitmap, if a picture is involved
-                Bitmap bmp = null;
-                DPicture pict = p as DPicture;
-                if (null != pict)
-                    bmp = pict.GetBitmap(c_xMaxPictureWidth);
-
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)
                 if (p.SimpleText.Length == 0 && p.SimpleTextBT.Length == 0)
@@ -207,7 +201,7 @@ namespace OurWord.Layouts
                     p,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
-                op.Bmp = bmp;
+                op.Bmp = GetPicture(p);
                 Contents.Append(op);
             }
 
@@ -257,6 +251,20 @@ namespace OurWord.Layouts
             // Override the Line Numbers color by this window's setting
             Color clr = Color.FromName(LineNumbersColor);
             base.LineNumberAttrs.Brush = new SolidBrush(clr);
+        }
+        #endregion
+        #region OMethod: bool ShowNoteIcon(TranslatorNote, bShowingBT)
+        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
+        {
+            // Naturalness only deals with the Target Translation
+            if (!note.IsTargetTranslationNote)
+                return false;
+
+            // For now, I'm thinking only the General notes
+            if (!note.IsGeneralNote)
+                return false;
+
+            return true;
         }
         #endregion
     }

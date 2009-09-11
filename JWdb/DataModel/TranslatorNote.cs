@@ -1,3 +1,4 @@
+#region ***** TranslatorNote.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    TranslatorNote.cs
@@ -17,9 +18,11 @@ using System.Data;
 using System.Text;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 // TODO: Do we want a Context for the vernacular, and another for the BT? Thus different things
@@ -30,8 +33,8 @@ using JWdb;
 
 namespace JWdb.DataModel
 {
-    #region Class: Discussion : JObject
-    public class Discussion : JObject
+    #region Class: DMessage : DParagraph
+    public class DMessage : DParagraph
     {
         // Content Attrs ---------------------------------------------------------------------
         #region BAttr{g/s}: string Author
@@ -62,15 +65,26 @@ namespace JWdb.DataModel
         }
         private DateTime m_dtCreated;
         #endregion
-        #region JAttr{g}: JOwnSeq<DParagraph> Paragraphs
-        public JOwnSeq<DParagraph> Paragraphs
+        #region BAttr{g/s}: string Status
+        public string Status
         {
             get
             {
-                return m_osParagraphs;
+                if (string.IsNullOrEmpty(m_sStatus))
+                    return Closed;
+
+                return m_sStatus;
+            }
+            set
+            {
+                string sValue = value;
+                if (sValue == Closed)
+                    sValue = "";
+
+                SetValue(ref m_sStatus, value);
             }
         }
-        JOwnSeq<DParagraph> m_osParagraphs;
+        private string m_sStatus = "";
         #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
@@ -78,22 +92,20 @@ namespace JWdb.DataModel
             base.DeclareAttrs();
             DefineAttr("Author", ref m_sAuthor);
             DefineAttr("Created", ref m_dtCreated);
+            DefineAttr("Status", ref m_sStatus);
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
-        public Discussion()
+        public DMessage()
             : base()
         {
-            // Create the Paragraph attribute
-            m_osParagraphs = new JOwnSeq<DParagraph>("paras", this, false, false);
+            // This paragraph will always have the Message style
+            StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
 
-            // Put an empty paragraph in it, with the default style
-            DParagraph p = new DParagraph();
-            p.StyleAbbrev = DStyleSheet.c_StyleNoteDiscussion;
-            p.SimpleText = "";
-            Paragraphs.Append(p);
+            // Start with a simple, empty text
+            SimpleText = "";
 
             // The Default date is "Today"
             m_dtCreated = DateTime.Now;
@@ -104,60 +116,60 @@ namespace JWdb.DataModel
             Debug_VerifyIntegrity();
         }
         #endregion
-        #region Constructor(sAuthor, string sSimpleText)
-        public Discussion(string sAuthor, DateTime dtCreated, string sSimpleText)
+        #region Constructor(sAuthor, dtCreated, sStatus, string sSimpleText)
+        public DMessage(string sAuthor, DateTime dtCreated, string sStatus, string sSimpleText)
             : this()
         {
             Author = sAuthor;
             Created = dtCreated;
+            Status = sStatus;
 
             // Temporary kludge: remove ||'s that we've  been inserting by mistake
             string sFixed = DSection.IO.EatSpuriousVerticleBars(sSimpleText);
 
-            // Parse the string into phrases
+            // Parse the string into phrases and add them
+            Runs.Clear();
             List<DRun> vRuns = DSection.IO.CreateDRunsFromInputText(sFixed);
-
-            // Add the phrases to our one-and-only paragraph
-            // TODO: Multiple paragraphs, of course!
-            Debug.Assert(1 == Paragraphs.Count);
-            Paragraphs[0].Runs.Clear();
             foreach (DRun run in vRuns)
             {
                 DText text = run as DText;
                 if (text != null && text.PhrasesBT.Count == 0)
                     text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
-                Paragraphs[0].Runs.Append(run);
+                Runs.Append(run);
             }
 
             Debug_VerifyIntegrity();
         }
         #endregion
-        #region OMethod: bool ContentEquals(Discussion)
+        #region OMethod: bool ContentEquals(DMessage)
  		public override bool ContentEquals(JObject obj)
         {
-            Discussion discussion = obj as Discussion;
-            if (null == discussion)
+            var message = obj as DMessage;
+            if (null == message)
                 return false;
 
-            if (discussion.Author != Author)
+            if (message.Author != Author)
                 return false;
-            if (discussion.Created.CompareTo(Created) != 0)
+            if (message.Created.CompareTo(Created) != 0)
+                return false;
+            if (message.Status != Status)
                 return false;
 
-            if (!discussion.Paragraphs.ContentEquals(Paragraphs))
+            if (!base.ContentEquals(message))
                 return false;
 
             return true;
         }
         #endregion
-        #region Method: Discussion Clone()
-        public Discussion Clone()
+        #region Method: DMessage Clone()
+        public DMessage Clone()
         {
-            Discussion d = new Discussion();
-            d.Author = Author;
-            d.Created = Created;
-            d.CopyParagraphsFrom(this);
-            return d;
+            var message = new DMessage();
+            message.Author = Author;
+            message.Created = Created;
+            message.Status = Status;
+            message.CopyFrom(this, false);
+            return message;
         }
         #endregion
         #region OAttr{g}: string SortKey
@@ -176,50 +188,67 @@ namespace JWdb.DataModel
         {
             get
             {
-                TranslatorNote tn = Owner as TranslatorNote;
+                var tn = Owner as TranslatorNote;
                 Debug.Assert(null != tn);
                 return tn;
             }
         }
         #endregion
         #region DEBUG SUPPORT
+        #region Method: void Debug_VerifyIntegrity()
         public void Debug_VerifyIntegrity()
         {
         #if DEBUG
-            foreach (DParagraph p in Paragraphs)
+            // Make sure we have a DText in every paragraph
+            Debug.Assert(Runs.Count > 0);
+            DText text = null;
+            foreach (DRun r in Runs)
             {
-                // Make sure we have a DText in every paragraph
-                Debug.Assert(p.Runs.Count > 0);
-                DText text = null;
-                foreach (DRun r in p.Runs)
-                {
-                    text = r as DText;
-                    if (null != text)
-                        break;
-                }
-                Debug.Assert(null != text);
-
-                // Make sure we have a phrase in the DText
-                Debug.Assert(text.Phrases.Count > 0);
+                text = r as DText;
+                if (null != text)
+                    break;
             }
+            Debug.Assert(null != text);
+
+            // Make sure we have a phrase in the DText
+            Debug.Assert(text.Phrases.Count > 0);
         #endif
         }
+        #endregion
         #region Attr{g}: string DebugString
-        public string DebugString
+        public override string DebugString
         {
             get
             {
-                string s = "D: Author={" + Author + "} Created={" + Created.ToShortDateString() +
-                    "} + Content={";
-
-                foreach(DParagraph p in Paragraphs)
-                    s += ("p:<" + p.DebugString + ">");
-
-                s += "}";
+                string s = "M: "+
+                    "Author={" + Author + "} " +
+                    "Created={" + Created.ToShortDateString() + "} " +
+                    "Status={" + Status + "} " +
+                    "Content={" + base.DebugString + "}";
                 return s;
             }
         }
         #endregion
+        #endregion
+
+        // Localized Status Values -----------------------------------------------------------
+        #region SAttr{g}: string Anyone
+        static public string Anyone
+        {
+            get
+            {
+                return Loc.GetNotes("kAnyone", "Anyone");
+            }
+        }
+        #endregion
+        #region SAttr{g}: string Closed
+        static public string Closed
+        {
+            get
+            {
+                return Loc.GetNotes("kClosed", "Closed");
+            }
+        }
         #endregion
 
         // View Construction -----------------------------------------------------------------
@@ -228,12 +257,12 @@ namespace JWdb.DataModel
         {
             get
             {
-                // If the owning Note isn't editable, then this discussion isn't.
+                // If the owning Annotation isn't editable, then this Message isn't.
                 if (!Note.IsEditable)
                     return false;
 
-                // If not the last one in the Note, it isn't
-                if (this != Note.LastDiscussion)
+                // If not the last one in the Annotation, it isn't
+                if (this != Note.LastMessage)
                     return false;
 
                 // If the author is someone different from me, it isn't
@@ -244,34 +273,93 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-        #region VAttr{g}: DParagraph FirstParagraph
-        public DParagraph FirstParagraph
+
+        // Oxes I/O --------------------------------------------------------------------------
+        #region Constants
+        public const string c_sTagMessage = "Message";
+        const string c_sAttrAuthor = "author";
+        const string c_sAttrCreated = "created";
+        const string c_sAttrStatus = "status";
+        #endregion
+        #region Method: bool ImportOldToolboxXmlParagraphContents(XmlNode nodeMessage)
+        bool ImportOldToolboxXmlParagraphContents(XmlNode nodeMessage)
         {
-            get
-            {
-                Debug.Assert(0 < Paragraphs.Count);
-                return Paragraphs[0];
-            }
+            // Our clue it is old format is if we have an "ownseq" child node
+            var nodeOwnSeq = XmlDoc.FindNode(nodeMessage, "ownseq");
+            if (null == nodeOwnSeq)
+                return false;
+
+            // Retrieve the paragraph node
+            var nodeParagraph = XmlDoc.FindNode(nodeOwnSeq, "DParagraph");
+            if (null == nodeParagraph)
+                return false;
+
+            // If the paragraph has an ownseq node, then we have something more
+            // complicated going on. I'm hoping there's none in the data. If there
+            // is, then I'll need to have the JObject's FromXml code execute here.
+            var nodeUhOh = XmlDoc.FindNode(nodeParagraph, "ownseq");
+            Debug.Assert(null == nodeUhOh);
+
+            // The text is the contents attr of that node
+            SimpleText = XmlDoc.GetAttrValue(nodeParagraph, "Contents", "");
+
+            return true;
         }
-        #endregion       
-        #region VAttr{g}: DParagraph LastParagraph
-        public DParagraph LastParagraph
+        #endregion
+        #region SMethod: DMessage Create(nodeMessage)
+        static public DMessage Create(XmlNode nodeMessage)
         {
-            get
+            // Is it a Message node? (Old-style were called Discussion)
+            if (!XmlDoc.IsNode(nodeMessage, c_sTagMessage) &&
+                !XmlDoc.IsNode(nodeMessage, "Discussion"))
             {
-                int c = Paragraphs.Count;
-                Debug.Assert(0 != c);
-                DParagraph p = Paragraphs[c - 1];
-                Debug.Assert(null != p);
-                return p;
+                return null;
             }
+
+            // Create the new Message object. 
+            var message = new DMessage();
+
+            // Attrs
+            message.Author = XmlDoc.GetAttrValue(nodeMessage, c_sAttrAuthor, "");
+            message.Created = XmlDoc.GetAttrValue(nodeMessage, c_sAttrCreated, DateTime.Now);
+            message.Status = XmlDoc.GetAttrValue(nodeMessage, c_sAttrStatus, "");
+
+            // Import old-style paragraph contents; if successful, we're done.
+            if (message.ImportOldToolboxXmlParagraphContents(nodeMessage))
+                return message;
+
+            // Paragraph contents
+            message.ReadOxes(nodeMessage);
+
+            return message;
+        }
+        #endregion
+        #region Method: XmlNode Save(oxes, nodeAnnotation)
+        public XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
+        {
+            var nodeMessage = oxes.AddNode(nodeAnnotation, c_sTagMessage);
+
+            // Attrs
+            oxes.AddAttr(nodeMessage, c_sAttrAuthor, Author);
+            oxes.AddAttr(nodeMessage, c_sAttrCreated, Created);
+
+            // An empty Status is interpreted as "closed", so we want to not
+            // att the status attr unless we have content.
+            if (!string.IsNullOrEmpty(Status) && Status != Closed)
+                oxes.AddAttr(nodeMessage, c_sAttrStatus, Status);
+
+            // Paragraph contents
+            foreach (DRun run in Runs)
+                run.SaveToOxesBook(oxes, nodeMessage);
+
+            return nodeMessage;
         }
         #endregion
 
         // Merging ---------------------------------------------------------------------------
         #region Method: bool IsSameOriginAs(Theirs)
-        public bool IsSameOriginAs(Discussion Theirs)
-            // Two discussions started out the same if they have the same Author and 
+        public bool IsSameOriginAs(DMessage Theirs)
+            // Two messages started out the same if they have the same Author and 
             // Create date.
         {
             if (0 != Created.CompareTo(Theirs.Created))
@@ -281,24 +369,12 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        #region Method: void CopyParagraphsFrom(Discussion source)
-        void CopyParagraphsFrom(Discussion source)
-        {
-            Paragraphs.Clear();
-            foreach(DParagraph p in source.Paragraphs)
-            {
-                DParagraph pCopy = new DParagraph();
-                pCopy.CopyFrom(p, false);
-                Paragraphs.Append(pCopy);
-            }
-        }
-        #endregion
-        #region Method: void Merge(Discussion Parent, Discussion Theirs)
-        public void Merge(Discussion Parent, Discussion Theirs)
+        #region Method: void Merge(Parent, Theirs)
+        public void Merge(DMessage Parent, DMessage Theirs)
         {
             // The caller needs to make sure these are the same Author and Created
-            Debug.Assert(IsSameOriginAs(Theirs), "Theirs wasn't the same discussion");
-            Debug.Assert(IsSameOriginAs(Parent), "Parent wasn't the same discussion");
+            Debug.Assert(IsSameOriginAs(Theirs), "Theirs wasn't the same message");
+            Debug.Assert(IsSameOriginAs(Parent), "Parent wasn't the same message");
 
             // If they are the same, we're done
             if (ContentEquals(Theirs))
@@ -307,7 +383,8 @@ namespace JWdb.DataModel
             // If we equal the parent, but they don't, then keep theirs
             if (ContentEquals(Parent) && !Theirs.ContentEquals(Parent))
             {
-                CopyParagraphsFrom(Theirs);
+                Status = Theirs.Status;
+                CopyFrom(Theirs, false);
                 return;
             }
 
@@ -320,56 +397,46 @@ namespace JWdb.DataModel
             if (Author == DB.UserName)
                 return;
             // If the author is someone else, then they win
-            CopyParagraphsFrom(Theirs);
+            Status = Theirs.Status;
+            CopyFrom(Theirs, false);
+            Status = Theirs.Status;
         }
         #endregion
     }
     #endregion
 
+    #region CLASS: TranslatorNote
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
-        #region BAttr{g/s}: string Category 
-        public string Category
+        #region BAttr{g/s}: NoteClass Class
+        public NoteClass Class
         {
             get
             {
-                return m_sCategory;
+                return (NoteClass)m_nClass;
             }
             set
             {
-                SetValue(ref m_sCategory, value);
+
+                SetValue(ref m_nClass, (int)value);
             }
         }
-        private string m_sCategory;
+        int m_nClass = (int)NoteClass.General;
         #endregion
-        #region BAttr{g/s}: string AssignedTo
-        public string AssignedTo
+        #region BAttr{g/s}: string SelectedText
+        public string SelectedText
         {
             get
             {
-                return m_sAssignedTo;
+                return m_sSelectedText;
             }
             set
             {
-                SetValue(ref m_sAssignedTo, value);
+                SetValue(ref m_sSelectedText, value);
             }
         }
-        private string m_sAssignedTo = "";
-        #endregion
-        #region BAttr{g/s}: string Context
-        public string Context
-        {
-            get
-            {
-                return m_sContext;
-            }
-            set
-            {
-                SetValue(ref m_sContext, value);
-            }
-        }
-        private string m_sContext;
+        private string m_sSelectedText;
         #endregion
         #region BAttr{g/s}: string Reference
         public string Reference
@@ -389,453 +456,150 @@ namespace JWdb.DataModel
         }
         private string m_sReference;
         #endregion
-        #region BAttr{g/s}: bool ShowInDaughterTranslations
-        public bool ShowInDaughterTranslations
+        #region JAttr{g}: JOwnSeq<DMessage> Messages
+        public JOwnSeq<DMessage> Messages
         {
             get
             {
-                return m_bShowInDaughterTranslations;
-            }
-            set
-            {
-                SetValue(ref m_bShowInDaughterTranslations, value);
+                Debug.Assert(null != m_osMessages);
+                return m_osMessages;
             }
         }
-        bool m_bShowInDaughterTranslations = false;
-        #endregion
-        #region JAttr{g}: JOwnSeq<Discussion> Discussions
-        public JOwnSeq<Discussion> Discussions
-        {
-            get
-            {
-                Debug.Assert(null != m_osDiscussions);
-                return m_osDiscussions;
-            }
-        }
-        JOwnSeq<Discussion> m_osDiscussions;
+        JOwnSeq<DMessage> m_osMessages;
         #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
-            DefineAttr("Category", ref m_sCategory);
-            DefineAttr("AssignedTo", ref m_sAssignedTo);
-            DefineAttr("Context", ref m_sContext);
+            DefineAttr("Class", ref m_nClass);
+            DefineAttr("SelectedText", ref m_sSelectedText);
             DefineAttr("Reference", ref m_sReference);
-            DefineAttr("ShowInDaughter", ref m_bShowInDaughterTranslations);
         }
         #endregion
 
-        // Classifications -------------------------------------------------------------------
-        #region CLASS: Classifications
-        public class Classifications : List<Classifications.Classification>
-        {
-            #region CLASS: Classification
-            public class Classification : IComparable<Classification>
-            {
-                #region Attr{g}: string Name
-                public string Name
-                {
-                    get
-                    {
-                        Debug.Assert(!string.IsNullOrEmpty(m_sName));
-                        return m_sName;
-                    }
-                }
-                string m_sName;
-                #endregion
-
-                #region Attr{g}: Classifications Owner
-                Classifications Owner
-                {
-                    get
-                    {
-                        Debug.Assert(null != m_Owner);
-                        return m_Owner;
-                    }
-                }
-                Classifications m_Owner;
-                #endregion
-
-                #region Attr{g/s}: bool IsChecked - If T, display it
-                public bool IsChecked
-                {
-                    get
-                    {
-                        return JW_Registry.GetValue(Owner.RegistrySubKey, Name, true);
-                    }
-                    set
-                    {
-                        JW_Registry.SetValue(Owner.RegistrySubKey, Name, value);
-                    }
-                }
-                #endregion
-
-                #region Method: ToolStripMenuItem CreateMenuItem(EventHandler handler)
-                public ToolStripMenuItem CreateMenuItem(EventHandler handler)
-                {
-                    // Create a new menu item
-                    ToolStripMenuItem item = new ToolStripMenuItem(Name);
-
-                    // Set the Checked State
-                    item.Checked = IsChecked;
-
-                    // Set the tag to identify which category
-                    item.Tag = this;
-
-                    // Set the event handler
-                    item.Click += handler;
-
-                    // Return the result
-                    return item;
-                }
-                #endregion
-
-                #region Constructor(Owner, sName)
-                public Classification(Classifications _Owner, string sName)
-                {
-                    m_Owner = _Owner;
-                    m_sName = sName;
-                }
-                #endregion
-                #region Method: int IComparable<T>.CompareTo(T)
-                public int CompareTo(Classification cl)
-                {
-                    return Name.CompareTo(cl.Name);
-                }
-                #endregion
-            }
-            #endregion
-
-            // Attrs -------------------------------------------------------------------------
-            #region Attr{g}:string Name
-            public string Name
-            {
-                get
-                {
-                    Debug.Assert(null != m_sName);
-                    return m_sName;
-                }
-            }
-            string m_sName;
-            #endregion
-            #region Attr{g/s}: BStringArray SettingsSource
-            BStringArray SettingsSource
-            {
-                get
-                {
-                    Debug.Assert(null != m_bsaSettingsSource);
-                    return m_bsaSettingsSource;
-                }
-                set
-                {
-                    m_bsaSettingsSource = value;
-                    InitFromSettingsSource();
-                }
-            }
-            BStringArray m_bsaSettingsSource;
-            #endregion
-            #region Attr{g}: string[] FactoryDefaultMembers
-            string[] FactoryDefaultMembers
-            {
-                get
-                {
-                    return m_vsFactoryDefaultMembers;
-                }
-            }
-            string[] m_vsFactoryDefaultMembers;
-            #endregion
-
-            const string c_sDefaultValue = "DefaultValue";
-            #region Attr{g/s}: string DefaultValue
-            public string DefaultValue
-            {
-                get
-                {
-                    string sValue = JW_Registry.GetValue(RegistrySubKey, 
-                        c_sDefaultValue, DefaultFactoryValue);
-                    return sValue;
-                }
-                set
-                {
-                    Debug.Assert(null != FindItem(value));
-                    JW_Registry.SetValue(RegistrySubKey, c_sDefaultValue, value);
-                }
-            }
-            #endregion
-            #region Attr{g}: string DefaultFactoryValue
-            string DefaultFactoryValue
-            {
-                get
-                {
-                    return m_sFactoryDefaultValue;
-                }
-            }
-            string m_sFactoryDefaultValue;
-            #endregion
-
-            // Configuration Dialog support --------------------------------------------------
-            #region Attr{g/s}: string CommaDelimitedString - access from Configuration Dialog
-            public string CommaDelimitedString
-            {
-                get
-                {
-                    string s = "";
-
-                    // Create a sorted version
-                    var v = new List<string>();
-                    foreach (string sClassificationName in SettingsSource)
-                        v.Add(sClassificationName);
-                    v.Sort();
-
-                    // Create the string
-                    foreach(string sClassificationName in v)
-                        s += (sClassificationName + ", ");
-
-                    return s;
-                }
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                        return;
-
-                    // Parse the string into its parts
-                    string[] vNames = value.Split(new char[] { ',' });
-
-                    // Remove any spaces
-                    for (int i = 0; i < vNames.Length; i++)
-                        vNames[i] = vNames[i].Trim();
-
-                    // Clear out the list, and the corresponding Settings BSA; we'll
-                    // rebuild both as we call AddItem in this and called methods
-                    Clear();
-                    SettingsSource.Clear();
-
-                    // Clear out the list, then build it from these new values
-                    Clear();
-                    foreach (string s in vNames)
-                        AddItem(s, true);
-
-                    // Scan the book to make sure we haven't deleted anything we need
-					if (null != DB.TargetBook && DB.TargetBook.Loaded)
-						ScanBookForNewClassifications(DB.TargetBook);
-
-                    // If we still have an empty list, then add the factory defaults
-                    // back in.
-                    AddFactoryDefaults();
-
-                    // Make sure whatever is our default value is in the list
-                    AddItem(DefaultValue, true);
-                }
-            }
-            #endregion
-
-            // Operations --------------------------------------------------------------------
-            #region Method: void AddItem(sName, bool bAddToPermanentSettings)
-            public void AddItem(string sName, bool bAddToPermanentSettings)
-            {
-                // Don't add any empty names
-                if (string.IsNullOrEmpty(sName))
-                    return;
-
-                // Check to see if it is already there
-                if (null != FindItem(sName))
-                    return;
-
-                // Create and add the new one
-                Add(new Classification(this, sName));
-                Sort();
-
-                // Add it to the settings if requested; otherwise it is only there
-                // because, e.g., the book already had it as a value.
-                if (bAddToPermanentSettings)
-                {
-                    if (!SettingsSource.Contains(sName))
-                        SettingsSource.InsertSortedIfUnique(sName);
-                }
-            }
-            #endregion
-            #region Method: Classification FindItem(sName)
-            public Classification FindItem(string sName)
-            {
-                foreach (Classification c in this)
-                {
-                    if (c.Name == sName)
-                        return c;
-                }
-                return null;
-            }
-            #endregion
-            #region Method: bool HasItem(string sName)
-            public bool HasItem(string sName)
-            {
-                return (null != FindItem(sName));
-            }
-            #endregion
-
-            // Scaffolding -------------------------------------------------------------------
-            #region Constructor(sName, bsaSettingsSource, vsFactoryDefaultMembers, sFactoryDefaultValue)
-            public Classifications(string sName, BStringArray bsaSettingsSource, 
-                string[] vsFactoryDefaultMembers, string sFactoryDefaultValue)
-            {
-                m_sName = sName;
-                m_bsaSettingsSource = bsaSettingsSource;
-
-                // Factory Defaults: Use Localized Versions
-                string[] vs = new string[vsFactoryDefaultMembers.Length];
-                for (int i = 0; i < vs.Length; i++)
-                {
-                    vs[i] = Loc.GetNotes("k" + vsFactoryDefaultMembers[i],
-                        vsFactoryDefaultMembers[i]);
-                }
-                m_vsFactoryDefaultMembers = vs;
-
-                // Use localized version of the Default Value, too.
-                m_sFactoryDefaultValue = Loc.GetNotes("k" + sFactoryDefaultValue, 
-                    sFactoryDefaultValue);
-
-                // Derive a registry key from the note's key and the name
-                m_sRegistrySubKey = TranslatorNote.c_sRegistrySubkey + "\\" + sName;
-
-                // Retrieve values from the settings
-                InitFromSettingsSource();
-            }
-            #endregion
-            #region Attr{g}: string RegistrySubKey
-            public string RegistrySubKey
-            {
-                get
-                {
-                    Debug.Assert(null != m_sRegistrySubKey);
-                    return m_sRegistrySubKey;
-                }
-            }
-            string m_sRegistrySubKey;
-            #endregion
-            #region Method: void AddFactoryDefaults()
-            void AddFactoryDefaults()
-            {
-                if (Count == 0 && null != FactoryDefaultMembers)
-                {
-                    foreach (string s in FactoryDefaultMembers)
-                        AddItem(s, true);
-                }
-            }
-            #endregion
-            #region Method: void InitFromSettingsSource()
-            public void InitFromSettingsSource()
-            {
-                // Get rid of any existing classifications
-                Clear();
-
-                // Populate with the classifications in the settings source
-                foreach (string s in SettingsSource)
-                    AddItem(s, true);
-
-                // If we're still empty, go with the factory defaults
-                AddFactoryDefaults();
-            }
-            #endregion
-        }
-        #endregion
-        #region SAttr{g}: Classifications Categories
-        static public Classifications Categories
+        // Classes ---------------------------------------------------------------------------
+        public enum NoteClass { General, Exegetical, Consultant, HintForDrafting };
+        #region VAttr{g}: string IconResourceForClass
+        public string IconResourceForClass
         {
             get
             {
-                if (null == s_vCategories)
-                    InitClassifications();
+                // The note's colors range from Bright to Dim, depending on the Status.
+                // Those that are closed are gray; those assigned to me are Yellow, and
+                // those assigned to anyone on the team are medium brightness. The idea
+                // is to have those which require attention to jump out at the user.
+                string sWho = "_Anyone.ico";
+                if (Status == DMessage.Closed)
+                    sWho = "_Closed.ico";
+                if (Status == DB.UserName)
+                    sWho = "_Me.ico";
 
-                Debug.Assert(null != s_vCategories);
-                return s_vCategories;
-            }
-        }
-        static Classifications s_vCategories;
-        #endregion
-        #region SAttr{g}: Classifications FrontCategories
-        static public Classifications FrontCategories
-        {
-            get
-            {
-                if (null == s_vFrontCategories)
-                    InitClassifications();
-
-                Debug.Assert(null != s_vFrontCategories);
-                return s_vFrontCategories;
-            }
-        }
-        static Classifications s_vFrontCategories;
-        #endregion
-        #region SAttr{g}: Classifications People
-        static public Classifications People
-        {
-            get
-            {
-                if (null == s_vPeople)
-                    InitClassifications();
-
-                Debug.Assert(null != s_vPeople);
-                return s_vPeople;
-            }
-        }
-        static Classifications s_vPeople;
-        #endregion
-        #region SMethod: void InitClassifications()
-        static public void InitClassifications()
-            // Initialize the classifcations, both from their data source, and their
-            // factory defaults. This zeros out anything existing, and should thus be
-            // called when a new project is loaded.
-            //
-            // The factory defaults, as passed in, are converted into localized
-            // versions by the constructor
-        {
-            s_vCategories = new Classifications("Categories",
-               DB.TeamSettings.NotesCategories,
-               new string[] { ToDo, Exegesis },
-               ToDo);
-
-            s_vFrontCategories = new Classifications("FrontCategories",
-                DB.TeamSettings.NotesFrontCategories,
-                new string[] { DraftingHelp, Exegesis },
-                Exegesis);
-
-            s_vPeople = new Classifications("People", 
-                DB.Project.People,
-                new string[] { "Translator", "Advisor", "Consultant", "None" },
-                "None");
-        }
-        #endregion
-        #region SMethod: void ScanBookForNewClassifications(DBook book)
-        static public void ScanBookForNewClassifications(DBook book)
-        {
-            if (null == book)
-                return;
-
-            bool bIsFront = (book.Translation == DB.FrontTranslation);
-            bool bIsTarget = (book.Translation == DB.TargetTranslation);
-
-            // Don't waste time except for Front and Target translations
-            if (!bIsFront && !bIsTarget)
-                return;
-
-            // Collect all of the book's notes
-            List<TranslatorNote> v = new List<TranslatorNote>();
-            foreach (DSection section in book.Sections)
-                v.AddRange(section.GetAllTranslatorNotes());
-
-            // Add classifications according to their kind
-            foreach (TranslatorNote tn in v)
-            {
-                if (bIsTarget)
+                // Determine the icon based on the note's type
+                switch (Class)
                 {
-                    Categories.AddItem(tn.Category, false);
+                    case NoteClass.General:
+                        return "NoteGeneric" + sWho;
 
-                    People.AddItem(tn.AssignedTo, false);
-                    foreach (Discussion d in tn.Discussions)
-                        People.AddItem(d.Author, false);
+                    case NoteClass.Exegetical:
+                        return "NoteExegesis" + sWho;
+
+                    case NoteClass.Consultant:
+                        return "NoteConsultant" + sWho;
+
+                    case NoteClass.HintForDrafting:
+                        if (IsFrontTranslationNote)
+                            return "NoteHint_Me.ico";
+                        return "NoteHint" + sWho;
+
+                    default:
+                        Debug.Assert(false, "Missing Resource foro class: " + Class.ToString());
+                        return "NoteGeneric" + sWho;
                 }
-                else if (tn.ShowInDaughterTranslations)
-                    FrontCategories.AddItem(tn.Category, false);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsGeneralNote
+        public bool IsGeneralNote
+        {
+            get
+            {
+                return (Class == NoteClass.General);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsExegeticalNote
+        public bool IsExegeticalNote
+        {
+            get
+            {
+                return (Class == NoteClass.Exegetical);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsConsultantNote
+        public bool IsConsultantNote
+        {
+            get
+            {
+                return (Class == NoteClass.Consultant);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsHintForDraftingNote
+        public bool IsHintForDraftingNote
+        {
+            get
+            {
+                return (Class == NoteClass.HintForDrafting);
+            }
+        }
+        #endregion
+
+        // Virtual Attrs ---------------------------------------------------------------------
+        #region VAttr{g/s}: string Status
+        public string Status
+        {
+            get
+            {
+                return LastMessage.Status;
+            }
+            set
+            {
+                LastMessage.Status = value;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsTargetTranslationNote
+        public bool IsTargetTranslationNote
+        {
+            get
+            {
+                JObject obj = this;
+                while (null != obj.Owner && null == obj as DTranslation)
+                    obj = obj.Owner;
+
+                var translation = obj as DTranslation;
+                if (null != translation && translation == DB.TargetTranslation)
+                    return true;
+
+                return false;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsFrontTranslationNote
+        public bool IsFrontTranslationNote
+        {
+            get
+            {
+                JObject obj = this;
+                while (null != obj.Owner && null == obj as DTranslation)
+                    obj = obj.Owner;
+
+                var translation = obj as DTranslation;
+                if (null != translation && translation == DB.FrontTranslation)
+                    return true;
+
+                return false;
             }
         }
         #endregion
@@ -914,29 +678,29 @@ namespace JWdb.DataModel
         }
         static Color s_BorderColor = Color.Empty;
         #endregion
-        #region Attr{g/s}: Color DiscussionHeaderColor
-        static public Color DiscussionHeaderColor
+        #region Attr{g/s}: Color MessageHeaderColor
+        static public Color MessageHeaderColor
         {
             get
             {
-                if (Color.Empty == s_DiscussionHeaderColor)
+                if (Color.Empty == s_MessageHeaderColor)
                 {
                     string s = JW_Registry.GetValue(c_sRegistrySubkey, 
-                        "DiscussionHeaderColor", "LightGreen");
-                    s_DiscussionHeaderColor = Color.FromName(s);
+                        "MessageHeaderColor", "LightGreen");
+                    s_MessageHeaderColor = Color.FromName(s);
                 }
-                Debug.Assert(Color.Empty != s_DiscussionHeaderColor);
-                return s_DiscussionHeaderColor;
+                Debug.Assert(Color.Empty != s_MessageHeaderColor);
+                return s_MessageHeaderColor;
             }
             set
             {
-                s_DiscussionHeaderColor = value;
-                Debug.Assert(Color.Empty != s_DiscussionHeaderColor);
-                JW_Registry.SetValue(c_sRegistrySubkey, 
-                    "DiscussionHeaderColor", value.Name);
+                s_MessageHeaderColor = value;
+                Debug.Assert(Color.Empty != s_MessageHeaderColor);
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "MessageHeaderColor", value.Name);
             }
         }
-        static Color s_DiscussionHeaderColor = Color.Empty;
+        static Color s_MessageHeaderColor = Color.Empty;
         #endregion
         #region Attr{g/s}: Color UneditableColor
         static public Color UneditableColor
@@ -977,18 +741,18 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-        #region Attr{g/s}: bool ShowCategories
-        static public bool ShowCategories
+        #region Attr{g/s}: bool CanDeleteAnything
+        static public bool CanDeleteAnything
         {
             get
             {
                 return JW_Registry.GetValue(c_sRegistrySubkey,
-                        "ShowCategories", false);
+                        "CanDeleteAnything", false);
             }
             set
             {
                 JW_Registry.SetValue(c_sRegistrySubkey,
-                    "ShowCategories", value);
+                    "CanDeleteAnything", value);
             }
         }
         #endregion
@@ -998,15 +762,15 @@ namespace JWdb.DataModel
         public TranslatorNote()
             : base()
         {
-            // Discussions, sorted by date
-            m_osDiscussions = new JOwnSeq<Discussion>("Discussions", this, false, true);
+            // Default is General class
+            Class = NoteClass.General;
 
-            // Set the category to the default
-            Category = Categories.DefaultValue;
+            // Messages, sorted by date
+            m_osMessages = new JOwnSeq<DMessage>("Messages", this, false, true);
         }
         #endregion
         #region Constructor(sReference, sContext)
-        public TranslatorNote(string _sReference, string _sContext)
+        public TranslatorNote(string _sReference, string _sSelectedText)
             : this()
         {
             // Reference, we expect something of the form "003:016", the Set attr 
@@ -1014,7 +778,7 @@ namespace JWdb.DataModel
             Reference = _sReference;
 
             // Context string
-            Context = _sContext;
+            SelectedText = _sSelectedText;
         }
         #endregion
         #region Method: bool ContentEquals(JObject)
@@ -1024,21 +788,19 @@ namespace JWdb.DataModel
             if (null == tn)
                 return false;
 
-            if (tn.Category != Category)
+            if (tn.Class != Class)
                 return false;
-            if (tn.AssignedTo != AssignedTo)
-                return false;
-            if (tn.Context != Context)
+            if (tn.SelectedText != SelectedText)
                 return false;
             if (tn.Reference != Reference)
                 return false;
 
-            if (Discussions.Count != tn.Discussions.Count)
+            if (Messages.Count != tn.Messages.Count)
                 return false;
 
-            for (int i = 0; i < Discussions.Count; i++)
+            for (int i = 0; i < Messages.Count; i++)
             {
-                if (!Discussions[i].ContentEquals(tn.Discussions[i]))
+                if (!Messages[i].ContentEquals(tn.Messages[i]))
                     return false;
             }
 
@@ -1052,11 +814,8 @@ namespace JWdb.DataModel
             {
                 string s = Reference;
 
-                if (Discussions.Count > 0)
-                {
-                    Discussion discussion = Discussions[0] as Discussion;
-                    s += discussion.SortKey;
-                }
+                if (Messages.Count > 0)
+                    s += Messages[0].SortKey;
 
                 return s;
             }
@@ -1073,14 +832,12 @@ namespace JWdb.DataModel
         {
             TranslatorNote note = new TranslatorNote();
 
-            note.Category = Category;
-            note.AssignedTo = AssignedTo;
-            note.Context = Context;
+            note.Class = Class;
+            note.SelectedText = SelectedText;
             note.Reference = Reference;
-            note.ShowInDaughterTranslations = ShowInDaughterTranslations;
 
-            foreach (Discussion d in Discussions)
-                note.Discussions.Append(d.Clone());
+            foreach (DMessage m in Messages)
+                note.Messages.Append(m.Clone());
 
             return note;
         }
@@ -1111,14 +868,28 @@ namespace JWdb.DataModel
         public void Debug_VerifyIntegrity()
         {
         #if DEBUG
-            Debug.Assert(Discussions.Count > 0);
-            foreach (Discussion d in Discussions)
-                d.Debug_VerifyIntegrity();
+            Debug.Assert(Messages.Count > 0);
+            foreach (DMessage m in Messages)
+                m.Debug_VerifyIntegrity();
         #endif
         }
         #endregion
 
         // I/O -------------------------------------------------------------------------------
+        #region Attr{g/s}: string SfmMarker
+        public string SfmMarker
+        {
+            get
+            {
+                return m_sSfmMarker;
+            }
+            set
+            {
+                m_sSfmMarker = value;
+            }
+        }
+        string m_sSfmMarker;
+        #endregion
         #region SAttr{g}: string UnknownAuthor
         static public string UnknownAuthor
         {
@@ -1129,58 +900,22 @@ namespace JWdb.DataModel
         }
         #endregion
         #region SMethod: TranslatorNote ImportFromOldStyle(nChapter, nVerse, SfField)
+
+        static List<string> s_vOldNotesMarkers;
+
         static public TranslatorNote ImportFromOldStyle(
             int nChapter, int nVerse, SfField field)
         {
-            // The Category and ShowInDaughter are derived from the marker
-            string sCategory = Loc.GetNoteDefs("kGeneral", "General");
-            bool bShowInDaughters = false;
-            switch (field.Mkr)
+            // Make sure it is a file for which notes are permitted
+            if (null == s_vOldNotesMarkers)
             {
-                case "nt":
-                    sCategory = Loc.GetNoteDefs("kGeneral", "General"); 
-                    break;
-                case "ntHint":
-                    sCategory = Loc.GetNoteDefs("kHintForDaughter", 
-                        "Drafting Help");
-                    bShowInDaughters = true;
-                    break;
-                case "ntck":
-                    sCategory = Loc.GetNoteDefs("kToDo", "To Do"); 
-                    break;
-                case "ntUns":
-                    sCategory = Loc.GetNoteDefs("kAskUns", "Ask UNS"); 
-                    break;
-                case "ntReas":
-                    sCategory = Loc.GetNoteDefs("kReason", "Reason"); 
-                    break;
-                case "ntFT":
-                    sCategory = Loc.GetNoteDefs("kFront", "Front Issues"); 
-                    break;
-                case "ntDef":
-                    sCategory = Loc.GetNoteDefs("kDefinition", "Definitions"); 
-                    break;
-                case "ov":
-                    sCategory = CategoryOldVersion; 
-                    break;
-                case "ntBT":
-                    sCategory = Loc.GetNoteDefs("kBT", "Back Translation"); 
-                    break;
-                case "ntgk":
-                    sCategory = Loc.GetNoteDefs("kGreek", "Greek");
-                    bShowInDaughters = true;
-                    break;
-                case "nthb":
-                    sCategory = Loc.GetNoteDefs("kHebrew", "Hebrew");
-                    bShowInDaughters = true;
-                    break;
-                case "ntcn":
-                    sCategory = Loc.GetNoteDefs("kExegesis", "Exegesis");
-                    bShowInDaughters = true;
-                    break;
-                default: // Not an old-style note
-                    return null;
+                s_vOldNotesMarkers = new List<string>() { 
+                    "nt", "ntHint", "ntck", "ntUns", "ntReas", "ntFT", 
+                    "ntDef", "ov", "ntBT", "ntgk", "nthb", "ntcn" 
+                };
             }
+            if (!s_vOldNotesMarkers.Contains(field.Mkr))
+                return null;
 
             // The author is set to "Unknown Author".
             string sAuthor = UnknownAuthor;
@@ -1194,8 +929,29 @@ namespace JWdb.DataModel
 
             // Create the Note. We will not have a context for it.
             TranslatorNote tn = new TranslatorNote(sReference, "");
-            tn.Category = sCategory;
-            tn.ShowInDaughterTranslations = bShowInDaughters;
+
+            // Set its class
+            switch (field.Mkr)
+            {
+                case "ntHint":
+                    tn.Class = NoteClass.HintForDrafting;
+                    break;
+                case "ntBT":
+                    tn.Class = NoteClass.Consultant;
+                    break;
+                case "ntgk":
+                case "nthb":
+                case "ntcn":
+                    tn.Class = NoteClass.Exegetical;
+                    break;
+                default:
+                    tn.Class = NoteClass.General; ;
+                    break;
+            }
+
+
+            // For now, we'll preserve the SFM marker so we can round-trip
+            tn.m_sSfmMarker = field.Mkr;
 
             // Remove any reference from the data
             string sData = tn.RemoveInitialReferenceFromText(field.Data);
@@ -1212,11 +968,11 @@ namespace JWdb.DataModel
             // The note needs a context. We'll go with the first five words
             // of the note. Its messy in that it gets repeated when the note is
             // expanded, unless we clear the ShowHeaderWhenExpanded flag.
-            tn.Context = GetWordsRight(sData, 0, 5);
+            tn.SelectedText = GetWordsRight(sData, 0, 5);
 
-            // Add the discussion
-            Discussion disc = new Discussion(sAuthor, dtCreated, sData);
-            tn.Discussions.Append(disc);          
+            // Add the Message
+            var message = new DMessage(sAuthor, dtCreated, "", sData);
+            tn.Messages.Append(message);          
 
             // Done
             tn.Debug_VerifyIntegrity();
@@ -1246,60 +1002,50 @@ namespace JWdb.DataModel
             // I do want to delete this at some point, and just convert everyone
             // to the new style. But best not to make too many waves while testing.
         {
-            // The old style has exactly one discussion
-            if (Discussions.Count != 1)
-                return null;
-
-            // The old style has exactly one paragraph
-            if (Discussions[0].Paragraphs.Count != 1)
+            // The old style has exactly one message
+            if (Messages.Count != 1)
                 return null;
 
             // The old style has exactly one DText
-            if (Discussions[0].Paragraphs[0].Runs.Count != 1)
+            if (Messages[0].Runs.Count != 1)
                 return null;
-            if (Discussions[0].Paragraphs[0].Runs[0] as DText == null)
+            if (Messages[0].Runs[0] as DText == null)
                 return null;
 
             // The old style's author is "Unknown Author"
             string sAuthor = Loc.GetString("kUnknownAuthor", "Unknown Author");
-            if (Discussions[0].Author != sAuthor)
+            if (Messages[0].Author != sAuthor)
                 return null;
 
             // Figure out the marker from the category. This is ugly, but it IS going away.
             string sMkr = "nt";
-            if (Category == Loc.GetNoteDefs("kHintForDaughter", "Drafting Help"))
+            if (Class == NoteClass.HintForDrafting)
                 sMkr = "ntHint";
-            else if (Category == Loc.GetNoteDefs("kToDo", "To Do"))
-                sMkr = "ntck";
-            else if (Category == Loc.GetNoteDefs("kAskUns", "Ask UNS"))
-                sMkr = "ntUns";
-            else if (Category == Loc.GetNoteDefs("kReason", "Reason"))
-                sMkr = "ntReas";
-            else if (Category == Loc.GetNoteDefs("kFront", "Front Issues"))
-                sMkr = "ntFT";
-            else if (Category == Loc.GetNoteDefs("kDefinition", "Definitions"))
-                sMkr = "ntDef";
-            else if (Category == Loc.GetNoteDefs("kOldVersion", "Old Version"))
-                sMkr = "ov";
-            else if (Category == Loc.GetNoteDefs("kBT", "Back Translation"))
-                sMkr = "ntBT";
-            else if (Category == Loc.GetNoteDefs("kGreek", "Greek"))
-                sMkr = "ntgk";
-            else if (Category == Loc.GetNoteDefs("kHebrew", "Hebrew"))
-                sMkr = "nthb";
-            else if (Category == Loc.GetNoteDefs("kExegesis", "Exegesis"))
+            else if (Class == NoteClass.Exegetical)
                 sMkr = "ntcn";
+            else if (Class == NoteClass.Consultant)
+                sMkr = "ntBT";
+            if (!string.IsNullOrEmpty(SfmMarker))
+                sMkr = SfmMarker;
 
             // Create the note
-            return new SfField(sMkr, Discussions[0].Paragraphs[0].Runs[0].ContentsSfmSaveString);
+            return new SfField(sMkr, Messages[0].Runs[0].ContentsSfmSaveString);
         }
         #endregion
         #region Method: void AddToSfmDB(ScriptureDB DB)
         public void AddToSfmDB(ScriptureDB DB)
         {
+            // Attempt to write to the old style. Fails if the note is too complicated.
             SfField f = ToSfField();
+
+            // Failed. Must do a new style
             if (null == f)
-                f = new SfField(DSFMapping.c_sMkrTranslatorNote, ToXml(true).OneLiner);
+            {
+                var oxes = new XmlDoc();
+                var node = Save(oxes, oxes);
+                f = new SfField(DSFMapping.c_sMkrTranslatorNote, XmlDoc.OneLiner(node));
+            }
+
             DB.Append(f);
         }
         #endregion
@@ -1347,6 +1093,81 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        // Oxes I/O --------------------------------------------------------------------------
+        #region Constants
+        public const string c_sTagTranslatorNote = "TranslatorNote";
+        const string c_sAttrClass = "class";
+        const string c_sAttrSelectedText = "selectedText";
+        const string c_sAttrReference = "reference";
+        #endregion
+        #region SMethod: TranslatorNote Create(nodeNote)
+        static public TranslatorNote Create(XmlNode nodeNote)
+        {
+            if (nodeNote.Name != c_sTagTranslatorNote)
+                return null;
+
+            // Create the new note
+            var note = new TranslatorNote();
+
+            // Class
+            var sClass = XmlDoc.GetAttrValue(nodeNote, c_sAttrClass, NoteClass.General.ToString());
+            try
+            {
+                note.Class = (NoteClass)Enum.Parse(typeof(NoteClass), sClass, true);
+            }
+            catch(Exception) {}
+
+            // Selected Text (previous version used "context" as the attr name
+            note.SelectedText = XmlDoc.GetAttrValue(nodeNote, 
+                new string[] {c_sAttrSelectedText, "context"},
+                "");
+
+            // Scripture reference
+            note.Reference = XmlDoc.GetAttrValue(nodeNote, c_sAttrReference, "");
+
+            // Toolbox old style had an AssignedTo attribute. We want that to be the
+            // Status of the LastMessage.
+            string sAssignedTo = XmlDoc.GetAttrValue(nodeNote, "assignedTo", "");
+
+            // Toolbox old style had a <ownseq node above the messages; so if we see this,
+            // we simply move down to it prior to iterating through the Message nodes.
+            var nodeParent = XmlDoc.FindNode(nodeNote, "ownseq");
+            if (null == nodeParent)
+                nodeParent = nodeNote;
+
+            // Messages
+            foreach (XmlNode child in nodeParent.ChildNodes)
+            {
+                var message = DMessage.Create(child);
+                if (null != message)
+                    note.Messages.Append(message);
+            }
+
+            // Handle old-style AssignedTo
+            if (!string.IsNullOrEmpty(sAssignedTo))
+                note.LastMessage.Status = sAssignedTo;
+
+            return note;
+        }
+        #endregion
+        #region Method: XmlNode Save(oxes, nodeAnnotation)
+        public XmlNode Save(XmlDoc oxes, XmlNode nodeParent)
+        {
+            var nodeNote = oxes.AddNode(nodeParent, c_sTagTranslatorNote);
+
+            // Attrs
+            oxes.AddAttr(nodeNote, c_sAttrClass, Class.ToString());
+            oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
+            oxes.AddAttr(nodeNote, c_sAttrReference, Reference);
+
+            // Message objects
+            foreach (DMessage m in Messages)
+                m.Save(oxes, nodeNote);
+
+            return nodeNote;
+        }
+        #endregion
+
         // Editor Support --------------------------------------------------------------------
         #region VAttr{g}: bool IsEditable
         public bool IsEditable
@@ -1386,60 +1207,6 @@ namespace JWdb.DataModel
             }
 
             return sOut;
-        }
-        #endregion
-        #region Method: DBasicText GetCollapsableHeaderText(sContainingText)
-        public DBasicText GetCollapsableHeaderText(string sContainingText)
-        {
-            // Create a text to put the header into
-            DBasicText text = new DBasicText();
-
-            // Start with the reference
-            string sBookRef = GetDisplayableReference() + ":" + DPhrase.c_chInsertionSpace;
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, sBookRef));
-
-            // If we don't have a Context, then we're done. We could reproduce the 
-            // containing text, but this would eat up the window and is redundant
-            // anyway.
-            if (string.IsNullOrEmpty(Context))
-                return text;
-
-            // Locate the position of the Context within the containing text
-            int iPos = -1;
-            if (!string.IsNullOrEmpty(sContainingText))
-                iPos = sContainingText.IndexOf(Context);
-
-            // If it wasn't found, then just add the Context and we're done
-            if (-1 == iPos)
-            {
-                DPhrase p = new DPhrase(DStyleSheet.c_sfmParagraph, Context);
-                text.Phrases.Append(p);
-                return text;
-            }
-
-            // If w'ere here, then the Context exists within the ContainingText. This
-            // is our preferred situation. We want to extract a few words to the left
-            // of the Context.
-            string sLeft = GetWordsLeft(sContainingText, iPos, 4);
-            if (!string.IsNullOrEmpty(sLeft))
-            {
-                DPhrase p = new DPhrase(DStyleSheet.c_sfmParagraph, sLeft + " ");
-                text.Phrases.Append(p);
-            }
-
-            // Add the context
-            DPhrase pContext = new DPhrase(DStyleSheet.c_StyleAbbrevBold, Context);
-            text.Phrases.Append(pContext);
-
-            // Extract a few words to the right
-            string sRight = GetWordsRight(sContainingText, iPos + Context.Length, 4);
-            if (!string.IsNullOrEmpty(sRight))
-            {
-                DPhrase p = new DPhrase(DStyleSheet.c_sfmParagraph, " " + sRight);
-                text.Phrases.Append(p);
-            }
-
-            return text;
         }
         #endregion
         #region SMethod: string GetWordsLeft(string s, int iPos, int cWords)
@@ -1484,134 +1251,38 @@ namespace JWdb.DataModel
             return sRight.Trim();
         }
         #endregion
-        #region SAttr{g/s}: bool ShowAllPeople - vs "Only show the notes assigned to me"
-        static public bool ShowAllPeople
-        {
-            get
-            {
-                return s_bShowAllPeople;
-            }
-            set
-            {
-                s_bShowAllPeople = value;
-            }
-        }
-        static bool s_bShowAllPeople = true;
-        #endregion
-        #region VAttr{g}: bool IsUnassigned
-        public bool IsUnassigned
-        {
-            get
-            {
-                return string.IsNullOrEmpty(AssignedTo);
-            }
-        }
-        #endregion
 
         // View Construction -----------------------------------------------------------------
-        #region VAttr{g}: Discussion FirstDiscussion
-        public Discussion FirstDiscussion
+        #region VAttr{g}: Message FirstMessage
+        public DMessage FirstMessage
         {
             get
             {
-                Debug.Assert(0 != Discussions.Count);
-                return Discussions[0];
+                Debug.Assert(0 != Messages.Count);
+                return Messages[0];
             }
         }
         #endregion
-        #region VAttr{g}: Discussion LastDiscussion
-        public Discussion LastDiscussion
+        #region VAttr{g}: Message LastMessage
+        public DMessage LastMessage
         {
             get
             {
-                Debug.Assert(0 != Discussions.Count);
-                return Discussions[Discussions.Count - 1];
+                Debug.Assert(0 != Messages.Count);
+                return Messages[Messages.Count - 1];
             }
-        }
-        #endregion
-        #region VAttr{g}: DParagraph FirstParagraph - first paragraph in the first discussion obj
-        public DParagraph FirstParagraph
-        {
-            get
-            {
-                Debug.Assert(0 < Discussions.Count);
-                return Discussions[0].FirstParagraph;
-            }
-        }
-        #endregion
-        #region VAttr{g}: DParagraph LastParagraph - last paragraph in the last discussion obj
-        public DParagraph LastParagraph
-        {
-            get
-            {
-                DParagraph p = LastDiscussion.LastParagraph;
-                Debug.Assert(null != p);
-                return p;
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool IsShown()
-        public bool IsShown()
-        {
-            // Is this an AssignedTo person we want to see?
-            if (!ShowAllPeople)
-            {
-                // Is it assigned to this user?
-                bool bIsAsignedToThisUser = (AssignedTo == DB.UserName);
-
-                // Was it recently created by this user? (The issue is that if the user
-                // has it "Show stuff assigned to me", and they then create the note,
-                // because the note is assigned to no one, it would not show up. So we
-                // give it an hour for the user to assign it to someone.
-                bool bWasJustCreatedByThisUser =
-                    (Discussions.Count == 1 &&
-                    FirstDiscussion.Author == DB.UserName &&
-                    FirstDiscussion.Created > DateTime.Now.AddHours(-1) &&
-                    IsUnassigned);
-
-                // Either criteria works
-                if (!bIsAsignedToThisUser && !bWasJustCreatedByThisUser)
-                    return false;
-            }
-
-            // Is this a Front Translation "Hint For Daughter" note?
-            if (Text.Paragraph.Translation == DB.FrontTranslation)
-            {
-                if (!ShowInDaughterTranslations)
-                    return false;
-                if (!FrontCategories.FindItem(Category).IsChecked)
-                    return false;
-                
-                return true;
-            }
-
-            // Is this a category we want to see?
-            Classifications.Classification cl = Categories.FindItem(Category);
-            if (null == cl || !cl.IsChecked)
-                return false;
-
-            return true;
         }
         #endregion
         #region SMethod: Bitmap GetBitmap(clrBackground)
-        static public Bitmap GetBitmap(Color clrBackground)
+        public Bitmap GetBitmap(Color clrBackground)
         {
             // Retrieve the bitmap from resources
-            Bitmap bmp = JWU.GetBitmap("NoteGeneric.ico");
-
-            // Set its transparent color to the background color. We assume that the
-            // pixel at 0,0 is a background pixel.
-            Color clrTransparent = bmp.GetPixel(0, 0);
-            for (int h = 0; h < bmp.Height; h++)
-            {
-                for (int w = 0; w < bmp.Width; w++)
-                {
-                    if (bmp.GetPixel(w, h) == clrTransparent)
-                        bmp.SetPixel(w, h, clrBackground);
-                }
-            }
-
+            Bitmap bmp = JWU.GetBitmap(IconResourceForClass);
             Debug.Assert(null != bmp);
+
+            // Set its transparent color to the background color.
+            JWU.ChangeBitmapBackground(bmp, clrBackground);
+
             return bmp;
         }
         #endregion
@@ -1619,22 +1290,22 @@ namespace JWdb.DataModel
         // Merging ---------------------------------------------------------------------------
         #region Method: bool IsSameOriginAs(Theirs)
         public bool IsSameOriginAs(TranslatorNote Theirs)
-            // Two Notes started out the same IFF the Author and Created of the first discussion
+            // Two Notes started out the same IFF the Author and Created of the first message
             // are the same.
         {
-            Debug.Assert(Discussions.Count > 0);
-            Debug.Assert(Theirs.Discussions.Count > 0);
+            Debug.Assert(Messages.Count > 0);
+            Debug.Assert(Theirs.Messages.Count > 0);
 
-            return Discussions[0].IsSameOriginAs(Theirs.Discussions[0]);
+            return Messages[0].IsSameOriginAs(Theirs.Messages[0]);
         }
         #endregion
-        #region Method: Discussion FindInParent(TranslatorNote Parent, Discussion)
-        Discussion FindInParent(TranslatorNote Parent, Discussion d)
+        #region Method: DMessage FindInParent(TranslatorNote Parent, DMessage)
+        DMessage FindInParent(TranslatorNote Parent, DMessage message)
         {
-            foreach (Discussion discParent in Parent.Discussions)
+            foreach (DMessage m in Parent.Messages)
             {
-                if (discParent.IsSameOriginAs(d))
-                    return discParent;
+                if (m.IsSameOriginAs(message))
+                    return m;
             }
             return null;
         }
@@ -1642,29 +1313,28 @@ namespace JWdb.DataModel
         #region Method: void Merge(TranslatorNote Parent, TranslatorNote Theirs)
         public void Merge(TranslatorNote Parent, TranslatorNote Theirs)
         {
-            // Find out who had the most recent discussion. They will be the
+            // Find out who had the most recent message. They will be the
             // winner for the basic attrs. (Thus if it was them, copy the values
             // over; otherwise by default we just keep ours.)
-            if (Theirs.LastDiscussion.Created.CompareTo(LastDiscussion.Created) > 1)
+            if (Theirs.LastMessage.Created.CompareTo(LastMessage.Created) > 1)
             {
-                Category = Theirs.Category;
-                AssignedTo = Theirs.AssignedTo;
-                Context = Theirs.Context;
+                Class = Theirs.Class;
+                SelectedText = Theirs.SelectedText;
                 Reference = Theirs.Reference;
-                ShowInDaughterTranslations = Theirs.ShowInDaughterTranslations;
+                SfmMarker = Theirs.SfmMarker;
             }
 
-            // Go through their discussions. Anything that we have, we merge; everything
-            // else, we add. Thus the result is a superset of all Discussion objects.
-            foreach (Discussion discTheirs in Theirs.Discussions)
+            // Go through their messages. Anything that we have, we merge; everything
+            // else, we add. Thus the result is a superset of all Message objects.
+            foreach (DMessage msgTheirs in Theirs.Messages)
             {
                 // If we have it, then merge the two
                 bool bFound = false;
-                foreach (Discussion discOurs in Discussions)
+                foreach (DMessage msgOurs in Messages)
                 {
-                    if (discTheirs.IsSameOriginAs(discOurs))
+                    if (msgTheirs.IsSameOriginAs(msgOurs))
                     {
-                        discOurs.Merge(FindInParent(Parent, discOurs), discTheirs);
+                        msgOurs.Merge(FindInParent(Parent, msgOurs), msgTheirs);
                         bFound = true;
                         break;
                     }
@@ -1672,10 +1342,10 @@ namespace JWdb.DataModel
 
                 // Otherwise, add theirs to our sequence
                 if (!bFound)
-                    Discussions.Append( discTheirs.Clone() );
+                    Messages.Append( msgTheirs.Clone() );
             }
         }
         #endregion
     }
-
+    #endregion
 }

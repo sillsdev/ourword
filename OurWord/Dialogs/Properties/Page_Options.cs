@@ -65,6 +65,9 @@ namespace OurWord.Dialogs
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
         const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
+        const string c_sGroupBackTranslation = "propBackTranslation";
+        const string c_sShowFrontVernacular = "propShowFrontVernacular";
+        const string c_sShowFrontBT = "propShowFrontBT";
 #if FEATURE_WESAY
         const string c_sGroupWeSayDictionary = "propDictionary";
         const string c_sPathToDictionaryApp = "propDictApp";
@@ -144,6 +147,22 @@ namespace OurWord.Dialogs
                     e.Value = WndNaturalness.LineNumbersColor;
                     break;
 
+                // Back Translation view
+                case c_sShowFrontVernacular:
+                    {
+                        YesNoPropertySpec PS = e.Property as YesNoPropertySpec;
+                        Debug.Assert(null !=PS);
+                        e.Value = PS.GetBoolString(WndBackTranslation.DisplayFrontVernacular);
+                        break;
+                    }
+                case c_sShowFrontBT:
+                    {
+                        YesNoPropertySpec PS = e.Property as YesNoPropertySpec;
+                        Debug.Assert(null != PS);
+                        e.Value = PS.GetBoolString(WndBackTranslation.DisplayFrontBT);
+                        break;
+                    }
+
 #if FEATURE_WESAY
                 // WeSay Dictionary Setup
                 case c_sPathToDictionaryApp:
@@ -172,6 +191,14 @@ namespace OurWord.Dialogs
                     e.Value = TranslationsWnd.RegistryBackgroundColor;
                     break;
             }
+        }
+        #endregion
+        #region Method: bool InterpretYesNo(PropertySpecEventArgs e)
+        bool InterpretYesNo(PropertySpecEventArgs e)
+        {
+            YesNoPropertySpec PS = e.Property as YesNoPropertySpec;
+            Debug.Assert(null != PS);
+            return PS.IsTrue(e.Value);
         }
         #endregion
         #region Method: void bag_SetValue(object sender, PropertySpecEventArgs e)
@@ -225,6 +252,14 @@ namespace OurWord.Dialogs
                     break;
                 case c_sLineNumberColor:
                     WndNaturalness.LineNumbersColor = (string)e.Value;
+                    break;
+
+                // Back Translation view
+                case c_sShowFrontVernacular:
+                    WndBackTranslation.DisplayFrontVernacular = InterpretYesNo(e);
+                    break;
+                case c_sShowFrontBT:
+                    WndBackTranslation.DisplayFrontBT = InterpretYesNo(e);
                     break;
 
 #if FEATURE_WESAY
@@ -366,6 +401,24 @@ namespace OurWord.Dialogs
                     "visible against the background color; yet that doesn't detract from reading the " +
                     "Scripture text.",
                 "DarkGray"));
+            #endregion
+
+            // Back Translation options
+            #region (Back Translation options)
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sShowFrontVernacular,
+                "Show Front Translation's Vernacular",
+                c_sGroupBackTranslation,
+                "If Yes, the vernacular text of the front translation will be shown in a column.",
+                false
+                ));
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sShowFrontBT,
+                "Show Front Translation's Back Translation",
+                c_sGroupBackTranslation,
+                "If Yes, the BT of the front translation will be shown in a column.",
+                false
+                ));
             #endregion
 
 #if FEATURE_WESAY

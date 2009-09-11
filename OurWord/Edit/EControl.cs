@@ -39,16 +39,18 @@ namespace OurWord.Edit
         #endregion
 
         // Screen Region ---------------------------------------------------------------------
+        const int c_nTopMargin = 4;   // Windows wants to overwrite the drawing above it.
+
         #region OAttr{g/s}: float Height
         public override float Height
         {
             get
             {
-                return Control.Height;
+                return Control.Height + c_nTopMargin;
             }
             set
             {
-                Control.Height = (int)value;
+                Control.Height = (int)value - c_nTopMargin;
             }
         }
         #endregion
@@ -124,7 +126,7 @@ namespace OurWord.Edit
 		public override void PaintControls()
 		{
 			float fScrollAmount = Window.ScrollBarPosition;
-			Control.Top = (int)(Position.Y - fScrollAmount);
+			Control.Top = c_nTopMargin + (int)(Position.Y - fScrollAmount);
 		}
 		#endregion
 	}
@@ -156,7 +158,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return Control.Height + c_nTopMargin;
+                return Control.Height;
             }
             set
             {
@@ -164,7 +166,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        const int c_nTopMargin = 3;   // Windows wants to overwrite the drawing above it.
 
         // Attrs -----------------------------------------------------------------------------
         #region VAttr{g}: ToolStrip ToolStrip
@@ -211,12 +212,9 @@ namespace OurWord.Edit
 		public override void CalculateVerticals(float y, bool bRepositionOnly)
         {
             // Set to the top-left position and width
-            Position = new PointF(Position.X, y + c_nTopMargin);
+            Position = new PointF(Position.X, y);
         }
         #endregion
     }
-
-
-
 
 }

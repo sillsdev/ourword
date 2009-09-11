@@ -52,10 +52,8 @@ namespace JWdb.DataModel
 		}
 		private JOwnSeq<DRun> j_osRuns;
 		#endregion
-		#region Declare BAttrs
-		enum BAttrs { bContents = BAttrBase };
-
-		protected override void DeclareAttrs()
+        #region OMethod: void DeclareAttrs()
+        protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
             DefineAttr("Abbrev", ref m_sStyleAbbrev);
@@ -319,7 +317,7 @@ namespace JWdb.DataModel
 		}
 		#endregion
 		#region Attr{g}: string DebugString
-		public string DebugString
+		public virtual string DebugString
 		{
 			get
 			{
@@ -519,6 +517,10 @@ namespace JWdb.DataModel
         {
             get
             {
+                // Can't change the style for Annotation Messages
+                if (null != this as DMessage)
+                    return null;
+
                 // We'll compile the possible styles here
                 var vPossibilities = new List<string>();
 
@@ -527,15 +529,6 @@ namespace JWdb.DataModel
                 vPossibilities.Add(DStyleSheet.c_sfmLine1);
                 vPossibilities.Add(DStyleSheet.c_sfmLine2);
                 vPossibilities.Add(DStyleSheet.c_sfmLine3);
-
-                // Translator Notes
-                bool bIsTranslatorNote = (Owner as Discussion != null);
-                if (bIsTranslatorNote)
-                {
-                    vPossibilities.Add(DStyleSheet.c_StyleNoteDiscussion);
-                    vPossibilities.Add(DStyleSheet.c_sfmSectionHead);
-                    vPossibilities.Add(DStyleSheet.c_sfmSectionHeadMinor);
-                }
 
                 // Is Scripture (rather than, e.g., a Translator Note)
                 bool bIsScripture = (Owner == Section);
@@ -1273,27 +1266,33 @@ namespace JWdb.DataModel
 			return text;
 		}
 		#endregion
-        #region Attr{g}: list<TranslatorNote> AllNotes
-        public List<TranslatorNote> AllNotes
-		{
-			get
-			{
-                var v = new List<TranslatorNote>();
 
-				foreach(DRun run in Runs)
-				{
-                    DText text = run as DText;
-                    if (null != text)
-					{
-                        foreach (TranslatorNote tn in text.TranslatorNotes)
-                            v.Add(tn);
-					}
-				}
 
-				return v;
-			}
-		}
-		#endregion
+        public List<TranslatorNote> GetAllTranslatorNotes()
+        {
+            var v = new List<TranslatorNote>();
+
+            foreach (DRun run in Runs)
+            {
+                // Notes that are attached to this text
+                var text = run as DText;
+                if (null != text)
+                {
+                    foreach (TranslatorNote note in text.TranslatorNotes)
+                        v.Add(note);
+                }
+
+                // Notes that are attached to this footnote
+                var foot = run as DFoot;
+                if (null != foot)
+                {
+                    v.AddRange(foot.Footnote.GetAllTranslatorNotes());
+                }
+            }
+
+            return v;
+        }
+
 
 		// Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -1502,14 +1501,20 @@ namespace JWdb.DataModel
         {
             get
             {
-                if (m_nID == -1 && null != Book)
-                    m_nID = Book.GetID();
+                EnsureHasID();
                 return m_nID;
             }
         }
         int m_nID = -1;
+        public void EnsureHasID()
+        {
+            if (m_nID == -1)
+                m_nID = Book.GetID();
+            Debug.Assert(m_nID > -1);
+        }
 
         // Oxes ------------------------------------------------------------------------------
+        const string c_sTagParagraph = "p";
         const string c_sAttrID = "id";
         const string c_sAttrStyle = "class";
         const string c_sAttrUsfm = "usfm";
@@ -1532,10 +1537,11 @@ namespace JWdb.DataModel
         protected void ReadOxes(XmlNode nodeParagraph)
             // Note that DPicture.CreatePicture calls this, too.
         {
-            // Get the ID attribute, creating a valid one if it is missing
+            // Get the ID attribute. We don't create one if one is missing,
+            // because this newly-created paragraph is likely not yet
+            // connected in the ownership hierarchy to a DBook, which we would
+            // need to get the ID from.
             m_nID = XmlDoc.GetAttrID(nodeParagraph, c_sAttrID);
-            if (-1 == m_nID)
-                m_nID = Book.GetID();
 
             // Style attribute
             string sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
@@ -1571,24 +1577,29 @@ namespace JWdb.DataModel
         #region SMethod: DParagraph CreateParagraph(nodeParagraph)
         static public DParagraph CreateParagraph(XmlNode nodeParagraph)
         {
+            if (null == nodeParagraph || nodeParagraph.Name != c_sTagParagraph)
+                return null;
+
             var p = new DParagraph();
             p.ReadOxes(nodeParagraph);
             return p;
         }
         #endregion
 
-        // TODO: Read/Create needs to handle the style and usfm attrs
-
-        #region VMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
+        #region VMethod: XmlNode SaveToOxesBook(oxes, nodeBook, bIncludeID)
         public virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
             // Saves the paragraph to the oxes document.
         {
             var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
             Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
 
-            var nodeParagraph = oxes.AddNode(nodeBook, "p");
+            var nodeParagraph = oxes.AddNode(nodeBook, c_sTagParagraph);
+
             oxes.AddAttr(nodeParagraph, c_sAttrStyle, map.Name);
-            oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
+
+            if (!string.IsNullOrEmpty(map.Usfm))
+                oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
+
             oxes.AddAttr(nodeParagraph, c_sAttrID, XmlDoc.IntToID(ID));
 
             foreach (DRun run in Runs)

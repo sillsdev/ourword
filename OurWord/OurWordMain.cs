@@ -102,8 +102,8 @@ namespace OurWord
         SideWindows m_SideWindows = null;
         #endregion
 
-        #region Attr{g}: OWWindow MainWindow - set{} changes it to another OWWindow subclass
-        public OWWindow MainWindow
+        #region Attr{g}: Layout MainWindow - set{} changes it to another OWWindow subclass
+        public Layout MainWindow
         {
             get
             {
@@ -132,7 +132,7 @@ namespace OurWord
                 ResetWindowContents();
             }
         }
-        OWWindow m_MainWindow = null;
+        Layout m_MainWindow = null;
         #endregion
 
         #region Attr{g}: WndDrafting WndDrafting
@@ -158,6 +158,11 @@ namespace OurWord
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
         private ToolStripMenuItem m_menuExportProject;
+        private ToolStripDropDownButton m_btnInsertNote;
+        private ToolStripMenuItem m_itemInsertGeneralNote;
+        private ToolStripMenuItem m_itemInsertExegeticalNote;
+        private ToolStripMenuItem m_itemInsertHintNote;
+        private ToolStripMenuItem m_itemInsertConsultantNote;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -780,6 +785,9 @@ namespace OurWord
             m_btnEditCut.Visible = !bEditMenuVisible;
             m_btnEditPaste.Visible = !bEditMenuVisible;
 
+            // Insert dropdown
+            MainWindow.SetupInsertNoteDropdown(m_btnInsertNote);
+
             // Clear dropdown subitems so we don't attempt to localize them
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
@@ -798,7 +806,8 @@ namespace OurWord
             EnableMenusAndToolbars();
         }
         #endregion
-        // Status Bar
+
+       // Status Bar
         #region Attr{g}: ToolStripStatusLabel StatusLabel1
         public ToolStripStatusLabel StatusLabel1
         {
@@ -996,6 +1005,11 @@ namespace OurWord
             this.m_menuInsertFootnote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuDeleteFootnote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnItalic = new System.Windows.Forms.ToolStripButton();
+            this.m_btnInsertNote = new System.Windows.Forms.ToolStripDropDownButton();
+            this.m_itemInsertGeneralNote = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_itemInsertExegeticalNote = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_itemInsertHintNote = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_itemInsertConsultantNote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnGotoFirstSection = new System.Windows.Forms.ToolStripButton();
             this.m_btnGotoPreviousSection = new System.Windows.Forms.ToolStripSplitButton();
             this.m_btnGotoNextSection = new System.Windows.Forms.ToolStripSplitButton();
@@ -1076,6 +1090,7 @@ namespace OurWord
             this.m_btnEditPaste,
             this.m_menuEdit,
             this.m_btnItalic,
+            this.m_btnInsertNote,
             m_separator2,
             this.m_btnGotoFirstSection,
             this.m_btnGotoPreviousSection,
@@ -1091,7 +1106,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(855, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(895, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1136,7 +1151,7 @@ namespace OurWord
             // 
             this.m_menuNewProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNewProject.Image")));
             this.m_menuNewProject.Name = "m_menuNewProject";
-            this.m_menuNewProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuNewProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuNewProject.Text = "&New...";
             this.m_menuNewProject.ToolTipText = "Create a brand new project.";
             this.m_menuNewProject.Click += new System.EventHandler(this.cmdNewProject);
@@ -1146,7 +1161,7 @@ namespace OurWord
             this.m_menuOpenProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOpenProject.Image")));
             this.m_menuOpenProject.Name = "m_menuOpenProject";
             this.m_menuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.m_menuOpenProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuOpenProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuOpenProject.Text = "&Open";
             this.m_menuOpenProject.ToolTipText = "Open an existing project.";
             // 
@@ -1155,7 +1170,7 @@ namespace OurWord
             this.m_menuSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSaveProject.Image")));
             this.m_menuSaveProject.Name = "m_menuSaveProject";
             this.m_menuSaveProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSaveProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuSaveProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuSaveProject.Text = "&Save";
             this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
             this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
@@ -1163,7 +1178,7 @@ namespace OurWord
             // m_menuExportProject
             // 
             this.m_menuExportProject.Name = "m_menuExportProject";
-            this.m_menuExportProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuExportProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuExportProject.Text = "Export...";
             this.m_menuExportProject.Click += new System.EventHandler(this.cmdExportProject);
             // 
@@ -1331,6 +1346,64 @@ namespace OurWord
             this.m_btnItalic.ToolTipText = "Changes the selected text to Italic; this is only enabled if Italic is allowed in" +
                 " the current context.";
             this.m_btnItalic.Click += new System.EventHandler(this.cmdItalic);
+            // 
+            // m_btnInsertNote
+            // 
+            this.m_btnInsertNote.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_itemInsertGeneralNote,
+            this.m_itemInsertExegeticalNote,
+            this.m_itemInsertHintNote,
+            this.m_itemInsertConsultantNote});
+            this.m_btnInsertNote.Image = ((System.Drawing.Image)(resources.GetObject("m_btnInsertNote.Image")));
+            this.m_btnInsertNote.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnInsertNote.Name = "m_btnInsertNote";
+            this.m_btnInsertNote.ShowDropDownArrow = false;
+            this.m_btnInsertNote.Size = new System.Drawing.Size(40, 35);
+            this.m_btnInsertNote.Text = "Insert";
+            this.m_btnInsertNote.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnInsertNote.ToolTipText = "Insert a Translator Note";
+            this.m_btnInsertNote.Click += new System.EventHandler(this.cmdInsertNote);
+            // 
+            // m_itemInsertGeneralNote
+            // 
+            this.m_itemInsertGeneralNote.Image = global::OurWord.Properties.Resources.NoteGeneric_Me;
+            this.m_itemInsertGeneralNote.Name = "m_itemInsertGeneralNote";
+            this.m_itemInsertGeneralNote.Size = new System.Drawing.Size(196, 22);
+            this.m_itemInsertGeneralNote.Tag = "General";
+            this.m_itemInsertGeneralNote.Text = "General Note";
+            this.m_itemInsertGeneralNote.ToolTipText = "Insert a general note.";
+            this.m_itemInsertGeneralNote.Click += new System.EventHandler(this.cmdInsertNote);
+            // 
+            // m_itemInsertExegeticalNote
+            // 
+            this.m_itemInsertExegeticalNote.Image = global::OurWord.Properties.Resources.NoteExegesis_Me;
+            this.m_itemInsertExegeticalNote.Name = "m_itemInsertExegeticalNote";
+            this.m_itemInsertExegeticalNote.Size = new System.Drawing.Size(196, 22);
+            this.m_itemInsertExegeticalNote.Tag = "Exegetical";
+            this.m_itemInsertExegeticalNote.Text = "Exegetical Note";
+            this.m_itemInsertExegeticalNote.ToolTipText = "Insert a note explaining your exegesis";
+            this.m_itemInsertExegeticalNote.Click += new System.EventHandler(this.cmdInsertNote);
+            // 
+            // m_itemInsertHintNote
+            // 
+            this.m_itemInsertHintNote.Image = global::OurWord.Properties.Resources.NoteHint_Me;
+            this.m_itemInsertHintNote.Name = "m_itemInsertHintNote";
+            this.m_itemInsertHintNote.Size = new System.Drawing.Size(196, 22);
+            this.m_itemInsertHintNote.Tag = "HintForDrafting";
+            this.m_itemInsertHintNote.Text = "Hint for Daughter Note";
+            this.m_itemInsertHintNote.ToolTipText = "Insert a note to be used in drafting a daughter translation, when this translatio" +
+                "n is used as a front.";
+            this.m_itemInsertHintNote.Click += new System.EventHandler(this.cmdInsertNote);
+            // 
+            // m_itemInsertConsultantNote
+            // 
+            this.m_itemInsertConsultantNote.Image = global::OurWord.Properties.Resources.NoteConsultant_Me;
+            this.m_itemInsertConsultantNote.Name = "m_itemInsertConsultantNote";
+            this.m_itemInsertConsultantNote.Size = new System.Drawing.Size(196, 22);
+            this.m_itemInsertConsultantNote.Tag = "Consultant";
+            this.m_itemInsertConsultantNote.Text = "Consultant Note";
+            this.m_itemInsertConsultantNote.ToolTipText = "Insert a note for the Consultant";
+            this.m_itemInsertConsultantNote.Click += new System.EventHandler(this.cmdInsertNote);
             // 
             // m_btnGotoFirstSection
             // 
@@ -3532,7 +3605,72 @@ namespace OurWord
 		}
 		#endregion
 
+        // Misc
+        #region Cmd: cmdInsertNote
+        private void cmdInsertNote(object sender, EventArgs e)
+        {
+            // Retrieve the user interface item. If it was the top-level dropdown button, and 
+            // if there are dropdown items that are visible, then we don't want to execture the
+            // command; rather, we want the dropdown to take place so that the user can choose
+            // which type of note he wants.
+            var btn = sender as ToolStripDropDownButton;
+            if (null != btn && btn.HasDropDownItems)
+                return;
+            var uiItem = sender as ToolStripItem;
 
+            // If the Main Window is not focused, then we don't have a
+            // context for inserting notes.
+            var window = G.App.MainWindow;
+            Debug.Assert(null != window);
+            if (!window.Focused)
+                return;
+
+            // If we don't have a selection, we inform the user; as we want our notes to be
+            // about someothing (and it gives us a title for our note.)
+            var selection = window.Selection;
+            if (null == selection || !selection.IsContentSelection)
+            {
+                LocDB.Message(
+                    "msgNeedTextSelectionForInsertNote",
+                    "Please select the text for which your note will be about.",
+                    null,
+                    LocDB.MessageTypes.Warning);
+
+                return;
+            }
+
+            // Get the Class of note from the Tag
+            var eClass = TranslatorNote.NoteClass.General;
+            try
+            {
+                var sClass = (string)uiItem.Tag;
+                eClass = (TranslatorNote.NoteClass)Enum.Parse(
+                    typeof(TranslatorNote.NoteClass), sClass, true);
+            }
+            catch (Exception)
+            {
+            }
+
+            // Perform the undoable action
+            var action = new InsertNoteAction(window, eClass);
+            action.Do();
+
+            // Launch the tooltip window for the new note
+            var vParas = window.Contents.AllParagraphs;
+            foreach (var owp in vParas)
+            {
+                foreach (var item in owp.SubItems)
+                {
+                    var en = item as ENote;
+                    if (null != en && en.Note == action.Note)
+                    {
+                        OWToolTip.ToolTip.LaunchToolTipWindow(en);
+                        return;
+                    }
+                }
+            }
+        }
+        #endregion
 
         #endregion
     }
