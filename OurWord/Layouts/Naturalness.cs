@@ -168,12 +168,6 @@ namespace OurWord.Layouts
             {
                 DParagraph p = DB.TargetSection.Paragraphs[ip] as DParagraph;
 
-                // Retrieve the bitmap, if a picture is involved
-                Bitmap bmp = null;
-                DPicture pict = p as DPicture;
-                if (null != pict)
-                    bmp = pict.GetBitmap(c_xMaxPictureWidth);
-
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)
                 if (p.SimpleText.Length == 0 && p.SimpleTextBT.Length == 0)
@@ -207,7 +201,7 @@ namespace OurWord.Layouts
                     p,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
-                op.Bmp = bmp;
+                op.Bmp = GetPicture(p);
                 Contents.Append(op);
             }
 

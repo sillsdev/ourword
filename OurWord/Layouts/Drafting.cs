@@ -542,7 +542,7 @@ namespace OurWord.Layouts
             base.LoadData();
         }
         #endregion
-        #region Method: void _LoadParagraphs()
+        #region Method: void LoadParagraphs()
         void LoadParagraphs()
         {
             // We'll work our way through both the Front and the Target paragraphs
@@ -581,18 +581,12 @@ namespace OurWord.Layouts
                 else
                 {
                     for (int k = 0; k < cFront; k++)
-                    {
-                        // Retrieve the bitmap, if a picture is involved
-                        Bitmap bmp = null;
-                        DPicture pict = DB.FrontSection.Paragraphs[iFront + k] as DPicture;
-                        if (null != pict)
-                            bmp = pict.GetBitmap(c_xMaxPictureWidth);
-                        
+                    {                       
                         // Start the row
                         EColumn colFront;
                         EColumn colTarget;
                         ERowOfColumns row = CreateRow(Contents, out colFront, out colTarget, false);
-                        row.Bmp = bmp;
+                        row.Bmp = GetPicture(DB.TargetSection.Paragraphs[iTarget + k]);
 
                         // Synchronize the Vernacular to the Target
                         DParagraph pFront = DB.FrontSection.Paragraphs[iFront + k] as DParagraph;

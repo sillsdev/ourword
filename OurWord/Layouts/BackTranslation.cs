@@ -30,7 +30,8 @@ namespace OurWord.Layouts
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "BT";
-        public const string c_sRegDisplayInterlinearBT = "DisplayIBT";
+        const string c_sRegDisplayFrontVernacular = "ShowFrontVernacular";
+        const string c_sRegDisplayFrontBT = "ShowFrontBT";
         #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
         static public string RegistryBackgroundColor
         {
@@ -44,24 +45,31 @@ namespace OurWord.Layouts
             }
         }
         #endregion
-        #region SAttr{g}: bool DisplayInterlinearBT
-        static public bool DisplayInterlinearBT
+        #region SAttr{g/s}: bool DisplayFrontVernacular
+        static public bool DisplayFrontVernacular
         {
             get
             {
-                if (s_nDisplayInterlinearBT == -1)
-                {
-                    s_nDisplayInterlinearBT = JW_Registry.GetValue(c_sName, c_sRegDisplayInterlinearBT, 0);
-                }
-                return (s_nDisplayInterlinearBT == 1) ? true : false;
+                return JW_Registry.GetValue(c_sName, c_sRegDisplayFrontVernacular, false);
             }
             set
             {
-                s_nDisplayInterlinearBT = (value == true) ? 1 : 0;
-                JW_Registry.SetValue(c_sName, c_sRegDisplayInterlinearBT, s_nDisplayInterlinearBT);
+                JW_Registry.SetValue(c_sName, c_sRegDisplayFrontVernacular, value);
             }
         }
-        static int s_nDisplayInterlinearBT = -1;
+        #endregion
+        #region SAttr{g/s{: bool DisplayFrontBT
+        static public bool DisplayFrontBT
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sName, c_sRegDisplayFrontBT, false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sName, c_sRegDisplayFrontBT, value);
+            }
+        }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -113,27 +121,7 @@ namespace OurWord.Layouts
         #endregion
 
         // Create the Window Contents from the data ------------------------------------------
-        const int c_xMaxPictureWidth = 300;
-        #region Method: Bitmap GetPicture(DParagraph p)
-        Bitmap GetPicture(DParagraph p)
-        {
-            DPicture pict = p as DPicture;
-            if (null != pict)
-                return pict.GetBitmap(c_xMaxPictureWidth);
-            return null;
-        }
-        #endregion
-        #region Method: OWPara CreateVernacularPara(DParagraph)
-        OWPara CreateVernacularPara(DParagraph p)
-        {
-            return new OWPara(
-                p.Translation.WritingSystemVernacular,
-                p.Style,
-                p,
-                BackColor,
-                OWPara.Flags.None);
-        }
-        #endregion
+
         #region Method: override void LoadData()
         public override void LoadData()
         {
@@ -143,6 +131,9 @@ namespace OurWord.Layouts
             // Nothing more to do if we don't have a completely-defined project
             if (!DB.Project.HasDataToDisplay)
                 return;
+
+            LoadFour();
+            return;
 
             // Load the paragraphs
             foreach (DParagraph p in DB.TargetSection.Paragraphs)
@@ -206,7 +197,7 @@ namespace OurWord.Layouts
                 bFirstFootnote = false;
 
                 // Add the vernacular paragraph to the left side
-                OWPara op = CreateVernacularPara(fn);
+                OWPara op = CreateUneditableVernacularPara(fn);
                 colVernacular.Append(op);
 
                 // Options for the display paragraph
@@ -257,6 +248,76 @@ namespace OurWord.Layouts
             btnInsertNote.ShowDropDownArrow = true;
         }
         #endregion
+
+        // Layout with Front Translation columns ---------------------------------------------
+        void LoadFour()
+        {
+            // Synchronze the sections
+            var synch = new WndBackTranslation.SynchronizedSection(DB.FrontSection, DB.TargetSection);
+
+            // Create the view
+            Clear();
+            foreach (SynchronizedSection.ParagraphGroup group in synch.ParagraphGroups)
+            {
+                // Each group is in a top-level row; the front is on the left, the target on the right
+                var rowTop = new ERowOfColumns(2);
+                Contents.Append(rowTop);
+
+                // Front
+                var rowFront = new ERowOfColumns(2);
+                rowTop.Append(rowFront);
+                foreach (DParagraph p in group.FrontParagraphs)
+                {
+                    // Uneditable Vernacular
+                    rowFront.Append(
+                        new OWPara(
+                            p.Translation.WritingSystemVernacular,
+                            p.Style,
+                            p,
+                            BackColor,
+                            OWPara.Flags.None));
+
+                    // Uneditable BT
+                    rowFront.Append(
+                        new OWPara(
+                            p.Translation.WritingSystemConsultant,
+                            p.Style,
+                            p,
+                            BackColor,
+                            OWPara.Flags.ShowBackTranslation));
+                }
+
+                // Target
+                var rowTarget = new ERowOfColumns(2);
+                rowTop.Append(rowTarget);
+                foreach (DParagraph p in group.TargetParagraphs)
+                {
+                    // Uneditable Vernacular
+                    rowTarget.Append( 
+                        new OWPara(
+                            p.Translation.WritingSystemVernacular,
+                            p.Style,
+                            p,
+                            BackColor,
+                            OWPara.Flags.None));
+
+                    // Editable BT
+                    rowTarget.Append(
+                        new OWPara(
+                            p.Translation.WritingSystemConsultant,
+                            p.Style,
+                            p,
+                            EditableBackgroundColor,
+                            OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable));
+                }
+            }
+
+            base.LoadData();
+        }
+
+
+
+
     }
 
 
