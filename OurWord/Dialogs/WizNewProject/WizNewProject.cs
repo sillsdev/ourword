@@ -73,9 +73,9 @@ namespace OurWord.Dialogs.WizNewProject
 			get
 			{
 				// See what we had in the registry, if anything
-				if (m_ChosenCluster == null)
+                if (m_ChosenCluster == null)
 				{
-					Debug.Assert(ClusterInfoList.Count > 0);
+                    Debug.Assert(ClusterInfoList.Count > 0);
 					string sLastTime = JW_Registry.GetValue(c_sRegKeyLastCluster, "");
 
                     m_ChosenCluster = ClusterInfoList[0];

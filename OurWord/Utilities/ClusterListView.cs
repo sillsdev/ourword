@@ -190,7 +190,6 @@ namespace OurWord.Utilities
             }
         }
         #endregion
-
         #region Method: void CreateNewCluster()
         public void CreateNewCluster()
         {
@@ -201,6 +200,10 @@ namespace OurWord.Utilities
 
             // A Cluster is defined as (1) a Cluster Folder, which (2) owns a
             // Settings folder. 
+            ClusterList.CreateNewCluster(dlg.StoreInMyDocuments, dlg.NewClusterName);
+
+            /***
+             * Obsolete 11sep09; moved to class ClusterList.
             string sParentFolder = (dlg.StoreInMyDocuments) ?
                 JWU.GetMyDocumentsFolder(null) :
                 JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
@@ -210,6 +213,7 @@ namespace OurWord.Utilities
                 DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
             if (!Directory.Exists(sSettingsPath))
                 Directory.CreateDirectory(sSettingsPath);
+            ***/
 
             // Recalculate the list of clusters
             ClusterList.ScanForClusters();

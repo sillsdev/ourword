@@ -154,6 +154,27 @@ namespace JWdb.DataModel
         static List<ClusterInfo> s_vClusters;
         #endregion
 
+        static public void CreateNewCluster(bool bStoreInMyDocuments, string sNewClusterName)
+            // A Cluster is defined as (1) a Cluster Folder, which (2) owns a
+            // Settings folder. 
+        {
+            // The owning folder is either in the publically visible MyDocuments, or
+            // in the relatively hidden local data folder.
+            string sParentFolder = (bStoreInMyDocuments) ?
+                JWU.GetMyDocumentsFolder(null) :
+                JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
+
+            // Build the path to the cluster folder
+            string sSettingsPath =
+                sParentFolder + Path.DirectorySeparatorChar +
+                sNewClusterName + Path.DirectorySeparatorChar +
+                DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
+
+            // Create the folder
+            if (!Directory.Exists(sSettingsPath))
+                Directory.CreateDirectory(sSettingsPath);
+        }
+
         #region SMethod: void ScanForClusters()
         static public void ScanForClusters()
         {
@@ -181,6 +202,14 @@ namespace JWdb.DataModel
                         s_vClusters.Add(new ClusterInfo(sClusterName, sPossibleLocation));
                     }
                 }
+            }
+
+            // If we came up empty, we need to create a cluster, so that we always
+            // have one to put things into. We'll place it into MyDocuments
+            if (s_vClusters.Count == 0)
+            {
+                CreateNewCluster(true, "OurWordData");
+                ScanForClusters();
             }
         }
         #endregion

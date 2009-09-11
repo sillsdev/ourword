@@ -56,6 +56,7 @@ namespace OurWord.Dialogs.WizNewProject
         public WizNew_ProjectName()
         {
             InitializeComponent();
+            m_vLanguages = new List<string>();
         }
         #endregion
 
