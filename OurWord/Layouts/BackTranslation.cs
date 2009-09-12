@@ -30,8 +30,7 @@ namespace OurWord.Layouts
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "BT";
-        const string c_sRegDisplayFrontVernacular = "ShowFrontVernacular";
-        const string c_sRegDisplayFrontBT = "ShowFrontBT";
+        const string c_sRegDisplayFrontInBT = "ShowFrontInBT";
         #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
         static public string RegistryBackgroundColor
         {
@@ -45,29 +44,16 @@ namespace OurWord.Layouts
             }
         }
         #endregion
-        #region SAttr{g/s}: bool DisplayFrontVernacular
-        static public bool DisplayFrontVernacular
+        #region SAttr{g/s}: bool DisplayFrontInBT
+        static public bool DisplayFrontInBT
         {
             get
             {
-                return JW_Registry.GetValue(c_sName, c_sRegDisplayFrontVernacular, false);
+                return JW_Registry.GetValue(c_sName, c_sRegDisplayFrontInBT, false);
             }
             set
             {
-                JW_Registry.SetValue(c_sName, c_sRegDisplayFrontVernacular, value);
-            }
-        }
-        #endregion
-        #region SAttr{g/s{: bool DisplayFrontBT
-        static public bool DisplayFrontBT
-        {
-            get
-            {
-                return JW_Registry.GetValue(c_sName, c_sRegDisplayFrontBT, false);
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sName, c_sRegDisplayFrontBT, value);
+                JW_Registry.SetValue(c_sName, c_sRegDisplayFrontInBT, value);
             }
         }
         #endregion
@@ -132,8 +118,13 @@ namespace OurWord.Layouts
             if (!DB.Project.HasDataToDisplay)
                 return;
 
-            LoadFour();
-            return;
+            // Version of the view which shows four columns, both Front and Target translations,
+            // both Vernacular and BT of both.
+            if (DisplayFrontInBT)
+            {
+                LoadFour();
+                return;
+            }
 
             // Load the paragraphs
             foreach (DParagraph p in DB.TargetSection.Paragraphs)

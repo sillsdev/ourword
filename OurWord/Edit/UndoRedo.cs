@@ -1305,6 +1305,10 @@ namespace OurWord.Edit
             if (!op.IsEditable)
                 return false;
 
+            //Do nothing if there's nothing to insert
+            if (string.IsNullOrEmpty(sInsert))
+                return false;
+
             // Save a bookmark for where we are prior to the insertion
             m_bookmark_BeforeInsert = Window.CreateBookmark();
 
@@ -1752,7 +1756,7 @@ namespace OurWord.Edit
                 return null;
 
             // Don't insert if too big; we figure the user has the wrong stuff on the clipboard!
-            if (m_sClipboardText.Length > 500)
+            if (m_sClipboardText.Length > 1000)
                 return null;
 
             // Remove the characters we don't like
