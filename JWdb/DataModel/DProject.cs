@@ -41,20 +41,6 @@ namespace JWdb.DataModel
 		}
 		private string m_sComment = "";
 		#endregion
-		#region BAttr{g/s}: bool VD_ShowNotesPane
-		static public bool VD_ShowNotesPane
-		{
-			get
-			{
-				return m_bVD_ShowNotesPane;
-			}
-			set
-			{
-				m_bVD_ShowNotesPane = value;
-			}
-		}
-		static private bool m_bVD_ShowNotesPane = false;
-		#endregion
         #region BAttr{g/s}: bool VD_ShowTranslationsPane
         static public bool VD_ShowTranslationsPane
 		{
@@ -163,7 +149,6 @@ namespace JWdb.DataModel
             DefineAttr("DictApp", ref m_sPathToDictionaryApp);
             DefineAttr("DictData", ref m_sPathToDictionaryData);
 
-			DefineAttr("vdShowNotes",    ref m_bVD_ShowNotesPane);
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
             DefineAttr("vdShowHistory",  ref m_bVD_ShowHistoryPane);
 

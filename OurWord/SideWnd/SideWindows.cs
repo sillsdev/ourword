@@ -184,22 +184,6 @@ namespace OurWord.SideWnd
         }
         #endregion
 
-        // Notes Window ----------------------------------------------------------------------
-        #region Attr{g}: bool HasNotesWindow
-        public bool HasNotesWindow
-        {
-            get
-            {
-                foreach (TabPage page in TabPages)
-                {
-                    if (page.Name == "Notes")
-                        return true;
-                }
-                return false;
-            }
-        }
-        #endregion
-
         // Commands from the owner -----------------------------------------------------------
         #region Cmd: OnResize
         protected override void OnResize(EventArgs e)

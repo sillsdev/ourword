@@ -354,7 +354,7 @@ namespace OurWord.SideWnd
             int nRoundedCornerInset = 8;
             var eDescrContainer = new EColumn();
             eDescrContainer.Border = new EContainer.RoundedBorder(eDescrContainer, 12);
-            eDescrContainer.Border.BorderColor = TranslatorNote.BorderColor;
+            eDescrContainer.Border.BorderColor = Color.DarkGray;
             eDescrContainer.Border.FillColor = Color.White;
             eDescrContainer.Border.Padding.Left = nRoundedCornerInset;
             eDescrContainer.Border.Padding.Right = nRoundedCornerInset;

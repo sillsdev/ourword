@@ -107,7 +107,6 @@ namespace OurWord.Layouts
         #endregion
 
         // Create the Window Contents from the data ------------------------------------------
-
         #region Method: override void LoadData()
         public override void LoadData()
         {
@@ -225,6 +224,15 @@ namespace OurWord.Layouts
             if (bShowingBT && note.IsTargetTranslationNote)
                 return true;
 
+            // In the front translation, show Exegetical and Consultant notes
+            if (bShowingBT && note.IsFrontTranslationNote)
+            {
+                if (note.IsExegeticalNote)
+                    return true;
+                if (note.IsConsultantNote)
+                    return true;
+            }
+
             // But nothing else
             return false;
         }
@@ -241,6 +249,79 @@ namespace OurWord.Layouts
         #endregion
 
         // Layout with Front Translation columns ---------------------------------------------
+        #region Method: var LoadFour_Picture(group)
+        ERowOfColumns LoadFour_Picture(SynchronizedSection.ParagraphGroup group)
+        {
+            // For this to hold tree, we'll have exactly one Front and one Target paragraph
+            if (group.TargetParagraphs.Count != 1 || group.FrontParagraphs.Count != 1)
+                return null;
+
+            // Get the two paragraphs (pictures) we're interested in
+            var pictureFront = group.FrontParagraphs[0] as DPicture;
+            var pictureTarget = group.TargetParagraphs[0]as DPicture;
+            if (null == pictureFront || null == pictureTarget)
+                return null;         
+
+            // We have a simple picture, one column, no paragraph content....if there is
+            // no text in any of our paragraphs
+            if (string.IsNullOrEmpty(pictureFront.SimpleText) &&
+                string.IsNullOrEmpty(pictureFront.SimpleTextBT) &&
+                string.IsNullOrEmpty(pictureTarget.SimpleText) &&
+                string.IsNullOrEmpty(pictureTarget.SimpleTextBT))
+            {
+                var rowSimple = new ERowOfColumns(1);
+                rowSimple.Bmp = GetPicture(pictureTarget);
+                return rowSimple;
+            }
+
+            // Create a row of four columns
+            var row = new ERowOfColumns(4);
+
+            // Load the picture into the row
+            row.Bmp = GetPicture(pictureTarget);
+
+            // Place the Front paragraphs into the columns (uneditable)
+            row.Append(new OWPara(pictureFront.Translation.WritingSystemVernacular,
+                pictureFront.Style, pictureFront, BackColor, OWPara.Flags.None));
+            row.Append(new OWPara(pictureFront.Translation.WritingSystemConsultant,
+                pictureFront.Style, pictureFront, BackColor, OWPara.Flags.ShowBackTranslation));
+
+            // The Target vernacular is not editable
+            row.Append(new OWPara(pictureTarget.Translation.WritingSystemVernacular,
+                pictureTarget.Style, pictureTarget, BackColor, OWPara.Flags.None));
+
+            // The Target BT is editable
+            var options = OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable |
+                OWPara.Flags.CanItalic;
+            if (OurWordMain.TargetIsLocked)
+                options |= OWPara.Flags.IsLocked;
+            row.Append(new OWPara(
+                pictureTarget.Translation.WritingSystemVernacular,
+                pictureTarget.Style, 
+                pictureTarget,
+                ((pictureTarget.IsUserEditable) ? EditableBackgroundColor : BackColor), 
+                options));
+
+            return row;
+        }
+        #endregion
+        #region Method: var AddPara(owp, bAddFootnoteSeparator
+        public const int c_nFootnoteSeparatorWidth = 60;
+        EColumn AddPara(OWPara owp, bool bAddFootnoteSeparator)
+        {
+            var col = new EColumn();
+            col.Append(owp);
+
+            if (bAddFootnoteSeparator)
+            {
+                col.Border = new EContainer.FootnoteSeparatorBorder(col,
+                    c_nFootnoteSeparatorWidth);
+            }
+
+            return col;
+        }
+        #endregion
+        #region Method: void LoadFour()
         void LoadFour()
         {
             // Synchronze the sections
@@ -248,11 +329,29 @@ namespace OurWord.Layouts
 
             // Create the view
             Clear();
-            foreach (SynchronizedSection.ParagraphGroup group in synch.ParagraphGroups)
+            var vGroups = synch.AllGroups;
+            bool bFirstFootnoteEncountered = false;
+            foreach (SynchronizedSection.ParagraphGroup group in vGroups)
             {
+                // Do we have a picture?
+                var rowPicture = LoadFour_Picture(group);
+                if (null != rowPicture)
+                {
+                    Contents.Append(rowPicture);
+                    continue;
+                }
+
                 // Each group is in a top-level row; the front is on the left, the target on the right
                 var rowTop = new ERowOfColumns(2);
                 Contents.Append(rowTop);
+
+                // First footnote
+                bool bAddFootnoteSeparator = false;
+                if (!bFirstFootnoteEncountered && group.IsFootnoteGroup)
+                {
+                    bFirstFootnoteEncountered = true;
+                    bAddFootnoteSeparator = true;
+                }
 
                 // Front
                 var rowFront = new ERowOfColumns(2);
@@ -260,22 +359,20 @@ namespace OurWord.Layouts
                 foreach (DParagraph p in group.FrontParagraphs)
                 {
                     // Uneditable Vernacular
-                    rowFront.Append(
-                        new OWPara(
-                            p.Translation.WritingSystemVernacular,
-                            p.Style,
-                            p,
-                            BackColor,
-                            OWPara.Flags.None));
+                    rowFront.Append(AddPara(
+                        new OWPara(p.Translation.WritingSystemVernacular,
+                            p.Style, p, BackColor, OWPara.Flags.None), 
+                        bAddFootnoteSeparator));
 
-                    // Uneditable BT
-                    rowFront.Append(
-                        new OWPara(
-                            p.Translation.WritingSystemConsultant,
-                            p.Style,
-                            p,
-                            BackColor,
-                            OWPara.Flags.ShowBackTranslation));
+                    // Uneditable BT. (The "options" switch here is for showing things like
+                    // cross references, where we just copy from the Vernacular rather than
+                    // requiring a back translation.)
+                    var options = (p.IsUserEditable) ?
+                        OWPara.Flags.ShowBackTranslation : OWPara.Flags.None;
+                    rowFront.Append( AddPara(
+                        new OWPara( p.Translation.WritingSystemConsultant,
+                            p.Style, p, BackColor, options),
+                        bAddFootnoteSeparator));
                 }
 
                 // Target
@@ -284,31 +381,37 @@ namespace OurWord.Layouts
                 foreach (DParagraph p in group.TargetParagraphs)
                 {
                     // Uneditable Vernacular
-                    rowTarget.Append( 
-                        new OWPara(
-                            p.Translation.WritingSystemVernacular,
-                            p.Style,
-                            p,
-                            BackColor,
-                            OWPara.Flags.None));
+                    rowTarget.Append( AddPara(
+                        new OWPara( p.Translation.WritingSystemVernacular,
+                            p.Style, p, BackColor, OWPara.Flags.None),
+                        bAddFootnoteSeparator));
 
                     // Editable BT
-                    rowTarget.Append(
+                    OWPara.Flags options = OWPara.Flags.None;
+                    if (p.IsUserEditable)
+                    {
+                        options = (
+                            OWPara.Flags.ShowBackTranslation |
+                            OWPara.Flags.IsEditable |
+                            OWPara.Flags.CanItalic);
+                        if (OurWordMain.TargetIsLocked)
+                            options |= OWPara.Flags.IsLocked;
+                    }
+
+                    rowTarget.Append( AddPara(
                         new OWPara(
                             p.Translation.WritingSystemConsultant,
                             p.Style,
                             p,
-                            EditableBackgroundColor,
-                            OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable));
+                            ((p.IsUserEditable) ? EditableBackgroundColor : BackColor),
+                            options),
+                        bAddFootnoteSeparator));
                 }
             }
 
             base.LoadData();
         }
-
-
-
-
+        #endregion
     }
 
 

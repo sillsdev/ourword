@@ -405,7 +405,7 @@ namespace JWdb.DataModel
     }
     #endregion
 
-    #region CLASS: TranslatorNote
+    #region Class: TranslatorNote
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
@@ -654,93 +654,7 @@ namespace JWdb.DataModel
 
         // Settings --------------------------------------------------------------------------
         public const string c_sRegistrySubkey = "TranslatorNotes";
-        #region Attr{g/s}: Color BorderColor
-        static public Color BorderColor
-        {
-            get
-            {
-                if (Color.Empty == s_BorderColor)
-                {
-                    string s = JW_Registry.GetValue(c_sRegistrySubkey, 
-                        "BorderColor", "DarkGray");
-                    s_BorderColor = Color.FromName(s);
-                }
-                Debug.Assert(Color.Empty != s_BorderColor);
-                return s_BorderColor;
-            }
-            set
-            {
-                s_BorderColor = value;
-                Debug.Assert(Color.Empty != s_BorderColor);
-                JW_Registry.SetValue(c_sRegistrySubkey,
-                    "BorderColor", value.Name);
-            }
-        }
-        static Color s_BorderColor = Color.Empty;
-        #endregion
-        #region Attr{g/s}: Color MessageHeaderColor
-        static public Color MessageHeaderColor
-        {
-            get
-            {
-                if (Color.Empty == s_MessageHeaderColor)
-                {
-                    string s = JW_Registry.GetValue(c_sRegistrySubkey, 
-                        "MessageHeaderColor", "LightGreen");
-                    s_MessageHeaderColor = Color.FromName(s);
-                }
-                Debug.Assert(Color.Empty != s_MessageHeaderColor);
-                return s_MessageHeaderColor;
-            }
-            set
-            {
-                s_MessageHeaderColor = value;
-                Debug.Assert(Color.Empty != s_MessageHeaderColor);
-                JW_Registry.SetValue(c_sRegistrySubkey,
-                    "MessageHeaderColor", value.Name);
-            }
-        }
-        static Color s_MessageHeaderColor = Color.Empty;
-        #endregion
-        #region Attr{g/s}: Color UneditableColor
-        static public Color UneditableColor
-        {
-            get
-            {
-                if (s_UneditableColor == Color.Empty)
-                {
-                    string s = JW_Registry.GetValue(c_sRegistrySubkey, 
-                        "UneditableColor", "Wheat");
-                    s_UneditableColor = Color.FromName(s);
-                }
-                Debug.Assert(Color.Empty != s_UneditableColor);
-                return s_UneditableColor;
-            }
-            set
-            {
-                s_UneditableColor = value;
-                Debug.Assert(Color.Empty != s_UneditableColor);
-                JW_Registry.SetValue(c_sRegistrySubkey,
-                    "UneditableColor", value.Name);
-            }
-        }
-        static Color s_UneditableColor = Color.Empty;
-        #endregion
-        #region Attr{g/s}: bool ShowAssignedTo
-        static public bool ShowAssignedTo
-        {
-            get
-            {
-                return JW_Registry.GetValue(c_sRegistrySubkey,
-                        "ShowAssignedTo", false);
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sRegistrySubkey,
-                    "ShowAssignedTo", value);
-            }
-        }
-        #endregion
+
         #region Attr{g/s}: bool CanDeleteAnything
         static public bool CanDeleteAnything
         {

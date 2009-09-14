@@ -705,6 +705,9 @@ namespace OurWord.Edit
         #region Method: void InitializeNoteIcons(DText)
         void InitializeNoteIcons(DText text, bool bShowingBT)
         {
+            if (!OurWordMain.s_Features.TranslatorNotes)
+                return;
+
             foreach (TranslatorNote note in text.TranslatorNotes)
             {
                 OWWindow wnd = OurWordMain.App.MainWindow;
@@ -796,8 +799,7 @@ namespace OurWord.Edit
                         break;
                     case "DText":
                         _InitializeBasicTextWords(r as DBasicText, null);
-                        if (G.App.HasSideWindows && G.App.SideWindows.HasNotesWindow)
-                            InitializeNoteIcons(r as DText, DisplayBT);
+                        InitializeNoteIcons(r as DText, DisplayBT);
                         break;
                     default:
                         Console.WriteLine("Unknown type in OWPara.Initialize...Name=" + 

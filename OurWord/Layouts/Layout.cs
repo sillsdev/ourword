@@ -152,6 +152,21 @@ namespace OurWord.Layouts
                 List<DParagraph> m_vTargetParagraphs;
                 #endregion
 
+                // Misc
+                #region VAttr{g}: bool IsFootnoteGroup
+                public bool IsFootnoteGroup
+                {
+                    get
+                    {
+                        if (TargetParagraphs.Count == 0)
+                            return false;
+                        if (null == TargetParagraphs[0] as DFootnote)
+                            return false;
+                        return true;
+                    }
+                }
+                #endregion
+
                 // Side-by-syde conversion
                 #region VAttr{g}: bool CanSideBySide
                 public bool CanSideBySide
@@ -233,11 +248,6 @@ namespace OurWord.Layouts
                     TargetParagraphs.Add(pTarget);
                 }
                 #endregion
-
-                // Layout
-
-
-
             }
             #endregion
             #region Attr{g}: List<ParagraphGroup> ParagraphGroups
@@ -261,6 +271,18 @@ namespace OurWord.Layouts
                 }
             }
             List<ParagraphGroup> m_vFootnoteGroups;
+            #endregion
+            #region VAttr{g}: List<ParagraphGroup> AllGroups
+            public List<ParagraphGroup> AllGroups
+            {
+                get
+                {
+                    var v = new List<ParagraphGroup>();
+                    v.AddRange(ParagraphGroups);
+                    v.AddRange(FootnoteGroups);
+                    return v;
+                }
+            }
             #endregion
 
             // Scaffolding

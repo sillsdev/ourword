@@ -157,12 +157,6 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
-        private ToolStripMenuItem m_menuExportProject;
-        private ToolStripDropDownButton m_btnInsertNote;
-        private ToolStripMenuItem m_itemInsertGeneralNote;
-        private ToolStripMenuItem m_itemInsertExegeticalNote;
-        private ToolStripMenuItem m_itemInsertHintNote;
-        private ToolStripMenuItem m_itemInsertConsultantNote;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -307,9 +301,6 @@ namespace OurWord
 
             if (DB.IsValidProject)
             {
-                if (OurWordMain.s_Features.TranslatorNotes && DProject.VD_ShowNotesPane)
-                    SideWindows.AddPage(new NotesPane(), "Notes");
-
                 if (DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
                     SideWindows.AddPage(new TranslationsPane(), "Translations");
 
@@ -468,7 +459,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuBackTranslation;
         private ToolStripMenuItem m_menuNaturalnessCheck;
         private ToolStripSeparator m_separatorWindow;
-        private ToolStripMenuItem m_menuShowNotesPane;
         private ToolStripMenuItem m_menuShowHistory;
         private ToolStripMenuItem m_menuShowTranslationsPane;
         private ToolStripMenuItem m_menuShowDictionaryPane;
@@ -488,6 +478,13 @@ namespace OurWord
         private ToolStrip m_ToolStrip;
         private StatusStrip m_StatusStrip;
         private ToolStripSeparator m_separator3;
+
+        private ToolStripMenuItem m_menuExportProject;
+        private ToolStripDropDownButton m_btnInsertNote;
+        private ToolStripMenuItem m_itemInsertGeneralNote;
+        private ToolStripMenuItem m_itemInsertExegeticalNote;
+        private ToolStripMenuItem m_itemInsertHintNote;
+        private ToolStripMenuItem m_itemInsertConsultantNote;
 
         private ToolStripButton m_btnExit;
         private ToolStripButton m_btnProjectSave;
@@ -728,6 +725,9 @@ namespace OurWord
             // Localizer Tool
             m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
 
+            // Translator Notes
+            m_btnInsertNote.Visible = s_Features.TranslatorNotes;
+
             // Window Menu in its entirety
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
@@ -753,8 +753,6 @@ namespace OurWord
             m_separatorWindow.Visible = bShowMainWindowSection && bShowSideWindowsSection;
 
             // Side Window Items
-            m_menuShowNotesPane.Visible = bShowTranslatorNotesMenu;
-            m_menuShowNotesPane.Checked = bShowTranslatorNotesMenu && DProject.VD_ShowNotesPane;
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
 
@@ -1038,7 +1036,6 @@ namespace OurWord
             this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
-            this.m_menuShowNotesPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
@@ -1631,7 +1628,6 @@ namespace OurWord
             this.m_menuNaturalnessCheck,
             this.m_menuBackTranslation,
             this.m_separatorWindow,
-            this.m_menuShowNotesPane,
             this.m_menuShowTranslationsPane,
             this.m_menuShowHistory,
             this.m_menuShowDictionaryPane,
@@ -1678,14 +1674,6 @@ namespace OurWord
             // 
             this.m_separatorWindow.Name = "m_separatorWindow";
             this.m_separatorWindow.Size = new System.Drawing.Size(229, 6);
-            // 
-            // m_menuShowNotesPane
-            // 
-            this.m_menuShowNotesPane.Name = "m_menuShowNotesPane";
-            this.m_menuShowNotesPane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowNotesPane.Text = "Show &Notes Pane";
-            this.m_menuShowNotesPane.ToolTipText = "Show the Notes pane.";
-            this.m_menuShowNotesPane.Click += new System.EventHandler(this.cmdToggleNotesPane);
             // 
             // m_menuShowTranslationsPane
             // 
@@ -2243,14 +2231,6 @@ namespace OurWord
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
 
-                m_Dlg.Add(ID.fTranslatorNotes.ToString(),
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "Translator Notes",
-                    "Enables the Translator Notes side window, through which you can make notes " +
-                        "about the translation and share them with others on your team.");
-
                 m_Dlg.Add(ID.fSectionHistory.ToString(),
                     false,
                     false,
@@ -2287,6 +2267,15 @@ namespace OurWord
                     "Undo",
                     "Enables the Undo and Redo menus, by which you can undo actions such as " +
                         "typing, deleting, splitting and joining paragraphs, etc.");
+
+                m_Dlg.Add(ID.fTranslatorNotes.ToString(),
+                    false,
+                    false,
+                    c_sNodeEditing,
+                    "Translator Notes",
+                    "Enables the Translator Notes button and icons, through which you can make notes " +
+                        "about the translation and share them with others on your team.");
+
                 #endregion
                 #region TOOLS FEATURES
                 m_Dlg.Add(ID.fRestoreBackup.ToString(),    
@@ -3203,13 +3192,6 @@ namespace OurWord
             SetupMenusAndToolbarsVisibility();
         }
         #endregion
-        #region Cmd: cmdToggleNotesPane
-        private void cmdToggleNotesPane(Object sender, EventArgs e)
-		{
-            DProject.VD_ShowNotesPane = !DProject.VD_ShowNotesPane;
-            _UpdateSideWindows();
-		}
-		#endregion
         #region Cmd: cmdToggleOtherTranslationsPane
         private void cmdToggleOtherTranslationsPane(Object sender, EventArgs e)
         {

@@ -51,19 +51,12 @@ namespace OurWord.Dialogs
 
         // Property Grid ---------------------------------------------------------------------
         #region BAG CONSTANTS
-        const string c_sGroupColors = "Colors";
-        const string c_sNotesWndBkgColor = "propNotesWndBkgColor";
-        const string c_sNotesBorderColor = "propBorderColor";
-        const string c_sNotesHeaderColor = "propHeaderColor";
-        const string c_sNotesUneditableColor = "propUneditableolor";
-
         const string c_sGroupMisc = "Misc";
         const string c_sDefaultAuthor = "propDefaultAuthor";
         const string c_sCanDeleteAnything = "propCanDeleteAnything";
 
         const string c_sGroupClassifications = "People";
         const string c_sPeople = "propPeople";
-        const string c_sShowAssignedTo = "propShowAssignedTo";
 
         const string c_sYes = "Yes";
         const string c_sNo = "No";
@@ -84,19 +77,6 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-                case c_sNotesWndBkgColor:
-                    e.Value = NotesWnd.RegistryBackgroundColor;
-                    break;
-                case c_sNotesBorderColor:
-                    e.Value = TranslatorNote.BorderColor.Name;
-                    break;
-                case c_sNotesHeaderColor:
-                    e.Value = TranslatorNote.MessageHeaderColor.Name;
-                    break;
-                case c_sNotesUneditableColor:
-                    e.Value = TranslatorNote.UneditableColor.Name;
-                    break;
-
                 case c_sDefaultAuthor:
                     e.Value = DB.UserName;
                     break;
@@ -109,11 +89,6 @@ namespace OurWord.Dialogs
                 case c_sPeople:
                     e.Value = DB.Project.People.ToCommaDelimitedString();
                     break;
-                case c_sShowAssignedTo:
-                    YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ShowAssignedToPS);
-                    e.Value = ShowAssignedToPS.GetBoolString(TranslatorNote.ShowAssignedTo);
-                    break;
             }
         }
         #endregion
@@ -122,19 +97,6 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-                case c_sNotesWndBkgColor:
-                    NotesWnd.RegistryBackgroundColor = (string)e.Value;
-                    break;
-                case c_sNotesBorderColor:
-                    TranslatorNote.BorderColor = Color.FromName( (string)e.Value );
-                    break;
-                case c_sNotesHeaderColor:
-                    TranslatorNote.MessageHeaderColor = Color.FromName((string)e.Value);
-                    break;
-                case c_sNotesUneditableColor:
-                    TranslatorNote.UneditableColor = Color.FromName((string)e.Value);
-                    break;
-
                 case c_sDefaultAuthor:
                     DB.UserName = (string)e.Value;
                     break;
@@ -147,11 +109,6 @@ namespace OurWord.Dialogs
                 case c_sPeople:
                     DB.Project.People.FromCommaDelimitedString((string)e.Value);
                     break;
-                case c_sShowAssignedTo:
-                    YesNoPropertySpec ShowAssignedToPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ShowAssignedToPS);
-                    TranslatorNote.ShowAssignedTo = ShowAssignedToPS.IsTrue(e.Value);
-                    break;
             }
         }
         #endregion
@@ -162,34 +119,6 @@ namespace OurWord.Dialogs
             m_bag = new PropertyBag();
             Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
             Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
-
-            // Colors
-            #region Colors
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sNotesWndBkgColor,
-                "Window Background",
-                c_sGroupColors,
-                "The color of the Notes window background.",
-                "Light Gray"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sNotesBorderColor,
-                "Outer Border",
-                c_sGroupColors,
-                "The color of the thin borders of an individual chat/discussion.",
-                "Dark Gray"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sNotesHeaderColor,
-                "Header Area",
-                c_sGroupColors,
-                "The color of inner area of an individual chat/discussion.",
-                "Light Green"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sNotesUneditableColor,
-                "Non-Editable Discussion",
-                c_sGroupColors,
-                "The color of those discussion/chats which are not available for edit.",
-                "Light Yellow"));
-            #endregion
 
             // Categories & People
             #region People
@@ -204,14 +133,6 @@ namespace OurWord.Dialogs
                 "",
                 "",
                 null
-                ));
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sShowAssignedTo,
-                "Show Assigned To combobox?",
-                c_sGroupClassifications,
-                "If Yes, you will have the ability to assign a note to a person's attention; " +
-                    "and to then turn off the display of any notes that are not assigned to you.",
-                false
                 ));
             #endregion
 
