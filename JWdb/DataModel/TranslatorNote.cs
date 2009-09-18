@@ -438,24 +438,6 @@ namespace JWdb.DataModel
         }
         private string m_sSelectedText;
         #endregion
-        #region BAttr{g/s}: string Reference
-        public string Reference
-        {
-            get
-            {
-                return m_sReference;
-            }
-            set
-            {
-                // We expect the reference of the form "003:016" (leading zeros)
-                Debug.Assert(value.Length == 7, "Reference length must be 7");
-                Debug.Assert(value[3] == ':', "Reference must have a ':' at position [3]");
-
-                SetValue(ref m_sReference, value);
-            }
-        }
-        private string m_sReference;
-        #endregion
         #region JAttr{g}: JOwnSeq<DMessage> Messages
         public JOwnSeq<DMessage> Messages
         {
@@ -473,7 +455,6 @@ namespace JWdb.DataModel
             base.DeclareAttrs();
             DefineAttr("Class", ref m_nClass);
             DefineAttr("SelectedText", ref m_sSelectedText);
-            DefineAttr("Reference", ref m_sReference);
         }
         #endregion
 
@@ -604,6 +585,70 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        // Scripture Reference containing the note -------------------------------------------
+        #region VAttr{g}: DReference ChapterVerse
+        public DReference ChapterVerse
+        {
+            get
+            {
+                // Get the owning text and paragraph
+                if (null == Owner || null == Text || null == Text.Paragraph)
+                    return null;
+                var text = Text;
+                var paragraph = Text.Paragraph;
+                
+                // We'll start with the initial chapter/verse of the paragraph
+                int nChapter = paragraph.ReferenceSpan.Start.Chapter;
+                int nVerse = paragraph.ReferenceSpan.Start.Verse;
+
+                // Now loop through the runs, looking for our Text, incrementing 
+                // chapter and verse as we encounter them.
+                foreach (DRun run in paragraph.Runs)
+                {
+                    var verse = run as DVerse;
+                    if (null != verse)
+                        nVerse = verse.VerseNo;
+
+                    var chapter = run as DChapter;
+                    if (null != chapter)
+                    {
+                        nChapter = chapter.ChapterNo;
+                        nVerse = 1;
+                    }
+
+                    if (run == text)
+                        break;
+                }
+
+                return new DReference(nChapter, nVerse);
+            }
+        }
+        #endregion
+        #region VAttr{g}: int Chapter
+        public int Chapter
+        {
+            get
+            {
+                var reference = ChapterVerse;
+                if (null == reference)
+                    return 0;
+                return ChapterVerse.Chapter;
+            }
+        }
+        #endregion
+        #region VAttr{g}: int Verse
+        public int Verse
+        {
+            get
+            {
+                var reference = ChapterVerse;
+                if (null == reference)
+                    return 0;
+                return ChapterVerse.Verse;
+            }
+        }
+        #endregion
+
         // Localized Classsifications --------------------------------------------------------
         #region SAttr{g}: string ToDo
         static public string ToDo
@@ -654,7 +699,6 @@ namespace JWdb.DataModel
 
         // Settings --------------------------------------------------------------------------
         public const string c_sRegistrySubkey = "TranslatorNotes";
-
         #region Attr{g/s}: bool CanDeleteAnything
         static public bool CanDeleteAnything
         {
@@ -683,14 +727,10 @@ namespace JWdb.DataModel
             m_osMessages = new JOwnSeq<DMessage>("Messages", this, false, true);
         }
         #endregion
-        #region Constructor(sReference, sContext)
-        public TranslatorNote(string _sReference, string _sSelectedText)
+        #region Constructor(sContext)
+        public TranslatorNote(string _sSelectedText)
             : this()
         {
-            // Reference, we expect something of the form "003:016", the Set attr 
-            // asserts for this
-            Reference = _sReference;
-
             // Context string
             SelectedText = _sSelectedText;
         }
@@ -705,8 +745,6 @@ namespace JWdb.DataModel
             if (tn.Class != Class)
                 return false;
             if (tn.SelectedText != SelectedText)
-                return false;
-            if (tn.Reference != Reference)
                 return false;
 
             if (Messages.Count != tn.Messages.Count)
@@ -726,11 +764,13 @@ namespace JWdb.DataModel
         {
             get
             {
-                string s = Reference;
+                var reference = ChapterVerse;
+                if (null == reference)
+                    return SelectedText;
 
+                string s = reference.ParseableName;
                 if (Messages.Count > 0)
                     s += Messages[0].SortKey;
-
                 return s;
             }
         }
@@ -748,7 +788,6 @@ namespace JWdb.DataModel
 
             note.Class = Class;
             note.SelectedText = SelectedText;
-            note.Reference = Reference;
 
             foreach (DMessage m in Messages)
                 note.Messages.Append(m.Clone());
@@ -837,12 +876,8 @@ namespace JWdb.DataModel
             // The date is set to today
             DateTime dtCreated = DateTime.Now;
 
-            // Create the Reference in the form we expect it
-            string sReference = nChapter.ToString("000") + ":" + 
-                nVerse.ToString("000");
-
             // Create the Note. We will not have a context for it.
-            TranslatorNote tn = new TranslatorNote(sReference, "");
+            TranslatorNote tn = new TranslatorNote("");
 
             // Set its class
             switch (field.Mkr)
@@ -966,8 +1001,8 @@ namespace JWdb.DataModel
         #region Method: string RemoveInitialReferenceFromText(string sIn)
         public string RemoveInitialReferenceFromText(string sIn)
             // It is redundant in the display, to show the reference there, but to also
-            // have it in the note text. So I remove it on import, as we have a lot of
-            // legacy notes that have it.
+            // have it in the note text. So I remove it on importing from the old style, 
+            // as we have a lot of legacy notes that have it.
         {
             // Collect any reference that exists in the first paragraph
             string sRef = "";
@@ -982,25 +1017,14 @@ namespace JWdb.DataModel
                     break;
             }
 
-            // Get the reference as we've stored it on the note, but as we plan
-            // to display it in the header
-            string sFromNote = GetDisplayableReference();
-
-            // Remove leading/trailing spaces and punctuation from both, so we can
-            // compare without the confusion
-            sFromNote = sFromNote.Trim();
-            sRef = sRef.Trim();
-            while (sRef.Length > 1 && char.IsPunctuation(sRef[sRef.Length - 1]))
-                sRef = sRef.Substring(0, sRef.Length - 1);
-            while (sFromNote.Length > 1 && char.IsPunctuation(sFromNote[sFromNote.Length - 1]))
-                sFromNote = sFromNote.Substring(0, sFromNote.Length - 1);
-
-            // If it does not equal the note's reference (as we want to display it),
-            // then we keep it.
-            if (sFromNote != sRef)
+            // Attempt to parse
+            var reference = DReference.CreateFromParsing(sRef);
+            if (null == reference)
+                return sIn;
+            if (reference.Chapter == 0 || reference.Verse == 0)
                 return sIn;
 
-            // Remove what we determined whne we were originally collecting the reference
+            // If there was a valid reference, then we can remove it
             sIn = (iPos < sIn.Length) ?
                 sIn.Substring(iPos) : "";
             return sIn;
@@ -1009,59 +1033,109 @@ namespace JWdb.DataModel
 
         // Oxes I/O --------------------------------------------------------------------------
         #region Constants
-        public const string c_sTagTranslatorNote = "TranslatorNote";
+        public const string c_sTagTranslatorNote = "Annotation";
         const string c_sAttrClass = "class";
         const string c_sAttrSelectedText = "selectedText";
-        const string c_sAttrReference = "reference";
+        #endregion
+        #region Class: CreateNote
+        class CreateNote
+        {
+            XmlNode m_nodeNote;
+            
+            // Methods for retrieving the attributes -----------------------------------------
+            #region Method: NoteClass GetClass()
+            NoteClass GetClass()
+            {
+                var sClass = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrClass, 
+                    NoteClass.General.ToString());
+
+                try
+                {
+                    return (NoteClass)Enum.Parse(typeof(NoteClass), sClass, true);
+                }
+                catch (Exception) { }
+
+                return NoteClass.General;
+            }
+            #endregion
+            #region Method: string GetSelectedText()
+            string GetSelectedText()
+            {
+                string s = XmlDoc.GetAttrValue(m_nodeNote,
+                    new string[] { c_sAttrSelectedText, "context" },
+                    "");
+                return s;
+            }
+            #endregion
+
+            // Other Methods -----------------------------------------------------------------
+            #region Method: void GetMessages(note)
+            void GetMessages(TranslatorNote note)
+            {
+                // Toolbox old style had a <ownseq node above the messages; so if we see this,
+                // we simply move down to it prior to iterating through the Message nodes.
+                var nodeParent = XmlDoc.FindNode(m_nodeNote, "ownseq");
+                if (null == nodeParent)
+                    nodeParent = m_nodeNote;
+
+                // Messages
+                foreach (XmlNode child in nodeParent.ChildNodes)
+                {
+                    var message = DMessage.Create(child);
+                    if (null != message)
+                        note.Messages.Append(message);
+                }
+            }
+            #endregion
+            #region Method: void HandleOldStatus(note)
+            void HandleOldStatus(TranslatorNote note)
+                // Toolbox old style had an AssignedTo attribute. We want that to be the
+                // Status of the LastMessage.
+                //
+                // Important: This must be called after the call to GetMessages, so 
+                // that the messages will have been read in and the final one can
+                // therefore be modified.
+            {
+                string sAssignedTo = XmlDoc.GetAttrValue(m_nodeNote, "assignedTo", "");
+                if (!string.IsNullOrEmpty(sAssignedTo) && note.Messages.Count > 0)
+                    note.LastMessage.Status = sAssignedTo;
+            }
+            #endregion
+
+            // Public Interface --------------------------------------------------------------
+            #region Constructor(nodeNote)
+            public CreateNote(XmlNode nodeNote)
+            {
+                m_nodeNote = nodeNote;
+            }
+            #endregion
+            #region Method: TranslatorNote Do()
+            public TranslatorNote Do()
+            {
+                // Do nothing if we aren't the right type of node
+                if (m_nodeNote.Name != c_sTagTranslatorNote && m_nodeNote.Name != "TranslatorNote")
+                    return null;
+
+                // Create the new note
+                var note = new TranslatorNote();
+
+                // Attrs
+                note.Class = GetClass();
+                note.SelectedText = GetSelectedText();
+
+                // Messages
+                GetMessages(note);
+                HandleOldStatus(note);
+
+                return note;
+            }
+            #endregion
+        }
         #endregion
         #region SMethod: TranslatorNote Create(nodeNote)
         static public TranslatorNote Create(XmlNode nodeNote)
         {
-            if (nodeNote.Name != c_sTagTranslatorNote)
-                return null;
-
-            // Create the new note
-            var note = new TranslatorNote();
-
-            // Class
-            var sClass = XmlDoc.GetAttrValue(nodeNote, c_sAttrClass, NoteClass.General.ToString());
-            try
-            {
-                note.Class = (NoteClass)Enum.Parse(typeof(NoteClass), sClass, true);
-            }
-            catch(Exception) {}
-
-            // Selected Text (previous version used "context" as the attr name
-            note.SelectedText = XmlDoc.GetAttrValue(nodeNote, 
-                new string[] {c_sAttrSelectedText, "context"},
-                "");
-
-            // Scripture reference
-            note.Reference = XmlDoc.GetAttrValue(nodeNote, c_sAttrReference, "");
-
-            // Toolbox old style had an AssignedTo attribute. We want that to be the
-            // Status of the LastMessage.
-            string sAssignedTo = XmlDoc.GetAttrValue(nodeNote, "assignedTo", "");
-
-            // Toolbox old style had a <ownseq node above the messages; so if we see this,
-            // we simply move down to it prior to iterating through the Message nodes.
-            var nodeParent = XmlDoc.FindNode(nodeNote, "ownseq");
-            if (null == nodeParent)
-                nodeParent = nodeNote;
-
-            // Messages
-            foreach (XmlNode child in nodeParent.ChildNodes)
-            {
-                var message = DMessage.Create(child);
-                if (null != message)
-                    note.Messages.Append(message);
-            }
-
-            // Handle old-style AssignedTo
-            if (!string.IsNullOrEmpty(sAssignedTo))
-                note.LastMessage.Status = sAssignedTo;
-
-            return note;
+            return (new CreateNote(nodeNote)).Do();
         }
         #endregion
         #region Method: XmlNode Save(oxes, nodeAnnotation)
@@ -1072,7 +1146,6 @@ namespace JWdb.DataModel
             // Attrs
             oxes.AddAttr(nodeNote, c_sAttrClass, Class.ToString());
             oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
-            oxes.AddAttr(nodeNote, c_sAttrReference, Reference);
 
             // Message objects
             foreach (DMessage m in Messages)
@@ -1098,29 +1171,11 @@ namespace JWdb.DataModel
         #endregion
         #region Method: string GetDisplayableReference()
         public string GetDisplayableReference()
-            // Strip out the leading zeros
         {
-            bool bZeros = true;
-
-            string sOut = "";
-
-            foreach (char ch in Reference)
-            {
-                // If we encounter a non-zero, then we want to start copying chars
-                if (ch != '0')
-                    bZeros = false;
-
-                // Copy chars if indicated
-                if (!bZeros)
-                    sOut += ch;
-
-                // If we have just copyied a ':', then we want to start eating
-                // zeros again
-                if (ch == ':')
-                    bZeros = true;
-            }
-
-            return sOut;
+            var reference = ChapterVerse;
+            if (null == reference)
+                return "";
+            return reference.FullName;
         }
         #endregion
         #region SMethod: string GetWordsLeft(string s, int iPos, int cWords)
@@ -1234,7 +1289,6 @@ namespace JWdb.DataModel
             {
                 Class = Theirs.Class;
                 SelectedText = Theirs.SelectedText;
-                Reference = Theirs.Reference;
                 SfmMarker = Theirs.SfmMarker;
             }
 

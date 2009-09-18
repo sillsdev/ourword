@@ -584,11 +584,23 @@ namespace OurWord.Edit
             var pTitle = BuildNoteTitle(ws, sTitle, "NoteExegesis_Me.ico");
             wnd.Contents.Append(pTitle);
 
-            // Messages section
-            wnd.Contents.Append(BuildInteractiveMessageContents(ws));
+            // Target translation notes have full "response" capability; other notes
+            // just display the first message
+            if (Note.IsTargetTranslationNote)
+            {
+                // Messages section
+                wnd.Contents.Append(BuildInteractiveMessageContents(ws));
 
-            // Add the toolbar for user actions
-            wnd.Contents.Append(BuildToolStrip(wnd));
+                // Add the toolbar for user actions
+                wnd.Contents.Append(BuildToolStrip(wnd));
+            }
+            else
+            {
+                var pMessage = BuildSingleMessageContents(ws, Note.FirstMessage,
+                   DStyleSheet.c_StyleToolTipText);
+                wnd.Contents.Append(pMessage);
+            }
+
             return true;
         }
         #endregion

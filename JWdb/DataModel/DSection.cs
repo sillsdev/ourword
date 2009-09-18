@@ -2990,7 +2990,6 @@ namespace JWdb.DataModel
 
                     // Create our note
                     TranslatorNote note = new TranslatorNote();
-                    note.Reference = Mine.GetReferenceAt(text).ParseableName;
                     note.SelectedText = TranslatorNote.MergeAuthor;
                     note.Class = TranslatorNote.NoteClass.General;
                     string sMessage = Loc.GetString("kStructureConflictInMerge",
@@ -3325,7 +3324,6 @@ namespace JWdb.DataModel
                     DReference reference = Mine.GetReferenceAt(itemx.MyRun);
                     if (null == reference)
                         continue;
-                    note.Reference = reference.ParseableName;
                     note.SelectedText = itemx.Context;
                     note.Class = TranslatorNote.NoteClass.General;
                     var message = new DMessage(

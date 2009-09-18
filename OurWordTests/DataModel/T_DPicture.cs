@@ -60,7 +60,6 @@ namespace OurWordTests.DataModel
             // Create a picture. 
             var pictureIn = new DPicture();
             section.Paragraphs.Append(pictureIn);
-            pictureIn.EnsureHasID();
             pictureIn.PathName = sPath;
             pictureIn.WordRtfInfo = sRtf;
             pictureIn.SimpleText = sCap;
@@ -77,7 +76,6 @@ namespace OurWordTests.DataModel
             Assert.AreEqual(sRtf, pictureOut.WordRtfInfo);
             Assert.AreEqual(sCap, pictureOut.SimpleText);
             Assert.AreEqual(sCapBT, pictureOut.SimpleTextBT);
-            Assert.AreEqual(0, pictureOut.ID);
             Assert.IsTrue(pictureOut.ContentEquals(pictureIn), "Pictures are the same.");
         }
         #endregion

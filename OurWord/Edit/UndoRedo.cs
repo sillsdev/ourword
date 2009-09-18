@@ -2487,10 +2487,7 @@ namespace OurWord.Edit
             DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
 
             // Create a blank note and insert it
-            m_Note = new TranslatorNote(
-                text.Section.GetReferenceAt(text).ParseableName,
-                G.App.MainWindow.Selection.SelectionString
-                );
+            m_Note = new TranslatorNote( G.App.MainWindow.Selection.SelectionString );
             Note.Class = NoteClass;
             Note.Messages.Append(new DMessage());
             Note.Status = DMessage.Anyone;

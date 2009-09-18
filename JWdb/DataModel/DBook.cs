@@ -1662,7 +1662,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-
         public int GetID()
         {
             int nID = m_NextID;
@@ -1674,12 +1673,14 @@ namespace JWdb.DataModel
         public int m_NextID = 0;
 
         // Oxes ------------------------------------------------------------------------------
+        #region Constants
         const string c_sTagBible = "bible";
         const string c_sAttrOxes = "oxes";
 
         const string c_sTagBook = "book";
         const string c_sAttrID = "id";
-
+        #endregion
+        #region SMethod: DBook CreateBook(XmlDoc xml)
         static public DBook CreateBook(XmlDoc xml)
         {
             // Find the Bible node
@@ -1728,7 +1729,8 @@ namespace JWdb.DataModel
             // Done
             return book;
         }
-
+        #endregion
+        #region Attr{g}: XmlDoc ToOxesDocument
         public XmlDoc ToOxesDocument
         {
             get
@@ -1753,6 +1755,7 @@ namespace JWdb.DataModel
                 return oxes;
             }
         }
+        #endregion
 
         // Merging ---------------------------------------------------------------------------
         #region Method: void Merge(DBook Parent, DBook Theirs)

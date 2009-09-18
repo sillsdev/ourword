@@ -286,8 +286,6 @@ namespace JWdb.DataModel
             if (!string.IsNullOrEmpty(WordRtfInfo))
                 oxes.AddAttr(nodePicture, c_sAttrRtf, WordRtfInfo);
 
-            oxes.AddAttr(nodePicture, "id", XmlDoc.IntToID(ID));
-
             foreach (DRun run in Runs)
                 run.SaveToOxesBook(oxes, nodePicture);
 

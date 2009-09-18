@@ -157,8 +157,17 @@ namespace JWTools
             return n;
         }
         #endregion
+        #region SMethod: int GetAttrID(XmlNode node, string sAttrName)
+        static public int GetAttrID(XmlNode node, string sAttrName)
+        {
+            // Retrieve the string value
+            string sID = GetAttrValue(node, sAttrName, "");
+            if (string.IsNullOrEmpty(sID))
+                return -1;
 
-        // Uri Parsing -----------------------------------------------------------------------
+            return IdToInt(sID);
+        }
+        #endregion
 
         // Attrs -----------------------------------------------------------------------------
         #region Method: XmlAttribute AddAttr(node, sAttrName, string sValue)
@@ -264,14 +273,16 @@ namespace JWTools
         }
         #endregion
 
+        // Misc ops
+        #region SMethod: bool IsNode(XmlNode node, string sName)
         static public bool IsNode(XmlNode node, string sName)
         {
             if (node.Name.ToUpper() == sName.ToUpper())
                 return true;
             return false;
         }
-
-
+        #endregion
+        #region Method: void AddXmlDeclaration()
         public void AddXmlDeclaration()
             // Creates "<?xml version="1.0" encoding="utf-16"?>"  
         {
@@ -279,7 +290,8 @@ namespace JWTools
             var root = DocumentElement;
             InsertBefore(decl, root);
         }
-
+        #endregion
+        #region Method: XmlNode AddNode(XmlNode nodeParent, string sName)
         public XmlNode AddNode(XmlNode nodeParent, string sName)
         {
             var node = CreateNode(XmlNodeType.Element, sName, null);
@@ -290,15 +302,16 @@ namespace JWTools
             nodeParent.AppendChild(node);
             return node;
         }
-
-
+        #endregion
+        #region Method: XmlText AddText(XmlNode node, string sValue)
         public XmlText AddText(XmlNode node, string sValue)
         {
             XmlText text = CreateTextNode(sValue);
             node.AppendChild(text);
             return text;
         }
-
+        #endregion
+        #region SMethod: XmlNode FindNode(XmlNode nodeParent, string sChildName)
         static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
         {
             foreach (XmlNode node in nodeParent.ChildNodes)
@@ -309,36 +322,21 @@ namespace JWTools
 
             return null;
         }
-
-        // Retrieve attr values of different types
-        static public int GetAttrID(XmlNode node, string sAttrName)
-        {
-            // Retrieve the string value
-            string sID = GetAttrValue(node, sAttrName, "");
-            if (string.IsNullOrEmpty(sID))
-                return -1;
-
-            return IdToInt(sID);
-        }
-
+        #endregion
+        #region Method: string OneLiner()
         public string OneLiner()
         {
             var sb = new StringBuilder();
             this.Save(new StringWriter(sb));
             return sb.ToString();
         }
-
+        #endregion
+        #region SMethod: string OneLiner(XmlNode node)
         static public string OneLiner(XmlNode node)
         {
             return node.OuterXml;
-
-            /**
-            var sb = new StringBuilder();
-            var w = new XmlTextWriter(new StringWriter(sb));
-            node.WriteContentTo(w);
-            return sb.ToString();
-            **/
         }
+        #endregion
 
         // For Unit Testing ------------------------------------------------------------------
         #region Method: bool IsSame(XmlDoc other)
@@ -404,6 +402,28 @@ namespace JWTools
             return bIsSame;
         }
         #endregion
+        #region Method: public void NormalizeCreatedDates()
+        void NormalizeCreatedDates(XmlNode node)
+        {
+            if (null != node.Attributes)
+            {
+                foreach (XmlAttribute attr in node.Attributes)
+                {
+                    if (attr.Name.ToUpper() == "CREATED")
+                        attr.Value = s_date.ToString("u", DateTimeFormatInfo.InvariantInfo);
+                }
+            }
+
+            foreach(XmlNode child in node.ChildNodes)
+                NormalizeCreatedDates(child);
+        }
+        static DateTime s_date = DateTime.Now;
+        public void NormalizeCreatedDates()
+        {
+            foreach(XmlNode child in ChildNodes)
+                NormalizeCreatedDates(child);
+        }
+        #endregion
     }
 
 
@@ -419,7 +439,7 @@ namespace JWTools
         }
         string m_sName;
         #endregion
-        #region Attr{g}: string Valuel
+        #region Attr{g}: string Value
         public string Value
         {
             get
@@ -493,7 +513,7 @@ namespace JWTools
             // Parse into name/value pairs
             if (string.IsNullOrEmpty(sAttributes))
                 return;
-            var vsParts = sAttributes.Split(new char[] { '&' });
+            var vsParts = sAttributes.Split(new char[] { c_chDelimiter });
             if (vsParts.Length == 0)
                 return;
 
@@ -514,7 +534,8 @@ namespace JWTools
                 if (n > 2 && (sValue[0] == '\'' && sValue[n-1] == '\''))
                     sValue = sValue.Substring(1, n-2);
 
-                Add(new UrlAttr(sName, sValue));
+                var ua = new UrlAttr(sName, sValue);
+                Add(ua);
             }
         }
         #endregion
@@ -531,6 +552,9 @@ namespace JWTools
             return null;
         }
         #endregion
+
+        public const char c_chDelimiter = '+';
+
         #region Method: string MakeUrl()
         public string MakeUrl()
         {
@@ -544,7 +568,7 @@ namespace JWTools
             foreach (var ua in this)
             {
                 if (bAmpersand)
-                    sUrl += '&';
+                    sUrl += c_chDelimiter;
                 bAmpersand = true;
 
                 sUrl += ua.Name;

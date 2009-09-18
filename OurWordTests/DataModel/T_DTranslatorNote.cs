@@ -256,7 +256,7 @@ namespace OurWordTests.DataModel
         #region Method: TranslatorNote CreateTestTranslatorNote()
         TranslatorNote CreateTestTranslatorNote()
         {
-            TranslatorNote tn = new TranslatorNote("003:016", "so loved the world");
+            TranslatorNote tn = new TranslatorNote("so loved the world");
             tn.Class = TranslatorNote.NoteClass.General;
             tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), "Sandra",
                 "Check exegesis here."));
@@ -265,11 +265,11 @@ namespace OurWordTests.DataModel
             return tn;
         }
         #endregion
-        #region Method: TranslatorNote CreateFromXmlString(string s)
-        TranslatorNote CreateFromXmlString(string s)
+        #region Method: TranslatorNote CreateFromXmlString(s, sTag)
+        TranslatorNote CreateFromXmlString(string s, string sTag)
         {
             var oxes = new XmlDoc(s);
-            var node = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
+            var node = XmlDoc.FindNode(oxes, sTag);
             return TranslatorNote.Create(node);
         }
         #endregion
@@ -279,14 +279,14 @@ namespace OurWordTests.DataModel
         [Test] public void ContentEquals_Note()
         {
             // Set up a Translator Note
-            TranslatorNote tn1 = new TranslatorNote("003:016", "so loved the world");
+            TranslatorNote tn1 = new TranslatorNote("so loved the world");
             tn1.Class = TranslatorNote.NoteClass.General;
             tn1.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), "David",
                     "Check exegesis here."));
 
             // Set up a duplicate
-            TranslatorNote tn2 = new TranslatorNote("003:016", "so loved the world");
+            TranslatorNote tn2 = new TranslatorNote("so loved the world");
             tn2.Class = TranslatorNote.NoteClass.General;
             tn2.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), "David",
@@ -310,11 +310,6 @@ namespace OurWordTests.DataModel
             Assert.IsFalse(tn1.ContentEquals(tn2));
             tn2.SelectedText = tn1.SelectedText;
 
-            // Reference differs
-            tn2.Reference = "004:016";
-            Assert.IsFalse(tn1.ContentEquals(tn2));
-            tn2.Reference = tn1.Reference;
-
             // Message differs
             tn2.Messages.Clear();
             Assert.IsFalse(tn1.ContentEquals(tn2));
@@ -335,11 +330,11 @@ namespace OurWordTests.DataModel
                 "</TranslatorNote>"
             };
             var vsOxesExpected = new string[] {
-                "<TranslatorNote class=\"General\" selectedText=\"mbambuninda\" reference=\"001:005\">",
+                "<Annotation class=\"General\" selectedText=\"mbambuninda\">",
                     "<Message author=\"Mandowen\" created=\"2009-04-29 02:32:42Z\">ratoe tumaimbe &quot;mbambuninda&quot;=yara gwaravainy=&quot;mbambunin indamu&quot; weramu tumainy ngkov.</Message>",
                     "<Message author=\"Ibu Linda\" created=\"2009-05-07 09:27:24Z\">Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai,  weramu syare wamo raporar taiso: &quot;mbambunin dai&quot;.</Message>",
                     "<Message author=\"Mandowen\" created=\"2009-05-22 04:06:54Z\">wamo ratoe &quot;mbambunin da.&quot; yara vemo ratoe &quot;mbambunin dai&quot; wenora.</Message>",
-                "</TranslatorNote>"
+                "</Annotation>"
            };
 
             // Create an Oxes object for Expected
@@ -347,7 +342,7 @@ namespace OurWordTests.DataModel
 
             // Import into a TranslatorNote object
             var xmlImported = new XmlDoc(vsToImport);
-            var nodeNote = XmlDoc.FindNode(xmlImported, TranslatorNote.c_sTagTranslatorNote);
+            var nodeNote = XmlDoc.FindNode(xmlImported, "TranslatorNote");
             var note = TranslatorNote.Create(nodeNote);
 
             // Create an new Oxes object for saving
@@ -371,11 +366,12 @@ namespace OurWordTests.DataModel
             var nodeNote = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
             string sSaved = XmlDoc.OneLiner(nodeNote);
             Assert.AreEqual(
-                "<TranslatorNote class=\"General\" selectedText=\"so loved the world\" reference=\"003:016\">" +
+                "<Annotation class=\"General\" selectedText=\"so loved the world\">" +
                     "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\" status=\"Sandra\">Check exegesis here.</Message>" +
                     "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
-                "</TranslatorNote>",
-                sSaved);
+                "</Annotation>",
+                sSaved,
+                "Does the XML save as we expect?");
 
             // Create a new Translator Note from this Oxes element; they should be identical
             var tnNew = TranslatorNote.Create(nodeNote);
@@ -421,7 +417,7 @@ namespace OurWordTests.DataModel
             vs[vs.Length - 1] += XmlDoc.OneLiner(nodeNote);
 
             // Make sure we have something that looks like a note
-            Assert.AreEqual("\\tn <Trans", vs[vs.Length-1].Substring(0, 10));
+            Assert.AreEqual("\\tn <Annot", vs[vs.Length-1].Substring(0, 10));
 
             // Do the test
             T_DSection t = new T_DSection();
@@ -438,7 +434,6 @@ namespace OurWordTests.DataModel
 
             TranslatorNote tn = TranslatorNote.ImportFromOldStyle(2, 15, f);
 
-            Assert.AreEqual("002:015", tn.Reference);
             Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
             Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
             Assert.AreEqual(TranslatorNote.NoteClass.General, tn.Class);
@@ -453,94 +448,10 @@ namespace OurWordTests.DataModel
 
             TranslatorNote tn = TranslatorNote.ImportFromOldStyle(2, 15, f);
 
-            Assert.AreEqual("002:015", tn.Reference);
             Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
             Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
             Assert.AreEqual(TranslatorNote.NoteClass.General, tn.Class);
             Assert.AreEqual("ntck", tn.SfmMarker);
-        }
-        #endregion
-
-        // Computing the Header Text
-        #region Test: GetDisplayableReference
-        [Test] public void GetDisplayableReference()
-        {
-            TranslatorNote tn = new TranslatorNote("010:020", "hello");
-            Assert.AreEqual("10:20", tn.GetDisplayableReference());
-
-            tn = new TranslatorNote("011:021", "hello");
-            Assert.AreEqual("11:21", tn.GetDisplayableReference());
-        }
-        #endregion
-        #region Test: GetWordsLeft
-        [Test] public void GetWordsLeft()
-        {
-            string s = "For God so loved the world that he gave his only son.";
-
-            Assert.AreEqual("so loved the world",
-                TranslatorNote.GetWordsLeft(s, 27, 4), "1");
-
-            Assert.AreEqual("God so loved the world",
-                TranslatorNote.GetWordsLeft(s, 26, 4), "2");
-
-            Assert.AreEqual("For God s",
-                TranslatorNote.GetWordsLeft(s, 9, 4), "3");
-        }
-        #endregion
-        #region Test: GetWordsRight
-        [Test] public void GetWordsRight()
-        {
-            string s = "For God so loved the world that he gave his only son.";
-
-            Assert.AreEqual("that he gave his only",
-                TranslatorNote.GetWordsRight(s, 27, 4), "1");
-
-            Assert.AreEqual("that he gave his",
-                TranslatorNote.GetWordsRight(s, 26, 4), "2");
-
-            Assert.AreEqual("s only son.",
-                TranslatorNote.GetWordsRight(s, 42, 4), "3");
-        }
-        #endregion
-        /*
-        #region Test: ComputeHeader
-        [Test] public void ComputeHeader()
-        {
-            char chSpace = DPhrase.c_chInsertionSpace;
-            string sVerse = "For God so loved the world, that he gave his one and only son.";
-
-            // Case 1 - A context within a containing text
-            TranslatorNote tn = new TranslatorNote("003:016", "loved");
-            DBasicText text = tn.GetCollapsableHeaderText(sVerse);
-            Assert.AreEqual("3:16:" + chSpace + "For God so loved the world, that he", text.AsString);
-            Assert.AreEqual(4, text.Phrases.Count);
-
-            // Case 2 - No containing text
-            text = tn.GetCollapsableHeaderText("");
-            Assert.AreEqual("3:16:" + chSpace + "loved", text.AsString);
-
-            // Case 3 - No Context
-            tn.SelectedText = "";
-            text = tn.GetCollapsableHeaderText("");
-            Assert.AreEqual("3:16:" + chSpace, text.AsString);
-        }
-        #endregion
-        */
-        #region Test: RemoveInitialRefFromText
-        [Test] public void RemoveInitialRefFromText()
-        {
-            TranslatorNote tn = new TranslatorNote("010:020", "");
-
-            Assert.AreEqual("This how it is.",
-                tn.RemoveInitialReferenceFromText("10:20: This how it is."));
-
-            Assert.AreEqual("This how it is.",
-                tn.RemoveInitialReferenceFromText("10:20 This how it is."));
-
-            Assert.AreEqual("10:21 This how it is.",
-                tn.RemoveInitialReferenceFromText("10:21 This how it is."));
-
-
         }
         #endregion
 
@@ -570,9 +481,9 @@ namespace OurWordTests.DataModel
                   "<Message Author=\"Sandra\" Created=\"2008-11-14 00:00:00Z\">Really, it is!</Message>" +
                 "</TranslatorNote>";
 
-            TranslatorNote Parent = CreateFromXmlString(sParent);
-            TranslatorNote Mine = CreateFromXmlString(sMine);
-            TranslatorNote Theirs = CreateFromXmlString(sTheirs);
+            TranslatorNote Parent = CreateFromXmlString(sParent, "TranslatorNote");
+            TranslatorNote Mine = CreateFromXmlString(sMine, "TranslatorNote");
+            TranslatorNote Theirs = CreateFromXmlString(sTheirs, "TranslatorNote");
 
             Mine.Merge(Parent, Theirs);
 
@@ -580,12 +491,12 @@ namespace OurWordTests.DataModel
             var oxes = new XmlDoc();
             var nodeOut = Mine.Save(oxes, oxes);
             var sOut = XmlDoc.OneLiner(nodeOut);
-            string sExpected = "<TranslatorNote class=\"General\" selectedText=\"so loved the world\" reference=\"003:016\">" +
+            string sExpected = "<Annotation class=\"General\" selectedText=\"so loved the world\">" +
                   "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\">Check exegesis here.</Message>" +
                   "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
                   "<Message author=\"Sandra\" created=\"2008-11-14 00:00:00Z\">Really, it is!</Message>" +
                   "<Message author=\"John\" created=\"2008-11-15 00:00:00Z\">I'm not convinced.</Message>" +
-                "</TranslatorNote>";
+                "</Annotation>";
             Assert.AreEqual(sExpected, sOut);
         }
         #endregion

@@ -609,7 +609,6 @@ namespace OurWordTests.DataModel
             // But we should have a Translator Note giving their version
             Assert.AreEqual(1, Ours.TranslatorNotes.Count);
             TranslatorNote note = Ours.TranslatorNotes[0];
-            Assert.AreEqual("003:008", note.Reference);
             Assert.AreEqual("not", note.SelectedText);
         }
         #endregion

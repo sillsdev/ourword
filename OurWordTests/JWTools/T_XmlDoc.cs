@@ -111,7 +111,7 @@ namespace OurWordTests.JWTools
         #region Test: UrlAttrList_Parsing1
         [Test] public void UrlAttrList_Parsing1()
         {
-            string sUrl = "oxes://book=Mrk&Chapter=3&Verse=2&selectedWord=carakiau";
+            string sUrl = "oxes://book=Mrk+Chapter=3+Verse=2+selectedWord=carakiau";
 
             var v = new UrlAttrList(sUrl);
 
@@ -146,7 +146,7 @@ namespace OurWordTests.JWTools
         #region Test: UrlAttrList_Finding
         [Test] public void UrlAttrList_Finding()
         {
-            string sUrl = "oxes://book=Mrk&Chapter=3&Verse=2&selectedWord=carakiau";
+            string sUrl = "oxes://book=Mrk+Chapter=3+Verse=2+selectedWord=carakiau";
 
             var v = new UrlAttrList(sUrl);
 
@@ -167,7 +167,7 @@ namespace OurWordTests.JWTools
 
             string sUrl = ua.MakeUrl();
 
-            Assert.AreEqual("oxes://book=John&chapter=3&verse=16", sUrl, "Should be identical.");
+            Assert.AreEqual("oxes://book=John+chapter=3+verse=16", sUrl, "Should be identical.");
         }
         #endregion
     }

@@ -148,7 +148,12 @@ namespace JWTools
 			// 3. In Solution Explorer, right-click over it and choose "Properties"; in the
 			//     properties form, declare the Build Action as an "Embedded Resource". 
 		{
-			Assembly ExecutingAssembly = Assembly.GetEntryAssembly();
+			var ExecutingAssembly = Assembly.GetEntryAssembly();
+
+            // From NUnit, ExecutingAssembly returns null, so we just create a dummy
+            // bitmap as we don't care about the appearance during testing.
+            if (null == ExecutingAssembly)
+                return new Bitmap(16, 16);
 
 			string sResourcePath = ResourceLocation + sResourceFile;
 
@@ -166,7 +171,7 @@ namespace JWTools
 			// 3. In Solution Explorer, right-click over it and choose "Properties"; in the
 			//     properties form, declare the Build Action as an "Embedded Resource". 
 		{
-			Assembly ExecutingAssembly = Assembly.GetEntryAssembly();
+			var ExecutingAssembly = Assembly.GetEntryAssembly();
 
 			string sResourcePath = ResourceLocation + sResourceFile;
 
@@ -240,6 +245,9 @@ namespace JWTools
 
             // Localization DB
             LocDB.Initialize(GetApplicationDataFolder("OurWord"));
+
+            // Set the resource location
+            JWU.ResourceLocation = "OurWord.Res.";
         }
         #endregion
         #region SAttr{g}: string NUnit_TestFileFolder - returns Path of folder, creates if necessary

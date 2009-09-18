@@ -1266,8 +1266,7 @@ namespace JWdb.DataModel
 			return text;
 		}
 		#endregion
-
-
+        #region Method: List<TranslatorNote> GetAllTranslatorNotes()
         public List<TranslatorNote> GetAllTranslatorNotes()
         {
             var v = new List<TranslatorNote>();
@@ -1292,9 +1291,9 @@ namespace JWdb.DataModel
 
             return v;
         }
+        #endregion
 
-
-		// Scaffolding -----------------------------------------------------------------------
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public DParagraph()
             : base()
@@ -1497,6 +1496,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        /*
         public int ID
         {
             get
@@ -1512,10 +1512,10 @@ namespace JWdb.DataModel
                 m_nID = Book.GetID();
             Debug.Assert(m_nID > -1);
         }
+        */
 
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagParagraph = "p";
-        const string c_sAttrID = "id";
         const string c_sAttrStyle = "class";
         const string c_sAttrUsfm = "usfm";
         #region Method: void ReadOxesPhrase(XmlNode)
@@ -1537,12 +1537,6 @@ namespace JWdb.DataModel
         protected void ReadOxes(XmlNode nodeParagraph)
             // Note that DPicture.CreatePicture calls this, too.
         {
-            // Get the ID attribute. We don't create one if one is missing,
-            // because this newly-created paragraph is likely not yet
-            // connected in the ownership hierarchy to a DBook, which we would
-            // need to get the ID from.
-            m_nID = XmlDoc.GetAttrID(nodeParagraph, c_sAttrID);
-
             // Style attribute
             string sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
             var map = DB.Map.FindMappingFromName(sStyleName);
@@ -1565,6 +1559,18 @@ namespace JWdb.DataModel
 
                     case DFoot.c_sNodeTag:
                         Runs.Append(DFoot.Create(child));
+                        break;
+
+                    case TranslatorNote.c_sTagTranslatorNote:
+                    case "TranslatorNote":
+                        {
+                            var note = TranslatorNote.Create(child);
+                            if (null != note)
+                            {
+                                var dbt = GetOrAddLastDText();
+                                dbt.TranslatorNotes.Append(note);
+                            }
+                        }
                         break;
 
                     default:
@@ -1599,8 +1605,6 @@ namespace JWdb.DataModel
 
             if (!string.IsNullOrEmpty(map.Usfm))
                 oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
-
-            oxes.AddAttr(nodeParagraph, c_sAttrID, XmlDoc.IntToID(ID));
 
             foreach (DRun run in Runs)
                 run.SaveToOxesBook(oxes, nodeParagraph);

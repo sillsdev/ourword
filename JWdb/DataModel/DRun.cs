@@ -2126,6 +2126,19 @@ namespace JWdb.DataModel
         JOwnSeq<TranslatorNote> m_osTranslatorNotes;
         #endregion
 
+        // Oxes ------------------------------------------------------------------------------
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeParagraph)
+        {
+            // Save the phrase data
+            base.SaveToOxesBook(oxes, nodeParagraph);
+
+            // Save the notes
+            foreach (TranslatorNote tn in TranslatorNotes)
+                tn.Save(oxes, nodeParagraph);
+
+            return nodeParagraph;
+        }
+
         // Scaffolding -----------------------------------------------------------------------
 		#region Constructor() - Creates the attributes
 		public DText()
@@ -2305,7 +2318,6 @@ namespace JWdb.DataModel
             // We want to keep Ours (as this is less confusing for the user), and generate 
             // a TranslatorNote indicating the nature of the conflict.
             TranslatorNote note = new TranslatorNote();
-            note.Reference = Section.GetReferenceAt(this).ParseableName;
             note.SelectedText = GetNoteContext(ContentsAsString, Theirs.ContentsAsString);
             note.Class = TranslatorNote.NoteClass.General;
 
