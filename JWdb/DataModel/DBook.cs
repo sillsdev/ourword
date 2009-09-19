@@ -776,6 +776,35 @@ namespace JWdb.DataModel
             return;
         }
         #endregion
+        #region Method: void CombineEmptyInitialSection()
+        void CombineEmptyInitialSection()
+            // The Timor MRK's typically have an introductory paragraph without a section
+            // (\s), and have preferred to edit these together with the next section for
+            // more context when editing. So I scan the first section for an \s, and if not
+            // found, combine it into the next section
+        {
+            if (Sections.Count < 2)
+                return;
+
+            // Check the first section and see if we find the SectionHead style
+            var section1 = Sections[0];
+            foreach (DParagraph p in section1.Paragraphs)
+            {
+                if (p.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
+                    return;
+            }
+
+            // Didn't find it, so combine with the nexxt one
+            var section2 = Sections[1];
+            while(section2.Paragraphs.Count > 0)
+            {
+                DParagraph p = section2.Paragraphs[0];
+                section2.Paragraphs.Remove(p);
+                section1.Paragraphs.Append(p);
+            }
+            Sections.Remove(section2);
+        }
+        #endregion
 
         // Filters ---------------------------------------------------------------------------
         #region Method: void RemoveFilter() - Turn off any active filter
@@ -1378,10 +1407,10 @@ namespace JWdb.DataModel
                 // Add the paragraph
                 section.Paragraphs.Append(paragraph);
             }
-            progress.End();
 
             // Post Processing (calc versification, check structure against front)
             _LoadPostProcessing();
+            progress.End();
             m_bIsLoaded = true;
 
             return true;
@@ -1432,16 +1461,9 @@ namespace JWdb.DataModel
                     if (DialogResult.Cancel == result)
                         return false;
 
-                    // Prepare to try the import again. We have to reinitialize the
-                    // TextReader, because we've already read the file to the end.
-                    // A reorganization of the code might be called for, as this
-                    // seems awkward.
-                    Sections.Clear();
-                    if (null != tr)
-                    {
-                        tr.Close();
-                        tr = null;
-                    }
+                    // Prepare to try the import again. 
+                    Clear();
+                    Debug.Assert(History.Events.Count == 0);
                 }
                 catch (Exception e)
                 {
@@ -1450,7 +1472,12 @@ namespace JWdb.DataModel
                 }
                 finally
                 {
-                    tr.Close();
+                    if (null != tr)
+                    {
+                        tr.Close();
+                        tr = null;
+                    }
+                    progress.End();
                 }
             }
 
@@ -1461,6 +1488,10 @@ namespace JWdb.DataModel
         #region Method: void _LoadPostProcessing()
         void _LoadPostProcessing()
         {
+            // If the first section is missing a SectionHead, put the first two sections
+            // together (e.g., Timor Mark's)
+            CombineEmptyInitialSection();
+
             // Each paragraph needs to know what verses are in it
             int nChapter = 0;
             int nVerse = 0;

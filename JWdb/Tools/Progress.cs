@@ -13,6 +13,7 @@ namespace JWdb
         void End();
     }
 
+    #region Class: NullProgress : IProgressIndicator
     public class NullProgress : IProgressIndicator
     {
         public void Start(string sMessage, int nCount)
@@ -25,6 +26,7 @@ namespace JWdb
         {
         }
     }
+    #endregion
 
     public class ToolStripProgress : IProgressIndicator
     {

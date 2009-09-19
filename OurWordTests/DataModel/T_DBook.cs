@@ -318,7 +318,7 @@ namespace OurWordTests.DataModel
             DBook.RestoreFromBackup(book, sBackupPathName, new NullProgress());
 
             // Check for original data, stage, version,.
-            section = book.Sections[1] as DSection;
+            section = book.Sections[0] as DSection;
             int iParaLast = section.Paragraphs.Count - 1;
             var pLast = section.Paragraphs[iParaLast] as DParagraph;
             string sActual = GetSimpleParagraphText(pLast);

@@ -2077,6 +2077,8 @@ namespace JWdb.DataModel
                 {
                     var oxes = new XmlDoc(field.Data);
                     var node = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
+                    if (null == node)
+                        node = XmlDoc.FindNode(oxes, "TranslatorNote");
                     tn = TranslatorNote.Create(node);
                 }
 

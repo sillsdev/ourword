@@ -1519,7 +1519,7 @@ namespace JWdb.DataModel
         const string c_sAttrStyle = "class";
         const string c_sAttrUsfm = "usfm";
         #region Method: void ReadOxesPhrase(XmlNode)
-        public void ReadOxesPhrase(XmlNode node)
+        public void  ReadOxesPhrase(XmlNode node)
         {
             // We want to add the node's data (which will be a phrase) to a DText. If the 
             // last Run isn't a DText, then append an empty one.
@@ -1578,6 +1578,10 @@ namespace JWdb.DataModel
                         break;
                 }
             }
+
+            // Make sure the paragraph is well-formed (e.g., all DTexts should have
+            // a BT phrase, even if the input data didn't.
+            Cleanup();
         }
         #endregion
         #region SMethod: DParagraph CreateParagraph(nodeParagraph)

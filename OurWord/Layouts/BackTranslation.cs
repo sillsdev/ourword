@@ -25,7 +25,6 @@ using JWTools;
 
 namespace OurWord.Layouts
 {
-
     public class WndBackTranslation : Layout
     {
         // Registry-Stored Settings ----------------------------------------------------------

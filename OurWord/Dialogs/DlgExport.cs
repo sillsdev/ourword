@@ -37,6 +37,15 @@ namespace OurWord.Dialogs
     public partial class DialogExport : Form
     {
         // Attrs -----------------------------------------------------------------------------
+        #region VAttr{g}: bool ExportToToolbox
+        public bool ExportToToolbox
+        {
+            get
+            {
+                return (m_radioToolbox.Checked == true);
+            }
+        }
+        #endregion
         #region VAttr{g}: bool ExportToParatext
         public bool ExportToParatext
         {
@@ -67,6 +76,9 @@ namespace OurWord.Dialogs
 
                 if (ExportToGoBibleCreator)
                     sSubFolder += "GoBibleCreator" + Path.DirectorySeparatorChar;
+
+                if (ExportToToolbox)
+                    sSubFolder += "Toolbox" + Path.DirectorySeparatorChar;
 
                 return sSubFolder;
             }

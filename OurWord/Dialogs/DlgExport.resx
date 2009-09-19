@@ -117,4 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="m_labelToolbox.Text" xml:space="preserve">
+    <value>These are Standard Format files in a format which includes the bach translation and notes; they cannot be read in Paratext, but they can be exported to Toolbox and reimported in OurWord without data loss.</value>
+  </data>
 </root>

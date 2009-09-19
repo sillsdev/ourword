@@ -1280,6 +1280,8 @@ namespace JWdb.DataModel
             StyleMappings.Add(new StyleMapping("r", "r", "Parallel Passage Reference"));
             StyleMappings.Add(new StyleMapping("q", "q1", "Line 1"));
             StyleMappings.Add(new StyleMapping("q2", "q2", "Line 2"));
+            StyleMappings.Add(new StyleMapping("q3", "q3", "Line 3"));
+            StyleMappings.Add(new StyleMapping("qc", "qc", "Line Centered"));
             StyleMappings.Add(new StyleMapping("cap", "fig", "Caption"));
             StyleMappings.Add(new StyleMapping("ms", "ms", "Major Section Head"));
             StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range"));

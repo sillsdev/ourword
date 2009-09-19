@@ -1140,6 +1140,10 @@ namespace OurWord.Dialogs
 			if (null == book)
 				return;
 
+            // Make sure the book is loaded, as we can neither see nor edit the 
+            // properties otherwise
+            book.LoadBook(G.CreateProgressIndicator());
+
 			// Launch the dialog
 			Debug.Assert(null != Translation);
 			Debug.Assert(null != Translation.Project);
@@ -1187,7 +1191,7 @@ namespace OurWord.Dialogs
 
 			// We can now get a filename from the book. Let's make sure that file doesn't
 			// already exist. If it does, then let the user abort.
-			if (File.Exists(book.StoragePath) && book.StoragePath != wizard.ImportFileName)
+			if (File.Exists(book.StoragePath))
 			{
 				if (!Messages.VerifyOverwriteBook())
 				{
@@ -1198,8 +1202,7 @@ namespace OurWord.Dialogs
 
             // Attempt to read it in
             Debug.Assert(!book.Loaded);
-			string sImportPath = wizard.ImportFileName;
-            book.LoadBook(sImportPath, G.CreateProgressIndicator());
+            book.LoadBook(wizard.ImportFileName, G.CreateProgressIndicator());
             if (!book.Loaded)
             {
                 Translation.Books.Remove(book);
@@ -1210,7 +1213,7 @@ namespace OurWord.Dialogs
             // will put it into our file format as well.
             book.DisplayName = book.BookName;
             book.DeclareDirty();  // Make certain this will be written to file
-            book.Unload(G.CreateProgressIndicator());    // Writes the file
+            book.WriteBook(G.CreateProgressIndicator());
 
             // Update the property page
             PopulateGrid(book.BookAbbrev, true);
