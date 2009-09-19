@@ -1,5 +1,5 @@
+#region ***** JObjectOnDemand.cs *****
 /**********************************************************************************************
- * App:     Josiah
  * File:    JObjectOnDemand.cs
  * Author:  John Wimbish
  * Created: 27 Mar 2004
@@ -18,6 +18,7 @@ using System.Text;
 using System.Threading;
 using JWTools;
 #endregion
+#endregion
 
 /* TASKS
  * - Error on file not found, followed by browse for file
@@ -34,21 +35,6 @@ namespace JWdb
 	public class JObjectOnDemand : JObject
 	{
 		// BAttrs ----------------------------------------------------------------------------
-		#region BAttr{g/s}: (private) FileType FileFormat (XML, Shoebox, Paratext)
-		private enum FileType { Shoebox = 0, XML, Paratext };
-		private FileType FileFormat
-		{
-			get
-			{
-				return (FileType)m_nFileFormat;
-			}
-			set
-			{
-                SetValue(ref m_nFileFormat, (int)value);
-            }
-		}
-		private int m_nFileFormat = (int)FileType.Shoebox;
-		#endregion
 		#region BAttr{g/s}: string DisplayName - the object's name as it appears in the UI
 		public string DisplayName
 			// This name will appear in the UI, e.g., in an error message stating that
@@ -69,7 +55,6 @@ namespace JWdb
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
-			DefineAttr("FileFormat",  ref m_nFileFormat);
 			DefineAttr("DisplayName", ref m_sDisplayName);
         }
 		#endregion
@@ -175,8 +160,8 @@ namespace JWdb
 		protected bool m_bIsLoaded = false;
 		#endregion
 
-        #region Method: void Load(ref sPath, IProgressIndicator)
-        public void Load(ref string sPath, IProgressIndicator progress)
+        #region Method: void LoadFromFile(ref sPath, IProgressIndicator)
+        public void LoadFromFile(ref string sPath, IProgressIndicator progress)
 			// This version permits us to load the file with a different location
 			// from that specified in the StoragePath. We use this, e.g., on
 			// loading a new Project, or for our test suite.
@@ -211,8 +196,8 @@ namespace JWdb
 			}
 		}
 		#endregion
-        #region Method: void Load(IProgressIndicator)
-        public void Load(IProgressIndicator progress)
+        #region Method: void LoadFromFile(IProgressIndicator)
+        public void LoadFromFile(IProgressIndicator progress)
 			// This is the normal version we'll use, where we already know
 			// the path and don't need it to be supplied.
 		{
@@ -225,7 +210,7 @@ namespace JWdb
 
 			// Call the path-aware version of Load
 			string sPathActuallyLoaded = StoragePath;
-            Load(ref sPathActuallyLoaded, progress);
+            LoadFromFile(ref sPathActuallyLoaded, progress);
 
             // By default, we are using the DisplayName to come up with the path.
             // If the DisplayName as stored within the file is different from what
@@ -247,7 +232,7 @@ namespace JWdb
 			{
 				Unload(progress);
                 File.Move(sPathActuallyLoaded, StoragePath);
-				Load(progress);
+				LoadFromFile(progress);
 			}
 		}
 		#endregion
@@ -273,15 +258,15 @@ namespace JWdb
         {
             if (Loaded)
             {
-                Write(progress);
+                WriteToFile(progress);
                 Clear();
                 m_bIsLoaded = false;
             }
         }
         #endregion
 
-        #region Method: void Write() - topmost level Write, writes all data
-        public void Write(IProgressIndicator progress)
+        #region Method: void WriteToFile() - topmost level Write, writes all data
+        public virtual void WriteToFile(IProgressIndicator progress)
 		{
             // Give the owned JObjectOnDemand's an opportunity to be written
             foreach (JAttr attr in AllAttrs)
@@ -348,7 +333,7 @@ namespace JWdb
             // If the file exists where we expect it, then load its settings
             if (File.Exists(StoragePath))
             {
-                Load(progress);
+                LoadFromFile(progress);
                 if (Loaded)
                     return;
             }
@@ -357,7 +342,7 @@ namespace JWdb
             string sFolder = Path.GetDirectoryName(StoragePath);
             if (!Directory.Exists(sFolder))
                 Directory.CreateDirectory(sFolder);
-            Write(progress);
+            WriteToFile(progress);
         }
         #endregion
 

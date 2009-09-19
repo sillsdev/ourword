@@ -287,7 +287,7 @@ namespace OurWord.Dialogs
             // Create and store the new translation
             DTranslation t = new DTranslation(dlg.TranslationName);
             DB.Project.OtherTranslations.Append(t);
-            t.Write(new NullProgress());
+            t.WriteToFile(new NullProgress());
 
             // Add it to the Properties dialog and go to its page
             ParentDlg.InitNavigation(Page_Translation.ComputeID(t.DisplayName));
@@ -324,7 +324,7 @@ namespace OurWord.Dialogs
                 {
                     DTranslation tInsert = new DTranslation(sItem);
                     DB.Project.OtherTranslations.Append(tInsert);
-                    tInsert.Load(G.CreateProgressIndicator());
+                    tInsert.LoadFromFile(G.CreateProgressIndicator());
                     ParentDlg.InitNavigation(Page_OtherTranslations.c_sID);
                 }
             }

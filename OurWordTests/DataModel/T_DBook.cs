@@ -1,3 +1,4 @@
+#region ***** T_DBook.cs *****
 /**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_DBook.cs
@@ -22,6 +23,7 @@ using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+#endregion
 #endregion
 
 namespace OurWordTests.DataModel
@@ -49,7 +51,7 @@ namespace OurWordTests.DataModel
 	}
 	#endregion
 
-	[TestFixture] public class T_DBook
+	[TestFixture] public class T_DBook : TestCommon
     {
         // Helper Methods --------------------------------------------------------------------
         #region Method: void Setup()
@@ -158,7 +160,7 @@ namespace OurWordTests.DataModel
             // Now read it into the book. 
 			DBook Book = new DBook("MRK");
             Translation.AddBook(Book);
-            Book.Load(ref sPathname, new NullProgress());
+            Book.LoadBook(sPathname, new NullProgress());
             Book.DisplayName = "Mark";
 
             // Check for the the proper book references for each section
@@ -209,6 +211,22 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("Amarasi", sLanguageName);
             Assert.AreEqual("Comm", sStageAbbrev);
             Assert.AreEqual("B", sVersion);
+        }
+        #endregion
+        #region Test: GetInfoFromPath
+        [Test] public void GetInfoFromPath()
+        {
+            // Normal path, should succeed
+            string sPath = "C:\\Users\\JWimbish\\Documents\\Timor2\\North Huidao\\42 LUK - North Huidao";
+            string[] vs = DBook.GetInfoFromPath(sPath);
+            Assert.AreEqual("42", vs[0]);
+            Assert.AreEqual("LUK", vs[1]);
+            Assert.AreEqual("North Huidao", vs[2]);
+
+            // Number doesn't match abbrev, should fail
+            sPath = "C:\\Users\\JWimbish\\Documents\\Timor2\\North Huidao\\02 LUK - North Huidao";
+            vs = DBook.GetInfoFromPath(sPath);
+            Assert.IsNull(vs, "Number doesn't match abbrev");
         }
         #endregion
 
@@ -262,7 +280,14 @@ namespace OurWordTests.DataModel
             DB.Project.FrontTranslation = translation;
 
             // Create an initial book which we will save as a backup
-            DTestBook book = SectionTestData.LoadIntoBook(SectionTestData.BaikenoMark0101_ImportVariant, translation);
+            var book = new DBook("MRK");
+            translation.AddBook(book);
+            TextWriter W = JWU.NUnit_OpenTextWriter("book.db");
+            foreach (string s in SectionTestData.BaikenoMark0101_ImportVariant)
+                W.WriteLine(s);
+            W.Close();
+            book.LoadBook(JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + "book.db", 
+                new NullProgress());
             book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idDraft);
             book.Version = "A";
 
@@ -276,9 +301,7 @@ namespace OurWordTests.DataModel
             // Save the book. Then save it again, so that "Original" gets placed
             // into the ".backup" folder
             book.DeclareDirty();
-            book.Write(new NullProgress());
-            book.DeclareDirty();
-            book.Write(new NullProgress());
+            book.WriteBook(new NullProgress());
 
             // Compute the backup path we've just saved to
             string sBackupPathName = book.Translation.Project.TeamSettings.BackupFolder +
@@ -289,16 +312,16 @@ namespace OurWordTests.DataModel
             book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idConsultantCheck);
             book.Version = "C";
             book.DeclareDirty();
-            book.Write(new NullProgress());
+            book.WriteBook(new NullProgress());
 
             // Restore the original
             DBook.RestoreFromBackup(book, sBackupPathName, new NullProgress());
 
             // Check for original data, stage, version,.
-            section = book.Sections[0] as DSection;
+            section = book.Sections[1] as DSection;
             int iParaLast = section.Paragraphs.Count - 1;
-            DParagraph pg = section.Paragraphs[iParaLast] as DParagraph;
-            string sActual = GetSimpleParagraphText(pg);
+            var pLast = section.Paragraphs[iParaLast] as DParagraph;
+            string sActual = GetSimpleParagraphText(pLast);
             Assert.AreEqual(sTextO, sActual);
             Assert.AreEqual(BookStages.c_idDraft, book.TranslationStage.ID);
             Assert.AreEqual("A", book.Version);

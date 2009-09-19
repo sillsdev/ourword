@@ -25,7 +25,7 @@ using JWdb;
 
 namespace JWdb.DataModel
 {
-    public class DBook : JObjectOnDemand
+    public class DBook : JObjectOnDemand, IComparable<DBook>
     {
         // BAttrs ----------------------------------------------------------------------------
         #region BAttr{g/s}: string BookAbbrev - a 3-letter abbreviation for the book
@@ -95,6 +95,7 @@ namespace JWdb.DataModel
         private int m_nTranslationStage = BookStages.c_idDraft;
         #endregion
         #region BAttr{g/s}: string Version - incremental version, 'A', 'B', etc.
+        public const string c_sVersionDefault = "A";
         public string Version
         {
             get
@@ -106,7 +107,7 @@ namespace JWdb.DataModel
                 SetValue(ref m_sVersion, value);
             }
         }
-        private string m_sVersion = "A";
+        private string m_sVersion = c_sVersionDefault;
         #endregion
         #region BAttr{g/s}: bool Locked - T if user is not allowed to edit.
         public bool Locked
@@ -272,7 +273,7 @@ namespace JWdb.DataModel
                     if (b.BookAbbrev == this.BookAbbrev)
                     {
                         m_FrontBookSaved = b;
-                        m_FrontBookSaved.Load(new NullProgress());
+                        m_FrontBookSaved.LoadBook(new NullProgress());
                         return b;
                     }
                 }
@@ -435,6 +436,7 @@ namespace JWdb.DataModel
         #endregion
         #region SMethod: static int FindBookAbbrevIndex(string sAbbrev)
         public static int FindBookAbbrevIndex(string sAbbrev)
+            // Returns 0-based index
         {
             for (int i = 0; i < BookAbbrevs.Length; i++)
             {
@@ -542,6 +544,12 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region IComparable<DBook>.CompareTo(DBook other)
+        int IComparable<DBook>.CompareTo(DBook other)
+        {
+            return FindBookAbbrevIndex(BookAbbrev).CompareTo(FindBookAbbrevIndex(other.BookAbbrev));
+        }
+        #endregion
 
         // Methods ---------------------------------------------------------------------------
         #region Method: void InitializeFromFrontTranslation()
@@ -552,7 +560,7 @@ namespace JWdb.DataModel
             if (null == FrontBook)
                 return false;
 
-            FrontBook.Load(progress);
+            FrontBook.LoadBook(progress);
             if (!FrontBook.Loaded)
                 return false;
 
@@ -1171,25 +1179,8 @@ namespace JWdb.DataModel
                     m_Progress.Step();
                 }
 
-                // Each paragraph needs to know what verses are in it
-                int nChapter = 0;
-                int nVerse = 0;
-                foreach (DSection section in Book.Sections)
-                    section.CalculateVersification(ref nChapter, ref nVerse);
-
-                // Items that depend on the Front translation
-                if (Book.Translation == DB.Project.TargetTranslation &&
-                    Book.FrontBook != null)
-                {
-                    // Make sure that each section has the same structure as the
-                    // front.
-                    Book.CheckSectionStructureAgainstFront(Book.FrontBook);
-
-                    // E.g., Generate the \ref and \cf's from the Front Translation
-                    // We do the test here to prevent the FrontBook from attempting
-                    // to load itself recursively here (via an embedded Loaded call.)
-                    Book.UpdateFromFront(Book.FrontBook);
-                }
+                // Post Processing (calc versification, check structure against front)
+                Book._LoadPostProcessing();
 
                 // Done
                 return true;
@@ -1283,30 +1274,148 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region Method: override void OnLoad(TextReader) - overridden to read Std Format
-        protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
+        #region Method: bool LoadFromOxes(sPath, progress)
+        public bool LoadFromOxes(string sPath, IProgressIndicator progress)
+            // Returns true if successful, false otherwise (which often means the user gave up)
         {
-            bool bResult = false;
-
-            // Load the book
-            do
+            // Load the xml file, giving the user the opportunity to fix any errors that
+            // occur. (In theory, if a valid Oxes loads, there will not be any further
+            // errors downstream.)
+            bool bXmlLoaded = false;
+            var xml = new XmlDoc();
+            while (!bXmlLoaded)
             {
                 try
                 {
-                    DSection.IO.s_VerticleBarsEncountered = false;
+                    xml.Load(sPath);
+                    bXmlLoaded = true;
+                }
+                catch (XmlException xmle)
+                    // Error in the XML
+                {
+                    // Display the Error Message & Repair dialog so that the user can have
+                    // opportunity to fix it.
+                    var bre = new eBookReadException(
+                        "There is a problem in the oxes file: " + xmle.Message,
+                        HelpSystem.Topic.kImportBook, xmle.LineNumber);
+                    var dlgRepair = new DialogRepairImportBook(this, sPath, bre);
+                    var result = dlgRepair.ShowDialog();
+
+                    // If he doesn't fix it, then we must abort the load
+                    if (DialogResult.Cancel == result)
+                        return false;
+                }
+                catch (Exception e)
+                    // I/O, Read Permission, or other similar system error
+                {
+                    LocDB.Message("kFailedToLoadOxes",
+                        "The Oxes file {0} failed to load with system error:\n{1}.",
+                        new string[] { Path.GetFileName(sPath), e.Message },
+                        LocDB.MessageTypes.Error);
+                    return false;
+                }
+            } // endwhile
+
+            // Find the Bible node (If well-formed Oxes, shouldn't be a problem.)
+            var nodeBible = XmlDoc.FindNode(xml, c_sTagBible);
+            if (null == nodeBible)
+                return false;
+
+            // Make sure it is a version of Oxes that we handle
+            string sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
+            if (sOxes != "2.0")
+            {
+                LocDB.Message("kUnsupportedOxes",
+                    "This version of OurWord does not support Oxes {0}.",
+                    new string[] { sOxes },
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+
+            // Find the Book node (if wel-formed Oxes, shouldn't be a problem.)
+            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
+            if (null == nodeBook)
+                return false;
+
+            // Get the Book's three-letter ID
+            string sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+            if (string.IsNullOrEmpty(sBookID))
+                return false;
+            if (sBookID != BookAbbrev)
+            {
+                LocDB.Message("kMismatchedBookAbbrevInOxesFile",
+                    "OurWord was expecting book {0}, but this Oxes file has book {1}.",
+                    new string[] { BookAbbrev, sBookID},
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+
+            // Read the Book attributes
+            m_nTranslationStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, 0);
+            Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
+            Locked = XmlDoc.GetAttrValue(nodeBook, c_sAttrLocked, false);
+            Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
+            Comment = XmlDoc.GetAttrValue(nodeBook, c_sAttrComment, "");
+
+            // Read in the paragraphs
+            progress.Start("Reading", nodeBook.ChildNodes.Count);
+            DSection section = null;
+            foreach (XmlNode nodeParagraph in nodeBook.ChildNodes)
+            {
+                progress.Step();
+                // Create the paragraph or picture
+                DParagraph paragraph = DPicture.CreatePicture(nodeParagraph);
+                if (null == paragraph)
+                    paragraph = DParagraph.CreateParagraph(nodeParagraph);
+
+                // A section for it to go into
+                if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
+                {
+                    section = new DSection();
+                    Sections.Append(section);
+                }
+
+                // Add the paragraph
+                section.Paragraphs.Append(paragraph);
+            }
+            progress.End();
+
+            // Post Processing (calc versification, check structure against front)
+            _LoadPostProcessing();
+            m_bIsLoaded = true;
+
+            return true;
+        }
+        #endregion
+        #region Method: bool LoadFromStandardFormat(sPath, progress)
+        bool LoadFromStandardFormat(string sPath, IProgressIndicator progress)
+        {
+            // Locate the file
+            if (!File.Exists(sPath))
+            {
+                LocDB.Message("UnableToFindFile",
+                    "Unable to find the file:\n{0}.",
+                    new string[] { sPath },
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+
+            // Open the file
+            bool bSfmLoaded = false;
+            while (!bSfmLoaded)
+            {
+                TextReader tr = null;
+                try
+                {
+                    var sr = new StreamReader(sPath, Encoding.UTF8);
+                    tr = TextReader.Synchronized(sr);
 
                     IO io = new IO(this, progress);
                     if (true == io.Read(tr))
                     {
-                        bResult = true;
-                        // We'll consider an object unchanged following a read. 
-                        IsDirty = false;
-                        // Unless we had those stinky verticle bars, in which case
-                        // we want to save the cleaned-up file
-                        if (DSection.IO.s_VerticleBarsEncountered)
-                            DeclareDirty();
+                        IsDirty = false;  // We'll consider an object unchanged following a read. 
+                        bSfmLoaded = true;
                     }
-                    break;
                 }
                 catch (eBookReadException bre)
                 {
@@ -1321,45 +1430,124 @@ namespace JWdb.DataModel
                     // If he doesn't fix it, then we must remove the book from
                     // the project. (Thus we return "false")
                     if (DialogResult.Cancel == result)
-                        goto done;
+                        return false;
 
                     // Prepare to try the import again. We have to reinitialize the
                     // TextReader, because we've already read the file to the end.
                     // A reorganization of the code might be called for, as this
                     // seems awkward.
                     Sections.Clear();
-                    tr.Close();
-                    tr = JW_Util.GetTextReader(ref sPath, FileFilter);
+                    if (null != tr)
+                    {
+                        tr.Close();
+                        tr = null;
+                    }
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine("Exception in DBook.Read: " + e.Message);
-                    goto done;
+                    return false;
                 }
-            } while (true);
+                finally
+                {
+                    tr.Close();
+                }
+            }
 
-            // Done with progress dialog
-        done:
-            progress.End();
-            return bResult;
+            m_bIsLoaded = true;
+            return true;
         }
         #endregion
-        #region Method: override void OnWrite(IProgressIndicator)
-        protected override void OnWrite(IProgressIndicator progress)
+        #region Method: void _LoadPostProcessing()
+        void _LoadPostProcessing()
+        {
+            // Each paragraph needs to know what verses are in it
+            int nChapter = 0;
+            int nVerse = 0;
+            foreach (DSection section in Sections)
+                section.CalculateVersification(ref nChapter, ref nVerse);
+
+            // Items that depend on the Front translation
+            if (Owner != null && Translation == DB.Project.TargetTranslation && FrontBook != null)
+            {
+                // Make sure that each section has the same structure as the front.
+                CheckSectionStructureAgainstFront(FrontBook);
+
+                // E.g., Generate the \ref and \cf's from the Front Translation
+                // We do the test here to prevent the FrontBook from attempting
+                // to load itself recursively here (via an embedded Loaded call.)
+                UpdateFromFront(FrontBook);
+            }
+
+        }
+        #endregion
+        #region Method: bool LoadBook(sPath, progress)
+        public bool LoadBook(string sPath, IProgressIndicator progress)
+        {
+            // Nothing to do if already loaded, or a bad pathname
+            if (Loaded || string.IsNullOrEmpty(sPath))
+                return false;
+
+            // Load according to format, which we determine based on the file extension
+            if (Path.GetExtension(sPath).ToLower() == ".oxes")
+            {
+                if (LoadFromOxes(sPath, progress))
+                    return true;
+            }
+            else
+            {
+                if (LoadFromStandardFormat(sPath, progress))
+                    return true;
+            }
+
+            return false;
+        }
+        #endregion
+        #region Method: bool LoadBook(progress)
+        public bool LoadBook(IProgressIndicator progress)
+        {
+            return LoadBook(StoragePath, progress);
+        }
+        #endregion
+
+        #region Method: void WriteBook(progress)
+        public void WriteBook(IProgressIndicator progress)
         {
             if (!Loaded)
                 return;
 
-            // Save the file
-            bool bSuccessful = (new IO(this, progress)).Write();
+            // Create the xml representation, and write it to disk
+            var xml = ToOxesDocument;
+            xml.Save(StoragePath);
+            IsDirty = false;
 
-            // Make the backup
-            if (bSuccessful)
-                (new BackupSystem(StoragePath, BaseNameForBackup)).MakeBackup();
+            // Make the backup to the ".backup" folder
+            var sBackupPath = Translation.Project.TeamSettings.BackupFolder +
+                BaseNameForBackup + ".bak";
+            if (File.Exists(StoragePath))
+            {
+                try
+                {
+                    if (File.Exists(sBackupPath))
+                        File.Delete(sBackupPath);
+                    File.Copy(StoragePath, sBackupPath, true);
 
-            // Save the OTrans, since the pathnames have probably changed (due to the
-            // dates being part of the file name
-            Translation.Write(progress);
+                    BackupSystem.CleanUpOldFiles(
+                        Translation.Project.TeamSettings.BackupFolder,
+                        sBackupPath);
+                }
+                catch (Exception)
+                { }
+            }
+
+            // Make the optional other-device backup
+            (new BackupSystem(StoragePath, BaseNameForBackup)).MakeBackup();
+        }
+        #endregion
+        #region OMethod: void WriteToFile(progress)
+        public override void WriteToFile(IProgressIndicator progress)
+        {
+            WriteBook(progress);
         }
         #endregion
 
@@ -1424,17 +1612,14 @@ namespace JWdb.DataModel
             // Post a status message
             progress.Start("Restoring from backup...", 0);
 
-            // Make sure the current book has been saved
-            book.Write(progress);
-
-            // Unload it from memory. We call Clear() even though Loaded=false does this,
+            // Unload the current book from memory. We call Clear() even though Loaded=false does this,
             // because from the test code it isn't activated (no harm done to have
             // it execute twice.)
             book.Unload(new NullProgress());
             book.Clear();
             Debug.Assert(0 == book.Sections.Count);
 
-            // Make a copy of it (to *.sav). The ability to use this will not be in the
+            // Rename it (to *.sav). The ability to use this will not be in the
             // user interface, but it may come in handy for computer techies.
             JW_Util.CreateBackup(book.StoragePath, ".sav");
 
@@ -1454,7 +1639,7 @@ namespace JWdb.DataModel
             book.Version = sVersion;
 
             // Load the book back in
-            book.Load(progress);
+            book.LoadBook(progress);
             progress.End();
 
             // Calling method (command handler) is responsible to navigate to the
@@ -1655,10 +1840,86 @@ namespace JWdb.DataModel
                 sPath += BaseName;
 
                 // Add the extension
-                sPath += ".db";
+                sPath += ".oxes";
 
                 return sPath;
             }
+        }
+        #endregion
+        #region SMethod: string[] GetInfoFromPath(string sBookPath)
+        static public string[] GetInfoFromPath(string sBookPath)
+        {
+            if (string.IsNullOrEmpty(sBookPath))
+                return null;
+
+            // Drill down to the basename
+            var sBaseName = Path.GetFileNameWithoutExtension(sBookPath);
+            if (string.IsNullOrEmpty(sBaseName))
+                return null;
+
+            // A well-formed name has at least four parts (including the hyphen);
+            // with the final parts being the language name
+            var vsParts = sBaseName.Split(new char[] { ' ' });
+            if (vsParts.Length < 4)
+                return null;
+
+            // Book Number should be two digits
+            var sBookNumber = vsParts[0];
+            if (sBookNumber.Length != 2)
+                return null;
+            foreach (char ch in sBookNumber)
+            {
+                if (!char.IsDigit(ch))
+                    return null;
+            }
+
+            // Abbreviation should be three letters; make sure they're uppercase
+            var sBookAbbrev = vsParts[1];
+            if (sBookAbbrev.Length != 3)
+                return null;
+            foreach (char ch in sBookAbbrev)
+            {
+                if (!char.IsLetter(ch))
+                    return null;
+            }
+            sBookAbbrev = sBookAbbrev.ToUpper();
+
+            // Number and Abbreviation should match (and Abbreviation should be something
+            // we recognize.
+            try
+            {
+                // The number as stored in the filename (1-based)
+                string sNumber = sBookNumber;
+                if (sNumber[0] == '0')
+                    sNumber = sNumber.Substring(1);
+
+                int n = Convert.ToInt16(sNumber);
+
+                // The index is 0-based, so we add 1 to it
+                int nAbbrev = FindBookAbbrevIndex(sBookAbbrev) + 1;
+
+                // Compare
+                if (n != nAbbrev)
+                    return null;
+            }
+            catch (Exception)
+            {
+            }
+
+            // Assemble the language name; should be non-empty
+            string sLanguageName = "";
+            for(int i = 3; i<vsParts.Length; i++)
+                sLanguageName += (vsParts[i] + ' ');
+            sLanguageName = sLanguageName.Trim();
+            if (string.IsNullOrEmpty(sLanguageName))
+                return null;
+
+            // Return the answer
+            var vs = new string[3];
+            vs[0] = sBookNumber;
+            vs[1] = sBookAbbrev;
+            vs[2] = sLanguageName;
+            return vs;
         }
         #endregion
 
@@ -1679,56 +1940,11 @@ namespace JWdb.DataModel
 
         const string c_sTagBook = "book";
         const string c_sAttrID = "id";
-        #endregion
-        #region SMethod: DBook CreateBook(XmlDoc xml)
-        static public DBook CreateBook(XmlDoc xml)
-        {
-            // Find the Bible node
-            var nodeBible = XmlDoc.FindNode(xml, c_sTagBible);
-            if (null == nodeBible)
-                return null;
-
-            // Make sure it is a version of Oxes that we handle
-            string sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
-            if (sOxes != "2.0")
-                throw new XmlDocException("OurWord can only handle Oxes 2.0.");
-
-            // Find the Book node
-            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
-            if (null == nodeBook)
-                return null;
-
-            // Get the Book's three-letter ID
-            string sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
-            if (string.IsNullOrEmpty(sBookID))
-                return null;
-
-            // Create the new, empty book
-            var book = new DBook(sBookID);
-
-            // Read in the paragraphs
-            DSection section = null;
-            foreach (XmlNode nodeParagraph in nodeBook.ChildNodes)
-            {
-                // Create the paragraph or picture
-                DParagraph paragraph = DPicture.CreatePicture(nodeParagraph);
-                if (null == paragraph)
-                    paragraph = DParagraph.CreateParagraph(nodeParagraph);
-
-                // A section for it to go into
-                if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
-                {
-                    section = new DSection();
-                    book.Sections.Append(section);
-                }
-
-                // Add the paragraph
-                section.Paragraphs.Append(paragraph);
-            }
-
-            // Done
-            return book;
-        }
+        const string c_sAttrStage = "stage";
+        const string c_sAttrVersion = "version";
+        const string c_sAttrLocked = "locked";
+        const string c_sAttrCopyright = "copyright";
+        const string c_sAttrComment = "comment";
         #endregion
         #region Attr{g}: XmlDoc ToOxesDocument
         public XmlDoc ToOxesDocument
@@ -1747,6 +1963,14 @@ namespace JWdb.DataModel
                 // Book Node
                 var nodeBook = oxes.AddNode(nodeBible, c_sTagBook);
                 oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
+                oxes.AddAttr(nodeBook, c_sAttrStage, m_nTranslationStage);
+                oxes.AddAttr(nodeBook, c_sAttrVersion, Version);
+                if (true == Locked)
+                    oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
+                if (!string.IsNullOrEmpty(Copyright))
+                    oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
+                if (!string.IsNullOrEmpty(Comment))
+                    oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
 
                 // Add the Sections
                 foreach (DSection section in Sections)

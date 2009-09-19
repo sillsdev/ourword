@@ -91,7 +91,7 @@ namespace OurWordTests.JWdb
             Assert.IsFalse(obj.Loaded);
 
             // Load the object
-            obj.Load(new NullProgress());
+            obj.LoadFromFile(new NullProgress());
 
             // Check that it is loaded
             Assert.IsNotNull(obj.m_own.Value);

@@ -517,7 +517,7 @@ namespace JWdb.DataModel
 					return null;
 
 				// Attempt to load the book
-                book.Load(progress);
+                book.LoadBook(progress);
 
 				// If we were unable to load the book, then we must remove it from the 
 				// translation, because we are unable to make use of it. The user will 
@@ -927,7 +927,7 @@ namespace JWdb.DataModel
             // Initialize the Team Settings file
             CheckTeamSettingsName(TeamSettings, sPath);
 			if (File.Exists(TeamSettings.StoragePath))
-                TeamSettings.Load(progress);
+                TeamSettings.LoadFromFile(progress);
 			else
                 TeamSettings.New();
 			TeamSettings.TemporaryFixes();
@@ -936,14 +936,14 @@ namespace JWdb.DataModel
             // Read the LoadOnDemand translation objects
             if (null != FrontTranslation)
             {
-                FrontTranslation.Load(progress);
+                FrontTranslation.LoadFromFile(progress);
                 if (!FrontTranslation.Loaded)
                     FrontTranslation = null;
             }
 
             if (null != TargetTranslation)
             {
-                TargetTranslation.Load(progress);
+                TargetTranslation.LoadFromFile(progress);
                 if (!TargetTranslation.Loaded)
                     TargetTranslation = null;
             }
@@ -953,16 +953,13 @@ namespace JWdb.DataModel
             {
                 DTranslation t = OtherTranslations[i] as DTranslation;
 
-                t.Load(progress);
+                t.LoadFromFile(progress);
 
                 if (!t.Loaded)
                     OtherTranslations.Remove(t);
                 else
                     i++;
             }
-
-			// Convert to the Version 2 file system if necessary
-			//ConvertFileSystem();
 
             return true;
         }
@@ -1027,7 +1024,7 @@ namespace JWdb.DataModel
                 return;
 
             // The JObjectOnDemand does the writing
-            Write(progress);
+            WriteToFile(progress);
         }
         #endregion
 	}

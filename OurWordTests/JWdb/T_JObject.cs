@@ -414,11 +414,11 @@ namespace OurWordTests.JWdb
             Assert.AreEqual('M', objStart.Gender, "Set");
 
             // Write out the object
-            objStart.Write(new NullProgress());
+            objStart.WriteToFile(new NullProgress());
 
             // Create a read-in object and populate it from the file we just wrote out
             BAttrTestObject objEnd = new BAttrTestObject();
-            objEnd.Load(new NullProgress());
+            objEnd.LoadFromFile(new NullProgress());
 
             // Test that the attributes are all the same
             Assert.AreEqual(objStart.Name, objEnd.Name, "Read-Name");

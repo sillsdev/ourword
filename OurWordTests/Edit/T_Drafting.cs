@@ -26,7 +26,7 @@ using OurWord.Layouts;
 
 namespace OurWordTests.Edit
 {
-    [TestFixture] public class T_Drafting
+    [TestFixture] public class T_Drafting : TestCommon
     {
         DBook FrontBook;
         DBook TargetBook;
@@ -36,24 +36,23 @@ namespace OurWordTests.Edit
         [SetUp] public void Setup()
         {
             JWU.NUnit_Setup();
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
-            DB.Project.DisplayName = "Drafting Test Project";
+            CreateHierarchyThroughTargetTranslation();
 
             DB.Project.FrontTranslation = new DTranslation("Front Translation", "Latin", "Latin");
             FrontBook = new DBook("GEN");
             DB.Project.FrontTranslation.AddBook(FrontBook);
 
-            DB.Project.TargetTranslation = new DTranslation("Target Translation", "Latin", "Latin");
             TargetBook = new DBook("GEN");
             DB.Project.TargetTranslation.AddBook(TargetBook);
+
+            JWU.NUnit_SetupClusterFolder();
         }
         #endregion
         #region TearDown
         [TearDown]
         public void TearDown()
         {
+            JWU.NUnit_TeardownClusterFolder();
             DB.Project = null;
         }
         #endregion
@@ -71,7 +70,7 @@ namespace OurWordTests.Edit
             W.Close();
 
             // Now read it into the book
-			book.Load(ref sPathname, new NullProgress());
+			book.LoadBook(sPathname, new NullProgress());
         }
         #endregion
 

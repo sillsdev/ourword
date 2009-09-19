@@ -1,3 +1,4 @@
+#region ***** T_DTranslation.cs *****
 /**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_DTranslation.cs
@@ -23,6 +24,7 @@ using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 #endregion
+#endregion
 
 namespace OurWordTests.DataModel
 {
@@ -35,7 +37,7 @@ namespace OurWordTests.DataModel
             JWU.NUnit_Setup();
 
             DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings();
+            DB.Project.TeamSettings = new DTeamSettings("Test");
             DB.TeamSettings.EnsureInitialized();
         }
         #endregion
@@ -92,6 +94,45 @@ namespace OurWordTests.DataModel
             DB.Project.TargetTranslation.ConvertCrossReferences(paraFront, paraTarget);
 
             Assert.AreEqual(sExpected, paraTarget.SimpleText);
+        }
+        #endregion
+
+        #region Test: PopulateBookListFromFolder
+        [Test] public void PopulateBookListFromFolder()
+        {
+            // Create a translation
+            var translation = new DTranslation("Kupang");
+            DB.Project.TargetTranslation = translation;
+
+            // Create a folder
+            ClusterList.CreateNewCluster(true, DB.TeamSettings.DisplayName);
+            ClusterList.ScanForClusters();
+            if (!Directory.Exists(translation.BookStorageFolder))
+                Directory.CreateDirectory(translation.BookStorageFolder);
+
+            // Add some oxes files
+            string[] vs = new string[] {
+                "42 LUK - Kupang",
+                "41 MRK - Kupang",
+                "44 ACT - Kupang"
+            };
+            foreach (string s in vs)
+            {
+                var f = File.Create(translation.BookStorageFolder + s + ".oxes");
+                f.Close();
+            }
+
+            // Perform the method
+            translation.PopulateBookListFromFolder();
+
+            // Did we get the BookList we expected?
+            Assert.AreEqual(3, translation.BookList.Count);
+            Assert.AreEqual("MRK", translation.BookList[0].BookAbbrev);
+            Assert.AreEqual("LUK", translation.BookList[1].BookAbbrev);
+            Assert.AreEqual("ACT", translation.BookList[2].BookAbbrev);
+
+            // Remove the folder
+            Directory.Delete(DB.TeamSettings.ClusterFolder, true);
         }
         #endregion
 
@@ -237,7 +278,7 @@ namespace OurWordTests.DataModel
 
             // Read it in
             string sPath = JWU.NUnit_TestFilePathName;
-            t.Load(ref sPath, new NullProgress());
+            t.LoadFromFile(ref sPath, new NullProgress());
             t.DisplayName = sDisplayName;
 
             // So ownership hierarchy will work in debugger

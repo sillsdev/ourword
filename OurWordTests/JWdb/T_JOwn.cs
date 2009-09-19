@@ -254,11 +254,11 @@ namespace OurWordTests.JWdb
             // Set up an owning attr and write it out
             TObjA objOwner1 = new TObjA("a1");
             objOwner1.m_own1.Value = new TObjB("VerseNo");
-            objOwner1.Write(new NullProgress());
+            objOwner1.WriteToFile(new NullProgress());
 
             // Read it into anouther owning attr
             TObjA objOwner2 = new TObjA("a2");
-            objOwner2.Load(new NullProgress());
+            objOwner2.LoadFromFile(new NullProgress());
 
             // Compare the two
             TObjB b1 = objOwner1.m_own1.Value;

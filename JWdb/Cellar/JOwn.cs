@@ -140,7 +140,7 @@ namespace JWdb
                 if (null != ood)
                 {
                     xOwn.AddSubItem(Value.ToXml(false));
-                    ood.Write(new NullProgress());
+                    ood.WriteToFile(new NullProgress());
                 }
                 else
                     xOwn.AddSubItem(Value.ToXml(true));
@@ -193,7 +193,7 @@ namespace JWdb
         {
             JObjectOnDemand ood = Value as JObjectOnDemand;
             if (null != ood)
-                ood.Write(new NullProgress());
+                ood.WriteToFile(new NullProgress());
         }
         #endregion
         #region OMethod: JObject GetObjectFromPath(sPath)

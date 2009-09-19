@@ -313,7 +313,7 @@ namespace JWdb
                     if (null != ood)
                     {
                         xOwnSeq.AddSubItem(obj.ToXml(false));
-                        ood.Write(new NullProgress());
+                        ood.WriteToFile(new NullProgress());
                     }
                     else
                     {

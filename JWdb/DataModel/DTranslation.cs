@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.IO;
@@ -143,7 +144,44 @@ namespace JWdb.DataModel
         }
 		#endregion
 
-		// JAttrs ----------------------------------------------------------------------------
+        // Books -----------------------------------------------------------------------------
+        #region Attr{g}: List<DBook> BookList
+        public List<DBook> BookList
+        {
+            get
+            {
+                Debug.Assert(null != m_vBookList);
+                return m_vBookList;
+            }
+        }
+        List<DBook> m_vBookList;
+        #endregion
+        #region Method: void PopulateBookListFromFolder()
+        public void PopulateBookListFromFolder()
+        {
+            // Get a list of all of the Oxes files in the translation's folder
+            var vsOxesFiles = Directory.GetFiles(BookStorageFolder, "*.oxes");
+
+            // Create books from each that fit the pattern
+            foreach (string sOxesFileFullPath in vsOxesFiles)
+            {
+                // Parse the book's base name to see which one it is
+                var vsParts = DBook.GetInfoFromPath(sOxesFileFullPath);
+                if (null == vsParts || vsParts.Length != 3)
+                    continue;
+                string sBookAbbrev = vsParts[1];
+
+                // Add the book to our list
+                var book = new DBook(sBookAbbrev);
+                BookList.Add(book);
+            }
+
+            // Sort the list according to cannonical order
+            BookList.Sort();
+        }
+        #endregion
+
+        // JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: JOwnSeq Books - sequence of DBook
 		public JOwnSeq<DBook> Books
 		{
@@ -325,6 +363,9 @@ namespace JWdb.DataModel
                 BookNames.GetTable(DB.TeamSettings.FileNameLanguage));
             m_bsaFootnoteCustomSeq = new BStringArray();
 
+            // Books
+            m_vBookList = new List<DBook>();
+
 			// Owning Sequence
 			m_osBooks = new JOwnSeq<DBook>("Books", this, true, true);
 
@@ -476,7 +517,7 @@ namespace JWdb.DataModel
 		{
 			get
 			{
-				return Project.TeamSettings.ClusterFolder + DisplayName + 
+				return DB.TeamSettings.ClusterFolder + DisplayName + 
                     Path.DirectorySeparatorChar;
 			}
 		}
@@ -490,7 +531,20 @@ namespace JWdb.DataModel
             Directory.CreateDirectory(BookStorageFolder);
         }
         #endregion
+        #region OMethod: bool OnLoad(...)
+        protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
+        {
+            // Do the load as usual
+            bool bSuccessful = base.OnLoad(tr, sPath, progress);
+            if (!bSuccessful)
+                return false;
 
-	}
+            // Scan the disk to load the BookList
+            PopulateBookListFromFolder();          
+
+            return true;
+        }
+        #endregion
+    }
 
 }

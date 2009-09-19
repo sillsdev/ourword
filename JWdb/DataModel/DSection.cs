@@ -278,7 +278,7 @@ namespace JWdb.DataModel
 		{
 			get
 			{
-				return Project.TeamSettings.SFMapping;
+                return DB.Map;
 			}
 		}
 		#endregion

@@ -218,11 +218,11 @@ namespace OurWordTests.JWdb
             ost1.m_os.Append(new TObject("Chapter"));
             ost1.m_os.Append(new TObject("Inscription"));
             ost1.m_os.Append(new TObject("Lord"));
-            ost1.Write(new NullProgress());
+            ost1.WriteToFile(new NullProgress());
 
             // Read into another object
             OwnSeqTestUnsorted ost2 = new OwnSeqTestUnsorted();
-            ost2.Load(new NullProgress());
+            ost2.LoadFromFile(new NullProgress());
 
             // Compare the two
             Assert.AreEqual(4, ost2.m_os.Count);
@@ -236,7 +236,7 @@ namespace OurWordTests.JWdb
 
             // Read it into the Sorted sequence object
             OwnSeqTestSorted oSorted = new OwnSeqTestSorted();
-            oSorted.Load(new NullProgress());
+            oSorted.LoadFromFile(new NullProgress());
             Assert.AreEqual(4, oSorted.m_os.Count);
             // Verify that the sorted sequence is indeed sorted
             for (int i = 0; i < oSorted.m_os.Count - 2; i++)

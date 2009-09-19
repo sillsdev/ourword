@@ -2457,7 +2457,7 @@ namespace OurWord
 			// Read in the project
 			DB.Project = new DProject();
             if (!string.IsNullOrEmpty(sPath))
-			    DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+                DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
 
             // Initial Splitter Position
             m_SplitContainer.SplitterDistance = (int)((float)m_fSplitterPercent * (float)Width / 100.0F);
@@ -2518,7 +2518,7 @@ namespace OurWord
 			// Save the window position
 			m_WindowState.SaveWindowState();
 
-			DB.TeamSettings.Write(G.CreateProgressIndicator());
+			DB.TeamSettings.WriteToFile(G.CreateProgressIndicator());
         }
         #endregion
         #region Event: OnResize - prevent the size from becomming too small
@@ -2623,7 +2623,7 @@ namespace OurWord
             DB.Project = project;
 
             // Save everything
-            DB.Project.Write(G.CreateProgressIndicator());
+            DB.Project.WriteToFile(G.CreateProgressIndicator());
 
             // Update the UI, views, etc
             DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
@@ -2651,7 +2651,7 @@ namespace OurWord
             // Open the requested project
             OnLeaveProject(true);
             DB.Project = new DProject();
-            DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+            DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
             DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
             OnEnterProject();
         }
@@ -2767,7 +2767,7 @@ namespace OurWord
 
                 // Load the book if not already in memory
                 bool bIsLoaded = book.Loaded;
-                book.Load(G.CreateProgressIndicator());
+                book.LoadBook(G.CreateProgressIndicator());
                 if (!book.Loaded)
                     continue;
 
@@ -3566,7 +3566,7 @@ namespace OurWord
             // We have to unload, then reload everything
             string sPath = DB.Project.StoragePath;
             DB.Project = new DProject();
-            DB.Project.Load(ref sPath, G.CreateProgressIndicator());
+            DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
             DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
             OnEnterProject();
         }

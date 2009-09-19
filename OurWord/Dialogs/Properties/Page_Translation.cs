@@ -1034,7 +1034,7 @@ namespace OurWord.Dialogs
 
             // Save the OTrans file in case anything has changed
             ParentDlg.HarvestChangesFromCurrentPage();
-            Translation.Write(G.CreateProgressIndicator());
+            Translation.WriteToFile(G.CreateProgressIndicator());
 
             // Remove it from the appropriate object in the Properties
             bool bWasFront = false;
@@ -1199,7 +1199,7 @@ namespace OurWord.Dialogs
             // Attempt to read it in
             Debug.Assert(!book.Loaded);
 			string sImportPath = wizard.ImportFileName;
-            book.Load(ref sImportPath, G.CreateProgressIndicator());
+            book.LoadBook(sImportPath, G.CreateProgressIndicator());
             if (!book.Loaded)
             {
                 Translation.Books.Remove(book);
@@ -1261,7 +1261,7 @@ namespace OurWord.Dialogs
                 Cursor.Current = Cursors.Default;
                 return;
             }
-            book.Write(G.CreateProgressIndicator());
+            book.WriteBook(G.CreateProgressIndicator());
             Cursor.Current = Cursors.Default;
             PopulateGrid(sAbbrev, true);
         }

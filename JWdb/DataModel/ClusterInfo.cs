@@ -154,6 +154,7 @@ namespace JWdb.DataModel
         static List<ClusterInfo> s_vClusters;
         #endregion
 
+        #region SMethod:  void CreateNewCluster(bool bStoreInMyDocuments, string sNewClusterName)
         static public void CreateNewCluster(bool bStoreInMyDocuments, string sNewClusterName)
             // A Cluster is defined as (1) a Cluster Folder, which (2) owns a
             // Settings folder. 
@@ -174,6 +175,7 @@ namespace JWdb.DataModel
             if (!Directory.Exists(sSettingsPath))
                 Directory.CreateDirectory(sSettingsPath);
         }
+        #endregion
 
         #region SMethod: void ScanForClusters()
         static public void ScanForClusters()

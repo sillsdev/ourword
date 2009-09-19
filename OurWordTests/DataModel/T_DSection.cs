@@ -146,7 +146,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -304,7 +304,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -540,7 +540,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -715,7 +715,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Header\" usfm=\"h\">",
                     "Mark",
@@ -922,7 +922,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Header\" usfm=\"h\">",
                     "Mark",
@@ -1135,7 +1135,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Header\" usfm=\"h\">",
                     "Mark",
@@ -1367,7 +1367,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -1518,7 +1518,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -1644,7 +1644,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -1726,7 +1726,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -1790,7 +1790,7 @@ namespace OurWordTests.DataModel
         {
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
             "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
-            "<book id=\"MRK\">",
+            "<book id=\"MRK\" stage=\"0\" version=\"A\">",
 
                 "<p class=\"Title Main\" usfm=\"mt\" />",
 
@@ -2002,7 +2002,7 @@ namespace OurWordTests.DataModel
             // Create and load the book from what we just wrote out
             DTestBook Book = new DTestBook(sPathName);
             translation.AddBook(Book);
-            Book.Load(new NullProgress());
+            Book.LoadBook(new NullProgress());
 
             return Book;
         }
@@ -2250,12 +2250,7 @@ namespace OurWordTests.DataModel
         // 
         {
             // Preliminary: Create the superstructure we need for a DBook
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings( JWU.NUnit_ClusterFolderName );
-            DB.TeamSettings.EnsureInitialized();
-            DB.Project.DisplayName = "Project";
-            DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
-            DB.Project.TargetTranslation = Translation;
+            var Translation = CreateHierarchyThroughTargetTranslation();
 
             //////////////////////////////////////////////////////////////////////////////////
             // PART 1: IMPORT vsRaw AND SEE IF WE SAVE IT TO MATCH vsSAV. Thus we are testing
@@ -2266,8 +2261,7 @@ namespace OurWordTests.DataModel
             DTestBook Book = SectionTestData.LoadIntoBook(vsRaw, Translation);
 
             // Now write it, to test TransformOut, & etc.
-            Book.DeclareDirty();                 // It'll not write without this
-            Book.Write(new NullProgress());
+            Book.ExportToToolbox(Book.StoragePath, new NullProgress());
 
             // Read the SFM result from disk
             string[] vsResult = SectionTestData.ReadSfmFromBookFile(Book);
@@ -2287,8 +2281,7 @@ namespace OurWordTests.DataModel
 
             // Now, write it back out. This will do DB.TransformOut, as well as the
             // various write methods in DBook.
-            Book.DeclareDirty();                 // It'll not write without this
-            Book.Write(new NullProgress());
+            Book.ExportToToolbox(Book.StoragePath, new NullProgress());
 
             // Finaly, read the result from disk
             vsResult = SectionTestData.ReadSfmFromBookFile(Book);
@@ -2949,7 +2942,7 @@ namespace OurWordTests.DataModel
             Mine.Merge(Parent, Theirs);
 
             // Compare the result
-            Mine.Book.Write(new NullProgress());
+            Mine.Book.WriteBook(new NullProgress());
             string[] vsActual = SectionTestData.ReadSfmFromBookFile(Mine.Book as DTestBook); 
 
             // WriteMergeCompareToConsole(vsExpected, vsActual);
@@ -3126,7 +3119,7 @@ namespace OurWordTests.DataModel
             Mine.Merge(Parent, Theirs);
 
             // Compare the result
-            Mine.Book.Write(new NullProgress());
+            Mine.Book.ExportToToolbox(Mine.Book.StoragePath, new NullProgress());
             string[] vsActual = SectionTestData.ReadSfmFromBookFile(Mine.Book as DTestBook);
 
             // Comment out unless debugging
@@ -3204,7 +3197,13 @@ namespace OurWordTests.DataModel
 
             // PART 2 - ROUND-TRIP OXES
             // Create a new book from our cannonical Oxes
-            DBook bookNew = DBook.CreateBook(xmlExpected);
+            var sNewBookPath = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + "BookNew.oxes";
+            xmlExpected.Save(sNewBookPath);
+            var bookNew = new DBook(Book.BookAbbrev);
+            bookNew.LoadFromOxes(sNewBookPath, new NullProgress());
+            File.Delete(sNewBookPath);
+
+            //DBook bookNew = DBook.CreateBook(xmlExpected);
 
             // Create the new book's xml
             xmlActual = bookNew.ToOxesDocument;

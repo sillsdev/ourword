@@ -75,7 +75,7 @@ namespace OurWordTests.Utilities
             DB.Project.TargetTranslation.AddBook(book);
             DSection section = new DSection();
             book.Sections.Append(section);
-            DB.Project.Write(new NullProgress());
+            DB.Project.WriteToFile(new NullProgress());
 
         }
         #endregion
