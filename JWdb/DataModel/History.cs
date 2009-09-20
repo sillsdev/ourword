@@ -17,6 +17,7 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using System.Xml;
 using JWTools;
 using JWdb;
 #endregion
@@ -24,6 +25,165 @@ using JWdb;
 
 namespace JWdb.DataModel
 {
+    public class DEventMessage : DMessage
+    {
+        // Content Attrs ---------------------------------------------------------------------
+        #region BAttr{g/s}: DateTime EventDate - Date this event took place
+        public DateTime EventDate
+        {
+            get
+            {
+                if (m_dtEventDate.CompareTo(DefaultDate) == 0)
+                    m_dtEventDate = Created;
+
+                return m_dtEventDate;
+            }
+            set
+            {
+                SetValue(ref m_dtEventDate, value);
+            }
+        }
+        private DateTime m_dtEventDate;
+        #endregion
+        #region BAttr{g/s}: string Stage - translation stage (draft, revision, etc)
+        public string Stage
+        {
+            get
+            {
+                return m_sStage;
+            }
+            set
+            {
+                SetValue(ref m_sStage, value);
+            }
+        }
+        private string m_sStage = "";
+        #endregion
+        #region Method void DeclareAttrs()
+        protected override void DeclareAttrs()
+        {
+            base.DeclareAttrs();
+            DefineAttr("Date", ref m_dtEventDate);
+            DefineAttr("Stage", ref m_sStage);
+        }
+        #endregion
+
+        // VAttrs ----------------------------------------------------------------------------
+        #region VAttr{g}: DateTime DefaultDate - default for the Date attr
+        public static DateTime DefaultDate
+        {
+            get
+            {
+                return new DateTime(2009, 1, 1);
+            }
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public DEventMessage()
+            : base()
+        {
+        }
+        #endregion
+        #region Constructor(XmlNode)
+        public DEventMessage(XmlNode node)
+            : base()
+        {
+            ReadFromOxes(node);
+        }
+        #endregion
+
+        #region OMethod: bool ContentEquals(DEventMessage)
+        public override bool ContentEquals(JObject obj)
+        {
+            var e = obj as DEventMessage;
+            if (null == e)
+                return false;
+
+            if (e.EventDate != EventDate)
+                return false;
+            if (e.Stage != Stage)
+                return false;
+
+            return base.ContentEquals(obj);
+            ;
+        }
+        #endregion
+        #region OMethod: DMessage Clone() - returns a DEventMessage
+        public override DMessage Clone()
+        {
+            var em = new DEventMessage();
+            em.Author = Author;
+            em.Created = Created;
+            em.Status = Status;
+            em.CopyFrom(this, false);
+
+            em.EventDate = EventDate;
+            em.Stage = Stage;
+
+            return em;
+        }
+        #endregion
+
+        // I/O -------------------------------------------------------------------------------
+        #region Constants
+        public const string c_sTagEventMessage = "Event";
+        #region OAttr{g}: string Tag
+        public override string Tag
+        {
+            get
+            {
+                return c_sTagEventMessage;
+            }
+        }
+        #endregion
+
+        const string c_sAttrEventDate = "when";
+        const string c_sAttrStage = "stage";
+        #endregion
+        #region SMethod: new bool IsXmlNode(XmlNode node)
+        static new public bool IsXmlNode(XmlNode node)
+        {
+            if (XmlDoc.IsNode(node, c_sTagEventMessage))
+                return true;
+            if (XmlDoc.IsNode(node, "DEvent"))
+                return true;
+            return false;
+        }
+        #endregion
+        #region OMethod: void ReadFromOxes(XmlNode node)
+        public override void ReadFromOxes(XmlNode node)
+        {
+            // Read all of the base data
+            base.ReadFromOxes(node);
+
+            // Add the DEventMessage data
+            // Stage
+            Stage = XmlDoc.GetAttrValue(node, c_sAttrStage, "");
+
+            // EventDate, including old-style which was "Date"
+            EventDate = XmlDoc.GetAttrValue(node, 
+                new string[] { c_sAttrEventDate, "Date" },
+                DateTime.Now);
+        }
+        #endregion
+        #region OMethod: XmlNode Save(oxes, nodeAnnotation)
+        public override XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
+        {
+            // Save the superclass values
+            XmlNode nodeEventMessage = base.Save(oxes, nodeAnnotation);
+
+            // Add in our additional attributes
+            oxes.AddAttr(nodeEventMessage, c_sAttrEventDate, EventDate);
+            oxes.AddAttr(nodeEventMessage, c_sAttrStage, Stage);
+
+            return nodeEventMessage;
+        }
+        #endregion
+
+    }
+
     public class DEvent : JObject
     {
         // ZAttrs ----------------------------------------------------------------------------

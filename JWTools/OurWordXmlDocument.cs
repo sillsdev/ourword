@@ -259,6 +259,7 @@ namespace JWTools
             return false;
         }
         #endregion
+
         #region SMethod: string GetAttrValue(node, vsAttr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string[] vsAttrName, string sDefaultValue)
         {
@@ -270,6 +271,24 @@ namespace JWTools
             }
 
             return sDefaultValue;
+        }
+        #endregion
+        #region SMethod: DateTime GetAttrValue(node, vsAttr, dtDefaultValue)
+        static public DateTime GetAttrValue(XmlNode node, string[] vsAttrName, DateTime dtDefaultValue)
+        {
+            string sDefaultValue = dtDefaultValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
+
+            foreach (string sAttrName in vsAttrName)
+            {
+                DateTime dtOut = GetAttrValue(node, sAttrName, dtDefaultValue);
+
+                string sOut = dtOut.ToString("u", DateTimeFormatInfo.InvariantInfo);
+
+                if (sOut != sDefaultValue)
+                    return dtOut;
+            }
+
+            return dtDefaultValue;
         }
         #endregion
 

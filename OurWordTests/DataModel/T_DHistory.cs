@@ -26,6 +26,113 @@ using OurWord.Layouts;
 
 namespace OurWordTests.DataModel
 {
+    [TestFixture] public class T_DEventMessage : TestCommon
+    {
+        DSection m_Section;
+        #region Setup
+        [SetUp]
+        public void Setup()
+        {
+            JWU.NUnit_Setup();
+            m_Section = CreateHierarchyThroughTargetSection("MRK");
+        }
+        #endregion
+
+        // General
+        #region Test: ContentEquals
+        [Test]
+        public void ContentEquals()
+        {
+            // Data 
+            string sStage = "Revision";
+            DateTime dtEventDate = new DateTime(2008, 11, 22);
+
+            // Create a base Message object
+            var message = new DEventMessage();
+            message.Author = "John";
+            message.Created = new DateTime(2008, 11, 23);
+            message.Status = "David";
+            message.SimpleText = "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.";
+            message.Stage = sStage;
+            message.EventDate = dtEventDate;
+
+            // Test equality
+            Assert.IsTrue(message.ContentEquals(message));
+
+            // Test if Stage gets changed
+            DEventMessage m2 = message.Clone() as DEventMessage;
+            m2.Stage = "Draft";
+            Assert.IsFalse(message.ContentEquals(m2));
+
+            // Test if EventDate gets changed
+            m2 = message.Clone() as DEventMessage;
+            m2.EventDate = new DateTime(2007, 5, 3);
+            Assert.IsFalse(message.ContentEquals(m2));
+        }
+        #endregion
+
+        // I/O
+        #region Test: ImportFromToolboxXml
+        [Test] public void ImportFromToolboxXml()
+        {
+            var vsToImport = new string[] {
+                "<DEvent Created=\"2009-06-03 11:45:29Z\" Date=\"2006-05-08 00:00:00Z\" Stage=\"Revisi\">",
+                    "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.",
+                "</DEvent>"
+            };
+            var vsOxesExpected = new string[] {
+                "<Event created=\"2009-06-03 11:45:29Z\" when=\"2006-05-08 00:00:00Z\" stage=\"Revisi\">",
+                    "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.",
+                "</Event>"
+            };
+
+            // Create an Oxes object for Expected
+            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
+
+            // Import into a EventMessage object
+            var xmlImported = new XmlDoc(vsToImport);
+            var nodeMessage = XmlDoc.FindNode(xmlImported, "DEvent");
+            var message = new DEventMessage(nodeMessage);
+
+            // Create an Oxes object for saving
+            var xmlOxesActual = new XmlDoc();
+            message.Save(xmlOxesActual, xmlOxesActual);
+
+            // Are they the same?
+            bool bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            Assert.IsTrue(bIsSame, "Message xmls should be the same.");
+        }
+        #endregion
+        #region Test: OxesIO
+        [Test] public void OxesIO()
+        {
+            // Cannonical form of a Message object
+            string[] vsOxesExpected = new string[] { 
+                "<Event author=\"John\" created=\"2008-11-23 00:00:00Z\" when=\"2008-11-21 00:00:00Z\" stage=\"Revision\">" ,
+                    "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.",
+                "</Event>"
+            };
+
+            // Create the XmlDoc
+            var xmlOxesExpected = new XmlDoc(vsOxesExpected);
+            var nodeMessage = XmlDoc.FindNode(xmlOxesExpected, DEventMessage.c_sTagEventMessage);
+            //xmlOxesExpected.WriteToConsole("Expected");
+
+            // Create the Message object from the Xml node
+            var message = new DEventMessage(nodeMessage);
+
+            // Save this new Message to oxes
+            var xmlOxesActual = new XmlDoc();
+            message.Save(xmlOxesActual, xmlOxesActual);
+
+            // Are they the same?
+            bool bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            Assert.IsTrue(bIsSame, "Message xmls should be the same.");
+        }
+        #endregion
+
+    }
+
     [TestFixture] public class T_DHistory
     {
         #region Setup

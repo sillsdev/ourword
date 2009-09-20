@@ -141,8 +141,17 @@ namespace JWdb.DataModel
             Debug_VerifyIntegrity();
         }
         #endregion
+        #region Constructor(XmlNode)
+        public DMessage(XmlNode node)
+            : this()
+        {
+            ReadFromOxes(node);
+            Debug_VerifyIntegrity();
+        }
+        #endregion
+
         #region OMethod: bool ContentEquals(DMessage)
- 		public override bool ContentEquals(JObject obj)
+        public override bool ContentEquals(JObject obj)
         {
             var message = obj as DMessage;
             if (null == message)
@@ -161,8 +170,8 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        #region Method: DMessage Clone()
-        public DMessage Clone()
+        #region VirtMethod: DMessage Clone()
+        public virtual DMessage Clone()
         {
             var message = new DMessage();
             message.Author = Author;
@@ -277,6 +286,16 @@ namespace JWdb.DataModel
         // Oxes I/O --------------------------------------------------------------------------
         #region Constants
         public const string c_sTagMessage = "Message";
+        #region VAttr{g}: string Tag
+        public virtual string Tag
+        {
+            get
+            {
+                return c_sTagMessage;
+            }
+        }
+        #endregion
+
         const string c_sAttrAuthor = "author";
         const string c_sAttrCreated = "created";
         const string c_sAttrStatus = "status";
@@ -306,41 +325,43 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        #region SMethod: DMessage Create(nodeMessage)
-        static public DMessage Create(XmlNode nodeMessage)
+        #region SMethod: bool IsXmlNode(XmlNode node)
+        static public bool IsXmlNode(XmlNode node)
         {
-            // Is it a Message node? (Old-style were called Discussion)
-            if (!XmlDoc.IsNode(nodeMessage, c_sTagMessage) &&
-                !XmlDoc.IsNode(nodeMessage, "Discussion"))
-            {
-                return null;
-            }
-
-            // Create the new Message object. 
-            var message = new DMessage();
-
-            // Attrs
-            message.Author = XmlDoc.GetAttrValue(nodeMessage, c_sAttrAuthor, "");
-            message.Created = XmlDoc.GetAttrValue(nodeMessage, c_sAttrCreated, DateTime.Now);
-            message.Status = XmlDoc.GetAttrValue(nodeMessage, c_sAttrStatus, "");
-
-            // Import old-style paragraph contents; if successful, we're done.
-            if (message.ImportOldToolboxXmlParagraphContents(nodeMessage))
-                return message;
-
-            // Paragraph contents
-            message.ReadOxes(nodeMessage);
-
-            return message;
+            if (XmlDoc.IsNode(node, c_sTagMessage))
+                return true;
+            if (XmlDoc.IsNode(node, "Discussion"))
+                return true;
+            return false;
         }
         #endregion
-        #region Method: XmlNode Save(oxes, nodeAnnotation)
-        public XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
+        #region VirtMethod: void ReadFromOxes(XmlNode node)
+        public virtual void ReadFromOxes(XmlNode node)
+            // We assume that "node.Name" is a DMessage or a subclass. We can't test here, 
+            // becaus esubclasses may have a different name different, and we want subclass
+            // methods to be able to invoke this method.
         {
-            var nodeMessage = oxes.AddNode(nodeAnnotation, c_sTagMessage);
+            // Attrs
+            Author = XmlDoc.GetAttrValue(node, c_sAttrAuthor, "");
+            Created = XmlDoc.GetAttrValue(node, c_sAttrCreated, DateTime.Now);
+            Status = XmlDoc.GetAttrValue(node, c_sAttrStatus, "");
+
+            // Import old-style paragraph contents; if successful, we're done.
+            if (ImportOldToolboxXmlParagraphContents(node))
+                return;
+
+            // Otherwise, normally-stored paragraph contents
+            ReadOxes(node);
+        }
+        #endregion
+        #region VirtMethod: XmlNode Save(oxes, nodeAnnotation)
+        public virtual XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
+        {
+            var nodeMessage = oxes.AddNode(nodeAnnotation, Tag);
 
             // Attrs
-            oxes.AddAttr(nodeMessage, c_sAttrAuthor, Author);
+            if (!string.IsNullOrEmpty(Author))
+                oxes.AddAttr(nodeMessage, c_sAttrAuthor, Author);
             oxes.AddAttr(nodeMessage, c_sAttrCreated, Created);
 
             // An empty Status is interpreted as "closed", so we want to not
@@ -1081,9 +1102,21 @@ namespace JWdb.DataModel
                 // Messages
                 foreach (XmlNode child in nodeParent.ChildNodes)
                 {
-                    var message = DMessage.Create(child);
+                    DMessage message = null;
+
+                    // Vanilla DMessage
+                    if (DMessage.IsXmlNode(child))
+                        message = new DMessage(child);
+
+                    // DEventMessage
+                    if (DEventMessage.IsXmlNode(child))
+                        message = new DEventMessage(child);
+
                     if (null != message)
+                    {
+  //                      message.ReadFromOxes(child);
                         note.Messages.Append(message);
+                    }
                 }
             }
             #endregion

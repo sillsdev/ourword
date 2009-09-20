@@ -111,7 +111,7 @@ namespace OurWordTests.DataModel
             // Import into a Message object
             var xmlImported = new XmlDoc(vsToImport);
             var nodeMessage = XmlDoc.FindNode(xmlImported, "Discussion");
-            var message = DMessage.Create(nodeMessage);
+            var message = new DMessage(nodeMessage);
 
             // Create an Oxes object for saving
             var xmlOxesActual = new XmlDoc();
@@ -139,7 +139,7 @@ namespace OurWordTests.DataModel
             //xmlOxesExpected.WriteToConsole("Expected");
 
             // Create the Message object from the Xml node
-            var message = DMessage.Create(nodeMessage);
+            var message = new DMessage(nodeMessage);
 
             // Save this new Message to oxes
             var xmlOxesActual = new XmlDoc();
