@@ -95,13 +95,13 @@ namespace OurWord.SideWnd
                 return;
 
             // Get the Event we wish to delete
-            DEvent Event = (Window as HistoryWnd).GetSelectedEvent();
+            DEventMessage Event = (Window as HistoryWnd).GetSelectedEvent();
             if (Event == null)
                 return;
 
             // Are you sure?
-            string sContents = Event.Date.ToShortDateString() + " - " + 
-                Event.Stage + " - " + Event.Description.SimpleText.Trim();
+            string sContents = Event.EventDate.ToShortDateString() + " - " + 
+                Event.Stage + " - " + Event.SimpleText.Trim();
             if (sContents.Length > 60)
                 sContents = sContents.Substring(0, 60) + "...";
             if (!LocDB.Message("kDeleteEvent",
@@ -194,7 +194,7 @@ namespace OurWord.SideWnd
             if (null == item)
                 return;
 
-            DEvent Event = item.Tag as DEvent;
+            DEventMessage Event = item.Tag as DEventMessage;
             if (null == Event)
                 return;
 
@@ -208,7 +208,7 @@ namespace OurWord.SideWnd
             if (null == ctrl)
                 return;
 
-            DEvent Event = ctrl.Tag as DEvent;
+            DEventMessage Event = ctrl.Tag as DEventMessage;
             if (null == Event)
                 return;
 
@@ -217,8 +217,8 @@ namespace OurWord.SideWnd
         #endregion
 
         // Methods ---------------------------------------------------------------------------
-        #region Method: ECollapsableHeaderColumn GetCollapsableFromEvent(DEvent)
-        public ECollapsableHeaderColumn GetCollapsableFromEvent(DEvent Event)
+        #region Method: ECollapsableHeaderColumn GetCollapsableFromEvent(Event)
+        public ECollapsableHeaderColumn GetCollapsableFromEvent(DEventMessage Event)
         {
             foreach (EContainer container in Contents)
             {
@@ -226,14 +226,14 @@ namespace OurWord.SideWnd
                 if (null == collapsable)
                     continue;
 
-                if (Event == collapsable.Tag as DEvent)
+                if (Event == collapsable.Tag as DEventMessage)
                     return collapsable;
             }
             return null;
         }
         #endregion
-        #region Method: EToolStrip GetToolStripFromEvent(DEvent Event)
-        ToolStrip GetToolStripFromEvent(DEvent Event)
+        #region Method: EToolStrip GetToolStripFromEvent(Event)
+        ToolStrip GetToolStripFromEvent(DEventMessage Event)
         {
             var container = GetCollapsableFromEvent(Event);
             if (null == container)
@@ -250,7 +250,7 @@ namespace OurWord.SideWnd
         }
         #endregion
         #region Method: ToolStripDropDownButton GetStageDropDownFromEvent(DEvent)
-        public ToolStripDropDownButton GetStageDropDownFromEvent(DEvent Event)
+        public ToolStripDropDownButton GetStageDropDownFromEvent(DEventMessage Event)
         {
             var ts = GetToolStripFromEvent(Event);
             if (null == ts)
@@ -265,8 +265,8 @@ namespace OurWord.SideWnd
             return null;
         }
         #endregion
-        #region Method: DateTimePicker GetPickerFromEvent(DEvent Event)
-        public DateTimePicker GetPickerFromEvent(DEvent Event)
+        #region Method: DateTimePicker GetPickerFromEvent(Event)
+        public DateTimePicker GetPickerFromEvent(DEventMessage Event)
         {
             var ts = GetToolStripFromEvent(Event);
             if (null == ts)
@@ -283,8 +283,8 @@ namespace OurWord.SideWnd
         }
         #endregion
 
-        #region Method: DEvent GetSelectedEvent()
-        public DEvent GetSelectedEvent()
+        #region Method: DEventMessage GetSelectedEvent()
+        public DEventMessage GetSelectedEvent()
         {
             if (Selection == null)
                 return null;
@@ -292,7 +292,7 @@ namespace OurWord.SideWnd
             DParagraph p = Selection.Paragraph.DataSource as DParagraph;
             Debug.Assert(null != p);
 
-            DEvent Event = p.Owner as DEvent;
+            var Event = p.Owner as DEventMessage;
 
             return Event;
         }
@@ -313,7 +313,7 @@ namespace OurWord.SideWnd
             DHistory history = DB.TargetSection.History;
 
             // Place them in the window
-            foreach (DEvent e in history.Events)
+            foreach (DEventMessage e in history.Events)
                 Contents.Append(BuildView(e));
 
             // Tell the superclass to finish loading, which involves laying out the window 
@@ -324,8 +324,8 @@ namespace OurWord.SideWnd
             ScrollBarPosition = 0;
         }
         #endregion
-        #region Method: EContainer BuildView(DEvent e)
-        EContainer BuildView(DEvent e)
+        #region Method: EContainer BuildView(DEventMessage e)
+        EContainer BuildView(DEventMessage e)
         {
             Color cHeader = Color.LightYellow;
 
@@ -364,7 +364,7 @@ namespace OurWord.SideWnd
             OWPara pDescription = new OWPara(
                 DB.TargetTranslation.WritingSystemConsultant,
                 DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleAnnotationMessage),
-                e.Description,
+                e,
                 Color.White,
                 OWPara.Flags.IsEditable);
             eDescrContainer.Append(pDescription);
@@ -376,7 +376,7 @@ namespace OurWord.SideWnd
         #region Method: ToolStripMenuItem AddStageMenuItem(...)
         ToolStripMenuItem AddStageMenuItem(ToolStripDropDownButton menu, 
             string sMenuText,
-            DEvent Event, 
+            DEventMessage Event, 
             bool bChecked)
         {
             var item = new ToolStripMenuItem(sMenuText);
@@ -387,8 +387,8 @@ namespace OurWord.SideWnd
             return item;
         }
         #endregion
-        #region Method: EToolStrip BuildToolStrip(DEvent Event)
-        EToolStrip BuildToolStrip(DEvent Event)
+        #region Method: EToolStrip BuildToolStrip(Event)
+        EToolStrip BuildToolStrip(DEventMessage Event)
         {
             // Create the EToolStrip
             EToolStrip toolstrip = new EToolStrip(this);
@@ -423,14 +423,14 @@ namespace OurWord.SideWnd
             return toolstrip;
         }
         #endregion
-        #region Method: ToolStripItem BuildDatePicker(DEvent Event)
-        ToolStripItem BuildDatePicker(DEvent Event)
+        #region Method: ToolStripItem BuildDatePicker(Event)
+        ToolStripItem BuildDatePicker(DEventMessage Event)
         {
             // Create a date-time picker
             var ctrl = new DateTimePicker();
             ctrl.Format = DateTimePickerFormat.Custom;
             ctrl.CustomFormat = "yyyy-MM-dd";
-            ctrl.Value = Event.Date;
+            ctrl.Value = Event.EventDate;
             ctrl.Width = 100;
             ctrl.ValueChanged += new EventHandler(OnDateChanged);
             ctrl.Tag = Event;

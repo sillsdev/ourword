@@ -106,6 +106,7 @@ namespace JWdb.DataModel
 
             // Start with a simple, empty text
             SimpleText = "";
+            SimpleTextBT = "";
 
             // The Default date is "Today"
             m_dtCreated = DateTime.Now;
@@ -149,7 +150,6 @@ namespace JWdb.DataModel
             Debug_VerifyIntegrity();
         }
         #endregion
-
         #region OMethod: bool ContentEquals(DMessage)
         public override bool ContentEquals(JObject obj)
         {
@@ -352,6 +352,11 @@ namespace JWdb.DataModel
 
             // Otherwise, normally-stored paragraph contents
             ReadOxes(node);
+
+            // The paragraph's ReadOxes method will attempt to set StyyleAbbrev to "p", because
+            // we don't actually have an attr in the xml. So even though the call
+            // to "this" constructor set it originally, we have to set it again here.
+            StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
         }
         #endregion
         #region VirtMethod: XmlNode Save(oxes, nodeAnnotation)
@@ -459,6 +464,14 @@ namespace JWdb.DataModel
         }
         private string m_sSelectedText;
         #endregion
+        #region Method void DeclareAttrs()
+        protected override void DeclareAttrs()
+        {
+            base.DeclareAttrs();
+            DefineAttr("Class", ref m_nClass);
+            DefineAttr("SelectedText", ref m_sSelectedText);
+        }
+        #endregion
         #region JAttr{g}: JOwnSeq<DMessage> Messages
         public JOwnSeq<DMessage> Messages
         {
@@ -469,14 +482,6 @@ namespace JWdb.DataModel
             }
         }
         JOwnSeq<DMessage> m_osMessages;
-        #endregion
-        #region Method void DeclareAttrs()
-        protected override void DeclareAttrs()
-        {
-            base.DeclareAttrs();
-            DefineAttr("Class", ref m_nClass);
-            DefineAttr("SelectedText", ref m_sSelectedText);
-        }
         #endregion
 
         // Classes ---------------------------------------------------------------------------
@@ -1113,10 +1118,7 @@ namespace JWdb.DataModel
                         message = new DEventMessage(child);
 
                     if (null != message)
-                    {
-  //                      message.ReadFromOxes(child);
                         note.Messages.Append(message);
-                    }
                 }
             }
             #endregion

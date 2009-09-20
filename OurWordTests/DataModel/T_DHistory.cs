@@ -150,21 +150,24 @@ namespace OurWordTests.DataModel
         [Test] public void EventIO()
         {
             // Create an event
-            DEvent e = new DEvent();
-            e.Date = new DateTime(2009, 5, 25);
+            DEventMessage e = new DEventMessage();
+            e.Author = "John";
+            e.EventDate = new DateTime(2009, 5, 25);
             e.Stage = "Draft";
-            e.Description.SimpleText = "Drafted by John";
-            e.DateCreated = new DateTime(2000, 1, 1);
+            e.SimpleText = "Drafted by John";
+            e.Created = new DateTime(2000, 1, 1);
 
             // Get its xml representation
-            XElement x = e.ToXml(true);
+            var oxes = new XmlDoc();
+            var node = e.Save(oxes, oxes);
+            string s = XmlDoc.OneLiner(node);
+
             Assert.AreEqual(
-                "<DEvent Created=\"2000-01-01 00:00:00Z\" Date=\"2009-05-25 00:00:00Z\" Stage=\"Draft\">Drafted by John</DEvent>", 
-                x.OneLiner);
+                "<Event author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2009-05-25 00:00:00Z\" stage=\"Draft\">Drafted by John</Event>", 
+                s);
 
             // Create a new event and  populate it from the xml
-            DEvent eNew = new DEvent();
-            eNew.FromXml(x);
+            var eNew = new DEventMessage(node);           
 
             // Should be identical
             Assert.IsTrue(eNew.ContentEquals(e), "Should be identical");
@@ -173,31 +176,35 @@ namespace OurWordTests.DataModel
         #region Test: ContentEquals
         [Test] public void ContentEquals()
         {
-            DEvent e1 = new DEvent();
-            e1.Date = new DateTime(2009, 5, 25);
+            var e1 = new DEventMessage();
+            e1.EventDate = new DateTime(2009, 5, 25);
+            e1.Created = e1.EventDate;
             e1.Stage = "Draft";
-            e1.Description.SimpleText = "Drafted by John";
+            e1.SimpleText = "Drafted by John";
+            e1.Author = "John";
 
-            DEvent e2 = new DEvent();
-            e2.Date = new DateTime(2009, 5, 25);
+            var e2 = new DEventMessage();
+            e2.EventDate = new DateTime(2009, 5, 25);
+            e2.Created = e2.EventDate;
             e2.Stage = "Draft";
-            e2.Description.SimpleText = "Drafted by John";
+            e2.SimpleText = "Drafted by John";
+            e2.Author = "John";
 
             // Should be identical
             Assert.IsTrue(e2.ContentEquals(e1), "Should be identical");
 
             // Change the date
-            e2.Date = new DateTime(1999, 5, 25);
+            e2.EventDate = new DateTime(1999, 5, 25);
             Assert.IsFalse(e2.ContentEquals(e1), "Dates differ");
 
             // Change the Stage
-            e2.Date = new DateTime(2009, 5, 25);
+            e2.EventDate = new DateTime(2009, 5, 25);
             e2.Stage = "Revision";
             Assert.IsFalse(e2.ContentEquals(e1), "Stages differ");
 
             // Change the paragraph
             e2.Stage = "Draft";
-            e2.Description.SimpleText = "Drafted by Sandra";
+            e2.SimpleText = "Drafted by Sandra";
             Assert.IsFalse(e2.ContentEquals(e1), "Descriptions differ");
         }
         #endregion
@@ -211,9 +218,9 @@ namespace OurWordTests.DataModel
             history.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by John, Sandra");
 
             // Years should now be in order
-            Assert.AreEqual(2005, history.Events[0].Date.Year);
-            Assert.AreEqual(2006, history.Events[1].Date.Year);
-            Assert.AreEqual(2007, history.Events[2].Date.Year);
+            Assert.AreEqual(2005, history.Events[0].Created.Year);
+            Assert.AreEqual(2006, history.Events[1].Created.Year);
+            Assert.AreEqual(2007, history.Events[2].Created.Year);
         }
         #endregion
         #region Test: HistorySfmIO
@@ -226,28 +233,34 @@ namespace OurWordTests.DataModel
 
             // Build a 3-event history
             DHistory history = new DHistory();
-            history.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").DateCreated = d1;
-            history.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by John, Sandra").DateCreated = d2;
-            history.AddEvent(new DateTime(2007, 11,23), "Trial", "Taken to Sosol by John").DateCreated = d3;
+            history.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").Created = d1;
+            history.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by John, Sandra").Created = d2;
+            history.AddEvent(new DateTime(2007, 11, 23), "Trial", "Taken to Sosol by John").Created = d3;
+            foreach (DEventMessage e in history.Events)
+                e.Author = "John";
 
             // Save to an SfField and see that it is ok
-            SfField f = history.ToSfm();
+            var oxes = new XmlDoc();
+            var node = history.Save(oxes, oxes);
+            var f = new SfField(DHistory.c_sTag, XmlDoc.OneLiner(node));
 
             Assert.AreEqual("History", f.Mkr);
             Assert.AreEqual(
-                "<DEvent Created=\"2000-01-01 00:00:00Z\" Date=\"2005-03-08 00:00:00Z\" Stage=\"Draft\">Drafted by John</DEvent>" +
-                "<DEvent Created=\"2000-01-02 00:00:00Z\" Date=\"2006-08-23 00:00:00Z\" Stage=\"Team Check\">Checked by John, Sandra</DEvent>" +
-                "<DEvent Created=\"2000-01-03 00:00:00Z\" Date=\"2007-11-23 00:00:00Z\" Stage=\"Trial\">Taken to Sosol by John</DEvent>", 
+                "<History>" + 
+                "<Event author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2005-03-08 00:00:00Z\" stage=\"Draft\">Drafted by John</Event>" +
+                "<Event author=\"John\" created=\"2000-01-02 00:00:00Z\" when=\"2006-08-23 00:00:00Z\" stage=\"Team Check\">Checked by John, Sandra</Event>" +
+                "<Event author=\"John\" created=\"2000-01-03 00:00:00Z\" when=\"2007-11-23 00:00:00Z\" stage=\"Trial\">Taken to Sosol by John</Event>" +
+                "</History>",
                 f.Data);
 
             // Now bring it back in and see what we have
             DHistory historyNew = new DHistory();
-            historyNew.FromSfm(f);
+            historyNew.Read(f);
 
             Assert.AreEqual(3, historyNew.Events.Count);
-            Assert.AreEqual(2005, historyNew.Events[0].Date.Year);
+            Assert.AreEqual(2005, historyNew.Events[0].EventDate.Year);
             Assert.AreEqual("Team Check", historyNew.Events[1].Stage);
-            Assert.AreEqual("Taken to Sosol by John", historyNew.Events[2].Description.SimpleText);
+            Assert.AreEqual("Taken to Sosol by John", historyNew.Events[2].SimpleText);
         }
         #endregion
 
@@ -256,38 +269,44 @@ namespace OurWordTests.DataModel
         {
             // Build a 3-event parent
             DHistory Parent = new DHistory();
-            Parent.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").DateCreated = new DateTime(2000, 1, 1);
-            Parent.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by Sandra").DateCreated = new DateTime(2000, 1, 2);
-            Parent.AddEvent(new DateTime(2007, 11, 23), "Trial", "Tested by John").DateCreated = new DateTime(2000, 1, 3);
+            Parent.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").Created = new DateTime(2000, 1, 1);
+            Parent.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by Sandra").Created = new DateTime(2000, 1, 2);
+            Parent.AddEvent(new DateTime(2007, 11, 23), "Trial", "Tested by John").Created = new DateTime(2000, 1, 3);
+            foreach (DEventMessage e in Parent.Events)
+                e.Author = "John";
 
             // Clone to Ours, Theirs
             DHistory Ours = Parent.Clone();
             DHistory Theirs = Parent.Clone();
 
             // Add an event to Theirs
-            Theirs.AddEvent(new DateTime(2008, 1, 1), "Consultant", "Consultant checked by Marge").DateCreated = new DateTime(2000, 1, 4);
+            Theirs.AddEvent(new DateTime(2008, 1, 1), "Consultant", "Consultant checked by Marge").Created = new DateTime(2000, 1, 4);
 
             // Change an event in Ours
-            Ours.Events[1].Description.SimpleText = "Checked by Sandra and John";
+            Ours.Events[1].SimpleText = "Checked by Sandra and John";
 
-            // Change the same event in both....Ours wins for Stage
+            // Change the same event in both....We expect Ours to win
             Ours.Events[0].Stage = "Konsul";
             Theirs.Events[0].Stage = "Draf";
-            // Special merge text for Descriptions
-            Ours.Events[0].Description.SimpleText = "John";
-            Theirs.Events[0].Description.SimpleText = "Sandra";
-            string sConflictExpected = "John -From Merge: Sandra";
 
             // Do the merge
             Ours.Merge(Parent, Theirs);
+            // Not testing authors, and the system, left to itself, automatically asigns it to
+            // DB.UserName, so we just override it here so that the test will work.
+            foreach (DEventMessage e in Ours.Events)
+                e.Author = "John";
 
             // Check the result
-            SfField f = Ours.ToSfm();
+            var oxes = new XmlDoc();
+            var node = Ours.Save(oxes, oxes);
+            var f = new SfField(DHistory.c_sTag, XmlDoc.OneLiner(node));
             Assert.AreEqual(
-                "<DEvent Created=\"2000-01-01 00:00:00Z\" Date=\"2005-03-08 00:00:00Z\" Stage=\"Konsul\">" + sConflictExpected + "</DEvent>" +
-                "<DEvent Created=\"2000-01-02 00:00:00Z\" Date=\"2006-08-23 00:00:00Z\" Stage=\"Team Check\">Checked by Sandra and John</DEvent>" +
-                "<DEvent Created=\"2000-01-03 00:00:00Z\" Date=\"2007-11-23 00:00:00Z\" Stage=\"Trial\">Tested by John</DEvent>" +
-                "<DEvent Created=\"2000-01-04 00:00:00Z\" Date=\"2008-01-01 00:00:00Z\" Stage=\"Consultant\">Consultant checked by Marge</DEvent>",
+                "<History>" +
+                "<Event author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2005-03-08 00:00:00Z\" stage=\"Konsul\">Drafted by John</Event>" +
+                "<Event author=\"John\" created=\"2000-01-02 00:00:00Z\" when=\"2006-08-23 00:00:00Z\" stage=\"Team Check\">Checked by Sandra and John</Event>" +
+                "<Event author=\"John\" created=\"2000-01-03 00:00:00Z\" when=\"2007-11-23 00:00:00Z\" stage=\"Trial\">Tested by John</Event>" +
+                "<Event author=\"John\" created=\"2000-01-04 00:00:00Z\" when=\"2008-01-01 00:00:00Z\" stage=\"Consultant\">Consultant checked by Marge</Event>" +
+                "</History>",
                 f.Data);
         }
         #endregion

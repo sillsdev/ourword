@@ -88,7 +88,7 @@ namespace JWdb.DataModel
         #endregion
         #region Constructor(XmlNode)
         public DEventMessage(XmlNode node)
-            : base()
+            : this()
         {
             ReadFromOxes(node);
         }
@@ -183,8 +183,8 @@ namespace JWdb.DataModel
         #endregion
 
     }
-
-    public class DEvent : JObject
+    #region SOON TO REPLACE: class DEventObs
+    public class DEventObs : JObject
     {
         // ZAttrs ----------------------------------------------------------------------------
         #region BAttr{g/s}: DateTime DateCreated - Used for resolving a merge
@@ -278,7 +278,7 @@ namespace JWdb.DataModel
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
-        public DEvent()
+        public DEventObs()
             : base()
         {
             m_ownDescription = new JOwn<DParagraph>("Description", this);
@@ -291,7 +291,7 @@ namespace JWdb.DataModel
         #region OMethod: bool ContentEquals(JObject obj)
         public override bool ContentEquals(JObject obj)
         {
-            DEvent e = obj as DEvent;
+            DEventObs e = obj as DEventObs;
             if (null == e)
                 return false;
 
@@ -315,9 +315,9 @@ namespace JWdb.DataModel
         }
         #endregion
         #region Method: DEvent Clone()
-        public DEvent Clone()
+        public DEventObs Clone()
         {
-            DEvent Event = new DEvent();
+            DEventObs Event = new DEventObs();
             Event.DateCreated = DateCreated;
             Event.Date = Date;
             Event.Stage = Stage;
@@ -363,12 +363,12 @@ namespace JWdb.DataModel
         }
         #endregion
         #region SMethod: DEvent CreateFromXmlString(string s)
-        static public DEvent CreateFromXmlString(string s)
+        static public DEventObs CreateFromXmlString(string s)
         {
             XElement[] x = XElement.CreateFrom(s);
             if (x.Length != 1)
                 return null;
-            DEvent e = new DEvent();
+            DEventObs e = new DEventObs();
             e.FromXml(x[0]);
 
             // An empty stage is how we know the data was corrupt.
@@ -381,7 +381,7 @@ namespace JWdb.DataModel
 
         // Misc Methods ----------------------------------------------------------------------
         #region Method: void Merge(Parent, Theirs)
-        public void Merge(DEvent Parent, DEvent Theirs)
+        public void Merge(DEventObs Parent, DEventObs Theirs)
         {
             // We can tell if we have the same ancestor via the DateCreated
             Debug.Assert(Parent.DateCreated == Theirs.DateCreated);
@@ -411,19 +411,20 @@ namespace JWdb.DataModel
         }
         #endregion
     }
+    #endregion
 
     public class DHistory : JObject
     {
         // ZAttrs ----------------------------------------------------------------------------
         #region JAttr{g}: JOwnSeq Events
-        public JOwnSeq<DEvent> Events
+        public JOwnSeq<DEventMessage> Events
         {
             get
             {
                 return m_osEvents;
             }
         }
-        private JOwnSeq<DEvent> m_osEvents;
+        private JOwnSeq<DEventMessage> m_osEvents;
         #endregion
 
         // VAttrs ----------------------------------------------------------------------------
@@ -454,40 +455,40 @@ namespace JWdb.DataModel
         public DHistory()
             : base()
         {
-            m_osEvents = new JOwnSeq<DEvent>("Events", this, true, true);
+            m_osEvents = new JOwnSeq<DEventMessage>("Events", this, true, true);
         }
         #endregion
         #region Method: DHistory Clone()
         public DHistory Clone()
         {
             DHistory History = new DHistory();
-            foreach (DEvent e in Events)
+            foreach (DEventMessage e in Events)
                 History.Events.Append(e.Clone());
             return History;
         }
         #endregion
 
         // Methods ---------------------------------------------------------------------------
-        #region Method: DEvent CreateEvent(DateTime, sStage, sDescription)
-        public DEvent CreateEvent(DateTime dtDate, string sStage, string sDescription)
+        #region Method: DEventMessage CreateEvent(DateTime, sStage, sDescription)
+        public DEventMessage CreateEvent(DateTime dtDate, string sStage, string sDescription)
         {
-            DEvent e = new DEvent();
-            e.Date = dtDate;
+            var e = new DEventMessage();
+            e.EventDate = dtDate;
             e.Stage = sStage;
-            e.Description.SimpleText = sDescription;
+            e.SimpleText = sDescription;
 
             return e;
         }
         #endregion
-        #region Method: DEvent AddEvent(DEvent)
-        public DEvent AddEvent(DEvent Event)
+        #region Method: DEventMessage AddEvent(DEventMessage)
+        public DEventMessage AddEvent(DEventMessage Event)
         {
-            // If allready there, just update it to the new description, but don't add a
+            // If already there, just update it to the new description, but don't add a
             // duplicate
             int i = Events.Find(Event.SortKey);
             if (i != -1)
             {
-                Events[i].Description.SimpleText = Event.Description.SimpleText;
+                Events[i].CopyFrom(Event, false);
                 return Events[i];
             }
 
@@ -496,25 +497,26 @@ namespace JWdb.DataModel
             return Event;
         }
         #endregion
-        #region Method: DEvent AddEvent(DateTime dtDate, string sStage, string sDescription)
-        public DEvent AddEvent(DateTime dtDate, string sStage, string sDescription)
+        #region Method: DEventMessage AddEvent(DateTime dtDate, string sStage, string sDescription)
+        public DEventMessage AddEvent(DateTime dtDate, string sStage, string sDescription)
         {
-            DEvent e = new DEvent();
-            e.Date = dtDate;
+            var e = new DEventMessage();
+            e.Created = dtDate;
+            e.EventDate = dtDate;
             e.Stage = sStage;
-            e.Description.SimpleText = sDescription;
+            e.SimpleText = sDescription;
 
             return AddEvent(e);
         }
         #endregion
 
         // Merge -----------------------------------------------------------------------------
-        #region Method: DEvent GetCorresponding(DHistory History, DateTime dtCreated)
-        DEvent GetCorresponding(DHistory History, DateTime dtCreated)
+        #region Method: DEventMessage GetCorresponding(DHistory History, DateTime dtCreated)
+        DEventMessage GetCorresponding(DHistory History, DateTime dtCreated)
         {
-            foreach (DEvent e in History.Events)
+            foreach (DEventMessage e in History.Events)
             {
-                if (e.DateCreated == dtCreated)
+                if (e.Created == dtCreated)
                     return e;
             }
             return null;
@@ -524,22 +526,22 @@ namespace JWdb.DataModel
         public void Merge(DHistory Parent, DHistory Theirs)
         {
             // Get a list of the Events in Theirs, for convenience as we work through them
-            var vTheirs = new List<DEvent>();
-            foreach (DEvent e in Theirs.Events)
+            var vTheirs = new List<DEventMessage>();
+            foreach (DEventMessage e in Theirs.Events)
                 vTheirs.Add(e);
 
             // Anything they have that's not in the parent is new (and presumably not
             // in Ours)
             for (int i = 0; i < vTheirs.Count; )
             {
-                if (null == GetCorresponding(Parent, vTheirs[i].DateCreated))
+                if (null == GetCorresponding(Parent, vTheirs[i].Created))
                 {
                     Theirs.Events.Remove(vTheirs[i]);
 
                     // In theory this condition should never happen; but it did once,
                     // because I think files were manually copied into a folder which
                     // would have bypassed the Parent mechanism.
-                    if (null == GetCorresponding(this, vTheirs[i].DateCreated))
+                    if (null == GetCorresponding(this, vTheirs[i].Created))
                         this.Events.Append(vTheirs[i]);
 
                     vTheirs.RemoveAt(i);
@@ -551,16 +553,16 @@ namespace JWdb.DataModel
             }
 
             // Anything theirs remaining should merge with us
-            foreach (DEvent TheirEvent in vTheirs)
+            foreach (DEventMessage TheirEvent in vTheirs)
             {
                 // If no parent event, someone's been monkeying with the parent file
-                DEvent ParentEvent = GetCorresponding(Parent, TheirEvent.DateCreated);
+                DEventMessage ParentEvent = GetCorresponding(Parent, TheirEvent.Created);
                 if (null == ParentEvent)
                     continue;
 
                 // If Ours is missing, it means we deleted it. We'll let the deletion
                 // win, even though they may have made changes.
-                DEvent OurEvent = GetCorresponding(this, TheirEvent.DateCreated);
+                DEventMessage OurEvent = GetCorresponding(this, TheirEvent.Created);
                 if (null == OurEvent)
                     continue;
 
@@ -571,6 +573,8 @@ namespace JWdb.DataModel
         #endregion
 
         // I/O -------------------------------------------------------------------------------
+        #region SOON OBSOLETE - To/From SFM
+        /**
         public const string c_sMkr = "History";
         #region Method: SfField ToSfm()
         public SfField ToSfm()
@@ -580,7 +584,7 @@ namespace JWdb.DataModel
 
             // Build the contents; we'll put each event on a separate line
             string sContents = "";
-            foreach(DEvent e in Events)
+            foreach (DEventObs e in Events)
                 sContents += e.ToXml(true).OneLiner;
 
             // Create and return the field
@@ -596,7 +600,7 @@ namespace JWdb.DataModel
                 return false;
 
             // Break the string into one line per Event
-            string sMatch = "<" + DEvent.c_sTag + " ";
+            string sMatch = "<DEvent ";
             string[] v = f.Data.Split(new string[] { sMatch }, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < v.Length; i++)
                 v[i] = sMatch + v[i];
@@ -604,7 +608,7 @@ namespace JWdb.DataModel
             // Each one is an event
             foreach (string s in v)
             {
-                DEvent e = DEvent.CreateFromXmlString(s);
+                var e = DEventMessage.CreateFromXmlString(s);
                 if (null != e)
                     Events.Append(e);
             }
@@ -612,5 +616,66 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
+        ***/
+        #endregion
+
+        public const string c_sTag = "History";
+
+        #region Method: XmlNode Save(XmlDoc oxes, XmlNode nodeParent)
+        public XmlNode Save(XmlDoc oxes, XmlNode nodeParent)
+        {
+            var nodeHistory = oxes.AddNode(nodeParent, c_sTag);
+
+            foreach (DEventMessage e in Events)
+                e.Save(oxes, nodeHistory);
+
+            return nodeHistory;
+        }
+        #endregion
+        #region Method: void AddToSfmDB(ScriptureDB SDB)
+        public void AddToSfmDB(ScriptureDB SDB)
+        {
+            if (Events.Count == 0)
+                return;
+
+            var oxes = new XmlDoc();
+            var node = Save(oxes, oxes);
+            var f = new SfField(c_sTag, XmlDoc.OneLiner(node));
+            SDB.Append(f);
+        }
+        #endregion
+
+        #region Method: bool Read(XmlNode nodeHistory)
+        public bool Read(XmlNode nodeHistory)
+        {
+            if (nodeHistory.Name != c_sTag)
+                return false;
+
+            foreach (XmlNode child in nodeHistory.ChildNodes)
+            {
+                var e = new DEventMessage(child);
+                Events.Append(e);
+            }
+
+            return true;
+        }
+        #endregion
+        #region Method: bool Read(SfField f)
+        public bool Read(SfField f)
+            // Returns True if the f was a History field, false otherwise.
+            // If the f.Data was empty, then we don't read an empty history. We just do nothing.
+        {
+            if (f.Mkr != c_sTag)
+                return false;
+
+            if (string.IsNullOrEmpty(f.Data))
+                return true;
+
+            var xml= new XmlDoc(new string[] { f.Data });
+            var nodeHistory = XmlDoc.FindNode(xml, c_sTag);
+            return Read(nodeHistory);
+        }
+        #endregion
+
     }
 }

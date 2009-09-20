@@ -2773,8 +2773,8 @@ namespace OurWord.Edit
     #region CLASS: InsertHistoryAction
     public class InsertHistoryAction : BookmarkedAction
     {
-        #region Attr[g}: DEvent Event - so we know which to delete on an Undo op
-        protected DEvent Event
+        #region Attr[g}: DEventMessage Event - so we know which to delete on an Undo op
+        protected DEventMessage Event
         {
             get
             {
@@ -2782,7 +2782,7 @@ namespace OurWord.Edit
                 return m_Event;
             }
         }
-        DEvent m_Event;
+        DEventMessage m_Event;
         #endregion
         #region Attr{g/s}: OWBookmark BmMainWnd - keep track of the main window's selection
         protected OWBookmark BmMainWnd
@@ -2812,11 +2812,11 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: Dictionary<DEvent, bool> PushCollapseStates()
-        Dictionary<DEvent, bool> PushCollapseStates()
+        #region Method: Dictionary<DEventMessage, bool> PushCollapseStates()
+        Dictionary<DEventMessage, bool> PushCollapseStates()
         {
-            var states = new Dictionary<DEvent, bool>();
-            foreach (DEvent e in DB.TargetSection.History.Events)
+            var states = new Dictionary<DEventMessage, bool>();
+            foreach (DEventMessage e in DB.TargetSection.History.Events)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2825,10 +2825,10 @@ namespace OurWord.Edit
             return states;
         }
         #endregion
-        #region Method: void RestoreStates(Dictionary<DEvent, bool> states)
-        void RestoreStates(Dictionary<DEvent, bool> states)
+        #region Method: void RestoreStates(Dictionary<DEventMessage, bool> states)
+        void RestoreStates(Dictionary<DEventMessage, bool> states)
         {
-            foreach (DEvent e in DB.TargetSection.History.Events)
+            foreach (DEventMessage e in DB.TargetSection.History.Events)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2905,8 +2905,8 @@ namespace OurWord.Edit
     #region CLASS: DeleteHistoryAction
     public class DeleteHistoryAction : BookmarkedAction
     {
-        #region Attr[g}: DEvent Event - We keep it so we can restore on Undo
-        protected DEvent Event
+        #region Attr[g}: DEventMessage Event - We keep it so we can restore on Undo
+        protected DEventMessage Event
         {
             get
             {
@@ -2914,11 +2914,11 @@ namespace OurWord.Edit
                 return m_Event;
             }
         }
-        DEvent m_Event;
+        DEventMessage m_Event;
         #endregion
 
-        #region Constructor(OWWindow, DEvent)
-        public DeleteHistoryAction(OWWindow window, DEvent Event)
+        #region Constructor(OWWindow, DEventMessage)
+        public DeleteHistoryAction(OWWindow window, DEventMessage Event)
             : base(window, "Delete Event")
         {
             Debug.Assert(null != Event);
@@ -2926,11 +2926,11 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: Dictionary<DEvent, bool> PushCollapseStates()
-        Dictionary<DEvent, bool> PushCollapseStates()
+        #region Method: Dictionary<DEventMessage, bool> PushCollapseStates()
+        Dictionary<DEventMessage, bool> PushCollapseStates()
         {
-            var states = new Dictionary<DEvent, bool>();
-            foreach (DEvent e in DB.TargetSection.History.Events)
+            var states = new Dictionary<DEventMessage, bool>();
+            foreach (DEventMessage e in DB.TargetSection.History.Events)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2939,10 +2939,10 @@ namespace OurWord.Edit
             return states;
         }
         #endregion
-        #region Method: void RestoreStates(Dictionary<DEvent, bool> states)
-        void RestoreStates(Dictionary<DEvent, bool> states)
+        #region Method: void RestoreStates(Dictionary<DEventMessage, bool> states)
+        void RestoreStates(Dictionary<DEventMessage, bool> states)
         {
-            foreach (DEvent e in DB.TargetSection.History.Events)
+            foreach (DEventMessage e in DB.TargetSection.History.Events)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2994,8 +2994,8 @@ namespace OurWord.Edit
     #region CLASS: ChangeStage
     public class ChangeStage : BookmarkedAction
     {
-        #region Attr{g}: DEvent Event
-        DEvent Event
+        #region Attr{g}: DEventMessage Event
+        DEventMessage Event
         {
             get
             {
@@ -3003,7 +3003,7 @@ namespace OurWord.Edit
                 return m_Event;
             }
         }
-        DEvent m_Event;
+        DEventMessage m_Event;
         #endregion
         #region Attr{g}: string NewStage
         string NewStage
@@ -3027,7 +3027,7 @@ namespace OurWord.Edit
         #endregion
 
         #region Constructor(OWWindow, Event, itemNewStage)
-        public ChangeStage(OWWindow window, DEvent Event, ToolStripMenuItem itemNewStage)
+        public ChangeStage(OWWindow window, DEventMessage Event, ToolStripMenuItem itemNewStage)
             : base(window, "Change Translation Stage to")
         {
             m_Event = Event;
@@ -3100,8 +3100,8 @@ namespace OurWord.Edit
     #region CLASS: ChangeEventDate
     public class ChangeEventDate : BookmarkedAction
     {
-        #region Attr{g}: DEvent Event
-        DEvent Event
+        #region Attr{g}: DEventMessage Event
+        DEventMessage Event
         {
             get
             {
@@ -3109,7 +3109,7 @@ namespace OurWord.Edit
                 return m_Event;
             }
         }
-        DEvent m_Event;
+        DEventMessage m_Event;
         #endregion
         #region Attr{g}: DateTime NewDate
         DateTime NewDate
@@ -3135,19 +3135,19 @@ namespace OurWord.Edit
         #endregion
 
         #region Constructor(OWWindow, Event, DateTimePicker)
-        public ChangeEventDate(OWWindow window, DEvent Event, DateTimePicker dtp)
+        public ChangeEventDate(OWWindow window, DEventMessage Event, DateTimePicker dtp)
             : base(window, "Change Date to")
         {
             m_Event = Event;
             m_NewDate = dtp.Value;
-            m_OriginalDate = Event.Date;
+            m_OriginalDate = Event.EventDate;
         }
         #endregion
 
         #region OMethod: bool PerformAction()
         protected override bool PerformAction()
         {
-            Event.Date = NewDate;
+            Event.EventDate = NewDate;
 
             // Update the date picker
             var wndHistory = Window as HistoryWnd;
@@ -3158,7 +3158,7 @@ namespace OurWord.Edit
                 return false;
 
             dtp.ValueChanged -= new EventHandler(wndHistory.OnDateChanged);
-            dtp.Value = Event.Date;
+            dtp.Value = Event.EventDate;
             dtp.ValueChanged += new EventHandler(wndHistory.OnDateChanged);
            
             return true;
@@ -3167,7 +3167,7 @@ namespace OurWord.Edit
         #region OMethod: void ReverseAction()
         protected override void ReverseAction()
         {
-            Event.Date = OriginalDate;
+            Event.EventDate = OriginalDate;
 
             // Locate the event and change its value
             var wndHistory = Window as HistoryWnd;
@@ -3178,7 +3178,7 @@ namespace OurWord.Edit
                 return;
 
             dtp.ValueChanged -= new EventHandler(wndHistory.OnDateChanged);
-            dtp.Value = Event.Date;
+            dtp.Value = Event.EventDate;
             dtp.ValueChanged += new EventHandler(wndHistory.OnDateChanged);
         }
         #endregion

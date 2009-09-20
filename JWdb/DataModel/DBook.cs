@@ -1031,7 +1031,7 @@ namespace JWdb.DataModel
                 }
 
                 // New style: interpret it
-                return Book.History.FromSfm(field);
+                return Book.History.Read(field);
             }
             #endregion
             #region Method: void History_out()
@@ -1039,9 +1039,7 @@ namespace JWdb.DataModel
             {
                 if (Book.History.HasHistory)
                 {
-                    SfField f = Book.History.ToSfm();
-                    if (null != f)
-                        DBS.Append(f);
+                    Book.History.AddToSfmDB(DBS);
                 }
             }
             #endregion

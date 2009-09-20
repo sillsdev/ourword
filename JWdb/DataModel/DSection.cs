@@ -2124,7 +2124,7 @@ namespace JWdb.DataModel
                     if (!string.IsNullOrEmpty(field.Data.Trim()))
                     {
                         var Event = Section.History.CreateEvent(
-                            DEvent.DefaultDate,
+                            DEventMessage.DefaultDate,
                             Loc.GetString("OldHistory", "Old"),
                             field.Data);
                         Section.History.AddEvent(Event);
@@ -2132,15 +2132,13 @@ namespace JWdb.DataModel
                     return true;
                 }
 
-                return Section.History.FromSfm(field);
+                return Section.History.Read(field);
             }
             #endregion
             #region Method: void History_Out()
             private void History_Out()
             {
-                SfField f = Section.History.ToSfm();
-                if (null != f)
-                    SDB.Append(f);
+                Section.History.AddToSfmDB(SDB);
             }
             #endregion
 
