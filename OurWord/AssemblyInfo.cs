@@ -37,8 +37,9 @@ using System.Security.Permissions;
 // 1.1.0 - initial
 // 1.1.1 - fixed Load problems with Absolute Paths
 // 1.3.0 - What I'm leaving at Tomohon 4 June 2009
+// 1.4.0 - Oxes, AuSIL
 
-[assembly: AssemblyVersion("1.3.5")]
+[assembly: AssemblyVersion("1.4.0")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

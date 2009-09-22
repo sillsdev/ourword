@@ -130,7 +130,6 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(bIsSame, "Message xmls should be the same.");
         }
         #endregion
-
     }
 
     [TestFixture] public class T_DHistory
@@ -310,6 +309,5 @@ namespace OurWordTests.DataModel
                 f.Data);
         }
         #endregion
-
     }
 }

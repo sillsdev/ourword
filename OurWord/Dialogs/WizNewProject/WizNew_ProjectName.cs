@@ -68,7 +68,7 @@ namespace OurWord.Dialogs.WizNewProject
 			// have to access the disk every time the user types (the cmdProjectNameChanged
 			// command handler.
             if (null != Wizard.ChosenCluster)
-                m_vLanguages = Wizard.ChosenCluster.GetClusterLanguageList();
+                m_vLanguages = Wizard.ChosenCluster.GetClusterLanguageList(false);
 
 			// Default to the error not being visible.
 			m_lblError.Visible = false;

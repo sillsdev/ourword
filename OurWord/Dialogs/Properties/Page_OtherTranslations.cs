@@ -53,7 +53,7 @@ namespace OurWord.Dialogs
         {
             // Get the list from the current folder contents
             ClusterInfo ci = ClusterList.FindClusterInfo(DB.TeamSettings.DisplayName);
-            m_vAvailableLanguages = ci.GetClusterLanguageList();
+            m_vAvailableLanguages = ci.GetClusterLanguageList(false);
 
             // Remove the Front and Target translations
             if (null != DB.FrontTranslation)

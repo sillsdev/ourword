@@ -794,7 +794,7 @@ namespace JWdb.DataModel
                     return;
             }
 
-            // Didn't find it, so combine with the nexxt one
+            // Didn't find it, so combine with the next one
             var section2 = Sections[1];
             while(section2.Paragraphs.Count > 0)
             {

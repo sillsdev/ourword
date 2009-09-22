@@ -1276,7 +1276,9 @@ namespace JWdb.DataModel
             StyleMappings.Add(new StyleMapping("mt", "mt", "Title Main"));
             StyleMappings.Add(new StyleMapping("st", "mt2", "Title Secondary"));
             StyleMappings.Add(new StyleMapping("p", "p", "Paragraph"));
+            StyleMappings.Add(new StyleMapping("m", "m", "Paragraph Continuation"));
             StyleMappings.Add(new StyleMapping("s", "s1", "Section Head"));
+            StyleMappings.Add(new StyleMapping("s2","s2", "Section Head 2"));
             StyleMappings.Add(new StyleMapping("r", "r", "Parallel Passage Reference"));
             StyleMappings.Add(new StyleMapping("q", "q1", "Line 1"));
             StyleMappings.Add(new StyleMapping("q2", "q2", "Line 2"));

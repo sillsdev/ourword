@@ -199,7 +199,7 @@ namespace OurWordTests.DataModel
 
 			// Get the list of languages there
             ClusterInfo ci = ClusterList.FindClusterInfo(c_sAru);
-            List<string> v = ci.GetClusterLanguageList();
+            List<string> v = ci.GetClusterLanguageList(true);
 
 			// Should be exactly what we have in Languages
 			Assert.AreEqual(Languages.Length, v.Count);

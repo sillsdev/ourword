@@ -685,6 +685,10 @@ namespace JWdb.DataModel
         #endregion
         #region Method: List<Head> GetHeads()
         List<Head> GetHeads()
+            // 21sep09 - I was orriginally doing the v.Add as part of encountering a
+            // "summary", but on a brand-spanking-new repository, there is no summary;
+            // so instead moved it to the "changeset"; thus called there, and also at the
+            // end of the loop.
         {
             var v = new List<Head>();
 
@@ -710,6 +714,9 @@ namespace JWdb.DataModel
             {
                 if (s.StartsWith("changeset:") && s.Length > iPosData)
                 {
+                    if (!string.IsNullOrEmpty(sChangeSet))
+                        v.Add(new Head(sChangeSet, sTag, sUser, sDate, sSummary));
+
                     sChangeSet = s.Substring(iPosData);
                     sTag = "";
                     sUser = "";
@@ -723,13 +730,12 @@ namespace JWdb.DataModel
                     sUser = s.Substring(iPosData);
                 if (s.StartsWith("date:") && s.Length > iPosData)
                     sDate = s.Substring(iPosData);
-
                 if (s.StartsWith("summary:") && s.Length > iPosData)
-                {
                     sSummary = s.Substring(iPosData);
-                    v.Add( new Head(sChangeSet, sTag, sUser, sDate, sSummary));
-                }
             }
+
+            if (!string.IsNullOrEmpty(sChangeSet))
+                v.Add(new Head(sChangeSet, sTag, sUser, sDate, sSummary));
 
             return v;
         }
@@ -924,7 +930,6 @@ namespace JWdb.DataModel
             return result.Successful;
         }
         #endregion
-
 
         #region Method: bool CloneTo(sDestinationPath)
         public bool CloneTo(string sDestinationPath)
@@ -1314,7 +1319,7 @@ namespace JWdb.DataModel
         #region Method: bool CommitAnyChangedFiles()
         bool CommitAnyChangedFiles()
         {
-            string[] vsExtensions = new string[] { ".owp", ".otrans", ".owt", ".db" };
+            string[] vsExtensions = new string[] { ".owp", ".otrans", ".owt", ".oxes" };
 
             SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetStartState();
 

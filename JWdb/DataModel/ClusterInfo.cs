@@ -114,9 +114,12 @@ namespace JWdb.DataModel
         #endregion
 
         #region Method: List<string> GetClusterLanguageList()
-        public List<string> GetClusterLanguageList()
+        public List<string> GetClusterLanguageList(bool bProjectsOnly)
         {
             List<string> v = new List<string>();
+
+            string sExtension = (bProjectsOnly) ? 
+                DProject.FileExtension : DTranslation.FileExtension;
 
             // Get the settings folder
             string sSettingsFolder = ParentFolder +
@@ -127,7 +130,7 @@ namespace JWdb.DataModel
 
             // Get the owp files in the settings folder
             string[] sFiles = Directory.GetFiles(sSettingsFolder,
-                "*" + DProject.FileExtension,
+                "*" + sExtension,
                 SearchOption.TopDirectoryOnly);
 
             // The base name of these are the languages

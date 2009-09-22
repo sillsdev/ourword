@@ -2660,7 +2660,7 @@ namespace OurWord
             EventHandler onClick)
         {
             // Get the list of files in this cluster, and sort them
-            var vs = ci.GetClusterLanguageList();
+            var vs = ci.GetClusterLanguageList(true);
             vs.Sort();
 
             // No items in the list?

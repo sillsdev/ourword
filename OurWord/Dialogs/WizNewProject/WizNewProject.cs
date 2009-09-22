@@ -158,7 +158,7 @@ namespace OurWord.Dialogs.WizNewProject
                 if (null == ChosenCluster)
                     return new List<string>();
 
-                return ChosenCluster.GetClusterLanguageList();
+                return ChosenCluster.GetClusterLanguageList(false);
 			}
 		}
 		#endregion

@@ -1,3 +1,4 @@
+#region ***** T_DTranslatorNote.cs *****
 /**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_DTranslatorNote.cs
@@ -22,8 +23,10 @@ using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 #endregion
+#endregion
+
 #region Doc: Paratext7's Notes xml format
-   /* Per email from Nathan (Nov 08), Paratext7's notes will be stored as:
+/* Per email from Nathan (Nov 08), Paratext7's notes will be stored as:
     * 
     * <Comment>
     * <Thread>de0d8491-6857-454e-8533-f8b10aa6de94</Thread>
