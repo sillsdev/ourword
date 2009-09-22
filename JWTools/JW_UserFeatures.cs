@@ -1,3 +1,4 @@
+#region ***** JW_UserFeatures.cs *****
 /**********************************************************************************************
  * Dll:     JWTools
  * File:    JW_UserFeatures.cs
@@ -6,7 +7,6 @@
  * Purpose: Provides a dialog (and underlying mechanism) for turning features on/off.
  * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-
 #region Using
 using System;
 using System.Collections;
@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.Win32;
+#endregion
 #endregion
 
 namespace JWTools

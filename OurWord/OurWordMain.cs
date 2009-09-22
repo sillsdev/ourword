@@ -2660,7 +2660,25 @@ namespace OurWord
             EventHandler onClick)
         {
             // Get the list of files in this cluster, and sort them
-            var vs = ci.GetClusterLanguageList(true);
+            var vsRaw = ci.GetClusterLanguageList(true);
+
+            // Remove those where access is denied
+            var vs = new List<string>();
+            if (!ClusterList.UserCanAccessAllProjects)
+            {
+                foreach (string s in vsRaw)
+                {
+                    var bUserCanAccess = ClusterList.GetUserCanAccessProject(ci.Name, s);
+                    if (bUserCanAccess)
+                        vs.Add(s);
+                }
+            }
+            else
+            {
+                vs = vsRaw;
+            }
+
+            // Sorted list for easy scanning
             vs.Sort();
 
             // No items in the list?
@@ -2683,6 +2701,7 @@ namespace OurWord
             }
         }
         #endregion
+
         #region Cmd: cmdSetupOpening
         private void cmdSetupOpening(object sender, EventArgs e)
         {

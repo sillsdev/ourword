@@ -60,6 +60,7 @@ namespace OurWord.Dialogs
         const string c_sMakeBackups = "propMakeBackups";
         const string c_sZoomFactor = "propZoomFactor";
         const string c_sShowFrontInBT = "propShowFrontBT";
+        const string c_sProjectAccess = "propProjectAccess";
 
         const string c_sGroupNaturalnessCheck = "propNaturalnessCheck";
         const string c_sSuppressVerses = "propNCSuppressVerses";
@@ -129,6 +130,11 @@ namespace OurWord.Dialogs
                 case c_sPicturesPath:
                     e.Value = DB.PictureSearchPath;
                     break;
+
+                case c_sProjectAccess:
+                    e.Value = ClusterList.UserCanAccessAllProjectsFriendly;
+                    break;
+
 
                 case c_sShowFrontInBT:
                     {
@@ -232,6 +238,9 @@ namespace OurWord.Dialogs
 
                 case c_sShowFrontInBT:
                     WndBackTranslation.DisplayFrontInBT = InterpretYesNo(e);
+                    break;
+
+                case c_sProjectAccess:
                     break;
 
                 // Naturalness Check view
@@ -347,6 +356,17 @@ namespace OurWord.Dialogs
                 "If a picture cannot be found, OurWord will search in this folder to attempt to locate it.",
                 "",
                 typeof(PictureFolderBrowseTypeEditor),
+                null));
+
+            // Project Access
+            Bag.Properties.Add(new PropertySpec(
+                c_sProjectAccess,
+                "Projects that this user can access",
+                typeof(string),
+                "",
+                "In a large cluster with numerous projects, you can limit the user of this computer to only a few of them.",
+                "All",
+                typeof(CheckTreeEditor),
                 null));
 
             // Zoom Factor (displays as a combo, showing, e.g., "120 %")
@@ -543,5 +563,64 @@ namespace OurWord.Dialogs
         #endregion
     }
     #endregion
+
+
+    // DlgCheckTree
+    public class CheckTreeEditor : UITypeEditor
+    {
+        #region Method: void CreateCheckTreeItems(DlgCheckTree dlg)
+        void CreateCheckTreeItems(DlgCheckTree dlg)
+        {
+            foreach (ClusterInfo ci in ClusterList.Clusters)
+            {
+                var ciItem = new CheckTreeItem(ci.Name, false, ci);
+                dlg.Items.Add(ciItem);
+
+                foreach (string sProject in ci.GetClusterLanguageList(true))
+                {
+                    var item = new CheckTreeItem(sProject, ci.GetUserCanAccess(sProject), sProject);
+                    ciItem.SubItems.Add(item);
+                }
+            }
+        }
+        #endregion
+        #region Method: void HarvestCheckTreeItems(DlgCheckTree dlg)
+        void HarvestCheckTreeItems(DlgCheckTree dlg)
+        {
+            foreach (CheckTreeItem ctiCluster in dlg.Items)
+            {
+                var ci = ClusterList.FindClusterInfo(ctiCluster.Name);
+                if (null == ci)
+                    continue;
+
+                foreach (CheckTreeItem ctiProject in ctiCluster.SubItems)
+                {
+                    ci.SetUserCanAccess(ctiProject.Name, ctiProject.Checked);
+                }
+            }
+        }
+        #endregion
+
+        #region OMethod: UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+        #endregion
+        #region OMethod: object EditValue(...)
+        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
+        {
+            // Set up the dialog
+            var dlg = new DlgCheckTree();
+            dlg.Label_Instruction = "Place a check beside the projects this user can access; or uncheck them all if they can access any project.";
+            CreateCheckTreeItems(dlg);
+
+            // Perform the dialog
+            if (dlg.ShowDialog() == DialogResult.OK)
+                HarvestCheckTreeItems(dlg);
+            return ClusterList.UserCanAccessAllProjectsFriendly; ;
+        }
+        #endregion
+    }
 
 }

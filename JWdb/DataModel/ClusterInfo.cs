@@ -113,7 +113,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region Method: List<string> GetClusterLanguageList()
+        #region Method: List<string> GetClusterLanguageList(bProjectsOnly)
         public List<string> GetClusterLanguageList(bool bProjectsOnly)
         {
             List<string> v = new List<string>();
@@ -140,6 +140,22 @@ namespace JWdb.DataModel
             return v;
         }
         #endregion
+
+        // User access of each projct, stored in the registry
+        const string c_sSubKeyAccess = "ProjectAccess";
+        #region Method: bool GetUserCanAccess(sProjectName)
+        public bool GetUserCanAccess(string sProjectName)
+        {
+            return JW_Registry.GetValue(c_sSubKeyAccess + "\\" + Name, sProjectName, true);
+        }
+        #endregion
+        #region Method: void SetUserCanAccess(sProjectName, bCanAccess)
+        public void SetUserCanAccess(string sProjectName, bool bCanAccess)
+        {
+            JW_Registry.SetValue(c_sSubKeyAccess + "\\" + Name, sProjectName, bCanAccess);
+        }
+        #endregion
+
     }
 
     static public class ClusterList
@@ -236,6 +252,56 @@ namespace JWdb.DataModel
             return null;
         }
         #endregion
+
+        #region SMethod: bool GetUserCanAccessProject(sClusterName, sProjectName)
+        static public bool GetUserCanAccessProject(string sClusterName, string sProjectName)
+        {
+            var ci = FindClusterInfo(sClusterName);
+            if (null == ci)
+                return false;
+            return ci.GetUserCanAccess(sProjectName);
+        }
+        #endregion
+        #region SMethod: bool UserCanAccessAllProjects
+        static public bool UserCanAccessAllProjects
+        {
+            get
+            {
+                bool bHasUnchecked = false;
+                bool bHasChecked = false;
+
+                foreach (ClusterInfo ci in Clusters)
+                {
+                    foreach (string sProject in ci.GetClusterLanguageList(true))
+                    {
+                        var bChecked = GetUserCanAccessProject(ci.Name, sProject);
+                        if (bChecked)
+                            bHasChecked = true;
+                        else
+                            bHasUnchecked = true;
+
+                    }
+                }
+
+                // The answer is True if either all are checked, or all are unchecked
+                if (bHasUnchecked && !bHasChecked)
+                    return true;
+                if (!bHasUnchecked && bHasChecked)
+                    return true;
+
+                return false;
+            }
+        }
+        #endregion
+        static public string UserCanAccessAllProjectsFriendly
+        {
+            get
+            {
+                if (UserCanAccessAllProjects)
+                    return Loc.GetString("CanAccessAllProjects", "All");
+                return Loc.GetString("CanAccessLimitedProjects", "Limited");
+            }
+        }
     }
 
 

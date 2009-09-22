@@ -1,3 +1,4 @@
+#region ***** PropertyBag.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    PropertyBag.cs
@@ -31,6 +32,7 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Windows.Forms;
 
+#endregion
 #endregion
 
 namespace JWTools
@@ -951,7 +953,6 @@ namespace JWTools
         #endregion
     }
     #endregion
-
 
     #region Delegate: PropertySpecEventHandler
     /// <summary>
