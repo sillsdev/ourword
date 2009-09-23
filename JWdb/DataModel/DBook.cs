@@ -1518,7 +1518,7 @@ namespace JWdb.DataModel
                 return false;
 
             // Load according to format, which we determine based on the file extension
-            if (Path.GetExtension(sPath).ToLower() == ".oxes")
+            if (sPath.ToLower().Contains( ".oxes" ))
             {
                 if (LoadFromOxes(sPath, progress))
                     return true;
@@ -1538,6 +1538,16 @@ namespace JWdb.DataModel
             return LoadBook(StoragePath, progress);
         }
         #endregion
+
+        public void WriteBook(string sPath)
+        {
+            if (!Loaded)
+                return;
+
+            var xml = ToOxesDocument;
+            xml.Save(sPath);
+            IsDirty = false;
+        }
 
         #region Method: void WriteBook(progress)
         public void WriteBook(IProgressIndicator progress)
