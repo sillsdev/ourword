@@ -52,18 +52,18 @@ namespace JWdb.DataModel
         private string m_sAuthor = "";
         #endregion
         #region BAttr{g/s}: DateTime Created
-        public DateTime Created
+        public DateTime UtcCreated
         {
             get
             {
-                return m_dtCreated;
+                return m_utcDtCreated;
             }
             set
             {
-                SetValue(ref m_dtCreated, value);
+                SetValue(ref m_utcDtCreated, value);
             }
         }
-        private DateTime m_dtCreated;
+        private DateTime m_utcDtCreated;
         #endregion
         #region BAttr{g/s}: string Status
         public string Status
@@ -91,8 +91,18 @@ namespace JWdb.DataModel
         {
             base.DeclareAttrs();
             DefineAttr("Author", ref m_sAuthor);
-            DefineAttr("Created", ref m_dtCreated);
+            DefineAttr("Created", ref m_utcDtCreated);
             DefineAttr("Status", ref m_sStatus);
+        }
+        #endregion
+
+        #region VAttr{g}: DateTime LocalTimeCreated
+        public DateTime LocalTimeCreated
+        {
+            get
+            {
+                return m_utcDtCreated.ToLocalTime();
+            }
         }
         #endregion
 
@@ -109,7 +119,7 @@ namespace JWdb.DataModel
             SimpleTextBT = "";
 
             // The Default date is "Today"
-            m_dtCreated = DateTime.Now;
+            m_utcDtCreated = DateTime.UtcNow;
 
             // The author
             Author = DB.UserName;
@@ -117,12 +127,12 @@ namespace JWdb.DataModel
             Debug_VerifyIntegrity();
         }
         #endregion
-        #region Constructor(sAuthor, dtCreated, sStatus, string sSimpleText)
-        public DMessage(string sAuthor, DateTime dtCreated, string sStatus, string sSimpleText)
+        #region Constructor(sAuthor, UtcDtCreated, sStatus, string sSimpleText)
+        public DMessage(string sAuthor, DateTime utcDtCreated, string sStatus, string sSimpleText)
             : this()
         {
             Author = sAuthor;
-            Created = dtCreated;
+            m_utcDtCreated = utcDtCreated;
             Status = sStatus;
 
             // Temporary kludge: remove ||'s that we've  been inserting by mistake
@@ -159,7 +169,7 @@ namespace JWdb.DataModel
 
             if (message.Author != Author)
                 return false;
-            if (message.Created.CompareTo(Created) != 0)
+            if (message.UtcCreated.CompareTo(UtcCreated) != 0)
                 return false;
             if (message.Status != Status)
                 return false;
@@ -175,7 +185,7 @@ namespace JWdb.DataModel
         {
             var message = new DMessage();
             message.Author = Author;
-            message.Created = Created;
+            message.UtcCreated = UtcCreated;
             message.Status = Status;
             message.CopyFrom(this, false);
             return message;
@@ -188,7 +198,7 @@ namespace JWdb.DataModel
             {
                 // Return Created in the universal invariant form of
                 //    "2006-04-17 21:22:48Z"
-                return Created.ToString("u");
+                return UtcCreated.ToString("u");
             }
         }
         #endregion
@@ -231,7 +241,7 @@ namespace JWdb.DataModel
             {
                 string s = "M: "+
                     "Author={" + Author + "} " +
-                    "Created={" + Created.ToShortDateString() + "} " +
+                    "Created={" + UtcCreated.ToShortDateString() + "} " +
                     "Status={" + Status + "} " +
                     "Content={" + base.DebugString + "}";
                 return s;
@@ -343,7 +353,7 @@ namespace JWdb.DataModel
         {
             // Attrs
             Author = XmlDoc.GetAttrValue(node, c_sAttrAuthor, "");
-            Created = XmlDoc.GetAttrValue(node, c_sAttrCreated, DateTime.Now);
+            UtcCreated = XmlDoc.GetAttrValue(node, c_sAttrCreated, DateTime.Now);
             Status = XmlDoc.GetAttrValue(node, c_sAttrStatus, "");
 
             // Import old-style paragraph contents; if successful, we're done.
@@ -367,7 +377,7 @@ namespace JWdb.DataModel
             // Attrs
             if (!string.IsNullOrEmpty(Author))
                 oxes.AddAttr(nodeMessage, c_sAttrAuthor, Author);
-            oxes.AddAttr(nodeMessage, c_sAttrCreated, Created);
+            oxes.AddAttr(nodeMessage, c_sAttrCreated, UtcCreated);
 
             // An empty Status is interpreted as "closed", so we want to not
             // att the status attr unless we have content.
@@ -388,7 +398,7 @@ namespace JWdb.DataModel
             // Two messages started out the same if they have the same Author and 
             // Create date.
         {
-            if (0 != Created.CompareTo(Theirs.Created))
+            if (0 != UtcCreated.CompareTo(Theirs.UtcCreated))
                 return false;
             if (Author != Theirs.Author)
                 return false;
@@ -1320,7 +1330,7 @@ namespace JWdb.DataModel
             // Find out who had the most recent message. They will be the
             // winner for the basic attrs. (Thus if it was them, copy the values
             // over; otherwise by default we just keep ours.)
-            if (Theirs.LastMessage.Created.CompareTo(LastMessage.Created) > 1)
+            if (Theirs.LastMessage.UtcCreated.CompareTo(LastMessage.UtcCreated) > 1)
             {
                 Class = Theirs.Class;
                 SelectedText = Theirs.SelectedText;

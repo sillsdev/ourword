@@ -3328,7 +3328,7 @@ namespace JWdb.DataModel
                     note.Class = TranslatorNote.NoteClass.General;
                     var message = new DMessage(
                         TranslatorNote.MergeAuthor,
-                        DateTime.Now,
+                        DateTime.UtcNow,
                         DMessage.Anyone,
                         itemx.NoteText);
                     note.Messages.Append(message);

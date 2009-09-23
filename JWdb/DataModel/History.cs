@@ -34,7 +34,7 @@ namespace JWdb.DataModel
             get
             {
                 if (m_dtEventDate.CompareTo(DefaultDate) == 0)
-                    m_dtEventDate = Created;
+                    m_dtEventDate = UtcCreated;
 
                 return m_dtEventDate;
             }
@@ -115,7 +115,7 @@ namespace JWdb.DataModel
         {
             var em = new DEventMessage();
             em.Author = Author;
-            em.Created = Created;
+            em.UtcCreated = UtcCreated;
             em.Status = Status;
             em.CopyFrom(this, false);
 
@@ -268,11 +268,11 @@ namespace JWdb.DataModel
         }
         #endregion
         #region Method: DEventMessage AddEvent(DateTime dtDate, string sStage, string sDescription)
-        public DEventMessage AddEvent(DateTime dtDate, string sStage, string sDescription)
+        public DEventMessage AddEvent(DateTime UtcDtDate, string sStage, string sDescription)
         {
             var e = new DEventMessage();
-            e.Created = dtDate;
-            e.EventDate = dtDate;
+            e.UtcCreated = UtcDtDate;
+            e.EventDate = UtcDtDate;
             e.Stage = sStage;
             e.SimpleText = sDescription;
 
@@ -286,7 +286,7 @@ namespace JWdb.DataModel
         {
             foreach (DEventMessage e in History.Events)
             {
-                if (e.Created == dtCreated)
+                if (e.UtcCreated == dtCreated)
                     return e;
             }
             return null;
@@ -304,14 +304,14 @@ namespace JWdb.DataModel
             // in Ours)
             for (int i = 0; i < vTheirs.Count; )
             {
-                if (null == GetCorresponding(Parent, vTheirs[i].Created))
+                if (null == GetCorresponding(Parent, vTheirs[i].UtcCreated))
                 {
                     Theirs.Events.Remove(vTheirs[i]);
 
                     // In theory this condition should never happen; but it did once,
                     // because I think files were manually copied into a folder which
                     // would have bypassed the Parent mechanism.
-                    if (null == GetCorresponding(this, vTheirs[i].Created))
+                    if (null == GetCorresponding(this, vTheirs[i].UtcCreated))
                         this.Events.Append(vTheirs[i]);
 
                     vTheirs.RemoveAt(i);
@@ -326,13 +326,13 @@ namespace JWdb.DataModel
             foreach (DEventMessage TheirEvent in vTheirs)
             {
                 // If no parent event, someone's been monkeying with the parent file
-                DEventMessage ParentEvent = GetCorresponding(Parent, TheirEvent.Created);
+                DEventMessage ParentEvent = GetCorresponding(Parent, TheirEvent.UtcCreated);
                 if (null == ParentEvent)
                     continue;
 
                 // If Ours is missing, it means we deleted it. We'll let the deletion
                 // win, even though they may have made changes.
-                DEventMessage OurEvent = GetCorresponding(this, TheirEvent.Created);
+                DEventMessage OurEvent = GetCorresponding(this, TheirEvent.UtcCreated);
                 if (null == OurEvent)
                     continue;
 

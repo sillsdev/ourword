@@ -50,7 +50,7 @@ namespace OurWordTests.DataModel
             // Create a base Message object
             var message = new DEventMessage();
             message.Author = "John";
-            message.Created = new DateTime(2008, 11, 23);
+            message.UtcCreated = new DateTime(2008, 11, 23);
             message.Status = "David";
             message.SimpleText = "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.";
             message.Stage = sStage;
@@ -154,7 +154,7 @@ namespace OurWordTests.DataModel
             e.EventDate = new DateTime(2009, 5, 25);
             e.Stage = "Draft";
             e.SimpleText = "Drafted by John";
-            e.Created = new DateTime(2000, 1, 1);
+            e.UtcCreated = new DateTime(2000, 1, 1);
 
             // Get its xml representation
             var oxes = new XmlDoc();
@@ -177,14 +177,14 @@ namespace OurWordTests.DataModel
         {
             var e1 = new DEventMessage();
             e1.EventDate = new DateTime(2009, 5, 25);
-            e1.Created = e1.EventDate;
+            e1.UtcCreated = e1.EventDate;
             e1.Stage = "Draft";
             e1.SimpleText = "Drafted by John";
             e1.Author = "John";
 
             var e2 = new DEventMessage();
             e2.EventDate = new DateTime(2009, 5, 25);
-            e2.Created = e2.EventDate;
+            e2.UtcCreated = e2.EventDate;
             e2.Stage = "Draft";
             e2.SimpleText = "Drafted by John";
             e2.Author = "John";
@@ -217,9 +217,9 @@ namespace OurWordTests.DataModel
             history.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by John, Sandra");
 
             // Years should now be in order
-            Assert.AreEqual(2005, history.Events[0].Created.Year);
-            Assert.AreEqual(2006, history.Events[1].Created.Year);
-            Assert.AreEqual(2007, history.Events[2].Created.Year);
+            Assert.AreEqual(2005, history.Events[0].UtcCreated.Year);
+            Assert.AreEqual(2006, history.Events[1].UtcCreated.Year);
+            Assert.AreEqual(2007, history.Events[2].UtcCreated.Year);
         }
         #endregion
         #region Test: HistorySfmIO
@@ -232,9 +232,9 @@ namespace OurWordTests.DataModel
 
             // Build a 3-event history
             DHistory history = new DHistory();
-            history.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").Created = d1;
-            history.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by John, Sandra").Created = d2;
-            history.AddEvent(new DateTime(2007, 11, 23), "Trial", "Taken to Sosol by John").Created = d3;
+            history.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").UtcCreated = d1;
+            history.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by John, Sandra").UtcCreated = d2;
+            history.AddEvent(new DateTime(2007, 11, 23), "Trial", "Taken to Sosol by John").UtcCreated = d3;
             foreach (DEventMessage e in history.Events)
                 e.Author = "John";
 
@@ -268,9 +268,9 @@ namespace OurWordTests.DataModel
         {
             // Build a 3-event parent
             DHistory Parent = new DHistory();
-            Parent.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").Created = new DateTime(2000, 1, 1);
-            Parent.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by Sandra").Created = new DateTime(2000, 1, 2);
-            Parent.AddEvent(new DateTime(2007, 11, 23), "Trial", "Tested by John").Created = new DateTime(2000, 1, 3);
+            Parent.AddEvent(new DateTime(2005, 3, 8), "Draft", "Drafted by John").UtcCreated = new DateTime(2000, 1, 1);
+            Parent.AddEvent(new DateTime(2006, 8, 23), "Team Check", "Checked by Sandra").UtcCreated = new DateTime(2000, 1, 2);
+            Parent.AddEvent(new DateTime(2007, 11, 23), "Trial", "Tested by John").UtcCreated = new DateTime(2000, 1, 3);
             foreach (DEventMessage e in Parent.Events)
                 e.Author = "John";
 
@@ -279,7 +279,7 @@ namespace OurWordTests.DataModel
             DHistory Theirs = Parent.Clone();
 
             // Add an event to Theirs
-            Theirs.AddEvent(new DateTime(2008, 1, 1), "Consultant", "Consultant checked by Marge").Created = new DateTime(2000, 1, 4);
+            Theirs.AddEvent(new DateTime(2008, 1, 1), "Consultant", "Consultant checked by Marge").UtcCreated = new DateTime(2000, 1, 4);
 
             // Change an event in Ours
             Ours.Events[1].SimpleText = "Checked by Sandra and John";

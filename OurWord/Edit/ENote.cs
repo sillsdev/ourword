@@ -231,7 +231,7 @@ namespace OurWord.Edit
             // rather than adding a new one. So we disable the button, but leave it there
             // so that the user isn't confused by a changing toolstrip.
             if (Note.LastMessage.Author == DB.UserName &&
-                Note.LastMessage.Created.Date == DateTime.Today)
+                Note.LastMessage.UtcCreated.Date == DateTime.Today)
             {
                 // Disable the button
                 btnAddResponse.Enabled = false;
@@ -294,7 +294,7 @@ namespace OurWord.Edit
                 return;
 
             // Give the user the opportunity to change his/her mind
-            string sText = message.Author + ", " + message.Created.ToShortDateString();
+            string sText = message.Author + ", " + message.LocalTimeCreated.ToShortDateString();
             bool bProceed =  LocDB.Message(
                 "msgConfirmMessageDeletion",
                 "Are you sure you want to delete the message:\n  {0}?",
@@ -353,7 +353,7 @@ namespace OurWord.Edit
 
             foreach (DMessage message in Note.Messages)
             {
-                string s = message.Author + ", " + message.Created.ToShortDateString();
+                string s = message.Author + ", " + message.LocalTimeCreated.ToShortDateString();
 
                 if (message.SimpleText.Length > 20)
                     s += "    (" + message.SimpleText.Substring(0, 20) + "...)";
@@ -503,7 +503,8 @@ namespace OurWord.Edit
                     new DPhrase[] { 
                         new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
                         new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, message.Created.ToShortDateString())
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
+                            message.LocalTimeCreated.ToShortDateString())
                     });
                 eMessages.Append(pMessageHeader);
 
