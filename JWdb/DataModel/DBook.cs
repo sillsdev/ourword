@@ -1390,6 +1390,7 @@ namespace JWdb.DataModel
             foreach (XmlNode nodeParagraph in nodeBook.ChildNodes)
             {
                 progress.Step();
+
                 // Create the paragraph or picture
                 DParagraph paragraph = DPicture.CreatePicture(nodeParagraph);
                 if (null == paragraph)
@@ -1539,6 +1540,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        #region Method: void WriteBook(string sPath)
         public void WriteBook(string sPath)
         {
             if (!Loaded)
@@ -1548,7 +1550,7 @@ namespace JWdb.DataModel
             xml.Save(sPath);
             IsDirty = false;
         }
-
+        #endregion
         #region Method: void WriteBook(progress)
         public void WriteBook(IProgressIndicator progress)
         {

@@ -357,8 +357,21 @@ namespace JWdb
             return field;
         }
         #endregion
-		#region Method: void RemoveAt(i)
-		public void RemoveAt(int i)
+
+        public void InsertBefore(SfField fNew, SfField fTarget)
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                if (Fields[i] == fTarget)
+                {
+                    InsertAt(i, fNew);
+                    return;
+                }
+            }
+        }
+
+        #region Method: void RemoveAt(i)
+        public void RemoveAt(int i)
 		{
 			Fields.RemoveAt(i);
 		}

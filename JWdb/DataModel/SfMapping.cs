@@ -64,13 +64,25 @@ namespace JWdb.DataModel
         }
         string m_sName;
         #endregion
+        #region Attr{g}: bool IsVernacularParagraph
+        public bool IsVernacularParagraph
+            // Paragraphs that can contain verse text
+        {
+            get
+            {
+                return m_bIsVernacularParagraph;
+            }
+        }
+        bool m_bIsVernacularParagraph;
+        #endregion
 
-        #region Constructor(sOurWord, sUsfm, sName)
-        public StyleMapping(string sOurWord, string sUsfm, string sName)
+        #region Constructor(sOurWord, sUsfm, sName, bIsVernacularParagraph)
+        public StyleMapping(string sOurWord, string sUsfm, string sName, bool bIsVernacularParagraph)
         {
             m_sOurWord = sOurWord;
             m_sUsfm = sUsfm;
             m_sName = sName;
+            m_bIsVernacularParagraph = bIsVernacularParagraph;
         }
         #endregion
     }
@@ -122,6 +134,47 @@ namespace JWdb.DataModel
             return null;
         }
         #endregion
+
+        #region Attr{g}: bool IsVernacularParagraph(string sMarker)
+        public bool IsVernacularParagraph(string sMarker)
+        {
+            var mapping = FindMappingFromOurWord(sMarker);
+            if (null == mapping)
+                return false;
+            return mapping.IsVernacularParagraph;
+
+            /*
+            foreach (string s in m_rgParagraphMkrs)
+            {
+                if (s == sMarker)
+                    return true;
+            }
+            return false;
+            */
+        }
+        #endregion
+        #region VAttr{g}: List<string> VernacularParagraphMarkers
+        public List<string> VernacularParagraphMarkers
+        {
+            get
+            {
+                var v = new List<string>();
+
+                foreach (StyleMapping sm in StyleMappings)
+                {
+                    if (sm.IsVernacularParagraph)
+                        v.Add(sm.OurWord);
+                }
+
+             //   foreach (string s in m_rgParagraphMkrs)
+             //       v.Add(s);
+
+                return v;
+            }
+        }
+        #endregion
+
+
 
         // Constants -------------------------------------------------------------------------
 		public const string c_sMkrID = "id";
@@ -800,7 +853,7 @@ namespace JWdb.DataModel
 		#endregion
 
 		// Unconverted attributes ------------------------------------------------------------
-		private ArrayList m_rgParagraphMkrs = null;
+//		private ArrayList m_rgParagraphMkrs = null;
 		private ArrayList m_rgDiscardMrks = null;
 
 		// Mappings Tests --------------------------------------------------------------------
@@ -882,32 +935,6 @@ namespace JWdb.DataModel
 			return ( sMarker == MkrVerseTextBT );
 		}
 		#endregion
-
-		#region Attr{g}: bool IsVernacularParagraph(string sMarker)
-		public bool IsVernacularParagraph(string sMarker)
-		{
-			foreach ( string s in m_rgParagraphMkrs )
-			{
-				if ( s == sMarker )
-					return true;
-			}
-			return false;
-		}
-		#endregion
-        #region VAttr{g}: List<string> VernacularParagraphMarkers
-        public List<string> VernacularParagraphMarkers
-        {
-            get
-            {
-                var v = new List<string>();
-
-                foreach (string s in m_rgParagraphMkrs)
-                    v.Add(s);
-
-                return v;
-            }
-        }
-        #endregion
 
         #region Attr{g}: bool IsDiscardedField(string sMarker)
         public bool IsDiscardedField(string sMarker)
@@ -1272,27 +1299,28 @@ namespace JWdb.DataModel
 			: base()
 		{
             m_vStyleMappings = new List<StyleMapping>();
-            StyleMappings.Add(new StyleMapping("h", "h", "Header"));
-            StyleMappings.Add(new StyleMapping("mt", "mt", "Title Main"));
-            StyleMappings.Add(new StyleMapping("st", "mt2", "Title Secondary"));
-            StyleMappings.Add(new StyleMapping("p", "p", "Paragraph"));
-            StyleMappings.Add(new StyleMapping("m", "m", "Paragraph Continuation"));
-            StyleMappings.Add(new StyleMapping("s", "s1", "Section Head"));
-            StyleMappings.Add(new StyleMapping("s2","s2", "Section Head 2"));
-            StyleMappings.Add(new StyleMapping("r", "r", "Parallel Passage Reference"));
-            StyleMappings.Add(new StyleMapping("q", "q1", "Line 1"));
-            StyleMappings.Add(new StyleMapping("q2", "q2", "Line 2"));
-            StyleMappings.Add(new StyleMapping("q3", "q3", "Line 3"));
-            StyleMappings.Add(new StyleMapping("qc", "qc", "Line Centered"));
-            StyleMappings.Add(new StyleMapping("cap", "fig", "Caption"));
-            StyleMappings.Add(new StyleMapping("ms", "ms", "Major Section Head"));
-            StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range"));
-            StyleMappings.Add(new StyleMapping("cf", "x", "Note Cross Reference Paragraph"));
-            StyleMappings.Add(new StyleMapping("fn", "f", "Note General Paragraph"));
-            StyleMappings.Add(new StyleMapping(DStyleSheet.c_StyleAnnotationMessage, "", "Annotation Message"));
+            StyleMappings.Add(new StyleMapping("h", "h", "Header", false));
+            StyleMappings.Add(new StyleMapping("mt", "mt", "Title Main", false));
+            StyleMappings.Add(new StyleMapping("st", "mt2", "Title Secondary", false));
+            StyleMappings.Add(new StyleMapping("p", "p", "Paragraph", true));
+            StyleMappings.Add(new StyleMapping("m", "m", "Paragraph Continuation", true));
+            StyleMappings.Add(new StyleMapping("s", "s1", "Section Head", false));
+            StyleMappings.Add(new StyleMapping("s2", "s2", "Section Head 2", false));
+            StyleMappings.Add(new StyleMapping("r", "r", "Parallel Passage Reference", false));
+            StyleMappings.Add(new StyleMapping("q", "q1", "Line 1", true));
+            StyleMappings.Add(new StyleMapping("q2", "q2", "Line 2", true));
+            StyleMappings.Add(new StyleMapping("q3", "q3", "Line 3", true));
+            StyleMappings.Add(new StyleMapping("qc", "qc", "Line Centered", true));
+            StyleMappings.Add(new StyleMapping("cap", "fig", "Caption", false));
+            StyleMappings.Add(new StyleMapping("ms", "ms", "Major Section Head", false));
+            StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range", false));
+            StyleMappings.Add(new StyleMapping("cf", "x", "Note Cross Reference Paragraph", false));
+            StyleMappings.Add(new StyleMapping("fn", "f", "Note General Paragraph", false));
+            StyleMappings.Add(new StyleMapping(DStyleSheet.c_StyleAnnotationMessage, "", "Annotation Message", false));
 
 			// TODO: Need to persist these array values
 
+            /***
 			// Markers that signal a vernacular paragraph
 			m_rgParagraphMkrs = new ArrayList();
 			m_rgParagraphMkrs.Add("p");
@@ -1301,6 +1329,7 @@ namespace JWdb.DataModel
 			m_rgParagraphMkrs.Add("q3");
 			m_rgParagraphMkrs.Add("qc");
 			m_rgParagraphMkrs.Add("m");
+            ***/
 
 			// Markers that signal fields that we'll discard
 			m_rgDiscardMrks = new ArrayList();
