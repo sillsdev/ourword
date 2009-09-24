@@ -357,7 +357,7 @@ namespace JWdb
             return field;
         }
         #endregion
-
+        #region Method: void InsertBefore(fNew, fTarget)
         public void InsertBefore(SfField fNew, SfField fTarget)
         {
             for (int i = 0; i < Count; i++)
@@ -369,7 +369,7 @@ namespace JWdb
                 }
             }
         }
-
+        #endregion
         #region Method: void RemoveAt(i)
         public void RemoveAt(int i)
 		{

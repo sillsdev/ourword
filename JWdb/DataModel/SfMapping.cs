@@ -142,15 +142,6 @@ namespace JWdb.DataModel
             if (null == mapping)
                 return false;
             return mapping.IsVernacularParagraph;
-
-            /*
-            foreach (string s in m_rgParagraphMkrs)
-            {
-                if (s == sMarker)
-                    return true;
-            }
-            return false;
-            */
         }
         #endregion
         #region VAttr{g}: List<string> VernacularParagraphMarkers
@@ -166,15 +157,10 @@ namespace JWdb.DataModel
                         v.Add(sm.OurWord);
                 }
 
-             //   foreach (string s in m_rgParagraphMkrs)
-             //       v.Add(s);
-
                 return v;
             }
         }
         #endregion
-
-
 
         // Constants -------------------------------------------------------------------------
 		public const string c_sMkrID = "id";
@@ -853,7 +839,6 @@ namespace JWdb.DataModel
 		#endregion
 
 		// Unconverted attributes ------------------------------------------------------------
-//		private ArrayList m_rgParagraphMkrs = null;
 		private ArrayList m_rgDiscardMrks = null;
 
 		// Mappings Tests --------------------------------------------------------------------
@@ -1319,17 +1304,6 @@ namespace JWdb.DataModel
             StyleMappings.Add(new StyleMapping(DStyleSheet.c_StyleAnnotationMessage, "", "Annotation Message", false));
 
 			// TODO: Need to persist these array values
-
-            /***
-			// Markers that signal a vernacular paragraph
-			m_rgParagraphMkrs = new ArrayList();
-			m_rgParagraphMkrs.Add("p");
-			m_rgParagraphMkrs.Add("q");
-			m_rgParagraphMkrs.Add("q2");
-			m_rgParagraphMkrs.Add("q3");
-			m_rgParagraphMkrs.Add("qc");
-			m_rgParagraphMkrs.Add("m");
-            ***/
 
 			// Markers that signal fields that we'll discard
 			m_rgDiscardMrks = new ArrayList();

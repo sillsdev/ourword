@@ -303,9 +303,9 @@ namespace JWTools
         #endregion
         #region Method: void AddXmlDeclaration()
         public void AddXmlDeclaration()
-            // Creates "<?xml version="1.0" encoding="utf-16"?>"  
+            // Creates "<?xml version="1.0" encoding="UTF-8"?>"  
         {
-            var decl = CreateXmlDeclaration("1.0", null, null);
+            var decl = CreateXmlDeclaration("1.0", "UTF-8", null);
             var root = DocumentElement;
             InsertBefore(decl, root);
         }

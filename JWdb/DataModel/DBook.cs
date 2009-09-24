@@ -2021,6 +2021,20 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region SMethod: string GetAbbrevFromOxes(XmlDoc oxes)
+        static public string GetAbbrevFromOxes(XmlDoc oxes)
+        {
+            var nodeBible = XmlDoc.FindNode(oxes, c_sTagBible);
+            if (null == nodeBible)
+                return null;
+
+            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
+            if (null == nodeBook)
+                return null;
+
+            return XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+        }
+        #endregion
 
         // Merging ---------------------------------------------------------------------------
         #region Method: void Merge(DBook Parent, DBook Theirs)

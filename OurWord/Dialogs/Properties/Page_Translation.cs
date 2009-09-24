@@ -1,3 +1,4 @@
+#region ***** Page_Translation.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Page_Translation.cs
@@ -28,6 +29,7 @@ using OurWord;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
+#endregion
 #endregion
 
 /* TODO: Make sure we can't get duplicate book names. We formerly had this as a 

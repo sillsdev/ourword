@@ -1,3 +1,4 @@
+#region ***** WizPage_GetFileName.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Dialogs\WizImportBook\WizPage_GetFileName.cs
@@ -23,6 +24,7 @@ using Microsoft.Win32;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+#endregion
 #endregion
 
 namespace OurWord.Dialogs.WizImportBook
@@ -105,82 +107,174 @@ namespace OurWord.Dialogs.WizImportBook
         #endregion
 
         // Misc Methods ----------------------------------------------------------------------
-        #region bool ExamineFile(string sPathName) - see if the proposed file is suitable
-        bool ExamineFile(string sPathName)
+        #region Method: void SetPathLabelText()
+        void SetPathLabelText()
         {
-            // Our default will be that the file does not pass muster.
-            m_bCanGoToNextPage = false;
-            m_sFormat = "";
+            m_labelFileName.Text = JWU.PathEllipses(PathName, 40);
+        }
+        #endregion
+        #region Method: void SetMessage(Color color, FontStyle style, string sMessage)
+        void SetMessage(Color color, FontStyle style, string sMessage)
+        {
+            m_labelFileStats.Text = sMessage;
 
-            // Turn off the Specify Encoding button; we'll turn it on below if it turns
-            // out that we need it.
-            m_btnSpecifyEncoding.Visible = false;
-            m_labelFileStats.TextAlign = ContentAlignment.TopLeft;
+            if (null != color)
+                m_labelFileStats.ForeColor = color;
 
-            // Do we have a half-way reasonable pathname?
-            if (null == sPathName || sPathName.Length == 0)
-                return false;
-
-            // Display the message that we are examining the file. Use an attention-getting
-            // font and Wait Cursor so the user will be patient.
-            m_labelFileStats.Visible = true;
-            m_labelFileStats.Text = LocDB.GetValue(this, "strPleaseWait",
-                "Please wait while OurWord examines this file...", null);
-            m_labelFileStats.ForeColor = Color.Red;
-            m_labelFileStats.Font = new Font(
-                m_labelFileStats.Font, FontStyle.Bold);
-
+            m_labelFileStats.Font = new Font(m_labelFileStats.Font, style);
+        }
+        #endregion
+        #region Method: bool ExamineEncoding(string sPath)
+        bool ExamineEncoding(string sPath)
+        {
             // Get the file's encoding from the BOM
-            Encoding enc = JW_Util.GetUnicodeFileEncoding(sPathName);
+            Encoding enc = JW_Util.GetUnicodeFileEncoding(sPath);
 
             // A null encoding means that we couldn't access the file
             if (enc == null)
             {
-                string sFileName = Path.GetFileName(sPathName);
-                m_labelFileStats.Text = LocDB.GetValue(this, "strUnableToAccessFile",
-                    "Unable to access file '{0}'.", new string[] { sFileName });
+                string sFileName = Path.GetFileName(sPath);
+
+                SetMessage(Color.Red, 
+                    FontStyle.Bold, 
+                    LocDB.GetValue(this, "strUnableToAccessFile",
+                    "Unable to access file '{0}'.", new string[] { sFileName }));
+
                 return false;
             }
 
             // Anything other than UTF8 is a problem
             if (enc != Encoding.UTF8)
             {
-                string sFileName = Path.GetFileName(sPathName);
-                m_labelFileStats.Text = LocDB.GetValue(this, "strNotUTF8",
-                    "File '{0}' does not appear to be in the UTF-8 Encoding. " +
-                    "As an Advanced task, you can specify the encoding; but " +
-                    "don't try this if you are unfamiliar with codepages and " +
-                    "encodings; rather, seek some help.", 
-                    new string[] { sFileName });
+                string sFileName = Path.GetFileName(sPath);
+
+                SetMessage(
+                    Color.Red, 
+                    FontStyle.Bold,
+                    LocDB.GetValue(this, "strNotUTF8",
+                        "File '{0}' does not appear to be in the UTF-8 Encoding. " +
+                        "As an Advanced task, you can specify the encoding; but " +
+                        "don't try this if you are unfamiliar with codepages and " +
+                        "encodings; rather, seek some help.",
+                        new string[] { sFileName }));
+
                 m_labelFileStats.TextAlign = ContentAlignment.BottomLeft;
                 m_btnSpecifyEncoding.Visible = true;
                 return false;
             }
 
-            // Is this a standard format file?
+            return true;
+        }
+        #endregion
+        #region Method: bool IsOxesFile(string sPath)
+        bool IsOxesFile(string sPath)
+        {
+            // Having Oxes in the filename indicates we think it is an Oxes file
+            if (!sPath.ToLower().Contains(".oxes"))
+                return false;
+
+            return true;
+        }
+        #endregion
+        #region Method: bool IsStandardFormatFile(string sPath)
+        bool IsStandardFormatFile(string sPath)
+        {
             string sFirstLine = "";
             try
             {
-                StreamReader r = new StreamReader(sPathName, true);
+                StreamReader r = new StreamReader(sPath, true);
                 sFirstLine = r.ReadLine();
                 r.Close();
             }
             catch (Exception)
             {
             }
+
             if (string.IsNullOrEmpty(sFirstLine) || sFirstLine[0] != '\\')
             {
-                string sFileName = Path.GetFileName(sPathName);
-                m_labelFileStats.Text = LocDB.GetValue(this, "strNotStandardFormat",
-                    "File '{0}' does not appear to be a Standard Format file. " +
-                    "(It does not begin with a backslash character.)",
-                    new string[] { sFileName });
+                string sFileName = Path.GetFileName(sPath);
+                SetMessage(
+                    Color.Red,
+                    FontStyle.Bold,
+                    LocDB.GetValue(this, "strNotStandardFormat",
+                        "File '{0}' does not appear to be a Standard Format file. " +
+                        "(It does not begin with a backslash character.)",
+                        new string[] { sFileName }));
+                return false;
+            }
+            return true;
+        }
+        #endregion
+        #region Method: void EnableNextButton()
+        void EnableNextButton()
+        {
+            m_bCanGoToNextPage = true;
+            Wizard.AdvanceButtonEnabled = CanGoToNextPage();
+            Wizard.Text = LocDB.GetValue(Wizard, Wizard.Name, WizImportBook.c_sEnglishTitle) +
+                " (" + Path.GetFileName(PathName) + ")";
+            Wizard.PlaceFocusOnAdvanceButton();
+        }
+        #endregion
+
+        #region Method: bool ExamineOxesFile(sPath)
+        bool ExamineOxesFile(string sPath)
+            // TODO: Scan it against a DTD
+        {
+            // Filename
+            string sFile = Path.GetFileName(sPath);
+
+            // Read in the file
+            var xml = new XmlDoc();
+            try
+            {
+                xml.Load(sPath);
+            }
+            catch (Exception e)
+            {
+                LocDB.Message("kFailedToLoadOxes",
+                    "The Oxes file {0} failed to load with system error:\n{1}.",
+                    new string[] { sFile, e.Message },
+                    LocDB.MessageTypes.Error);
                 return false;
             }
 
+            // Get the book'x abbreviation
+            var sAbbrev = DBook.GetAbbrevFromOxes(xml);
+            if (string.IsNullOrEmpty(sAbbrev))
+            {
+                SetMessage(Color.Red,
+                    FontStyle.Bold,
+                    LocDB.GetValue(this, "kNoOxesAbbrev",
+                        "The Oxes file is not valid, the book's abbreviation could not be found.", null));
+                return false;
+            }
+
+            // Get the fields for the summary page
+            Wizard.BookAbbrev = sAbbrev;
+            int iBook = DBook.FindBookAbbrevIndex(Wizard.BookAbbrev);
+            Wizard.BookName = DBook.GetBookName(iBook, Wizard.Translation);
+            m_sFormat = "Oxes";
+
+            // Display the scan results
+            SetMessage(
+                Color.Black,
+                FontStyle.Regular,
+                LocDB.GetValue(this, "strOxesFileStatus",
+                    "File: {0}\n" +
+                    "Format: Oxes\n" +
+                    "Book: {1}",
+                    new string[] { sFile, sAbbrev }));
+
+            EnableNextButton();
+            return true;
+        }
+        #endregion
+        #region Method: bool ExamineStandardFormatFile(sPath)
+        bool ExamineStandardFormatFile(string sPath)
+        {
 			// Read in the file; the rest of what we do is based on internals
             ScriptureDB DB = new ScriptureDB();
-            string s = sPathName;
+            string s = sPath;
 			TextReader tr = JW_Util.GetTextReader(ref s, "");
 			DB.Read(tr);
 			tr.Close();
@@ -191,15 +285,18 @@ namespace OurWord.Dialogs.WizImportBook
 			int iBook = DBook.FindBookAbbrevIndex(Wizard.BookAbbrev);
 			if (-1 == iBook)
 			{
-				m_labelFileStats.Text = LocDB.GetValue(this, "strUnrecognizedBook",
-					"The file either does not have an \\id line, or does not have a " +
-					"recognized 3-Letter book abbreviation in it. OurWord expects " +
-					"something like \"\\id LUK\"", null);
+                SetMessage(
+                    Color.Red,
+                    FontStyle.Bold,
+				    LocDB.GetValue(this, "strUnrecognizedBook",
+					    "The file either does not have an \\id line, or does not have a " +
+					    "recognized 3-Letter book abbreviation in it. OurWord expects " +
+					    "something like \"\\id LUK\"", null));
 				return false;
 			}
 			Wizard.BookName = DBook.GetBookName(iBook, Wizard.Translation);
 
-            // See that it is either Paratext or Toolbox; and check  for any unknown markers.
+            // See that it is either Paratext or Toolbox; and check for any unknown markers.
             ArrayList aUnknownMarkers = DB.GetUnknownMarkersInventory();
             string sUnrecognizedMarkers = "";
             foreach (string sMkr in aUnknownMarkers)
@@ -225,7 +322,7 @@ namespace OurWord.Dialogs.WizImportBook
                 m_labelFileStats.Font, FontStyle.Regular);
 
             string[] v = new string[3];
-            v[0] = Path.GetFileName(sPathName);
+            v[0] = Path.GetFileName(sPath);
             v[1] = (DB.IsParatextFormat) ? "Paratext" : "Toolbox";
             v[2] = sMarkerFeedback;
             m_labelFileStats.Text = LocDB.GetValue(this, "strFileStats",
@@ -238,19 +335,48 @@ namespace OurWord.Dialogs.WizImportBook
             m_sFormat = (DB.IsParatextFormat) ? "Paratext" : "Toolbox";
 
             // If we are here, we have a valid filename, so the Next button can be enabled.
-            m_bCanGoToNextPage = true;
-            Wizard.AdvanceButtonEnabled = CanGoToNextPage();
-            Wizard.Text = LocDB.GetValue(Wizard, Wizard.Name, WizImportBook.c_sEnglishTitle) +
-                " (" + Path.GetFileName(PathName) + ")";
-            Wizard.PlaceFocusOnAdvanceButton();
+            EnableNextButton();
 
             return true;
         }
         #endregion
-        #region Method: void SetPathLabelText()
-        void SetPathLabelText()
+
+        #region bool ExamineFile(string sPathName) - see if the proposed file is suitable
+        bool ExamineFile(string sPathName)
         {
-            m_labelFileName.Text = JWU.PathEllipses(PathName, 40);
+            // Our default will be that the file does not pass muster.
+            m_bCanGoToNextPage = false;
+            m_sFormat = "";
+
+            // Turn off the Specify Encoding button; we'll turn it on later if it turns
+            // out that we need it.
+            m_btnSpecifyEncoding.Visible = false;
+            m_labelFileStats.TextAlign = ContentAlignment.TopLeft;
+
+            // Do we have a half-way reasonable pathname?
+            if (null == sPathName || sPathName.Length == 0)
+                return false;
+
+            // Display the message that we are examining the file. Use an attention-getting
+            // font and Wait Cursor so the user will be patient.
+            m_labelFileStats.Visible = true;
+            SetMessage(Color.Red, FontStyle.Bold, LocDB.GetValue(this, "strPleaseWait",
+                "Please wait while OurWord examines this file...", null));
+
+            // Is the encoding UTF8?
+            if (!ExamineEncoding(sPathName))
+                return false;
+
+            // Is it an Oxes file?
+            if (IsOxesFile(sPathName))
+                return ExamineOxesFile(sPathName);
+
+            // Is this a standard format file?
+            if (!IsStandardFormatFile(sPathName))
+                return ExamineStandardFormatFile(sPathName);
+
+            // None of the above
+            return false;
         }
         #endregion
 
