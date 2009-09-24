@@ -1159,6 +1159,10 @@ namespace JWdb.DataModel
                 RemoteUserName + ":" + 
                 RemotePassword + "@" +
                 RemoteUrl;
+
+            if (!CheckRemoteRepositoryIsSetUp())
+                return false;
+
             return SynchronizeWith(sRemotePath);
         }
         #endregion
@@ -1200,6 +1204,24 @@ namespace JWdb.DataModel
 
         // Main Synchronize Helper Methods ---------------------------------------------------
         // TODO: Error messages on everything; and incorporate the Hg's error text into our error dialog.
+        #region Method: bool CheckRemoteRepositoryIsSetUp()
+        bool CheckRemoteRepositoryIsSetUp()
+        {
+            if (string.IsNullOrEmpty(RemoteUrl) |
+                string.IsNullOrEmpty(RemotePassword) ||
+                string.IsNullOrEmpty(RemoteUserName))
+            {
+                LocDB.Message("noSynchSettings",
+                    "You do not yet have synchronization settings entered.\n\n" +
+                    "Use the Collaboration page on the Configuration dialog to enter\n" +
+                    "a Url for the repository, plus your user name and password.",
+                    null, LocDB.MessageTypes.Error);
+                return false;
+            }
+            return true;
+        }
+        #endregion
+
         #region Method: void LaunchSynchProgressDialog()
         void LaunchSynchProgressDialog()
             // Launch the Progress dialog in a separate thread so that it will update.
