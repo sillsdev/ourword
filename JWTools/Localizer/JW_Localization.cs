@@ -1689,8 +1689,11 @@ namespace JWTools
             string sAppTitle = "Our Word";
 
             // Finally, we can show the message
-            DialogResult result = MessageBox.Show(Form.ActiveForm,
-                sMessageText, sAppTitle, buttons, icon);
+            // Note: We don't give a parent window, because some messages can happen
+            // during loading, before a window is available, in which case we get an
+            // error, because Form.ActiveForm would return the splash screen, which is
+            // running in a different process.
+            DialogResult result = MessageBox.Show(null, sMessageText, sAppTitle, buttons, icon);
             return (result == DialogResult.Yes);
         }
         #endregion

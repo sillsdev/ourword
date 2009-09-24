@@ -2582,13 +2582,15 @@ namespace JWdb.DataModel
 		#endregion
 
         // Oxes ------------------------------------------------------------------------------
+        #region Method: void SaveToOxesBook(oxes, nodeBook)
         public void SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
         {
             foreach (DParagraph p in Paragraphs)
                 p.SaveToOxesBook(oxes, nodeBook);
         }
+        #endregion
 
-		// Methods ---------------------------------------------------------------------------
+        // Methods ---------------------------------------------------------------------------
 		#region Method: DParagraph[] GetParagraphs(DReferenceSpan span)
 		public DParagraph[] GetParagraphs(DReferenceSpan span)
 		{

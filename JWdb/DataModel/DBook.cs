@@ -1,4 +1,5 @@
-﻿/**********************************************************************************************
+﻿#region ***** DBook.cs *****
+/**********************************************************************************************
  * Project: Our Word!
  * File:    DBook.cs
  * Author:  John Wimbish
@@ -21,6 +22,7 @@ using System.IO;
 using System.Xml;
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 namespace JWdb.DataModel
@@ -717,6 +719,38 @@ namespace JWdb.DataModel
         #endregion
 
         #region Method: bool CheckSectionStructureAgainstFront(DBook BFront)
+        #region Method: int GetFirstVerseInSection(DSection section)
+        int GetFirstVerseInSection(DSection section)
+        {
+            foreach (DParagraph p in section.Paragraphs)
+            {
+                foreach (DRun run in p.Runs)
+                {
+                    if (null != run as DVerse)
+                        return (run as DVerse).VerseNo;
+                }
+            }
+            return 0;
+        }
+        #endregion
+        #region Method: int GetLastVerseInSection(DSection section)
+        int GetLastVerseInSection(DSection section)
+        {
+            int nVerse = 0;
+
+            foreach (DParagraph p in section.Paragraphs)
+            {
+                foreach (DRun run in p.Runs)
+                {
+                    if (null != run as DVerse)
+                        nVerse = (run as DVerse).VerseNo;
+                }
+            }
+
+            return nVerse;
+        }
+        #endregion
+
         public void CheckSectionStructureAgainstFront(DBook BFront)
         {
             // If we don't have a Front book, or if we are not the TargetTranslation,
@@ -753,7 +787,8 @@ namespace JWdb.DataModel
                 DSection SFront = BFront.Sections[i] as DSection;
                 DSection STarget = Sections[i] as DSection;
 
-                if (SFront.ReferenceSpan != STarget.ReferenceSpan)
+                if (GetFirstVerseInSection(SFront) != GetFirstVerseInSection(STarget) ||
+                    GetLastVerseInSection(SFront) != GetLastVerseInSection(STarget))
                 {
                     throw new eBookReadException(
                         GetSpanMismatchMsg(i, SFront, STarget),
@@ -1359,7 +1394,7 @@ namespace JWdb.DataModel
                 return false;
             }
 
-            // Find the Book node (if wel-formed Oxes, shouldn't be a problem.)
+            // Find the Book node (if well-formed Oxes, shouldn't be a problem.)
             var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
             if (null == nodeBook)
                 return false;
@@ -1408,10 +1443,30 @@ namespace JWdb.DataModel
             }
 
             // Post Processing (calc versification, check structure against front)
-            _LoadPostProcessing();
+            try
+            {
+                _LoadPostProcessing();
+            }
+            catch (eBookReadException bre)
+            {
+                LocDB.Message("kFailedToLoadOxes",
+                    "The Oxes file {0} failed to load with system error:\n{1}.",
+                    new string[] { Path.GetFileName(sPath), bre.UserMessage },
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+            catch (Exception e)
+            {
+                LocDB.Message("kFailedToLoadOxes",
+                    "The Oxes file {0} failed to load with system error:\n{1}.",
+                    new string[] { Path.GetFileName(sPath), e.Message },
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+
+            // Successful
             progress.End();
             m_bIsLoaded = true;
-
             return true;
         }
         #endregion
