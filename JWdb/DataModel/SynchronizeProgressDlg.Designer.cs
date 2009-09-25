@@ -89,7 +89,7 @@
             this.m_labelPulling.Name = "m_labelPulling";
             this.m_labelPulling.Size = new System.Drawing.Size(278, 23);
             this.m_labelPulling.TabIndex = 3;
-            this.m_labelPulling.Text = "Receiving changes from the Internet";
+            this.m_labelPulling.Text = "Receiving data from the Internet";
             this.m_labelPulling.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // m_labelMerge

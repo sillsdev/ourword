@@ -54,6 +54,7 @@
             this.m_textURL.Name = "m_textURL";
             this.m_textURL.Size = new System.Drawing.Size(241, 20);
             this.m_textURL.TabIndex = 1;
+            this.m_textURL.TextChanged += new System.EventHandler(this.cmdTextChanged);
             // 
             // m_descrURL
             // 
@@ -62,7 +63,7 @@
             this.m_descrURL.Size = new System.Drawing.Size(327, 46);
             this.m_descrURL.TabIndex = 2;
             this.m_descrURL.Text = "The location on the Internet for the repository. Do not enter \"http\". For example" +
-                ", \"hg.mx.languagedepot.org/MyProject\".";
+                ", \"hg-public.languagedepot.org/MyProject\".";
             // 
             // m_labelErrorMsg
             // 
@@ -89,6 +90,7 @@
             this.m_textUserName.Name = "m_textUserName";
             this.m_textUserName.Size = new System.Drawing.Size(241, 20);
             this.m_textUserName.TabIndex = 5;
+            this.m_textUserName.TextChanged += new System.EventHandler(this.cmdTextChanged);
             // 
             // m_labelUserName
             // 
@@ -105,6 +107,7 @@
             this.m_textPassword.Name = "m_textPassword";
             this.m_textPassword.Size = new System.Drawing.Size(241, 20);
             this.m_textPassword.TabIndex = 8;
+            this.m_textPassword.TextChanged += new System.EventHandler(this.cmdTextChanged);
             // 
             // m_labelPassword
             // 

@@ -32,6 +32,18 @@ namespace OurWord.Dialogs
 {
     public partial class WizRepo_GetRepoInfo : UserControl, IJW_WizPage
     {
+        // Attrs -----------------------------------------------------------------------------
+        #region VAttr{g}: WizInitializeFromRepository Wizard - the owning wizard
+        WizInitializeFromRepository Wizard
+        {
+            get
+            {
+                Debug.Assert(null != Parent as WizInitializeFromRepository);
+                return Parent as WizInitializeFromRepository;
+            }
+        }
+        #endregion
+
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public WizRepo_GetRepoInfo()
@@ -113,6 +125,8 @@ namespace OurWord.Dialogs
                 return false;
             }
 
+            m_labelErrorMsg.Text = "";
+
             return true;
         }
         #endregion
@@ -129,5 +143,12 @@ namespace OurWord.Dialogs
         }
         #endregion
 
+        // Handlers --------------------------------------------------------------------------
+        #region Cmd: cmdTextChanged
+        private void cmdTextChanged(object sender, EventArgs e)
+        {
+            Wizard.AdvanceButtonEnabled = CanGoToNextPage();
+        }
+        #endregion
     }
 }

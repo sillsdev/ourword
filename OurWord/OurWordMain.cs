@@ -157,6 +157,8 @@ namespace OurWord
         }
         WndBackTranslation m_wndBackTranslation = null;
         #endregion
+        private ToolStripMenuItem m_menuInitializeFromAnInternetRepositoryToolStripMenuItem;
+        private ToolStripMenuItem m_menuCreateANewProjectOnThisComputerToolStripMenuItem;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -1056,6 +1058,8 @@ namespace OurWord
             this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
             this.m_tbLanguageInfo = new System.Windows.Forms.ToolStripLabel();
             this.m_tbCurrentPassage = new System.Windows.Forms.ToolStripLabel();
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             m_separator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_ToolStrip.SuspendLayout();
             this.m_toolStripContainer.BottomToolStripPanel.SuspendLayout();
@@ -1146,19 +1150,21 @@ namespace OurWord
             // 
             // m_menuNewProject
             // 
+            this.m_menuNewProject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem,
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem});
             this.m_menuNewProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNewProject.Image")));
             this.m_menuNewProject.Name = "m_menuNewProject";
-            this.m_menuNewProject.Size = new System.Drawing.Size(146, 22);
-            this.m_menuNewProject.Text = "&New...";
+            this.m_menuNewProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuNewProject.Text = "&New";
             this.m_menuNewProject.ToolTipText = "Create a brand new project.";
-            this.m_menuNewProject.Click += new System.EventHandler(this.cmdNewProject);
             // 
             // m_menuOpenProject
             // 
             this.m_menuOpenProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOpenProject.Image")));
             this.m_menuOpenProject.Name = "m_menuOpenProject";
             this.m_menuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.m_menuOpenProject.Size = new System.Drawing.Size(146, 22);
+            this.m_menuOpenProject.Size = new System.Drawing.Size(152, 22);
             this.m_menuOpenProject.Text = "&Open";
             this.m_menuOpenProject.ToolTipText = "Open an existing project.";
             // 
@@ -1167,7 +1173,7 @@ namespace OurWord
             this.m_menuSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSaveProject.Image")));
             this.m_menuSaveProject.Name = "m_menuSaveProject";
             this.m_menuSaveProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSaveProject.Size = new System.Drawing.Size(146, 22);
+            this.m_menuSaveProject.Size = new System.Drawing.Size(152, 22);
             this.m_menuSaveProject.Text = "&Save";
             this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
             this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
@@ -1175,7 +1181,7 @@ namespace OurWord
             // m_menuExportProject
             // 
             this.m_menuExportProject.Name = "m_menuExportProject";
-            this.m_menuExportProject.Size = new System.Drawing.Size(146, 22);
+            this.m_menuExportProject.Size = new System.Drawing.Size(152, 22);
             this.m_menuExportProject.Text = "Export...";
             this.m_menuExportProject.Click += new System.EventHandler(this.cmdExportProject);
             // 
@@ -1870,6 +1876,20 @@ namespace OurWord
             this.m_tbCurrentPassage.Size = new System.Drawing.Size(84, 22);
             this.m_tbCurrentPassage.Text = "(passage)";
             // 
+            // m_menuInitializeFromAnInternetRepositoryToolStripMenuItem
+            // 
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Name = "m_menuInitializeFromAnInternetRepositoryToolStripMenuItem";
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Text = "Initialize from an Internet Repository...";
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Click += new System.EventHandler(this.cmdDownloadRepository);
+            // 
+            // m_menuCreateANewProjectOnThisComputerToolStripMenuItem
+            // 
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Name = "m_menuCreateANewProjectOnThisComputerToolStripMenuItem";
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Text = "Create a New Project on this computer...";
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Click += new System.EventHandler(this.cmdNewProject);
+            // 
             // OurWordMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -2512,7 +2532,8 @@ namespace OurWord
 			OnLeaveProject(true);
 
 			// Save the current project's registry info
-            JW_Registry.SetValue(c_sLastProjectOpened, DB.Project.StoragePath);
+            if (!string.IsNullOrEmpty(DB.Project.StoragePath))
+                JW_Registry.SetValue(c_sLastProjectOpened, DB.Project.StoragePath);
 			DB.Project.Nav.SavePositionToRegistry();
 			
 			// Save the window position
@@ -2585,7 +2606,7 @@ namespace OurWord
         // Project Dropdown
 		#region Cmd: cmdNewProject
         private void cmdNewProject(Object sender, EventArgs e)
-		{
+        {
             // Don't allow if the menu item is hidden (Microsoft allows a Shortcut key to work,
             // even though the menu command is hidden!)
             if (!m_btnProject.Visible)
@@ -2602,22 +2623,25 @@ namespace OurWord
             OnLeaveProject(true);
 
             // Create and initialize the new project according to the settings
-            DB.Project = new DProject(wiz.ProjectName);
+            DProject project = new DProject(wiz.ProjectName);
 
             // Team Settings: start with the factory default; load over it if a file already exists,
-			// otherwise create the new cluster
-            DB.Project.TeamSettings = new DTeamSettings(wiz.ChosenCluster.Name);
-            DB.Project.TeamSettings.EnsureInitialized();
-            DB.Project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
+            // otherwise create the new cluster
+            project.TeamSettings = new DTeamSettings(wiz.ChosenCluster.Name);
+            project.TeamSettings.EnsureInitialized();
+            project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
 
             // Create the front translation. If the settings file exists, load it; otherwise
-			// create its folder, settings file, etc.
-            DB.Project.FrontTranslation = new DTranslation(wiz.FrontName);
-            DB.Project.FrontTranslation.InitialCreation(G.CreateProgressIndicator());
+            // create its folder, settings file, etc.
+            project.FrontTranslation = new DTranslation(wiz.FrontName);
+            project.FrontTranslation.InitialCreation(G.CreateProgressIndicator());
 
             // Target Translation
-            DB.Project.TargetTranslation = new DTranslation(wiz.ProjectName);
-            DB.Project.TargetTranslation.InitialCreation(G.CreateProgressIndicator());
+            project.TargetTranslation = new DTranslation(wiz.ProjectName);
+            project.TargetTranslation.InitialCreation(G.CreateProgressIndicator());
+
+            // Set OW to this project
+            DB.Project = project;
 
             // Save everything
             DB.Project.WriteToFile(G.CreateProgressIndicator());
@@ -2629,8 +2653,149 @@ namespace OurWord
             // Edit properties?
             if (wiz.LaunchPropertiesDialogWhenDone)
                 cmdConfigure(null, null);
-		}
+        }
 		#endregion
+        #region Cmd: cmdDownloadRepository
+        const string c_sCloneFailedMsg = "Repository.CloneTo() failed.";
+        const string c_sPullFailedMsg = "Repository.Pull() failed.";
+        private void cmdDownloadRepository(Object sender, EventArgs e)
+        {
+            // Is Mercurial Installed?
+            if (!Repository.HgIsInstalled)
+            {
+                LocDB.Message("msgHgNotInstalled",
+                    "It appears that Mercurial is not installed on this computer.\n" +
+                    "Please install it, and then try again.",
+                    null,
+                    LocDB.MessageTypes.Error);
+                return;
+            }
+
+            // We'll contruct the wizard outside of the loop, in case we have to go
+            // back and change settings (e.g., on an error)
+            var wiz = new WizInitializeFromRepository();
+
+            // Loop until success or give up
+            while (true)
+            {
+                // Get the user's settings for the to-be-downloaded cluster
+                if (DialogResult.OK != wiz.ShowDialog(this))
+                    return;
+
+                // Make sure the current project is saved and up-to-date, before we create
+                // the new one. Commit to the Repository, to have a restore  point if we need it.
+                OnLeaveProject(true);
+
+                // Create the ClusterInfo object
+                string sParentFolder = (wiz.IsInMyDocuments) ?
+                    JWU.GetMyDocumentsFolder(null) :
+                    JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
+                ClusterInfo ci = new ClusterInfo(wiz.ClusterName, sParentFolder);
+
+                // If the Cluster already exists, we don't continue, else we'd overwrite it.
+                if (Directory.Exists(ci.ClusterFolder))
+                {
+                    bool bTryAgain = LocDB.Message("msgClusterAlreadyExists",
+                        "We cannot create cluster {0} because it already exists.\n\n" + 
+                        "Do you want to try again?",
+                        new string[] { ci.Name },
+                        LocDB.MessageTypes.WarningYN);
+                    if (!bTryAgain)
+                        return;
+                    continue;
+                }
+
+                // Can we access the Internet?
+                bool bCanAccessInternet = Repository.CanAccessInternet();
+                if (!bCanAccessInternet)
+                {
+                    bool bTryAgain = LocDB.Message("msgCannotAccessInternet",
+                        "OurWord is unable to access the Internet.\n\n" + 
+                        "Please check that you have an Internet connection, then press " +
+                        "\"Yes\" to try again; or \"No\" to cancel.",
+                        null,
+                        LocDB.MessageTypes.WarningYN);
+                    if (!bTryAgain)
+                        return;
+                    continue;
+                }
+
+                // Make changes to the disk
+                try
+                {
+                    // Progress Dialog
+                    SynchProgressDlg.Start(true);
+                    while (!SynchProgressDlg.IsCreated)
+                        Thread.Sleep(500);
+                    Thread.Sleep(2000);
+                    SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.InternetAccess);
+
+                    // Clone the repository (thus creating the Cluster folder and
+                    // the .Hg subfolder)
+                    SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Pulling);
+                    string sRepository = Repository.BuildRemoteRepositoryString(
+                        wiz.Url, wiz.UserName, wiz.Password);
+                    if (!Repository.CloneTo(ci.ClusterFolder, sRepository))
+                    {
+                        SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Pulling);
+                        throw new Exception(c_sCloneFailedMsg);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Clean Up
+                    if (Directory.Exists(ci.ClusterFolder))
+                        Directory.Delete(ci.ClusterFolder, true);
+
+                    if (ex.Message == c_sCloneFailedMsg)
+                    {
+                        bool bTryAgain = LocDB.Message("msgCloneFailed",
+                            "OurWord was unable to retrieve the data from the Internet.\n\n" +
+                            "Do you wish to try again?",
+                            null,
+                            LocDB.MessageTypes.WarningYN);
+                        if (!bTryAgain)
+                            return;
+                        continue;
+                    }
+
+                    if (ex.Message == c_sPullFailedMsg)
+                    {
+                         bool bTryAgain = LocDB.Message("msgPullFailed",
+                            "OurWord was unable to build folders on your disk.\n\n" +
+                            "Do you wish to try again?",
+                            null,
+                            LocDB.MessageTypes.WarningYN);
+                        if (!bTryAgain)
+                            return;
+                        continue;
+                   }
+
+                    bool bAgain = LocDB.Message("msgDownloadClusterFailedGeneric",
+                        "OurWord was unable to download / create the cluster on your computer, " +
+                        "for unknown reason.\n\n" +
+                            "Do you wish to try again?",
+                            null,
+                            LocDB.MessageTypes.WarningYN);
+                    if (!bAgain)
+                        return;
+                    continue;
+                }
+                finally
+                {
+                    SynchProgressDlg.Stop();
+                }
+
+                // If here, then we were successful
+                break;
+            }
+
+            // Display a dialog declaring Success, and giving a choice of which project to open
+            LocDB.Message("msgRepoCreated",
+                "The Respository has been sucessfully downloaded to your computer.",
+                null, LocDB.MessageTypes.Info);
+        }
+        #endregion
 
         #region Cmd: cmdOpenProject
         private void cmdOpenProject(Object sender, EventArgs e)
@@ -2819,130 +2984,6 @@ namespace OurWord
 
         }
         #endregion
-
-        const string c_sCloneFailedMsg = "Repository.CloneTo() failed.";
-        const string c_sPullFailedMsg = "Repository.Pull() failed.";
-        private void cmdDownloadRepository(Object sender, EventArgs e)
-        {
-            // Is Mercurial Installed?
-            if (!Repository.HgIsInstalled)
-            {
-                LocDB.Message("msgHgNotInstalled",
-                    "It appears that Mercurial is not installed on this computer.\n" +
-                    "Please install it, and then try again.",
-                    null,
-                    LocDB.MessageTypes.Error);
-                return;
-            }
-
-            // We'll contruct the wizard outside of the loop, in case we have to go
-            // back and change settings (e.g., on an error)
-            var wiz = new WizInitializeFromRepository();
-
-            // Loop until success or give up
-            while (true)
-            {
-                // Get the user's settings for the to-be-downloaded cluster
-                if (DialogResult.OK != wiz.ShowDialog(this))
-                    return;
-
-                // Make sure the current project is saved and up-to-date, before we create
-                // the new one. Commit to the Repository, to have a restore  point if we need it.
-                OnLeaveProject(true);
-
-                // Create the ClusterInfo object
-                string sParentFolder = (wiz.IsInMyDocuments) ?
-                    JWU.GetMyDocumentsFolder(null) :
-                    JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
-                ClusterInfo ci = new ClusterInfo(wiz.Name, sParentFolder);
-
-                // If the Cluster already exists, we don't continue, else we'd overwrite it.
-                if (Directory.Exists(ci.ClusterFolder))
-                {
-                    bool bTryAgain = LocDB.Message("msgClusterAlreadyExists",
-                        "We cannot create cluster {0} because it already exists.\n\n" + 
-                        "Do you want to try again?",
-                        new string[] { ci.Name },
-                        LocDB.MessageTypes.WarningYN);
-                    if (!bTryAgain)
-                        return;
-                    continue;
-                }
-
-                // Can we access the Internet?
-                if (!Repository.CanAccessInternet())
-                {
-                    bool bTryAgain = LocDB.Message("msgCannotAccessInternet",
-                        "OurWord is unable to access the Internet.\n\n" + 
-                        "Please check that you have an Internet connection, then press " +
-                        "\"Yes\" to try again; or \"No\" to cancel.",
-                        null,
-                        LocDB.MessageTypes.WarningYN);
-                    if (!bTryAgain)
-                        return;
-                    continue;
-                }
-
-                // Make changes to the disk
-                try
-                {
-                    // Create the Cluster Folder
-                    Directory.CreateDirectory(ci.ClusterFolder);
-
-                    // Clone the repository (thus creating the .Hg subfolder)
-                    if (!Repository.CloneTo(ci.ClusterFolder, wiz.Url))
-                        throw new Exception(c_sCloneFailedMsg);
-
-                    // Pull, so that the project folders are all created
-                    if (!Repository.Pull(ci.ClusterFolder))
-                        throw new Exception(c_sPullFailedMsg);
-
-                }
-                catch (Exception ex)
-                {
-                    // Clean Up
-                    if (Directory.Exists(ci.ClusterFolder))
-                        Directory.Delete(ci.ClusterFolder, true);
-
-                    if (ex.Message == c_sCloneFailedMsg)
-                    {
-                        bool bTryAgain = LocDB.Message("msgCloneFailed",
-                            "OurWord was unable to retrieve the data from the Internet.\n\n" +
-                            "Do you wish to try again?",
-                            null,
-                            LocDB.MessageTypes.WarningYN);
-                        if (!bTryAgain)
-                            return;
-                        continue;
-                    }
-
-                    if (ex.Message == c_sPullFailedMsg)
-                    {
-                         bool bTryAgain = LocDB.Message("msgPullFailed",
-                            "OurWord was unable to build folders on your disk.\n\n" +
-                            "Do you wish to try again?",
-                            null,
-                            LocDB.MessageTypes.WarningYN);
-                        if (!bTryAgain)
-                            return;
-                        continue;
-                   }
-
-                    bool bAgain = LocDB.Message("msgDownloadClusterFailedGeneric",
-                        "OurWord was unable to download / create the cluster on your computer, " +
-                        "for unknown reason.\n\n" +
-                            "Do you wish to try again?",
-                            null,
-                            LocDB.MessageTypes.WarningYN);
-                    if (!bAgain)
-                        return;
-                    continue;
-                }
-
-                // Display a dialog declaring Success, and giving a choice of which project to open
-
-            }
-        }
 
         // Edit Dropdown
         #region Cmd: cmdUndo

@@ -11,7 +11,7 @@
       <Alt ID="inz" Value="Proyek" Tip="Tunjukkan menu untuk pilih proyek (Baru, Buka, bahasa2, dll.)"></Alt>
     </Item>
     <Item ID="m_menuNewProject">
-      <Alt ID="inz" Value="&amp;Baru..." Tip="Ciptakan proyek baru"></Alt>
+      <Alt ID="inz" Value="&amp;Baru" Tip="Ciptakan proyek baru"></Alt>
     </Item>
     <Item ID="m_menuOpenProject">
       <Alt ID="inz" Value="B&amp;uka..." Tip="Buka proyek yang pernah dikerjakan"></Alt>

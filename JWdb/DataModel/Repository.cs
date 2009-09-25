@@ -382,8 +382,9 @@ namespace JWdb.DataModel
             {
                 p.Start();
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine("Execution failed with message: " + e.Message);
                 return null;
             }
 
@@ -565,19 +566,30 @@ namespace JWdb.DataModel
         #endregion
 
         // Static version of Operations ------------------------------------------------------
-        #region SMethod: bool CloneTo(string sDestinationPath, string sSourcePath)
-        static public bool CloneTo(string sDestinationPath, string sSourcePath)
+        #region SMethod: string BuildRemoteRepositoryString(sUrl, sUserName, sPassword)
+        static public string BuildRemoteRepositoryString(string sUrl, string sUserName, string sPassword)
+        {
+            string sRemotePath = "http://" +
+                sUserName + ":" +
+                sPassword + "@" +
+                sUrl;
+            return sRemotePath;
+        }
+        #endregion
+        #region SMethod: bool CloneTo(string sDestinationPath, string sRepository)
+        static public bool CloneTo(string sDestinationPath, string sRepository)
         {
             string sCommand = c_sClone;
 
             // Source Repository
-            sCommand += (" " + SurroundWithQuotes(sSourcePath));
+            sCommand += (" " + SurroundWithQuotes(sRepository));
 
             // Destination Path
+            sDestinationPath = sDestinationPath.Trim(new char[] { Path.DirectorySeparatorChar });
             sCommand += (" " + SurroundWithQuotes(sDestinationPath));
 
             // Do it
-            ExecutionResult result = Execute(sCommand, sSourcePath);
+            ExecutionResult result = Execute(sCommand, "");
             return result.Successful;
         }
         #endregion
@@ -1223,12 +1235,12 @@ namespace JWdb.DataModel
         #endregion
 
         #region Method: void LaunchSynchProgressDialog()
-        void LaunchSynchProgressDialog()
+        static public void LaunchSynchProgressDialog()
             // Launch the Progress dialog in a separate thread so that it will update.
             // We loop until we know it is created, and then waiti an addition couple
             // of seconds to make sure it is showing.
         {
-            SynchProgressDlg.Start();
+            SynchProgressDlg.Start(false);
             while (!SynchProgressDlg.IsCreated)
                 Thread.Sleep(500);
             Thread.Sleep(2000);
@@ -1237,11 +1249,11 @@ namespace JWdb.DataModel
         #region Method: bool CheckInternetAccess()
         bool CheckInternetAccess()
         {
-            SynchProgressDlg.InternetAccess = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.InternetAccess);
 
             if (!CanAccessInternet())
             {
-                SynchProgressDlg.InternetAccess = SynchProgressDlg.GetFinishState(false);
+                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.InternetAccess);
 
                 SynchProgressDlg.ShowError("kNoInternetConnection",
                     "OurWord is unable to connect to the Internet. \n\n" +
@@ -1250,7 +1262,7 @@ namespace JWdb.DataModel
                 return false;
             }
 
-            SynchProgressDlg.InternetAccess = SynchProgressDlg.GetFinishState(true);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.InternetAccess);
             return true;
         }
         #endregion
@@ -1275,12 +1287,12 @@ namespace JWdb.DataModel
         #region Method: bool CheckLocalIntegrity()
         bool CheckLocalIntegrity()
         {
-            SynchProgressDlg.Integrity = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Integrity);
 
             // Issue a command just to make certain that Mercurial is installed
             if (!CheckMercurialPresent())
             {
-                SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(false);
+                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Integrity);
                 return false;
             }
 
@@ -1298,7 +1310,7 @@ namespace JWdb.DataModel
                         "The Repository is in use by another process. Please wait, then try again.\n\n" +
                         "Please contact us at http://ourword.TheSeedCompany.org for information " +
                         "on how to solve this problem, if restarting your computer does not help.");
-                    SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(false);
+                    SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Integrity);
                     return false;
                 }
             }
@@ -1329,12 +1341,12 @@ namespace JWdb.DataModel
                         "We're sorry, but there is apparently a bug in OurWord related to synchronization.\n\n" +
                         "Please contact us at http://ourword.TheSeedCompany.org for information " +
                         "on how to solve this problem.");
-                    SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(false);
+                    SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Integrity);
                     return false;
                 }
             }
 
-            SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(true);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Integrity);
             return true;
         }
         #endregion
@@ -1343,7 +1355,7 @@ namespace JWdb.DataModel
         {
             string[] vsExtensions = new string[] { ".owp", ".otrans", ".owt", ".oxes" };
 
-            SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.StoringChanges);
 
             // Get a list of the files that have changed
             var vsChangedFiles = GetChangedFiles();
@@ -1377,7 +1389,7 @@ namespace JWdb.DataModel
                                 "file, then try again.",
                             new string[] { s },
                             LocDB.MessageTypes.Error);
-                        SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(false);
+                        SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.StoringChanges);
                         return false;
                     }
                 }
@@ -1400,19 +1412,19 @@ namespace JWdb.DataModel
                     "Please try again. If the problem continues, please contact us at " +
                      "http://ourword.TheSeedCompany.org so that we can determine how to " +
                      "solve this problem.");
-                 SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(false);
+                 SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.StoringChanges);
                  return false;
             }
 
         Done:
-            SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(true);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.StoringChanges);
             return true;
         }
         #endregion
         #region Method: bool PullRemoteChanges(string sTheirPath)
         bool PullRemoteChanges(string sTheirPath)
         {
-            SynchProgressDlg.Pulling = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Pulling);
 
             if (!PullFrom(sTheirPath))
             {
@@ -1420,11 +1432,11 @@ namespace JWdb.DataModel
                     "OurWord is unable to retrieve changes from the Internet. \n\n" +
                     "The remote computer may not be working. Please try again sometime later.");
 
-                SynchProgressDlg.Pulling = SynchProgressDlg.GetFinishState(false);
+                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Pulling);
                 return false;
             }
 
-            SynchProgressDlg.Pulling = SynchProgressDlg.GetFinishState(true);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Pulling);
             return true;
         }
         #endregion
@@ -1436,14 +1448,14 @@ namespace JWdb.DataModel
             // 
             // TODO: Figure out if the Merge was unsuccessful and display an error message
         {
-            SynchProgressDlg.Merging = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Merging);
 
             using (new ShortTermEnvironmentalVariable("HGMERGE", PathToChorusMerge))
             {
                 ExecutionResult result = Execute(c_sMerge);
             }
 
-            SynchProgressDlg.Merging = SynchProgressDlg.GetFinishState(true);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Merging);
             return true;
         }
         #endregion
@@ -1452,7 +1464,7 @@ namespace JWdb.DataModel
             // TODO: Cam Commit return a false error? E.g., saying it didn't commit when
             // in actuality it was because there was nothing to commit?
         {
-            SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.StoringMerge);
 
             bool bOK = Commit("Merged by " + DB.UserName + " " +
                 DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo),
@@ -1464,22 +1476,22 @@ namespace JWdb.DataModel
                     "OurWord was unable to store the results of the merge. \n\n" +
                     "This is an odd thing to happen. If it continues, please contact us at http://ourword.TheSeedCompany.org so that we can work with you to solve the problem.");
 
-                SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetFinishState(false);
+                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.StoringMerge);
                 return false;
             }
 
-            SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetFinishState(true);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.StoringMerge);
             return true;
         }
         #endregion
         #region Method: bool PushToRemote(sTheirPath)
         bool PushToRemote(string sTheirPath)
         {
-            SynchProgressDlg.Pushing = SynchProgressDlg.GetStartState();
+            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Pushing);
 
             bool bResult = PushTo(sTheirPath);
 
-            SynchProgressDlg.Pushing = SynchProgressDlg.GetFinishState(bResult);
+            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Pushing);
 
             return bResult;
         }

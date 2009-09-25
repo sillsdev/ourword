@@ -11,7 +11,7 @@
       <Alt ID="sp" Value="Proyecto" Tip="Muestra el menú para trabajar con un proyecto (Nuevo, Abrir, etc.)."></Alt>
     </Item>
     <Item ID="m_menuNewProject">
-      <Alt ID="sp" Value="&amp;Nuevo..." Tip="Cree de cero un nuevo proyecto."></Alt>
+      <Alt ID="sp" Value="&amp;Nuevo" Tip="Cree de cero un nuevo proyecto."></Alt>
     </Item>
     <Item ID="m_menuOpenProject">
       <Alt ID="sp" Value="&amp;Abrir..." Tip="Abra un proyecto que ya existe."></Alt>

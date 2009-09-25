@@ -452,6 +452,8 @@ namespace JWdb.DataModel
 			get
 			{
                 var ci = ClusterList.FindClusterInfo(DisplayName);
+                if (null == ci)
+                    return null;
 
                 if (!Directory.Exists(ci.ClusterFolder))
                     Directory.CreateDirectory(ci.ClusterFolder);
@@ -465,6 +467,10 @@ namespace JWdb.DataModel
 		{
 			get
 			{
+                string sClusterFolder = ClusterFolder;
+                if (string.IsNullOrEmpty(sClusterFolder))
+                    return null;
+
 				// Make sure the folder exists
 				string sFolder = ClusterFolder + SettingsFolderName + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(sFolder))

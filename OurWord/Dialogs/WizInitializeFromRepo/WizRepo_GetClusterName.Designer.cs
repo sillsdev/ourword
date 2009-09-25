@@ -49,6 +49,7 @@
             this.m_textClusterName.Name = "m_textClusterName";
             this.m_textClusterName.Size = new System.Drawing.Size(241, 20);
             this.m_textClusterName.TabIndex = 4;
+            this.m_textClusterName.TextChanged += new System.EventHandler(this.cmdTextChanged);
             // 
             // m_labelClusterName
             // 

@@ -35,7 +35,16 @@ namespace JWdb.DataModel
 
         // Status ----------------------------------------------------------------------------
         public enum states { Pending, InProcess, Complete, Failure };
-
+        public enum steps
+        {
+            InternetAccess,
+            Integrity,
+            StoringChanges,
+            Pulling,
+            Merging,
+            StoringMerge,
+            Pushing
+        };
         #region Method: void SetPicture(PictureBox, states NewState)
         delegate void cbSetPicture(PictureBox pict, states state);
         void SetPicture(PictureBox pict, states NewState)
@@ -59,94 +68,61 @@ namespace JWdb.DataModel
         }
         #endregion
 
-
-        #region SAttr{s}: states InternetAccess
-        static public states InternetAccess
+        #region SMethod: void SetStepStart(steps step)
+        static public void SetStepStart(steps step)
         {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictInternetAccess, value);
-            }
+            SetStep(step, states.InProcess);
         }
         #endregion
-        #region SAttr{s}: states Integrity
-        static public states Integrity
+        #region SMethod: void SetStepFailed(steps step)
+        static public void SetStepFailed(steps step)
         {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictIntegrity, value);
-            }
-        }
-        #endregion
-        #region SAttr{s}: states StoringRecentChanges
-        static public states StoringRecentChanges
-        {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictStoringRecentChanges, value);
-            }
-        }
-        #endregion
-        #region SAttr{s}: states Pulling
-        static public states Pulling
-        {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictPulling, value);
-            }
-        }
-        #endregion
-        #region SAttr{s}: states Merging
-        static public states Merging
-        {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictMerging, value);
-            }
-        }
-        #endregion
-        #region SAttr{s}: states StoringMergeResults
-        static public states StoringMergeResults
-        {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictStoringMergeResults, value);
-            }
-        }
-        #endregion
-        #region SAttr{s}: states Pushing
-        static public states Pushing
-        {
-            set
-            {
-                if (null != s_Dlg)
-                    s_Dlg.SetPicture(s_Dlg.m_pictPush, value);
-            }
-        }
-        #endregion
-
-        #region SMethod: states GetStartState()
-        static public states GetStartState()
-        {
-            return states.InProcess;
-        }
-        #endregion
-        #region SMethod: states GetFinishState(bool bResult)
-        static public states GetFinishState(bool bResult)
-        {
-            // If true, then the caller was successful
-            if (bResult)
-                return states.Complete;
-
-            // Otherwise, a problem was encountered
+            SetStep(step, states.Failure);
             s_bHadProblem = true;
-            return states.Failure;
+        }
+        #endregion
+        #region SMethod: void SetStepSuccess(steps step)
+        static public void SetStepSuccess(steps step)
+        {
+            SetStep(step, states.Complete);
+        }
+        #endregion
+        #region SMethod: void SetStep(steps step, states state)
+        static void SetStep(steps step, states state)
+        {
+            if (null == s_Dlg)
+                return;
+
+            switch (step)
+            {
+                case steps.InternetAccess:
+                    s_Dlg.SetPicture(s_Dlg.m_pictInternetAccess, state);
+                    break;
+
+                case steps.Integrity:
+                    s_Dlg.SetPicture(s_Dlg.m_pictIntegrity, state);
+                    break;
+
+                case steps.StoringChanges:
+                    s_Dlg.SetPicture(s_Dlg.m_pictStoringRecentChanges, state);
+                    break;
+
+                case steps.Pulling:
+                    s_Dlg.SetPicture(s_Dlg.m_pictPulling, state);
+                    break;
+
+                case steps.Merging:
+                    s_Dlg.SetPicture(s_Dlg.m_pictMerging, state);
+                    break;
+
+                case steps.StoringMerge:
+                    s_Dlg.SetPicture(s_Dlg.m_pictStoringMergeResults, state);
+                    break;
+
+                case steps.Pushing:
+                    s_Dlg.SetPicture(s_Dlg.m_pictPush, state);
+                    break;
+            }
         }
         #endregion
 
@@ -192,10 +168,66 @@ namespace JWdb.DataModel
         }
         static public bool IsShowing = false;
         #endregion
-        #region SMethod: public void Start()
-        static public void Start()
+        #region SMethod: void SetMode(bool bClone)
+        static public void SetMode(bool bClone)
+        {
+            if (null == s_Dlg)
+                return;
+
+            // If cloning, then we hide a bunch of controls
+            bool bShow = (bClone) ? false : true;
+
+            // Show/hide the controls
+            s_Dlg.m_labelIntegrity.Visible = bShow;
+            s_Dlg.m_pictIntegrity.Visible = bShow;
+
+            s_Dlg.m_labelStoringRecentChanges.Visible = bShow;
+            s_Dlg.m_pictStoringRecentChanges.Visible = bShow;
+
+            s_Dlg.m_labelMerge.Visible = bShow;
+            s_Dlg.m_pictMerging.Visible = bShow;
+
+            s_Dlg.m_labelStoringMergeResults.Visible = bShow;
+            s_Dlg.m_pictStoringMergeResults.Visible = bShow;
+
+            s_Dlg.m_labelPush.Visible = bShow;
+            s_Dlg.m_pictPush.Visible = bShow;
+
+            // Pulling position depends on valuel
+            int yDiff = (s_Dlg.m_pictPush.Location.Y - s_Dlg.m_pictStoringMergeResults.Location.Y);
+            if (bClone)
+            {
+                s_Dlg.m_labelPulling.Location = new Point(
+                    s_Dlg.m_labelPulling.Location.X,
+                    s_Dlg.m_labelInternetAccess.Location.Y + yDiff);
+                s_Dlg.m_pictPulling.Location = new Point(
+                    s_Dlg.m_pictPulling.Location.X,
+                    s_Dlg.m_pictInternetAccess.Location.Y + yDiff);
+            }
+            else
+            {
+                s_Dlg.m_labelPulling.Location = new Point(
+                    s_Dlg.m_labelPulling.Location.X,
+                    s_Dlg.m_labelStoringRecentChanges.Location.Y + yDiff);
+                s_Dlg.m_pictPulling.Location = new Point(
+                    s_Dlg.m_pictPulling.Location.X,
+                    s_Dlg.m_pictStoringRecentChanges.Location.Y + yDiff);
+            }
+
+            // Overall label depends on operation
+            s_Dlg.m_labelHeader.Text = (bClone) ?
+                "Please wait while OurWord downloads your data from the Internet" :
+                "Please wait while OurWord synchronizes your data with the Internet"; 
+        }
+        #endregion
+
+        static bool s_bCloneMode = false;
+
+        #region SMethod: public void Start(bCloneMode)
+        static public void Start(bool bCloneMode)
         {
             s_bHadProblem = false;
+            s_bCloneMode = bCloneMode;
 
             Thread t = new Thread(new ThreadStart(SynchProgressDlg.StartDialog));
             t.IsBackground = true;
@@ -206,6 +238,7 @@ namespace JWdb.DataModel
         static private void StartDialog()
         {
             s_Dlg = new SynchProgressDlg();
+            SetMode(s_bCloneMode);
             Application.Run(s_Dlg);
         }
         #endregion

@@ -155,7 +155,6 @@ namespace JWdb.DataModel
             JW_Registry.SetValue(c_sSubKeyAccess + "\\" + Name, sProjectName, bCanAccess);
         }
         #endregion
-
     }
 
     static public class ClusterList
@@ -293,6 +292,7 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region SAttr{g}: string UserCanAccessAllProjectsFriendly
         static public string UserCanAccessAllProjectsFriendly
         {
             get
@@ -302,7 +302,7 @@ namespace JWdb.DataModel
                 return Loc.GetString("CanAccessLimitedProjects", "Limited");
             }
         }
+        #endregion
     }
-
 
 }

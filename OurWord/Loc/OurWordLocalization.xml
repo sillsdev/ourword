@@ -13,7 +13,7 @@
       <Tip>Shows the menu for working with a project (New, Open, etc.).</Tip>
     </Item>
     <Item ID="m_menuNewProject" Tip="true">
-      <English>&amp;New...</English>
+      <English>&amp;New</English>
       <Tip>Create a brand new project.</Tip>
     </Item>
     <Item ID="m_menuOpenProject" Tip="true">
