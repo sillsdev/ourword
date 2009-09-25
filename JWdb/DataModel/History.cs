@@ -25,6 +25,7 @@ using JWdb;
 
 namespace JWdb.DataModel
 {
+    #region CLASS: DEventMessage
     public class DEventMessage : DMessage
     {
         // Content Attrs ---------------------------------------------------------------------
@@ -128,35 +129,15 @@ namespace JWdb.DataModel
 
         // I/O -------------------------------------------------------------------------------
         #region Constants
-        public const string c_sTagEventMessage = "Event";
-        #region OAttr{g}: string Tag
-        public override string Tag
-        {
-            get
-            {
-                return c_sTagEventMessage;
-            }
-        }
-        #endregion
-
         const string c_sAttrEventDate = "when";
         const string c_sAttrStage = "stage";
         #endregion
-        #region SMethod: new bool IsXmlNode(XmlNode node)
-        static new public bool IsXmlNode(XmlNode node)
-        {
-            if (XmlDoc.IsNode(node, c_sTagEventMessage))
-                return true;
-            if (XmlDoc.IsNode(node, "DEvent"))
-                return true;
-            return false;
-        }
-        #endregion
-        #region OMethod: void ReadFromOxes(XmlNode node)
-        public override void ReadFromOxes(XmlNode node)
+        #region OMethod: bool ReadFromOxes(XmlNode node)
+        public override bool ReadFromOxes(XmlNode node)
         {
             // Read all of the base data
-            base.ReadFromOxes(node);
+            if (!base.ReadFromOxes(node))
+                return false;
 
             // Add the DEventMessage data
             // Stage
@@ -166,6 +147,8 @@ namespace JWdb.DataModel
             EventDate = XmlDoc.GetAttrValue(node, 
                 new string[] { c_sAttrEventDate, "Date" },
                 DateTime.Now);
+
+            return true;
         }
         #endregion
         #region OMethod: XmlNode Save(oxes, nodeAnnotation)
@@ -182,6 +165,7 @@ namespace JWdb.DataModel
         }
         #endregion
     }
+    #endregion
 
     public class DHistory : JObject
     {

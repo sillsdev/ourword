@@ -296,15 +296,6 @@ namespace JWdb.DataModel
         // Oxes I/O --------------------------------------------------------------------------
         #region Constants
         public const string c_sTagMessage = "Message";
-        #region VAttr{g}: string Tag
-        public virtual string Tag
-        {
-            get
-            {
-                return c_sTagMessage;
-            }
-        }
-        #endregion
 
         const string c_sAttrAuthor = "author";
         const string c_sAttrCreated = "created";
@@ -335,22 +326,14 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        #region SMethod: bool IsXmlNode(XmlNode node)
-        static public bool IsXmlNode(XmlNode node)
-        {
-            if (XmlDoc.IsNode(node, c_sTagMessage))
-                return true;
-            if (XmlDoc.IsNode(node, "Discussion"))
-                return true;
-            return false;
-        }
-        #endregion
         #region VirtMethod: void ReadFromOxes(XmlNode node)
-        public virtual void ReadFromOxes(XmlNode node)
-            // We assume that "node.Name" is a DMessage or a subclass. We can't test here, 
-            // becaus esubclasses may have a different name different, and we want subclass
-            // methods to be able to invoke this method.
+        public virtual bool ReadFromOxes(XmlNode node)
         {
+            if (!XmlDoc.IsNode(node, c_sTagMessage) && 
+                !XmlDoc.IsNode(node, "Discussion") &&
+                !XmlDoc.IsNode(node, "DEvent"))
+                return false;
+
             // Attrs
             Author = XmlDoc.GetAttrValue(node, c_sAttrAuthor, "");
             UtcCreated = XmlDoc.GetAttrValue(node, c_sAttrCreated, DateTime.Now);
@@ -358,7 +341,7 @@ namespace JWdb.DataModel
 
             // Import old-style paragraph contents; if successful, we're done.
             if (ImportOldToolboxXmlParagraphContents(node))
-                return;
+                return true;
 
             // Otherwise, normally-stored paragraph contents
             ReadOxes(node);
@@ -367,12 +350,14 @@ namespace JWdb.DataModel
             // we don't actually have an attr in the xml. So even though the call
             // to "this" constructor set it originally, we have to set it again here.
             StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
+
+            return true;
         }
         #endregion
         #region VirtMethod: XmlNode Save(oxes, nodeAnnotation)
         public virtual XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
         {
-            var nodeMessage = oxes.AddNode(nodeAnnotation, Tag);
+            var nodeMessage = oxes.AddNode(nodeAnnotation, c_sTagMessage);
 
             // Attrs
             if (!string.IsNullOrEmpty(Author))
@@ -380,7 +365,7 @@ namespace JWdb.DataModel
             oxes.AddAttr(nodeMessage, c_sAttrCreated, UtcCreated);
 
             // An empty Status is interpreted as "closed", so we want to not
-            // att the status attr unless we have content.
+            // add the status attr unless we have content.
             if (!string.IsNullOrEmpty(Status) && Status != Closed)
                 oxes.AddAttr(nodeMessage, c_sAttrStatus, Status);
 
@@ -1117,16 +1102,7 @@ namespace JWdb.DataModel
                 // Messages
                 foreach (XmlNode child in nodeParent.ChildNodes)
                 {
-                    DMessage message = null;
-
-                    // Vanilla DMessage
-                    if (DMessage.IsXmlNode(child))
-                        message = new DMessage(child);
-
-                    // DEventMessage
-                    if (DEventMessage.IsXmlNode(child))
-                        message = new DEventMessage(child);
-
+                    var message = new DMessage(child);
                     if (null != message)
                         note.Messages.Append(message);
                 }

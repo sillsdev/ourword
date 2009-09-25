@@ -81,9 +81,9 @@ namespace OurWordTests.DataModel
                 "</DEvent>"
             };
             var vsOxesExpected = new string[] {
-                "<Event created=\"2009-06-03 11:45:29Z\" when=\"2006-05-08 00:00:00Z\" stage=\"Revisi\">",
+                "<Message created=\"2009-06-03 11:45:29Z\" when=\"2006-05-08 00:00:00Z\" stage=\"Revisi\">",
                     "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.",
-                "</Event>"
+                "</Message>"
             };
 
             // Create an Oxes object for Expected
@@ -108,14 +108,14 @@ namespace OurWordTests.DataModel
         {
             // Cannonical form of a Message object
             string[] vsOxesExpected = new string[] { 
-                "<Event author=\"John\" created=\"2008-11-23 00:00:00Z\" when=\"2008-11-21 00:00:00Z\" stage=\"Revision\">" ,
+                "<Message author=\"John\" created=\"2008-11-23 00:00:00Z\" when=\"2008-11-21 00:00:00Z\" stage=\"Revision\">" ,
                     "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.",
-                "</Event>"
+                "</Message>"
             };
 
             // Create the XmlDoc
             var xmlOxesExpected = new XmlDoc(vsOxesExpected);
-            var nodeMessage = XmlDoc.FindNode(xmlOxesExpected, DEventMessage.c_sTagEventMessage);
+            var nodeMessage = XmlDoc.FindNode(xmlOxesExpected, DEventMessage.c_sTagMessage);
             //xmlOxesExpected.WriteToConsole("Expected");
 
             // Create the Message object from the Xml node
@@ -162,7 +162,7 @@ namespace OurWordTests.DataModel
             string s = XmlDoc.OneLiner(node);
 
             Assert.AreEqual(
-                "<Event author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2009-05-25 00:00:00Z\" stage=\"Draft\">Drafted by John</Event>", 
+                "<Message author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2009-05-25 00:00:00Z\" stage=\"Draft\">Drafted by John</Message>", 
                 s);
 
             // Create a new event and  populate it from the xml
@@ -245,10 +245,10 @@ namespace OurWordTests.DataModel
 
             Assert.AreEqual("History", f.Mkr);
             Assert.AreEqual(
-                "<History>" + 
-                "<Event author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2005-03-08 00:00:00Z\" stage=\"Draft\">Drafted by John</Event>" +
-                "<Event author=\"John\" created=\"2000-01-02 00:00:00Z\" when=\"2006-08-23 00:00:00Z\" stage=\"Team Check\">Checked by John, Sandra</Event>" +
-                "<Event author=\"John\" created=\"2000-01-03 00:00:00Z\" when=\"2007-11-23 00:00:00Z\" stage=\"Trial\">Taken to Sosol by John</Event>" +
+                "<History>" +
+                "<Message author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2005-03-08 00:00:00Z\" stage=\"Draft\">Drafted by John</Message>" +
+                "<Message author=\"John\" created=\"2000-01-02 00:00:00Z\" when=\"2006-08-23 00:00:00Z\" stage=\"Team Check\">Checked by John, Sandra</Message>" +
+                "<Message author=\"John\" created=\"2000-01-03 00:00:00Z\" when=\"2007-11-23 00:00:00Z\" stage=\"Trial\">Taken to Sosol by John</Message>" +
                 "</History>",
                 f.Data);
 
@@ -301,10 +301,10 @@ namespace OurWordTests.DataModel
             var f = new SfField(DHistory.c_sTag, XmlDoc.OneLiner(node));
             Assert.AreEqual(
                 "<History>" +
-                "<Event author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2005-03-08 00:00:00Z\" stage=\"Konsul\">Drafted by John</Event>" +
-                "<Event author=\"John\" created=\"2000-01-02 00:00:00Z\" when=\"2006-08-23 00:00:00Z\" stage=\"Team Check\">Checked by Sandra and John</Event>" +
-                "<Event author=\"John\" created=\"2000-01-03 00:00:00Z\" when=\"2007-11-23 00:00:00Z\" stage=\"Trial\">Tested by John</Event>" +
-                "<Event author=\"John\" created=\"2000-01-04 00:00:00Z\" when=\"2008-01-01 00:00:00Z\" stage=\"Consultant\">Consultant checked by Marge</Event>" +
+                "<Message author=\"John\" created=\"2000-01-01 00:00:00Z\" when=\"2005-03-08 00:00:00Z\" stage=\"Konsul\">Drafted by John</Message>" +
+                "<Message author=\"John\" created=\"2000-01-02 00:00:00Z\" when=\"2006-08-23 00:00:00Z\" stage=\"Team Check\">Checked by Sandra and John</Message>" +
+                "<Message author=\"John\" created=\"2000-01-03 00:00:00Z\" when=\"2007-11-23 00:00:00Z\" stage=\"Trial\">Tested by John</Message>" +
+                "<Message author=\"John\" created=\"2000-01-04 00:00:00Z\" when=\"2008-01-01 00:00:00Z\" stage=\"Consultant\">Consultant checked by Marge</Message>" +
                 "</History>",
                 f.Data);
         }
