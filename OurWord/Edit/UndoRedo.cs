@@ -2804,11 +2804,12 @@ namespace OurWord.Edit
             : base(window, "Insert Event")
         {
             // Create the Event, and thus remember it here, so that Undo/Redo will work.
-            DHistory History = DB.TargetSection.History;
-            string sNewStage = History.MostRecentStage;
+            var History = DB.TargetSection.History;
+            string sNewStage = (History.HasMessages) ?
+                (History.LastMessage as DEventMessage).Stage : "";
             if (string.IsNullOrEmpty(sNewStage))
                 sNewStage = DB.TeamSettings.TranslationStages[0].Name;
-            m_Event = History.CreateEvent(DateTime.Now, sNewStage, "");
+            m_Event = History.AddMessage(DateTime.UtcNow, sNewStage, "") as DEventMessage;
         }
         #endregion
 
@@ -2816,7 +2817,7 @@ namespace OurWord.Edit
         Dictionary<DEventMessage, bool> PushCollapseStates()
         {
             var states = new Dictionary<DEventMessage, bool>();
-            foreach (DEventMessage e in DB.TargetSection.History.Events)
+            foreach (DEventMessage e in DB.TargetSection.History.Messages)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2828,7 +2829,7 @@ namespace OurWord.Edit
         #region Method: void RestoreStates(Dictionary<DEventMessage, bool> states)
         void RestoreStates(Dictionary<DEventMessage, bool> states)
         {
-            foreach (DEventMessage e in DB.TargetSection.History.Events)
+            foreach (DEventMessage e in DB.TargetSection.History.Messages)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2852,7 +2853,7 @@ namespace OurWord.Edit
             var states = PushCollapseStates();
 
             // Add the new Event
-            DB.TargetSection.History.AddEvent(Event);
+            DB.TargetSection.History.AddMessage(Event);
 
             // Recalculate the entire display
             G.App.ResetWindowContents();
@@ -2882,7 +2883,7 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             // Remove the event from its owner
-            DB.TargetSection.History.Events.Remove(Event);
+            DB.TargetSection.History.RemoveMessage(Event);
 
             // Remember the current expand/collapsed states
             var states = PushCollapseStates();
@@ -2930,7 +2931,7 @@ namespace OurWord.Edit
         Dictionary<DEventMessage, bool> PushCollapseStates()
         {
             var states = new Dictionary<DEventMessage, bool>();
-            foreach (DEventMessage e in DB.TargetSection.History.Events)
+            foreach (DEventMessage e in DB.TargetSection.History.Messages)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2942,7 +2943,7 @@ namespace OurWord.Edit
         #region Method: void RestoreStates(Dictionary<DEventMessage, bool> states)
         void RestoreStates(Dictionary<DEventMessage, bool> states)
         {
-            foreach (DEventMessage e in DB.TargetSection.History.Events)
+            foreach (DEventMessage e in DB.TargetSection.History.Messages)
             {
                 var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
                 if (null != container)
@@ -2959,7 +2960,7 @@ namespace OurWord.Edit
         protected override bool PerformAction()
         {
             // Remove the event from its owner
-            DB.TargetSection.History.Events.Remove(Event);
+            DB.TargetSection.History.RemoveMessage(Event);
 
             // Regenerate the windows
             var states = PushCollapseStates();
@@ -2975,7 +2976,7 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             // Re-insert the event
-            DB.TargetSection.History.Events.Append(Event);
+            DB.TargetSection.History.AddMessage(Event);
 
             // Recalculate the display
             var states = PushCollapseStates();

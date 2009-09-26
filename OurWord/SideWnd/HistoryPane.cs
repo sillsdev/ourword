@@ -310,10 +310,10 @@ namespace OurWord.SideWnd
                 return;
 
             // Retrieve the history we'll be showing
-            DHistory history = DB.TargetSection.History;
+            var history = DB.TargetSection.History;
 
             // Place them in the window
-            foreach (DEventMessage e in history.Events)
+            foreach (DEventMessage e in history.Messages)
                 Contents.Append(BuildView(e));
 
             // Tell the superclass to finish loading, which involves laying out the window 
@@ -361,6 +361,7 @@ namespace OurWord.SideWnd
             eEventContainer.Append(eDescrContainer);
 
             // Place the description into its main area
+            e.Cleanup();
             OWPara pDescription = new OWPara(
                 DB.TargetTranslation.WritingSystemConsultant,
                 DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleAnnotationMessage),

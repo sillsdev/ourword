@@ -1,3 +1,4 @@
+#region ***** DParagraph.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DParagraph.cs
@@ -20,6 +21,7 @@ using System.Xml;
 
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 namespace JWdb.DataModel
@@ -1496,24 +1498,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        /*
-        public int ID
-        {
-            get
-            {
-                EnsureHasID();
-                return m_nID;
-            }
-        }
-        int m_nID = -1;
-        public void EnsureHasID()
-        {
-            if (m_nID == -1)
-                m_nID = Book.GetID();
-            Debug.Assert(m_nID > -1);
-        }
-        */
-
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagParagraph = "p";
         const string c_sAttrStyle = "class";
@@ -1565,11 +1549,11 @@ namespace JWdb.DataModel
                     case "TranslatorNote":
                         {
                             var note = TranslatorNote.Create(child);
-                            if (null != note)
-                            {
-                                var dbt = GetOrAddLastDText();
+                            if (null == note)
+                                break;
+
+                            var dbt = GetOrAddLastDText();
                                 dbt.TranslatorNotes.Append(note);
-                            }
                         }
                         break;
 

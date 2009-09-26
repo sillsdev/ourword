@@ -292,6 +292,18 @@ namespace JWTools
         }
         #endregion
 
+        #region Method: bool HasAttr(XmlNode node, string sAttrName)
+        static public bool HasAttr(XmlNode node, string sAttrName)
+        {
+            foreach (XmlAttribute attr in node.Attributes)
+            {
+                if (attr.Name.ToUpper() == sAttrName.ToUpper())
+                    return true;
+            }
+            return false;
+        }
+        #endregion
+
         // Misc ops
         #region SMethod: bool IsNode(XmlNode node, string sName)
         static public bool IsNode(XmlNode node, string sName)
@@ -330,6 +342,7 @@ namespace JWTools
             return text;
         }
         #endregion
+
         #region SMethod: XmlNode FindNode(XmlNode nodeParent, string sChildName)
         static public XmlNode FindNode(XmlNode nodeParent, string sChildName)
         {
@@ -342,6 +355,20 @@ namespace JWTools
             return null;
         }
         #endregion
+        #region SMethod: XmlNode FindNode(nodeParent, vsChildName)
+        static public XmlNode FindNode(XmlNode nodeParent, string[] vsChildName)
+        {
+            foreach(string sChildName in vsChildName)
+            {
+                var node = FindNode(nodeParent, sChildName);
+                if (null != node)
+                    return node;
+
+            }
+            return null;
+        }
+        #endregion
+
         #region Method: string OneLiner()
         public string OneLiner()
         {

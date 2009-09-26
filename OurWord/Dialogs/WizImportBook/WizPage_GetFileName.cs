@@ -372,10 +372,12 @@ namespace OurWord.Dialogs.WizImportBook
                 return ExamineOxesFile(sPathName);
 
             // Is this a standard format file?
-            if (!IsStandardFormatFile(sPathName))
+            if (IsStandardFormatFile(sPathName))
                 return ExamineStandardFormatFile(sPathName);
 
             // None of the above
+            SetMessage(Color.Red, FontStyle.Bold, LocDB.GetValue(this, "strUnknownFileType",
+               "OurWord does not handle this type of file. Please try a different file.", null));
             return false;
         }
         #endregion

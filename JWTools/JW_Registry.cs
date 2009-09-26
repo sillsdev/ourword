@@ -381,7 +381,18 @@ namespace JWTools
 				throw new InvalidRootKeyException();
 		}
 		#endregion
-	}
+        #region SAttr{g}: bool HasValidRootKey
+        static public bool HasValidRootKey
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(s_sRootKey))
+                    return false;
+                return true;
+            }
+        }
+        #endregion
+    }
 
 	// Testing -------------------------------------------------------------------------------
 	#region OBSOLETE - NUnit Testing - Need to replace!

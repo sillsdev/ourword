@@ -174,15 +174,15 @@ namespace JWdb.DataModel
         }
         private JOwnSeq<DParagraph> j_osNotes = null;
         #endregion
-        #region JAttr{g/s}: DHistory History
-        public DHistory History
+        #region JAttr{g/s}: TranslatorNote History
+        public TranslatorNote History
         {
             get
             {
                 // An unload calls Clear; but we want to always make sure we have
                 // an object here for any future load.
                 if (null == j_ownHistory.Value)
-                    j_ownHistory.Value = new DHistory();
+                    j_ownHistory.Value = new TranslatorNote();
 
                 return j_ownHistory.Value;
             }
@@ -191,7 +191,7 @@ namespace JWdb.DataModel
                 j_ownHistory.Value = value;
             }
         }
-        private JOwn<DHistory> j_ownHistory = null;
+        private JOwn<TranslatorNote> j_ownHistory = null;
         #endregion
 
         // Temporary (run-time) attrs --------------------------------------------------------
@@ -502,8 +502,8 @@ namespace JWdb.DataModel
             j_osNotes = new JOwnSeq<DParagraph>("Notes", this, false, false);
 
             // Book History
-            j_ownHistory = new JOwn<DHistory>("History", this);
-            History = new DHistory();
+            j_ownHistory = new JOwn<TranslatorNote>("History", this);
+            History = new TranslatorNote(TranslatorNote.NoteClass.History);
         }
         #endregion
         #region Constructor(sBookAbbrev)
@@ -736,6 +736,12 @@ namespace JWdb.DataModel
         #region Method: int GetLastVerseInSection(DSection section)
         int GetLastVerseInSection(DSection section)
         {
+            return section.ReferenceSpan.End.Verse;
+
+            // I originally was trying the mirror of GetFirstVerse, but it doesn't
+            // work with verse bridges, so this is more accurage for the tail-end
+            // of a section.
+            /*
             int nVerse = 0;
 
             foreach (DParagraph p in section.Paragraphs)
@@ -748,6 +754,7 @@ namespace JWdb.DataModel
             }
 
             return nVerse;
+            */
         }
         #endregion
 
@@ -1057,22 +1064,21 @@ namespace JWdb.DataModel
                 // new-style; as once we import it, we write it out as new.
                 if (Map.IsBookHistoryMarker(field.Mkr))
                 {
-                    var Event = Book.History.CreateEvent(
+                    Book.History.AddMessage(
                         new DateTime(2009,1,1), 
                         Loc.GetString("OldHistory", "Old"),
                         field.Data);
-                    Book.History.AddEvent(Event);
                     return true;
                 }
 
                 // New style: interpret it
-                return Book.History.Read(field);
+                return Book.History.ReadOldHistory(field);
             }
             #endregion
             #region Method: void History_out()
             void History_out()
             {
-                if (Book.History.HasHistory)
+                if (Book.History.HasMessages)
                 {
                     Book.History.AddToSfmDB(DBS);
                 }
@@ -1422,14 +1428,27 @@ namespace JWdb.DataModel
             // Read in the paragraphs
             progress.Start("Reading", nodeBook.ChildNodes.Count);
             DSection section = null;
-            foreach (XmlNode nodeParagraph in nodeBook.ChildNodes)
+            foreach (XmlNode child in nodeBook.ChildNodes)
             {
                 progress.Step();
 
+                // The first child node, if a History note, would be the History for the entire
+                // book. (There will be no "section" defined yet. Otherwise, any History we
+                // encounter goes with the most recently defined section.
+                var history = TranslatorNote.Create(child);
+                if (null != history && history.IsHistoryNote)
+                {
+                    if (null == section)
+                        History = history;
+                    else
+                        section.History = history;
+                    continue;
+                }
+
                 // Create the paragraph or picture
-                DParagraph paragraph = DPicture.CreatePicture(nodeParagraph);
+                DParagraph paragraph = DPicture.CreatePicture(child);
                 if (null == paragraph)
-                    paragraph = DParagraph.CreateParagraph(nodeParagraph);
+                    paragraph = DParagraph.CreateParagraph(child);
 
                 // A section for it to go into
                 if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
@@ -1517,7 +1536,7 @@ namespace JWdb.DataModel
 
                     // Prepare to try the import again. 
                     Clear();
-                    Debug.Assert(History.Events.Count == 0);
+                    Debug.Assert(!History.HasMessages);
                 }
                 catch (Exception e)
                 {
@@ -2067,6 +2086,9 @@ namespace JWdb.DataModel
                     oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
                 if (!string.IsNullOrEmpty(Comment))
                     oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
+
+                // Book History, saved prior to the sections
+                History.Save(oxes, nodeBook);
 
                 // Add the Sections
                 foreach (DSection section in Sections)

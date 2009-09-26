@@ -51,7 +51,7 @@ namespace JWdb.DataModel
         }
         private string m_sAuthor = "";
         #endregion
-        #region BAttr{g/s}: DateTime Created
+        #region BAttr{g/s}: DateTime UtcCreated
         public DateTime UtcCreated
         {
             get
@@ -426,12 +426,171 @@ namespace JWdb.DataModel
     }
     #endregion
 
+    #region CLASS: DEventMessage
+    public class DEventMessage : DMessage
+    {
+        // Content Attrs ---------------------------------------------------------------------
+        #region BAttr{g/s}: DateTime EventDate - Date this event took place
+        public DateTime EventDate
+        {
+            get
+            {
+                if (m_dtEventDate.CompareTo(DefaultDate) == 0)
+                    m_dtEventDate = UtcCreated;
+
+                return m_dtEventDate;
+            }
+            set
+            {
+                SetValue(ref m_dtEventDate, value);
+            }
+        }
+        private DateTime m_dtEventDate;
+        #endregion
+        #region BAttr{g/s}: string Stage - translation stage (draft, revision, etc)
+        public string Stage
+        {
+            get
+            {
+                return m_sStage;
+            }
+            set
+            {
+                SetValue(ref m_sStage, value);
+            }
+        }
+        private string m_sStage = "";
+        #endregion
+        #region Method void DeclareAttrs()
+        protected override void DeclareAttrs()
+        {
+            base.DeclareAttrs();
+            DefineAttr("Date", ref m_dtEventDate);
+            DefineAttr("Stage", ref m_sStage);
+        }
+        #endregion
+
+        // VAttrs ----------------------------------------------------------------------------
+        #region VAttr{g}: DateTime DefaultDate - default for the Date attr
+        public static DateTime DefaultDate
+        {
+            get
+            {
+                return new DateTime(2009, 1, 1);
+            }
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor()
+        public DEventMessage()
+            : base()
+        {
+        }
+        #endregion
+        #region Constructor(XmlNode)
+        public DEventMessage(XmlNode node)
+            : this()
+        {
+            ReadFromOxes(node);
+        }
+        #endregion
+        #region Constructor(utcDate, sStage, sDescription)
+        public DEventMessage(DateTime utcDate, string sStage, string sDescription)
+            : this()
+        {
+            EventDate = utcDate;
+            UtcCreated = EventDate;
+            Stage = sStage;
+            SimpleText = sDescription;
+        }
+        #endregion
+        #region OMethod: bool ContentEquals(DEventMessage)
+        public override bool ContentEquals(JObject obj)
+        {
+            var e = obj as DEventMessage;
+            if (null == e)
+                return false;
+
+            if (e.EventDate != EventDate)
+                return false;
+            if (e.Stage != Stage)
+                return false;
+
+            return base.ContentEquals(obj);
+            ;
+        }
+        #endregion
+        #region OMethod: DMessage Clone() - returns a DEventMessage
+        public override DMessage Clone()
+        {
+            var em = new DEventMessage();
+            em.Author = Author;
+            em.UtcCreated = UtcCreated;
+            em.Status = Status;
+            em.CopyFrom(this, false);
+
+            em.EventDate = EventDate;
+            em.Stage = Stage;
+
+            return em;
+        }
+        #endregion
+
+        // I/O -------------------------------------------------------------------------------
+        #region Constants
+        const string c_sAttrEventDate = "when";
+        const string c_sAttrStage = "stage";
+        #endregion
+        #region OMethod: bool ReadFromOxes(XmlNode node)
+        public override bool ReadFromOxes(XmlNode node)
+        {
+            // Read all of the base data
+            if (!base.ReadFromOxes(node))
+                return false;
+
+            // Add the DEventMessage data
+            // Stage
+            Stage = XmlDoc.GetAttrValue(node, c_sAttrStage, "");
+
+            // EventDate, including old-style which was "Date"
+            EventDate = XmlDoc.GetAttrValue(node,
+                new string[] { c_sAttrEventDate, "Date" },
+                DateTime.Now);
+
+            return true;
+        }
+        #endregion
+        #region OMethod: XmlNode Save(oxes, nodeAnnotation)
+        public override XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
+        {
+            // Save the superclass values
+            XmlNode nodeEventMessage = base.Save(oxes, nodeAnnotation);
+
+            // Add in our additional attributes
+            oxes.AddAttr(nodeEventMessage, c_sAttrEventDate, EventDate);
+            oxes.AddAttr(nodeEventMessage, c_sAttrStage, Stage);
+
+            return nodeEventMessage;
+        }
+        #endregion
+        #region SMethod: bool IsEventMessageNode(XmlNode node)
+        static public bool IsEventMessageNode(XmlNode node)
+        {
+            if (XmlDoc.HasAttr(node, c_sAttrEventDate))
+                return true;
+            return false;
+        }
+        #endregion
+    }
+    #endregion
+
     #region Class: TranslatorNote
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
         #region BAttr{g/s}: NoteClass Class
-        public NoteClass Class
+        public virtual NoteClass Class
         {
             get
             {
@@ -467,6 +626,8 @@ namespace JWdb.DataModel
             DefineAttr("SelectedText", ref m_sSelectedText);
         }
         #endregion
+
+        // Messages --------------------------------------------------------------------------
         #region JAttr{g}: JOwnSeq<DMessage> Messages
         public JOwnSeq<DMessage> Messages
         {
@@ -478,9 +639,64 @@ namespace JWdb.DataModel
         }
         JOwnSeq<DMessage> m_osMessages;
         #endregion
+        #region Method: DMessage AddMessage(utcDate, sStage, sDescription)
+        public DMessage AddMessage(DateTime utcDate, string sStage, string sDescription)
+        {
+            DMessage m = null;
+
+            // History notes take a subclass of DMessage
+            if (IsHistoryNote)
+                m = new DEventMessage(utcDate, sStage, sDescription);
+            else
+            {
+                m = new DMessage();
+                m.UtcCreated = utcDate;
+                m.SimpleText = sDescription;
+            }
+
+            return AddMessage(m);
+        }
+        #endregion
+        #region Method: DMessage AddMessage(DMessage)
+        public DMessage AddMessage(DMessage m)
+        {
+            // Enforce that History notes have their own special message type
+            if (IsHistoryNote && null == m as DEventMessage)
+            {
+                Debug.Assert(false, "Attempt to add a DMessage to a History note");
+                return null;
+            }
+
+            // If already there, just update it's text; but don't add a duplicate
+            int i = Messages.Find(m.SortKey);
+            if (i != -1)
+            {
+                Messages[i].CopyFrom(m, false);
+                return Messages[i];
+            }
+
+            Messages.Append(m);
+            return m;
+        }
+        #endregion
+        #region Method: void RemoveMessage(DMessage m)
+        public void RemoveMessage(DMessage m)
+        {
+            Messages.Remove(m);
+        }
+        #endregion
+        #region VAttr{g}: bool HasMessages
+        public bool HasMessages
+        {
+            get
+            {
+                return (Messages.Count > 0);
+            }
+        }
+        #endregion
 
         // Classes ---------------------------------------------------------------------------
-        public enum NoteClass { General, Exegetical, Consultant, HintForDrafting };
+        public enum NoteClass { General, Exegetical, Consultant, HintForDrafting, History };
         #region VAttr{g}: string IconResourceForClass
         public string IconResourceForClass
         {
@@ -553,6 +769,15 @@ namespace JWdb.DataModel
             get
             {
                 return (Class == NoteClass.HintForDrafting);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsHistoryNote
+        public bool IsHistoryNote
+        {
+            get
+            {
+                return (Class == NoteClass.History);
             }
         }
         #endregion
@@ -756,6 +981,14 @@ namespace JWdb.DataModel
             SelectedText = _sSelectedText;
         }
         #endregion
+        #region Constructor(NoteClass)
+        public TranslatorNote(NoteClass cl)
+            : this()
+        {
+            Class = cl;
+        }
+        #endregion
+
         #region Method: bool ContentEquals(JObject)
         public override bool ContentEquals(JObject obj)
         {
@@ -803,16 +1036,18 @@ namespace JWdb.DataModel
         }
         #endregion
         #region Method: TranslatorNote Clone()
-        public TranslatorNote Clone()
+        protected void ClonePopulate(TranslatorNote noteNew)
         {
-            TranslatorNote note = new TranslatorNote();
-
-            note.Class = Class;
-            note.SelectedText = SelectedText;
+            noteNew.Class = Class;
+            noteNew.SelectedText = SelectedText;
 
             foreach (DMessage m in Messages)
-                note.Messages.Append(m.Clone());
-
+                noteNew.Messages.Append(m.Clone());
+        }
+        public virtual TranslatorNote Clone()
+        {
+            var note = new TranslatorNote();
+            ClonePopulate(note);
             return note;
         }
         #endregion
@@ -915,7 +1150,7 @@ namespace JWdb.DataModel
                     tn.Class = NoteClass.Exegetical;
                     break;
                 default:
-                    tn.Class = NoteClass.General; ;
+                    tn.Class = NoteClass.General;
                     break;
             }
 
@@ -995,6 +1230,8 @@ namespace JWdb.DataModel
                 sMkr = "ntcn";
             else if (Class == NoteClass.Consultant)
                 sMkr = "ntBT";
+            else if (Class == NoteClass.History)
+                sMkr = "History";
             if (!string.IsNullOrEmpty(SfmMarker))
                 sMkr = SfmMarker;
 
@@ -1005,6 +1242,10 @@ namespace JWdb.DataModel
         #region Method: void AddToSfmDB(ScriptureDB DB)
         public void AddToSfmDB(ScriptureDB DB)
         {
+            // If no messages, don't write anything out
+            if (!HasMessages)
+                return;
+
             // Attempt to write to the old style. Fails if the note is too complicated.
             SfField f = ToSfField();
 
@@ -1013,7 +1254,8 @@ namespace JWdb.DataModel
             {
                 var oxes = new XmlDoc();
                 var node = Save(oxes, oxes);
-                f = new SfField(DSFMapping.c_sMkrTranslatorNote, XmlDoc.OneLiner(node));
+                if (null != node)
+                    f = new SfField(DSFMapping.c_sMkrTranslatorNote, XmlDoc.OneLiner(node));
             }
 
             DB.Append(f);
@@ -1051,6 +1293,44 @@ namespace JWdb.DataModel
             return sIn;
         }
         #endregion
+
+        // Old History I/O -------------------------------------------------------------------
+        // After upgrading Manado and Timor, can probably remove this
+        public const string c_sTagOldHistory = "History";
+        #region Method: bool ReadOldHistory(SfField)
+        public bool ReadOldHistory(SfField f)
+            // Returns True if the f was a History field, false otherwise.
+            // If the f.Data was empty, then we don't read an empty history. We just do nothing.
+        {
+            if (f.Mkr != c_sTagOldHistory)
+                return false;
+
+            if (string.IsNullOrEmpty(f.Data))
+                return true;
+
+            // The old model just had a series of "DEvents"; we need to encapsulate these
+            // inside of an annotation
+            if (f.Data.ToLower().StartsWith("<devent"))
+            {
+                f.Data = "<" + c_sTagTranslatorNote + " class=\"History\">" +
+                    f.Data +
+                    "</" + c_sTagTranslatorNote + ">";
+            }
+
+            var xml = new XmlDoc(new string[] { f.Data });
+            var nodeHistory = XmlDoc.FindNode(xml, 
+                new string[] { c_sTagOldHistory, c_sTagTranslatorNote });
+
+            foreach (XmlNode child in nodeHistory.ChildNodes)
+            {
+                var em = new DEventMessage(child);
+                AddMessage(em);
+            }
+
+            return true;
+        }
+        #endregion
+
 
         // Oxes I/O --------------------------------------------------------------------------
         #region Constants
@@ -1102,7 +1382,14 @@ namespace JWdb.DataModel
                 // Messages
                 foreach (XmlNode child in nodeParent.ChildNodes)
                 {
-                    var message = new DMessage(child);
+                    // The type of messages depends on what attributes it has
+                    DMessage message = null;
+                    if (DEventMessage.IsEventMessageNode(child))
+                        message = new DEventMessage(child);
+                    else
+                        message = new DMessage(child);
+
+                    // Add the message to the list
                     if (null != message)
                         note.Messages.Append(message);
                 }
@@ -1134,8 +1421,11 @@ namespace JWdb.DataModel
             public TranslatorNote Do()
             {
                 // Do nothing if we aren't the right type of node
-                if (m_nodeNote.Name != c_sTagTranslatorNote && m_nodeNote.Name != "TranslatorNote")
+                if (m_nodeNote.Name != c_sTagTranslatorNote &&
+                    m_nodeNote.Name != "TranslatorNote")
+                {
                     return null;
+                }
 
                 // Create the new note
                 var note = new TranslatorNote();
@@ -1162,11 +1452,16 @@ namespace JWdb.DataModel
         #region Method: XmlNode Save(oxes, nodeAnnotation)
         public XmlNode Save(XmlDoc oxes, XmlNode nodeParent)
         {
+            if (!HasMessages)
+                return null;
+
             var nodeNote = oxes.AddNode(nodeParent, c_sTagTranslatorNote);
 
             // Attrs
             oxes.AddAttr(nodeNote, c_sAttrClass, Class.ToString());
-            oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
+
+            if (!string.IsNullOrEmpty(SelectedText))
+                oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
 
             // Message objects
             foreach (DMessage m in Messages)
@@ -1306,7 +1601,12 @@ namespace JWdb.DataModel
             // Find out who had the most recent message. They will be the
             // winner for the basic attrs. (Thus if it was them, copy the values
             // over; otherwise by default we just keep ours.)
-            if (Theirs.LastMessage.UtcCreated.CompareTo(LastMessage.UtcCreated) > 1)
+            DateTime TheirLastMessageDate = (Theirs.HasMessages) ? 
+                Theirs.LastMessage.UtcCreated : DateTime.UtcNow;
+            DateTime OurLastMessageDate = (HasMessages) ?
+                LastMessage.UtcCreated : DateTime.UtcNow;
+
+            if (TheirLastMessageDate.CompareTo(OurLastMessageDate) > 1)
             {
                 Class = Theirs.Class;
                 SelectedText = Theirs.SelectedText;

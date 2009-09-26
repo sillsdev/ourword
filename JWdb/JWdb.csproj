@@ -119,7 +119,6 @@
     <Compile Include="DataModel\DSection.cs" />
     <Compile Include="DataModel\DTeamSettings.cs" />
     <Compile Include="DataModel\DTranslation.cs" />
-    <Compile Include="DataModel\History.cs" />
     <Compile Include="DataModel\RepairImportBook.cs">
       <SubType>Form</SubType>
     </Compile>

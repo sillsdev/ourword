@@ -1,3 +1,4 @@
+#region ***** DSection.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DSection.cs
@@ -19,6 +20,7 @@ using System.IO;
 using System.Xml;
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 namespace JWdb.DataModel
@@ -222,8 +224,8 @@ namespace JWdb.DataModel
 		}
 		private JOwn<DReferenceSpan> j_ownReferenceSpan = null;
 		#endregion
-        #region JAttr{g/s}: DHistory History
-        public DHistory History
+        #region JAttr{g/s}: TranslatorNote History
+        public TranslatorNote History
         {
             get
             {
@@ -234,7 +236,7 @@ namespace JWdb.DataModel
                 j_ownHistory.Value = value;
             }
         }
-        private JOwn<DHistory> j_ownHistory = null;
+        private JOwn<TranslatorNote> j_ownHistory = null;
         #endregion
 
 		// Derived Attributes: Ownership Hiererachy ------------------------------------------
@@ -537,8 +539,8 @@ namespace JWdb.DataModel
             ReferenceSpan = new DReferenceSpan();
 
             // Section History
-            j_ownHistory = new JOwn<DHistory>("History", this);
-            History = new DHistory();
+            j_ownHistory = new JOwn<TranslatorNote>("History", this);
+            History = new TranslatorNote(TranslatorNote.NoteClass.History);
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -2123,16 +2125,15 @@ namespace JWdb.DataModel
                 {
                     if (!string.IsNullOrEmpty(field.Data.Trim()))
                     {
-                        var Event = Section.History.CreateEvent(
+                        Section.History.AddMessage(
                             DEventMessage.DefaultDate,
                             Loc.GetString("OldHistory", "Old"),
                             field.Data);
-                        Section.History.AddEvent(Event);
                     }
                     return true;
                 }
 
-                return Section.History.Read(field);
+                return Section.History.ReadOldHistory(field);
             }
             #endregion
             #region Method: void History_Out()
@@ -2585,8 +2586,13 @@ namespace JWdb.DataModel
         #region Method: void SaveToOxesBook(oxes, nodeBook)
         public void SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
         {
+            // Save the section's paragraphs
             foreach (DParagraph p in Paragraphs)
                 p.SaveToOxesBook(oxes, nodeBook);
+
+            // Save the History note, if any. It will be at the same level as the paragraphs,
+            // but on Read we will place it into the section we are currently reading in.
+            History.Save(oxes, nodeBook);
         }
         #endregion
 

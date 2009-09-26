@@ -333,6 +333,10 @@ namespace OurWord.Edit
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
+            // Visual Studio can't show the control unless we check for this
+            if (!JW_Registry.HasValidRootKey)
+                return;
+
             // The initial value of the ShowDocumentation checkbox is stored in the registry;
             // the default value is to show it. We do this during Load, rather than during
             // construction, in order to give time for the Name to be changed from the

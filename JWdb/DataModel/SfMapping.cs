@@ -1134,6 +1134,10 @@ namespace JWdb.DataModel
             if (IsBookOverviewMarker(sMarker))
                 return true;
 
+            // History can be in either Book or Section
+            if (sMarker == "History")
+                return true;
+
             // Didn't find it in either list
             return false;
         }
