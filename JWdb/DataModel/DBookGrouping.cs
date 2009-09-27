@@ -249,7 +249,8 @@ namespace JWdb.DataModel
 
                 // Create the menu item, showing the display name
                 ToolStripMenuItem itemBook = new ToolStripMenuItem(book.DisplayName, null, onClick);
-                itemBook.Name = "menu" + book.DisplayName;
+                itemBook.Name = "menu" + book.BookAbbrev;
+                itemBook.Tag = book.BookAbbrev;
 
                 // For a locked book, write its text as Red color
                 if (book.Locked)

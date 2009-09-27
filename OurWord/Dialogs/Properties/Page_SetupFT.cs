@@ -1,3 +1,4 @@
+#region ***** Page_SetupFT.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Page_SetupFT.cs
@@ -9,6 +10,7 @@
 #region Header: Using, etc.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Data;
@@ -27,6 +29,7 @@ using JWdb.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+#endregion
 #endregion
 
 namespace OurWord.Dialogs
@@ -48,15 +51,33 @@ namespace OurWord.Dialogs
 			}
 		}
 		#endregion
+        #region Attr{g}: List<string> Languages
+        List<string> Languages
+        {
+            get
+            {
+                Debug.Assert(null != m_vLanguages);
+                return m_vLanguages;
+            }
+        }
+        List<string> m_vLanguages;
+        #endregion
+        #region Attr{g}: string ChosenLanguage
+        string ChosenLanguage
+        {
+            get
+            {
+                return m_comboChooseLanguage.Text;
+            }
+        }
+        #endregion
 
-		// Scaffolding -----------------------------------------------------------------------
+        // Scaffolding -----------------------------------------------------------------------
 		#region Dialog Controls
-		private   Button m_btnCreate;
-		private   Button m_btnOpen;
-		protected Label  m_lblCreate;
-		protected Label  m_lblOpen;
-        private Label m_lblActions;
         protected Label m_lblDefinition;
+        private Label m_labelInstructions;
+        private Button m_btnInitialize;
+        private ComboBox m_comboChooseLanguage;
 		private System.ComponentModel.Container components = null;
 		#endregion
 		#region Constructor()
@@ -87,90 +108,73 @@ namespace OurWord.Dialogs
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_SetupFT));
-			this.m_lblDefinition = new System.Windows.Forms.Label();
-			this.m_btnCreate = new System.Windows.Forms.Button();
-			this.m_btnOpen = new System.Windows.Forms.Button();
-			this.m_lblCreate = new System.Windows.Forms.Label();
-			this.m_lblOpen = new System.Windows.Forms.Label();
-			this.m_lblActions = new System.Windows.Forms.Label();
-			this.SuspendLayout();
-			// 
-			// m_lblDefinition
-			// 
-			this.m_lblDefinition.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.m_lblDefinition.Location = new System.Drawing.Point(3, 0);
-			this.m_lblDefinition.Name = "m_lblDefinition";
-			this.m_lblDefinition.Size = new System.Drawing.Size(462, 64);
-			this.m_lblDefinition.TabIndex = 0;
-			this.m_lblDefinition.Text = resources.GetString("m_lblDefinition.Text");
-			// 
-			// m_btnCreate
-			// 
-			this.m_btnCreate.Location = new System.Drawing.Point(6, 91);
-			this.m_btnCreate.Name = "m_btnCreate";
-			this.m_btnCreate.Size = new System.Drawing.Size(122, 23);
-			this.m_btnCreate.TabIndex = 1;
-			this.m_btnCreate.Text = "Create New...";
-			this.m_btnCreate.Click += new System.EventHandler(this.cmdCreate);
-			// 
-			// m_btnOpen
-			// 
-			this.m_btnOpen.Location = new System.Drawing.Point(6, 149);
-			this.m_btnOpen.Name = "m_btnOpen";
-			this.m_btnOpen.Size = new System.Drawing.Size(122, 23);
-			this.m_btnOpen.TabIndex = 2;
-			this.m_btnOpen.Text = "Open Existing...";
-			this.m_btnOpen.Click += new System.EventHandler(this.cmdOpen);
-			// 
-			// m_lblCreate
-			// 
-			this.m_lblCreate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.m_lblCreate.Location = new System.Drawing.Point(137, 91);
-			this.m_lblCreate.Name = "m_lblCreate";
-			this.m_lblCreate.Size = new System.Drawing.Size(328, 58);
-			this.m_lblCreate.TabIndex = 3;
-			this.m_lblCreate.Text = "Start from scratch to initialize settings for your front translation. You will be" +
-				" presented with blank settings, and will need to enter the name of the translati" +
-				"on, its books, etc.";
-			// 
-			// m_lblOpen
-			// 
-			this.m_lblOpen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-						| System.Windows.Forms.AnchorStyles.Right)));
-			this.m_lblOpen.Location = new System.Drawing.Point(137, 149);
-			this.m_lblOpen.Name = "m_lblOpen";
-			this.m_lblOpen.Size = new System.Drawing.Size(328, 69);
-			this.m_lblOpen.TabIndex = 4;
-			this.m_lblOpen.Text = "Make use of existing settings for your front translation. If you defined the tran" +
-				"slation in another project, then you can reuse it here, rather than entering the" +
-				" information all over again.";
-			// 
-			// m_lblActions
-			// 
-			this.m_lblActions.Location = new System.Drawing.Point(3, 64);
-			this.m_lblActions.Name = "m_lblActions";
-			this.m_lblActions.Size = new System.Drawing.Size(444, 23);
-			this.m_lblActions.TabIndex = 7;
-			this.m_lblActions.Text = "Available UndoStack:";
-			this.m_lblActions.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-			// 
-			// Page_SetupFT
-			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-			this.Controls.Add(this.m_lblActions);
-			this.Controls.Add(this.m_lblOpen);
-			this.Controls.Add(this.m_lblCreate);
-			this.Controls.Add(this.m_btnOpen);
-			this.Controls.Add(this.m_btnCreate);
-			this.Controls.Add(this.m_lblDefinition);
-			this.Name = "Page_SetupFT";
-			this.Size = new System.Drawing.Size(468, 321);
-			this.Load += new System.EventHandler(this.cmdLoad);
-			this.ResumeLayout(false);
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Page_SetupFT));
+            this.m_lblDefinition = new System.Windows.Forms.Label();
+            this.m_labelInstructions = new System.Windows.Forms.Label();
+            this.m_btnInitialize = new System.Windows.Forms.Button();
+            this.m_comboChooseLanguage = new System.Windows.Forms.ComboBox();
+            this.SuspendLayout();
+            // 
+            // m_lblDefinition
+            // 
+            this.m_lblDefinition.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_lblDefinition.Location = new System.Drawing.Point(3, 0);
+            this.m_lblDefinition.Name = "m_lblDefinition";
+            this.m_lblDefinition.Size = new System.Drawing.Size(462, 64);
+            this.m_lblDefinition.TabIndex = 0;
+            this.m_lblDefinition.Text = resources.GetString("m_lblDefinition.Text");
+            // 
+            // m_labelInstructions
+            // 
+            this.m_labelInstructions.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_labelInstructions.Location = new System.Drawing.Point(6, 64);
+            this.m_labelInstructions.Name = "m_labelInstructions";
+            this.m_labelInstructions.Size = new System.Drawing.Size(459, 38);
+            this.m_labelInstructions.TabIndex = 3;
+            this.m_labelInstructions.Text = "Enter the name of the language if you wish to create a new one, or choose an exis" +
+                "ting one from the list. Then click the Initialize button when you are ready.";
+            this.m_labelInstructions.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            // 
+            // m_btnInitialize
+            // 
+            this.m_btnInitialize.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.m_btnInitialize.Location = new System.Drawing.Point(318, 119);
+            this.m_btnInitialize.Name = "m_btnInitialize";
+            this.m_btnInitialize.Size = new System.Drawing.Size(75, 23);
+            this.m_btnInitialize.TabIndex = 5;
+            this.m_btnInitialize.Text = "Initialize";
+            this.m_btnInitialize.UseVisualStyleBackColor = true;
+            this.m_btnInitialize.Click += new System.EventHandler(this.cmdInitializeTranslation);
+            // 
+            // m_comboChooseLanguage
+            // 
+            this.m_comboChooseLanguage.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.m_comboChooseLanguage.DropDownHeight = 200;
+            this.m_comboChooseLanguage.FormattingEnabled = true;
+            this.m_comboChooseLanguage.IntegralHeight = false;
+            this.m_comboChooseLanguage.Location = new System.Drawing.Point(93, 121);
+            this.m_comboChooseLanguage.MaxDropDownItems = 15;
+            this.m_comboChooseLanguage.Name = "m_comboChooseLanguage";
+            this.m_comboChooseLanguage.Size = new System.Drawing.Size(219, 21);
+            this.m_comboChooseLanguage.Sorted = true;
+            this.m_comboChooseLanguage.TabIndex = 6;
+            this.m_comboChooseLanguage.SelectedIndexChanged += new System.EventHandler(this.cmdLanguageTextChanged);
+            this.m_comboChooseLanguage.TextUpdate += new System.EventHandler(this.cmdLanguageTextChanged);
+            // 
+            // Page_SetupFT
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.Controls.Add(this.m_comboChooseLanguage);
+            this.Controls.Add(this.m_btnInitialize);
+            this.Controls.Add(this.m_labelInstructions);
+            this.Controls.Add(this.m_lblDefinition);
+            this.Name = "Page_SetupFT";
+            this.Size = new System.Drawing.Size(468, 321);
+            this.Load += new System.EventHandler(this.cmdLoad);
+            this.ResumeLayout(false);
 
 		}
 		#endregion
@@ -179,7 +183,7 @@ namespace OurWord.Dialogs
 		{
             // We exclude those items whose values depend on the subclasses;
             // these localizations are obtained from the strings section.
-            Control[] vExclude = { m_lblDefinition, m_lblCreate, m_lblOpen };
+            Control[] vExclude = { m_lblDefinition };
             LocDB.Localize(this, vExclude);
 		}
 		#endregion
@@ -190,75 +194,48 @@ namespace OurWord.Dialogs
 		{
 			// Label text in the appropriate language
 			Localization();
-		}
-		#endregion
-		#region Handler: cmdCreate - create a blank set of translation settings
-		private void cmdCreate(object sender, System.EventArgs e)
-		{
-			/***
-			// Make sure the user understands that this will remove his current Front/Target
-			// Translation from the project.
-			// Note: OVERRIDE ConfirmTranslationReplacement() in subclass
-            if (null != Translation && !ConfirmTranslationReplacement())
-			    return;
 
-			// Launch the dialog to prompt for crucial information: Name and
-			// Settings Filename. The user has the option to abort from this dlg.
-			DialogCreateTranslation dlg = new DialogCreateTranslation();
-			if (DialogResult.OK != dlg.ShowDialog(this))
-				return;
+            // Get the list of languages
+            var clusterInfo = ClusterList.FindClusterInfo(DB.TeamSettings.DisplayName);
+            if (null != clusterInfo)
+                m_vLanguages = clusterInfo.GetClusterLanguageList(false);
 
-			// Create the DTranslation object, initialize it, place it into the Project
-			// settings.
-            Translation = new DTranslation(dlg.TranslationName, "Latin", "Latin");
-            Translation.AbsolutePathName = dlg.SettingsPath;
-            Translation.LanguageAbbrev = dlg.Abbreviation;
+            // Populate the combo
+            m_comboChooseLanguage.Items.Clear();
+            foreach (string s in Languages)
+                m_comboChooseLanguage.Items.Add(s);
 
-			// Tell the parent dialog to show the settings page for the new translation
-			ParentDlg.InitNavTree(Page_Translation.ComputeID(Translation.DisplayName));
-			***/
+            // Don't enable the button until we have something in it
+            m_btnInitialize.Enabled = false;
         }
 		#endregion
-		#region Handler: cmdOpen - open an existing translation settings file
-		private void cmdOpen(object sender, System.EventArgs e)
-		{
-			/***
-			// Make sure the user understands that this will remove his current Front
-			// Translation from the project.
-			// Note: OVERRIDE ConfirmTranslationReplacement() in subclass
-            if (null != Translation && !ConfirmTranslationReplacement())
-					return;
-
-			// Launch the dialog to prompt for the Settings Filename. The user has the 
-			// option to abort from this dlg.
-			DialogOpenTranslation dlg = new DialogOpenTranslation();
-			if (DialogResult.OK != dlg.ShowDialog())
-				return;
-
-			// Read in the translation object
-			Translation = new DTranslation();
-            Translation.AbsolutePathName = dlg.SettingsPath;  // First so we know what to load
-            Translation.Load();
-            Translation.AbsolutePathName = dlg.SettingsPath;  // Second because Load overwrote it
-
-			// Tell the parent dialog to show the settings page for the newly-opened translation
-			ParentDlg.InitNavTree(Page_Translation.ComputeID(Translation.DisplayName));
-			***/
+        #region Cmd: cmdLanguageTextChanged
+        private void cmdLanguageTextChanged(object sender, EventArgs e)
+        {
+            m_btnInitialize.Enabled = !string.IsNullOrEmpty(ChosenLanguage);
         }
-		#endregion
+        #endregion
+        #region Cmd: cmdInitializeTranslation
+        private void cmdInitializeTranslation(object sender, EventArgs e)
+        {
+            // Create and save the new translation
+            Translation = new DTranslation(ChosenLanguage);
+            Translation.WriteToFile(new NullProgress());
+            DB.Project.WriteToFile(new NullProgress());
 
-		// Must be overridden in the subclass: supports Create and Open actions --------------
-		#region Method: virtual bool ConfirmTranslationReplacement()
-		protected virtual bool ConfirmTranslationReplacement()
-		{
-			Debug.Assert(false);
-			return false;
-		}
-		#endregion
-	}
+            // Read the books, if any, from the translation's folder
+            Translation.PopulateBookListFromFolder();
 
-	public class Page_SetupFront : Page_SetupFT
+            // Switch to the translations page
+            ParentDlg.InitNavigation(Page_Translation.ComputeID(Translation.DisplayName));
+        }
+        #endregion
+    }
+
+    #region Class: Page_SetupFront : Page_SetupFT
+    public class Page_SetupFront : Page_SetupFT
     {
+        // Attrs -----------------------------------------------------------------------------
         #region Attr{g/s}: override DTranslation Translation
         protected override DTranslation Translation
         {
@@ -276,6 +253,7 @@ namespace OurWord.Dialogs
         }
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DlgProperties)
         public Page_SetupFront(DialogProperties _dlg)
             : base(_dlg)
@@ -290,17 +268,6 @@ namespace OurWord.Dialogs
 
 			// Front-Translation dependent
 			m_lblDefinition.Text  = Strings.SetupFT_FrontDefinition;
-            m_lblCreate.Text = Strings.SetupFT_FrontCreateExpl;
-            m_lblOpen.Text = Strings.SetupFT_FrontOpenExpl;
-		}
-		#endregion
-
-		// Overrides to support Create and Open actions --------------------------------------
-		#region Method: override bool ConfirmTranslationReplacement()
-		protected override bool ConfirmTranslationReplacement()
-		{
-            Debug.Assert(null != Translation);
-            return Messages.ConfirmFrontReplace(Translation.DisplayName);
 		}
 		#endregion
 
@@ -324,10 +291,12 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-	}
-
-	public class Page_SetupTarget : Page_SetupFT
+    }
+    #endregion
+    #region Class: Page_SetupTarget : Page_SetupFT
+    public class Page_SetupTarget : Page_SetupFT
     {
+        // Attrs -----------------------------------------------------------------------------
         #region Attr{g/s}: override DTranslation Translation
         protected override DTranslation Translation
         {
@@ -345,6 +314,7 @@ namespace OurWord.Dialogs
         }
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DlgProperties)
 		public Page_SetupTarget(DialogProperties _dlg)
             : base(_dlg)
@@ -359,18 +329,7 @@ namespace OurWord.Dialogs
 
 			// Target-Translation dependent
             m_lblDefinition.Text = Strings.SetupFT_TargetDefinition;
-            m_lblCreate.Text = Strings.SetupFT_TargetCreateExpl;
-            m_lblOpen.Text = Strings.SetupFT_TargetOpenExpl;
         }
-		#endregion
-
-		// Overrides to support Create and Open actions --------------------------------------
-		#region Method: override bool ConfirmTranslationReplacement()
-		protected override bool ConfirmTranslationReplacement()
-		{
-            Debug.Assert(null != Translation);
-            return Messages.ConfirmTargetReplace(Translation.DisplayName);
-		}
 		#endregion
 
         // DlgPropertySheet overrides --------------------------------------------------------
@@ -393,6 +352,6 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-	}
-
+    }
+    #endregion
 }

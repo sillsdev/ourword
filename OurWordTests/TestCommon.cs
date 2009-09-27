@@ -48,7 +48,7 @@ namespace OurWordTests
         {
             var translation = CreateHierarchyThroughTargetTranslation();
             var book = new DBook(sBookAbbrev);
-            translation.Books.Append(book);
+            translation.AddBook(book);
             return book;
         }
         #endregion

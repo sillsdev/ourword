@@ -209,19 +209,23 @@ namespace JWdb.DataModel
         }
         bool m_bUserHasSeenLockedMessage = false;
         #endregion
-
-        // Derived Attributes: ---------------------------------------------------------------
         #region Attr{g}: DTranslation Translation - returns the translation that owns this book
-        virtual public DTranslation Translation
+        public DTranslation Translation
         {
             get
             {
-                DTranslation translation = (DTranslation)Owner;
-                Debug.Assert(null != translation);
-                return translation;
+                Debug.Assert(null != m_Translation);
+                return m_Translation;
+            }
+            set
+            {
+                m_Translation = value;
             }
         }
+        DTranslation m_Translation;
         #endregion
+
+        // Derived Attributes: ---------------------------------------------------------------
         #region Attr{g}: DProject Project - returns the Project that owns this book
         public DProject Project
         {
@@ -270,7 +274,7 @@ namespace JWdb.DataModel
                 if (null == Project.FrontTranslation)
                     return null;
 
-                foreach (DBook b in Project.FrontTranslation.Books)
+                foreach (DBook b in Project.FrontTranslation.BookList)
                 {
                     if (b.BookAbbrev == this.BookAbbrev)
                     {
@@ -424,6 +428,22 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        public override string DisplayName
+        {
+            get
+            {
+                if (null != m_Translation)
+                {
+                    int i = FindBookAbbrevIndex(BookAbbrev);
+                    return Translation.BookNamesTable[i];
+                }
+                return base.DisplayName;
+            }
+            set
+            {
+                base.DisplayName = value;
+            }
+        }
 
         // BookAbbrev-To-BookNumber Conversions ----------------------------------------------
         public const int BookAbbrevsCount = 66;
@@ -1540,6 +1560,10 @@ namespace JWdb.DataModel
                 }
                 catch (Exception e)
                 {
+                    LocDB.Message("cantLoadBookSystemException",
+                        "Unable to load book {0} due to system message:\n\n{1}",
+                        new string[] { e.Message },
+                        LocDB.MessageTypes.Error);
                     Console.WriteLine("Exception in DBook.Read: " + e.Message);
                     return false;
                 }
@@ -1629,6 +1653,8 @@ namespace JWdb.DataModel
         public void WriteBook(IProgressIndicator progress)
         {
             if (!Loaded)
+                return;
+            if (!IsDirty)
                 return;
 
             // Create the xml representation, and write it to disk
@@ -1994,7 +2020,7 @@ namespace JWdb.DataModel
                 return null;
             foreach (char ch in sBookAbbrev)
             {
-                if (!char.IsLetter(ch))
+                if (!char.IsLetterOrDigit(ch))
                     return null;
             }
             sBookAbbrev = sBookAbbrev.ToUpper();
@@ -2110,6 +2136,53 @@ namespace JWdb.DataModel
                 return null;
 
             return XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+        }
+        #endregion
+        #region Method: void QuicklyReadBasicAttrs()
+        public void QuicklyReadBasicAttrs()
+        {
+            TextReader tr = null;
+            try
+            {
+                var sr = new StreamReader(StoragePath, Encoding.UTF8);
+                tr = TextReader.Synchronized(sr);
+
+                do
+                {
+                    string s = tr.ReadLine();
+                    if (null == s)
+                        break;
+                    s = s.Trim();
+
+                    if (!s.StartsWith("<" + c_sTagBook + " "))
+                        continue;
+
+                    // Create an endtag so we can parse it legally
+                    s = s.Replace(">", " />");
+
+                    // Parse it in
+                    var xml = new XmlDoc(s);
+                    var xmlBook = xml.FirstChild;
+
+                    // Interpret the basic attrs
+                    Locked = XmlDoc.GetAttrValue(xmlBook, c_sAttrLocked, false);
+                    m_nTranslationStage = XmlDoc.GetAttrValue(xmlBook, c_sAttrStage, 0);
+
+                    // Done reading the file
+                    break;
+
+                } while (true);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Reading basic attrs failed: " + e.Message);
+            }
+            finally
+            {
+                if (null != tr)
+                    tr.Close();
+            }
         }
         #endregion
 

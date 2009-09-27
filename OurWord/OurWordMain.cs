@@ -521,7 +521,7 @@ namespace OurWord
         {
             // Remove any subitems
             m_btnGotoPreviousSection.DropDownItems.Clear();
-            m_btnGotoNextSection.DropDownItems.Clear();
+            m_btnGotoNextSection.DropDownItems.Clear(); 
 
             // Get our current position within the book
             if (null == DB.FrontSection)
@@ -693,7 +693,7 @@ namespace OurWord
             // a valid project.
             bool bShowNewOpenEtc = (!DB.IsValidProject || OurWordMain.Features.F_Project);
             m_btnProject.Visible = bShowNewOpenEtc;
-            m_menuExportProject.Visible = (DB.IsValidProject && DB.TargetTranslation.Books.Count > 0);
+            m_menuExportProject.Visible = (DB.IsValidProject && DB.TargetTranslation.BookList.Count > 0);
 
             // Print
             m_btnPrint.Visible = OurWordMain.Features.F_Print;
@@ -2463,8 +2463,6 @@ namespace OurWord
             }
         }
         #endregion
-
-
         #region Event: cmdLoad
         private void cmdLoad(object sender, System.EventArgs e)
 		{
@@ -2645,6 +2643,7 @@ namespace OurWord
 
             // Save everything
             DB.Project.WriteToFile(G.CreateProgressIndicator());
+            DB.TargetTranslation.WriteToFile(G.CreateProgressIndicator());
 
             // Update the UI, views, etc
             DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
@@ -2923,7 +2922,7 @@ namespace OurWord
             // the target translation, then abort
             if (!DB.IsValidProject)
                 return;
-            if (DB.TargetTranslation.Books.Count == 0)
+            if (DB.TargetTranslation.BookList.Count == 0)
                 return;
 
             // Get the user's desires (or cancel)
@@ -2936,7 +2935,7 @@ namespace OurWord
             DlgExportProgress.SetCurrentBook("Setting up...");
 
             // Loop through the books of the requested translation
-            foreach (DBook book in DB.TargetTranslation.Books)
+            foreach (DBook book in DB.TargetTranslation.BookList)
             {
                 // Does the user wish to cancel?
                 if (DlgExportProgress.UserSaysCancel)
@@ -3226,13 +3225,13 @@ namespace OurWord
             // Retrieve the target book from the menu item's text
             ToolStripMenuItem mi = (sender as ToolStripMenuItem);
             Debug.Assert(null != mi);
-            string sBookDisplayName = mi.Text;
-            Debug.Assert(!string.IsNullOrEmpty(sBookDisplayName));
+            string sBookAbbrev = (string)mi.Tag;
+            Debug.Assert(!string.IsNullOrEmpty(sBookAbbrev));
 
             // Go to that book
             OnLeaveSection();
             DB.Project.Save(G.CreateProgressIndicator());
-            DB.Project.Nav.GoToBook(sBookDisplayName, G.CreateProgressIndicator());
+            DB.Project.Nav.GoToBook(sBookAbbrev, G.CreateProgressIndicator());
             OnEnterSection();
         }
 		#endregion

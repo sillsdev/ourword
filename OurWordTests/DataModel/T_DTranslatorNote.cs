@@ -416,7 +416,7 @@ namespace OurWordTests.DataModel
             DB.Project.TargetTranslation = new DTranslation();
 
             DBook book = new DBook("LUK");
-            DB.Project.TargetTranslation.Books.Append(book);
+            DB.Project.TargetTranslation.AddBook(book);
 
             m_Section = new DSection();
             book.Sections.Append(m_Section);

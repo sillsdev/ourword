@@ -660,7 +660,7 @@ namespace OurWordTests.DataModel
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
             DB.Project.TargetTranslation = Translation;
             var Book = new DBook("MRK");
-            Translation.Books.Append(Book);
+            Translation.AddBook(Book);
             var Section = new DSection();
             Book.Sections.Append(Section);
 

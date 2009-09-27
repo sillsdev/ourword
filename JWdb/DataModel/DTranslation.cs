@@ -1,3 +1,4 @@
+#region ***** DTranslation.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DTranslation.cs
@@ -20,28 +21,6 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 #endregion
-#region Documentation - PropertiesFile
-/*     \root "C:\Documents and Settings\Wimbish\My Documents\Data\Timor\Kupang\Terjemah\"
- *     \book MRK "KM-Done\PB\Kml-MrkLc.db"
- *     \book ACT "KM-Done\PB\Kml-ActKb.db"
- *     \book 2PE "KM-Work\Kml-2PeB.db"
- */
-#endregion
-#region Features Implemented for DTranslationProperties
-/* Features implemented:
- * 
- * - OK complains if there is a zero-length filename
- * 
- * - OK complains if there is a zero-length Translation Name
- * 
- * - Double clicking on a listview row brings up properties for that book.
- * 
- * - The Title Bar shows the translation name, e.g., "Kupang Properties"; this changes when the 
- *   TranslationName field is edited.
- * 
- * - The Remove button asks the user to verify his intention, then removes the book from
- *   the list (but not from the disk)
- */
 #endregion
 
 namespace JWdb.DataModel
@@ -173,21 +152,36 @@ namespace JWdb.DataModel
 
                 // Add the book to our list
                 var book = new DBook(sBookAbbrev);
-                BookList.Add(book);
+                AddBook(book);
+
+                // Get the book's basic attributes from the individual files
+                book.QuicklyReadBasicAttrs();
             }
 
             // Sort the list according to cannonical order
             BookList.Sort();
         }
         #endregion
-
-        // JAttrs ----------------------------------------------------------------------------
-		#region JAttr{g}: JOwnSeq Books - sequence of DBook
-		public JOwnSeq<DBook> Books
+		#region Method: DBook AddBook(book) - adds a book that has already been constructed
+		public DBook AddBook(DBook book)
 		{
-			get { return m_osBooks; }
+			Debug.Assert(!string.IsNullOrEmpty(book.BookAbbrev));
+            BookList.Add(book);
+            BookList.Sort();
+            book.Translation = this;
+			return book;
 		}
-		JOwnSeq<DBook> m_osBooks = null;
+		#endregion
+		#region Method: DBook FindBook(sBookAbbrev) - retrieves a book from the Books attribute
+		public DBook FindBook(string sBookAbbrev)
+		{
+            foreach (DBook book in BookList)
+            {
+                if (book.BookAbbrev == sBookAbbrev)
+                    return book;
+            }
+            return null;
+		}
 		#endregion
 
 		// Derived Attributes ----------------------------------------------------------------
@@ -199,67 +193,6 @@ namespace JWdb.DataModel
 				DProject project = (DProject)Owner;
 				Debug.Assert(null != project);
 				return project;
-			}
-		}
-		#endregion
-		#region Attr{g}: string NextAvailableBookAbbrev - returns the next open book slot
-		public string NextAvailableBookAbbrev
-		{
-			get
-			{
-				ArrayList books = new ArrayList();
-
-				// If This is the Front Translation, then we want to look at all of the
-				// books which we haven't already added. 
-				if (null != Owner && this == Project.FrontTranslation)
-				{
-					foreach (string s in DBook.BookAbbrevs)
-					{
-						if (null == FindBook(s))
-							books.Add(s);
-					}
-
-					// If the first book is Genesis, then return it
-					if ( "GEN" == books[0] as string )
-						return books[0] as string;
-
-					// If Malachi exists, and if there is a book after it, then return
-					// the one after; this lets us default to something in the NT, which
-					// will generally be nearer to what the user will be wanting to import.
-					for(int i=0; i<books.Count - 1; i++)
-					{
-						if (books[i] as string == "MAL" )
-							return books[i+1] as string;
-					}
-
-					// Return the first one, whatever it is
-					return books[0] as string;
-				}
-
-				// If we are here, then we are dealing with a Target translation.
-				// Get the list of Front translation books (or else, all books)
-				if (null != Owner && null != Project.FrontTranslation)
-				{
-					foreach(DBook b in Project.FrontTranslation.Books)
-						books.Add(b.BookAbbrev);
-				}
-				else
-				{
-					foreach (string s in DBook.BookAbbrevs)
-						books.Add(s);
-				}
-
-				// Get the first book that isn't already done in This translation
-				foreach( string s in books)
-				{
-					if (null == FindBook(s))
-						return s;
-				}
-
-				// If we get here, then there are no front translation books for which
-				// we don't have a target translation. So....just return the first thing
-				// we can.
-				return null;
 			}
 		}
 		#endregion
@@ -318,7 +251,7 @@ namespace JWdb.DataModel
                     // Does this abbreviation already exist in the translation?
                     // Don't add it, if so.
                     bool bAlreadyInBook = false;
-                    foreach (DBook b in Books)
+                    foreach (DBook b in BookList)
                     {
                         if (b.BookAbbrev == s)
                             bAlreadyInBook = true;
@@ -331,7 +264,7 @@ namespace JWdb.DataModel
                     if (IsTargetTranslation)
                     {
                         bool bAlreadyInFront = false;
-                        foreach (DBook bF in Project.FrontTranslation.Books)
+                        foreach (DBook bF in Project.FrontTranslation.BookList)
                         {
                             if (bF.BookAbbrev == s)
                                 bAlreadyInFront = true;
@@ -365,9 +298,6 @@ namespace JWdb.DataModel
 
             // Books
             m_vBookList = new List<DBook>();
-
-			// Owning Sequence
-			m_osBooks = new JOwnSeq<DBook>("Books", this, true, true);
 
 			// Default Writing Systems
 			VernacularWritingSystemName = DStyleSheet.c_Latin;
@@ -404,46 +334,6 @@ namespace JWdb.DataModel
 		}
 		#endregion
 
-		// Individual Books & Sections Access ------------------------------------------------
-		#region Method: DBook AddBook(book) - adds a book that has already been constructed
-		public DBook AddBook(DBook book)
-		{
-			Debug.Assert(book.BookAbbrev != "");
-			Books.Append(book);
-			return book;
-		}
-		#endregion
-		#region Method: DBook FindBook(sBookAbbrev) - retrieves a book from the Books attribute
-		public DBook FindBook(string sBookAbbrev)
-		{
-			int iOrder = DBook.FindBookAbbrevIndex(sBookAbbrev);
-			int i = Books.Find(iOrder.ToString("00"));
-			if (-1 == i)
-				return null;
-			return (DBook)Books[i];
-		}
-		#endregion
-		#region Method: DBook FindBookByDisplayName(sDisplayName) - returns the book, or null
-		public DBook FindBookByDisplayName(string sDisplayName)
-		{
-			foreach (DBook b in Books)
-			{
-				if (b.DisplayName == sDisplayName)
-					return b;
-			}
-			return null;
-		}
-		#endregion
-		#region Method: DSection GetFirstSection(sBookAbbrev) - rtns 1st section of desired book
-		public DSection GetFirstSection(string sBookAbbrev)
-		{
-			int nBook = Books.Find(sBookAbbrev);
-			if (-1 == nBook)
-				return null;
-			return ((DBook)Books[nBook]).GetFirstSection();
-		}
-		#endregion
-
         // Misc ------------------------------------------------------------------------------
         #region Method: void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
         public void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
@@ -464,7 +354,7 @@ namespace JWdb.DataModel
         #region Method: void UpdateFromFront()
         public void UpdateFromFront()
 		{
-			foreach(DBook book in Books)
+			foreach(DBook book in BookList)
 			{
 				// If the book isn't loaded, then no need to do this
 				if (!book.Loaded)
@@ -480,8 +370,6 @@ namespace JWdb.DataModel
 			}
 		}
 		#endregion
-
-        // Merging ---------------------------------------------------------------------------
 
 		// I/O -------------------------------------------------------------------------------
 		#region SAttr{g}: string FileExtension
@@ -543,6 +431,15 @@ namespace JWdb.DataModel
             PopulateBookListFromFolder();          
 
             return true;
+        }
+        #endregion
+        #region OMethod: void OnWrite(progress)
+        protected override void OnWrite(IProgressIndicator progress)
+        {
+            base.OnWrite(progress);
+
+            foreach(DBook book in BookList)
+                book.WriteBook(new NullProgress());
         }
         #endregion
     }

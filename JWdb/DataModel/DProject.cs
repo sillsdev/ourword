@@ -427,9 +427,9 @@ namespace JWdb.DataModel
 					ArrayList list = new ArrayList();
 
 					// Loop through all Target books; add those which are also in the Front
-					foreach(DBook bt in TTarget.Books)
+					foreach(DBook bt in TTarget.BookList)
 					{
-						foreach(DBook bf in TFront.Books)
+						foreach(DBook bf in TFront.BookList)
 						{
 							if (bt.BookAbbrev == bf.BookAbbrev)
 							{
@@ -483,9 +483,9 @@ namespace JWdb.DataModel
 					ArrayList list = new ArrayList();
 
 					// Loop through all Target books; add those which are also in the Front
-					foreach(DBook bt in TTarget.Books)
+					foreach(DBook bt in TTarget.BookList)
 					{
-						foreach(DBook bf in TFront.Books)
+						foreach(DBook bf in TFront.BookList)
 						{
 							if (bt.BookAbbrev == bf.BookAbbrev)
 							{
@@ -519,14 +519,10 @@ namespace JWdb.DataModel
 				// Attempt to load the book
                 book.LoadBook(progress);
 
-				// If we were unable to load the book, then we must remove it from the 
-				// translation, because we are unable to make use of it. The user will 
-				// have to go to Properties and get it back in correctly.
+				// If we were unable to load the book, then don't return it; the caller will
+                // then know to find a different book.
 				if (false == book.Loaded)
-				{
-					translation.Books.Remove(book);
 					return null;
-				}
 
 				return book;
 			}
@@ -654,32 +650,23 @@ namespace JWdb.DataModel
 					SectionNo = iSection;
 			}
 			#endregion
-            #region Method: void GoToBook(sBookDisplayName, IProgressIndicator) - move the position to another book
-            public void GoToBook(string sBookDisplayName, IProgressIndicator progress)
+            #region Method: void GoToBook(sBookAbbrev, IProgressIndicator) - move the position to another book
+            public void GoToBook(string sBookAbbrev, IProgressIndicator progress)
 			{
-				// Get the target book that has this display name
-				DBook book = null;
-				foreach( DBook b in TTarget.Books)
+                // Do nothing if we're already there
+                if (sBookAbbrev == BookAbbrev)
+                    return;
+
+				// Get the target book that has this abbreviation
+				foreach( DBook b in TTarget.BookList)
 				{
-					if (b.DisplayName == sBookDisplayName)
+                    if (b.BookAbbrev == sBookAbbrev)
 					{
-						book = b;
-						break;
+                        BTarget.RemoveFilter();
+                        GoToAvailableBook(sBookAbbrev, progress);
+						return;
 					}
 				}
-				if (null == book)
-					return;
-
-				// Get the book's abbreviation; do nothing if we are already there
-				string sBookAbbrev = book.BookAbbrev;
-				if (sBookAbbrev == BookAbbrev)
-					return;
-
-				// Turn off any filter before going to a different book
-				BTarget.RemoveFilter();
-
-				// Go there (this also adjusts the SectionNo to 0
-                GoToAvailableBook(sBookAbbrev, progress);
 			}
 			#endregion
 			#region Method: void GoToFirstAvailableBook()

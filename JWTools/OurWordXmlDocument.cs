@@ -52,8 +52,47 @@ namespace JWTools
             string sXml = "";
             foreach (string s in vsInitializeFrom)
                 sXml += s;
+
+            // Watch out for discrepancies in the data due to improper xml in now-obsolete store
+            // routines; once the upgrade to 2.0 is complete, I can probably remove this.
+            // The & character is illegal in Xml, reserved for: &lt; &gt; &amp; &nbsp etc.
+            string sOK = "";
+            string[] vReserve = new string[] { "&lt;", "&gt;", "&amp;", "&nbsp;", "&quot;" };
+            for (int i = 0; i < sXml.Length; i++)
+            {
+                // If we encoutner an ampersand....
+                if (sXml[i] == '&')
+                {
+                    // See if it is one of our reserve "words"
+                    bool bReserveFound = false;
+                    foreach (string sReserve in vReserve)
+                    {
+                        int iReserve = sReserve.Length;
+                        if (i + iReserve >= sXml.Length)
+                            continue;
+                        if (sXml.Substring(i, iReserve) == sReserve)
+                        {
+                            bReserveFound = true;
+                            continue;
+                        }
+                    }
+
+                    // If not one of our reserved words, convert to an ampersand
+                    if (!bReserveFound)
+                    {
+                        sOK += "&amp;";
+                        continue;
+                    }
+
+                }
+
+                sOK += sXml[i];
+            }
+
             //Console.WriteLine(sXml);
-            LoadXml(sXml);
+            //Console.WriteLine(sOK);
+
+            LoadXml(sOK);
         }
         #endregion
 

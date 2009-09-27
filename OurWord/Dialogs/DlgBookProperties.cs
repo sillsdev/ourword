@@ -421,7 +421,7 @@ namespace OurWord.Dialogs
 			m_translation = new DTranslation("Kupang Malay", "Latin", "Latin");
 			m_project.FrontTranslation = m_translation;
 			m_book = new DBook("GEN");
-			m_translation.Books.Append(m_book);
+			m_translation.AddBook(m_book);
 			m_dlg = new DBookProperties(null, m_translation, m_book);
 		}
 		#endregion

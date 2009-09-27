@@ -217,18 +217,6 @@
       <DependentUpon>Page_WritingSystemAddRemove.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.resx">
-      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_GetClusterName.resx">
       <DependentUpon>WizRepo_GetClusterName.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -469,9 +457,6 @@
     <Compile Include="Dialogs\Properties\DlgProperties.Designer.cs">
       <DependentUpon>DlgProperties.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\OpenTranslationDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -526,29 +511,8 @@
     <Compile Include="Dialogs\Properties\Page_Translation.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizCreateBook.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizPage_CreateBookIntroduction.Designer.cs">
-      <DependentUpon>WizPage_CreateBookIntroduction.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizCreateBook\WizPage_GetDestinationFolder.Designer.cs">
-      <DependentUpon>WizPage_GetDestinationFolder.cs</DependentUpon>
-    </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\WizImportBook\WizPage_GetAbbreviation.designer.cs">
-      <DependentUpon>WizPage_GetAbbreviation.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizPage_GetFileName.cs">
       <SubType>UserControl</SubType>
@@ -754,10 +718,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\DlgCreateTranslation.resx">
       <DependentUpon>DlgCreateTranslation.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\OpenTranslationDlg.resx">
-      <DependentUpon>OpenTranslationDlg.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_AdvancedPrintOptions.resx">

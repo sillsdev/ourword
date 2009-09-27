@@ -1,3 +1,4 @@
+#region ***** DlgProperties.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DlgProperties.cs
@@ -30,6 +31,7 @@ using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWord.Utilities;
+#endregion
 #endregion
 
 // TODO: Check over Localization of pages, especially, e.g., "Front: Kupang"

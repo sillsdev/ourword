@@ -273,9 +273,12 @@ namespace JWdb.DataModel
             // Convert to integers and create the reference, if possible
             try
             {
-                int nChapter = Convert.ToInt16(sChapter);
-                int nVerse = Convert.ToInt16(sVerse);
-                return new DReference(nChapter, nVerse);
+                if (!string.IsNullOrEmpty(sChapter) && !string.IsNullOrEmpty(sVerse))
+                {
+                    int nChapter = Convert.ToInt16(sChapter);
+                    int nVerse = Convert.ToInt16(sVerse);
+                    return new DReference(nChapter, nVerse);
+                }
             }
             catch (Exception) {}
 

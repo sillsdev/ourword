@@ -32,13 +32,6 @@ using OurWord.Layouts;
 #endregion
 #endregion
 
-/* TODO: Make sure we can't get duplicate book names. We formerly had this as a 
- * tet in the BookProperties dialog ValidateData, calling
- *    Messages.DuplicateBookName();
- * But now that dialog no longer handles the book name, it is done here.
- *
- */
-
 namespace OurWord.Dialogs
 {
     public class Page_Translation : DlgPropertySheet
@@ -303,7 +296,7 @@ namespace OurWord.Dialogs
             this.m_bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_bRemove.Name = "m_bRemove";
             this.m_bRemove.Size = new System.Drawing.Size(109, 19);
-            this.m_bRemove.Text = "Remove...";
+            this.m_bRemove.Text = "Delete...";
             this.m_bRemove.Click += new System.EventHandler(this.cmdRemoveBook);
             // 
             // m_bProperties
@@ -1006,7 +999,7 @@ namespace OurWord.Dialogs
             // Determine how much to filter. Are there any OT books present? (if so, the
             // first one will be, since they are stored in cannonical order.)
             bool bOTBookPresent = false;
-            if (Translation.Books.Count > 0 && Translation.Books[0].IsOldTestamentBook)
+            if (Translation.BookList.Count > 0 && Translation.BookList[0].IsOldTestamentBook)
                 bOTBookPresent = true;
             m_FilterOn = ((bOTBookPresent) ? FilterOn.kAll : FilterOn.kNT);
 
@@ -1124,11 +1117,26 @@ namespace OurWord.Dialogs
 				return;
 
 			// Make sure the user wants to remove the book.
-			if (!Messages.VerifyRemoveBook())  
-				return;
+            bool bRemove = LocDB.Message(
+                "msgVerifyDeleteBook",
+                "Do you want to delete this book from the translation?\n\n" +
+                "(This will delete the file from the disk; and if you synchronize with others\n" +
+                "it will remove it from their computers as well.)",
+                null,
+                LocDB.MessageTypes.WarningYN);
+            if (!bRemove)
+                return;
 
-			// Remove the book from the translation & refresh the listview
-			Translation.Books.Remove(book);
+            // Delete the book
+            try
+            {
+                File.Delete(book.StoragePath);
+                Translation.BookList.Remove(book);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Failed to delete book: " + ex.Message);
+            }
 
             // Update the property page
             PopulateGrid(book.BookAbbrev, true);
@@ -1178,7 +1186,7 @@ namespace OurWord.Dialogs
 					{
 						File.Delete(bookExisting.StoragePath);
 					}
-					Translation.Books.Remove(bookExisting);
+					Translation.BookList.Remove(bookExisting);
 				}
 				else
 					return;
@@ -1197,7 +1205,7 @@ namespace OurWord.Dialogs
 			{
 				if (!Messages.VerifyOverwriteBook())
 				{
-					Translation.Books.Remove(book);
+					Translation.BookList.Remove(book);
 					return;
 				}
 			}
@@ -1207,7 +1215,7 @@ namespace OurWord.Dialogs
             book.LoadBook(wizard.ImportFileName, G.CreateProgressIndicator());
             if (!book.Loaded)
             {
-                Translation.Books.Remove(book);
+                Translation.BookList.Remove(book);
                 return;
             }
 
@@ -1262,7 +1270,7 @@ namespace OurWord.Dialogs
             Cursor.Current = Cursors.WaitCursor;
             if (false == book.InitializeFromFrontTranslation(G.CreateProgressIndicator()))
             {
-                Translation.Books.Remove(book);
+                Translation.BookList.Remove(book);
                 Cursor.Current = Cursors.Default;
                 return;
             }

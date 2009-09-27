@@ -91,16 +91,6 @@ namespace OurWord
                 LocDB.MessageTypes.YN);
         }
         #endregion
-        #region YN:        bool ConfirmFrontReplace(sPathname)
-        static public bool ConfirmFrontReplace(string sPathname)
-        {
-            return LocDB.Message("msgConfirmFrontReplace",
-                "This will replace {0} as your front translation.\n\n" +
-				    "Are you sure you want to do this?",
-                new string[] { sPathname },
-                LocDB.MessageTypes.YN);
-        }
-        #endregion
         #region YN:        bool ConfirmNoteDeletion(sNoteText)
         static public bool ConfirmNoteDeletion(string sNoteText)
         {
@@ -118,16 +108,6 @@ namespace OurWord
                 "msgConfirmDiscussionDeletion",
                 "Are you sure you want to delete the discussion item:\n  {0}?",
                 new string[] { sNoteText },
-                LocDB.MessageTypes.YN);
-        }
-        #endregion
-        #region YN:        bool ConfirmTargetReplace(sPathname)
-        static public bool ConfirmTargetReplace(string sPathname)
-        {
-            return LocDB.Message("msgConfirmTargetReplace",
-                "This will replace {0} as your target translation.\n\n" +
-                    "Are you sure you want to do this?",
-                new string[] { sPathname },
                 LocDB.MessageTypes.YN);
         }
         #endregion
@@ -272,19 +252,6 @@ namespace OurWord
         }
         #endregion
 
-
-        #region WarningYN: bool VerifyRemoveBook()
-        static public bool VerifyRemoveBook()
-        {
-            return LocDB.Message(
-                "msgVerifyRemoveBook",
-                "Do you want to remove this book from the translation?\n\n" +
-				"(This will not delete the file from the disk; it only removes\n" +
-				"OurWord's awareness that the book exists.)",
-                null,
-                LocDB.MessageTypes.WarningYN);
-        }
-        #endregion
         #region WarningYN: bool VerifyRemoveTranslation()
         static public bool VerifyRemoveTranslation()
         {

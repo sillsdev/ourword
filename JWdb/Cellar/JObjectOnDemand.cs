@@ -36,7 +36,7 @@ namespace JWdb
 	{
 		// BAttrs ----------------------------------------------------------------------------
 		#region BAttr{g/s}: string DisplayName - the object's name as it appears in the UI
-		public string DisplayName
+		public virtual string DisplayName
 			// This name will appear in the UI, e.g., in an error message stating that
 			// the object can't be found and asking if the user wants to navigate to it.
 		{

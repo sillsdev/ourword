@@ -53,15 +53,15 @@ namespace OurWordTests.DataModel
             DB.Project.FrontTranslation = new DTranslation("Front", "Latin", "Latin");
             DB.Project.TargetTranslation = new DTranslation("Target", "Latin", "Latin");
 
-            DBook bookFront = new DBook();
-            DB.Project.FrontTranslation.Books.Append(bookFront);
+            DBook bookFront = new DBook("MRK");
+            DB.Project.FrontTranslation.AddBook(bookFront);
             DSection sectionFront = new DSection();
             bookFront.Sections.Append(sectionFront);
             DParagraph paraFront = new DParagraph();
             sectionFront.Paragraphs.Append(paraFront);
 
-            DBook bookTarget = new DBook();
-            DB.Project.TargetTranslation.Books.Append(bookTarget);
+            DBook bookTarget = new DBook("MRK");
+            DB.Project.TargetTranslation.AddBook(bookTarget);
             DSection sectionTarget = new DSection();
             bookTarget.Sections.Append(sectionTarget);
             DParagraph paraTarget = new DParagraph();
@@ -311,8 +311,12 @@ namespace OurWordTests.DataModel
             tOurs.Merge(tParent, tTheirs, true);
 
             // Compare
-            Assert.AreEqual(tExpected.Books.Count, tOurs.Books.Count, "Same Count");
-            Assert.IsTrue(tExpected.Books.ContentEquals(tOurs.Books), "Same Books");
+            Assert.AreEqual(tExpected.BookList.Count, tOurs.BookList.Count, "Same Count");
+            for (int i = 0; i < tExpected.BookList.Count; i++)
+            {
+                Assert.AreEqual(tExpected.BookList[i].BookAbbrev, 
+                    tOurs.BookList[i].BookAbbrev, "Same Books");
+            }
         }
         #endregion
     }
