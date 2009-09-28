@@ -2762,37 +2762,26 @@ namespace OurWord.Edit
     class ChangeAuthor : BookmarkedAction
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: ENote ENote
-        ENote ENote
-        {
-            get
-            {
-                Debug.Assert(null != m_ENote);
-                return m_ENote;
-            }
-        }
-        ENote m_ENote;
-        #endregion
-        #region VAttr{g}: TranslatorNote Note
+        #region Attr{g}: TranslatorNote Note
         TranslatorNote Note
         {
             get
             {
-                TranslatorNote note = ENote.Note;
-                Debug.Assert(null != note);
-                return note;
+                Debug.Assert(null != m_Note);
+                return m_Note;
             }
         }
+        TranslatorNote m_Note;
         #endregion
-        #region Attr{g}: ToolStripDropDownButton DropDownButton
-        public ToolStripDropDownButton DropDownButton
+        #region Attr{g}: ToolStripComboBox Combo
+        public ToolStripComboBox Combo
         {
             get
             {
-                return m_DropDownButton;
+                return m_Combo;
             }
         }
-        ToolStripDropDownButton m_DropDownButton;
+        ToolStripComboBox m_Combo;
         #endregion
         #region Attr{g}: string NewAuthor
         string NewAuthor
@@ -2816,23 +2805,18 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(OWWindow, ENote, ToolStripMenuItem newAuthor)
+        #region Constructor(OWWindow, Note, ToolStripComboBox combo)
         public ChangeAuthor(OWWindow window,
-            ENote _ENote,
-            ToolStripMenuItem itemNewAuthor)
+            TranslatorNote _note,
+            ToolStripComboBox comboAuthor,
+            string sNewAuthor,
+            string sOriginalAuthor)
             : base(window, "Author")
         {
-            m_ENote = _ENote;
-
-            // Save a pointer to the owning DropDown button which owns this item
-            m_DropDownButton = itemNewAuthor.OwnerItem as ToolStripDropDownButton;
-            Debug.Assert(null != m_DropDownButton);
-
-            // Save what the new classification text will be
-            m_sNewAuthor = itemNewAuthor.Text;
-
-            // Remember what the current (original) status is
-            m_sOriginalAuthor = DropDownButton.Text;
+            m_Note = _note;
+            m_sNewAuthor = sNewAuthor;
+            m_sOriginalAuthor = sOriginalAuthor;
+            m_Combo = comboAuthor;
         }
         #endregion
         #region OAttr{g}: string Contents - Places the name we assigned to, into the Undo menu
@@ -2851,17 +2835,10 @@ namespace OurWord.Edit
         {
             // Save the new status
             Note.LastMessage.Author = sAuthor;
+            DB.UserName = sAuthor;
 
             // Update the dropdown button text
-            DropDownButton.Text = sAuthor;
-
-            // Check the correct item within
-            foreach (ToolStripItem item in DropDownButton.DropDownItems)
-            {
-                var menuItem = item as ToolStripMenuItem;
-                if (null != menuItem)
-                    menuItem.Checked = (menuItem.Text == sAuthor);
-            }
+            Combo.Text = sAuthor;
         }
         #endregion
         #region OMethod: bool PerformAction()

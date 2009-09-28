@@ -551,9 +551,6 @@ namespace OurWord.Edit
 
         // Pending
 
-        // Text Contents
-
-
         // Load, based on Class and Context
         #region Method: bool LoadToolTip_HintFromFront(ToolTipContents)
         bool LoadToolTip_HintFromFront(ToolTipContents wnd)
@@ -874,10 +871,13 @@ namespace OurWord.Edit
             var combo = new ToolStripComboBox("author");
             ts.Items.Add(combo);
             combo.Text = message.Author;
+            combo.Tag = Note;
             foreach (string sPerson in DB.Project.People)
                 combo.Items.Add(sPerson);
             if (!DB.Project.People.Contains(DB.UserName))
                 combo.Items.Add(DB.UserName);
+            combo.DropDownClosed += new EventHandler(OnAuthorDropDownClosed);
+            combo.TextChanged += new EventHandler(OnAuthorTextChanged);
 
             // Add space between the next control
             ts.Items.Add(new ToolStripLabel("  "));
@@ -955,6 +955,68 @@ namespace OurWord.Edit
             }
 
             return eMessages;
+        }
+        #endregion
+
+        // Messages Handlers for Tip controls ------------------------------------------------
+        #region Method: void MoveCursorIntoTipArea()
+        void MoveCursorIntoTipArea()
+        {
+            var wnd = OWToolTip.ToolTip.ContentWindow;
+            int yWndBottom = wnd.PointToScreen(new Point(wnd.Left, wnd.Bottom)).Y;
+            if (Cursor.Position.Y > yWndBottom)
+                Cursor.Position = new Point(Cursor.Position.X, yWndBottom - 3);
+        }
+        #endregion
+
+        #region Cmd: OnAuthorDropDownClosed - user has responded to the combo
+        public void OnAuthorDropDownClosed(object sender, EventArgs e)
+        {
+            var combo = sender as ToolStripComboBox;
+            if (null == combo)
+                return;
+
+            var note = combo.Tag as TranslatorNote;
+            if (null == note)
+                return;
+
+            // Move the mouse back into the tooltip window so the window will
+            // not get dismissed when the mouse next moves.
+            MoveCursorIntoTipArea();
+
+            // The original author is the combo's current text
+            string sOriginalAuthor = combo.Text;
+
+            // The new author is the value in the dropdown
+            string sNewAuthor = (string)combo.SelectedItem;
+
+            // Make the change
+            (new ChangeAuthor(G.App.MainWindow, note, combo, sNewAuthor, sOriginalAuthor)).Do();
+        }
+        #endregion
+        #region Cmd: void OnAuthorTextChanged(object sender, EventArgs e)
+        public void OnAuthorTextChanged(object sender, EventArgs e)
+        {
+            var combo = sender as ToolStripComboBox;
+            if (null == combo)
+                return;
+
+            var note = combo.Tag as TranslatorNote;
+            if (null == note)
+                return;
+
+            // The Original Author is who we've stored at the Note Author
+            string sOriginalAuthor = DB.UserName;
+
+            // The New Author is now in the combo text
+            string sNewAuthor = combo.Text;
+
+            // If the new author would be empty, we don't make the change
+            if (string.IsNullOrEmpty(sNewAuthor))
+                return;
+
+            // Make the change
+            (new ChangeAuthor(G.App.MainWindow, note, combo, sNewAuthor, sOriginalAuthor)).Do();
         }
         #endregion
 
