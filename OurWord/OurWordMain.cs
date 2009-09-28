@@ -159,6 +159,7 @@ namespace OurWord
         #endregion
         private ToolStripMenuItem m_menuInitializeFromAnInternetRepositoryToolStripMenuItem;
         private ToolStripMenuItem m_menuCreateANewProjectOnThisComputerToolStripMenuItem;
+        private ToolStripButton m_btnHistory;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -705,6 +706,9 @@ namespace OurWord
             // Go To Chapter
             m_btnChapter.Visible = DB.IsValidProject && Features.F_GoTo_Chapter;
 
+            // TEMP: TURN OFF UNTIL IMPLEMENTED
+            m_btnHistory.Visible = false;
+
             // Configure - If we have an invalid project, we turn this on regardless
             bool bShowConfigureDlg = (!DB.IsValidProject || OurWordMain.Features.F_PropertiesDialog);
             m_menuConfigure.Visible = bShowConfigureDlg;
@@ -985,6 +989,8 @@ namespace OurWord
             this.m_btnProjectSave = new System.Windows.Forms.ToolStripButton();
             this.m_btnProject = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuNewProject = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOpenProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSaveProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuExportProject = new System.Windows.Forms.ToolStripMenuItem();
@@ -1017,6 +1023,7 @@ namespace OurWord
             this.m_btnChapter = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_btnGoToBook = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_separator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.m_btnHistory = new System.Windows.Forms.ToolStripButton();
             this.m_btnTools = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
@@ -1058,8 +1065,6 @@ namespace OurWord
             this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
             this.m_tbLanguageInfo = new System.Windows.Forms.ToolStripLabel();
             this.m_tbCurrentPassage = new System.Windows.Forms.ToolStripLabel();
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             m_separator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_ToolStrip.SuspendLayout();
             this.m_toolStripContainer.BottomToolStripPanel.SuspendLayout();
@@ -1100,6 +1105,7 @@ namespace OurWord
             this.m_btnChapter,
             this.m_btnGoToBook,
             this.m_separator3,
+            this.m_btnHistory,
             this.m_btnTools,
             this.m_btnWindow,
             this.m_separator4,
@@ -1107,7 +1113,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(895, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(943, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1155,16 +1161,30 @@ namespace OurWord
             this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem});
             this.m_menuNewProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNewProject.Image")));
             this.m_menuNewProject.Name = "m_menuNewProject";
-            this.m_menuNewProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuNewProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuNewProject.Text = "&New";
             this.m_menuNewProject.ToolTipText = "Create a brand new project.";
+            // 
+            // m_menuInitializeFromAnInternetRepositoryToolStripMenuItem
+            // 
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Name = "m_menuInitializeFromAnInternetRepositoryToolStripMenuItem";
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Text = "Initialize from an Internet Repository...";
+            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Click += new System.EventHandler(this.cmdDownloadRepository);
+            // 
+            // m_menuCreateANewProjectOnThisComputerToolStripMenuItem
+            // 
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Name = "m_menuCreateANewProjectOnThisComputerToolStripMenuItem";
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Text = "Create a New Project on this computer...";
+            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Click += new System.EventHandler(this.cmdNewProject);
             // 
             // m_menuOpenProject
             // 
             this.m_menuOpenProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuOpenProject.Image")));
             this.m_menuOpenProject.Name = "m_menuOpenProject";
             this.m_menuOpenProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.m_menuOpenProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuOpenProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuOpenProject.Text = "&Open";
             this.m_menuOpenProject.ToolTipText = "Open an existing project.";
             // 
@@ -1173,7 +1193,7 @@ namespace OurWord
             this.m_menuSaveProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSaveProject.Image")));
             this.m_menuSaveProject.Name = "m_menuSaveProject";
             this.m_menuSaveProject.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSaveProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuSaveProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuSaveProject.Text = "&Save";
             this.m_menuSaveProject.ToolTipText = "Save this project and any edited books to the disk.";
             this.m_menuSaveProject.Click += new System.EventHandler(this.cmdSaveProject);
@@ -1181,7 +1201,7 @@ namespace OurWord
             // m_menuExportProject
             // 
             this.m_menuExportProject.Name = "m_menuExportProject";
-            this.m_menuExportProject.Size = new System.Drawing.Size(152, 22);
+            this.m_menuExportProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuExportProject.Text = "Export...";
             this.m_menuExportProject.Click += new System.EventHandler(this.cmdExportProject);
             // 
@@ -1478,6 +1498,16 @@ namespace OurWord
             this.m_separator3.Name = "m_separator3";
             this.m_separator3.Size = new System.Drawing.Size(6, 38);
             // 
+            // m_btnHistory
+            // 
+            this.m_btnHistory.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHistory.Image")));
+            this.m_btnHistory.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_btnHistory.Name = "m_btnHistory";
+            this.m_btnHistory.Size = new System.Drawing.Size(49, 35);
+            this.m_btnHistory.Text = "History";
+            this.m_btnHistory.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            this.m_btnHistory.Click += new System.EventHandler(this.cmdHistory);
+            // 
             // m_btnTools
             // 
             this.m_btnTools.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -1762,13 +1792,13 @@ namespace OurWord
             // 
             this.m_toolStripContainer.ContentPanel.AutoScroll = true;
             this.m_toolStripContainer.ContentPanel.Controls.Add(this.m_SplitContainer);
-            this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(912, 441);
+            this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(946, 441);
             this.m_toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_toolStripContainer.LeftToolStripPanelVisible = false;
             this.m_toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.m_toolStripContainer.Name = "m_toolStripContainer";
             this.m_toolStripContainer.RightToolStripPanelVisible = false;
-            this.m_toolStripContainer.Size = new System.Drawing.Size(912, 526);
+            this.m_toolStripContainer.Size = new System.Drawing.Size(946, 526);
             this.m_toolStripContainer.TabIndex = 2;
             this.m_toolStripContainer.Text = "toolStripContainer1";
             // 
@@ -1786,7 +1816,7 @@ namespace OurWord
             this.m_StatusMessage2});
             this.m_StatusStrip.Location = new System.Drawing.Point(0, 0);
             this.m_StatusStrip.Name = "m_StatusStrip";
-            this.m_StatusStrip.Size = new System.Drawing.Size(912, 22);
+            this.m_StatusStrip.Size = new System.Drawing.Size(946, 22);
             this.m_StatusStrip.SizingGrip = false;
             this.m_StatusStrip.TabIndex = 0;
             // 
@@ -1820,8 +1850,8 @@ namespace OurWord
             this.m_SplitContainer.Panel1.Resize += new System.EventHandler(this.onMainWindowResize);
             this.m_SplitContainer.Panel1MinSize = 100;
             this.m_SplitContainer.Panel2MinSize = 100;
-            this.m_SplitContainer.Size = new System.Drawing.Size(912, 441);
-            this.m_SplitContainer.SplitterDistance = 608;
+            this.m_SplitContainer.Size = new System.Drawing.Size(946, 441);
+            this.m_SplitContainer.SplitterDistance = 630;
             this.m_SplitContainer.TabIndex = 0;
             this.m_SplitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.cmdSplitterMoved);
             // 
@@ -1837,7 +1867,7 @@ namespace OurWord
             this.m_tbCurrentPassage});
             this.m_Taskbar.Location = new System.Drawing.Point(0, 0);
             this.m_Taskbar.Name = "m_Taskbar";
-            this.m_Taskbar.Size = new System.Drawing.Size(912, 25);
+            this.m_Taskbar.Size = new System.Drawing.Size(946, 25);
             this.m_Taskbar.Stretch = true;
             this.m_Taskbar.TabIndex = 2;
             // 
@@ -1876,25 +1906,11 @@ namespace OurWord
             this.m_tbCurrentPassage.Size = new System.Drawing.Size(84, 22);
             this.m_tbCurrentPassage.Text = "(passage)";
             // 
-            // m_menuInitializeFromAnInternetRepositoryToolStripMenuItem
-            // 
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Name = "m_menuInitializeFromAnInternetRepositoryToolStripMenuItem";
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Text = "Initialize from an Internet Repository...";
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Click += new System.EventHandler(this.cmdDownloadRepository);
-            // 
-            // m_menuCreateANewProjectOnThisComputerToolStripMenuItem
-            // 
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Name = "m_menuCreateANewProjectOnThisComputerToolStripMenuItem";
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Text = "Create a New Project on this computer...";
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Click += new System.EventHandler(this.cmdNewProject);
-            // 
             // OurWordMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(912, 526);
+            this.ClientSize = new System.Drawing.Size(946, 526);
             this.Controls.Add(this.m_toolStripContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OurWordMain";
@@ -3632,6 +3648,11 @@ namespace OurWord
             OnEnterProject();
         }
         #endregion
+        private void cmdHistory(object sender, EventArgs e)
+        {
+            var history = new DlgHistory(DB.TargetSection);
+            history.ShowDialog(this);
+        }
 
         // Help
         #region Cmd: cmdHelpTopics
@@ -3653,7 +3674,7 @@ namespace OurWord
         private void cmdInsertNote(object sender, EventArgs e)
         {
             // Retrieve the user interface item. If it was the top-level dropdown button, and 
-            // if there are dropdown items that are visible, then we don't want to execture the
+            // if there are dropdown items that are visible, then we don't want to execute the
             // command; rather, we want the dropdown to take place so that the user can choose
             // which type of note he wants.
             var btn = sender as ToolStripDropDownButton;
@@ -3687,8 +3708,11 @@ namespace OurWord
             try
             {
                 var sClass = (string)uiItem.Tag;
-                eClass = (TranslatorNote.NoteClass)Enum.Parse(
-                    typeof(TranslatorNote.NoteClass), sClass, true);
+                if (!string.IsNullOrEmpty(sClass))
+                {
+                    eClass = (TranslatorNote.NoteClass)Enum.Parse(
+                        typeof(TranslatorNote.NoteClass), sClass, true);
+                }
             }
             catch (Exception)
             {

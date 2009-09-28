@@ -162,6 +162,12 @@ namespace OurWord.Edit
                 w.LoadData();
         }
         #endregion
+        #region Method: void SetSize(Size)
+        public void SetSize(Size sz)
+        {
+            SetSize(sz.Width, sz.Height);
+        }
+        #endregion
         #region Method: void SetSize(nWidth, nHeight) - respond to resize of owner
         public void SetSize(int nWidth, int nHeight)
         {

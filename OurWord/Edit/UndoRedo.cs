@@ -2517,16 +2517,6 @@ namespace OurWord.Edit
             BmMainWnd.RestoreWindowSelectionAndScrollPosition();
         }
         #endregion
-        /*
-        #region OMethod: void UndoFinishing()
-        protected override void UndoFinishing()
-        {
-            // Restore focus back to the main window, where it was before the
-            // note was inserted.
-            G.App.MainWindow.Focus();
-        }
-        #endregion
-        */
     }
     #endregion
     #region CLASS: DeleteNoteAction
@@ -2768,6 +2758,127 @@ namespace OurWord.Edit
         #endregion
 	}
 	#endregion
+    #region CLASS: ChangeAuthor
+    class ChangeAuthor : BookmarkedAction
+    {
+        // Attrs -----------------------------------------------------------------------------
+        #region Attr{g}: ENote ENote
+        ENote ENote
+        {
+            get
+            {
+                Debug.Assert(null != m_ENote);
+                return m_ENote;
+            }
+        }
+        ENote m_ENote;
+        #endregion
+        #region VAttr{g}: TranslatorNote Note
+        TranslatorNote Note
+        {
+            get
+            {
+                TranslatorNote note = ENote.Note;
+                Debug.Assert(null != note);
+                return note;
+            }
+        }
+        #endregion
+        #region Attr{g}: ToolStripDropDownButton DropDownButton
+        public ToolStripDropDownButton DropDownButton
+        {
+            get
+            {
+                return m_DropDownButton;
+            }
+        }
+        ToolStripDropDownButton m_DropDownButton;
+        #endregion
+        #region Attr{g}: string NewAuthor
+        string NewAuthor
+        {
+            get
+            {
+                return m_sNewAuthor;
+            }
+        }
+        string m_sNewAuthor;
+        #endregion
+        #region Attr{g}: string OriginalAuthor
+        string OriginalAuthor
+        {
+            get
+            {
+                return m_sOriginalAuthor;
+            }
+        }
+        string m_sOriginalAuthor;
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(OWWindow, ENote, ToolStripMenuItem newAuthor)
+        public ChangeAuthor(OWWindow window,
+            ENote _ENote,
+            ToolStripMenuItem itemNewAuthor)
+            : base(window, "Author")
+        {
+            m_ENote = _ENote;
+
+            // Save a pointer to the owning DropDown button which owns this item
+            m_DropDownButton = itemNewAuthor.OwnerItem as ToolStripDropDownButton;
+            Debug.Assert(null != m_DropDownButton);
+
+            // Save what the new classification text will be
+            m_sNewAuthor = itemNewAuthor.Text;
+
+            // Remember what the current (original) status is
+            m_sOriginalAuthor = DropDownButton.Text;
+        }
+        #endregion
+        #region OAttr{g}: string Contents - Places the name we assigned to, into the Undo menu
+        public override string Contents
+        {
+            get
+            {
+                return NewAuthor;
+            }
+        }
+        #endregion
+
+        // Action ----------------------------------------------------------------------------
+        #region Method: void SetAuthor(string sAuthor)
+        void SetAuthor(string sAuthor)
+        {
+            // Save the new status
+            Note.LastMessage.Author = sAuthor;
+
+            // Update the dropdown button text
+            DropDownButton.Text = sAuthor;
+
+            // Check the correct item within
+            foreach (ToolStripItem item in DropDownButton.DropDownItems)
+            {
+                var menuItem = item as ToolStripMenuItem;
+                if (null != menuItem)
+                    menuItem.Checked = (menuItem.Text == sAuthor);
+            }
+        }
+        #endregion
+        #region OMethod: bool PerformAction()
+        protected override bool PerformAction()
+        {
+            SetAuthor(NewAuthor);
+            return true;
+        }
+        #endregion
+        #region Omethod: void ReverseAction()
+        protected override void ReverseAction()
+        {
+            SetAuthor(OriginalAuthor);
+        }
+        #endregion
+    }
+    #endregion
 
     // History -------------------------------------------------------------------------------
     #region CLASS: InsertHistoryAction

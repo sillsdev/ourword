@@ -28,6 +28,7 @@ using OurWord.Edit;
 
 namespace OurWord.SideWnd
 {
+    #region Interface ISideWnd
     interface ISideWnd
     {
         // For positioning the child windows, toolbars, etc.
@@ -39,6 +40,7 @@ namespace OurWord.SideWnd
         // Respond to events in the main window, to set toolbar button enabling
         void SetControlsEnabling();
     }
+    #endregion
 
     public class SideWindows : TabControl
     {

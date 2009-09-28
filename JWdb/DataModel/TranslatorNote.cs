@@ -796,16 +796,28 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region VAttr{g}: DBook OwningBook
+        DBook OwningBook
+        {
+            get
+            {
+                JObject obj = this;
+                while (null != obj.Owner && null == obj as DBook)
+                    obj = obj.Owner;
+                return obj as DBook;
+            }
+        }
+        #endregion
         #region VAttr{g}: bool IsTargetTranslationNote
         public bool IsTargetTranslationNote
         {
             get
             {
-                JObject obj = this;
-                while (null != obj.Owner && null == obj as DTranslation)
-                    obj = obj.Owner;
+                var book = OwningBook;
+                if (null == book)
+                    return false;
 
-                var translation = obj as DTranslation;
+                var translation = book.Translation;
                 if (null != translation && translation == DB.TargetTranslation)
                     return true;
 
@@ -818,11 +830,11 @@ namespace JWdb.DataModel
         {
             get
             {
-                JObject obj = this;
-                while (null != obj.Owner && null == obj as DTranslation)
-                    obj = obj.Owner;
+                var book = OwningBook;
+                if (null == book)
+                    return false;
 
-                var translation = obj as DTranslation;
+                var translation = book.Translation;
                 if (null != translation && translation == DB.FrontTranslation)
                     return true;
 
@@ -1059,17 +1071,6 @@ namespace JWdb.DataModel
                 DText text = Owner as DText;
                 Debug.Assert(null != text);
                 return text;
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool IsOwnedInTargetTranslation
-        public bool IsOwnedInTargetTranslation
-        {
-            get
-            {
-                if (Text.Paragraph.Translation == DB.TargetTranslation)
-                    return true;
-                return false;
             }
         }
         #endregion
@@ -1331,7 +1332,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-
         // Oxes I/O --------------------------------------------------------------------------
         #region Constants
         public const string c_sTagTranslatorNote = "Annotation";
@@ -1478,7 +1478,7 @@ namespace JWdb.DataModel
             get
             {
                 // If it is not the Target Translation, then we don't allow edits
-                if (!IsOwnedInTargetTranslation)
+                if (!IsTargetTranslationNote)
                     return false;
 
                 return true;

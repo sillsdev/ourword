@@ -398,7 +398,7 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Text Contents
+        // Moved
         #region Method: var BuildNoteTitle(ws, sNoteTitle, sIconResource)
         OWPara BuildNoteTitle(JWritingSystem ws, 
             string sNoteTitle,
@@ -430,7 +430,6 @@ namespace OurWord.Edit
             var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
             dbt.Phrases.Append(pSelectedText);
 
-
             // Create the paragraph
             OWPara pTitle = new OWPara(
                 ws,
@@ -441,6 +440,72 @@ namespace OurWord.Edit
             pTitle.InsertAt(0, new EIcon(sIconResource));
 
             return pTitle;
+        }
+        #endregion
+        #region Method: EItem BuildMessageTitle(OWWindow tip, JWritingSystem ws, DMessage message)
+        EItem BuildMessageTitle(OWWindow tip, JWritingSystem ws, DMessage message)
+        {
+            // Uneditable messages are just a line of text
+            if (!message.IsEditable)
+            {
+                var p = new OWPara(ws,
+                    DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader),
+                    new DPhrase[] { 
+                        new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
+                            message.LocalTimeCreated.ToShortDateString())
+                    });
+                return p;
+            }
+
+            // For an editable message, we want to permit the user to change the author, thus
+            // we need a toolstrip
+            var eToolstrip = new EToolStrip(tip);
+            var ts = eToolstrip.ToolStrip;
+
+            // The first item is a combo box, whose dropdown items are the team members, and 
+            // which allows names to be typed into the text area
+            var combo = new ToolStripComboBox("author");
+            ts.Items.Add(combo);
+            combo.Text = message.Author;
+            foreach (string sPerson in DB.Project.People)
+                combo.Items.Add(sPerson);
+
+            // Add space between the next control
+            ts.Items.Add(new ToolStripLabel("  "));
+
+            // Add the date
+            ts.Items.Add(new ToolStripLabel(message.LocalTimeCreated.ToShortDateString()));
+
+            return eToolstrip;
+        }
+        #endregion
+        #region Method: var BuildInteractiveMessageContents(...)
+        EContainer BuildInteractiveMessageContents(OWWindow tip, JWritingSystem ws)
+        {
+            // We'll place the meessages in their own container, so we can have a top and
+            // bottom border
+            var eMessages = new EColumn();
+            eMessages.Border = new EContainer.SquareBorder(eMessages);
+            eMessages.Border.BorderPlacement = EContainer.BorderBase.BorderSides.TopAndBottom;
+            eMessages.Border.Padding.Bottom = 5;     // So not too tight with bottom horz line
+            eMessages.Border.Margin.Top = 5;         // So not too tight with the title
+
+            // Add each message
+            foreach (DMessage message in Note.Messages)
+            {
+                // Author and Date
+                var eTitle = BuildMessageTitle(tip, ws, message);
+                eMessages.Append(eTitle);
+
+                // Contents
+                var eContents = BuildSingleMessageContents(ws, message, 
+                    DStyleSheet.c_StyleMessageContent);
+                eMessages.Append(eContents);
+            }
+
+            return eMessages;
         }
         #endregion
         #region Method: var BuildSingleMessageContents(...)
@@ -483,40 +548,11 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: var BuildInteractiveMessageContents(...)
-        EContainer BuildInteractiveMessageContents(JWritingSystem ws)
-        {
-            // We'll place the meessages in their own container, so we can have a top and
-            // bottom border
-            var eMessages = new EColumn();
-            eMessages.Border = new EContainer.SquareBorder(eMessages);
-            eMessages.Border.BorderPlacement = EContainer.BorderBase.BorderSides.TopAndBottom;
-            eMessages.Border.Padding.Bottom = 5;     // So not too tight with bottom horz line
-            eMessages.Border.Margin.Top = 5;         // So not too tight with the title
 
-            // Add each message
-            foreach (DMessage message in Note.Messages)
-            {
-                // Author and Date
-                var pMessageHeader = new OWPara(ws,
-                    DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader),
-                    new DPhrase[] { 
-                        new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
-                            message.LocalTimeCreated.ToShortDateString())
-                    });
-                eMessages.Append(pMessageHeader);
+        // Pending
 
-                // Contents
-                var pMessage = BuildSingleMessageContents(ws, message,
-                    DStyleSheet.c_StyleMessageContent);
-                eMessages.Append(pMessage);
-            }
+        // Text Contents
 
-            return eMessages;
-        }
-        #endregion
 
         // Load, based on Class and Context
         #region Method: bool LoadToolTip_HintFromFront(ToolTipContents)
@@ -562,7 +598,7 @@ namespace OurWord.Edit
             wnd.Contents.Append(pTitle);
 
             // Messages section
-            wnd.Contents.Append(BuildInteractiveMessageContents(ws));
+            wnd.Contents.Append(BuildInteractiveMessageContents(wnd, ws));
 
             // Add the toolbar for user actions
             wnd.Contents.Append(BuildToolStrip(wnd));
@@ -590,7 +626,7 @@ namespace OurWord.Edit
             if (Note.IsTargetTranslationNote)
             {
                 // Messages section
-                wnd.Contents.Append(BuildInteractiveMessageContents(ws));
+                wnd.Contents.Append(BuildInteractiveMessageContents(wnd, ws));
 
                 // Add the toolbar for user actions
                 wnd.Contents.Append(BuildToolStrip(wnd));
@@ -621,7 +657,7 @@ namespace OurWord.Edit
             wnd.Contents.Append(pTitle);
 
             // Messages section
-            wnd.Contents.Append(BuildInteractiveMessageContents(ws));
+            wnd.Contents.Append(BuildInteractiveMessageContents(wnd, ws));
 
             // Add the toolbar for user actions
             wnd.Contents.Append(BuildToolStrip(wnd));
@@ -629,27 +665,32 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: bool LoadToolTip_General(ToolTipContents)
-        bool LoadToolTip_General(ToolTipContents wnd)
+        bool LoadToolTip_General(ToolTipContents tip)
         {
             if (!Note.IsTargetTranslationNote)
                 return false;
             if (!Note.IsGeneralNote)
                 return false;
 
+            // Tip building class
+            var build = new BuildToolTip(tip, Note,
+                DB.TargetTranslation.WritingSystemVernacular);
+
             // The writing system will be the vernacular of rhe target
             var ws = DB.TargetTranslation.WritingSystemVernacular;
 
             // Note Title
-            var pTitle = BuildNoteTitle(ws, 
-                null, 
-                Note.IconResourceForClass);
-            wnd.Contents.Append(pTitle);
+            var eTitle = build.BuildNoteTitle(null);
+            tip.Contents.Append(eTitle);
 
             // Messages section
-            wnd.Contents.Append(BuildInteractiveMessageContents(ws));
+            var eMessages = build.BuildMessageList();
+            tip.Contents.Append(eMessages);
+
+ //           tip.Contents.Append(BuildInteractiveMessageContents(tip, ws));
 
             // Add the toolbar for user actions
-            wnd.Contents.Append(BuildToolStrip(wnd));
+            tip.Contents.Append(BuildToolStrip(tip));
 
             return true;
         }
@@ -709,5 +750,213 @@ namespace OurWord.Edit
             return true;
         }
         #endregion
+    }
+
+    public class BuildToolTip
+    {
+        // Attrs -----------------------------------------------------------------------------
+        #region Attr{g}: ToolTipContents Tip
+        ToolTipContents Tip
+        {
+            get
+            {
+                Debug.Assert(null != m_wndTip);
+                return m_wndTip;
+            }
+        }
+        ToolTipContents m_wndTip;
+        #endregion
+        #region JWritingSystem WS
+        JWritingSystem WS
+        {
+            get
+            {
+                Debug.Assert(null != m_ws);
+                return m_ws;
+            }
+        }
+        JWritingSystem m_ws;
+        #endregion
+        #region Attr{g}: TranslatorNote Note
+        public TranslatorNote Note
+        {
+            get
+            {
+                Debug.Assert(null != m_Note);
+                return m_Note;
+            }
+        }
+        TranslatorNote m_Note = null;
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(Tip, ws, sIconResource)
+        public BuildToolTip(ToolTipContents wndTip, TranslatorNote note, JWritingSystem ws)
+        {
+            m_wndTip = wndTip;
+            m_ws = ws;
+            m_Note = note;
+        }
+        #endregion
+
+        // Build note components -------------------------------------------------------------
+        #region Method: var BuildNoteTitle(sNoteTitle)
+        public OWPara BuildNoteTitle(string sNoteTitle)
+        {
+            // We'll build a Basic Text with the title elements
+            var dbt = new DBasicText();
+
+            // The first part is any Title supplied by the caller
+            if (!string.IsNullOrEmpty(sNoteTitle))
+            {
+                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold,
+                    sNoteTitle + DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace);
+                dbt.Phrases.Append(pNoteTitle);
+            }
+
+            // Add the reference, in italics
+            string sBookRef = Note.GetDisplayableReference() + ":" + DPhrase.c_chInsertionSpace;
+            var pRef = new DPhrase(DStyleSheet.c_StyleAbbrevItalic, sBookRef);
+            dbt.Phrases.Append(pRef);
+
+            // Add a truncated and quote-surrounded version of the selected text
+            string sSelectedText = Note.SelectedText;
+            if (sSelectedText.Length > 40)
+                sSelectedText = sSelectedText.Substring(0, 40) + "...";
+            sSelectedText = "\"" + sSelectedText + "\"";
+            var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
+            dbt.Phrases.Append(pSelectedText);
+
+            // Store this in a the paragraph
+            OWPara pTitle = new OWPara(
+                WS,
+                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipHeader),
+                dbt.Phrases.AsVector);
+
+            // Pre-pend the icon
+            var sIconResource = Note.IconResourceForClass;
+            if (!string.IsNullOrEmpty(sIconResource))
+                pTitle.InsertAt(0, new EIcon(sIconResource));
+
+            return pTitle;
+        }
+        #endregion
+
+        #region Method: EItem BuildMessageTitle(message)
+        EItem BuildMessageTitle(DMessage message)
+        {
+            // Header style and font
+            var styleHeader = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
+            var fontHeader = styleHeader.CharacterStyle.FindOrAddFontForWritingSystem(
+                WS).FindOrAddFont(true, FontStyle.Regular);
+
+            // Uneditable messages are just a line of text
+            if (!message.IsEditable)
+            {
+                var p = new OWPara(WS,
+                    styleHeader,
+                    new DPhrase[] { 
+                        new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
+                            message.LocalTimeCreated.ToShortDateString())
+                    });
+                return p;
+            }
+
+            // For an editable message, we want to permit the user to change the author, thus
+            // we need a toolstrip
+            var eToolstrip = new EToolStrip(Tip);
+            var ts = eToolstrip.ToolStrip;
+
+            // The first item is a combo box, whose dropdown items are the team members, and 
+            // which allows names to be typed into the text area
+            var combo = new ToolStripComboBox("author");
+            ts.Items.Add(combo);
+            combo.Text = message.Author;
+            foreach (string sPerson in DB.Project.People)
+                combo.Items.Add(sPerson);
+            if (!DB.Project.People.Contains(DB.UserName))
+                combo.Items.Add(DB.UserName);
+
+            // Add space between the next control
+            ts.Items.Add(new ToolStripLabel("  "));
+
+            // Add the date
+            var label = new ToolStripLabel(message.LocalTimeCreated.ToShortDateString());
+            label.Font = fontHeader;
+            ts.Items.Add(label);
+
+            return eToolstrip;
+        }
+        #endregion
+        #region Method: EItem BuildMessageContents(message)
+        EItem BuildMessageContents(DMessage message)
+        {
+            // Background color depends on editibility
+            var clrBackground = (message.IsEditable) ? Color.White : Color.Cornsilk;
+
+            // Flags depend on editibility
+            var flags = (message.IsEditable) ?
+                (OWPara.Flags.IsEditable | OWPara.Flags.CanItalic) :
+                (OWPara.Flags.None);
+
+            // Create the paragraph
+            string sStyle = (message.IsEditable) ? 
+                DStyleSheet.c_StyleMessageContent : DStyleSheet.c_StyleToolTipText;
+            var p = new OWPara(
+                WS,
+                DB.StyleSheet.FindParagraphStyle(sStyle),
+                message,
+                clrBackground,
+                flags);
+
+            // If the message is editable, we want to make it stand out by placing it inside
+            // a container that shows the color better.
+            if (message.IsEditable)
+            {
+                var eEdit = new EColumn();
+                eEdit.Border = new EContainer.RoundedBorder(eEdit, 8);
+                eEdit.Border.Padding.Top = 3;
+                eEdit.Border.Padding.Bottom = 3;
+                eEdit.Border.BorderColor = Color.Navy;
+                eEdit.Border.FillColor = Color.White;
+                eEdit.Border.Margin.Top = 4;  // get out of the way of the toolbar
+                eEdit.Append(p);
+                return eEdit;
+            }
+            else
+            {
+                return p;
+            }
+        }
+        #endregion
+        #region Method: EItem BuildMessageList()
+        public EItem BuildMessageList()
+        {
+            // We'll place the meessages in their own container, so we can have a top and
+            // bottom border separating them from the note's title and controls at the
+            // bottom for manipulating the entire note.
+            var eMessages = new EColumn();
+            eMessages.Border = new EContainer.SquareBorder(eMessages);
+            eMessages.Border.BorderPlacement = EContainer.BorderBase.BorderSides.TopAndBottom;
+            eMessages.Border.Padding.Bottom = 5;     // So not too tight with bottom horz line
+            eMessages.Border.Margin.Top = 5;         // So not too tight with the title
+
+            // Add each message to the container
+            foreach (DMessage message in Note.Messages)
+            {
+                // Author and Date
+                var eTitle = BuildMessageTitle(message);
+                eMessages.Append(eTitle);
+
+                var eContents = BuildMessageContents(message);
+                eMessages.Append(eContents);
+            }
+
+            return eMessages;
+        }
+        #endregion
+
     }
 }

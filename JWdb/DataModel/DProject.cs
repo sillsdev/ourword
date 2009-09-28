@@ -1,3 +1,4 @@
+#region ***** DProject.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DProject.cs
@@ -18,6 +19,7 @@ using System.Windows.Forms;
 using System.IO;
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 namespace JWdb.DataModel
