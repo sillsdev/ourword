@@ -707,7 +707,7 @@ namespace OurWord
             m_btnChapter.Visible = DB.IsValidProject && Features.F_GoTo_Chapter;
 
             // TEMP: TURN OFF UNTIL IMPLEMENTED
-            m_btnHistory.Visible = false;
+            //m_btnHistory.Visible = false;
 
             // Configure - If we have an invalid project, we turn this on regardless
             bool bShowConfigureDlg = (!DB.IsValidProject || OurWordMain.Features.F_PropertiesDialog);

@@ -182,7 +182,7 @@ namespace JWdb.DataModel
                 // An unload calls Clear; but we want to always make sure we have
                 // an object here for any future load.
                 if (null == j_ownHistory.Value)
-                    j_ownHistory.Value = new TranslatorNote();
+                    j_ownHistory.Value = new TranslatorNote(TranslatorNote.NoteClass.History);
 
                 return j_ownHistory.Value;
             }
@@ -428,6 +428,7 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        #region OAttr{g}: string DisplayName
         public override string DisplayName
         {
             get
@@ -444,6 +445,7 @@ namespace JWdb.DataModel
                 base.DisplayName = value;
             }
         }
+        #endregion
 
         // BookAbbrev-To-BookNumber Conversions ----------------------------------------------
         public const int BookAbbrevsCount = 66;
@@ -1375,6 +1377,7 @@ namespace JWdb.DataModel
             {
                 try
                 {
+                    Clear();
                     xml.Load(sPath);
                     bXmlLoaded = true;
                 }
@@ -1489,15 +1492,15 @@ namespace JWdb.DataModel
             catch (eBookReadException bre)
             {
                 LocDB.Message("kFailedToLoadOxes",
-                    "The Oxes file {0} failed to load with system error:\n{1}.",
+                    "The Oxes file \"{0}\" failed to load with error:\n{1}.",
                     new string[] { Path.GetFileName(sPath), bre.UserMessage },
                     LocDB.MessageTypes.Error);
                 return false;
             }
             catch (Exception e)
             {
-                LocDB.Message("kFailedToLoadOxes",
-                    "The Oxes file {0} failed to load with system error:\n{1}.",
+                LocDB.Message("kFailedToLoadOxesSysErr",
+                    "The Oxes file \"{0}\" failed to load with system error:\n{1}.",
                     new string[] { Path.GetFileName(sPath), e.Message },
                     LocDB.MessageTypes.Error);
                 return false;
@@ -1596,7 +1599,7 @@ namespace JWdb.DataModel
                 section.CalculateVersification(ref nChapter, ref nVerse);
 
             // Items that depend on the Front translation
-            if (Owner != null && Translation == DB.Project.TargetTranslation && FrontBook != null)
+            if (Translation == DB.Project.TargetTranslation && FrontBook != null)
             {
                 // Make sure that each section has the same structure as the front.
                 CheckSectionStructureAgainstFront(FrontBook);

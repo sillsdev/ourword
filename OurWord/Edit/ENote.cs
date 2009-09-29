@@ -752,8 +752,8 @@ namespace OurWord.Edit
     public class BuildToolTip
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: ToolTipContents Tip
-        ToolTipContents Tip
+        #region Attr{g}: OWWindow Tip
+        OWWindow Tip
         {
             get
             {
@@ -761,7 +761,7 @@ namespace OurWord.Edit
                 return m_wndTip;
             }
         }
-        ToolTipContents m_wndTip;
+        OWWindow m_wndTip;
         #endregion
         #region JWritingSystem WS
         JWritingSystem WS
@@ -788,7 +788,7 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(Tip, ws, sIconResource)
-        public BuildToolTip(ToolTipContents wndTip, TranslatorNote note, JWritingSystem ws)
+        public BuildToolTip(OWWindow wndTip, TranslatorNote note, JWritingSystem ws)
         {
             m_wndTip = wndTip;
             m_ws = ws;
@@ -806,23 +806,35 @@ namespace OurWord.Edit
             // The first part is any Title supplied by the caller
             if (!string.IsNullOrEmpty(sNoteTitle))
             {
-                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold,
-                    sNoteTitle + DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace);
+                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold, sNoteTitle);
                 dbt.Phrases.Append(pNoteTitle);
             }
 
             // Add the reference, in italics
-            string sBookRef = Note.GetDisplayableReference() + ":" + DPhrase.c_chInsertionSpace;
-            var pRef = new DPhrase(DStyleSheet.c_StyleAbbrevItalic, sBookRef);
-            dbt.Phrases.Append(pRef);
+            string sBookRef = Note.GetDisplayableReference();
+            if (!string.IsNullOrEmpty(sBookRef))
+            {
+                if (dbt.Phrases.Count > 0)
+                {
+                    dbt.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevBold,
+                        DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace));
+                }
+
+                var pRef = new DPhrase(DStyleSheet.c_StyleAbbrevItalic,
+                    sBookRef + ":" + DPhrase.c_chInsertionSpace);
+                dbt.Phrases.Append(pRef);
+            }
 
             // Add a truncated and quote-surrounded version of the selected text
             string sSelectedText = Note.SelectedText;
-            if (sSelectedText.Length > 40)
-                sSelectedText = sSelectedText.Substring(0, 40) + "...";
-            sSelectedText = "\"" + sSelectedText + "\"";
-            var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
-            dbt.Phrases.Append(pSelectedText);
+            if (!string.IsNullOrEmpty(sSelectedText))
+            {
+                if (sSelectedText.Length > 40)
+                    sSelectedText = sSelectedText.Substring(0, 40) + "...";
+                sSelectedText = "\"" + sSelectedText + "\"";
+                var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
+                dbt.Phrases.Append(pSelectedText);
+            }
 
             // Store this in a the paragraph
             OWPara pTitle = new OWPara(
@@ -957,6 +969,29 @@ namespace OurWord.Edit
             return eMessages;
         }
         #endregion
+
+        public EItem BuildMessage(DMessage message, bool bDarkBackground)
+        {
+            // Place the message in a container so that we draw a dividing line
+            // below it
+            var eMessage = new EColumn();
+            eMessage.Border = new EContainer.SquareBorder(eMessage);
+            eMessage.Border.BorderPlacement = EContainer.BorderBase.BorderSides.Bottom;
+
+            // Every other message has a dark background to delineate 
+            if (bDarkBackground)
+                eMessage.Border.FillColor = Color.DeepPink;
+
+            // The message title
+            var eTitle = BuildMessageTitle(message);
+            eMessage.Append(eTitle);
+
+            // The message contents
+            var eContents = BuildMessageContents(message);
+            eMessage.Append(eContents);
+
+            return eMessage;
+        }
 
         // Messages Handlers for Tip controls ------------------------------------------------
         #region Method: void MoveCursorIntoTipArea()

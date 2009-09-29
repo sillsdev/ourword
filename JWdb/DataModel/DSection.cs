@@ -229,6 +229,11 @@ namespace JWdb.DataModel
         {
             get
             {
+                // An unload calls Clear; but we want to always make sure we have
+                // an object here for any future load.
+                if (null == j_ownHistory.Value)
+                    j_ownHistory.Value = new TranslatorNote(TranslatorNote.NoteClass.History);
+
                 return j_ownHistory.Value;
             }
             set

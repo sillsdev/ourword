@@ -729,8 +729,11 @@ namespace JWdb.DataModel
                             return "NoteHint_Me.ico";
                         return "NoteHint" + sWho;
 
+                    case NoteClass.History:
+                        return "Note_OldVersions.ico";
+
                     default:
-                        Debug.Assert(false, "Missing Resource foro class: " + Class.ToString());
+                        Debug.Assert(false, "Missing Resource for class: " + Class.ToString());
                         return "NoteGeneric" + sWho;
                 }
             }
@@ -849,7 +852,7 @@ namespace JWdb.DataModel
         {
             get
             {
-                // Get the owning text and paragraph
+                // Get the owning text and paragraph 
                 if (null == Owner || null == Text || null == Text.Paragraph)
                     return null;
                 var text = Text;
@@ -1069,7 +1072,13 @@ namespace JWdb.DataModel
             get
             {
                 DText text = Owner as DText;
+
+                // History notes are not owned by a text, so we want to avoid the 
+                // assertion for them.
+                if (IsHistoryNote)
+                    return null;
                 Debug.Assert(null != text);
+
                 return text;
             }
         }
@@ -1465,7 +1474,9 @@ namespace JWdb.DataModel
 
             // Message objects
             foreach (DMessage m in Messages)
+            {
                 m.Save(oxes, nodeNote);
+            }
 
             return nodeNote;
         }

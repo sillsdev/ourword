@@ -890,6 +890,9 @@ namespace JWdb.DataModel
             foreach (XmlNode child in node.ChildNodes)
                 footnote.ReadOxesPhrase(child);
 
+            // Make sure we are properly formed, e.g., at least one phrase in the BT
+            footnote.Cleanup();
+
             return foot;
         }
         #endregion
