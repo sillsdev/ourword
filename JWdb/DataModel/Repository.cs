@@ -33,6 +33,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 
+using Chorus.merge;
 using Chorus.VcsDrivers.Mercurial;
 using Chorus.sync;
 #endregion
@@ -1727,4 +1728,143 @@ namespace JWdb.DataModel
         }
     }
     #endregion
+
+
+    // OurWord Scripture Merger
+    #region Class: OurWordMerger
+    public class OurWordMerger
+    {
+        #region Attr{g}: string MergeType
+        public string MergeType
+        {
+            get
+            {
+                return m_sMergeType;
+            }
+        }
+        string m_sMergeType;
+        #endregion
+
+        #region Attr{g}: string OurPath
+        public string OurPath
+        {
+            get
+            {
+                return m_sOurPath;
+            }
+        }
+        readonly string m_sOurPath;
+        #endregion
+        #region Attr{g}: string TheirPath
+        public string TheirPath
+        {
+            get
+            {
+                return m_sTheirPath;
+            }
+        }
+        readonly string m_sTheirPath;
+        #endregion
+        #region Attr{g}: string ParentPath
+        public string ParentPath
+        {
+            get
+            {
+                return m_sParentPath;
+            }
+        }
+        readonly string m_sParentPath;
+        #endregion
+
+        #region Constructor(MergeOrder)
+        protected OurWordMerger(MergeOrder order, string sMergeType)
+        {
+            m_sMergeType = sMergeType;
+
+            m_sOurPath = order.pathToOurs;
+            m_sTheirPath = order.pathToTheirs;
+            m_sParentPath = order.pathToCommonAncestor;
+        }
+        #endregion
+        #region virtual int Run()
+        public virtual int Run()
+        {
+            return 1;
+        }
+        #endregion
+
+        #region protected void Setup()
+        protected void Setup()
+        {
+            // Initialize the registry (the Map process needs it)
+            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
+
+            // We need to initialize the localization system (perhaps we can get rid of
+            // this dependency eventually.)
+            LocDB.Initialize(JWU.GetApplicationDataFolder("OurWord"));
+
+            // We need to create an owning project, because currently stuff depends on the
+            // ownership hierarchy. Perhaps I can remove this in the future.
+            DB.Project = new DProject("Merge");
+            DB.Project.TeamSettings = new DTeamSettings("Merge");
+            DB.Project.TeamSettings.EnsureInitialized();
+        }
+        #endregion
+    }
+    #endregion
+    #region Class: OurWordScriptureMerger
+    public class OurWordScriptureMerger : OurWordMerger
+    {
+        string m_sBookAbbrev;
+        #region DBook CreateAndReadBook(sBookName, sPath)
+        DBook CreateAndReadBook(string sName, string sPath)
+        {
+            // Create and add a translation
+            DTranslation translation = new DTranslation(sName);
+            DB.Project.OtherTranslations.Append(translation);
+
+            // Create and add a book. We need it to be in the hierarchy before we start
+            // the Load.
+            DBook book = new DBook(m_sBookAbbrev);
+            translation.AddBook(book);
+
+            // Read in the book
+            book.LoadBook(sPath, new NullProgress());
+            return book;
+        }
+        #endregion
+
+        #region Constructor(MergeOrder)
+        public OurWordScriptureMerger(MergeOrder order)
+            : base(order, "Oxes Book")
+        {
+            // Extract the Book Abbrev from the path
+            string sBaseName = Path.GetFileNameWithoutExtension(OurPath);
+            m_sBookAbbrev = sBaseName.Substring(3, 3);
+        }
+        #endregion
+        #region override int Run()
+        public override int Run()
+        {
+            //Debug.Assert(false, "breakpoint for debugging");
+
+            Setup();
+
+            // Read in the three books
+            DBook OurBook = CreateAndReadBook("Ours", OurPath);
+            DBook TheirBook = CreateAndReadBook("Theirs", TheirPath);
+            DBook ParentBook = CreateAndReadBook("Parent", ParentPath);
+
+            // Tell OurWord to do the merge
+            OurBook.Merge(ParentBook, TheirBook);
+
+            // Write out the answer
+            OurBook.WriteBook(OurPath);
+
+            return 0;
+        }
+        #endregion
+    }
+    #endregion
+
 }

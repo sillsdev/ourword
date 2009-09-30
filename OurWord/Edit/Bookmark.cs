@@ -99,6 +99,10 @@ namespace OurWord.Edit
             {
                 return m_ParagraphFlags;
             }
+            set
+            {
+                m_ParagraphFlags = value;
+            }
         }
         OWPara.Flags m_ParagraphFlags = OWPara.Flags.None;
         #endregion

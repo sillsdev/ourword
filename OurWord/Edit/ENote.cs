@@ -970,6 +970,324 @@ namespace OurWord.Edit
         }
         #endregion
 
+        // DEventMessage
+        #region Cmd: OnDateChanged
+        public void OnDateChanged(Object sender, EventArgs e)
+            // Not undoable since implemented here
+        {
+            var datePicker = (sender as DateTimePicker);
+            if (null == datePicker)
+                return;
+
+            DEventMessage Event = datePicker.Tag as DEventMessage;
+            if (null == Event)
+                return;
+
+            // Update the event's date
+            Event.EventDate = datePicker.Value.ToUniversalTime();
+        }
+        #endregion
+        #region Cmd: OnChangeStage
+        public void OnChangeStage(object sender, EventArgs e)
+        {
+            var menuItem = sender as ToolStripMenuItem;
+            if (null == menuItem)
+                return;
+
+            var Event = menuItem.Tag as DEventMessage;
+            if (null == Event)
+                return;
+
+            // Set the event's new stage
+            Event.Stage = menuItem.Text;
+
+            // Update the menu
+            var menu = menuItem.OwnerItem as ToolStripDropDownButton;
+            foreach (ToolStripMenuItem item in menu.DropDownItems)
+                item.Checked = (item.Text == Event.Stage);
+            menu.Text = Event.Stage;
+        }
+        #endregion
+
+        #region Method: ToolStripItem BuildDatePicker(Event)
+        ToolStripItem BuildDatePicker(DEventMessage Event)
+        {
+            // Create a date-time picker
+            var ctrl = new DateTimePicker();
+            ctrl.Format = DateTimePickerFormat.Custom;
+            ctrl.CustomFormat = "yyyy-MM-dd";
+            ctrl.Value = Event.EventDate.ToLocalTime();
+            ctrl.Width = 100;
+            ctrl.ValueChanged += new EventHandler(OnDateChanged);
+            ctrl.Tag = Event;
+
+            // Place it in a control  host
+            return new ToolStripControlHost(ctrl);
+        }
+        #endregion
+        #region Method: ToolStripMenuItem AddStageMenuItem(...)
+        ToolStripMenuItem AddStageMenuItem(ToolStripDropDownButton menu, 
+            string sMenuText,
+            DEventMessage Event, 
+            bool bChecked)
+        {
+            var item = new ToolStripMenuItem(sMenuText);
+            item.Tag = Event;
+            item.Click += new EventHandler(OnChangeStage);
+            item.Checked = bChecked;
+            menu.DropDownItems.Add(item);
+            return item;
+        }
+        #endregion
+        #region Method: ToolStripItem BuildStageDropdown(Event)
+        ToolStripItem BuildStageDropdown(DEventMessage Event)
+        {
+            bool bCurrentStageFound = false;
+            var menuStage = new ToolStripDropDownButton(Event.Stage);
+            foreach (TranslationStage stage in DB.TeamSettings.TranslationStages.TranslationStages)
+            {
+                AddStageMenuItem(menuStage, stage.Name, Event, (stage.Name == Event.Stage));
+                if (stage.Name == Event.Stage)
+                    bCurrentStageFound = true;
+            }
+            if (!bCurrentStageFound)
+                AddStageMenuItem(menuStage, Event.Stage, Event, true);
+            return menuStage;
+        }
+        #endregion
+        #region Method: EItem BuildMessageContents(Event)
+        EItem BuildMessageContents(DEventMessage Event)
+        {
+            // Background color depends on editibility
+            var clrBackground = (Event.IsEditable) ? Color.White : Color.Cornsilk;
+
+            // Flags depend on editibility
+            var flags = (Event.IsEditable) ?
+                (OWPara.Flags.IsEditable | OWPara.Flags.CanItalic) :
+                (OWPara.Flags.None);
+
+            // Create the paragraph
+            string sStyle = (Event.IsEditable) ?
+                DStyleSheet.c_StyleMessageContent : DStyleSheet.c_StyleToolTipText;
+            var pStyle = DB.StyleSheet.FindParagraphStyle(sStyle);
+            pStyle.SpaceBefore = 0;
+            pStyle.SpaceAfter = 2;
+            pStyle.LeftMargin = 0.25;
+            var p = new OWPara(WS, pStyle, Event, clrBackground, flags);
+
+            // If the message is editable, we want to make it stand out by placing it inside
+            // a container that shows the color better.
+            if (Event.IsEditable)
+            {
+                var eEdit = new EColumn();
+                eEdit.Border = new EContainer.RoundedBorder(eEdit, 8);
+                eEdit.Border.Padding.Top = 3;
+                eEdit.Border.Padding.Bottom = 3;
+                eEdit.Border.BorderColor = Color.Navy;
+                eEdit.Border.FillColor = Color.White;
+                eEdit.Border.Margin.Top = 4;  // get out of the way of the toolbar
+                eEdit.Border.Margin.Bottom = 2; // Space before the separator line
+                eEdit.Append(p);
+                return eEdit;
+            }
+            else
+            {
+                return p;
+            }
+        }
+        #endregion
+        #region Method: EItem BuildMessage(DEventMessage message, bool bDarkBackground)
+        public EItem BuildMessage(DEventMessage message, bool bDarkBackground)
+        {
+            // Place the message in a container so that we draw a dividing line below it. 
+            // The first message needs one above, too; and some margin to separate it from
+            // the title.
+            var eMessage = new EColumn();
+            eMessage.Border = new EContainer.SquareBorder(eMessage);
+            if (message == message.Note.FirstMessage)
+            {
+                eMessage.Border.BorderPlacement = EContainer.BorderBase.BorderSides.TopAndBottom;
+                eMessage.Border.Margin.Top = 5;
+            }
+            else
+            {
+                eMessage.Border.BorderPlacement = EContainer.BorderBase.BorderSides.Bottom;
+            }
+
+            // If editable, the Message Title is a toolstrip with the date and the stage;
+            // otherwise its the same information in an uneditable paragraph
+            if (message.IsEditable)
+            {
+                EToolStrip eToolstrip = new EToolStrip(Tip);
+                eMessage.Append(eToolstrip);
+                eToolstrip.ToolStrip.Items.Add(BuildDatePicker(message));
+                eToolstrip.ToolStrip.Items.Add(new ToolStripLabel("   "));
+                eToolstrip.ToolStrip.Items.Add(BuildStageDropdown(message));
+            }
+            else
+            {
+                // Override any spacing the user entered, so it looks "right"
+                var pStyle = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
+                pStyle.SpaceBefore = 2;
+                pStyle.SpaceAfter = 0;
+
+                var pTitle = new OWPara(WS,
+                    pStyle,
+                    new DPhrase[] { 
+                        new DPhrase( DStyleSheet.c_StyleToolTipHeader, 
+                            message.EventDate.ToShortDateString()),
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
+                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
+                            message.Stage)
+                    });
+                eMessage.Append(pTitle);
+            }
+
+            // Message Contents
+            var eContents = BuildMessageContents(message);
+            eMessage.Append(eContents);
+
+            return eMessage;
+        }
+        #endregion
+
+        // History
+        #region Cmd: cmdAppendEvent
+        private void cmdAppendEvent(object sender, EventArgs e)
+            // Since implemented here, not undoable
+        {
+            var button = sender as ToolStripButton;
+            if (null == button)
+                return;
+
+            var history = button.Tag as TranslatorNote;
+            if (null == history || !history.IsHistoryNote)
+                return;
+
+            // The stage of the new event will be what we used last time
+            string sNewStage = (history.HasMessages) ?
+                (history.LastMessage as DEventMessage).Stage : "";
+            if (string.IsNullOrEmpty(sNewStage))
+                sNewStage = DB.TeamSettings.TranslationStages[0].Name;
+
+            // Create the Event, and thus remember it here, so that Undo/Redo will work.
+            history.AddMessage(DateTime.UtcNow, sNewStage, "");
+            var bookmark = Tip.CreateBookmark();
+            // Reset the bookmark's flags to none, because the former last message will no
+            // no longer be editable; and restoring the bookmark will not otherwise work
+            // because it seeks a paragraph with the same flags as when the bookmark
+            // was originally set.
+            bookmark.ParagraphFlags = OWPara.Flags.None;
+            Tip.LoadData();
+            bookmark.RestoreWindowSelectionAndScrollPosition();           
+            Tip.Contents.Select_LastWord_End();
+        }
+        #endregion
+        #region Cmd: cmdDeleteEvent
+        private void cmdDeleteEvent(object sender, EventArgs e)
+            // Since implemented here, not undoable
+        {
+            var button = sender as ToolStripButton;
+            if (null == button)
+                return;
+
+            var history = button.Tag as TranslatorNote;
+            if (null == history || !history.IsHistoryNote)
+                return;
+
+            // Can't delete the one remaining event
+            if (history.Messages.Count < 2)
+                return;
+            var Event = history.LastMessage as DEventMessage;
+            Debug.Assert(null != Event);
+
+            // Confirm
+            string sContents = Event.EventDate.ToShortDateString() + " - " +
+                Event.Stage + " - " + Event.SimpleText.Trim();
+            if (sContents.Length > 60)
+                sContents = sContents.Substring(0, 60) + "...";
+            if (!LocDB.Message("kDeleteEvent",
+                "Are you sure you want to delete:\n\n\"{0}\"?",
+                new string[] { sContents },
+                LocDB.MessageTypes.YN))
+            {
+                return;
+            }
+
+            // Remove it
+            var bookmark = Tip.CreateBookmark();
+            history.RemoveMessage(history.LastMessage);
+            Tip.LoadData();
+
+            // Restoring bookmark can cause a null reference failure
+ //           bookmark.RestoreWindowSelectionAndScrollPosition();
+        }
+        #endregion
+
+        #region Method: var BuildAddEventControl()
+        ToolStripButton BuildAddEventControl()
+        {
+            // Create the button
+            string sButtonText = Loc.GetNotes("AddEvent", "Add New");
+            var btnAdd = new ToolStripButton(sButtonText);
+            btnAdd.Tag = Note;
+            btnAdd.Image = JWU.GetBitmap("Note_OldVersions.ico");
+
+            // Command handler
+            btnAdd.Click += new EventHandler(cmdAppendEvent);
+
+            // Normal tooltip
+            btnAdd.ToolTipText = Loc.GetNotes("AddEvent_tip",
+                "Add another event to this history.");
+
+            // Disable is last message is blank
+            if (Note.HasMessages && string.IsNullOrEmpty(Note.LastMessage.SimpleText))
+                btnAdd.Enabled = false;
+
+            return btnAdd;
+        }
+        #endregion
+        #region Method: ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
+        ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
+        {
+            string sButtonText = Loc.GetNotes("DeleteEvent", "Delete...");
+            var btn = new ToolStripButton(sButtonText);
+            btn.Image = JWU.GetBitmap("Delete.ico");
+            btn.Tag = Note;
+            btn.Click += new EventHandler(cmdDeleteEvent);
+
+            // Disable if one one message
+            if (Note.Messages.Count < 2)
+                btn.Enabled = false;
+
+            // Tooltip
+            btn.ToolTipText = Loc.GetNotes("DeleteEvent_tip",
+                "Delete the most recent event.");
+
+            return btn;
+        }
+        #endregion
+        #region Method: EToolStrip BuildHistoryToolStrip()
+        public EToolStrip BuildHistoryToolStrip()
+        {
+            // Create the EToolStrip
+            var eToolstrip = new EToolStrip(Tip);
+
+            // Respond button
+            eToolstrip.ToolStrip.Items.Add(BuildAddEventControl());
+
+            // Space
+            eToolstrip.ToolStrip.Items.Add(new ToolStripLabel("  "));
+
+            // Add the Delete control
+            eToolstrip.ToolStrip.Items.Add(BuildDeleteEventButton(Note.LastMessage));
+
+            return eToolstrip;
+        }
+        #endregion
+
+        // DMessage
+        #region EItem BuildMessage(DMessage message, bool bDarkBackground)
         public EItem BuildMessage(DMessage message, bool bDarkBackground)
         {
             // Place the message in a container so that we draw a dividing line
@@ -992,6 +1310,7 @@ namespace OurWord.Edit
 
             return eMessage;
         }
+        #endregion
 
         // Messages Handlers for Tip controls ------------------------------------------------
         #region Method: void MoveCursorIntoTipArea()

@@ -1,0 +1,222 @@
+﻿#region ***** DlgHistory.cs *****
+/**********************************************************************************************
+ * Project: OurWord!
+ * File:    DlgHistory.cs
+ * Author:  John Wimbish
+ * Created: 26 Sept 2009
+ * Purpose: For displaying the History of a section or book
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
+#region Using
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Timers;
+using System.Windows.Forms;
+
+using JWTools;
+using JWdb;
+using JWdb.DataModel;
+
+using OurWord.Layouts;
+using OurWord.Edit;
+#endregion
+#endregion
+
+namespace OurWord.Dialogs
+{
+    #region Class: DlgHistory
+    public partial class DlgHistory : Form
+    {
+        WndHistory m_wndEntireBook;
+        WndHistory m_wndThisSection;
+
+        #region Constructor(DSection)
+        public DlgHistory(DSection section)
+        {
+            InitializeComponent();
+
+            m_wndEntireBook = new WndHistory(section.Book.History, "BookHistory");
+            m_tabBook.Controls.Add(m_wndEntireBook);
+
+            m_wndThisSection = new WndHistory(section.History, "SectionHistory");
+            m_tabSection.Controls.Add(m_wndThisSection);
+        }
+        #endregion
+
+        #region Cmd: cmdLoad
+        private void cmdLoad(object sender, EventArgs e)
+        {
+            m_wndEntireBook.LoadData();
+            m_wndThisSection.LoadData();
+
+            // Initial setting of width, height to tab control
+            cmdSizeChanged(null, null);
+        }
+        #endregion
+        #region Cmd: cmdSizeChanged
+        private void cmdSizeChanged(object sender, EventArgs e)
+        {
+            m_wndEntireBook.SetSize(m_tabs.DisplayRectangle.Size);
+            m_wndThisSection.SetSize(m_tabs.DisplayRectangle.Size);
+        }
+        #endregion
+    }
+    #endregion
+
+    public class WndHistory : OWWindow
+    {
+        const string c_sName = "History";
+        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
+        static public string RegistryBackgroundColor
+        {
+            get
+            {
+                return OWWindow.GetRegistryBackgroundColor(c_sName, "LightPink");
+            }
+            set
+            {
+                OWWindow.SetRegistryBackgroundColor(c_sName, value);
+            }
+        }
+        #endregion
+
+        #region Attr{g}: TranslatorNote History
+        TranslatorNote History
+        {
+            get
+            {
+                return m_History;
+            }
+        }
+        TranslatorNote m_History;
+        #endregion
+        #region Attr{g}: string Title
+        public string Title
+        {
+            get
+            {
+                return m_sTitle;
+            }
+        }
+        string m_sTitle;
+        #endregion
+        #region Attr{g}: JWritingSystem WS
+        JWritingSystem WS
+        {
+            get
+            {
+                return m_ws;
+            }
+        }
+        JWritingSystem m_ws;
+        #endregion
+
+        #region Constructor(history, sWindowName)
+        public WndHistory(TranslatorNote history, string sName)
+            : base(sName, 1)
+        {
+            m_History = history;
+
+            var section = history.Owner as DSection;
+            if (section != null)
+            {
+                m_sTitle = section.ReferenceSpan.DisplayName + " - " + section.Title;
+                m_ws = section.Translation.WritingSystemVernacular;
+            }
+
+            var book = history.Owner as DBook;
+            if (book != null)
+            {
+                m_sTitle = book.DisplayName;
+                m_ws = book.Translation.WritingSystemVernacular;
+            }
+        }
+        #endregion
+
+        // Commands --------------------------------------------------------------------------
+        #region Cmd: OnChangeStage
+        public void OnChangeStage(object sender, EventArgs e)
+        {
+            ToolStripMenuItem item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
+
+            DEventMessage Event = item.Tag as DEventMessage;
+            if (null == Event)
+                return;
+
+            (new ChangeStage(this, Event, item)).Do();
+        }
+        #endregion
+        #region Cmd: OnDateChanged
+        public void OnDateChanged(Object sender, EventArgs e)
+        {
+            var ctrl = (sender as DateTimePicker);
+            if (null == ctrl)
+                return;
+
+            DEventMessage Event = ctrl.Tag as DEventMessage;
+            if (null == Event)
+                return;
+
+            (new ChangeEventDate(this, Event, ctrl)).Do();
+        }
+        #endregion
+
+        // View Building ---------------------------------------------------------------------
+        #region OMethod: void LoadData()
+        public override void LoadData()
+        {
+            // Start with an empty window
+            Clear();
+
+            // If this note had no messages, add one now
+            if (!History.HasMessages)
+            {
+                var sStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idDraft).Name;
+                var message = new DEventMessage(DateTime.UtcNow, sStage, "");
+                History.Messages.Append(message);
+            }
+
+            // Builder helper class
+            var build = new BuildToolTip(this, History, WS);
+
+            // Title
+            var eTitle = build.BuildNoteTitle(Title);
+            Contents.Append(eTitle);
+
+            // Message List
+            bool bDarkBackground = true;
+            foreach (DEventMessage message in History.Messages)
+            {
+                var eMessage = build.BuildMessage(message, bDarkBackground);
+                Contents.Append(eMessage);
+                bDarkBackground = !bDarkBackground;
+            }
+
+            // Toolbar (respond, delete)
+            Contents.Append(build.BuildHistoryToolStrip());
+
+            // Tell the superclass to finish loading, which involves laying out the window 
+            // with the data we've just put in, as doing the same for any secondary windows.
+            base.LoadData();
+
+            // Position at the top
+            ScrollBarPosition = 0;
+        }
+        #endregion
+
+
+
+
+
+
+    }
+}

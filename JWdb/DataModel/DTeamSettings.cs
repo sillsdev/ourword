@@ -1045,7 +1045,7 @@ namespace JWdb.DataModel
             {
                 style = AddParagraphStyle(c_StyleMessageHeader, "Message Header");
                 style.SetFonts(false, 9, true);
-                style.SpaceBefore = 10;
+                style.SpaceBefore = 0;
                 style.SpaceAfter = 0;
             }
 

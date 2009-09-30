@@ -84,7 +84,7 @@ namespace OurWord.SideWnd
         #region Cmd: cmdAddEvent
         private void cmdAddEvent(object sender, EventArgs e)
         {
-            (new InsertHistoryAction(Window as HistoryWnd)).Do();
+        //    (new InsertHistoryAction(Window as HistoryWnd)).Do();
         }
         #endregion
         #region Cmd: cmdDeleteEvent

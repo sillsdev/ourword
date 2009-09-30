@@ -188,7 +188,7 @@ namespace OurWord.Edit
         {
             get
             {
-                // Because I allow literals, sometimes paragraphs to not have data sources.
+                // Because I allow literals, sometimes paragraphs do not have data sources.
                 // EContainer.FindContainerOfDataSource, e.g., needs DataSource to return
                 // null, rather than fire an assertion.
                 //    Once I get all OWPara's to have a data source, then I should

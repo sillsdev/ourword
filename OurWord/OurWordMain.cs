@@ -738,7 +738,7 @@ namespace OurWord
             bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
             bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
             bool bShowTranslationsPane = (DB.IsValidProject && DB.Project.OtherTranslations.Count > 0);
-            bool bShowHistoryMenu = (DB.IsValidProject && s_Features.SectionHistory);
+            bool bShowHistoryMenu = false; // (DB.IsValidProject && s_Features.SectionHistory);
 
 #if FEATURE_WESAY
             bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
@@ -2058,7 +2058,7 @@ namespace OurWord
             {
                 get
                 {
-                    return m_Dlg.GetEnabledState(ID.fSectionHistory.ToString());
+                    return false; //  m_Dlg.GetEnabledState(ID.fSectionHistory.ToString());
                 }
             }
             #endregion
