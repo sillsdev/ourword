@@ -780,7 +780,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        public void CheckSectionStructureAgainstFront(DBook BFront)
+        public void CheckSectionStructureAgainstFront(string sTargetPath, DBook BFront)
         {
             // If we don't have a Front book, or if we are not the TargetTranslation,
             // then we have nothing to do here.
@@ -805,8 +805,8 @@ namespace JWdb.DataModel
                 throw new eBookReadException(
                     GetSectionMiscountMsg(SFront, STarget),
                     HelpSystem.Topic.kErrStructureSectionMiscount,
-                    SFront.LineNoInFile,
-                    STarget.LineNoInFile
+                    eBookReadException.GetOffendingLineNumber(BFront.StoragePath, SFront),
+                    eBookReadException.GetOffendingLineNumber(sTargetPath, STarget)
                     );
             }
 
@@ -822,8 +822,9 @@ namespace JWdb.DataModel
                     throw new eBookReadException(
                         GetSpanMismatchMsg(i, SFront, STarget),
                         HelpSystem.Topic.kErrStructureSpanMismatch,
-                        SFront.LineNoInFile,
-                        STarget.LineNoInFile);
+                        eBookReadException.GetOffendingLineNumber(BFront.StoragePath, SFront),
+                        eBookReadException.GetOffendingLineNumber(sTargetPath, STarget)
+                    );
                 }
 
                 if (SFront.SectionStructure != STarget.SectionStructure)
@@ -831,8 +832,8 @@ namespace JWdb.DataModel
                     throw new eBookReadException(
                         GetStructureMismatchMsg(SFront, STarget),
                         HelpSystem.Topic.kErrStructureMismatch,
-                        SFront.LineNoInFile,
-                        STarget.LineNoInFile
+                        eBookReadException.GetOffendingLineNumber(BFront.StoragePath, SFront),
+                        eBookReadException.GetOffendingLineNumber(sTargetPath, STarget)
                         );
                 }
             }
@@ -1270,7 +1271,7 @@ namespace JWdb.DataModel
                 }
 
                 // Post Processing (calc versification, check structure against front)
-                Book._LoadPostProcessing();
+                Book._LoadPostProcessing(null);
 
                 // Done
                 return true;
@@ -1364,25 +1365,180 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region Method: bool LoadFromOxes(sPath, progress)
+        // I/O (Oxes) ------------------------------------------------------------------------
+
         public bool LoadFromOxes(string sPath, IProgressIndicator progress)
-            // Returns true if successful, false otherwise (which often means the user gave up)
         {
+            var oxes = new XmlDoc();
+
+            try
+            {
+                // Read in the xml file via the dotnet system
+                Clear();
+                oxes.Load(sPath);
+
+                // Find the Bible node (If well-formed Oxes, shouldn't be a problem.)
+                var nodeBible = XmlDoc.FindNode(oxes, c_sTagBible);
+                if (null == nodeBible)
+                {
+                    throw new eBookReadException(
+                        Loc.GetMessages("msgMissingBibleTag",
+                            "The oxes file is missing a \"Bible\" tag."),
+                        HelpSystem.Topic.kImportBook, 0);
+                }
+
+                // Make sure it is a version of Oxes that we handle
+                string sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
+                if (sOxes != "2.0")
+                {
+                    LocDB.Message("kUnsupportedOxes",
+                        "This version of OurWord does not support Oxes {0}.",
+                        new string[] { sOxes },
+                        LocDB.MessageTypes.Error);
+                    return false;
+                }
+
+                // Find the Book node (If well-formed Oxes, shouldn't be a problem.)
+                var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
+                if (null == nodeBook)
+                {
+                    throw new eBookReadException(
+                        Loc.GetMessages("msgMissingBookTag",
+                            "The oxes file is missing a \"Book\" tag."),
+                        HelpSystem.Topic.kImportBook, 0);
+                }
+
+                // Verify the Book's three-letter ID is what we expect
+                string sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+                if (string.IsNullOrEmpty(sBookID) || sBookID != BookAbbrev)
+                {
+                    string sBase = Loc.GetString("msgOxesImportBadAbbrev",
+                        "Either the Book's Abbreviation attribute is missing, \n" +
+                        "or it is not {0} as was expected.");
+                    string sMessage = LocDB.Insert(sBase, new string[] { BookAbbrev });
+                    throw new eBookReadException(sMessage, HelpSystem.Topic.kImportBook, 0);
+                }
+
+                // Read the Book's attributes
+                m_nTranslationStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, 0);
+                Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
+                Locked = XmlDoc.GetAttrValue(nodeBook, c_sAttrLocked, false);
+                Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
+                Comment = XmlDoc.GetAttrValue(nodeBook, c_sAttrComment, "");
+
+                // Read in the paragraphs
+                progress.Start("Reading", nodeBook.ChildNodes.Count);
+                DSection section = null;
+                foreach (XmlNode child in nodeBook.ChildNodes)
+                {
+                    progress.Step();
+
+                    // The first child node, if a History note, would be the History for the entire
+                    // book. (There will be no "section" defined yet. Otherwise, any History we
+                    // encounter goes with the most recently defined section.
+                    var history = TranslatorNote.Create(child);
+                    if (null != history && history.IsHistoryNote)
+                    {
+                        if (null == section)
+                            History = history;
+                        else
+                            section.History = history;
+                        continue;
+                    }
+
+                    // Create the paragraph or picture
+                    DParagraph paragraph = DPicture.CreatePicture(child);
+                    if (null == paragraph)
+                        paragraph = DParagraph.CreateParagraph(child);
+
+                    // A section for it to go into
+                    if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
+                    {
+                        section = new DSection();
+                        Sections.Append(section);
+                    }
+
+                    // Add the paragraph
+                    section.Paragraphs.Append(paragraph);
+                }
+
+                // Final post processing
+                _LoadPostProcessing(sPath);
+            }
+
+            // Error in the raw xml   
+            catch (XmlException eXml)
+            {
+                var bre = new eBookReadException(
+                    "There is a problem in the oxes file: " + eXml.Message,
+                    HelpSystem.Topic.kImportBook,
+                    eXml.LineNumber);
+                var dlgRepair = new DialogRepairImportBook(this, sPath, bre);
+                var result = dlgRepair.ShowDialog();
+                if (DialogResult.Cancel == result)
+                    return false;
+            }
+
+            // Error in the interpreted xml
+            catch (XmlDocException eDocXml)
+            {
+                int iLine = eDocXml.GetProblemLineNo(sPath, oxes);
+                var bre = new eBookReadException(
+                    "There is a problem in the oxes file: " + eDocXml.Message,
+                    HelpSystem.Topic.kImportBook,
+                    iLine);
+                var dlgRepair = new DialogRepairImportBook(this, sPath, bre);
+                var result = dlgRepair.ShowDialog();
+                if (DialogResult.Cancel == result)
+                    return false;
+            }
+
+            // Error in the book's structure
+            catch (eBookReadException bre)
+            {
+                DialogRepairImportBook dlgRepair = (bre.NeedToShowFront) ?
+                    new RepairImportBookStructure(FrontBook, this, sPath, bre) :
+                    new DialogRepairImportBook(this, sPath, bre);
+                var result = dlgRepair.ShowDialog();
+                if (DialogResult.Cancel == result)
+                    return false;
+            }
+
+            // System or otherwise unrepairable error
+            catch (Exception e)
+            {
+                LocDB.Message("kFailedToLoadOxesSysErr",
+                    "The Oxes file {0} failed to load with system error:\n{1}.",
+                    new string[] { Path.GetFileName(sPath), e.Message },
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+
+            // Successful
+            progress.End();
+            m_bIsLoaded = true;
+            return true;
+        }
+
+
+        #region HEADED FOR OBSOLESCENCE 01 Oct 2009
+        #region Method: XmlDoc _LoadFromOxes_ReadXml(string sPath)
+        XmlDoc _LoadFromOxes_ReadXml(string sPath)
             // Load the xml file, giving the user the opportunity to fix any errors that
             // occur. (In theory, if a valid Oxes loads, there will not be any further
             // errors downstream.)
-            bool bXmlLoaded = false;
-            var xml = new XmlDoc();
-            while (!bXmlLoaded)
+        {
+            while (true)
             {
                 try
                 {
                     Clear();
+                    var xml = new XmlDoc();
                     xml.Load(sPath);
-                    bXmlLoaded = true;
+                    return xml;
                 }
                 catch (XmlException xmle)
-                    // Error in the XML
+                // Error in the XML
                 {
                     // Display the Error Message & Repair dialog so that the user can have
                     // opportunity to fix it.
@@ -1394,18 +1550,28 @@ namespace JWdb.DataModel
 
                     // If he doesn't fix it, then we must abort the load
                     if (DialogResult.Cancel == result)
-                        return false;
+                        return null;
                 }
                 catch (Exception e)
-                    // I/O, Read Permission, or other similar system error
+                // I/O, Read Permission, or other similar system error
                 {
                     LocDB.Message("kFailedToLoadOxes",
                         "The Oxes file {0} failed to load with system error:\n{1}.",
                         new string[] { Path.GetFileName(sPath), e.Message },
                         LocDB.MessageTypes.Error);
-                    return false;
+                    return null;
                 }
             } // endwhile
+        }
+        #endregion
+        #region Method: bool LoadFromOxes(sPath, progress)
+        public bool LoadFromOxesOriginal(string sPath, IProgressIndicator progress)
+            // Returns true if successful, false otherwise (which often means the user gave up)
+        {
+            #region DONE
+            /////////////////////////////////////////////
+            // Load the xml file into an XmlDocument
+            var xml = _LoadFromOxes_ReadXml(sPath);
 
             // Find the Bible node (If well-formed Oxes, shouldn't be a problem.)
             var nodeBible = XmlDoc.FindNode(xml, c_sTagBible);
@@ -1483,11 +1649,13 @@ namespace JWdb.DataModel
                 // Add the paragraph
                 section.Paragraphs.Append(paragraph);
             }
+            //////////////////////////////////////////////
+            #endregion
 
             // Post Processing (calc versification, check structure against front)
             try
             {
-                _LoadPostProcessing();
+                _LoadPostProcessing(null);
             }
             catch (eBookReadException bre)
             {
@@ -1512,6 +1680,8 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
+        #endregion
+
         #region Method: bool LoadFromStandardFormat(sPath, progress)
         bool LoadFromStandardFormat(string sPath, IProgressIndicator progress)
         {
@@ -1585,8 +1755,8 @@ namespace JWdb.DataModel
             return true;
         }
         #endregion
-        #region Method: void _LoadPostProcessing()
-        void _LoadPostProcessing()
+        #region Method: void _LoadPostProcessing(sPath)
+        void _LoadPostProcessing(string sPath)
         {
             // If the first section is missing a SectionHead, put the first two sections
             // together (e.g., Timor Mark's)
@@ -1602,7 +1772,7 @@ namespace JWdb.DataModel
             if (Translation == DB.Project.TargetTranslation && FrontBook != null)
             {
                 // Make sure that each section has the same structure as the front.
-                CheckSectionStructureAgainstFront(FrontBook);
+                CheckSectionStructureAgainstFront(sPath, FrontBook);
 
                 // E.g., Generate the \ref and \cf's from the Front Translation
                 // We do the test here to prevent the FrontBook from attempting

@@ -2755,6 +2755,25 @@ namespace OurWord
                         SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Pulling);
                         throw new Exception(c_sCloneFailedMsg);
                     }
+
+                    // Open the first project we find (if any); we need it in order to
+                    // save the repository settings
+                    var vsProjects = ci.GetClusterLanguageList(true);
+                    if (null != vsProjects && vsProjects.Count > 0)
+                    {
+                        // Open the project
+                        string sPath = ci.GetProjectPath(vsProjects[0]);
+                        DB.Project = new DProject();
+                        DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
+                        DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
+                        OnEnterProject();
+
+                        // Save the Collaboration repository settings
+                        Repository.RemoteUrl = wiz.Url;
+                        Repository.RemoteUserName = wiz.UserName;
+                        Repository.RemotePassword = wiz.Password;
+                    }
+
                 }
                 catch (Exception ex)
                 {
@@ -2871,12 +2890,13 @@ namespace OurWord
             // Add them to the menu
             foreach (string s in vs)
             {
-                string sPath = ci.ClusterFolder + 
-                    ".Settings" + Path.DirectorySeparatorChar +
-                    s + ".owp";
+ //               string sPath = ci.ClusterFolder + 
+ //                   ".Settings" + Path.DirectorySeparatorChar +
+ //                   s + ".owp";
 
                 var mi = new ToolStripMenuItem(s, null, onClick);
-                mi.Tag = sPath;
+ //               mi.Tag = sPath;
+                mi.Tag = ci.GetProjectPath(s);
                 miParent.DropDownItems.Add(mi);
             }
         }

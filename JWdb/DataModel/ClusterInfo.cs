@@ -141,6 +141,16 @@ namespace JWdb.DataModel
         }
         #endregion
 
+        #region Method: string GetProjectPath(sProjectName)
+        public string GetProjectPath(string sProjectName)
+        {
+            string sPath = ClusterFolder +
+                ".Settings" + Path.DirectorySeparatorChar +
+                sProjectName + ".owp";
+            return sPath;
+        }
+        #endregion
+
         // User access of each projct, stored in the registry
         const string c_sSubKeyAccess = "ProjectAccess";
         #region Method: bool GetUserCanAccess(sProjectName)

@@ -530,6 +530,23 @@ namespace JWTools
             return true;
         }
 
+        #region SMethod: List<string> ReadFile(sPath)
+        static public List<string> ReadFile(string sPath)
+        {
+            var v = new List<string>();
+
+            var sr = new StreamReader(sPath, Encoding.UTF8);
+            var tr = TextReader.Synchronized(sr);
+
+            string s;
+            while ((s = tr.ReadLine()) != null)
+                v.Add(s);
+
+            tr.Close();
+
+            return v;
+        }
+        #endregion
 
     }
 

@@ -262,7 +262,7 @@ namespace JWdb.DataModel
             // We expect to have a path name
             picture.PathName = XmlDoc.GetAttrValue(nodePicture, c_sAttrPath, "");
             if (string.IsNullOrEmpty(picture.PathName))
-                throw new XmlDocException("Missing picture path in oxes file.");
+                throw new XmlDocException(nodePicture, "Missing picture path in oxes file.");
 
             // The Rtf info is optional
             picture.WordRtfInfo = XmlDoc.GetAttrValue(nodePicture, c_sAttrRtf, "");

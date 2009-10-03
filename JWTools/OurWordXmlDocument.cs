@@ -28,10 +28,71 @@ namespace JWTools
 {
     public class XmlDocException : Exception
     {
+        #region Attr{g}: XmlNode ProblemNode
+        XmlNode ProblemNode
+        {
+            get
+            {
+                return m_ProblemNode;
+            }
+        }
+        XmlNode m_ProblemNode;
+        #endregion
+
         #region Constructor(sErrorMessage)
-        public XmlDocException(string sMessage)
+        public XmlDocException(XmlNode _ProblemNode, string sMessage)
             : base(sMessage)
         {
+            m_ProblemNode = _ProblemNode;
+        }
+        #endregion
+
+        #region Method: bool FindNodeIndex(node, ref int c)
+        public bool FindNodeIndex(XmlNode node, ref int c)
+        {
+            if (node == ProblemNode)
+                return true;
+
+            if (node.Name == ProblemNode.Name)
+                c++;
+
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                if (FindNodeIndex(child, ref c))
+                    return true;
+            }
+
+            return false;
+        }
+        #endregion
+
+        #region Method: int GetProblemLineNo(sPath, XmlDocument)
+        public int GetProblemLineNo(string sPath, XmlDocument xml)
+        {
+            // Scan to see the sequential index of the problem node in the xml hierarchy
+            int c = 0;
+            if (!FindNodeIndex(xml, ref c))
+                return 0;
+
+            // Scan the corresponding input file to find the line number containing it
+            var sr = new StreamReader(sPath, Encoding.UTF8);
+            var tr = TextReader.Synchronized(sr);
+            int iLine = 0;
+            string sLookFor = "<" + ProblemNode.Name;
+            string s;
+            while (c >= 0 && (s = tr.ReadLine()) != null)
+            {
+                while (c >= 0 && s.IndexOf(sLookFor) != -1)
+                {
+                    s = s.Remove(s.IndexOf(sLookFor), sLookFor.Length);
+                    c--;
+                }
+
+                iLine++;
+            }
+            tr.Close();
+
+            return iLine;
         }
         #endregion
     }
@@ -267,7 +328,7 @@ namespace JWTools
             }
             catch (Exception e)
             {
-                throw new XmlDocException("Bad integer data in oxes file: " + e.Message);
+                throw new XmlDocException(node, "Bad integer data in oxes file: " + e.Message);
             }
         }
         #endregion

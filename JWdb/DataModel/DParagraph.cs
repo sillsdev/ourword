@@ -1525,7 +1525,10 @@ namespace JWdb.DataModel
             string sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
             var map = DB.Map.FindMappingFromName(sStyleName);
             if (null == map)
-                throw (new XmlDocException("Missing or unknown paragraph style name."));
+            {
+                throw (new XmlDocException(nodeParagraph,
+                    "Missing or unknown paragraph style name."));
+            }
             StyleAbbrev = map.OurWord;
 
             // Populate the runs from the child nodes

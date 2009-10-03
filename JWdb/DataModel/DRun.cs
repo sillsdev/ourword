@@ -383,7 +383,7 @@ namespace JWdb.DataModel
             {
                 string sText = XmlDoc.GetAttrValue(node, c_sAttrText, "");
                 if (string.IsNullOrEmpty(sText))
-                    throw new XmlDocException("Missing verse number");
+                    throw new XmlDocException(node, "Missing verse number");
                 return new DVerse(sText);
             }
             return null;
@@ -544,7 +544,7 @@ namespace JWdb.DataModel
             {
                 int nChapterNo = XmlDoc.GetAttrValue(node, c_sAttrText, 0);
                 if (0 == nChapterNo)
-                    throw new XmlDocException("Bad or missing chapter number in oxes data.");
+                    throw new XmlDocException(node, "Bad or missing chapter number in oxes data.");
 
                 return new DChapter(nChapterNo);
             }
@@ -868,17 +868,17 @@ namespace JWdb.DataModel
 
             string sStyle = XmlDoc.GetAttrValue(node, c_sAttrStyle, "");
             if (string.IsNullOrEmpty(sStyle))
-                throw new XmlDocException("Missing Style attribute in oxes read.");
+                throw new XmlDocException(node, "Missing Style attribute in oxes read.");
 
             string sUsfm = XmlDoc.GetAttrValue(node, c_sAttrUsfm, "");
             if (string.IsNullOrEmpty(sUsfm))
-                throw new XmlDocException("Missing Usfm attribute in oxes read.");
+                throw new XmlDocException(node, "Missing Usfm attribute in oxes read.");
 
             // The Usfm and the Style should match up; if they don't, we hardly know which
             // one the user wanted.
             var map = DB.Map.FindMappingFromUsfm(sUsfm);
             if (null == map || map.Name != sStyle)
-                throw new XmlDocException("Style and Usfm data do not match.");
+                throw new XmlDocException(node, "Style and Usfm data do not match.");
 
             // Create the empty footnote, and place it into a DFoot object
             var footnote = new DFootnote(

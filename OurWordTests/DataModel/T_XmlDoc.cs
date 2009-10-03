@@ -28,11 +28,10 @@ using OurWord.Layouts;
 #endregion
 #endregion
 
-
-namespace OurWordTests.JWTools
+namespace OurWordTests.DataModel
 {
     [TestFixture]
-    public class T_XmlDoc
+    public class T_XmlDoc : TestCommon
     {
         #region Setup
         [SetUp]
@@ -168,6 +167,43 @@ namespace OurWordTests.JWTools
             string sUrl = ua.MakeUrl();
 
             Assert.AreEqual("oxes://book=John+chapter=3+verse=16", sUrl, "Should be identical.");
+        }
+        #endregion
+
+        #region Test: FindNodeIndex
+        [Test] public void FindNodeIndex()
+        {
+            // Load in some oxes data
+            var xmlOxes = new XmlDoc(SectionTestData.BaikenoMark0101_oxes);
+            xmlOxes.NormalizeCreatedDates();
+
+            // We'll look for the <bt> in the book's 3rd paragraph
+            var nodeBible = XmlDoc.FindNode(xmlOxes, "bible");
+            var nodeBook = XmlDoc.FindNode(nodeBible, "book");
+            var nodeThirdPara = nodeBook.ChildNodes[2];
+            var nodeBT = XmlDoc.FindNode(nodeThirdPara, "bt");
+
+            // Find the node's position; that is, how many occurences of <bt> have
+            // happened by the time we get to the one in question. 
+            var e = new XmlDocException(nodeBT, "test");
+            int c = 0;
+            e.FindNodeIndex(xmlOxes, ref c);
+
+            // We expect it to be 3
+            Assert.AreEqual(3, c);
+
+            // We need a temporary file with the oxes data, that we can then read in
+            var vsOxes = SectionTestData.BaikenoMark0101_oxes;
+            TextWriter W = JWU.NUnit_OpenTextWriter("test.x");
+            foreach (string s in vsOxes)
+                W.WriteLine(s);
+            W.Close();
+
+            // Get the actual line number
+            int iLine = e.GetProblemLineNo(JWU.NUnit_TestFilePathName, xmlOxes);
+
+            // We expect it to be 22
+            Assert.AreEqual(22, iLine);
         }
         #endregion
     }

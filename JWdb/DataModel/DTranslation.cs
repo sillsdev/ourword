@@ -139,6 +139,8 @@ namespace JWdb.DataModel
         public void PopulateBookListFromFolder()
         {
             // Get a list of all of the Oxes files in the translation's folder
+            if (!Directory.Exists(BookStorageFolder))
+                Directory.CreateDirectory(BookStorageFolder);
             var vsOxesFiles = Directory.GetFiles(BookStorageFolder, "*.oxes");
 
             // Create books from each that fit the pattern

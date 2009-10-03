@@ -313,14 +313,45 @@ namespace JWdb.DataModel
 			// what was a bottleneck according to the Profile is now gone!
 			string[] v = box.Lines;
 
+            // Calculate the offset position of the line of text
 			int cStart = 0;
 			for(int i=0; i < nLine && i < v.Length; i++)
-			{
 				cStart += (v[i].Length + 1);
-			}
 
-			if (nLine >= 0 && nLine < box.Lines.Length)
-				box.Select(cStart, box.Lines[nLine].Length);
+            // Select the bottom line so we force a scroll to it. Then, when we select
+            // the actual text we're interested in, it will appear at the top of the control,
+            // so that we can see the following text (which is what we need to see to
+            // make repairs.)
+            box.Select(box.Text.Length, 0);
+            box.ScrollToCaret();
+
+            // Select our target position
+            if (nLine >= 0 && nLine < v.Length)
+            {
+                string sLine = v[nLine];
+
+                // Standard format: select the entire line, as they tend to be short enough
+                if (sLine.Length > 0 && sLine[0] == '\\')
+                {
+                    box.Select(cStart, v[nLine].Length);
+                    return;
+                }
+
+                // Xml: select to the end of the tag
+                if (sLine.Trim().Length > 0 && sLine.Trim()[0] == '<')
+                {
+                    int i = sLine.IndexOf('>');
+                    if (i != -1)
+                    {
+                        box.Select(cStart, i + 1);
+                        return;
+                    }
+                }
+
+                // Otherwise, just select the first 20 characters
+                int iLength = Math.Min(v[nLine].Length, 20);
+                box.Select(cStart, iLength);
+            }
 		}
 		#endregion
 
@@ -341,6 +372,7 @@ namespace JWdb.DataModel
 
         }
 		#endregion
+
         #region Cmd: OnLayout(LayoutEventArgs)
         protected override void OnLayout(LayoutEventArgs levent)
         {
@@ -753,6 +785,46 @@ namespace JWdb.DataModel
 			m_HelpID  = _HelpID;
 		}
 		#endregion
-	}
+
+        #region SMethod: nt GetOffendingLineNumber(sPath, DSection)
+        static public int GetOffendingLineNumber(string sPath, DSection section)
+        {
+            // We already have this in standard format files
+            if (string.IsNullOrEmpty(sPath) || !sPath.ToLower().Contains(".oxes"))
+                return section.LineNoInFile;
+
+            // Load the file
+            var vs = JWU.ReadFile(sPath);
+
+            // We'll look for the chapter and verse in the section's reference
+            var cv = section.ReferenceSpan.Start;
+            string sChapter = "<c n=\"" + cv.Chapter + "\" />";
+            string sVerse = "<v n=\"" + cv.Verse;
+            string sSection = "<p class=\"Section Head\"";
+
+            // Scan for our target
+            int iLine = 0;
+            int iLineSection = 0;
+            bool bChapterFound = false;
+            foreach (string s in vs)
+            {
+                // The SelectLine routine appears to be 1-based.
+                // TODO: Make it 0-based.
+                if (s.Contains(sSection))
+                    iLineSection = iLine + 1; 
+
+                if (s.Contains(sChapter))
+                    bChapterFound = true;
+
+                if (bChapterFound && s.Contains(sVerse))
+                    return iLineSection;
+
+                iLine++;
+            }
+
+            return 0;
+        }
+        #endregion
+    }
 
 }
