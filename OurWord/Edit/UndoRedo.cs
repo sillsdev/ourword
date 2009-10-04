@@ -2858,96 +2858,6 @@ namespace OurWord.Edit
     #endregion
 
     // History -------------------------------------------------------------------------------
-
-    #region CLASS: DeleteHistoryAction
-    public class DeleteHistoryAction : BookmarkedAction
-    {
-        #region Attr[g}: DEventMessage Event - We keep it so we can restore on Undo
-        protected DEventMessage Event
-        {
-            get
-            {
-                Debug.Assert(null != m_Event);
-                return m_Event;
-            }
-        }
-        DEventMessage m_Event;
-        #endregion
-
-        #region Constructor(OWWindow, DEventMessage)
-        public DeleteHistoryAction(OWWindow window, DEventMessage Event)
-            : base(window, "Delete Event")
-        {
-            Debug.Assert(null != Event);
-            m_Event = Event;
-        }
-        #endregion
-
-        #region Method: Dictionary<DEventMessage, bool> PushCollapseStates()
-        Dictionary<DEventMessage, bool> PushCollapseStates()
-        {
-            var states = new Dictionary<DEventMessage, bool>();
-            foreach (DEventMessage e in DB.TargetSection.History.Messages)
-            {
-                var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
-                if (null != container)
-                    states.Add(e, container.IsCollapsed);
-            }
-            return states;
-        }
-        #endregion
-        #region Method: void RestoreStates(Dictionary<DEventMessage, bool> states)
-        void RestoreStates(Dictionary<DEventMessage, bool> states)
-        {
-            foreach (DEventMessage e in DB.TargetSection.History.Messages)
-            {
-                var container = (Window as HistoryWnd).GetCollapsableFromEvent(e);
-                if (null != container)
-                {
-                    bool b;
-                    if (states.TryGetValue(e, out b))
-                        container.IsCollapsed = b;
-                }
-            }
-        }
-        #endregion
-
-        #region OMethod: bool PerformAction()
-        protected override bool PerformAction()
-        {
-            // Remove the event from its owner
-            DB.TargetSection.History.RemoveMessage(Event);
-
-            // Regenerate the windows
-            var states = PushCollapseStates();
-            G.App.ResetWindowContents();
-            RestoreStates(states);
-            Window.DoLayout();
-            Window.Invalidate();
-
-            return true;
-        }
-        #endregion
-        #region OMethod: void ReverseAction()
-        protected override void ReverseAction()
-        {
-            // Re-insert the event
-            DB.TargetSection.History.AddMessage(Event);
-
-            // Recalculate the display
-            var states = PushCollapseStates();
-            G.App.ResetWindowContents();
-            RestoreStates(states);
-
-            // Expand what we just inserted
-            var eCollapsable = (Window as HistoryWnd).GetCollapsableFromEvent(Event);
-            eCollapsable.IsCollapsed = false;
-            Window.DoLayout();
-            Window.Invalidate();
-        }
-        #endregion
-    }
-    #endregion
     #region CLASS: ChangeStage
     public class ChangeStage : BookmarkedAction
     {
@@ -2982,6 +2892,17 @@ namespace OurWord.Edit
         }
         string m_sOriginalStage;
         #endregion
+        #region Attr{g}: ToolStripDropDownButton StagesDropDown
+        public ToolStripDropDownButton StagesDropDown
+        {
+            get
+            {
+                Debug.Assert(null != m_StagesDropDownButton);
+                return m_StagesDropDownButton;
+            }
+        }
+        ToolStripDropDownButton m_StagesDropDownButton;
+        #endregion
 
         #region Constructor(OWWindow, Event, itemNewStage)
         public ChangeStage(OWWindow window, DEventMessage Event, ToolStripMenuItem itemNewStage)
@@ -2994,15 +2915,10 @@ namespace OurWord.Edit
 
             // Get the stage we are currently
             m_sOriginalStage = Event.Stage;
-        }
-        #endregion
-        #region Method: ToolStripDropDownButton GetStagesDropDown()
-        ToolStripDropDownButton GetStagesDropDown()
-        {
-            var wndHistory = Window as HistoryWnd;
-            if (null == wndHistory)
-                return null;
-            return wndHistory.GetStageDropDownFromEvent(Event);
+
+            // Save a pointer to the owning DropDown button which owns this item
+            m_StagesDropDownButton = itemNewStage.OwnerItem as ToolStripDropDownButton;
+            Debug.Assert(null != m_StagesDropDownButton);
         }
         #endregion
 
@@ -3013,10 +2929,6 @@ namespace OurWord.Edit
             Event.Stage = NewStage;
 
             // Update the menu
-            var StagesDropDown = GetStagesDropDown();
-            if (null == StagesDropDown)
-                return false;
-
             foreach (ToolStripMenuItem item in StagesDropDown.DropDownItems)
                 item.Checked = (item.Text == Event.Stage);
 
@@ -3032,10 +2944,6 @@ namespace OurWord.Edit
             Event.Stage = OriginalStage;
 
             // Update the menu
-            var StagesDropDown = GetStagesDropDown();
-            if (null == StagesDropDown)
-                return;
-
             foreach (ToolStripMenuItem item in StagesDropDown.DropDownItems)
                 item.Checked = (item.Text == NewStage);
 
@@ -3105,19 +3013,6 @@ namespace OurWord.Edit
         protected override bool PerformAction()
         {
             Event.EventDate = NewDate;
-
-            // Update the date picker
-            var wndHistory = Window as HistoryWnd;
-            if (null == wndHistory)
-                return false;
-            var dtp = wndHistory.GetPickerFromEvent(Event);
-            if (null == dtp)
-                return false;
-
-            dtp.ValueChanged -= new EventHandler(wndHistory.OnDateChanged);
-            dtp.Value = Event.EventDate;
-            dtp.ValueChanged += new EventHandler(wndHistory.OnDateChanged);
-           
             return true;
         }
         #endregion
@@ -3125,18 +3020,6 @@ namespace OurWord.Edit
         protected override void ReverseAction()
         {
             Event.EventDate = OriginalDate;
-
-            // Locate the event and change its value
-            var wndHistory = Window as HistoryWnd;
-            if (null == wndHistory)
-                return;
-            var dtp = wndHistory.GetPickerFromEvent(Event);
-            if (null == dtp)
-                return;
-
-            dtp.ValueChanged -= new EventHandler(wndHistory.OnDateChanged);
-            dtp.Value = Event.EventDate;
-            dtp.ValueChanged += new EventHandler(wndHistory.OnDateChanged);
         }
         #endregion
 
@@ -3150,5 +3033,5 @@ namespace OurWord.Edit
         }
         #endregion
     }
-    #endregion
+    #endregion   
 }

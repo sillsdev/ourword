@@ -72,21 +72,7 @@ namespace OurWord.Dialogs
 
     public class WndHistory : OWWindow
     {
-        const string c_sName = "History";
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
-        static public string RegistryBackgroundColor
-        {
-            get
-            {
-                return OWWindow.GetRegistryBackgroundColor(c_sName, "LightPink");
-            }
-            set
-            {
-                OWWindow.SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
-
+        // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: TranslatorNote History
         TranslatorNote History
         {
@@ -118,6 +104,7 @@ namespace OurWord.Dialogs
         JWritingSystem m_ws;
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor(history, sWindowName)
         public WndHistory(TranslatorNote history, string sName)
             : base(sName, 1)
@@ -138,6 +125,44 @@ namespace OurWord.Dialogs
                 m_ws = book.Translation.WritingSystemVernacular;
             }
         }
+        #endregion
+        const string c_sName = "History";
+        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
+        static public string RegistryBackgroundColor
+        {
+            get
+            {
+                return OWWindow.GetRegistryBackgroundColor(c_sName, "LightPink");
+            }
+            set
+            {
+                OWWindow.SetRegistryBackgroundColor(c_sName, value);
+            }
+        }
+        #endregion
+
+        // Controls (set during LoadData) ----------------------------------------------------
+        #region Attr{g}: ToolStripButton AddEventButton
+        ToolStripButton AddEventButton
+        {
+            get
+            {
+                Debug.Assert(null != m_btnAddEvent);
+                return m_btnAddEvent;
+            }
+        }
+        ToolStripButton m_btnAddEvent;
+        #endregion
+        #region Attr{g}: ToolStripButton DeleteEventButton
+        ToolStripButton DeleteEventButton
+        {
+            get
+            {
+                Debug.Assert(null != m_btnDeleteEvent);
+                return m_btnDeleteEvent;
+            }
+        }
+        ToolStripButton m_btnDeleteEvent;
         #endregion
 
         // Commands --------------------------------------------------------------------------
@@ -169,6 +194,15 @@ namespace OurWord.Dialogs
             (new ChangeEventDate(this, Event, ctrl)).Do();
         }
         #endregion
+        #region Cmd: OnCursorTimerTick - updates button enabling
+        protected override void OnCursorTimerTick()
+        {
+            if (string.IsNullOrEmpty(History.LastMessage.SimpleText))
+                AddEventButton.Enabled = false;
+            else
+                AddEventButton.Enabled = true;
+        }
+        #endregion
 
         // View Building ---------------------------------------------------------------------
         #region OMethod: void LoadData()
@@ -176,6 +210,11 @@ namespace OurWord.Dialogs
         {
             // Start with an empty window
             Clear();
+
+            // If this note has an empty message from before, delete it, because we want
+            // to create a new one with today's date
+            if (History.Messages.Count == 1 && string.IsNullOrEmpty(History.Messages[0].SimpleText))
+                History.RemoveMessage(History.Messages[0]);
 
             // If this note had no messages, add one now
             if (!History.HasMessages)
@@ -202,7 +241,13 @@ namespace OurWord.Dialogs
             }
 
             // Toolbar (respond, delete)
-            Contents.Append(build.BuildHistoryToolStrip());
+            var eToolstrip = new EToolStrip(this);
+            m_btnAddEvent = build.BuildAddEventControl();
+            eToolstrip.ToolStrip.Items.Add(m_btnAddEvent);
+            eToolstrip.ToolStrip.Items.Add(new ToolStripLabel("  "));
+            m_btnDeleteEvent = build.BuildDeleteEventButton(History.LastMessage);
+            eToolstrip.ToolStrip.Items.Add(m_btnDeleteEvent);
+            Contents.Append(eToolstrip);
 
             // Tell the superclass to finish loading, which involves laying out the window 
             // with the data we've just put in, as doing the same for any secondary windows.
@@ -212,11 +257,5 @@ namespace OurWord.Dialogs
             ScrollBarPosition = 0;
         }
         #endregion
-
-
-
-
-
-
     }
 }

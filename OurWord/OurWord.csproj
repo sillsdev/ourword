@@ -268,10 +268,6 @@
       <DependentUpon>LiterateSettingsWnd.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="SideWnd\HistoryPane.resx">
-      <DependentUpon>HistoryPane.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Res\FileNew.gif" />
     <EmbeddedResource Include="Res\FileOpen.gif" />
     <EmbeddedResource Include="Res\DeleteMergeFile.ico" />
@@ -635,12 +631,6 @@
     </Compile>
     <Compile Include="Layouts\Drafting.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="SideWnd\HistoryPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="SideWnd\HistoryPane.Designer.cs">
-      <DependentUpon>HistoryPane.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\Naturalness.cs">
       <SubType>Component</SubType>

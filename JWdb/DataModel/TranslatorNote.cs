@@ -1461,7 +1461,10 @@ namespace JWdb.DataModel
         #region Method: XmlNode Save(oxes, nodeAnnotation)
         public XmlNode Save(XmlDoc oxes, XmlNode nodeParent)
         {
+            // We don't save empty notes
             if (!HasMessages)
+                return null;
+            if (Messages.Count == 1 && String.IsNullOrEmpty(Messages[0].SimpleText))
                 return null;
 
             var nodeNote = oxes.AddNode(nodeParent, c_sTagTranslatorNote);

@@ -307,9 +307,6 @@ namespace OurWord
                 if (DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
                     SideWindows.AddPage(new TranslationsPane(), "Translations");
 
-                if (OurWordMain.s_Features.SectionHistory && DProject.VD_ShowHistoryPane)
-                    SideWindows.AddPage(new HistoryPane(), "History");
-
 #if FEATURE_WESAY
                 if (s_Features.F_Dictionary && DProject.ShowDictionaryPane)
                     SideWindows.CreateDictionaryPane();
@@ -462,7 +459,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuBackTranslation;
         private ToolStripMenuItem m_menuNaturalnessCheck;
         private ToolStripSeparator m_separatorWindow;
-        private ToolStripMenuItem m_menuShowHistory;
         private ToolStripMenuItem m_menuShowTranslationsPane;
         private ToolStripMenuItem m_menuShowDictionaryPane;
         private ToolStripSeparator m_separatorZoom;
@@ -762,9 +758,6 @@ namespace OurWord
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
 
-            m_menuShowHistory.Visible = bShowHistoryMenu;
-            m_menuShowHistory.Checked = bShowHistoryMenu && DProject.VD_ShowHistoryPane;
-
 #if FEATURE_WESAY
             m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
             m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
@@ -1046,7 +1039,6 @@ namespace OurWord
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuShowHistory = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorZoom = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
@@ -1665,7 +1657,6 @@ namespace OurWord
             this.m_menuBackTranslation,
             this.m_separatorWindow,
             this.m_menuShowTranslationsPane,
-            this.m_menuShowHistory,
             this.m_menuShowDictionaryPane,
             this.m_separatorZoom,
             this.m_menuZoom});
@@ -1718,14 +1709,6 @@ namespace OurWord
             this.m_menuShowTranslationsPane.Text = "Show &Other Translations Pane";
             this.m_menuShowTranslationsPane.ToolTipText = "Show the Other Translations Pane";
             this.m_menuShowTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
-            // 
-            // m_menuShowHistory
-            // 
-            this.m_menuShowHistory.Name = "m_menuShowHistory";
-            this.m_menuShowHistory.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowHistory.Text = "Show &History Pane";
-            this.m_menuShowHistory.ToolTipText = "Show the History Pane";
-            this.m_menuShowHistory.Click += new System.EventHandler(this.cmdToggleHistoryPane);
             // 
             // m_menuShowDictionaryPane
             // 
@@ -2053,15 +2036,6 @@ namespace OurWord
                 }
             }
             #endregion
-            #region Attr{g}: bool SectionHistory
-            public bool SectionHistory
-            {
-                get
-                {
-                    return false; //  m_Dlg.GetEnabledState(ID.fSectionHistory.ToString());
-                }
-            }
-            #endregion
 
             #region Attr{g}: bool F_Project
 			public bool F_Project
@@ -2230,7 +2204,6 @@ namespace OurWord
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
                 fTranslatorNotes,
-                fSectionHistory,
 #if FEATURE_WESAY
                 fDictionary,
 #endif
@@ -2266,14 +2239,6 @@ namespace OurWord
                     "Naturalness Check Window",
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
-
-                m_Dlg.Add(ID.fSectionHistory.ToString(),
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "Section History",
-                    "Enables the History side window, which you can use to track the translation stages " +
-                        "for individual sections.");
                         
 #if FEATURE_WESAY
                 m_Dlg.Add(ID.fDictionary.ToString(),
@@ -3307,13 +3272,6 @@ namespace OurWord
 #endif
         }
         #endregion
-        #region Cmd: cmdToggleHistoryPane
-        private void cmdToggleHistoryPane(object sender, EventArgs e)
-        {
-            DProject.VD_ShowHistoryPane = !DProject.VD_ShowHistoryPane;
-            _UpdateSideWindows();
-        }
-        #endregion
 
         #region Cmd: cmdJobDrafting
         private void cmdJobDrafting(Object sender, EventArgs e)
@@ -3668,11 +3626,13 @@ namespace OurWord
             OnEnterProject();
         }
         #endregion
+        #region Cmd: cmdHistory
         private void cmdHistory(object sender, EventArgs e)
         {
             var history = new DlgHistory(DB.TargetSection);
             history.ShowDialog(this);
         }
+        #endregion
 
         // Help
         #region Cmd: cmdHelpTopics

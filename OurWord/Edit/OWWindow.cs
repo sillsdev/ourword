@@ -1,6 +1,7 @@
+#region ***** OWWindow.cs *****
 /**********************************************************************************************
  * Project: OurWord!
- * File:    OWPara.cs
+ * File:    OWWindow.cs
  * Author:  John Wimbish
  * Created: 21 Mar 2007
  * Purpose: A window, with rows and piles
@@ -23,6 +24,7 @@ using JWTools;
 using JWdb;
 using JWdb.DataModel;
 using Palaso.UI.WindowsForms.Keyboarding;
+#endregion
 #endregion
 
 namespace OurWord.Edit
@@ -197,6 +199,11 @@ namespace OurWord.Edit
             {
                 return (null == MainWindow);
             }
+        }
+        #endregion
+        #region VMethod: void OnCursorTimerTick()
+        protected virtual void OnCursorTimerTick()
+        {
         }
         #endregion
 
@@ -1684,6 +1691,9 @@ namespace OurWord.Edit
 
                 // Invalidate the word that contains the insertion point
                 Window.Draw.InvalidateBlock(Anchor.Word);
+
+                // Let the window do anything it wants
+                Window.OnCursorTimerTick();
             }
             #endregion
             #region Method: void SetupTimer()

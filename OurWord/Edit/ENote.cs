@@ -1225,7 +1225,7 @@ namespace OurWord.Edit
         #endregion
 
         #region Method: var BuildAddEventControl()
-        ToolStripButton BuildAddEventControl()
+        public ToolStripButton BuildAddEventControl()
         {
             // Create the button
             string sButtonText = Loc.GetNotes("AddEvent", "Add New");
@@ -1248,7 +1248,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
-        ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
+        public ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
         {
             string sButtonText = Loc.GetNotes("DeleteEvent", "Delete...");
             var btn = new ToolStripButton(sButtonText);
@@ -1256,7 +1256,7 @@ namespace OurWord.Edit
             btn.Tag = Note;
             btn.Click += new EventHandler(cmdDeleteEvent);
 
-            // Disable if one one message
+            // Disable if only one message
             if (Note.Messages.Count < 2)
                 btn.Enabled = false;
 
@@ -1265,24 +1265,6 @@ namespace OurWord.Edit
                 "Delete the most recent event.");
 
             return btn;
-        }
-        #endregion
-        #region Method: EToolStrip BuildHistoryToolStrip()
-        public EToolStrip BuildHistoryToolStrip()
-        {
-            // Create the EToolStrip
-            var eToolstrip = new EToolStrip(Tip);
-
-            // Respond button
-            eToolstrip.ToolStrip.Items.Add(BuildAddEventControl());
-
-            // Space
-            eToolstrip.ToolStrip.Items.Add(new ToolStripLabel("  "));
-
-            // Add the Delete control
-            eToolstrip.ToolStrip.Items.Add(BuildDeleteEventButton(Note.LastMessage));
-
-            return eToolstrip;
         }
         #endregion
 

@@ -1482,6 +1482,7 @@ namespace JWdb.DataModel
                 _LoadPostProcessing(sPath);
             }
 
+            #region Handle Exceptions
             // Error in the raw xml   
             catch (XmlException eXml)
             {
@@ -1530,6 +1531,7 @@ namespace JWdb.DataModel
                     LocDB.MessageTypes.Error);
                 return false;
             }
+            #endregion
 
             // Successful
             progress.End();

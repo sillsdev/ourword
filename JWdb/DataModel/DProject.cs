@@ -57,20 +57,6 @@ namespace JWdb.DataModel
 		}
         static private bool m_bVD_ShowTranslationsPane = false;
 		#endregion
-        #region BAttr{g/s}: bool VD_ShowHistoryPane 
-        static public bool VD_ShowHistoryPane
-        {
-            get
-            {
-                return m_bVD_ShowHistoryPane;
-            }
-            set
-            {
-                m_bVD_ShowHistoryPane = value;
-            }
-        }
-        static private bool m_bVD_ShowHistoryPane = false;
-        #endregion
         #region BAttr{g/s}: bool ShowDictionaryPane
 #if FEATURE_WESAY
         static public bool ShowDictionaryPane
@@ -152,7 +138,6 @@ namespace JWdb.DataModel
             DefineAttr("DictData", ref m_sPathToDictionaryData);
 
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
-            DefineAttr("vdShowHistory",  ref m_bVD_ShowHistoryPane);
 
             DefineAttr("Persons", ref m_bsaPeople);
 			DefineAttr("Version", ref m_nVersion);
