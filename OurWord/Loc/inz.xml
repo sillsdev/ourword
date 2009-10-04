@@ -1446,7 +1446,7 @@
       <Alt ID="inz" Value="Coba ulang"></Alt>
     </Item>
     <Item ID="m_btnCancel">
-      <Alt ID="inz" Value="Batal Impor"></Alt>
+      <Alt ID="inz" Value="Batal"></Alt>
     </Item>
     <Item ID="sRemoveWarning">
       <Alt ID="inz" Value="Jika anda tidak memperbaiki masalah, {0} akan dihilangkan dari ciri-ciri {1}.{n}{n}Apakah betul anda ingin batal proses ini, sehingga buku tidak lagi diimpor sekarang?"></Alt>

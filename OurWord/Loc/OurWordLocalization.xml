@@ -1596,7 +1596,7 @@
       <English>Try Again</English>
     </Item>
     <Item ID="m_btnCancel">
-      <English>Cancel Import</English>
+      <English>Cancel Read</English>
     </Item>
     <Item ID="sRemoveWarning">
       <English>If you do not fix the error, {0} will be removed from the {1} properties.{n}{n} Are you sure you want to cancel reading the book?</English>

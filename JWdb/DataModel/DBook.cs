@@ -1366,9 +1366,19 @@ namespace JWdb.DataModel
         #endregion
 
         // I/O (Oxes) ------------------------------------------------------------------------
+        #region Method: bool LoadFromOxes(string sPath, IProgressIndicator progress)
 
-        public bool LoadFromOxes(string sPath, IProgressIndicator progress)
+        public void LoadFromOxes(string sPath, IProgressIndicator progress)
         {
+            while (_LoadFromOxes(sPath, progress))
+                ;
+        }
+
+        public bool _LoadFromOxes(string sPath, IProgressIndicator progress)
+            // Returns true if the user wishes to try again following making corrections in the
+            // Repair dialog, false otherwise.
+        {
+            m_bIsLoaded = false;
             var oxes = new XmlDoc();
 
             try
@@ -1435,10 +1445,16 @@ namespace JWdb.DataModel
 
                     // The first child node, if a History note, would be the History for the entire
                     // book. (There will be no "section" defined yet. Otherwise, any History we
-                    // encounter goes with the most recently defined section.
+                    // encounter goes with the most recently defined section. (The only notes
+                    // we should see at this level are History notes.)
                     var history = TranslatorNote.Create(child);
-                    if (null != history && history.IsHistoryNote)
+                    if (null != history)
                     {
+                        if (!history.IsHistoryNote)
+                        {
+                            throw new XmlDocException(child,
+                                "A non-History Annotation was encountered at the top level of the book.");
+                        }
                         if (null == section)
                             History = history;
                         else
@@ -1469,19 +1485,20 @@ namespace JWdb.DataModel
             // Error in the raw xml   
             catch (XmlException eXml)
             {
+                progress.End();
                 var bre = new eBookReadException(
                     "There is a problem in the oxes file: " + eXml.Message,
                     HelpSystem.Topic.kImportBook,
                     eXml.LineNumber);
                 var dlgRepair = new DialogRepairImportBook(this, sPath, bre);
                 var result = dlgRepair.ShowDialog();
-                if (DialogResult.Cancel == result)
-                    return false;
+                return (DialogResult.OK == result);
             }
 
             // Error in the interpreted xml
             catch (XmlDocException eDocXml)
             {
+                progress.End();
                 int iLine = eDocXml.GetProblemLineNo(sPath, oxes);
                 var bre = new eBookReadException(
                     "There is a problem in the oxes file: " + eDocXml.Message,
@@ -1489,24 +1506,24 @@ namespace JWdb.DataModel
                     iLine);
                 var dlgRepair = new DialogRepairImportBook(this, sPath, bre);
                 var result = dlgRepair.ShowDialog();
-                if (DialogResult.Cancel == result)
-                    return false;
+                return (DialogResult.OK == result);
             }
 
             // Error in the book's structure
             catch (eBookReadException bre)
             {
+                progress.End();
                 DialogRepairImportBook dlgRepair = (bre.NeedToShowFront) ?
                     new RepairImportBookStructure(FrontBook, this, sPath, bre) :
                     new DialogRepairImportBook(this, sPath, bre);
                 var result = dlgRepair.ShowDialog();
-                if (DialogResult.Cancel == result)
-                    return false;
+                return (DialogResult.OK == result);
             }
 
             // System or otherwise unrepairable error
             catch (Exception e)
             {
+                progress.End();
                 LocDB.Message("kFailedToLoadOxesSysErr",
                     "The Oxes file {0} failed to load with system error:\n{1}.",
                     new string[] { Path.GetFileName(sPath), e.Message },
@@ -1517,169 +1534,8 @@ namespace JWdb.DataModel
             // Successful
             progress.End();
             m_bIsLoaded = true;
-            return true;
+            return false;
         }
-
-
-        #region HEADED FOR OBSOLESCENCE 01 Oct 2009
-        #region Method: XmlDoc _LoadFromOxes_ReadXml(string sPath)
-        XmlDoc _LoadFromOxes_ReadXml(string sPath)
-            // Load the xml file, giving the user the opportunity to fix any errors that
-            // occur. (In theory, if a valid Oxes loads, there will not be any further
-            // errors downstream.)
-        {
-            while (true)
-            {
-                try
-                {
-                    Clear();
-                    var xml = new XmlDoc();
-                    xml.Load(sPath);
-                    return xml;
-                }
-                catch (XmlException xmle)
-                // Error in the XML
-                {
-                    // Display the Error Message & Repair dialog so that the user can have
-                    // opportunity to fix it.
-                    var bre = new eBookReadException(
-                        "There is a problem in the oxes file: " + xmle.Message,
-                        HelpSystem.Topic.kImportBook, xmle.LineNumber);
-                    var dlgRepair = new DialogRepairImportBook(this, sPath, bre);
-                    var result = dlgRepair.ShowDialog();
-
-                    // If he doesn't fix it, then we must abort the load
-                    if (DialogResult.Cancel == result)
-                        return null;
-                }
-                catch (Exception e)
-                // I/O, Read Permission, or other similar system error
-                {
-                    LocDB.Message("kFailedToLoadOxes",
-                        "The Oxes file {0} failed to load with system error:\n{1}.",
-                        new string[] { Path.GetFileName(sPath), e.Message },
-                        LocDB.MessageTypes.Error);
-                    return null;
-                }
-            } // endwhile
-        }
-        #endregion
-        #region Method: bool LoadFromOxes(sPath, progress)
-        public bool LoadFromOxesOriginal(string sPath, IProgressIndicator progress)
-            // Returns true if successful, false otherwise (which often means the user gave up)
-        {
-            #region DONE
-            /////////////////////////////////////////////
-            // Load the xml file into an XmlDocument
-            var xml = _LoadFromOxes_ReadXml(sPath);
-
-            // Find the Bible node (If well-formed Oxes, shouldn't be a problem.)
-            var nodeBible = XmlDoc.FindNode(xml, c_sTagBible);
-            if (null == nodeBible)
-                return false;
-
-            // Make sure it is a version of Oxes that we handle
-            string sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
-            if (sOxes != "2.0")
-            {
-                LocDB.Message("kUnsupportedOxes",
-                    "This version of OurWord does not support Oxes {0}.",
-                    new string[] { sOxes },
-                    LocDB.MessageTypes.Error);
-                return false;
-            }
-
-            // Find the Book node (if well-formed Oxes, shouldn't be a problem.)
-            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
-            if (null == nodeBook)
-                return false;
-
-            // Get the Book's three-letter ID
-            string sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
-            if (string.IsNullOrEmpty(sBookID))
-                return false;
-            if (sBookID != BookAbbrev)
-            {
-                LocDB.Message("kMismatchedBookAbbrevInOxesFile",
-                    "OurWord was expecting book {0}, but this Oxes file has book {1}.",
-                    new string[] { BookAbbrev, sBookID},
-                    LocDB.MessageTypes.Error);
-                return false;
-            }
-
-            // Read the Book attributes
-            m_nTranslationStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, 0);
-            Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
-            Locked = XmlDoc.GetAttrValue(nodeBook, c_sAttrLocked, false);
-            Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
-            Comment = XmlDoc.GetAttrValue(nodeBook, c_sAttrComment, "");
-
-            // Read in the paragraphs
-            progress.Start("Reading", nodeBook.ChildNodes.Count);
-            DSection section = null;
-            foreach (XmlNode child in nodeBook.ChildNodes)
-            {
-                progress.Step();
-
-                // The first child node, if a History note, would be the History for the entire
-                // book. (There will be no "section" defined yet. Otherwise, any History we
-                // encounter goes with the most recently defined section.
-                var history = TranslatorNote.Create(child);
-                if (null != history && history.IsHistoryNote)
-                {
-                    if (null == section)
-                        History = history;
-                    else
-                        section.History = history;
-                    continue;
-                }
-
-                // Create the paragraph or picture
-                DParagraph paragraph = DPicture.CreatePicture(child);
-                if (null == paragraph)
-                    paragraph = DParagraph.CreateParagraph(child);
-
-                // A section for it to go into
-                if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
-                {
-                    section = new DSection();
-                    Sections.Append(section);
-                }
-
-                // Add the paragraph
-                section.Paragraphs.Append(paragraph);
-            }
-            //////////////////////////////////////////////
-            #endregion
-
-            // Post Processing (calc versification, check structure against front)
-            try
-            {
-                _LoadPostProcessing(null);
-            }
-            catch (eBookReadException bre)
-            {
-                LocDB.Message("kFailedToLoadOxes",
-                    "The Oxes file \"{0}\" failed to load with error:\n{1}.",
-                    new string[] { Path.GetFileName(sPath), bre.UserMessage },
-                    LocDB.MessageTypes.Error);
-                return false;
-            }
-            catch (Exception e)
-            {
-                LocDB.Message("kFailedToLoadOxesSysErr",
-                    "The Oxes file \"{0}\" failed to load with system error:\n{1}.",
-                    new string[] { Path.GetFileName(sPath), e.Message },
-                    LocDB.MessageTypes.Error);
-                return false;
-            }
-
-            // Successful
-            progress.End();
-            m_bIsLoaded = true;
-            return true;
-        }
-        #endregion
         #endregion
 
         #region Method: bool LoadFromStandardFormat(sPath, progress)
@@ -1783,31 +1639,23 @@ namespace JWdb.DataModel
         }
         #endregion
         #region Method: bool LoadBook(sPath, progress)
-        public bool LoadBook(string sPath, IProgressIndicator progress)
+        public void LoadBook(string sPath, IProgressIndicator progress)
         {
             // Nothing to do if already loaded, or a bad pathname
             if (Loaded || string.IsNullOrEmpty(sPath))
-                return false;
+                return;
 
             // Load according to format, which we determine based on the file extension
-            if (sPath.ToLower().Contains( ".oxes" ))
-            {
-                if (LoadFromOxes(sPath, progress))
-                    return true;
-            }
+            if (sPath.ToLower().Contains(".oxes"))
+                LoadFromOxes(sPath, progress);
             else
-            {
-                if (LoadFromStandardFormat(sPath, progress))
-                    return true;
-            }
-
-            return false;
+                LoadFromStandardFormat(sPath, progress);
         }
         #endregion
         #region Method: bool LoadBook(progress)
-        public bool LoadBook(IProgressIndicator progress)
+        public void LoadBook(IProgressIndicator progress)
         {
-            return LoadBook(StoragePath, progress);
+            LoadBook(StoragePath, progress);
         }
         #endregion
 

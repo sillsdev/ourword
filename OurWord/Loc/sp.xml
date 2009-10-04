@@ -1437,7 +1437,7 @@
       <Alt ID="sp" Value="Una Vez Más"></Alt>
     </Item>
     <Item ID="m_btnCancel">
-      <Alt ID="sp" Value="Cancelar Importación"></Alt>
+      <Alt ID="sp" Value="Cancelar"></Alt>
     </Item>
     <Item ID="sRemoveWarning">
       <Alt ID="sp" Value="Si Vd. no corrige el error, {0} se borrará de entre las propiedades de {1} ¿Está Vd. seguro de que quere cancelar la importación de este libro?"></Alt>

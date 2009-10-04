@@ -1,3 +1,4 @@
+#region ***** RepairImportBook.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    RepairImportBook.cs
@@ -20,6 +21,7 @@ using System.Windows.Forms;
 using JWTools;
 using JWdb;
 
+#endregion
 #endregion
 
 namespace JWdb.DataModel
@@ -234,22 +236,7 @@ namespace JWdb.DataModel
 
 			// If the user cancelled, then we're done
 			if (DialogResult != DialogResult.OK)
-			{
-				// Ask the user if he is sure he wants to abort.
-                string sBase = LocDB.GetValue(this, "sRemoveWarning", 
-                    "If you do not fix the error, {0} will be removed from the {1} " +
-                    "properties.\n\nAre you sure you want to cancel reading the book?");
-                string sMessage = LocDB.Insert(sBase, new string[] { BookName, TranslationName });
-				DialogResult r = MessageBox.Show( Form.ActiveForm, sMessage, 
-					LanguageResources.AppTitle, MessageBoxButtons.RetryCancel, 
-					MessageBoxIcon.Warning);
-
-				// If the user decided to retry, then we cancel the Closing operation
-				if (r == DialogResult.Retry)
-					e.Cancel = true;
-
 				return;
-			}
 
 			// Save the changes the user made.
 			// Note: We don't use the "SaveFile" method, because it is destroying the UTF8.
@@ -386,7 +373,6 @@ namespace JWdb.DataModel
                 m_nPreviousWidth = Width;
                 m_nPreviousHeight = Height;
             }
-
         }
         #endregion
         #region FRAMEWORK STUFF
@@ -430,7 +416,7 @@ namespace JWdb.DataModel
             // 
             this.m_AnErrorOccured.Location = new System.Drawing.Point(72, 9);
             this.m_AnErrorOccured.Name = "m_AnErrorOccured";
-            this.m_AnErrorOccured.Size = new System.Drawing.Size(496, 23);
+            this.m_AnErrorOccured.Size = new System.Drawing.Size(592, 23);
             this.m_AnErrorOccured.TabIndex = 0;
             this.m_AnErrorOccured.Text = "An error occurred in attempting to import the book \"{0}\":";
             this.m_AnErrorOccured.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -441,7 +427,7 @@ namespace JWdb.DataModel
             this.m_Error.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Error.Location = new System.Drawing.Point(72, 32);
             this.m_Error.Name = "m_Error";
-            this.m_Error.Size = new System.Drawing.Size(496, 56);
+            this.m_Error.Size = new System.Drawing.Size(592, 56);
             this.m_Error.TabIndex = 1;
             this.m_Error.Text = "(Error Message Goes Here)";
             // 
@@ -449,7 +435,7 @@ namespace JWdb.DataModel
             // 
             this.m_Directions.Location = new System.Drawing.Point(69, 88);
             this.m_Directions.Name = "m_Directions";
-            this.m_Directions.Size = new System.Drawing.Size(488, 23);
+            this.m_Directions.Size = new System.Drawing.Size(584, 23);
             this.m_Directions.TabIndex = 2;
             this.m_Directions.Text = "You can fix the error and click on the Try Again button below, or you can Cancel " +
                 "the import.";
@@ -458,7 +444,7 @@ namespace JWdb.DataModel
             // m_btnTryAgain
             // 
             this.m_btnTryAgain.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnTryAgain.Location = new System.Drawing.Point(144, 512);
+            this.m_btnTryAgain.Location = new System.Drawing.Point(192, 514);
             this.m_btnTryAgain.Name = "m_btnTryAgain";
             this.m_btnTryAgain.Size = new System.Drawing.Size(96, 23);
             this.m_btnTryAgain.TabIndex = 4;
@@ -467,17 +453,17 @@ namespace JWdb.DataModel
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(248, 512);
+            this.m_btnCancel.Location = new System.Drawing.Point(296, 514);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(96, 23);
             this.m_btnCancel.TabIndex = 5;
-            this.m_btnCancel.Text = "Cancel Import";
+            this.m_btnCancel.Text = "Cancel Read";
             // 
             // m_btnHelp
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(352, 512);
+            this.m_btnHelp.Location = new System.Drawing.Point(400, 514);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(96, 23);
             this.m_btnHelp.TabIndex = 8;
@@ -489,16 +475,18 @@ namespace JWdb.DataModel
             this.m_rtfText.HideSelection = false;
             this.m_rtfText.Location = new System.Drawing.Point(12, 136);
             this.m_rtfText.Name = "m_rtfText";
-            this.m_rtfText.Size = new System.Drawing.Size(560, 360);
+            this.m_rtfText.Size = new System.Drawing.Size(656, 362);
             this.m_rtfText.TabIndex = 9;
             this.m_rtfText.Text = "(File Goes here)";
             this.m_rtfText.WordWrap = false;
             // 
             // m_PathName
             // 
+            this.m_PathName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.m_PathName.Location = new System.Drawing.Point(12, 112);
             this.m_PathName.Name = "m_PathName";
-            this.m_PathName.Size = new System.Drawing.Size(556, 23);
+            this.m_PathName.Size = new System.Drawing.Size(652, 23);
             this.m_PathName.TabIndex = 10;
             this.m_PathName.Text = "(pathname)";
             this.m_PathName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -515,7 +503,7 @@ namespace JWdb.DataModel
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(584, 542);
+            this.ClientSize = new System.Drawing.Size(680, 544);
             this.Controls.Add(this.m_Icon);
             this.Controls.Add(this.m_PathName);
             this.Controls.Add(this.m_rtfText);
@@ -618,7 +606,7 @@ namespace JWdb.DataModel
 			m_rtfFrontText.HideSelection = false;
 			m_rtfFrontText.Location = new System.Drawing.Point(16, 136);
 			m_rtfFrontText.Name = "m_rtfFrontText";
-			m_rtfFrontText.Size = new System.Drawing.Size(nColWidth, 360);
+			m_rtfFrontText.Size = new System.Drawing.Size(nColWidth, m_rtfText.Height);
 			m_rtfFrontText.TabIndex = 9;
 			m_rtfFrontText.Text = "(Front File Goes here)";
 			m_rtfFrontText.WordWrap = false;

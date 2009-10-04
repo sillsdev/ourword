@@ -1005,7 +1005,7 @@
       <Alt ID="por" Value="Nova Tentativa"></Alt>
     </Item>
     <Item ID="m_btnCancel">
-      <Alt ID="por" Value="Cancelar a Importação"></Alt>
+      <Alt ID="por" Value="Cancelar"></Alt>
     </Item>
     <Item ID="sRemoveWarning">
       <Alt ID="por" Value="Se você não corrigir o problema, {0} vai ser removido das propriedades da língua {1}. Você tem certeza que quer cancelar a leitura do livro?"></Alt>
