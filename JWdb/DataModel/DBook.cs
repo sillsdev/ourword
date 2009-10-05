@@ -1536,6 +1536,7 @@ namespace JWdb.DataModel
             // Successful
             progress.End();
             m_bIsLoaded = true;
+            IsDirty = false;
             return false;
         }
         #endregion
