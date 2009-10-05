@@ -134,6 +134,7 @@ namespace OurWord.Dialogs
             // Turn off the old one
             if (null != CurrentPage)
             {
+                HarvestChangesFromCurrentPage();
                 CurrentPage.Visible = false;
                 Controls.Remove(CurrentPage);
             }
