@@ -137,16 +137,21 @@ namespace OurWord.Utilities
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
+        #region Constructor(ParentList, vImages)
         public GroupedTasks(GroupedTasksList _ParentList, ImageList vImages)
         {
             m_ParentList = _ParentList;
-            InitializeComponent();
 
             m_vImages = vImages;
             m_vButtons = new List<Button>();
+
+            // Caution: Create m_vButtons first, because InitializeComponent can cause
+            // a call to cmdLayout on some computers, which needs Buttons to not be null.
+            // See B1.4.16.
+            InitializeComponent();
         }
         #endregion
+
         ImageList m_vImages;
 
         // Commands --------------------------------------------------------------------------
