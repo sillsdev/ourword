@@ -318,6 +318,7 @@ namespace JWdb.DataModel
             {
                 TranslationStage stage = new TranslationStage(
                     group.ID, group.Abbrev, group.Name);
+
                 TranslationStages.Append(stage);
             }
         }

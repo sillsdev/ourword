@@ -174,8 +174,11 @@
       <DependentUpon>DlgRawFileEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgHistory.resx">
+    <EmbeddedResource Include="Dialogs\History\DlgHistory.resx">
       <DependentUpon>DlgHistory.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\History\TranslationProgress.resx">
+      <DependentUpon>TranslationProgress.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\DlgMoveCluster.resx">
       <DependentUpon>DlgMoveCluster.cs</DependentUpon>
@@ -365,11 +368,17 @@
     <Compile Include="Dialogs\DlgRawFileEdit.Designer.cs">
       <DependentUpon>DlgRawFileEdit.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgHistory.cs">
+    <Compile Include="Dialogs\History\DlgHistory.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\DlgHistory.Designer.cs">
+    <Compile Include="Dialogs\History\DlgHistory.Designer.cs">
       <DependentUpon>DlgHistory.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\History\TranslationProgress.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\History\TranslationProgress.Designer.cs">
+      <DependentUpon>TranslationProgress.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgMoveCluster.cs">
       <SubType>Form</SubType>

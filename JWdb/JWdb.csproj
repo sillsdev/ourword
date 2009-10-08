@@ -104,6 +104,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModel\BookInfo.cs" />
     <Compile Include="DataModel\BookNames.cs" />
     <Compile Include="DataModel\ClusterInfo.cs" />
     <Compile Include="DataModel\DB.cs" />

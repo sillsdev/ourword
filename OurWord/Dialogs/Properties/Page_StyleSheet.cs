@@ -649,8 +649,8 @@ namespace OurWord.Dialogs
             #region PARAGRAPH SETTINGS SETUP
             if (null != PStyle)
             {
-                // The LeftMargin + FirstLine must be >= 0; we cannot have a 
-                // negative first line that is not compensated for by the LeftMargin
+                // The HorzMargin + FirstLine must be >= 0; we cannot have a 
+                // negative first line that is not compensated for by the HorzMargin
                 if (PStyle.FirstLineIndent < 0)
                     PStyle.LeftMargin = Math.Max(PStyle.LeftMargin, -PStyle.FirstLineIndent);
 

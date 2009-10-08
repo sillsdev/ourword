@@ -36,10 +36,13 @@ namespace OurWord.Dialogs
     {
         WndHistory m_wndEntireBook;
         WndHistory m_wndThisSection;
+        DSection m_section;
 
         #region Constructor(DSection)
         public DlgHistory(DSection section)
         {
+            m_section = section;
+
             InitializeComponent();
 
             m_wndEntireBook = new WndHistory(section.Book.History, "BookHistory");
@@ -55,6 +58,9 @@ namespace OurWord.Dialogs
         {
             m_wndEntireBook.LoadData();
             m_wndThisSection.LoadData();
+
+            // Translation Progress initialization
+            TranslationProgress.Translation = m_section.Translation;
 
             // Initial setting of width, height to tab control
             cmdSizeChanged(null, null);
