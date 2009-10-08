@@ -206,10 +206,20 @@ namespace OurWord.Dialogs
             if (null == Translation)
                 return;
 
-            foreach (DBook b in Translation.BookList)
+            // Loop through all possible books
+            var vPlanned = DB.Project.PlannedBooks;
+            for(int i=0; i<BookInfoList.Books.Count; i++)
             {
-                var box = new BookBox(b);
-                Boxes.Add(box);
+                var info = BookInfoList.Books[i];
+
+                // If the book is one we've started, add it
+                var book = Translation.FindBook(info.Abbrev);
+                if (null != book)
+                    Boxes.Add(new BookBox(book));
+
+                // If the book is in our PlannedBooks, add it
+                else if (vPlanned.Contains(info.Abbrev))
+                    Boxes.Add(new BookBox(Translation.BookNamesTable[i], info));
             }
         }
         #endregion
@@ -342,18 +352,40 @@ namespace OurWord.Dialogs
     class BookBox
     {
         // Attrs ----------------------------------------------------------------------------
-        #region Attr[g}: DBook Book
-        DBook Book
+        #region Attr{g}: string BookDisplayName
+        string BookDisplayName
         {
             get
             {
-                Debug.Assert(null != m_Book);
-                return m_Book;
+                Debug.Assert(!string.IsNullOrEmpty(m_sBookDisplayName));
+                return m_sBookDisplayName;
             }
         }
-        DBook m_Book;
+        string m_sBookDisplayName;
+        #endregion
+        #region Attr{g}: BookInfo Info
+        BookInfo Info
+        {
+            get
+            {
+                Debug.Assert(null != m_BookInfo);
+                return m_BookInfo;
+            }
+        }
+        BookInfo m_BookInfo;
+        #endregion
+        #region Attr{g}: TranslationStage Stage
+        TranslationStage Stage
+        {
+            get
+            {
+                return m_Stage;
+            }
+        }
+        TranslationStage m_Stage;
         #endregion
 
+        // Layout and Paint ------------------------------------------------------------------
         #region VAttr{g}: double HeightRatio
         double HeightRatio
             // Returns a number between 0 and 1 representing this book's number of
@@ -361,11 +393,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                var bookInfo = BookInfoList.FindBook(Book);
-                if (null == bookInfo)
-                    return 1;
-
-                double cBookVerses = bookInfo.VersesCount;
+                double cBookVerses = Info.VersesCount;
 
                 double cMaxVerses = BookInfoList.MaxVerses;
                 double cMinVerses = BookInfoList.MinVerses;
@@ -377,7 +405,6 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-
         #region Method: int LayoutAndPaint(Graphics g, TranslationProgress tp, int y)
         public int LayoutAndPaint(Graphics g, TranslationProgress tp, int y)
         {
@@ -388,42 +415,68 @@ namespace OurWord.Dialogs
 
             // Book Name
             int yBookName = y + (int)(((double)RowHeight - (double)tp.BookNameFont.Height)/2.0);
-            string sBookName = Book.DisplayName;
+            string sBookName = BookDisplayName;
             float xBookName = JWU.CalculateDisplayWidth(g, sBookName, tp.BookNameFont);
             int cTruncate = 0;
             while (xBookName > tp.BookNameColumnWidth - tp.Between)
             {
                 cTruncate++;
-                sBookName = Book.DisplayName.Substring(0, Book.DisplayName.Length - cTruncate) + "...";
+                sBookName = BookDisplayName.Substring(0, BookDisplayName.Length - cTruncate) + "...";
                 xBookName = JWU.CalculateDisplayWidth(g, sBookName, tp.BookNameFont);
             }
 
             g.DrawString(sBookName, tp.BookNameFont, Brushes.Navy, 
                 new PointF(tp.HorzMargin, yBookName));
 
-            // Which stage are we in this book
-            int iStage = 0;
-            while (tp.Stages[iStage] != Book.TranslationStage)
-                iStage++;
-
-            // Fill in the colors of what's been done
-            for (int i = 0; i <= iStage && i < tp.Stages.Count; i++)
+            // Planned books will have null stage, so we'll just do an outline to show it as a
+            // placeholder
+            if (null == Stage)
             {
-                var brush = new SolidBrush(tp.GetStageColor(i));
-                int x = tp.HorzMargin + tp.BookNameColumnWidth + (i * tp.StageColumnWidth);
+                var pen = new Pen(tp.GetStageColor(0));
+                int x = tp.HorzMargin + tp.BookNameColumnWidth;
                 int width = tp.StageColumnWidth - tp.Between;
                 var rect = new Rectangle(x, y, width, RowHeight);
-                g.FillRectangle(brush, rect);
+                g.DrawRectangle(pen, rect);
+            }
+
+            // Otherwise, we have a book with stages
+            else
+            {
+                // Which stage are we in this book
+                int iStage = 0;
+                while (tp.Stages[iStage] != Stage)
+                    iStage++;
+
+                // Fill in the colors of what's been done
+                for (int i = 0; i <= iStage && i < tp.Stages.Count; i++)
+                {
+                    var brush = new SolidBrush(tp.GetStageColor(i));
+                    int x = tp.HorzMargin + tp.BookNameColumnWidth + (i * tp.StageColumnWidth);
+                    int width = tp.StageColumnWidth - tp.Between;
+                    var rect = new Rectangle(x, y, width, RowHeight);
+                    g.FillRectangle(brush, rect);
+                }
             }
 
             return y + RowHeight + tp.Between;
         }
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DBook)
         public BookBox(DBook book)
         {
-            m_Book = book;
+            m_sBookDisplayName = book.DisplayName;
+            m_BookInfo = BookInfoList.FindBook(book);
+            m_Stage = book.TranslationStage;
+        }
+        #endregion
+        #region Constructor(sBookDisplayName, BookInfo)
+        public BookBox(string sBookDisplayName, BookInfo bi)
+        {
+            m_sBookDisplayName = sBookDisplayName;
+            m_BookInfo = bi;
+            m_Stage = null;
         }
         #endregion
     }

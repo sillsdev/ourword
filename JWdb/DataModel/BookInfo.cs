@@ -90,7 +90,7 @@ namespace JWdb.DataModel
     {
 
         #region SAttr{g}: List<BookInfo> Books
-        static List<BookInfo> Books
+        static public List<BookInfo> Books
         {
             get
             {

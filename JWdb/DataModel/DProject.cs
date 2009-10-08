@@ -28,7 +28,6 @@ namespace JWdb.DataModel
 	{
 		// ZAttrs ----------------------------------------------------------------------------
 		const string c_sDefaultProjectName = "My Project";
-
 		#region BAttr{g/s}: string Comment - a miscellaneous note about the project in general
 		public string Comment
 		{
@@ -101,6 +100,34 @@ namespace JWdb.DataModel
         }
         private string m_sPathToDictionaryData = "";
         #endregion
+        #region BAttr{g/s}: List<string>PlannedBooks
+        public List<string> PlannedBooks
+        {
+            get
+            {
+                var v = new List<string>();
+
+                if (!string.IsNullOrEmpty(m_sPlannedBooks))
+                {
+                    var vs = m_sPlannedBooks.Split(' ');
+                    foreach (string s in vs)
+                        v.Add(s);
+                }
+
+                return v;
+            }
+            set
+            {
+                string sPlanned = "";
+                foreach (string s in value)
+                    sPlanned += s + " ";
+                sPlanned = sPlanned.Trim();
+                SetValue(ref m_sPlannedBooks, sPlanned);
+            }
+        }
+        string m_sPlannedBooks = "";
+        #endregion
+
         #region BAttr{g}:   BStringArray People
         public BStringArray People
         {
@@ -132,7 +159,8 @@ namespace JWdb.DataModel
 		{
 			base.DeclareAttrs();
 
-			DefineAttr("Comment",        ref m_sComment);
+			DefineAttr("Comment", ref m_sComment);
+            DefineAttr("Planned", ref m_sPlannedBooks);
 
             DefineAttr("DictApp", ref m_sPathToDictionaryApp);
             DefineAttr("DictData", ref m_sPathToDictionaryData);
@@ -935,6 +963,7 @@ namespace JWdb.DataModel
                     i++;
             }
 
+            IsDirty = false;
             return true;
         }
         #endregion

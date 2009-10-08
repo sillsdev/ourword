@@ -10,6 +10,7 @@
 #region Header: Using, etc.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Data;
@@ -93,8 +94,6 @@ namespace OurWord.Dialogs
         private TabPage m_tabOther;
 		private TabPage m_tabBooks;
         private DataGridView m_gridBooks;
-		private DataGridViewTextBoxColumn m_colAbbreviation;
-        private DataGridViewTextBoxColumn m_colBookName;
         private RadioButton m_radioStartedBooks;
         private RadioButton m_radioOldTestament;
         private RadioButton m_radioNewTestament;
@@ -108,8 +107,10 @@ namespace OurWord.Dialogs
         private ToolStripDropDownButton m_bCopyNames;
         private ToolStripButton m_bEditRawFile;
         private ToolStripSeparator toolStripSeparator1;
+        private DataGridViewTextBoxColumn m_colAbbreviation;
+        private DataGridViewTextBoxColumn m_colBookName;
+        private DataGridViewComboBoxColumn m_colStage;
         private ToolStripSeparator toolStripSeparator2;
-        private DataGridViewTextBoxColumn m_colStage;
 		#endregion
         #region Constructor(DlgProperties, DTranslation, bSuppressCreateBook)
         public Page_Translation(DialogProperties _ParentDlg, 
@@ -175,11 +176,11 @@ namespace OurWord.Dialogs
             this.m_radioNewTestament = new System.Windows.Forms.RadioButton();
             this.m_radioAll = new System.Windows.Forms.RadioButton();
             this.m_gridBooks = new System.Windows.Forms.DataGridView();
-            this.m_colAbbreviation = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.m_colBookName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.m_colStage = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_tabOther = new System.Windows.Forms.TabPage();
             this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
+            this.m_colAbbreviation = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_colBookName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.m_colStage = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.m_tabctrlTranslation.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
             this.m_ToolStrip.SuspendLayout();
@@ -412,39 +413,6 @@ namespace OurWord.Dialogs
             this.m_gridBooks.Resize += new System.EventHandler(this.cmdDataGridResized);
             this.m_gridBooks.SelectionChanged += new System.EventHandler(this.cmdGridSelectionChanged);
             // 
-            // m_colAbbreviation
-            // 
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle1;
-            this.m_colAbbreviation.HeaderText = "Abbrev";
-            this.m_colAbbreviation.Name = "m_colAbbreviation";
-            this.m_colAbbreviation.ReadOnly = true;
-            this.m_colAbbreviation.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.m_colAbbreviation.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.m_colAbbreviation.ToolTipText = "The standard 3-letter abbreviation for this book, commonly used in Bible translat" +
-                "ion organizations to identify the book.";
-            this.m_colAbbreviation.Width = 50;
-            // 
-            // m_colBookName
-            // 
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle2;
-            this.m_colBookName.HeaderText = "Book Name";
-            this.m_colBookName.Name = "m_colBookName";
-            this.m_colBookName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.m_colBookName.ToolTipText = "The name of the book in your language.";
-            this.m_colBookName.Width = 170;
-            // 
-            // m_colStage
-            // 
-            this.m_colStage.HeaderText = "Stage";
-            this.m_colStage.Name = "m_colStage";
-            this.m_colStage.ReadOnly = true;
-            this.m_colStage.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this.m_colStage.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.m_colStage.ToolTipText = "E.g., Draft, Revision, Consultant Checked, etc.";
-            this.m_colStage.Width = 90;
-            // 
             // m_tabOther
             // 
             this.m_tabOther.Controls.Add(this.m_LiterateSettings);
@@ -470,6 +438,42 @@ namespace OurWord.Dialogs
             this.m_LiterateSettings.Name = "m_LiterateSettings";
             this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
             this.m_LiterateSettings.TabIndex = 7;
+            // 
+            // m_colAbbreviation
+            // 
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colAbbreviation.DefaultCellStyle = dataGridViewCellStyle1;
+            this.m_colAbbreviation.HeaderText = "Abbrev";
+            this.m_colAbbreviation.Name = "m_colAbbreviation";
+            this.m_colAbbreviation.ReadOnly = true;
+            this.m_colAbbreviation.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.m_colAbbreviation.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.m_colAbbreviation.ToolTipText = "The standard 3-letter abbreviation for this book, commonly used in Bible translat" +
+                "ion organizations to identify the book.";
+            this.m_colAbbreviation.Width = 50;
+            // 
+            // m_colBookName
+            // 
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_colBookName.DefaultCellStyle = dataGridViewCellStyle2;
+            this.m_colBookName.HeaderText = "Book Name";
+            this.m_colBookName.Name = "m_colBookName";
+            this.m_colBookName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.m_colBookName.ToolTipText = "The name of the book in your language.";
+            this.m_colBookName.Width = 170;
+            // 
+            // m_colStage
+            // 
+            this.m_colStage.DisplayStyle = System.Windows.Forms.DataGridViewComboBoxDisplayStyle.ComboBox;
+            this.m_colStage.DisplayStyleForCurrentCellOnly = true;
+            this.m_colStage.DropDownWidth = 100;
+            this.m_colStage.HeaderText = "Stage";
+            this.m_colStage.MaxDropDownItems = 15;
+            this.m_colStage.MinimumWidth = 40;
+            this.m_colStage.Name = "m_colStage";
+            this.m_colStage.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this.m_colStage.ToolTipText = "E.g., Draft, Revision, Consultant Checked, etc.";
+            this.m_colStage.Width = 90;
             // 
             // Page_Translation
             // 
@@ -529,7 +533,7 @@ namespace OurWord.Dialogs
         #region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
-            HarvestBookNames();
+            HarvestGridData();
 
 			// The translation's name should be a valid, non-zero-lengthed name
 			if (LanguageName.Length == 0)
@@ -733,16 +737,78 @@ namespace OurWord.Dialogs
         #endregion
 
         // Books Data Grid -------------------------------------------------------------------
+        #region VAttr{g}: string Planned
+        string Planned
+        {
+            get
+            {
+                return Loc.GetString("Planned", "Planned");
+            }
+        }
+        #endregion
+        #region Method: void SetupStageCombo(DataGridViewComboBoxCell, sBookAbbrev)
+        void SetupStageCombo(DataGridViewComboBoxCell combo, string sBookAbbrev)
+        {
+            Debug.Assert(null != combo);
+            var book = Translation.FindBook(sBookAbbrev);
+
+            // If we have a book, then the combo's possibilities are the translation stages
+            if (null != book)
+            {
+                foreach (string s in DB.TeamSettings.TranslationStages.AllNames)
+                    combo.Items.Add(s);
+                combo.Value = book.TranslationStage.Name;
+            }
+
+            // Otherwise, the possibilities are Planned vs nothing
+            if (null == book && Translation == DB.TargetTranslation)
+            {
+                combo.Items.Add("");
+                combo.Items.Add(Planned);
+                if (DB.Project.PlannedBooks.Contains(sBookAbbrev))
+                    combo.Value = Planned;
+            }
+        }
+        #endregion
+        #region Method: DataGridViewRow PopulateRow(int iBook)
+        DataGridViewRow PopulateRow(int iBook)
+        {
+            // Cannonical 3-letter abbreviation
+            string sAbbrev = DBook.BookAbbrevs[iBook];
+
+            // Book name in the target language
+            string sBookName = Translation.BookNamesTable[iBook];
+
+            // Create the row
+            var row = new DataGridViewRow();
+            row.CreateCells(m_gridBooks, new object[] { sAbbrev, sBookName, "" });
+            row.Tag = sAbbrev;
+
+            // Stage
+            var cellCombo = row.Cells[2] as DataGridViewComboBoxCell;
+            SetupStageCombo(cellCombo, sAbbrev);
+
+            // Locked books, set to red text
+            var book = Translation.FindBook(sAbbrev);
+            if (null != book && book.Locked)
+            {
+                foreach (DataGridViewCell cell in row.Cells)
+                    cell.Style.ForeColor = Color.Red;
+            }
+
+            return row;
+        }
+        #endregion
         #region Method: void PopulateGrid(string sBookAbbrevToSelect)
         void PopulateGrid(string sBookAbbrevToSelect, bool bHarvestExistingBookNames)
 		{
             // In case book names have been changed, we want to harvest them before we
             // regenerate this. The exception comes from our CopyBookNamesFrom method,
             // where we have new names we want to place into the grid; otherwise
-            // HarvestBookNames would overwrite our Newly Copied Names with the 
+            // HarvestGridData would overwrite our Newly Copied Names with the 
             // previous old names.
             if (bHarvestExistingBookNames)
-                HarvestBookNames();
+                HarvestGridData();
 
             // Clear out whatever was there
 			m_gridBooks.Rows.Clear();
@@ -775,31 +841,12 @@ namespace OurWord.Dialogs
                         break;
                 }
 
-                // Put together the objects that go into the row's cells, then
-                // create and add the row
-				object[] v = 
-				{
-					sBookAbbrev,
-					Translation.BookNamesTable[i],
-					sStage
-				};
-				DataGridViewRow row = new DataGridViewRow();
-				row.CreateCells(m_gridBooks, v);
-                row.Tag = sBookAbbrev;
+                var row = PopulateRow(i);
 				m_gridBooks.Rows.Add(row);
 
 				// If the book doesn't exist, gray out the stage cell
                 if (null == book)
                     row.Cells[2].Style.BackColor = BackColor;
-
-                // For locked books, set the forecolor to red
-                foreach (DataGridViewCell cell in row.Cells)
-                {
-                    cell.Style.ForeColor =
-                        (null != book && book.Locked) ?
-                        Color.Red :
-                        Color.Black;
-                }
 
                 // Select this row?
                 if (sBookAbbrev == sBookAbbrevToSelect)
@@ -842,29 +889,57 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-        #region Method: void HarvestBookNames()
-        void HarvestBookNames()
+        #region Method: void HarvestGridData()
+        void HarvestGridData()
         {
             foreach (DataGridViewRow row in m_gridBooks.Rows)
             {
                 string sAbbrev = (string)row.Cells[0].Value;
                 string sName = (string)row.Cells[1].Value;
+                string sStage = (string)row.Cells[2].Value;
 
-                // Don't do anything if it was set to empty; assume that
-                // was a user mistake.
-                if (string.IsNullOrEmpty(sName))
-                    continue;
-
+                // Find the book in question
                 int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
-                if (-1 != iBook)
-                {
-                    // Update the name in the table
-                    Translation.BookNamesTable[iBook] = sName;
+                if (-1 == iBook)
+                    continue;
+                var book = Translation.FindBook(sAbbrev);
 
-                    // Update the book's display name
-                    DBook book = Translation.FindBook(sAbbrev);
-                    if (null != book)
+                // Update the name if not empty; if it is empty, assume user mistake and
+                // don't update it.
+                if (!string.IsNullOrEmpty(sName))
+                {
+                    Translation.BookNamesTable[iBook] = sName;
+                    if (null != book && book.DisplayName != sName)
+                    {
+                        book.LoadBook(new NullProgress());
                         book.DisplayName = sName;
+                        book.DeclareDirty();
+                    }
+                }
+
+                // Update the stage
+                if (null != book && book.TranslationStage.Name != sStage)
+                {
+                    book.LoadBook(new NullProgress());
+                    book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromName(sStage);
+                    book.DeclareDirty();
+                }
+
+                // Update the Planned Books
+                if (null == book && Translation == DB.TargetTranslation)
+                {
+                    var vPlanned = DB.Project.PlannedBooks;
+                    if (sStage == Planned && !vPlanned.Contains(sAbbrev))
+                    {
+                        vPlanned.Add(sAbbrev);
+                        DB.Project.PlannedBooks = vPlanned;
+                    }
+                    if (sStage != Planned && vPlanned.Contains(sAbbrev))
+                    {
+                        vPlanned.Remove(sAbbrev);
+                        DB.Project.PlannedBooks = vPlanned;
+                    }
+
                 }
             }
         }
@@ -996,17 +1071,23 @@ namespace OurWord.Dialogs
 			// Language Name
 			LanguageName = Translation.DisplayName;
 
-            // Determine how much to filter. Are there any OT books present? (if so, the
-            // first one will be, since they are stored in cannonical order.)
-            bool bOTBookPresent = false;
-            if (Translation.BookList.Count > 0 && Translation.BookList[0].IsOldTestamentBook)
-                bOTBookPresent = true;
-            m_FilterOn = ((bOTBookPresent) ? FilterOn.kAll : FilterOn.kNT);
+            // Count books present in each Testament
+            int cOT = 0;
+            int cNT = 0;
+            foreach (DBook book in Translation.BookList)
+            {
+                if (book.IsOldTestamentBook)
+                    cOT++;
+                else
+                    cNT++;
+            }
 
-            if (bOTBookPresent)
-                m_radioAll.Checked = true;
-            else
+            // If this is predonimately a NT project, then that's how we want to filter;
+            // otherwise we just show all books
+            if (cNT > cOT && cOT < 5)
                 m_radioNewTestament.Checked = true;
+            else
+                m_radioAll.Checked = true;
 
 			// Populate the list of books; select the first item in the list
 			PopulateGrid("GEN", false);
