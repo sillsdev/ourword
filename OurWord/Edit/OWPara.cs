@@ -741,7 +741,9 @@ namespace OurWord.Edit
             // But we do glue in the case, e.g., where we are followed by certain objects
             if (blockRight as EFoot != null)
                 blockLeft.GlueToNext = true;
-            if (blockRight as ENote != null)
+            // We glue the first note after text, but not subsequent ones; because Manado data
+            // has so many notes that they would take up the entire line.
+            if (blockLeft as ENote == null && blockRight as ENote != null)
                 blockLeft.GlueToNext = true;
             if (blockLeft as EFootnoteLabel != null)
                 blockLeft.GlueToNext = true;
