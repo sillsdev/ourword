@@ -276,19 +276,12 @@ namespace JWdb
             if (!IsDirty)
                 return;
 
-            // Perform the object-specific write; default is our 
-            // JObject built-in XML write
-            OnWrite(progress);
-		}
-		#endregion
-        #region Method: virtual void OnWrite(IProgressIndicator)
-        protected virtual void OnWrite(IProgressIndicator progress)
-        {
 			// Create a backup file by copying this one, if it exists
             string sExtension = Path.GetExtension(StoragePath);
 			string sBackupExtension = sExtension + "bak";
 			string sBackupPath = JW_Util.CreateBackup(StoragePath, sBackupExtension);
 
+            // Perform JObject built-in XML write
 			TextWriter W = null;
 			try
 			{

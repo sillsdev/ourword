@@ -938,14 +938,14 @@ namespace JWdb.DataModel
             // Read the LoadOnDemand translation objects
             if (null != FrontTranslation)
             {
-                FrontTranslation.LoadFromFile(progress);
+                FrontTranslation.LoadFromFile();
                 if (!FrontTranslation.Loaded)
                     FrontTranslation = null;
             }
 
             if (null != TargetTranslation)
             {
-                TargetTranslation.LoadFromFile(progress);
+                TargetTranslation.LoadFromFile();
                 if (!TargetTranslation.Loaded)
                     TargetTranslation = null;
             }
@@ -955,7 +955,7 @@ namespace JWdb.DataModel
             {
                 DTranslation t = OtherTranslations[i] as DTranslation;
 
-                t.LoadFromFile(progress);
+                t.LoadFromFile();
 
                 if (!t.Loaded)
                     OtherTranslations.Remove(t);

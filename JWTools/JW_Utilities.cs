@@ -496,6 +496,7 @@ namespace JWTools
             }
         }
 
+        #region SMethod: bool Move(sSourceFolder, sDestinationFolder)
         static public bool Move(string sSourceFolder, string sDestinationFolder)
             // We want this to be safe, so instead of a strict move, we first do a copy of
             // everything. If the copy succeeds, then we delete from the source. 
@@ -529,6 +530,7 @@ namespace JWTools
 
             return true;
         }
+        #endregion
 
         #region SMethod: List<string> ReadFile(sPath)
         static public List<string> ReadFile(string sPath)
@@ -545,6 +547,27 @@ namespace JWTools
             tr.Close();
 
             return v;
+        }
+        #endregion
+        #region SMethod: void WriteFile(string sPath, string[] vs)
+        static public void WriteFile(string sPath, string[] vs)
+        {
+            var sw = new StreamWriter(sPath, false, Encoding.UTF8);
+            var tw = TextWriter.Synchronized(sw);
+
+            foreach(string s in vs)
+                tw.WriteLine(s);
+
+            tw.Close();
+        }
+        #endregion
+        #region SMethod: void WriteFile(string sPath, string s)
+        static public void WriteFile(string sPath, string s)
+        {
+            var sw = new StreamWriter(sPath, false, Encoding.UTF8);
+            var tw = TextWriter.Synchronized(sw);
+            tw.WriteLine(s);
+            tw.Close();
         }
         #endregion
 

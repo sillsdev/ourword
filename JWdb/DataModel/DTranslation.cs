@@ -20,6 +20,7 @@ using System.Text;
 using System.Windows.Forms;
 using JWTools;
 using JWdb;
+using Chorus.merge;
 #endregion
 #endregion
 
@@ -138,6 +139,11 @@ namespace JWdb.DataModel
         #region Method: void PopulateBookListFromFolder()
         public void PopulateBookListFromFolder()
         {
+            // When doing unit testing, we may not have a cluster folder, in which
+            // case we don't want to be creating a BookStorageFolder
+            if (string.IsNullOrEmpty(DB.TeamSettings.ClusterFolder))
+                return;
+
             // Get a list of all of the Oxes files in the translation's folder
             if (!Directory.Exists(BookStorageFolder))
                 Directory.CreateDirectory(BookStorageFolder);
@@ -421,27 +427,165 @@ namespace JWdb.DataModel
             Directory.CreateDirectory(BookStorageFolder);
         }
         #endregion
-        #region OMethod: bool OnLoad(...)
-        protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
+
+        // I/O -------------------------------------------------------------------------------
+        #region Constants
+        const string c_sTag = "DTranslation";
+        const string c_sAttrDisplayName = "DisplayName";
+        const string c_sAttrVernacularWS = "VernacularWS";
+        const string c_sAttrConsultantWS = "ConsultantWS";
+        const string c_sAttrComment = "Comment";
+        const string c_sBookNamesTable = "BookNamesTable";
+        const string c_sFootnoteSeqType = "FootnoteSeqType";
+        const string c_sFootnoteCustomSeq = "FootnoteCustomSeq";
+        #endregion
+
+        #region Method: void LoadFromFile(string sPath)
+        public void LoadFromFile(string sPath)
         {
-            // Do the load as usual
-            bool bSuccessful = base.OnLoad(tr, sPath, progress);
-            if (!bSuccessful)
-                return false;
+            if (Loaded)
+                return;
+            if (string.IsNullOrEmpty(sPath))
+                return;
 
-            // Scan the disk to load the BookList
-            PopulateBookListFromFolder();          
+            try
+            {
+                // Bring the file into the dotnet system
+                var xml = new XmlDoc();
+                xml.Load(sPath);
 
-            return true;
+                // Get the translation node and interpret it
+                var node = XmlDoc.FindNode(xml, c_sTag);
+                DisplayName = XmlDoc.GetAttrValue(node, c_sAttrDisplayName, "(TranslationName)");
+                VernacularWritingSystemName = XmlDoc.GetAttrValue(node, c_sAttrVernacularWS, "Latin");
+                ConsultantWritingSystemName = XmlDoc.GetAttrValue(node, c_sAttrConsultantWS, "Latin");
+                Comment = XmlDoc.GetAttrValue(node, c_sAttrComment, "");
+
+                string sBookNames = XmlDoc.GetAttrValue(node, c_sBookNamesTable, "");
+                BookNamesTable.Read(sBookNames);
+
+                try
+                {
+                    string sFootnoteType = XmlDoc.GetAttrValue(node, c_sFootnoteSeqType, "0");
+                    FootnoteSequenceType = (DFoot.FootnoteSequenceTypes)Convert.ToInt16(sFootnoteType);
+                }
+                catch (Exception)
+                {
+                }
+
+                string sCustomSeq = XmlDoc.GetAttrValue(node, c_sFootnoteCustomSeq, "");
+                FootnoteCustomSeq.Read(sCustomSeq);
+
+                // Scan the disk to load the BookList
+                PopulateBookListFromFolder();
+
+                // Successful
+                m_bIsLoaded = true;
+                IsDirty = false;
+            }
+            catch (Exception e)
+            {
+                // Error Message
+                LocDB.Message("CantReadTranslationSettings",
+                    "OurWord was unable to read the Translation Settings File {0}\nwith reason {1}",
+                    new string[] { Path.GetFileName(sPath), e.Message },
+                    LocDB.MessageTypes.Error);
+
+                // Should still be false, but make certain
+                m_bIsLoaded = false;
+            }
         }
         #endregion
-        #region OMethod: void OnWrite(progress)
-        protected override void OnWrite(IProgressIndicator progress)
+        #region Method: void LoadFromFile()
+        public void LoadFromFile()
         {
-            base.OnWrite(progress);
+            LoadFromFile(StoragePath);
+        }
+        #endregion
 
-            foreach(DBook book in BookList)
+        #region Method: void WriteToFile(string sPath, IProgressIndicator progress)
+        public void WriteToFile(string sPath, IProgressIndicator progress)
+        {
+            if (!IsDirty)
+                return;
+
+            // Initialize the xml object
+            var xml = new XmlDoc();
+            var node = xml.AddNode(xml, c_sTag);
+
+            // Add attrs if not empty
+            xml.AddAttr(node, c_sAttrDisplayName, DisplayName);
+            xml.AddAttr(node, c_sAttrVernacularWS, VernacularWritingSystemName);
+            xml.AddAttr(node, c_sAttrConsultantWS, ConsultantWritingSystemName);
+            xml.AddAttr(node, c_sAttrComment, Comment);
+            xml.AddAttr(node, c_sBookNamesTable, BookNamesTable.SaveLine);
+            xml.AddAttr(node, c_sFootnoteSeqType, ((int)FootnoteSequenceType).ToString());
+            xml.AddAttr(node, c_sFootnoteCustomSeq, FootnoteCustomSeq.SaveLine);
+
+            // Write it out
+            xml.Write(sPath);
+
+            // Save any books that have been modified
+            foreach (DBook book in BookList)
                 book.WriteBook(new NullProgress());
+        }
+        #endregion
+        #region Method: void WriteToFile(IProgressIndicator progress)
+        public override void WriteToFile(IProgressIndicator progress)
+        {
+            WriteToFile(StoragePath, progress);
+        }
+        #endregion
+
+        // Merge -----------------------------------------------------------------------------
+        #region SMethod: void Merge(MergeOrder MergeInfo)
+        static public void Merge(MergeOrder MergeInfo)
+            // Merges the DTranslation files on an attr-by-attr bases. So conceivable different
+            // people can edit differing attributes, yet merge. If they edit the same attr, though,
+            // "ours" will win.
+        {
+            // Load into three DTranslation objects
+            var Parent = new DTranslation();
+            var Ours = new DTranslation();
+            var Theirs = new DTranslation();
+            Parent.LoadFromFile(MergeInfo.pathToCommonAncestor);
+            Ours.LoadFromFile(MergeInfo.pathToOurs);
+            Theirs.LoadFromFile(MergeInfo.pathToTheirs);
+
+            // If we differ from Parent, then keep Ours, otherwise keep Theirs. Or put another
+            // way, if we equal the parrent, then we keep theirs, assuming either theirs have
+            // changed, or neither has changed. OTOH, if we are different from the parent then
+            // this logic keeps ours, which means that if both have made changes, Ours wins.
+            if (Ours.DisplayName == Parent.DisplayName)
+                Ours.DisplayName = Theirs.DisplayName;
+
+            if (Ours.VernacularWritingSystemName == Parent.VernacularWritingSystemName)
+                Ours.VernacularWritingSystemName = Theirs.VernacularWritingSystemName;
+
+            if (Ours.ConsultantWritingSystemName == Parent.ConsultantWritingSystemName)
+                Ours.ConsultantWritingSystemName = Theirs.ConsultantWritingSystemName;
+
+            if (Ours.Comment == Parent.Comment)
+                Ours.Comment = Theirs.Comment;
+
+            if (Ours.BookNamesTable.Length == Theirs.BookNamesTable.Length &&
+                Ours.BookNamesTable.Length == Parent.BookNamesTable.Length)
+            {
+                for (int i = 0; i < Ours.BookNamesTable.Length; i++)
+                {
+                    if (Ours.BookNamesTable[i] == Parent.BookNamesTable[i])
+                        Ours.BookNamesTable[i] = Theirs.BookNamesTable[i];
+                }
+            }
+
+            if (Ours.FootnoteSequenceType == Parent.FootnoteSequenceType)
+                Ours.FootnoteSequenceType = Theirs.FootnoteSequenceType;
+
+            if (Ours.FootnoteCustomSeq.SaveLine == Parent.FootnoteCustomSeq.SaveLine)
+                Ours.FootnoteCustomSeq.Read(Theirs.FootnoteCustomSeq.SaveLine);
+
+            // Save the result
+            Ours.WriteToFile(MergeInfo.pathToOurs, new NullProgress());
         }
         #endregion
     }

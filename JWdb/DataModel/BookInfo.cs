@@ -88,7 +88,6 @@ namespace JWdb.DataModel
 
     public class BookInfoList
     {
-
         #region SAttr{g}: List<BookInfo> Books
         static public List<BookInfo> Books
         {

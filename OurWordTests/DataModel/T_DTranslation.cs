@@ -18,6 +18,7 @@ using NUnit.Framework;
 
 using JWTools;
 using JWdb;
+using Chorus.merge;
 
 using OurWord;
 using JWdb.DataModel;
@@ -136,188 +137,224 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
-        // Merging ---------------------------------------------------------------------------
-        #region SAttr{g}: string[] vsParent
-        static string[] vsParent = 
+        // I/O -------------------------------------------------------------------------------
+        #region Test: IO
+        [Test] public void IO()
         {
-            "<DTranslation FileFormat=\"0\" DisplayName=\"Tii\" VernacularWS=\"Latin\" ConsultantWS=\"Latin\" BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} " +
-            "{Kalua numa Masir mai} {Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} {Mana Maketu Dede'a kara} {Rut} {1 Samuel} " +
-            "{2 Samuel} {1 Mane-mane kara} {2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} {Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio " +
-            "kara} {Dede'a Lasik} {Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} {Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} " +
-            "{Yunus} {Mika} {Nahum} {Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} {Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} " +
-            "{2 Korentus} {Galati} {Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} {2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} " +
-            "{2 Petrus} {1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\">",
-            "  <ownseq Name=\"Books\">",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Tutui Hata Mana Dadik Sososan\" Abbrev=\"GEN\" ID=\"GEN\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Mateos\" Abbrev=\"MAT\" ID=\"MAT\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Markus\" Abbrev=\"MRK\" ID=\"MRK\" Stage=\"5\" Version=\"H\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Nadenu nara Tutuin\" Abbrev=\"ACT\" ID=\"ACT\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Galati\" Abbrev=\"GAL\" ID=\"GAL\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Efesus\" Abbrev=\"EPH\" ID=\"EPH\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Felipi\" Abbrev=\"PHP\" ID=\"PHP\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Kolose\" Abbrev=\"COL\" ID=\"COL\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Tesalonika\" Abbrev=\"1TH\" ID=\"1TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Tesalonika\" Abbrev=\"2TH\" ID=\"2TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Timotius\" Abbrev=\"1TI\" ID=\"1TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Timotius\" Abbrev=\"2TI\" ID=\"2TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Filmon\" Abbrev=\"PHM\" ID=\"PHM\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Ibrani\" Abbrev=\"HEB\" ID=\"HEB\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Yakobis\" Abbrev=\"JAS\" ID=\"JAS\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Dae-bafo Mata Beuk\" Abbrev=\"REV\" ID=\"REV\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "  </ownseq>",
-            "</DTranslation>"
-        };
-        #endregion
-        #region SAttr{g}: string[] vsOurs
-        static string[] vsOurs = 
-        {
-            "<DTranslation FileFormat=\"0\" DisplayName=\"Tii\" VernacularWS=\"Latin\" ConsultantWS=\"Latin\" BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} " +
-            "{Kalua numa Masir mai} {Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} {Mana Maketu Dede'a kara} {Rut} {1 Samuel} " +
-            "{2 Samuel} {1 Mane-mane kara} {2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} {Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio " +
-            "kara} {Dede'a Lasik} {Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} {Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} " +
-            "{Yunus} {Mika} {Nahum} {Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} {Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} " +
-            "{2 Korentus} {Galati} {Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} {2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} " +
-            "{2 Petrus} {1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\">",
-            "  <ownseq Name=\"Books\">",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Tutui Hata Mana Dadik Sososan\" Abbrev=\"GEN\" ID=\"GEN\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Mateos\" Abbrev=\"MAT\" ID=\"MAT\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Markus\" Abbrev=\"MRK\" ID=\"MRK\" Stage=\"5\" Version=\"H\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Lukas\" Abbrev=\"LUK\" ID=\"LUK\" Stage=\"1\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Nadenu nara Tutuin\" Abbrev=\"ACT\" ID=\"ACT\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Galati\" Abbrev=\"GAL\" ID=\"GAL\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Efesus\" Abbrev=\"EPH\" ID=\"EPH\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Tesalonika\" Abbrev=\"1TH\" ID=\"1TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Tesalonika\" Abbrev=\"2TH\" ID=\"2TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Timotius\" Abbrev=\"1TI\" ID=\"1TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Timotius\" Abbrev=\"2TI\" ID=\"2TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Titus\" Abbrev=\"TIT\" ID=\"TIT\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Filmon\" Abbrev=\"PHM\" ID=\"PHM\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Ibrani\" Abbrev=\"HEB\" ID=\"HEB\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Yakobis\" Abbrev=\"JAS\" ID=\"JAS\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Dae-bafo Mata Beuk\" Abbrev=\"REV\" ID=\"REV\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "  </ownseq>",
-            "</DTranslation>"
-        };
-        #endregion
-        #region SAttr{g}: string[] vsTheirs
-        static string[] vsTheirs = 
-        {
-            "<DTranslation FileFormat=\"0\" DisplayName=\"Tii\" VernacularWS=\"Latin\" ConsultantWS=\"Latin\" BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} " +
-            "{Kalua numa Masir mai} {Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} {Mana Maketu Dede'a kara} {Rut} {1 Samuel} " +
-            "{2 Samuel} {1 Mane-mane kara} {2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} {Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio " +
-            "kara} {Dede'a Lasik} {Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} {Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} " +
-            "{Yunus} {Mika} {Nahum} {Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} {Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} " +
-            "{2 Korentus} {Galati} {Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} {2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} " +
-            "{2 Petrus} {1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\">",
-            "  <ownseq Name=\"Books\">",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Tutui Hata Mana Dadik Sososan\" Abbrev=\"GEN\" ID=\"GEN\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Mateos\" Abbrev=\"MAT\" ID=\"MAT\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Markus\" Abbrev=\"MRK\" ID=\"MRK\" Stage=\"5\" Version=\"H\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Nadenu nara Tutuin\" Abbrev=\"ACT\" ID=\"ACT\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Roma\" Abbrev=\"ROM\" ID=\"ROM\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Galati\" Abbrev=\"GAL\" ID=\"GAL\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Efesus\" Abbrev=\"EPH\" ID=\"EPH\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Felipi\" Abbrev=\"PHP\" ID=\"PHP\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Tesalonika\" Abbrev=\"1TH\" ID=\"1TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Tesalonika\" Abbrev=\"2TH\" ID=\"2TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Timotius\" Abbrev=\"1TI\" ID=\"1TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Timotius\" Abbrev=\"2TI\" ID=\"2TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Filmon\" Abbrev=\"PHM\" ID=\"PHM\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Ibrani\" Abbrev=\"HEB\" ID=\"HEB\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Yakobis\" Abbrev=\"JAS\" ID=\"JAS\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Yudas\" Abbrev=\"JUD\" ID=\"JUD\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Dae-bafo Mata Beuk\" Abbrev=\"REV\" ID=\"REV\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "  </ownseq>",
-            "</DTranslation>"
-        };
-        #endregion
-        #region SAttr{g}: string[] vsExpected
-        static string[] vsExpected = 
-        {
-            "<DTranslation FileFormat=\"0\" DisplayName=\"Tii\" VernacularWS=\"Latin\" ConsultantWS=\"Latin\" BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} " +
-            "{Kalua numa Masir mai} {Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} {Mana Maketu Dede'a kara} {Rut} {1 Samuel} " +
-            "{2 Samuel} {1 Mane-mane kara} {2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} {Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio " +
-            "kara} {Dede'a Lasik} {Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} {Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} " +
-            "{Yunus} {Mika} {Nahum} {Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} {Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} " +
-            "{2 Korentus} {Galati} {Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} {2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} " +
-            "{2 Petrus} {1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\">",
-            "  <ownseq Name=\"Books\">",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Tutui Hata Mana Dadik Sososan\" Abbrev=\"GEN\" ID=\"GEN\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Mateos\" Abbrev=\"MAT\" ID=\"MAT\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Markus\" Abbrev=\"MRK\" ID=\"MRK\" Stage=\"5\" Version=\"H\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Lukas\" Abbrev=\"LUK\" ID=\"LUK\" Stage=\"1\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Nadenu nara Tutuin\" Abbrev=\"ACT\" ID=\"ACT\" Stage=\"5\" Version=\"F\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Roma\" Abbrev=\"ROM\" ID=\"ROM\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Galati\" Abbrev=\"GAL\" ID=\"GAL\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Efesus\" Abbrev=\"EPH\" ID=\"EPH\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Tesalonika\" Abbrev=\"1TH\" ID=\"1TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Tesalonika\" Abbrev=\"2TH\" ID=\"2TH\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"1 Timotius\" Abbrev=\"1TI\" ID=\"1TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"2 Timotius\" Abbrev=\"2TI\" ID=\"2TI\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Titus\" Abbrev=\"TIT\" ID=\"TIT\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Filmon\" Abbrev=\"PHM\" ID=\"PHM\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Ibrani\" Abbrev=\"HEB\" ID=\"HEB\" Stage=\"0\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Yakobis\" Abbrev=\"JAS\" ID=\"JAS\" Stage=\"5\" Version=\"C\" Locked=\"true\" \"/>",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Yudas\" Abbrev=\"JUD\" ID=\"JUD\" Stage=\"3\" Version=\"A\" Locked=\"false\" />",
-            "    <DBook FileFormat=\"0\" DisplayName=\"Dae-bafo Mata Beuk\" Abbrev=\"REV\" ID=\"REV\" Stage=\"5\" Version=\"C\" Locked=\"true\" />",
-            "  </ownseq>",
-            "</DTranslation>"
-        };
-        #endregion
+            // Individual attributes
+            string sDisplayName = "Amarasi";
+            string sVernacularWS = "Malay";
+            string sConsultantWS = "English";
+            string sBookNames = "66 {Tutui Hata Mana Dadik Sososan} {Kalua numa Masir mai} " +
+                "{Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} " +
+                "{Mana Maketu Dede'a kara} {Rut} {1 Samuel} {2 Samuel} {1 Mane-mane kara} " +
+                "{2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} " +
+                "{Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio kara} {Dede'a Lasik} " +
+                "{Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} " +
+                "{Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} {Yunus} {Mika} {Nahum} " +
+                "{Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} " +
+                "{Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} {2 Korentus} {Galati} " +
+                "{Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} " +
+                "{2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} {2 Petrus} " +
+                "{1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}";
+            string sComment = "Drafted using OurWord's Marla strategy.";
+            var nFootnoteType = DFoot.FootnoteSequenceTypes.iv;
+            string sCustomFootnotes = "5 {a} {b} {x} {y} {z}";
 
-        #region Method: DTranslation CreateTranslation(sDisplayName, string[] vsData)
-        DTranslation CreateTranslation(string sDisplayName, string[] vsData)
-        {
-            DTranslation t = new DTranslation(sDisplayName);
+            // Expected xml string
+            string sExpected = "<DTranslation " +
+                "DisplayName=\"Amarasi\" " +
+                "VernacularWS=\"Malay\" " +
+                "ConsultantWS=\"English\" " +
+                "Comment=\"Drafted using OurWord's Marla strategy.\" " +
+                "BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} {Kalua numa Masir mai} " +
+                    "{Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} " +
+                    "{Mana Maketu Dede'a kara} {Rut} {1 Samuel} {2 Samuel} {1 Mane-mane kara} " +
+                    "{2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} " +
+                    "{Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio kara} {Dede'a Lasik} " +
+                    "{Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} " +
+                    "{Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} {Yunus} {Mika} {Nahum} " +
+                    "{Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} " +
+                    "{Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} {2 Korentus} {Galati} " +
+                    "{Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} " +
+                    "{2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} {2 Petrus} " +
+                    "{1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\" " +
+                "FootnoteSeqType=\"1\" " +
+                "FootnoteCustomSeq=\"5 {a} {b} {x} {y} {z}\"" +
+                " />";
 
-            // Writei out the data so we can read it in
-            TextWriter W = JWU.NUnit_OpenTextWriter("test.x");
-            foreach (string s in vsData)
-                W.WriteLine(s);
-            W.Close();
-
-            // Read it in
-            string sPath = JWU.NUnit_TestFilePathName;
-            t.LoadFromFile(ref sPath, new NullProgress());
+            // Create and populate a translation
+            var t = new DTranslation();
             t.DisplayName = sDisplayName;
+            t.VernacularWritingSystemName = sVernacularWS;
+            t.ConsultantWritingSystemName = sConsultantWS;
+            t.BookNamesTable.Read(sBookNames);
+            t.Comment = sComment;
+            t.FootnoteSequenceType = nFootnoteType;
+            t.FootnoteCustomSeq.Read(sCustomFootnotes);
 
-            // So ownership hierarchy will work in debugger
-            DB.Project.OtherTranslations.Append(t);
+            // A. TEST the WRITE implementation
+            // Write it to a temporary file
+            t.WriteToFile(JWU.NUnit_TestFilePathName, new NullProgress());
 
-            return t;
+            // Read it in and see if we got what we expected
+            var vs = JWU.ReadFile(JWU.NUnit_TestFilePathName);
+            string sActual = "";
+            foreach (string s in vs)
+                sActual += s;
+            Assert.AreEqual(sExpected, sActual);
+
+            // B. TEST the READ implementation
+            var tIn = new DTranslation();
+            tIn.LoadFromFile(JWU.NUnit_TestFilePathName);
+            Assert.AreEqual(sDisplayName, tIn.DisplayName);
+            Assert.AreEqual(sVernacularWS, tIn.VernacularWritingSystemName);
+            Assert.AreEqual(sConsultantWS, tIn.ConsultantWritingSystemName);
+            Assert.AreEqual(sBookNames, tIn.BookNamesTable.SaveLine);
+            Assert.AreEqual(sComment, tIn.Comment);
+            Assert.AreEqual(nFootnoteType, tIn.FootnoteSequenceType);
+            Assert.AreEqual(sCustomFootnotes, tIn.FootnoteCustomSeq.SaveLine);
         }
         #endregion
-
-        #region Test: MergeBooksSequence
-        [Test] public void MergeBooksSequence()
+        #region Test: Merge
+        [Test] public void Merge()
         {
-            // Differences
-            // Ours
-            // - Adds Luke and Titus  (thus Parent, Theirs lacks these; Expected has them)
-            // - Deletes Philippians  (thus Parent, Theirs have it, Expected doesn't)
-            //
-            // Theirs
-            // - Adds Romans, Yudas (thus Parent,  Mine lacks these, Expected has them)
-            //
-            // Both
-            // - Delete Colosians (thus Parent has these, all others don't)
+            #region Data
+            // Parent
+            string sParent = "<DTranslation " +
+                "DisplayName=\"Amarasi\" " +
+                "VernacularWS=\"Malay\" " +
+                "ConsultantWS=\"English\" " +
+                "Comment=\"Drafted using OurWord's Marla strategy.\" " +
+                "BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} {Kalua numa Masir mai} " +
+                    "{Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} " +
+                    "{Mana Maketu Dede'a kara} {Rut} {1 Samuel} {2 Samuel} {1 Mane-mane kara} " +
+                    "{2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} " +
+                    "{Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio kara} {Dede'a Lasik} " +
+                    "{Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} " +
+                    "{Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} {Yunus} {Mika} {Nahum} " +
+                    "{Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} " +
+                    "{Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} {2 Korentus} {Galati} " +
+                    "{Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} " +
+                    "{2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} {2 Petrus} " +
+                    "{1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\" " +
+                "FootnoteSeqType=\"1\" " +
+                "FootnoteCustomSeq=\"5 {a} {b} {x} {y} {z}\"" +
+                " />";
 
-            DTranslation tParent = CreateTranslation("parent", vsParent);
-            DTranslation tOurs = CreateTranslation("ours", vsOurs);
-            DTranslation tTheirs = CreateTranslation("theirs", vsTheirs);
-            DTranslation tExpected = CreateTranslation("expected", vsExpected);
+            // Ours Changes: 
+            //   DisplayName = "Helong"
+            //   Vernacular = "Latin"
+            //   FirstBook = "Kejadian"
+            string sOurs = "<DTranslation " +
+                "DisplayName=\"Helong\" " +
+                "VernacularWS=\"Latin\" " +
+                "ConsultantWS=\"English\" " +
+                "Comment=\"Drafted using OurWord's Marla strategy.\" " +
+                "BookNamesTable=\"66 {Kejadian} {Kalua numa Masir mai} " +
+                    "{Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} " +
+                    "{Mana Maketu Dede'a kara} {Rut} {1 Samuel} {2 Samuel} {1 Mane-mane kara} " +
+                    "{2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} " +
+                    "{Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio kara} {Dede'a Lasik} " +
+                    "{Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} " +
+                    "{Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} {Yunus} {Mika} {Nahum} " +
+                    "{Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} " +
+                    "{Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} {2 Korentus} {Galati} " +
+                    "{Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} " +
+                    "{2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} {2 Petrus} " +
+                    "{1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\" " +
+                "FootnoteSeqType=\"1\" " +
+                "FootnoteCustomSeq=\"5 {a} {b} {x} {y} {z}\"" +
+                " />";
+
+
+            // Theirs Changes:
+            //   ConsultantWS = "Spanish"
+            //   SecondBook = "Keluaran"
+            //   Comment = "Revised"
+            //   CustomSeq = "6 {1} {2} {3} {4} {5} {6}"
+            //   FootnoteSeq = "0"
+            string sTheirs = "<DTranslation " +
+                "DisplayName=\"Amarasi\" " +
+                "VernacularWS=\"Malay\" " +
+                "ConsultantWS=\"Spanish\" " +
+                "Comment=\"Revised\" " +
+                "BookNamesTable=\"66 {Tutui Hata Mana Dadik Sososan} {Keluaran} " +
+                    "{Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} " +
+                    "{Mana Maketu Dede'a kara} {Rut} {1 Samuel} {2 Samuel} {1 Mane-mane kara} " +
+                    "{2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} " +
+                    "{Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio kara} {Dede'a Lasik} " +
+                    "{Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} " +
+                    "{Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} {Yunus} {Mika} {Nahum} " +
+                    "{Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} " +
+                    "{Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} {2 Korentus} {Galati} " +
+                    "{Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} " +
+                    "{2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} {2 Petrus} " +
+                    "{1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\" " +
+                "FootnoteSeqType=\"0\" " +
+                "FootnoteCustomSeq=\"6 {1} {2} {3} {4} {5} {6}\"" +
+                " />";
+
+            // Expected Result
+            //   DisplayName = "Helong"
+            //   Vernacular = "Latin"
+            //   ConsultantWS = "Spanish"
+            //   FirstBook = "Kejadian"
+            //   SecondBook = "Keluaran"
+            //   Comment = "Revised"
+            //   CustomSeq = "6 {1} {2} {3} {4} {5} {6}"
+            //   FootnoteSeq = "0"
+            string sExpected = "<DTranslation " +
+                "DisplayName=\"Helong\" " +
+                "VernacularWS=\"Latin\" " +
+                "ConsultantWS=\"Spanish\" " +
+                "Comment=\"Revised\" " +
+                "BookNamesTable=\"66 {Kejadian} {Keluaran} " +
+                    "{Malangga Anggamar Dala Hadan} {Susura Rerekek} {Tui Seluk Dala Sodak} {Yosua} " +
+                    "{Mana Maketu Dede'a kara} {Rut} {1 Samuel} {2 Samuel} {1 Mane-mane kara} " +
+                    "{2 Mane-mane kara} {1 Isra'el no Yahuda Tutuin} {2 Isra'el no Yahuda Tutuin} " +
+                    "{Esra} {Nehemia} {Ester} {Ayub} {Sosoda Kokoa-Kikio kara} {Dede'a Lasik} " +
+                    "{Nenori la'e neu Sodak} {Soleman Dede'a Binin} {Yesaya} {Yermia} {Bu'i Nekerereu} " +
+                    "{Yeskial} {Danial} {Hosea} {Yoel} {Amos} {Obaja} {Yunus} {Mika} {Nahum} " +
+                    "{Habakuk} {Sefanya} {Hanggai} {Sakarias} {Maleaki} {Mateos} {Markus} {Lukas} " +
+                    "{Yohanis} {Nadenu nara Tutuin} {Roma} {1 Korentus} {2 Korentus} {Galati} " +
+                    "{Efesus} {Felipi} {Kolose} {1 Tesalonika} {2 Tesalonika} {1 Timotius} " +
+                    "{2 Timotius} {Titus} {Filmon} {Ibrani} {Yakobis} {1 Petrus} {2 Petrus} " +
+                    "{1 Yohanis} {2 Yohanis} {3 Yohanis} {Yudas} {Dae-bafo Mata Beuk}\" " +
+                "FootnoteSeqType=\"0\" " +
+                "FootnoteCustomSeq=\"6 {1} {2} {3} {4} {5} {6}\"" +
+                " />";
+            #endregion
+
+            // Write the three files
+            string sFolder = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar;
+
+            var sFileParent = sFolder + "parent.otrans";
+            JWU.WriteFile(sFileParent, sParent);
+
+            var sFileOurs = sFolder + "ours.otrans";
+            JWU.WriteFile(sFileOurs, sOurs);
+
+            var sFileTheirs = sFolder + "theirs.otrans";
+            JWU.WriteFile(sFileTheirs, sTheirs);
+
+            var MergeInfo = new MergeOrder(MergeOrder.ConflictHandlingMode.WeWin,
+                sFileOurs, sFileParent, sFileTheirs);
 
             // Do the merge
-            tOurs.Merge(tParent, tTheirs, true);
+            DTranslation.Merge(MergeInfo);
 
-            // Compare
-            Assert.AreEqual(tExpected.BookList.Count, tOurs.BookList.Count, "Same Count");
-            for (int i = 0; i < tExpected.BookList.Count; i++)
-            {
-                Assert.AreEqual(tExpected.BookList[i].BookAbbrev, 
-                    tOurs.BookList[i].BookAbbrev, "Same Books");
-            }
+            // Read the result and compare vs expected
+            var t = new DTranslation();
+            t.LoadFromFile(sFileOurs);
+            t.WriteToFile(JWU.NUnit_TestFilePathName, new NullProgress());
+            var vs = JWU.ReadFile(JWU.NUnit_TestFilePathName);
+            string sActual = "";
+            foreach (string s in vs)
+                sActual += s;
+            Assert.AreEqual(sExpected, sActual);
         }
         #endregion
+
     }
 }

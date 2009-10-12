@@ -484,6 +484,17 @@ namespace JWTools
         }
         #endregion
 
+        public void Write(string sPath)
+        {
+            // Create the directory if it doesn't exist
+            string sFolder = Path.GetDirectoryName(sPath);
+            if (!Directory.Exists(sFolder))
+                Directory.CreateDirectory(sFolder);
+
+            // Write out the file
+            Save(sPath);
+        }
+
         // For Unit Testing ------------------------------------------------------------------
         #region Method: bool IsSame(XmlDoc other)
         public bool IsSame(XmlDoc other)
