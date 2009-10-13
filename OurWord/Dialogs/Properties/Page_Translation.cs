@@ -918,7 +918,7 @@ namespace OurWord.Dialogs
                 }
 
                 // Update the stage
-                if (null != book && book.TranslationStage.Name != sStage)
+                if (null != book && !string.IsNullOrEmpty(sStage) && book.TranslationStage.Name != sStage)
                 {
                     book.LoadBook(new NullProgress());
                     book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromName(sStage);

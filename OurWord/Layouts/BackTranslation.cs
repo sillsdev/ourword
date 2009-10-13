@@ -1,3 +1,4 @@
+#region ***** BackTranslation.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Layouts\BackTranslation.cs
@@ -21,6 +22,7 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using JWdb;
 using JWTools;
+#endregion
 #endregion
 
 namespace OurWord.Layouts
@@ -186,7 +188,10 @@ namespace OurWord.Layouts
                 bFirstFootnote = false;
 
                 // Add the vernacular paragraph to the left side
-                OWPara op = CreateUneditableVernacularPara(fn);
+                var op = CreateFootnotePara(fn,
+                    fn.Translation.WritingSystemVernacular,
+                    BackColor,
+                    OWPara.Flags.None);
                 colVernacular.Append(op);
 
                 // Options for the display paragraph
@@ -359,8 +364,8 @@ namespace OurWord.Layouts
                 {
                     // Uneditable Vernacular
                     rowFront.Append(AddPara(
-                        new OWPara(p.Translation.WritingSystemVernacular,
-                            p.Style, p, BackColor, OWPara.Flags.None), 
+                        BuildParagraph(p, p.Translation.WritingSystemVernacular,
+                            BackColor, OWPara.Flags.None),
                         bAddFootnoteSeparator));
 
                     // Uneditable BT. (The "options" switch here is for showing things like
@@ -369,8 +374,8 @@ namespace OurWord.Layouts
                     var options = (p.IsUserEditable) ?
                         OWPara.Flags.ShowBackTranslation : OWPara.Flags.None;
                     rowFront.Append( AddPara(
-                        new OWPara( p.Translation.WritingSystemConsultant,
-                            p.Style, p, BackColor, options),
+                        BuildParagraph(p, p.Translation.WritingSystemConsultant,
+                            BackColor, options),
                         bAddFootnoteSeparator));
                 }
 
@@ -381,8 +386,8 @@ namespace OurWord.Layouts
                 {
                     // Uneditable Vernacular
                     rowTarget.Append( AddPara(
-                        new OWPara( p.Translation.WritingSystemVernacular,
-                            p.Style, p, BackColor, OWPara.Flags.None),
+                        BuildParagraph(p, p.Translation.WritingSystemVernacular,
+                            BackColor, OWPara.Flags.None),
                         bAddFootnoteSeparator));
 
                     // Editable BT
@@ -398,10 +403,8 @@ namespace OurWord.Layouts
                     }
 
                     rowTarget.Append( AddPara(
-                        new OWPara(
+                        BuildParagraph(p,
                             p.Translation.WritingSystemConsultant,
-                            p.Style,
-                            p,
                             ((p.IsUserEditable) ? EditableBackgroundColor : BackColor),
                             options),
                         bAddFootnoteSeparator));
@@ -409,6 +412,18 @@ namespace OurWord.Layouts
             }
 
             base.LoadData();
+        }
+        #endregion
+        #region Method: OWPara BuildParagraph(p, ws, backColor, flags)
+        OWPara BuildParagraph(DParagraph p, JWritingSystem ws, Color backColor, OWPara.Flags flags)
+            // Creates an OWPara, but switches based on whether we're dealing with a footnote or
+            // a normal paragraph (the Footnote code inserts the footnote reference/label.)
+        {
+            DFootnote fn = p as DFootnote;
+            if (null != fn)              
+                return CreateFootnotePara(fn, ws, backColor, flags);
+
+            return new OWPara(ws, p.Style, p, backColor, flags);
         }
         #endregion
     }

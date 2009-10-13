@@ -534,7 +534,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region CLASS: EFootnoteLabel
-        class EFootnoteLabel : EBlock
+        public class EFootnoteLabel : EBlock
         {
             #region Attr{g}: DFootnote Footnote
             DFootnote Footnote

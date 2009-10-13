@@ -347,6 +347,7 @@ namespace OurWordTests.DataModel
             // Read the result and compare vs expected
             var t = new DTranslation();
             t.LoadFromFile(sFileOurs);
+            t.IsDirty = true;
             t.WriteToFile(JWU.NUnit_TestFilePathName, new NullProgress());
             var vs = JWU.ReadFile(JWU.NUnit_TestFilePathName);
             string sActual = "";

@@ -470,7 +470,7 @@ namespace JWTools
                 Directory.Delete(sFolderPath, true);
         }
         #endregion
-
+        #region SMethod: void Copy(string sSourceFolder, string sDestinationFolder)
         static void Copy(string sSourceFolder, string sDestinationFolder)
         {
             // Get the info about this folder
@@ -495,7 +495,7 @@ namespace JWTools
                 Copy(subdir.FullName, temppath);
             }
         }
-
+        #endregion
         #region SMethod: bool Move(sSourceFolder, sDestinationFolder)
         static public bool Move(string sSourceFolder, string sDestinationFolder)
             // We want this to be safe, so instead of a strict move, we first do a copy of

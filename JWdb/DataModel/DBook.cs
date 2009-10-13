@@ -919,50 +919,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        // Read Standard Format --------------------------------------------------------------
-        #region DReference GetDefaultReference(sData)
-        private DReference GetDefaultReference(string sData)
-        {
-            int i = 0;
-
-            // Skip past the book abbreviation
-            while (i < sData.Length && sData[i] != ' ')
-                ++i;
-            while (i < sData.Length && sData[i] == ' ')
-                ++i;
-            while (i < sData.Length && sData[i] == '0')
-                ++i;
-
-            // Get the chapter number
-            string sChapter = "";
-            while (i < sData.Length && sData[i] != '.')
-            {
-                sChapter += sData[i];
-                ++i;
-            }
-            while (i < sData.Length && sData[i] == '.')
-                ++i;
-            while (i < sData.Length && sData[i] == '0')
-                ++i;
-
-            // Get the verse number
-            string sVerse = "";
-            while (i < sData.Length && sData[i] != '-')
-            {
-                sVerse += sData[i];
-                ++i;
-            }
-
-            // Build the reference
-            DReference reference = new DReference();
-            if (sChapter.Length > 0)
-                reference.Chapter = Convert.ToInt16(sChapter);
-            if (sVerse.Length > 0)
-                reference.Verse = Convert.ToInt16(sVerse);
-            return reference;
-        }
-        #endregion
-
         // I/O (Standard Format) -------------------------------------------------------------
         #region EMBEDDED CLASS IO
         public class IO
@@ -1364,8 +1320,193 @@ namespace JWdb.DataModel
             (new IO(this, progress)).ExportToToolbox(sPathName);
         }
         #endregion
+        #region Method: bool LoadFromStandardFormat(sPath, progress)
+        bool LoadFromStandardFormat(string sPath, IProgressIndicator progress)
+        {
+            // Locate the file
+            if (!File.Exists(sPath))
+            {
+                LocDB.Message("UnableToFindFile",
+                    "Unable to find the file:\n{0}.",
+                    new string[] { sPath },
+                    LocDB.MessageTypes.Error);
+                return false;
+            }
+
+            // Open the file
+            bool bSfmLoaded = false;
+            while (!bSfmLoaded)
+            {
+                TextReader tr = null;
+                try
+                {
+                    var sr = new StreamReader(sPath, Encoding.UTF8);
+                    tr = TextReader.Synchronized(sr);
+
+                    IO io = new IO(this, progress);
+                    if (true == io.Read(tr))
+                    {
+                        IsDirty = false;  // We'll consider an object unchanged following a read. 
+                        bSfmLoaded = true;
+                    }
+                }
+                catch (eBookReadException bre)
+                {
+                    // Decide which version of the Repair dialog to show
+                    DialogRepairImportBook dlgRepair = (bre.NeedToShowFront) ?
+                        new RepairImportBookStructure(FrontBook, this, sPath, bre) :
+                        new DialogRepairImportBook(this, sPath, bre);
+
+                    // Give the user the opportunity to fix the problem
+                    DialogResult result = dlgRepair.ShowDialog();
+
+                    // If he doesn't fix it, then we must remove the book from
+                    // the project. (Thus we return "false")
+                    if (DialogResult.Cancel == result)
+                        return false;
+
+                    // Prepare to try the import again. 
+                    Clear();
+                    Debug.Assert(!History.HasMessages);
+                }
+                catch (Exception e)
+                {
+                    LocDB.Message("cantLoadBookSystemException",
+                        "Unable to load book {0} due to system message:\n\n{1}",
+                        new string[] { e.Message },
+                        LocDB.MessageTypes.Error);
+                    Console.WriteLine("Exception in DBook.Read: " + e.Message);
+                    return false;
+                }
+                finally
+                {
+                    if (null != tr)
+                    {
+                        tr.Close();
+                        tr = null;
+                    }
+                    progress.End();
+                }
+            }
+
+            m_bIsLoaded = true;
+            return true;
+        }
+        #endregion
 
         // I/O (Oxes) ------------------------------------------------------------------------
+        #region Constants
+        const string c_sTagBible = "bible";
+        const string c_sAttrOxes = "oxes";
+
+        const string c_sTagBook = "book";
+        const string c_sAttrID = "id";
+        const string c_sAttrStage = "stage";
+        const string c_sAttrVersion = "version";
+        const string c_sAttrLocked = "locked";
+        const string c_sAttrCopyright = "copyright";
+        const string c_sAttrComment = "comment";
+        #endregion
+
+        #region Attr{g}: XmlDoc ToOxesDocument
+        public XmlDoc ToOxesDocument
+        {
+            get
+            {
+                var oxes = new XmlDoc();
+                oxes.AddXmlDeclaration();
+
+                // Bible Node
+                var nodeBible = oxes.AddNode(null, c_sTagBible);
+                oxes.AddAttr(nodeBible, "xml:lang", "bko");
+                oxes.AddAttr(nodeBible, "backtTranslaltionDefaultLanguage", "en");
+                oxes.AddAttr(nodeBible, c_sAttrOxes, "2.0");
+
+                // Book Node
+                var nodeBook = oxes.AddNode(nodeBible, c_sTagBook);
+                oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
+                oxes.AddAttr(nodeBook, c_sAttrStage, m_nTranslationStage);
+                oxes.AddAttr(nodeBook, c_sAttrVersion, Version);
+                if (true == Locked)
+                    oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
+                if (!string.IsNullOrEmpty(Copyright))
+                    oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
+                if (!string.IsNullOrEmpty(Comment))
+                    oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
+
+                // Book History, saved prior to the sections
+                History.Save(oxes, nodeBook);
+
+                // Add the Sections
+                foreach (DSection section in Sections)
+                    section.SaveToOxesBook(oxes, nodeBook);
+
+                return oxes;
+            }
+        }
+        #endregion
+        #region SMethod: string GetAbbrevFromOxes(XmlDoc oxes)
+        static public string GetAbbrevFromOxes(XmlDoc oxes)
+        {
+            var nodeBible = XmlDoc.FindNode(oxes, c_sTagBible);
+            if (null == nodeBible)
+                return null;
+
+            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
+            if (null == nodeBook)
+                return null;
+
+            return XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+        }
+        #endregion
+        #region Method: void QuicklyReadBasicAttrs()
+        public void QuicklyReadBasicAttrs()
+        {
+            TextReader tr = null;
+            try
+            {
+                var sr = new StreamReader(StoragePath, Encoding.UTF8);
+                tr = TextReader.Synchronized(sr);
+
+                do
+                {
+                    string s = tr.ReadLine();
+                    if (null == s)
+                        break;
+                    s = s.Trim();
+
+                    if (!s.StartsWith("<" + c_sTagBook + " "))
+                        continue;
+
+                    // Create an endtag so we can parse it legally
+                    s = s.Replace(">", " />");
+
+                    // Parse it in
+                    var xml = new XmlDoc(s);
+                    var xmlBook = xml.FirstChild;
+
+                    // Interpret the basic attrs
+                    Locked = XmlDoc.GetAttrValue(xmlBook, c_sAttrLocked, false);
+                    m_nTranslationStage = XmlDoc.GetAttrValue(xmlBook, c_sAttrStage, 0);
+
+                    // Done reading the file
+                    break;
+
+                } while (true);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Reading basic attrs failed: " + e.Message);
+            }
+            finally
+            {
+                if (null != tr)
+                    tr.Close();
+            }
+        }
+        #endregion
+
         #region Method: bool LoadFromOxes(string sPath, IProgressIndicator progress)
 
         public void LoadFromOxes(string sPath, IProgressIndicator progress)
@@ -1541,79 +1682,6 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        #region Method: bool LoadFromStandardFormat(sPath, progress)
-        bool LoadFromStandardFormat(string sPath, IProgressIndicator progress)
-        {
-            // Locate the file
-            if (!File.Exists(sPath))
-            {
-                LocDB.Message("UnableToFindFile",
-                    "Unable to find the file:\n{0}.",
-                    new string[] { sPath },
-                    LocDB.MessageTypes.Error);
-                return false;
-            }
-
-            // Open the file
-            bool bSfmLoaded = false;
-            while (!bSfmLoaded)
-            {
-                TextReader tr = null;
-                try
-                {
-                    var sr = new StreamReader(sPath, Encoding.UTF8);
-                    tr = TextReader.Synchronized(sr);
-
-                    IO io = new IO(this, progress);
-                    if (true == io.Read(tr))
-                    {
-                        IsDirty = false;  // We'll consider an object unchanged following a read. 
-                        bSfmLoaded = true;
-                    }
-                }
-                catch (eBookReadException bre)
-                {
-                    // Decide which version of the Repair dialog to show
-                    DialogRepairImportBook dlgRepair = (bre.NeedToShowFront) ?
-                        new RepairImportBookStructure(FrontBook, this, sPath, bre) :
-                        new DialogRepairImportBook(this, sPath, bre);
-
-                    // Give the user the opportunity to fix the problem
-                    DialogResult result = dlgRepair.ShowDialog();
-
-                    // If he doesn't fix it, then we must remove the book from
-                    // the project. (Thus we return "false")
-                    if (DialogResult.Cancel == result)
-                        return false;
-
-                    // Prepare to try the import again. 
-                    Clear();
-                    Debug.Assert(!History.HasMessages);
-                }
-                catch (Exception e)
-                {
-                    LocDB.Message("cantLoadBookSystemException",
-                        "Unable to load book {0} due to system message:\n\n{1}",
-                        new string[] { e.Message },
-                        LocDB.MessageTypes.Error);
-                    Console.WriteLine("Exception in DBook.Read: " + e.Message);
-                    return false;
-                }
-                finally
-                {
-                    if (null != tr)
-                    {
-                        tr.Close();
-                        tr = null;
-                    }
-                    progress.End();
-                }
-            }
-
-            m_bIsLoaded = true;
-            return true;
-        }
-        #endregion
         #region Method: void _LoadPostProcessing(sPath)
         void _LoadPostProcessing(string sPath)
         {
@@ -1717,6 +1785,48 @@ namespace JWdb.DataModel
         #endregion
 
         // Read/Write Standard Format --------------------------------------------------------
+        #region DReference GetDefaultReference(sData)
+        private DReference GetDefaultReference(string sData)
+        {
+            int i = 0;
+
+            // Skip past the book abbreviation
+            while (i < sData.Length && sData[i] != ' ')
+                ++i;
+            while (i < sData.Length && sData[i] == ' ')
+                ++i;
+            while (i < sData.Length && sData[i] == '0')
+                ++i;
+
+            // Get the chapter number
+            string sChapter = "";
+            while (i < sData.Length && sData[i] != '.')
+            {
+                sChapter += sData[i];
+                ++i;
+            }
+            while (i < sData.Length && sData[i] == '.')
+                ++i;
+            while (i < sData.Length && sData[i] == '0')
+                ++i;
+
+            // Get the verse number
+            string sVerse = "";
+            while (i < sData.Length && sData[i] != '-')
+            {
+                sVerse += sData[i];
+                ++i;
+            }
+
+            // Build the reference
+            DReference reference = new DReference();
+            if (sChapter.Length > 0)
+                reference.Chapter = Convert.ToInt16(sChapter);
+            if (sVerse.Length > 0)
+                reference.Verse = Convert.ToInt16(sVerse);
+            return reference;
+        }
+        #endregion
         #region SMethod: void ParseFileName(...)
         static public void ParseFileName(string sPath, ref int nBookNumber,
             ref string sBookAbbrev, ref string sLanguageName, ref string sStageAbbrev,
@@ -1770,7 +1880,6 @@ namespace JWdb.DataModel
                 i++;
         }
         #endregion
-
         #region Method: static void RestoreFromBackup(DBook book, string sBackupPathName)
         static public void RestoreFromBackup(DBook book, string sBackupPathName, IProgressIndicator progress)
         {
@@ -2085,128 +2194,6 @@ namespace JWdb.DataModel
             vs[1] = sBookAbbrev;
             vs[2] = sLanguageName;
             return vs;
-        }
-        #endregion
-
-        public int GetID()
-        {
-            int nID = m_NextID;
-
-            m_NextID++;
-
-            return nID;
-        }
-        public int m_NextID = 0;
-
-        // Oxes ------------------------------------------------------------------------------
-        #region Constants
-        const string c_sTagBible = "bible";
-        const string c_sAttrOxes = "oxes";
-
-        const string c_sTagBook = "book";
-        const string c_sAttrID = "id";
-        const string c_sAttrStage = "stage";
-        const string c_sAttrVersion = "version";
-        const string c_sAttrLocked = "locked";
-        const string c_sAttrCopyright = "copyright";
-        const string c_sAttrComment = "comment";
-        #endregion
-        #region Attr{g}: XmlDoc ToOxesDocument
-        public XmlDoc ToOxesDocument
-        {
-            get
-            {
-                var oxes = new XmlDoc();
-                oxes.AddXmlDeclaration();
-
-                // Bible Node
-                var nodeBible = oxes.AddNode(null, c_sTagBible);
-                oxes.AddAttr(nodeBible, "xml:lang", "bko");
-                oxes.AddAttr(nodeBible, "backtTranslaltionDefaultLanguage", "en");
-                oxes.AddAttr(nodeBible, c_sAttrOxes, "2.0");
-
-                // Book Node
-                var nodeBook = oxes.AddNode(nodeBible, c_sTagBook);
-                oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
-                oxes.AddAttr(nodeBook, c_sAttrStage, m_nTranslationStage);
-                oxes.AddAttr(nodeBook, c_sAttrVersion, Version);
-                if (true == Locked)
-                    oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
-                if (!string.IsNullOrEmpty(Copyright))
-                    oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
-                if (!string.IsNullOrEmpty(Comment))
-                    oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
-
-                // Book History, saved prior to the sections
-                History.Save(oxes, nodeBook);
-
-                // Add the Sections
-                foreach (DSection section in Sections)
-                    section.SaveToOxesBook(oxes, nodeBook);
-
-                return oxes;
-            }
-        }
-        #endregion
-        #region SMethod: string GetAbbrevFromOxes(XmlDoc oxes)
-        static public string GetAbbrevFromOxes(XmlDoc oxes)
-        {
-            var nodeBible = XmlDoc.FindNode(oxes, c_sTagBible);
-            if (null == nodeBible)
-                return null;
-
-            var nodeBook = XmlDoc.FindNode(nodeBible, c_sTagBook);
-            if (null == nodeBook)
-                return null;
-
-            return XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
-        }
-        #endregion
-        #region Method: void QuicklyReadBasicAttrs()
-        public void QuicklyReadBasicAttrs()
-        {
-            TextReader tr = null;
-            try
-            {
-                var sr = new StreamReader(StoragePath, Encoding.UTF8);
-                tr = TextReader.Synchronized(sr);
-
-                do
-                {
-                    string s = tr.ReadLine();
-                    if (null == s)
-                        break;
-                    s = s.Trim();
-
-                    if (!s.StartsWith("<" + c_sTagBook + " "))
-                        continue;
-
-                    // Create an endtag so we can parse it legally
-                    s = s.Replace(">", " />");
-
-                    // Parse it in
-                    var xml = new XmlDoc(s);
-                    var xmlBook = xml.FirstChild;
-
-                    // Interpret the basic attrs
-                    Locked = XmlDoc.GetAttrValue(xmlBook, c_sAttrLocked, false);
-                    m_nTranslationStage = XmlDoc.GetAttrValue(xmlBook, c_sAttrStage, 0);
-
-                    // Done reading the file
-                    break;
-
-                } while (true);
-
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Reading basic attrs failed: " + e.Message);
-            }
-            finally
-            {
-                if (null != tr)
-                    tr.Close();
-            }
         }
         #endregion
 
