@@ -506,24 +506,24 @@ namespace JWdb.DataModel
         #region Method: void WriteToFile(string sPath, IProgressIndicator progress)
         public void WriteToFile(string sPath, IProgressIndicator progress)
         {
-            if (!IsDirty)
-                return;
+            if (IsDirty)
+            {
+                // Initialize the xml object
+                var xml = new XmlDoc();
+                var node = xml.AddNode(xml, c_sTag);
 
-            // Initialize the xml object
-            var xml = new XmlDoc();
-            var node = xml.AddNode(xml, c_sTag);
+                // Add attrs if not empty
+                xml.AddAttr(node, c_sAttrDisplayName, DisplayName);
+                xml.AddAttr(node, c_sAttrVernacularWS, VernacularWritingSystemName);
+                xml.AddAttr(node, c_sAttrConsultantWS, ConsultantWritingSystemName);
+                xml.AddAttr(node, c_sAttrComment, Comment);
+                xml.AddAttr(node, c_sBookNamesTable, BookNamesTable.SaveLine);
+                xml.AddAttr(node, c_sFootnoteSeqType, ((int)FootnoteSequenceType).ToString());
+                xml.AddAttr(node, c_sFootnoteCustomSeq, FootnoteCustomSeq.SaveLine);
 
-            // Add attrs if not empty
-            xml.AddAttr(node, c_sAttrDisplayName, DisplayName);
-            xml.AddAttr(node, c_sAttrVernacularWS, VernacularWritingSystemName);
-            xml.AddAttr(node, c_sAttrConsultantWS, ConsultantWritingSystemName);
-            xml.AddAttr(node, c_sAttrComment, Comment);
-            xml.AddAttr(node, c_sBookNamesTable, BookNamesTable.SaveLine);
-            xml.AddAttr(node, c_sFootnoteSeqType, ((int)FootnoteSequenceType).ToString());
-            xml.AddAttr(node, c_sFootnoteCustomSeq, FootnoteCustomSeq.SaveLine);
-
-            // Write it out
-            xml.Write(sPath);
+                // Write it out
+                xml.Write(sPath);
+            }
 
             // Save any books that have been modified
             foreach (DBook book in BookList)

@@ -1028,8 +1028,13 @@ namespace JWdb.DataModel
 
             // The JObjectOnDemand does the writing
             WriteToFile(progress);
+
+            // Need to pick up the translations as well
+            if (null != TargetTranslation)
+                TargetTranslation.WriteToFile(new NullProgress());
         }
         #endregion
+
 	}
 
 }

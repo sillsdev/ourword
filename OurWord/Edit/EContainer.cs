@@ -1590,6 +1590,24 @@ namespace OurWord.Edit
         }
         #endregion
 
+        // Misc Methods ----------------------------------------------------------------------
+        #region Method: EColumn GetColumn(iColumn)
+        public EColumn GetColumn(int iColumn)
+            // Creates the column if it is not there yet; otherwise returns an EColumn.
+            // If there is some other time of object there instead, an assertion is fired.
+        {
+            Debug.Assert(iColumn < ColumnsCount);
+
+            while (SubItems.Length <= iColumn)
+                Append(new EColumn());
+
+            var column = SubItems[iColumn] as EColumn;
+
+            Debug.Assert(null != column);
+            return column;
+        }
+        #endregion
+
         // Layout Calculations ---------------------------------------------------------------
         #region OAttr{g}: float AvailableWidthForOneSubitem
         public override float AvailableWidthForOneSubitem

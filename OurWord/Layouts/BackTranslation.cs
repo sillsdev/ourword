@@ -358,10 +358,12 @@ namespace OurWord.Layouts
                 }
 
                 // Front
-                var rowFront = new ERowOfColumns(2);
-                rowTop.Append(rowFront);
                 foreach (DParagraph p in group.FrontParagraphs)
                 {
+                    // Place the front paragraph in a two-column row
+                    var rowFront = new ERowOfColumns(2);
+                    rowTop.GetColumn(0).Append(rowFront);
+
                     // Uneditable Vernacular
                     rowFront.Append(AddPara(
                         BuildParagraph(p, p.Translation.WritingSystemVernacular,
@@ -380,10 +382,12 @@ namespace OurWord.Layouts
                 }
 
                 // Target
-                var rowTarget = new ERowOfColumns(2);
-                rowTop.Append(rowTarget);
                 foreach (DParagraph p in group.TargetParagraphs)
                 {
+                    // Place the target paragraph in a two-column row
+                    var rowTarget = new ERowOfColumns(2);
+                    rowTop.GetColumn(1).Append(rowTarget);
+
                     // Uneditable Vernacular
                     rowTarget.Append( AddPara(
                         BuildParagraph(p, p.Translation.WritingSystemVernacular,
