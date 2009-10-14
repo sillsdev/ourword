@@ -79,7 +79,8 @@ namespace OurWord.Dialogs
 
             // Read in the file and place it in the control
             DataFile.Clear();
-            DataFile.Lines = LoadFile(Book.StoragePath);
+            var vs = JWU.ReadFile(Book.StoragePath);
+            DataFile.Lines = vs.ToArray();
 
             DataFile.SelectAll();
             DataFile.SelectionHangingIndent = 20;
@@ -95,11 +96,7 @@ namespace OurWord.Dialogs
                 return;
 
             // Save the changes
-            string[] v = DataFile.Lines;
-            TextWriter w = JW_Util.GetTextWriter(Book.StoragePath);
-            foreach (string s in v)
-                w.WriteLine(s);
-            w.Close();
+            JWU.WriteFile(Book.StoragePath, DataFile.Lines);
         }
         #endregion
         #region Cmd: cmdFindBoxKeyDown
@@ -127,26 +124,6 @@ namespace OurWord.Dialogs
             DataFile.SelectionLength = sSearchText.Length;
 
             e.Handled = true;
-        }
-        #endregion
-
-        // Misc Methods ----------------------------------------------------------------------
-        #region Method: string[] LoadFile(string sPathName)
-        protected string[] LoadFile(string sPathName)
-        // Loads the file into the RichTextBox. We can't use the RTF Box's LoadFile,
-        // because it appears to want to munge up the UTF8's. 
-        {
-            // Get a TextReader to the file
-            StreamReader sr = new StreamReader(sPathName, Encoding.UTF8);
-            TextReader r = TextReader.Synchronized(sr);
-
-            // Read in as a standard format database; this will concatenate lines
-            var db = new ScriptureDB();
-            db.Read(r);
-            r.Close();
-
-            // Return it as an array of strings
-            return db.ExtractData();
         }
         #endregion
     }
