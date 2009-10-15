@@ -1637,7 +1637,14 @@ namespace JWdb.DataModel
                 {
                     if (msgTheirs.IsSameOriginAs(msgOurs))
                     {
-                        msgOurs.Merge(FindInParent(Parent, msgOurs), msgTheirs);
+                        var msgParent = FindInParent(Parent, msgOurs);
+                        // You'd think if its in Ours and Theirs, it would also be in Parent.
+                        // But not necessarily true, if someone has just physically copied the
+                        // file into the directory without a common parent. This is a patheological
+                        // event, hopefully rare, in which case we just accept "Ours" rather than
+                        // attempting something smarter.
+                        if (null != msgParent)
+                            msgOurs.Merge(msgParent, msgTheirs);
                         bFound = true;
                         break;
                     }
