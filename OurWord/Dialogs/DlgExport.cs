@@ -64,12 +64,25 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
+        #region Attr{g}: DTranslation Translation
+        DTranslation Translation
+        {
+            get
+            {
+                Debug.Assert(null != m_Translation);
+                return m_Translation;
+            }
+        }
+        DTranslation m_Translation;
+        #endregion
         #region VAttr{g}: string ExportSubFolderName
         public string ExportSubFolderName
         {
             get
             {
                 string sSubFolder = "OurWordExport" + Path.DirectorySeparatorChar;
+
+                sSubFolder += Translation.DisplayName + Path.DirectorySeparatorChar;
 
                 if (ExportToParatext)
                     sSubFolder += "Paratext" + Path.DirectorySeparatorChar;
@@ -86,9 +99,10 @@ namespace OurWord.Dialogs
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public DialogExport()
+        #region Constructor(DTranslation)
+        public DialogExport(DTranslation translation)
         {
+            m_Translation = translation;
             InitializeComponent();
         }
         #endregion

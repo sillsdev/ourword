@@ -2927,7 +2927,7 @@ namespace OurWord
                 return;
 
             // Get the user's desires (or cancel)
-            DialogExport dlgDesires = new DialogExport();
+            DialogExport dlgDesires = new DialogExport(DB.TargetTranslation);
             if (DialogResult.OK != dlgDesires.ShowDialog(this))
                 return;
 
