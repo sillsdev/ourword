@@ -483,7 +483,7 @@ namespace JWTools
             return node.OuterXml;
         }
         #endregion
-
+        #region Method: void Write(string sPath)
         public void Write(string sPath)
         {
             // Create the directory if it doesn't exist
@@ -494,6 +494,7 @@ namespace JWTools
             // Write out the file
             Save(sPath);
         }
+        #endregion
 
         // For Unit Testing ------------------------------------------------------------------
         #region Method: bool IsSame(XmlDoc other)
@@ -644,8 +645,8 @@ namespace JWTools
         {
         }
         #endregion
-        #region Constructor(sUrl)
-        public UrlAttrList(string sUrl)
+        #region Constructor(sPrefix, sUrl)
+        public UrlAttrList(string sPrefix, string sUrl)
             : this()
         {
             // Start with the assumption that we don't have a good Oxes Url
@@ -655,12 +656,13 @@ namespace JWTools
             if (string.IsNullOrEmpty(sUrl))
                 return;
 
-            // Make sure it is an Oxes url; otherwise we can't identify it
-            if (!sUrl.StartsWith("oxes://", true, CultureInfo.InvariantCulture))
+            // Make sure it is a the right kind of url (e.g., oxes); otherwise we can't identify it
+            if (!string.IsNullOrEmpty(sPrefix) && 
+                !sUrl.StartsWith(sPrefix, true, CultureInfo.InvariantCulture))
                 return;
 
             // We want to consider what's to the right of the Oxes part.
-            string sUrlData = sUrl.Substring(7);
+            string sUrlData = sUrl.Substring(sPrefix.Length);
             var vsSections = sUrlData.Split(new char[] { '/' });
             if (vsSections.Length == 0 || vsSections.Length > 2)
                 return;
@@ -696,6 +698,12 @@ namespace JWTools
             }
         }
         #endregion
+        #region Constructor(sUrl)
+        public UrlAttrList(string sUrl)
+            : this("", sUrl)
+        {
+        }
+        #endregion
 
         #region Method: string GetValueFor(string sName)
         public string GetValueFor(string sName)
@@ -712,10 +720,13 @@ namespace JWTools
 
         public const char c_chDelimiter = '+';
 
-        #region Method: string MakeUrl()
-        public string MakeUrl()
+        #region Method: string MakeUrl(sPrefix)
+        public string MakeUrl(string sPrefix)
         {
-            string sUrl = "oxes://";
+            if (null == sPrefix)
+                sPrefix = "";
+
+            string sUrl = sPrefix;
 
             if (!string.IsNullOrEmpty(OxesFilePath))
                 sUrl += (OxesFilePath + "/");
@@ -734,6 +745,12 @@ namespace JWTools
             }
 
             return sUrl;
+        }
+        #endregion
+        #region Method: string MakeUrl()
+        public string MakeUrl()
+        {
+            return MakeUrl("");
         }
         #endregion
     }

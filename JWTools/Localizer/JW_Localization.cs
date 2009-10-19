@@ -1220,6 +1220,9 @@ namespace JWTools
         #region Method: LocLanguage FindLanguageByName(sLanguageName)
         public LocLanguage FindLanguageByName(string sLanguageName)
         {
+            if (string.IsNullOrEmpty(sLanguageName))
+                return null;
+
             foreach (LocLanguage lang in Languages)
             {
                 if (lang.Name == sLanguageName)

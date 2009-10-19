@@ -1779,7 +1779,7 @@ namespace OurWord
 				return;
 
 			// Get the string to print
-			string sBookStatus = DB.TargetBook.TranslationStage.Name;
+			string sBookStatus = DB.TargetBook.Stage.LocalizedName;
 
 			// Calculate the maximum length this text should appear (non-rotated). We'll
 			// assume a 30-degree angle. 
@@ -1860,7 +1860,7 @@ namespace OurWord
 			// Stage and Date
 			if ( kFooterPart == DTeamSettings.FooterParts.kStageAndDate)
 			{
-				string sBookStatus = DB.TargetBook.TranslationStage.Name;
+				string sBookStatus = DB.TargetBook.Stage.LocalizedName;
 				string sDate = DateTime.Today.ToShortDateString();
 				return sBookStatus + " - " + sDate;
 			}
@@ -1869,7 +1869,7 @@ namespace OurWord
 			if ( kFooterPart == DTeamSettings.FooterParts.kLanguageStageAndDate)
 			{
 				string sName       = DB.TargetBook.Translation.DisplayName + " ";
-				string sBookStatus = DB.TargetBook.TranslationStage.Name;
+				string sBookStatus = DB.TargetBook.Stage.LocalizedName;
 				string sDate       = DateTime.Today.ToShortDateString();
 
 				return sName + " - " + sBookStatus + " - " + sDate;

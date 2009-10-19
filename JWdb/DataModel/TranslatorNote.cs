@@ -447,27 +447,31 @@ namespace JWdb.DataModel
         }
         private DateTime m_dtEventDate;
         #endregion
-        #region BAttr{g/s}: string Stage - translation stage (draft, revision, etc)
-        public string Stage
-        {
-            get
-            {
-                return m_sStage;
-            }
-            set
-            {
-                SetValue(ref m_sStage, value);
-            }
-        }
-        private string m_sStage = "";
-        #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
             DefineAttr("Date", ref m_dtEventDate);
-            DefineAttr("Stage", ref m_sStage);
         }
+        #endregion
+
+        #region Attr{g/s}: Stage Stage
+        public Stage Stage
+        {
+            get
+            {
+                return m_Stage;
+            }
+            set
+            {
+                if (m_Stage != value)
+                {
+                    m_Stage = value;
+                    DeclareDirty();
+                }
+            }
+        }
+        Stage m_Stage;
         #endregion
 
         // VAttrs ----------------------------------------------------------------------------
@@ -496,12 +500,12 @@ namespace JWdb.DataModel
         }
         #endregion
         #region Constructor(utcDate, sStage, sDescription)
-        public DEventMessage(DateTime utcDate, string sStage, string sDescription)
+        public DEventMessage(DateTime utcDate, Stage stage, string sDescription)
             : this()
         {
             EventDate = utcDate;
             UtcCreated = EventDate;
-            Stage = sStage;
+            m_Stage = stage;
             SimpleText = sDescription;
         }
         #endregion
@@ -514,7 +518,7 @@ namespace JWdb.DataModel
 
             if (e.EventDate != EventDate)
                 return false;
-            if (e.Stage != Stage)
+            if (e.Stage.EnglishAbbrev != Stage.EnglishAbbrev)
                 return false;
 
             return base.ContentEquals(obj);
@@ -551,7 +555,19 @@ namespace JWdb.DataModel
 
             // Add the DEventMessage data
             // Stage
-            Stage = XmlDoc.GetAttrValue(node, c_sAttrStage, "");
+            var sStage = XmlDoc.GetAttrValue(node, c_sAttrStage, Stage.c_sDraft);
+            // Normally we expect this to be the English Abbreviation
+            Stage = DB.TeamSettings.Stages.Find(sStage);
+            // But old data may have been saved some other way
+            if (null == Stage)
+                Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.LocalizedAbbrev, sStage);
+            if (null == Stage)
+                Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.LocalizedName, sStage);
+            if (null == Stage)
+                Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.EnglishName, sStage);
+            // Give Up
+            if (null == Stage)
+                Stage = DB.TeamSettings.Stages.Draft;
 
             // EventDate, including old-style which was "Date"
             EventDate = XmlDoc.GetAttrValue(node,
@@ -569,7 +585,7 @@ namespace JWdb.DataModel
 
             // Add in our additional attributes
             oxes.AddAttr(nodeEventMessage, c_sAttrEventDate, EventDate);
-            oxes.AddAttr(nodeEventMessage, c_sAttrStage, Stage);
+            oxes.AddAttr(nodeEventMessage, c_sAttrStage, Stage.EnglishAbbrev);
 
             return nodeEventMessage;
         }
@@ -640,13 +656,13 @@ namespace JWdb.DataModel
         JOwnSeq<DMessage> m_osMessages;
         #endregion
         #region Method: DMessage AddMessage(utcDate, sStage, sDescription)
-        public DMessage AddMessage(DateTime utcDate, string sStage, string sDescription)
+        public DMessage AddMessage(DateTime utcDate, Stage stage, string sDescription)
         {
             DMessage m = null;
 
             // History notes take a subclass of DMessage
             if (IsHistoryNote)
-                m = new DEventMessage(utcDate, sStage, sDescription);
+                m = new DEventMessage(utcDate, stage, sDescription);
             else
             {
                 m = new DMessage();

@@ -1,3 +1,4 @@
+#region ***** UndoRedo.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    UndoRedo.cs
@@ -24,6 +25,7 @@ using JWTools;
 using JWdb;
 using JWdb.DataModel;
 using OurWord.SideWnd;
+#endregion
 #endregion
 
 namespace OurWord.Edit
@@ -2872,25 +2874,25 @@ namespace OurWord.Edit
         }
         DEventMessage m_Event;
         #endregion
-        #region Attr{g}: string NewStage
-        string NewStage
+        #region Attr{g}: Stage NewStage
+        Stage NewStage
         {
             get
             {
-                return m_sNewStage;
+                return m_NewStage;
             }
         }
-        string m_sNewStage;
+        Stage m_NewStage;
         #endregion
-        #region Attr{g}: string OriginalStage
-        string OriginalStage
+        #region Attr{g}: Stage OriginalStage
+        Stage OriginalStage
         {
             get
             {
-                return m_sOriginalStage;
+                return m_OriginalStage;
             }
         }
-        string m_sOriginalStage;
+        Stage m_OriginalStage;
         #endregion
         #region Attr{g}: ToolStripDropDownButton StagesDropDown
         public ToolStripDropDownButton StagesDropDown
@@ -2911,10 +2913,13 @@ namespace OurWord.Edit
             m_Event = Event;
 
             // Get the stage we want to get set to
-            m_sNewStage = itemNewStage.Text;
+            string sNewStageLocAbbrev = itemNewStage.Text;
+            m_NewStage = DB.TeamSettings.Stages.Find(
+                StageList.FindBy.LocalizedAbbrev,
+                sNewStageLocAbbrev);
 
             // Get the stage we are currently
-            m_sOriginalStage = Event.Stage;
+            m_OriginalStage = Event.Stage;
 
             // Save a pointer to the owning DropDown button which owns this item
             m_StagesDropDownButton = itemNewStage.OwnerItem as ToolStripDropDownButton;
@@ -2930,9 +2935,9 @@ namespace OurWord.Edit
 
             // Update the menu
             foreach (ToolStripMenuItem item in StagesDropDown.DropDownItems)
-                item.Checked = (item.Text == Event.Stage);
+                item.Checked = (item.Text == Event.Stage.LocalizedAbbrev);
 
-            StagesDropDown.Text = Event.Stage;
+            StagesDropDown.Text = Event.Stage.LocalizedAbbrev;
 
             return true;
         }
@@ -2945,9 +2950,9 @@ namespace OurWord.Edit
 
             // Update the menu
             foreach (ToolStripMenuItem item in StagesDropDown.DropDownItems)
-                item.Checked = (item.Text == NewStage);
+                item.Checked = (item.Text == NewStage.LocalizedAbbrev);
 
-            StagesDropDown.Text = Event.Stage;
+            StagesDropDown.Text = Event.Stage.LocalizedAbbrev;
         }
         #endregion
 
@@ -2956,7 +2961,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return NewStage;
+                return NewStage.LocalizedAbbrev;
             }
         }
         #endregion

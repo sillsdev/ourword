@@ -225,8 +225,7 @@ namespace OurWord.Dialogs
             // If this note had no messages, add one now
             if (!History.HasMessages)
             {
-                var sStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idDraft).Name;
-                var message = new DEventMessage(DateTime.UtcNow, sStage, "");
+                var message = new DEventMessage(DateTime.UtcNow, DB.TeamSettings.Stages.Draft, "");
                 History.Messages.Append(message);
             }
 

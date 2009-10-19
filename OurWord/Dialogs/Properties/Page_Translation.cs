@@ -755,9 +755,9 @@ namespace OurWord.Dialogs
             // If we have a book, then the combo's possibilities are the translation stages
             if (null != book)
             {
-                foreach (string s in DB.TeamSettings.TranslationStages.AllNames)
-                    combo.Items.Add(s);
-                combo.Value = book.TranslationStage.Name;
+                foreach (Stage stage in DB.TeamSettings.Stages)
+                    combo.Items.Add(stage.LocalizedName);
+                combo.Value = book.Stage.LocalizedName;
             }
 
             // Otherwise, the possibilities are Planned vs nothing
@@ -822,7 +822,7 @@ namespace OurWord.Dialogs
 
 				// If the book exists in the translation, get its stage
 				DBook book = Translation.FindBook(sBookAbbrev);
-				string sStage = ((null == book) ? "" : book.TranslationStage.Name);
+				string sStage = ((null == book) ? "" : book.Stage.LocalizedName);
 
                 // Apply the Show filter
                 switch (m_FilterOn)
@@ -918,10 +918,10 @@ namespace OurWord.Dialogs
                 }
 
                 // Update the stage
-                if (null != book && !string.IsNullOrEmpty(sStage) && book.TranslationStage.Name != sStage)
+                if (null != book && !string.IsNullOrEmpty(sStage) && book.Stage.LocalizedName != sStage)
                 {
                     book.LoadBook(new NullProgress());
-                    book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromName(sStage);
+                    book.Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.LocalizedName, sStage);
                     book.DeclareDirty();
                 }
 
@@ -984,11 +984,6 @@ namespace OurWord.Dialogs
                 AddDropDownItem(LocDB.DB.PrimaryLanguage.Name);
             if (null != LocDB.DB.SecondaryLanguage)
                 AddDropDownItem(LocDB.DB.SecondaryLanguage.Name);
-
-            // Put in the FileName language (if different)
-            DTeamSettings ts = DB.TeamSettings;
-            string sFileNameLang = ts.FileNameLanguage;
-            AddDropDownItem(ts.FileNameLanguage);
 
             // Put in the Front Translation (if this isn't the Front)
             if (null != DB.Project.FrontTranslation && DB.Project.FrontTranslation != Translation)

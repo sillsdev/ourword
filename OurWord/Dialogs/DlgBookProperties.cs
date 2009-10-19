@@ -103,12 +103,15 @@ namespace OurWord.Dialogs
                 "Community Check, Team Check, Back Translation, etc., until they finally " +
                 "are ready to publish. You can customize the stages to match the way you " +
                 "work in the Configuration Dialog.");
+            var vsAllNames = new string[DB.TeamSettings.Stages.Count];
+            for (int k = 0; k < DB.TeamSettings.Stages.Count; k++)
+                vsAllNames[k] = DB.TeamSettings.Stages[k].LocalizedName;
             m_Stage = LS.AddAtringChoice(
                 "BpStage",
                 "Translation Stage",
                 "Enter this book's stage, e.g., Draft, Team Check, Consultant Checked",
-                Book.TranslationStage.Name,
-                DB.TeamSettings.TranslationStages.AllNames);
+                Book.Stage.LocalizedName,
+                vsAllNames);
 
             // Version
             LS.AddInformation("Bp300", Information.PStyleNormal,
@@ -378,11 +381,13 @@ namespace OurWord.Dialogs
 			Book.Locked = m_LockedForEditing.Value;
             Book.Copyright = m_Copyright.Value;
 			Book.Version = m_Version.Value;
-
-            BookStages Stages = DB.TeamSettings.TranslationStages;
-            Book.TranslationStage = Stages.GetFromName( m_Stage.Value);
-
 			Book.Comment = m_textComment.Text;
+
+            foreach (Stage stage in DB.TeamSettings.Stages)
+            {
+                if (stage.LocalizedName == m_Stage.Value)
+                    Book.Stage = stage;
+            }
 
             Book.DeclareDirty();
 		}

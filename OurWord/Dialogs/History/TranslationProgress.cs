@@ -159,8 +159,8 @@ namespace OurWord.Dialogs
         }
         Font m_BookNameFont = null;
         #endregion
-        #region Attr{g}: List<TranslationStage> Stages
-        public List<TranslationStage> Stages
+        #region Attr{g}: List<Stage> Stages
+        public List<Stage> Stages
             // The FinalRevision stage isn't really part of the translatio process; it is just
             // used to represent revisions that happen after the book has been printed (or
             // approved for printing) but before the NT/Bible is published. So we don't really
@@ -170,11 +170,11 @@ namespace OurWord.Dialogs
             {
                 if (null == m_vStages)
                 {
-                    m_vStages = new List<TranslationStage>();
+                    m_vStages = new List<Stage>();
 
-                    foreach (TranslationStage stage in DB.TeamSettings.TranslationStages.TranslationStages)
+                    foreach (Stage stage in DB.TeamSettings.Stages)
                     {
-                        if (stage.ID != BookStages.c_idFinalRevision)
+                        if (stage.ID != Stage.c_idFinalRevision)
                             m_vStages.Add(stage);
                     }
                 }
@@ -182,7 +182,7 @@ namespace OurWord.Dialogs
                 return m_vStages;
             }
         }
-        List<TranslationStage> m_vStages;
+        List<Stage> m_vStages;
         #endregion
 
         // Book Boxes (info on drawing individual books) -------------------------------------
@@ -281,15 +281,15 @@ namespace OurWord.Dialogs
 
             int x = HorzMargin + BookNameColumnWidth;
             int iStage = 0;
-            foreach (TranslationStage stage in Stages)
+            foreach (Stage stage in Stages)
             {
                 // Get text position so we can center in the column
-                var fTextWidth = JWU.CalculateDisplayWidth(g, stage.Abbrev, fontStage);
+                var fTextWidth = JWU.CalculateDisplayWidth(g, stage.LocalizedAbbrev, fontStage);
                 int xText = x + (int)(StageColumnWidth - fTextWidth)/2;
 
                 var brushStage = new SolidBrush(GetStageColor(iStage++) );
 
-                g.DrawString(stage.Abbrev, fontStage, brushStage, new PointF(xText, y));
+                g.DrawString(stage.LocalizedAbbrev, fontStage, brushStage, new PointF(xText, y));
                 x += StageColumnWidth;
             }
 
@@ -374,15 +374,15 @@ namespace OurWord.Dialogs
         }
         BookInfo m_BookInfo;
         #endregion
-        #region Attr{g}: TranslationStage Stage
-        TranslationStage Stage
+        #region Attr{g}: DBook Book
+        DBook Book
         {
             get
             {
-                return m_Stage;
+                return m_Book;
             }
         }
-        TranslationStage m_Stage;
+        DBook m_Book;
         #endregion
 
         // Layout and Paint ------------------------------------------------------------------
@@ -430,7 +430,7 @@ namespace OurWord.Dialogs
 
             // Planned books will have null stage, so we'll just do an outline to show it as a
             // placeholder
-            if (null == Stage)
+            if (null == Book)
             {
                 var pen = new Pen(tp.GetStageColor(0));
                 int x = tp.HorzMargin + tp.BookNameColumnWidth;
@@ -444,31 +444,37 @@ namespace OurWord.Dialogs
             {
                 // Which stage are we in this book
                 int iStage = 0;
-                while (tp.Stages[iStage] != Stage)
+                while (iStage < tp.Stages.Count && tp.Stages[iStage] != Book.Stage)
                     iStage++;
 
                 // Fill in the colors of what's been done
                 for (int i = 0; i <= iStage && i < tp.Stages.Count; i++)
-                {
-                    var brush = new SolidBrush(tp.GetStageColor(i));
-                    int x = tp.HorzMargin + tp.BookNameColumnWidth + (i * tp.StageColumnWidth);
-                    int width = tp.StageColumnWidth - tp.Between;
-                    var rect = new Rectangle(x, y, width, RowHeight);
-                    g.FillRectangle(brush, rect);
-                }
+                    PaintStage(g, tp, i, y, RowHeight);
             }
 
             return y + RowHeight + tp.Between;
         }
         #endregion
 
+        void PaintStage(Graphics g, TranslationProgress tp, int iStage, int y, int RowHeight)
+        {
+
+            var brush = new SolidBrush(tp.GetStageColor(iStage));
+            int x = tp.HorzMargin + tp.BookNameColumnWidth + (iStage * tp.StageColumnWidth);
+            int width = tp.StageColumnWidth - tp.Between;
+            var rect = new Rectangle(x, y, width, RowHeight);
+            g.FillRectangle(brush, rect);
+
+
+        }
+
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DBook)
         public BookBox(DBook book)
         {
+            m_Book = book;
             m_sBookDisplayName = book.DisplayName;
             m_BookInfo = BookInfoList.FindBook(book);
-            m_Stage = book.TranslationStage;
         }
         #endregion
         #region Constructor(sBookDisplayName, BookInfo)
@@ -476,7 +482,6 @@ namespace OurWord.Dialogs
         {
             m_sBookDisplayName = sBookDisplayName;
             m_BookInfo = bi;
-            m_Stage = null;
         }
         #endregion
     }

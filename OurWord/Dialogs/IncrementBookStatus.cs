@@ -279,9 +279,9 @@ namespace OurWord.Dialogs
 			m_btnCancel.Text   = DlgBookPropsRes.Cancel;
 
 			// Set the control contents to reflect the current book's status
-			m_iStage        = DB.TeamSettings.TranslationStages.GetIndexOf( Book.TranslationStage );
+			m_iStage        = DB.TeamSettings.Stages.IndexOf(Book.Stage);
 			m_Book.Text     = Book.DisplayName;
-			m_Stage.Text    = Book.TranslationStage.Name;
+			m_Stage.Text    = Book.Stage.LocalizedName;
 			m_Version.Text  = Book.Version.ToString();
 		}
 		#endregion
@@ -293,22 +293,27 @@ namespace OurWord.Dialogs
 			if (DialogResult != DialogResult.OK)
 				return;
 
-			Book.SetTranslationStageTo(m_Stage.Text);
-			Book.Version = m_Version.Text;
+            foreach(Stage stage in DB.TeamSettings.Stages)
+            {
+                if (stage.LocalizedName == m_Stage.Text)
+                    Book.Stage = stage;
+            }
+
+            Book.Version = m_Version.Text;
 		}
 		#endregion
 		#region Cmd: cmdIncrementStage
 		private void cmdIncrementStage(object sender, System.EventArgs e)
 		{
 			// Make sure incrementing is possible
-            if (m_iStage >= DB.TeamSettings.TranslationStages.Count)
+            if (m_iStage >= DB.TeamSettings.Stages.Count)
 				return;
 
 			// Increment the stage
 			m_iStage++;
-            TranslationStage stage = DB.TeamSettings.TranslationStages.GetFromIndex(m_iStage);
+            var stage = DB.TeamSettings.Stages[m_iStage];
 			Debug.Assert(null != stage);
-			m_Stage.Text = stage.Name;
+			m_Stage.Text = stage.LocalizedName;
 
 			// Reset the Version
 			m_Version.Text = "A";

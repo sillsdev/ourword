@@ -990,6 +990,7 @@ namespace OurWord.Edit
         #region Cmd: OnChangeStage
         public void OnChangeStage(object sender, EventArgs e)
         {
+            // Get the various entities of interest
             var menuItem = sender as ToolStripMenuItem;
             if (null == menuItem)
                 return;
@@ -998,14 +999,24 @@ namespace OurWord.Edit
             if (null == Event)
                 return;
 
+            var menu = menuItem.OwnerItem as ToolStripDropDownButton;
+            if (null == menu)
+                return;
+
+            // The menu item's text is the localized form of the stage's abbreviation
+            var stage = DB.TeamSettings.Stages.Find(
+                StageList.FindBy.LocalizedAbbrev,
+                menuItem.Text);
+            if (null == stage)
+                return;
+
             // Set the event's new stage
-            Event.Stage = menuItem.Text;
+            Event.Stage = stage;
 
             // Update the menu
-            var menu = menuItem.OwnerItem as ToolStripDropDownButton;
             foreach (ToolStripMenuItem item in menu.DropDownItems)
-                item.Checked = (item.Text == Event.Stage);
-            menu.Text = Event.Stage;
+                item.Checked = (item.Text == stage.LocalizedAbbrev);
+            menu.Text = stage.LocalizedAbbrev;
         }
         #endregion
 
@@ -1042,16 +1053,23 @@ namespace OurWord.Edit
         #region Method: ToolStripItem BuildStageDropdown(Event)
         ToolStripItem BuildStageDropdown(DEventMessage Event)
         {
+            var menuStage = new ToolStripDropDownButton( Event.Stage.LocalizedAbbrev );
+
             bool bCurrentStageFound = false;
-            var menuStage = new ToolStripDropDownButton(Event.Stage);
-            foreach (TranslationStage stage in DB.TeamSettings.TranslationStages.TranslationStages)
+            foreach (Stage stage in DB.TeamSettings.Stages)
             {
-                AddStageMenuItem(menuStage, stage.Name, Event, (stage.Name == Event.Stage));
-                if (stage.Name == Event.Stage)
+                AddStageMenuItem(menuStage, 
+                    stage.LocalizedAbbrev, 
+                    Event,
+                    (Event.Stage == stage));
+
+                if (Event.Stage == stage)
                     bCurrentStageFound = true;
             }
+
             if (!bCurrentStageFound)
-                AddStageMenuItem(menuStage, Event.Stage, Event, true);
+                AddStageMenuItem(menuStage, Event.Stage.LocalizedAbbrev, Event, true);
+
             return menuStage;
         }
         #endregion
@@ -1131,6 +1149,10 @@ namespace OurWord.Edit
                 pStyle.SpaceBefore = 2;
                 pStyle.SpaceAfter = 0;
 
+                string sStage = "";
+                if (null != message.Stage)
+                    sStage = message.Stage.LocalizedAbbrev;
+
                 var pTitle = new OWPara(WS,
                     pStyle,
                     new DPhrase[] { 
@@ -1138,7 +1160,7 @@ namespace OurWord.Edit
                             message.EventDate.ToShortDateString()),
                         new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
                         new DPhrase( DStyleSheet.c_StyleToolTipText, 
-                            message.Stage)
+                            sStage)
                     });
                 eMessage.Append(pTitle);
             }
@@ -1165,13 +1187,12 @@ namespace OurWord.Edit
                 return;
 
             // The stage of the new event will be what we used last time
-            string sNewStage = (history.HasMessages) ?
-                (history.LastMessage as DEventMessage).Stage : "";
-            if (string.IsNullOrEmpty(sNewStage))
-                sNewStage = DB.TeamSettings.TranslationStages[0].Name;
+            Stage stage = (history.HasMessages) ?
+                (history.LastMessage as DEventMessage).Stage :
+                DB.TeamSettings.Stages.Draft;
 
             // Create the Event, and thus remember it here, so that Undo/Redo will work.
-            history.AddMessage(DateTime.UtcNow, sNewStage, "");
+            history.AddMessage(DateTime.UtcNow, stage, "");
             var bookmark = Tip.CreateBookmark();
             // Reset the bookmark's flags to none, because the former last message will no
             // no longer be editable; and restoring the bookmark will not otherwise work

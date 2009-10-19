@@ -2132,7 +2132,7 @@ namespace JWdb.DataModel
                     {
                         Section.History.AddMessage(
                             DEventMessage.DefaultDate,
-                            Loc.GetString("OldHistory", "Old"),
+                            DB.TeamSettings.Stages.Draft,
                             field.Data);
                     }
                     return true;

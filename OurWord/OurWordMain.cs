@@ -2455,7 +2455,7 @@ namespace OurWord
 
 			// Read in the project
 			DB.Project = new DProject();
-            if (!string.IsNullOrEmpty(sPath))
+            if (!string.IsNullOrEmpty(sPath) && File.Exists(sPath))
                 DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
 
             // Initial Splitter Position

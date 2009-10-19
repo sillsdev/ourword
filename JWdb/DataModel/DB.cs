@@ -243,10 +243,11 @@ namespace JWdb.DataModel
                 new string[] { "TranslationStages" },
                 sItemID,
                 sEnglish,
-                DB.TeamSettings.FileNameLanguage,
+                null, 
                 null);
         }
         #endregion
+
         #region SMethod: string GetBookGroupings(sItemID, sEnglish) - "BookGroupings"
         static public string GetBookGroupings(string sItemID, string sEnglishDefault)
         {

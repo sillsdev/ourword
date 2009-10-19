@@ -189,7 +189,7 @@ namespace OurWordTests.DataModel
             Translation.AddBook(book);
 
             // Set up stage, version info
-            book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idCommunityCheck);
+            book.Stage = DB.TeamSettings.Stages.Find(Stage.c_idCommunityCheck);
             book.Version = "B";
 
             // Compute the filename
@@ -288,7 +288,7 @@ namespace OurWordTests.DataModel
             W.Close();
             book.LoadBook(JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + "book.db", 
                 new NullProgress());
-            book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idDraft);
+            book.Stage = DB.TeamSettings.Stages.Find(Stage.c_idDraft);
             book.Version = "A";
 
             // Add an extra paragraph
@@ -309,7 +309,7 @@ namespace OurWordTests.DataModel
 
             // Change the book and the pathname and save it as a current version
             SetSimpleParagraphText(p, sTextC);
-            book.TranslationStage = DB.TeamSettings.TranslationStages.GetFromID(BookStages.c_idConsultantCheck);
+            book.Stage = DB.TeamSettings.Stages.Find(Stage.c_idConsultantCheck);
             book.Version = "C";
             book.DeclareDirty();
             book.WriteBook(new NullProgress());
@@ -323,13 +323,48 @@ namespace OurWordTests.DataModel
             var pLast = section.Paragraphs[iParaLast] as DParagraph;
             string sActual = GetSimpleParagraphText(pLast);
             Assert.AreEqual(sTextO, sActual);
-            Assert.AreEqual(BookStages.c_idDraft, book.TranslationStage.ID);
+            Assert.AreEqual(Stage.c_idDraft, book.Stage.ID);
             Assert.AreEqual("A", book.Version);
 
             // Reset the LocDB
             LocDB.Reset();
         }
         #endregion
+
+        // Book Stats ------------------------------------------------------------------------
+        #region Test: StatsIO
+        [Test] public void StatsIO()
+        {
+            // Load some data into a book
+            var book = new DBook("MRK");
+            book.BookStats.SetValue(DB.TeamSettings.Stages.Find(Stage.c_idDraft), 25.2);
+            book.BookStats.SetValue(DB.TeamSettings.Stages.Find(Stage.c_idCommunityCheck), 12);
+            book.BookStats.SetValue(DB.TeamSettings.Stages.Find(Stage.c_idBackTranslation), 5.3);
+
+            // Do we get the expected save string?
+            string sSave = book.BookStats.ToSaveString();
+            Assert.AreEqual("Draft=25.20+Comm=12.00+BT=5.30", sSave);
+
+            // Clear the book, then populate the stats from our save string
+            book.BookStats.DictStatistics.Clear();
+            Assert.AreEqual(0, book.BookStats.DictStatistics.Count);
+            book.BookStats.FromSaveString(sSave);
+
+            // Do we get the stats we expect?
+            Assert.AreEqual("25.20", 
+                book.BookStats.GetPercentComplete(DB.TeamSettings.Stages.Find(Stage.c_idDraft)).ToString("0.00"));
+            Assert.AreEqual("12.00", 
+                book.BookStats.GetPercentComplete(DB.TeamSettings.Stages.Find(Stage.c_idCommunityCheck)).ToString("0.00"));
+            Assert.AreEqual("5.30", 
+                book.BookStats.GetPercentComplete(DB.TeamSettings.Stages.Find(Stage.c_idBackTranslation)).ToString("0.00"));
+        }
+        #endregion
+
+        [Test] public void PercentDrafted()
+        {
+
+        }
+
 
     }
 

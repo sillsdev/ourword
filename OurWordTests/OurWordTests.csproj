@@ -67,6 +67,7 @@
     <Compile Include="DataModel\T_DTranslation.cs" />
     <Compile Include="DataModel\T_DTranslatorNote.cs" />
     <Compile Include="DataModel\T_ScriptureDB.cs" />
+    <Compile Include="DataModel\T_Stage.cs" />
     <Compile Include="DataModel\T_TeamSettings.cs" />
     <Compile Include="Dialogs\T_BookNames.cs" />
     <Compile Include="Edit\EditTestsCommon.cs">

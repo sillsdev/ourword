@@ -76,26 +76,6 @@ namespace JWdb.DataModel
         }
         private string m_sComment = "";
         #endregion
-        #region BAttr{g/s} TranslationStage TranslationStage
-        public TranslationStage TranslationStage
-        {
-            get
-            {
-                BookStages Stages = DB.TeamSettings.TranslationStages;
-                TranslationStage ts = Stages.GetFromID(m_nTranslationStage);
-                if (null == ts)
-                    ts = Stages.GetFromIndex(0);
-                Debug.Assert(null != ts);
-                return ts;
-            }
-            set
-            {
-                Debug.Assert(null != value);
-                SetValue(ref m_nTranslationStage, value.ID);
-            }
-        }
-        private int m_nTranslationStage = BookStages.c_idDraft;
-        #endregion
         #region BAttr{g/s}: string Version - incremental version, 'A', 'B', etc.
         public const string c_sVersionDefault = "A";
         public string Version
@@ -146,7 +126,6 @@ namespace JWdb.DataModel
             DefineAttr("Abbrev", ref m_sBookAbbrev);
             DefineAttr("ID", ref m_sID);
             DefineAttr("Comment", ref m_sComment);
-            DefineAttr("Stage", ref m_nTranslationStage);
             DefineAttr("Version", ref m_sVersion);
             DefineAttr("Locked", ref m_bLocked);
             DefineAttr("Copyright", ref m_sCopyright);
@@ -223,6 +202,25 @@ namespace JWdb.DataModel
             }
         }
         DTranslation m_Translation;
+        #endregion
+        #region Attr{g/s}: Stage Stage
+        public Stage Stage
+        {
+            get
+            {
+                return m_Stage;
+            }
+            set
+            {
+                // We always want the book to have a stage, so don't set it to null.
+                if (value != null && m_Stage.EnglishAbbrev != value.EnglishAbbrev)
+                {
+                    m_Stage = value;
+                    IsDirty = true;
+                }
+            }
+        }
+        Stage m_Stage = DB.TeamSettings.Stages.Draft;
         #endregion
 
         // Derived Attributes: ---------------------------------------------------------------
@@ -416,7 +414,7 @@ namespace JWdb.DataModel
                 string sBaseName = BaseName;
 
                 // Add the stage (e.g., "Draft")
-                sBaseName += (" - " + TranslationStage.Abbrev);
+                sBaseName += (" - " + Stage.EnglishAbbrev);
 
                 // Add the version number/letter (e.g., "B")
                 sBaseName += ("-" + Version.ToString());
@@ -443,6 +441,16 @@ namespace JWdb.DataModel
             set
             {
                 base.DisplayName = value;
+            }
+        }
+        #endregion
+        #region VAttr{g}: string StatusPhrase - for displaying in the pane's title bar
+        public string StatusPhrase
+        {
+            get
+            {
+                string s = "(" + Stage.LocalizedAbbrev + '-' + Version.ToString() + ")";
+                return s;
             }
         }
         #endregion
@@ -526,6 +534,9 @@ namespace JWdb.DataModel
             // Book History
             j_ownHistory = new JOwn<TranslatorNote>("History", this);
             History = new TranslatorNote(TranslatorNote.NoteClass.History);
+
+            // Book Statistics
+            m_BookStats = new Statistics(this);
         }
         #endregion
         #region Constructor(sBookAbbrev)
@@ -1038,14 +1049,13 @@ namespace JWdb.DataModel
             #region Method: bool History_in(SfField field)
             private bool History_in(SfField field)
             {
-                // Old-style history: Import it
-                // Note: For any given book, we assume we'll either have an old-style or a
-                // new-style; as once we import it, we write it out as new.
+                // Old-style history: Import it. Since we don't know what it is, we have
+                // to set the stage to Draft
                 if (Map.IsBookHistoryMarker(field.Mkr))
                 {
                     Book.History.AddMessage(
                         new DateTime(2009,1,1), 
-                        Loc.GetString("OldHistory", "Old"),
+                        DB.TeamSettings.Stages.Draft,
                         field.Data);
                     return true;
                 }
@@ -1425,7 +1435,7 @@ namespace JWdb.DataModel
                 // Book Node
                 var nodeBook = oxes.AddNode(nodeBible, c_sTagBook);
                 oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
-                oxes.AddAttr(nodeBook, c_sAttrStage, m_nTranslationStage);
+                oxes.AddAttr(nodeBook, c_sAttrStage, Stage.EnglishAbbrev);
                 oxes.AddAttr(nodeBook, c_sAttrVersion, Version);
                 if (true == Locked)
                     oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
@@ -1487,7 +1497,8 @@ namespace JWdb.DataModel
 
                     // Interpret the basic attrs
                     Locked = XmlDoc.GetAttrValue(xmlBook, c_sAttrLocked, false);
-                    m_nTranslationStage = XmlDoc.GetAttrValue(xmlBook, c_sAttrStage, 0);
+                    string sStage = XmlDoc.GetAttrValue(xmlBook, c_sAttrStage, Stage.c_sDraft);
+                    Stage = DB.TeamSettings.Stages.FromOxesAttr(sStage);
 
                     // Done reading the file
                     break;
@@ -1571,7 +1582,8 @@ namespace JWdb.DataModel
                 }
 
                 // Read the Book's attributes
-                m_nTranslationStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, 0);
+                string sStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, Stage.c_sDraft);
+                Stage = DB.TeamSettings.Stages.FromOxesAttr(sStage);
                 Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
                 Locked = XmlDoc.GetAttrValue(nodeBook, c_sAttrLocked, false);
                 Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
@@ -1909,7 +1921,7 @@ namespace JWdb.DataModel
             string sVersion = "";
             DBook.ParseFileName(sBackupPathName, ref nBookNumber, ref sBookAbbrev,
                 ref sLanguageName, ref sStageAbbrev, ref sVersion);
-            book.SetTranslationStageTo(sStageAbbrev);
+            book.Stage = DB.TeamSettings.Stages.Find(sStageAbbrev);
             book.Version = sVersion;
 
             // Load the book back in
@@ -1921,26 +1933,183 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        // Book Status -----------------------------------------------------------------------
-        #region Method: void SetTranslationStageTo(string sStageName
-        public void SetTranslationStageTo(string sStageName)
+        // Book Statisics --------------------------------------------------------------------
+        #region Class: Statistics
+        public class Statistics
         {
-            TranslationStage stage = DB.TeamSettings.TranslationStages.GetFromName(sStageName);
-            if (stage == null)
-                stage = DB.TeamSettings.TranslationStages.GetFirstStage;
+            // Attrs -------------------------------------------------------------------------
+            #region Attr{g}: Dictionary<string, double> DictStatistics
+            public Dictionary<string, double> DictStatistics
+            {
+                get
+                {
+                    Debug.Assert(null != m_dictStatistics);
+                    return m_dictStatistics;
+                }
+            }
+            Dictionary<string, double> m_dictStatistics;
+            #endregion
+            #region Attr{g}: DBook Book
+            DBook Book
+            {
+                get
+                {
+                    Debug.Assert(null != m_Book);
+                    return m_Book;
+                }
+            }
+            DBook m_Book;
+            #endregion
 
-            TranslationStage = stage;
+            // Scaffolding -------------------------------------------------------------------
+            #region Constructor(DBook)
+            public Statistics(DBook book)
+            {
+                m_Book = book;
+                m_dictStatistics = new Dictionary<string, double>();
+            }
+            #endregion
+            #region Method: void SetValue(stage, dValue)
+            public void SetValue(Stage stage, double dValue)
+            {
+                if (DictStatistics.ContainsKey(stage.EnglishAbbrev))
+                    DictStatistics.Remove(stage.EnglishAbbrev);
+
+                DictStatistics.Add(stage.EnglishAbbrev, dValue);
+            }
+            #endregion
+            #region Method:  double GetValue(stage)
+            public double GetValue(Stage stage)
+            {
+                if (null == stage)
+                    return 0;
+
+                double d;
+                if (DictStatistics.TryGetValue(stage.EnglishAbbrev, out d))
+                    return d;
+                return 0;
+            }
+            #endregion
+
+            // Get / Compute -----------------------------------------------------------------
+            #region Method: void ComputePercentDrafted()
+            public void ComputePercentDrafted()
+                // Computes the percentage of DTexts which have drafted (and BT'd) text.
+                // Sets these into the dictionary, and returns whichever figure was
+                // asked for by the bool bBT.
+            {
+                if (!Book.Loaded)
+                    Book.LoadBook(new NullProgress());
+
+                int cTexts = 0;
+                int cTextsWithContent = 0;
+                int cTextWithBT = 0;
+
+                foreach (DSection section in Book.Sections)
+                {
+                    foreach (DParagraph p in section.Paragraphs)
+                    {
+                        foreach (DRun run in p.Runs)
+                        {
+                            var text = run as DText;
+                            if (null == text)
+                                continue;
+
+                            cTexts++;
+
+                            if (!string.IsNullOrEmpty(text.AsString))
+                                cTextsWithContent++;
+                            if (!string.IsNullOrEmpty(text.ProseBTAsString))
+                                cTextWithBT++;
+                        }
+                    }
+                }
+
+                double dPctDraft = (double)cTextsWithContent / (double)cTexts;
+                double dPctBT = (double)cTextWithBT / (double)cTexts;
+
+                SetValue(DB.TeamSettings.Stages.Find(Stage.c_idDraft), dPctDraft);
+                SetValue(DB.TeamSettings.Stages.Find(Stage.c_idBackTranslation), dPctBT);
+            }
+            #endregion
+            #region Method: double ComputePercentComplete(stage)
+            public double ComputePercentComplete(Stage stage)
+            {
+                if (Stage.c_idDraft == stage.ID)
+                    ComputePercentDrafted();
+
+                if (Stage.c_idBackTranslation == stage.ID)
+                    ComputePercentDrafted();
+
+                return GetValue(stage);
+            }
+            #endregion
+            #region Method: double GetPercentComplete(stage)
+            public double GetPercentComplete(Stage stage)
+            {
+                // Return it if we already have it
+                double d;
+                if (DictStatistics.TryGetValue(stage.EnglishAbbrev, out d))
+                    return d;
+
+                //  Compute it otherwise
+                return ComputePercentComplete(stage);
+            }
+            #endregion
+
+            // I/O ---------------------------------------------------------------------------
+            #region Method: string ToSaveString()
+            public string ToSaveString()
+            {
+                var ua = new UrlAttrList();
+
+                foreach (KeyValuePair<string, double> pair in DictStatistics)
+                {
+                    string sEnglishAbbrev = pair.Key;
+                    double dPct = pair.Value;
+
+                    ua.Add(new UrlAttr(sEnglishAbbrev, dPct.ToString("0.00")));
+                }
+
+                return ua.MakeUrl();
+            }
+            #endregion
+            #region Method: void FromSaveString(string s)
+            public void FromSaveString(string s)
+            {
+                DictStatistics.Clear();
+
+                var v = new UrlAttrList(s);
+
+                foreach (UrlAttr ua in v)
+                {
+                    try
+                    {
+                        string sEnglishAbbrev = ua.Name;
+
+                        string sPct = ua.Value;
+                        double dPct = Convert.ToDouble(sPct);
+
+                        DictStatistics.Add(sEnglishAbbrev, dPct);
+                    }
+                    catch (Exception)
+                    {
+                    }
+                }
+            }
+            #endregion
         }
         #endregion
-        #region Attr{g}: string StatusPhrase - for displaying in the pane's title bar
-        public string StatusPhrase
+        #region Attr{g}: Statistics BookStats
+        public Statistics BookStats
         {
             get
             {
-                string s = "(" + TranslationStage.Abbrev + '-' + Version.ToString() + ")";
-                return s;
+                Debug.Assert(null != m_BookStats);
+                return m_BookStats;
             }
         }
+        Statistics m_BookStats;
         #endregion
 
         // Data Access -----------------------------------------------------------------------

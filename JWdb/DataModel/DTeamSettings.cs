@@ -1,3 +1,4 @@
+#region ***** DTeamSettings.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DTeamSettings.cs
@@ -19,6 +20,7 @@ using System.Windows.Forms;
 using System.IO;
 using JWTools;
 using JWdb;
+#endregion
 #endregion
 
 namespace JWdb.DataModel
@@ -42,33 +44,6 @@ namespace JWdb.DataModel
         int m_nSettingsVersion = 0;
         #endregion
 
-        #region BAttr{g/s}: string FileNameLanguage
-        public string FileNameLanguage
-        {
-            get
-            {
-                // We need to be able to read in the old way of doing things, which was
-                // an integer. Thus we don't mess up the Timor data.
-                if (-1 != m_nOldFileNameLanguage)
-                {
-                    if (0 == m_nOldFileNameLanguage)
-                        return "English";
-                    if (1 == m_nOldFileNameLanguage)
-                        return "Bahasa Indonesia";
-                }
-
-                return m_sFileNameLanguage;
-            }
-            set
-            {
-                SetValue(ref m_nOldFileNameLanguage, -1);
-                SetValue(ref m_sFileNameLanguage, value);
-            }
-        }
-        int m_nOldFileNameLanguage = -1;
-        string m_sFileNameLanguage = "English";
-        #endregion
-
         #region BAttr{g/s}: string CopyrightNotice
         public string CopyrightNotice
 		{
@@ -83,6 +58,27 @@ namespace JWdb.DataModel
 		}
 		string m_sCopyrightNotice = "";
 		#endregion
+
+        #region BAttr{g/s}: string StagesSetup
+        public string StagesSetup
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_sStagesSetup) && null != m_Stages)
+                    m_sStagesSetup = Stages.ToSaveString();
+
+                return m_sStagesSetup;
+            }
+            set
+            {
+                if (!string.IsNullOrEmpty(value) && null != m_Stages)
+                    Stages.FromSaveString(value);
+
+                SetValue(ref m_sStagesSetup, value);
+            }
+        }
+        string m_sStagesSetup = "";
+        #endregion
 
         #region DOC: To Add Another Type of Footer Part
         /* To Add Another Type of Footer Part
@@ -218,9 +214,8 @@ namespace JWdb.DataModel
 
             DefineAttr("SettingsVersion", ref m_nSettingsVersion);
 
-            DefineAttr("FileNameLanguage", ref m_sFileNameLanguage);
-            DefineAttr("FileNameLang", ref m_nOldFileNameLanguage);  // Deprecated
 			DefineAttr("Copyright",    ref m_sCopyrightNotice);
+            DefineAttr("Stages", ref m_sStagesSetup);
 
 			DefineAttr("OddLeft",      ref m_OddLeft);
 			DefineAttr("OddMiddle",    ref m_OddMiddle);
@@ -256,23 +251,6 @@ namespace JWdb.DataModel
 		}
 		private JOwn<DSFMapping> j_SFMapping = null;
 		#endregion
-		#region JAttr{g}: BookStages TranslationStages
-		public BookStages TranslationStages
-			// See the note in ConstructAttrs as to why we initialize this here.
-		{
-			get 
-			{ 
-				if (null == m_TranslationStages)
-                    m_TranslationStages = new JOwn<BookStages>("Stages", this);
-
-				if (null == m_TranslationStages.Value)
-					m_TranslationStages.Value = new BookStages();
-
-				return m_TranslationStages.Value; 
-			}
-		}
-		private JOwn<BookStages> m_TranslationStages = null;  
-		#endregion
         #region JAttr{g}: JOwnSeq BookGroupings
         public JOwnSeq<DBookGrouping> BookGroupings
         {
@@ -288,7 +266,20 @@ namespace JWdb.DataModel
         private JOwnSeq<DBookGrouping> m_BookGroupings = null;
         #endregion
 
-		// Scaffolding -----------------------------------------------------------------------
+        // Stages ----------------------------------------------------------------------------
+        #region Attr{g}: StageList Stages
+        public StageList Stages
+        {
+            get
+            {
+                Debug.Assert(null != m_Stages);
+                return m_Stages;
+            }
+        }
+        StageList m_Stages;
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DTeamSettings()
 			: base()
@@ -300,16 +291,8 @@ namespace JWdb.DataModel
 			// Style Sheet
 			m_StyleSheet = new JOwn<DStyleSheet>("StyleSheet", this);
 
-			// Translation Stages. Note that we initialize this at runtime (i.e., 
-			// we call "new BookStages" as part of the TranslationStages
-			// get accessor, rather than here, because:
-			// 1. Doing it here puts us in an infinite loop, because the
-			//    BookStages constructor needs to know about TeamSettings,
-			//    which may not exist yet, and
-			// 2. BookStages was a later addition and earlier data (e.g.,
-			//    Timor) does not have it, so to construct it here means
-			//    that the Read operation would overwrite it.
-			m_TranslationStages = new JOwn<BookStages>("Stages", this);
+            // Stages
+            m_Stages = new StageList();
 
             // Book Groupings
             m_BookGroupings = new JOwnSeq<DBookGrouping>("BookGroupings", this);

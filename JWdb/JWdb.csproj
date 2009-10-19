@@ -132,7 +132,7 @@
     <Compile Include="DataModel\SynchronizeProgressDlg.Designer.cs">
       <DependentUpon>SynchronizeProgressDlg.cs</DependentUpon>
     </Compile>
-    <Compile Include="DataModel\TranslationStage.cs" />
+    <Compile Include="DataModel\Stage.cs" />
     <Compile Include="DataModel\TranslatorNote.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

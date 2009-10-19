@@ -31,6 +31,14 @@ namespace OurWordTests
         }
         #endregion
 
+        #region Method: void SetupTest()
+        protected void SetupTest()
+        {
+            // Inits registry, LocDB, resources
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
         #region Method: DTranslation CreateHierarchyThroughTargetTranslation()
         public DTranslation CreateHierarchyThroughTargetTranslation()
         {

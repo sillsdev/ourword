@@ -1,3 +1,4 @@
+#region ***** T_BookNames.cs *****
 /**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_BookNames.cs
@@ -23,6 +24,7 @@ using OurWord;
 using JWdb.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+#endregion
 #endregion
 
 namespace OurWordTests.Dialogs

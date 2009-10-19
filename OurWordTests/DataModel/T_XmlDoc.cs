@@ -112,7 +112,7 @@ namespace OurWordTests.DataModel
         {
             string sUrl = "oxes://book=Mrk+Chapter=3+Verse=2+selectedWord=carakiau";
 
-            var v = new UrlAttrList(sUrl);
+            var v = new UrlAttrList("oxes://", sUrl);
 
             Assert.AreEqual(4, v.Count);
 
@@ -134,7 +134,7 @@ namespace OurWordTests.DataModel
         {
             string sUrl = "oxes://testChorus.lift/entryguid='8bbee099-1a7e-44a2-99fc-fbbc6ad20894'";
 
-            var v = new UrlAttrList(sUrl);
+            var v = new UrlAttrList("oxes://", sUrl);
 
             Assert.AreEqual(1, v.Count);
 
@@ -147,7 +147,7 @@ namespace OurWordTests.DataModel
         {
             string sUrl = "oxes://book=Mrk+Chapter=3+Verse=2+selectedWord=carakiau";
 
-            var v = new UrlAttrList(sUrl);
+            var v = new UrlAttrList("oxes://", sUrl);
 
             Assert.AreEqual("Mrk", v.GetValueFor("book"));
             Assert.AreEqual("3", v.GetValueFor("Chapter"));
@@ -164,7 +164,7 @@ namespace OurWordTests.DataModel
             ua.Add(new UrlAttr("chapter", "3"));
             ua.Add(new UrlAttr("verse", "16"));
 
-            string sUrl = ua.MakeUrl();
+            string sUrl = ua.MakeUrl("oxes://");
 
             Assert.AreEqual("oxes://book=John+chapter=3+verse=16", sUrl, "Should be identical.");
         }

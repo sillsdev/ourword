@@ -299,9 +299,13 @@ namespace JWdb.DataModel
 		public DTranslation()
 			: base()
 		{
+            // LocDB.DB.PrimaryLanguage
 			// Complex basic attrs
+            string sLanguageName = "";
+            if (null != LocDB.DB.PrimaryLanguage)
+                sLanguageName = LocDB.DB.PrimaryLanguage.Name;
             m_bsaBookNamesTable = new BStringArray(
-                BookNames.GetTable(DB.TeamSettings.FileNameLanguage));
+                BookNames.GetTable(sLanguageName)); 
             m_bsaFootnoteCustomSeq = new BStringArray();
 
             // Books
