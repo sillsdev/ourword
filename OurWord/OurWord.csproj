@@ -263,10 +263,6 @@
     <EmbeddedResource Include="Edit\OWToolTip.resx">
       <DependentUpon>OWToolTip.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SideWnd\DictionaryPane.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DictionaryPane.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Edit\LiterateSettingsWnd.resx">
       <DependentUpon>LiterateSettingsWnd.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -607,12 +603,6 @@
     </Compile>
     <Compile Include="Layouts\Layout.cs">
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="SideWnd\DictionaryPane.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="SideWnd\DictionaryPane.Designer.cs">
-      <DependentUpon>DictionaryPane.cs</DependentUpon>
     </Compile>
     <Compile Include="Edit\Bookmark.cs" />
     <Compile Include="Edit\ECollapsableColumn.cs" />

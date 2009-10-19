@@ -111,7 +111,6 @@
     <Compile Include="DataModel\DBook.cs" />
     <Compile Include="DataModel\DBookGrouping.cs" />
     <Compile Include="DataModel\DFootnote.cs" />
-    <Compile Include="DataModel\Dictionary.cs" />
     <Compile Include="DataModel\DParagraph.cs" />
     <Compile Include="DataModel\DPicture.cs" />
     <Compile Include="DataModel\DProject.cs" />

@@ -56,50 +56,6 @@ namespace JWdb.DataModel
 		}
         static private bool m_bVD_ShowTranslationsPane = false;
 		#endregion
-        #region BAttr{g/s}: bool ShowDictionaryPane
-#if FEATURE_WESAY
-        static public bool ShowDictionaryPane
-        {
-            get
-            {
-                return m_bShowDictionaryPane;
-            }
-            set
-            {
-                m_bShowDictionaryPane = value;
-            }
-        }
-        static private bool m_bShowDictionaryPane = false;
-#endif
-        #endregion
-        #region BAttr{g/s}: string PathToDictionaryApp - e.g., where to find WeSay
-        public string PathToDictionaryApp
-        {
-            get
-            {
-                return m_sPathToDictionaryApp;
-            }
-            set
-            {
-                SetValue(ref m_sPathToDictionaryApp, value);
-            }
-        }
-        private string m_sPathToDictionaryApp = "";
-        #endregion
-        #region BAttr{g/s}: string PathToDictionaryData - e.g., where to find WeSay
-        public string PathToDictionaryData
-        {
-            get
-            {
-                return m_sPathToDictionaryData;
-            }
-            set
-            {
-                SetValue(ref m_sPathToDictionaryData, value);
-            }
-        }
-        private string m_sPathToDictionaryData = "";
-        #endregion
         #region BAttr{g/s}: List<string>PlannedBooks
         public List<string> PlannedBooks
         {
@@ -162,17 +118,10 @@ namespace JWdb.DataModel
 			DefineAttr("Comment", ref m_sComment);
             DefineAttr("Planned", ref m_sPlannedBooks);
 
-            DefineAttr("DictApp", ref m_sPathToDictionaryApp);
-            DefineAttr("DictData", ref m_sPathToDictionaryData);
-
             DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
 
             DefineAttr("Persons", ref m_bsaPeople);
 			DefineAttr("Version", ref m_nVersion);
-
-#if FEAT_WESAY
-            DefineAttr("ShowDictionary", ref m_bShowDictionaryPane);
-#endif
         }
 		#endregion
 
@@ -344,20 +293,6 @@ namespace JWdb.DataModel
             }
         }
         #endregion
-
-		// Dictionary ------------------------------------------------------------------------
-		#region WESAY STUFF
-		public Dictionary Dictionary
-        {
-            get
-            {
-                if (null == m_Dictionary)
-                    m_Dictionary = new Dictionary(this);
-                return m_Dictionary;
-            }
-        }
-        Dictionary m_Dictionary = null;
-		#endregion
 
 		// Navigation ------------------------------------------------------------------------
 		#region EMBEDDED CLASS: Navigation
@@ -893,8 +828,6 @@ namespace JWdb.DataModel
         #region Method: void Dispose()
         public void Dispose()
         {
-            if (null != m_Dictionary)
-                m_Dictionary.Dispose();
         }
         #endregion
 

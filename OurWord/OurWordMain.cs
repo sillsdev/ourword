@@ -306,11 +306,6 @@ namespace OurWord
             {
                 if (DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
                     SideWindows.AddPage(new TranslationsPane(), "Translations");
-
-#if FEATURE_WESAY
-                if (s_Features.F_Dictionary && DProject.ShowDictionaryPane)
-                    SideWindows.CreateDictionaryPane();
-#endif
             }
 
             // Tell the system which side windows are being displayed; thereafter events will be 
@@ -460,8 +455,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuNaturalnessCheck;
         private ToolStripSeparator m_separatorWindow;
         private ToolStripMenuItem m_menuShowTranslationsPane;
-        private ToolStripMenuItem m_menuShowDictionaryPane;
-        private ToolStripSeparator m_separatorZoom;
         private ToolStripMenuItem m_menuZoom;
         private ToolStripDropDownButton m_btnHelp;
         private ToolStripMenuItem m_menuHelpTopics;
@@ -735,17 +728,11 @@ namespace OurWord
             bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
             bool bShowTranslationsPane = (DB.IsValidProject && DB.Project.OtherTranslations.Count > 0);
             bool bShowHistoryMenu = false; // (DB.IsValidProject && s_Features.SectionHistory);
-
-#if FEATURE_WESAY
-            bool bShowDictionaryPane = (s_Features.F_Dictionary && G.IsValidProject);
-            bool bShowSideWindowsSection = s_Features.TranslatorNotes || bShowTranslationsPane || 
-                bShowDictionaryPane ;
-#else
             bool bShowSideWindowsSection = 
                 bShowTranslatorNotesMenu || 
                 bShowTranslationsPane || 
                 bShowHistoryMenu;
-#endif
+
             m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
 
             // Main Window items: Drafting, Naturalness, BT
@@ -757,16 +744,6 @@ namespace OurWord
             // Side Window Items
             m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
-
-#if FEATURE_WESAY
-            m_menuShowDictionaryPane.Visible = bShowDictionaryPane;
-            m_menuShowDictionaryPane.Checked = DProject.ShowDictionaryPane;
-#else
-            m_menuShowDictionaryPane.Visible = false;
-#endif
-
-            // Zoom menu command area
-            m_separatorZoom.Visible = bShowSideWindowsSection || bShowMainWindowSection;
 
             // Edit Menu / Structured Editing
             bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
@@ -1039,8 +1016,6 @@ namespace OurWord
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuShowDictionaryPane = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_separatorZoom = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separator4 = new System.Windows.Forms.ToolStripSeparator();
             this.m_btnHelp = new System.Windows.Forms.ToolStripDropDownButton();
@@ -1657,8 +1632,6 @@ namespace OurWord
             this.m_menuBackTranslation,
             this.m_separatorWindow,
             this.m_menuShowTranslationsPane,
-            this.m_menuShowDictionaryPane,
-            this.m_separatorZoom,
             this.m_menuZoom});
             this.m_btnWindow.Image = ((System.Drawing.Image)(resources.GetObject("m_btnWindow.Image")));
             this.m_btnWindow.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -1709,19 +1682,6 @@ namespace OurWord
             this.m_menuShowTranslationsPane.Text = "Show &Other Translations Pane";
             this.m_menuShowTranslationsPane.ToolTipText = "Show the Other Translations Pane";
             this.m_menuShowTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
-            // 
-            // m_menuShowDictionaryPane
-            // 
-            this.m_menuShowDictionaryPane.Name = "m_menuShowDictionaryPane";
-            this.m_menuShowDictionaryPane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowDictionaryPane.Text = "Show &Dictionary Pane";
-            this.m_menuShowDictionaryPane.ToolTipText = "Show the Dictionary Pane.";
-            this.m_menuShowDictionaryPane.Click += new System.EventHandler(this.cmdToggleDictionaryPane);
-            // 
-            // m_separatorZoom
-            // 
-            this.m_separatorZoom.Name = "m_separatorZoom";
-            this.m_separatorZoom.Size = new System.Drawing.Size(229, 6);
             // 
             // m_menuZoom
             // 
@@ -2145,17 +2105,6 @@ namespace OurWord
 				}
 			}
 			#endregion
-#if FEATURE_WESAY
-            #region Attr{g}: bool F_Dictionary
-            public bool F_Dictionary
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fDictionary.ToString());
-                }
-            }
-            #endregion
-#endif
 
             // Scaffolding -------------------------------------------------------------------
 			#region Constructor()
@@ -2204,9 +2153,6 @@ namespace OurWord
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
                 fTranslatorNotes,
-#if FEATURE_WESAY
-                fDictionary,
-#endif
                 kLast
             };
             #endregion
@@ -2239,17 +2185,7 @@ namespace OurWord
                     "Naturalness Check Window",
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
-                        
-#if FEATURE_WESAY
-                m_Dlg.Add(ID.fDictionary.ToString(),
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "WeSay Dictionary",
-                    "Enables the Dictionary Pane, by which you can access a WeSay dictionary. " +
-                        "You can enter words in the dictionary that are in the translation; and " +
-                        "you can look up definitions when doing a back translation.");
-#endif
+                       
                 #endregion
                 #region EDITING FEATURES
                 m_Dlg.Add(ID.fStructuralEditing.ToString(),
@@ -3259,17 +3195,6 @@ namespace OurWord
         {
             DProject.VD_ShowTranslationsPane = !DProject.VD_ShowTranslationsPane;
             _UpdateSideWindows();
-        }
-        #endregion
-        #region Cmd: cmdToggleDictionaryPane
-        private void cmdToggleDictionaryPane(object sender, EventArgs e)
-        {
-#if FEATURE_WESAY
-            DProject.ShowDictionaryPane = !DProject.ShowDictionaryPane;
-            _UpdateSideWindows();
-            if (DProject.ShowDictionaryPane)
-                SideWindows.ActivateDictionaryPane();
-#endif
         }
         #endregion
 

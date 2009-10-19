@@ -67,11 +67,6 @@ namespace OurWord.Dialogs
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
         const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
-#if FEATURE_WESAY
-        const string c_sGroupWeSayDictionary = "propDictionary";
-        const string c_sPathToDictionaryApp = "propDictApp";
-        const string c_sPathToDictionaryData = "propDictData";
-#endif
         const string c_sGroup_BackgroundColors = "propBackgroundColors";
         const string c_sColorDrafting = "propBackColorDraftingWindow";
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
@@ -159,21 +154,6 @@ namespace OurWord.Dialogs
                     e.Value = WndNaturalness.LineNumbersColor;
                     break;
 
-
-#if FEATURE_WESAY
-                // WeSay Dictionary Setup
-                case c_sPathToDictionaryApp:
-                    e.Value = new PathForPropertyGrid(
-                        G.Project.PathToDictionaryApp, 
-                        "Application (*.exe)| *.exe");
-                    break;
-                case c_sPathToDictionaryData:
-                    e.Value = new PathForPropertyGrid(
-                        G.Project.PathToDictionaryData, 
-                        "WeSay Dictionary(.lift)| *.lift");
-                    break;
-#endif
-
                 // Window background colors
                 case c_sColorDrafting:
                     e.Value = WndDrafting.RegistryBackgroundColor;
@@ -257,17 +237,6 @@ namespace OurWord.Dialogs
                 case c_sLineNumberColor:
                     WndNaturalness.LineNumbersColor = (string)e.Value;
                     break;
-
-
-#if FEATURE_WESAY
-                // WeSay Dictionary Setup
-                case c_sPathToDictionaryApp:
-                    G.Project.PathToDictionaryApp = ((PathForPropertyGrid)e.Value).Path;
-                    break;
-                case c_sPathToDictionaryData:
-                    G.Project.PathToDictionaryData = ((PathForPropertyGrid)e.Value).Path;
-                    break;
-#endif
 
                 // Window background colors
                 case c_sColorDrafting:
@@ -418,31 +387,6 @@ namespace OurWord.Dialogs
                     "Scripture text.",
                 "DarkGray"));
             #endregion
-
-
-#if FEATURE_WESAY
-            // WeSay Dictionary Setup
-            #region WeSay Options
-            Bag.Properties.Add(new PropertySpec(
-                c_sPathToDictionaryApp,
-                "Path to the WeSay App",
-                typeof(PathForPropertyGrid),
-                c_sGroupWeSayDictionary,
-                "The full path to the application that manages the dictionary; currently WeSay.App.Exe is the only one supported.",
-                "",
-                typeof(FilePathEditor),
-                null));
-            Bag.Properties.Add(new PropertySpec(
-                c_sPathToDictionaryData,
-                "Path to the LIFT Dictionary",
-                typeof(PathForPropertyGrid),
-                c_sGroupWeSayDictionary,
-                "The full path to the dictionary data as managed by WeSay, a LIFT format file.",
-                null,
-                typeof(FilePathEditor),
-                null));
-            #endregion
-#endif
 
             // Window Background Colors
             #region (Background Colors)
