@@ -1383,6 +1383,12 @@
     <Item ID="fStructuralEditing_Description">
       <English>Enables the translator to split and join paragraphs, or to assign different styles to a paragraph. By doing this the translation will depart from the paragraph structure of the front translation.</English>
     </Item>
+    <Item ID="fExport_CheckBox">
+      <English>Export</English>
+    </Item>
+    <Item ID="fExport_Description">
+      <English>Provides export to Toolbox, USFM, GoBible, and potentially other file formats.</English>
+    </Item>
     <Item ID="fCanDeleteNotes_CheckBox">
       <English>Can Delete Notes?</English>
     </Item>

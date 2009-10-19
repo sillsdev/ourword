@@ -683,7 +683,10 @@ namespace OurWord
             // a valid project.
             bool bShowNewOpenEtc = (!DB.IsValidProject || OurWordMain.Features.F_Project);
             m_btnProject.Visible = bShowNewOpenEtc;
-            m_menuExportProject.Visible = (DB.IsValidProject && DB.TargetTranslation.BookList.Count > 0);
+            m_menuExportProject.Visible = (
+                DB.IsValidProject && 
+                DB.TargetTranslation.BookList.Count > 0 &&
+                Features.F_Export);
 
             // Print
             m_btnPrint.Visible = OurWordMain.Features.F_Print;
@@ -2105,6 +2108,15 @@ namespace OurWord
 				}
 			}
 			#endregion
+            #region Attr{g}: bool F_Export
+            public bool F_Export
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fExport.ToString());
+                }
+            }
+            #endregion
 
             // Scaffolding -------------------------------------------------------------------
 			#region Constructor()
@@ -2153,6 +2165,7 @@ namespace OurWord
                 fGoTo_FirstLast,
                 fGoTo_Chapter,
                 fTranslatorNotes,
+                fExport,
                 kLast
             };
             #endregion
@@ -2259,6 +2272,13 @@ namespace OurWord
                     "Localization Dialog",
                     "This dialog, appearing in the Tools menu, allows you to translate the " +
                         "user interface of OurWord into another language.");
+
+                m_Dlg.Add(ID.fExport.ToString(),
+                    false,
+                    false,
+                    c_sNodeTools,
+                    "Export",
+                    "Provides export to Toolbox, USFM, GoBible, and potentially other file formats.");
                 #endregion
                 #region NAVIGATION FEATURES
                 m_Dlg.Add(ID.fGoTo_FirstLast.ToString(),
