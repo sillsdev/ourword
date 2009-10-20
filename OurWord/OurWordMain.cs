@@ -160,6 +160,7 @@ namespace OurWord
         private ToolStripMenuItem m_menuInitializeFromAnInternetRepositoryToolStripMenuItem;
         private ToolStripMenuItem m_menuCreateANewProjectOnThisComputerToolStripMenuItem;
         private ToolStripButton m_btnHistory;
+        private ToolStripMenuItem m_menuCopyBTFromFrontTranslation;
         #region Attr{g}: WndNaturalness WndNaturalness
         WndNaturalness WndNaturalness
         {
@@ -439,9 +440,6 @@ namespace OurWord
 		private ToolStripMenuItem m_menuSaveProject;
         private ToolStripButton m_btnPrint;
         private ToolStripMenuItem m_menuConfigure;
-        private ToolStripMenuItem m_menuCopyBTfromFront;
-        private ToolStripMenuItem m_menuEntireBook;
-        private ToolStripMenuItem m_menuCurrentSectionOnly;
         private ToolStripSeparator m_separatorDebug;
         private ToolStripMenuItem m_menuRunDebugTestSuite;
         private ToolStripMenuItem m_menuOnlyShowSectionsThat;
@@ -708,10 +706,6 @@ namespace OurWord
             // Restore from Backup
             m_menuRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
 
-            // Copy BT from the Front Translation
-            m_menuCopyBTfromFront.Visible = (OurWordMain.Features.F_CopyBTfromFront &&
-                G.App.MainWindowIsBackTranslation);
-
             // Debug Test Suite
             bool bShowDebugItems = JW_Registry.GetValue("Debug", false);
             m_separatorDebug.Visible = bShowDebugItems;
@@ -761,6 +755,11 @@ namespace OurWord
             m_btnEditCopy.Visible = !bEditMenuVisible;
             m_btnEditCut.Visible = !bEditMenuVisible;
             m_btnEditPaste.Visible = !bEditMenuVisible;
+
+            m_menuCopyBTFromFrontTranslation.Visible = (
+                OurWordMain.Features.F_CopyBTfromFront &&
+                G.App.MainWindowIsBackTranslation &&
+                WndBackTranslation.DisplayFrontInBT);
 
             // Insert dropdown
             MainWindow.SetupInsertNoteDropdown(m_btnInsertNote);
@@ -983,6 +982,7 @@ namespace OurWord
             this.m_menuChangeParagraphTo = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuInsertFootnote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuDeleteFootnote = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuCopyBTFromFrontTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnItalic = new System.Windows.Forms.ToolStripButton();
             this.m_btnInsertNote = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_itemInsertGeneralNote = new System.Windows.Forms.ToolStripMenuItem();
@@ -1001,9 +1001,6 @@ namespace OurWord
             this.m_menuIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOnlyShowSectionsThat = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuCopyBTfromFront = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuEntireBook = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuCurrentSectionOnly = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Synchronize = new System.Windows.Forms.ToolStripMenuItem();
@@ -1237,7 +1234,8 @@ namespace OurWord
             this.m_seperatorEdit,
             this.m_menuChangeParagraphTo,
             this.m_menuInsertFootnote,
-            this.m_menuDeleteFootnote});
+            this.m_menuDeleteFootnote,
+            this.m_menuCopyBTFromFrontTranslation});
             this.m_menuEdit.Image = ((System.Drawing.Image)(resources.GetObject("m_menuEdit.Image")));
             this.m_menuEdit.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_menuEdit.Name = "m_menuEdit";
@@ -1327,6 +1325,13 @@ namespace OurWord
             this.m_menuDeleteFootnote.Size = new System.Drawing.Size(189, 22);
             this.m_menuDeleteFootnote.Text = "Delete Footnote";
             this.m_menuDeleteFootnote.Click += new System.EventHandler(this.cmdDeleteFootnote);
+            // 
+            // m_menuCopyBTFromFrontTranslation
+            // 
+            this.m_menuCopyBTFromFrontTranslation.Name = "m_menuCopyBTFromFrontTranslation";
+            this.m_menuCopyBTFromFrontTranslation.Size = new System.Drawing.Size(189, 22);
+            this.m_menuCopyBTFromFrontTranslation.Text = "Copy BT from &Front...";
+            this.m_menuCopyBTFromFrontTranslation.Click += new System.EventHandler(this.cmdCopyBTFromFront);
             // 
             // m_btnItalic
             // 
@@ -1484,7 +1489,6 @@ namespace OurWord
             this.m_menuIncrementBookStatus,
             this.m_menuRestoreFromBackup,
             this.m_menuOnlyShowSectionsThat,
-            this.m_menuCopyBTfromFront,
             this.m_menuConfigure,
             this.m_menuSetUpFeatures,
             this.m_Synchronize,
@@ -1525,30 +1529,6 @@ namespace OurWord
             this.m_menuOnlyShowSectionsThat.Text = "Only &Show Sections that...";
             this.m_menuOnlyShowSectionsThat.ToolTipText = "Filter out the sections which do not conform to a criteria.";
             this.m_menuOnlyShowSectionsThat.Click += new System.EventHandler(this.cmdFilter);
-            // 
-            // m_menuCopyBTfromFront
-            // 
-            this.m_menuCopyBTfromFront.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuEntireBook,
-            this.m_menuCurrentSectionOnly});
-            this.m_menuCopyBTfromFront.Name = "m_menuCopyBTfromFront";
-            this.m_menuCopyBTfromFront.Size = new System.Drawing.Size(211, 22);
-            this.m_menuCopyBTfromFront.Text = "&Copy BT from Front";
-            this.m_menuCopyBTfromFront.ToolTipText = "Copy the Back Translation from the Front translation.";
-            // 
-            // m_menuEntireBook
-            // 
-            this.m_menuEntireBook.Name = "m_menuEntireBook";
-            this.m_menuEntireBook.Size = new System.Drawing.Size(193, 22);
-            this.m_menuEntireBook.Text = "Entire &Book...";
-            this.m_menuEntireBook.Click += new System.EventHandler(this.cmdCopyBTfromFront_Book);
-            // 
-            // m_menuCurrentSectionOnly
-            // 
-            this.m_menuCurrentSectionOnly.Name = "m_menuCurrentSectionOnly";
-            this.m_menuCurrentSectionOnly.Size = new System.Drawing.Size(193, 22);
-            this.m_menuCurrentSectionOnly.Text = "Current &Section Only...";
-            this.m_menuCurrentSectionOnly.Click += new System.EventHandler(this.cmdCopyBTfromFront_Section);
             // 
             // m_menuConfigure
             // 
@@ -3048,6 +3028,21 @@ namespace OurWord
         }
         #endregion
 
+        #region Cmd: cmdCopyBTFromFront
+        private void cmdCopyBTFromFront(object sender, EventArgs e)
+        {
+            // We only do this in four-column back translation view
+            if (!MainWindowIsBackTranslation || !WndBackTranslation.DisplayFrontInBT)
+                return;
+
+            OnLeaveSection();
+
+            (new CopyBtFromFrontMethod()).Run();
+
+            OnEnterSection();
+        }
+        #endregion
+
         // Navigation
 		#region Cmd: cmdGoToFirstSection
         private void cmdGoToFirstSection(Object sender, EventArgs e)
@@ -3479,30 +3474,6 @@ namespace OurWord
 		#endregion
 
 		#endregion
-		#region Cmd: cmdCopyBTfromFront_Book/Section
-
-        private void cmdCopyBTfromFront_Book(Object sender, EventArgs e)
-        {
-            _cmdCopyBTfromFront(true);
-        }
-        private void cmdCopyBTfromFront_Section(Object sender, EventArgs e)
-        {
-            _cmdCopyBTfromFront(false);
-        }
-
-		private void _cmdCopyBTfromFront(bool bEntireBook)
-		{
-            if (!MainWindowIsBackTranslation)
-                return;
-
-			OnLeaveSection();
-
-            CopyBtMethod method = new CopyBtMethod(bEntireBook);
-            method.Run();
-
-			OnEnterSection();
-		}
-		#endregion
 		#region Cmd: cmdConfigure
         private void cmdConfigure(Object sender, EventArgs e)
 		{
@@ -3663,6 +3634,7 @@ namespace OurWord
             }
         }
         #endregion
+
 
         #endregion
     }

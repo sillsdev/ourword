@@ -279,10 +279,6 @@
     <EmbeddedResource Include="Res\Failure.ico" />
     <EmbeddedResource Include="Res\Delete.ico" />
     <Content Include="Res\Increment.ico" />
-    <EmbeddedResource Include="Dialogs\DlgCopyBTConflict.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Ctrl_AutoReplace.cs</DependentUpon>
@@ -405,12 +401,6 @@
     </Compile>
     <Compile Include="Dialogs\CopyBTfromFront.cs">
       <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\DlgCopyBTConflict.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Dialogs\DlgCopyBTConflict.Designer.cs">
-      <DependentUpon>DlgCopyBTConflict.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DlgDebug.cs">
       <SubType>Form</SubType>

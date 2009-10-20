@@ -1,14 +1,16 @@
+#region ***** CopyBTfromFront.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    CopyBTfromFront.cs
  * Author:  John Wimbish
  * Created: 16 Mar 2006
- * Purpose: Dialog to copy the back translations from the front to the daughter
+ * Purpose: Dialog and method to copy the back translations from the front to the daughter
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -27,7 +29,7 @@ using JWTools;
 using JWdb;
 using JWdb.DataModel;
 #endregion
-
+#endregion
 
 namespace OurWord
 {
@@ -259,4 +261,225 @@ namespace OurWord
 		}
 		#endregion
 	}
+
+    public class CopyBtFromFrontMethod
+    {
+        // Work Methods ----------------------------------------------------------------------
+        #region SAttr{g/s}: string SternWarningSeen
+        static public bool SternWarningSeen
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sSternWarningSeen, false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sSternWarningSeen, value);
+            }
+        }
+        const string c_sSternWarningSeen = "CopyBtSternWarningSeen";
+        #endregion
+        #region Method: bool DisplaySternWarning()
+        bool DisplaySternWarning()
+        // returns false if the user wants to abort
+        {
+            if (!SternWarningSeen)
+            {
+                CopyBTfromFront dlg = new CopyBTfromFront(false);
+                if (DialogResult.OK != dlg.ShowDialog())
+                    return false;
+                SternWarningSeen = true;
+            }
+
+            return true;
+        }
+        #endregion
+        #region Method: char GetParagraphType(DParagraph p)
+        char GetParagraphType(DParagraph p)
+        {
+            char ch = DSection.c_Text;
+            if (p as DPicture != null)
+                ch = DSection.c_Pict;
+            return ch;
+        }
+        #endregion
+        #region Method: List<DParagraph> GetParagraphsFromPart(DSection, int nPart)
+        List<DParagraph> GetParagraphsFromPart(DSection section, int nPart)
+        {
+            int iPara = 0;
+
+            string sSectionStructure = section.SectionStructure;
+
+            // Move past the preceeding parts of the section
+            for (int n = 0; n < nPart; n++)
+            {
+                char chPartType = sSectionStructure[n];
+                while (iPara < section.Paragraphs.Count)
+                {
+                    if (chPartType != GetParagraphType(section.Paragraphs[iPara]))
+                        break;
+                    ++iPara;
+                }
+            }
+
+            // Now add the desired paragraphs to the list
+            var v = new List<DParagraph>();
+            char chDesiredPartType = sSectionStructure[nPart];
+            while (iPara < section.Paragraphs.Count)
+            {
+                DParagraph p = section.Paragraphs[iPara];
+                if (chDesiredPartType != GetParagraphType(p))
+                    break;
+                v.Add(p);
+                ++iPara;
+            }
+
+            return v;
+        }
+        #endregion
+        #region Method: List<DBasicText> GetEditableRuns(DParagraph p)
+        List<DBasicText> GetEditableRuns(DParagraph p)
+        {
+            var v = new List<DBasicText>();
+
+            foreach (DRun run in p.Runs)
+            {
+                if (null != run as DBasicText)
+                    v.Add(run as DBasicText);
+            }
+
+            return v;
+        }
+        #endregion
+        #region Method: bool CopyBT(DParagraph PFront, DParagraph PTarget)
+        bool CopyBT(DParagraph PFront, DParagraph PTarget)
+        {
+            // We want the same count of editable runs in the paragraph
+            var vFrontTexts = GetEditableRuns(PFront);
+            var vTargetTexts = GetEditableRuns(PTarget);
+            if (vFrontTexts.Count != vTargetTexts.Count)
+                return false;
+
+            bool bSuccess = true;
+            for (int i = 0; i < vFrontTexts.Count; i++)
+            {
+                var FrontText = vFrontTexts[i];
+                var TargetText = vTargetTexts[i];
+
+                if (string.IsNullOrEmpty(FrontText.ProseBTAsString))
+                    continue;
+
+                if (!string.IsNullOrEmpty(TargetText.ProseBTAsString))
+                {
+                    bSuccess = false;
+                    continue;
+                }
+
+                TargetText.CopyBackTranslationsFromFront(FrontText, true);
+            }
+
+            return bSuccess;
+        }
+        #endregion
+        #region Method: List<DFootnote> GetEditableFootnotes(DSection)
+        List<DFootnote> GetEditableFootnotes(DSection section)
+        {
+            var v = new List<DFootnote>();
+
+            var vAll = section.AllFootnotes;
+
+            foreach (DFootnote foot in vAll)
+            {
+                if (foot.IsExplanatory)
+                    v.Add(foot);
+            }
+
+            return v;
+        }
+        #endregion
+        #region Method: bool CopyFootnotes(DSection SFront, DSection STarget)
+        bool CopyFootnotes(DSection SFront, DSection STarget)
+        {
+            var vFrontFootnotes = GetEditableFootnotes(SFront);
+            var vTargetFootnotes = GetEditableFootnotes(STarget);
+
+            if (vFrontFootnotes.Count != vTargetFootnotes.Count)
+                return false;
+
+            bool bSuccess = true;
+
+            for (int i = 0; i < vFrontFootnotes.Count; i++)
+            {
+                if (!CopyBT(vFrontFootnotes[i], vTargetFootnotes[i]))
+                    bSuccess = false;
+            }
+
+            return bSuccess;
+        }
+        #endregion
+
+        // Public Interface ------------------------------------------------------------------
+        #region Constructor()
+        public CopyBtFromFrontMethod()
+        {
+        }
+        #endregion
+        #region Method: void Run()
+        public void Run()
+        {
+            // Display a very intense warning to the user.
+            if (!DisplaySternWarning())
+                return;
+
+            // Shorthand
+            var SFront = DB.FrontSection;
+            var STarget = DB.TargetSection;
+
+            // Check for identical section structures
+            Debug.Assert(SFront.SectionStructure == STarget.SectionStructure);
+            int cSectionStructureParts = STarget.SectionStructure.Length;
+
+            // This will become false if we encoutner any problems, in which case
+            // we'll inform the user
+            bool bSuccess = true;
+
+            // Go through the major parts, dividing into chunks
+            for (int n = 0; n < cSectionStructureParts; n++)
+            {
+                var vFrontParas = GetParagraphsFromPart(SFront, n);
+                var vTargetParas = GetParagraphsFromPart(STarget, n);
+
+                // We need to have the same number of paragraphs
+                if (vFrontParas.Count != vTargetParas.Count)
+                {
+                    bSuccess = false;
+                    continue;
+                }
+
+                for (int i = 0; i < vFrontParas.Count; i++)
+                {
+                    if (!CopyBT(vFrontParas[i], vTargetParas[i]))
+                        bSuccess = false;
+                }
+            }
+
+            // Copy the footnotes
+            if (!CopyFootnotes(SFront, STarget))
+                bSuccess = false;
+
+            // If any problems, report a message
+            if (!bSuccess)
+            {
+                LocDB.Message("cbtUnsucessful",
+                    "OurWord was unable to completely copy the back translation, due\n" +
+                    "either to differences between the model and the target translations,\n" +
+                    "or because there was already text in the target translation. You will\n" +
+                    "need to copy and paste manually in order to finish the job.",
+                    null,
+                    LocDB.MessageTypes.Info);
+            }
+        }
+        #endregion
+    }
+
 }

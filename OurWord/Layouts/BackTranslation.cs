@@ -288,7 +288,8 @@ namespace OurWord.Layouts
             row.Append(new OWPara(pictureFront.Translation.WritingSystemVernacular,
                 pictureFront.Style, pictureFront, BackColor, OWPara.Flags.None));
             row.Append(new OWPara(pictureFront.Translation.WritingSystemConsultant,
-                pictureFront.Style, pictureFront, BackColor, OWPara.Flags.ShowBackTranslation));
+                pictureFront.Style, pictureFront, BackColor, 
+                OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsLocked));
 
             // The Target vernacular is not editable
             row.Append(new OWPara(pictureTarget.Translation.WritingSystemVernacular,
@@ -373,8 +374,9 @@ namespace OurWord.Layouts
                     // Uneditable BT. (The "options" switch here is for showing things like
                     // cross references, where we just copy from the Vernacular rather than
                     // requiring a back translation.)
-                    var options = (p.IsUserEditable) ?
-                        OWPara.Flags.ShowBackTranslation : OWPara.Flags.None;
+                    var options = OWPara.Flags.None;
+                    if (p.IsUserEditable)
+                        options = OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsLocked;
                     rowFront.Append( AddPara(
                         BuildParagraph(p, p.Translation.WritingSystemConsultant,
                             BackColor, options),
