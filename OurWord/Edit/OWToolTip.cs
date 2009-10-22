@@ -103,18 +103,23 @@ namespace OurWord.Edit
             if (nleft + Width > screen.Bounds.Right)
                 nleft = screen.Bounds.Right - Width;
 
-            // We want to position the Tooltip vertically so it is just under the block.
-            // However, if this would push us below the window, then we move it to be
-            // just above the block.
+            // Vertical:
+            // 1. Our top desire is to position so we're just under the block
             int nTop = ptWindowScreenLocation.Y +
                 (int)Block.Position.Y -
                 (int)Block.Window.ScrollBarPosition +
                 (int)Block.Height;
+            // 2. The block could be scrolled out of view, in which case, move it up into the window
+            int yWindowBottom = Block.Window.PointToScreen(new Point(0, 0)).Y + Block.Window.Height;
+            nTop = Math.Min(nTop, yWindowBottom);
+            // 3. If we're below the screen, move it just above the block
             if (nTop + Height > screen.Bounds.Bottom)
             {
                 nTop -= Height;
                 nTop -= (int)Block.Height;
             }
+            // 4. But make sure we're not above the screen
+            nTop = Math.Max(nTop, 0);
 
             // Calculations done: move and show the window
             this.Location = new Point(nleft, nTop);
