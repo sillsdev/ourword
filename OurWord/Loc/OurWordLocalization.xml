@@ -1323,6 +1323,13 @@
     <Item ID="fJobNaturalness_Description">
       <English>A layout where only the translation is visible, so that you can read through for naturalness, without being influenced by the front translation.</English>
     </Item>
+    <Item ID="fJobConsultantPreparation_CheckBox">
+      <English>Consultant Preparation Window</English>
+    </Item>
+    <Item ID="fJobConsultantPreparation_Description">
+      <English>Displays the Front/Model translation and the Target translation, with both the vernacular and back translations. Use this to preparefor the consultant (e.g., exegetical notes.)</English>
+    </Item>
+    
     <Item ID="fProject_CheckBox">
       <English>Project New / Open / etc.</English>
     </Item>
@@ -1352,12 +1359,6 @@
     </Item>
     <Item ID="fRestoreBackup_Description">
       <English>Files can be automatically backed up (via the Tools-Options command) to a flash card or other storage device. If you turn on this Restore feature, the Tools menu will provide access to a dialog by which the current file can be replaced by a previously stored backup.</English>
-    </Item>
-    <Item ID="fCopyBTfromFront_CheckBox">
-      <English>Copy the BT from the Front Translation</English>
-    </Item>
-    <Item ID="fCopyBTfromFront_Description">
-      <English>Copies the back translation from the Front to the Target. This provides a convenient starting place for a back translation which you should then plan on carefully reviewing and editing, so that it accurately matches the actual vernacular translation.</English>
     </Item>
     <Item ID="fFilter_CheckBox">
       <English>Only show Sections that have (Filter)</English>

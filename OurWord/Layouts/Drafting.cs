@@ -1,3 +1,4 @@
+#region ***** Drafting.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Layouts\Drafting.cs
@@ -22,10 +23,11 @@ using JWdb;
 using JWdb.DataModel;
 using JWTools;
 #endregion
+#endregion
 
 namespace OurWord.Layouts
 {
-    public class WndDrafting : Layout
+    public class WndDrafting : WLayout
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "Draft";
@@ -58,6 +60,15 @@ namespace OurWord.Layouts
 
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
+        }
+        #endregion
+        #region OAttr{g}: string LayoutName
+        public override string LayoutName
+        {
+            get
+            {
+                return c_sName;
+            }
         }
         #endregion
         #region Cmd: OnGotFocus - make sure commands are properly enabled
@@ -390,7 +401,6 @@ namespace OurWord.Layouts
         }
         #endregion
 
-        public const int c_nFootnoteSeparatorWidth = 60;
         #region Method: OWPara CreateFrontPara(DParagraph)
         OWPara CreateFrontPara(DParagraph p)
         {

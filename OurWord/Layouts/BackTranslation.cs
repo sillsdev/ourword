@@ -27,11 +27,10 @@ using JWTools;
 
 namespace OurWord.Layouts
 {
-    public class WndBackTranslation : Layout
+    public class WndBackTranslation : WLayout
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "BT";
-        const string c_sRegDisplayFrontInBT = "ShowFrontInBT";
         #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
         static public string RegistryBackgroundColor
         {
@@ -42,19 +41,6 @@ namespace OurWord.Layouts
             set
             {
                 OWWindow.SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
-        #region SAttr{g/s}: bool DisplayFrontInBT
-        static public bool DisplayFrontInBT
-        {
-            get
-            {
-                return JW_Registry.GetValue(c_sName, c_sRegDisplayFrontInBT, false);
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sName, c_sRegDisplayFrontInBT, value);
             }
         }
         #endregion
@@ -73,6 +59,16 @@ namespace OurWord.Layouts
             EditableBackgroundColor = Color.White;
         }
         #endregion
+        #region OAttr{g}: string LayoutName
+        public override string LayoutName
+        {
+            get
+            {
+                return c_sName;
+            }
+        }
+        #endregion
+
         #region Cmd: OnGotFocus - make sure commands are properly enabled
         protected override void OnGotFocus(EventArgs e)
         {
@@ -117,14 +113,6 @@ namespace OurWord.Layouts
             // Nothing more to do if we don't have a completely-defined project
             if (!DB.Project.HasDataToDisplay)
                 return;
-
-            // Version of the view which shows four columns, both Front and Target translations,
-            // both Vernacular and BT of both.
-            if (DisplayFrontInBT)
-            {
-                LoadFour();
-                return;
-            }
 
             // Load the paragraphs
             foreach (DParagraph p in DB.TargetSection.Paragraphs)
@@ -252,186 +240,6 @@ namespace OurWord.Layouts
         }
         #endregion
 
-        // Layout with Front Translation columns ---------------------------------------------
-        #region Method: var LoadFour_Picture(group)
-        ERowOfColumns LoadFour_Picture(SynchronizedSection.ParagraphGroup group)
-        {
-            // For this to hold tree, we'll have exactly one Front and one Target paragraph
-            if (group.TargetParagraphs.Count != 1 || group.FrontParagraphs.Count != 1)
-                return null;
-
-            // Get the two paragraphs (pictures) we're interested in
-            var pictureFront = group.FrontParagraphs[0] as DPicture;
-            var pictureTarget = group.TargetParagraphs[0]as DPicture;
-            if (null == pictureFront || null == pictureTarget)
-                return null;         
-
-            // We have a simple picture, one column, no paragraph content....if there is
-            // no text in any of our paragraphs
-            if (string.IsNullOrEmpty(pictureFront.SimpleText) &&
-                string.IsNullOrEmpty(pictureFront.SimpleTextBT) &&
-                string.IsNullOrEmpty(pictureTarget.SimpleText) &&
-                string.IsNullOrEmpty(pictureTarget.SimpleTextBT))
-            {
-                var rowSimple = new ERowOfColumns(1);
-                rowSimple.Bmp = GetPicture(pictureTarget);
-                return rowSimple;
-            }
-
-            // Create a row of four columns
-            var row = new ERowOfColumns(4);
-
-            // Load the picture into the row
-            row.Bmp = GetPicture(pictureTarget);
-
-            // Place the Front paragraphs into the columns (uneditable)
-            row.Append(new OWPara(pictureFront.Translation.WritingSystemVernacular,
-                pictureFront.Style, pictureFront, BackColor, OWPara.Flags.None));
-            row.Append(new OWPara(pictureFront.Translation.WritingSystemConsultant,
-                pictureFront.Style, pictureFront, BackColor, 
-                OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsLocked));
-
-            // The Target vernacular is not editable
-            row.Append(new OWPara(pictureTarget.Translation.WritingSystemVernacular,
-                pictureTarget.Style, pictureTarget, BackColor, OWPara.Flags.None));
-
-            // The Target BT is editable
-            var options = OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsEditable |
-                OWPara.Flags.CanItalic;
-            if (OurWordMain.TargetIsLocked)
-                options |= OWPara.Flags.IsLocked;
-            row.Append(new OWPara(
-                pictureTarget.Translation.WritingSystemVernacular,
-                pictureTarget.Style, 
-                pictureTarget,
-                ((pictureTarget.IsUserEditable) ? EditableBackgroundColor : BackColor), 
-                options));
-
-            return row;
-        }
-        #endregion
-        #region Method: var AddPara(owp, bAddFootnoteSeparator
-        public const int c_nFootnoteSeparatorWidth = 60;
-        EColumn AddPara(OWPara owp, bool bAddFootnoteSeparator)
-        {
-            var col = new EColumn();
-            col.Append(owp);
-
-            if (bAddFootnoteSeparator)
-            {
-                col.Border = new EContainer.FootnoteSeparatorBorder(col,
-                    c_nFootnoteSeparatorWidth);
-            }
-
-            return col;
-        }
-        #endregion
-        #region Method: void LoadFour()
-        void LoadFour()
-        {
-            // Synchronze the sections
-            var synch = new WndBackTranslation.SynchronizedSection(DB.FrontSection, DB.TargetSection);
-
-            // Create the view
-            Clear();
-            var vGroups = synch.AllGroups;
-            bool bFirstFootnoteEncountered = false;
-            foreach (SynchronizedSection.ParagraphGroup group in vGroups)
-            {
-                // Do we have a picture?
-                var rowPicture = LoadFour_Picture(group);
-                if (null != rowPicture)
-                {
-                    Contents.Append(rowPicture);
-                    continue;
-                }
-
-                // Each group is in a top-level row; the front is on the left, the target on the right
-                var rowTop = new ERowOfColumns(2);
-                Contents.Append(rowTop);
-
-                // First footnote
-                bool bAddFootnoteSeparator = false;
-                if (!bFirstFootnoteEncountered && group.IsFootnoteGroup)
-                {
-                    bFirstFootnoteEncountered = true;
-                    bAddFootnoteSeparator = true;
-                }
-
-                // Front
-                foreach (DParagraph p in group.FrontParagraphs)
-                {
-                    // Place the front paragraph in a two-column row
-                    var rowFront = new ERowOfColumns(2);
-                    rowTop.GetColumn(0).Append(rowFront);
-
-                    // Uneditable Vernacular
-                    rowFront.Append(AddPara(
-                        BuildParagraph(p, p.Translation.WritingSystemVernacular,
-                            BackColor, OWPara.Flags.None),
-                        bAddFootnoteSeparator));
-
-                    // Uneditable BT. (The "options" switch here is for showing things like
-                    // cross references, where we just copy from the Vernacular rather than
-                    // requiring a back translation.)
-                    var options = OWPara.Flags.None;
-                    if (p.IsUserEditable)
-                        options = OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsLocked;
-                    rowFront.Append( AddPara(
-                        BuildParagraph(p, p.Translation.WritingSystemConsultant,
-                            BackColor, options),
-                        bAddFootnoteSeparator));
-                }
-
-                // Target
-                foreach (DParagraph p in group.TargetParagraphs)
-                {
-                    // Place the target paragraph in a two-column row
-                    var rowTarget = new ERowOfColumns(2);
-                    rowTop.GetColumn(1).Append(rowTarget);
-
-                    // Uneditable Vernacular
-                    rowTarget.Append( AddPara(
-                        BuildParagraph(p, p.Translation.WritingSystemVernacular,
-                            BackColor, OWPara.Flags.None),
-                        bAddFootnoteSeparator));
-
-                    // Editable BT
-                    OWPara.Flags options = OWPara.Flags.None;
-                    if (p.IsUserEditable)
-                    {
-                        options = (
-                            OWPara.Flags.ShowBackTranslation |
-                            OWPara.Flags.IsEditable |
-                            OWPara.Flags.CanItalic);
-                        if (OurWordMain.TargetIsLocked)
-                            options |= OWPara.Flags.IsLocked;
-                    }
-
-                    rowTarget.Append( AddPara(
-                        BuildParagraph(p,
-                            p.Translation.WritingSystemConsultant,
-                            ((p.IsUserEditable) ? EditableBackgroundColor : BackColor),
-                            options),
-                        bAddFootnoteSeparator));
-                }
-            }
-
-            base.LoadData();
-        }
-        #endregion
-        #region Method: OWPara BuildParagraph(p, ws, backColor, flags)
-        OWPara BuildParagraph(DParagraph p, JWritingSystem ws, Color backColor, OWPara.Flags flags)
-            // Creates an OWPara, but switches based on whether we're dealing with a footnote or
-            // a normal paragraph (the Footnote code inserts the footnote reference/label.)
-        {
-            DFootnote fn = p as DFootnote;
-            if (null != fn)              
-                return CreateFootnotePara(fn, ws, backColor, flags);
-
-            return new OWPara(ws, p.Style, p, backColor, flags);
-        }
-        #endregion
     }
 
 

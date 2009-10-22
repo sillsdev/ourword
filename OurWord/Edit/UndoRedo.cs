@@ -2481,15 +2481,15 @@ namespace OurWord.Edit
         {
             // Remember the main window location, as we have to reset the 
             // scroll position after we regenerate window contents
-            if (G.App.MainWindow.Selection == null)
+            if (G.App.CurrentLayout.Selection == null)
                 return false;
-            BmMainWnd = G.App.MainWindow.CreateBookmark();
+            BmMainWnd = G.App.CurrentLayout.CreateBookmark();
 
             // Retrieve the DText to which this note will be attached
-            DText text = G.App.MainWindow.Selection.Anchor.BasicText as DText;
+            DText text = G.App.CurrentLayout.Selection.Anchor.BasicText as DText;
 
             // Create a blank note and insert it
-            m_Note = new TranslatorNote( G.App.MainWindow.Selection.SelectionString );
+            m_Note = new TranslatorNote(G.App.CurrentLayout.Selection.SelectionString);
             Note.Class = NoteClass;
             Note.Messages.Append(new DMessage());
             Note.Status = DMessage.Anyone;

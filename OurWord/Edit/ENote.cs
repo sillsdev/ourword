@@ -1348,7 +1348,7 @@ namespace OurWord.Edit
             string sNewAuthor = (string)combo.SelectedItem;
 
             // Make the change
-            (new ChangeAuthor(G.App.MainWindow, note, combo, sNewAuthor, sOriginalAuthor)).Do();
+            (new ChangeAuthor(G.App.CurrentLayout, note, combo, sNewAuthor, sOriginalAuthor)).Do();
         }
         #endregion
         #region Cmd: void OnAuthorTextChanged(object sender, EventArgs e)
@@ -1373,7 +1373,7 @@ namespace OurWord.Edit
                 return;
 
             // Make the change
-            (new ChangeAuthor(G.App.MainWindow, note, combo, sNewAuthor, sOriginalAuthor)).Do();
+            (new ChangeAuthor(G.App.CurrentLayout, note, combo, sNewAuthor, sOriginalAuthor)).Do();
         }
         #endregion
 

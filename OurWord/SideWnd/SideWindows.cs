@@ -236,7 +236,7 @@ namespace OurWord.SideWnd
             // If we're already at the final Tab, then focus the main window
             if (SelectedTab == TabPages[TabPages.Count - 1])
             {
-                G.App.MainWindow.Focus();
+                G.App.CurrentLayout.Focus();
                 return;
             }
 
@@ -255,7 +255,7 @@ namespace OurWord.SideWnd
             // If we're already at the first Tab, then focus the main window
             if (SelectedTab == TabPages[0])
             {
-                G.App.MainWindow.Focus();
+                G.App.CurrentLayout.Focus();
                 return;
             }
 

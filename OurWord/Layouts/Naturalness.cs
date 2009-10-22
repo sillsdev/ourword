@@ -1,3 +1,4 @@
+#region ***** Naturalness.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Layouts\Naturalness.cs
@@ -23,10 +24,11 @@ using OurWord.Layouts;
 using JWdb;
 using JWTools;
 #endregion
+#endregion
 
 namespace OurWord.Layouts
 {
-    class WndNaturalness : Layout
+    class WndNaturalness : WLayout
     {
         // Registry-Stored Settings ----------------------------------------------------------
         public const string c_sName = "Naturalness";
@@ -115,6 +117,15 @@ namespace OurWord.Layouts
 
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
+        }
+        #endregion
+        #region OAttr{g}: string LayoutName
+        public override string LayoutName
+        {
+            get
+            {
+                return c_sName;
+            }
         }
         #endregion
         #region Cmd: OnGotFocus - make sure commands are properly enabled

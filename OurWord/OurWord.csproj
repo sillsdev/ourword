@@ -310,6 +310,7 @@
     <EmbeddedResource Include="Res\NoteConsultant_Anyone.ico" />
     <EmbeddedResource Include="Res\NoteConsultant_Closed.ico" />
     <EmbeddedResource Include="Res\NoteConsultant_Me.ico" />
+    <EmbeddedResource Include="Res\JobConsultantPreparation.ico" />
     <Content Include="Res\NoteEdit.ico" />
     <EmbeddedResource Include="Res\NoteExegesis_Anyone.ico" />
     <EmbeddedResource Include="Res\NoteExegesis_Closed.ico" />
@@ -590,6 +591,9 @@
     </Compile>
     <Compile Include="Edit\OWToolTip.Designer.cs">
       <DependentUpon>OWToolTip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ConsultantPreparation.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Layouts\Layout.cs">
       <SubType>Component</SubType>

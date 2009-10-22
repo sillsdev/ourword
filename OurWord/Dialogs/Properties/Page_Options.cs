@@ -59,7 +59,6 @@ namespace OurWord.Dialogs
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
         const string c_sZoomFactor = "propZoomFactor";
-        const string c_sShowFrontInBT = "propShowFrontBT";
         const string c_sProjectAccess = "propProjectAccess";
 
         const string c_sGroupNaturalnessCheck = "propNaturalnessCheck";
@@ -70,6 +69,7 @@ namespace OurWord.Dialogs
         const string c_sGroup_BackgroundColors = "propBackgroundColors";
         const string c_sColorDrafting = "propBackColorDraftingWindow";
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
+        const string c_sColorConsultantPreparation = "propBackColorConsultantPreparation";
         const string c_sColorNaturalnessCheck = "propBackColorNaturalnessCheckWindow";
         const string c_sColorOtherTranslations = "propBackColorOtherTranslationsWindow";
         #endregion
@@ -130,15 +130,6 @@ namespace OurWord.Dialogs
                     e.Value = ClusterList.UserCanAccessAllProjectsFriendly;
                     break;
 
-
-                case c_sShowFrontInBT:
-                    {
-                        YesNoPropertySpec PS = e.Property as YesNoPropertySpec;
-                        Debug.Assert(null != PS);
-                        e.Value = PS.GetBoolString(WndBackTranslation.DisplayFrontInBT);
-                        break;
-                    }
-
                 // Naturalness Check view
                 case c_sSuppressVerses:
                     YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
@@ -160,6 +151,9 @@ namespace OurWord.Dialogs
                     break;
                 case c_sColorBackTranslation:
                     e.Value = WndBackTranslation.RegistryBackgroundColor;
+                    break;
+                case c_sColorConsultantPreparation:
+                    e.Value = WndConsultantPreparation.RegistryBackgroundColor;
                     break;
                 case c_sColorNaturalnessCheck:
                     e.Value = WndNaturalness.RegistryBackgroundColor;
@@ -216,10 +210,6 @@ namespace OurWord.Dialogs
                     G.ZoomPercent = ZoomPS.GetZoomFactor(e.Value);
                     break;
 
-                case c_sShowFrontInBT:
-                    WndBackTranslation.DisplayFrontInBT = InterpretYesNo(e);
-                    break;
-
                 case c_sProjectAccess:
                     break;
 
@@ -244,6 +234,9 @@ namespace OurWord.Dialogs
                     break;
                 case c_sColorBackTranslation:
                     WndBackTranslation.RegistryBackgroundColor = (string)e.Value;
+                    break;
+                case c_sColorConsultantPreparation:
+                    WndConsultantPreparation.RegistryBackgroundColor = (string)e.Value;
                     break;
                 case c_sColorNaturalnessCheck:
                     WndNaturalness.RegistryBackgroundColor = (string)e.Value;
@@ -350,14 +343,6 @@ namespace OurWord.Dialogs
                 );
             zps.DontLocalizeEnums = true;
             Bag.Properties.Add(zps);
-
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sShowFrontInBT,
-                "Show Front Translation's Back Translation",
-                "",
-                "If Yes, the BT of the front translation will be shown in a column.",
-                false
-                ));
             #endregion
 
             // Naturalness Check options
@@ -402,6 +387,12 @@ namespace OurWord.Dialogs
                 c_sGroup_BackgroundColors,
                 "The color of the Back Translation window background.",
                 "Wheat"));
+            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sColorConsultantPreparation,
+                "Consultant Preparation",
+                c_sGroup_BackgroundColors,
+                "The color of the Consultant Preparation window background.",
+                "LilghtYellow"));
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorNaturalnessCheck,
                 "Naturalness Check",

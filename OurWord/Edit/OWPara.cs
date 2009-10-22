@@ -710,7 +710,7 @@ namespace OurWord.Edit
 
             foreach (TranslatorNote note in text.TranslatorNotes)
             {
-                OWWindow wnd = OurWordMain.App.MainWindow;
+                OWWindow wnd = OurWordMain.App.CurrentLayout;
                 if (null != wnd)
                 {
                     if (wnd.ShowNoteIcon(note, bShowingBT))

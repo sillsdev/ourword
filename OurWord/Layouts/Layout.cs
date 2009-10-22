@@ -29,12 +29,22 @@ using JWTools;
 
 namespace OurWord.Layouts
 {
-    public class Layout : OWWindow
+    public class WLayout : OWWindow
     {
         #region Constructor(sName, cColumnCout)
-        protected Layout(string sName, int cColumnCount)
+        protected WLayout(string sName, int cColumnCount)
             : base(sName, cColumnCount)
         {
+        }
+        #endregion
+        #region VirtAttr{g}: string LayoutName
+        public virtual string LayoutName
+        {
+            get
+            {
+                Debug.Assert(false, "LayoutName must be overwritten in the subclass");
+                return "Layout";
+            }
         }
         #endregion
 
@@ -104,6 +114,7 @@ namespace OurWord.Layouts
         }
         #endregion
 
+        public const int c_nFootnoteSeparatorWidth = 60;
 
         // Synchronize Front and Target paragraphs -------------------------------------------
         protected class SynchronizedSection
@@ -400,7 +411,134 @@ namespace OurWord.Layouts
             #endregion
         }
 
+        // Registered Layouts ----------------------------------------------------------------
+        /* DOCUMENTATION: Adding a new Window/Job
+         * 1. Create the subclass of WLayout
+         * 2. Create and Register the subclass in OW's constructor
+         * 3. Create the Window menu item, make sure to set the Tag to the subclass's LayoutName
+         * 4. Create the command handler for changing windows
+         */
+        const string c_sCurrentLayout = "CurrentJob";
+        #region SAttr{g}: WLayout CurrentLayout
+        static public WLayout CurrentLayout
+        {
+            get
+            {
+                return s_CurrentLayout;
+            }
+        }
+        static WLayout s_CurrentLayout;
+        #endregion
+        #region List<WLayout> RegisteredLayouts
+        static List<WLayout> RegisteredLayouts
+        {
+            get
+            {
+                if (null == s_vRegisteredLayouts)
+                    s_vRegisteredLayouts = new List<WLayout>();
+                Debug.Assert(null != s_vRegisteredLayouts);
+                return s_vRegisteredLayouts;
+            }
+        }
+        static List<WLayout> s_vRegisteredLayouts;
+        #endregion
+        #region SMethod: WLayout Find(sLayoutName)
+        static public WLayout Find(string sLayoutName)
+        {
+            foreach (WLayout layout in RegisteredLayouts)
+            {
+                if (layout.LayoutName == sLayoutName)
+                    return layout;
+            }
+            return null;
+        }
+        #endregion
+        #region SMethod: void RegisterLayout(parent, WLayout layout)
+        static public void RegisterLayout(Control parent, WLayout layout)
+        {
+            // Don't do this but once for a given layout
+            if (null != Find(layout.LayoutName))
+                return;
 
+            // Add it to our list
+            RegisteredLayouts.Add(layout);
+
+            // Place it in the window correctly
+            layout.Hide();
+            layout.Dock = DockStyle.Fill;
+            parent.Controls.Add(layout);
+        }
+        #endregion
+        #region SMethod: bool SetCurrentLayout(string sLayoutName)
+        static public bool SetCurrentLayout(string sLayoutName)
+        {
+            WLayout layout = Find(sLayoutName);
+            Debug.Assert(null != layout, "Did you forget to register a window type?");
+
+            // Don't do anything if we're already active
+            if (CurrentLayout == layout)
+                return false;
+
+            // Hide the current one
+            if (CurrentLayout != null)
+                CurrentLayout.Hide();
+
+            // Now set to the new one and show it
+            s_CurrentLayout = layout;
+            CurrentLayout.Show();
+
+            // Save this to the Registry so we can restore it on OurWord startup
+            JW_Registry.SetValue(c_sCurrentLayout, CurrentLayout.LayoutName);
+            return true;
+        }
+        #endregion
+        #region SMethod: string GetLayoutFromRegistry(sDefaultLayout)
+        static public string GetLayoutFromRegistry(string sDefaultLayout)
+        {
+            return JW_Registry.GetValue(c_sCurrentLayout, sDefaultLayout);
+        }
+        #endregion
+        static public bool CurrentLayoutIs(string sLayoutName)
+        {
+            if (CurrentLayout.LayoutName == sLayoutName)
+                return true;
+            return false;
+        }
+        static public bool CurrentLayoutIs(string[] vsLayoutName)
+        {
+            foreach (string s in vsLayoutName)
+            {
+                if (CurrentLayoutIs(s))
+                    return true;
+            }
+            return false;
+        }
+
+        /*
+        */
+        static public void CheckWindowMenuItem(ToolStripDropDownButton btnParent)
+        {
+            if (null == CurrentLayout)
+                return;
+
+            foreach (ToolStripItem item in btnParent.DropDownItems)
+            {
+                // Only interested in menu items, not, e.g., separators
+                var menuItem = item as ToolStripMenuItem;
+                if (null == menuItem)
+                    continue;
+
+                // Retrieve the name of the layout for which this menu item corresponds
+                string sMenuItemLayoutName = (string)menuItem.Tag;
+
+                // Is thie item a Window name?
+                if (null == Find(sMenuItemLayoutName))
+                    continue;
+
+                // Set the check depending on if it is current
+                menuItem.Checked = (sMenuItemLayoutName == CurrentLayout.LayoutName);
+            }
+        }
 
 
     }

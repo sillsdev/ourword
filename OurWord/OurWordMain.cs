@@ -102,107 +102,22 @@ namespace OurWord
         SideWindows m_SideWindows = null;
         #endregion
 
-        #region Attr{g}: Layout MainWindow - set{} changes it to another OWWindow subclass
-        public Layout MainWindow
+        #region Method: void SetCurrentLayout(sLayoutName)
+        public void SetCurrentLayout(string sLayoutName)
         {
-            get
+            if (WLayout.SetCurrentLayout(sLayoutName))
             {
-                return m_MainWindow;
-            }
-            set
-            {
-                // Don't do anything if we're already active
-                if (m_MainWindow == value)
-                    return;
-
-                // Hide the current one
-                if (m_MainWindow != null)
-                    m_MainWindow.Hide();
-
-                // Now set to the new one and show it
-                m_MainWindow = value;
-                m_MainWindow.Show();
-
-                // Save this to the Registry so we can restore it
-                // on OurWord startup
-                JW_Registry.SetValue("CurrentJob", MainWindow.Name);
-
-                // Update the contents of all of the windows
                 SetupSideWindows();
                 ResetWindowContents();
             }
         }
-        Layout m_MainWindow = null;
         #endregion
-
-        #region Attr{g}: WndDrafting WndDrafting
-        WndDrafting WndDrafting
+        #region VAttr{g}: Layout CurrentLayout
+        public WLayout CurrentLayout
         {
             get
             {
-                Debug.Assert(null != m_wndDrafting);
-                return m_wndDrafting;
-            }
-        }
-        WndDrafting m_wndDrafting = null;
-        #endregion
-        #region Attr{g}: WndBackTranslation WndBackTranslation
-        WndBackTranslation WndBackTranslation
-        {
-            get
-            {
-                Debug.Assert(null != m_wndBackTranslation);
-                return m_wndBackTranslation;
-            }
-        }
-        WndBackTranslation m_wndBackTranslation = null;
-        #endregion
-        private ToolStripMenuItem m_menuInitializeFromAnInternetRepositoryToolStripMenuItem;
-        private ToolStripMenuItem m_menuCreateANewProjectOnThisComputerToolStripMenuItem;
-        private ToolStripButton m_btnHistory;
-        private ToolStripMenuItem m_menuCopyBTFromFrontTranslation;
-        #region Attr{g}: WndNaturalness WndNaturalness
-        WndNaturalness WndNaturalness
-        {
-            get
-            {
-                Debug.Assert(null != m_wndNaturalness);
-                return m_wndNaturalness;
-            }
-        }
-        WndNaturalness m_wndNaturalness = null;
-        #endregion
-
-        #region VAttr{g}:  bool MainWindowIsDrafting
-        public bool MainWindowIsDrafting
-        {
-            get
-            {
-                if (MainWindow == WndDrafting)
-                    return true;
-                return false;
-            }
-        }
-        #endregion
-        #region VAttr{g}:  bool MainWindowIsBackTranslation
-        public bool MainWindowIsBackTranslation
-        {
-            get
-            {
-                if (MainWindow == WndBackTranslation)
-                    return true;
-                return false;
-            }
-        }
-        #endregion
-        #region VAttr{g}:  bool MainWindowIsNaturalness
-        public bool MainWindowIsNaturalness
-        {
-            get
-            {
-                if (MainWindow == WndNaturalness)
-                    return true;
-                return false;
+                return WLayout.CurrentLayout;
             }
         }
         #endregion
@@ -212,8 +127,8 @@ namespace OurWord
         {
             get
             {
-                if (MainWindow.Focused)
-                    return MainWindow;
+                if (CurrentLayout.Focused)
+                    return CurrentLayout;
                 return SideWindows.FocusedWindow;
             }
         }
@@ -226,7 +141,7 @@ namespace OurWord
                 return;
 
             // If this window is focused, then send focus to the first tab
-            if (MainWindow.Focused)
+            if (CurrentLayout.Focused)
             {
                 SideWindows.SelectFirstTab();
                 return;
@@ -244,7 +159,7 @@ namespace OurWord
                 return;
 
             // If this window is focused, then send focus to the first tab
-            if (MainWindow.Focused)
+            if (CurrentLayout.Focused)
             {
                 SideWindows.SelectLastTab();
                 return;
@@ -263,41 +178,6 @@ namespace OurWord
             }
         }
         #endregion
-
-        #region Method: void CreateClientWindows() - called once, when OW first starts
-        void CreateClientWindows()
-        {
-            // Suspend the layout while we monkey around with the child windows
-            SuspendLayout();
-
-            // Create the SideWindows; hide them initially
-            m_SideWindows = new SideWindows();
-            m_SplitContainer.Panel2.Controls.Add(SideWindows);
-            SideWindows.Dock = DockStyle.Fill;
-
-            // Create the Drafting Window 
-            m_wndDrafting = new WndDrafting();
-            WndDrafting.Show();
-            m_SplitContainer.Panel1.Controls.Add(WndDrafting);
-            WndDrafting.Dock = DockStyle.Fill;
-            m_MainWindow = WndDrafting;
-
-            // Create the Back Translation Window
-            m_wndBackTranslation = new WndBackTranslation();
-            WndBackTranslation.Hide();
-            m_SplitContainer.Panel1.Controls.Add(WndBackTranslation);
-            WndBackTranslation.Dock = DockStyle.Fill;
-
-            // Create the Naturalness Window
-            m_wndNaturalness = new WndNaturalness();
-            m_wndNaturalness.Hide();
-            m_SplitContainer.Panel1.Controls.Add(WndNaturalness);
-            WndNaturalness.Dock = DockStyle.Fill;
-
-            // Let the window go ahead and proceed with the layout
-            ResumeLayout();
-        }
-        #endregion
         #region Method: void SetupSideWindows() - called whenever different SideWindows are desired (startup, Tools-Options)
         void SetupSideWindows()
         {
@@ -305,13 +185,13 @@ namespace OurWord
 
             if (DB.IsValidProject)
             {
-                if (DB.Project.ShowTranslationsPane && MainWindowIsDrafting)
+                if (DB.Project.ShowTranslationsPane && WLayout.CurrentLayoutIs(WndDrafting.c_sName))
                     SideWindows.AddPage(new TranslationsPane(), "Translations");
             }
 
             // Tell the system which side windows are being displayed; thereafter events will be 
             // automatically routed to these windows.
-            SideWindows.RegisterWindows(MainWindow);
+            SideWindows.RegisterWindows(CurrentLayout);
 
             if (HasSideWindows)
             {
@@ -355,8 +235,8 @@ namespace OurWord
             // Do we have a valid project? Can't do much if not.
             if (null == DB.Project || null == DB.FrontSection || null == DB.TargetSection)
             {
-                MainWindow.Clear();
-                MainWindow.Invalidate();
+                CurrentLayout.Clear();
+                CurrentLayout.Invalidate();
                 TaskName = G.GetLoc_GeneralUI("NoProjectDefined", "No Project Defined");
                 LanguageInfo = "";
                 Passage = "";
@@ -367,24 +247,24 @@ namespace OurWord
             }
 
             // Update the Title Window contents
-            TaskName = MainWindow.WindowName;
-            LanguageInfo = MainWindow.LanguageInfo;
-            Passage = MainWindow.PassageName;
+            TaskName = CurrentLayout.WindowName;
+            LanguageInfo = CurrentLayout.LanguageInfo;
+            Passage = CurrentLayout.PassageName;
             ShowPadlock = TargetIsLocked;
 
             // Loading the main window should also load the data in the side windows, as this
             // is generally built as the main window is loaded (or as items there are selected)
-            MainWindow.LoadData();
+            CurrentLayout.LoadData();
 
             // Place focus in the main window, so that it is ready for editing
-            MainWindow.Focus();
+            CurrentLayout.Focus();
         }
         #endregion
         #region Method: void SetZoomFactor()
         void SetZoomFactor()
         {
-            if ( null != MainWindow)
-                MainWindow.ZoomFactor = G.ZoomFactor;
+            if (null != CurrentLayout)
+                CurrentLayout.ZoomFactor = G.ZoomFactor;
 
             if (null != SideWindows)
                 SideWindows.SetZoomFactor(G.ZoomFactor);
@@ -425,6 +305,11 @@ namespace OurWord
         // Toolbar, MenuBar, Taskbar & StatusBar ---------------------------------------------
         #region Toolbar, Taskbar & StatusBar
         #region Menu/Toolbar attributes
+        private ToolStripMenuItem m_menuInitializeFromAnInternetRepositoryToolStripMenuItem;
+        private ToolStripMenuItem m_menuCreateANewProjectOnThisComputerToolStripMenuItem;
+        private ToolStripButton m_btnHistory;
+        private ToolStripMenuItem m_menuCopyBTFromFrontTranslation;
+        private ToolStripMenuItem m_menuConsultantPreparationToolStripMenuItem;
         private ToolStripDropDownButton m_btnChapter;
         private ToolStripMenuItem m_menuUndo;
         private ToolStripMenuItem m_menuRedo;
@@ -635,7 +520,7 @@ namespace OurWord
             m_btnPrint.Enabled = bValidProjectWithData;
 
             // Editing
-            bool bCanEdit = (MainWindow.Focused && TargetIsLocked) ? false : true;
+            bool bCanEdit = (CurrentLayout.Focused && TargetIsLocked) ? false : true;
             m_btnEditCut.Enabled = bCanEdit;
             m_btnEditPaste.Enabled = bCanEdit;
             EnableItalicsButton();
@@ -661,10 +546,8 @@ namespace OurWord
             // Tools menu
             m_menuIncrementBookStatus.Enabled = canIncrementBookStatus;
 
-            // Window menu
-            m_menuDrafting.Checked = MainWindowIsDrafting;
-            m_menuNaturalnessCheck.Checked = MainWindowIsNaturalness;
-            m_menuBackTranslation.Checked = MainWindowIsBackTranslation;
+            // Check the current "job" on the Window menu
+            WLayout.CheckWindowMenuItem(m_btnWindow);
         }
         #endregion
         #region Method: void SetupMenusAndToolbarsVisibility()
@@ -721,7 +604,9 @@ namespace OurWord
             m_btnInsertNote.Visible = s_Features.TranslatorNotes;
 
             // Window Menu in its entirety
-            bool bShowMainWindowSection = s_Features.F_JobBT || s_Features.F_JobNaturalness;
+            bool bShowMainWindowSection = s_Features.F_JobBT || 
+                s_Features.F_JobNaturalness ||
+                s_Features.F_ConsultantPreparation;
             bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
             bool bShowTranslationsPane = (DB.IsValidProject && DB.Project.OtherTranslations.Count > 0);
             bool bShowHistoryMenu = false; // (DB.IsValidProject && s_Features.SectionHistory);
@@ -735,6 +620,8 @@ namespace OurWord
             // Main Window items: Drafting, Naturalness, BT
             m_menuDrafting.Visible = bShowMainWindowSection;
             m_menuBackTranslation.Visible = (bShowMainWindowSection && s_Features.F_JobBT);
+            m_menuConsultantPreparationToolStripMenuItem.Visible = 
+                (bShowMainWindowSection && s_Features.F_ConsultantPreparation);
             m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && s_Features.F_JobNaturalness);
             m_separatorWindow.Visible = bShowMainWindowSection && bShowSideWindowsSection;
 
@@ -743,7 +630,8 @@ namespace OurWord
             m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
 
             // Edit Menu / Structured Editing
-            bool bStructuralEditing = s_Features.F_StructuralEditing && OurWordMain.App.MainWindowIsDrafting;
+            bool bStructuralEditing = s_Features.F_StructuralEditing &&
+                WLayout.CurrentLayoutIs(WndDrafting.c_sName);
             bool bEditMenuVisible = bStructuralEditing || Features.F_UndoRedo;
             m_seperatorEdit.Visible = bStructuralEditing;
             m_menuChangeParagraphTo.Visible = bStructuralEditing;
@@ -757,12 +645,13 @@ namespace OurWord
             m_btnEditPaste.Visible = !bEditMenuVisible;
 
             m_menuCopyBTFromFrontTranslation.Visible = (
-                OurWordMain.Features.F_CopyBTfromFront &&
-                G.App.MainWindowIsBackTranslation &&
-                WndBackTranslation.DisplayFrontInBT);
+                OurWordMain.Features.F_ConsultantPreparation && 
+                WLayout.CurrentLayoutIs( new string[] {
+                    WndConsultantPreparation.c_sName, WndBackTranslation.c_sName } )
+                );
 
             // Insert dropdown
-            MainWindow.SetupInsertNoteDropdown(m_btnInsertNote);
+            CurrentLayout.SetupInsertNoteDropdown(m_btnInsertNote);
 
             // Clear dropdown subitems so we don't attempt to localize them
             m_btnGotoPreviousSection.DropDownItems.Clear();
@@ -909,9 +798,25 @@ namespace OurWord
 			// Initialize the features we will make available
 			s_Features = new FeaturesMgr();
 
-            // Initialize the Client Window (do now, to establish proper z-order)
-            CreateClientWindows();
-            SetupSideWindows();
+            // Suspend the layout while we create the windows. We create them here in order
+            // to get the propert z-order
+            // TO DO: Still necessary? Can we move this to OnLoad?
+            SuspendLayout();
+
+            // Create the SideWindows; hide them initially
+            // TODO: Once we get rid of sidewindows, we  no longer need this layer
+            m_SideWindows = new SideWindows();
+            m_SplitContainer.Panel2.Controls.Add(SideWindows);
+            SideWindows.Dock = DockStyle.Fill;
+
+            // Create the "job" windows
+            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndDrafting());
+            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndNaturalness());
+            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndBackTranslation());
+            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndConsultantPreparation());
+
+            // Let the window go ahead and proceed with the layout
+            ResumeLayout();
 
 			// Initialize the window state mechanism. We'll default to a full screen
 			// the first time we are launched.
@@ -1014,6 +919,7 @@ namespace OurWord
             this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuConsultantPreparationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
@@ -1613,6 +1519,7 @@ namespace OurWord
             this.m_menuDrafting,
             this.m_menuNaturalnessCheck,
             this.m_menuBackTranslation,
+            this.m_menuConsultantPreparationToolStripMenuItem,
             this.m_separatorWindow,
             this.m_menuShowTranslationsPane,
             this.m_menuZoom});
@@ -1630,6 +1537,7 @@ namespace OurWord
             this.m_menuDrafting.Image = ((System.Drawing.Image)(resources.GetObject("m_menuDrafting.Image")));
             this.m_menuDrafting.Name = "m_menuDrafting";
             this.m_menuDrafting.Size = new System.Drawing.Size(232, 22);
+            this.m_menuDrafting.Tag = "Draft";
             this.m_menuDrafting.Text = "&Drafting";
             this.m_menuDrafting.ToolTipText = "Set the main window to do Drafting.";
             this.m_menuDrafting.Click += new System.EventHandler(this.cmdJobDrafting);
@@ -1639,6 +1547,7 @@ namespace OurWord
             this.m_menuNaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNaturalnessCheck.Image")));
             this.m_menuNaturalnessCheck.Name = "m_menuNaturalnessCheck";
             this.m_menuNaturalnessCheck.Size = new System.Drawing.Size(232, 22);
+            this.m_menuNaturalnessCheck.Tag = "Naturalness";
             this.m_menuNaturalnessCheck.Text = "&Naturalness Check";
             this.m_menuNaturalnessCheck.ToolTipText = "Set the main window to do a Naturalness Check (where the Front Translation is not" +
                 " displayed.)";
@@ -1649,9 +1558,19 @@ namespace OurWord
             this.m_menuBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_menuBackTranslation.Image")));
             this.m_menuBackTranslation.Name = "m_menuBackTranslation";
             this.m_menuBackTranslation.Size = new System.Drawing.Size(232, 22);
+            this.m_menuBackTranslation.Tag = "BT";
             this.m_menuBackTranslation.Text = "&Back Translation";
             this.m_menuBackTranslation.ToolTipText = "Set the main window to work on the Back Translation.";
             this.m_menuBackTranslation.Click += new System.EventHandler(this.cmdJobBackTranslation);
+            // 
+            // m_menuConsultantPreparationToolStripMenuItem
+            // 
+            this.m_menuConsultantPreparationToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("m_menuConsultantPreparationToolStripMenuItem.Image")));
+            this.m_menuConsultantPreparationToolStripMenuItem.Name = "m_menuConsultantPreparationToolStripMenuItem";
+            this.m_menuConsultantPreparationToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.m_menuConsultantPreparationToolStripMenuItem.Tag = "ConsultantPreparation";
+            this.m_menuConsultantPreparationToolStripMenuItem.Text = "Consultant &Preparation";
+            this.m_menuConsultantPreparationToolStripMenuItem.Click += new System.EventHandler(this.cmdJobConsultantPreparation);
             // 
             // m_separatorWindow
             // 
@@ -1952,6 +1871,15 @@ namespace OurWord
 			DialogSetupFeatures m_Dlg = null;
 
 			// Values (obtain from current project) ------------------------------------------
+            #region Attr{g}: bool F_JobNaturalness
+            public bool F_JobNaturalness
+            {
+                get
+                {
+                    return m_Dlg.GetEnabledState(ID.fJobNaturalness.ToString());
+                }
+            }
+            #endregion
 			#region Attr{g}: bool F_JobBT
 			public bool F_JobBT
 			{
@@ -1961,12 +1889,12 @@ namespace OurWord
 				}
 			}
 			#endregion
-            #region Attr{g}: bool F_JobNaturalness
-            public bool F_JobNaturalness
+            #region Attr{g}: bool F_ConsultantPreparation
+            public bool F_ConsultantPreparation
             {
                 get
                 {
-                    return m_Dlg.GetEnabledState(ID.fJobNaturalness.ToString());
+                    return m_Dlg.GetEnabledState(ID.fJobConsultantPreparation.ToString());
                 }
             }
             #endregion
@@ -2022,15 +1950,6 @@ namespace OurWord
 				get
 				{
 					return m_Dlg.GetEnabledState( ID.fFilter.ToString());
-				}
-			}
-			#endregion
-			#region Attr{g}: bool F_CopyBTfromFront
-			public bool F_CopyBTfromFront
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fCopyBTfromFront.ToString());
 				}
 			}
 			#endregion
@@ -2135,8 +2054,8 @@ namespace OurWord
                 fPrint,
                 fJobBT,
                 fJobNaturalness,
+                fJobConsultantPreparation,
                 fRestoreBackup,
-                fCopyBTfromFront,
                 fFilter,
                 fJustTheBasics,
                 fStructuralEditing,
@@ -2179,6 +2098,15 @@ namespace OurWord
                     "A layout where only the translation is visible, so that you can read through " +
                         "for naturalness, without being influenced by the front translation.");
                        
+                m_Dlg.Add(ID.fJobConsultantPreparation.ToString(),  
+                    false,
+                    false,
+                    c_sNodeWindows,
+                    "Consultant Preparation Window",
+                    "Displays the Front/Model translation and the Target translation, with both " +
+                        "the vernacular and back translations. Use this to preparefor the " +
+                        "consultant (e.g., exegetical notes.)");
+
                 #endregion
                 #region EDITING FEATURES
                 m_Dlg.Add(ID.fStructuralEditing.ToString(),
@@ -2217,16 +2145,6 @@ namespace OurWord
                         "to a flash card or other storage device. If you turn on this Restore " +
                         "feature, the Tools menu will provide access to a dialog by which the " +
                         "current file can be replaced by a previously stored backup.");
-
-                m_Dlg.Add(ID.fCopyBTfromFront.ToString(),  
-                    false,
-                    false,
-                    c_sNodeTools,
-                    "Copy the BT from the Front Translation",
-                    "Copies the back translation from the Front to the Target. This provides " +
-                        "a convenient starting place for a back translation which you should then " +
-                        "plan on carefully reviewing and editing, so that it accurately matches " +
-                        "the actual vernacular translation.");
 
                 m_Dlg.Add(ID.fConfigurationDialog.ToString(),
                     true,
@@ -2398,14 +2316,7 @@ namespace OurWord
             m_SplitContainer.SplitterDistance = (int)((float)m_fSplitterPercent * (float)Width / 100.0F);
 
             // Restore which layout is active
-            string sPreferredWindowName = JW_Registry.GetValue("CurrentJob",
-                WndDrafting.c_sName);
-            if (sPreferredWindowName == WndDrafting.c_sName)
-                MainWindow = WndDrafting;
-            if (sPreferredWindowName == WndBackTranslation.c_sName)
-                MainWindow = WndBackTranslation;
-            if (sPreferredWindowName == WndNaturalness.c_sName)
-                MainWindow = WndNaturalness;
+            SetCurrentLayout(WLayout.GetLayoutFromRegistry(WndDrafting.c_sName));
 
             // Restore to where we last were.
             DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
@@ -2437,7 +2348,7 @@ namespace OurWord
 
             // Leave everything in a state where the main window has focus, so that the
             // Text Selection will be appropriately flashing its readiness
-            MainWindow.Focus();
+            CurrentLayout.Focus();
         }
 		#endregion
         #region Event: cmdClosing - save window state, data, etc.
@@ -2485,17 +2396,17 @@ namespace OurWord
             // Tests to see if we can proceed with layout and sizing
             if (null != G.App && G.App.WindowState == FormWindowState.Minimized)
                 return;
-            if (null == MainWindow)
+            if (null == CurrentLayout)
                 return;
             if (m_SplitContainer.Panel1.Width == 0 || m_SplitContainer.Panel1.Height == 0)
                 return;   // Happens in Mono, not in Windows
 
             // the MainWindow needs to have a size for its double buffering
-            MainWindow.SetSize(m_SplitContainer.Panel1.Width, m_SplitContainer.Panel1.Height);
+            CurrentLayout.SetSize(m_SplitContainer.Panel1.Width, m_SplitContainer.Panel1.Height);
 
             // Re-do the layout and redraw
-            MainWindow.DoLayout();
-            MainWindow.Invalidate();
+            CurrentLayout.DoLayout();
+            CurrentLayout.Invalidate();
         }
         #endregion
 
@@ -3031,9 +2942,13 @@ namespace OurWord
         #region Cmd: cmdCopyBTFromFront
         private void cmdCopyBTFromFront(object sender, EventArgs e)
         {
-            // We only do this in four-column back translation view
-            if (!MainWindowIsBackTranslation || !WndBackTranslation.DisplayFrontInBT)
+            // We only do this in select views
+            if (!WLayout.CurrentLayoutIs(new string[] {
+                WndBackTranslation.c_sName, 
+                WndConsultantPreparation.c_sName }))
+            {
                 return;
+            }
 
             OnLeaveSection();
 
@@ -3216,21 +3131,28 @@ namespace OurWord
         #region Cmd: cmdJobDrafting
         private void cmdJobDrafting(Object sender, EventArgs e)
 		{
-            MainWindow = WndDrafting;
+            SetCurrentLayout(WndDrafting.c_sName);
             G.URStack.Clear();
 		}
 		#endregion
 		#region Cmd: cmdJobBackTranslation
         private void cmdJobBackTranslation(Object sender, EventArgs e)
 		{
-            MainWindow = WndBackTranslation;
+            SetCurrentLayout(WndBackTranslation.c_sName);
             G.URStack.Clear();
         }
 		#endregion
         #region Cmd: cmdJobNaturalness
         private void cmdJobNaturalness(Object sender, EventArgs e)
         {
-            MainWindow = WndNaturalness;
+            SetCurrentLayout(WndNaturalness.c_sName);
+            G.URStack.Clear();
+        }
+        #endregion
+        #region Cmd: cmdJobConsultantPreparation
+        private void cmdJobConsultantPreparation(object sender, EventArgs e)
+        {
+            SetCurrentLayout(WndConsultantPreparation.c_sName);
             G.URStack.Clear();
         }
         #endregion
@@ -3580,7 +3502,7 @@ namespace OurWord
 
             // If the Main Window is not focused, then we don't have a
             // context for inserting notes.
-            var window = G.App.MainWindow;
+            var window = G.App.CurrentLayout;
             Debug.Assert(null != window);
             if (!window.Focused)
                 return;
@@ -3634,8 +3556,6 @@ namespace OurWord
             }
         }
         #endregion
-
-
         #endregion
     }
 
