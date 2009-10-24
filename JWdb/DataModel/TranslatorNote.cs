@@ -614,12 +614,13 @@ namespace JWdb.DataModel
             }
             set
             {
-
                 SetValue(ref m_nClass, (int)value);
             }
         }
         int m_nClass = (int)NoteClass.General;
         #endregion
+        /*
+        */
         #region BAttr{g/s}: string SelectedText
         public string SelectedText
         {
@@ -713,48 +714,7 @@ namespace JWdb.DataModel
 
         // Classes ---------------------------------------------------------------------------
         public enum NoteClass { General, Exegetical, Consultant, HintForDrafting, History };
-        #region VAttr{g}: string IconResourceForClass
-        public string IconResourceForClass
-        {
-            get
-            {
-                // The note's colors range from Bright to Dim, depending on the Status.
-                // Those that are closed are gray; those assigned to me are Yellow, and
-                // those assigned to anyone on the team are medium brightness. The idea
-                // is to have those which require attention to jump out at the user.
-                string sWho = "_Anyone.ico";
-                if (Status == DMessage.Closed)
-                    sWho = "_Closed.ico";
-                if (Status == DB.UserName)
-                    sWho = "_Me.ico";
 
-                // Determine the icon based on the note's type
-                switch (Class)
-                {
-                    case NoteClass.General:
-                        return "NoteGeneric" + sWho;
-
-                    case NoteClass.Exegetical:
-                        return "NoteExegesis" + sWho;
-
-                    case NoteClass.Consultant:
-                        return "NoteConsultant" + sWho;
-
-                    case NoteClass.HintForDrafting:
-                        if (IsFrontTranslationNote)
-                            return "NoteHint_Me.ico";
-                        return "NoteHint" + sWho;
-
-                    case NoteClass.History:
-                        return "Note_OldVersions.ico";
-
-                    default:
-                        Debug.Assert(false, "Missing Resource for class: " + Class.ToString());
-                        return "NoteGeneric" + sWho;
-                }
-            }
-        }
-        #endregion
         #region VAttr{g}: bool IsGeneralNote
         public bool IsGeneralNote
         {
@@ -773,6 +733,7 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        /*
         #region VAttr{g}: bool IsConsultantNote
         public bool IsConsultantNote
         {
@@ -782,6 +743,7 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+        */
         #region VAttr{g}: bool IsHintForDraftingNote
         public bool IsHintForDraftingNote
         {
@@ -800,6 +762,213 @@ namespace JWdb.DataModel
             }
         }
         #endregion
+
+        #region Attr{g/s}: BehaviorBase Behavior
+        public BehaviorBase Behavior
+        {
+            get
+            {
+                Debug.Assert(null != m_Behavior);
+                return m_Behavior;
+            }
+            set
+            {
+                Debug.Assert(null != value);
+                m_Behavior = value;
+            }
+        }
+        BehaviorBase m_Behavior;
+        #endregion
+        public class BehaviorBase
+        {
+            #region VirtAttr{g}: string Name
+            virtual public string Name
+            {
+                get
+                {
+                    Debug.Assert(false, "Subclass must override the Name attribute");
+                    return "";
+                }
+            }
+            #endregion
+
+            // Icons
+            #region VirtAttr{g}: string IconResourceBaseName
+            virtual protected string IconResourceBaseName
+            {
+                get
+                {
+                    Debug.Assert(false, "Subclass must override the Name attribute");
+                    return "";
+                }
+            }
+            #endregion
+            #region VAttr{g}: string IconResourceAnyone
+            public string IconResourceAnyone
+            {
+                get
+                {
+                    return IconResourceBaseName + "_Anyone.ico";
+                }
+            }
+            #endregion
+            #region VAttr{g}: string IconResourceClosed
+            public string IconResourceClosed
+            {
+                get
+                {
+                    return IconResourceBaseName + "_Closed.ico";
+                }
+            }
+            #endregion
+            #region VAttr{g}: string IconResourceMe
+            public string IconResourceMe
+            {
+                get
+                {
+                    return IconResourceBaseName + "_Me.ico";
+                }
+            }
+            #endregion
+
+            // Useage
+            // Codewords: "Conversation" = editing multiple messages
+            virtual public bool ForConversationWithConsultant
+            {
+                get
+                {
+                    return false;
+                }
+            }
+
+        }
+        public class GeneralBehavior : BehaviorBase
+        {
+            #region OAttr{g}: string Name
+            public override string Name
+            {
+                get
+                {
+                    return "General";
+                }
+            }
+            #endregion
+            #region OAttr{g}: string IconResourceBaseName
+            protected override string IconResourceBaseName
+            {
+                get
+                {
+                    return "NoteGeneric";
+                }
+            }
+            #endregion
+        }
+        public class ExegeticalBehavior : BehaviorBase
+        {
+            #region OAttr{g}: string Name
+            public override string Name
+            {
+                get
+                {
+                    return "Exegetical";
+                }
+            }
+            #endregion
+            #region OAttr{g}: string IconResourceBaseName
+            protected override string IconResourceBaseName
+            {
+                get
+                {
+                    return "NoteExegesis";
+                }
+            }
+            #endregion
+
+            // Useage
+            #region OAttr{g}: bool ForConversationWithConsultant
+            public override bool ForConversationWithConsultant
+            {
+                get
+                {
+                    return true;
+                }
+            }
+            #endregion
+        }
+        public class ConsultantBehavior : BehaviorBase
+        {
+            #region OAttr{g}: string Name
+            public override string Name
+            {
+                get
+                {
+                    return "Consultant";
+                }
+            }
+            #endregion
+            #region OAttr{g}: string IconResourceBaseName
+            protected override string IconResourceBaseName
+            {
+                get
+                {
+                    return "NoteConsultant";
+                }
+            }
+            #endregion
+
+            // Useage
+            #region OAttr{g}: bool ForConversationWithConsultant
+            public override bool ForConversationWithConsultant
+            {
+                get
+                {
+                    return true;
+                }
+            }
+            #endregion
+        }
+        public class HintForDraftingBehavior : BehaviorBase
+        {
+            #region OAttr{g}: string Name
+            public override string Name
+            {
+                get
+                {
+                    return "HintForDrafting";
+                }
+            }
+            #endregion
+            #region OAttr{g}: string IconResourceBaseName
+            protected override string IconResourceBaseName
+            {
+                get
+                {
+                    return "NoteHint";
+                }
+            }
+            #endregion
+        }
+        public class HistoryBehavior : BehaviorBase
+        {
+            #region OAttr{g}: string Name
+            public override string Name
+            {
+                get
+                {
+                    return "History";
+                }
+            }
+            #endregion
+            #region OAttr{g}: string IconResourceBaseName
+            protected override string IconResourceBaseName
+            {
+                get
+                {
+                    return "Note_OldVersions";
+                }
+            }
+            #endregion
+        }
 
         // Virtual Attrs ---------------------------------------------------------------------
         #region VAttr{g/s}: string Status
@@ -999,6 +1168,7 @@ namespace JWdb.DataModel
         {
             // Default is General class
             Class = NoteClass.General;
+            Behavior = new GeneralBehavior();
 
             // Messages, sorted by date
             m_osMessages = new JOwnSeq<DMessage>("Messages", this, false, true);
@@ -1165,18 +1335,22 @@ namespace JWdb.DataModel
             switch (field.Mkr)
             {
                 case "ntHint":
-                    tn.Class = NoteClass.HintForDrafting;
+                    tn.Behavior = new HintForDraftingBehavior();
+ //                   tn.Class = NoteClass.HintForDrafting;
                     break;
                 case "ntBT":
-                    tn.Class = NoteClass.Consultant;
+                    tn.Behavior = new ConsultantBehavior();
+ //                   tn.Class = NoteClass.Consultant;
                     break;
                 case "ntgk":
                 case "nthb":
                 case "ntcn":
-                    tn.Class = NoteClass.Exegetical;
+                    tn.Behavior = new ExegeticalBehavior();
+//                    tn.Class = NoteClass.Exegetical;
                     break;
                 default:
-                    tn.Class = NoteClass.General;
+                    tn.Behavior = new GeneralBehavior();
+//                    tn.Class = NoteClass.General;
                     break;
             }
 
@@ -1586,19 +1760,6 @@ namespace JWdb.DataModel
                 Debug.Assert(0 != Messages.Count);
                 return Messages[Messages.Count - 1];
             }
-        }
-        #endregion
-        #region SMethod: Bitmap GetBitmap(clrBackground)
-        public Bitmap GetBitmap(Color clrBackground)
-        {
-            // Retrieve the bitmap from resources
-            Bitmap bmp = JWU.GetBitmap(IconResourceForClass);
-            Debug.Assert(null != bmp);
-
-            // Set its transparent color to the background color.
-            JWU.ChangeBitmapBackground(bmp, clrBackground);
-
-            return bmp;
         }
         #endregion
 

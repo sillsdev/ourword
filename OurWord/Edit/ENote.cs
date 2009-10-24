@@ -39,23 +39,6 @@ namespace OurWord.Edit
         }
         TranslatorNote m_Note = null;
         #endregion
-        #region Attr{g}: Bitmap Bmp - the note's bitmap
-        Bitmap Bmp
-        {
-            get
-            {
-                // Get this when we first need it. We previously had this in
-                // the constructor; but the problem was that we do not
-                // have access to the Window at the time of construction.
-                if (null == m_bmp)
-                    m_bmp = Note.GetBitmap(Window.BackColor);
-
-                Debug.Assert(null != m_bmp);
-                return m_bmp;
-            }
-        }
-        Bitmap m_bmp = null;
-        #endregion
         #region OAttr{g}: float Width
         public override float Width
         {
@@ -71,22 +54,21 @@ namespace OurWord.Edit
         #endregion
 
         #region Constructor(TranslatorNote)
-        public ENote(TranslatorNote _Note)
+        public ENote(TranslatorNote _Note, Flags _ContextOptions)
             : base(null, "")
         {
             m_Note = _Note;
+
+            // Don't create the ENote for "None" notes
+            Debug.Assert(_ContextOptions != Flags.None);
+            ContextOptions = _ContextOptions;
         }
         #endregion
+
         #region OMethod: void CalculateWidth(Graphics g)
         public override void CalculateWidth(Graphics g)
         {
             // Do-nothing override
-        }
-        #endregion
-        #region Method: void CauseBmpReset()
-        public void CauseBmpReset()
-        {
-            m_bmp = null;
         }
         #endregion
 
@@ -110,6 +92,103 @@ namespace OurWord.Edit
         public override void cmdLeftMouseClick(PointF pt)
         {
             OWToolTip.ToolTip.LaunchToolTipWindow();
+        }
+        #endregion
+
+        // Note Bitmap ----------------------------------------------------------------------
+        #region Attr{g}: Bitmap Bmp - the note's bitmap
+        Bitmap Bmp
+        {
+            get
+            {
+                // Get this when we first need it. We previously had this in the constructor; but the 
+                // problem was that we do not have access to the Window at the time of construction.
+                if (null == m_bmp)
+                    InitializeBitmap();
+
+                Debug.Assert(null != m_bmp);
+                return m_bmp;
+            }
+        }
+        Bitmap m_bmp = null;
+        #endregion
+        #region Method: void InitializeBitmap()
+        public void InitializeBitmap()
+        {
+            // Get the name of the file; this depends on the note and its context
+            string sResource = NoteIconResource;
+
+            // Retrieve the bitmap from resources
+            Bitmap bmp = JWU.GetBitmap(sResource);
+            Debug.Assert(null != bmp);
+
+            // Set its transparent color to the background color.
+            m_bmp = JWU.ChangeBitmapBackground(bmp, Window.BackColor);
+        }
+        #endregion
+        #region VAttr{g}: string NoteIconResource
+        public string NoteIconResource
+        {
+            get
+            {
+                // If DisplayMe is set, it overrides all other logic
+                if (DisplayMeIcon)
+                    return Note.Behavior.IconResourceMe;
+
+                if (Note.Status == DMessage.Closed)
+                    return Note.Behavior.IconResourceClosed;
+
+                if (Note.Status == DB.UserName)
+                    return Note.Behavior.IconResourceMe;
+
+                // Default
+                return Note.Behavior.IconResourceAnyone;
+            }
+        }
+        #endregion
+
+        // View Context ----------------------------------------------------------------------
+        #region Flags enum - UserEditable, FirstMessageOnly, DisplayMeIcon, etc.
+        [Flags]
+        public enum Flags
+        {
+            None = 0,             // Don't display the note
+            UserEditable = 1,     // Display in conversational mode
+            FirstMessageOnly = 2, // Don't display more than one message
+            DisplayMeIcon = 4     // Override to display only Me, not Anyone or Closed
+        };
+        #endregion
+        Flags ContextOptions;
+        #region VAttr{g}: bool UserEditable
+        public bool UserEditable
+        // If T, display all messages in conversational mode; else display just
+        // the first message, non-editable.
+        {
+            get
+            {
+                return ((ContextOptions & Flags.UserEditable) == Flags.UserEditable);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool FirstMessageOnly
+        public bool FirstMessageOnly
+        {
+            get
+            {
+                return ((ContextOptions & Flags.FirstMessageOnly) == Flags.FirstMessageOnly);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool DisplayMeIcon
+        public bool DisplayMeIcon
+        // If T, display the "Me" icon rather than "Anyone" or "Closed", regardless
+        // of the context. (We do this for HintsForDaughters in the Drafting
+        // window, to make sure the user sees the note.)
+        {
+            get
+            {
+                return ((ContextOptions & Flags.DisplayMeIcon) == Flags.DisplayMeIcon);
+            }
         }
         #endregion
 
@@ -549,8 +628,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Pending
-
         // Load, based on Class and Context
         #region Method: bool LoadToolTip_HintFromFront(ToolTipContents)
         bool LoadToolTip_HintFromFront(ToolTipContents wnd)
@@ -677,14 +754,12 @@ namespace OurWord.Edit
             var ws = DB.TargetTranslation.WritingSystemVernacular;
 
             // Note Title
-            var eTitle = build.BuildNoteTitle(null);
+            var eTitle = build.BuildNoteTitle(null, this);
             tip.Contents.Append(eTitle);
 
             // Messages section
             var eMessages = build.BuildMessageList();
             tip.Contents.Append(eMessages);
-
- //           tip.Contents.Append(BuildInteractiveMessageContents(tip, ws));
 
             // Add the toolbar for user actions
             tip.Contents.Append(BuildToolStrip(tip));
@@ -797,8 +872,8 @@ namespace OurWord.Edit
         #endregion
 
         // Build note components -------------------------------------------------------------
-        #region Method: var BuildNoteTitle(sNoteTitle)
-        public OWPara BuildNoteTitle(string sNoteTitle)
+        #region Method: var BuildNoteTitle(sNoteTitle, ENote)
+        public OWPara BuildNoteTitle(string sNoteTitle, ENote enote)
         {
             // We'll build a Basic Text with the title elements
             var dbt = new DBasicText();
@@ -843,10 +918,12 @@ namespace OurWord.Edit
                 dbt.Phrases.AsVector);
 
             // Pre-pend the icon
-            var sIconResource = Note.IconResourceForClass;
-            if (!string.IsNullOrEmpty(sIconResource))
-                pTitle.InsertAt(0, new EIcon(sIconResource));
-
+            if (null != enote)
+            {
+                var sIconResource = enote.NoteIconResource;
+                if (!string.IsNullOrEmpty(sIconResource))
+                    pTitle.InsertAt(0, new EIcon(sIconResource));
+            }
             return pTitle;
         }
         #endregion
@@ -1376,6 +1453,7 @@ namespace OurWord.Edit
             (new ChangeAuthor(G.App.CurrentLayout, note, combo, sNewAuthor, sOriginalAuthor)).Do();
         }
         #endregion
-
     }
+
+
 }

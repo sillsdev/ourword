@@ -713,8 +713,9 @@ namespace OurWord.Edit
                 OWWindow wnd = OurWordMain.App.CurrentLayout;
                 if (null != wnd)
                 {
-                    if (wnd.ShowNoteIcon(note, bShowingBT))
-                        Append(new ENote(note));
+                    var context = wnd.GetNoteContext(note, Options);
+                    if (ENote.Flags.None != context)
+                        Append(new ENote(note, context));
                 }
             }
         }

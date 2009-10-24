@@ -223,10 +223,11 @@ namespace OurWord.Layouts
                 row.GetColumn(0).Append(pVernacular);
 
                 // Back Translation
+                var BTColor = (p.IsUserEditable && !bUseFront) ? EditableBackgroundColor : BackColor;
                 var pBT = BuildParagraph(
                     p,
                     p.Translation.WritingSystemConsultant,
-                    BackColor,
+                    BTColor,
                     GetBTOptions(p, bUseFront));
                 row.GetColumn(1).Append(pBT);
 
@@ -301,36 +302,6 @@ namespace OurWord.Layouts
         #endregion
 
         // Notes -----------------------------------------------------------------------------
-        #region OMethod: bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
-        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
-        {
-            // Front Translation
-            if (note.IsFrontTranslationNote)
-            {
-                // For the back translation, show some kinds of notes
-                if (bShowingBT)
-                {
-                    if (note.IsExegeticalNote)
-                        return true;
-                    if (note.IsConsultantNote)
-                        return true;
-                    if (note.IsHintForDraftingNote)
-                        return true;
-                }
-            }
-
-            // Target Translation
-            if (note.IsTargetTranslationNote)
-            {
-                // For the back translation, show everything
-                if (bShowingBT)
-                    return true;
-            }
-
-            // Some other condition
-            return false;
-        }
-        #endregion
         #region OMethod: void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
         public override void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
         {
@@ -339,5 +310,37 @@ namespace OurWord.Layouts
             btnInsertNote.ShowDropDownArrow = true;
         }
         #endregion
+
+        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        {
+            // Is the containing paragraph displaying the back translation?
+            bool bIsBT = ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) == OWPara.Flags.ShowBackTranslation);
+
+            // In the Target Translation, we display all back translation notes
+            // + editable: conversations desired
+            if (note.IsTargetTranslationNote && bIsBT)
+                return ENote.Flags.UserEditable;
+
+            // In the Front Translation's Back Translation paragraph, we are not interested in general
+            // MTT notes, but rather, notes that the consultant might want to see. But since we're
+            // preparing for the consultant, we permit the user (advisor) to edit these
+            // + editable: conversations desired
+            if (note.IsFrontTranslationNote && bIsBT)
+            {
+                if (note.Behavior.ForConversationWithConsultant)
+                    return ENote.Flags.UserEditable;
+
+//                if (note.IsExegeticalNote)
+//                    return ENote.Flags.UserEditable;
+//                if (note.IsConsultantNote)
+//                    return ENote.Flags.UserEditable;
+                if (note.IsHintForDraftingNote)
+                    return ENote.Flags.UserEditable;
+            }
+
+            return ENote.Flags.None;
+        }
     }
+
+
 }

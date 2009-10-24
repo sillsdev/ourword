@@ -264,19 +264,19 @@ namespace OurWord.Layouts
             base.LineNumberAttrs.Brush = new SolidBrush(clr);
         }
         #endregion
-        #region OMethod: bool ShowNoteIcon(TranslatorNote, bShowingBT)
-        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
+
+        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
         {
-            // Naturalness only deals with the Target Translation
+            // Only display TargetTranslation notes (since the Target is all we're showing)
             if (!note.IsTargetTranslationNote)
-                return false;
+                return ENote.Flags.None;
 
-            // For now, I'm thinking only the General notes
-            if (!note.IsGeneralNote)
-                return false;
+            // Only general notes (interaction is only with the MTT, not the consultant)
+            // + Editable (user action desired)
+            if (note.IsGeneralNote)
+                return ENote.Flags.UserEditable;
 
-            return true;
+            return ENote.Flags.None;
         }
-        #endregion
     }
 }

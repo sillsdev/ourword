@@ -266,12 +266,11 @@ namespace OurWord.Edit
                 Focus();
         }
         #endregion
-        #region VMethod: bool ShowNoteIcon(TranslatorNote note, bShowingBT)
-        public virtual bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
-            // By default we'll indescriminately show them all; and rely on the subclasses to
-            // show a bit more restraint!
+        #region VirtMethod: ENote.Flags GetNoteContext(note, ParagraphFlags)
+        public virtual ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
         {
-            return true;
+            Debug.Assert(false, "Views must override GetNoteContext so that notes will display");
+            return ENote.Flags.None;
         }
         #endregion
 

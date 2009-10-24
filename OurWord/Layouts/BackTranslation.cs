@@ -208,27 +208,6 @@ namespace OurWord.Layouts
             base.LoadData();
         }
         #endregion
-        #region OMethod: bool ShowNoteIcon(TranslatorNote, bShowingBT)
-        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
-        {
-            // In the back translation, show everything in our target translation. But
-            // only show it on the BT side, not the vernacular side
-            if (bShowingBT && note.IsTargetTranslationNote)
-                return true;
-
-            // In the front translation, show Exegetical and Consultant notes
-            if (bShowingBT && note.IsFrontTranslationNote)
-            {
-                if (note.IsExegeticalNote)
-                    return true;
-                if (note.IsConsultantNote)
-                    return true;
-            }
-
-            // But nothing else
-            return false;
-        }
-        #endregion
         #region OMethod: void SetupInsertNoteDropdown(btnInsertNote)
         public override void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
             // For the back translation, we want all types of notes to be visible
@@ -239,6 +218,31 @@ namespace OurWord.Layouts
             btnInsertNote.ShowDropDownArrow = true;
         }
         #endregion
+
+        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        {
+            // In the back translation view, we only want to display notes in back translation 
+            //  paragraphs; if this is a vernacular we don't display the note.
+            if ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) == OWPara.Flags.ShowBackTranslation)
+                return ENote.Flags.None;
+
+            // If its a Target Translation note, we want to see all notes classes
+            // + editable (we expect dialog between, e.g., advisor and consultant)
+            if (note.IsTargetTranslationNote)
+                return ENote.Flags.UserEditable;
+
+            // If its a Front Translation note, we only care about Exegetical and Consultant notes
+            // - not editable; these are for the consultant's information, not for comment
+            if (note.IsFrontTranslationNote)
+            {
+                if (note.IsExegeticalNote)
+                    return ENote.Flags.FirstMessageOnly | ENote.Flags.DisplayMeIcon;
+                if (note.IsConsultantNote)
+                    return ENote.Flags.FirstMessageOnly | ENote.Flags.DisplayMeIcon;
+            }
+
+            return ENote.Flags.None;
+        }
 
     }
 

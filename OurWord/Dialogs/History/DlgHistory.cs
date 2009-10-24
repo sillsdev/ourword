@@ -233,7 +233,7 @@ namespace OurWord.Dialogs
             var build = new BuildToolTip(this, History, WS);
 
             // Title
-            var eTitle = build.BuildNoteTitle(Title);
+            var eTitle = build.BuildNoteTitle(Title, null);
             Contents.Append(eTitle);
 
             // Message List

@@ -28,6 +28,7 @@ using Microsoft.Win32;
 using JWTools;
 using JWdb;
 using JWdb.DataModel;
+using OurWord.Layouts;
 #endregion
 #endregion
 
@@ -470,13 +471,32 @@ namespace OurWord
             // If any problems, report a message
             if (!bSuccess)
             {
-                LocDB.Message("cbtUnsucessful",
-                    "OurWord was unable to completely copy the back translation, due\n" +
-                    "either to differences between the model and the target translations,\n" +
-                    "or because there was already text in the target translation. You will\n" +
-                    "need to copy and paste manually in order to finish the job.",
-                    null,
-                    LocDB.MessageTypes.Info);
+                // If we're not in Consultant Preparation window, we'll want to switch to it
+                bool bMustSwitch = !WLayout.CurrentLayoutIs(WndConsultantPreparation.c_sName);
+
+                if (bMustSwitch)
+                {
+                    LocDB.Message("cbtUnsucessfulSwitching",
+                        "OurWord was unable to completely copy the back translation, due either " +
+                        "to differences between the model and the target translations, or because " +
+                        "there was already text in the target translation.\n\n" +
+                        "OurWord will now swtich to the Consultant Preparation window so that you can" +
+                        "copy and paste mannually in order to finish the job.",
+                        null,
+                        LocDB.MessageTypes.Info);
+                    G.App.SetCurrentLayout(WndConsultantPreparation.c_sName);
+                }
+
+                else
+                {
+                    LocDB.Message("cbtUnsucessful",
+                        "OurWord was unable to completely copy the back translation, due either " +
+                        "to differences between the model and the target translations, or because " +
+                        "there was already text in the target translation. You will need to copy and " +
+                        "paste manually in order to finish the job.",
+                        null,
+                        LocDB.MessageTypes.Info);
+                }
             }
         }
         #endregion

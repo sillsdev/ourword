@@ -2320,7 +2320,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon in case the status is now different
-            ENote.CauseBmpReset();
+            ENote.InitializeBitmap();
             Window.Invalidate();
 
             // Select the new discussion
@@ -2346,7 +2346,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon
-            ENote.CauseBmpReset();
+            ENote.InitializeBitmap();
             Window.Invalidate();
         }
         #endregion
@@ -2741,7 +2741,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon
-            ENote.CauseBmpReset();
+            ENote.InitializeBitmap();
             Window.Invalidate();
         }
         #endregion

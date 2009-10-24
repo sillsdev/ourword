@@ -621,26 +621,23 @@ namespace OurWord.Layouts
         }
         #endregion
 
-        #region OMethod: bool ShowNoteIcon(TranslatorNote, bShowingBT)
-        public override bool ShowNoteIcon(TranslatorNote note, bool bShowingBT)
+        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
         {
-            // Front Translation: only show the HintForDrafting notes
-            if (note.IsFrontTranslationNote)
-            {
-                if (note.IsHintForDraftingNote)
-                    return true;
-            }
+            // Front Translation (which will be the Vernacular by definition) we are only 
+            // interested in HintForDrafting notes. 
+            // - Not editable (info for the MTT)
+            // + Bright icon to draw user's attention
+            if (note.IsFrontTranslationNote && note.IsHintForDraftingNote)
+                return ENote.Flags.DisplayMeIcon | ENote.Flags.FirstMessageOnly;
 
-            // Target Translation: only show the General notes
-            if (note.IsTargetTranslationNote)
-            {
-                if (note.IsGeneralNote)
-                    return true;
-            }
+            // In the Target Translation, just show the General notes (e.g., what's for use by
+            // the MTT, as opposed to stuff for the consultant.)
+            // + Editable (user action desired)
+            if (note.IsTargetTranslationNote && note.IsGeneralNote)
+                return ENote.Flags.None;
 
-            return false;
+            return ENote.Flags.None;
         }
-        #endregion
     }
 
 }
