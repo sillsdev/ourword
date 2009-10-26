@@ -1,5 +1,6 @@
 syntax: glob
 OurWord\Setup\Output/*.exe
+OurWord\Setup\Output\Old/*.exe
 bin
 obj
 _ReSharper.OurWord
