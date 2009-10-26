@@ -605,22 +605,6 @@ namespace JWdb.DataModel
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
-        #region BAttr{g/s}: NoteClass Class
-        public virtual NoteClass Class
-        {
-            get
-            {
-                return (NoteClass)m_nClass;
-            }
-            set
-            {
-                SetValue(ref m_nClass, (int)value);
-            }
-        }
-        int m_nClass = (int)NoteClass.General;
-        #endregion
-        /*
-        */
         #region BAttr{g/s}: string SelectedText
         public string SelectedText
         {
@@ -639,7 +623,6 @@ namespace JWdb.DataModel
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
-            DefineAttr("Class", ref m_nClass);
             DefineAttr("SelectedText", ref m_sSelectedText);
         }
         #endregion
@@ -662,7 +645,7 @@ namespace JWdb.DataModel
             DMessage m = null;
 
             // History notes take a subclass of DMessage
-            if (IsHistoryNote)
+            if (Behavior == History)
                 m = new DEventMessage(utcDate, stage, sDescription);
             else
             {
@@ -678,7 +661,7 @@ namespace JWdb.DataModel
         public DMessage AddMessage(DMessage m)
         {
             // Enforce that History notes have their own special message type
-            if (IsHistoryNote && null == m as DEventMessage)
+            if (Behavior == History && null == m as DEventMessage)
             {
                 Debug.Assert(false, "Attempt to add a DMessage to a History note");
                 return null;
@@ -713,97 +696,79 @@ namespace JWdb.DataModel
         #endregion
 
         // Classes ---------------------------------------------------------------------------
-        public enum NoteClass { General, Exegetical, Consultant, HintForDrafting, History };
-
-        #region VAttr{g}: bool IsGeneralNote
-        public bool IsGeneralNote
+        #region Class: Properties
+        public class Properties
         {
-            get
-            {
-                return (Class == NoteClass.General);
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool IsExegeticalNote
-        public bool IsExegeticalNote
-        {
-            get
-            {
-                return (Class == NoteClass.Exegetical);
-            }
-        }
-        #endregion
-        /*
-        #region VAttr{g}: bool IsConsultantNote
-        public bool IsConsultantNote
-        {
-            get
-            {
-                return (Class == NoteClass.Consultant);
-            }
-        }
-        #endregion
-        */
-        #region VAttr{g}: bool IsHintForDraftingNote
-        public bool IsHintForDraftingNote
-        {
-            get
-            {
-                return (Class == NoteClass.HintForDrafting);
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool IsHistoryNote
-        public bool IsHistoryNote
-        {
-            get
-            {
-                return (Class == NoteClass.History);
-            }
-        }
-        #endregion
-
-        #region Attr{g/s}: BehaviorBase Behavior
-        public BehaviorBase Behavior
-        {
-            get
-            {
-                Debug.Assert(null != m_Behavior);
-                return m_Behavior;
-            }
-            set
-            {
-                Debug.Assert(null != value);
-                m_Behavior = value;
-            }
-        }
-        BehaviorBase m_Behavior;
-        #endregion
-        public class BehaviorBase
-        {
-            #region VirtAttr{g}: string Name
-            virtual public string Name
+            // Attrs
+            #region Attr{g}: string Name
+            public string Name
             {
                 get
                 {
-                    Debug.Assert(false, "Subclass must override the Name attribute");
-                    return "";
+                    return m_sName;
+                }
+            }
+            string m_sName;
+            #endregion
+            #region Attr{g}: string SfmMarker
+            public string SfmMarker
+            {
+                get
+                {
+                    return m_sSfmMarker;
+                }
+            }
+            string m_sSfmMarker;
+            #endregion
+
+            // Writing System
+            #region Attr{g}: bool ConsultantWritingSystem
+            public bool ConsultantWritingSystem
+            {
+                get
+                {
+                    return m_bConsultantWritingSystem;
+                }
+            }
+            bool m_bConsultantWritingSystem;
+            #endregion
+            #region Method: JWritingSystem GetWritingSystem(TranslatorNote note)
+            public JWritingSystem GetWritingSystem(TranslatorNote note)
+            {
+                Debug.Assert(null != note.OwningBook);
+                var translation = note.OwningBook.Translation;
+                Debug.Assert(null != translation);
+                if (ConsultantWritingSystem)
+                    return translation.WritingSystemConsultant;
+                return translation.WritingSystemVernacular;
+            }
+            #endregion
+
+            // Title
+            #region VAttr{g}: string Title
+            public string Title
+            {
+                get
+                {
+                    return Loc.GetString(m_sTitleLocID, m_sTitleEnglishDefault);
                 }
             }
             #endregion
+            string m_sTitleLocID;
+            string m_sTitleEnglishDefault;
 
             // Icons
-            #region VirtAttr{g}: string IconResourceBaseName
-            virtual protected string IconResourceBaseName
+            #region Attr{g}: private string IconResourceBaseName
+            private string IconResourceBaseName
             {
                 get
                 {
-                    Debug.Assert(false, "Subclass must override the Name attribute");
-                    return "";
+                    return m_sIconResourceBaseName;
                 }
             }
+            string m_sIconResourceBaseName;
             #endregion
-            #region VAttr{g}: string IconResourceAnyone
+            #region Attr{g}: string IconResourceAnyone
             public string IconResourceAnyone
             {
                 get
@@ -812,7 +777,7 @@ namespace JWdb.DataModel
                 }
             }
             #endregion
-            #region VAttr{g}: string IconResourceClosed
+            #region Attr{g}: string IconResourceClosed
             public string IconResourceClosed
             {
                 get
@@ -821,7 +786,7 @@ namespace JWdb.DataModel
                 }
             }
             #endregion
-            #region VAttr{g}: string IconResourceMe
+            #region Attr{g}: string IconResourceMe
             public string IconResourceMe
             {
                 get
@@ -831,144 +796,75 @@ namespace JWdb.DataModel
             }
             #endregion
 
-            // Useage
-            // Codewords: "Conversation" = editing multiple messages
-            virtual public bool ForConversationWithConsultant
+            // Scaffolding
+            #region Constructor(sName, sIconResource, sSfn, bIsConsultant, sIdTitle, sEnglishTitle)
+            public Properties(string sName, 
+                string sIconResourceBaseName, 
+                string sSfmMarker, 
+                bool bConsultantWS,
+                string sTitleLocID,
+                string sTitleEnglishDefault)
             {
-                get
-                {
-                    return false;
-                }
-            }
+                m_sName = sName;
+                m_sIconResourceBaseName = sIconResourceBaseName;
+                m_sSfmMarker = sSfmMarker;
+                m_bConsultantWritingSystem = bConsultantWS;
+                m_sTitleLocID = sTitleLocID;
+                m_sTitleEnglishDefault = sTitleEnglishDefault;
 
-        }
-        public class GeneralBehavior : BehaviorBase
-        {
-            #region OAttr{g}: string Name
-            public override string Name
-            {
-                get
-                {
-                    return "General";
-                }
-            }
-            #endregion
-            #region OAttr{g}: string IconResourceBaseName
-            protected override string IconResourceBaseName
-            {
-                get
-                {
-                    return "NoteGeneric";
-                }
-            }
-            #endregion
-        }
-        public class ExegeticalBehavior : BehaviorBase
-        {
-            #region OAttr{g}: string Name
-            public override string Name
-            {
-                get
-                {
-                    return "Exegetical";
-                }
-            }
-            #endregion
-            #region OAttr{g}: string IconResourceBaseName
-            protected override string IconResourceBaseName
-            {
-                get
-                {
-                    return "NoteExegesis";
-                }
+                if (null == m_vProperties)
+                    m_vProperties = new List<Properties>();
+                m_vProperties.Add(this);
             }
             #endregion
 
-            // Useage
-            #region OAttr{g}: bool ForConversationWithConsultant
-            public override bool ForConversationWithConsultant
+            // List of all of our (static) properties
+            static List<Properties> m_vProperties;
+            #region Method: Properties Find(sClass)
+            static public Properties Find(string sClass)
             {
-                get
+                foreach (Properties prop in m_vProperties)
                 {
-                    return true;
+                    if (prop.Name == sClass)
+                        return prop;
                 }
+                Debug.Assert(false, "Property not found: " + sClass);
+                return null;
             }
             #endregion
         }
-        public class ConsultantBehavior : BehaviorBase
+        #endregion
+        #region Attr{g/s}: Properties Behavior
+        public Properties Behavior
         {
-            #region OAttr{g}: string Name
-            public override string Name
+            get
             {
-                get
-                {
-                    return "Consultant";
-                }
+                return m_Behavior;
             }
-            #endregion
-            #region OAttr{g}: string IconResourceBaseName
-            protected override string IconResourceBaseName
+            set
             {
-                get
-                {
-                    return "NoteConsultant";
-                }
+                Debug.Assert(null != value);
+                m_Behavior = value;
             }
-            #endregion
+        }
+        Properties m_Behavior = General;
+        #endregion
+        #region Definitions: General, Exegetical, Consultant, HintForDrafting, History
+        static public Properties General = new Properties("General", "NoteGeneric", 
+            "nt", false, "kGeneralNote", "Note");
 
-            // Useage
-            #region OAttr{g}: bool ForConversationWithConsultant
-            public override bool ForConversationWithConsultant
-            {
-                get
-                {
-                    return true;
-                }
-            }
-            #endregion
-        }
-        public class HintForDraftingBehavior : BehaviorBase
-        {
-            #region OAttr{g}: string Name
-            public override string Name
-            {
-                get
-                {
-                    return "HintForDrafting";
-                }
-            }
-            #endregion
-            #region OAttr{g}: string IconResourceBaseName
-            protected override string IconResourceBaseName
-            {
-                get
-                {
-                    return "NoteHint";
-                }
-            }
-            #endregion
-        }
-        public class HistoryBehavior : BehaviorBase
-        {
-            #region OAttr{g}: string Name
-            public override string Name
-            {
-                get
-                {
-                    return "History";
-                }
-            }
-            #endregion
-            #region OAttr{g}: string IconResourceBaseName
-            protected override string IconResourceBaseName
-            {
-                get
-                {
-                    return "Note_OldVersions";
-                }
-            }
-            #endregion
-        }
+        static public Properties Exegetical = new Properties("Exegetical", "NoteExegesis", 
+            "ntcn", true, "kExegeticalNote", "Exegetical Note");
+
+        static public Properties Consultant = new Properties("Consultant", "NoteConsultant",
+            "ntBT", true, "kConsultantNote", "Consultant Note");
+
+        static public Properties HintForDrafting = new Properties("HintForDrafting", "NoteHint",
+            "ntHint", false, "kDraftingHint", "Drafting Hint");
+
+        static public Properties History = new Properties("History", "Note_OldVersions", 
+            "History", false, "kHistory", "History Note");
+        #endregion
 
         // Virtual Attrs ---------------------------------------------------------------------
         #region VAttr{g/s}: string Status
@@ -985,7 +881,7 @@ namespace JWdb.DataModel
         }
         #endregion
         #region VAttr{g}: DBook OwningBook
-        DBook OwningBook
+        public DBook OwningBook
         {
             get
             {
@@ -1095,44 +991,7 @@ namespace JWdb.DataModel
         }
         #endregion
 
-        // Localized Classsifications --------------------------------------------------------
-        #region SAttr{g}: string ToDo
-        static public string ToDo
-        {
-            get
-            {
-                return Loc.GetNotes("kToDo", "To Do");
-            }
-        }
-        #endregion
-        #region SAttr{g}: string Exegesis
-        static public string Exegesis
-        {
-            get
-            {
-                return Loc.GetNotes("kExegesis", "Exegesis");
-            }
-        }
-        #endregion
-        #region SAttr{g}: string CategoryOldVersion
-        static public string CategoryOldVersion
-        {
-            get
-            {
-                return Loc.GetNoteDefs("kOldVersion", "Old Version");
-            }
-        }
-        #endregion
-        #region SAttr{g}: string DraftingHelp
-        static public string DraftingHelp
-        {
-            get
-            {
-                return Loc.GetNotes("kDraftingHelp", "Drafting Help");
-            }
-        }
-        #endregion
-        // Other Localizations --------------------------------------------------------------
+        // Localizations --------------------------------------------------------------------
         #region SAttr{g}: string MergeAuthor
         static public string MergeAuthor
         {
@@ -1166,9 +1025,8 @@ namespace JWdb.DataModel
         public TranslatorNote()
             : base()
         {
-            // Default is General class
-            Class = NoteClass.General;
-            Behavior = new GeneralBehavior();
+            // Default is General all-purpose note
+            Behavior = General;
 
             // Messages, sorted by date
             m_osMessages = new JOwnSeq<DMessage>("Messages", this, false, true);
@@ -1182,14 +1040,13 @@ namespace JWdb.DataModel
             SelectedText = _sSelectedText;
         }
         #endregion
-        #region Constructor(NoteClass)
-        public TranslatorNote(NoteClass cl)
+        #region Constructor(Properties)
+        public TranslatorNote(Properties _behavior)
             : this()
         {
-            Class = cl;
+            Behavior = _behavior;
         }
         #endregion
-
         #region Method: bool ContentEquals(JObject)
         public override bool ContentEquals(JObject obj)
         {
@@ -1197,7 +1054,7 @@ namespace JWdb.DataModel
             if (null == tn)
                 return false;
 
-            if (tn.Class != Class)
+            if (tn.Behavior != Behavior)
                 return false;
             if (tn.SelectedText != SelectedText)
                 return false;
@@ -1239,7 +1096,7 @@ namespace JWdb.DataModel
         #region Method: TranslatorNote Clone()
         protected void ClonePopulate(TranslatorNote noteNew)
         {
-            noteNew.Class = Class;
+            noteNew.Behavior = Behavior;
             noteNew.SelectedText = SelectedText;
 
             foreach (DMessage m in Messages)
@@ -1261,7 +1118,7 @@ namespace JWdb.DataModel
 
                 // History notes are not owned by a text, so we want to avoid the 
                 // assertion for them.
-                if (IsHistoryNote)
+                if (Behavior == History)
                     return null;
                 Debug.Assert(null != text);
 
@@ -1335,22 +1192,18 @@ namespace JWdb.DataModel
             switch (field.Mkr)
             {
                 case "ntHint":
-                    tn.Behavior = new HintForDraftingBehavior();
- //                   tn.Class = NoteClass.HintForDrafting;
+                    tn.Behavior = HintForDrafting;
                     break;
                 case "ntBT":
-                    tn.Behavior = new ConsultantBehavior();
- //                   tn.Class = NoteClass.Consultant;
+                    tn.Behavior = Consultant;
                     break;
                 case "ntgk":
                 case "nthb":
                 case "ntcn":
-                    tn.Behavior = new ExegeticalBehavior();
-//                    tn.Class = NoteClass.Exegetical;
+                    tn.Behavior = Exegetical;
                     break;
                 default:
-                    tn.Behavior = new GeneralBehavior();
-//                    tn.Class = NoteClass.General;
+                    tn.Behavior = General;
                     break;
             }
 
@@ -1422,21 +1275,8 @@ namespace JWdb.DataModel
             if (Messages[0].Author != sAuthor)
                 return null;
 
-            // Figure out the marker from the category. This is ugly, but it IS going away.
-            string sMkr = "nt";
-            if (Class == NoteClass.HintForDrafting)
-                sMkr = "ntHint";
-            else if (Class == NoteClass.Exegetical)
-                sMkr = "ntcn";
-            else if (Class == NoteClass.Consultant)
-                sMkr = "ntBT";
-            else if (Class == NoteClass.History)
-                sMkr = "History";
-            if (!string.IsNullOrEmpty(SfmMarker))
-                sMkr = SfmMarker;
-
             // Create the note
-            return new SfField(sMkr, Messages[0].Runs[0].ContentsSfmSaveString);
+            return new SfField(Behavior.SfmMarker, Messages[0].Runs[0].ContentsSfmSaveString);
         }
         #endregion
         #region Method: void AddToSfmDB(ScriptureDB DB)
@@ -1541,23 +1381,8 @@ namespace JWdb.DataModel
         class CreateNote
         {
             XmlNode m_nodeNote;
-            
+
             // Methods for retrieving the attributes -----------------------------------------
-            #region Method: NoteClass GetClass()
-            NoteClass GetClass()
-            {
-                var sClass = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrClass, 
-                    NoteClass.General.ToString());
-
-                try
-                {
-                    return (NoteClass)Enum.Parse(typeof(NoteClass), sClass, true);
-                }
-                catch (Exception) { }
-
-                return NoteClass.General;
-            }
-            #endregion
             #region Method: string GetSelectedText()
             string GetSelectedText()
             {
@@ -1629,8 +1454,12 @@ namespace JWdb.DataModel
                 // Create the new note
                 var note = new TranslatorNote();
 
+                // Class (Properties)
+                var sBehavior = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrClass,
+                    TranslatorNote.General.Name);
+                note.Behavior = TranslatorNote.Properties.Find(sBehavior);
+
                 // Attrs
-                note.Class = GetClass();
                 note.SelectedText = GetSelectedText();
 
                 // Messages
@@ -1660,7 +1489,7 @@ namespace JWdb.DataModel
             var nodeNote = oxes.AddNode(nodeParent, c_sTagTranslatorNote);
 
             // Attrs
-            oxes.AddAttr(nodeNote, c_sAttrClass, Class.ToString());
+            oxes.AddAttr(nodeNote, c_sAttrClass, Behavior.Name);
 
             if (!string.IsNullOrEmpty(SelectedText))
                 oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
@@ -1799,7 +1628,7 @@ namespace JWdb.DataModel
 
             if (TheirLastMessageDate.CompareTo(OurLastMessageDate) > 1)
             {
-                Class = Theirs.Class;
+                Behavior = Theirs.Behavior;
                 SelectedText = Theirs.SelectedText;
                 SfmMarker = Theirs.SfmMarker;
             }

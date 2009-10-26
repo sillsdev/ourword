@@ -327,14 +327,11 @@ namespace OurWord.Layouts
             // + editable: conversations desired
             if (note.IsFrontTranslationNote && bIsBT)
             {
-                if (note.Behavior.ForConversationWithConsultant)
+                if (note.Behavior == TranslatorNote.Exegetical)
                     return ENote.Flags.UserEditable;
-
-//                if (note.IsExegeticalNote)
-//                    return ENote.Flags.UserEditable;
-//                if (note.IsConsultantNote)
-//                    return ENote.Flags.UserEditable;
-                if (note.IsHintForDraftingNote)
+                if (note.Behavior == TranslatorNote.Consultant)
+                    return ENote.Flags.UserEditable;
+                if (note.Behavior == TranslatorNote.HintForDrafting)
                     return ENote.Flags.UserEditable;
             }
 

@@ -2326,7 +2326,6 @@ namespace JWdb.DataModel
             // a TranslatorNote indicating the nature of the conflict.
             TranslatorNote note = new TranslatorNote();
             note.SelectedText = GetNoteContext(ContentsAsString, Theirs.ContentsAsString);
-            note.Class = TranslatorNote.NoteClass.General;
 
             // TODO: Assign it to this user? Or, perhaps this should be a merge setting.
             // I guess for now it just stays unassigned.

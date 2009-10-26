@@ -193,6 +193,34 @@ namespace OurWord.Edit
         #endregion
 
         // Tooltip ---------------------------------------------------------------------------
+        #region Method: void LoadToolTip(ToolTipContents)
+        override public void LoadToolTip(ToolTipContents wnd)
+        {
+            var builder = new BuildToolTip(wnd, Note);
+
+            // Title
+            builder.LoadNoteTitle(NoteIconResource);
+
+            if (FirstMessageOnly)
+            {
+                // First message, read-only
+                var pMessage = BuildSingleMessageContents(Note.Behavior.GetWritingSystem(Note),
+                    Note.FirstMessage, DStyleSheet.c_StyleToolTipText);
+                wnd.Contents.Append(pMessage);
+            }
+            else if (UserEditable)
+            {
+                // Messages section
+                wnd.Contents.Append(BuildInteractiveMessageContents(wnd,
+                    Note.Behavior.GetWritingSystem(Note)));
+
+                // Add the toolbar for user actions
+                wnd.Contents.Append(BuildToolStrip(wnd));
+            }
+        }
+        #endregion
+
+        // Tooltip to Deprecate --------------------------------------------------------------
         // AssignStatus within ToolStrip
         #region Cmd: OnAssignStatus - user has responded to the Status dropdown
         public void OnAssignStatus(object sender, EventArgs e)
@@ -478,49 +506,6 @@ namespace OurWord.Edit
         #endregion
 
         // Moved
-        #region Method: var BuildNoteTitle(ws, sNoteTitle, sIconResource)
-        OWPara BuildNoteTitle(JWritingSystem ws, 
-            string sNoteTitle,
-            string sIconResource)
-        {
-            var wnd = OWToolTip.ToolTip.ContentWindow;
-
-            // Basic Text this will go into
-            var dbt = new DBasicText();
-
-            // Note Title if supplied
-            if (!string.IsNullOrEmpty(sNoteTitle))
-            {
-                var pNoteTitle = new DPhrase( DStyleSheet.c_StyleAbbrevBold,
-                    sNoteTitle + DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace);
-                dbt.Phrases.Append(pNoteTitle);
-            }
-
-            // Start with the reference, in italics
-            string sBookRef = Note.GetDisplayableReference() + ":" + DPhrase.c_chInsertionSpace;
-            var pRef = new DPhrase(DStyleSheet.c_StyleAbbrevItalic, sBookRef);
-            dbt.Phrases.Append(pRef);
-
-            // Create a truncated and quote-surrounded version of the selected text
-            string sSelectedText = Note.SelectedText;
-            if (sSelectedText.Length > 40)
-                sSelectedText = sSelectedText.Substring(0, 40) + "...";
-            sSelectedText = "\"" + sSelectedText + "\"";
-            var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
-            dbt.Phrases.Append(pSelectedText);
-
-            // Create the paragraph
-            OWPara pTitle = new OWPara(
-                ws,
-                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipHeader),
-                dbt.Phrases.AsVector);
-
-            // Pre-pend the icon
-            pTitle.InsertAt(0, new EIcon(sIconResource));
-
-            return pTitle;
-        }
-        #endregion
         #region Method: EItem BuildMessageTitle(OWWindow tip, JWritingSystem ws, DMessage message)
         EItem BuildMessageTitle(OWWindow tip, JWritingSystem ws, DMessage message)
         {
@@ -628,162 +613,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // Load, based on Class and Context
-        #region Method: bool LoadToolTip_HintFromFront(ToolTipContents)
-        bool LoadToolTip_HintFromFront(ToolTipContents wnd)
-        {
-            // Only for Hints from the Front Translation
-            if (Note.IsTargetTranslationNote)
-                return false;
-            if (!Note.IsHintForDraftingNote)
-                return false;
-
-            // The writing system will be the vernacular of rhe front
-            var ws = DB.FrontTranslation.WritingSystemVernacular;
-
-            // The title is be "Drafting Hint."
-            string sTitle = Loc.GetString("kDraftingHint", "Drafting Hint");
-            var pTitle = BuildNoteTitle(ws, sTitle, "NoteHint_Me.ico");
-            wnd.Contents.Append(pTitle);
-
-            // We are only interested in the first paragraph(message), not any subsequent
-            // discussion which the translators in the Front translation might have
-            // conducted.
-            var pMessage = BuildSingleMessageContents(ws, Note.FirstMessage, 
-                DStyleSheet.c_StyleToolTipText);
-            wnd.Contents.Append(pMessage);
-
-            return true;
-        }
-        #endregion
-        #region Method: bool LoadToolTip_HintForDaughter(ToolTipContents)
-        bool LoadToolTip_HintForDaughter(ToolTipContents wnd)
-        {
-            // We only want Hints that are in the Target Translation
-            if (!Note.IsTargetTranslationNote || !Note.IsHintForDraftingNote)
-                return false;
-
-            // The writing system will be the vernacular of rhe target translation
-            var ws = DB.TargetTranslation.WritingSystemVernacular;
-
-            // The title is be "Drafting Hint." 
-            string sTitle = Loc.GetString("kDraftingHint", "Drafting Hint");
-            var pTitle = BuildNoteTitle(ws, sTitle, "NoteHint_Me.ico");
-            wnd.Contents.Append(pTitle);
-
-            // Messages section
-            wnd.Contents.Append(BuildInteractiveMessageContents(wnd, ws));
-
-            // Add the toolbar for user actions
-            wnd.Contents.Append(BuildToolStrip(wnd));
-
-            return true;
-        }
-        #endregion
-        #region Method: bool LoadToolTip_Exegesis(ToolTipContents)
-        bool LoadToolTip_Exegesis(ToolTipContents wnd)
-        {
-            // Only exegesis notes
-            if (!Note.IsExegeticalNote)
-                return false;
-
-            // The writing system is that of the consultant
-            var ws = DB.TargetTranslation.WritingSystemConsultant;
-
-            // The title is "Exegetical Note"
-            string sTitle = Loc.GetString("kExegeticalNote", "Exegetical Note");
-            var pTitle = BuildNoteTitle(ws, sTitle, "NoteExegesis_Me.ico");
-            wnd.Contents.Append(pTitle);
-
-            // Target translation notes have full "response" capability; other notes
-            // just display the first message
-            if (Note.IsTargetTranslationNote)
-            {
-                // Messages section
-                wnd.Contents.Append(BuildInteractiveMessageContents(wnd, ws));
-
-                // Add the toolbar for user actions
-                wnd.Contents.Append(BuildToolStrip(wnd));
-            }
-            else
-            {
-                var pMessage = BuildSingleMessageContents(ws, Note.FirstMessage,
-                   DStyleSheet.c_StyleToolTipText);
-                wnd.Contents.Append(pMessage);
-            }
-
-            return true;
-        }
-        #endregion
-        #region Method: bool LoadToolTip_Consultant(ToolTipContents)
-        bool LoadToolTip_Consultant(ToolTipContents wnd)
-        {
-            // Only exegesis notes
-            if (!Note.IsConsultantNote)
-                return false;
-
-            // The writing system is that of the consultant
-            var ws = DB.TargetTranslation.WritingSystemConsultant;
-
-            // The title is "Consultant Note"
-            string sTitle = Loc.GetString("kConsultantNote", "Consultant Note");
-            var pTitle = BuildNoteTitle(ws, sTitle, "NoteConsultant_Me.ico");
-            wnd.Contents.Append(pTitle);
-
-            // Messages section
-            wnd.Contents.Append(BuildInteractiveMessageContents(wnd, ws));
-
-            // Add the toolbar for user actions
-            wnd.Contents.Append(BuildToolStrip(wnd));
-            return true;
-        }
-        #endregion
-        #region Method: bool LoadToolTip_General(ToolTipContents)
-        bool LoadToolTip_General(ToolTipContents tip)
-        {
-            if (!Note.IsTargetTranslationNote)
-                return false;
-            if (!Note.IsGeneralNote)
-                return false;
-
-            // Tip building class
-            var build = new BuildToolTip(tip, Note,
-                DB.TargetTranslation.WritingSystemVernacular);
-
-            // The writing system will be the vernacular of rhe target
-            var ws = DB.TargetTranslation.WritingSystemVernacular;
-
-            // Note Title
-            var eTitle = build.BuildNoteTitle(null, this);
-            tip.Contents.Append(eTitle);
-
-            // Messages section
-            var eMessages = build.BuildMessageList();
-            tip.Contents.Append(eMessages);
-
-            // Add the toolbar for user actions
-            tip.Contents.Append(BuildToolStrip(tip));
-
-            return true;
-        }
-        #endregion
-        #region Method: void LoadToolTip(ToolTipContents)
-        override public void LoadToolTip(ToolTipContents wnd)
-        {
-            wnd.Contents.Clear();
-
-            if (LoadToolTip_General(wnd))
-                return;
-            if (LoadToolTip_HintFromFront(wnd))
-                return;
-            if (LoadToolTip_HintForDaughter(wnd))
-                return;
-            if (LoadToolTip_Exegesis(wnd))
-                return;
-            if (LoadToolTip_Consultant(wnd))
-                return;
-        }
-        #endregion
+        /*
+        */
 
         // Misc
         #region Method: EToolStrip BuildToolStrip(OWWindow)
@@ -838,17 +669,6 @@ namespace OurWord.Edit
         }
         OWWindow m_wndTip;
         #endregion
-        #region JWritingSystem WS
-        JWritingSystem WS
-        {
-            get
-            {
-                Debug.Assert(null != m_ws);
-                return m_ws;
-            }
-        }
-        JWritingSystem m_ws;
-        #endregion
         #region Attr{g}: TranslatorNote Note
         public TranslatorNote Note
         {
@@ -862,26 +682,27 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(Tip, ws, sIconResource)
-        public BuildToolTip(OWWindow wndTip, TranslatorNote note, JWritingSystem ws)
+        #region Constructor(Tip, note)
+        public BuildToolTip(OWWindow wndTip, TranslatorNote note)
         {
             m_wndTip = wndTip;
-            m_ws = ws;
             m_Note = note;
+
+            Tip.Contents.Clear();
         }
         #endregion
 
         // Build note components -------------------------------------------------------------
-        #region Method: var BuildNoteTitle(sNoteTitle, ENote)
-        public OWPara BuildNoteTitle(string sNoteTitle, ENote enote)
+        #region Method: void LoadNoteTitle(sIconResource)
+        public void LoadNoteTitle(string sIconResource)
         {
-            // We'll build a Basic Text with the title elements
+            // The E classes require a text object for this to go into
             var dbt = new DBasicText();
 
-            // The first part is any Title supplied by the caller
-            if (!string.IsNullOrEmpty(sNoteTitle))
+            // Note Title if supplied (General Notes don't add to the title)
+            if (Note.Behavior != TranslatorNote.General && !string.IsNullOrEmpty(Note.Behavior.Title))
             {
-                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold, sNoteTitle);
+                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold, Note.Behavior.Title);
                 dbt.Phrases.Append(pNoteTitle);
             }
 
@@ -911,26 +732,25 @@ namespace OurWord.Edit
                 dbt.Phrases.Append(pSelectedText);
             }
 
-            // Store this in a the paragraph
+            // Create the paragraph
             OWPara pTitle = new OWPara(
-                WS,
+                Note.Behavior.GetWritingSystem(Note),
                 DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipHeader),
                 dbt.Phrases.AsVector);
 
             // Pre-pend the icon
-            if (null != enote)
-            {
-                var sIconResource = enote.NoteIconResource;
-                if (!string.IsNullOrEmpty(sIconResource))
-                    pTitle.InsertAt(0, new EIcon(sIconResource));
-            }
-            return pTitle;
+            pTitle.InsertAt(0, new EIcon(sIconResource));
+
+            // Load into the window
+            OWToolTip.ToolTip.ContentWindow.Contents.Append(pTitle);
         }
         #endregion
 
         #region Method: EItem BuildMessageTitle(message)
         EItem BuildMessageTitle(DMessage message)
         {
+            var WS = Note.Behavior.GetWritingSystem(Note);
+
             // Header style and font
             var styleHeader = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
             var fontHeader = styleHeader.CharacterStyle.FindOrAddFontForWritingSystem(
@@ -982,6 +802,8 @@ namespace OurWord.Edit
         #region Method: EItem BuildMessageContents(message)
         EItem BuildMessageContents(DMessage message)
         {
+            var WS = Note.Behavior.GetWritingSystem(Note);
+
             // Background color depends on editibility
             var clrBackground = (message.IsEditable) ? Color.White : Color.Cornsilk;
 
@@ -1153,6 +975,8 @@ namespace OurWord.Edit
         #region Method: EItem BuildMessageContents(Event)
         EItem BuildMessageContents(DEventMessage Event)
         {
+            var WS = Note.Behavior.GetWritingSystem(Note);
+
             // Background color depends on editibility
             var clrBackground = (Event.IsEditable) ? Color.White : Color.Cornsilk;
 
@@ -1194,6 +1018,8 @@ namespace OurWord.Edit
         #region Method: EItem BuildMessage(DEventMessage message, bool bDarkBackground)
         public EItem BuildMessage(DEventMessage message, bool bDarkBackground)
         {
+            var WS = Note.Behavior.GetWritingSystem(Note);
+
             // Place the message in a container so that we draw a dividing line below it. 
             // The first message needs one above, too; and some margin to separate it from
             // the title.
@@ -1260,7 +1086,7 @@ namespace OurWord.Edit
                 return;
 
             var history = button.Tag as TranslatorNote;
-            if (null == history || !history.IsHistoryNote)
+            if (null == history || history.Behavior != TranslatorNote.History)
                 return;
 
             // The stage of the new event will be what we used last time
@@ -1290,7 +1116,7 @@ namespace OurWord.Edit
                 return;
 
             var history = button.Tag as TranslatorNote;
-            if (null == history || !history.IsHistoryNote)
+            if (null == history || history.Behavior != TranslatorNote.History)
                 return;
 
             // Can't delete the one remaining event

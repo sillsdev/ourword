@@ -223,23 +223,9 @@ namespace OurWord.Layouts
         {
             // In the back translation view, we only want to display notes in back translation 
             //  paragraphs; if this is a vernacular we don't display the note.
-            if ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) == OWPara.Flags.ShowBackTranslation)
-                return ENote.Flags.None;
-
-            // If its a Target Translation note, we want to see all notes classes
             // + editable (we expect dialog between, e.g., advisor and consultant)
-            if (note.IsTargetTranslationNote)
+            if ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) == OWPara.Flags.ShowBackTranslation)
                 return ENote.Flags.UserEditable;
-
-            // If its a Front Translation note, we only care about Exegetical and Consultant notes
-            // - not editable; these are for the consultant's information, not for comment
-            if (note.IsFrontTranslationNote)
-            {
-                if (note.IsExegeticalNote)
-                    return ENote.Flags.FirstMessageOnly | ENote.Flags.DisplayMeIcon;
-                if (note.IsConsultantNote)
-                    return ENote.Flags.FirstMessageOnly | ENote.Flags.DisplayMeIcon;
-            }
 
             return ENote.Flags.None;
         }

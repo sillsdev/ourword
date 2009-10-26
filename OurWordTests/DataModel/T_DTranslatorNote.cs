@@ -429,7 +429,7 @@ namespace OurWordTests.DataModel
         TranslatorNote CreateTestTranslatorNote()
         {
             TranslatorNote tn = new TranslatorNote("so loved the world");
-            tn.Class = TranslatorNote.NoteClass.General;
+            tn.Behavior = TranslatorNote.General;
             tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), "Sandra",
                 "Check exegesis here."));
             tn.Messages.Append(new DMessage("Sandra", new DateTime(2008, 11, 3), DMessage.Closed,
@@ -452,14 +452,14 @@ namespace OurWordTests.DataModel
         {
             // Set up a Translator Note
             TranslatorNote tn1 = new TranslatorNote("so loved the world");
-            tn1.Class = TranslatorNote.NoteClass.General;
+            tn1.Behavior = TranslatorNote.General;
             tn1.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), "David",
                     "Check exegesis here."));
 
             // Set up a duplicate
             TranslatorNote tn2 = new TranslatorNote("so loved the world");
-            tn2.Class = TranslatorNote.NoteClass.General;
+            tn2.Behavior = TranslatorNote.General;
             tn2.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), "David",
                     "Check exegesis here."));
@@ -467,10 +467,10 @@ namespace OurWordTests.DataModel
             // Equality
             Assert.IsTrue(tn1.ContentEquals(tn2));
 
-            // Category differs
-            tn2.Class = TranslatorNote.NoteClass.Exegetical;
+            // Behavior differs
+            tn2.Behavior = TranslatorNote.Exegetical;
             Assert.IsFalse(tn1.ContentEquals(tn2));
-            tn2.Class = tn1.Class;
+            tn2.Behavior = tn1.Behavior;
 
             // AssignedTo differs
             tn2.Status = "Sandra";
@@ -608,7 +608,7 @@ namespace OurWordTests.DataModel
 
             Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
             Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
-            Assert.AreEqual(TranslatorNote.NoteClass.General, tn.Class);
+            Assert.AreEqual(TranslatorNote.General.Name, tn.Behavior.Name);
             Assert.AreEqual("nt", tn.SfmMarker);
         }
         #endregion
@@ -622,7 +622,7 @@ namespace OurWordTests.DataModel
 
             Assert.AreEqual(sNoteText, tn.Messages[0].SimpleText);
             Assert.AreEqual("Unknown Author", tn.Messages[0].Author);
-            Assert.AreEqual(TranslatorNote.NoteClass.General, tn.Class);
+            Assert.AreEqual(TranslatorNote.General.Name, tn.Behavior.Name);
             Assert.AreEqual("ntck", tn.SfmMarker);
         }
         #endregion
@@ -678,7 +678,7 @@ namespace OurWordTests.DataModel
         [Test] public void MessagesAreSorted()
         {
             // Add events, but out of date order
-            var history = new TranslatorNote(TranslatorNote.NoteClass.History);
+            var history = new TranslatorNote(TranslatorNote.History);
             history.AddMessage(new DateTime(2005, 3, 8), 
                 DB.TeamSettings.Stages.Draft, 
                 "Drafted by John");
@@ -704,7 +704,7 @@ namespace OurWordTests.DataModel
             DateTime d3 = new DateTime(2000, 1, 3);
 
             // Build a 3-event history
-            var history = new TranslatorNote(TranslatorNote.NoteClass.History);
+            var history = new TranslatorNote(TranslatorNote.History);
             history.AddMessage(new DateTime(2005, 3, 8), 
                 DB.TeamSettings.Stages.Draft, 
                 "Drafted by John").UtcCreated = d1;
@@ -732,7 +732,7 @@ namespace OurWordTests.DataModel
                 f.Data);
 
             // Now bring it back in and see what we have
-            var historyNew = new TranslatorNote(TranslatorNote.NoteClass.History);
+            var historyNew = new TranslatorNote(TranslatorNote.History);
             historyNew.ReadOldHistory(f);
 
             Assert.AreEqual(3, historyNew.Messages.Count);
@@ -745,7 +745,7 @@ namespace OurWordTests.DataModel
         [Test] public void MergeHistory()
         {
             // Build a 3-event parent
-            var Parent = new TranslatorNote(TranslatorNote.NoteClass.History);
+            var Parent = new TranslatorNote(TranslatorNote.History);
             Parent.AddMessage(new DateTime(2005, 3, 8), 
                 DB.TeamSettings.Stages.Draft, 
                 "Drafted by John").UtcCreated = new DateTime(2000, 1, 1);

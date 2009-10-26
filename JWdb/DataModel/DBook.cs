@@ -161,7 +161,7 @@ namespace JWdb.DataModel
                 // An unload calls Clear; but we want to always make sure we have
                 // an object here for any future load.
                 if (null == j_ownHistory.Value)
-                    j_ownHistory.Value = new TranslatorNote(TranslatorNote.NoteClass.History);
+                    j_ownHistory.Value = new TranslatorNote(TranslatorNote.History);
 
                 return j_ownHistory.Value;
             }
@@ -533,7 +533,7 @@ namespace JWdb.DataModel
 
             // Book History
             j_ownHistory = new JOwn<TranslatorNote>("History", this);
-            History = new TranslatorNote(TranslatorNote.NoteClass.History);
+            History = new TranslatorNote(TranslatorNote.History);
 
             // Book Statistics
             m_BookStats = new Statistics(this);
@@ -1603,7 +1603,7 @@ namespace JWdb.DataModel
                     var history = TranslatorNote.Create(child);
                     if (null != history)
                     {
-                        if (!history.IsHistoryNote)
+                        if (history.Behavior != TranslatorNote.History)
                         {
                             throw new XmlDocException(child,
                                 "A non-History Annotation was encountered at the top level of the book.");

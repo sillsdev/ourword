@@ -127,6 +127,8 @@ namespace OurWord
         {
             get
             {
+                if (null == CurrentLayout)
+                    return null;
                 if (CurrentLayout.Focused)
                     return CurrentLayout;
                 return SideWindows.FocusedWindow;
@@ -3522,22 +3524,11 @@ namespace OurWord
             }
 
             // Get the Class of note from the Tag
-            var eClass = TranslatorNote.NoteClass.General;
-            try
-            {
-                var sClass = (string)uiItem.Tag;
-                if (!string.IsNullOrEmpty(sClass))
-                {
-                    eClass = (TranslatorNote.NoteClass)Enum.Parse(
-                        typeof(TranslatorNote.NoteClass), sClass, true);
-                }
-            }
-            catch (Exception)
-            {
-            }
+            var sClass = (string)uiItem.Tag;
+            var properties = TranslatorNote.Properties.Find(sClass);
 
             // Perform the undoable action
-            var action = new InsertNoteAction(window, eClass);
+            var action = new InsertNoteAction(window, properties);
             action.Do();
 
             // Launch the tooltip window for the new note

@@ -232,7 +232,7 @@ namespace JWdb.DataModel
                 // An unload calls Clear; but we want to always make sure we have
                 // an object here for any future load.
                 if (null == j_ownHistory.Value)
-                    j_ownHistory.Value = new TranslatorNote(TranslatorNote.NoteClass.History);
+                    j_ownHistory.Value = new TranslatorNote(TranslatorNote.History);
 
                 return j_ownHistory.Value;
             }
@@ -545,7 +545,7 @@ namespace JWdb.DataModel
 
             // Section History
             j_ownHistory = new JOwn<TranslatorNote>("History", this);
-            History = new TranslatorNote(TranslatorNote.NoteClass.History);
+            History = new TranslatorNote(TranslatorNote.History);
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -3004,7 +3004,7 @@ namespace JWdb.DataModel
                     // Create our note
                     TranslatorNote note = new TranslatorNote();
                     note.SelectedText = TranslatorNote.MergeAuthor;
-                    note.Class = TranslatorNote.NoteClass.General;
+                    note.Behavior = TranslatorNote.General;
                     string sMessage = Loc.GetString("kStructureConflictInMerge",
                         "This section's paragraphing was changed by more than one user. " +
                         "We kept one; you'll need to look at Mercurial's history to see " +
@@ -3338,7 +3338,6 @@ namespace JWdb.DataModel
                     if (null == reference)
                         continue;
                     note.SelectedText = itemx.Context;
-                    note.Class = TranslatorNote.NoteClass.General;
                     var message = new DMessage(
                         TranslatorNote.MergeAuthor,
                         DateTime.UtcNow,

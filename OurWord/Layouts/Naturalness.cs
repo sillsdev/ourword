@@ -273,7 +273,7 @@ namespace OurWord.Layouts
 
             // Only general notes (interaction is only with the MTT, not the consultant)
             // + Editable (user action desired)
-            if (note.IsGeneralNote)
+            if (note.Behavior == TranslatorNote.General)
                 return ENote.Flags.UserEditable;
 
             return ENote.Flags.None;

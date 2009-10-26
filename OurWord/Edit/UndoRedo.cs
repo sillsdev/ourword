@@ -2457,22 +2457,22 @@ namespace OurWord.Edit
         }
         TranslatorNote m_Note;
         #endregion
-        #region Attr{g}: TranslatorNote.NoteClass NoteClass
-        TranslatorNote.NoteClass NoteClass
+        #region Attr{g}: TranslatorNote.Properties Behavior
+        TranslatorNote.Properties Behavior
         {
             get
             {
-                return m_eNoteClass;
+                return m_Behavior;
             }
         }
-        TranslatorNote.NoteClass m_eNoteClass = TranslatorNote.NoteClass.General;
+        TranslatorNote.Properties m_Behavior;
         #endregion
 
-        #region Constructor(OWWindow)
-        public InsertNoteAction(OWWindow window, TranslatorNote.NoteClass eClass)
+        #region Constructor(OWWindow, Properties)
+        public InsertNoteAction(OWWindow window, TranslatorNote.Properties _Behavior)
             : base(window, "Insert Translator Note")
         {
-            m_eNoteClass = eClass;
+            m_Behavior = _Behavior;
         }
         #endregion
 
@@ -2490,7 +2490,7 @@ namespace OurWord.Edit
 
             // Create a blank note and insert it
             m_Note = new TranslatorNote(G.App.CurrentLayout.Selection.SelectionString);
-            Note.Class = NoteClass;
+            Note.Behavior = Behavior;
             Note.Messages.Append(new DMessage());
             Note.Status = DMessage.Anyone;
             text.TranslatorNotes.Append(Note);

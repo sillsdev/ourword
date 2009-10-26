@@ -627,14 +627,14 @@ namespace OurWord.Layouts
             // interested in HintForDrafting notes. 
             // - Not editable (info for the MTT)
             // + Bright icon to draw user's attention
-            if (note.IsFrontTranslationNote && note.IsHintForDraftingNote)
+            if (note.IsFrontTranslationNote && note.Behavior == TranslatorNote.HintForDrafting)
                 return ENote.Flags.DisplayMeIcon | ENote.Flags.FirstMessageOnly;
 
             // In the Target Translation, just show the General notes (e.g., what's for use by
             // the MTT, as opposed to stuff for the consultant.)
             // + Editable (user action desired)
-            if (note.IsTargetTranslationNote && note.IsGeneralNote)
-                return ENote.Flags.None;
+            if (note.IsTargetTranslationNote && note.Behavior == TranslatorNote.General)
+                return ENote.Flags.UserEditable;
 
             return ENote.Flags.None;
         }

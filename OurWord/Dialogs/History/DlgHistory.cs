@@ -214,9 +214,6 @@ namespace OurWord.Dialogs
         #region OMethod: void LoadData()
         public override void LoadData()
         {
-            // Start with an empty window
-            Clear();
-
             // If this note has an empty message from before, delete it, because we want
             // to create a new one with today's date
             if (History.Messages.Count == 1 && string.IsNullOrEmpty(History.Messages[0].SimpleText))
@@ -230,11 +227,10 @@ namespace OurWord.Dialogs
             }
 
             // Builder helper class
-            var build = new BuildToolTip(this, History, WS);
+            var build = new BuildToolTip(this, History);
 
             // Title
-            var eTitle = build.BuildNoteTitle(Title, null);
-            Contents.Append(eTitle);
+            build.LoadNoteTitle(null);
 
             // Message List
             bool bDarkBackground = true;
