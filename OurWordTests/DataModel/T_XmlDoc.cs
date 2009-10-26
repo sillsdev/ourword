@@ -92,15 +92,15 @@ namespace OurWordTests.DataModel
                 "CBBB"
             };
 
-            for (int i = 0; i < vN.Length; i++)
+            for (var i = 0; i < vN.Length; i++)
             {
                 // Convert the integer to the string ID
-                string s = XmlDoc.IntToID( vN[i] );
+                var s = XmlDoc.IntToID( vN[i] );
                 Assert.AreEqual(vS[i], s, 
                     "N=" + vN[i].ToString() + " --should convert to-- S=\"" +vS[i] + "\"");
 
                 // Convert the resultant string ID back to the original integer
-                int n = XmlDoc.IdToInt(vS[i]);
+                var n = XmlDoc.IdToInt(vS[i]);
                 Assert.AreEqual(vN[i], n, 
                     "S=\"" + vS[i] + "\" --should convert to-- N=" + vN[i].ToString());
             }

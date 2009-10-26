@@ -27,7 +27,7 @@ using JWdb;
 
 // TODO: Do we want a Context for the vernacular, and another for the BT? Thus different things
 // would potentially show in each view; or alternatively, if no context we could decide to
-// not show the note in that particular view? Currently, the Context is not really all that
+// not show the annotation in that particular view? Currently, the Context is not really all that
 // meaningful, in that we don't highlight it in the text. But when we do, we'll regret contexts
 // that don't work for us.
 
@@ -708,7 +708,7 @@ namespace JWdb.DataModel
                     return m_sName;
                 }
             }
-            string m_sName;
+            readonly string m_sName;
             #endregion
             #region Attr{g}: string SfmMarker
             public string SfmMarker
@@ -718,7 +718,7 @@ namespace JWdb.DataModel
                     return m_sSfmMarker;
                 }
             }
-            string m_sSfmMarker;
+            readonly string m_sSfmMarker;
             #endregion
 
             // Writing System
@@ -730,7 +730,7 @@ namespace JWdb.DataModel
                     return m_bConsultantWritingSystem;
                 }
             }
-            bool m_bConsultantWritingSystem;
+            readonly bool m_bConsultantWritingSystem;
             #endregion
             #region Method: JWritingSystem GetWritingSystem(TranslatorNote note)
             public JWritingSystem GetWritingSystem(TranslatorNote note)
@@ -754,8 +754,8 @@ namespace JWdb.DataModel
                 }
             }
             #endregion
-            string m_sTitleLocID;
-            string m_sTitleEnglishDefault;
+            readonly string m_sTitleLocID;
+            readonly string m_sTitleEnglishDefault;
 
             // Icons
             #region Attr{g}: private string IconResourceBaseName
@@ -766,7 +766,7 @@ namespace JWdb.DataModel
                     return m_sIconResourceBaseName;
                 }
             }
-            string m_sIconResourceBaseName;
+            readonly string m_sIconResourceBaseName;
             #endregion
             #region Attr{g}: string IconResourceAnyone
             public string IconResourceAnyone
@@ -812,24 +812,24 @@ namespace JWdb.DataModel
                 m_sTitleLocID = sTitleLocID;
                 m_sTitleEnglishDefault = sTitleEnglishDefault;
 
-                if (null == m_vProperties)
-                    m_vProperties = new List<Properties>();
-                m_vProperties.Add(this);
+                if (null == s_vProperties)
+                    s_vProperties = new List<Properties>();
+                s_vProperties.Add(this);
             }
             #endregion
 
             // List of all of our (static) properties
-            static List<Properties> m_vProperties;
+            static List<Properties> s_vProperties;
             #region Method: Properties Find(sClass)
             static public Properties Find(string sClass)
             {
-                foreach (Properties prop in m_vProperties)
+                foreach (var prop in s_vProperties)
                 {
                     if (prop.Name == sClass)
                         return prop;
                 }
                 Debug.Assert(false, "Property not found: " + sClass);
-                return null;
+                return TranslatorNote.General;
             }
             #endregion
         }
@@ -850,20 +850,20 @@ namespace JWdb.DataModel
         Properties m_Behavior = General;
         #endregion
         #region Definitions: General, Exegetical, Consultant, HintForDrafting, History
-        static public Properties General = new Properties("General", "NoteGeneric", 
+        static readonly public Properties General = new Properties("General", "NoteGeneric", 
             "nt", false, "kGeneralNote", "Note");
 
-        static public Properties Exegetical = new Properties("Exegetical", "NoteExegesis", 
+        static readonly public Properties Exegetical = new Properties("Exegetical", "NoteExegesis", 
             "ntcn", true, "kExegeticalNote", "Exegetical Note");
 
-        static public Properties Consultant = new Properties("Consultant", "NoteConsultant",
+        static readonly public Properties Consultant = new Properties("Consultant", "NoteConsultant",
             "ntBT", true, "kConsultantNote", "Consultant Note");
 
-        static public Properties HintForDrafting = new Properties("HintForDrafting", "NoteHint",
+        static readonly public Properties HintForDrafting = new Properties("HintForDrafting", "NoteHint",
             "ntHint", false, "kDraftingHint", "Drafting Hint");
 
-        static public Properties History = new Properties("History", "Note_OldVersions", 
-            "History", false, "kHistory", "History Note");
+        static readonly public Properties History = new Properties("History", "Note_OldVersions", 
+            "History", false, "kHistory", "History");
         #endregion
 
         // Virtual Attrs ---------------------------------------------------------------------

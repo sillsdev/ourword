@@ -1,4 +1,4 @@
-﻿namespace OurWord.Dialogs
+﻿namespace OurWord.Dialogs.History
 {
     partial class DlgHistory
     {

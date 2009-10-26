@@ -2637,22 +2637,36 @@ namespace OurWord.Edit
         {
             get
             {
-                Debug.Assert(null != m_ENote);
-                return m_ENote;
+                var vParagraphs = G.App.CurrentLayout.Contents.AllParagraphs;
+                foreach (var paragraph in vParagraphs)
+                {
+                    foreach(var item in paragraph.SubItems)
+                    {
+                        var enote = item as ENote;
+                        if (null == enote)
+                            continue;
+
+                        if (enote.Note == Note)
+                            return enote;
+                    }
+                }
+
+                Debug.Assert(false, "View doesn't contain the enote");
+                return null;
             }
         }
-        ENote m_ENote;
         #endregion
         #region VAttr{g}: TranslatorNote Note
         TranslatorNote Note
         {
             get
             {
-                TranslatorNote note = ENote.Note;
-                Debug.Assert(null != note);
-                return note;
+                Debug.Assert(null != m_Note);
+                return m_Note;
             }
         }
+
+	    readonly private TranslatorNote m_Note;
         #endregion
         #region Attr{g}: ToolStripDropDownButton DropDownButton
         public ToolStripDropDownButton DropDownButton
@@ -2688,11 +2702,11 @@ namespace OurWord.Edit
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(OWWindow, ENote, ToolStripMenuItem newPerson)
         public ChangeStatus(OWWindow window, 
-            ENote _ENote,
+            TranslatorNote note,
             ToolStripMenuItem itemNewStatus)
             : base(window, "Assign to")
         {
-            m_ENote = _ENote;
+            m_Note = note;
 
             // Save a pointer to the owning DropDown button which owns this item
             m_DropDownButton = itemNewStatus.OwnerItem as ToolStripDropDownButton;
@@ -2734,7 +2748,7 @@ namespace OurWord.Edit
             }
 
             // Handle the item's tooltip
-            ENote.SetStatusToolTip(DropDownButton);
+            AnnotationTipBuilder.SetStatusToolTip(Note, DropDownButton);
 
             // Reload the Window, and recalculate its display, in order to update the icon
             var wnd = OWToolTip.ToolTip.ContentWindow;
@@ -2742,7 +2756,7 @@ namespace OurWord.Edit
 
             // Update the underlying window's icon
             ENote.InitializeBitmap();
-            Window.Invalidate();
+            G.App.CurrentLayout.Invalidate();
         }
         #endregion
         #region OMethod: bool PerformAction()

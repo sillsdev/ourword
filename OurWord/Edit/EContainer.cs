@@ -1094,7 +1094,7 @@ namespace OurWord.Edit
             {
                 var v = new List<OWPara>();
 
-                foreach (EItem item in SubItems)
+                foreach (var item in SubItems)
                 {
                     if (item as OWPara != null)
                         v.Add(item as OWPara);

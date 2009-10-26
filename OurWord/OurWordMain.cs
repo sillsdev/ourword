@@ -29,6 +29,7 @@ using JWdb.DataModel;
 using OurWord.Edit;
 using OurWord.Layouts;
 using OurWord.Dialogs;
+using OurWord.Dialogs.History;
 using OurWord.SideWnd;
 using OurWord.Utilities;
 #endregion
@@ -1265,6 +1266,7 @@ namespace OurWord
             this.m_btnInsertNote.Name = "m_btnInsertNote";
             this.m_btnInsertNote.ShowDropDownArrow = false;
             this.m_btnInsertNote.Size = new System.Drawing.Size(40, 35);
+            this.m_btnInsertNote.Tag = "General";
             this.m_btnInsertNote.Text = "Insert";
             this.m_btnInsertNote.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.m_btnInsertNote.ToolTipText = "Insert a Translator Note";
@@ -3497,21 +3499,25 @@ namespace OurWord
             // if there are dropdown items that are visible, then we don't want to execute the
             // command; rather, we want the dropdown to take place so that the user can choose
             // which type of note he wants.
-            var btn = sender as ToolStripDropDownButton;
-            if (null != btn && btn.HasDropDownItems)
+            var button = sender as ToolStripDropDownButton;
+            if (null != button && button.HasDropDownItems)
                 return;
-            var uiItem = sender as ToolStripItem;
 
-            // If the Main Window is not focused, then we don't have a
-            // context for inserting notes.
-            var window = G.App.CurrentLayout;
-            Debug.Assert(null != window);
-            if (!window.Focused)
+            // If we're here, we have a bonafide Insert command; either the top-level button
+            // (without dropdowns), or a dropdown itself.
+            var uiItem = sender as ToolStripItem;
+            Debug.Assert(null != uiItem, "cmdInsertNote expects a ToolStripItem");
+            if (null == uiItem)
+                return;
+
+            // If the Main Window is not focused, we don't have a context for inserting.
+            Debug.Assert(null != CurrentLayout);
+            if (!CurrentLayout.Focused)
                 return;
 
             // If we don't have a selection, we inform the user; as we want our notes to be
-            // about someothing (and it gives us a title for our note.)
-            var selection = window.Selection;
+            // about someohing (and it gives us a title for our annotation.)
+            var selection = CurrentLayout.Selection;
             if (null == selection || !selection.IsContentSelection)
             {
                 LocDB.Message(
@@ -3523,16 +3529,16 @@ namespace OurWord
                 return;
             }
 
-            // Get the Class of note from the Tag
+            // Get the Class of annotation from the Tag
             var sClass = (string)uiItem.Tag;
             var properties = TranslatorNote.Properties.Find(sClass);
 
             // Perform the undoable action
-            var action = new InsertNoteAction(window, properties);
+            var action = new InsertNoteAction(CurrentLayout, properties);
             action.Do();
 
-            // Launch the tooltip window for the new note
-            var vParas = window.Contents.AllParagraphs;
+            // Launch the tooltip window for the new annotation
+            var vParas = CurrentLayout.Contents.AllParagraphs;
             foreach (var owp in vParas)
             {
                 foreach (var item in owp.SubItems)
