@@ -18,7 +18,7 @@ using System.Windows.Forms;
 using System.Text;
 using System.IO;
 using JWTools;
-using JWdb;
+using OurWordData;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWord.Edit;

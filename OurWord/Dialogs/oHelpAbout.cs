@@ -23,8 +23,8 @@ using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
 using JWTools;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 #endregion
 
 namespace OurWord

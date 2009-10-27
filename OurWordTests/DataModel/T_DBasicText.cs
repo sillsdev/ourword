@@ -15,8 +15,8 @@ using System.Windows.Forms;
 using NUnit.Framework;
 
 using JWTools;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 
 using OurWord;
 using OurWord.Dialogs;

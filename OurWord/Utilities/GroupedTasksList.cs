@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading;
 
 using JWTools;
-using JWdb;
+using OurWordData;
 using OurWord;
 #endregion
 

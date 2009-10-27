@@ -54,6 +54,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Cellar\T_AutoReplace.cs" />
+    <Compile Include="Cellar\T_JAttr.cs" />
+    <Compile Include="Cellar\T_JObject.cs" />
+    <Compile Include="Cellar\T_JObjectOnDemand.cs" />
+    <Compile Include="Cellar\T_JOwn.cs" />
+    <Compile Include="Cellar\T_JOwnSeq.cs" />
+    <Compile Include="Cellar\T_JRef.cs" />
+    <Compile Include="Cellar\T_JSeq.cs" />
+    <Compile Include="Cellar\T_SfDB.cs" />
+    <Compile Include="Cellar\T_StdFmtTransform.cs" />
+    <Compile Include="Cellar\T_StyleSheet.cs" />
     <Compile Include="DataModel\T_DBookGrouping.cs" />
     <Compile Include="DataModel\T_DBasicText.cs" />
     <Compile Include="DataModel\T_DBook.cs" />
@@ -79,17 +90,6 @@
     <Compile Include="Edit\T_UndoRedo.cs" />
     <Compile Include="Edit\T_OWWindow.cs">
     </Compile>
-    <Compile Include="JWdb\T_AutoReplace.cs" />
-    <Compile Include="JWdb\T_JAttr.cs" />
-    <Compile Include="JWdb\T_JObject.cs" />
-    <Compile Include="JWdb\T_JObjectOnDemand.cs" />
-    <Compile Include="JWdb\T_JOwn.cs" />
-    <Compile Include="JWdb\T_JOwnSeq.cs" />
-    <Compile Include="JWdb\T_JRef.cs" />
-    <Compile Include="JWdb\T_JSeq.cs" />
-    <Compile Include="JWdb\T_SfDB.cs" />
-    <Compile Include="JWdb\T_StdFmtTransform.cs" />
-    <Compile Include="JWdb\T_StyleSheet.cs" />
     <Compile Include="JWTools\T_BackupSystem.cs" />
     <Compile Include="JWTools\T_Localization.cs" />
     <Compile Include="JWTools\T_PathConverter.cs" />
@@ -101,13 +101,13 @@
     <Compile Include="Utilities\T_Repository.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\JWdb\JWdb.csproj">
-      <Project>{CD66A898-A60C-44F7-8731-EAE0E558C639}</Project>
-      <Name>JWdb</Name>
-    </ProjectReference>
     <ProjectReference Include="..\JWTools\JWTools.csproj">
       <Project>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</Project>
       <Name>JWTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OurWordData\OurWordData.csproj">
+      <Project>{12DD196B-D08E-4197-8DC1-AE94307E55B5}</Project>
+      <Name>OurWordData</Name>
     </ProjectReference>
     <ProjectReference Include="..\OurWord\OurWord.csproj">
       <Project>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</Project>

@@ -25,8 +25,8 @@ using System.Text;
 using System.Threading;
 
 using JWTools;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 
 using OurWord.Dialogs;
 #endregion

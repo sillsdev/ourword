@@ -18,8 +18,8 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using JWTools;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 #endregion

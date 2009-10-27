@@ -18,8 +18,8 @@ using System.IO;
 using System.Windows.Forms;
 using System.Text;
 using JWTools;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 #endregion
 
 namespace OurWord.Edit

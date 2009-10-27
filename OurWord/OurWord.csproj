@@ -153,14 +153,13 @@
     <Reference Include="System.Xml">
       <Name>System.XML</Name>
     </Reference>
-    <ProjectReference Include="..\JWdb\JWdb.csproj">
-      <Name>JWdb</Name>
-      <Project>{CD66A898-A60C-44F7-8731-EAE0E558C639}</Project>
-      <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
-    </ProjectReference>
     <ProjectReference Include="..\JWTools\JWTools.csproj">
       <Project>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</Project>
       <Name>JWTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OurWordData\OurWordData.csproj">
+      <Project>{12DD196B-D08E-4197-8DC1-AE94307E55B5}</Project>
+      <Name>OurWordData</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

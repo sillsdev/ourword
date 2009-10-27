@@ -15,7 +15,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Utilities;
 #endregion
 #endregion

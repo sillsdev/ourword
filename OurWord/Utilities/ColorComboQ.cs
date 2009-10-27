@@ -17,9 +17,9 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Layouts;
-using JWdb;
+using OurWordData;
 using JWTools;
 #endregion
 

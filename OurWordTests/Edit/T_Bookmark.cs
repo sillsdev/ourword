@@ -18,15 +18,16 @@ using System.Windows.Forms;
 using NUnit.Framework;
 
 using JWTools;
-using JWdb;
+using OurWordData;
 
 using OurWord;
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
-
 using OurWordTests.DataModel;
+
+using OurWordTests.Cellar;
 #endregion
 
 namespace OurWordTests.Edit

@@ -21,8 +21,8 @@ using System.Text;
 
 using OurWord.Edit;
 using OurWord.Layouts;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 using JWTools;
 #endregion
 #endregion

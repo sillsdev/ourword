@@ -25,9 +25,9 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
-using JWdb;
+using OurWordData;
 using OurWord;
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.SideWnd;

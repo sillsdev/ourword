@@ -17,10 +17,10 @@ using System.Windows.Forms;
 using System.Data;
 using System.IO;
 
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Edit;
 using OurWord.Layouts;
-using JWdb;
+using OurWordData;
 using JWTools;
 #endregion
 #endregion

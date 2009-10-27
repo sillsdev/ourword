@@ -21,9 +21,9 @@ using System.Runtime.InteropServices;
 using System.Threading;
 
 using JWTools;
-using JWdb;
+using OurWordData;
 
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Layouts;
 using OurWord.Dialogs;
 #endregion

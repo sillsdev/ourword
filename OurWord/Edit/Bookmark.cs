@@ -19,8 +19,8 @@ using System.Timers;
 using System.Threading;
 using System.Windows.Forms;
 using JWTools;
-using JWdb;
-using JWdb.DataModel;
+using OurWordData;
+using OurWordData.DataModel;
 using Palaso.UI.WindowsForms.Keyboarding;
 #endregion
 

@@ -19,10 +19,10 @@ using System.Xml;
 using NUnit.Framework;
 
 using JWTools;
-using JWdb;
+using OurWordData;
 
 using OurWord;
-using JWdb.DataModel;
+using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 #endregion

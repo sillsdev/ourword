@@ -1,0 +1,215 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
+  <PropertyGroup>
+    <ProjectType>Local</ProjectType>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{12DD196B-D08E-4197-8DC1-AE94307E55B5}</ProjectGuid>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <AssemblyKeyContainerName>
+    </AssemblyKeyContainerName>
+    <AssemblyName>OurWordData</AssemblyName>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <DefaultClientScript>JScript</DefaultClientScript>
+    <DefaultHTMLPageLayout>Grid</DefaultHTMLPageLayout>
+    <DefaultTargetSchema>IE50</DefaultTargetSchema>
+    <DelaySign>false</DelaySign>
+    <OutputType>Library</OutputType>
+    <RootNamespace>OurWordData</RootNamespace>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <StartupObject>
+    </StartupObject>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>true</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>false</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>full</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <BaseAddress>285212672</BaseAddress>
+    <CheckForOverflowUnderflow>false</CheckForOverflowUnderflow>
+    <ConfigurationOverrideFile>
+    </ConfigurationOverrideFile>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>
+    </DocumentationFile>
+    <DebugSymbols>false</DebugSymbols>
+    <FileAlignment>4096</FileAlignment>
+    <NoStdLib>false</NoStdLib>
+    <NoWarn>
+    </NoWarn>
+    <Optimize>true</Optimize>
+    <RegisterForComInterop>false</RegisterForComInterop>
+    <RemoveIntegerChecks>false</RemoveIntegerChecks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <WarningLevel>4</WarningLevel>
+    <DebugType>none</DebugType>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Chorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\src\Chorus\obj\Debug\Chorus.exe</HintPath>
+    </Reference>
+    <Reference Include="ChorusMerge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\src\ChorusMerge\obj\Debug\ChorusMerge.exe</HintPath>
+    </Reference>
+    <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Palaso.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <Name>System</Name>
+    </Reference>
+    <Reference Include="System.Data">
+      <Name>System.Data</Name>
+    </Reference>
+    <Reference Include="System.Drawing">
+      <Name>System.Drawing</Name>
+    </Reference>
+    <Reference Include="System.Windows.Forms">
+      <Name>System.Windows.Forms</Name>
+    </Reference>
+    <Reference Include="System.Xml">
+      <Name>System.XML</Name>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DataModel\BookInfo.cs" />
+    <Compile Include="DataModel\BookNames.cs" />
+    <Compile Include="DataModel\ClusterInfo.cs" />
+    <Compile Include="DataModel\DB.cs" />
+    <Compile Include="DataModel\DBook.cs" />
+    <Compile Include="DataModel\DBookGrouping.cs" />
+    <Compile Include="DataModel\DFootnote.cs" />
+    <Compile Include="DataModel\DParagraph.cs" />
+    <Compile Include="DataModel\DPicture.cs" />
+    <Compile Include="DataModel\DProject.cs" />
+    <Compile Include="DataModel\DReference.cs" />
+    <Compile Include="DataModel\DRun.cs" />
+    <Compile Include="DataModel\DSection.cs" />
+    <Compile Include="DataModel\DTeamSettings.cs" />
+    <Compile Include="DataModel\DTranslation.cs" />
+    <Compile Include="DataModel\RepairImportBook.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataModel\Repository.cs" />
+    <Compile Include="DataModel\SfMapping.cs" />
+    <Compile Include="DataModel\StdFmtTransform.cs" />
+    <Compile Include="DataModel\SynchronizeProgressDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DataModel\SynchronizeProgressDlg.Designer.cs">
+      <DependentUpon>SynchronizeProgressDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataModel\Stage.cs" />
+    <Compile Include="DataModel\TranslatorNote.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\AutoReplace.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JAttr.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JObject.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JObjectOnDemand.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JOwn.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JOwnSeq.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JRef.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JSeq.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\JStyleSheet.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Cellar\SfDB.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\Diff.cs" />
+    <Compile Include="Tools\Progress.cs" />
+    <EmbeddedResource Include="Cellar\AutoReplace.id-ID.resx">
+      <DependentUpon>AutoReplace.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Cellar\AutoReplace.id.resx">
+      <DependentUpon>AutoReplace.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Cellar\AutoReplace.resx">
+      <DependentUpon>AutoReplace.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataModel\RepairImportBook.resx">
+      <DependentUpon>RepairImportBook.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataModel\SynchronizeProgressDlg.resx">
+      <DependentUpon>SynchronizeProgressDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\JWTools\JWTools.csproj">
+      <Project>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</Project>
+      <Name>JWTools</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
