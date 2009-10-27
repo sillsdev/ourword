@@ -37,7 +37,7 @@ namespace OurWord.Edit
                 return m_Note;
             }
         }
-        TranslatorNote m_Note = null;
+        readonly TranslatorNote m_Note = null;
         #endregion
         #region OAttr{g}: float Width
         public override float Width

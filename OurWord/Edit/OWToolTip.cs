@@ -37,7 +37,7 @@ namespace OurWord.Edit
 
         // Launch Window ---------------------------------------------------------------------
         #region Method: Screen GetScreenContainingPoint(Point pt)
-        Screen GetScreenContainingPoint(Point pt)
+        static Screen GetScreenContainingPoint(Point pt)
         {
             var screen = Screen.PrimaryScreen;
             foreach (var sc in Screen.AllScreens)
@@ -54,7 +54,7 @@ namespace OurWord.Edit
             // the user; otherwise a faulty mouse movement would easily dismiss the window.
             // So we want to move it vertically so that it is within the window.
         {
-            int nOffset = 5;
+            const int nOffset = 5;
 
             var rectToolTipScreenCoords = RectangleToScreen(ClientRectangle);
 
@@ -145,7 +145,7 @@ namespace OurWord.Edit
         #endregion
 
         // Timer -----------------------------------------------------------------------------
-        System.Windows.Forms.Timer m_TooltipTimer;
+        readonly System.Windows.Forms.Timer m_TooltipTimer;
         const int c_nTooltipTimerInterval = 400;
         #region Cmd: OnTooltipTimerTick
         void OnTooltipTimerTick(object sender, EventArgs e)
@@ -227,9 +227,8 @@ namespace OurWord.Edit
             Visible = false;
 
             // Turn on the timer
-            m_TooltipTimer = new System.Windows.Forms.Timer();
-            m_TooltipTimer.Tick += new EventHandler(OnTooltipTimerTick);
-            m_TooltipTimer.Interval = c_nTooltipTimerInterval;
+            m_TooltipTimer = new Timer {Interval = c_nTooltipTimerInterval};
+            m_TooltipTimer.Tick += OnTooltipTimerTick;
             m_TooltipTimer.Start();
         }
         #endregion
@@ -620,7 +619,7 @@ namespace OurWord.Edit
         #region static void SetStatusToolTip(TranslatorNote, ToolStripDropDownButton)
         static public void SetStatusToolTip(TranslatorNote note, ToolStripDropDownButton item)
         {
-            var sTip = "";
+            string sTip;
             if (note.Status == DMessage.Closed)
             {
                 sTip = Loc.GetNotes("btnStatusClosed",
@@ -631,7 +630,7 @@ namespace OurWord.Edit
             {
                 var sBase = Loc.GetNotes("btnStatusOpen",
                     "This note has been assigned to {0}.");
-                sTip = LocDB.Insert(sBase, new string[] { note.Status });
+                sTip = LocDB.Insert(sBase, new[] { note.Status });
             }
             item.ToolTipText = sTip;
         }
@@ -718,7 +717,7 @@ namespace OurWord.Edit
             var bProceed = LocDB.Message(
                 "msgConfirmMessageDeletion",
                 "Are you sure you want to delete the message:\n  {0}?",
-                new string[] { sText },
+                new[] { sText },
                 LocDB.MessageTypes.YN);
             if (!bProceed)
                 return;
@@ -835,7 +834,7 @@ namespace OurWord.Edit
             {
                 var p = new OWPara(writingSystem,
                     styleHeader,
-                    new DPhrase[] { 
+                    new[] { 
                         new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
                         new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
                         new DPhrase( DStyleSheet.c_StyleToolTipText, 
@@ -866,8 +865,8 @@ namespace OurWord.Edit
             ts.Items.Add(new ToolStripLabel("  "));
 
             // Add the date
-            var label = new ToolStripLabel(message.LocalTimeCreated.ToShortDateString());
-            label.Font = fontHeader;
+            var label = new ToolStripLabel(message.LocalTimeCreated.ToShortDateString()) 
+                {Font = fontHeader};
             ts.Items.Add(label);
 
             return eToolstrip;
@@ -899,7 +898,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region OnAuthorTextChanged
-        private void OnAuthorTextChanged(object sender, EventArgs e)
+        private static void OnAuthorTextChanged(object sender, EventArgs e)
         {
             var combo = sender as ToolStripComboBox;
             if (null == combo)
@@ -986,7 +985,7 @@ namespace OurWord.Edit
             ctrlToolstrip.Items.Add(new ToolStripLabel("  "));
 
             // Delete control
-            ctrlToolstrip.Items.Add(BuildDeleteEventButton(Note.LastMessage));
+            ctrlToolstrip.Items.Add(BuildDeleteEventButton());
         }
         #endregion
 
@@ -1037,12 +1036,14 @@ namespace OurWord.Edit
         {
             // Create the button
             var sButtonText = Loc.GetNotes("AddEvent", "Add New");
-            m_btnAddEvent = new ToolStripButton(sButtonText);
-            m_btnAddEvent.Tag = Note;
-            m_btnAddEvent.Image = JWU.GetBitmap("Note_OldVersions.ico");
+            m_btnAddEvent = new ToolStripButton(sButtonText) 
+            {
+                Tag = Note, 
+                Image = JWU.GetBitmap("Note_OldVersions.ico")
+            };
 
             // Command handler
-            m_btnAddEvent.Click += new EventHandler(OnAppendEvent);
+            m_btnAddEvent.Click += OnAppendEvent;
 
             // Normal tooltip
             m_btnAddEvent.ToolTipText = Loc.GetNotes("AddEvent_tip",
@@ -1059,7 +1060,7 @@ namespace OurWord.Edit
         // Delete control
         #region Cmd: OnDeleteEvent
         private void OnDeleteEvent(object sender, EventArgs e)
-        // Since implemented here, not undoable
+            // Since implemented here, not undoable
         {
             var button = sender as ToolStripButton;
             if (null == button)
@@ -1072,36 +1073,38 @@ namespace OurWord.Edit
             // Can't delete the one remaining event
             if (history.Messages.Count < 2)
                 return;
-            var Event = history.LastMessage as DEventMessage;
-            Debug.Assert(null != Event);
+            var message = history.LastMessage as DEventMessage;
+            Debug.Assert(null != message);
 
             // Confirm
-            var sContents = Event.EventDate.ToShortDateString() + " - " +
-                Event.Stage + " - " + Event.SimpleText.Trim();
+            var sContents = message.EventDate.ToShortDateString() + " - " +
+                message.Stage + " - " + message.SimpleText.Trim();
             if (sContents.Length > 60)
                 sContents = sContents.Substring(0, 60) + "...";
             if (!LocDB.Message("kDeleteEvent",
                 "Are you sure you want to delete:\n\n\"{0}\"?",
-                new string[] { sContents },
+                new[] { sContents },
                 LocDB.MessageTypes.YN))
             {
                 return;
             }
 
             // Remove it
-            var bookmark = Tip.CreateBookmark();
             history.RemoveMessage(history.LastMessage);
             Tip.LoadData();
         }
         #endregion
-        #region Method: ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
-        public ToolStripButton BuildDeleteEventButton(JObject objWhatToDelete)
+        #region ToolStripButton BuildDeleteEventButton()
+        private ToolStripButton BuildDeleteEventButton()
         {
             var sButtonText = Loc.GetNotes("DeleteEvent", "Delete...");
-            var button = new ToolStripButton(sButtonText);
-            button.Image = JWU.GetBitmap("Delete.ico");
-            button.Tag = Note;
-            button.Click += new EventHandler(OnDeleteEvent);
+
+            var button = new ToolStripButton(sButtonText)
+            {
+                Image = JWU.GetBitmap("Delete.ico"), 
+                Tag = Note
+            };
+            button.Click += OnDeleteEvent;
 
             // Disable if only one message
             if (Note.Messages.Count < 2)
@@ -1138,7 +1141,7 @@ namespace OurWord.Edit
             var pTitle = new OWPara(
                 Note.Behavior.GetWritingSystem(Note),
                 pStyle,
-                new DPhrase[] { 
+                new[] { 
                     new DPhrase( DStyleSheet.c_StyleToolTipHeader, 
                         message.EventDate.ToShortDateString()),
                     new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
@@ -1149,86 +1152,97 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: ToolStripItem BuildDatePicker(Event)
-        ToolStripItem BuildDatePicker(DEventMessage Event)
+        #region ToolStripItem BuildDatePicker(Event)
+        static ToolStripItem BuildDatePicker(DEventMessage message)
         {
+            if (message == null) throw new ArgumentNullException("message");
+
             // Create a date-time picker
-            var ctrl = new DateTimePicker();
-            ctrl.Format = DateTimePickerFormat.Custom;
-            ctrl.CustomFormat = "yyyy-MM-dd";
-            ctrl.Value = Event.EventDate.ToLocalTime();
-            ctrl.Width = 100;
-            ctrl.ValueChanged += new EventHandler(OnDateChanged);
-            ctrl.Tag = Event;
+            var ctrl = new DateTimePicker
+            {
+                Format = DateTimePickerFormat.Custom,
+                CustomFormat = "yyyy-MM-dd",
+                Value = message.EventDate.ToLocalTime(),
+                Width = 100,
+                Tag = message
+            };
+            ctrl.ValueChanged += OnDateChanged;
 
             // Place it in a control  host
             return new ToolStripControlHost(ctrl);
         }
         #endregion
         #region OnDateChanged
-        private void OnDateChanged(Object sender, EventArgs e)
+        private static void OnDateChanged(Object sender, EventArgs e)
         // Not undoable since implemented here
         {
             var datePicker = (sender as DateTimePicker);
             if (null == datePicker)
                 return;
 
-            var Event = datePicker.Tag as DEventMessage;
-            if (null == Event)
+            var message = datePicker.Tag as DEventMessage;
+            if (null == message)
                 return;
 
             // Update the event's date
-            Event.EventDate = datePicker.Value.ToUniversalTime();
+            message.EventDate = datePicker.Value.ToUniversalTime();
         }
         #endregion
 
-        #region Method: ToolStripItem BuildStageDropdown(Event)
-        ToolStripItem BuildStageDropdown(DEventMessage Event)
+        #region ToolStripItem BuildStageDropdown(message)
+        static ToolStripItem BuildStageDropdown(DEventMessage message)
         {
-            var menuStage = new ToolStripDropDownButton(Event.Stage.LocalizedAbbrev);
+            if (message == null) throw new ArgumentNullException("message");
+
+            var menuStage = new ToolStripDropDownButton(message.Stage.LocalizedAbbrev);
 
             var bCurrentStageFound = false;
             foreach (Stage stage in DB.TeamSettings.Stages)
             {
                 AddStageMenuItem(menuStage,
                     stage.LocalizedAbbrev,
-                    Event,
-                    (Event.Stage == stage));
+                    message,
+                    (message.Stage == stage));
 
-                if (Event.Stage == stage)
+                if (message.Stage == stage)
                     bCurrentStageFound = true;
             }
 
             if (!bCurrentStageFound)
-                AddStageMenuItem(menuStage, Event.Stage.LocalizedAbbrev, Event, true);
+                AddStageMenuItem(menuStage, message.Stage.LocalizedAbbrev, message, true);
 
             return menuStage;
         }
         #endregion
-        #region Method: ToolStripMenuItem AddStageMenuItem(...)
-        ToolStripMenuItem AddStageMenuItem(ToolStripDropDownButton menu,
+        #region void AddStageMenuItem(...)
+        static void AddStageMenuItem(ToolStripDropDownItem menu,
             string sMenuText,
-            DEventMessage Event,
+            DEventMessage message,
             bool bChecked)
         {
-            var item = new ToolStripMenuItem(sMenuText);
-            item.Tag = Event;
-            item.Click += new EventHandler(OnChangeStage);
-            item.Checked = bChecked;
+            if (menu == null) throw new ArgumentNullException("menu");
+            if (string.IsNullOrEmpty(sMenuText)) throw new ArgumentNullException("sMenuText");
+            if (message == null) throw new ArgumentNullException("message");
+
+            var item = new ToolStripMenuItem(sMenuText)
+            {
+                Tag = message, 
+                Checked = bChecked
+            };
+            item.Click += OnChangeStage;
             menu.DropDownItems.Add(item);
-            return item;
         }
         #endregion
         #region OnChangeStage
-        private void OnChangeStage(object sender, EventArgs e)
+        private static void OnChangeStage(object sender, EventArgs e)
         {
             // Get the various entities of interest
             var menuItem = sender as ToolStripMenuItem;
             if (null == menuItem)
                 return;
 
-            var Event = menuItem.Tag as DEventMessage;
-            if (null == Event)
+            var message = menuItem.Tag as DEventMessage;
+            if (null == message)
                 return;
 
             var menu = menuItem.OwnerItem as ToolStripDropDownButton;
@@ -1243,7 +1257,7 @@ namespace OurWord.Edit
                 return;
 
             // Set the event's new stage
-            Event.Stage = stage;
+            message.Stage = stage;
 
             // Update the menu
             foreach (ToolStripMenuItem item in menu.DropDownItems)
