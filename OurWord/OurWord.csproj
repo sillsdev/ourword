@@ -114,12 +114,15 @@
   <ItemGroup>
     <Reference Include="Chorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\chorus\src\Chorus\obj\Debug\Chorus.exe</HintPath>
+      <HintPath>..\..\chorus\chorus\output\Debug\Chorus.exe</HintPath>
     </Reference>
     <Reference Include="ChorusMerge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <ExecutableExtension>.exe</ExecutableExtension>
-      <HintPath>..\..\chorus\src\ChorusMerge\obj\Debug\ChorusMerge.exe</HintPath>
+      <HintPath>..\..\chorus\chorus\output\Debug\ChorusMerge.exe</HintPath>
+    </Reference>
+    <Reference Include="LibChorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\chorus\output\Debug\LibChorus.dll</HintPath>
     </Reference>
     <Reference Include="Palaso.Services, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -277,6 +280,7 @@
     <EmbeddedResource Include="Res\Check.ico" />
     <EmbeddedResource Include="Res\Failure.ico" />
     <EmbeddedResource Include="Res\Delete.ico" />
+    <EmbeddedResource Include="Res\BlueDot.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
       <SubType>Designer</SubType>

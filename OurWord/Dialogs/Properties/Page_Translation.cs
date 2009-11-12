@@ -176,11 +176,11 @@ namespace OurWord.Dialogs
             this.m_radioNewTestament = new System.Windows.Forms.RadioButton();
             this.m_radioAll = new System.Windows.Forms.RadioButton();
             this.m_gridBooks = new System.Windows.Forms.DataGridView();
-            this.m_tabOther = new System.Windows.Forms.TabPage();
-            this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
             this.m_colAbbreviation = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_colBookName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.m_colStage = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.m_tabOther = new System.Windows.Forms.TabPage();
+            this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
             this.m_tabctrlTranslation.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
             this.m_ToolStrip.SuspendLayout();
@@ -413,32 +413,6 @@ namespace OurWord.Dialogs
             this.m_gridBooks.Resize += new System.EventHandler(this.cmdDataGridResized);
             this.m_gridBooks.SelectionChanged += new System.EventHandler(this.cmdGridSelectionChanged);
             // 
-            // m_tabOther
-            // 
-            this.m_tabOther.Controls.Add(this.m_LiterateSettings);
-            this.m_tabOther.Controls.Add(this.m_btnRemoveTranslation);
-            this.m_tabOther.Controls.Add(this.m_lblLanguageName);
-            this.m_tabOther.Controls.Add(this.m_editLanguageName);
-            this.m_tabOther.Location = new System.Drawing.Point(4, 22);
-            this.m_tabOther.Name = "m_tabOther";
-            this.m_tabOther.Padding = new System.Windows.Forms.Padding(3);
-            this.m_tabOther.Size = new System.Drawing.Size(460, 339);
-            this.m_tabOther.TabIndex = 0;
-            this.m_tabOther.Text = "Other";
-            this.m_tabOther.UseVisualStyleBackColor = true;
-            // 
-            // m_LiterateSettings
-            // 
-            this.m_LiterateSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_LiterateSettings.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_LiterateSettings.DontAllowPropertyGrid = false;
-            this.m_LiterateSettings.Location = new System.Drawing.Point(9, 38);
-            this.m_LiterateSettings.Name = "m_LiterateSettings";
-            this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
-            this.m_LiterateSettings.TabIndex = 7;
-            // 
             // m_colAbbreviation
             // 
             dataGridViewCellStyle1.Font = new System.Drawing.Font("Arial", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
@@ -474,6 +448,32 @@ namespace OurWord.Dialogs
             this.m_colStage.Resizable = System.Windows.Forms.DataGridViewTriState.True;
             this.m_colStage.ToolTipText = "E.g., Draft, Revision, Consultant Checked, etc.";
             this.m_colStage.Width = 90;
+            // 
+            // m_tabOther
+            // 
+            this.m_tabOther.Controls.Add(this.m_LiterateSettings);
+            this.m_tabOther.Controls.Add(this.m_btnRemoveTranslation);
+            this.m_tabOther.Controls.Add(this.m_lblLanguageName);
+            this.m_tabOther.Controls.Add(this.m_editLanguageName);
+            this.m_tabOther.Location = new System.Drawing.Point(4, 22);
+            this.m_tabOther.Name = "m_tabOther";
+            this.m_tabOther.Padding = new System.Windows.Forms.Padding(3);
+            this.m_tabOther.Size = new System.Drawing.Size(460, 339);
+            this.m_tabOther.TabIndex = 0;
+            this.m_tabOther.Text = "Other";
+            this.m_tabOther.UseVisualStyleBackColor = true;
+            // 
+            // m_LiterateSettings
+            // 
+            this.m_LiterateSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_LiterateSettings.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.m_LiterateSettings.DontAllowPropertyGrid = false;
+            this.m_LiterateSettings.Location = new System.Drawing.Point(9, 38);
+            this.m_LiterateSettings.Name = "m_LiterateSettings";
+            this.m_LiterateSettings.Size = new System.Drawing.Size(442, 266);
+            this.m_LiterateSettings.TabIndex = 7;
             // 
             // Page_Translation
             // 
@@ -689,28 +689,38 @@ namespace OurWord.Dialogs
             if (m_radioAll.Checked)
             {
                 m_FilterOn = FilterOn.kAll;
-                UpdateFilter();
+                UpdateFilter(SelectedBookAbbrev);
             }
         }
         #endregion
         #region Cmd: cmdFilterOnNT
         private void cmdFilterOnNT(object sender, EventArgs e)
         {
-            if (m_radioNewTestament.Checked)
-            {
-                m_FilterOn = FilterOn.kNT;
-                UpdateFilter();
-            }
+            if (!m_radioNewTestament.Checked) 
+                return;
+
+            m_FilterOn = FilterOn.kNT;
+
+            var sSelectBook = SelectedBookAbbrev;
+            if (!DBook.GetIsNewTestamentBook(SelectedBookAbbrev))
+                sSelectBook = "MAT";
+
+            UpdateFilter(sSelectBook);
         }
         #endregion
         #region Cmd: cmdFilterOnOT
         private void cmdFilterOnOT(object sender, EventArgs e)
         {
-            if (m_radioOldTestament.Checked)
-            {
-                m_FilterOn = FilterOn.kOT;
-                UpdateFilter();
-            }
+            if (!m_radioOldTestament.Checked) 
+                return;
+
+            m_FilterOn = FilterOn.kOT;
+
+            var sSelectBook = SelectedBookAbbrev;
+            if (!DBook.GetIsOldTestamentBook(SelectedBookAbbrev))
+                sSelectBook = "GEN";
+
+            UpdateFilter(sSelectBook);
         }
         #endregion
         #region Cmd: cmdFilterOnStartedBooks
@@ -719,12 +729,17 @@ namespace OurWord.Dialogs
             if (m_radioStartedBooks.Checked)
             {
                 m_FilterOn = FilterOn.kStartedBooks;
-                UpdateFilter();
+
+                string sSelectBook = SelectedBookAbbrev;
+                if (!DBook.GetIsOldTestamentBook(SelectedBookAbbrev))
+                    sSelectBook = null;
+
+                UpdateFilter(sSelectBook);
             }
         }
         #endregion
-        #region Method: void UpdateFilter()
-        void UpdateFilter()
+        #region Method: void UpdateFilter(sBookToSelect)
+        void UpdateFilter(string sBookToSelect)
         {
             m_radioAll.Checked = (m_FilterOn == FilterOn.kAll);
             m_radioNewTestament.Checked = (m_FilterOn == FilterOn.kNT);
@@ -732,13 +747,28 @@ namespace OurWord.Dialogs
             m_radioStartedBooks.Checked = (m_FilterOn == FilterOn.kStartedBooks);
 
             // The grid will apply the filter
-            PopulateGrid(SelectedBookAbbrev, true);
+            PopulateGrid(sBookToSelect, true);
+        }
+        #endregion
+        #region Method: bool GetIsStartedBook(sBookAbbrev)
+        bool GetIsStartedBook(string sBookAbbrev)
+        {
+            if (string.IsNullOrEmpty(sBookAbbrev))
+                return false;
+
+            if (null == DB.TargetTranslation)
+                return false;
+
+            if (null == DB.TargetTranslation.FindBook(SelectedBookAbbrev))
+                return false;
+
+            return true;
         }
         #endregion
 
         // Books Data Grid -------------------------------------------------------------------
         #region VAttr{g}: string Planned
-        string Planned
+        static string Planned
         {
             get
             {
@@ -768,6 +798,7 @@ namespace OurWord.Dialogs
                 if (DB.Project.PlannedBooks.Contains(sBookAbbrev))
                     combo.Value = Planned;
             }
+
         }
         #endregion
         #region Method: DataGridViewRow PopulateRow(int iBook)
@@ -813,26 +844,48 @@ namespace OurWord.Dialogs
             // Clear out whatever was there
 			m_gridBooks.Rows.Clear();
 
-            int iMatthew = 39;
+            // Make sure the requested book will be visible, by changing the filter if necessary;
+            // in which case UpdateFilter will cause PopulateGrid to be called.
+            if (!string.IsNullOrEmpty(sBookAbbrevToSelect))
+            {
+                if (m_FilterOn == FilterOn.kStartedBooks && !GetIsStartedBook(sBookAbbrevToSelect))
+                {
+                    m_FilterOn = (DBook.GetIsNewTestamentBook(sBookAbbrevToSelect)) ? FilterOn.kNT : FilterOn.kOT;
+                    UpdateFilter(sBookAbbrevToSelect);
+                    return;
+                }
+                if (m_FilterOn == FilterOn.kNT && DBook.GetIsOldTestamentBook(sBookAbbrevToSelect))
+                {
+                    m_FilterOn = FilterOn.kOT;
+                    UpdateFilter(sBookAbbrevToSelect);
+                    return;
+                }
+                if (m_FilterOn == FilterOn.kOT && DBook.GetIsNewTestamentBook(sBookAbbrevToSelect))
+                {
+                    m_FilterOn = FilterOn.kNT;
+                    UpdateFilter(sBookAbbrevToSelect);
+                    return;
+                }
+            }
 
 			// One row per book
-			for (int i = 0; i < DBook.BookAbbrevsCount; i++)
+			for (var i = 0; i < DBook.BookAbbrevsCount; i++)
 			{
-				string sBookAbbrev = DBook.BookAbbrevs[i];
+				var sBookAbbrev = DBook.BookAbbrevs[i];
 
 				// If the book exists in the translation, get its stage
-				DBook book = Translation.FindBook(sBookAbbrev);
-				string sStage = ((null == book) ? "" : book.Stage.LocalizedName);
+				var book = Translation.FindBook(sBookAbbrev);
+				var sStage = ((null == book) ? "" : book.Stage.LocalizedName);
 
                 // Apply the Show filter
                 switch (m_FilterOn)
                 {
                     case FilterOn.kNT:
-                        if (i < iMatthew)
+                        if (i < DBook.c_iMatthew)
                             continue;
                         break;
                     case FilterOn.kOT:
-                        if (i >= iMatthew)
+                        if (i >= DBook.c_iMatthew)
                             continue;
                         break;
                     case FilterOn.kStartedBooks:
@@ -868,11 +921,10 @@ namespace OurWord.Dialogs
                 // Find the row in question, and select it
                 foreach (DataGridViewRow row in m_gridBooks.Rows)
                 {
-                    if ((string)row.Tag == value)
-                    {
-                        row.Selected = true;
-                        return;
-                    }
+                    if ((string) row.Tag != value) 
+                        continue;
+                    row.Selected = true;
+                    return;
                 }
             }
         }
@@ -892,14 +944,20 @@ namespace OurWord.Dialogs
         #region Method: void HarvestGridData()
         void HarvestGridData()
         {
+            // The DataGrid does not necessarily commit changes into its cache right away.
+            // In particular, the Stage combo is not commited upon something being selected.
+            // So this command forces any remaining commits to be done, so that we'll see 
+            // them as we harvest.
+            m_gridBooks.CommitEdit(DataGridViewDataErrorContexts.Commit);
+
             foreach (DataGridViewRow row in m_gridBooks.Rows)
             {
-                string sAbbrev = (string)row.Cells[0].Value;
-                string sName = (string)row.Cells[1].Value;
-                string sStage = (string)row.Cells[2].Value;
+                var sAbbrev = (string)row.Cells[0].Value;
+                var sName = (string)row.Cells[1].Value;
+                var sStage = (string)row.Cells[2].Value;
 
                 // Find the book in question
-                int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
+                var iBook = DBook.FindBookAbbrevIndex(sAbbrev);
                 if (-1 == iBook)
                     continue;
                 var book = Translation.FindBook(sAbbrev);
@@ -1173,11 +1231,10 @@ namespace OurWord.Dialogs
 		private void cmdGridSelectionChanged(object sender, EventArgs e)
 		{
 			// From the abbreviation, we can see if the translation defines this book
-            DBook book = Translation.FindBook(SelectedBookAbbrev);
+            var book = Translation.FindBook(SelectedBookAbbrev);
 
 			// Disable/Enable buttons accordingly
 			m_bCreate.Enabled = (book == null);
-			m_bImport.Enabled = (book == null);
 			m_bRemove.Enabled = (book != null);
 			m_bProperties.Enabled = (book != null);
 		}
@@ -1246,13 +1303,12 @@ namespace OurWord.Dialogs
 		{
             // Show the wizard; the user will input the needed information and
             // indicate whether or not to proceed.
-            Dialogs.WizImportBook.WizImportBook wizard =
-                new Dialogs.WizImportBook.WizImportBook(Translation);
+            var wizard = new Dialogs.WizImportBook.WizImportBook(Translation);
             if (DialogResult.OK != wizard.ShowDialog())
                 return;
 
 			// Make sure it isn't already in the translation
-			DBook bookExisting = Translation.FindBook(wizard.BookAbbrev);
+			var bookExisting = Translation.FindBook(wizard.BookAbbrev);
 			if (null != bookExisting)
 			{
 				if (Messages.VerifyReplaceBook())
@@ -1269,7 +1325,7 @@ namespace OurWord.Dialogs
 			}
 
             // Create a book object
-            DBook book = new DBook(wizard.BookAbbrev);
+            var book = new DBook(wizard.BookAbbrev);
 
             // Add it to the translation (we must do this or book.LoadData cannot
             // properly check for errors.)
@@ -1370,7 +1426,6 @@ namespace OurWord.Dialogs
             SelectedBook.Unload(new NullProgress());
         }
         #endregion
-
     }
 
 }

@@ -487,7 +487,7 @@ namespace JWTools
         public void Write(string sPath)
         {
             // Create the directory if it doesn't exist
-            string sFolder = Path.GetDirectoryName(sPath);
+            var sFolder = Path.GetDirectoryName(sPath);
             if (!Directory.Exists(sFolder))
                 Directory.CreateDirectory(sFolder);
 

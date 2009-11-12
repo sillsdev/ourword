@@ -422,65 +422,6 @@ namespace OurWordData
             return this[iIndex].GetObjectFromPath(sPath);
         }
         #endregion
-
-        // Merge -----------------------------------------------------------------------------
-        #region Method: T GetCorresponding(T obj)
-        T GetCorresponding(T obj)
-        {
-            foreach (T t in this)
-            {
-                if (t.SortKey == obj.SortKey)
-                    return t;
-            }
-            return null;
-        }
-        #endregion
-
-        public override void Merge(JAttr Parent, JAttr Theirs, bool bWeWin)
-            // Assumption for now: SortKey is unique (no duplicates), and hasn't changed
-        {
-            JOwnSeq<T> ownParent = Parent as JOwnSeq<T>;
-            JOwnSeq<T> ownTheirs = Theirs as JOwnSeq<T>;
-            Debug.Assert(null != ownParent && null != ownTheirs);
-
-            // Make temporary lists of Theirs, as we'll whittle away at it
-            var vTheirs = new List<T>();
-            foreach (T t in ownTheirs)
-                vTheirs.Add(t);
-
-            // Merge those that correspond; removing them from the temporary lists
-            // as having now been dealt with
-            foreach (T objMine in this)
-            {
-                T objParent = ownParent.GetCorresponding(objMine);
-                T objTheirs = ownTheirs.GetCorresponding(objMine);
-
-                if (null != objParent && null != objTheirs)
-                {
-                    objMine.Merge(objParent, objTheirs, bWeWin);
-                    vTheirs.Remove(objTheirs);
-                }
-            }
-
-            // Scan through the parent list, to find notes in the parent that also
-            // have notes in Theirs. Where these exist, we need to delete them from
-            // Theirs, because they represent notes that we deleted in ours.
-            foreach (T objParent in ownParent)
-            {
-                T objTheirs = ownTheirs.GetCorresponding(objParent);
-                if (null != objTheirs && vTheirs.Contains(objTheirs))
-                    vTheirs.Remove(objTheirs);
-            }
-
-            // Anything remaining in Theirs represents an insertion we need to add.
-            // Easiest thing to do here is just move it over
-            foreach (T objTheirs in vTheirs)
-            {
-                ownTheirs.Remove(objTheirs);
-                if (-1 == Find(objTheirs.SortKey))
-                    Append(objTheirs);
-            }
-        }
     }
 
 	#region TEST

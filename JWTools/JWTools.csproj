@@ -185,6 +185,12 @@
     <Compile Include="Localizer\NewLanguageDlg.Designer.cs">
       <DependentUpon>NewLanguageDlg.cs</DependentUpon>
     </Compile>
+    <Compile Include="EnumeratedStepsProgressDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EnumeratedStepsProgressDlg.Designer.cs">
+      <DependentUpon>EnumeratedStepsProgressDlg.cs</DependentUpon>
+    </Compile>
     <Compile Include="OurWordXmlDocument.cs" />
     <Compile Include="PathConverter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -224,6 +230,9 @@
     <EmbeddedResource Include="Localizer\NewLanguageDlg.resx">
       <SubType>Designer</SubType>
       <DependentUpon>NewLanguageDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="EnumeratedStepsProgressDlg.resx">
+      <DependentUpon>EnumeratedStepsProgressDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>

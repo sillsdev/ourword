@@ -5,36 +5,19 @@
  * Author:  John Wimbish
  * Created: 03 March 2009
  * Purpose: Mercurial connectivity
- * 
- * NOTE: My intention is to use Chorus. But given that I have just over two weeks before
- * introducing this in a language project, and that Chorus isn't ready, I'm going to
- * implement code here and shamelessly steal from Chorus, with the idea that Hatton
- * and I can later reconcile anything new I invent, and obsolete most of this code.
- *    I figure I'll always need a class that OurWord interacts with (which this will be),
- * but the internals of the class will likely eventually just become calls to Chorus.
- * 
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Net.NetworkInformation;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Windows.Forms;
-
+using Chorus.VcsDrivers;
 using JWTools;
-using OurWordData;
-
-using Chorus.merge;
-using Chorus.VcsDrivers.Mercurial;
 using Chorus.sync;
 #endregion
 #endregion
@@ -46,6 +29,117 @@ using Chorus.sync;
 
 namespace OurWordData.DataModel
 {
+    public class SynchronizeIdea
+    {
+        static public void LocalWithRemote(string clusterName, string fullPathToLocal, string fullPathToRemote)
+        {
+            var configuration = BuildConfiguration(fullPathToLocal);
+
+            var synchronizer = Synchronizer.FromProjectConfiguration(configuration,
+                new Chorus.Utilities.ConsoleProgress());
+
+            var remoteAddress = RepositoryAddress.Create(clusterName, fullPathToRemote);
+            remoteAddress.ReadOnly = false;
+            remoteAddress.Enabled = true;
+
+            var options = BuildSyncOptions(remoteAddress, "message");
+
+            var results = synchronizer.SyncNow(options);
+        }
+
+        static void LocalWithLocal(string repositoryName, string fullPathToLocal, string fullPathToOther)
+        {
+            var configuration = BuildConfiguration(fullPathToLocal);
+
+            var synchronizer = Synchronizer.FromProjectConfiguration(configuration,
+                new Chorus.Utilities.ConsoleProgress());
+
+            var otherAddress = RepositoryAddress.Create(repositoryName, fullPathToOther);
+            otherAddress.ReadOnly = false;
+            otherAddress.Enabled = true;
+
+            var options = BuildSyncOptions(otherAddress, "message");
+
+            var results = synchronizer.SyncNow(options);
+        }
+
+        // Major helper methods
+        #region ProjectFolderConfiguration BuildConfiguration(fullPathToLocal)
+        static ProjectFolderConfiguration BuildConfiguration(string fullPathToLocal)
+        {
+            var configuration = new ProjectFolderConfiguration(
+                StripTrailingPathSeparator(fullPathToLocal));
+
+            // Files we will most definitely exclude (name them to be double certain)
+            configuration.ExcludePatterns.Add("/.backup");
+            configuration.ExcludePatterns.Add("**.bak");
+
+            // Files to include
+            configuration.IncludePatterns.Add("**.oxes");
+            configuration.IncludePatterns.Add(".Settings/*.otrans");
+            configuration.IncludePatterns.Add(".Settings/*.owp");
+            configuration.IncludePatterns.Add(".Settings/*.owt");
+
+            return configuration;
+        }
+        #endregion
+        #region string BuildRemoteRepositoryPath(sBaseUrl, sUserName, sPassword)
+        static public string BuildRemoteRepositoryPath(string baseUrl, string userName, string password)
+        {
+            baseUrl = StripLeadingHttp(baseUrl);
+            baseUrl = StripTrailingPathSeparator(baseUrl);
+            return string.Format("http://{0}:{1}@{2}", userName, password, baseUrl);
+        }
+        #endregion
+        #region SyncOptions BuildSyncOptions(address, checkInDescription)
+        static SyncOptions BuildSyncOptions(RepositoryAddress address, string checkInDescription)
+        {
+            var options = new SyncOptions
+            {
+                DoSendToOthers = true, 
+                DoPullFromOthers = true, 
+                DoMergeWithOthers = true,
+                CheckinDescription = checkInDescription
+            };
+
+            options.RepositorySourcesToTry.Clear();
+            options.RepositorySourcesToTry.Add(address);
+
+            return options;
+        }
+        #endregion
+
+        // Minor helper methods
+        #region static string StripTrailingPathSeparator(sPath)
+        static public string StripTrailingPathSeparator(string sPath)
+            // Some (all?) Mercurial commands fail if there is a trailing path separator
+        {
+            if (string.IsNullOrEmpty(sPath))
+                return sPath;
+
+            // Check not only for the generic DirectorySeparatorChar, but also for stuff
+            // the user might have hardcoded irregardless of which OS was running.
+            char ch = sPath[sPath.Length - 1];
+            if (ch == Path.DirectorySeparatorChar || ch == '\\' || ch == '/')
+                sPath = sPath.Substring(0, sPath.Length - 1);
+
+            return sPath;
+        }
+        #endregion
+        #region static public string StripLeadingHttp(sUrl)
+        static public string StripLeadingHttp(string sUrl)
+        // In case user typed this, we remove it
+        {
+            if (string.IsNullOrEmpty(sUrl))
+                return sUrl;
+
+            return sUrl.Replace("http://", "");
+        }
+        #endregion
+
+    }
+
+
     public class Repository
     {
         // Attrs -----------------------------------------------------------------------------
@@ -200,9 +294,10 @@ namespace OurWordData.DataModel
 
         // Supporting Methods ----------------------------------------------------------------
         #region SMethod: string SurroundWithQuotes(string s)
-        static string SurroundWithQuotes(string sIn)
+        static public string SurroundWithQuotes(string sIn)
         {
-            // We need to remove any existing quotes we might have
+            // We need to remove any existing quotes we might have, thus this can be called
+            // on paths that already are surrounded by quotes.
             string sOut = "";
             foreach (char ch in sIn)
             {
@@ -366,7 +461,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region SMethod: ExecutionResult Execute(string sHgCommand, string sWorkingDir)
-        static ExecutionResult Execute(string sHgCommand, string sWorkingDir)
+        static public ExecutionResult Execute(string sHgCommand, string sWorkingDir)
         {
             // Initialize the process
             Process p = new Process();
@@ -818,8 +913,8 @@ namespace OurWordData.DataModel
                 Directory.CreateDirectory(HgRepositoryRoot);
 
             // This will create an ".Hg" directory under the Cluster
-            ExecutionResult result = Execute(c_sInit);
-            bool bSuccess = ((result.ExitCode == 0) ? true : false );
+            var result = Execute(c_sInit);
+            var bSuccess = ((result.ExitCode == 0) ? true : false );
 
             // Create the list of files to ignore; make that our first commit
             if (bSuccess)
@@ -835,7 +930,7 @@ namespace OurWordData.DataModel
         /// <summary>
         /// Create (if missing) and make sure the HgIgnore file is up to date
         /// </summary>
-        public void CreateHgIgnore()
+        private void CreateHgIgnore()
         {
             if (!Active)
                 return;
@@ -968,7 +1063,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method: List<csd> OutGoing(sDestinationPath)
-        public List<ChangeSetDescription> OutGoing(string sDestinationPath)
+        static public List<ChangeSetDescription> OutGoing(string sDestinationPath)
         /* Mercurial Documentation
          * ------------------------
          * outgoing [-M] [-p] [-n] [-f] [-r REV]… [DEST]
@@ -992,22 +1087,22 @@ namespace OurWordData.DataModel
          * --remotecmd         specify hg command to run on the remote side
          */
         {
-            if (!Active)
-                return new List<ChangeSetDescription>();
+//            if (!Active)
+//                return new List<ChangeSetDescription>();
 
             // Outgoing
-            string sCommand = c_sOutGoing;
+            var sCommand = c_sOutGoing;
 
             // Destination Repository
             sCommand += (" " + SurroundWithQuotes(sDestinationPath));
 
             // Do it
-            ExecutionResult result = Execute(sCommand);
+            var result = Execute(sCommand, "");
 
             // Interpret it
             if (result.Successful)
             {
-                string[] vsLines = result.StandardOutput.Split('\n');
+                var vsLines = result.StandardOutput.Split('\n');
                 var v = ChangeSetDescription.Create(vsLines);
                 return v;
             }
@@ -1217,6 +1312,7 @@ namespace OurWordData.DataModel
 
         // Main Synchronize Helper Methods ---------------------------------------------------
         // TODO: Error messages on everything; and incorporate the Hg's error text into our error dialog.
+
         #region Method: bool CheckRemoteRepositoryIsSetUp()
         bool CheckRemoteRepositoryIsSetUp()
         {
@@ -1235,71 +1331,42 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        #region Method: void LaunchSynchProgressDialog()
-        static public void LaunchSynchProgressDialog()
-            // Launch the Progress dialog in a separate thread so that it will update.
-            // We loop until we know it is created, and then waiti an addition couple
-            // of seconds to make sure it is showing.
+        #region Method: bool CheckCanAccessInternet()
+        bool CheckCanAccessInternet()
         {
-            SynchProgressDlg.Start(false);
-            while (!SynchProgressDlg.IsCreated)
-                Thread.Sleep(500);
-            Thread.Sleep(2000);
-        }
-        #endregion
-        #region Method: bool CheckInternetAccess()
-        bool CheckInternetAccess()
-        {
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.InternetAccess);
+            if (CanAccessInternet())
+                return true;
 
-            if (!CanAccessInternet())
-            {
-                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.InternetAccess);
-
-                SynchProgressDlg.ShowError("kNoInternetConnection",
-                    "OurWord is unable to connect to the Internet. \n\n" +
-                    "Please check that you have an active Internet connection, then try again.");
-
-                return false;
-            }
-
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.InternetAccess);
-            return true;
+            EnumeratedStepsProgressDlg.Fail("msgNoInternetConnection",
+                "OurWord is unable to connect to the Internet.\n\n" +
+                "Please check that you have an active Internet connection, then try again.");
+            return false;
         }
         #endregion
         #region Method: bool CheckMercurialPresent()
         bool CheckMercurialPresent()
         {
             // Issue the Mercurial command to get the number of heads in the repo
-            int cHeads = GetHeadsCount();
+            var cHeads = GetHeadsCount();
 
             // If it returns zero, we interpret this to mean Mercurial is not properly installed.
             if (cHeads == 0)
             {
-                SynchProgressDlg.ShowError("msgNoMercurial",
+                EnumeratedStepsProgressDlg.Fail("msgNoMercurial",
                     "The external program Mercurial did not respond.\n\n" +
-                    "Either it is not installed, or you have a corrupt repository. Refer to the Help file.");
+                    "Either it is not installed (most likely), or else you have a corrupt repository.");
                 return false;
             }
 
             return true;
         }
         #endregion
-        #region Method: bool CheckLocalIntegrity()
-        bool CheckLocalIntegrity()
-        {
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Integrity);
-
-            // Issue a command just to make certain that Mercurial is installed
-            if (!CheckMercurialPresent())
-            {
-                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Integrity);
-                return false;
-            }
-
+        #region Method: bool CheckUnlockedRepository()
+        bool CheckUnlockedRepository()
             // An interruption could somehow leave the repository locked. We assume that no one
             // has access to our Repo but us, and thus remove any indication of locking. 
-            string sLockFile = RepositoryStore + "wlock";
+        {
+            var sLockFile = RepositoryStore + "wlock";
             if (File.Exists(sLockFile))
             {
                 Thread.Sleep(5000);
@@ -1307,26 +1374,36 @@ namespace OurWordData.DataModel
                     File.Delete(sLockFile);
                 if (File.Exists(sLockFile))
                 {
-                    SynchProgressDlg.ShowError("msgRepositoryLocked",
+                    EnumeratedStepsProgressDlg.Fail("msgRepositoryLocked",
                         "The Repository is in use by another process. Please wait, then try again.\n\n" +
-                        "Please contact us at http://ourword.TheSeedCompany.org for information " +
-                        "on how to solve this problem, if restarting your computer does not help.");
-                    SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Integrity);
+                        "If this message continues to appear, try restarting your computer.");
                     return false;
                 }
             }
 
+            return true;
+        }
+        #endregion
+        #region Method: bool CheckRecoveredTransaction()
+        bool CheckRecoveredTransaction()
             // If we had an interrupted transaction, then we need to recover from it. This
             // command has  no effect if the repositiory is in good shape; but it repairs the
             // repositiory if a transaction was interrupted.
+        {
             Execute("Recover");
-
+            return true;
+        }
+        #endregion
+        #region Method: bool CheckUnresolvedMerge()
+        bool CheckUnresolvedMerge()
             // Do we have unresolved files?
+        {
             if (HasUnresolvedFiles)
             {
-                // Attempt to resolve them. Most likely this will fail, because unresolved files are 
-                // generally due to a bug in the merge code; but if the user has installed a later
-                // version of OW, then perhaps the bug will have been fixed.
+                // Attempt to resolve them. Most likely this will fail, because unresolved 
+                // files are generally due to a problem in the merge code; but if the user 
+                // has installed a later version of OW, then perhaps the problem will have 
+                // been fixed.
                 using (new ShortTermEnvironmentalVariable("HGMERGE", PathToChorusMerge))
                 {
                     var result = Execute("resolve -a");
@@ -1338,41 +1415,39 @@ namespace OurWordData.DataModel
                 // TODO: Offer the user the opportunity to choose Repo vs Local versions for the problem files
                 if (HasUnresolvedFiles)
                 {
-                    SynchProgressDlg.ShowError("msgRepositoryProblem",
-                        "We're sorry, but there is apparently a bug in OurWord related to synchronization.\n\n" +
-                        "Please contact us at http://ourword.TheSeedCompany.org for information " +
-                        "on how to solve this problem.");
-                    SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Integrity);
+                    EnumeratedStepsProgressDlg.Fail("msgRepositoryProblem",
+                        "We're sorry, but there is apparently a bug in OurWord related to merging files.\n\n" +
+                        "If you have upgraded to the latest version, then please contact us at " +
+                        "http://ourword.TheSeedCompany.org for information on how to solve " +
+                        "this problem.");
+
                     return false;
                 }
             }
 
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Integrity);
             return true;
         }
         #endregion
-        #region Method: bool CommitAnyChangedFiles()
-        bool CommitAnyChangedFiles()
+        #region Method: bool CheckUnrecognizedAddFiles()
+        bool CheckUnrecognizedAddFiles()
         {
-            string[] vsExtensions = new string[] { ".owp", ".otrans", ".owt", ".oxes" };
-
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.StoringChanges);
+            var vsExtensions = new string[] { ".owp", ".otrans", ".owt", ".oxes" };
 
             // Get a list of the files that have changed
             var vsChangedFiles = GetChangedFiles();
             if (vsChangedFiles.Count == 0)
-                goto Done;
+                return true;
 
             // Remove any that we don't recognize, so that they don't get added to the repo.
             // (If they were already in the repo, then this will resort in their being
             // removed.)
-            foreach (string s in vsChangedFiles)
+            foreach (var s in vsChangedFiles)
             {
-                string sPath = HgRepositoryRoot + Path.DirectorySeparatorChar + s;
+                var sPath = HgRepositoryRoot + Path.DirectorySeparatorChar + s;
 
-                string sExtension = Path.GetExtension(sPath).ToLower();
-                bool bExtensionFound = false;
-                foreach (string sExt in vsExtensions)
+                var sExtension = Path.GetExtension(sPath).ToLower();
+                var bExtensionFound = false;
+                foreach (var sExt in vsExtensions)
                 {
                     if (sExtension == sExt)
                         bExtensionFound = true;
@@ -1383,61 +1458,62 @@ namespace OurWordData.DataModel
                     File.Delete(sPath);
                     if (File.Exists(sPath))
                     {
-                        LocDB.Message("msgCantDeleteFileBeforeCommit",
+                        var sMessageBase = LocDB.GetValue(
+                            new[] {"Strings", "ProgressSteps"},
+                            "msgCantDeleteFileBeforeCommit",
                             "An unrecognized file, \"{0}\", is in your data folder.{n}{n} " +
-                                "OurWord was unable to delete it. Perhaps you have some other " +
-                                "software running which is using that file. Please delete the " +
-                                "file, then try again.",
-                            new string[] { s },
-                            LocDB.MessageTypes.Error);
-                        SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.StoringChanges);
+                            "OurWord was unable to delete it. Perhaps you have some other " +
+                            "software running which is using that file. Please delete the " +
+                            "file, then try again.",
+                            null,
+                            null);
+                        var sLocalizedMessage = LocDB.Insert(sMessageBase, new string[] {s});
+                        EnumeratedStepsProgressDlg.Fail(sLocalizedMessage);
                         return false;
                     }
                 }
             }
 
-            // Rebuild our list, to make sure we still have something to commit
-            vsChangedFiles = GetChangedFiles();
+            return true;
+        }
+        #endregion
+        #region Method: bool CommitAnyChangedFiles()
+        bool CommitAnyChangedFiles()
+        {
+            // Build a list of files, to make sure we still have something to commit
+            var vsChangedFiles = GetChangedFiles();
             if (vsChangedFiles.Count == 0)
-                goto Done;
+                return true;
 
             // Commit the changed files
-            bool bResult = Commit("Synching from " + DB.UserName + " " +
+            var bResult = Commit("Synching from " + DB.UserName + " " +
                 DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo), true);
 
             // Report failure
             if (!bResult)
             {
-                 SynchProgressDlg.ShowError("msgCantCommitRecentChanges",
+                EnumeratedStepsProgressDlg.Fail("msgCantCommitRecentChanges",
                      "OurWord was unable to place your most recent changes into the local Repository.\n\n" +
-                    "Please try again. If the problem continues, please contact us at " +
+                     "Please try again. If the problem continues, please contact us at " +
                      "http://ourword.TheSeedCompany.org so that we can determine how to " +
                      "solve this problem.");
-                 SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.StoringChanges);
                  return false;
             }
-
-        Done:
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.StoringChanges);
             return true;
         }
         #endregion
         #region Method: bool PullRemoteChanges(string sTheirPath)
         bool PullRemoteChanges(string sTheirPath)
         {
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Pulling);
-
             if (!PullFrom(sTheirPath))
             {
-                SynchProgressDlg.ShowError("msgUnableToPull",
+                EnumeratedStepsProgressDlg.Fail("msgUnableToPull",
                     "OurWord is unable to retrieve changes from the Internet. \n\n" +
-                    "The remote computer may not be working. Please try again sometime later.");
-
-                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Pulling);
+                    "The remote computer may not be working, or you may have the username " +
+                    "or password incorrectly entered. Please try again later.");
                 return false;
             }
 
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Pulling);
             return true;
         }
         #endregion
@@ -1449,14 +1525,11 @@ namespace OurWordData.DataModel
             // 
             // TODO: Figure out if the Merge was unsuccessful and display an error message
         {
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Merging);
-
             using (new ShortTermEnvironmentalVariable("HGMERGE", PathToChorusMerge))
             {
                 ExecutionResult result = Execute(c_sMerge);
             }
 
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Merging);
             return true;
         }
         #endregion
@@ -1465,38 +1538,36 @@ namespace OurWordData.DataModel
             // TODO: Cam Commit return a false error? E.g., saying it didn't commit when
             // in actuality it was because there was nothing to commit?
         {
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.StoringMerge);
-
-            bool bOK = Commit("Merged by " + DB.UserName + " " +
+            var bOK = Commit("Merged by " + DB.UserName + " " +
                 DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo),
                 false);
 
             if (!bOK)
             {
-                SynchProgressDlg.ShowError("msgUnableToCommitMerge",
+                EnumeratedStepsProgressDlg.Fail("msgUnableToCommitMerge",
                     "OurWord was unable to store the results of the merge. \n\n" +
                     "This is an odd thing to happen. If it continues, please contact us at http://ourword.TheSeedCompany.org so that we can work with you to solve the problem.");
 
-                SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.StoringMerge);
                 return false;
             }
 
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.StoringMerge);
             return true;
         }
         #endregion
         #region Method: bool PushToRemote(sTheirPath)
         bool PushToRemote(string sTheirPath)
         {
-            SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Pushing);
-
             bool bResult = PushTo(sTheirPath);
 
-            SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.Pushing);
+            if (bResult == false)
+                EnumeratedStepsProgressDlg.Fail("msgPushFailed",
+                    "Sending changes back to the Internet failed, perhaps due to a bad " +
+                    "Internet connection. Please try again.");
 
             return bResult;
         }
         #endregion
+
         #region Method: bool SynchronizeWith(string sTheirPath)
         public bool SynchronizeWith(string sTheirPath)
             // Returns true if succeeded, false on failure
@@ -1506,166 +1577,69 @@ namespace OurWordData.DataModel
                 return false;
 
             // Launch the Progress dialog (in another thread)
-            LaunchSynchProgressDialog();
-            bool bOK = true;
+            EnumeratedStepsProgressDlg.Start("Synchronizing across the Internet...",
+                new[] {
+                    "Checking Internet access",
+                    "Checking data integrity",
+                    "Storing any files you've changed",
+                    "Retrieving any newer files from the Internet",
+                    "Merging your changes with theirs",
+                    "Storing the results of the merge",
+                    "Sending all changes back to the Internet",
+                    "Updating your data with the changes"
+                });
 
-            // Do we have an Internet connection? Display a message if not and give up
-            if (!CheckInternetAccess())
-                bOK = false;
-
-            // Check for any problems in the local setup (e.g., unresolved merges), and fix them.
-            if (bOK && !CheckLocalIntegrity())
-                bOK = false;
-
-            // Commit any files we've changed
-            if (bOK && !CommitAnyChangedFiles())
-                bOK = false;
-
-            // Pull any changes from the remote server
-            if (bOK && !PullRemoteChanges(sTheirPath))
-                bOK = false;
-
-            // Merge our changes with what we've just pulled
-            if (bOK && !MergeOurChanges())
-                bOK = false;
-
-            // Commit the merge we've just done
-            if (bOK && !CommitTheMerge())
-                bOK = false;
-
-            // Push the merge to the destination repository
-            if (bOK && !PushToRemote(sTheirPath))
-                bOK = false;
-
-            // Update our current working directory
-            if (bOK && !Update())
-                bOK = false;
-
-            // Done with the Progress dialog
-            SynchProgressDlg.Stop();
-            return bOK;
-        }
-        #endregion
-
-        #region REWORKED 22jul09 - Delete when confident rework is ok
-        /****
-        #region Method: bool SynchronizeWith(string sTheirPath)
-        public bool SynchronizeWith(string sTheirPath)
-            // We Pull, Merge, then Push
-        {
-            return SynchWith(sTheirPath);
-
-            bool bResult = true;
-
-            if (!Active)
+            // 1. Checking Internet access
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!CheckCanAccessInternet())
                 return false;
 
-            // Launch the Progress dialog in a separate thread so that it will update.
-            SynchProgressDlg.Start();
-            while (!SynchProgressDlg.IsCreated)  // Wait for it to get created
-                Thread.Sleep(500);
-            Thread.Sleep(2000);                  // Give it time to show
-
-            // Do we have an Internet connection? Display a message if not.
-            SynchProgressDlg.InternetAccess = SynchProgressDlg.GetStartState();
-            if (!CanAccessInternet())
-            {
-                // TODO: TEMPORARY FOR YAWA INTALLATION
-                SynchProgressDlg.ShowError("kNoInternetConnection",
-                    "Sabda Kita tidak dapat terhubung dengan Internet.\n\n" +
-                    "Periksalah apakah anda terhubung secara aktif dengan Internet, lalu coba lagi.");
-
-                //SynchProgressDlg.ShowError("kNoInternetConnection",
-                //    "OurWord is unable to connect to the Internet. \n\n" +
-                //    "Please check that you have an active Internet connection, then try again.");
-
-                SynchProgressDlg.Stop();
-                return false; // No point in sticking around.
-            }
-            SynchProgressDlg.InternetAccess = SynchProgressDlg.GetFinishState(true);
-
-            // If we are in a state where a previous merge was not committed, take care of 
-            // that first. (It happened in Sentani, due to network timeouts and such.)
-            SynchProgressDlg.Integrity = SynchProgressDlg.GetStartState();
-            bool bResult = true;
-            int cHeads = GetHeadsCount();
-            if (cHeads == 0)
-            {
-                SynchProgressDlg.ShowError("kNoMercurial",
-                    "The external program Mercurial did not respond.\n\n" +
-                    "Either it is not installed, or you have a corrupt repository. Refer to the Help file.");
-                SynchProgressDlg.Stop();
+            // 2. Checking data integrity
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!CheckMercurialPresent())
                 return false;
-            }
-            if (cHeads > 1)
-                bResult = Commit("Committing unresolved merge", false);
-            SynchProgressDlg.Integrity = SynchProgressDlg.GetFinishState(bResult);
-                
-            // Commit if we have any changed files
-            SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetStartState();
-            if (GetChangedFiles().Count > 0)
-            {
-                bResult = Commit("Synching from " + DB.UserName + " " +
-                    DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo), true);
-            }
-            SynchProgressDlg.StoringRecentChanges = SynchProgressDlg.GetFinishState(bResult);
-
-            // Pull the changes from Theirs
-            SynchProgressDlg.Pulling = SynchProgressDlg.GetStartState();
-            if (!PullFrom(sTheirPath))
-            {
-                // TODO: TEMPORARY FOR YAWA INTALLATION
-                SynchProgressDlg.ShowError("kUnableToPull",
-                    "Sabda Kita tidak bisa menirimah dari Internet.\n\n" +
-                    "Computer yang ada di America mungkin tidak jalan. Tungguh dulu, lalu coba lagi.");
-
-                //SynchProgressDlg.ShowError("kUnableToPull",
-                //    "OurWord is unable to retrieve changes from the Internet. \n\n" +
-                //    "The remote computer may not be working. Please try again sometime later.");
-                SynchProgressDlg.Stop();
+            if (!CheckUnlockedRepository())
                 return false;
-            }
-            SynchProgressDlg.Pulling = SynchProgressDlg.GetFinishState(true);
+            if (!CheckRecoveredTransaction())
+                return false;
+            if (!CheckUnresolvedMerge())
+                return false;
 
-            // Merge anything that needs it. Setting HGMERGE causes Chorus to be called.
-            SynchProgressDlg.Merging = SynchProgressDlg.GetStartState();
-            string sPathToChorusMerge = SurroundWithQuotes(
-                Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
-            using (new ShortTermEnvironmentalVariable("HGMERGE", sPathToChorusMerge))
-            {
-                ExecutionResult result = Execute(c_sMerge);
-                bResult = result.Successful;
-            }
-            // TODO: Merge gives strange error messages, e.g., its an error if there was
-            // nothing to merge. So for Yawa, we'll just use true until we can figure 
-            // out what bResult we really want to place here.
-            SynchProgressDlg.Merging = SynchProgressDlg.GetFinishState(true);
+            // 3. Storing any files you've changed
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!CheckUnrecognizedAddFiles())
+                return false;
+            if (!CommitAnyChangedFiles())
+                return false;
 
-            // Commit the result of the merge
-            SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetStartState();
-            bResult = Commit("Merged by " + DB.UserName + " " +
-                DateTime.UtcNow.ToString("u", DateTimeFormatInfo.InvariantInfo), 
-                false);
-            SynchProgressDlg.StoringMergeResults = SynchProgressDlg.GetFinishState(bResult);
+            // 4. Retrieving any newer files from the Internet
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!PullRemoteChanges(sTheirPath))
+                return false;
 
-            // Push the merge to the destination repository
-            SynchProgressDlg.Pushing = SynchProgressDlg.GetStartState();
-            bResult = PushTo(sTheirPath);
-            SynchProgressDlg.Pushing = SynchProgressDlg.GetFinishState(bResult);
+            // 5. Merging your changes with theirs
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!MergeOurChanges())
+                return false;
 
-            // Update our current working directory
+            // 6. Storing the results of the merge
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!CommitTheMerge())
+                return false;
+
+            // 7. Sending all changes back to the Internet
+            EnumeratedStepsProgressDlg.IncrementStep();
+            if (!PushToRemote(sTheirPath))
+                return false;
+
+            // 8. Updating your data with the changes
+            EnumeratedStepsProgressDlg.IncrementStep();
             Update();
 
-            // Remove the dialog if all was well; keep it around if there was even one
-            // problem so he can see it.
-            if (!SynchProgressDlg.HadProblem)
-                SynchProgressDlg.Stop();
-            else
-                SynchProgressDlg.EnableOkButton();
+            // Done with the Progress dialog
+            EnumeratedStepsProgressDlg.Stop();
             return true;
         }
-        #endregion
-        ****/
         #endregion
     }
 
@@ -1689,6 +1663,7 @@ namespace OurWordData.DataModel
         }
     }
     #endregion
+
     #region CLASS: Other
     public class Other
     {
@@ -1726,144 +1701,6 @@ namespace OurWordData.DataModel
             }
             return path;
         }
-    }
-    #endregion
-
-
-    // OurWord Scripture Merger
-    #region Class: OurWordMerger
-    public class OurWordMerger
-    {
-        #region Attr{g}: string MergeType
-        public string MergeType
-        {
-            get
-            {
-                return m_sMergeType;
-            }
-        }
-        string m_sMergeType;
-        #endregion
-
-        #region Attr{g}: string OurPath
-        public string OurPath
-        {
-            get
-            {
-                return m_sOurPath;
-            }
-        }
-        readonly string m_sOurPath;
-        #endregion
-        #region Attr{g}: string TheirPath
-        public string TheirPath
-        {
-            get
-            {
-                return m_sTheirPath;
-            }
-        }
-        readonly string m_sTheirPath;
-        #endregion
-        #region Attr{g}: string ParentPath
-        public string ParentPath
-        {
-            get
-            {
-                return m_sParentPath;
-            }
-        }
-        readonly string m_sParentPath;
-        #endregion
-
-        #region Constructor(MergeOrder)
-        protected OurWordMerger(MergeOrder order, string sMergeType)
-        {
-            m_sMergeType = sMergeType;
-
-            m_sOurPath = order.pathToOurs;
-            m_sTheirPath = order.pathToTheirs;
-            m_sParentPath = order.pathToCommonAncestor;
-        }
-        #endregion
-        #region virtual int Run()
-        public virtual int Run()
-        {
-            return 1;
-        }
-        #endregion
-
-        #region protected void Setup()
-        protected void Setup()
-        {
-            // Initialize the registry (the Map process needs it)
-            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
-
-            // We need to initialize the localization system (perhaps we can get rid of
-            // this dependency eventually.)
-            LocDB.Initialize(JWU.GetApplicationDataFolder("OurWord"));
-
-            // We need to create an owning project, because currently stuff depends on the
-            // ownership hierarchy. Perhaps I can remove this in the future.
-            DB.Project = new DProject("Merge");
-            DB.Project.TeamSettings = new DTeamSettings("Merge");
-            DB.Project.TeamSettings.EnsureInitialized();
-        }
-        #endregion
-    }
-    #endregion
-    #region Class: OurWordScriptureMerger
-    public class OurWordScriptureMerger : OurWordMerger
-    {
-        string m_sBookAbbrev;
-        #region DBook CreateAndReadBook(sBookName, sPath)
-        DBook CreateAndReadBook(string sName, string sPath)
-        {
-            // Create and add a translation
-            DTranslation translation = new DTranslation(sName);
-            DB.Project.OtherTranslations.Append(translation);
-
-            // Create and add a book. We need it to be in the hierarchy before we start
-            // the Load.
-            DBook book = new DBook(m_sBookAbbrev);
-            translation.AddBook(book);
-
-            // Read in the book
-            book.LoadBook(sPath, new NullProgress());
-            return book;
-        }
-        #endregion
-
-        #region Constructor(MergeOrder)
-        public OurWordScriptureMerger(MergeOrder order)
-            : base(order, "Oxes Book")
-        {
-            // Extract the Book Abbrev from the path
-            string sBaseName = Path.GetFileNameWithoutExtension(OurPath);
-            m_sBookAbbrev = sBaseName.Substring(3, 3);
-        }
-        #endregion
-        #region override int Run()
-        public override int Run()
-        {
-            //Debug.Assert(false, "breakpoint for debugging");
-
-            Setup();
-
-            // Read in the three books
-            DBook OurBook = CreateAndReadBook("Ours", OurPath);
-            DBook TheirBook = CreateAndReadBook("Theirs", TheirPath);
-            DBook ParentBook = CreateAndReadBook("Parent", ParentPath);
-
-            // Tell OurWord to do the merge
-            OurBook.Merge(ParentBook, TheirBook);
-
-            // Write out the answer
-            OurBook.WriteBook(OurPath);
-
-            return 0;
-        }
-        #endregion
     }
     #endregion
 

@@ -965,6 +965,8 @@ namespace OurWordData.DataModel
             // Need to pick up the translations as well
             if (null != TargetTranslation)
                 TargetTranslation.WriteToFile(new NullProgress());
+            foreach (DTranslation t in OtherTranslations)
+                t.WriteToFile(new NullProgress());
         }
         #endregion
 

@@ -217,44 +217,6 @@ namespace OurWordData
         }
         #endregion
 
-        // Merge -----------------------------------------------------------------------------
-        #region OMethod: void Merge(JAttr Parent, JAttr Theirs, bool bWeWin)
-        public override void Merge(JAttr Parent, JAttr Theirs, bool bWeWin)
-            // An owning attr, as used in OW, generally either owns an object or is
-            // clear. I think merging is mostly a matter of checking whether it should
-            // be clear or not, and then having the owned object do its thing for
-            // the merge if not clear.
-        {
-            JOwn<T> ownParent = Parent as JOwn<T>;
-            JOwn<T> ownTheirs = Theirs as JOwn<T>;
-            Debug.Assert(null != ownParent && null != ownTheirs);
-
-            // Check for Null set/cleared
-            bool bOurNullChanged = (
-                (ownParent.Value == null && Value != null) ||
-                (ownParent.Value != null && Value == null));
-            bool bTheirNullChanged = (
-                (ownTheirs.Value == null && Value != null) ||
-                (ownTheirs.Value != null && Value == null));
-            // Theirs changed, so we need to become as them
-            if (bTheirNullChanged && !bOurNullChanged)
-            {
-                if (ownTheirs.Value != null)
-                {
-                    T obj = ownTheirs.Value;
-                    ownTheirs.Value = null;
-                    Value = obj;
-                }
-                else
-                    Value = null;
-                return;
-            }
-
-            // A merge only if we have values in all three
-            if (null != ownParent.Value && null != ownTheirs.Value && null != Value)
-                Value.Merge(ownParent.Value, ownTheirs.Value, true);
-        }
-        #endregion
     }
 
 }

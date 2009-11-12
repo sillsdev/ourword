@@ -1,4 +1,5 @@
-﻿/**********************************************************************************************
+﻿#region ***** T_Repository.cs *****
+/**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_Repository.cs
  * Author:  John Wimbish
@@ -7,27 +8,338 @@
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Text;
-using System.Windows.Forms;
-
+using Chorus.merge;
 using NUnit.Framework;
 
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
-
-using OurWord;
-using OurWord.Utilities;
 #endregion
-
+#endregion
 
 namespace OurWordTests.Utilities
 {
+    [TestFixture]
+    public class TestHgRepositoryBase
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: StripTrailingPathSeparator
+        [Test] public void StripTrailingPathSeparator()
+        {
+            // Build a path in a OS-independant manner
+            var vFolders = new[] { "Users", "Albert", "My Documents", "Inuit" };
+            var pathWithoutTrailingSeparator = "C:";
+            foreach (var sFolder in vFolders)
+                pathWithoutTrailingSeparator = Path.Combine(pathWithoutTrailingSeparator, sFolder);
+
+            var pathWithTrailingSeparator = pathWithoutTrailingSeparator +
+                Path.DirectorySeparatorChar;
+
+            // Make sure that our two paths do indeed differ by a trailing character
+            Assert.AreEqual(pathWithoutTrailingSeparator.Length + 1,
+                pathWithTrailingSeparator.Length);
+            Assert.AreEqual(pathWithTrailingSeparator[pathWithTrailingSeparator.Length - 1],
+                Path.DirectorySeparatorChar);
+
+            // Do we strip out the trailing separator if its there?
+            Assert.AreEqual(pathWithoutTrailingSeparator,
+                HgRepositoryBase.StripTrailingPathSeparator(pathWithTrailingSeparator));
+
+            // Do we do nothing if there's no trailing separator to begin with?
+            Assert.AreEqual(pathWithoutTrailingSeparator,
+                HgRepositoryBase.StripTrailingPathSeparator(pathWithoutTrailingSeparator));
+        }
+        #endregion
+        #region Test: CloneTo
+        [Test] public void CloneTo()
+        {
+            var originRepositoryFolder = JWU.NUnit_GetFreshTempSubFolder("origin");
+            var originRepository = new HgLocalRepository(originRepositoryFolder);
+            originRepository.CreateIfDoesntExist();
+
+            var clonedRepositoryFolder = JWU.NUnit_GetFreshTempSubFolder("cloned");
+            originRepository.CloneTo(clonedRepositoryFolder);
+            var clonedRepository = new HgLocalRepository(clonedRepositoryFolder);
+
+            Assert.IsTrue(clonedRepository.Exists);
+        }
+        #endregion
+    }
+
+    [TestFixture]
+    public class TestHgLocalRepository
+    {
+        #region Setup
+        [SetUp]
+        public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: CreateIfDoesntExist
+        [Test] public void CreateIfDoesntExist()
+        {
+            var repositoryRootFolder = JWU.NUnit_GetFreshTempSubFolder("repository");
+
+            Directory.CreateDirectory(repositoryRootFolder);
+            var repository = new HgLocalRepository(repositoryRootFolder);
+            repository.CreateIfDoesntExist();
+
+            var hgFolder = repositoryRootFolder + Path.DirectorySeparatorChar + ".hg";
+            Assert.IsTrue(Directory.Exists(hgFolder), "Should have a .hg folder.");
+        }
+        #endregion
+    }
+
+    [TestFixture]
+    public class TestHgInternetRepository
+    {
+        #region Setup
+        [SetUp] public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        #region Test: BuildUrlToInternetRepository
+        [Test] public void BuildUrlToInternetRepository()
+        {
+            var repository = new HgInternetRepository("Cherokee");
+            HgInternetRepository.UserName = "Harry";
+            HgInternetRepository.Password = "NoClue";
+            HgInternetRepository.Server = "hg-public.languagedepot.org";
+
+            var path = repository.FullPathToRepositoryRoot;
+
+            // "cherokee" should be normalized to lower case to make Linux servers happy
+            Assert.AreEqual("http://Harry:NoClue@hg-public.languagedepot.org/cherokee", path);
+        }
+        #endregion
+        #region Test: StripLeadingHttpOnSettingServerValue
+        [Test] public void StripLeadingHttpOnSettingServerValue()
+        {
+            var repository = new HgInternetRepository("Cherokee");
+            HgInternetRepository.Server = "http://bitbucket.org";
+
+            Assert.AreEqual("bitbucket.org", HgInternetRepository.Server);
+        }
+        #endregion
+        #region Test: StripTrailingSlashOnSettingServerValue
+        [Test] public void StripTrailingSlashOnSettingServerValue()
+        {
+            var repository = new HgInternetRepository("Cherokee");
+
+            HgInternetRepository.Server = "bitbucket.org/";
+            Assert.AreEqual("bitbucket.org", HgInternetRepository.Server);
+
+            HgInternetRepository.Server = "bitbucket.org\\";
+            Assert.AreEqual("bitbucket.org", HgInternetRepository.Server);
+        }
+        #endregion
+    }
+
+    [TestFixture]
+    public class TestSynchronize
+    {
+        #region Setup
+        [SetUp]
+        public void Setup()
+        {
+            JWU.NUnit_Setup();
+        }
+        #endregion
+
+        // Helper methods: Setup Xml Test Data
+        #region static string CreateMessageStorageString(sAuthor, sDateTime, sContents)
+        static string CreateMessageStorageString(string sAuthor, string sDateTime, string sContents)
+        {
+            return string.Format("<Message author=\"{0}\" created=\"{1}\">{2}</Message>", 
+                sAuthor, sDateTime, sContents);
+        }
+        #endregion
+        #region static XmlDoc CreateXmlDoc( IEnumerable<int> indicesOfMessagesToInclude )
+        static XmlDoc CreateXmlDoc( IEnumerable<int> indicesOfMessagesToInclude )
+        {
+            var allXmlMessages = new[]
+            {
+                CreateMessageStorageString("John", "2009-02-28 09:14:18Z", "'Arono' is used twice in this verse, isn't that stylistically bad?"),
+                CreateMessageStorageString("Larry", "2009-03-01 09:14:18Z", "Its a discourse feature. You obviously haven't read my paper on Yawa Discourse!"),
+                CreateMessageStorageString("Linda", "2009-03-01 10:14:18Z", "I don't know, Larry, you're ok as an administrator, but why do you think I'm the one doing this final revision?"),
+                CreateMessageStorageString("Larry", "2009-03-01 12:14:18Z", "Well, you've got a point"),
+                CreateMessageStorageString("Owen", "2009-03-02 10:14:18Z", "Hey! Who's the MTT here, anyway? I say, Wimbish is right!"),
+                CreateMessageStorageString("John", "2009-03-02 11:14:18Z", "Looks like my work here is done."),
+                CreateMessageStorageString("Kathy", "2009-03-05 11:14:18Z", "But I'm the consultant, and I say, rubbish!")
+            };
+
+            var includedXmlMessages = "";
+            foreach (var i in indicesOfMessagesToInclude)
+                includedXmlMessages += allXmlMessages[i];
+
+            var oxesScriptureParagraphs = new[]
+            {
+		        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", 
+		        "<bible xml:lang=\"bko\" backtTranslaltionDefaultLanguage=\"en\" oxes=\"2.0\">",
+                "  <book id=\"MRK\" stage=\"Final\" version=\"A\">",
+                "    <p class=\"Header\" usfm=\"h\">Mark</p>",
+                "    <p class=\"Title Secondary\" usfm=\"mt2\">The Gospel Of</p>",
+                "    <p class=\"Title Main\" usfm=\"mt\">Mark</p>",
+                "    <p class=\"Section Head\" usfm=\"s1\">Usif Jesus naleta' neu fini le' in nesan an-ana' neis<bt>The Lord Jesus give an example of a seed that is extremely tiny</bt></p>",
+                "    <p class=\"Parallel Passage Reference\" usfm=\"r\">(Mateus 13:31-32, 34; Lukas 13:18-19)</p>",
+                "    <p class=\"Paragraph\" usfm=\"p\">" +
+                        "<v n=\"30\" />" +
+                        "Oke te, Jesus namolok antein, mnak, \"Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok." +
+                        "<bt>Then Jesus spoke again, saying, \"I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.</bt>" +
+                        "<Annotation class=\"General\" selectedText=\"Arono\">" +
+                            includedXmlMessages +
+                        "</Annotation>" +
+                        "</p>",
+                "    <p class=\"Paragraph\" usfm=\"p\">" +
+                        "<v n=\"31\" />" +
+                        "Nane namnees onle' fini le' in nesan an-ana' neis." +
+                        "<bt>That is like a seed that is very tiny.</bt>" +
+                        "<v n=\"32\" />" +
+                        "Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof kolo neem namin mafo', ma nmo'en kuna' neu ne.\"" +
+                        "<bt>If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.\"</bt>" +
+                        "</p>",
+                "    <p class=\"Paragraph\" usfm=\"p\">" +
+                        "<v n=\"33\" />" +
+                        "Jesus In na'noina' in ma'mo'en natuin sin hiin kini." +
+                        "<bt>Jesus' way of teaching was according to their understanding.</bt>" +
+                        "<v n=\"34\" />" +
+                        "In na'noina' atoni neki haa lais leta'. Mes kalu nok In atopu'-noina' sin, In natoon lais leta' nane in na' naon ok-oke'." +
+                        "<bt>He taught people using only examples. But with His *disciples, He told the meaning of all the examples.</bt>" +
+                        "</p>",
+                "  </book>",
+                "</bible>"
+            };
+
+            return new XmlDoc(oxesScriptureParagraphs);
+        }
+        #endregion
+
+        // Helper methods: Files
+        #region static string GetFreshRepositoryRootPath(repositoryName)
+        static string GetFreshRepositoryRootPath(string repositoryName)
+        {
+            var sFolder = JWU.GetMyDocumentsFolder(null) + repositoryName;
+
+            CleanupByEnsuringIsDeleted(sFolder);
+
+            Directory.CreateDirectory(sFolder);
+
+            return sFolder;
+        }
+        #endregion
+        #region static void WriteAndCommitFile(repository, sFileBaseName, XmlDoc, message)
+        static void WriteAndCommitFile(HgRepositoryBase repository, string sFileBaseName, XmlDoc doc, string message)
+        {
+            var path = repository.FullPathToRepositoryRoot + Path.DirectorySeparatorChar +
+                       sFileBaseName;
+            doc.Write(path);
+
+            repository.CommitChangedFiles("jsw", message);
+        }
+        #endregion
+        #region static void CleanupByEnsuringIsDeleted(string sFolder)
+        static void CleanupByEnsuringIsDeleted(string sFolder)
+        {
+            if (Directory.Exists(sFolder))
+                JWU.SafeFolderDelete(sFolder);
+        }
+        #endregion
+
+        // Tests
+        #region Test: TestVanilaMerge
+        [Test] public void TestVanilaMerge()
+            // Just tests the DBook.Merge method, not synch nor chorus
+        {
+            var parentDoc = CreateXmlDoc(new[] { 0, 1, 4 });
+            var ourDoc = CreateXmlDoc(new[] { 0, 1, 2, 4, 5, 6 });
+            var theirDoc = CreateXmlDoc(new[] { 0, 1, 2, 3, 4, 5 });
+            var mergedDocExpected = CreateXmlDoc(new[] { 0, 1, 2, 3, 4, 5, 6 });
+
+            var tempFolder = GetFreshRepositoryRootPath("MergeTest");
+
+            var parentPath = tempFolder + Path.DirectorySeparatorChar + "41 MRK - parent.oxes";
+            var ourPath = tempFolder + Path.DirectorySeparatorChar + "41 MRK - our.oxes";
+            var theirPath = tempFolder + Path.DirectorySeparatorChar + "41 MRK - their.oxes";
+
+            parentDoc.Write(parentPath);
+            ourDoc.Write(ourPath);
+            theirDoc.Write(theirPath);
+
+            var mergeOrder = new MergeOrder(ourPath, parentPath, theirPath, null);
+            DBook.Merge(mergeOrder);
+
+            var mergeDocActual = new XmlDoc();
+            mergeDocActual.Load(ourPath);
+            Assert.IsTrue(XmlDoc.Compare(mergedDocExpected, mergeDocActual),
+                "Merge should have given the expected result");
+
+            CleanupByEnsuringIsDeleted(tempFolder);
+        }
+        #endregion
+        #region Test: TestCompleteSynchMerge
+        [Test] public void TestCompleteSynchMerge()
+        {
+            const string sFileBaseName = "41 MRK - Test.oxes";
+
+            // We create minimal oxes books and parse them in. They only differ by the
+            // content of one of the annotations, in terms of which messages the
+            // annotation has. We're looking to test that the overall merge mechanism
+            // works, as opposed to testing every possible merge permutation.
+            //    Thus "ours" and "theirs" contain everything in "parent", plus additional
+            // messages; and "mergedDoc" should contain the entire total of messages.
+            var parentDoc = CreateXmlDoc(new[] { 0, 1,       4});
+            var ourDoc    = CreateXmlDoc(new[] { 0, 1, 2,    4, 5, 6});
+            var theirDoc  = CreateXmlDoc(new[] { 0, 1, 2, 3, 4, 5 });
+            var mergedDocExpected = CreateXmlDoc(new[] { 0, 1, 2, 3, 4, 5, 6 });
+
+            // Create an origin repository
+            var originRepositoryPath = GetFreshRepositoryRootPath("origin");
+            var originRepository = new HgLocalRepository(originRepositoryPath);
+            originRepository.CreateIfDoesntExist();
+            WriteAndCommitFile(originRepository, sFileBaseName, parentDoc, "Parent created");
+
+            // Clone it to another repository; thus we have "parent" in two places
+            var clonedRepositoryPath = GetFreshRepositoryRootPath("cloned");
+            originRepository.CloneTo(clonedRepositoryPath);
+            var clonedRepository = new HgLocalRepository(clonedRepositoryPath);
+
+            // Update the repositories with "our" and "their" versions
+            WriteAndCommitFile(originRepository, sFileBaseName, ourDoc, "Origin updated with ours");
+            WriteAndCommitFile(clonedRepository, sFileBaseName, theirDoc, "Clone updated with theirs");
+
+            // Do the synch; it will fail if ChorusMerge is not correctly hooked up
+            EnumeratedStepsProgressDlg.DisableForTesting = true;
+            var success = (new Synchronize(originRepository, clonedRepository, "jsw")).Do();
+
+            // Did we get what we expected?
+            var mergeDocActual = new XmlDoc();
+            mergeDocActual.Load(originRepositoryPath + Path.DirectorySeparatorChar + sFileBaseName);
+            Assert.IsTrue(XmlDoc.Compare(mergedDocExpected, mergeDocActual),
+                "Merge should have given the expected result");
+            Assert.IsTrue(success, "Merge result was ok, but Do method didn't complete all steps successfully.");
+
+            // Remove the repositories we created
+            CleanupByEnsuringIsDeleted(originRepositoryPath);
+            CleanupByEnsuringIsDeleted(clonedRepositoryPath);
+        }
+        #endregion
+
+
+    }
+
+
     [TestFixture] 
     public class T_Repository
     {
@@ -279,267 +591,5 @@ namespace OurWordTests.Utilities
 
         }
         #endregion
-
-        // Merging ---------------------------------------------------------------------------
-        #region Method: void WriteFile(string sPath, string[] vs)
-        void WriteFile(string sPath, string[] vs)
-        {
-            StreamWriter sw = new StreamWriter(sPath, false, Encoding.UTF8);
-            TextWriter W = TextWriter.Synchronized(sw);
-            foreach (string s in vs)
-                W.WriteLine(s);
-            W.Close();
-        }
-        #endregion
-        #region Method: List<string> ReadFile(sPath)
-        List<string> ReadFile(string sPath)
-        {
-            List<string> v = new List<string>();
-
-            StreamReader sr = new StreamReader(sPath, Encoding.UTF8);
-            TextReader R = TextReader.Synchronized(sr);
-
-            string s;
-            while ((s = R.ReadLine()) != null)
-            {
-                s = s.Trim();
-
-                if (s.Length > 0 && s[0] == '\\')
-                    v.Add(s);
-                else if (v.Count > 0)
-                    v[v.Count - 1] = v[v.Count - 1] + " " + s;
-            }
-
-            R.Close();
-
-            return v;
-        }
-        #endregion
-
-        /* [Test] */ public void Synchronize()
-            // The purpose of this test is to check that the broad ChorusMerge 
-            // is working. Individual classes will have their own merge tests for
-            // specific situations.
-        {
-            // Discussion Parts
-            string sJohn1 = "<Discussion Author=\"John\" Created=\"2009-02-28 09:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"'Arono' is used twice in this verse, isn't that stylistically bad?\"/></ownseq></Discussion>";
-            string sLarry1 = "<Discussion Author=\"Larry\" Created=\"2009-03-01 09:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"Its a discourse feature. You obviously haven't read my paper on Yawa Discourse!\"/></ownseq></Discussion>";
-            string sLinda = "<Discussion Author=\"Linda\" Created=\"2009-03-01 10:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"I don't know, Larry, you're ok as an administrator, but why do you think I'm the one doing this final revision?\"/></ownseq></Discussion>";
-            string sLarry2 = "<Discussion Author=\"Larry\" Created=\"2009-03-01 12:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"Well, you've got a point.\"/></ownseq></Discussion>";
-            string sOwen = "<Discussion Author=\"Owen\" Created=\"2009-03-02 10:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"Hey! Who's the MTT here, anyway? I say, Wimbish is right!\"/></ownseq></Discussion>";
-            string sJohn2 = "<Discussion Author=\"John\" Created=\"2009-03-02 11:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"Looks like my work here is done.\"/></ownseq></Discussion>";
-            string sSue = "<Discussion Author=\"Sue\" Created=\"2009-03-05 11:14:18Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"But I'm the consultant, and I say, rubbish!\"/></ownseq></Discussion>";
-
-            // Book contents
-            #region string[] vsParent - John1 Larry1 Linda Owen John2
-            string[] vsParent = new string[]
-            {
-			    "\\_sh v3.0 2 SHW-Scripture", 
-			    "\\_DateStampHasFourDigitYear",
-			    "\\rcrd MRK",
-			    "\\h Mark",
-			    "\\st The Gospel Of",
-			    "\\mt Mark",
-			    "\\id Mark",
-			    "\\rcrd MRK 1",
-			    "\\s Usif Jesus naleta' neu fini le' in nesan an-ana' neis",
-			    "\\bts The Lord Jesus give an example of a seed that is extremely tiny",
-			    "\\nt sain = jenis biji yg kici ana",
-			    "\\r (Mateus 13:31-32, 34; Lukas 13:18-19)",
-			    "\\p",
-			    "\\v 30",
-			    "\\vt Oke te, |iJesus namolok|r antein, mnak, <<Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok.",
-			    "\\btvt Then Jesus spoke again, saying, <<I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.",
-			    "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"Owen\" Context=\"Arono\" Reference=\"001:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                    sJohn1 + sLarry1 + sLinda + sOwen + sJohn2 +
-                    "</ownseq></TranslatorNote>",
-                "\\p",
-			    "\\v 31",
-			    "\\vt Nane namnees onle' fini le' in nesan an-ana' neis.",
-			    "\\btvt That is like a seed that is very tiny.",
-			    "\\v 32",
-			    "\\vt Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof kolo neem namin mafo', ma nmo'en kuna' neu ne.>>",
-			    "\\btvt If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.>>",
-			    "\\p",
-			    "\\v 33",
-			    "\\vt Jesus In na'noina' in ma'mo'en natuin sin hiin kini.",
-			    "\\btvt Jesus' way of teaching was according to their understanding.",
-			    "\\v 34",
-			    "\\vt In na'noina' atoni neki haa lais leta'. Mes kalu nok In atopu'-noina' sin, In natoon lais leta' nane in na' naon ok-oke'.",
-			    "\\btvt He taught people using only examples. But with His *disciples, He told the meaning of all the examples.",
-            };
-            #endregion
-            #region string[] vsOurs -   John1 Larry1 Linda Owen John2 Sue
-            string[] vsOurs = new string[]
-            {
-			    "\\_sh v3.0 2 SHW-Scripture", 
-			    "\\_DateStampHasFourDigitYear",
-			    "\\rcrd MRK",
-			    "\\h Mark",
-			    "\\st The Gospel Of",
-			    "\\mt Mark",
-			    "\\id Mark",
-			    "\\rcrd MRK 1",
-			    "\\s Usif Jesus naleta' neu fini le' in nesan an-ana' neis",
-			    "\\bts The Lord Jesus give an example of a seed that is extremely tiny",
-			    "\\nt sain = jenis biji yg kici ana",
-			    "\\r (Mateus 13:31-32, 34; Lukas 13:18-19)",
-			    "\\p",
-			    "\\v 30",
-			    "\\vt Oke te, |iJesus namolok|r antein, mnak, <<Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok.",
-			    "\\btvt Then Jesus spoke again, saying, <<I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.",
-			    "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"Owen\" Context=\"Arono\" Reference=\"001:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                    sJohn1 + sLarry1 + sLinda + sOwen + sJohn2 + sSue +
-                    "</ownseq></TranslatorNote>",
-                "\\p",
-			    "\\v 31",
-			    "\\vt Nane namnees onle' fini le' in nesan an-ana' neis.",
-			    "\\btvt That is like a seed that is very tiny.",
-			    "\\v 32",
-			    "\\vt Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof kolo neem namin mafo', ma nmo'en kuna' neu ne.>>",
-			    "\\btvt If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.>>",
-			    "\\p",
-			    "\\v 33",
-			    "\\vt Jesus In na'noina' in ma'mo'en natuin sin hiin kini.",
-			    "\\btvt Jesus' way of teaching was according to their understanding.",
-			    "\\v 34",
-			    "\\vt In na'noina' atoni neki haa lais leta'. Mes kalu nok In atopu'-noina' sin, In natoon lais leta' nane in na' naon ok-oke'.",
-			    "\\btvt He taught people using only examples. But with His *disciples, He told the meaning of all the examples.",
-            };
-            #endregion
-            #region string[] vsTheirs - John1 Larry1 Linda Larry2 Owen John2
-            string[] vsTheirs = new string[]
-            {
-			    "\\_sh v3.0 2 SHW-Scripture", 
-			    "\\_DateStampHasFourDigitYear",
-			    "\\rcrd MRK",
-			    "\\h Mark",
-			    "\\st The Gospel Of",
-			    "\\mt Mark",
-			    "\\id Mark",
-			    "\\rcrd MRK 1",
-			    "\\s Usif Jesus naleta' neu fini le' in nesan an-ana' neis",
-			    "\\bts The Lord Jesus give an example of a seed that is extremely tiny",
-			    "\\nt sain = jenis biji yg kici ana",
-			    "\\r (Mateus 13:31-32, 34; Lukas 13:18-19)",
-			    "\\p",
-			    "\\v 30",
-			    "\\vt Oke te, |iJesus namolok|r antein, mnak, <<Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok.",
-			    "\\btvt Then Jesus spoke again, saying, <<I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.",
-			    "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"Owen\" Context=\"Arono\" Reference=\"001:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                    sJohn1 + sLarry1 + sLinda + sLarry2 + sOwen + sJohn2 +
-                    "</ownseq></TranslatorNote>",
-                "\\p",
-			    "\\v 31",
-			    "\\vt Nane namnees onle' fini le' in nesan an-ana' neis.",
-			    "\\btvt That is like a seed that is very tiny.",
-			    "\\v 32",
-			    "\\vt Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof kolo neem namin mafo', ma nmo'en kuna' neu ne.>>",
-			    "\\btvt If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.>>",
-			    "\\p",
-			    "\\v 33",
-			    "\\vt Jesus In na'noina' in ma'mo'en natuin sin hiin kini.",
-			    "\\btvt Jesus' way of teaching was according to their understanding.",
-			    "\\v 34",
-			    "\\vt In na'noina' atoni neki haa lais leta'. Mes kalu nok In atopu'-noina' sin, In natoon lais leta' nane in na' naon ok-oke'.",
-			    "\\btvt He taught people using only examples. But with His *disciples, He told the meaning of all the examples.",
-            };
-            #endregion
-            #region string[] vsSynchedResult - John1 Larry1 Linda Larry2 Owen John2 Sue
-            string[] vsSynchedResult = new string[]
-            {
-			    "\\_sh v3.0 2 SHW-Scripture", 
-			    "\\_DateStampHasFourDigitYear",
-			    "\\rcrd MRK",
-			    "\\h Mark",
-			    "\\st The Gospel Of",
-			    "\\mt Mark",
-			    "\\id Mark",
-			    "\\rcrd MRK 1",
-			    "\\s Usif Jesus naleta' neu fini le' in nesan an-ana' neis",
-			    "\\bts The Lord Jesus give an example of a seed that is extremely tiny",
-			    "\\nt sain = jenis biji yg kici ana",
-			    "\\r (Mateus 13:31-32, 34; Lukas 13:18-19)",
-			    "\\p",
-			    "\\v 30",
-			    "\\vt Oke te, |iJesus namolok|r antein, mnak, <<Au uleta' 'tein on ii: Hi nabei' mnoon Uis-neno in toob. Na'ko sin tuaf fua' fauk es, mes nabaab-took, tal antee sin namfau nok.",
-			    "\\btvt Then Jesus spoke again, saying, <<I give another example like this: You(pl) can compare God's *social group. From just a few people, it nevertheless increases (in number), to the point that they are very many.",
-			    "\\tn <TranslatorNote Category=\"To Do\" AssignedTo=\"Owen\" Context=\"Arono\" Reference=\"001:001\" ShowInDaughter=\"false\"><ownseq Name=\"Discussions\">" +
-                    sJohn1 + sLarry1 + sLinda + sLarry2 + sOwen + sJohn2 + sSue +
-                    "</ownseq></TranslatorNote>",
-                "\\p",
-			    "\\v 31",
-			    "\\vt Nane namnees onle' fini le' in nesan an-ana' neis.",
-			    "\\btvt That is like a seed that is very tiny.",
-			    "\\v 32",
-			    "\\vt Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof kolo neem namin mafo', ma nmo'en kuna' neu ne.>>",
-			    "\\btvt If we(inc) plant it (with dibble stick) it will grow to become a large tree. And birds will come looking for shade, and make nests in it.>>",
-			    "\\p",
-			    "\\v 33",
-			    "\\vt Jesus In na'noina' in ma'mo'en natuin sin hiin kini.",
-			    "\\btvt Jesus' way of teaching was according to their understanding.",
-			    "\\v 34",
-			    "\\vt In na'noina' atoni neki haa lais leta'. Mes kalu nok In atopu'-noina' sin, In natoon lais leta' nane in na' naon ok-oke'.",
-			    "\\btvt He taught people using only examples. But with His *disciples, He told the meaning of all the examples.",
-            };
-            #endregion
-
-            // Create our local Repository and write the file that will serve as our parrent
-            Repository.Create();
-            string sOurPath = Repository.HgRepositoryRoot + Path.DirectorySeparatorChar + "05 MRK.db";
-            WriteFile(sOurPath, vsParent);
-            Repository.Commit("Parent Created.", true);
-
-            // Clone it. So now, both Repositories should be identical, both with the
-            // parent book
-            if (Directory.Exists(ClonePath))
-                Directory.Delete(ClonePath, true);
-            Repository.CloneTo(ClonePath);
-            var v = Repository.OutGoing(ClonePath);
-            Assert.AreEqual(0, v.Count, "Should have zero change sets");
-
-            // Change the book in our local repository
-            WriteFile(sOurPath, vsOurs);
-            Repository.Commit("Ours Changed.", true);
-
-            // Change it in the cloned repository
-            string sTheirPath = ClonePath + Path.DirectorySeparatorChar + "05 MRK.db";
-            WriteFile(sTheirPath, vsTheirs);
-            Process p = new Process();
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardOutput = true;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.WorkingDirectory = ClonePath;
-            p.StartInfo.FileName = "hg";
-            p.StartInfo.Arguments = "commit -u \"Them\" -m \"Theirs Changed.\" \"" + ClonePath + "\"";
-            p.Start();
-
-            // Do the synch
-            Repository.SynchronizeWith(ClonePath);
-
-            // Did we get what we expected?
-            List<string> vActual = ReadFile(
-                Repository.HgRepositoryRoot + Path.DirectorySeparatorChar + "05 MRK.db");
-            foreach (string s in vActual)
-                Console.WriteLine("<" + s + ">");
-            Assert.AreEqual(vsSynchedResult.Length, vActual.Count, "Counts should be equal");
-
-            Console.WriteLine("");
-            Console.WriteLine("-----------------------------------------------");
-            for (int i = 0; i < vActual.Count; i++)
-            {
-                Console.WriteLine("i=" + i.ToString());
-                Console.WriteLine("Exp=" + vsSynchedResult[i]);
-                Console.WriteLine("Act=" + vActual[i]);
-                Console.WriteLine("");
-
-                Assert.AreEqual(vsSynchedResult[i].Trim(), vActual[i].Trim(), "Contents should be equal");
-            }
-        }
-
-
-
-
     }
 }

@@ -2559,16 +2559,16 @@ namespace OurWord
                     while (!SynchProgressDlg.IsCreated)
                         Thread.Sleep(500);
                     Thread.Sleep(2000);
-                    SynchProgressDlg.SetStepSuccess(SynchProgressDlg.steps.InternetAccess);
+                    SynchProgressDlg.SetStepSuccess(SynchProgressDlg.Steps.InternetAccess);
 
                     // Clone the repository (thus creating the Cluster folder and
                     // the .Hg subfolder)
-                    SynchProgressDlg.SetStepStart(SynchProgressDlg.steps.Pulling);
+                    SynchProgressDlg.SetStepStart(SynchProgressDlg.Steps.Pulling);
                     string sRepository = Repository.BuildRemoteRepositoryString(
                         wiz.Url, wiz.UserName, wiz.Password);
                     if (!Repository.CloneTo(ci.ClusterFolder, sRepository))
                     {
-                        SynchProgressDlg.SetStepFailed(SynchProgressDlg.steps.Pulling);
+                        SynchProgressDlg.SetStepFailed(SynchProgressDlg.Steps.Pulling);
                         throw new Exception(c_sCloneFailedMsg);
                     }
 
@@ -3458,10 +3458,15 @@ namespace OurWord
             DB.Project.Nav.SavePositionToRegistry();
             OnLeaveProject(false);
 
-            DB.TeamSettings.Repository.SynchronizeWithRemote();
+            // Do the Synchronize
+            var local = new HgLocalRepository(DB.TeamSettings.ClusterFolder);
+            var remote = new HgInternetRepository(DB.TeamSettings.DisplayName);
+            var username = DB.UserName;
+            var synch = new Synchronize(local, remote, username);
+            synch.Do();
 
             // We have to unload, then reload everything
-            string sPath = DB.Project.StoragePath;
+            var sPath = DB.Project.StoragePath;
             DB.Project = new DProject();
             DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
             DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
@@ -3809,8 +3814,6 @@ namespace OurWord
                 null);
         }
         #endregion
-        /***
-        ***/
     }
 	#endregion
 

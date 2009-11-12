@@ -3185,12 +3185,12 @@ namespace OurWordData.DataModel
                         return MyRun.AsString;
 
                     // Fetch the DText
-                    DText MyText = MyRun as DText;
+                    var MyText = MyRun as DText;
                     Debug.Assert(null != MyText);
 
                     // Determine which string: Vernacular or Backtranslation
-                    int iPos = PosInMyRun;
-                    string sFull = MyText.AsString;
+                    var iPos = PosInMyRun;
+                    var sFull = MyText.AsString;
                     if (sFull.Length <= iPos)
                     {
                         iPos -= sFull.Length;
@@ -3259,12 +3259,13 @@ namespace OurWordData.DataModel
                 #region Attt{g}: string GetNoteText()
                 string GetNoteText()
                 {
+                    var sTheirValue = (null == TheirRun) ? "" : TheirRun.AsString;
                     return LocDB.GetValue(
                         new string[] { "Strings " },
                         "mergeNote",
                         "The other version had \"{0}\".",
                         null,
-                        new string[] { TheirRun.AsString } );
+                        new string[] { sTheirValue });
                 }
                 #endregion
                 #region Method: void ConsoleOut()

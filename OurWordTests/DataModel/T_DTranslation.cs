@@ -338,8 +338,13 @@ namespace OurWordTests.DataModel
             var sFileTheirs = sFolder + "theirs.otrans";
             JWU.WriteFile(sFileTheirs, sTheirs);
 
-            var MergeInfo = new MergeOrder(MergeOrder.ConflictHandlingMode.WeWin,
-                sFileOurs, sFileParent, sFileTheirs);
+            var MergeInfo = new MergeOrder(
+                sFileOurs, sFileParent, sFileTheirs,
+                new NullMergeSituation());
+
+
+//            var MergeInfo = new MergeOrder(MergeOrder.ConflictHandlingMode.WeWin,
+//                sFileOurs, sFileParent, sFileTheirs);
 
             // Do the merge
             DTranslation.Merge(MergeInfo);

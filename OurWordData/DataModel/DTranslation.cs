@@ -542,54 +542,56 @@ namespace OurWordData.DataModel
         #endregion
 
         // Merge -----------------------------------------------------------------------------
-        #region SMethod: void Merge(MergeOrder MergeInfo)
-        static public void Merge(MergeOrder MergeInfo)
+        #region SMethod: void Merge(MergeOrder mergeOrder)
+        static public void Merge(MergeOrder mergeOrder)
             // Merges the DTranslation files on an attr-by-attr bases. So conceivable different
             // people can edit differing attributes, yet merge. If they edit the same attr, though,
             // "ours" will win.
         {
+            if (mergeOrder == null) throw new ArgumentNullException("mergeOrder");
+
             // Load into three DTranslation objects
-            var Parent = new DTranslation();
-            var Ours = new DTranslation();
-            var Theirs = new DTranslation();
-            Parent.LoadFromFile(MergeInfo.pathToCommonAncestor);
-            Ours.LoadFromFile(MergeInfo.pathToOurs);
-            Theirs.LoadFromFile(MergeInfo.pathToTheirs);
+            var parentTranslation = new DTranslation();
+            var ourTranslation = new DTranslation();
+            var theirTranslation = new DTranslation();
+            parentTranslation.LoadFromFile(mergeOrder.pathToCommonAncestor);
+            ourTranslation.LoadFromFile(mergeOrder.pathToOurs);
+            theirTranslation.LoadFromFile(mergeOrder.pathToTheirs);
 
             // If we differ from Parent, then keep Ours, otherwise keep Theirs. Or put another
-            // way, if we equal the parrent, then we keep theirs, assuming either theirs have
+            // way, if we equal the parent, then we keep theirs, assuming either theirs has
             // changed, or neither has changed. OTOH, if we are different from the parent then
             // this logic keeps ours, which means that if both have made changes, Ours wins.
-            if (Ours.DisplayName == Parent.DisplayName)
-                Ours.DisplayName = Theirs.DisplayName;
+            if (ourTranslation.DisplayName == parentTranslation.DisplayName)
+                ourTranslation.DisplayName = theirTranslation.DisplayName;
 
-            if (Ours.VernacularWritingSystemName == Parent.VernacularWritingSystemName)
-                Ours.VernacularWritingSystemName = Theirs.VernacularWritingSystemName;
+            if (ourTranslation.VernacularWritingSystemName == parentTranslation.VernacularWritingSystemName)
+                ourTranslation.VernacularWritingSystemName = theirTranslation.VernacularWritingSystemName;
 
-            if (Ours.ConsultantWritingSystemName == Parent.ConsultantWritingSystemName)
-                Ours.ConsultantWritingSystemName = Theirs.ConsultantWritingSystemName;
+            if (ourTranslation.ConsultantWritingSystemName == parentTranslation.ConsultantWritingSystemName)
+                ourTranslation.ConsultantWritingSystemName = theirTranslation.ConsultantWritingSystemName;
 
-            if (Ours.Comment == Parent.Comment)
-                Ours.Comment = Theirs.Comment;
+            if (ourTranslation.Comment == parentTranslation.Comment)
+                ourTranslation.Comment = theirTranslation.Comment;
 
-            if (Ours.BookNamesTable.Length == Theirs.BookNamesTable.Length &&
-                Ours.BookNamesTable.Length == Parent.BookNamesTable.Length)
+            if (ourTranslation.BookNamesTable.Length == theirTranslation.BookNamesTable.Length &&
+                ourTranslation.BookNamesTable.Length == parentTranslation.BookNamesTable.Length)
             {
-                for (int i = 0; i < Ours.BookNamesTable.Length; i++)
+                for (int i = 0; i < ourTranslation.BookNamesTable.Length; i++)
                 {
-                    if (Ours.BookNamesTable[i] == Parent.BookNamesTable[i])
-                        Ours.BookNamesTable[i] = Theirs.BookNamesTable[i];
+                    if (ourTranslation.BookNamesTable[i] == parentTranslation.BookNamesTable[i])
+                        ourTranslation.BookNamesTable[i] = theirTranslation.BookNamesTable[i];
                 }
             }
 
-            if (Ours.FootnoteSequenceType == Parent.FootnoteSequenceType)
-                Ours.FootnoteSequenceType = Theirs.FootnoteSequenceType;
+            if (ourTranslation.FootnoteSequenceType == parentTranslation.FootnoteSequenceType)
+                ourTranslation.FootnoteSequenceType = theirTranslation.FootnoteSequenceType;
 
-            if (Ours.FootnoteCustomSeq.SaveLine == Parent.FootnoteCustomSeq.SaveLine)
-                Ours.FootnoteCustomSeq.Read(Theirs.FootnoteCustomSeq.SaveLine);
+            if (ourTranslation.FootnoteCustomSeq.SaveLine == parentTranslation.FootnoteCustomSeq.SaveLine)
+                ourTranslation.FootnoteCustomSeq.Read(theirTranslation.FootnoteCustomSeq.SaveLine);
 
             // Save the result
-            Ours.WriteToFile(MergeInfo.pathToOurs, new NullProgress());
+            ourTranslation.WriteToFile(mergeOrder.pathToOurs, new NullProgress());
         }
         #endregion
     }

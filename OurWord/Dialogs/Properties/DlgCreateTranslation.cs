@@ -199,7 +199,7 @@ namespace OurWord.Dialogs
         }
         #endregion
         #region Method: void ValidateData() - Don't allow the dlg to exit if data not right
-        public bool ValidateData()
+	    private bool ValidateData()
 			// I do this as a separate method, rather than having it in the OnClosing handler,
 			// so that the unit tests can call it easily.
 		{
@@ -234,12 +234,12 @@ namespace OurWord.Dialogs
 
             // The translation's name must be made of characters, digits, and optional internal
             // blank space.
-            foreach (char ch in sProposedName)
+            foreach (var ch in sProposedName)
             {
-                if (!char.IsLetter(ch) && ch != ' ')
+                if (!char.IsLetterOrDigit(ch) && ch != ' ' && ch != '-' && ch != ' ')
                 {
                     SetErrorText("msgInvalidCharsInTranslationName",
-                        "A translation name can be made up only of letters, digits and space.");
+                        "A translation name can be made up only of letters, hyphen, digits and space.");
                     SetFocusToTranslationName();
                     return false;
                 }
@@ -252,7 +252,7 @@ namespace OurWord.Dialogs
 
 		// Command Handlers ------------------------------------------------------------------
 		#region Handler: cmdLoad - localize the controls
-		private void cmdLoad(object sender, System.EventArgs e)
+		private void cmdLoad(object sender, EventArgs e)
 		{
 			// Localizations
             Control[] vExclude = { };
@@ -263,7 +263,7 @@ namespace OurWord.Dialogs
 		}
 		#endregion
 		#region Handler: cmdClosing - abort if data is not acceptable
-		private void cmdClosing(object sender, System.ComponentModel.CancelEventArgs e)
+		private void cmdClosing(object sender, CancelEventArgs e)
 		{
 			// We're only interested in further processing if the user has hit the OK
 			// button, signaling he is done and wishes to save his results.

@@ -77,11 +77,15 @@
   <ItemGroup>
     <Reference Include="Chorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\chorus\src\Chorus\obj\Debug\Chorus.exe</HintPath>
+      <HintPath>..\..\chorus\chorus\output\Debug\Chorus.exe</HintPath>
     </Reference>
     <Reference Include="ChorusMerge, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\chorus\src\ChorusMerge\obj\Debug\ChorusMerge.exe</HintPath>
+      <HintPath>..\..\chorus\chorus\output\Debug\ChorusMerge.exe</HintPath>
+    </Reference>
+    <Reference Include="LibChorus, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\chorus\chorus\output\Debug\LibChorus.dll</HintPath>
     </Reference>
     <Reference Include="LinqBridge, Version=1.0.0.0, Culture=neutral, PublicKeyToken=c2b14eb747628076, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -123,6 +127,7 @@
     <Compile Include="DataModel\DSection.cs" />
     <Compile Include="DataModel\DTeamSettings.cs" />
     <Compile Include="DataModel\DTranslation.cs" />
+    <Compile Include="DataModel\HgRepositoryBase.cs" />
     <Compile Include="DataModel\Merger.cs" />
     <Compile Include="DataModel\RepairImportBook.cs">
       <SubType>Form</SubType>

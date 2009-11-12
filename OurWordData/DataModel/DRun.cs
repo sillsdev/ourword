@@ -2235,7 +2235,7 @@ namespace OurWordData.DataModel
         static public string GetNoteContext(string sOurs, string sTheirs)
         {
             // Scan forward until we get a difference
-            int iStart = 0;
+            var iStart = 0;
             while (iStart < sOurs.Length && 
                 iStart < sTheirs.Length &&
                 sOurs[iStart] == sTheirs[iStart])
@@ -2244,8 +2244,8 @@ namespace OurWordData.DataModel
             }
 
             // Scan backward from the end until we get a difference
-            int iEnd = sOurs.Length - 1;
-            int iTheirEnd = sTheirs.Length - 1;
+            var iEnd = sOurs.Length - 1;
+            var iTheirEnd = sTheirs.Length - 1;
             while( iEnd >= 0 && 
                 iTheirEnd >= 0 && 
                 sOurs[iEnd] == sTheirs[iTheirEnd])
@@ -2255,12 +2255,21 @@ namespace OurWordData.DataModel
             }
 
             // Everything in-between Start and End is where the differences were found
-            string sContext = "";
-            for (int i = iStart; i <= iEnd && sContext.Length < c_nMaxContextLength; i++)
+            var sContext = "";
+            for (var i = iStart; i <= iEnd && sContext.Length < c_nMaxContextLength; i++)
                 sContext += sOurs[i];
 
             // We're not wanting to fool with whitespace
             sContext = sContext.Trim();
+
+            // If Theirs is empty, then all of Ours is different. We want an elipses if
+            // it is longer than what we just extracted
+            if (string.IsNullOrEmpty(sTheirs))
+            {
+                if (sOurs.Length > c_nMaxContextLength)
+                    sContext += "...";
+                return sContext;
+            }
 
             // If we have no differences, it is because the changes were appended either
             // to the front or to the end
@@ -2270,7 +2279,7 @@ namespace OurWordData.DataModel
                 // a prepend
                 if (iStart == 0)
                 {
-                    for (int k = 0; k < sOurs.Length && k < c_nMaxContextLength; k++)
+                    for (var k = 0; k < sOurs.Length && k < c_nMaxContextLength; k++)
                         sContext += sOurs[k];
                     if (sContext.Length == c_nMaxContextLength)
                         sContext = sContext.Trim() + "...";
@@ -2293,6 +2302,66 @@ namespace OurWordData.DataModel
             }
 
             return sContext.Trim();
+        }
+        #endregion
+        #region SMethod: string GetConflictMergeNoteContents(sParent, sOurs, sTheirs)
+        static public string GetConflictMergeNoteContents(string sParent, string sOurs, string sTheirs)
+        {
+            var sParentChanged = sParent;
+            var sOursChanged = sOurs;
+            var sTheirsChanged = sTheirs;
+
+            const int minimumLength = 12;
+
+            // Remove what they have in common at their beginning
+            while (!string.IsNullOrEmpty(sParentChanged) && 
+                !string.IsNullOrEmpty(sOursChanged) &&
+                !string.IsNullOrEmpty(sTheirsChanged))
+            {
+                if (sParentChanged.Length < minimumLength ||
+                    sOursChanged.Length < minimumLength ||
+                    sTheirsChanged.Length < minimumLength)
+                    break;
+
+                if (sParentChanged[0] != sOursChanged[0])
+                    break;
+                if (sParentChanged[0] != sTheirsChanged[0])
+                    break;
+
+                sParentChanged = sParentChanged.Substring(1);
+                sOursChanged = sOursChanged.Substring(1);
+                sTheirsChanged = sTheirsChanged.Substring(1);
+            }
+
+            // Remove what they have in common at their ending
+            while (!string.IsNullOrEmpty(sParentChanged) &&
+                !string.IsNullOrEmpty(sOursChanged) &&
+                !string.IsNullOrEmpty(sTheirsChanged))
+            {
+                if (sParentChanged.Length < minimumLength ||
+                    sOursChanged.Length < minimumLength ||
+                    sTheirsChanged.Length < minimumLength)
+                    break;
+
+                var iParent = sParentChanged.Length - 1;
+                var iOurs = sOursChanged.Length - 1;
+                var iTheirs = sTheirsChanged.Length - 1;
+
+                if (sParentChanged[iParent] != sOursChanged[iOurs])
+                    break;
+                if (sParentChanged[iParent] != sTheirsChanged[iTheirs])
+                    break;
+
+                sParentChanged = sParentChanged.Substring(0, iParent);
+                sOursChanged = sOursChanged.Substring(0, iOurs);
+                sTheirsChanged = sTheirsChanged.Substring(0, iTheirs);
+            }
+
+            // Build the string
+            var sContents = string.Format("Merge Conflict: Original was \"{0}\"; Ours was \"{1}\"; Theirs was \"{2}\"",
+                sParentChanged, sOursChanged, sTheirsChanged);
+
+            return sContents;
         }
         #endregion
         #region Method:  void Merge(DBasicText Parent, DBasicText Theirs)
@@ -2329,9 +2398,10 @@ namespace OurWordData.DataModel
 
             // TODO: Assign it to this user? Or, perhaps this should be a merge setting.
             // I guess for now it just stays unassigned.
-
-            var message = new DMessage(TranslatorNote.MergeAuthor, 
-                DateTime.Now, DMessage.Anyone, Theirs.ContentsAsString);
+            var sMessageContents = GetConflictMergeNoteContents(Parent.ContentsAsString,
+                 this.ContentsAsString, Theirs.ContentsAsString);
+            var message = new DMessage(TranslatorNote.MergeAuthor,
+                DateTime.Now, DMessage.Anyone, sMessageContents);
             note.Messages.Append(message);
 
             TranslatorNotes.Append(note);

@@ -24,18 +24,26 @@ namespace OurWordData.DataModel
 {
     public partial class SynchProgressDlg : Form
     {
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public SynchProgressDlg()
         {
             InitializeComponent();
         }
         #endregion
-
         static SynchProgressDlg s_Dlg;
 
         // Status ----------------------------------------------------------------------------
+        static private Steps[] s_ActiveSteps;
+        static void SetupSteps(Steps[] vActiveSteps)
+        {
+            s_ActiveSteps = vActiveSteps;
+
+        }
+
+
         public enum states { Pending, InProcess, Complete, Failure };
-        public enum steps
+        public enum Steps
         {
             InternetAccess,
             Integrity,
@@ -69,57 +77,57 @@ namespace OurWordData.DataModel
         #endregion
 
         #region SMethod: void SetStepStart(steps step)
-        static public void SetStepStart(steps step)
+        static public void SetStepStart(Steps step)
         {
             SetStep(step, states.InProcess);
         }
         #endregion
         #region SMethod: void SetStepFailed(steps step)
-        static public void SetStepFailed(steps step)
+        static public void SetStepFailed(Steps step)
         {
             SetStep(step, states.Failure);
             s_bHadProblem = true;
         }
         #endregion
         #region SMethod: void SetStepSuccess(steps step)
-        static public void SetStepSuccess(steps step)
+        static public void SetStepSuccess(Steps step)
         {
             SetStep(step, states.Complete);
         }
         #endregion
         #region SMethod: void SetStep(steps step, states state)
-        static void SetStep(steps step, states state)
+        static void SetStep(Steps step, states state)
         {
             if (null == s_Dlg)
                 return;
 
             switch (step)
             {
-                case steps.InternetAccess:
+                case Steps.InternetAccess:
                     s_Dlg.SetPicture(s_Dlg.m_pictInternetAccess, state);
                     break;
 
-                case steps.Integrity:
+                case Steps.Integrity:
                     s_Dlg.SetPicture(s_Dlg.m_pictIntegrity, state);
                     break;
 
-                case steps.StoringChanges:
+                case Steps.StoringChanges:
                     s_Dlg.SetPicture(s_Dlg.m_pictStoringRecentChanges, state);
                     break;
 
-                case steps.Pulling:
+                case Steps.Pulling:
                     s_Dlg.SetPicture(s_Dlg.m_pictPulling, state);
                     break;
 
-                case steps.Merging:
+                case Steps.Merging:
                     s_Dlg.SetPicture(s_Dlg.m_pictMerging, state);
                     break;
 
-                case steps.StoringMerge:
+                case Steps.StoringMerge:
                     s_Dlg.SetPicture(s_Dlg.m_pictStoringMergeResults, state);
                     break;
 
-                case steps.Pushing:
+                case Steps.Pushing:
                     s_Dlg.SetPicture(s_Dlg.m_pictPush, state);
                     break;
             }
@@ -284,5 +292,59 @@ namespace OurWordData.DataModel
 
 
     }
+
+
+    public class SynchProgress
+    {
+        private readonly bool m_bMakeVisible;
+
+        public SynchProgress(bool bMakeVisible, SynchProgressDlg.Steps[] vSteps)
+        {
+            m_bMakeVisible = bMakeVisible;
+        }
+
+        #region Method: void Launch()
+        public void Launch()
+        // Launch the Progress dialog in a separate thread so that it will update.
+        // We loop until we know it is created, and then wait an addition couple
+        // of seconds to make sure it is showing.
+        {
+            if (!m_bMakeVisible)
+                return;
+
+            SynchProgressDlg.Start(false);
+            while (!SynchProgressDlg.IsCreated)
+                Thread.Sleep(500);
+            Thread.Sleep(2000);
+        }
+        #endregion
+        #region Method: void Stop()
+        public void Stop()
+        {
+            if (!m_bMakeVisible)
+                return;
+
+            SynchProgressDlg.Stop();
+        }
+        #endregion
+
+        public void Step()
+        {
+            if (!m_bMakeVisible)
+                return;
+
+        }
+
+        public void Fail()
+        {
+            if (!m_bMakeVisible)
+                return;
+
+        }
+
+    }
+
+
+
 
 }

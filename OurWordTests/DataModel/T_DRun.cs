@@ -644,6 +644,101 @@ namespace OurWordTests.DataModel
             sOurs = "For God so loved the world";
             sTheirs = "For God so loved the world he gave the world";
             Assert.AreEqual("...the world", DText.GetNoteContext(sOurs, sTheirs), "Pathelogic");
+
+            // Empty "theirs"
+            sOurs = "For God so loved the world";
+            sTheirs = "";
+            Assert.AreEqual("For God so...", DText.GetNoteContext(sOurs, sTheirs), "Empty");
+
+        }
+        #endregion
+
+        #region Test: CreateNoteContents
+        [Test] public void CreateNoteContents()
+        {
+            const string sParent = "For God so loved the world that he gave his only begotten son";
+            const string sOurs = "For God so loved the world that he gave his one and only son";
+            const string sTheirs = "For God loved the world so much that he gave his one and only son";
+
+            var sActual = DText.GetConflictMergeNoteContents(sParent, sOurs, sTheirs);
+
+            const string sParentChanged = "so loved the world that he gave his only begotten";
+            const string sOursChanged = "so loved the world that he gave his one and only";
+            const string sTheirsChanged = "loved the world so much that he gave his one and only";
+            var sExpected = string.Format(
+                "Merge Conflict: Original was \"{0}\"; Ours was \"{1}\"; Theirs was \"{2}\"", 
+                sParentChanged, sOursChanged, sTheirsChanged);
+
+            Assert.AreEqual(sExpected, sActual);
+        }
+        #endregion
+        #region Test: CreateNoteContents_TheirsIsEmpty
+        [Test]
+        public void CreateNoteContents_TheirsIsEmpty()
+        {
+            const string sParent = "For God so loved the world that he gave his only begotten son";
+            const string sOurs = "For God so loved the world that he gave his one and only son";
+            const string sTheirs = "";
+
+            var sActual = DText.GetConflictMergeNoteContents(sParent, sOurs, sTheirs);
+
+            var sExpected = string.Format(
+                "Merge Conflict: Original was \"{0}\"; Ours was \"{1}\"; Theirs was \"\"",
+                sParent, sOurs);
+
+            Assert.AreEqual(sExpected, sActual);
+        }
+        #endregion
+        #region Test: CreateNoteContents_OursIsEmpty
+        [Test]
+        public void CreateNoteContents_OursIsEmpty()
+        {
+            const string sParent = "For God so loved the world that he gave his only begotten son";
+            const string sOurs = "";
+            const string sTheirs = "For God loved the world so much that he gave his one and only son";
+
+            var sActual = DText.GetConflictMergeNoteContents(sParent, sOurs, sTheirs);
+
+            var sExpected = string.Format(
+                "Merge Conflict: Original was \"{0}\"; Ours was \"\"; Theirs was \"{1}\"",
+                sParent, sTheirs);
+
+            Assert.AreEqual(sExpected, sActual);
+        }
+        #endregion
+        #region Test: CreateNoteContents_ParentWasEmpty
+        [Test]
+        public void CreateNoteContents_ParentWasEmpty()
+        {
+            const string sParent = "";
+            const string sOurs = "For God so loved the world that he gave his one and only son";
+            const string sTheirs = "For God loved the world so much that he gave his one and only son";
+
+            var sActual = DText.GetConflictMergeNoteContents(sParent, sOurs, sTheirs);
+
+            var sExpected = string.Format(
+                "Merge Conflict: Original was \"\"; Ours was \"{0}\"; Theirs was \"{1}\"",
+                sOurs, sTheirs);
+
+            Assert.AreEqual(sExpected, sActual);
+        }
+        #endregion
+        #region Test: CreateNoteContents_ProvideMoreContext
+        [Test]
+        public void CreateNoteContents_ProvideMoreContext()
+        {
+            const string sParent = "My God is an awesome God.";
+            const string sOurs = "My God is an amazing God.";
+            const string sTheirs = "My God is an everlasting God.";
+
+            var sActual = DText.GetConflictMergeNoteContents(sParent, sOurs, sTheirs);
+
+            const string sExpected =
+                "Merge Conflict: Original was \"awesome God\"; " +
+                "Ours was \"amazing God\"; " +
+                "Theirs was \"everlasting God\"";
+
+            Assert.AreEqual(sExpected, sActual);
         }
         #endregion
     }

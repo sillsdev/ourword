@@ -10,18 +10,15 @@
 #region Using
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Windows.Forms;
 using System.Text;
 using System.Threading;
 using System.IO;
 using System.Xml;
 using JWTools;
-using OurWordData;
+using Chorus.merge;
 #endregion
 #endregion
 
@@ -457,6 +454,7 @@ namespace OurWordData.DataModel
 
         // BookAbbrev-To-BookNumber Conversions ----------------------------------------------
         public const int BookAbbrevsCount = 66;
+        public const int c_iMatthew = 39;
         #region SAttr{g} string[] BookAbbrevs - e.g., "GEN", "EXO", "LEV", etc.
         static public string[] BookAbbrevs = { "GEN", "EXO", "LEV", "NUM", "DEU", "JOS",
 			"JDG", "RUT", "1SA", "2SA", "1KI", "2KI", "1CH", "2CH", "EZR", "NEH",
@@ -468,7 +466,7 @@ namespace OurWordData.DataModel
         #endregion
         #region SMethod: static int FindBookAbbrevIndex(string sAbbrev)
         public static int FindBookAbbrevIndex(string sAbbrev)
-            // Returns 0-based index
+        // Returns 0-based index
         {
             for (int i = 0; i < BookAbbrevs.Length; i++)
             {
@@ -516,10 +514,36 @@ namespace OurWordData.DataModel
         {
             get
             {
-                if (BookIndex < 39)
+                if (BookIndex < c_iMatthew)
                     return true;
                 return false;
             }
+        }
+        #endregion
+        #region SMethod: bool GetIsOldTestamentBook(sBookAbbrev)
+        static public bool GetIsOldTestamentBook(string sBookAbbrev)
+        {
+            if (string.IsNullOrEmpty(sBookAbbrev))
+                return false;
+
+            var i = DBook.FindBookAbbrevIndex(sBookAbbrev);
+            if (-1 == i)
+                return false;
+
+            return (i < c_iMatthew);
+        }
+        #endregion
+        #region SMethod: bool GetIsNewTestamentBook(sBookAbbrev)
+        static public bool GetIsNewTestamentBook(string sBookAbbrev)
+        {
+            if (string.IsNullOrEmpty(sBookAbbrev))
+                return false;
+
+            var i = DBook.FindBookAbbrevIndex(sBookAbbrev);
+            if (-1 == i)
+                return false;
+
+            return (i >= c_iMatthew);
         }
         #endregion
 
@@ -854,10 +878,10 @@ namespace OurWordData.DataModel
         #endregion
         #region Method: void CombineEmptyInitialSection()
         void CombineEmptyInitialSection()
-            // The Timor MRK's typically have an introductory paragraph without a section
-            // (\s), and have preferred to edit these together with the next section for
-            // more context when editing. So I scan the first section for an \s, and if not
-            // found, combine it into the next section
+        // The Timor MRK's typically have an introductory paragraph without a section
+        // (\s), and have preferred to edit these together with the next section for
+        // more context when editing. So I scan the first section for an \s, and if not
+        // found, combine it into the next section
         {
             if (Sections.Count < 2)
                 return;
@@ -872,7 +896,7 @@ namespace OurWordData.DataModel
 
             // Didn't find it, so combine with the next one
             var section2 = Sections[1];
-            while(section2.Paragraphs.Count > 0)
+            while (section2.Paragraphs.Count > 0)
             {
                 DParagraph p = section2.Paragraphs[0];
                 section2.Paragraphs.Remove(p);
@@ -1054,7 +1078,7 @@ namespace OurWordData.DataModel
                 if (Map.IsBookHistoryMarker(field.Mkr))
                 {
                     Book.History.AddMessage(
-                        new DateTime(2009,1,1), 
+                        new DateTime(2009, 1, 1),
                         DB.TeamSettings.Stages.Draft,
                         field.Data);
                     return true;
@@ -1527,8 +1551,8 @@ namespace OurWordData.DataModel
         }
 
         public bool _LoadFromOxes(string sPath, IProgressIndicator progress)
-            // Returns true if the user wishes to try again following making corrections in the
-            // Repair dialog, false otherwise.
+        // Returns true if the user wishes to try again following making corrections in the
+        // Repair dialog, false otherwise.
         {
             m_bIsLoaded = false;
             var oxes = new XmlDoc();
@@ -1994,9 +2018,9 @@ namespace OurWordData.DataModel
             // Get / Compute -----------------------------------------------------------------
             #region Method: void ComputePercentDrafted()
             public void ComputePercentDrafted()
-                // Computes the percentage of DTexts which have drafted (and BT'd) text.
-                // Sets these into the dictionary, and returns whichever figure was
-                // asked for by the bool bBT.
+            // Computes the percentage of DTexts which have drafted (and BT'd) text.
+            // Sets these into the dictionary, and returns whichever figure was
+            // asked for by the bool bBT.
             {
                 if (!Book.Loaded)
                     Book.LoadBook(new NullProgress());
@@ -2351,7 +2375,7 @@ namespace OurWordData.DataModel
 
             // Assemble the language name; should be non-empty
             string sLanguageName = "";
-            for(int i = 3; i<vsParts.Length; i++)
+            for (int i = 3; i < vsParts.Length; i++)
                 sLanguageName += (vsParts[i] + ' ');
             sLanguageName = sLanguageName.Trim();
             if (string.IsNullOrEmpty(sLanguageName))
@@ -2367,35 +2391,85 @@ namespace OurWordData.DataModel
         #endregion
 
         // Merging ---------------------------------------------------------------------------
-        #region Method: void Merge(DBook Parent, DBook Theirs)
-        public void Merge(DBook Parent, DBook Theirs)
+        #region static DBook CreateAndReadBook(sAbbrevation, sBookName, sPath)
+        static DBook CreateAndReadBook(string abbreviation, string bookName, string bookPath)
+        {
+            // Create and add a translation
+            var translation = new DTranslation(bookName);
+            DB.Project.OtherTranslations.Append(translation);
+
+            // Create and add a book. We need it to be in the hierarchy before we start the Load.
+            var book = new DBook(abbreviation);
+            translation.AddBook(book);
+
+            // Read in the book
+            book.LoadBook(bookPath, new NullProgress());
+            return book;
+        }
+        #endregion
+        #region static void Merge(MergeOrder)
+        static public void Merge(MergeOrder mergeOrder)
         {
             // Debug.Fail("Breakpoint");
 
-            // Merge the histories
-            History.Merge(Parent.History, Theirs.History);
+            if (mergeOrder == null) throw new ArgumentNullException("mergeOrder");
 
-            // At this point we must assume the same number of sections
-            if (Sections.Count != Parent.Sections.Count)
+            // Initializations (dependencies we should get rid of someday)
+            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
+            LocDB.Initialize(JWU.GetApplicationDataFolder("OurWord"));
+
+            // Create an owning project, because currently stuff depends on having it
+            DB.Project = new DProject("Merge") {TeamSettings = new DTeamSettings("Merge")};
+            DB.Project.TeamSettings.EnsureInitialized();
+
+            // Extract the book's Abbrev from the path
+            var sBaseFileName = Path.GetFileNameWithoutExtension(mergeOrder.pathToOurs);
+            var sBookAbbrev = sBaseFileName.Substring(3, 3);
+
+            // Read in the three versions of the book
+            var ourBook = CreateAndReadBook(sBookAbbrev, "Ours", mergeOrder.pathToOurs);
+            var theirBook = CreateAndReadBook(sBookAbbrev, "Theirs", mergeOrder.pathToTheirs);
+            var parentBook = CreateAndReadBook(sBookAbbrev, "Parent", mergeOrder.pathToCommonAncestor);
+
+            // At this point we must assume the same number of sections; if this differs
+            // then our's wins and everything in theirs is tossed.
+            if (ourBook.Sections.Count != parentBook.Sections.Count)
                 return;
-            if (Sections.Count != Theirs.Sections.Count)
+            if (ourBook.Sections.Count != theirBook.Sections.Count)
                 return;
+
+            // Merge the attributes. 
+            // If we differ from Parent, then keep Ours, otherwise keep Theirs. Or put another
+            // way, if we equal the parent, then we keep theirs, assuming either theirs has
+            // changed, or neither has changed. OTOH, if we are different from the parent then
+            // this logic keeps ours, which means that if both have made changes, Ours wins.
+            if (ourBook.Comment == parentBook.Comment)
+                ourBook.Comment = theirBook.Comment;
+
+            if (ourBook.Version == parentBook.Version)
+                ourBook.Version = theirBook.Version;
+
+            if (ourBook.Copyright == parentBook.Copyright)
+                ourBook.Copyright = theirBook.Copyright;
+
+            if (ourBook.Locked == parentBook.Locked)
+                ourBook.Locked = theirBook.Locked;
+
+            if (ourBook.ID == parentBook.ID)
+                ourBook.ID = theirBook.ID;
+
+            if (ourBook.Stage == parentBook.Stage)
+                ourBook.Stage = theirBook.Stage;
+
+            // Merge the histories
+            ourBook.History.Merge(parentBook.History, theirBook.History);
 
             // Merge the sections
-            for (int i = 0; i < Sections.Count; i++)
-            {
-                Sections[i].Merge(Parent.Sections[i], Theirs.Sections[i]);
-            }
-        }
-        #endregion
-        #region OMethod: void Merge(JObject Parent, JObject Theirs, bool bWeWin)
-        public override void Merge(JObject Parent, JObject Theirs, bool bWeWin)
-        {
-            // Just let the basic attrs be merged; don't change the content, as we do that
-            // in a separate process called from ChorusMerge (the Merge method above).
-            base.MergeBasicAttrs(Parent, Theirs, bWeWin);
+            for (var i = 0; i < ourBook.Sections.Count; i++)
+                ourBook.Sections[i].Merge(parentBook.Sections[i], theirBook.Sections[i]);
+
+            ourBook.WriteBook(mergeOrder.pathToOurs);
         }
         #endregion
     }
-
 }

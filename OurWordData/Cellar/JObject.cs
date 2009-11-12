@@ -607,70 +607,7 @@ namespace OurWordData
             }
         }
         #endregion
-
-        // Merge -----------------------------------------------------------------------------
-        #region Method: void MergeBasicAttrs(objParent, objTheirs, bWeWin)
-        public void MergeBasicAttrs(JObject Parent, JObject Theirs, bool bWeWin)
-        {
-            // Collect the basic attr values within the xml element
-            XElement xMine = ToXml(false);
-            XElement xParent = Parent.ToXml(false);
-            XElement xTheirs = Theirs.ToXml(false);
-
-            // Loop through the attrs. We can assume they are the same number, because
-            // this list is produced by the object, not by the incoming data stream.
-            Debug.Assert(BAttrCount == Parent.BAttrCount);
-            Debug.Assert(BAttrCount == Theirs.BAttrCount);
-            foreach (XElement.XAttr attrMine in xMine.Attrs)
-            {
-                XElement.XAttr attrParent = xParent.FindAttr(attrMine.Tag);
-                XElement.XAttr attrTheirs = xTheirs.FindAttr(attrMine.Tag);
-
-                bool bWeDiffer = (attrMine.Value != attrParent.Value);
-                bool bTheyDiffer = (attrTheirs.Value != attrParent.Value);
-
-                // If no one differs, we're done
-                if (!bWeDiffer && !bTheyDiffer)
-                    continue;
-
-                // If we differ from parent, but they are same, keep ours.
-                if (bWeDiffer && !bTheyDiffer)
-                    continue;
-
-                // If they differ, but we are the same, keep theirs
-                if (bTheyDiffer && !bWeDiffer)
-                {
-                    attrMine.Value = attrTheirs.Value;
-                    continue;
-                }
-
-                // We have a conflict: let WeWin decide
-                if (!bWeWin)
-                    attrMine.Value = attrTheirs.Value;
-            }
-
-            // Place the answer back into the object
-            m_ioX = xMine;
-            m_ioOperation = Ops.kRead;
-            DeclareAttrs();
-        }
-        #endregion
-
-        public virtual void Merge(JObject Parent, JObject Theirs, bool bWeWin)
-        {
-            // Basic Attrs
-            MergeBasicAttrs(Parent, Theirs, bWeWin);
-
-            // Non-Basic Attrs
-            foreach (JAttr attrMine in AllAttrs)
-            {
-                JAttr attrParent = Parent.FindAttrByName(attrMine.Name);
-                JAttr attrTheirs = Theirs.FindAttrByName(attrMine.Name);
-
-                attrMine.Merge(attrParent, attrTheirs, bWeWin);
-            }
-        }
-       
+      
 		// I/O: Support Methods for resolving reference attributes ---------------------------
 		#region Method: string GetPathFromOwningObject(objAtTop) - returns, e.g., "LexEntries-234-Senses-5"
 		public string GetPathFromOwningObject(JObject objAtTop)
@@ -749,7 +686,4 @@ namespace OurWordData
 		}
 		#endregion
 	}
-
-
-
 }
