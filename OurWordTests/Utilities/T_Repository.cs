@@ -335,8 +335,6 @@ namespace OurWordTests.Utilities
             CleanupByEnsuringIsDeleted(clonedRepositoryPath);
         }
         #endregion
-
-
     }
 
 

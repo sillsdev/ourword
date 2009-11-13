@@ -46,7 +46,7 @@
             this.m_progressBar.Location = new System.Drawing.Point(12, 299);
             this.m_progressBar.MarqueeAnimationSpeed = 50;
             this.m_progressBar.Name = "m_progressBar";
-            this.m_progressBar.Size = new System.Drawing.Size(333, 23);
+            this.m_progressBar.Size = new System.Drawing.Size(356, 23);
             this.m_progressBar.Step = 1;
             this.m_progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.m_progressBar.TabIndex = 0;
@@ -58,7 +58,7 @@
             this.m_ProcessName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_ProcessName.Location = new System.Drawing.Point(9, 9);
             this.m_ProcessName.Name = "m_ProcessName";
-            this.m_ProcessName.Size = new System.Drawing.Size(336, 23);
+            this.m_ProcessName.Size = new System.Drawing.Size(359, 23);
             this.m_ProcessName.TabIndex = 1;
             this.m_ProcessName.Text = "Working...";
             this.m_ProcessName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -66,7 +66,7 @@
             // m_bOK
             // 
             this.m_bOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_bOK.Location = new System.Drawing.Point(146, 141);
+            this.m_bOK.Location = new System.Drawing.Point(136, 163);
             this.m_bOK.Name = "m_bOK";
             this.m_bOK.Size = new System.Drawing.Size(75, 23);
             this.m_bOK.TabIndex = 3;
@@ -82,7 +82,7 @@
             this.m_labelError.ForeColor = System.Drawing.Color.Red;
             this.m_labelError.Location = new System.Drawing.Point(45, 3);
             this.m_labelError.Name = "m_labelError";
-            this.m_labelError.Size = new System.Drawing.Size(282, 90);
+            this.m_labelError.Size = new System.Drawing.Size(305, 90);
             this.m_labelError.TabIndex = 4;
             this.m_labelError.Text = "(Error)";
             // 
@@ -104,7 +104,7 @@
             this.m_ErrorPanel.ForeColor = System.Drawing.Color.Red;
             this.m_ErrorPanel.Location = new System.Drawing.Point(12, 35);
             this.m_ErrorPanel.Name = "m_ErrorPanel";
-            this.m_ErrorPanel.Size = new System.Drawing.Size(333, 100);
+            this.m_ErrorPanel.Size = new System.Drawing.Size(356, 122);
             this.m_ErrorPanel.TabIndex = 6;
             // 
             // EnumeratedStepsProgressDlg
@@ -112,7 +112,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.m_bOK;
-            this.ClientSize = new System.Drawing.Size(357, 334);
+            this.ClientSize = new System.Drawing.Size(380, 334);
             this.ControlBox = false;
             this.Controls.Add(this.m_ErrorPanel);
             this.Controls.Add(this.m_bOK);

@@ -239,6 +239,8 @@ namespace JWTools
 
                 Controls.Add(step.PictureControl);
                 Controls.Add(step.LabelControl);
+
+                step.LabelControl.Size = new Size(m_progressBar.Right, step.LabelControl.Height);
             }
             ResumeLayout(); 
            

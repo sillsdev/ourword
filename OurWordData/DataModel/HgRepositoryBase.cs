@@ -796,8 +796,8 @@ namespace OurWordData.DataModel
             // Setup the steps/actions that the synch will require
             m_SynchSteps = new List<SynchStep>();
             var sOtherName = (other.IsRemoteOnInternet) ? "Internet" : "other repository";
-//            if (other.IsRemoteOnInternet)
-//                AddSynchStep("Checking Internet access", CheckInternetAccess);
+            if (other.IsRemoteOnInternet)
+                AddSynchStep("Checking Internet access", CheckInternetAccess);
             AddSynchStep("Checking data integrity", CheckLocalIntegrity);
             AddSynchStep("Storing any files you've changed", StoreChangedFiles);
             AddSynchStep("Retrieving any newer files from the " + sOtherName, PullNewerFiles);
