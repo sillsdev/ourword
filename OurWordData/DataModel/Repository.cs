@@ -31,7 +31,7 @@ namespace OurWordData.DataModel
 {
     public class SynchronizeIdea
     {
-        static public void LocalWithRemote(string clusterName, string fullPathToLocal, string fullPathToRemote)
+        static public SyncResults LocalWithRemote(string clusterName, string fullPathToLocal, string fullPathToRemote)
         {
             var configuration = BuildConfiguration(fullPathToLocal);
 
@@ -44,7 +44,7 @@ namespace OurWordData.DataModel
 
             var options = BuildSyncOptions(remoteAddress, "message");
 
-            var results = synchronizer.SyncNow(options);
+            return synchronizer.SyncNow(options);
         }
 
         static void LocalWithLocal(string repositoryName, string fullPathToLocal, string fullPathToOther)
@@ -178,75 +178,6 @@ namespace OurWordData.DataModel
         bool m_bActive;
         #endregion
 
-        // Settings --------------------------------------------------------------------------
-        const string c_sRegistrySubkey = "Collaboration";
-        const string c_sRegistryRemoteUserName = "RemoteUserName";
-        const string c_sRegistryRemotePassword = "RemotePassword";
-        const string c_sRegistryMineAlwaysWins = "MineAlwaysWins";
-        #region SAttr{g}: string RegistryClusterSubKey
-        static string RegistryClusterSubKey
-        {
-            get
-            {
-                return c_sRegistrySubkey + "\\" + DB.TeamSettings.DisplayName;
-            }
-        }
-        #endregion
-        #region SAttr{g/s}: string RemoteUrl - Url of the remote central repository
-        static public string RemoteUrl
-        {
-            get
-            {
-                return JW_Registry.GetValue(RegistryClusterSubKey, DB.TeamSettings.DisplayName, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(RegistryClusterSubKey, DB.TeamSettings.DisplayName, value);
-            }
-        }
-        #endregion
-        #region SAttr{g/s}: string RemoteUserName - User Name for the central repository
-        static public string RemoteUserName
-        {
-            get
-            {
-                return JW_Registry.GetValue(RegistryClusterSubKey, c_sRegistryRemoteUserName, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(RegistryClusterSubKey, c_sRegistryRemoteUserName, value);
-            }
-        }
-        #endregion
-        #region SAttr{g/s}: string RemotePassword - Password for the central repository
-        static public string RemotePassword
-        {
-            get
-            {
-                return JW_Registry.GetValue(RegistryClusterSubKey, c_sRegistryRemotePassword, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(RegistryClusterSubKey, c_sRegistryRemotePassword, value);
-            }
-        }
-        #endregion
-        #region SAttr{g/s}: bool MineAlwaysWins
-        static public bool MineAlwaysWins
-        {
-            get
-            {
-                return JW_Registry.GetValue(RegistryClusterSubKey, 
-                    c_sRegistryMineAlwaysWins, false);
-            }
-            set
-            {
-                JW_Registry.SetValue(RegistryClusterSubKey, 
-                    c_sRegistryMineAlwaysWins, value);
-            }
-        }
-        #endregion
-
         // VAttrs ----------------------------------------------------------------------------
         #region VAttr{g}: string HgRepositoryRoot - e.g., "MyDocuments\Timor"
         public string HgRepositoryRoot
@@ -315,13 +246,9 @@ namespace OurWordData.DataModel
         // Mercurial Direct Commands ---------------------------------------------------------
         // Commands
         const string c_sInit = "init";  // Create the repository
-        const string c_sStatus = "status"; // Get a list of files that have changed
         const string c_sCommit = "commit"; // Commit the changed files to the repo
         const string c_sClone = "clone";
-        const string c_sPush = "push";
-        const string c_sPull = "pull";
-        const string c_sOutGoing = "outgoing"; // Show changes that will be pushed
-       // Options
+        // Options
         const string c_sAddRemove = "-A"; // mark new/missing files as added/removed before committing
         const string c_sMessage = "-m";   // The following text is the Message for a commit
         const string c_suser = "-u";
@@ -482,172 +409,6 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        #region CLASS: ChangeSetDescription
-        public class ChangeSetDescription
-        {
-            #region Attr{g/s}: string ID
-            public string ID
-            {
-                get
-                {
-                    return m_sID;
-                }
-                set
-                {
-                    m_sID = value;
-                }
-            }
-            string m_sID;
-            #endregion
-            #region Attr{g/s}: string Tag
-            public string Tag
-            {
-                get
-                {
-                    return m_sTag;
-                }
-                set
-                {
-                    m_sTag = value;
-                }
-            }
-            string m_sTag;
-            #endregion
-            #region Attr{g/s}: string User
-            public string User
-            {
-                get
-                {
-                    return m_sUser;
-                }
-                set
-                {
-                    m_sUser = value;
-                }
-            }
-            string m_sUser;
-            #endregion
-            #region Attr{g/s}: string Date
-            public string Date
-            {
-                get
-                {
-                    return m_sDate;
-                }
-                set
-                {
-                    m_sDate = value;
-                }
-            }
-            string m_sDate;
-            #endregion
-            #region Attr{g/s}: string Summary
-            public string Summary
-            {
-                get
-                {
-                    return m_sSummary;
-                }
-                set
-                {
-                    m_sSummary = value;
-                }
-            }
-            string m_sSummary;
-            #endregion
-
-            #region Constructor(sID, sTag, sUser, sDate, sSummary)
-            public ChangeSetDescription(string sID, string sTag, string sUser, 
-                string sDate, string sSummary)
-            {
-                m_sID = sID;
-                m_sTag = sTag;
-                m_sUser = sUser;
-                m_sDate = sDate;
-                m_sSummary = sSummary;
-            }
-            #endregion
-            #region Constructor()
-            public ChangeSetDescription()
-            {
-            }
-            #endregion
-
-            #region List<> Create(vs[])
-            static public List<ChangeSetDescription> Create(string[] vs)
-            /* Changesets arrive in the form of:
-             *    changeset:   1:bbe11909d08a
-             *    tag:         tip
-             *    user:        JWimbish
-             *    date:        Wed Mar 04 19:37:07 2009 -0500
-             *    summary:     New File Added
-             */
-            {
-                var v = new List<ChangeSetDescription>();
-
-                string sID = null;
-                string sTag = null;
-                string sUser = null;
-                string sDate = null;
-                string sSummary = null;
-
-                foreach (string s in vs)
-                {
-                    int i = 0;
-
-                    // Collect the field
-                    string sField = "";
-                    while (i < s.Length && s[i] != ':')
-                        sField += s[i++];
-
-                    // Move to the next one
-                    if (i < s.Length && s[i] == ':')
-                        i++;
-                    while (i < s.Length && char.IsWhiteSpace(s[i]))
-                        i++;
-
-                    // Collect the data
-                    string sData = "";
-                    while (i < s.Length)
-                        sData += s[i++];
-
-                    if (sField == "changeset")
-                        sID = sData;
-                    if (sField == "tag")
-                        sTag = sData;
-                    if (sField == "user")
-                        sUser = sData;
-                    if (sField == "date")
-                        sDate = sData;
-                    if (sField == "summary")
-                    {
-                        sSummary = sData;
-
-                        if (!string.IsNullOrEmpty(sID) &&
-                            !string.IsNullOrEmpty(sTag) &&
-                            !string.IsNullOrEmpty(sUser) &&
-                            !string.IsNullOrEmpty(sDate) &&
-                            !string.IsNullOrEmpty(sSummary))
-                        {
-                            ChangeSetDescription set = new ChangeSetDescription(
-                                sID, sTag, sUser, sDate, sSummary);
-                            v.Add(set);
-                        }
-
-                        sID = null;
-                        sTag = null;
-                        sUser = null;
-                        sDate = null;
-                        sSummary = null;
-
-                    }
-                }
-                return v;
-            }
-            #endregion
-        }
-        #endregion
-
         // Static version of Operations ------------------------------------------------------
         #region SMethod: string BuildRemoteRepositoryString(sUrl, sUserName, sPassword)
         static public string BuildRemoteRepositoryString(string sUrl, string sUserName, string sPassword)
@@ -679,31 +440,7 @@ namespace OurWordData.DataModel
 
 
         // Operations ------------------------------------------------------------------------
-        #region SAttr{g}: bool HgIsInstalled
-        static public bool HgIsInstalled
-        {
-            get
-            {
-                // Attempt to get mercurial's version. If it fails, then Mercurial
-                // was not found.
-                ProcessStartInfo startInfo = new ProcessStartInfo();
-                startInfo.FileName = "hg";
-                startInfo.Arguments = "version";
-                startInfo.CreateNoWindow = true;
-                startInfo.UseShellExecute = false;
 
-                try
-                {
-                    System.Diagnostics.Process.Start(startInfo);
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-                return true;
-            }
-        }
-        #endregion
         #region VAttr{g}: bool Exists
         /// <summary>
         /// Returns T if the repository exists, as evidenced by having a .Hg directory
@@ -784,27 +521,7 @@ namespace OurWordData.DataModel
             w.Close();
         }
         #endregion
-        #region Method: List<string> GetChangedFiles()
-        public List<string> GetChangedFiles()
-        {
-            List<string> vsFiles = new List<string>();
 
-            if (!Active)
-                return vsFiles;
-
-            ExecutionResult result = Execute(c_sStatus);
-
-            string[] vsLines = result.StandardOutput.Split('\n');
-
-            foreach (string line in vsLines)
-            {
-                if(line.Trim()!="")
-                    vsFiles.Add(line.Substring(2)); //! data.txt
-            }
-
-            return vsFiles;
-        }
-        #endregion
         #region Method: bool Commit(sMessage, bAddFiles)
         public bool Commit(string sMessage, bool bAddFiles)
             #region Mercurial Documentation
@@ -859,128 +576,7 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        #region Method: bool CloneTo(sDestinationPath)
-        public bool CloneTo(string sDestinationPath)
-            // If cloning to a path on a computer, the destination path cannot
-            // exist, the Clone process creates it, and fails if it already
-            // exists. I don't delete it here, though, because I don't yet
-            // know what happens if you are cloning across the Internet.
-        {
-            if (!Active)
-                return false;
 
-            string sCommand = c_sClone;
-
-            // Source Repository
-            sCommand += (" " + SurroundWithQuotes(HgRepositoryRoot));
-
-            // Destination Repository
-            sCommand += (" " + SurroundWithQuotes(sDestinationPath));
-
-            // Do it
-            ExecutionResult result = Execute(sCommand);
-            return result.Successful;
-        }
-        #endregion
-        #region Method: List<csd> OutGoing(sDestinationPath)
-        static public List<ChangeSetDescription> OutGoing(string sDestinationPath)
-        /* Mercurial Documentation
-         * ------------------------
-         * outgoing [-M] [-p] [-n] [-f] [-r REV]… [DEST]
-         * 
-         * Show changesets not found in the specified destination repository or the default 
-         * push location. These are the changesets that would be pushed if a push was requested.
-         * 
-         * See pull for valid destination format details.
-         * 
-         * options:
-         * -f, --force         run even when remote repository is unrelated
-         * -r, --rev           a specific revision up to which you would like to push
-         * -n, --newest-first  show newest record first
-         * -p, --patch         show patch
-         * -g, --git           use git extended diff format
-         * -l, --limit         limit number of changes displayed
-         * -M, --no-merges     do not show merges
-         * --style             display using template map file
-         * --template          display with template
-         * -e, --ssh           specify ssh command to use
-         * --remotecmd         specify hg command to run on the remote side
-         */
-        {
-//            if (!Active)
-//                return new List<ChangeSetDescription>();
-
-            // Outgoing
-            var sCommand = c_sOutGoing;
-
-            // Destination Repository
-            sCommand += (" " + SurroundWithQuotes(sDestinationPath));
-
-            // Do it
-            var result = Execute(sCommand, "");
-
-            // Interpret it
-            if (result.Successful)
-            {
-                var vsLines = result.StandardOutput.Split('\n');
-                var v = ChangeSetDescription.Create(vsLines);
-                return v;
-            }
-
-            // Unsuccessful: return an empty list
-            return new List<ChangeSetDescription>();
-        }
-        #endregion
-
-        #region Method: bool PushTo(sDestinationPath)
-        public bool PushTo(string sDestinationPath)
-            #region Mercurial Documentation
-            /* Mercurial Documentation
-             * ------------------------
-             * Hg push [-f] [-r REV] [-e CMD] [—remotecmd CMD] [DEST] 
-             * 
-             * Push changes from the local repository to the given destination.
-             * 
-             * This is the symmetrical operation for pull. It helps to move changes from
-             * the current repository to a different one. If the destination is local this
-             * is identical to a pull in that directory from the current one.
-             * 
-             * By default, push will refuse to run if it detects the result would increase
-             * the number of remote heads. This generally indicates the the client has
-             * forgotten to pull and merge before pushing.
-             * 
-             * If -r is used, the named changeset and all its ancestors will be pushed
-             * to the remote repository.
-             * 
-             * Look at the help text for urls for important details about ssh:// URLs. If
-             * DESTINATION is omitted, a default path will be used. See 'hg help urls'
-             * for more information.
-             * 
-             * options:
-             * -f, --force  force push
-             * -r, --rev    a specific revision up to which you would like to push
-             * -e, --ssh    specify ssh command to use
-             * --remotecmd  specify hg command to run on the remote side
-             */
-            #endregion
-            // Note: We don't include the Local repository in the command line, but Hg 
-            // knows about it anyway because the Execute command sets the working directory 
-            // to it.
-        {
-            if (!Active)
-                return false;
-
-            // Push
-            string sCommand = c_sPush;
-
-            // Destination Repository
-            sCommand += (" " + SurroundWithQuotes(sDestinationPath));
-
-            // Do it
-            ExecutionResult result = Execute(sCommand);
-            return result.Successful;
-        }
-        #endregion
         #region Method: bool CanAccessInternet()
         static public bool CanAccessInternet()
             // We'll just ping on Google, since they're up most of the time.

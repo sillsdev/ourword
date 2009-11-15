@@ -322,7 +322,12 @@ namespace OurWordData.DataModel
         #endregion
 
         // Repository ------------------------------------------------------------------------
-        #region Attr{g}: Repository Repository
+        public HgInternetRepository GetInternetRepository()
+        {
+            return new HgInternetRepository(DisplayName);
+        }
+
+	    #region Attr{g}: Repository Repository
         public Repository Repository
         {
             get

@@ -35,7 +35,7 @@ namespace OurWordTests.Edit
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             CreateHierarchyThroughTargetTranslation();
 
             DB.Project.FrontTranslation = new DTranslation("Front Translation", "Latin", "Latin");

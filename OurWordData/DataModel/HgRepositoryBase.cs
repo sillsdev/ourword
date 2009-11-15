@@ -48,7 +48,6 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region SVAttr{g}: string PathToChorusMerge
-
         static public string PathToChorusMerge
         {
             get
@@ -82,7 +81,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region static string StripTrailingPathSeparator(sPath)
-        static public string StripTrailingPathSeparator(string sPath)
+        protected static string StripTrailingPathSeparator(string sPath)
         // Some (all?) Mercurial commands fail if there is a trailing path separator
         {
             if (string.IsNullOrEmpty(sPath))
@@ -95,83 +94,6 @@ namespace OurWordData.DataModel
                 sPath = sPath.Substring(0, sPath.Length - 1);
 
             return sPath;
-        }
-        #endregion
-
-        // Heads ----------------------------------------------------------------------------
-        #region CLASS: Head
-        public class Head
-        {
-            public readonly string ChangeSet;
-            public readonly string Tag;
-            public readonly string User;
-            public readonly string Date;
-            public readonly string Summary;
-
-            #region Constructor(sChangeSet, sTag, sUser, sDate, sSummary)
-            public Head(string sChangeSet, string sTag, string sUser, string sDate, string sSummary)
-            {
-                ChangeSet = sChangeSet;
-                Tag = sTag;
-                User = sUser;
-                Date = sDate;
-                Summary = sSummary;
-            }
-            #endregion
-        }
-        #endregion
-        #region Method: List<Head> GetHeads()
-        public List<Head> GetHeads()
-        // 21sep09 - I was originally doing the v.Add as part of encountering a
-        // "summary", but on a brand-spanking-new repository, there is no summary;
-        // so instead moved it to the "changeset"; thus called there, and also at the
-        // end of the loop.
-        {
-            var v = new List<Head>();
-
-            // Request the information from Mercurial
-            var result = DoCommand("heads");
-            if (null == result)
-                return null;
-
-            var vsLines = result.StandardOutput.Split('\n');
-
-            var sChangeSet = "";
-            var sTag = "";
-            var sUser = "";
-            var sDate = "";
-            var sSummary = "";
-
-            const int iPosData = 14;
-
-            foreach (var s in vsLines)
-            {
-                if (s.StartsWith("changeset:") && s.Length > iPosData)
-                {
-                    if (!string.IsNullOrEmpty(sChangeSet))
-                        v.Add(new Head(sChangeSet, sTag, sUser, sDate, sSummary));
-
-                    sChangeSet = s.Substring(iPosData);
-                    sTag = "";
-                    sUser = "";
-                    sDate = "";
-                    sSummary = "";
-                }
-
-                if (s.StartsWith("tag:") && s.Length > iPosData)
-                    sTag = s.Substring(iPosData);
-                if (s.StartsWith("user:") && s.Length > iPosData)
-                    sUser = s.Substring(iPosData);
-                if (s.StartsWith("date:") && s.Length > iPosData)
-                    sDate = s.Substring(iPosData);
-                if (s.StartsWith("summary:") && s.Length > iPosData)
-                    sSummary = s.Substring(iPosData);
-            }
-
-            if (!string.IsNullOrEmpty(sChangeSet))
-                v.Add(new Head(sChangeSet, sTag, sUser, sDate, sSummary));
-
-            return v;
         }
         #endregion
 
@@ -315,6 +237,23 @@ namespace OurWordData.DataModel
             return DoCommand(pushCommand);
         }
         #endregion
+        #region SMethod: bool CheckMercialIsInstalled()
+        static public bool CheckMercialIsInstalled()
+        {
+            // The Chorus routine calls "Hg version" and returns null if successful;
+            // returns a string with a message otherwise.
+            var notInstalledMessage = HgRepository.GetEnvironmentReadinessMessage("en");
+            return (string.IsNullOrEmpty(notInstalledMessage));
+        }
+        #endregion
+        #region Method: bool GetFileExistsInRepo(string pathFromRoot)
+        public bool GetFileExistsInRepo(string pathFromRoot)
+        {
+            var repo = new HgRepository(FullPathToRepositoryRoot, 
+                new Chorus.Utilities.NullProgress());
+            return repo.GetFileExistsInRepo(pathFromRoot);
+        }
+        #endregion
     }
     #endregion
 
@@ -437,20 +376,26 @@ namespace OurWordData.DataModel
             return DoCommand(pullCommand);
         }
         #endregion
+        #region ExecutionResult UpdateToCurrentBranchTip()
+        public ExecutionResult UpdateToCurrentBranchTip()
+        {
+            return DoCommand("update");
+        }
+        #endregion
     }
     #endregion
 
     #region Class: HgInternetRepository
     public class HgInternetRepository : HgRepositoryBase
     {
-        // Attrs
+        // Attrs -----------------------------------------------------------------------------
         #region OAttr{g}: string FullPathToRepositoryRoot
         public override string FullPathToRepositoryRoot
         {
             get
             {
                 var path = string.Format("http://{0}:{1}@{2}/{3}",
-                    UserName, Password, Server, s_ClusterName.ToLower());
+                    UserName, Password, Server, m_ClusterName.ToLower());
                 return path;
             }
         }
@@ -467,12 +412,12 @@ namespace OurWordData.DataModel
         #endregion
 
         // Username/password are stored in the Registry --------------------------------------
-        #region SVAttr{g}: string RegistryClusterSubKey
-        static string RegistryClusterSubKey
+        #region VAttr{g}: string RegistryClusterSubKey
+        string RegistryClusterSubKey
         {
             get
             {
-                return string.Format("Collaboration\\{0}", s_ClusterName);
+                return string.Format("Collaboration\\{0}", m_ClusterName);
             }
         }
         #endregion
@@ -480,7 +425,7 @@ namespace OurWordData.DataModel
         private const string c_registryPassword = "RemotePassword";
         private const string c_registryServer = "RemoteServer";
         #region SAttr{g/s}: string UserName
-        static public string UserName
+        public string UserName
         {
             get
             {
@@ -493,7 +438,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region SAttr{g/s}: string Password
-        static public string Password
+        public string Password
         {
             get
             {
@@ -506,7 +451,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region SAttr{g/s}: string Server
-        static public string Server
+        public string Server
         {
             get
             {
@@ -526,11 +471,9 @@ namespace OurWordData.DataModel
         static private string StripLeadingHttp(string sUrl)
         // In case user typed this, we remove it
         {
-            if (string.IsNullOrEmpty(sUrl))
-                return sUrl;
-
-            return sUrl.Replace("http://", "");
+            return string.IsNullOrEmpty(sUrl) ? sUrl : sUrl.Replace("http://", "");
         }
+
         #endregion
         #region SMethod: string StripTrailingSlash(string sUrl)
         static private string StripTrailingSlash(string sUrl)
@@ -547,14 +490,14 @@ namespace OurWordData.DataModel
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        static private string s_ClusterName;
+        private readonly string m_ClusterName;
         #region Constructor(clusterDisplayName)
         public HgInternetRepository(string clusterDisplayName)
         {
             if (string.IsNullOrEmpty(clusterDisplayName)) 
                 throw new ArgumentNullException("clusterDisplayName");
 
-            s_ClusterName = clusterDisplayName;
+            m_ClusterName = clusterDisplayName;
         }
         #endregion
     }
@@ -659,7 +602,7 @@ namespace OurWordData.DataModel
         void CheckLocalIntegrity()
         {
             // Is Mercurial installed? GetHeads will return non-zero.
-            if (m_LocalRepository.GetHeads().Count == 0)
+            if (!HgRepositoryBase.CheckMercialIsInstalled())
             {
                 throw new SynchException("msgNoMercurial",
                     "The external program Mercurial did not respond.\n\n" +
@@ -777,7 +720,7 @@ namespace OurWordData.DataModel
         #region UpdateLocalFiles
         void UpdateLocalFiles()
         {
-            m_LocalRepository.DoCommand("update");
+            m_LocalRepository.UpdateToCurrentBranchTip();
         }
         #endregion
 

@@ -2492,7 +2492,7 @@ namespace OurWord
         private void cmdDownloadRepository(Object sender, EventArgs e)
         {
             // Is Mercurial Installed?
-            if (!Repository.HgIsInstalled)
+            if (!HgRepositoryBase.CheckMercialIsInstalled())
             {
                 LocDB.Message("msgHgNotInstalled",
                     "It appears that Mercurial is not installed on this computer.\n" +
@@ -2561,6 +2561,12 @@ namespace OurWord
                     Thread.Sleep(2000);
                     SynchProgressDlg.SetStepSuccess(SynchProgressDlg.Steps.InternetAccess);
 
+                    // Create the Internet Repo and save the wizard's information
+                    var internetRepository = new HgInternetRepository(wiz.ClusterName);
+                    internetRepository.Server = wiz.Url;
+                    internetRepository.UserName = wiz.UserName;
+                    internetRepository.Password = wiz.Password;
+
                     // Clone the repository (thus creating the Cluster folder and
                     // the .Hg subfolder)
                     SynchProgressDlg.SetStepStart(SynchProgressDlg.Steps.Pulling);
@@ -2585,9 +2591,9 @@ namespace OurWord
                         OnEnterProject();
 
                         // Save the Collaboration repository settings
-                        Repository.RemoteUrl = wiz.Url;
-                        Repository.RemoteUserName = wiz.UserName;
-                        Repository.RemotePassword = wiz.Password;
+//                        HgInternetRepository.Server = wiz.Url;
+//                        HgInternetRepository.UserName = wiz.UserName;
+//                        HgInternetRepository.Password = wiz.Password;
                     }
 
                 }

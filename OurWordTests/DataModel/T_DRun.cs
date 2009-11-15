@@ -32,7 +32,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
 
             OurWordMain.App = new OurWordMain();
             DB.Project = new DProject();
@@ -376,7 +376,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
@@ -496,7 +496,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
 
             OurWordMain.App = new OurWordMain();
             DB.Project = new DProject();
@@ -750,7 +750,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
@@ -783,7 +783,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 

@@ -32,7 +32,7 @@ namespace OurWordTests.DataModel
         [SetUp] public void Setup()
         {
             // Unit Test Setup
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
             DB.TeamSettings.EnsureInitialized();

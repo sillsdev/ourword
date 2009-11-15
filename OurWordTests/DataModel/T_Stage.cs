@@ -33,7 +33,7 @@ namespace OurWordTests.DataModel
         #region Method: void Setup()
         [SetUp] public void Setup()
         {
-            SetupTest();
+            GlobalTestSetup();
         }
         #endregion
 

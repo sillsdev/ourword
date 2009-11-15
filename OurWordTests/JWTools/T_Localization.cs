@@ -35,7 +35,7 @@ namespace OurWordTests.JWTools
         [SetUp]
         public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 

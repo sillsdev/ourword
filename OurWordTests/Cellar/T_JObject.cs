@@ -162,8 +162,7 @@ namespace OurWordTests.Cellar
         #region Setup
         [SetUp] public void Setup()
         {
-            // Unit Test Setup
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
 
             // Create objects in a hierarchy
             objRoot = new TestObject("Level1");

@@ -44,9 +44,9 @@
             this.m_labelUrl.AutoSize = true;
             this.m_labelUrl.Location = new System.Drawing.Point(13, 22);
             this.m_labelUrl.Name = "m_labelUrl";
-            this.m_labelUrl.Size = new System.Drawing.Size(85, 13);
+            this.m_labelUrl.Size = new System.Drawing.Size(94, 13);
             this.m_labelUrl.TabIndex = 0;
-            this.m_labelUrl.Text = "Repository URL:";
+            this.m_labelUrl.Text = "Repository Server:";
             // 
             // m_textURL
             // 
@@ -62,8 +62,8 @@
             this.m_descrURL.Name = "m_descrURL";
             this.m_descrURL.Size = new System.Drawing.Size(327, 46);
             this.m_descrURL.TabIndex = 2;
-            this.m_descrURL.Text = "The location on the Internet for the repository. Do not enter \"http\". For example" +
-                ", \"hg-public.languagedepot.org/MyProject\".";
+            this.m_descrURL.Text = "The location on the Internet for the repository host. Do not enter \"http\". For ex" +
+                "ample, \"hg-public.languagedepot.org\".";
             // 
             // m_labelErrorMsg
             // 

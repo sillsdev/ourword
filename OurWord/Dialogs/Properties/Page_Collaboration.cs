@@ -7,31 +7,8 @@
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Globalization;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
-using System.Text;
-using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-
-using JWTools;
-using OurWordData;
 using OurWordData.DataModel;
-using OurWord;
-using OurWord.Dialogs;
 using OurWord.Edit;
-using OurWord.Layouts;
-using OurWord.Utilities;
 #endregion
 
 namespace OurWord.Dialogs
@@ -52,10 +29,11 @@ namespace OurWord.Dialogs
         EditTextSetting m_RemoteServerUrl;
         EditTextSetting m_RemoteServerUserName;
         EditTextSetting m_RemoteServerPassword;
-        YesNoSetting m_MineAlwaysWins;
         #region Method: BuildLiterateSettings()
         void BuildLiterateSettings()
         {
+            var internetRepository = DB.TeamSettings.GetInternetRepository();
+
             // Make sure the styles have been defined
             Information.InitStyleSheet();
 
@@ -84,7 +62,7 @@ namespace OurWord.Dialogs
                 "probably want to know.");
 
             // Need to install mercurial
-            if (!Repository.HgIsInstalled)
+            if (!HgRepositoryBase.CheckMercialIsInstalled())
             {
                 LS.AddInformation("co200", Information.PStyleAttention,
                     "Note: OurWord has detected that Mercurial is not installed on this computer. " +
@@ -130,65 +108,22 @@ namespace OurWord.Dialogs
             m_RemoteServerUrl = LS.AddEditText("coUrl",
                 "Central Repository URL:",
                 "The Url for accessing the remote, central respository.)",
-                Repository.RemoteUrl);
+                internetRepository.Server);
             m_RemoteServerUserName = LS.AddEditText("coUserName",
                 "User Name:",
                 "The central repositiory administrator will provide you with your user name.",
-                Repository.RemoteUserName);
+                internetRepository.UserName);
             m_RemoteServerPassword = LS.AddEditText("coPassword",
                 "Password",
                 "The central repositiory administrator will provide you with your password.",
-                Repository.RemotePassword);
-
-            // Merging
-            LS.AddInformation("co500", Information.PStyleHeading1,
-                "D. Merging");
-            LS.AddInformation("co510", Information.PStyleNormal,
-                "When two (or more) people modify the same text on their individual computers, " +
-                "a \"conflict\" results. When we merge their files, we must determine which " +
-                "person's change to keep.");
-            LS.AddInformation("co520", Information.PStyleNormal,
-                "For the translation itself, we first assume that if a change has been made, " +
-                "it has the right to be there. That is, the person making the change had the " +
-                "authority to do so. If you want to prevent a user from making changes, you " +
-                "need to lock that book from editing through its Properties dialog.");
-            LS.AddInformation("co530", Information.PStyleNormal,
-                "Thus Person A and Person B both are assumed to have permission to make " +
-                "changes. Now if Person A and Person B make changes to different parts of " +
-                "the draft, there is no conflict and both changes are kept. The problem " +
-                "comes with A and B both change the exact same text. When that happens, " +
-                "we have a \"conflict.\"");
-            LS.AddInformation("co540", Information.PStyleNormal,
-                "What we do in this case is not change the draft on the person's computer " +
-                "who is doing the merge. Rather, we take the incoming conflicting text, " +
-                "and make a Translator Note out of it. It thus appears in the Side Window, " +
-                "where the user can study it and deal with it at his convenience.");
-            LS.AddInformation("co550", Information.PStyleNormal,
-                "Unfortunately we cannot make Translator Notes when dealing with settings. " +
-                "If two users open this Configuration dialog and make conflicting changes, " +
-                "OurWord is forced to keep one and toss the other. ");
-            LS.AddInformation("co560", Information.PStyleNormal,
-                "We assume that a typical project will have one or more Advisors who will " +
-                "be the ones who generally make changes to settings; and then one or more " +
-                "translators who generally will not be touching the settings. Therefore upon " +
-                "encountering a merge conflict in a settings file, we want to keep those " +
-                "from the Advisor, and toss those from the translator. To facilitate this, " +
-                "you can tell OurWord that merges performed on this computer should keep " +
-                "any conflicting settings. For translator computers you should keep the " +
-                "default value of \"no.\"");
-            m_MineAlwaysWins = LS.AddYesNo(
-                "coMySettingsWin",
-                "On Conflict, Keep My Settings?",
-                "When others have edited the same settings, keep mine? Typically Yes for " +
-                    "and advisor, No for a translator.",
-                Repository.MineAlwaysWins);
+                internetRepository.Password);
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DlgProperties)
-        public Page_Collaboration(DialogProperties _ParentDlg)
-            : base(_ParentDlg)
+        public Page_Collaboration(DialogProperties parentDlg)
+            : base(parentDlg)
         {
             InitializeComponent();
             BuildLiterateSettings();
@@ -223,21 +158,12 @@ namespace OurWord.Dialogs
         #region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
-            // Strip any leading http from the value, as the Repository class 
-            // needs to add this when it prepends the username and password
-            string sRemoteUrl = m_RemoteServerUrl.Value;
-            string sHttp = "http://";
-            if (sRemoteUrl.Length > sHttp.Length &&
-                sRemoteUrl.Substring(0, sHttp.Length) == sHttp)
-            {
-                sRemoteUrl = sRemoteUrl.Substring(sHttp.Length);
-            }
-            Repository.RemoteUrl = sRemoteUrl;
+            var internetRepository = DB.TeamSettings.GetInternetRepository();
 
-            // Store the other settings
             DB.TeamSettings.RepositoryIsActive = m_Activate.Value;
-            Repository.RemoteUserName = m_RemoteServerUserName.Value;
-            Repository.RemotePassword = m_RemoteServerPassword.Value;
+            internetRepository.Server = m_RemoteServerUrl.Value;
+            internetRepository.UserName = m_RemoteServerUserName.Value;
+            internetRepository.Password = m_RemoteServerPassword.Value;
             return true;
         }
         #endregion

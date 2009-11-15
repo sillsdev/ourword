@@ -21,6 +21,7 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordTests;
 #endregion
 
 namespace OurWordTests.DataModel
@@ -30,7 +31,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
             DB.TeamSettings.EnsureInitialized();

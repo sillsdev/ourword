@@ -40,8 +40,7 @@ namespace OurWordTests.DataModel
         {
             m_OldProject = DB.Project;
 
-            // NUnit Setup
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
 
             // Create a project with a whole bunch of books
             m_TeamSettings = new DTeamSettings();

@@ -57,7 +57,7 @@ namespace OurWordTests.DataModel
         #region Method: void Setup()
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             JWU.NUnit_SetupClusterFolder();
         }
         #endregion

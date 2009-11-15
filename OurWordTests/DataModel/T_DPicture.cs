@@ -37,7 +37,7 @@ namespace OurWordTests.DataModel
         [SetUp]
         public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 

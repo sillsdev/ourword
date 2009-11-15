@@ -39,7 +39,7 @@ using System.Security.Permissions;
 // 1.3.0 - What I'm leaving at Tomohon 4 June 2009
 // 1.4.0 - Oxes, AuSIL, Manado, Kupang
 
-[assembly: AssemblyVersion("1.4.6")]
+[assembly: AssemblyVersion("1.4.7")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

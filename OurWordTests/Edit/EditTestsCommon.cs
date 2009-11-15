@@ -138,9 +138,6 @@ namespace OurWordTests.Edit
         #region Helper: void _PreliminarySetup()
         static void _PreliminarySetup()
         {
-            // Unit Test Setup
-            JWU.NUnit_Setup();
-
             // Application and Project initialization
             OurWordMain.App = new OurWordMain();
             DB.Project = new DProject();
@@ -175,6 +172,8 @@ namespace OurWordTests.Edit
         #region SMethod: void Setup(string[] vsRawData)
         static public void Setup(string[] vsRawData)
         {
+            TestCommon.GlobalTestSetup();
+
             // Set up the app, project, translation, etc
             _PreliminarySetup();
 

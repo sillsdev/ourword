@@ -52,7 +52,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             m_Section = CreateHierarchyThroughTargetSection("MRK");
         }
         #endregion
@@ -232,7 +232,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             m_Section = CreateHierarchyThroughTargetSection("MRK");
         }
         #endregion
@@ -402,7 +402,8 @@ namespace OurWordTests.DataModel
         #region Setup 
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
+
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
             DB.TeamSettings.EnsureInitialized();

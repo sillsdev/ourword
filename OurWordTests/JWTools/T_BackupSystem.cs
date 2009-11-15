@@ -37,14 +37,14 @@ namespace OurWordTests.JWTools
         #region Method: void Setup()
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
         #region Test: CleanUpOldFiles
         [Test] public void CleanUpOldFiles()
         {
-			int cFilesToCreate = 400;
+			const int cFilesToCreate = 400;
 
 			// Create an empty working directory
             JWU.NUnit_RemoveTestFileFolder();

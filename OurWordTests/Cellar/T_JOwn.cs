@@ -180,8 +180,7 @@ namespace OurWordTests.Cellar
         #region Setup
         [SetUp] public void Setup()
         {
-            // Unit Test Setup
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
         #region TearDown

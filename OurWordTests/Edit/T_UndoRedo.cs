@@ -39,7 +39,7 @@ namespace OurWordTests.Edit
         {
             EditTest.Setup(SectionTestData.BaikenoMark430_ImportVariant);
 
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
         #region TearDown

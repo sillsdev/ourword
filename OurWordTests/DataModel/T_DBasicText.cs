@@ -31,7 +31,7 @@ namespace OurWordTests.DataModel
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
             DB.TeamSettings.EnsureInitialized();

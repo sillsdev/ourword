@@ -11,10 +11,10 @@
 using System.Collections.Generic;
 using System.IO;
 using Chorus.merge;
+using Chorus.Utilities;
 using NUnit.Framework;
 
 using JWTools;
-using OurWordData;
 using OurWordData.DataModel;
 #endregion
 #endregion
@@ -22,17 +22,17 @@ using OurWordData.DataModel;
 namespace OurWordTests.Utilities
 {
     [TestFixture]
-    public class TestHgRepositoryBase
+    public class TestHgRepositoryBase : HgRepositoryBase
     {
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
-        #region Test: StripTrailingPathSeparator
-        [Test] public void StripTrailingPathSeparator()
+        #region Test: TStripTrailingPathSeparator
+        [Test] public void TStripTrailingPathSeparator()
         {
             // Build a path in a OS-independant manner
             var vFolders = new[] { "Users", "Albert", "My Documents", "Inuit" };
@@ -51,25 +51,142 @@ namespace OurWordTests.Utilities
 
             // Do we strip out the trailing separator if its there?
             Assert.AreEqual(pathWithoutTrailingSeparator,
-                HgRepositoryBase.StripTrailingPathSeparator(pathWithTrailingSeparator));
+                StripTrailingPathSeparator(pathWithTrailingSeparator));
 
             // Do we do nothing if there's no trailing separator to begin with?
             Assert.AreEqual(pathWithoutTrailingSeparator,
-                HgRepositoryBase.StripTrailingPathSeparator(pathWithoutTrailingSeparator));
+                StripTrailingPathSeparator(pathWithoutTrailingSeparator));
         }
         #endregion
-        #region Test: CloneTo
-        [Test] public void CloneTo()
+        #region Test: TCloneTo
+        [Test] public void TCloneTo()
         {
-            var originRepositoryFolder = JWU.NUnit_GetFreshTempSubFolder("origin");
+            TestFolder.CreateEmpty();
+
+            var originRepositoryFolder = TestFolder.CreateEmptySubFolder("origin");
             var originRepository = new HgLocalRepository(originRepositoryFolder);
             originRepository.CreateIfDoesntExist();
 
-            var clonedRepositoryFolder = JWU.NUnit_GetFreshTempSubFolder("cloned");
+            var clonedRepositoryFolder = TestFolder.CreateEmptySubFolder("cloned");
             originRepository.CloneTo(clonedRepositoryFolder);
             var clonedRepository = new HgLocalRepository(clonedRepositoryFolder);
 
             Assert.IsTrue(clonedRepository.Exists);
+
+            TestFolder.DeleteIfExists();
+        }
+        #endregion
+        #region Test: TCheckMercialIsInstalled
+        [Test] public void TCheckMercialIsInstalled()
+            // Not much of a test, if Hg is installed. A true test would try it
+            // out both if installed and not installed.
+            //   And yet, if the test fails, it means the underlying Chorus that
+            // the method is calling has changed in how it operates.
+        {
+            // As a developer's machine, I expect Mercurial to be isntalled
+            Assert.IsTrue( CheckMercialIsInstalled(), 
+                "Hg should be installed");
+
+            // If we remove the Path environment variable, the ability to run Hg
+            // should fail, thus simulating a not-installed situation.
+            using (new ShortTermEnvironmentalVariable("Path", ""))
+            {
+                Assert.IsFalse( CheckMercialIsInstalled(),
+                    "Hg should seem to not be installed");
+            }
+        }
+        #endregion
+        #region Test: TGetChangedFiles
+        [Test] public void TGetChangedFiles()
+        {
+            var path = TestFolder.CreateEmpty();
+            var repository = new HgLocalRepository(path);
+            repository.CreateIfDoesntExist();
+
+            // Create a file at the repository root
+            const string sFile1 = "AtRoot.oxes";
+            var file1 = new TestFile(null, sFile1);
+            file1.CreateAndWrite(null);
+
+            // Create another file a folder lower
+            const string sFile2 = "hello.owt";
+            const string sFolder2 = ".Settings";
+            var sFolderFile2 = sFolder2 + Path.DirectorySeparatorChar + sFile2;
+            var file2 = new TestFile(sFolder2, sFile2);
+            file2.CreateAndWrite(null);
+
+            var vsFiles = repository.GetChangedFiles();
+
+            // We should be able to find our two files
+            Assert.AreEqual(2, vsFiles.Count);
+            Assert.IsTrue(vsFiles.Contains(sFile1), "Missing " + sFile1);
+            Assert.IsTrue(vsFiles.Contains(sFolderFile2), "Missing " + sFolderFile2);
+
+            TestFolder.DeleteIfExists();
+        }
+        #endregion
+        #region Test: TCommitChangedFiles
+        [Test] public void TCommitChangedFiles()
+        {
+            // Create the Repository
+            TestFolder.CreateEmpty();
+            var repository = new HgLocalRepository(TestFolder.RootFolderPath);
+            repository.CreateIfDoesntExist();
+
+            // Create a couple of files
+            var file1 = new TestFile(null, "AtRoot.oxes");
+            file1.CreateAndWrite(null);
+            var file2 = new TestFile(".Settings", "hello.owt");
+            file2.CreateAndWrite(null);
+            Assert.AreEqual(2, repository.GetChangedFiles().Count,
+                "should have two uncommitted files.");
+
+            // Do the commit
+            repository.CommitChangedFiles("jsw", "Created two files for test purposes");
+
+            // Should have no files to commit
+            Assert.AreEqual(0, repository.GetChangedFiles().Count,
+                "should have no uncommitted files now.");
+        }
+        #endregion
+        #region Test: TPushTo
+        [Test] public void TPushTo()
+        {
+            TestFolder.CreateEmpty();
+
+            const string filename = "hello.oxes";
+
+            // Create an origin Repository
+            var originRepositoryPath = TestFolder.CreateEmptySubFolder("origin");
+            var originRepository = new HgLocalRepository(originRepositoryPath);
+            originRepository.CreateIfDoesntExist();
+
+            // Clone it
+            var clonedRepositoryPath = TestFolder.CreateEmptySubFolder("cloned");
+            originRepository.CloneTo(clonedRepositoryPath);
+            var clonedRepository = new HgLocalRepository(clonedRepositoryPath);
+
+            // Add a new file to the original repo
+            var file = new TestFile("origin", filename);
+            file.CreateAndWrite(null);
+            originRepository.CommitChangedFiles("jsw", "Commiting new file to original.");
+
+            // Verify the file exists in only the origin repo
+            Assert.IsTrue(originRepository.GetFileExistsInRepo(filename), 
+                "File should exist in origin");
+            Assert.IsFalse(clonedRepository.GetFileExistsInRepo(filename), 
+                "File should not exist in cloned");
+
+            // Push it. The Update is required because GetFileExistsInRepo tests
+            // for actual files, not stuff hidden in the .Hg folder.
+            originRepository.PushTo(clonedRepositoryPath);
+            clonedRepository.UpdateToCurrentBranchTip();
+
+            // Verify file now exists in cloned
+            Assert.IsTrue(clonedRepository.GetFileExistsInRepo(filename), 
+                "File should exist in cloned");
+
+            TestFolder.DeleteIfExists();
         }
         #endregion
     }
@@ -81,21 +198,21 @@ namespace OurWordTests.Utilities
         [SetUp]
         public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
         #region Test: CreateIfDoesntExist
         [Test] public void CreateIfDoesntExist()
         {
-            var repositoryRootFolder = JWU.NUnit_GetFreshTempSubFolder("repository");
-
-            Directory.CreateDirectory(repositoryRootFolder);
+            var repositoryRootFolder = TestFolder.CreateEmpty();
             var repository = new HgLocalRepository(repositoryRootFolder);
             repository.CreateIfDoesntExist();
 
-            var hgFolder = repositoryRootFolder + Path.DirectorySeparatorChar + ".hg";
+            var hgFolder = Path.Combine(repositoryRootFolder, ".hg");
             Assert.IsTrue(Directory.Exists(hgFolder), "Should have a .hg folder.");
+
+            TestFolder.DeleteIfExists();
         }
         #endregion
     }
@@ -106,43 +223,48 @@ namespace OurWordTests.Utilities
         #region Setup
         [SetUp] public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
         #region Test: BuildUrlToInternetRepository
         [Test] public void BuildUrlToInternetRepository()
         {
-            var repository = new HgInternetRepository("Cherokee");
-            HgInternetRepository.UserName = "Harry";
-            HgInternetRepository.Password = "NoClue";
-            HgInternetRepository.Server = "hg-public.languagedepot.org";
+            var repository = new HgInternetRepository("Cherokee")
+            {
+                UserName = "Harry",
+                Password = "NoClue",
+                Server = "hg-public.languagedepot.org"
+            };
 
             var path = repository.FullPathToRepositoryRoot;
 
-            // "cherokee" should be normalized to lower case to make Linux servers happy
+            // "cherokee" must be normalized to lower case to make Linux servers happy
             Assert.AreEqual("http://Harry:NoClue@hg-public.languagedepot.org/cherokee", path);
         }
         #endregion
         #region Test: StripLeadingHttpOnSettingServerValue
         [Test] public void StripLeadingHttpOnSettingServerValue()
         {
-            var repository = new HgInternetRepository("Cherokee");
-            HgInternetRepository.Server = "http://bitbucket.org";
+            var repository = new HgInternetRepository("Cherokee") 
+            {
+                Server = "http://bitbucket.org"
+            };
 
-            Assert.AreEqual("bitbucket.org", HgInternetRepository.Server);
+            Assert.AreEqual("bitbucket.org", repository.Server);
         }
         #endregion
         #region Test: StripTrailingSlashOnSettingServerValue
         [Test] public void StripTrailingSlashOnSettingServerValue()
         {
-            var repository = new HgInternetRepository("Cherokee");
+            var repository = new HgInternetRepository("Cherokee") 
+            {
+                Server = "bitbucket.org/"
+            };
+            Assert.AreEqual("bitbucket.org", repository.Server);
 
-            HgInternetRepository.Server = "bitbucket.org/";
-            Assert.AreEqual("bitbucket.org", HgInternetRepository.Server);
-
-            HgInternetRepository.Server = "bitbucket.org\\";
-            Assert.AreEqual("bitbucket.org", HgInternetRepository.Server);
+            repository.Server = "bitbucket.org\\";
+            Assert.AreEqual("bitbucket.org", repository.Server);
         }
         #endregion
     }
@@ -154,7 +276,7 @@ namespace OurWordTests.Utilities
         [SetUp]
         public void Setup()
         {
-            JWU.NUnit_Setup();
+            TestCommon.GlobalTestSetup();
         }
         #endregion
 
@@ -337,257 +459,4 @@ namespace OurWordTests.Utilities
         #endregion
     }
 
-
-    [TestFixture] 
-    public class T_Repository
-    {
-        // Setup/Teardown --------------------------------------------------------------------
-        #region Attr{g}: Repository Repository
-        Repository Repository
-        {
-            get
-            {
-                return DB.TeamSettings.Repository;
-            }
-        }
-        #endregion
-        #region VAttr{g}: string ClonePath - Another repo on my hard drive
-        string ClonePath
-        {
-            get
-            {
-                return JWU.GetMyDocumentsFolder(null) + "Clone";
-
-            }
-        }
-        #endregion
-
-        #region Setup
-        [SetUp] public void Setup()
-        {
-            JWU.NUnit_Setup();
-
-            // Get rid of any remnants of our Test Cluster, e.g., from debugging.
-            JWU.NUnit_TeardownClusterFolder();
-
-            // Create the empty cluster folder
-            JWU.NUnit_SetupClusterFolder();
-
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
-            DB.TeamSettings.Repository.Active = true;
-
-            DB.Project.DisplayName = "RepositoryTestProject";
-
-            DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
-            DBook book = new DBook("MRK");
-            DB.Project.TargetTranslation.AddBook(book);
-            DSection section = new DSection();
-            book.Sections.Append(section);
-            DB.Project.WriteToFile(new NullProgress());
-
-        }
-        #endregion
-        #region TearDown
-        [TearDown] public void TearDown()
-        {
-            // Get rid of our Test Cluster
-            JWU.NUnit_TeardownClusterFolder();
-
-            // Remove the Clone/PushTo Cluster
-            if (Directory.Exists(ClonePath))
-                Directory.Delete(ClonePath, true);
-
-            DB.Project = null;
-        }
-        #endregion
-
-        // Remote test repository ------------------------------------------------------------
-        #region VAttr{g}: string RemoteUrl - http://hg.mx.languagedepot.org/Test
-        string RemoteUrl
-        {
-            get
-            {
-                return "http://hg.mx.languagedepot.org/Test";
-
-            }
-        }
-        #endregion
-        #region VAttr{g}: string RemoteUserName - "tester"
-        string RemoteUserName
-        {
-            get
-            {
-                return "tester";
-
-            }
-        }
-        #endregion
-        #region VAttr{g}: string RemotePassword = "auto"
-        string RemotePassword
-        {
-            get
-            {
-                return "auto";
-
-            }
-        }
-        #endregion
-
-        // Helper Methods --------------------------------------------------------------------
-        #region Method: void CreateFile(sFullPath, svContents)
-        void CreateFile(string sPath, string[] svContents)
-        {
-            TextWriter w = JW_Util.GetTextWriter(sPath);
-
-            if (null != svContents)
-            {
-                foreach (string s in svContents)
-                    w.WriteLine(s);
-            }
-
-            w.Close();
-        }
-        #endregion
-
-        // Tests -----------------------------------------------------------------------------
-        #region Test: HgIsInstalled
-        [Test] 
-        public void HgIsInstalled()
-            // Not much of a test, if Hg is installed. A true test would try it
-            // out both if installed and not installed.
-        {
-            Assert.IsTrue( Repository.HgIsInstalled, "Hg Should Be Installed");
-        }
-        #endregion
-        #region Test: GetChangedFiles
-        [Test] public void GetChangedFiles()
-        {
-            // Create the Repository
-            Repository.Create();
-
-            // Create a couple of files
-            string sFileName1 = ".Settings" + Path.DirectorySeparatorChar + "hello.owt";
-            CreateFile(DB.TeamSettings.ClusterFolder + sFileName1, null);
-
-            string sFileName2 = "AtRoot.db";
-            CreateFile(DB.TeamSettings.ClusterFolder + sFileName2, null);
-
-            // Our two files should be returned
-            List<string> vsFiles = Repository.GetChangedFiles();
-
-            // Debugging
-            /*
-            Console.WriteLine("Count = " + vsFiles.Count.ToString());
-            foreach (string s in vsFiles)
-                Console.WriteLine(s);
-            */
-
-            Assert.IsTrue(vsFiles.Contains(sFileName1), "Doesn't contain " + sFileName1);
-            Assert.IsTrue(vsFiles.Contains(sFileName2), "Doesn't contain " + sFileName2);
-        }
-        #endregion
-        #region Test: Commit
-        [Test] public void Commit()
-        {
-            // Create the Repository
-            Repository.Create();
-
-            // Create a couple of files
-            string sFileName1 = ".Settings" + Path.DirectorySeparatorChar + "hello.owt";
-            CreateFile(DB.TeamSettings.ClusterFolder + sFileName1, null);
-            string sFileName2 = "AtRoot.db";
-            CreateFile(DB.TeamSettings.ClusterFolder + sFileName2, null);
-
-            // Get the count of files that would be committed
-            List<string> vsFiles = Repository.GetChangedFiles();
-            Assert.IsTrue(vsFiles.Count >= 2, "Should have at least the two we created.");
-
-            // Do the commit
-            string sMessage = "Created two files for test purposes";
-            Repository.Commit(sMessage, true);
-
-            // We should now have zero files
-            vsFiles = Repository.GetChangedFiles();
-            Assert.IsTrue(vsFiles.Count == 0, "should have no uncommitted files now.");
-        }
-        #endregion
-        #region Test: Clone
-        [Test] public void Clone()
-        {
-            // Create the Repository
-            Repository.Create();
-            Repository.Commit("Clone Test", true);
-
-            // Destination for the repository (make sure it is clear); we
-            // fail otherwise.
-            if (Directory.Exists(ClonePath))
-                Directory.Delete(ClonePath, true);
-
-            // Clone it
-            Repository.CloneTo(ClonePath);
-
-            // Does the directory exist?
-            string sFolder = ClonePath + Path.DirectorySeparatorChar + ".Hg";
-            Assert.IsTrue(Directory.Exists(sFolder));
-        }
-        #endregion
-        #region Test: ParseChangeSetString
-        [Test] public void ParseChangeSetString()
-        {
-            string[] vs = 
-            {
-                "changeset:   1:bbe11909d08a",
-                "tag:         tip",
-                "user:        JWimbish",
-                "date:        Wed Mar 04 19:37:07 2009 -0500",
-                "summary:     New File Added"
-            };
-
-            var v = Repository.ChangeSetDescription.Create(vs);
-
-            Assert.AreEqual(1, v.Count, "Should have exactly one change set");
-
-            Repository.ChangeSetDescription csd = v[0];
-
-            Assert.AreEqual(csd.ID, "1:bbe11909d08a");
-            Assert.AreEqual(csd.Tag, "tip");
-            Assert.AreEqual(csd.User, "JWimbish");
-            Assert.AreEqual(csd.Date, "Wed Mar 04 19:37:07 2009 -0500");
-            Assert.AreEqual(csd.Summary, "New File Added");
-        }
-        #endregion
-        #region Test: PushTo
-        [Test] public void PushTo()
-        {
-            // Create the Repository
-            Repository.Create();
-            Repository.Commit("Push Test", true);
-
-            // Clone it
-            if (Directory.Exists(ClonePath))
-                Directory.Delete(ClonePath, true);
-            Repository.CloneTo(ClonePath);
-
-            // Add a new file to our repository
-            string sNewFile = "NewFile.db";
-            CreateFile(DB.TeamSettings.ClusterFolder + sNewFile, null);
-            Repository.Commit("New File Added", true);
-
-            // Verify that we have a change to make
-            var v = Repository.OutGoing(ClonePath);
-            Assert.AreEqual(1, v.Count, "Should have exactly one change set");
-
-            // Push it
-            bool bResult = Repository.PushTo(ClonePath);
-            Assert.IsTrue(bResult, "Push should have returned 'true'");
-
-            // Should not have any changes remaining
-            v = Repository.OutGoing(ClonePath);
-            Assert.AreEqual(0, v.Count, "Should have zero change sets");
-
-        }
-        #endregion
-    }
 }

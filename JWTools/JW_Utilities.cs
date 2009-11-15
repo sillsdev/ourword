@@ -237,19 +237,7 @@ namespace JWTools
 
         // NUnit support ---------------------------------------------------------------------
         #if DEBUG
-        #region SMethod: void NUnit_Setup()
-        static public void NUnit_Setup()
-        {
-            // Initialize the registry (the Map process needs it)
-            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
 
-            // Localization DB
-            LocDB.Initialize(GetApplicationDataFolder("OurWord"));
-
-            // Set the resource location
-            JWU.ResourceLocation = "OurWord.Res.";
-        }
-        #endregion
         #region SAttr{g}: string NUnit_TestFileFolder - returns Path of folder, creates if necessary
         static public string NUnit_TestFileFolder
         {
