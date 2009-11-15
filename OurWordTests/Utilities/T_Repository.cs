@@ -22,7 +22,7 @@ using OurWordData.DataModel;
 namespace OurWordTests.Utilities
 {
     [TestFixture]
-    public class TestHgRepositoryBase : HgRepositoryBase
+    public class TestRepository : Repository
     {
         #region Setup
         [SetUp] public void Setup()
@@ -64,12 +64,12 @@ namespace OurWordTests.Utilities
             TestFolder.CreateEmpty();
 
             var originRepositoryFolder = TestFolder.CreateEmptySubFolder("origin");
-            var originRepository = new HgLocalRepository(originRepositoryFolder);
+            var originRepository = new LocalRepository(originRepositoryFolder);
             originRepository.CreateIfDoesntExist();
 
             var clonedRepositoryFolder = TestFolder.CreateEmptySubFolder("cloned");
             originRepository.CloneTo(clonedRepositoryFolder);
-            var clonedRepository = new HgLocalRepository(clonedRepositoryFolder);
+            var clonedRepository = new LocalRepository(clonedRepositoryFolder);
 
             Assert.IsTrue(clonedRepository.Exists);
 
@@ -100,7 +100,7 @@ namespace OurWordTests.Utilities
         [Test] public void TGetChangedFiles()
         {
             var path = TestFolder.CreateEmpty();
-            var repository = new HgLocalRepository(path);
+            var repository = new LocalRepository(path);
             repository.CreateIfDoesntExist();
 
             // Create a file at the repository root
@@ -130,7 +130,7 @@ namespace OurWordTests.Utilities
         {
             // Create the Repository
             TestFolder.CreateEmpty();
-            var repository = new HgLocalRepository(TestFolder.RootFolderPath);
+            var repository = new LocalRepository(TestFolder.RootFolderPath);
             repository.CreateIfDoesntExist();
 
             // Create a couple of files
@@ -158,13 +158,13 @@ namespace OurWordTests.Utilities
 
             // Create an origin Repository
             var originRepositoryPath = TestFolder.CreateEmptySubFolder("origin");
-            var originRepository = new HgLocalRepository(originRepositoryPath);
+            var originRepository = new LocalRepository(originRepositoryPath);
             originRepository.CreateIfDoesntExist();
 
             // Clone it
             var clonedRepositoryPath = TestFolder.CreateEmptySubFolder("cloned");
             originRepository.CloneTo(clonedRepositoryPath);
-            var clonedRepository = new HgLocalRepository(clonedRepositoryPath);
+            var clonedRepository = new LocalRepository(clonedRepositoryPath);
 
             // Add a new file to the original repo
             var file = new TestFile("origin", filename);
@@ -192,7 +192,7 @@ namespace OurWordTests.Utilities
     }
 
     [TestFixture]
-    public class TestHgLocalRepository
+    public class TestLocalRepository 
     {
         #region Setup
         [SetUp]
@@ -202,11 +202,11 @@ namespace OurWordTests.Utilities
         }
         #endregion
 
-        #region Test: CreateIfDoesntExist
-        [Test] public void CreateIfDoesntExist()
+        #region Test: TCreateIfDoesntExist
+        [Test] public void TCreateIfDoesntExist()
         {
             var repositoryRootFolder = TestFolder.CreateEmpty();
-            var repository = new HgLocalRepository(repositoryRootFolder);
+            var repository = new LocalRepository(repositoryRootFolder);
             repository.CreateIfDoesntExist();
 
             var hgFolder = Path.Combine(repositoryRootFolder, ".hg");
@@ -218,7 +218,7 @@ namespace OurWordTests.Utilities
     }
 
     [TestFixture]
-    public class TestHgInternetRepository
+    public class TestInternetRepository
     {
         #region Setup
         [SetUp] public void Setup()
@@ -230,7 +230,7 @@ namespace OurWordTests.Utilities
         #region Test: BuildUrlToInternetRepository
         [Test] public void BuildUrlToInternetRepository()
         {
-            var repository = new HgInternetRepository("Cherokee")
+            var repository = new InternetRepository("Cherokee")
             {
                 UserName = "Harry",
                 Password = "NoClue",
@@ -246,7 +246,7 @@ namespace OurWordTests.Utilities
         #region Test: StripLeadingHttpOnSettingServerValue
         [Test] public void StripLeadingHttpOnSettingServerValue()
         {
-            var repository = new HgInternetRepository("Cherokee") 
+            var repository = new InternetRepository("Cherokee") 
             {
                 Server = "http://bitbucket.org"
             };
@@ -257,7 +257,7 @@ namespace OurWordTests.Utilities
         #region Test: StripTrailingSlashOnSettingServerValue
         [Test] public void StripTrailingSlashOnSettingServerValue()
         {
-            var repository = new HgInternetRepository("Cherokee") 
+            var repository = new InternetRepository("Cherokee") 
             {
                 Server = "bitbucket.org/"
             };
@@ -362,7 +362,7 @@ namespace OurWordTests.Utilities
         }
         #endregion
         #region static void WriteAndCommitFile(repository, sFileBaseName, XmlDoc, message)
-        static void WriteAndCommitFile(HgRepositoryBase repository, string sFileBaseName, XmlDoc doc, string message)
+        static void WriteAndCommitFile(Repository repository, string sFileBaseName, XmlDoc doc, string message)
         {
             var path = repository.FullPathToRepositoryRoot + Path.DirectorySeparatorChar +
                        sFileBaseName;
@@ -428,14 +428,14 @@ namespace OurWordTests.Utilities
 
             // Create an origin repository
             var originRepositoryPath = GetFreshRepositoryRootPath("origin");
-            var originRepository = new HgLocalRepository(originRepositoryPath);
+            var originRepository = new LocalRepository(originRepositoryPath);
             originRepository.CreateIfDoesntExist();
             WriteAndCommitFile(originRepository, sFileBaseName, parentDoc, "Parent created");
 
             // Clone it to another repository; thus we have "parent" in two places
             var clonedRepositoryPath = GetFreshRepositoryRootPath("cloned");
             originRepository.CloneTo(clonedRepositoryPath);
-            var clonedRepository = new HgLocalRepository(clonedRepositoryPath);
+            var clonedRepository = new LocalRepository(clonedRepositoryPath);
 
             // Update the repositories with "our" and "their" versions
             WriteAndCommitFile(originRepository, sFileBaseName, ourDoc, "Origin updated with ours");
@@ -443,7 +443,7 @@ namespace OurWordTests.Utilities
 
             // Do the synch; it will fail if ChorusMerge is not correctly hooked up
             EnumeratedStepsProgressDlg.DisableForTesting = true;
-            var success = (new Synchronize(originRepository, clonedRepository, "jsw")).Do();
+            var success = (new Synchronize(originRepository, clonedRepository, "jsw")).SynchLocalToOther();
 
             // Did we get what we expected?
             var mergeDocActual = new XmlDoc();

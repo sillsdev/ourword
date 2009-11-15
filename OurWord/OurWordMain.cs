@@ -2487,24 +2487,15 @@ namespace OurWord
         }
 		#endregion
         #region Cmd: cmdDownloadRepository
-        const string c_sCloneFailedMsg = "Repository.CloneTo() failed.";
-        const string c_sPullFailedMsg = "Repository.Pull() failed.";
         private void cmdDownloadRepository(Object sender, EventArgs e)
         {
-            // Is Mercurial Installed?
-            if (!HgRepositoryBase.CheckMercialIsInstalled())
-            {
-                LocDB.Message("msgHgNotInstalled",
-                    "It appears that Mercurial is not installed on this computer.\n" +
-                    "Please install it, and then try again.",
-                    null,
-                    LocDB.MessageTypes.Error);
-                return;
-            }
-
             // We'll contruct the wizard outside of the loop, in case we have to go
             // back and change settings (e.g., on an error)
             var wiz = new WizInitializeFromRepository();
+
+            // Make sure the current project is saved and up-to-date, before we create
+            // the new one. Commit to the Repository, to have a restore  point if we need it.
+            OnLeaveProject(true);
 
             // Loop until success or give up
             while (true)
@@ -2513,133 +2504,49 @@ namespace OurWord
                 if (DialogResult.OK != wiz.ShowDialog(this))
                     return;
 
-                // Make sure the current project is saved and up-to-date, before we create
-                // the new one. Commit to the Repository, to have a restore  point if we need it.
-                OnLeaveProject(true);
-
-                // Create the ClusterInfo object
-                string sParentFolder = (wiz.IsInMyDocuments) ?
+                // The ClusterInfo tells us where the new cluster will be stored
+                var sParentFolder = (wiz.IsInMyDocuments) ?
                     JWU.GetMyDocumentsFolder(null) :
                     JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
-                ClusterInfo ci = new ClusterInfo(wiz.ClusterName, sParentFolder);
+                var ci = new ClusterInfo(wiz.ClusterName, sParentFolder);
 
-                // If the Cluster already exists, we don't continue, else we'd overwrite it.
-                if (Directory.Exists(ci.ClusterFolder))
+                // Attempt the clone
+                var internetRepository = new InternetRepository(wiz.ClusterName)
                 {
-                    bool bTryAgain = LocDB.Message("msgClusterAlreadyExists",
-                        "We cannot create cluster {0} because it already exists.\n\n" + 
-                        "Do you want to try again?",
-                        new string[] { ci.Name },
-                        LocDB.MessageTypes.WarningYN);
-                    if (!bTryAgain)
-                        return;
-                    continue;
-                }
+                    Server = wiz.Url,
+                    UserName = wiz.UserName,
+                    Password = wiz.Password
+                };
 
-                // Can we access the Internet?
-                bool bCanAccessInternet = Repository.CanAccessInternet();
-                if (!bCanAccessInternet)
+                var localRepository = new LocalRepository(ci.ClusterFolder);
+
+                var method = new Synchronize(localRepository, internetRepository, DB.UserName);
+                var bSuccessful = method.CloneFromOther();
+
+                // If error, give the user opportunity to try again, so we don't lose
+                // the wizards settings.
+                if (!bSuccessful)
                 {
-                    bool bTryAgain = LocDB.Message("msgCannotAccessInternet",
-                        "OurWord is unable to access the Internet.\n\n" + 
-                        "Please check that you have an Internet connection, then press " +
-                        "\"Yes\" to try again; or \"No\" to cancel.",
+                    JWU.SafeFolderDelete(ci.ClusterFolder);
+
+                    var bAgain = LocDB.Message("msgTryAgain",
+                        "Do you wish to try again?",
                         null,
-                        LocDB.MessageTypes.WarningYN);
-                    if (!bTryAgain)
-                        return;
-                    continue;
-                }
-
-                // Make changes to the disk
-                try
-                {
-                    // Progress Dialog
-                    SynchProgressDlg.Start(true);
-                    while (!SynchProgressDlg.IsCreated)
-                        Thread.Sleep(500);
-                    Thread.Sleep(2000);
-                    SynchProgressDlg.SetStepSuccess(SynchProgressDlg.Steps.InternetAccess);
-
-                    // Create the Internet Repo and save the wizard's information
-                    var internetRepository = new HgInternetRepository(wiz.ClusterName);
-                    internetRepository.Server = wiz.Url;
-                    internetRepository.UserName = wiz.UserName;
-                    internetRepository.Password = wiz.Password;
-
-                    // Clone the repository (thus creating the Cluster folder and
-                    // the .Hg subfolder)
-                    SynchProgressDlg.SetStepStart(SynchProgressDlg.Steps.Pulling);
-                    string sRepository = Repository.BuildRemoteRepositoryString(
-                        wiz.Url, wiz.UserName, wiz.Password);
-                    if (!Repository.CloneTo(ci.ClusterFolder, sRepository))
-                    {
-                        SynchProgressDlg.SetStepFailed(SynchProgressDlg.Steps.Pulling);
-                        throw new Exception(c_sCloneFailedMsg);
-                    }
-
-                    // Open the first project we find (if any); we need it in order to
-                    // save the repository settings
-                    var vsProjects = ci.GetClusterLanguageList(true);
-                    if (null != vsProjects && vsProjects.Count > 0)
-                    {
-                        // Open the project
-                        string sPath = ci.GetProjectPath(vsProjects[0]);
-                        DB.Project = new DProject();
-                        DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
-                        DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
-                        OnEnterProject();
-
-                        // Save the Collaboration repository settings
-//                        HgInternetRepository.Server = wiz.Url;
-//                        HgInternetRepository.UserName = wiz.UserName;
-//                        HgInternetRepository.Password = wiz.Password;
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    // Clean Up
-                    if (Directory.Exists(ci.ClusterFolder))
-                        Directory.Delete(ci.ClusterFolder, true);
-
-                    if (ex.Message == c_sCloneFailedMsg)
-                    {
-                        bool bTryAgain = LocDB.Message("msgCloneFailed",
-                            "OurWord was unable to retrieve the data from the Internet.\n\n" +
-                            "Do you wish to try again?",
-                            null,
-                            LocDB.MessageTypes.WarningYN);
-                        if (!bTryAgain)
-                            return;
-                        continue;
-                    }
-
-                    if (ex.Message == c_sPullFailedMsg)
-                    {
-                         bool bTryAgain = LocDB.Message("msgPullFailed",
-                            "OurWord was unable to build folders on your disk.\n\n" +
-                            "Do you wish to try again?",
-                            null,
-                            LocDB.MessageTypes.WarningYN);
-                        if (!bTryAgain)
-                            return;
-                        continue;
-                   }
-
-                    bool bAgain = LocDB.Message("msgDownloadClusterFailedGeneric",
-                        "OurWord was unable to download / create the cluster on your computer, " +
-                        "for unknown reason.\n\n" +
-                            "Do you wish to try again?",
-                            null,
-                            LocDB.MessageTypes.WarningYN);
+                        LocDB.MessageTypes.YN);
                     if (!bAgain)
                         return;
                     continue;
                 }
-                finally
+
+                // Open the first project we find
+                var vsProjects = ci.GetClusterLanguageList(true);
+                if (null != vsProjects && vsProjects.Count > 0)
                 {
-                    SynchProgressDlg.Stop();
+                    var sPath = ci.GetProjectPath(vsProjects[0]);
+                    DB.Project = new DProject();
+                    DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
+                    DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
+                    OnEnterProject();
                 }
 
                 // If here, then we were successful
@@ -3465,11 +3372,11 @@ namespace OurWord
             OnLeaveProject(false);
 
             // Do the Synchronize
-            var local = new HgLocalRepository(DB.TeamSettings.ClusterFolder);
-            var remote = new HgInternetRepository(DB.TeamSettings.DisplayName);
+            var local = DB.TeamSettings.GetLocalRepository();
+            var remote = DB.TeamSettings.GetInternetRepository();
             var username = DB.UserName;
             var synch = new Synchronize(local, remote, username);
-            synch.Do();
+            synch.SynchLocalToOther();
 
             // We have to unload, then reload everything
             var sPath = DB.Project.StoragePath;

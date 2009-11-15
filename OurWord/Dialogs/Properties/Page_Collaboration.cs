@@ -25,7 +25,6 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-        YesNoSetting m_Activate;
         EditTextSetting m_RemoteServerUrl;
         EditTextSetting m_RemoteServerUserName;
         EditTextSetting m_RemoteServerPassword;
@@ -62,7 +61,7 @@ namespace OurWord.Dialogs
                 "probably want to know.");
 
             // Need to install mercurial
-            if (!HgRepositoryBase.CheckMercialIsInstalled())
+            if (!Repository.CheckMercialIsInstalled())
             {
                 LS.AddInformation("co200", Information.PStyleAttention,
                     "Note: OurWord has detected that Mercurial is not installed on this computer. " +
@@ -74,18 +73,6 @@ namespace OurWord.Dialogs
                 LS.AddInformation("co220", Information.PStyleList1,
                     "Windows - http://sourceforge.net/project/showfiles.php?group_id=199155");
             }
-
-            // Activate
-            LS.AddInformation("co300", Information.PStyleHeading1,
-                "B. Activation");
-            LS.AddInformation("co310", Information.PStyleNormal,
-                "By default Collaboration is not turned on. You need to do that here. This " +
-                "setting will apply to every language and every user in the entire cluster.");
-            m_Activate = LS.AddYesNo(
-                "coActivate",
-                "Activate Collaboration?",
-                "Turn on the Mercurial Collaboration feature.",
-                DB.TeamSettings.RepositoryIsActive);
 
             // Central Repository
             LS.AddInformation("co400", Information.PStyleHeading1,
@@ -160,7 +147,6 @@ namespace OurWord.Dialogs
         {
             var internetRepository = DB.TeamSettings.GetInternetRepository();
 
-            DB.TeamSettings.RepositoryIsActive = m_Activate.Value;
             internetRepository.Server = m_RemoteServerUrl.Value;
             internetRepository.UserName = m_RemoteServerUserName.Value;
             internetRepository.Password = m_RemoteServerPassword.Value;

@@ -192,21 +192,6 @@ namespace OurWordData.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
-        #region Attr{g/s}: bool RepositoryIsActive - T if source control is turned on
-        public bool RepositoryIsActive
-        {
-            get
-            {
-                return m_bRepositoryIsActive;
-            }
-            set
-            {
-                SetValue(ref m_bRepositoryIsActive, value);
-            }
-        }
-        bool m_bRepositoryIsActive;
-        #endregion
-
 		#region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
@@ -223,8 +208,6 @@ namespace OurWordData.DataModel
 			DefineAttr("EvenLeft",     ref m_EvenLeft);
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
-
-            DefineAttr("Repository", ref m_bRepositoryIsActive);
         }
 		#endregion
 
@@ -308,9 +291,6 @@ namespace OurWordData.DataModel
 				CopyrightNotice = "Copyright © " + 
 					DateTime.Today.Year.ToString() + ".";
 			}
-
-            // Local Repository
-            m_Repository = new Repository(this, RepositoryIsActive);
         }
 		#endregion
         #region Constructor(sDisplayName)
@@ -321,21 +301,18 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        // Repository ------------------------------------------------------------------------
-        public HgInternetRepository GetInternetRepository()
+        // Repositor Factories ---------------------------------------------------------------
+        #region Method: InternetRepository GetInternetRepository()
+        public InternetRepository GetInternetRepository()
         {
-            return new HgInternetRepository(DisplayName);
+            return new InternetRepository(DisplayName);
         }
-
-	    #region Attr{g}: Repository Repository
-        public Repository Repository
+        #endregion
+        #region Method: LocalRepository GetLocalRepository()
+        public LocalRepository GetLocalRepository()
         {
-            get
-            {
-                return m_Repository;
-            }
+            return new LocalRepository(ClusterFolder);
         }
-        Repository m_Repository;
         #endregion
 
         // Initializations -------------------------------------------------------------------
@@ -509,8 +486,6 @@ namespace OurWordData.DataModel
         protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
         {
             bool bResult = base.OnLoad(tr, sPath, progress);
-
-            Repository.Active = RepositoryIsActive;
 
             return bResult;
         }
