@@ -176,6 +176,7 @@
     </Compile>
     <Compile Include="Tools\Diff.cs" />
     <Compile Include="Tools\Progress.cs" />
+    <Compile Include="Tools\StringMerger.cs" />
     <EmbeddedResource Include="Cellar\AutoReplace.id-ID.resx">
       <DependentUpon>AutoReplace.cs</DependentUpon>
       <SubType>Designer</SubType>

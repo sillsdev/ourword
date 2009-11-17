@@ -11,6 +11,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using JWTools;
 using OurWordData.DataModel;
@@ -27,11 +28,16 @@ namespace OurWordTests
         }
         #endregion
 
+        public static void InitializeRegistry()
+            // Needed, e.g., by Map and RootFolderPath
+        {
+            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";           
+        }
+
         #region Method: void GlobalTestSetup()
         public static void GlobalTestSetup()
         {
-            // Initialize the registry (the Map process needs it)
-            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
+            InitializeRegistry();
 
             // Localization DB
             LocDB.Initialize(JWU.GetApplicationDataFolder("OurWord"));
@@ -90,6 +96,7 @@ namespace OurWordTests
         {
             get
             {
+                TestCommon.InitializeRegistry();
                 return JW_Registry.GetValue("NUnit_LocDbDir",
                     "C:\\Users\\JWimbish\\Documents\\Visual Studio 2008\\Projects\\" +
                     "ourword\\OurWord\\bin\\Debug\\Testing");

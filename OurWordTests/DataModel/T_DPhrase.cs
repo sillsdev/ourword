@@ -21,6 +21,7 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.Tools;
 using OurWordTests;
 #endregion
 
@@ -119,5 +120,6 @@ namespace OurWordTests.DataModel
             Assert.AreEqual(sText, (text.Phrases[0] as DPhrase).Text);
         }
         #endregion
+
     }
 }

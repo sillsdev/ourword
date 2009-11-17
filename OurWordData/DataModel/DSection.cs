@@ -2847,7 +2847,7 @@ namespace OurWordData.DataModel
 
                     // If the sections match in structure, then we can place the note in
                     // the same place
-                    if (StructuresAreSame(Mine, Theirs))
+                    if (StructuresAreSame(new[] {Mine, Theirs}))
                     {
                         DParagraph OurParagraph = Mine.Paragraphs[iParagraph];
                         Debug.Assert(null != OurParagraph);
@@ -2886,30 +2886,37 @@ namespace OurWordData.DataModel
             #endregion
 
             // Evaluate Structures -----------------------------------------------------------
-            #region Method: bool StructuresAreSame(one, two)
-            bool StructuresAreSame(DSection one, DSection two)
+            #region SMethod: bool StructuresAreSame(DSection[] sections)
+            static bool StructuresAreSame(DSection[] sections)
             {
-                if (one.Paragraphs.Count != two.Paragraphs.Count)
-                    return false;
-
-                for (int i = 0; i < one.Paragraphs.Count; i++)
+                for(var i=0; i<sections.Length - 1; i++)
                 {
-                    if (one.Paragraphs[i].StyleAbbrev != two.Paragraphs[i].StyleAbbrev)
+                    var one = sections[i];
+                    var two = sections[i + 1];
+
+                    if (one.Paragraphs.Count != two.Paragraphs.Count)
                         return false;
-                    if (one.Paragraphs[i].TypeCodes != two.Paragraphs[i].TypeCodes)
+                    if (one.AllFootnotes.Count != two.AllFootnotes.Count)
                         return false;
+
+                    for(var k=0; k<one.Paragraphs.Count; k++)
+                    {
+                        var p1 = one.Paragraphs[k];
+                        var p2 = two.Paragraphs[k];
+
+                        if (p1.StyleAbbrev != p2.StyleAbbrev)
+                            return false;
+                        if (p1.TypeCodes != p2.TypeCodes)
+                            return false;
+                    }
                 }
-
-                if (one.AllFootnotes.Count != two.AllFootnotes.Count)
-                    return false;
-
                 return true;
             }
             #endregion
             #region Method: bool SameStructureMerge()
             bool SameStructureMerge()
             {
-                if (!StructuresAreSame(Mine, Theirs))
+                if (!StructuresAreSame(new[] {Parent, Mine, Theirs}))
                     return false;
 
                 // Take care of the translator notes
@@ -2957,8 +2964,8 @@ namespace OurWordData.DataModel
             #region Method: void DiffStructureMerge()
             void DiffStructureMerge()
             {
-                bool bMineHasChanged = !StructuresAreSame(Mine, Parent);
-                bool bTheirsHasChanged = !StructuresAreSame(Theirs, Parent);
+                bool bMineHasChanged = !StructuresAreSame( new[] {Mine, Parent});
+                bool bTheirsHasChanged = !StructuresAreSame(new[] {Theirs, Parent});
 
                 // If their's hasn't changed, then we're done. We just keep ours.
                 if (!bTheirsHasChanged)

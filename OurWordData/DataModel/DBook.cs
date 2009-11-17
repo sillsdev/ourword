@@ -2410,7 +2410,7 @@ namespace OurWordData.DataModel
         #region static void Merge(MergeOrder)
         static public void Merge(MergeOrder mergeOrder)
         {
-            // Debug.Fail("Breakpoint");
+            //Debug.Fail("DBook.Merge Break for Debugging");
 
             if (mergeOrder == null) throw new ArgumentNullException("mergeOrder");
 

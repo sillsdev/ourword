@@ -23,6 +23,7 @@ using System.Xml;
 
 using JWTools;
 using OurWordData;
+using OurWordData.Tools;
 #endregion
 #endregion
 
@@ -1122,7 +1123,7 @@ namespace OurWordData.DataModel
             {
                 get
                 {
-                    string s = "";
+                    var s = "";
                     foreach (DPhrase p in this)
                         s += p.Text;
                     return s;
@@ -1361,7 +1362,7 @@ namespace OurWordData.DataModel
                 get
                 {
                     // Start with an empty string
-                    string s = "";
+                    var s = "";
 
                     // Add the phrases
                     foreach (DPhrase phrase in this)
@@ -1376,10 +1377,10 @@ namespace OurWordData.DataModel
             public void FromSaveString(string s)
             {
                 // We'll build a list of transitional phrase objects here
-                List<DSection.IO.Phrase> v = new List<DSection.IO.Phrase>();
+                var v = new List<DSection.IO.Phrase>();
 
                 // Parse the string into phrase objects
-                int iPos = 0;
+                var iPos = 0;
                 DSection.IO.Phrase p;
                 while ((p = DSection.IO.Phrase.GetPhrase(s, ref iPos)) != null)
                     v.Add(p);
@@ -1410,7 +1411,7 @@ namespace OurWordData.DataModel
             public void ReadOxesPhrase(XmlNode node)
             {
                 // If we have a Span, then get its style
-                string sStyle = DStyleSheet.c_sfmParagraph;
+                var sStyle = DStyleSheet.c_sfmParagraph;
                 if (node.Name == c_sTagSpan)
                 {
                     var sStyleName = XmlDoc.GetAttrValue(node, c_sAttrStyle, 
@@ -1439,13 +1440,13 @@ namespace OurWordData.DataModel
 
                 foreach (DPhrase p in this)
                 {
-                    XmlNode nodeParent = nodeParagraph;
+                    var nodeParent = nodeParagraph;
 
                     if (p.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
                     {
                         nodeParent = oxes.AddNode(nodeParent, c_sTagSpan);
 
-                        string sStyleName = p.CharacterStyleAbbrev;
+                        var sStyleName = p.CharacterStyleAbbrev;
                         if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
                             sStyleName = c_sStyleNameItalic;
                         if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
@@ -1458,6 +1459,95 @@ namespace OurWordData.DataModel
                 }
             }
             #endregion
+
+            // Merging -----------------------------------------------------------------------
+            #region Method: void InsertConflictNote(parentPhrases, theirPhrases)
+            void InsertConflictNote(DPhrases<T> parentPhrases, DPhrases<T> theirPhrases)
+            {
+                // The place to put the ConflictNote is our owner
+                var text = Owner as DText;
+                Debug.Assert(null != text);
+
+                var note = new TranslatorNote();
+                note.SelectedText = DText.GetNoteContext(AsString, theirPhrases.AsString);
+
+                var sMessageContents = DText.GetConflictMergeNoteContents(parentPhrases.AsString,
+                     this.AsString, theirPhrases.AsString);
+
+                var message = new DMessage(TranslatorNote.MergeAuthor,
+                    DateTime.Now, DMessage.Anyone, sMessageContents);
+                note.Messages.Append(message);
+
+                text.TranslatorNotes.Append(note);
+
+                var reference = text.Paragraph.ReferenceSpan.DisplayName;
+                //LogTheChange(reference, parentPhrases.AsString, this.AsString, theirPhrases.AsString);
+            }
+            #endregion
+            #region Method: void Do3WayMerge(parentPhrases, theirPhrases)
+            public void Do3WayMerge(DPhrases<T> parentPhrases, DPhrases<T> theirPhrases)
+                // Returns true if able to resolve the differences
+            {
+                // We'll examine as flat strings
+                var parent = parentPhrases.ToSaveString;
+                var theirs = theirPhrases.ToSaveString;
+                var ours = this.ToSaveString;
+
+                // If one is equal to parent, but the other changed, then keep the changed one
+                if (parent.CompareTo(theirs) == 0)
+                    return;
+                if (parent.CompareTo(ours) == 0)
+                {
+                    this.FromSaveString(theirs);
+                    return;
+                }
+
+                // If both changed in the same way (e.g., both fixed a typo), then keep ours
+                if (ours.CompareTo(theirs) == 0)
+                    return;
+
+                // If here, both changed in different ways.
+                var bMergeSuccess = StringMerger.Merge3Way(ref parent, ref ours, theirs);
+                parentPhrases.FromSaveString(parent);
+                this.FromSaveString(ours);
+                if (bMergeSuccess)
+                    return;
+
+                // If we have a footnote we can't resolve, we have to give up; because 
+                // Standard Format doesn't support notes on footnotes
+                var text = Owner as DText;
+                if (null != text && text.Owner as DFootnote != null)
+                    return;
+
+                // Give up and create a ConflictNote for the user
+                InsertConflictNote(parentPhrases, theirPhrases);
+            }
+            #endregion
+            #region SMethod: LogTheChange(...)
+            static void LogTheChange(string reference, string parent, string ours, string theirs)
+            {
+                try
+                {
+                    const string path = "C:\\Users\\JWimbish\\Documents\\MergeLog.txt";
+                    var sw = new StreamWriter(path, true);
+                    var w = TextWriter.Synchronized(sw);
+
+                    w.WriteLine("---------------------------------------");
+                    w.WriteLine(reference);
+                    w.WriteLine("Parent  =" + parent);
+                    w.WriteLine("Ours    =" + ours);
+                    w.WriteLine("Theirs  =" + theirs);
+                    w.WriteLine("");
+
+                    w.Flush();
+                    w.Close();
+                }
+                catch (Exception)
+                {
+                }
+            }
+            #endregion
+
         }
         #endregion
         #region JAttr{g}: DPhrases Phrases
@@ -1693,12 +1783,7 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				string s = "";
-
-				foreach(DPhrase p in Phrases)
-					s += p.Text;
-
-				return s;
+			    return Phrases.AsString;
 			}
 		}
 		#endregion
@@ -1707,12 +1792,7 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				string s = "";
-
-				foreach(DPhrase p in PhrasesBT)
-					s += p.Text;
-
-				return s;
+			    return PhrasesBT.AsString;
 			}
 		}
 		#endregion
@@ -2367,44 +2447,8 @@ namespace OurWordData.DataModel
         #region Method:  void Merge(DBasicText Parent, DBasicText Theirs)
         public void Merge(DBasicText Parent, DBasicText Theirs)
         {
-            // If theirs didn't change (which we define as meaning that Theirs is identical
-            // to the Parent),  then regardless of whether ours changed or not, we just keep
-            // ours; as there is nothing to merge.
-            if (Theirs.PhrasalContentsEquals(Parent))
-                return;
-
-            // So if we're here, Theirs changed. If ours didn't change, then we just want to
-            // overwrite ours with a copy of theirs.
-            if (this.PhrasalContentsEquals(Parent))
-            {
-                Theirs.CopyDataTo(this);
-                return;
-            }
-
-            // If we're here, then both changed, and we have a conflict.
-
-            // If its a footnote, we aren't prepared to do anything, and just keep ours.
-            // (1) If a \cf, it really doesn't matter as these get re-generated.
-            // (2) But if a \fn, we will loose info. (TODO: figure out how to save the change)
-            if (Paragraph as DFootnote != null)
-            {
-                return;
-            }
-
-            // We want to keep Ours (as this is less confusing for the user), and generate 
-            // a TranslatorNote indicating the nature of the conflict.
-            TranslatorNote note = new TranslatorNote();
-            note.SelectedText = GetNoteContext(ContentsAsString, Theirs.ContentsAsString);
-
-            // TODO: Assign it to this user? Or, perhaps this should be a merge setting.
-            // I guess for now it just stays unassigned.
-            var sMessageContents = GetConflictMergeNoteContents(Parent.ContentsAsString,
-                 this.ContentsAsString, Theirs.ContentsAsString);
-            var message = new DMessage(TranslatorNote.MergeAuthor,
-                DateTime.Now, DMessage.Anyone, sMessageContents);
-            note.Messages.Append(message);
-
-            TranslatorNotes.Append(note);
+            Phrases.Do3WayMerge(Parent.Phrases, Theirs.Phrases);
+            PhrasesBT.Do3WayMerge(Parent.PhrasesBT, Theirs.PhrasesBT);
         }
         #endregion
     }

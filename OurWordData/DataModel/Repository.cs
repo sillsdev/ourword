@@ -110,22 +110,6 @@ namespace OurWordData.DataModel
             return result;
         }
         #endregion
-        #region Method: ExecutionResult CloneTo(destinationPath)
-        public ExecutionResult CloneTo(string destinationPath)
-        {
-            if (string.IsNullOrEmpty(destinationPath)) 
-                throw new ArgumentException("destinationPath");
-
-            if (Directory.Exists(destinationPath))
-                Directory.Delete(destinationPath, true);
-
-            var source = SurroundWithQuotes(FullPathToRepositoryRoot);
-            var destination = SurroundWithQuotes(StripTrailingPathSeparator(destinationPath));
-
-            var cloneCommand = string.Format("clone {0} {1}", source, destination);
-            return DoCommand(cloneCommand);
-        }
-        #endregion
         #region Method: ExecutionResult CommitChangedFiles(user, message)
         public ExecutionResult CommitChangedFiles(string user, string message)
         {
@@ -305,10 +289,10 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method: ExecutionResult CreateIfDoesntExist()
-        public ExecutionResult CreateIfDoesntExist()
+        public void CreateIfDoesntExist()
         {
             if (Exists)
-                return null;
+                return;
 
             // Make sure the root folder exists; in the case of some unit tests we may
             // not have created the folder yet.
@@ -323,7 +307,11 @@ namespace OurWordData.DataModel
             CreateHgIgnoreFile();
 
             // Commit the ignore file
-            return CommitChangedFiles("OurWord", "Initial setup (Added .hgignore)");
+            CommitChangedFiles("OurWord", "Initial setup (Added .hgignore)");
+
+            // Version Number for this repository. Do this after the hgignore commit,
+            // otherwise it will not show up in the tags command.
+            AddOurWordVersionTag();
         }
         #endregion
         #region Method: bool CheckUnlockedRepository()
@@ -391,6 +379,103 @@ namespace OurWordData.DataModel
             return DoCommand("update");
         }
         #endregion
+        #region Method: ExecutionResult CloneFrom(Repository other)
+        public ExecutionResult CloneFrom(Repository other)
+        {
+            // Get rid of anything that might have been there; then creat an empty
+            // folder so that Hg will not complain of an invalid working directory
+            if (Directory.Exists(FullPathToRepositoryRoot))
+                JWU.SafeFolderDelete(FullPathToRepositoryRoot);
+            Directory.CreateDirectory(FullPathToRepositoryRoot);
+
+            var destination = SurroundWithQuotes(FullPathToRepositoryRoot);
+
+            var source = SurroundWithQuotes(StripTrailingPathSeparator(
+                other.FullPathToRepositoryRoot));
+
+            var cloneCommand = string.Format("clone {0} {1}", source, destination);
+            return DoCommand(cloneCommand);
+        }
+        #endregion
+        #region Method: void Rollback()
+        public void Rollback()
+        {
+            DoCommand("rollback");
+        }
+        #endregion
+
+        // Repository Version ----------------------------------------------------------------
+        private const string c_VersionTag = "OurWordVersion";
+        protected const int c_CurrentVersionNo = 1;
+        #region SAttr{g}: string TagContents
+        public static string TagContents
+        {
+            get
+            {
+                return c_VersionTag + "=" + c_CurrentVersionNo;
+            }
+        }
+        #endregion
+        #region Method: int GetOurWordVersion()
+        public int GetOurWordVersion()
+            // Tags are of the form:
+            // tip                                1:a545ad8f51c7
+            // OurWordVersion=14                  0:f214fd2969a7
+        {
+            var result = DoCommand("tags");
+
+            var vsTags = result.StandardOutput.Split('\n');
+            var iStart = c_VersionTag.Length + 1;
+
+            var vsVersionStrings = new List<string>();
+            foreach(var s in vsTags)
+            {
+                if (!s.Contains(c_VersionTag + "=")) 
+                    continue;
+                var sTag = s.Substring(iStart, s.IndexOf(' ') - iStart);
+                vsVersionStrings.Add(sTag);
+            }
+
+            // We want that one with the highest number; a repository may have incremented
+            // versions (formats) along the way; the highest one should also be the most
+            // recent one.
+            var nVersion = 0;
+            foreach (var s in vsVersionStrings)
+            {
+                try
+                {
+                    var n = Convert.ToInt16(s);
+                    nVersion = Math.Max(nVersion, n);
+                }
+                catch (Exception e)
+                {
+                    var message = string.Format("GetOurWordVersion ToInt({0}) failed: {1}",
+                        s, e.Message);
+                    Console.WriteLine(message);
+                }
+            }
+
+            return nVersion;
+        }
+        #endregion
+        #region Method: void UpdateVersionTag()
+        public void UpdateVersionTag()
+        {
+            // Do nothing if we're already at the desired version
+            var currentVersion = GetOurWordVersion();
+            if (currentVersion >= c_CurrentVersionNo)
+                return;
+
+            AddOurWordVersionTag();
+        }
+        #endregion
+        #region Method: void AddOurWordVersionTag()
+        void AddOurWordVersionTag()
+        {
+            var tagCommand = "tag " + SurroundWithQuotes(TagContents);
+            DoCommand(tagCommand);
+        }
+        #endregion
 
         // Methods ---------------------------------------------------------------------------
         #region Method: void CreateHgIgnoreFile()
@@ -424,6 +509,7 @@ namespace OurWordData.DataModel
             // Ignore Mercurial files
             w.WriteLine("*.orig");
             w.WriteLine("*.conflict");
+            w.WriteLine("*.resolve");
 
             // Done
             w.Close();
@@ -742,8 +828,10 @@ namespace OurWordData.DataModel
                     }
         #endregion
         #region PullNewerFiles
-        void PullNewerFiles()
+        public void PullNewerFiles()
         {
+            var nRepoVersion = m_LocalRepository.GetOurWordVersion();
+
             var result = m_LocalRepository.PullFrom(m_OtherRepository.FullPathToRepositoryRoot);
             if (0 != result.ExitCode)
             {
@@ -751,6 +839,16 @@ namespace OurWordData.DataModel
                     "OurWord is unable to retrieve changes from the Internet. \n\n" +
                     "The remote computer may not be working, or you may have the username " +
                     "or password incorrectly entered. Please try again later.");
+            }
+
+            var nPulledVersion = m_LocalRepository.GetOurWordVersion();
+            if (nPulledVersion > nRepoVersion)
+            {
+                m_LocalRepository.Rollback();
+                throw new SynchException("msgYouNeedToUpgrade", 
+                    "The data on the Internet was created with a newer version of OurWord. " +
+                    "You need to upgrade to the latest version before you will be able to " +
+                    "send/receive.");
             }
         }
         #endregion
@@ -784,6 +882,12 @@ namespace OurWordData.DataModel
         #region PushToOther
         void PushToOther()
         {
+            // Make sure the repository reflects our current version, now that we're 
+            // sending changes up. Thus on other computers, older versions of OurWord
+            // will rollback if they pull a repo with a higher version than they can
+            // handle.
+            m_LocalRepository.UpdateVersionTag();
+
             var result = m_LocalRepository.PushTo(m_OtherRepository.FullPathToRepositoryRoot);
             if (0 != result.ExitCode)
             {
@@ -824,7 +928,7 @@ namespace OurWordData.DataModel
         #region Method: void DoClone()
         void DoClone()
         {
-            var result = m_OtherRepository.CloneTo(m_LocalRepository.FullPathToRepositoryRoot);
+            var result = m_LocalRepository.CloneFrom(m_OtherRepository);
 
             if (0 != result.ExitCode)
             {

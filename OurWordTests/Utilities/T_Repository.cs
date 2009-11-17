@@ -8,6 +8,8 @@
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Chorus.merge;
@@ -56,24 +58,6 @@ namespace OurWordTests.Utilities
             // Do we do nothing if there's no trailing separator to begin with?
             Assert.AreEqual(pathWithoutTrailingSeparator,
                 StripTrailingPathSeparator(pathWithoutTrailingSeparator));
-        }
-        #endregion
-        #region Test: TCloneTo
-        [Test] public void TCloneTo()
-        {
-            TestFolder.CreateEmpty();
-
-            var originRepositoryFolder = TestFolder.CreateEmptySubFolder("origin");
-            var originRepository = new LocalRepository(originRepositoryFolder);
-            originRepository.CreateIfDoesntExist();
-
-            var clonedRepositoryFolder = TestFolder.CreateEmptySubFolder("cloned");
-            originRepository.CloneTo(clonedRepositoryFolder);
-            var clonedRepository = new LocalRepository(clonedRepositoryFolder);
-
-            Assert.IsTrue(clonedRepository.Exists);
-
-            TestFolder.DeleteIfExists();
         }
         #endregion
         #region Test: TCheckMercialIsInstalled
@@ -163,8 +147,8 @@ namespace OurWordTests.Utilities
 
             // Clone it
             var clonedRepositoryPath = TestFolder.CreateEmptySubFolder("cloned");
-            originRepository.CloneTo(clonedRepositoryPath);
             var clonedRepository = new LocalRepository(clonedRepositoryPath);
+            clonedRepository.CloneFrom(originRepository);
 
             // Add a new file to the original repo
             var file = new TestFile("origin", filename);
@@ -192,13 +176,14 @@ namespace OurWordTests.Utilities
     }
 
     [TestFixture]
-    public class TestLocalRepository 
+    public class TestLocalRepository : LocalRepository
     {
-        #region Setup
-        [SetUp]
-        public void Setup()
+        #region Constructor()
+        public TestLocalRepository() : 
+            base(TestFolder.RootFolderPath)
         {
-            TestCommon.GlobalTestSetup();
+            // As a result, "this" can be a LocalRepository should we want
+            // to test in that manner.
         }
         #endregion
 
@@ -213,6 +198,58 @@ namespace OurWordTests.Utilities
             Assert.IsTrue(Directory.Exists(hgFolder), "Should have a .hg folder.");
 
             TestFolder.DeleteIfExists();
+        }
+        #endregion
+        #region Test: TCloneFrom
+        [Test] public void TCloneFrom()
+        {
+            TestFolder.CreateEmpty();
+
+            var originRepositoryFolder = TestFolder.CreateEmptySubFolder("origin");
+            var originRepository = new LocalRepository(originRepositoryFolder);
+            originRepository.CreateIfDoesntExist();
+
+            var clonedRepositoryFolder = TestFolder.CreateEmptySubFolder("cloned");
+            var clonedRepository = new LocalRepository(clonedRepositoryFolder);
+            clonedRepository.CloneFrom(originRepository);
+
+            Assert.IsTrue(clonedRepository.Exists);
+
+            TestFolder.DeleteIfExists();
+        }
+        #endregion
+        #region Test: TVersionTagIsCreated
+        [Test] public void TVersionTagIsCreated()
+        {
+            var folder = TestFolder.CreateEmpty();
+            CreateIfDoesntExist();
+
+            var version = GetOurWordVersion();
+
+            Assert.AreNotEqual(0, version, "Should be nonzero on a create");
+
+            TestFolder.DeleteIfExists();
+        }
+        #endregion
+        #region Test: TUpdateVersionTag
+        [Test] public void TUpdateVersionTag()
+        {
+            var folder = TestFolder.CreateEmpty();
+            var repo = new LocalRepository(folder);
+            repo.CreateIfDoesntExist();
+
+            // Remove the tag that we just inserted
+            var removeCommand = string.Format("tag --remove {0}", 
+                SurroundWithQuotes(TagContents));
+            DoCommand(removeCommand);
+
+            var version = repo.GetOurWordVersion();
+            Assert.AreEqual(0, version, "Should be zero following removal");
+
+            repo.UpdateVersionTag();
+
+            Assert.AreEqual(c_CurrentVersionNo, repo.GetOurWordVersion(),
+                "Version should be " + c_CurrentVersionNo);
         }
         #endregion
     }
@@ -273,8 +310,7 @@ namespace OurWordTests.Utilities
     public class TestSynchronize
     {
         #region Setup
-        [SetUp]
-        public void Setup()
+        [SetUp] public void Setup()
         {
             TestCommon.GlobalTestSetup();
         }
@@ -434,8 +470,8 @@ namespace OurWordTests.Utilities
 
             // Clone it to another repository; thus we have "parent" in two places
             var clonedRepositoryPath = GetFreshRepositoryRootPath("cloned");
-            originRepository.CloneTo(clonedRepositoryPath);
             var clonedRepository = new LocalRepository(clonedRepositoryPath);
+            clonedRepository.CloneFrom(originRepository);
 
             // Update the repositories with "our" and "their" versions
             WriteAndCommitFile(originRepository, sFileBaseName, ourDoc, "Origin updated with ours");
@@ -455,6 +491,49 @@ namespace OurWordTests.Utilities
             // Remove the repositories we created
             CleanupByEnsuringIsDeleted(originRepositoryPath);
             CleanupByEnsuringIsDeleted(clonedRepositoryPath);
+        }
+        #endregion
+        #region Test: DetectAndRecoverFromLaterVersion
+        [Test] public void DetectAndRecoverFromLaterVersion()
+        {
+            TestFolder.CreateEmpty();
+
+            // Create a repositiory with data version "0"
+            var folderLocal = TestFolder.CreateEmptySubFolder("local");
+            var repoLocal = new LocalRepository(folderLocal);
+            repoLocal.CreateIfDoesntExist();
+            var removeCommand = string.Format("tag --remove \"{0}\"", 
+                LocalRepository.TagContents);
+            repoLocal.DoCommand(removeCommand);
+
+            // Clone it to "other"
+            var folderOther = TestFolder.CreateEmptySubFolder("other");
+            var repoOther = new LocalRepository(folderOther);
+            repoOther.CloneFrom(repoLocal);
+
+            // In the "Other", update the version
+            repoOther.UpdateVersionTag();
+            Assert.IsTrue(0 == repoLocal.GetOurWordVersion());
+            Assert.IsTrue(0 < repoOther.GetOurWordVersion());
+
+            // Attempt the pull; local's version should be less than other's.
+            try
+            {
+                var synch = new Synchronize(repoLocal, repoOther, "jsw");
+                synch.PullNewerFiles();
+
+                Assert.IsTrue(false, "Exception in PullNewerFiles shouldl tell the user to upgrade");
+            }
+            catch (Exception e)
+            {
+                Assert.IsTrue(e.Message.Contains("upgrade"));
+            }
+
+            // Recover should remove the pull
+            repoLocal.Rollback();
+            Assert.IsTrue(0 == repoLocal.GetOurWordVersion());
+
+            TestFolder.DeleteIfExists();
         }
         #endregion
     }

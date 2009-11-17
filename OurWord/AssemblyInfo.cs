@@ -29,7 +29,7 @@ using System.Security.Permissions;
 // Version information consists of the following four values:
 //    Major Version - E.g., major functionality has been added
 //    Minor Version - A new feature here or there
-//    Build Number  - generally just bug fixes
+//    Build Number  - generally just fixes
 //    Revision      - not used.
 //
 
@@ -38,8 +38,9 @@ using System.Security.Permissions;
 // 1.1.1 - fixed Load problems with Absolute Paths
 // 1.3.0 - What I'm leaving at Tomohon 4 June 2009
 // 1.4.0 - Oxes, AuSIL, Manado, Kupang
+// 1.5.0 - Huichol (repo Version 1)
 
-[assembly: AssemblyVersion("1.4.7")]
+[assembly: AssemblyVersion("1.5.0")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
