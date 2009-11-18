@@ -1767,7 +1767,7 @@ namespace OurWordData.DataModel
         #endregion
 
         #region Method: void WriteBook(string sPath)
-        public void WriteBook(string sPath)
+        private void WriteBook(string sPath)
         {
             if (!Loaded)
                 return;
@@ -2410,7 +2410,11 @@ namespace OurWordData.DataModel
         #region static void Merge(MergeOrder)
         static public void Merge(MergeOrder mergeOrder)
         {
+            // Debugging support
             //Debug.Fail("DBook.Merge Break for Debugging");
+            // This hook allows a merge to fail for the benefit of unit testing
+            if (mergeOrder.pathToOurs.Contains(".MustFail."))
+                throw new Exception("Merge Failed for Unit Testing");
 
             if (mergeOrder == null) throw new ArgumentNullException("mergeOrder");
 

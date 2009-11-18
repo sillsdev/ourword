@@ -40,7 +40,7 @@ using System.Security.Permissions;
 // 1.4.0 - Oxes, AuSIL, Manado, Kupang
 // 1.5.0 - Huichol (repo Version 1)
 
-[assembly: AssemblyVersion("1.5.0")]
+[assembly: AssemblyVersion("1.5.1")]
 
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 

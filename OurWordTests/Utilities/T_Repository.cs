@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.IO;
 using Chorus.merge;
 using Chorus.Utilities;
+using Chorus.VcsDrivers.Mercurial;
 using NUnit.Framework;
 
 using JWTools;
@@ -90,14 +91,14 @@ namespace OurWordTests.Utilities
             // Create a file at the repository root
             const string sFile1 = "AtRoot.oxes";
             var file1 = new TestFile(null, sFile1);
-            file1.CreateAndWrite(null);
+            file1.CreateAndWrite("");
 
             // Create another file a folder lower
             const string sFile2 = "hello.owt";
             const string sFolder2 = ".Settings";
             var sFolderFile2 = sFolder2 + Path.DirectorySeparatorChar + sFile2;
             var file2 = new TestFile(sFolder2, sFile2);
-            file2.CreateAndWrite(null);
+            file2.CreateAndWrite("");
 
             var vsFiles = repository.GetChangedFiles();
 
@@ -119,9 +120,9 @@ namespace OurWordTests.Utilities
 
             // Create a couple of files
             var file1 = new TestFile(null, "AtRoot.oxes");
-            file1.CreateAndWrite(null);
+            file1.CreateAndWrite("");
             var file2 = new TestFile(".Settings", "hello.owt");
-            file2.CreateAndWrite(null);
+            file2.CreateAndWrite("");
             Assert.AreEqual(2, repository.GetChangedFiles().Count,
                 "should have two uncommitted files.");
 
@@ -152,7 +153,7 @@ namespace OurWordTests.Utilities
 
             // Add a new file to the original repo
             var file = new TestFile("origin", filename);
-            file.CreateAndWrite(null);
+            file.CreateAndWrite("");
             originRepository.CommitChangedFiles("jsw", "Commiting new file to original.");
 
             // Verify the file exists in only the origin repo
@@ -536,6 +537,69 @@ namespace OurWordTests.Utilities
             TestFolder.DeleteIfExists();
         }
         #endregion
+        #region Test: TestRollbackUponMergeFailure
+        [Test] public void TestRollbackUponMergeFailure()
+        {
+            TestFolder.CreateEmpty();
+            const string filename = "01 GEN - Pura.MustFail.oxes";
+
+            // Create a original repository
+            var folderLocal = TestFolder.CreateEmptySubFolder("original");
+            var repoLocal = new LocalRepository(folderLocal);
+            repoLocal.CreateIfDoesntExist();
+
+            // Add a test file to it
+            var fileLocal = new TestFile(folderLocal, filename);
+            fileLocal.CreateAndWrite("");
+            repoLocal.CommitChangedFiles("jsw", "Created PuraGEN");
+
+            // Clone it to "other"
+            var folderOther = TestFolder.CreateEmptySubFolder("other");
+            var repoOther = new LocalRepository(folderOther);
+            repoOther.CloneFrom(repoLocal);
+
+            // Change the original to "one"
+            fileLocal.CreateAndWrite("one");
+
+            // Change the "other" to "two" and commit it so that it will pull
+            var fileOther = new TestFile(folderOther, filename);
+            fileOther.CreateAndWrite("two");
+            repoOther.CommitChangedFiles("jsw", "Changed PuraGEN");
+
+            // Attempt the merge. We should get an Exception saying the merge
+            // could not be done. (As our files are not really oxes files)
+            EnumeratedStepsProgressDlg.DisableForTesting = true;
+            var synch = new Synchronize(repoLocal, repoOther, "jsw");
+            var success = synch.SynchLocalToOther();
+            Assert.IsFalse(success, "Synch #1 should have failed.");
+
+            // The file in our working directory should still be "one"
+            var vsContents = fileLocal.Read();
+            Assert.AreEqual(1, vsContents.Count);
+            Assert.AreEqual("one", vsContents[0]);
+
+            // There should be exactly one head in the repository
+            var heads = (new HgRepository(folderLocal, new NullProgress()).GetHeads());
+            Assert.AreEqual(1, heads.Count);
+
+            // Now change our local file to "one++"
+            fileLocal.CreateAndWrite("one++");
+
+            // Do another failed synch
+            success = synch.SynchLocalToOther();
+            Assert.IsFalse(success, "Synch #2 should have failed.");
+
+            // Our local file should still be "one++"
+            vsContents = fileLocal.Read();
+            Assert.AreEqual(1, vsContents.Count);
+            Assert.AreEqual("one++", vsContents[0]);
+
+            // There should be exactly one head in the repository
+            heads = (new HgRepository(folderLocal, new NullProgress()).GetHeads());
+            Assert.AreEqual(1, heads.Count);
+        }
+        #endregion
+
     }
 
 }

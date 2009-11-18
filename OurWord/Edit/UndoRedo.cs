@@ -1299,7 +1299,7 @@ namespace OurWord.Edit
         protected bool Insert(string sInsert)
         {
             // Retrieve the selected paragraph
-            OWPara op = Window.Selection.Paragraph;
+            var op = Window.Selection.Paragraph;
             if (null == op)
                 return false;
 
@@ -1323,7 +1323,7 @@ namespace OurWord.Edit
                     Window.Selection.Anchor);
             }
 
-            // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
+            // We'll make a copy of the data for Undo; this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
             // original object, not replace it.
             m_dbtCopyOfOriginal = new DBasicText(Window.Selection.DBT);
@@ -1337,18 +1337,18 @@ namespace OurWord.Edit
             }
 
             // Get the iBlocks that correspond to the DBasicText
-            OWWindow.Sel sel = Window.Selection;
-            int iBlockFirst = sel.DBT_iBlockFirst;
+            var sel = Window.Selection;
+            var iBlockFirst = sel.DBT_iBlockFirst;
 
             // Get the offset into the DBasicText
-            int n = Window.Selection.DBT_iCharFirst;
+            var n = Window.Selection.DBT_iCharFirst;
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
-            DBasicText DBT = sel.DBT;
-            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            var DBT = sel.DBT;
+            var phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll keep track of which DPhrase we're currently processing here
-            int iPhrase = 0;
+            var iPhrase = 0;
 
             // Increment past any DPhrases that are prior to the insertion point
             DPhrase phr = null;
@@ -1356,7 +1356,7 @@ namespace OurWord.Edit
             {
                 phr = phrases[iPhrase];
 
-                // We will do the insert in this phrase. (Note that we use '>' rather than
+                // We will do the insert in this phrase. (We use '>' rather than
                 // '>=', because at the phrase boundary, this moves us to the next phrase,
                 // rather than attempting to append at the end of a phrase; which gives
                 // unwanted (i.e., wierd) typing behavior.
@@ -1373,12 +1373,12 @@ namespace OurWord.Edit
             }
 
             // We now have the DPhrase insertion point
-            DPhrase phrase = phrases[iPhrase];
-            int iPos = n;
+            var phrase = phrases[iPhrase];
+            var iPos = n;
 
-            // Insert the text. Note that we remove spurious spaces, so if the result of the
-            // insertion is that we have what we started with, then we need proceed no further.
-            string sBeforeInsert = phrase.Text;
+            // Insert the text. We remove spurious spaces, so if the result of the insertion 
+            // is that we have what we started with, then we need proceed no further.
+            var sBeforeInsert = phrase.Text;
             phrase.Text = DPhrase.EliminateSpuriousSpaces(phrase.Text.Insert(n, sInsert));
             if (sBeforeInsert == phrase.Text)
             {
@@ -1394,7 +1394,7 @@ namespace OurWord.Edit
             op.ReplaceBlocksWithNewDBT(Window.Selection, DBT);
 
             // Restore a selection at the deletion point plus the amount inserted. 
-            int iInsertPos = sel.DBT_iCharFirst + sInsert.Length;
+            var iInsertPos = sel.DBT_iCharFirst + sInsert.Length;
             sel = OWWindow.Sel.CreateSel(op, sel.DBT, iInsertPos);
             Window.Selection = op.NormalizeSelection(sel);
 

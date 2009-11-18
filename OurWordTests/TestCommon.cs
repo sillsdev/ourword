@@ -9,6 +9,7 @@
  *********************************************************************************************/
 #region Using
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
@@ -199,8 +200,19 @@ namespace OurWordTests
         }
         #endregion
 
-        #region Method: void CreateAndWrite(string vsContents)
-        public void CreateAndWrite(string vsContents)
+        #region Method: void CreateAndWrite(string sContents)
+        public void CreateAndWrite(string sContents)
+        {
+            // Create the test folder & any subfolder if it isn't there already
+            TestFolder.EnsurePathExists(m_FullPath);
+
+            var w = GetTextWriter();
+            w.WriteLine(sContents);
+            w.Close();
+        }
+        #endregion
+        #region Method: void CreateAndWrite(string[] vsContents)
+        public void CreateAndWrite(string[] vsContents)
         {
             // Create the test folder & any subfolder if it isn't there already
             TestFolder.EnsurePathExists(m_FullPath);
@@ -235,6 +247,12 @@ namespace OurWordTests
             var w = new StreamWriter(m_FullPath, false, Encoding.UTF8);
             var tw = TextWriter.Synchronized(w);
             return tw;
+        }
+        #endregion
+        #region Method: List<string> Read()
+        public List<string> Read()
+        {
+            return JWU.ReadFile(m_FullPath);
         }
         #endregion
     }

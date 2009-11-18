@@ -154,7 +154,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method: bool CheckHasUnresolvedFiles()
-        bool CheckHasUnresolvedFiles()
+        public bool CheckHasUnresolvedFiles()
             // Any line in standard output that starts as "U " signals an unresolved
             // file, for which merge is needed.
             //
@@ -171,29 +171,6 @@ namespace OurWordData.DataModel
             }
 
             return false;
-        }
-        #endregion
-        #region Method: bool ResolveFilesIfNeeded(string username)
-        public bool ResolveFilesIfNeeded(string username)
-            // Returns false if there are still unresolved files (that is, if the attempt
-            // to merge any unresolved files failed.
-        {
-            if (!CheckHasUnresolvedFiles())
-                return true;
-
-            // Attempt to resolve them. Most likely this will fail, because unresolved 
-            // files are generally due to a problem in the merge code; but if the user 
-            // has installed a later version of OW, then perhaps the problem will have 
-            // been fixed.
-            using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", FullPathToRepositoryRoot))
-            using (new ShortTermEnvironmentalVariable("HGMERGE", PathToChorusMerge))
-            {
-                var result = DoCommand("resolve -a");
-                if (result.ExitCode == 0) // Successful
-                    CommitRepairOfUnresolvedMerge(username);
-            }
-
-            return !CheckHasUnresolvedFiles();
         }
         #endregion
         #region Method: List<string> GetChangedFiles()
@@ -790,14 +767,13 @@ namespace OurWordData.DataModel
             // repositiory if a transaction was interrupted.
             m_LocalRepository.Recover();
 
-            // Do we have an failed merge, e.g., leftover from a previous version of OurWord?
-            if (!m_LocalRepository.ResolveFilesIfNeeded(m_UserNameForCommits))
+            // If we have problem from a bad merge (from an old version), we need to report 
+            // it to the user and get them to fix it (with help our help, I'm sure.)
+            if (m_LocalRepository.CheckHasUnresolvedFiles())
             {
-                throw new SynchException("msgRepositoryProblem",
-                    "We're sorry, but there is apparently a bug in OurWord related to merging files.\n\n" +
-                    "If you have upgraded to the latest version, then please contact us at " +
-                    "http://ourword.TheSeedCompany.org for information on how to solve " +
-                    "this problem.");
+                throw new SynchException("msgRepositoryProblem", 
+                    "Your local repository is in an error state. This is probably due to a " +
+                    "version of OurWord previous to 1.5. Please contact us for help.");
             }
         }
         #endregion
@@ -842,7 +818,7 @@ namespace OurWordData.DataModel
             }
 
             var nPulledVersion = m_LocalRepository.GetOurWordVersion();
-            if (nPulledVersion > nRepoVersion)
+            if (nPulledVersion > nRepoVersion && nRepoVersion > 0)
             {
                 m_LocalRepository.Rollback();
                 throw new SynchException("msgYouNeedToUpgrade", 
@@ -857,19 +833,26 @@ namespace OurWordData.DataModel
             // Hg's Merge gives strange error messages. E.g., its an error if there was
             // nothing to merge. So we're ignoring the error message returned from 
             // the Execute command.
-            // 
-            // TODO: Figure out if the Merge was unsuccessful and display an error message
         {
             using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", m_LocalRepository.FullPathToRepositoryRoot))
             using (new ShortTermEnvironmentalVariable("HGMERGE", Repository.PathToChorusMerge))
             {
                 m_LocalRepository.DoCommand("merge");
             }
-        }
-        #endregion
-        #region StoreMergeResults
-        void StoreMergeResults()
-        {
+
+            // If there were unresolved files, it means the merge waas unsuccessful. 
+            // We don't want to leave the repository in this state, so we roll it back
+            if (m_LocalRepository.CheckHasUnresolvedFiles())
+            {
+                m_LocalRepository.Rollback();
+                throw new SynchException("msgUnableToMerge",
+                    "OurWord was unable to merge. This is most likely a bug with OurWord. " +
+                    "If you are runing the latest version, then  please contact us " +
+                    "at http://ourword.TheSeedCompany.org so that we can work with you to " +
+                    "solve the problem.");
+            }
+
+            // Store the results of the merge
             var result = m_LocalRepository.CommitResultsOfMerge(m_UserNameForCommits);
             if (0 != result.ExitCode)
             {
@@ -966,7 +949,6 @@ namespace OurWordData.DataModel
             AddSynchStep("Storing any files you've changed", StoreChangedFiles);
             AddSynchStep("Retrieving any newer files from the " + sOtherName, PullNewerFiles);
             AddSynchStep("Merging your changes with theirs", Merge);
-            AddSynchStep("Storing the results of the merge", StoreMergeResults);
             AddSynchStep("Sending all changes back to the " + sOtherName, PushToOther);
             AddSynchStep("Updating your data with the changed", UpdateLocalFiles);
 
