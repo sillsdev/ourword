@@ -222,7 +222,7 @@ namespace OurWordTests.Utilities
         #region Test: TVersionTagIsCreated
         [Test] public void TVersionTagIsCreated()
         {
-            var folder = TestFolder.CreateEmpty();
+            TestFolder.CreateEmpty();
             CreateIfDoesntExist();
 
             var version = GetOurWordVersion();

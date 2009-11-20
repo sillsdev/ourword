@@ -1641,7 +1641,7 @@ namespace OurWord.Edit
             float fHighest = 0;
             foreach (EItem item in SubItems)
             {
-				item.CalculateVerticals(y, bRepositionOnly);
+                item.CalculateVerticals(y, bRepositionOnly);
 				fHighest = Math.Max(fHighest, item.Height);
             }
             y += fHighest;

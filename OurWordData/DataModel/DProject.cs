@@ -52,6 +52,8 @@ namespace OurWordData.DataModel
 			set
 			{
                 m_bVD_ShowTranslationsPane = value;
+                if (DB.IsValidProject)
+                    DB.Project.DeclareDirty();
 			}
 		}
         static private bool m_bVD_ShowTranslationsPane = false;

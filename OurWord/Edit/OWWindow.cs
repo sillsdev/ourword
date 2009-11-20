@@ -54,7 +54,7 @@ namespace OurWord.Edit
                 Debug.Assert(null != m_szWindowMargins);
                 return m_szWindowMargins;
             }
-            set
+            private set
             {
                 m_szWindowMargins = value;
             }
@@ -748,8 +748,8 @@ namespace OurWord.Edit
             Contents.CalculateContainerHorizontals();
 
 			// Calculate the vertical layout
-			float yTop = WindowMargins.Height;   // Top of the window, taking margin into account
-			Contents.CalculateVerticals(yTop, false);
+            float yTop = WindowMargins.Height;   // Top of the window, taking margin into account
+            Contents.CalculateVerticals(yTop, false);
 
             // Now that the lines have been defined in the low-level OWPara's,
             // give each line a line number

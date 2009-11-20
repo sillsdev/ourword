@@ -19,17 +19,6 @@ namespace OurWordData.DataModel
     public class Repository
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: int SecondsBeforeTimeout
-        protected virtual int SecondsBeforeTimeout
-        {
-            get
-            {
-                // ToDo: What, if anything, do we want to do with this?
-                // 3 minutes
-                return 30*60; 
-            }
-        }
-        #endregion
         #region VAttr{g}: string FullPathToRepositoryRoot
         public virtual string FullPathToRepositoryRoot
         {
@@ -49,16 +38,6 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region SVAttr{g}: string PathToChorusMerge
-        static public string PathToChorusMerge
-        {
-            get
-            {
-                return SurroundWithQuotes(
-                    Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
-            }
-        }
-        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -67,7 +46,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region SMethod: string SurroundWithQuotes(string s)
-        protected static string SurroundWithQuotes(string sIn)
+        public static string SurroundWithQuotes(string sIn)
         {
             // We need to remove any existing quotes we might have, thus this can be called
             // on paths that already are surrounded by quotes.
@@ -103,10 +82,13 @@ namespace OurWordData.DataModel
         #region Method: ExecutionResult DoCommand(commandLine)
         public ExecutionResult DoCommand(string commandLine)
         {
+            const int cSecondsBeforeTimeout = 60*60;
+
             var result = HgRunner.Run(commandLine,
                 FullPathToRepositoryRoot,
-                SecondsBeforeTimeout, 
+                cSecondsBeforeTimeout, 
                 new Chorus.Utilities.NullProgress());
+
             return result;
         }
         #endregion
@@ -120,17 +102,6 @@ namespace OurWordData.DataModel
                 return new ExecutionResult {ExitCode = 0, StandardError = "", StandardOutput = ""};
 
             var commitCommand = string.Format("commit -A -u \"{0}\" -m \"{1}\"", user, message);
-            return DoCommand(commitCommand);
-        }
-        #endregion
-        #region Method: ExecutionResult CommitRepairOfUnresolvedMerge(username)
-        ExecutionResult CommitRepairOfUnresolvedMerge(string username)
-        {
-            if (string.IsNullOrEmpty(username)) 
-                throw new ArgumentException("user");
-
-            var commitCommand = string.Format("commit -u \"{0}\" -m \"Repaired an unresolved merge.\"", 
-                username);
             return DoCommand(commitCommand);
         }
         #endregion
@@ -148,9 +119,11 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method: ExecutionResult Recover()
-        public ExecutionResult Recover()
+        public void Recover()
+            // Has no effect if the repositiory is in good shape; but it repairs the
+            // repositiory if a transaction was interrupted.
         {
-            return DoCommand("Recover");
+            DoCommand("Recover");
         }
         #endregion
         #region Method: bool CheckHasUnresolvedFiles()
@@ -350,10 +323,10 @@ namespace OurWordData.DataModel
             return DoCommand(pullCommand);
         }
         #endregion
-        #region ExecutionResult UpdateToCurrentBranchTip()
-        public ExecutionResult UpdateToCurrentBranchTip()
+        #region void UpdateToCurrentBranchTip()
+        public void UpdateToCurrentBranchTip()
         {
-            return DoCommand("update");
+            DoCommand("update");
         }
         #endregion
         #region Method: ExecutionResult CloneFrom(Repository other)
@@ -507,16 +480,6 @@ namespace OurWordData.DataModel
                 var path = string.Format("http://{0}:{1}@{2}/{3}",
                     UserName, Password, Server, m_ClusterName.ToLower());
                 return path;
-            }
-        }
-        #endregion
-        #region OAttr{g}: int SecondsBeforeTimeout
-        protected override int SecondsBeforeTimeout
-        {
-            get
-            {
-                // 30 minutes
-                return 30*60;
             }
         }
         #endregion
@@ -754,6 +717,11 @@ namespace OurWordData.DataModel
             // Is Mercurial installed? 
             ThrowIfNoMercurial();
 
+            // If this is the first time to synch, then we'll not have created the
+            // repo yet. If on the other hand the project was initated from the Internet,
+            // then a repo already exists.
+            m_LocalRepository.CreateIfDoesntExist();
+
             // Attempt to unlock the repository if it is locked
             if (!m_LocalRepository.CheckUnlockedRepository())
             {
@@ -784,7 +752,7 @@ namespace OurWordData.DataModel
             {
                 throw new SynchException("msgCantDeleteFileBeforeCommit",
                     "A file with an unrecognized extension is in your data folder{n}{n}" +
-                    "OurWord was uable to delete it. Perhaps you ave some other software " +
+                    "OurWord was uable to delete it. Perhaps you have some other software " +
                     "running which is using that file. Please delete the file, then try " +
                     "again. OurWord only recognizes files of type \".owp\", \".owt\", " +
                     "\".otrans\" and \".oxes\".");
@@ -828,14 +796,18 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
+
         #region Merge
         void Merge()
             // Hg's Merge gives strange error messages. E.g., its an error if there was
             // nothing to merge. So we're ignoring the error message returned from 
             // the Execute command.
         {
+            var pathToChorusMerge = Repository.SurroundWithQuotes(
+                Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
+
             using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", m_LocalRepository.FullPathToRepositoryRoot))
-            using (new ShortTermEnvironmentalVariable("HGMERGE", Repository.PathToChorusMerge))
+            using (new ShortTermEnvironmentalVariable("HGMERGE", pathToChorusMerge))
             {
                 m_LocalRepository.DoCommand("merge");
             }

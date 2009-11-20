@@ -2253,7 +2253,7 @@ namespace OurWord
 
             // Clear the Undo stack since we now have new data we're working with
             G.URStack.Clear();
-		}
+        }
 		#endregion
         #region Method: void OnLeaveProject(bCommitToRepository)
         private void OnLeaveProject(bool bCommitToRepository)
@@ -2272,7 +2272,7 @@ namespace OurWord
 		#region Method: void OnEnterProject()
 		private void OnEnterProject()
 		{
-			// If we aren't already navigated to a book, then attempt to find one.
+            // If we aren't already navigated to a book, then attempt to find one.
 			DB.Project.Nav.GoToReasonableBook(G.CreateProgressIndicator());
 
             // A new project may have different settings for whether or not the
@@ -2284,7 +2284,7 @@ namespace OurWord
 
             // Window contents, etc.
 			OnEnterSection();
-		}
+        }
 		#endregion
 
         // Event Handlers --------------------------------------------------------------------
@@ -2305,7 +2305,7 @@ namespace OurWord
         #region Event: cmdLoad
         private void cmdLoad(object sender, System.EventArgs e)
 		{
-			// Init the Help system
+            // Init the Help system
             HelpSystem.Initialize(this, "OurWordMain.chm");
 
             // Retrieve the most recent item
@@ -2340,8 +2340,7 @@ namespace OurWord
 			{
 				if (SplashScreen.Wnd.InvokeRequired)
 				{
-					SplashScreen.StopSplashScreen_Callback d =
-						new SplashScreen.StopSplashScreen_Callback(SplashScreen.Wnd.Stop);
+					var d = new SplashScreen.StopSplashScreen_Callback(SplashScreen.Wnd.Stop);
 					this.Invoke(d, new object[] { this });
 				}
 				else
