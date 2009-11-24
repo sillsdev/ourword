@@ -22,67 +22,19 @@ namespace OurWordData.DataModel
 {
     public class StyleMapping
     {
-        #region Attr{g/s}: string OurWord
-        public string OurWord
-        {
-            get
-            {
-                return m_sOurWord;
-            }
-            set
-            {
-                m_sOurWord = value;
-            }
-        }
-        string m_sOurWord;
-        #endregion
-        #region Attr{g/s}: string Usfm
-        public string Usfm
-        {
-            get
-            {
-                return m_sUsfm;
-            }
-            set
-            {
-                m_sUsfm = value;
-            }
-        }
-        string m_sUsfm;
-        #endregion
-        #region Attr{g/s}: string Name
-        public string Name
-        {
-            get
-            {
-                return m_sName;
-            }
-            set
-            {
-                m_sName = value;
-            }
-        }
-        string m_sName;
-        #endregion
-        #region Attr{g}: bool IsVernacularParagraph
-        public bool IsVernacularParagraph
-            // Paragraphs that can contain verse text
-        {
-            get
-            {
-                return m_bIsVernacularParagraph;
-            }
-        }
-        bool m_bIsVernacularParagraph;
-        #endregion
+        public string ToolboxCode { get; private set; }
+        public string UsfmCode { get; private set; }
+        public string StyleName { get; private set; }
+        public bool IsVernacularParagraphStyle { get; private set; }
 
-        #region Constructor(sOurWord, sUsfm, sName, bIsVernacularParagraph)
-        public StyleMapping(string sOurWord, string sUsfm, string sName, bool bIsVernacularParagraph)
+        #region Constructor(sToolboxCode, sUsfmCode, sStyleName, bIsVernacularParagraph)
+        public StyleMapping(string sToolboxCode, string sUsfmCode, 
+            string sStyleName, bool bIsVernacularParagraphStyle)
         {
-            m_sOurWord = sOurWord;
-            m_sUsfm = sUsfm;
-            m_sName = sName;
-            m_bIsVernacularParagraph = bIsVernacularParagraph;
+            ToolboxCode = sToolboxCode;
+            UsfmCode = sUsfmCode;
+            StyleName = sStyleName;
+            IsVernacularParagraphStyle = bIsVernacularParagraphStyle;
         }
         #endregion
     }
@@ -102,11 +54,11 @@ namespace OurWordData.DataModel
         List<StyleMapping> m_vStyleMappings;
         #endregion
         #region Method: StyleMapping FindMappingFromOurWord(sOurWordStyle)
-        public StyleMapping FindMappingFromOurWord(string sOurWord)
+        public StyleMapping FindMappingFromOurWord(string sToolboxCode)
         {
             foreach (StyleMapping sm in StyleMappings)
             {
-                if (sm.OurWord == sOurWord)
+                if (sm.ToolboxCode == sToolboxCode)
                     return sm;
             }
             return null;
@@ -117,7 +69,7 @@ namespace OurWordData.DataModel
         {
             foreach (StyleMapping sm in StyleMappings)
             {
-                if (sm.Usfm == sUsfm)
+                if (sm.UsfmCode == sUsfm)
                     return sm;
             }
             return null;
@@ -128,7 +80,7 @@ namespace OurWordData.DataModel
         {
             foreach (StyleMapping sm in StyleMappings)
             {
-                if (sm.Name == sName)
+                if (sm.StyleName == sName)
                     return sm;
             }
             return null;
@@ -141,7 +93,7 @@ namespace OurWordData.DataModel
             var mapping = FindMappingFromOurWord(sMarker);
             if (null == mapping)
                 return false;
-            return mapping.IsVernacularParagraph;
+            return mapping.IsVernacularParagraphStyle;
         }
         #endregion
         #region VAttr{g}: List<string> VernacularParagraphMarkers
@@ -153,8 +105,8 @@ namespace OurWordData.DataModel
 
                 foreach (StyleMapping sm in StyleMappings)
                 {
-                    if (sm.IsVernacularParagraph)
-                        v.Add(sm.OurWord);
+                    if (sm.IsVernacularParagraphStyle)
+                        v.Add(sm.ToolboxCode);
                 }
 
                 return v;

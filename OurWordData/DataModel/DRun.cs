@@ -873,13 +873,13 @@ namespace OurWordData.DataModel
 
             string sUsfm = XmlDoc.GetAttrValue(node, c_sAttrUsfm, "");
             if (string.IsNullOrEmpty(sUsfm))
-                throw new XmlDocException(node, "Missing Usfm attribute in oxes read.");
+                throw new XmlDocException(node, "Missing UsfmCode attribute in oxes read.");
 
-            // The Usfm and the Style should match up; if they don't, we hardly know which
+            // The UsfmCode and the Style should match up; if they don't, we hardly know which
             // one the user wanted.
             var map = DB.Map.FindMappingFromUsfm(sUsfm);
-            if (null == map || map.Name != sStyle)
-                throw new XmlDocException(node, "Style and Usfm data do not match.");
+            if (null == map || map.StyleName != sStyle)
+                throw new XmlDocException(node, "Style and UsfmCode data do not match.");
 
             // Create the empty footnote, and place it into a DFoot object
             var footnote = new DFootnote(

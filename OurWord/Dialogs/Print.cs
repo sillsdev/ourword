@@ -980,6 +980,27 @@ namespace OurWord
 			return pos;
 		}
 		#endregion
+
+        public void Prepend(string sNewWord, JCharacterStyle charStyle, JParagraphStyle paraStyle)
+            // Purpose is to support adding a footnote's letter to the beginning of
+            // the set of words, as the letter is not stored within the DFootnote
+            // object, and thus the routine to initialise PWords does not include it.
+            //
+            // We want to add the letter to the front; and because we're doing it via
+            // glue, we just take the previous front word and make it a GlueTo on the
+            // new letter we're inserting.
+        {
+            if (PWords.Length == 0)
+                return;
+
+            var newWord = new PWord(sNewWord, charStyle, paraStyle);
+
+            newWord.GlueTo = m_vPWords[0];
+
+            m_vPWords[0] = newWord;
+        }
+
+
 		#region Method: void PrependLetter(char chLetter)
 		public void PrependLetter(char chLetter)
 			// Purpose is to support adding a footnote's letter to the beginning of
@@ -2088,8 +2109,16 @@ namespace OurWord
 
 				// Retrieve the footnote text. This is a subclass of DParagraph
 				DFootnote footnote = foot.Footnote;
-				PPosition PosFN = new PPosition(footnote, 0);								
-				PosFN.PrependLetter(chFootnoteLetter);
+				var PosFN = new PPosition(footnote, 0);
+//                PosFN.PrependLetter(chFootnoteLetter);
+                PosFN.Prepend(footnote.VerseReference,
+                    DB.StyleSheet.FindCharacterStyleOrNormal(DStyleSheet.c_sfmParagraph),
+                    DB.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_sfmParagraph));
+                PosFN.Prepend(chFootnoteLetter.ToString(), 
+                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
+                    null);
+                /*
+                */
 
 				// Create PLines for it
 				char chDummy = chFootnoteLetter;

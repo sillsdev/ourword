@@ -11,7 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows.Forms;
-
+using System.Xml;
 using NUnit.Framework;
 
 using JWTools;
@@ -693,5 +693,27 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(paragraphOut.ContentEquals(paragraphIn), "Paras are the same");
         }
         #endregion
+    }
+
+    public class TParagraph : DParagraph
+    {
+        public TParagraph(string oxesXml)
+            : base()
+        {
+            try
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.LoadXml(oxesXml);
+
+                var paragraphNode = xmlDoc.DocumentElement;
+                ReadOxes(paragraphNode);
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("TParagraph(oxesXml): " + e.Message);
+            }
+
+        }
+        
     }
 }

@@ -1529,7 +1529,7 @@ namespace OurWordData.DataModel
                 throw (new XmlDocException(nodeParagraph,
                     "Missing or unknown paragraph style name."));
             }
-            StyleAbbrev = map.OurWord;
+            StyleAbbrev = map.ToolboxCode;
 
             // Populate the runs from the child nodes
             foreach (XmlNode child in nodeParagraph.ChildNodes)
@@ -1592,10 +1592,10 @@ namespace OurWordData.DataModel
 
             var nodeParagraph = oxes.AddNode(nodeBook, c_sTagParagraph);
 
-            oxes.AddAttr(nodeParagraph, c_sAttrStyle, map.Name);
+            oxes.AddAttr(nodeParagraph, c_sAttrStyle, map.StyleName);
 
-            if (!string.IsNullOrEmpty(map.Usfm))
-                oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.Usfm);
+            if (!string.IsNullOrEmpty(map.UsfmCode))
+                oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.UsfmCode);
 
             foreach (DRun run in Runs)
                 run.SaveToOxesBook(oxes, nodeParagraph);

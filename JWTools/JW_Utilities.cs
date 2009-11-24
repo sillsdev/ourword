@@ -315,19 +315,6 @@ namespace JWTools
                 Directory.Delete(sFolder, true);
         }
         #endregion
-        #region SMethod: string NUnit_GetFreshTempSubFolder(sSubFolderName)
-        static public string NUnit_GetFreshTempSubFolder(string sSubFolderName)
-        {
-            var path = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + sSubFolderName;
-
-            // Blow away anything that was previous there, in case debugging left
-            // the folder lying around, perhaps with stuff in it
-            if (Directory.Exists(path))
-                JWU.SafeFolderDelete(path);
-
-            return path;
-        }
-        #endregion
         #endif
 
         // Retrieves the OS-specific data folder for all users

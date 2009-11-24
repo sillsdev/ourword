@@ -960,28 +960,28 @@ namespace OurWord.Edit
 
 			// Header
 			s_PStyleHeading1 = StyleSheet.AddParagraphStyle("s", "Heading 1");
-			PStyleHeading1.SetFonts(false, 9, true);
+			PStyleHeading1.SetFonts(9, true);
 			PStyleHeading1.IsJustified = true;
 			PStyleHeading1.SpaceBefore = 6;
             PStyleHeading1.SpaceAfter = 3;
 
 			// Normal
 			s_PStyleNormal = StyleSheet.AddParagraphStyle("p", "Normal");
-			PStyleNormal.SetFonts(false, 8, false);
+			PStyleNormal.SetFonts(8, false);
 			PStyleNormal.IsJustified = true;
 			PStyleNormal.SpaceBefore = 3;
             PStyleNormal.SpaceAfter = 3;
 
             // Attention
             s_PStyleAttention = StyleSheet.AddParagraphStyle("a", "Attention");
-            PStyleAttention.SetFonts(false, 8, true, false, false, false, Color.DarkRed);
+            PStyleAttention.SetFonts(8, true, false, false, false, Color.DarkRed);
             PStyleAttention.IsJustified = true;
             PStyleAttention.SpaceBefore = 3;
             PStyleAttention.SpaceAfter = 3;
 
 			// List
 			s_PStyleList1 = StyleSheet.AddParagraphStyle("L1", "List 1");
-			PStyleList1.SetFonts(false, 8, false);
+			PStyleList1.SetFonts(8, false);
 			PStyleList1.IsJustified = true;
 			PStyleList1.LeftMargin = 0.2;
 			PStyleList1.SpaceBefore = 0;
@@ -990,13 +990,13 @@ namespace OurWord.Edit
 
 			// Character Styles
 			JCharacterStyle cs = StyleSheet.AddCharacterStyle(c_sBold, "Bold");
-			cs.SetFonts(false, 8, true);
+			cs.SetFonts(8, true);
 
 			cs = StyleSheet.AddCharacterStyle(c_sItalic, "Italic");
-			cs.SetFonts(false, 8, false, true, false, false, Color.Black);
+			cs.SetFonts(8, false, true, false, false, Color.Black);
 
 			cs = StyleSheet.AddCharacterStyle(c_sBoldItalic, "BoldItalic");
-			cs.SetFonts(false, 8, true, true, false, false, Color.Black);
+			cs.SetFonts(8, true, true, false, false, Color.Black);
 
 			// Zoom factor set to 1.0, no zoom
 			StyleSheet.ZoomFactor = 1;

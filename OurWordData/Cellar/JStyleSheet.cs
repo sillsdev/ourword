@@ -226,7 +226,7 @@ namespace OurWordData
 		#region Method: JCharacterStyle FindCharacterStyle(sAbbrev)
 		public JCharacterStyle FindCharacterStyle(string sAbbrev)
 		{
-			if (null == sAbbrev || sAbbrev.Length == 0)
+			if (string.IsNullOrEmpty(sAbbrev))
 				return null;
 			int i = CharacterStyles.Find(sAbbrev);
 			if (-1 == i)
@@ -546,17 +546,17 @@ namespace OurWordData
 		#endregion
 
 		// Character Style Attributes --------------------------------------------------------
-		#region Method: void SetFonts(bool bSerif, int nSize, bool bIsBold)
-		public void SetFonts(bool bSerif, int nSize, bool bIsBold)
+		#region Method: void SetFonts(int nSize, bool bIsBold)
+		public void SetFonts(int nSize, bool bIsBold)
 		{
-			CharacterStyle.SetFonts(bSerif, nSize, bIsBold);
+			CharacterStyle.SetFonts(nSize, bIsBold);
 		}
 		#endregion
-		#region Method: void SetFonts(bSerif, nSize, bBold, bItalic, bStrike, bUnder, clrText)
-		public void SetFonts(bool bSerif, int nSize, bool bIsBold, bool bIsItalic, 
+		#region Method: void SetFonts(nSize, bBold, bItalic, bStrike, bUnder, clrText)
+		public void SetFonts(int nSize, bool bIsBold, bool bIsItalic, 
 			bool bIsStrikeout, bool bIsUnderline, Color colorText)
 		{
-			CharacterStyle.SetFonts(bSerif, nSize, bIsBold, bIsItalic, bIsStrikeout,
+			CharacterStyle.SetFonts(nSize, bIsBold, bIsItalic, bIsStrikeout,
 				bIsUnderline, colorText);
 		}
 		#endregion
@@ -941,6 +941,8 @@ namespace OurWordData
     #region CLASS JCharacterStyle
     public class JCharacterStyle : JObject
 	{
+
+
 		// BAttrs ----------------------------------------------------------------------------
 		#region BAttr{g/s}: bool IsSuperScript - T if the characters are superscripted
 		public bool IsSuperScript
@@ -970,6 +972,7 @@ namespace OurWordData
 		}
 		private bool m_bIsSubScript = false;
 		#endregion
+
 		#region BAttr{g/s}: bool IsEditable    - T if the characters are allowed to be edited
 		public bool IsEditable
 		{
@@ -984,6 +987,7 @@ namespace OurWordData
 		}
 		private bool m_bIsEditable = true;
 		#endregion
+
 		#region BAttr{g/s}: string Abbrev - an abbreviation for the style, used in inline text
 		public string Abbrev
 		{
@@ -1155,7 +1159,7 @@ namespace OurWordData
                     return fws;
             }
 
-            JFontForWritingSystem newFWS = new JFontForWritingSystem(ws);
+            var newFWS = new JFontForWritingSystem(ws);
             newFWS.IsBold = IsBoldByDefault;
             newFWS.IsItalic = IsItalicByDefault;
             newFWS.IsStrikeout = IsStrikeoutByDefault;
@@ -1205,14 +1209,14 @@ namespace OurWordData
 		}
 		#endregion
 
-		#region Method: void SetFonts(bool bSerif, int nSize, bool bIsBold)
-		public void SetFonts(bool bSerif, int nSize, bool bIsBold)
+		#region Method: void SetFonts(nSize, bIsBold)
+		public void SetFonts(int nSize, bool bIsBold)
 		{
-			SetFonts(bSerif, nSize, bIsBold, false, false, false, Color.Black);
+			SetFonts(nSize, bIsBold, false, false, false, Color.Black);
 		}
 		#endregion
-		#region Method: void SetFonts(bSerif, nSize, bBold, bItalic, bStrike, bUnder, clrText)
-		public void SetFonts(bool bSerif, int nSize, bool bIsBold, bool bIsItalic, 
+		#region Method: void SetFonts(nSize, bBold, bItalic, bStrike, bUnder, clrText)
+		public void SetFonts(int nSize, bool bIsBold, bool bIsItalic, 
 			bool bIsStrikeout, bool bIsUnderline, Color colorText)
 		{
             // These will seed the FWS objects as they are created
