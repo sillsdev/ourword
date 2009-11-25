@@ -627,7 +627,7 @@ namespace OurWord.Dialogs
 
             m_WSAdvisor = LS.AddAtringChoice(
                 "trAdvisor",
-                "Advvisor",
+                "Advisor",
                 "The writing system for the back translation and other materials the advisor or consultant might use.",
                 Translation.ConsultantWritingSystemName,
                 vsWritingSystems);
@@ -729,12 +729,7 @@ namespace OurWord.Dialogs
             if (m_radioStartedBooks.Checked)
             {
                 m_FilterOn = FilterOn.kStartedBooks;
-
-                string sSelectBook = SelectedBookAbbrev;
-                if (!DBook.GetIsOldTestamentBook(SelectedBookAbbrev))
-                    sSelectBook = null;
-
-                UpdateFilter(sSelectBook);
+                UpdateFilter(SelectedBookAbbrev);
             }
         }
         #endregion
@@ -844,30 +839,6 @@ namespace OurWord.Dialogs
             // Clear out whatever was there
 			m_gridBooks.Rows.Clear();
 
-            // Make sure the requested book will be visible, by changing the filter if necessary;
-            // in which case UpdateFilter will cause PopulateGrid to be called.
-            if (!string.IsNullOrEmpty(sBookAbbrevToSelect))
-            {
-                if (m_FilterOn == FilterOn.kStartedBooks && !GetIsStartedBook(sBookAbbrevToSelect))
-                {
-                    m_FilterOn = (DBook.GetIsNewTestamentBook(sBookAbbrevToSelect)) ? FilterOn.kNT : FilterOn.kOT;
-                    UpdateFilter(sBookAbbrevToSelect);
-                    return;
-                }
-                if (m_FilterOn == FilterOn.kNT && DBook.GetIsOldTestamentBook(sBookAbbrevToSelect))
-                {
-                    m_FilterOn = FilterOn.kOT;
-                    UpdateFilter(sBookAbbrevToSelect);
-                    return;
-                }
-                if (m_FilterOn == FilterOn.kOT && DBook.GetIsNewTestamentBook(sBookAbbrevToSelect))
-                {
-                    m_FilterOn = FilterOn.kNT;
-                    UpdateFilter(sBookAbbrevToSelect);
-                    return;
-                }
-            }
-
 			// One row per book
 			for (var i = 0; i < DBook.BookAbbrevsCount; i++)
 			{
@@ -905,6 +876,10 @@ namespace OurWord.Dialogs
                 if (sBookAbbrev == sBookAbbrevToSelect)
                     row.Selected = true;
 			}
+
+            // Make sure something is selected
+            if (string.IsNullOrEmpty(SelectedBookAbbrev) && m_gridBooks.Rows.Count > 0)
+                m_gridBooks.Rows[0].Selected = true;
         }
         #endregion
         #region Attr{g/s}: string SelectedBookAbbrev
