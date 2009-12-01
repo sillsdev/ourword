@@ -14,6 +14,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Reflection;
 using System.Windows.Forms;
 using System.IO;
 using JWTools;
@@ -231,6 +232,15 @@ namespace OurWordData.DataModel
         }
         #endregion
 
+        static public int GetYearThisAssemblyWasCompiled()
+        {
+            var assembly = Assembly.GetAssembly(typeof(DB));
+            Debug.Assert(null != assembly);
+            var version = assembly.GetName().Version;
+            var daysSince01Jan2000 = version.Build;
+            var buildDate = new DateTime(2000, 1, 1).AddDays(daysSince01Jan2000);
+            return buildDate.Year;
+        }
     }
 
     public class Loc

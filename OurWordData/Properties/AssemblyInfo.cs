@@ -26,6 +26,10 @@ using System.Runtime.CompilerServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
+
+// IMPORTANT: We need to keep the '*' in the third position, because this 
+// is used by GetYearThisAssemblyWasCompiled; Microsoft sets it to "days since 
+// Jan 1 2000" at compile time.
 [assembly: AssemblyVersion("1.0.*")]
 
 //

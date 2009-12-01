@@ -1,3 +1,4 @@
+#region ***** AssemblyInfo.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    AssemblyInfo.cs
@@ -6,42 +7,28 @@
  * Purpose: Information about the assembly.
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Permissions;
+#endregion
 
-//
-// General Information about an assembly is controlled through the following 
-// set of attributes. Change these attribute values to modify the information
-// associated with an assembly.
-//
 [assembly: AssemblyTitle("Our Word!")]
 [assembly: AssemblyDescription("Translation Environment for Collaborative MTT projects.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("John S. Wimbish")]
 [assembly: AssemblyProduct("OurWord!")]
-[assembly: AssemblyCopyright("© 2004-09, John S. Wimbish")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]		
+[assembly: AssemblyCulture("")]
 
-//
+// IMPORTANT: Make sure we have the right year here
+[assembly: AssemblyCopyright("© 2004-09, John S. Wimbish")]
+
 // Version information consists of the following four values:
 //    Major Version - E.g., major functionality has been added
 //    Minor Version - A new feature here or there
 //    Build Number  - generally just fixes
 //    Revision      - not used.
-//
-
-// Huichol throwaway versions
-// 1.1.0 - initial
-// 1.1.1 - fixed Load problems with Absolute Paths
-// 1.3.0 - What I'm leaving at Tomohon 4 June 2009
-// 1.4.0 - Oxes, AuSIL, Manado, Kupang
-// 1.5.0 - Huichol (repo Version 1)
-
 [assembly: AssemblyVersion("1.5.2")]
 
+#region DOC: Signing
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
 // Microsoft .NET Framework documentation for more information on assembly signing.
@@ -67,6 +54,7 @@ using System.Security.Permissions;
 //   (*) Delay Signing is an advanced option - see the Microsoft .NET Framework
 //       documentation for more information on this.
 //
+#endregion
 [assembly: AssemblyDelaySign(false)]
 [assembly: AssemblyKeyFile("")]
 [assembly: AssemblyKeyName("")]

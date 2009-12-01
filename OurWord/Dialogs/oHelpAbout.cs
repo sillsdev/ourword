@@ -224,7 +224,7 @@ namespace OurWord
 		private void oHelpAbout_Load(object sender, System.EventArgs e)
 		{
 			// Localization
-            Control[] vExclude = { m_lblVersion, m_lblTSCInfo, m_lblTheSeedCompany };
+            Control[] vExclude = { m_lblVersion, m_lblTSCInfo, m_lblTheSeedCompany, m_lblCopyright };
             LocDB.Localize(this, vExclude);
 
             // The version information is built at runtime
@@ -232,6 +232,14 @@ namespace OurWord
                 m_lblVersion.Name,
                 "Version {0}",
                 new string[] { G.Version });
+
+            // We get the compile date from the OurWordData assembly
+		    var thisYear = DB.GetYearThisAssemblyWasCompiled();
+            m_lblCopyright.Text = G.GetLoc_DialogCommon(
+                "copyrightInfo",
+                "Copyright © 2004-{0} John Wimbish. All rights reserved.",
+                new[] { thisYear.ToString() });
+
 		}
 		#endregion
 
