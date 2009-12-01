@@ -2309,8 +2309,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon in case the status is now different
-//            ENote.InitializeBitmap();
-            Window.Invalidate();
+            G.App.ResetWindowContents();
 
             // Select the new discussion
             var container = wnd.Contents.FindContainerOfDataSource(message);
@@ -2335,8 +2334,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon
-//            ENote.InitializeBitmap();
-            Window.Invalidate();
+            G.App.ResetWindowContents();
         }
         #endregion
     }
