@@ -2274,34 +2274,23 @@ namespace OurWord.Edit
     #region CLASS: AddMessageAction
     public class AddMessageAction : BookmarkedAction
     {
-        #region Attr{g}: ENote ENote
-        ENote ENote
-        {
-            get
-            {
-                Debug.Assert(null != m_ENote);
-                return m_ENote;
-            }
-        }
-        ENote m_ENote;
-        #endregion
         #region VAttr{g}: TranslatorNote Note
         TranslatorNote Note
         {
             get
             {
-                TranslatorNote note = ENote.Note;
-                Debug.Assert(null != note);
-                return note;
+                Debug.Assert(null != m_Note);
+                return m_Note;
             }
         }
+        private readonly TranslatorNote m_Note;
         #endregion
 
         #region Constructor(OWWindow, ENote)
-        public AddMessageAction(OWWindow window, ENote _ENote)
+        public AddMessageAction(OWWindow window, TranslatorNote note)
             : base(window, "Add Response to Note")
         {
-            m_ENote = _ENote;
+            m_Note = note;
         }
         #endregion
 
@@ -2309,7 +2298,7 @@ namespace OurWord.Edit
         protected override bool PerformAction()
             // Create and add a new Message item
         {
-            // Create a new Message object and add it to the note
+            // Create a new Message object and add it to the annotation
             var message = new DMessage();
             Note.Messages.Append(message);
             Note.Status = DMessage.Anyone;
@@ -2320,7 +2309,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon in case the status is now different
-            ENote.InitializeBitmap();
+//            ENote.InitializeBitmap();
             Window.Invalidate();
 
             // Select the new discussion
@@ -2346,7 +2335,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon
-            ENote.InitializeBitmap();
+//            ENote.InitializeBitmap();
             Window.Invalidate();
         }
         #endregion

@@ -555,11 +555,11 @@ namespace OurWord.Edit
             if (null == button)
                 return;
 
-            var en = button.Tag as ENote;
-            if (null == en)
+            var note = button.Tag as TranslatorNote;
+            if (null == note)
                 return;
 
-            (new AddMessageAction(Tip, en)).Do();
+            (new AddMessageAction(Tip, note)).Do();
         }
         #endregion
         #region ToolStripButton BuildRespondControl()
@@ -567,9 +567,11 @@ namespace OurWord.Edit
         {
             // Create the button
             var sButtonText = Loc.GetNotes("AddResponse", "Respond");
-            var btnAddResponse = new ToolStripButton(sButtonText);
-            btnAddResponse.Tag = this;
-            btnAddResponse.Image = JWU.GetBitmap("Note_OldVersions.ico");
+            var btnAddResponse = new ToolStripButton(sButtonText)
+            {
+                Tag = Note,
+                Image = JWU.GetBitmap("Note_OldVersions.ico")
+            };
 
             // Command handler
             btnAddResponse.Click += new EventHandler(OnRespond);
