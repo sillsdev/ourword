@@ -78,4 +78,10 @@ namespace OurWordTests.DataModel
         #endregion
 
     }
+
+    [TestFixture] public class T_FontForWritingSystem
+    {
+        
+
+    }
 }

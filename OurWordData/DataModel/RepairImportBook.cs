@@ -187,15 +187,12 @@ namespace OurWordData.DataModel
             Localize();
 
 			// Header Message
-            string sBase = LocDB.GetValue(this, m_AnErrorOccured.Name, 
+            var sBase = LocDB.GetValue(this, m_AnErrorOccured.Name, 
                 "An error occurred in attempting to import the book &quot;{0}&quot;:");
             m_AnErrorOccured.Text = LocDB.Insert(sBase, new string[] { BookName });
 
-			// Font
-            JParagraphStyle pstyle = DB.TeamSettings.StyleSheet.FindParagraphStyleOrNormal(
-                DStyleSheet.c_sfmParagraph);
-            DataFile.Font = pstyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).DefaultFont;
+            // Use a slightly larger font than the system font for better readability of diacritics
+            DataFile.Font = DStyleSheet.LargeDialogFont;
 
 			// Place the error message into the control
 			ErrorText = BookReadError.UserMessage;
@@ -660,11 +657,8 @@ namespace OurWordData.DataModel
 		{
 			base.cmdLoad(sender, e);
 
-			// Font
-            JParagraphStyle PStyle = DB.TeamSettings.StyleSheet.FindParagraphStyleOrNormal(
-                DStyleSheet.c_sfmParagraph);
-            FrontFile.Font = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                DB.FrontTranslation.WritingSystemVernacular).DefaultFont;
+			// Use a slightly larger font than the system font for better readability of diacritics
+            FrontFile.Font = DStyleSheet.LargeDialogFont;
 
 			// Front Path
 			m_FrontPathName.Text = FrontPathName;

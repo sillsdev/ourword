@@ -864,6 +864,8 @@ namespace OurWordData
         }
         Font m_DefaultFont = null;
         #endregion
+        /*
+        */
         #region VAttr[g}: Font DefaultFontZoomed - the styled font, without any forced mods
         public Font DefaultFontZoomed
         {

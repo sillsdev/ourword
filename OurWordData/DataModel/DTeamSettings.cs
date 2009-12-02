@@ -1069,6 +1069,28 @@ namespace OurWordData.DataModel
             _InitializeUICharacterStyles();
 		}
 		#endregion
+
+
+        #region SAttr{g}: Font LargeDialogFont
+        public static Font LargeDialogFont
+        // This font is used for examining raw oxes files. I use a slightly larger
+        // font due to the possible presence of diacritics which can otherwise be
+        // difficult to read.
+        {
+            get
+            {
+                if (null == s_LargeDialogFont)
+                {
+                    s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
+                        SystemFonts.DialogFont.Size * 1.2F,
+                        FontStyle.Regular);
+                }
+                return s_LargeDialogFont;
+            }
+        }
+        private static Font s_LargeDialogFont;
+        #endregion
+
 	}
 	#endregion
 

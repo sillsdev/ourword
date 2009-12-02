@@ -5,6 +5,97 @@ using System.Text;
 
 namespace OurWordData.DataModel
 {
+    public class FontForWritingSystem
+    {
+        #region Attr{g/s}: string Name
+        public string Name
+        {
+            get
+            {
+                return m_sName;
+            }
+            set
+            {
+                if (m_sName == value || string.IsNullOrEmpty(value))
+                    return;
+                m_sName = value;
+                Reset();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        private string m_sName = "Arial";
+        #endregion
+        #region Attr{g/s}: FontStyle Style
+        public FontStyle Style
+        {
+            get
+            {
+                return m_Style;
+            }
+            set
+            {
+                if (m_Style == value)
+                    return;
+                m_Style = value;
+                Reset();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        private FontStyle m_Style;
+        #endregion
+        #region Attr{g/s}: float Size
+        public float Size
+        {
+            get
+            {
+                return m_fSize;
+            }
+            set
+            {
+                if (m_fSize == value)
+                    return;
+                m_fSize = value;
+                Reset();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        private float m_fSize = 10;
+        #endregion
+
+        public Font Regular
+        {
+            get
+            {
+                if (null == m_Regular)
+                    m_Regular = new Font(Name, Size, Style);
+                return m_Regular;
+            }
+        }
+        private Font m_Regular;
+
+        public Font Zoomed
+        {
+            get
+            {
+                if (null == m_Zoomed)
+                {
+                    var zoomedSize = Size * 1.5;
+                    m_Zoomed = new Font(Name, Size, Style);
+                }
+                return m_Zoomed;
+            }
+        }
+        private Font m_Zoomed;
+
+        #region Method: void Reset()
+        public void Reset()
+        {
+            m_Regular = null;
+        }
+        #endregion
+    }
+
+
     public class CharacterStyle
     {
         public enum Variants { Normal, Superscript, Subscript };
@@ -26,9 +117,8 @@ namespace OurWordData.DataModel
         private Variants m_Variant;
         #endregion
 
-        public enum Styles { Normal, Bold=1, Italic=2, Underline=4 };
         #region Attr{g/s}: Styles Style
-        public Styles Style
+        public FontStyle Style
         {
             get
             {
@@ -42,7 +132,7 @@ namespace OurWordData.DataModel
                 StyleSheet.DeclareDirty();
             }
         }
-        private Styles m_Style;
+        private FontStyle m_Style;
         #endregion
 
         #region Attr{g/s}: Color TextColor - color for text; default is black
@@ -69,7 +159,7 @@ namespace OurWordData.DataModel
         public CharacterStyle()
         {
             m_Variant = Variants.Normal;
-            m_Style = Styles.Normal;
+            m_Style = FontStyle.Regular;
             m_sTextColorName = Color.Black.Name;
         }
 
@@ -77,10 +167,12 @@ namespace OurWordData.DataModel
 
     public class StyleSheet
     {
+        #region SMethod: void DeclareDirty()
         static public void DeclareDirty()
         {
             s_bIsDirty = true;
         }
+        #endregion
         static private bool s_bIsDirty;
 
         static void IniitializeStyles()
@@ -98,7 +190,7 @@ namespace OurWordData.DataModel
 
             s_ChapterNumber = new CharacterStyle
             {
-                Style = CharacterStyle.Styles.Bold
+                Style = FontStyle.Bold
             };
 
             s_bIsDirty = b;
@@ -127,7 +219,26 @@ namespace OurWordData.DataModel
             }
         }
         private static CharacterStyle s_ChapterNumber;
-  
 
+
+        #region SAttr{g}: Font LargeDialogFont
+        public static Font LargeDialogFont
+            // This font is used for examining raw oxes files. I use a slightly larger
+            // font due to the possible presence of diacritics which can otherwise be
+            // difficult to read.
+        {
+            get
+            {
+                if (null == s_LargeDialogFont)
+                {
+                    s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
+                        SystemFonts.DialogFont.Size * 1.2F,
+                        FontStyle.Regular);
+                }
+                return s_LargeDialogFont;
+            }
+        }
+        private static Font s_LargeDialogFont;
+        #endregion
     }
 }
