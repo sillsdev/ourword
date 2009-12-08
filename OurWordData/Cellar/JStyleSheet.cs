@@ -1,5 +1,4 @@
 /**********************************************************************************************
- * App:     Josiah
  * File:    JStyleSheet.cs
  * Author:  John Wimbish
  * Created: 25 Jan 2004
@@ -14,6 +13,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
+using System.Xml;
 using JWTools;
 #endregion
 #region Documentation
@@ -937,102 +937,52 @@ namespace OurWordData
             return true;
         }
         #endregion
+
+        // I/O -------------------------------------------------------------------------------
+        private const string c_sTag = "Font";
+        private const string c_sAttrWritingSystem = "WritingSystem";
+        private const string c_sAttrFontName = "Name";
+        private const string c_sAttrSize = "Size";
+        private const string c_sAttrBold = "Bold";
+        private const string c_sAttrItalic = "Italic";
+        private const string c_sAttrStrikeout = "Strike";
+        public XmlNode Save(XmlDoc doc, XmlNode nodeParent)
+        {
+            var nodeFont = doc.AddNode(nodeParent, c_sTag);
+
+            doc.AddAttr(nodeFont, c_sAttrWritingSystem, WritingSystem.Name);
+            doc.AddAttr(nodeFont, c_sAttrFontName, FontName);
+            doc.AddAttr(nodeFont, c_sAttrSize, Size);
+            doc.AddAttr(nodeFont, c_sAttrBold, IsBold);
+            doc.AddAttr(nodeFont, c_sAttrItalic, IsItalic);
+            doc.AddAttr(nodeFont, c_sAttrStrikeout, IsStrikeout);
+
+            return nodeFont;
+        }
+        static public JFontForWritingSystem Create(XmlNode nodeFont)
+        {
+            if (nodeFont.Name != c_sTag)
+                return null;
+
+            var font = new JFontForWritingSystem
+            {
+                FontName = XmlDoc.GetAttrValue(nodeFont, c_sAttrFontName, "Arial"),
+                Size = XmlDoc.GetAttrValue(nodeFont, c_sAttrSize, 10),
+                m_bIsBold = XmlDoc.GetAttrValue(nodeFont, c_sAttrBold, false),
+                m_bIsItalic = XmlDoc.GetAttrValue(nodeFont, c_sAttrItalic, false),
+                m_bStrikeout = XmlDoc.GetAttrValue(nodeFont, c_sAttrStrikeout, false)
+            };           
+
+            return font;
+        }
+
     }
     #endregion
 
     #region CLASS JCharacterStyle
     public class JCharacterStyle : JObject
 	{
-
-
 		// BAttrs ----------------------------------------------------------------------------
-		#region BAttr{g/s}: bool IsSuperScript - T if the characters are superscripted
-		public bool IsSuperScript
-		{
-			get
-			{
-				return m_bIsSuperScript;
-			}
-			set
-			{
-                SetValue(ref m_bIsSuperScript, value);
-            }
-		}
-		private bool m_bIsSuperScript = false;
-		#endregion
-		#region BAttr{g/s}: bool IsSubScript   - T if the characters are subscripted
-		public bool IsSubScript
-		{
-			get
-			{
-				return m_bIsSubScript;
-			}
-			set
-			{
-                SetValue(ref m_bIsSubScript, value);
-			}
-		}
-		private bool m_bIsSubScript = false;
-		#endregion
-
-		#region BAttr{g/s}: bool IsEditable    - T if the characters are allowed to be edited
-		public bool IsEditable
-		{
-			get
-			{
-				return m_bIsEditable;
-			}
-			set
-			{
-                SetValue(ref m_bIsEditable, value);
-			}
-		}
-		private bool m_bIsEditable = true;
-		#endregion
-
-		#region BAttr{g/s}: string Abbrev - an abbreviation for the style, used in inline text
-		public string Abbrev
-		{
-			get
-			{
-				return m_sAbbrev;
-			}
-			set
-			{
-                SetValue(ref m_sAbbrev, value);
-            }
-		}
-		private string m_sAbbrev = "";
-		#endregion
-		#region BAttr{g/s}: string DisplayName - the style's name as it appears in the UI
-		public string DisplayName
-		{
-			get
-			{
-				return m_sDisplayName;
-			}
-			set
-			{
-                SetValue(ref m_sDisplayName, value);
-			}
-		}
-		private string m_sDisplayName = "";
-		#endregion
-		#region BAttr{g/s}: string Description - UI-displayable description for the style
-		public string Description
-		{
-			get
-			{
-				return m_sDescription;
-			}
-			set
-			{
-                SetValue(ref m_sDescription, value);
-			}
-		}
-		private string m_sDescription = "";
-		#endregion
-
         #region BAttr{g/s}: int SizeByDefault - The height of the font, default is 10
         public int SizeByDefault
         {
@@ -1089,6 +1039,20 @@ namespace OurWordData
         }
         private bool m_bStrikeoutByDefault = false;
         #endregion
+        #region BAttr{g/s}: bool IsUnderline - T if the font is strikeout
+        public bool IsUnderline
+        {
+            get
+            {
+                return m_bIsUnderline;
+            }
+            set
+            {
+                SetValue(ref m_bIsUnderline, value);
+            }
+        }
+        private bool m_bIsUnderline = false;
+        #endregion
 
         #region BAttr{g/s}: Color FontColor - color for text; default is black
         public Color FontColor
@@ -1106,28 +1070,70 @@ namespace OurWordData
         private string m_sColorName = Color.Black.Name;
         #endregion
 
-        #region BAttr{g/s}: bool IsUnderline - T if the font is strikeout
-        public bool IsUnderline
-        {
-            get
-            {
-                return m_bIsUnderline;
+		#region BAttr{g/s}: bool IsSuperScript - T if the characters are superscripted
+		public bool IsSuperScript
+		{
+			get
+			{
+				return m_bIsSuperScript;
+			}
+			set
+			{
+                SetValue(ref m_bIsSuperScript, value);
             }
-            set
-            {
-                SetValue(ref m_bIsUnderline, value);
+		}
+		private bool m_bIsSuperScript = false;
+		#endregion
+
+		#region BAttr{g/s}: string Abbrev - an abbreviation for the style, used in inline text
+		public string Abbrev
+		{
+			get
+			{
+				return m_sAbbrev;
+			}
+			set
+			{
+                SetValue(ref m_sAbbrev, value);
             }
-        }
-        private bool m_bIsUnderline = false;
-        #endregion
+		}
+		private string m_sAbbrev = "";
+		#endregion
+		#region BAttr{g/s}: string DisplayName - the style's name as it appears in the UI
+		public string DisplayName
+		{
+			get
+			{
+				return m_sDisplayName;
+			}
+			set
+			{
+                SetValue(ref m_sDisplayName, value);
+			}
+		}
+		private string m_sDisplayName = "";
+		#endregion
+		#region BAttr{g/s}: string Description - UI-displayable description for the style
+		public string Description
+		{
+			get
+			{
+				return m_sDescription;
+			}
+			set
+			{
+                SetValue(ref m_sDescription, value);
+			}
+		}
+		private string m_sDescription = "";
+		#endregion
+
 
 		#region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
 			DefineAttr("Super",       ref m_bIsSuperScript);
-			DefineAttr("Sub",         ref m_bIsSubScript);
-			DefineAttr("Editable",    ref m_bIsEditable);
 			DefineAttr("Abbrev",      ref m_sAbbrev);
 			DefineAttr("DisplayName", ref m_sDisplayName);
 			DefineAttr("Description", ref m_sDescription);

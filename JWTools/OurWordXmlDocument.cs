@@ -270,33 +270,45 @@ namespace JWTools
         #endregion
 
         // Attrs -----------------------------------------------------------------------------
-        #region Method: XmlAttribute AddAttr(node, sAttrName, string sValue)
-        public XmlAttribute AddAttr(XmlNode node, string sAttrName, string sValue)
+        #region Method: void AddAttr(node, sAttrName, sValue)
+        public void AddAttr(XmlNode node, string sAttrName, string sValue)
+            // Empty strings are not output to the file; thus a missing value
+            // is understood to be an empty string.
         {
+            if (string.IsNullOrEmpty(sValue))
+                return;
+
             var attr = CreateAttribute(sAttrName);
             attr.Value = sValue;
             node.Attributes.Append(attr);
-            return attr;
         }
         #endregion
-        #region Method: XmlAttribute AddAttr(node, sAttrName, int nValue)
-        public XmlAttribute AddAttr(XmlNode node, string sAttrName, int nValue)
+        #region Method: void AddAttr(node, sAttrName, nValue)
+        public void AddAttr(XmlNode node, string sAttrName, int nValue)
         {
-            return AddAttr(node, sAttrName, nValue.ToString());
+            AddAttr(node, sAttrName, nValue.ToString());
         }
         #endregion
-        #region Method: XmlAttribute AddAttr(node, sAttrName, DateTime dtValue)
-        public XmlAttribute AddAttr(XmlNode node, string sAttrName, DateTime dtValue)
+        #region Method: void AddAttr(node, sAttrName, dtValue)
+        public void AddAttr(XmlNode node, string sAttrName, DateTime dtValue)
         {
-            string sDate = dtValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
-            return AddAttr(node, sAttrName, sDate);
+            var sDate = dtValue.ToString("u", DateTimeFormatInfo.InvariantInfo);
+            AddAttr(node, sAttrName, sDate);
         }
         #endregion
-        #region Method: XmlAttribute AddAttr(node, sAttrName, bool bValue)
-        public XmlAttribute AddAttr(XmlNode node, string sAttrName, bool bValue)
+        #region Method: void AddAttr(node, sAttrName, bValue)
+        public void AddAttr(XmlNode node, string sAttrName, bool bValue)
+            // False values are not output to the file; thus a missing value
+            // is understood to be false.
         {
-            string sValue = (bValue) ? "true" : "false";
-            return AddAttr(node, sAttrName, sValue);
+            if (bValue)
+                AddAttr(node, sAttrName, "true");
+        }
+        #endregion
+        #region Method: void AddAttr(node, sAttrName, fValue)
+        public void AddAttr(XmlNode node, string sAttrName, float fValue)
+        {
+            AddAttr(node, sAttrName, fValue.ToString());
         }
         #endregion
 
@@ -320,7 +332,7 @@ namespace JWTools
         #region SMethod: int GetAttrValue(node, attr, nDefaultValue)
         static public int GetAttrValue(XmlNode node, string sAttrName, int nDefaultValue)
         {
-            string sValue = GetAttrValue(node, sAttrName, nDefaultValue.ToString());
+            var sValue = GetAttrValue(node, sAttrName, nDefaultValue.ToString());
 
             try
             {
@@ -350,13 +362,26 @@ namespace JWTools
         #region SMethod: bool GetAttrValue(node, attr, bDefaultValue)
         static public bool GetAttrValue(XmlNode node, string sAttrName, bool bDefaultValue)
         {
-            string sDefaultValue = (bDefaultValue) ? "true" : "false";
+            var sDefaultValue = (bDefaultValue) ? "true" : "false";
 
-            string sValue = GetAttrValue(node, sAttrName, sDefaultValue);
+            var sValue = GetAttrValue(node, sAttrName, sDefaultValue);
 
-            if (sValue.ToUpper() == "TRUE")
-                return true;
-            return false;
+            return (sValue.ToUpper() == "TRUE");
+        }
+        #endregion
+        #region SMethod: float GetAttrValue(node, attr, fDefaultValue)
+        static public float GetAttrValue(XmlNode node, string sAttrName, float fDefaultValue)
+        {
+            var sValue = GetAttrValue(node, sAttrName, fDefaultValue.ToString());
+
+            try
+            {
+                return (float)Convert.ToDouble(sValue);
+            }
+            catch (Exception e)
+            {
+                throw new XmlDocException(node, "Bad float data in oxes file: " + e.Message);
+            }
         }
         #endregion
 
@@ -493,6 +518,63 @@ namespace JWTools
 
             // Write out the file
             Save(sPath);
+        }
+        #endregion
+
+        // Merge support ---------------------------------------------------------------------
+        #region SMethod: void SetAttrValue(node, sAttrName, sValue)
+        static public void SetAttrValue(XmlNode node, string sAttrName, string sValue)
+        {
+            // Find the attr and set it
+            foreach (XmlAttribute attr in node.Attributes)
+            {
+                if (attr.Name.ToUpper() != sAttrName.ToUpper()) 
+                    continue;
+                attr.Value = sValue;
+                return;
+            }
+
+            // If here, we didn't find it
+            Debug.Assert(false, "Attribute (" + sAttrName + ") not found");
+        }
+
+        #endregion
+        #region SMethod: void MergeAttr(nodeOurs, nodeTheirs, nodeParent, sAttrName)
+        static public void MergeAttr(XmlNode ours, XmlNode theirs, XmlNode parent, string sAttrName)
+            // Merge logic: By default we keep ours. The only time we keep theirs is if
+            // theirs changed and ours didn't change.
+        {
+            var sOurs = XmlDoc.GetAttrValue(ours, sAttrName, "");
+            var sTheirs = XmlDoc.GetAttrValue(theirs, sAttrName, "");
+            var sParent = XmlDoc.GetAttrValue(parent, sAttrName, "");
+
+            var bShouldKeepTheirs = sTheirs != sParent && sOurs == sParent;
+
+            if (bShouldKeepTheirs)
+                SetAttrValue(ours, sAttrName, sTheirs);
+        }
+        #endregion
+        #region SMethod: void CopyNode(XmlNode newParent, XmlNode nodeToCopy)
+        static public void CopyNode(XmlNode newParent, XmlNode nodeToCopy)
+            // Irritating. If we're copying nodeToCopy to a newParent that is part of a
+            // different document, we have to create a new one within that different 
+            // document's context. Hence the convolutions below of looking
+            // for the OwnerDocument everywhere.
+        {
+            var node = newParent.OwnerDocument.CreateNode(XmlNodeType.Element,
+                nodeToCopy.Name, null);
+
+            foreach (XmlAttribute attr in nodeToCopy.Attributes)
+            {
+                var newAttr = newParent.OwnerDocument.CreateAttribute(attr.Name);
+                newAttr.Value = attr.Value;
+                node.Attributes.Append(newAttr);
+            }
+
+            foreach (XmlNode child in nodeToCopy.ChildNodes)
+                CopyNode(node, child);
+
+            newParent.AppendChild(node);
         }
         #endregion
 

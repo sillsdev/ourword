@@ -356,7 +356,10 @@ namespace OurWordData.DataModel
 
         // Repository Version ----------------------------------------------------------------
         private const string c_VersionTag = "OurWordVersion";
-        protected const int c_CurrentVersionNo = 1;
+        protected const int c_CurrentVersionNo = 2;
+        // Data Version History
+        // 1 - Tag system initiated
+        // 2 - Case folding problem corrected
         #region SAttr{g}: string TagContents
         public static string TagContents
         {

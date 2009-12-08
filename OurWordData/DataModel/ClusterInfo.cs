@@ -116,25 +116,25 @@ namespace OurWordData.DataModel
         #region Method: List<string> GetClusterLanguageList(bProjectsOnly)
         public List<string> GetClusterLanguageList(bool bProjectsOnly)
         {
-            List<string> v = new List<string>();
+            var v = new List<string>();
 
-            string sExtension = (bProjectsOnly) ? 
+            var sExtension = (bProjectsOnly) ? 
                 DProject.FileExtension : DTranslation.FileExtension;
 
             // Get the settings folder
-            string sSettingsFolder = ParentFolder +
+            var sSettingsFolder = ParentFolder +
                 Name +
                 Path.DirectorySeparatorChar +
                 DTeamSettings.SettingsFolderName +
                 Path.DirectorySeparatorChar;
 
             // Get the owp files in the settings folder
-            string[] sFiles = Directory.GetFiles(sSettingsFolder,
+            var sFiles = Directory.GetFiles(sSettingsFolder,
                 "*" + sExtension,
                 SearchOption.TopDirectoryOnly);
 
             // The base name of these are the languages
-            foreach (string s in sFiles)
+            foreach (var s in sFiles)
                 v.Add(Path.GetFileNameWithoutExtension(s));
 
             return v;
@@ -210,37 +210,37 @@ namespace OurWordData.DataModel
         {
             s_vClusters = new List<ClusterInfo>();
 
-            // Places where we'll search for clusters
-            var vsPossibleClusterLocations = new List<string>();
-            vsPossibleClusterLocations.Add(JWU.GetMyDocumentsFolder(null));
-            vsPossibleClusterLocations.Add(JWU.GetLocalApplicationDataFolder(
-                ClusterInfo.c_sLanguageDataFolder));
+            // Locations (base folders) where we'll search for clusters
+            var vsPossibleClusterLocations = new List<string>
+            {
+                JWU.GetMyDocumentsFolder(null),
+                JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder)
+            };
 
             // Loop to search each location
-            foreach (string sPossibleLocation in vsPossibleClusterLocations)
+            foreach (var sPossibleLocation in vsPossibleClusterLocations)
             {
-                string[] sPotentialClusterFolders = Directory.GetDirectories(sPossibleLocation);
+                var sPotentialClusterFolders = Directory.GetDirectories(sPossibleLocation);
 
-                foreach (string sFolder in sPotentialClusterFolders)
+                foreach (var sFolder in sPotentialClusterFolders)
                 {
-                    string sSettingsFolder = sFolder + Path.DirectorySeparatorChar +
+                    var sSettingsFolder = sFolder + Path.DirectorySeparatorChar +
                         DTeamSettings.SettingsFolderName + Path.DirectorySeparatorChar;
 
-                    if (Directory.Exists(sSettingsFolder))
-                    {
-                        string sClusterName = JWU.ExtractRightmostSubFolder(sFolder);
-                        s_vClusters.Add(new ClusterInfo(sClusterName, sPossibleLocation));
-                    }
+                    if (!Directory.Exists(sSettingsFolder)) 
+                        continue;
+
+                    var sClusterName = JWU.ExtractRightmostSubFolder(sFolder);
+                    s_vClusters.Add(new ClusterInfo(sClusterName, sPossibleLocation));
                 }
             }
 
             // If we came up empty, we need to create a cluster, so that we always
             // have one to put things into. We'll place it into MyDocuments
-            if (s_vClusters.Count == 0)
-            {
-                CreateNewCluster(true, "OurWordData");
-                ScanForClusters();
-            }
+            if (s_vClusters.Count != 0) 
+                return;
+            CreateNewCluster(true, "OurWordData");
+            ScanForClusters();
         }
         #endregion
 

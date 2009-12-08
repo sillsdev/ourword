@@ -135,7 +135,6 @@
     <Compile Include="DataModel\SfMapping.cs" />
     <Compile Include="DataModel\StdFmtTransform.cs" />
     <Compile Include="DataModel\Stage.cs" />
-    <Compile Include="DataModel\Styles.cs" />
     <Compile Include="DataModel\TranslatorNote.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -175,6 +174,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Styles\CharacterStyle.cs" />
+    <Compile Include="Styles\FontForWritingSystem.cs" />
+    <Compile Include="Styles\Style.cs" />
+    <Compile Include="Styles\StyleSheet.cs" />
     <Compile Include="Tools\Diff.cs" />
     <Compile Include="Tools\Progress.cs" />
     <Compile Include="Tools\StringMerger.cs" />

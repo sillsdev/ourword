@@ -2593,7 +2593,7 @@ namespace OurWord
             var vs = new List<string>();
             if (!ClusterList.UserCanAccessAllProjects)
             {
-                foreach (string s in vsRaw)
+                foreach (var s in vsRaw)
                 {
                     var bUserCanAccess = ClusterList.GetUserCanAccessProject(ci.Name, s);
                     if (bUserCanAccess)
@@ -2616,15 +2616,12 @@ namespace OurWord
             }
 
             // Add them to the menu
-            foreach (string s in vs)
+            foreach (var s in vs)
             {
- //               string sPath = ci.ClusterFolder + 
- //                   ".Settings" + Path.DirectorySeparatorChar +
- //                   s + ".owp";
-
-                var mi = new ToolStripMenuItem(s, null, onClick);
- //               mi.Tag = sPath;
-                mi.Tag = ci.GetProjectPath(s);
+                var mi = new ToolStripMenuItem(s, null, onClick) 
+                {
+                    Tag = ci.GetProjectPath(s)
+                };
                 miParent.DropDownItems.Add(mi);
             }
         }

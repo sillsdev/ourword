@@ -952,7 +952,6 @@ namespace OurWordData.DataModel
 				charStyle = AddCharacterStyle("ntc", "Note Character");
 				charStyle.SetFonts(10, false, false, false, false, Color.Navy);
 				charStyle.IsSuperScript = true;
-				charStyle.IsEditable = false;
 			}
 
 		}

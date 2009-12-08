@@ -1461,12 +1461,9 @@ namespace OurWordData.DataModel
                 oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
                 oxes.AddAttr(nodeBook, c_sAttrStage, Stage.EnglishAbbrev);
                 oxes.AddAttr(nodeBook, c_sAttrVersion, Version);
-                if (true == Locked)
-                    oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
-                if (!string.IsNullOrEmpty(Copyright))
-                    oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
-                if (!string.IsNullOrEmpty(Comment))
-                    oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
+                oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
+                oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
+                oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
 
                 // Book History, saved prior to the sections
                 History.Save(oxes, nodeBook);
