@@ -18,6 +18,16 @@ namespace OurWordTests.Styles
     [TestFixture]
     public class TFontForWritingSystem : FontForWritingSystem
     {
+        #region SMethod: FontForWritingSystem CreateFromXml(string sXml)
+        static FontForWritingSystem CreateFromXml(string sXml)
+        {
+            var doc = new XmlDoc(sXml);
+            var node = XmlDoc.FindNode(doc, c_sTag);
+            var style = Create(node);
+            return style;
+        }
+        #endregion
+
         // FontStyle to FontStyleAsString ----------------------------------------------------
         #region Test: TFontStyleAsString_Get
         [Test] public void TFontStyleAsString_Get()
@@ -78,6 +88,27 @@ namespace OurWordTests.Styles
         }
         #endregion
 
+        // Misc ------------------------------------------------------------------------------
+        #region Test: TClone
+        [Test] public void TClone()
+        {
+            var original = new FontForWritingSystem
+            {
+                WritingSystemName = "Latin",
+                FontName = "PLaybill",
+                FontSize = 13.0F,
+                FontStyle = FontStyle.Italic
+            };
+
+            var cloned = original.Clone();
+
+            Assert.AreEqual(original.WritingSystemName, cloned.WritingSystemName);
+            Assert.AreEqual(original.FontName, cloned.FontName);
+            Assert.AreEqual(original.FontSize, cloned.FontSize);
+            Assert.AreEqual(original.FontStyle, cloned.FontStyle);
+        }
+        #endregion
+
         // I/O & Merge -----------------------------------------------------------------------
         private const string c_sXmlForIoTest = "<Font WritingSystem=\"Cherokee\" " +
             "Name=\"Gentium\" Size=\"10.3\" Style=\"BoldStrikeout\" />";
@@ -128,38 +159,15 @@ namespace OurWordTests.Styles
             const string sTheirs = "<Font WritingSystem=\"Cherokee\" Name=\"Gentium\" Size=\"11\" Style=\"Bold\" />";
             const string sExpected = "<Font WritingSystem=\"Cherokee\" Name=\"Arial\" Size=\"11\" Style=\"Italic\" />";
 
-            var nodeParent = XmlDoc.FindNode((new XmlDoc(sParent)), "Font");
-            var nodeOurs = XmlDoc.FindNode((new XmlDoc(sOurs)), "Font");
-            var nodeTheirs = XmlDoc.FindNode((new XmlDoc(sTheirs)), "Font");
+            var parent = CreateFromXml(sParent);
+            var ours = CreateFromXml(sOurs);
+            var theirs = CreateFromXml(sTheirs);
 
-            Merge(nodeOurs, nodeTheirs, nodeParent);
+            ours.Merge(parent, theirs);
 
-            Assert.AreEqual(sExpected, nodeOurs.OuterXml);
-        }
-        #endregion
-        #region Test: TMergeThenRestoreDefaultValues
-        [Test] public void TMergeThenRestoreDefaultValues()
-            // Ours removes everything; defaults should be restored upon creation
-        {
-            const string sParent = "<Font WritingSystem=\"Cherokee\" Name=\"Gentium\" Size=\"10.3\" Style=\"BoldStrikeout\" />";
-            const string sOurs = "<Font WritingSystem=\"Cherokee\" />";
-            const string sTheirs = "<Font WritingSystem=\"Cherokee\" Name=\"Gentium\" Size=\"10.3\" Style=\"BoldStrikeout\" />";
+            var sActual = ours.Save(new XmlDoc(), null).OuterXml;
 
-            var nodeParent = XmlDoc.FindNode((new XmlDoc(sParent)), "Font");
-            var nodeOurs = XmlDoc.FindNode((new XmlDoc(sOurs)), "Font");
-            var nodeTheirs = XmlDoc.FindNode((new XmlDoc(sTheirs)), "Font");
-
-            Merge(nodeOurs, nodeTheirs, nodeParent);
-
-            // At this point, we save with empty values
-            const string sExpectedOnMerge = "<Font WritingSystem=\"Cherokee\" />";
-            Assert.AreEqual(sExpectedOnMerge, nodeOurs.OuterXml);
-
-            // But when we create from this, we expect to have default values
-            const string sExpectedOnCreate = "<Font WritingSystem=\"Cherokee\" Name=\"Arial\" Size=\"10\" />";
-            var fws = Create(nodeOurs);
-            var fwsSaved = fws.Save(new XmlDoc(), null);
-            Assert.AreEqual(sExpectedOnCreate, fwsSaved.OuterXml);
+            Assert.AreEqual(sExpected, sActual);
         }
         #endregion
     }

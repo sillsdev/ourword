@@ -17,9 +17,19 @@ using JWTools;
 
 namespace OurWordData.Styles
 {
-    public class CharacterStyle : Style
+    public class CharacterStyle
     {
         // Content Attrs ---------------------------------------------------------------------
+        #region Attr{g/s}: string StyleName - serves as the style's unique ID
+        public string StyleName
+        {
+            get
+            {
+                return m_sStyleName;
+            }
+        }
+        private readonly string m_sStyleName;
+        #endregion
         #region Attr{g/s}: Color FontColor - color for text; default is black
         public Color FontColor
         {
@@ -56,6 +66,38 @@ namespace OurWordData.Styles
                 fws.ResetFonts();
         }
         #endregion
+        #region Method: FontForWritingSystem FindFont(sWritingSystemName)
+        public FontForWritingSystem FindFont(string sWritingSystemName)
+        {
+            foreach(var fws in FontsForWritingSystem)
+            {
+                if (fws.WritingSystemName == sWritingSystemName)
+                    return fws;
+            }
+            return null;
+        }
+        #endregion
+        #region Method: FontForWritingSystem FindOrAddFont(sWritingSystemName)
+        public FontForWritingSystem FindOrAddFont(string sWritingSystemName)
+        {
+            var fws = FindFont(sWritingSystemName);
+
+            if (null == fws)
+            {
+                fws = new FontForWritingSystem 
+                {
+                    WritingSystemName = sWritingSystemName,
+                    FontName = m_DefaultFont.FontName,
+                    FontSize = m_DefaultFont.FontSize,
+                    FontStyle = m_DefaultFont.FontStyle
+                };
+                FontsForWritingSystem.Add(fws);
+            }
+
+            Debug.Assert(null != fws);
+            return fws;
+        }
+        #endregion
 
         // Default (factory) font settings --------------------------------------------------
         #region Attr{s}: string DefaultFontName
@@ -85,7 +127,7 @@ namespace OurWordData.Styles
             }
         }
         #endregion
-        private readonly FontForWritingSystem m_DefaultFont;
+        protected readonly FontForWritingSystem m_DefaultFont;
         #region Method: void SetDefaults(pattern)
         public void SetDefaults(CharacterStyle pattern)
         {
@@ -98,8 +140,9 @@ namespace OurWordData.Styles
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sStyleName)
         public CharacterStyle(string sStyleName)
-            : base(sStyleName)
         {
+            m_sStyleName = sStyleName;
+
             m_FontsForWritingSystem = new List<FontForWritingSystem>();
 
             m_DefaultFont = new FontForWritingSystem 
@@ -113,24 +156,64 @@ namespace OurWordData.Styles
         #endregion
 
         // I/O & Merge -----------------------------------------------------------------------
+        #region VirtAttr{g}: Tag
         private const string c_sTag = "CharacterStyle";
-        private const string c_sAttrColor = "Color";
-        #region OMethod: XmlNode Save(XmlDoc, nodeParent)
-        public override XmlNode Save(XmlDoc doc, XmlNode nodeParent)
+        protected virtual string Tag
         {
-            var node = doc.AddNode(nodeParent, c_sTag);
-
-            // Superclass attributes
-            SaveStyleAttrs(doc, node);
-
-            // This class's data
-            doc.AddAttr(node, c_sAttrColor, FontColor.Name );
-            foreach (var fws in FontsForWritingSystem)
-                fws.Save(doc, node);
-
+            get
+            {
+                return c_sTag;
+            }
+        }
+        #endregion
+        #region I/O Constants
+        private const string c_sAttrStyleName = "Name";
+        private const string c_sAttrColor = "Color";
+        #endregion
+        #region SMethod: string GetStyleNameFromXml(XmlNode node)
+        static protected string GetStyleNameFromXml(XmlNode node)
+        {
+            return XmlDoc.GetAttrValue(node, c_sAttrStyleName, "");
+        }
+        #endregion
+        #region Method: XmlNode Save(XmlDoc doc, XmlNode nodeParent)
+        public XmlNode Save(XmlDoc doc, XmlNode nodeParent)
+        {
+            var node = doc.AddNode(nodeParent, Tag);
+            SaveContent(doc, node);
             return node;
         }
         #endregion
+
+        #region VirtMethod: void SaveContent(XmlDoc, nodeStyle)
+        protected virtual void SaveContent(XmlDoc doc, XmlNode node)
+        {
+            doc.AddAttr(node, c_sAttrStyleName, StyleName);
+            doc.AddAttr(node, c_sAttrColor, FontColor.Name);
+
+            foreach (var fws in FontsForWritingSystem)
+                fws.Save(doc, node);
+        }
+        #endregion
+        #region VirtMethod: void ReadContent(XmlNode node)
+        virtual protected void ReadContent(XmlNode node)
+        {
+            // Content Attributes
+            m_Color = Color.FromName(XmlDoc.GetAttrValue(node, c_sAttrColor,
+                Color.Black.ToString()));
+
+            // FontsForWritingSystem
+            foreach (XmlNode child in node.ChildNodes)
+            {
+                var fws = FontForWritingSystem.Create(child);
+                if (null == fws)
+                    continue;
+
+                FontsForWritingSystem.Add(fws);
+            }
+        }
+        #endregion
+
         #region SMethod: CharacterStyle Create(node)
         static public CharacterStyle Create(XmlNode node)
         {
@@ -142,72 +225,48 @@ namespace OurWordData.Styles
             if (string.IsNullOrEmpty(sStyleName))
                 return null;
 
-            // Create the style with its attributes
-            var style = new CharacterStyle(sStyleName)
-            {
-                m_Color = Color.FromName(XmlDoc.GetAttrValue(node, c_sAttrColor, 
-                    Color.Black.ToString()))
-            };
-
-            // Read in the FontsForWritingSystem
-            foreach(XmlNode child in node.ChildNodes)
-            {
-                var fws = FontForWritingSystem.Create(child);
-                if (null == fws) 
-                    continue;
-
-                style.FontsForWritingSystem.Add(fws);
-            }
+            // Create the style
+            var style = new CharacterStyle(sStyleName);
+            style.ReadContent(node);
 
             return style;
         }
         #endregion
-        #region SMethod: void Merge(nodeOurs, nodeTheirs, nodeParent)
-        #region Method: XmlNode GetCorrespondingFontNode(targetFontNode, parent)
-        static XmlNode GetCorrespondingFontNode(XmlNode targetFontNode, XmlNode parent)
+
+        #region Method: void Merge(parent, theirs)
+        public void Merge(CharacterStyle parent, CharacterStyle theirs)
         {
-            var sWritingSystemName = FontForWritingSystem.GetWritingSystemNameFromXml(targetFontNode);
+            Debug.Assert(parent != null);
+            Debug.Assert(theirs != null);
 
-             foreach(XmlNode child in parent.ChildNodes)
-             {
-                 if (FontForWritingSystem.GetWritingSystemNameFromXml(child) == sWritingSystemName)
-                     return child;
-             }
-             return null;
-        }
-        #endregion
-        static public void Merge(XmlNode ours, XmlNode theirs, XmlNode parent)
-        {
-            if (!CanMerge(ours, theirs, parent))
-                return;
+            // We require them to all be the same StyleName (that's their Unique ID)
+            Debug.Assert(StyleName == parent.StyleName);
+            Debug.Assert(StyleName == theirs.StyleName);
 
-            Debug.Assert(ours.Name == c_sTag);
-            Debug.Assert(theirs.Name == c_sTag);
-            Debug.Assert(parent.Name == c_sTag);
+            // Attributes. Algorithm: We keep theirs iff they differ from ours and ours is
+            // unchanged from the parent. Otherwise we always keep ours.
+            if (FontColor != theirs.FontColor && FontColor == parent.FontColor)
+                FontColor = theirs.FontColor;
 
-            // Merge the Attributes
-            XmlDoc.MergeAttr(ours, theirs, parent, c_sAttrColor);
-
-            // Merge the fonts which exist in all three
-            foreach(XmlNode ourFontNode in ours.ChildNodes)
+            // Merge those fonts which exist in all three
+            foreach(var ourFont in FontsForWritingSystem)
             {
-                var theirFontNode = GetCorrespondingFontNode(ourFontNode, theirs);
-                var parentFontNode = GetCorrespondingFontNode(ourFontNode, parent);
-
-                if (null != theirFontNode && null != parentFontNode)
-                    FontForWritingSystem.Merge(ourFontNode, theirFontNode, parentFontNode);
+                var parentFont = parent.FindFont(ourFont.WritingSystemName);
+                var theirFont = theirs.FindFont(ourFont.WritingSystemName);
+                if (null != parentFont && null != theirFont)
+                    ourFont.Merge(parentFont, theirFont);
             }
 
             // Add any new fonts that only exist in theirs
-            foreach (XmlNode theirFontNode in theirs.ChildNodes)
+            foreach(var theirFont in theirs.FontsForWritingSystem)
             {
-                var ourFontNode = GetCorrespondingFontNode(theirFontNode, ours);
-                var parentFontNode = GetCorrespondingFontNode(theirFontNode, parent);
-
-                if (null == parentFontNode && null == ourFontNode)
-                    XmlDoc.CopyNode(ours, theirFontNode);
+                var ourFont = FindFont(theirFont.WritingSystemName);
+                var parentFont = parent.FindFont(theirFont.WritingSystemName);
+                if (null == parentFont && null == ourFont)
+                    FontsForWritingSystem.Add(theirFont.Clone());
             }
         }
         #endregion
+
     }
 }

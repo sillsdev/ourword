@@ -128,9 +128,23 @@ namespace OurWordData.Styles
         }
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
+        #region Method: FontForWritingSystem Clone()
+        public FontForWritingSystem Clone()
+        {
+            return new FontForWritingSystem
+            {
+                WritingSystemName = WritingSystemName,
+                FontName = FontName,
+                FontSize = FontSize,
+                FontStyle = FontStyle
+            };
+        }
+        #endregion
+
         // I/O & Merge -----------------------------------------------------------------------
         #region I/O Constants
-        private const string c_sTag = "Font";
+        protected const string c_sTag = "Font";
         private const string c_sAttrWritingSystem = "WritingSystem";
         private const string c_sAttrFontName = "Name";
         private const string c_sAttrSize = "Size";
@@ -192,12 +206,6 @@ namespace OurWordData.Styles
             return nodeFont;
         }
         #endregion
-        #region SMethod: string GetWritingSystemNameFromXml(node)
-        static public string GetWritingSystemNameFromXml(XmlNode node)
-        {
-            return XmlDoc.GetAttrValue(node, c_sAttrWritingSystem, c_sDefaultWritingSystem);
-        }
-        #endregion
         #region SMethod: FontForWritingSystem Create(nodeFont)
         static public FontForWritingSystem Create(XmlNode nodeFont)
         {
@@ -206,7 +214,7 @@ namespace OurWordData.Styles
 
             var obj = new FontForWritingSystem
             {
-                WritingSystemName = GetWritingSystemNameFromXml(nodeFont),
+                WritingSystemName = XmlDoc.GetAttrValue(nodeFont, c_sAttrWritingSystem, c_sDefaultWritingSystem),
                 FontName = XmlDoc.GetAttrValue(nodeFont, c_sAttrFontName, "Arial"),
                 FontSize = XmlDoc.GetAttrValue(nodeFont, c_sAttrSize, 10.0F),
                 FontStyleAsString = XmlDoc.GetAttrValue(nodeFont, c_sAttrStyle, "")
@@ -215,25 +223,26 @@ namespace OurWordData.Styles
             return obj;
         }
         #endregion
-        #region SMethod: void Merge(nodeOurs, nodeTheirs, nodeParent)
-        static public void Merge(XmlNode ours, XmlNode theirs, XmlNode parent)
+        #region Method: void Merge(parent, theirs)
+        public void Merge(FontForWritingSystem parent, FontForWritingSystem theirs)
         {
-            Debug.Assert(ours.Name == c_sTag);
-            Debug.Assert(theirs.Name == c_sTag);
-            Debug.Assert(parent.Name == c_sTag);
+            Debug.Assert(parent != null);
+            Debug.Assert(theirs != null);
 
-            // If they aren't all the same writing system, then we can't merge them. The
-            // writing system is their unique ID for this character style.
-            var sWritingSystem = GetWritingSystemNameFromXml(ours);
-            if (sWritingSystem != GetWritingSystemNameFromXml(theirs) ||
-                sWritingSystem != GetWritingSystemNameFromXml(parent))
-                return;
+            // We require them to all be the same writing system (that's their Unique ID)
+            Debug.Assert(WritingSystemName == parent.WritingSystemName);
+            Debug.Assert(WritingSystemName == theirs.WritingSystemName);
 
-            // Merge the attributes
-            XmlDoc.MergeAttr(ours, theirs, parent, c_sAttrFontName);
-            XmlDoc.MergeAttr(ours, theirs, parent, c_sAttrSize);
-            XmlDoc.MergeAttr(ours, theirs, parent, c_sAttrStyle);
+            // Algorithm: We keep theirs iff they differ from ours and ours is
+            // unchanged from the parent. Otherwise we always keep ours.
+            if (FontName != theirs.FontName && FontName == parent.FontName)
+                FontName = theirs.FontName;
+            if (FontSize != theirs.FontSize && FontSize == parent.FontSize)
+                FontSize = theirs.FontSize;
+            if (FontStyle != theirs.FontStyle && FontStyle == parent.FontStyle)
+                FontStyle = theirs.FontStyle;
         }
         #endregion
+
     }
 }

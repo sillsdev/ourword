@@ -176,7 +176,7 @@
     </Compile>
     <Compile Include="Styles\CharacterStyle.cs" />
     <Compile Include="Styles\FontForWritingSystem.cs" />
-    <Compile Include="Styles\Style.cs" />
+    <Compile Include="Styles\ParagraphStyle.cs" />
     <Compile Include="Styles\StyleSheet.cs" />
     <Compile Include="Tools\Diff.cs" />
     <Compile Include="Tools\Progress.cs" />

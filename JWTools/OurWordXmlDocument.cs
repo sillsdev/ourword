@@ -311,6 +311,12 @@ namespace JWTools
             AddAttr(node, sAttrName, fValue.ToString());
         }
         #endregion
+        #region Method: void AddAttr(node, sAttrName, dValue)
+        public void AddAttr(XmlNode node, string sAttrName, double dValue)
+        {
+            AddAttr(node, sAttrName, dValue.ToString());
+        }
+        #endregion
 
         #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
@@ -381,6 +387,21 @@ namespace JWTools
             catch (Exception e)
             {
                 throw new XmlDocException(node, "Bad float data in oxes file: " + e.Message);
+            }
+        }
+        #endregion
+        #region SMethod: double GetAttrValue(node, attr, dDefaultValue)
+        static public double GetAttrValue(XmlNode node, string sAttrName, double dDefaultValue)
+        {
+            var sValue = GetAttrValue(node, sAttrName, dDefaultValue.ToString());
+
+            try
+            {
+                return Convert.ToDouble(sValue);
+            }
+            catch (Exception e)
+            {
+                throw new XmlDocException(node, "Bad double data in oxes file: " + e.Message);
             }
         }
         #endregion
