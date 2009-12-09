@@ -115,7 +115,7 @@ namespace OurWordTests.Styles
         #region Test: TSave
         [Test] public void TSave()
         {
-            var obj = new TFontForWritingSystem
+            var obj = new FontForWritingSystem
             {
                 FontName = "Gentium",
                 FontSize = 10.3F,

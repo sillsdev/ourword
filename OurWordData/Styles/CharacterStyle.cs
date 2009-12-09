@@ -184,7 +184,6 @@ namespace OurWordData.Styles
             return node;
         }
         #endregion
-
         #region VirtMethod: void SaveContent(XmlDoc, nodeStyle)
         protected virtual void SaveContent(XmlDoc doc, XmlNode node)
         {
@@ -213,7 +212,6 @@ namespace OurWordData.Styles
             }
         }
         #endregion
-
         #region SMethod: CharacterStyle Create(node)
         static public CharacterStyle Create(XmlNode node)
         {
@@ -232,7 +230,6 @@ namespace OurWordData.Styles
             return style;
         }
         #endregion
-
         #region Method: void Merge(parent, theirs)
         public void Merge(CharacterStyle parent, CharacterStyle theirs)
         {

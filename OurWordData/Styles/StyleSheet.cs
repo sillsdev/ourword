@@ -1,7 +1,18 @@
-﻿using System.Collections.Generic;
+﻿#region ***** Styles.cs *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    Styles.cs
+ * Author:  John Wimbish
+ * Created: 7 Dec 2009
+ * Purpose: Top-level class for the Stylesheet. Meant to be accessed as a Global (thus
+ *          everything is implemented as a static
+ * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
+using System.Collections.Generic;
 using System.Drawing;
 using System.Xml;
 using JWTools;
+#endregion
 
 namespace OurWordData.Styles
 {
@@ -54,6 +65,7 @@ namespace OurWordData.Styles
         }
         #endregion
 
+        #region SMethod: void Initialize()
         static public void Initialize()
             // Defaults in the style system; anything different must be explicitly 
             // declared here
@@ -110,6 +122,7 @@ namespace OurWordData.Styles
             // flag; so we need to clear it now that we're all done
             s_bIsDirty = false;
         }
+        #endregion
 
         // I/O & Merge -----------------------------------------------------------------------
         private const string c_sTag = "StyleSheet";

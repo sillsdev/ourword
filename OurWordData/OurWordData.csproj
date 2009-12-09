@@ -178,6 +178,7 @@
     <Compile Include="Styles\FontForWritingSystem.cs" />
     <Compile Include="Styles\ParagraphStyle.cs" />
     <Compile Include="Styles\StyleSheet.cs" />
+    <Compile Include="Styles\WritingSystem.cs" />
     <Compile Include="Tools\Diff.cs" />
     <Compile Include="Tools\Progress.cs" />
     <Compile Include="Tools\StringMerger.cs" />

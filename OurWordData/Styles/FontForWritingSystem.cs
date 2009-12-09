@@ -149,7 +149,6 @@ namespace OurWordData.Styles
         private const string c_sAttrFontName = "Name";
         private const string c_sAttrSize = "Size";
         private const string c_sAttrStyle = "Style";
-        private const string c_sDefaultWritingSystem = "Latin";
         #endregion
         #region Attr{g/s}: string FontStyleAsString
         protected string FontStyleAsString
@@ -214,7 +213,8 @@ namespace OurWordData.Styles
 
             var obj = new FontForWritingSystem
             {
-                WritingSystemName = XmlDoc.GetAttrValue(nodeFont, c_sAttrWritingSystem, c_sDefaultWritingSystem),
+                WritingSystemName = XmlDoc.GetAttrValue(nodeFont, c_sAttrWritingSystem, 
+                    WritingSystem.DefaultWritingSystemName),
                 FontName = XmlDoc.GetAttrValue(nodeFont, c_sAttrFontName, "Arial"),
                 FontSize = XmlDoc.GetAttrValue(nodeFont, c_sAttrSize, 10.0F),
                 FontStyleAsString = XmlDoc.GetAttrValue(nodeFont, c_sAttrStyle, "")

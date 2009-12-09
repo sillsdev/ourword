@@ -106,6 +106,7 @@
     <Compile Include="Styles\TCharacterStyle.cs" />
     <Compile Include="Styles\TFontForWritingSystem.cs" />
     <Compile Include="Styles\TParagraphStyle.cs" />
+    <Compile Include="Styles\TWritingSystem.cs" />
     <Compile Include="TestCommon.cs" />
     <Compile Include="Utilities\TStringMerger.cs" />
     <Compile Include="Utilities\T_Repository.cs" />

@@ -79,9 +79,4 @@ namespace OurWordTests.DataModel
 
     }
 
-    [TestFixture] public class T_FontForWritingSystem
-    {
-        
-
-    }
 }

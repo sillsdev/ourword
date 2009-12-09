@@ -844,7 +844,7 @@ namespace OurWordData
 		{
 			get
 			{
-				string sSaveLine = Length.ToString();
+				var sSaveLine = Length.ToString();
 
 				foreach(string s in m_rgStrings)
 					sSaveLine += ( " " + SaveDelimiterI + s + SaveDelimiterF );
@@ -856,6 +856,9 @@ namespace OurWordData
 		#region Method: void Read(string sReadLine)
 		public void Read(string s)
 		{
+            if (string.IsNullOrEmpty(s))
+                return;
+
 			int i = 0;
 
 			// Retrieve the first number, which is the size of the array; create an
