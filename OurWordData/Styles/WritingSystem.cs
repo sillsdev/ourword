@@ -29,7 +29,7 @@ namespace OurWordData.Styles
                 if (m_sName == value)
                     return;
                 m_sName = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sName = "";
@@ -46,7 +46,7 @@ namespace OurWordData.Styles
                 if (m_bIsIdeaGraph == value)
                     return;
                 m_bIsIdeaGraph = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private bool m_bIsIdeaGraph;
@@ -63,7 +63,7 @@ namespace OurWordData.Styles
                 if (m_sPunctuationChars == value)
                     return;
                 m_sPunctuationChars = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sPunctuationChars = c_sDefaultPunctuationChars;
@@ -81,7 +81,7 @@ namespace OurWordData.Styles
                 if (m_sEndPunctuationChars == value)
                     return;
                 m_sEndPunctuationChars = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sEndPunctuationChars = c_sDefaultEndPunctuationChars;
@@ -99,7 +99,7 @@ namespace OurWordData.Styles
                 if (m_sKeyboardName == value)
                     return;
                 m_sKeyboardName = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sKeyboardName = "";
@@ -118,7 +118,7 @@ namespace OurWordData.Styles
                 if (m_sConsonants == value)
                     return;
                 m_sConsonants = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sConsonants = c_sDefaultConsonants;
@@ -136,7 +136,7 @@ namespace OurWordData.Styles
                 if (m_bUseAutomatedHyphenation == value)
                     return;
                 m_bUseAutomatedHyphenation = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private bool m_bUseAutomatedHyphenation;
@@ -153,7 +153,7 @@ namespace OurWordData.Styles
                 if (m_sHyphenationCVPattern == value)
                     return;
                 m_sHyphenationCVPattern = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sHyphenationCVPattern = c_sHyphenationCVPattern;
@@ -171,7 +171,7 @@ namespace OurWordData.Styles
                 if (m_nMinHyphenSplit == value)
                     return;
                 m_nMinHyphenSplit = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private int m_nMinHyphenSplit = c_DefaultMinHiphenSplit;

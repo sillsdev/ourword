@@ -42,7 +42,7 @@ namespace OurWordData.Styles
                 if (m_Color == value)
                     return;
                 m_Color = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private Color m_Color = Color.Black;

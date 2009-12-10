@@ -13,7 +13,6 @@ using NUnit.Framework;
 using OurWordData.Styles;
 #endregion
 
-
 namespace OurWordTests.Styles
 {
     [TestFixture]

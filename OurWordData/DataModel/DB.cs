@@ -64,7 +64,7 @@ namespace OurWordData.DataModel
         {
             get
             {
-                return TeamSettings.StyleSheet;
+                return TeamSettings.OldStyleSheet;
             }
         }
         #endregion

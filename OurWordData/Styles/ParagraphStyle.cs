@@ -29,7 +29,7 @@ namespace OurWordData.Styles
                 if (m_ptPointsBefore == value)
                     return;
                 m_ptPointsBefore = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private int m_ptPointsBefore;
@@ -46,7 +46,7 @@ namespace OurWordData.Styles
                 if (m_ptPointsAfter == value)
                     return;
                 m_ptPointsAfter = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private int m_ptPointsAfter = 6;
@@ -63,7 +63,7 @@ namespace OurWordData.Styles
                 if (m_dFirstLineIndentInches == value)
                     return;
                 m_dFirstLineIndentInches = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private double m_dFirstLineIndentInches;
@@ -80,7 +80,7 @@ namespace OurWordData.Styles
                 if (m_dLeftMarginInches == value)
                     return;
                 m_dLeftMarginInches = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private double m_dLeftMarginInches;
@@ -97,7 +97,7 @@ namespace OurWordData.Styles
                 if (m_dRightMarginInches == value)
                     return;
                 m_dRightMarginInches = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private double m_dRightMarginInches;
@@ -114,7 +114,7 @@ namespace OurWordData.Styles
                 if (m_bKeepWithNextParagraph == value)
                     return;
                 m_bKeepWithNextParagraph = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private bool m_bKeepWithNextParagraph;
@@ -131,7 +131,7 @@ namespace OurWordData.Styles
                 if (m_bBulleted == value)
                     return;
                 m_bBulleted = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private bool m_bBulleted;
@@ -149,7 +149,7 @@ namespace OurWordData.Styles
                 if (m_Alignment == value)
                     return;
                 m_Alignment = value;
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private Align m_Alignment = Align.Left;
@@ -277,6 +277,5 @@ namespace OurWordData.Styles
                 Alignment = theirs.Alignment;
         }
         #endregion
-
     }
 }

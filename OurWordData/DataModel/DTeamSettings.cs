@@ -12,14 +12,9 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Windows.Forms;
 using System.IO;
 using JWTools;
-using OurWordData;
+using OurWordData.Styles;
 #endregion
 #endregion
 
@@ -213,7 +208,7 @@ namespace OurWordData.DataModel
 
 		// JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: DStyleSheet StyleSheet
-		public DStyleSheet StyleSheet
+		public DStyleSheet OldStyleSheet
 		{
 			get 
 			{ 
@@ -334,7 +329,7 @@ namespace OurWordData.DataModel
             // Style Sheet
             if (null == m_StyleSheet.Value)
                 m_StyleSheet.Value = new DStyleSheet();
-            StyleSheet.Initialize(false);
+            OldStyleSheet.Initialize(false);
 
 			// Make sure we have writing systems for the current project. Just create
 			// blank ones if we need to.
@@ -342,8 +337,8 @@ namespace OurWordData.DataModel
 			{
 				foreach (DTranslation t in DB.Project.AllTranslations)
 				{
-					StyleSheet.FindOrAddWritingSystem(t.WritingSystemVernacular.Name);
-					StyleSheet.FindOrAddWritingSystem(t.WritingSystemConsultant.Name);
+					OldStyleSheet.FindOrAddWritingSystem(t.WritingSystemVernacular.Name);
+					OldStyleSheet.FindOrAddWritingSystem(t.WritingSystemConsultant.Name);
 				}
 			}
 
@@ -427,7 +422,7 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: string SettingsFolder - Top-level, e.g., "MyDocuments\OurWord\Settings"
+		#region Attr{g}: string SettingsFolder - Top-level, e.g., "MyDocuments\OurWord\.Settings"
 		public string SettingsFolder
 		{
 			get
@@ -482,11 +477,20 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
+        #region Attr{g}: string StyleSheetStoragePath
+        public string StyleSheetStoragePath
+	    {
+	        get
+	        {
+	            var sFileName = DisplayName + ".owStyles";
+                return Path.Combine(SettingsFolder, sFileName);
+	        }
+        }
+        #endregion
         #region OMethod: bool OnLoad(TextReader)
         protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
         {
-            bool bResult = base.OnLoad(tr, sPath, progress);
-
+            var bResult = base.OnLoad(tr, sPath, progress);
             return bResult;
         }
         #endregion

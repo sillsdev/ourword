@@ -32,7 +32,7 @@ namespace OurWordData.Styles
                     return;
                 m_sFontName = value;
                 ResetFonts();
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sFontName = "Arial";
@@ -50,7 +50,7 @@ namespace OurWordData.Styles
                     return;
                 m_fFontSize = value;
                 ResetFonts();
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private float m_fFontSize = 10;
@@ -68,7 +68,7 @@ namespace OurWordData.Styles
                     return;
                 m_FontStyle = value;
                 ResetFonts();
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private FontStyle m_FontStyle;
@@ -86,7 +86,7 @@ namespace OurWordData.Styles
                     return;
                 m_sWritingSystemName = value;
                 ResetFonts();
-                Styles.DeclareDirty();
+                StyleSheet.DeclareDirty();
             }
         }
         private string m_sWritingSystemName = "Latin";
