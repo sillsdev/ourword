@@ -1585,25 +1585,28 @@ namespace OurWord.Edit
             #endregion
             #region Method: void CreateHyphenedWordPair()
             void CreateHyphenedWordPair()
-                // Creates the hyphened word / overflow word pair, if they do
-                // not already exist
+            // Creates the hyphened word / overflow word pair, if they do not already exist
             {
-                EWord word = HyphenedWord;
+                var word = HyphenedWord;
 
                 // Already done
-                if (word.Hyphenated == true)
+                if (word.Hyphenated)
                     return;
 
                 // Create a new, empty word
-                EWord wordNew = word.Clone();
+                var wordNew = word.Clone();
                 wordNew.Text = "";
 
                 // Insert it after our word
-                int iPos = Para.Find(word);
+                var iPos = Para.Find(word);
                 Para.InsertAt(iPos + 1, wordNew);
 
                 // We now have a hyphenated word
                 word.Hyphenated = true;
+
+                // The next word now has the glue setting; the current word is no longer glued.
+                wordNew.GlueToNext = word.GlueToNext;
+                word.GlueToNext = false;
             }
             #endregion
             #region Method: void MoveTextIntoOverflowWord()
