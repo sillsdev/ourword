@@ -772,7 +772,7 @@ namespace OurWordData.DataModel
                      "http://ourword.TheSeedCompany.org so that we can determine how to " +
                      "solve this problem.");
             }
-                    }
+        }
         #endregion
         #region PullNewerFiles
         public void PullNewerFiles()

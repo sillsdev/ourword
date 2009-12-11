@@ -23,6 +23,7 @@ using System.Xml;
 
 using JWTools;
 using OurWordData;
+using OurWordData.Styles;
 using OurWordData.Tools;
 #endregion
 #endregion
@@ -2459,8 +2460,8 @@ namespace OurWordData.DataModel
 	{
 		// Constants -------------------------------------------------------------------------
 		public const char c_chInsertionSpace = '\u2004';   // Unicode's "Four-Per-EM space"
-		public const int  c_cInsertedSpaces = 7;           // Number spaces for InsertionIcon
-		public const char c_chVerticalBar = '|';           // Sfm for char styles
+	    private const int  c_cInsertedSpaces = 7;          // Number spaces for InsertionIcon
+	    private const char c_chVerticalBar = '|';          // Sfm for char styles
 
 		// BAttrs ----------------------------------------------------------------------------
 		#region BAttr{g/s}: public string Text - The well-formed contents of the phrase
@@ -2486,7 +2487,7 @@ namespace OurWordData.DataModel
 			}
 			set
 			{
-				Debug.Assert(null != value && value.Length > 0);
+				Debug.Assert(!string.IsNullOrEmpty(value));
                 SetValue(ref m_sCharacterStyleAbbrev, value);
 			}
 		}
@@ -2501,47 +2502,55 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        // Derived Attrs ---------------------------------------------------------------------
+        // Style Modifications ---------------------------------------------------------------
+        #region Attr{g/s}: FontStyle FontStyle
+        public FontStyle FontStyle
+	    {     
+            get
+            {
+                return m_FontStyle;
+            }
+            set
+            {
+                m_FontStyle = value;
+                DeclareDirty();
+            }
+	    }
+	    private FontStyle m_FontStyle = FontStyle.Regular;
+        #endregion
         #region VAttr{g}: bool IsItalic
         public bool IsItalic
         {
             get
             {
-                return (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic);
+                return ((FontStyle & FontStyle.Italic) == FontStyle.Italic);
             }
         }
         #endregion
+
+        // Derived Attrs ---------------------------------------------------------------------
 		#region Attr{g}: public string SfmSaveString -  For saving to an SFM file
 		public string SfmSaveString
 		{
 			get
 			{
-				// Start with an empty string
-				string s = "";
+                // Double any literals in the text
+			    var s = "";
+                foreach (var ch in Text)
+                {
+                    s += ch;
+                    if (ch == c_chVerticalBar)
+                        s += ch;
+                }
 
-				if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-				{
-					s += c_chVerticalBar;
-					s += CharacterStyleAbbrev;
-				}
+                // Font Modifications
+                if ((FontStyle & FontStyle.Bold) == FontStyle.Bold)
+                    s = "|b" + s + "|r";
+                if ((FontStyle & FontStyle.Italic) == FontStyle.Italic)
+                    s = "|i" + s + "|r";
+                if ((FontStyle & FontStyle.Underline) == FontStyle.Underline)
+                    s = "|u" + s + "|r";
 
-				// Output the text, doubling any literals
-				foreach(char ch in Text)
-				{
-					s += ch;
-
-					if (ch == c_chVerticalBar)
-						s += ch;
-				}
-
-				// Style End
-				if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-				{
-					s += c_chVerticalBar;
-					s += 'r';
-				}
-
-				// Return the result
 				return s;
 			}
 		}
@@ -2573,12 +2582,15 @@ namespace OurWordData.DataModel
         {
             get
             {
-                JCharacterStyle cs = DB.StyleSheet.FindCharacterStyleOrNormal(CharacterStyleAbbrev);
+                JCharacterStyle cs = DB.StyleSheet.FindCharacterStyleOrNormal(
+                    CharacterStyleAbbrev);
                 Debug.Assert(null != cs);
                 return cs;
             }
         }
         #endregion
+        /*
+        */
         #region VAttr{g}: DBasicText BasicText
         public DBasicText BasicText
         {
@@ -2612,6 +2624,14 @@ namespace OurWordData.DataModel
 			// Attributes are now ready to store
 			CharacterStyleAbbrev = sCharacterStyleAbbrev;
 			Text = sText;
+
+            // Temp: Create FontStyle from char style
+            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic)
+                m_FontStyle = FontStyle.Italic;
+            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevBold)
+                m_FontStyle = FontStyle.Bold;
+            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevUnderline)
+                m_FontStyle = FontStyle.Underline;
 		}
 		#endregion
 		#region Constructor(DPhrase source)
@@ -2619,7 +2639,8 @@ namespace OurWordData.DataModel
             : this()
 		{
 			CharacterStyleAbbrev = source.CharacterStyleAbbrev;
-			Text                 = source.Text;
+			Text = source.Text;
+		    m_FontStyle = source.FontStyle;
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -2628,11 +2649,18 @@ namespace OurWordData.DataModel
 			if (this.GetType() != obj.GetType())
 				return false;
 
-			DPhrase phrase = obj as DPhrase;
-			if (phrase.Text == Text && phrase.CharacterStyleAbbrev == CharacterStyleAbbrev)
-				return true;
+			var phrase = obj as DPhrase;
+            if (null  == phrase)
+                return false;
 
-			return false;
+			if (phrase.Text != Text)
+                return false;
+            if (phrase.CharacterStyleAbbrev != CharacterStyleAbbrev)
+                return false;
+            if (phrase.FontStyle != FontStyle)
+                return false;
+
+            return true;
 		}
 		#endregion
 
@@ -2704,15 +2732,15 @@ namespace OurWordData.DataModel
 			}
 
 			// The number of words is one greater than the number of spaces
-			int cWords = cSpaces + 1;
+			var cWords = cSpaces + 1;
 
 			// Create the string array to hold the results
 			PWord[] v = new PWord[cWords];
 
 			// Go through the string and collect the words
-			string sWord = "";
-			int i = 0;
-			foreach(char ch in s)
+			var sWord = "";
+			var i = 0;
+			foreach(var ch in s)
 			{
 				if (ch == ' ')
 				{
@@ -3054,13 +3082,14 @@ namespace OurWordData.DataModel
             JCharacterStyle _CStyle,
             JParagraphStyle _PStyle,
             DRun _Footnote)
-            : this(_Text, _CStyle, _PStyle) // _CharacterStyleAbbrev)
+            : this(_Text, _CStyle, _PStyle)
         {
             Debug.Assert( _Footnote as DFoot != null );
 
             m_Footnote = _Footnote;
         }
         #endregion
+
     }
     #endregion
 

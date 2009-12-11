@@ -2503,7 +2503,7 @@ namespace OurWord
 	{
 		// Attrs -----------------------------------------------------------------------------
 		#region Attr{g}: bool CanPrint - T if there is data that can be printed
-		static public bool CanPrint
+	    private static bool CanPrint
 	    {
 			get
 			{
@@ -2636,9 +2636,8 @@ namespace OurWord
 			if (!CanPrint)
 				return false;
 
-			// The PrintDocument stores many of the user settings (e.g., which printer
-			// to use.)
-			PrintDocument pdoc = new PrintDocument();
+			// The PrintDocument stores many of the user settings (e.g., which printer)
+			var pdoc = new PrintDocument();
 
 			// Determine what the user wants to do; abandon if he cancels
 			m_dlg = new DialogPrint(pdoc);
@@ -2647,7 +2646,7 @@ namespace OurWord
 				return false;
 
 			// Name of the document
-			pdoc.DocumentName = DB.Project.STarget.Book.DisplayName;
+			pdoc.DocumentName = DB.TargetBook.DisplayName;
 
 			// Printer to use
 			pdoc.PrinterSettings.PrinterName = m_dlg.PrinterName;
@@ -2662,12 +2661,12 @@ namespace OurWord
 
 			// Initial position in the document (which may be All Sections or just the
 			// current Section, depending on the print settings)
-			DSection InitialSection = DB.TargetSection;
+			var InitialSection = DB.TargetSection;
 			if (!m_dlg.CurrentSection)
-				InitialSection = DB.Project.STarget.Book.Sections[0] as DSection;
+				InitialSection = DB.TargetBook.Sections[0];
 			if (null == InitialSection)
 				return false;
-			DParagraph InitialPara = InitialSection.Paragraphs[0] as DParagraph;
+			var InitialPara = InitialSection.Paragraphs[0];
 			if (null == InitialPara)
 				return false;
 
@@ -2681,13 +2680,13 @@ namespace OurWord
             m_Progress = G.CreateProgressIndicator();
             m_Progress.Start(G.GetLoc_String("strFormattingPages", "Formatting Pages..."),
                 InitialSection.Book.Sections.Count);
-			int nPageNo = 1;
+			var nPageNo = 1;
 			LineSpacing = m_dlg.LineSpacing;
 			PPage PreviousPage = null;
 			do
 			{
 				// Layout the page
-				PPage page = new PPage(pdoc, PreviousPage, nPageNo, m_dlg.PrintWaterMark);
+				var page = new PPage(pdoc, PreviousPage, nPageNo, m_dlg.PrintWaterMark);
 				PreviousPage = page;
                 page.Layout(ref m_position, m_Progress);
 

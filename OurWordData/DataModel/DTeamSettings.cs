@@ -541,14 +541,14 @@ namespace OurWordData.DataModel
 		public const string c_StyleAbbrevVerse            = "v";
 		public const string c_StyleAbbrevChapter          = "c";
 		public const string c_StyleAbbrevFootLetter       = "fn";
-		public const string c_StyleAbbrevItalic           = "i";
-		public const string c_StyleAbbrevBold             = "b";
-		public const string c_StyleAbbrevUnderline        = "u";
-		public const string c_StyleAbbrevDashed           = "d";
         public const string c_StyleAbbrevBigHeader        = "bh";
 		public const string c_StyleAbbrevLabel            = "L";
         public const string c_StyleAbbrevPictureCaption   = "cap";
         public const string c_StyleFootnote               = "ft";
+
+		public const string c_StyleAbbrevItalic           = "i";
+		public const string c_StyleAbbrevBold             = "b";
+		public const string c_StyleAbbrevUnderline        = "u";
 
         // User-Interface Only
         public const string c_CStyleRevisionDeletion = "del";
@@ -898,6 +898,8 @@ namespace OurWordData.DataModel
 				charStyle.SetFonts(10, false, false, false, false, Color.Red);
 				charStyle.IsSuperScript = true;
 			}
+            /*
+            */
 
 			// Footnote Character (fn)
 			if (null == FindCharacterStyle(c_StyleAbbrevFootLetter))
@@ -941,13 +943,6 @@ namespace OurWordData.DataModel
 			{
 				charStyle = AddCharacterStyle( c_StyleAbbrevUnderline, "Underline");
                 charStyle.SetFonts(10, false, false, false, true, Color.Black);
-			}
-
-			// Dashed
-			if (null == FindCharacterStyle(c_StyleAbbrevDashed))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevDashed, "Dashed");
-                charStyle.SetFonts(10, false, false, false, true, Color.Navy);
 			}
 
 			// Note Character (ntc)
