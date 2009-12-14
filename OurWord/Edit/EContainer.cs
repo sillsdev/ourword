@@ -1582,7 +1582,7 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(EContainer Owner, cColumnsCount)
+        #region Constructor(cColumnsCount)
         public ERowOfColumns(int cColumnsCount)
             : base()
         {
