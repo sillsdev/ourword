@@ -19,6 +19,8 @@ using NUnit.Framework;
 
 using JWTools;
 using OurWordData.DataModel;
+using OurWordData.Synchronize;
+
 #endregion
 #endregion
 

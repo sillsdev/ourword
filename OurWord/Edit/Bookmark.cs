@@ -8,20 +8,9 @@
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
-using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.IO;
-using System.Timers;
-using System.Threading;
-using System.Windows.Forms;
-using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
-using Palaso.UI.WindowsForms.Keyboarding;
 #endregion
 
 namespace OurWord.Edit

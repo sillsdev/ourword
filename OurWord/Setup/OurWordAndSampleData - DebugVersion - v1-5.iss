@@ -5,14 +5,15 @@ Source: ..\bin\Debug\OurWordData.dll; DestDir: {app}
 Source: ..\..\Help\OurWordHelp.chm; DestDir: {app}\Help
 Source: SampleData\*.*; DestDir: {userdocs}\OurWordSample; Flags: recursesubdirs createallsubdirs
 Source: ..\Loc\*.*; DestDir: {commonappdata}\OurWord\Loc
-Source: ..\..\lib\Palaso.Services.dll; DestDir: {app}
-Source: ..\..\lib\PalasoUIWindowsForms.dll; DestDir: {app}
-Source: ..\..\lib\PalasoReporting.dll; DestDir: {app}
-Source: ..\..\lib\KeymanLink.dll; DestDir: {app}
+
 Source: ..\bin\Debug\Chorus.exe; DestDir: {app}
 Source: ..\bin\Debug\ChorusMerge.exe; DestDir: {app}
 Source: ..\bin\Debug\LibChorus.dll; DestDir: {app}
 Source: ..\bin\Debug\LinqBridge.dll; DestDir: {app}
+Source: ..\bin\Debug\Palaso.dll; DestDir: {app}
+Source: ..\bin\Debug\KeymanLink.dll; DestDir: {app}
+Source: ..\bin\Debug\PalasoUIWindowsForms.dll; DestDir: {app}
+ 
 [Registry]
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!; ValueType: string; ValueName: HelpFile; ValueData: {app}\Help\OurWordHelp.chm; Flags: uninsdeletevalue
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: string; ValueName: Folder; ValueData: {userdocs}\OurWordSample\BackupFiles; Flags: uninsdeletevalue

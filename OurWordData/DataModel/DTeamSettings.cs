@@ -20,6 +20,8 @@ using System.Windows.Forms;
 using System.IO;
 using JWTools;
 using OurWordData;
+using OurWordData.Synchronize;
+
 #endregion
 #endregion
 

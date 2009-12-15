@@ -17,6 +17,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Management.Instrumentation;
 using System.Management;
+using System.Net.Mail;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -237,7 +238,6 @@ namespace JWTools
 
         // NUnit support ---------------------------------------------------------------------
         #if DEBUG
-
         #region SAttr{g}: string NUnit_TestFileFolder - returns Path of folder, creates if necessary
         static public string NUnit_TestFileFolder
         {
@@ -558,6 +558,17 @@ namespace JWTools
             tw.Close();
         }
         #endregion
+
+	    public static string BuildFriendlyVersion(Version v)
+        {
+            var chBuild = (char)((int)'a' + v.Build);
+
+            var sVersionNo = v.Major.ToString() + "." +
+                v.Minor.ToString() +
+                ((v.Build == 0) ? "" : chBuild.ToString());
+
+            return sVersionNo;           
+        }
 
     }
 

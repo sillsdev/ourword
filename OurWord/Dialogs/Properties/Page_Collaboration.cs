@@ -9,6 +9,8 @@
 #region Header: Using, etc.
 using OurWordData.DataModel;
 using OurWord.Edit;
+using OurWordData.Synchronize;
+
 #endregion
 
 namespace OurWord.Dialogs

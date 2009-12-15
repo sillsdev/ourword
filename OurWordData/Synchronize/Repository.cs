@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.NetworkInformation;
+using System.Reflection;
 using System.Threading;
 using Chorus.sync;
 using Chorus.VcsDrivers;
@@ -13,7 +14,7 @@ using Chorus.Utilities;
 using Chorus.VcsDrivers.Mercurial;
 #endregion
 
-namespace OurWordData.DataModel
+namespace OurWordData.Synchronize
 {
     #region Class: Repository
     public class Repository
@@ -356,7 +357,7 @@ namespace OurWordData.DataModel
 
         // Repository Version ----------------------------------------------------------------
         private const string c_VersionTag = "OurWordVersion";
-        protected const int c_CurrentVersionNo = 1;
+        public const int c_CurrentVersionNo = 1;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {
@@ -806,6 +807,7 @@ namespace OurWordData.DataModel
             var pathToChorusMerge = Repository.SurroundWithQuotes(
                 Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
 
+            using (new ShortTermEnvironmentalVariable("OurWordDataVersion", LocalRepository.c_CurrentVersionNo.ToString()))
             using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", m_LocalRepository.FullPathToRepositoryRoot))
             using (new ShortTermEnvironmentalVariable("HGMERGE", pathToChorusMerge))
             {
