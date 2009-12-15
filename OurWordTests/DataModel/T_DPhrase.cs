@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -121,5 +122,37 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        #region Test: TSfmSaveString
+        [Test] public void TSfmSaveString()
+        {
+            var phrase = new DPhrase 
+            {
+                Text="Hi",
+                FontStyle = FontStyle.Italic
+            };
+            Assert.AreEqual("|iHi|r", phrase.SfmSaveString);
+
+            phrase = new DPhrase
+            {
+                Text = "Hi",
+                FontStyle = FontStyle.Bold
+            };
+            Assert.AreEqual("|bHi|r", phrase.SfmSaveString);
+
+            phrase = new DPhrase
+            {
+                Text = "Hi",
+                FontStyle = FontStyle.Bold | FontStyle.Italic
+            };
+            Assert.AreEqual("|i|bHi|r|r", phrase.SfmSaveString);
+
+            phrase = new DPhrase
+            {
+                Text = "Hi",
+                FontStyle = FontStyle.Underline
+            };
+            Assert.AreEqual("|uHi|r", phrase.SfmSaveString);
+        }
+        #endregion
     }
 }

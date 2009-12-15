@@ -139,7 +139,6 @@
     <Compile Include="DataModel\SfMapping.cs" />
     <Compile Include="DataModel\StdFmtTransform.cs" />
     <Compile Include="DataModel\Stage.cs" />
-    <Compile Include="DataModel\Styles.cs" />
     <Compile Include="DataModel\TranslatorNote.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>

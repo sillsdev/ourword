@@ -67,11 +67,8 @@ namespace OurWord.Dialogs
             // The file name we're editing
             Text = Text + " - " + Book.StorageFileName;
 
-            // Font
-            JParagraphStyle pstyle = DB.TeamSettings.StyleSheet.FindParagraphStyleOrNormal(
-                DStyleSheet.c_sfmParagraph);
-            DataFile.Font = pstyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                Book.Translation.WritingSystemVernacular).DefaultFont;
+            // Use a slightly larger font than the system font for better readability of diacritics
+            DataFile.Font = DStyleSheet.LargeDialogFont;
 
             // Hanging indent so the lines are easy to see
             DataFile.SelectionHangingIndent = 20;

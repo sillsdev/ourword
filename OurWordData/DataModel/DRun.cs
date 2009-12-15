@@ -23,6 +23,7 @@ using System.Xml;
 
 using JWTools;
 using OurWordData;
+using OurWordData.Styles;
 using OurWordData.Tools;
 #endregion
 #endregion
@@ -183,13 +184,12 @@ namespace OurWordData.DataModel
 		#endregion
 
 		#region method: virtual PWord[] GetPWords()
-		public virtual PWord[] GetPWords()
+		public virtual List<PWord> GetPWords()
 		{
 			Debug.Assert(false);
 			return null;
 		}
 		#endregion
-
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: virtual void CopyBackTranslationsFromFront(DRun RFront)
@@ -354,14 +354,19 @@ namespace OurWordData.DataModel
 			Text = s;
 		}
 		#endregion
-		#region method: override PWord[] GetPWords()
-		public override PWord[] GetPWords()
+        #region method: override List<PWord> GetPWords()
+        public override List<PWord> GetPWords()
 		{
-			PWord[] v = new PWord[1];
-			v[0] = new PWord(Text, 
-                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevVerse),
-                null);
-			return v;
+            return new List<PWord>
+            {
+                new PWord(Text,
+                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevVerse),
+                    null) 
+                    {
+                        NeedsGlueToNext = true,
+                        IsVerseNumber = true
+                    }
+            };
 		}
 		#endregion
 		#region Attr{g}: override string AsString
@@ -515,14 +520,15 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region method: override PWord[] GetPWords()
-		public override PWord[] GetPWords()
+        #region method: override List<PWord> GetPWords()
+        public override List<PWord> GetPWords()
 		{
-			PWord[] v = new PWord[1];
-            v[0] = new PWord(Text,
-                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevChapter),
-                null);
-			return v;
+            return new List<PWord>
+            {
+                new PWord(Text,
+                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevChapter),
+                    null)
+            };
 		}
 		#endregion
 		#region Attr{g}: override string AsString
@@ -841,15 +847,20 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region method: override PWord[] GetPWords()
-        public override PWord[] GetPWords()
+        #region method: override List<PWord> GetPWords()
+        public override List<PWord> GetPWords()
         {
-            PWord[] v = new PWord[1];
-            v[0] = new PWord(Text,
-                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
-                null,
-                this);
-            return v;
+            return new List<PWord>
+            {
+                new PWord(Text,
+                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
+                    null)
+                    {
+                        Footnote = this,
+                        IsFootnoteLetter = true,
+                        NeedsGlueToPrevious = true
+                    }
+            };
         }
         #endregion
 
@@ -1066,14 +1077,15 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 
-        #region method: override PWord[] GetPWords()
-        public override PWord[] GetPWords()
+        #region method: override List<PWord> GetPWords()
+        public override List<PWord> GetPWords()
 		{
-			PWord[] v = new PWord[1];
-            v[0] = new PWord(Text,
-                DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevLabel),
-                null);
-			return v;
+            return new List<PWord>
+            {
+                new PWord(Text,
+                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevLabel),
+                    null)
+            };
 		}
 		#endregion
 		#region Attr{g}: override string AsString
@@ -2104,31 +2116,19 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Method: override PWord[] GetPWords()
-		public override PWord[] GetPWords()
+        #region Method: override List<PWord> GetPWords()
+        public override List<PWord> GetPWords()
 		{
-			ArrayList al = new ArrayList();
-			foreach(DPhrase p in Phrases)
-			{
-				PWord[] vpw = p.GetPWords();
-				if (null != vpw && vpw.Length > 0)
-					al.Add( vpw );
-			}
+		    var v = new List<PWord>();
 
-			int c = 0;
-			foreach( PWord[] vpw in al )
-				c += vpw.Length;
+            foreach (DPhrase p in Phrases)
+            {
+                var words = p.GetPWords();
+                if (null != words)
+                    v.AddRange(words);
+            }
 
-			PWord[] v = new PWord[ c ];
-
-			int i = 0;
-			foreach( PWord[] vpw in al )
-			{
-				foreach( PWord pw in vpw )
-					v[i++] = pw;
-			}
-
-			return v;
+            return v;
 		}
 		#endregion
 		#region Method: override void CopyBackTranslationsFromFront(DRun RFront)
@@ -2459,8 +2459,8 @@ namespace OurWordData.DataModel
 	{
 		// Constants -------------------------------------------------------------------------
 		public const char c_chInsertionSpace = '\u2004';   // Unicode's "Four-Per-EM space"
-		public const int  c_cInsertedSpaces = 7;           // Number spaces for InsertionIcon
-		public const char c_chVerticalBar = '|';           // Sfm for char styles
+	    private const int  c_cInsertedSpaces = 7;          // Number spaces for InsertionIcon
+	    private const char c_chVerticalBar = '|';          // Sfm for char styles
 
 		// BAttrs ----------------------------------------------------------------------------
 		#region BAttr{g/s}: public string Text - The well-formed contents of the phrase
@@ -2486,7 +2486,7 @@ namespace OurWordData.DataModel
 			}
 			set
 			{
-				Debug.Assert(null != value && value.Length > 0);
+				Debug.Assert(!string.IsNullOrEmpty(value));
                 SetValue(ref m_sCharacterStyleAbbrev, value);
 			}
 		}
@@ -2501,47 +2501,55 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        // Derived Attrs ---------------------------------------------------------------------
+        // Style Modifications ---------------------------------------------------------------
+        #region Attr{g/s}: FontStyle FontStyle
+        public FontStyle FontStyle
+	    {     
+            get
+            {
+                return m_FontStyle;
+            }
+            set
+            {
+                m_FontStyle = value;
+                DeclareDirty();
+            }
+	    }
+	    private FontStyle m_FontStyle = FontStyle.Regular;
+        #endregion
         #region VAttr{g}: bool IsItalic
         public bool IsItalic
         {
             get
             {
-                return (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic);
+                return ((FontStyle & FontStyle.Italic) == FontStyle.Italic);
             }
         }
         #endregion
+
+        // Derived Attrs ---------------------------------------------------------------------
 		#region Attr{g}: public string SfmSaveString -  For saving to an SFM file
 		public string SfmSaveString
 		{
 			get
 			{
-				// Start with an empty string
-				string s = "";
+                // Double any literals in the text
+			    var s = "";
+                foreach (var ch in Text)
+                {
+                    s += ch;
+                    if (ch == c_chVerticalBar)
+                        s += ch;
+                }
 
-				if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-				{
-					s += c_chVerticalBar;
-					s += CharacterStyleAbbrev;
-				}
+                // Font Modifications
+                if ((FontStyle & FontStyle.Bold) == FontStyle.Bold)
+                    s = "|b" + s + "|r";
+                if ((FontStyle & FontStyle.Italic) == FontStyle.Italic)
+                    s = "|i" + s + "|r";
+                if ((FontStyle & FontStyle.Underline) == FontStyle.Underline)
+                    s = "|u" + s + "|r";
 
-				// Output the text, doubling any literals
-				foreach(char ch in Text)
-				{
-					s += ch;
-
-					if (ch == c_chVerticalBar)
-						s += ch;
-				}
-
-				// Style End
-				if (CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-				{
-					s += c_chVerticalBar;
-					s += 'r';
-				}
-
-				// Return the result
 				return s;
 			}
 		}
@@ -2573,7 +2581,8 @@ namespace OurWordData.DataModel
         {
             get
             {
-                JCharacterStyle cs = DB.StyleSheet.FindCharacterStyleOrNormal(CharacterStyleAbbrev);
+                JCharacterStyle cs = DB.StyleSheet.FindCharacterStyleOrNormal(
+                    CharacterStyleAbbrev);
                 Debug.Assert(null != cs);
                 return cs;
             }
@@ -2612,6 +2621,14 @@ namespace OurWordData.DataModel
 			// Attributes are now ready to store
 			CharacterStyleAbbrev = sCharacterStyleAbbrev;
 			Text = sText;
+
+            // Temp: Create FontStyle from char style
+            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic)
+                m_FontStyle = FontStyle.Italic;
+            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevBold)
+                m_FontStyle = FontStyle.Bold;
+            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevUnderline)
+                m_FontStyle = FontStyle.Underline;
 		}
 		#endregion
 		#region Constructor(DPhrase source)
@@ -2619,7 +2636,8 @@ namespace OurWordData.DataModel
             : this()
 		{
 			CharacterStyleAbbrev = source.CharacterStyleAbbrev;
-			Text                 = source.Text;
+			Text = source.Text;
+		    m_FontStyle = source.FontStyle;
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -2628,11 +2646,18 @@ namespace OurWordData.DataModel
 			if (this.GetType() != obj.GetType())
 				return false;
 
-			DPhrase phrase = obj as DPhrase;
-			if (phrase.Text == Text && phrase.CharacterStyleAbbrev == CharacterStyleAbbrev)
-				return true;
+			var phrase = obj as DPhrase;
+            if (null  == phrase)
+                return false;
 
-			return false;
+			if (phrase.Text != Text)
+                return false;
+            if (phrase.CharacterStyleAbbrev != CharacterStyleAbbrev)
+                return false;
+            if (phrase.FontStyle != FontStyle)
+                return false;
+
+            return true;
 		}
 		#endregion
 
@@ -2704,15 +2729,15 @@ namespace OurWordData.DataModel
 			}
 
 			// The number of words is one greater than the number of spaces
-			int cWords = cSpaces + 1;
+			var cWords = cSpaces + 1;
 
 			// Create the string array to hold the results
 			PWord[] v = new PWord[cWords];
 
 			// Go through the string and collect the words
-			string sWord = "";
-			int i = 0;
-			foreach(char ch in s)
+			var sWord = "";
+			var i = 0;
+			foreach(var ch in s)
 			{
 				if (ch == ' ')
 				{
@@ -2757,36 +2782,24 @@ namespace OurWordData.DataModel
         string m_Text;
         #endregion
         #region Attr{g}: DRun Footnote - the DRun containing the footnote, or null
-        DRun Footnote
+        public DFoot Footnote
         {
-            get
+            private get
             {
                 return m_Footnote;
             }
+            set
+            {
+                Debug.Assert(null != value);
+                m_Footnote = value;
+            }
         }
-        DRun m_Footnote;
+        DFoot m_Footnote;
         #endregion
 
-        #region Attr{g}: Font Font
-        public Font Font
-        {
-            get
-            {
-                Debug.Assert(null != m_Font);
-                return m_Font;
-            }
-        }
-        Font m_Font = null;
-        #endregion
-        #region Attr{g}: Brush TextBrush - retrieves the brush for painting text
-        public Brush TextBrush
-        {
-            get
-            {
-                return new SolidBrush(m_CStyle.FontColor);
-            }
-        }
-        #endregion
+        // Glue ------------------------------------------------------------------------------
+        public bool NeedsGlueToNext { get; set; }
+        public bool NeedsGlueToPrevious { get; set; }
         #region Attr{g/s}: PWord GlueTo
         public PWord GlueTo
         {
@@ -2801,47 +2814,57 @@ namespace OurWordData.DataModel
         }
         PWord m_GlueTo = null;
         #endregion
-        #region Attr{g}: string CStyleAbbrev
-        public string CStyleAbbrev
+
+        // T if a letter in the text, or a letter just prior to the footnote itself
+        public bool IsFootnoteLetter { private get; set; }
+
+        public bool IsVerseNumber { get; set; }
+
+        #region Attr{g}: Font Font
+        public Font Font
         {
             get
             {
-                return m_CStyle.Abbrev;
+                Debug.Assert(null != m_Font);
+                return m_Font;
             }
         }
+        Font m_Font;
         #endregion
-        JCharacterStyle m_CStyle;
-        #region Attr{g}: DRun[] FootnoteRuns
-        public DRun[] FootnoteRuns
+        #region Attr{g}: Brush TextBrush
+        public Brush TextBrush
         {
             get
             {
-                ArrayList a = new ArrayList();
+                return m_TextBrush;
+            }
+        }
+        private Brush m_TextBrush;
+        #endregion
+
+        #region Attr{g}: List<DRun> FootnoteRuns
+        public List<DRun> FootnoteRuns
+        {
+            get
+            {
+                var v = new List<DRun>();
 
                 if (null != Footnote)
-                    a.Add(Footnote);
+                    v.Add(Footnote);
 
                 if (null != GlueTo)
-                {
-                    foreach (DRun r in GlueTo.FootnoteRuns)
-                        a.Add(r);
-                }
-
-                DRun[] v = new DRun[a.Count];
-
-                for (int i = 0; i < a.Count; i++)
-                    v[i] = a[i] as DRun;
+                    v.AddRange(GlueTo.FootnoteRuns);
 
                 return v;
             }
         }
         #endregion
         #region Attr{g}: bool HasFootnotes
-        public bool HasFootnotes
+        private bool HasFootnotes
         {
             get
             {
-                return ((FootnoteRuns.Length > 0) ? true : false);
+                return ((FootnoteRuns.Count > 0) ? true : false);
             }
         }
         #endregion
@@ -2918,7 +2941,7 @@ namespace OurWordData.DataModel
         #region Method: void SetFootnoteLetter(ref char chFootnoteLetter)
         public void SetFootnoteLetter(ref char chFootnoteLetter)
         {
-            if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
+            if (IsFootnoteLetter)
             {
                 Text = chFootnoteLetter.ToString();
                 chFootnoteLetter++;
@@ -2933,7 +2956,7 @@ namespace OurWordData.DataModel
         {
             get
             {
-                if (CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
+                if (IsFootnoteLetter)
                 {
                     return Text[0];
                 }
@@ -2976,7 +2999,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method: static string MakeReplacements(string s)
-        static public string MakeReplacements(string s)
+        protected static string MakeReplacements(string s)
         {
             // Just return the source string if replacements are not desired
             if (!ShouldMakeReplacements)
@@ -2993,10 +3016,22 @@ namespace OurWordData.DataModel
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Method: _InitializeFont(JCharacterStyle, JParagraphStyle)
-        void _InitializeFont(JCharacterStyle _CStyle, JParagraphStyle _PStyle)
-        // Set up the Font for the word
+        public PWord(string sText, Font font, Color foreColor)
         {
+            Debug.Assert(!string.IsNullOrEmpty(sText));
+            m_Text = MakeReplacements(sText);
+
+            m_Font = font;
+
+            m_TextBrush = new SolidBrush(foreColor);
+        }
+
+        #region Constructor(string _Text, JCharacterStyle, JParagraphStyle)
+        public PWord(string sText, JCharacterStyle _CStyle, JParagraphStyle _PStyle)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(sText));
+            m_Text =  MakeReplacements(sText);
+
             Debug.Assert(null != _CStyle);
 
             // Determine what, if any, mods are requested
@@ -3019,7 +3054,7 @@ namespace OurWordData.DataModel
             }
 
             // Get the font container for the writing system
-            JFontForWritingSystem fws = _CStyle.FindOrAddFontForWritingSystem(
+            var fws = _CStyle.FindOrAddFontForWritingSystem(
                 DB.TargetTranslation.WritingSystemVernacular);
 
             // Adjust for any modifications
@@ -3032,35 +3067,10 @@ namespace OurWordData.DataModel
                 m_Font = new Font(m_Font.FontFamily, fSize, m_Font.Style);
             }
 
-            m_CStyle = _CStyle;
+            m_TextBrush = new SolidBrush(_CStyle.FontColor);
         }
         #endregion
 
-        #region Constructor(string _Text, JCharacterStyle, JParagraphStyle)
-        public PWord(string _Text, JCharacterStyle _CStyle, JParagraphStyle _PStyle)
-        {
-            m_Text = _Text;
-            Debug.Assert(null != m_Text && m_Text.Length > 0);
-
-            _InitializeFont(_CStyle, _PStyle);
-
-            // Make any replacements
-            m_Text = MakeReplacements(m_Text);
-        }
-        #endregion
-        #region Constructor(string _Text, JCharacterStyle, JParagraphStyle, DRun _Footnote)
-        public PWord(
-            string _Text,
-            JCharacterStyle _CStyle,
-            JParagraphStyle _PStyle,
-            DRun _Footnote)
-            : this(_Text, _CStyle, _PStyle) // _CharacterStyleAbbrev)
-        {
-            Debug.Assert( _Footnote as DFoot != null );
-
-            m_Footnote = _Footnote;
-        }
-        #endregion
     }
     #endregion
 

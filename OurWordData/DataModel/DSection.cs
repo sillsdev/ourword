@@ -273,7 +273,7 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				return Project.StyleSheet;
+				return DB.TeamSettings.OldStyleSheet;
 			}
 		}
 		#endregion

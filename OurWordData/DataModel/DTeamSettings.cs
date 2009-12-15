@@ -12,14 +12,9 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Windows.Forms;
 using System.IO;
 using JWTools;
-using OurWordData;
+using OurWordData.Styles;
 using OurWordData.Synchronize;
 
 #endregion
@@ -215,7 +210,7 @@ namespace OurWordData.DataModel
 
 		// JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g}: DStyleSheet StyleSheet
-		public DStyleSheet StyleSheet
+		public DStyleSheet OldStyleSheet
 		{
 			get 
 			{ 
@@ -336,7 +331,7 @@ namespace OurWordData.DataModel
             // Style Sheet
             if (null == m_StyleSheet.Value)
                 m_StyleSheet.Value = new DStyleSheet();
-            StyleSheet.Initialize(false);
+            OldStyleSheet.Initialize(false);
 
 			// Make sure we have writing systems for the current project. Just create
 			// blank ones if we need to.
@@ -344,8 +339,8 @@ namespace OurWordData.DataModel
 			{
 				foreach (DTranslation t in DB.Project.AllTranslations)
 				{
-					StyleSheet.FindOrAddWritingSystem(t.WritingSystemVernacular.Name);
-					StyleSheet.FindOrAddWritingSystem(t.WritingSystemConsultant.Name);
+					OldStyleSheet.FindOrAddWritingSystem(t.WritingSystemVernacular.Name);
+					OldStyleSheet.FindOrAddWritingSystem(t.WritingSystemConsultant.Name);
 				}
 			}
 
@@ -429,7 +424,7 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: string SettingsFolder - Top-level, e.g., "MyDocuments\OurWord\Settings"
+		#region Attr{g}: string SettingsFolder - Top-level, e.g., "MyDocuments\OurWord\.Settings"
 		public string SettingsFolder
 		{
 			get
@@ -484,11 +479,20 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
+        #region Attr{g}: string StyleSheetStoragePath
+        public string StyleSheetStoragePath
+	    {
+	        get
+	        {
+	            var sFileName = DisplayName + ".owStyles";
+                return Path.Combine(SettingsFolder, sFileName);
+	        }
+        }
+        #endregion
         #region OMethod: bool OnLoad(TextReader)
         protected override bool OnLoad(TextReader tr, string sPath, IProgressIndicator progress)
         {
-            bool bResult = base.OnLoad(tr, sPath, progress);
-
+            var bResult = base.OnLoad(tr, sPath, progress);
             return bResult;
         }
         #endregion
@@ -539,14 +543,14 @@ namespace OurWordData.DataModel
 		public const string c_StyleAbbrevVerse            = "v";
 		public const string c_StyleAbbrevChapter          = "c";
 		public const string c_StyleAbbrevFootLetter       = "fn";
-		public const string c_StyleAbbrevItalic           = "i";
-		public const string c_StyleAbbrevBold             = "b";
-		public const string c_StyleAbbrevUnderline        = "u";
-		public const string c_StyleAbbrevDashed           = "d";
         public const string c_StyleAbbrevBigHeader        = "bh";
 		public const string c_StyleAbbrevLabel            = "L";
         public const string c_StyleAbbrevPictureCaption   = "cap";
         public const string c_StyleFootnote               = "ft";
+
+		public const string c_StyleAbbrevItalic           = "i";
+		public const string c_StyleAbbrevBold             = "b";
+		public const string c_StyleAbbrevUnderline        = "u";
 
         // User-Interface Only
         public const string c_CStyleRevisionDeletion = "del";
@@ -896,6 +900,8 @@ namespace OurWordData.DataModel
 				charStyle.SetFonts(10, false, false, false, false, Color.Red);
 				charStyle.IsSuperScript = true;
 			}
+            /*
+            */
 
 			// Footnote Character (fn)
 			if (null == FindCharacterStyle(c_StyleAbbrevFootLetter))
@@ -941,20 +947,12 @@ namespace OurWordData.DataModel
                 charStyle.SetFonts(10, false, false, false, true, Color.Black);
 			}
 
-			// Dashed
-			if (null == FindCharacterStyle(c_StyleAbbrevDashed))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevDashed, "Dashed");
-                charStyle.SetFonts(10, false, false, false, true, Color.Navy);
-			}
-
 			// Note Character (ntc)
 			if (null == FindCharacterStyle("ntc"))
 			{
 				charStyle = AddCharacterStyle("ntc", "Note Character");
 				charStyle.SetFonts(10, false, false, false, false, Color.Navy);
 				charStyle.IsSuperScript = true;
-				charStyle.IsEditable = false;
 			}
 
 		}
@@ -1071,6 +1069,28 @@ namespace OurWordData.DataModel
             _InitializeUICharacterStyles();
 		}
 		#endregion
+
+
+        #region SAttr{g}: Font LargeDialogFont
+        public static Font LargeDialogFont
+        // This font is used for examining raw oxes files. I use a slightly larger
+        // font due to the possible presence of diacritics which can otherwise be
+        // difficult to read.
+        {
+            get
+            {
+                if (null == s_LargeDialogFont)
+                {
+                    s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
+                        SystemFonts.DialogFont.Size * 1.2F,
+                        FontStyle.Regular);
+                }
+                return s_LargeDialogFont;
+            }
+        }
+        private static Font s_LargeDialogFont;
+        #endregion
+
 	}
 	#endregion
 

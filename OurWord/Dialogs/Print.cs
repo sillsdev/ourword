@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
@@ -780,7 +781,7 @@ namespace OurWord
 		{
 			get
 			{
-				if (PWords.Length == 0)
+				if (PWords.Count == 0)
 					return false;
 
 				if (iWord != 0)
@@ -798,9 +799,9 @@ namespace OurWord
 		{
 			get
 			{
-				if (PWords.Length == 0)
+				if (PWords.Count == 0)
 					return null;
-				if (iWord >= PWords.Length)
+				if (iWord >= PWords.Count)
 					return null;
 				return PWords[iWord];
 			}
@@ -811,7 +812,7 @@ namespace OurWord
 		{
 			get
 			{
-				return PWords.Length;
+				return PWords.Count;
 			}
 		}
 		#endregion
@@ -845,8 +846,8 @@ namespace OurWord
 		}
 		protected DParagraph m_Paragraph;
 		#endregion
-		#region Attr{g}: PWord[] PWords
-		public PWord[] PWords
+        #region Attr{g}: List<PWord> PWords
+        public List<PWord> PWords
 		{
 			get
 			{
@@ -854,7 +855,7 @@ namespace OurWord
 				return m_vPWords;
 			}
 		}
-		protected PWord[] m_vPWords = null;
+	    private List<PWord> m_vPWords;
 		#endregion
 		#region Attr{g/s}: int iWord - we allow it to be incremented
 		public int iWord
@@ -875,18 +876,15 @@ namespace OurWord
 		#region Method: void ApplyGlueToWords()
 		void ApplyGlueToWords()
 		{
-			for(int i=0; i<m_vPWords.Length - 1; i++)
+			for(int i=0; i<m_vPWords.Count - 1; i++)
 			{
 				// Get this word, and the next word
 				PWord word = m_vPWords[i];
 				PWord next = m_vPWords[i+1];
 
-				// Determine if this word should be glued to the next: based on certain style types
-				bool bNeedsGlue = false;
-				if (word.CStyleAbbrev == DStyleSheet.c_StyleAbbrevVerse)
-					bNeedsGlue = true;
-				if (next.CStyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
-					bNeedsGlue = true;
+			    bool bNeedsGlue = false;
+                if (word.NeedsGlueToNext || next.NeedsGlueToPrevious)
+                    bNeedsGlue = true;
 
                 // Determine if glue required: based on following punctuation
                 if (!string.IsNullOrEmpty(next.Text) &&  
@@ -899,28 +897,9 @@ namespace OurWord
 				if (bNeedsGlue)
 				{
 					word.GlueTo = next;
-					m_vPWords = RemoveAt(i+1);
+				    PWords.RemoveAt(i + 1);
 				}
 			}
-		}
-		#endregion
-		#region Method: PWord[] RemoveAt(int iRemove)
-		PWord[] RemoveAt(int iRemove)
-		{
-			// Create a new, smaller array as the destination
-			PWord[] v = new PWord[ m_vPWords.Length - 1];
-
-			// Copy over everything that is lower in position than iOut
-			int i = 0;
-			for(; i<iRemove; i++)
-				v[i] = m_vPWords[i];
-
-			// Copy everything that is higher in position than iOut
-			for(; i < m_vPWords.Length - 1; i++)
-				v[i] = m_vPWords[i+1];
-
-			// Return the result
-			return v;
 		}
 		#endregion
 		#region Method: bool InitializeParagraph()
@@ -954,7 +933,7 @@ namespace OurWord
 		#region Method: PWord GetWord(int i)
 		public PWord GetWord(int i)
 		{
-			Debug.Assert(i >= 0 && i < PWords.Length );
+			Debug.Assert(i >= 0 && i < PWords.Count );
 			return PWords[i];
 		}
 		#endregion
@@ -965,23 +944,23 @@ namespace OurWord
 			// we can't be certain that PWords hasn't been changed (e.g., via
 			// the PrependLetter method), and using the public constructor would
 			// erase any changes made.
-			PPosition pos = new PPosition();
+			var pos = new PPosition();
 
 			// Set the attributes
-			pos.m_iWord = this.iWord;
-			pos.m_Paragraph = this.Paragraph;
+			pos.m_iWord = iWord;
+			pos.m_Paragraph = Paragraph;
 
 			// Make a copy of the array (but don't worry about copying the
 			// contents; garbage collection should handle these ok.
-			pos.m_vPWords = new PWord[ this.PWords.Length ];
-			for(int i=0; i< PWords.Length; i++)
-				pos.m_vPWords[i] = PWords[i];;
+            pos.m_vPWords = new List<PWord>();
+            foreach(var pw in PWords)
+                pos.m_vPWords.Add(pw);
 
 			return pos;
 		}
 		#endregion
-        #region Method: void Prepend(sNewWord, charStyle, paraStyle)
-        public void Prepend(string sNewWord, JCharacterStyle charStyle, JParagraphStyle paraStyle)
+        #region Method: void Prepend(PWord newWord)
+        public void Prepend(PWord newWord)
             // Purpose is to support adding a footnote's letter to the beginning of
             // the set of words, as the letter is not stored within the DFootnote
             // object, and thus the routine to initialise PWords does not include it.
@@ -990,18 +969,14 @@ namespace OurWord
             // glue, we just take the previous front word and make it a GlueTo on the
             // new letter we're inserting.
         {
-            if (PWords.Length == 0)
+            if (PWords.Count == 0)
                 return;
 
-            var newWord = new PWord(sNewWord, charStyle, paraStyle) 
-            {
-                GlueTo = m_vPWords[0]
-            };
-
+            newWord.GlueTo = m_vPWords[0];
             m_vPWords[0] = newWord;
         }
-		#endregion
-	}
+        #endregion
+    }
 	#endregion
 	#region CLASS: DynamicPosition - Like PPosition, but can increment the DParagraph & DSection
 	public class DynamicPosition : PPosition
@@ -1045,7 +1020,7 @@ namespace OurWord
 		public bool IncrementWord()
 		{
 			// If there are no more words, then we are done
-			if ( m_iWord == PWords.Length)
+			if ( m_iWord == PWords.Count)
 				return false;
 
 			// Otherwise, increment the indexer
@@ -1160,7 +1135,7 @@ namespace OurWord
 			get
 			{
 				// Do we have more words?
-				if (iWord < PWords.Length - 1)
+				if (iWord < PWords.Count - 1)
 					return true;
 
                 // Do we have more footnotes? We scan through the list of all but the last
@@ -1285,9 +1260,9 @@ namespace OurWord
 
 				foreach(PWord word in Words)
 				{
-					DRun[] runs = word.FootnoteRuns;
+					var vRuns = word.FootnoteRuns;
 
-					foreach(DRun r in runs)
+                    foreach (var r in vRuns)
 						a.Add(r);
 				}
 
@@ -1319,15 +1294,16 @@ namespace OurWord
 			}
 		}
 		#endregion
-		#region Attr{g}: PWord[] Words
-		public PWord[] Words
+        #region Attr{g}: List<PWord> Words
+        public List<PWord> Words
 		{
 			get
 			{
+                Debug.Assert(null != m_vWords);
 				return m_vWords;
 			}
 		}
-		PWord[] m_vWords;
+	    readonly List<PWord> m_vWords;
 		#endregion
 		#region Attr{g}: PDropCap DropCap - the DropCap that goes with this line, or null
 		public PDropCap DropCap
@@ -1347,7 +1323,7 @@ namespace OurWord
 				string sVerse = "";
 				foreach(PWord w in Words)
 				{
-					if (w.CStyleAbbrev == DStyleSheet.c_StyleAbbrevVerse)
+					if (w.IsVerseNumber)
 					{
 						sVerse = w.Text;
 						break;
@@ -1438,7 +1414,7 @@ namespace OurWord
 			m_Paragraph = LinePos.Paragraph;
 			m_dropcap = _dc;
 
-			ArrayList aWords = new ArrayList();
+            m_vWords = new List<PWord>();
 
 			// Beginning of a paragraph?
 			m_bIsParagraphBegin = LinePos.IsParagraphBegin;
@@ -1446,7 +1422,7 @@ namespace OurWord
 			// If a picture, then get its bitmap
 			if (IsPicture)
 			{
-				DPicture picture = Paragraph as DPicture;
+				var picture = Paragraph as DPicture;
 				if (null != picture)
 					m_bmp = picture.GetBitmap(300);
 			}
@@ -1454,7 +1430,7 @@ namespace OurWord
 			// Populate the line with words: Loop through all of the words, adding them
 			// to the line as long as there is space
 			float x = m_xl;
-			for(int i = LinePos.iWord; i < LinePos.PWords.Length; i++)
+			for(var i = LinePos.iWord; i < LinePos.PWords.Count; i++)
 			{
 				// Get the next word in the paragraph
 				PWord word = LinePos.PWords[i];
@@ -1477,7 +1453,7 @@ namespace OurWord
 					chFootnoteLetter = chFootnoteLetterInitial;
 					break;
 				}
-				aWords.Add(word);
+                Words.Add(word);
 
 				// Increment x to account for the word's width
 				x += fWordWidth;
@@ -1501,11 +1477,6 @@ namespace OurWord
 			// Add the height of the picture, if any
 			if (IsPicture && null != m_bmp)
 				m_yLineHeight += (m_bmp.Height + yPointsBetweenPictureAndCaption);
-
-			// Create and store the array of words that we've just added
-			m_vWords = new PWord[ aWords.Count ];
-			for(int i=0; i<aWords.Count; i++)
-				m_vWords[i] = aWords[i] as PWord;
 		}
 		#endregion
 	}
@@ -2088,12 +2059,19 @@ namespace OurWord
 				// Retrieve the footnote text. This is a subclass of DParagraph
 				DFootnote footnote = foot.Footnote;
 				var PosFN = new PPosition(footnote, 0);
-                PosFN.Prepend(footnote.VerseReference,
-                    DB.StyleSheet.FindCharacterStyleOrNormal(DStyleSheet.c_sfmParagraph),
-                    DB.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_sfmParagraph));
-                PosFN.Prepend(chFootnoteLetter.ToString(), 
-                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
-                    null);
+			    PosFN.Prepend(new PWord(footnote.VerseReference,
+			        DB.StyleSheet.FindCharacterStyleOrNormal(DStyleSheet.c_sfmParagraph),
+			        DB.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_sfmParagraph))
+                    {NeedsGlueToNext = true}
+			        );
+                PosFN.Prepend(new PWord(chFootnoteLetter.ToString(),
+                    DB.StyleSheet.FindCharacterStyleOrNormal(DStyleSheet.c_StyleAbbrevFootLetter),
+                    null) 
+                    {
+                        IsFootnoteLetter = true,
+                        NeedsGlueToNext = true
+                    }
+                    );
 
 				// Create PLines for it
 				char chDummy = chFootnoteLetter;
@@ -2116,7 +2094,7 @@ namespace OurWord
 
 					// Ready for the next one
 					y += line.Height;
-					PosFN.iWord += line.Words.Length;
+					PosFN.iWord += line.Words.Count;
 					chFootnoteLetter++;
 				}
 			}
@@ -2189,8 +2167,8 @@ namespace OurWord
 
 			// Is there more to the paragraph? If this is the only line, then
 			// we are happy to print it.
-			int cWordsInParagraph = line.LinePos.PWords.Length;
-			int cWordsInLine      = line.Words.Length;
+			int cWordsInParagraph = line.LinePos.PWords.Count;
+			int cWordsInLine      = line.Words.Count;
 			if (cWordsInLine == cWordsInParagraph)
 				return 0;
 
@@ -2425,7 +2403,7 @@ namespace OurWord
 
 			// We will start renumbering (relettering) footnotes with 'a' at the
 			// beginning of each page.
-			char chFootnoteLetter = 'a';
+			var chFootnoteLetter = 'a';
 
 			// yBody is where we currently are in layout out the body lines
 			float yBody = RectPage.Top;
@@ -2470,7 +2448,7 @@ namespace OurWord
 					yBody = IncrementY(yBody, GetParagraphSpaceAfter(Pos));
 
 				// Increment Pos to get ready for the next line
-				for(int i=0; i<line.Words.Length; i++)
+				for(int i=0; i<line.Words.Count; i++)
 					Pos.IncrementWord();
 			}
 
@@ -2503,7 +2481,7 @@ namespace OurWord
 	{
 		// Attrs -----------------------------------------------------------------------------
 		#region Attr{g}: bool CanPrint - T if there is data that can be printed
-		static public bool CanPrint
+	    private static bool CanPrint
 	    {
 			get
 			{
@@ -2602,7 +2580,7 @@ namespace OurWord
 		{
 			// Retrieve the current page
 			Debug.Assert(m_iCurrentPageNo < Pages.Count);
-			PPage page = Pages[ m_iCurrentPageNo ] as PPage;
+			var page = Pages[ m_iCurrentPageNo ] as PPage;
 			Debug.Assert(null != page);
 
 			// Print it
@@ -2636,9 +2614,8 @@ namespace OurWord
 			if (!CanPrint)
 				return false;
 
-			// The PrintDocument stores many of the user settings (e.g., which printer
-			// to use.)
-			PrintDocument pdoc = new PrintDocument();
+			// The PrintDocument stores many of the user settings (e.g., which printer)
+			var pdoc = new PrintDocument();
 
 			// Determine what the user wants to do; abandon if he cancels
 			m_dlg = new DialogPrint(pdoc);
@@ -2647,7 +2624,7 @@ namespace OurWord
 				return false;
 
 			// Name of the document
-			pdoc.DocumentName = DB.Project.STarget.Book.DisplayName;
+			pdoc.DocumentName = DB.TargetBook.DisplayName;
 
 			// Printer to use
 			pdoc.PrinterSettings.PrinterName = m_dlg.PrinterName;
@@ -2662,12 +2639,12 @@ namespace OurWord
 
 			// Initial position in the document (which may be All Sections or just the
 			// current Section, depending on the print settings)
-			DSection InitialSection = DB.TargetSection;
+			var InitialSection = DB.TargetSection;
 			if (!m_dlg.CurrentSection)
-				InitialSection = DB.Project.STarget.Book.Sections[0] as DSection;
+				InitialSection = DB.TargetBook.Sections[0];
 			if (null == InitialSection)
 				return false;
-			DParagraph InitialPara = InitialSection.Paragraphs[0] as DParagraph;
+			var InitialPara = InitialSection.Paragraphs[0];
 			if (null == InitialPara)
 				return false;
 
@@ -2681,13 +2658,13 @@ namespace OurWord
             m_Progress = G.CreateProgressIndicator();
             m_Progress.Start(G.GetLoc_String("strFormattingPages", "Formatting Pages..."),
                 InitialSection.Book.Sections.Count);
-			int nPageNo = 1;
+			var nPageNo = 1;
 			LineSpacing = m_dlg.LineSpacing;
 			PPage PreviousPage = null;
 			do
 			{
 				// Layout the page
-				PPage page = new PPage(pdoc, PreviousPage, nPageNo, m_dlg.PrintWaterMark);
+				var page = new PPage(pdoc, PreviousPage, nPageNo, m_dlg.PrintWaterMark);
 				PreviousPage = page;
                 page.Layout(ref m_position, m_Progress);
 
@@ -2724,37 +2701,6 @@ namespace OurWord
 			return true;
 		}
 		#endregion
-	}
-	#endregion
-
-	#region TEST
-	public class Test_Print : Test
-	{
-		#region Constructor()
-		public Test_Print()
-			: base("Print")
-		{
-			AddTest( new IndividualTest( TestSubstitutions ), "Substitutions" );
-		}
-		#endregion
-
-		public void TestSubstitutions()
-		{
-            PWord.ShouldMakeReplacements = true;
-            AreSame("kuna'”,", PWord.MakeReplacements("kuna'>>,"));
-            AreSame("“Au", PWord.MakeReplacements("<<Au"));
-            AreSame("“‘Au", PWord.MakeReplacements("<<<Au"));
-            AreSame("“‘Au’”", PWord.MakeReplacements("<<<Au>>>"));
-            AreSame("A‘u", PWord.MakeReplacements("A<u"));
-
-            PWord.ShouldMakeReplacements = false;
-            AreSame("kuna'>>,", PWord.MakeReplacements("kuna'>>,"));
-            AreSame("<<Au", PWord.MakeReplacements("<<Au"));
-            AreSame("<<<Au", PWord.MakeReplacements("<<<Au"));
-            AreSame("<<<Au>>>", PWord.MakeReplacements("<<<Au>>>"));
-            AreSame("A<u", PWord.MakeReplacements("A<u"));
-		}
-
 	}
 	#endregion
 }

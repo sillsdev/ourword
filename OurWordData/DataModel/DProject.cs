@@ -18,7 +18,7 @@ using System.Data;
 using System.Windows.Forms;
 using System.IO;
 using JWTools;
-using OurWordData;
+using OurWordData.Styles;
 #endregion
 #endregion
 
@@ -179,16 +179,6 @@ namespace OurWordData.DataModel
 		#endregion
 
 		// Derived Attrs: Global settings ----------------------------------------------------
-		#region VAttr{g}:   DStyleSheet StyleSheet
-		public DStyleSheet StyleSheet
-		{
-			get 
-			{ 
-				Debug.Assert(null != TeamSettings);
-				return TeamSettings.StyleSheet;
-			}
-		}
-		#endregion
 		#region VAttr{g}:   DSFMapping SFMapping - the mapping from SF to styles
 		public DSFMapping SFMapping
 		{
@@ -869,6 +859,7 @@ namespace OurWordData.DataModel
                 TeamSettings.New();
 			TeamSettings.TemporaryFixes();
             TeamSettings.EnsureInitialized();
+            StyleSheet.Initialize(DB.TeamSettings.StyleSheetStoragePath);
 
             // Read the LoadOnDemand translation objects
             if (null != FrontTranslation)
@@ -886,9 +877,9 @@ namespace OurWordData.DataModel
             }
 
             // Load the other translations; remove them from the list if unsuccessful
-            for (int i = 0; i < OtherTranslations.Count; )
+            for (var i = 0; i < OtherTranslations.Count; )
             {
-                DTranslation t = OtherTranslations[i] as DTranslation;
+                var t = OtherTranslations[i];
 
                 t.LoadFromFile();
 
@@ -969,6 +960,9 @@ namespace OurWordData.DataModel
                 TargetTranslation.WriteToFile(new NullProgress());
             foreach (DTranslation t in OtherTranslations)
                 t.WriteToFile(new NullProgress());
+
+            // StyleSheet
+            StyleSheet.Save(TeamSettings.StyleSheetStoragePath);
         }
         #endregion
 

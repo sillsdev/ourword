@@ -1219,30 +1219,13 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-		#region Method: PWord[] GetPWords()
-		public PWord[] GetPWords()
+        #region Method: List<PWord> GetPWords()
+        public List<PWord> GetPWords()
 		{
-			ArrayList al = new ArrayList();
-			foreach(DRun r in Runs)
-			{
-				al.Add( r.GetPWords() );
-			}
-
-			int c = 0;
-			foreach( PWord[] vpw in al )
-				c += vpw.Length;
-
-			PWord[] v = new PWord[ c ];
-
-			int i = 0;
-			foreach( PWord[] vpw in al )
-			{
-				foreach( PWord pw in vpw )
-				{
-					v[i++] = pw;
-				}
-			}
-			return v;
+		    var vWords = new List<PWord>();
+            foreach(DRun run in Runs)
+                vWords.AddRange(run.GetPWords());
+		    return vWords;
 		}
 		#endregion
 

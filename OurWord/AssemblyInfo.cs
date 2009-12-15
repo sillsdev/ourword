@@ -26,7 +26,7 @@ using System.Reflection;
 //    Minor Version - A new feature here or there
 //    Build Number  - generally just fixes
 //    Revision      - not used.
-[assembly: AssemblyVersion("1.5.2")]
+[assembly: AssemblyVersion("1.5.3")]
 
 #region DOC: Signing
 //

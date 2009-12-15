@@ -105,13 +105,6 @@ namespace OurWordTests.DataModel
                 DStyleSheet.c_StyleAbbrevUnderline,
                 "underlined.");
 
-            // Test: dashed
-            s = "|dThis is dashed text.|r";
-            iPos = 0;
-            _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevDashed,
-                "This is dashed text.");
-
             // Test: Lots of literals
             s = "||||This i||s a str||ing with a b||unch of li||terals in it.||||";
             iPos = 0;
@@ -261,8 +254,8 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 0, 2, " life.");
 
             // Test: data with heaps of phrases
-            field.Data = "|bIje|r lais |ualekot|r. Ije |iUis-neno In Anmone|r in na' |dmonin.|r";
-            field.BT = "|bThis|r is a good |ustory/matter|r. This is |i*God's Son's|r |dlife.|r";
+            field.Data = "|bIje|r lais |ualekot|r. Ije |iUis-neno In Anmone|r in na' monin.";
+            field.BT = "|bThis|r is a good |ustory/matter|r. This is |i*God's Son's|r life.";
             vRuns = DSection.IO.FieldToRuns(field);
             Assert.AreEqual(1, vRuns.Count);
             CheckText(vRuns, 0, 0, "Ije");
@@ -275,10 +268,8 @@ namespace OurWordTests.DataModel
             CheckBT(vRuns, 0, 3, ". This is ");
             CheckText(vRuns, 0, 4, "Uis-neno In Anmone");
             CheckBT(vRuns, 0, 4, "*God's Son's");
-            CheckText(vRuns, 0, 5, " in na' ");
-            CheckBT(vRuns, 0, 5, " ");
-            CheckText(vRuns, 0, 6, "monin.");
-            CheckBT(vRuns, 0, 6, "life.");
+            CheckText(vRuns, 0, 5, " in na' monin.");
+            CheckBT(vRuns, 0, 5, " life.");
 
 //			CheckText(runs, 0, 0, "");
 //			CheckBT(  runs, 0, 0, "");

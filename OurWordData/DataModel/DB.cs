@@ -64,7 +64,7 @@ namespace OurWordData.DataModel
         {
             get
             {
-                return TeamSettings.StyleSheet;
+                return TeamSettings.OldStyleSheet;
             }
         }
         #endregion
@@ -232,6 +232,7 @@ namespace OurWordData.DataModel
         }
         #endregion
 
+        #region SMethod: int GetYearThisAssemblyWasCompiled()
         static public int GetYearThisAssemblyWasCompiled()
         {
             var assembly = Assembly.GetAssembly(typeof(DB));
@@ -241,6 +242,7 @@ namespace OurWordData.DataModel
             var buildDate = new DateTime(2000, 1, 1).AddDays(daysSince01Jan2000);
             return buildDate.Year;
         }
+        #endregion
     }
 
     public class Loc

@@ -69,6 +69,7 @@
     <Compile Include="Cellar\T_SfDB.cs" />
     <Compile Include="Cellar\T_StdFmtTransform.cs" />
     <Compile Include="Cellar\T_StyleSheet.cs" />
+    <Compile Include="DataModel\TPWord.cs" />
     <Compile Include="DataModel\T_DB.cs" />
     <Compile Include="DataModel\T_DBookGrouping.cs" />
     <Compile Include="DataModel\T_DBasicText.cs" />
@@ -103,6 +104,11 @@
     <Compile Include="JWTools\T_Xml.cs" />
     <Compile Include="DataModel\T_XmlDoc.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Styles\TCharacterStyle.cs" />
+    <Compile Include="Styles\TFontForWritingSystem.cs" />
+    <Compile Include="Styles\TParagraphStyle.cs" />
+    <Compile Include="Styles\TStyleSheet.cs" />
+    <Compile Include="Styles\TWritingSystem.cs" />
     <Compile Include="TestCommon.cs" />
     <Compile Include="Utilities\TStringMerger.cs" />
     <Compile Include="Utilities\T_Repository.cs" />
