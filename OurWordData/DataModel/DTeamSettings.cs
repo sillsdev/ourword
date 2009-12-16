@@ -15,6 +15,8 @@ using System.Drawing;
 using System.IO;
 using JWTools;
 using OurWordData.Styles;
+using OurWordData.Synchronize;
+
 #endregion
 #endregion
 

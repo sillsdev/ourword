@@ -19,6 +19,9 @@ using System.IO;
 using System.Xml;
 using JWTools;
 using Chorus.merge;
+using Palaso.Email;
+using Palaso.Reporting;
+
 #endregion
 #endregion
 
@@ -2405,15 +2408,12 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region static void Merge(MergeOrder)
-        static public void Merge(MergeOrder mergeOrder)
+        public static void Merge(MergeOrder mergeOrder)
         {
-            // Debugging support
-            //Debug.Fail("DBook.Merge Break for Debugging");
-            // This hook allows a merge to fail for the benefit of unit testing
-            if (mergeOrder.pathToOurs.Contains(".MustFail."))
-                throw new Exception("Merge Failed for Unit Testing");
+            // Debug.Fail("DBook.Merge Break for Debugging");
 
-            if (mergeOrder == null) throw new ArgumentNullException("mergeOrder");
+            if (mergeOrder == null) 
+                throw new ArgumentNullException("mergeOrder");
 
             // Initializations (dependencies we should get rid of someday)
             JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";

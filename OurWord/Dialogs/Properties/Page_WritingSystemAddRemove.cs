@@ -8,28 +8,10 @@
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
-using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-
-using Palaso.UI.WindowsForms.Keyboarding;
 using JWTools;
 using OurWordData;
-using OurWord;
 using OurWordData.DataModel;
-using OurWord.Dialogs;
-using OurWord.Layouts;
 using OurWord.Edit;
 #endregion
 

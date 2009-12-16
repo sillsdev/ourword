@@ -33,6 +33,8 @@ using OurWord.Dialogs;
 using OurWord.Dialogs.History;
 using OurWord.SideWnd;
 using OurWord.Utilities;
+using OurWordData.Synchronize;
+
 #endregion
 
 namespace OurWord
@@ -3374,7 +3376,8 @@ namespace OurWord
             var remote = DB.TeamSettings.GetInternetRepository();
             var username = DB.UserName;
             var synch = new Synchronize(local, remote, username);
-            synch.SynchLocalToOther();
+            using (new Chorus.Utilities.ShortTermEnvironmentalVariable("OurWordExeVersion", G.Version))
+                synch.SynchLocalToOther();
 
             // We have to unload, then reload everything
             var sPath = DB.Project.StoragePath;
@@ -3603,15 +3606,8 @@ namespace OurWord
         {
             get
             {
-                Version v = Assembly.GetExecutingAssembly().GetName().Version;
-
-                char chBuild = (char)((int)'a' + v.Build);
-
-                string sVersionNo = v.Major.ToString() + "." + 
-                    v.Minor.ToString() +
-                    ((v.Build == 0) ? "" : chBuild.ToString());
-
-                return sVersionNo;
+                var v = Assembly.GetExecutingAssembly().GetName().Version;
+                return JWU.BuildFriendlyVersion(v);
             }
         }
         #endregion
