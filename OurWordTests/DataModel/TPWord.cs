@@ -16,8 +16,8 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
-        #region Test: TMakeSubstitutions
-        [Test] public void TMakeSubstitutions()
+        #region Test: TMakeReplacements
+        [Test] public void TMakeReplacements()
         {
             PWord.ShouldMakeReplacements = true;
             Assert.AreEqual("kuna'”,", MakeReplacements("kuna'>>,"));

@@ -1,3 +1,4 @@
+#region ***** OWPara.cs *****
 /**********************************************************************************************
  * Project: OurWord!
  * File:    OWPara.cs
@@ -6,19 +7,14 @@
  * Purpose: An individual paragraph
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Collections;
-using System.ComponentModel;
-using System.Data;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
-using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
-using OurWord.SideWnd;
 #endregion
 
 namespace OurWord.Edit
@@ -875,7 +871,7 @@ namespace OurWord.Edit
             Clear();
 
             // Initialize the list of Lines
-            m_vLines = new Line[0];
+            m_vLines = new List<ELine>();
         }
         #endregion
         #region Constructor(JWS, PStyle, DParagraph, clrEditableBackground, Flags) - for DParagraph
@@ -1017,290 +1013,8 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Dependant ------------------------------------------------------------------
-        #region CLASS: Line
-        public class Line : EContainer
-        {
-            // Content Attrs
-            #region Attr{g/s}: EChapter Chapter - the EChapter prior to this line (or null if none there)
-            public EChapter Chapter
-            {
-                get
-                {
-                    return m_Chapter;
-                }
-                set
-                {
-                    Debug.Assert(null != value);
-                    m_Chapter = value;
-                }
-            }
-            EChapter m_Chapter = null;
-            #endregion
-
-            #region Attr{g/s}: float LeftIndent - how much to indent the line for the chapter
-            public float LeftIndent
-            {
-                get
-                {
-                    return m_fLeftIndent;
-                }
-                set
-                {
-                    m_fLeftIndent = value;
-                }
-            }
-            float m_fLeftIndent = 0;
-            #endregion
-            #region OAttr{g}: float Width
-            override public float Width
-            {
-                get
-                {
-                    float f = 0;
-                    foreach (EItem item in SubItems)
-                        f += item.Width;
-                    return f;
-                }
-                set
-                {
-                }
-            }
-            #endregion
-            #region OAttr{g} float Height
-            public override float Height
-            {
-                get
-                {
-                    if (Count == 0)
-                        return 0;
-                    return SubItems[0].Height;
-                }
-                set
-                {
-                }
-            }
-            #endregion
-
-            #region OMethod: void AddParagraph(EItem item)
-            public override void Append(EItem item)
-                // Override in order to make sure the Line doesn't become the owner, as until we
-                // do a rewrite, the Line isn't directly in the ownership hierarchy.
-            {
-                EContainer container = item.Owner;
-                base.Append(item);
-                item.Owner = container;
-            }
-            #endregion
-
-            // Line numbers ------------------------------------------------------------------
-            #region Attr{g}: int LineNo
-            public int LineNo
-            {
-                get
-                {
-                    return m_nLineNo;
-                }
-                set
-                {
-                    m_nLineNo = value;
-                }
-            }
-            int m_nLineNo = -1;
-            #endregion
-            #region Method: void PaintLineNumber(OWWindow window, OWPara para)
-            public void PaintLineNumber(OWWindow window, OWPara para)
-            {
-                // No lines to paint
-                if (Count == 0)
-                    return;
-
-                // Lines in, e.g., uneditable paragraphs, where we don't show their line numbers
-                if (LineNo == -1)
-                    return;
-
-                // Get the string we'll draw, including trailing space for a margin
-                string s = LineNo.ToString() + " ";
-
-                // Calculate the width of this number
-                float fWidth = window.Draw.Measure(s, window.LineNumberAttrs.Font);
-
-                // The X coordinate is the x of the window (root) left, 
-                float x = para.Root.Position.X;
-                // plus the width allocated to columns
-                x += window.LineNumberAttrs.ColumnWidth;
-                // Less the space needed to draw this number
-                x -= fWidth;
-
-                // The Y coordinate is the y of the first block
-                float y = SubItems[0].Position.Y;
-
-                // Draw the line number
-                window.Draw.String(s, window.LineNumberAttrs.Font,
-                    window.LineNumberAttrs.Brush, new PointF(x, y));
-            }
-            #endregion
-
-            #region Constructor()
-            public Line()
-                : base()
-            {
-            }
-            #endregion
-
-            #region Method: void SetPositions(float x, float y, float xMaxWidth, bool bJustify)
-            public void SetPositions(float x, float y, float xWidthToFill, bool bJustify)
-            {
-                // Remember the position of this line
-                Position = new PointF(x, y);
-
-                // Indent for the chapter if necessary
-                x += LeftIndent;
-
-                // Calculate how many pixels we have to justify
-                float fRawWidthOfMaterial = LeftIndent + Width;
-                int cPixelsToJustify = (int)(xWidthToFill - fRawWidthOfMaterial);
-
-                // Calculate how many positions we can add these pixels to
-                int cJustificationPositions = Count - 1;
-                foreach (EBlock block in SubItems)
-                {
-                    if (block.GlueToNext)
-                        cJustificationPositions--;
-                }
-
-                // Calculate how many pixels to add to each position
-                int cPadding = 0;
-                int cRemainder = 0;
-                if (cJustificationPositions > 0)
-                {
-                    cPadding = (int)((float)cPixelsToJustify / (float)cJustificationPositions);
-                    cRemainder = cPixelsToJustify - (cPadding * cJustificationPositions);
-                }
-
-                foreach (EBlock block in SubItems)
-                {
-                    block.Position = new PointF(x, y);
-                    x += block.Width;
-
-                    // Add the justification for padding
-                    block.JustificationPaddingAdded = 0;
-                    if (bJustify && !block.GlueToNext)
-                    {
-                        // We'll certainly add the standard padding amount
-                        int nPad = cPadding;
-
-                        // We'll also work our way through any remainder
-                        if (cRemainder > 0)
-                        {
-                            nPad++;
-                            cRemainder--;
-                        }
-
-                        // Add the final answer to X (and to the block for future reference)
-                        x += nPad;
-                        if (block != SubItems[Count - 1])
-                            block.JustificationPaddingAdded = nPad;
-                    }
-                }
-            }
-            #endregion
-
-            #region OMethod: EBlock GetBlockAt(PointF pt)
-            public override EBlock GetBlockAt(PointF pt)
-            {
-                // Is it in the EChapter?
-                if (null != Chapter)
-                {
-                    if (Chapter.ContainsPoint(pt))
-                        return Chapter;
-                }
-
-                // Don't call the base class; it gets confused, as witnessed by the notes
-                // window, where the Hand cursor shows up while moving over the text of a
-                // note. Thus,
-                //    return base.GetBlockAt(pt);
-                // didn't work.
-                foreach (EBlock block in SubItems)
-                {
-                    if (block.ContainsPoint(pt))
-                        return block;
-                }
-                return null;
-
-            }
-            #endregion
-            #region Method: bool Contains(EItem)
-            public override bool Contains(EItem item)
-            {
-                if (item == Chapter)
-                    return true;
-
-                return base.Contains(item);
-            }
-            #endregion
-
-            #region Method: bool MakeSelectionClosestTo(PointF pt)
-            public bool MakeSelectionClosestTo(PointF pt)
-            // In response to the LineUp/LineDown keyboarding (up & down arrows), we need to find
-            // the spot on a line closest so the requested pt.
-            {
-                // Attempt to find a block exactly where we want it, that is, at the indicated "x".
-                EBlock block = GetBlockAt(pt);
-                if (null != block as EWord)
-                {
-                    EWord word = block as EWord;
-                    int iBlock = word.PositionWithinPara;
-                    int iChar = word.GetCharacterIndex(pt);
-                    block.Window.Selection = new OWWindow.Sel(word.Para,
-                        new OWWindow.Sel.SelPoint(iBlock, iChar));
-                    return true;
-                }
-
-                // Not possible, so perhaps the line is too short, or perhaps the Block there
-                // is a verse number or some other uneditable. So......
-                // Examine all of the blocks in the line for the one which is closest to x
-                float fDistance = 10000;
-                EWord ClosestWord = null;
-                bool bBeginningIsClosest = true;
-                foreach (EItem b in SubItems)
-                {
-                    // Retrieve each EWord in the line
-                    EWord w = b as EWord;
-                    if (null == w)
-                        continue;
-
-                    // Calculate its distance
-                    float d1 = Math.Abs(pt.X - w.Position.X);
-                    float d2 = Math.Abs(pt.X - (w.Position.X + w.Width));
-                    float d = Math.Min(d1, d2);
-
-                    // Do we have a new shortest one?
-                    if (d < fDistance)
-                    {
-                        ClosestWord = w;
-                        fDistance = d;
-                        bBeginningIsClosest = (d1 < d2);
-                    }
-                }
-
-                // If we found a block, then put the selection into it
-                if (null != ClosestWord)
-                {
-                    int iBlock = ClosestWord.PositionWithinPara;
-                    int iChar = (bBeginningIsClosest) ? 0 : ClosestWord.Text.Length;
-                    ClosestWord.Window.Selection = new OWWindow.Sel(
-                        ClosestWord.Para,
-                        new OWWindow.Sel.SelPoint(iBlock, iChar));
-                    return true;
-                }
-
-                return false;
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g}: Line[] Lines - the list of Lines in the currently calculated layout
-        public Line[] Lines
+        #region Attr{g}: List<ELine> Lines - the list of Lines in the currently calculated layout
+        public List<ELine> Lines
         {
             get
             {
@@ -1308,31 +1022,12 @@ namespace OurWord.Edit
                 return m_vLines;
             }
         }
-        Line[] m_vLines = null;
-        #endregion
-        #region Method: void AddLine(Line line)
-        void AddLine(Line line)
-        {
-            Line[] v = new Line[Lines.Length + 1];
-
-            for (int i = 0; i < Lines.Length; i++)
-                v[i] = Lines[i];
-
-            v[Lines.Length] = line;
-
-            m_vLines = v;
-        }
-        #endregion
-        #region Method: void ClearLines()
-        void ClearLines()
-        {
-            m_vLines = new Line[0];
-        }
+        readonly List<ELine> m_vLines = null;
         #endregion
         #region Method: Line LineContainingBlock(EBlock block)
-        public Line LineContainingBlock(EBlock block)
+        ELine LineContainingBlock(EBlock block)
         {
-            foreach (Line ln in Lines)
+            foreach (var ln in Lines)
             {
                 if (ln.Contains(block))
                     return ln;
@@ -1340,10 +1035,10 @@ namespace OurWord.Edit
             return null;
         }
         #endregion
-        #region Method: int IndexOfLine(Line ln)
-        public int IndexOfLine(Line ln)
+        #region Method: int IndexOfLine(EDisplayLine ln)
+        int IndexOfLine(ELine ln)
         {
-            for (int i = 0; i < Lines.Length; i++)
+            for (int i = 0; i < Lines.Count; i++)
             {
                 if (Lines[i] == ln)
                     return i;
@@ -1800,13 +1495,13 @@ namespace OurWord.Edit
             // We'll use "y" to indicate the height of each line
             float y = ptPos.Y;
 
-            foreach (Line ln in Lines)
+            foreach (var ln in Lines)
             {
                 // Whether or not the line is justified depends first on the
                 // paragraph style; but the final line is not justified in
                 // any case.
                 bool bJustify = PStyle.IsJustified;
-                if (ln == Lines[Lines.Length - 1])
+                if (ln == Lines[Lines.Count - 1])
                     bJustify = false;
 
                 // For Left and Justified paragraphs, the line starts at the ptPos's x value
@@ -1903,9 +1598,9 @@ namespace OurWord.Edit
             float x = (float)PStyle.FirstLineIndent * g.DpiX;
 
             // We'll build the lines here
-            ClearLines();
-            Line line = new Line();
-            AddLine(line);
+            Lines.Clear();
+            var line = new ELine();
+            Lines.Add(line);
 
             // Loop through all the blocks, adding them into lines
             for (int i = 0; i < SubItems.Length; )
@@ -1918,8 +1613,8 @@ namespace OurWord.Edit
                     // line, so the chapter occurs at the left margin.
                     if (line.Count > 0)
                     {
-                        line = new Line();
-                        AddLine(line);
+                        line = new ELine();
+                        Lines.Add(line);
                     }
 
                     line.Chapter = chapter;
@@ -1963,8 +1658,8 @@ namespace OurWord.Edit
                     float fIndentLine = (null == line.Chapter) ? 0 : line.Chapter.Width;
 
                     // Create the new line, and put this appropriate indentation to it
-                    line = new Line();
-                    AddLine(line);
+                    line = new ELine();
+                    Lines.Add(line);
                     line.LeftIndent = fIndentLine;
 
                     // Reset x so we can work through this line
@@ -2030,7 +1725,7 @@ namespace OurWord.Edit
             }
 
             // Set the individual lines to their new values
-            foreach (Line ln in Lines)
+            foreach (var ln in Lines)
             {
                 ln.Position = new PointF(ln.Position.X,
                     ln.Position.Y + yDiff);
@@ -2051,7 +1746,7 @@ namespace OurWord.Edit
 
             // Get the line number of the first line (if any) before the layout
             int nLineNo = -1;
-            if (Lines.Length > 0)
+            if (Lines.Count > 0)
                 nLineNo = Lines[0].LineNo;
 
             // Rework the paragraph: words on each line, justification, etc., etc.
@@ -2082,7 +1777,7 @@ namespace OurWord.Edit
             if (!IsEditable)
                 return;
 
-            foreach (Line line in Lines)
+            foreach (var line in Lines)
                 line.LineNo = nLineNo++;
         }
         #endregion
@@ -2138,7 +1833,7 @@ namespace OurWord.Edit
             // Paint the line numbers, if turned on
             if (ShowLineNumbers)
             {
-                foreach (Line line in Lines)
+                foreach (var line in Lines)
                     line.PaintLineNumber(Window, this);
             }
         }
@@ -2177,7 +1872,7 @@ namespace OurWord.Edit
 
             // For Efficiency, let the Lines handle it; this saves time for larger paragraphs
             // TODO: Refactoring Lines could help here.
-            foreach (Line ln in Lines)
+            foreach (var ln in Lines)
             {
                 EBlock block = ln.GetBlockAt(pt);
                 if (null != block)
@@ -2194,7 +1889,7 @@ namespace OurWord.Edit
             if (!IsEditable)
                 return;
 
-            foreach (Line ln in Lines)
+            foreach (var ln in Lines)
             {
                 if (ln.Contains(Window.Selection.Anchor.Word))
                 {
@@ -2217,7 +1912,7 @@ namespace OurWord.Edit
             if (!IsEditable)
                 return;
 
-            foreach (Line ln in Lines)
+            foreach (var ln in Lines)
             {
                 if (ln.Contains(Window.Selection.Anchor.Word))
                 {
@@ -2251,7 +1946,7 @@ namespace OurWord.Edit
                 pt = Window.Selection.End;
 
             // Locate the Line this block is on
-            Line line = LineContainingBlock(pt.Word);
+            var line = LineContainingBlock(pt.Word);
             Debug.Assert(null != line);
             int iBlockInLine = line.Find(pt.Word);
             Debug.Assert(-1 != iBlockInLine);
@@ -2299,14 +1994,14 @@ namespace OurWord.Edit
                 Window.Selection.End;
 
             // Retrieve the current line
-            Line lineCurrent = LineContainingBlock(sp.Word);
+            var lineCurrent = LineContainingBlock(sp.Word);
             int iLineCurrent = IndexOfLine(lineCurrent);
 
             // Get the next line down; abort if no-can-do. This gives us coordinates to look for.
             int iLineTarget = (bDown) ? iLineCurrent + 1 : iLineCurrent - 1;
-            if (iLineTarget == Lines.Length || iLineTarget < 0)
+            if (iLineTarget == Lines.Count || iLineTarget < 0)
                 return;
-            Line lineTarget = Lines[iLineTarget];
+            var lineTarget = Lines[iLineTarget];
             PointF pt = new PointF(x, lineTarget.Position.Y);
 
             // Loop through the blocks, looking for the pt, but don't go beyond the line in question
@@ -2571,7 +2266,7 @@ namespace OurWord.Edit
                     continue;
 
                 // Get the line this word is in
-                Line line = LineContainingBlock(word);
+                var line = LineContainingBlock(word);
                 if( line.MakeSelectionClosestTo(new PointF(ptCurrentLocation.X, word.Position.Y)))
                     return true;
             }
@@ -2601,7 +2296,7 @@ namespace OurWord.Edit
                     continue;
 
                 // Get the line this word is in
-                Line line = LineContainingBlock(word);
+                var line = LineContainingBlock(word);
                 if (line.MakeSelectionClosestTo(new PointF(ptCurrentLocation.X, word.Position.Y)))
                     return true;
             }

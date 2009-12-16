@@ -11,7 +11,7 @@ namespace OurWord.Printing
     public class RunningFooter : ERowOfColumns
     {
         // Content ---------------------------------------------------------------------------
-        #region Method: void SetColumnText(int iColumn, string sText)
+        #region Method: void SetColumnText(iColumn, sText)
         void SetColumnText(int iColumn, string sText)
         {
             Debug.Assert(0 >= iColumn && iColumn < NumberOfColumns);
@@ -21,15 +21,15 @@ namespace OurWord.Printing
             column.Append(owp);
         }
         #endregion
-        #region Method: void SetPageNumber(int iColumn, int nNumber)
-        public void SetPageNumber(int iColumn, int nNumber)
+        #region Method: void SetPageNumber(iColumn, nPageNumber)
+        public void SetPageNumber(int iColumn, int nPageNumber)
         {
-            var sText = string.Format("- {0} -", nNumber);
+            var sText = string.Format("- {0} -", nPageNumber);
             SetColumnText(iColumn, sText);
 
         }
         #endregion
-        #region Method: void SetCopyrightNotice(int iColumn)
+        #region Method: void SetCopyrightNotice(iColumn)
         private void SetCopyrightNotice(int iColumn)
         {
             var sCopyright = DB.TeamSettings.CopyrightNotice;
@@ -40,7 +40,7 @@ namespace OurWord.Printing
                 SetColumnText(iColumn, sCopyright);
         }
         #endregion
-        #region Method: void SetStageAndDate(int iColumn)
+        #region Method: void SetStageAndDate(iColumn)
         private void SetStageAndDate(int iColumn)
         {
             var sStatus = DB.TargetBook.Stage.LocalizedName;
@@ -49,7 +49,7 @@ namespace OurWord.Printing
             SetColumnText(iColumn, sText);
         }
         #endregion
-        #region Method:  void SetLanguageNameStageAndDate(int iColumn)
+        #region Method: void SetLanguageNameStageAndDate(iColumn)
         private void SetLanguageNameStageAndDate(int iColumn)
         {
             var sLanguageName = DB.TargetBook.Translation.DisplayName;
@@ -59,11 +59,15 @@ namespace OurWord.Printing
             SetColumnText(iColumn, sText);
         }
         #endregion
-        public void SetScriptureReference(int iColumn, int nChapter, int nVerse)
+        #region Method: void SetScriptureReference(iColumn, chapterAndVerse)
+        public void SetScriptureReference(int iColumn, DReference chapterAndVerse)
         {
+            var nChapter = chapterAndVerse.Chapter;
+            var nVerse = chapterAndVerse.Verse;
             var sText = string.Format("{0}:{1}", nChapter, nVerse);
             SetColumnText(iColumn, sText);
         }
+        #endregion
 
         // Context ---------------------------------------------------------------------------
         #region SVAttr{g}: JParagraphStyle ParagraphStyle
@@ -88,7 +92,7 @@ namespace OurWord.Printing
         // Scaffolding -----------------------------------------------------------------------
         private const int NumberOfColumns = 3;
         #region Constructor(nPageNumber)
-        public RunningFooter(int nPageNumber)
+        public RunningFooter(int nPageNumber, DReference chapterAndVerse)
             : base(NumberOfColumns)
         {
             var vContent = new List<DTeamSettings.FooterParts>
@@ -123,6 +127,7 @@ namespace OurWord.Printing
                         break;
 
                    case DTeamSettings.FooterParts.kScriptureReference:
+                        SetScriptureReference(iColumn, chapterAndVerse);
                         break;
                 }
             }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using OurWord.Edit;
+using OurWordData.DataModel;
 
 namespace OurWord.Printing
 {
@@ -36,15 +38,18 @@ namespace OurWord.Printing
         private readonly RunningFooter m_RunningFooter;
         #endregion
 
-        public Page(int nPageNumber)
+        public Page(int nPageNumber, DReference chapterAndVerse)
         {
             m_Header = new ERowOfColumns(3);
 
-            m_RunningFooter = new RunningFooter(nPageNumber);
+            m_RunningFooter = new RunningFooter(nPageNumber, chapterAndVerse);
 
         }
 
 
-
+        public void Draw(Graphics g)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -27,6 +27,12 @@ using OurWordData.DataModel;
 
 namespace OurWord.Edit
 {
+    public class DrawEnvironment
+    {
+        public Graphics Graphics { get; set; }
+    }
+
+
     #region CLASS: EItem
     public class EItem
     {
@@ -1737,15 +1743,39 @@ namespace OurWord.Edit
                 return m_wndWindow;
             }
         }
-        OWWindow m_wndWindow = null;
+        readonly OWWindow m_wndWindow = null;
+        #endregion
+        #region Attr{g/s}: DrawEnvironment Drawing
+        public DrawEnvironment Drawing
+        {
+            get
+            {
+                if (null == m_Drawing && null != m_wndWindow)
+                {
+                    m_Drawing = new DrawEnvironment 
+                    {
+                        Graphics = m_wndWindow.Draw.Graphics
+                    };
+                }
+
+                Debug.Assert(null != m_Drawing);
+                return m_Drawing;
+            }
+            set
+            {
+                m_Drawing = value;
+                Debug.Assert(null != m_Drawing);
+            }
+        }
+        private DrawEnvironment m_Drawing;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(OWWindow)
-        public ERoot(OWWindow _Window)
+        public ERoot(OWWindow window)
             : base()
         {
-            m_wndWindow = _Window;
+            m_wndWindow = window;
         }
         #endregion
 
@@ -1872,7 +1902,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
-		#region OMethod:  void CalculateVerticals(float y, bool bRepositionOnly)
+		#region OMethod: void CalculateVerticals(float y, bool bRepositionOnly)
 		public override void CalculateVerticals(float y, bool bRepositionOnly)
 		{
 			// Lay out the items
