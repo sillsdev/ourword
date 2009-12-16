@@ -805,7 +805,7 @@ namespace OurWordData.Synchronize
             // the Execute command.
         {
             var pathToChorusMerge = Repository.SurroundWithQuotes(
-                Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
+                Path.Combine(ExecutionEnvironment.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
 
             using (new ShortTermEnvironmentalVariable("OurWordDataVersion", LocalRepository.c_CurrentVersionNo.ToString()))
             using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", m_LocalRepository.FullPathToRepositoryRoot))

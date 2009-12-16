@@ -131,6 +131,11 @@
     <Compile Include="DataModel\DSection.cs" />
     <Compile Include="DataModel\DTeamSettings.cs" />
     <Compile Include="DataModel\DTranslation.cs" />
+    <Compile Include="Styles\CharacterStyle.cs" />
+    <Compile Include="Styles\FontForWritingSystem.cs" />
+    <Compile Include="Styles\ParagraphStyle.cs" />
+    <Compile Include="Styles\StyleSheet.cs" />
+    <Compile Include="Styles\WritingSystem.cs" />
     <Compile Include="Synchronize\Repository.cs" />
     <Compile Include="Synchronize\Merger.cs" />
     <Compile Include="DataModel\RepairImportBook.cs">
