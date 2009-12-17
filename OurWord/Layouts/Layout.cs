@@ -54,29 +54,7 @@ namespace OurWord.Layouts
             Color backColor, 
             OWPara.Flags flags)
         {
-            // Create the basic paragraph
-            var owp = new OWPara(
-                ws,
-                footnote.Style,
-                footnote,
-                backColor,
-                flags);
-
-            // Insert the reference (e.g., "3:16") right after the footnote letter if present,
-            // or else at the beginning.
-            if (!string.IsNullOrEmpty(footnote.VerseReference))
-            {
-                var f = footnote.Style.CharacterStyle.FindOrAddFontForWritingSystem(ws);
-                var label = new DLabel(footnote.VerseReference + ": ");
-
-                int iPos = 0;
-                if (owp.SubItems.Length > 0 && owp.SubItems[0] as OWPara.EFootnoteLabel != null)
-                    iPos = 1;
-
-                owp.InsertAt(iPos, new OWPara.ELabel(f, label));
-            }
-
-            return owp;
+            return new OWFootnotePara(footnote, backColor, flags);
         }
         #endregion
 

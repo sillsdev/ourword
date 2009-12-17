@@ -699,9 +699,9 @@ namespace OurWordData.DataModel
         #region Method: string GetFootnoteLetterFor(int n)
         public string GetFootnoteLetterFor(int n)
         {
-            DTranslation t = Section.Translation;
+            var translation = Section.Translation;
 
-            switch (t.FootnoteSequenceType)
+            switch (translation.FootnoteSequenceType)
             {
                 case FootnoteSequenceTypes.abc:
                     return GetFootnoteLetter_abc(n);
@@ -710,7 +710,7 @@ namespace OurWordData.DataModel
                     return GetFootnoteLetter_iv(n);
 
                 case FootnoteSequenceTypes.custom:
-                    return GetFootnoteLetter_bsa(n, t.FootnoteCustomSeq);
+                    return GetFootnoteLetter_bsa(n, translation.FootnoteCustomSeq);
 
                 default:
                     Debug.Assert(false, "Unsupported FootnoteSequenceType");

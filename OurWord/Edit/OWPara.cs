@@ -255,10 +255,34 @@ namespace OurWord.Edit
                 Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
             }
             #endregion
+            #region Attr{g}: int Number
+            public int Number
+            {
+                get
+                {
+                    try
+                    {
+                        var sNumber = "";
+                        foreach(var ch in Text)
+                        {
+                            if (char.IsDigit(ch))
+                                sNumber += ch;
+                            else
+                                break;
+                        }
+                        return Convert.ToInt16(sNumber);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                    return 1;
+                }
+            }
+            #endregion
         }
         #endregion
         #region CLASS: EVerse
-        class EVerse : EBlock
+        public class EVerse : EBlock
         {
             const string c_sLeadingSpace = "  ";
             #region Attr{g}: bool NeedsExtraLeadingSpace - T if some extra leading padding is required.
@@ -346,6 +370,31 @@ namespace OurWord.Edit
                 StringFormat fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
                 Width = g.MeasureString(s, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
+            }
+            #endregion
+
+            #region Attr{g}: int Number
+            public int Number
+            {
+                get
+                {
+                    try
+                    {
+                        var sNumber = "";
+                        foreach (var ch in Text)
+                        {
+                            if (char.IsDigit(ch))
+                                sNumber += ch;
+                            else
+                                break;
+                        }
+                        return Convert.ToInt16(sNumber);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                    return 1;
+                }
             }
             #endregion
 
@@ -541,7 +590,7 @@ namespace OurWord.Edit
                     return m_Footnote;
                 }
             }
-            DFootnote m_Footnote = null;
+            readonly DFootnote m_Footnote = null;
             #endregion
 
             #region Constructor(DFootLetter)
@@ -747,7 +796,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: JFontForWritingSystem RetrieveFont(sCharStyleAbbrev)
-        JFontForWritingSystem RetrieveFont(string sCharStyleAbbrev)
+        protected JFontForWritingSystem RetrieveFont(string sCharStyleAbbrev)
         {
             JCharacterStyle cs = DB.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
             return cs.FindOrAddFontForWritingSystem(WritingSystem);
@@ -771,10 +820,6 @@ namespace OurWord.Edit
             JFontForWritingSystem fFootLetter = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
             JFontForWritingSystem fLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevLabel);
             JFontForWritingSystem fFootnoteLabel = fFootLetter;
-
-            // If this is a footnote, we need to add its letter
-            if (null != p as DFootnote)
-                Append(new EFootnoteLabel(fFootnoteLabel, p as DFootnote)); 
 
             // Loop through the paragraph's runs
             foreach (DRun r in p.Runs)
@@ -1545,8 +1590,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(DrawingContext, y)
+        public override void CalculateVerticals(DrawingContext context, float y)
         // y - The top coordinate of the paragraph. We'll use "y" to work through the 
         //     height of the paragraph, setting the individula paragraph parts.
         #region DOC - Leading Space before Verses
@@ -1563,10 +1608,8 @@ namespace OurWord.Edit
              */
         #endregion
         {
-            if (bRepositionOnly)
-                RePosition(y);
-
-            Graphics g = Window.Draw.Graphics;
+            // Shorthand
+            var g = context.Graphics;
 
             // Combine all hyphenated words, we'll figure out shortly if we must re-hyphenate
             RemoveHyphenation();
@@ -1603,10 +1646,10 @@ namespace OurWord.Edit
             Lines.Add(line);
 
             // Loop through all the blocks, adding them into lines
-            for (int i = 0; i < SubItems.Length; )
+            for (var i = 0; i < SubItems.Length; )
             {
                 // If we have a chapter, we treat if separately, since it takes up two lines.
-                EChapter chapter = SubItems[i] as EChapter;
+                var chapter = SubItems[i] as EChapter;
                 if (null != chapter)
                 {
                     // If we have contents in the current line, then we need to start a new
@@ -1626,7 +1669,7 @@ namespace OurWord.Edit
 
                 // If we have a Verse, we first determine if it needs extra leading space.
                 // Refer to the DOC above.
-                EVerse verse = (i > 0) ? SubItems[i] as EVerse : null;
+                var verse = (i > 0) ? SubItems[i] as EVerse : null;
                 if (null != verse)
                 {
                     verse.NeedsExtraLeadingSpace = true;
@@ -1655,7 +1698,7 @@ namespace OurWord.Edit
                 {
                     // If we're working on a chapter, then both this line and the next line will 
                     // need to reflect the indentation
-                    float fIndentLine = (null == line.Chapter) ? 0 : line.Chapter.Width;
+                    var fIndentLine = (null == line.Chapter) ? 0 : line.Chapter.Width;
 
                     // Create the new line, and put this appropriate indentation to it
                     line = new ELine();
@@ -1679,9 +1722,9 @@ namespace OurWord.Edit
                 }
 
                 // Add the approved chunk(s) to the line
-                for (int k = 0; k < chunk.ChunkSize; k++)
+                for (var k = 0; k < chunk.ChunkSize; k++)
                 {
-                    EBlock block = SubItems[i] as EBlock;
+                    var block = SubItems[i] as EBlock;
                     line.Append(block);
                     x += block.Width;   // Can't use ChunkWidth because of verse width recalcs
                     i++;
@@ -1690,7 +1733,7 @@ namespace OurWord.Edit
 
             // Finally, we need to loop and actually assign Screen Coordinates to these objects,
             // now that we've broken them down into lines.
-            float xLeft = Position.X + (float)PStyle.LeftMargin * g.DpiX;
+            var xLeft = Position.X + (float)PStyle.LeftMargin * g.DpiX;
             Layout_SetCoordinates(g, new PointF(xLeft, y), xMaxWidth);
 
             // Add any SpaceBefore and Space-After to the Height. 
@@ -1705,35 +1748,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: void RePosition(float yNew) - change the Y coord of the paragraph and its parts
-        public void RePosition(float yNew)
-            // Moves all of the "y" coordinates in the paragraph (paragraph, EBlocks, Lines)
-            // to the new yNew. This is called when the paragraph is being moved to reflect
-            // editing somewhere on the screen.
-        {
-            // Get the difference between the current and the new Y values
-            float yDiff = yNew - Position.Y;
-
-            // Set the paragraph to its new value
-            Position = new PointF(Position.X, yNew);
-
-            // Set the individual blocks to their new values
-            foreach (EBlock block in SubItems)
-            {
-                block.Position = new PointF(block.Position.X,
-                    block.Position.Y + yDiff);
-            }
-
-            // Set the individual lines to their new values
-            foreach (var ln in Lines)
-            {
-                ln.Position = new PointF(ln.Position.X,
-                    ln.Position.Y + yDiff);
-            }
-        }
-        #endregion
-        #region Method: void ReLayout() - recalculate the layout; decide if the rest of screen needs to be updated
-        void ReLayout()
+        #region Method: void ReLayout(DrawingContext) - recalculate the layout; decide if the rest of screen needs to be updated
+        void ReLayout(DrawingContext context)
             // Call this when the paragraph's contents have changed (e.g., due to a
             // Delete or Insert; so that higher-level containers can be appropriately
             // shifted / redrawn in the window.
@@ -1750,7 +1766,7 @@ namespace OurWord.Edit
                 nLineNo = Lines[0].LineNo;
 
             // Rework the paragraph: words on each line, justification, etc., etc.
-            CalculateVerticals(Position.Y, false);
+            CalculateVerticals(context, Position.Y);
 
             // If the height did not change, then all we need to do is re-do the
             // line numbers (because we've created new Lines) and redraw the paragraph.
@@ -2350,7 +2366,51 @@ namespace OurWord.Edit
             InsertAt(iBlockFirst, vWords);
             foreach (EWord w in vWords)
                 w.CalculateWidth(Window.Draw.Graphics);
-            ReLayout();
+
+            var context = DrawingContext.CreateFromWindow(Window);
+            ReLayout(context);
+        }
+        #endregion
+    }
+
+
+
+    public class OWFootnotePara : OWPara
+    {
+        // Construction ----------------------------------------------------------------------
+        public OWFootnotePara(DFootnote footnote, Color cldEditableBackground, Flags options)
+            : base(GetWritingSystem(footnote, options),            
+                footnote.Style, footnote, cldEditableBackground, options)
+        {
+            ConstructFootnoteReference(footnote, options);
+            ConstructFootnoteLetter(footnote);
+        }
+        #region Method: void ConstructFootnoteReference(DFootnote, Flags)
+        void ConstructFootnoteReference(DFootnote footnote, Flags options)
+        {
+            if (string.IsNullOrEmpty(footnote.VerseReference))
+                return;
+
+            var font = footnote.Style.CharacterStyle.FindOrAddFontForWritingSystem(
+                GetWritingSystem(footnote, options));
+            var label = new DLabel(footnote.VerseReference + ": ");
+
+            InsertAt(0, new ELabel(font, label));
+        }
+        #endregion
+
+        void ConstructFootnoteLetter(DFootnote footnote)
+        {
+            var fFootnoteLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
+            InsertAt(0, new EFootnoteLabel(fFootnoteLabel, footnote));
+        }
+
+        #region SMethod: JWritingSystem GetWritingSystem(DParagraph p, Flags options)
+        static JWritingSystem GetWritingSystem(DParagraph p, Flags options)
+        {
+            return ((options & Flags.ShowBackTranslation) == Flags.ShowBackTranslation) ?
+                p.Translation.WritingSystemVernacular :
+                p.Translation.WritingSystemConsultant;
         }
         #endregion
     }

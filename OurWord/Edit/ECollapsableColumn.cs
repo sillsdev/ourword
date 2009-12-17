@@ -148,13 +148,13 @@ namespace OurWord.Edit
             return Position.X + PlusMinusIcon.Width + c_SpaceAfterPlusMinusIcon;
         }
         #endregion
-        #region OMethod: void CalculateContainerHorizontals()
-        public override void CalculateContainerHorizontals()
+        #region OMethod: void CalculateContainerHorizontals(DrawingContext)
+        public override void CalculateContainerHorizontals(DrawingContext context)
         {
             // We must call the base method, as it has the logic to correctly position
             // us within the row of columns. It also calculates for subitems, which 
             // is a waste of time if we are collapsed, but no harm is otherwise done.
-            base.CalculateContainerHorizontals();
+            base.CalculateContainerHorizontals(context);
 
             // PlusMinus icon position
             PlusMinusIcon.Position = new PointF(
@@ -162,8 +162,8 @@ namespace OurWord.Edit
                 Position.Y);
         }
         #endregion
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(DrawingContext, y)
+        public override void CalculateVerticals(DrawingContext context, float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -179,7 +179,7 @@ namespace OurWord.Edit
             // Header
             if (ShowHeaderWhenExpanded || IsCollapsed)
             {
-                Header.CalculateVerticals(y, bRepositionOnly);
+                Header.CalculateVerticals(context, y);
                 y += Header.Height;
             }
 
@@ -192,7 +192,7 @@ namespace OurWord.Edit
                 // Layout the owned subitems, one below the other
                 foreach (EItem item in SubItems)
                 {
-					item.CalculateVerticals(y, bRepositionOnly);
+					item.CalculateVerticals(context, y);
 					y += item.Height;
                 }
             }

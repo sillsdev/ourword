@@ -111,7 +111,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region VAttr{g}: DFoot Foot - the owner
-        DFoot Foot
+        public DFoot Foot
         {
             get
             {

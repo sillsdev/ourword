@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.Text;
 using OurWord.Edit;
 using OurWordData;
@@ -8,15 +9,19 @@ using OurWordData.DataModel;
 
 namespace OurWord.Printing
 {
-    public class RunningFooter : ERowOfColumns
+    public sealed class RunningFooter : ERoot
     {
         // Content ---------------------------------------------------------------------------
         #region Method: void SetColumnText(iColumn, sText)
         void SetColumnText(int iColumn, string sText)
         {
+            Debug.Assert(SubItems.Length == 1);
+            var rowOfColumns = SubItems[0] as ERowOfColumns;
+            Debug.Assert(null != rowOfColumns);
+
             Debug.Assert(0 >= iColumn && iColumn < NumberOfColumns);
             var owp = new OWPara(WritingSystem, ParagraphStyle, sText);
-            var column = GetColumn(iColumn);
+            var column = rowOfColumns.GetColumn(iColumn);
             column.Clear();
             column.Append(owp);
         }
@@ -93,8 +98,11 @@ namespace OurWord.Printing
         private const int NumberOfColumns = 3;
         #region Constructor(nPageNumber)
         public RunningFooter(int nPageNumber, DReference chapterAndVerse)
-            : base(NumberOfColumns)
+            : base(null)
         {
+            // We'll have exactly one element in this Root (which will itself have three columns)
+            Append(new ERowOfColumns(NumberOfColumns));
+
             var vContent = new List<DTeamSettings.FooterParts>
             {
                 (IsEvenPage(nPageNumber)) ? DB.TeamSettings.EvenLeft : DB.TeamSettings.OddLeft,
@@ -142,5 +150,12 @@ namespace OurWord.Printing
             return (nHalf * 2 == nPageNumber);
         }
         #endregion
+
+
+        public void Layout(PrintDocument pdoc)
+        {
+            var context = DrawingContext.CreateFromPrintDocument(pdoc);
+            DoLayout(context);
+        }
     }
 }

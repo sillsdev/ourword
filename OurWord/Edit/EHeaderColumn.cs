@@ -129,19 +129,19 @@ namespace OurWord.Edit
             Header.CalculateBlockWidths(g);
         }
         #endregion
-        #region OMethod: void CalculateContainerHorizontals()
-        public override void CalculateContainerHorizontals()
+        #region OMethod: void CalculateContainerHorizontals(DrawingContext)
+        public override void CalculateContainerHorizontals(DrawingContext context)
         {
             // Base method correctly positions us within our owner, and calculates
             // for our subitems.
-            base.CalculateContainerHorizontals();
+            base.CalculateContainerHorizontals(context);
 
             // Calculate for the header
-            Header.CalculateContainerHorizontals();
+            Header.CalculateContainerHorizontals(context);
         }
         #endregion
-        #region OMethod: void CalculateVerticals(float y, bool bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(DrawingContext, float y)
+        public override void CalculateVerticals(DrawingContext context, float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -150,7 +150,7 @@ namespace OurWord.Edit
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
 
             // Header
-            Header.CalculateVerticals(y, bRepositionOnly);
+            Header.CalculateVerticals(context, y);
             y += Header.Height;
 
             m_yContentsTop = y;
@@ -161,7 +161,7 @@ namespace OurWord.Edit
             // Layout the owned subitems, one below the other
             foreach (EItem item in SubItems)
             {
-				item.CalculateVerticals(y, bRepositionOnly);
+				item.CalculateVerticals(context, y);
 				y += item.Height;
             }
 

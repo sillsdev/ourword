@@ -27,12 +27,6 @@ using OurWordData.DataModel;
 
 namespace OurWord.Edit
 {
-    public class DrawEnvironment
-    {
-        public Graphics Graphics { get; set; }
-    }
-
-
     #region CLASS: EItem
     public class EItem
     {
@@ -218,16 +212,12 @@ namespace OurWord.Edit
         #endregion
 
 		// Layout Calculations ---------------------------------------------------------------
-		#region VirtMethod: void CalculateVerticals(y, bRepositionOnly)
-		virtual public void CalculateVerticals(float y, bool bRepositionOnly)
+		#region VirtMethod: void CalculateVerticals(DrawingContext, y)
+		virtual public void CalculateVerticals(DrawingContext context, float y)
 		// Layout any children, and calculate the Height. 
 		//
 		// Parameters
 		//   yTop - the top pixel for the container
-		//   bRepositionOnly - we just adjust the y values, we don't recalculate the heights,
-		//        or, e.g., in the case of a paragraph, re-layout all of the elements.
-		//        (e.g., when one paragraph has gotten larger, and the ones below it need to 
-		//        shift down.
 		{
 			// This will be different for every subclass
 			Debug.Assert(false);
@@ -1503,8 +1493,8 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region VirtMethod: void CalculateContainerHorizontals()
-        virtual public void CalculateContainerHorizontals()
+        #region VirtMethod: void CalculateContainerHorizontals(DrawingContext)
+        virtual public void CalculateContainerHorizontals(DrawingContext context)
         {
             // Always calculate our width and Left first....
             // (Default is the Width and Left of the owner)
@@ -1512,19 +1502,19 @@ namespace OurWord.Edit
             {
                 Width = Owner.AvailableWidthForOneSubitem;
 
-                float xleft = Owner.CalculateSubItemX(this);
+                var xleft = Owner.CalculateSubItemX(this);
                 Position = new PointF(xleft, Position.Y);
             }
 
             // Then calculate the width of the owned items (as they may need to
             // refer to this object via the AvailableWidthForOneSubitem call.)
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
-                    container.CalculateContainerHorizontals();
+                    container.CalculateContainerHorizontals(context);
 
-                EControl control = item as EControl;
+                var control = item as EControl;
                 if (null != control)
                     control.CalculateHorizontals();
             }
@@ -1631,8 +1621,8 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y)
+        public override void CalculateVerticals(DrawingContext context, float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -1647,7 +1637,7 @@ namespace OurWord.Edit
             float fHighest = 0;
             foreach (EItem item in SubItems)
             {
-                item.CalculateVerticals(y, bRepositionOnly);
+                item.CalculateVerticals(context, y);
 				fHighest = Math.Max(fHighest, item.Height);
             }
             y += fHighest;
@@ -1692,8 +1682,8 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(DrawingContext, y)
+        public override void CalculateVerticals(DrawingContext context, float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -1707,7 +1697,7 @@ namespace OurWord.Edit
             // Layout the owned subitems, one below the other
             foreach (EItem item in SubItems)
             {
-				item.CalculateVerticals(y, bRepositionOnly);
+				item.CalculateVerticals(context, y);
 				y += item.Height;
             }
 
@@ -1744,30 +1734,6 @@ namespace OurWord.Edit
             }
         }
         readonly OWWindow m_wndWindow = null;
-        #endregion
-        #region Attr{g/s}: DrawEnvironment Drawing
-        public DrawEnvironment Drawing
-        {
-            get
-            {
-                if (null == m_Drawing && null != m_wndWindow)
-                {
-                    m_Drawing = new DrawEnvironment 
-                    {
-                        Graphics = m_wndWindow.Draw.Graphics
-                    };
-                }
-
-                Debug.Assert(null != m_Drawing);
-                return m_Drawing;
-            }
-            set
-            {
-                m_Drawing = value;
-                Debug.Assert(null != m_Drawing);
-            }
-        }
-        private DrawEnvironment m_Drawing;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -1878,37 +1844,42 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateContainerHorizontals()
-        override public void CalculateContainerHorizontals()
+        #region Method: void DoLayout(DrawingContext context)
+        public void DoLayout(DrawingContext context)
         {
-            // The width of this root container is the width of the window, less the
-            // left and right margins.
-            int nScroolBarWidth = (null == Window.m_ScrollBar) ? 0 : Window.m_ScrollBar.Width;
-            Width = Window.Width - nScroolBarWidth - Window.WindowMargins.Width * 2;
+            if (context == null) 
+                throw new ArgumentNullException("context");
 
-            // The Left is the margin width
-            Position = new PointF(Window.WindowMargins.Width, Position.Y);
+            CalculateContainerHorizontals(context);
+            CalculateVerticals(context, context.TopMargin);
+        }
+        #endregion
+        #region OMethod: void CalculateContainerHorizontals(DrawingContext)
+        override public void CalculateContainerHorizontals(DrawingContext context)
+        {
+            Width = context.AvailableWidthForContent;
+            Position = new PointF(context.LeftMargin, Position.Y);
 
             // Process the sub-items as per usual
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
-                    container.CalculateContainerHorizontals();
+                    container.CalculateContainerHorizontals(context);
 
-				EControl control = item as EControl;
+				var control = item as EControl;
 				if (null != control)
 					control.CalculateHorizontals();
             }
         }
         #endregion
-		#region OMethod: void CalculateVerticals(float y, bool bRepositionOnly)
-		public override void CalculateVerticals(float y, bool bRepositionOnly)
+		#region OMethod: void CalculateVerticals(DrawingContext, float y)
+		public override void CalculateVerticals(DrawingContext context, float y)
 		{
 			// Lay out the items
-			foreach (EItem item in SubItems)
+			foreach (var item in SubItems)
 			{
-				item.CalculateVerticals(y, false);
+				item.CalculateVerticals(context, y);
 				y += item.Height;
 			}
 
@@ -1918,7 +1889,7 @@ namespace OurWord.Edit
 		#region Method: void CalculateLineNumbers()
 		public void CalculateLineNumbers()
         {
-            int nLineNo = 1;
+            var nLineNo = 1;
             CalculateLineNumbers(ref nLineNo);
         }
         #endregion

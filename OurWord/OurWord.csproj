@@ -595,6 +595,7 @@
     <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.Designer.cs">
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </Compile>
+    <Compile Include="Edit\DrawingContext.cs" />
     <Compile Include="Edit\EIcon.cs" />
     <Compile Include="Edit\ELine.cs" />
     <Compile Include="Edit\ENote.cs" />
@@ -643,6 +644,7 @@
     <Compile Include="OurWordMain.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Printing\AssociatedLines.cs" />
     <Compile Include="Printing\Printer.cs" />
     <Compile Include="Printing\RunningFooter.cs" />
     <Compile Include="Printing\Page.cs" />

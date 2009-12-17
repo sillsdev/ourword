@@ -321,8 +321,10 @@ namespace OurWord.Edit
 
             // Initialize ScrollBar
             AutoScroll = false;             // Don't use Panel's built-in scrollbar
-            m_ScrollBar = new VScrollBar();
-            m_ScrollBar.Dock = DockStyle.Right;
+            m_ScrollBar = new VScrollBar 
+            {
+                Dock = DockStyle.Right
+            };
             Controls.Add(m_ScrollBar);
             ScrollBarPosition = 0;
             ScrollBar.ValueChanged += new EventHandler(OnScrollBarValueChanged);
@@ -744,19 +746,16 @@ namespace OurWord.Edit
             if (!m_bLoaded)
                 return;
 
-            // Calculate the Lefts and Widths for the EContainer hierarchy
-            Contents.CalculateContainerHorizontals();
-
-			// Calculate the vertical layout
-            float yTop = WindowMargins.Height;   // Top of the window, taking margin into account
-            Contents.CalculateVerticals(yTop, false);
+            // Drawing Environment
+            var context = DrawingContext.CreateFromWindow(this);
+            Contents.DoLayout(context);
 
             // Now that the lines have been defined in the low-level OWPara's,
             // give each line a line number
             Contents.CalculateLineNumbers();
 
-            // Set the ScrollBar, adding some (30 pixels) padding at the bottom
-            Layout_SetupScrollBar((int)(yTop + Contents.Height));
+            // Set the ScrollBar
+            Layout_SetupScrollBar((int)(WindowMargins.Height + Contents.Height));
         }
         #endregion
         #region Method: void PaintNoDataMessage(PaintEventArgs e)
@@ -837,41 +836,6 @@ namespace OurWord.Edit
             DoLayout();
         }
         #endregion
-        #region Cmd: OnParagraphHeightChanged - recalculate positions to accomdate the new-sized paragraph
-        public void OnParagraphHeightChanged(EContainer TopLevelContainer)
-            // Each paragraph needs to recalculate its position and be redrawn
-        {
-            // Start at the top margin for the window
-            float y = WindowMargins.Height;
-
-            // We'll not redraw until we encounter the row that has changed; thus we'll use
-            // bFound to indicate when we've located that row
-            bool bFound = false;
-
-            // Process through each row
-            foreach (EContainer container in Contents.SubItems)
-            {
-                // Set the bFound flag once we encounter the target row
-                if (container == TopLevelContainer)
-                    bFound = true;
-
-                // RePosition each row from the target to the end of the screen
-                if (bFound)
-                    container.CalculateVerticals(y, true);
-
-                y += container.Height;
-            }
-
-            // Recalculate the lines numbers, as they may have changed
-            Contents.CalculateLineNumbers();
-
-            // Change the scrollbar to reflect the new height
-            Layout_SetupScrollBar((int)y);
-
-            // Tell the window to do some painting
-            Invalidate();
-        }
-        #endregion
 
         // Line Numbers ----------------------------------------------------------------------
         #region CLASS: CLineNumberAttrs
@@ -943,20 +907,29 @@ namespace OurWord.Edit
                 return m_LineNumberAttrs;
             }
         }
-        public CLineNumberAttrs m_LineNumberAttrs = null;
+        private CLineNumberAttrs m_LineNumberAttrs;
         #endregion
 
         // Scroll Bar ------------------------------------------------------------------------
         #region Scroll Bar
         #region Attr{g}: VScrollBar ScrollBar
-        VScrollBar ScrollBar
+        public VScrollBar ScrollBar
         {
             get
             {
                 return m_ScrollBar;
             }
         }
-        public VScrollBar m_ScrollBar;
+        private readonly VScrollBar m_ScrollBar;
+        #endregion
+        #region VAttr{g}: bool HasScrollbar
+        private bool HasScrollbar
+        {
+            get
+            {
+                return (null != m_ScrollBar);
+            }
+        }
         #endregion
         #region Attr{g/s}: float ScrollBarRange
         float ScrollBarRange
@@ -2436,7 +2409,7 @@ namespace OurWord.Edit
         #region Cmd: OnMouseWheel
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            if (null == m_ScrollBar)
+            if (!HasScrollbar)
                 return;
 
             // We'll take a Wheel Delta as being the equivalent of one line of text multipled

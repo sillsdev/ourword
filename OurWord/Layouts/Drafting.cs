@@ -505,18 +505,18 @@ namespace OurWord.Layouts
                 CreateRow(Contents, out colFront, out colTarget, true);
 
                 // All Front Footnotes
-                foreach (DFootnote f in FrontFootnotes)
+                foreach (var f in FrontFootnotes)
                     colFront.Append(CreateFrontPara(f));
 
                 // All Target Footnotes
-                foreach (DFootnote f in TargetFootnotes)
+                foreach (var f in TargetFootnotes)
                     colTarget.Append(CreateTargetPara(f, true));
 
                 return;
             }
 
             // Otherwise, they are on individual parallel rows
-            for (int k = 0; k < FrontFootnotes.Count; k++)
+            for (var k = 0; k < FrontFootnotes.Count; k++)
             {
                 // A single row with two columns
                 EColumn colFront;
