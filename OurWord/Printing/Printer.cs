@@ -46,7 +46,7 @@ namespace OurWord.Printing
         #endregion
 
         // Public Interface ------------------------------------------------------------------
-        #region Constructor(DBook)
+        #region Constructor(DSection)
         public Printer(DSection currentSectionOfBookToPrint)
         {
             m_Pages = new List<Page>();

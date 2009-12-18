@@ -23,6 +23,7 @@ using System.Text;
 using System.Threading;
 
 using JWTools;
+using OurWord.Printing;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.Styles;
@@ -2424,7 +2425,10 @@ namespace OurWord
 		{
 			OnLeaveSection();
 
-			Print p = new Print();
+            var p = new Printer(DB.TargetSection);
+
+		//	var p = new Print();
+
 			p.Do();
 		}
 		#endregion

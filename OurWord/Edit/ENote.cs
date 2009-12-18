@@ -110,7 +110,7 @@ namespace OurWord.Edit
                 return m_bmp;
             }
         }
-        Bitmap m_bmp = null;
+        Bitmap m_bmp;
         #endregion
         #region Method: void InitializeBitmap()
         public void InitializeBitmap()

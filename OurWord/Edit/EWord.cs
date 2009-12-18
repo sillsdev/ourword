@@ -196,10 +196,14 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: virtual void Paint()
+        #region Method: virtual void Paint() - for the editor
         virtual public void Paint()
         {
-            //                Debug.Assert(false);
+        }
+        #endregion
+        #region Method: virtual void Print(g) - for the printer
+        virtual public void Print(Graphics g)
+        {
         }
         #endregion
 
@@ -482,6 +486,16 @@ namespace OurWord.Edit
         }
         #endregion
 
+        public override void Print(Graphics g)
+        {
+            var s = Text;
+            if (Hyphenated)
+                s += "-";
+
+            g.DrawString(s, Font, GetBrush(), Position);
+        }
+
+
         // Insertion Point ---------------------------------------------------------------
         public const char c_chInsertionSpace = '\u2004';   // Unicode's "Four-Per-EM space"
         public const float c_xInsertionSize = 50;          // Pixels for insertion display
@@ -667,42 +681,6 @@ namespace OurWord.Edit
                 new OWWindow.Sel.SelPoint(iBlock, 0),
                 new OWWindow.Sel.SelPoint(iBlock, Text.Length));
         }
-        #endregion
-
-        #region IBT STUFF
-        /***
-        // Interlinear Back Translation ------------------------------------------------------
-        #region Attr{g}: string WordGloss
-        public string WordGloss
-        {
-            get
-            {
-                return m_sWordGloss;
-            }
-        }
-        string m_sWordGloss;
-        #endregion
-        #region Attr{g}: string PhraseGloss
-        public string PhraseGloss
-        {
-            get
-            {
-                return m_sPhraseGloss;
-            }
-        }
-        string m_sPhraseGloss;
-        #endregion
-        #region Attr{g}: int WordsInPhrase
-        public int WordsInPhrase
-        {
-            get
-            {
-                return m_cWordsInPhease;
-            }
-        }
-        int m_cWordsInPhease = 1;
-        #endregion
-        ***/
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------

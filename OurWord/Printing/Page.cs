@@ -47,6 +47,7 @@ namespace OurWord.Printing
         private readonly PageSettings m_PageSettings;
         private readonly float m_fTotalAvailableContentHeight;
 
+        #region Constructor(pDoc, nPageNumber, vGroups)
         public Page(PrintDocument pdoc, int nPageNumber, IList<AssociatedLines> vLineGroups)
         {
             m_BodyLines = new List<ELine>();
@@ -68,6 +69,7 @@ namespace OurWord.Printing
             LayoutBody(vGroupsThisPage);
             LayoutFootnotes(vGroupsThisPage);
         }
+        #endregion
 
         // Layout (done during construction) -------------------------------------------------
         #region Method: List<AssociatedLines> GetGroupsThatWillFit(vSourceGroups)
@@ -147,7 +149,15 @@ namespace OurWord.Printing
 
         public void Draw(Graphics g)
         {
-            throw new NotImplementedException();
+            var allLines = new List<ELine>();
+            allLines.AddRange(BodyLines);
+            allLines.AddRange(FootnoteLines);
+
+            foreach (var line in allLines)
+            {
+                foreach (EBlock block in line.SubItems)
+                    block.Print(g);
+            }
         }
     }
 }
