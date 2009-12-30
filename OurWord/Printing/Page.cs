@@ -59,7 +59,8 @@ namespace OurWord.Printing
                 - m_PageSettings.Margins.Top - m_PageSettings.Margins.Bottom;
 
             // Setup and measure the running footer
-            m_RunningFooter = new RunningFooter(nPageNumber, vLineGroups[0].Reference);
+            m_RunningFooter = new RunningFooter(nPageNumber, vLineGroups[0].Reference,
+                new PrintContext(pdoc));
             RunningFooter.Layout(pdoc);
 
             // Extract from the source list the groups which will fit on this page
@@ -93,9 +94,10 @@ namespace OurWord.Printing
                 if (group.TotalHeight > fHeightRemaining)
                     break;
 
+                fHeightRemaining -= group.TotalHeight;
+
                 vSourceGroups.Remove(group);
                 vGroupsThisPage.Add(group);
-                fHeightRemaining -= group.TotalHeight;
             }
 
             return vGroupsThisPage;
@@ -126,22 +128,25 @@ namespace OurWord.Printing
         #region Method: void LayoutFootnotes(IEnumerable<AssociatedLines> vGroups)
         void LayoutFootnotes(IEnumerable<AssociatedLines> vGroups)
         {
-            float fBottom = m_PageSettings.Bounds.Bottom + m_PageSettings.Margins.Bottom;
+            // Calculate the top of the footnotes area
+            float fBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
 
+            foreach (var group in vGroups)
+            {
+                foreach (var line in group.FootnoteLines)
+                    fBottom -= line.LargestItemHeight;
+            }
+
+            // Layout the footnotes
             foreach(var group in vGroups)
             {
                 foreach(var line in group.FootnoteLines)
                 {
-                    var fLineHeight = 0F;
-                    foreach (var item in line.SubItems)
-                        fLineHeight = Math.Max(fLineHeight, item.Height);
-
-                    fBottom -= fLineHeight;
-
                     foreach (var item in line.SubItems)
                         item.Position = new PointF(item.Position.X, fBottom);
-                    
                     FootnoteLines.Add(line);
+
+                    fBottom += line.LargestItemHeight;               
                 }
             }
         }
@@ -154,10 +159,7 @@ namespace OurWord.Printing
             allLines.AddRange(FootnoteLines);
 
             foreach (var line in allLines)
-            {
-                foreach (EBlock block in line.SubItems)
-                    block.Print(g);
-            }
+                line.Print(g);
         }
     }
 }

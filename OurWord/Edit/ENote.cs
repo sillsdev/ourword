@@ -65,8 +65,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region OMethod: void CalculateWidth(Graphics g)
-        public override void CalculateWidth(Graphics g)
+        #region OMethod: void CalculateWidth()
+        public override void CalculateWidth()
         {
             // Do-nothing override
         }
@@ -75,7 +75,7 @@ namespace OurWord.Edit
         #region Method: override void Paint()
         public override void Paint()
         {
-            Draw.Image(Bmp, Position);
+            Draw.DrawImage(Bmp, Position);
         }
         #endregion
 
@@ -104,7 +104,7 @@ namespace OurWord.Edit
                 // Get this when we first need it. We previously had this in the constructor; but the 
                 // problem was that we do not have access to the Window at the time of construction.
                 if (null == m_bmp)
-                    InitializeBitmap();
+                    InitializeBitmap(Context.BackgroundColor); // Window.BackColor);
 
                 Debug.Assert(null != m_bmp);
                 return m_bmp;
@@ -112,18 +112,18 @@ namespace OurWord.Edit
         }
         Bitmap m_bmp;
         #endregion
-        #region Method: void InitializeBitmap()
-        public void InitializeBitmap()
+        #region Method: void InitializeBitmap(backgroundColor)
+        public void InitializeBitmap(Color backgroundColor)
         {
-            // Get the name of the file; this depends on the note and its context
-            string sResource = NoteIconResource;
+            // Get the name of the file; this depends on the type and context
+            var sResource = NoteIconResource;
 
             // Retrieve the bitmap from resources
-            Bitmap bmp = JWU.GetBitmap(sResource);
+            var bmp = JWU.GetBitmap(sResource);
             Debug.Assert(null != bmp);
 
             // Set its transparent color to the background color.
-            m_bmp = JWU.ChangeBitmapBackground(bmp, Window.BackColor);
+            m_bmp = JWU.ChangeBitmapBackground(bmp, backgroundColor);
         }
         #endregion
         #region VAttr{g}: string NoteIconResource
@@ -158,7 +158,7 @@ namespace OurWord.Edit
             DisplayMeIcon = 4     // Override to display only Me, not Anyone or Closed
         };
         #endregion
-        Flags ContextOptions;
+        readonly Flags ContextOptions;
         #region VAttr{g}: bool UserEditable
         public bool UserEditable
         // If T, display all messages in conversational mode; else display just

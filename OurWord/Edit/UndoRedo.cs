@@ -2742,7 +2742,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon
-            ENote.InitializeBitmap();
+            ENote.InitializeBitmap(wnd.BackColor);
             G.App.CurrentLayout.Invalidate();
         }
         #endregion

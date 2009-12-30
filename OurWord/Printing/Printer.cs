@@ -173,12 +173,12 @@ namespace OurWord.Printing
         static void LayoutDisplayLines(List<OWPara> vDisplayParagraphs, PrintDocument pdoc)
         {
             // Place the paragraphs into a root container
-            var root = new ERoot(null);
+            var root = new ERoot(null, new PrintContext(pdoc));
             root.Append(vDisplayParagraphs.ToArray());
 
             // Lay them out
-            var context = DrawingContext.CreateFromPrintDocument(pdoc);
-            root.DoLayout(context);
+            root.CalculateBlockWidths();
+            root.DoLayout();
         }
         #endregion
         #region SMethod: List<LineGroup> AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes)
@@ -192,29 +192,49 @@ namespace OurWord.Printing
 
             foreach(var owp in vDisplayParagraphs)
             {
+                if (owp.Lines.Count == 0)
+                    continue;
+
                 // Shorthand
                 var count = owp.Lines.Count;
+
+                // Space above and  below the lines
+                var firstLine = owp.Lines[0];
+                var fSpaceAbove = firstLine.Position.X - owp.Position.X;
+                var lastLine = owp.Lines[owp.Lines.Count - 1];
+                var fSpaceBelow = owp.Position.X + owp.Height - 
+                    (lastLine.Position.X + lastLine.Height);
 
                 // Widow/orphan control: small paragraphs always go together
                 if (count <= 3)
                 {
-                    vGroups.Add(new AssociatedLines(owp.Lines, vDisplayFootnotes));
+                    vGroups.Add(
+                        new AssociatedLines(owp.Lines, vDisplayFootnotes)
+                            {
+                                SpaceAbove = fSpaceAbove, 
+                                SpaceBelow = fSpaceBelow
+                            });
                     continue;
                 }
 
                 // The first two lines are a group
-                vGroups.Add(new AssociatedLines( 
-                    owp.Lines.GetRange(0, 2), 
-                    vDisplayFootnotes));
+                vGroups.Add(
+                    new AssociatedLines( owp.Lines.GetRange(0, 2), vDisplayFootnotes)
+                        {
+                            SpaceAbove = fSpaceAbove
+                        });
 
                 // The middle lines are individually separate
                 for (var i = 2; i < count - 2; i++)
                     vGroups.Add(new AssociatedLines(owp.Lines[i], vDisplayFootnotes));
 
                 // The final two lines are a group
-                vGroups.Add(new AssociatedLines(
-                    owp.Lines.GetRange(count - 2, 2),
-                    vDisplayFootnotes));
+                vGroups.Add(
+                    new AssociatedLines(owp.Lines.GetRange(count - 2, 2), vDisplayFootnotes)
+                        {
+                            SpaceBelow = fSpaceBelow
+                        }
+                    );
             }
 
             return vGroups;

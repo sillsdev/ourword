@@ -23,6 +23,9 @@ namespace OurWord.Printing
         }
         #endregion
 
+        public float SpaceAbove { get; set; }
+        public float SpaceBelow { get; set; }
+
         #region VAttr{g}: float TotalHeight
         public float TotalHeight
         {
@@ -34,7 +37,10 @@ namespace OurWord.Printing
                     fHeight += line.Height;
 
                 foreach (var line in FootnoteLines)
-                    fHeight += line.Height;
+                    fHeight += line.LargestItemHeight;
+
+                fHeight += SpaceAbove;
+                fHeight += SpaceBelow;
 
                 return fHeight;
             }

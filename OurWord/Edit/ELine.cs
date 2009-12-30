@@ -65,6 +65,17 @@ namespace OurWord.Edit
         }
         #endregion
 
+        public float LargestItemHeight
+        {
+            get
+            {
+                var fLargestItemHeight = 0F;
+                foreach (var item in SubItems)
+                    fLargestItemHeight = Math.Max(fLargestItemHeight, item.Height);
+                return fLargestItemHeight;
+            }
+        }
+
         // Line numbers ----------------------------------------------------------------------
         #region Attr{g}: int LineNo
         public int LineNo
@@ -95,7 +106,7 @@ namespace OurWord.Edit
             var s = LineNo.ToString() + " ";
 
             // Calculate the width of this number
-            var fWidth = window.Draw.Measure(s, window.LineNumberAttrs.Font);
+            var fWidth = Context.Measure(s, window.LineNumberAttrs.Font);
 
             // The X coordinate is the x of the window (root) left, 
             var x = para.Root.Position.X;
@@ -108,7 +119,7 @@ namespace OurWord.Edit
             var y = SubItems[0].Position.Y;
 
             // Draw the line number
-            window.Draw.String(s, window.LineNumberAttrs.Font,
+            window.Draw.DrawString(s, window.LineNumberAttrs.Font,
                 window.LineNumberAttrs.Brush, new PointF(x, y));
         }
         #endregion
@@ -271,6 +282,17 @@ namespace OurWord.Edit
             }
 
             return false;
+        }
+        #endregion
+
+        #region Method: void Print(g)
+        public void Print(Graphics g)
+        {
+            if (null != Chapter)
+                Chapter.Print(g);
+
+            foreach (EBlock block in SubItems)
+                block.Print(g);
         }
         #endregion
     }

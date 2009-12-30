@@ -241,18 +241,26 @@ namespace OurWord.Edit
             }
             #endregion
 
+            // Drawing -----------------------------------------------------------------------
+            public override void Print(Graphics g)
+            {
+                var x = Position.X;
+                var y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
+                g.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(),
+                    x, y, StringFormat.GenericTypographic);
+            }
+
             #region Method: override void Paint()
             public override void Paint()
-                // We want to center the chapter within a nice, pretty rectangular border
             {
                 // Position "x" at the left margin
-                float x = Position.X; 
+                var x = Position.X; 
 
                 // Calculate "y" to be centered horizontally
-                float y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
+                var y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
 
                 // Draw the string
-                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
+                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
             }
             #endregion
             #region Attr{g}: int Number
@@ -272,7 +280,7 @@ namespace OurWord.Edit
                         }
                         return Convert.ToInt16(sNumber);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                     }
                     return 1;
@@ -331,25 +339,25 @@ namespace OurWord.Edit
                 {
                     if (Para.IsEditable && !Para.IsLocked)
                     {
-                        RectangleF r = new RectangleF(Position, new SizeF(Width, Height));
+                        var r = new RectangleF(Position, new SizeF(Width, Height));
                         Draw.FillRectangle(Para.EditableBackgroundColor, r);
                     }
                     return;
                 }
                
-                string s = Text;
+                var s = Text;
                 if (NeedsExtraLeadingSpace)
                     s = c_sLeadingSpace + Text;
-                Draw.String(s, GetSuperscriptFont(), GetBrush(), Position);
+                Draw.DrawString(s, GetSuperscriptFont(), GetBrush(), Position);
             }
             #endregion
 
             // Layout Calculations ---------------------------------------------------------------
-            #region OMethod: override void CalculateWidth(g)
-            public override void CalculateWidth(Graphics g)
+            #region OMethod: override void CalculateWidth()
+            public override void CalculateWidth()
             {
                 // The text we will measure
-                string s = Text;
+                var s = Text;
 
                 // If we are not doing verse numbers, then we have nothing to measure
                 if (Para.SuppressVerseNumbers)
@@ -367,9 +375,10 @@ namespace OurWord.Edit
                 }
 
                 // Do the measurement
-                StringFormat fmt = StringFormat.GenericTypographic;
+                var fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-                Width = g.MeasureString(s, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
+                Width = Context.Graphics.MeasureString(s, FontForWS.DefaultFontZoomed, 
+                    1000, fmt).Width;
             }
             #endregion
 
@@ -390,7 +399,7 @@ namespace OurWord.Edit
                         }
                         return Convert.ToInt16(sNumber);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                     }
                     return 1;
@@ -436,7 +445,7 @@ namespace OurWord.Edit
             #region Method: override void Paint()
             public override void Paint()
             {
-                Draw.String(Text, GetSuperscriptFont(), GetBrush(), Position);
+                Draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
             }
             #endregion
 
@@ -521,7 +530,7 @@ namespace OurWord.Edit
             #region Method: override void Paint()
             public override void Paint()
             {
-                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
         }
@@ -554,7 +563,7 @@ namespace OurWord.Edit
             #region OMethod: void Paint()
             public override void Paint()
             {
-                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
             #region OMethod: void cmdLeftMouseClick(PointF pt)
@@ -604,7 +613,7 @@ namespace OurWord.Edit
             #region Method: override void Paint()
             public override void Paint()
             {
-                Draw.String(Text, GetSuperscriptFont(), GetBrush(), Position);
+                Draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
             }
             #endregion
 
@@ -657,7 +666,7 @@ namespace OurWord.Edit
             #region Method: override void Paint()
             public override void Paint()
             {
-                Draw.String(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
         }
@@ -921,12 +930,12 @@ namespace OurWord.Edit
         #endregion
         #region Constructor(JWS, PStyle, DParagraph, clrEditableBackground, Flags) - for DParagraph
         public OWPara(
-            JWritingSystem _ws, 
+            JWritingSystem ws, 
             JParagraphStyle PStyle,
             DParagraph p,
             Color clrEditableBackground, 
-            Flags _Options)
-            : this(_ws, PStyle, p as JObject, _Options)
+            Flags options)
+            : this(ws, PStyle, p as JObject, options)
         {
             // The paragraph itself may override to make itself uneditable, 
             // even though we received "true" from the _bEditable parameter.
@@ -1361,8 +1370,8 @@ namespace OurWord.Edit
                 wordOverflow.Text = OriginalTextToHyphen.Substring(iHyphenPos);
 
                 // The words now have new lengths
-                wordHyphen.CalculateWidth(G);
-                wordOverflow.CalculateWidth(G);
+                wordHyphen.CalculateWidth();
+                wordOverflow.CalculateWidth();
             }
             #endregion
             #region Method: void RemoveAnyHyphenation()
@@ -1387,7 +1396,7 @@ namespace OurWord.Edit
 
                 word.Text += wordOverflow.Text;
                 word.Hyphenated = wordOverflow.Hyphenated;
-                word.CalculateWidth(G);
+                word.CalculateWidth();
 
                 Para.Remove(wordOverflow);
             }
@@ -1488,7 +1497,7 @@ namespace OurWord.Edit
                 // be continuing a hyphenation into even the next word.)
                 word.Text = word.Text + wordNext.Text;
                 word.Hyphenated = wordNext.Hyphenated;
-                word.CalculateWidth(Window.Draw.Graphics);
+                word.CalculateWidth();
                 RemoveAt(i+1);
                 continue;
 
@@ -1566,7 +1575,7 @@ namespace OurWord.Edit
                 // (assuming there is no chapter number; as we ignore first-line indentation
                 // where we have chapter numbers)
                 if (ln == Lines[0] && null == ln.Chapter)
-                    x += (float)PStyle.FirstLineIndent * g.DpiX;
+                    x += Context.InchesToDeviceX((float)PStyle.FirstLineIndent);
                 if (PStyle.IsRight)
                     x += (xMaxWidth - ln.Width);
                 if (PStyle.IsCentered)
@@ -1575,9 +1584,9 @@ namespace OurWord.Edit
                 // Calculate the width to be filled. If we are working on the first line, we need
                 // to adjust that width. Thus, e.g., for a negative line indent, we want to increase
                 // the fill-width. Hence we subtract.
-                float xWidthToFill = xMaxWidth;
+                var xWidthToFill = xMaxWidth;
                 if (ln == Lines[0])
-                    xWidthToFill -= (float)PStyle.FirstLineIndent * g.DpiX;
+                    xWidthToFill -= Context.InchesToDeviceX((float)PStyle.FirstLineIndent);
 
                 ln.SetPositions(x, y, xWidthToFill, bJustify);
                 y += LineHeight;
@@ -1590,8 +1599,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region OMethod: void CalculateVerticals(DrawingContext, y)
-        public override void CalculateVerticals(DrawingContext context, float y)
+        #region OMethod: void CalculateVerticals(y)
+        public override void CalculateVerticals(float y)
         // y - The top coordinate of the paragraph. We'll use "y" to work through the 
         //     height of the paragraph, setting the individula paragraph parts.
         #region DOC - Leading Space before Verses
@@ -1609,7 +1618,7 @@ namespace OurWord.Edit
         #endregion
         {
             // Shorthand
-            var g = context.Graphics;
+            var g = Context.Graphics;
 
             // Combine all hyphenated words, we'll figure out shortly if we must re-hyphenate
             RemoveHyphenation();
@@ -1618,11 +1627,11 @@ namespace OurWord.Edit
             Position = new PointF(Position.X, y);
 
             // We'll adjust the "internal" width based on the paragraph style
-            float xMaxWidth = Width;
+            var xMaxWidth = Width;
 
             // Decrease the width by the paragraph margins
-            xMaxWidth -= (float)PStyle.LeftMargin * g.DpiX;
-            xMaxWidth -= (float)PStyle.RightMargin * g.DpiX;
+            xMaxWidth -= Context.InchesToDeviceX((float)PStyle.LeftMargin);
+            xMaxWidth -= Context.InchesToDeviceX((float)PStyle.RightMargin);
 
             // Decrease the width if line numbers are requested
             if (ShowLineNumbers)
@@ -1630,7 +1639,7 @@ namespace OurWord.Edit
 
             // Add any SpaceBefore. This comes to us in Points, so we divide by 72 to
             // get Inches, then multiply by the screen's DPI to get pixels.
-            float ySpaceBefore = (((float)PStyle.SpaceBefore) * g.DpiY / 72.0F);
+            var ySpaceBefore = Context.PointsToDeviceY(PStyle.SpaceBefore);
             ySpaceBefore *= G.ZoomFactor;
             y += ySpaceBefore;
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
@@ -1638,7 +1647,7 @@ namespace OurWord.Edit
 
             // We'll add to x until we get to xMaxWidth, to know how much can fit on a line.
             // For this first x, we need to allow for the paragraph's FirstLineIndent
-            float x = (float)PStyle.FirstLineIndent * g.DpiX;
+            var x = Context.InchesToDeviceX((float)PStyle.FirstLineIndent);
 
             // We'll build the lines here
             Lines.Clear();
@@ -1673,7 +1682,7 @@ namespace OurWord.Edit
                 if (null != verse)
                 {
                     verse.NeedsExtraLeadingSpace = true;
-                    verse.CalculateWidth(g);
+                    verse.CalculateWidth();
                 }
 
                 if (this.SubItems.Length == 1 && (this.SubItems[0] as EBlock != null
@@ -1685,9 +1694,9 @@ namespace OurWord.Edit
                 // Measure the next "chunk" we want to add (this may be more than one EBlock
                 // due to glue, but it will have at most only one DText). If the chunk is too
                 // long, then we break it apart using hyphenation rules.
-                float fAvailWidth = xMaxWidth - x;
-                bool bMustForceHyphen = (line.SubItems.Length == 0);
-                ProposeNextLayoutChunk chunk = new ProposeNextLayoutChunk(
+                var fAvailWidth = xMaxWidth - x;
+                var bMustForceHyphen = (line.SubItems.Length == 0);
+                var chunk = new ProposeNextLayoutChunk(
                     g, this, fAvailWidth, i, bMustForceHyphen);
 
                 Debug.Assert( !(chunk.TooLarge && line.SubItems.Length == 0),
@@ -1713,7 +1722,7 @@ namespace OurWord.Edit
                     if (null != verse)
                     {
                         verse.NeedsExtraLeadingSpace = false;
-                        verse.CalculateWidth(g);
+                        verse.CalculateWidth();
                     }
 
                     // Loop back, because now that we have a longer line, we can try hyphenation
@@ -1733,7 +1742,7 @@ namespace OurWord.Edit
 
             // Finally, we need to loop and actually assign Screen Coordinates to these objects,
             // now that we've broken them down into lines.
-            var xLeft = Position.X + (float)PStyle.LeftMargin * g.DpiX;
+            var xLeft = Position.X + Context.InchesToDeviceX((float)PStyle.LeftMargin);
             Layout_SetCoordinates(g, new PointF(xLeft, y), xMaxWidth);
 
             // Add any SpaceBefore and Space-After to the Height. 
@@ -1742,14 +1751,14 @@ namespace OurWord.Edit
             Height += Border.GetTotalWidth(BorderBase.BorderSides.Top);
             Height += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
             Height += CalculateBitmapHeightRequirement();
-            float ySpaceAfter = (((float)PStyle.SpaceAfter) * g.DpiY / 72.0F);
+            var ySpaceAfter = Context.PointsToDeviceY(PStyle.SpaceAfter);
             ySpaceAfter *= G.ZoomFactor;
             Height += ySpaceAfter;
         }
         #endregion
 
-        #region Method: void ReLayout(DrawingContext) - recalculate the layout; decide if the rest of screen needs to be updated
-        void ReLayout(DrawingContext context)
+        #region Method: void ReLayout(IDrawingContext) - recalculate the layout; decide if the rest of screen needs to be updated
+        void ReLayout(IDrawingContext context)
             // Call this when the paragraph's contents have changed (e.g., due to a
             // Delete or Insert; so that higher-level containers can be appropriately
             // shifted / redrawn in the window.
@@ -1766,14 +1775,14 @@ namespace OurWord.Edit
                 nLineNo = Lines[0].LineNo;
 
             // Rework the paragraph: words on each line, justification, etc., etc.
-            CalculateVerticals(context, Position.Y);
+            CalculateVerticals(Position.Y);
 
             // If the height did not change, then all we need to do is re-do the
             // line numbers (because we've created new Lines) and redraw the paragraph.
             if (Height == fHeightGoingIn)
             {
                 CalculateLineNumbers(ref nLineNo);
-                Window.Draw.Invalidate(Rectangle);
+                Window.Invalidate(Rectangle);
                 return;
             }
 
@@ -2365,9 +2374,9 @@ namespace OurWord.Edit
             EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
             InsertAt(iBlockFirst, vWords);
             foreach (EWord w in vWords)
-                w.CalculateWidth(Window.Draw.Graphics);
+                w.CalculateWidth();
 
-            var context = DrawingContext.CreateFromWindow(Window);
+            var context = new WindowContext(Window);
             ReLayout(context);
         }
         #endregion

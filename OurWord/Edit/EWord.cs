@@ -248,15 +248,15 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region VirtMethod: void CalculateWidth(Graphics g)
-        virtual public void CalculateWidth(Graphics g)
+        #region VirtMethod: void CalculateWidth()
+        virtual public void CalculateWidth()
             // Those subclasses which override will not need to call this base method.
         {
             // For the most cases, we'll measure the width of Text according to the
             // font stored in the CharacterStyle.
-            StringFormat fmt = StringFormat.GenericTypographic;
+            var fmt = StringFormat.GenericTypographic;
             fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            Width = g.MeasureString(Text, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
+            Width = Context.Graphics.MeasureString(Text, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
         }
         #endregion
 
@@ -392,11 +392,11 @@ namespace OurWord.Edit
             // The text
             if (!IsInsertionIcon)
             {
-                Draw.String(Text, Font, GetBrush(), Position);
+                Draw.DrawString(Text, Font, GetBrush(), Position);
 
                 if (Hyphenated)
                 {
-                    Draw.String("-", Font, GetBrush(), 
+                    Draw.DrawString("-", Font, GetBrush(), 
                         new PointF(Position.X + Width - HyphenWidth, Position.Y));
                 }
             }
@@ -415,7 +415,7 @@ namespace OurWord.Edit
             if (IsInsertionIcon)
             {
                 PaintBackgroundRectangle(clrSelectedBackground);
-                Draw.String(G.GetLoc_String("TypeHere", "[Type Here]"),
+                Draw.DrawString(G.GetLoc_String("TypeHere", "[Type Here]"),
                     Font, brushSelectedText, Position);
                 return;
             }
@@ -430,7 +430,7 @@ namespace OurWord.Edit
             if (iCharLeft == 0 && iCharRight == Text.Length)
             {
                 PaintBackgroundRectangle(clrSelectedBackground);
-                Draw.String(Text, Font, brushSelectedText, Position);
+                Draw.DrawString(Text, Font, brushSelectedText, Position);
                 return;
             }
 
@@ -449,10 +449,10 @@ namespace OurWord.Edit
             // Figure out the boundaries
             float fTotalWidth = Width + JustificationPaddingAdded;
             float xSelLeft = Position.X +
-                ((iCharLeft == 0) ? 0 : Draw.Measure(sLeft, Font));
+                ((iCharLeft == 0) ? 0 : Context.Measure(sLeft, Font));
             float xSelRight = xSelLeft + ((iCharRight == Text.Length) ?
-                fTotalWidth - Draw.Measure(sLeft, Font) :
-                Draw.Measure(sSelected, Font));
+                fTotalWidth - Context.Measure(sLeft, Font) :
+                Context.Measure(sSelected, Font));
 
             // Paint the white background, for those portions that are not selected
             PaintBackgroundRectangle(
@@ -464,14 +464,14 @@ namespace OurWord.Edit
 
             // Paint the text
             if (sLeft.Length > 0)
-                Draw.String(sLeft, Font, brushNormalText, Position);
+                Draw.DrawString(sLeft, Font, brushNormalText, Position);
 
-            Draw.String(sSelected, Font, brushSelectedText,
+            Draw.DrawString(sSelected, Font, brushSelectedText,
                 new PointF(xSelLeft, Position.Y));
 
             if (sRight.Length > 0)
             {
-                Draw.String(sRight, Font, brushNormalText,
+                Draw.DrawString(sRight, Font, brushNormalText,
                     new PointF(xSelRight, Position.Y));
             }
         }
@@ -482,7 +482,7 @@ namespace OurWord.Edit
             if (i == 0)
                 return 0;
 
-            return Draw.Measure(Text.Substring(0, i), Font);
+            return Context.Measure(Text.Substring(0, i), Font);
         }
         #endregion
 
@@ -525,7 +525,7 @@ namespace OurWord.Edit
                 string sPortion = Text.Substring(0, iChar + 1);
 
                 // Get the position right after this character
-                float x2 = Position.X + Draw.Measure(sPortion, Font);
+                float x2 = Position.X + Context.Measure(sPortion, Font);
 
                 // The average should thus be right in the midst of this character,
                 // since x1 represents the position to the char's left.
@@ -684,25 +684,25 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateWidth(Graphics g)
-        override public void CalculateWidth(Graphics g)
+        #region OMethod: void CalculateWidth()
+        override public void CalculateWidth()
         {
 			HyphenWidth = 0;
 
             if (IsInsertionIcon)
             {
-                Width = Draw.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);
+                Width = Context.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);
             }
             else if (Hyphenated)
             {
-                Width = Draw.Measure(Text, Font);
+                Width = Context.Measure(Text, Font);
 
-                HyphenWidth = Draw.Measure("-", Font);
+                HyphenWidth = Context.Measure("-", Font);
                 Width += HyphenWidth;
             }
             else
             {
-                base.CalculateWidth(g);
+                base.CalculateWidth();
             }
         }
         #endregion

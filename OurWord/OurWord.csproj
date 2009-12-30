@@ -595,6 +595,7 @@
     <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.Designer.cs">
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </Compile>
+    <Compile Include="Edit\Draw.cs" />
     <Compile Include="Edit\DrawingContext.cs" />
     <Compile Include="Edit\EIcon.cs" />
     <Compile Include="Edit\ELine.cs" />

@@ -426,7 +426,7 @@ namespace OurWord.Layouts
         OWPara CreateTargetPara(DParagraph p, bool bAllowItalics)
         {
             // Options for paragraphs that will be on the right-hand, editable side
-            OWPara.Flags DraftingOptions = OWPara.Flags.None;
+            var DraftingOptions = OWPara.Flags.None;
             if (p.IsUserEditable)
             {
                 DraftingOptions = OWPara.Flags.IsEditable;
@@ -620,7 +620,7 @@ namespace OurWord.Layouts
             }
         }
         #endregion
-
+        #region OMethod: ENote.Flags GetNoteContext(note, OWPara.Flags)
         public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
         {
             // Front Translation (which will be the Vernacular by definition) we are only 
@@ -638,6 +638,7 @@ namespace OurWord.Layouts
 
             return ENote.Flags.None;
         }
+        #endregion
     }
 
 }

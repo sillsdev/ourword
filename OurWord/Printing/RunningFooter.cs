@@ -19,7 +19,7 @@ namespace OurWord.Printing
             var rowOfColumns = SubItems[0] as ERowOfColumns;
             Debug.Assert(null != rowOfColumns);
 
-            Debug.Assert(0 >= iColumn && iColumn < NumberOfColumns);
+            Debug.Assert(0 <= iColumn && iColumn < NumberOfColumns);
             var owp = new OWPara(WritingSystem, ParagraphStyle, sText);
             var column = rowOfColumns.GetColumn(iColumn);
             column.Clear();
@@ -97,8 +97,8 @@ namespace OurWord.Printing
         // Scaffolding -----------------------------------------------------------------------
         private const int NumberOfColumns = 3;
         #region Constructor(nPageNumber)
-        public RunningFooter(int nPageNumber, DReference chapterAndVerse)
-            : base(null)
+        public RunningFooter(int nPageNumber, DReference chapterAndVerse, IDrawingContext context)
+            : base(null, context)
         {
             // We'll have exactly one element in this Root (which will itself have three columns)
             Append(new ERowOfColumns(NumberOfColumns));
@@ -154,8 +154,7 @@ namespace OurWord.Printing
 
         public void Layout(PrintDocument pdoc)
         {
-            var context = DrawingContext.CreateFromPrintDocument(pdoc);
-            DoLayout(context);
+            DoLayout();
         }
     }
 }

@@ -107,8 +107,8 @@ namespace OurWord.Edit
             // AvailableWidthForOneSubitem method (see EToolStrip)
         }
         #endregion
-		#region OMethod: void CalculateVerticals(DrawingContext, y)
-		public override void CalculateVerticals(DrawingContext context, float y)
+		#region OMethod: void CalculateVerticals(y)
+		public override void CalculateVerticals(float y)
         {
             // Set to the top-left position and width
             Position = new PointF(Position.X, y);
@@ -208,8 +208,8 @@ namespace OurWord.Edit
             Width = Owner.AvailableWidthForOneSubitem;
         }
         #endregion
-		#region OMethod: void CalculateVerticals(DrawingContext, y)
-		public override void CalculateVerticals(DrawingContext context, float y)
+		#region OMethod: void CalculateVerticals(y)
+		public override void CalculateVerticals(float y)
         {
             // Set to the top-left position and width
             Position = new PointF(Position.X, y);
