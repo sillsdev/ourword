@@ -250,8 +250,8 @@ namespace OurWord.Edit
                     x, y, StringFormat.GenericTypographic);
             }
 
-            #region Method: override void Paint()
-            public override void Paint()
+            #region Method: override void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
                 // Position "x" at the left margin
                 var x = Position.X; 
@@ -260,7 +260,7 @@ namespace OurWord.Edit
                 var y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
 
                 // Draw the string
-                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
+                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
             }
             #endregion
             #region Attr{g}: int Number
@@ -328,8 +328,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint()
-            public override void Paint()
+            #region Method: override void Paint(IDraw)
+            public override void Paint(IDraw draw)
                 // The verse size in the stylesheet reflects a normal style; we need to
                 // decrease it for the superscript.
             {
@@ -340,7 +340,7 @@ namespace OurWord.Edit
                     if (Para.IsEditable && !Para.IsLocked)
                     {
                         var r = new RectangleF(Position, new SizeF(Width, Height));
-                        Draw.FillRectangle(Para.EditableBackgroundColor, r);
+                        draw.FillRectangle(Para.EditableBackgroundColor, r);
                     }
                     return;
                 }
@@ -348,7 +348,7 @@ namespace OurWord.Edit
                 var s = Text;
                 if (NeedsExtraLeadingSpace)
                     s = c_sLeadingSpace + Text;
-                Draw.DrawString(s, GetSuperscriptFont(), GetBrush(), Position);
+                draw.DrawString(s, GetSuperscriptFont(), GetBrush(), Position);
             }
             #endregion
 
@@ -442,10 +442,10 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint()
-            public override void Paint()
+            #region Method: override void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
+                draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
             }
             #endregion
 
@@ -527,10 +527,10 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint()
-            public override void Paint()
+            #region Method: override void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
         }
@@ -560,10 +560,10 @@ namespace OurWord.Edit
                 }
             }
             #endregion
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
             #region OMethod: void cmdLeftMouseClick(PointF pt)
@@ -610,10 +610,10 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint()
-            public override void Paint()
+            #region Method: override void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
+                draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
             }
             #endregion
 
@@ -663,10 +663,10 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint()
-            public override void Paint()
+            #region Method: override void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
             #endregion
         }
@@ -1835,53 +1835,53 @@ namespace OurWord.Edit
         }
         Color m_NonEditableBackgroundColor = Color.Empty;
         #endregion
-        #region OMethod: void OnPaint(ClipRectangle)
-        public override void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(IDraw, ClipRectangle)
+        public override void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
             // See if this paragraph needs to be painted
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
+            if (!clipRectangle.IntersectsWith(IntRectangle))
                 return;
 
 			// Bullet if indicated
-			PaintBullet();
+			PaintBullet(draw);
 
             // Borders if indicated
-            Border.Paint();
+            Border.Paint(draw);
 
             // Bitmap if indicated
-            PaintBitmap();
+            PaintBitmap(draw);
 
             // Paint the contents
             foreach (EBlock block in SubItems)
-                block.Paint();
+                block.Paint(draw);
 
             // Paint the line numbers, if turned on
-            if (ShowLineNumbers)
-            {
-                foreach (var line in Lines)
-                    line.PaintLineNumber(Window, this);
-            }
+            if (!ShowLineNumbers) 
+                return;
+            foreach (var line in Lines)
+                line.PaintLineNumber(Window, this);
         }
         #endregion
-		#region Method: void PaintBullet()
-		void PaintBullet()
+		#region Method: void PaintBullet(IDraw)
+		void PaintBullet(IDraw draw)
 		{
 			if (!PStyle.Bulleted)
 				return;
 
-			Graphics g = Window.Draw.Graphics;
-
 			// The radius is 1/5 of the line height
-			float fRadius = LineHeight / 5;
+			var fRadius = LineHeight / 5;
 
 			// We'll place it to the left of our first line by three times the radius
-			float xLeft = Position.X + (float)PStyle.LeftMargin * g.DpiX - fRadius * 3;
+		    var xLeft = SubItems[0].Position.X - fRadius * 3;
+// OLD: Verify a bullet displays correctly, then we can remove this. The line above
+// Should do the trick without the need for the DpiX value.
+//			var xLeft = Position.X + (float)PStyle.LeftMargin * g.DpiX - fRadius * 3;
 
 			// We'll place it vertically in the middle of the first line
-			float yTop = Position.Y + LineHeight / 2;
+			var yTop = Position.Y + LineHeight / 2;
 
 			// Draw the bullet
-			Window.Draw.DrawBullet( Color.Black, new PointF(xLeft, yTop), fRadius);
+			draw.DrawBullet( Color.Black, new PointF(xLeft, yTop), fRadius);
 		}
 		#endregion
 

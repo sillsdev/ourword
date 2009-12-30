@@ -115,13 +115,13 @@ namespace OurWord.Edit
         {
             // Get the window's background color (it may have changed since the window was 
             // first created.
-            string sBackColor = GetRegistryBackgroundColor(RegistrySettingsSubKey, "Wheat");
+            var sBackColor = GetRegistryBackgroundColor(RegistrySettingsSubKey, "Wheat");
             BackColor = Color.FromName(sBackColor);
 
             // Instantiate a draw object (Assumption is that if we need to do a Resize,
             // then the Draw object's double buffer needs to be recreated so it will be
             // of the correct size.
-            Draw = new DrawBuffer(this);
+            Draw = new ScreenDraw(this);
 
             // Start with a fresh calculation of the font size, window width, etc., for
             // the LineNumbers column, should it be turned on by the user.
@@ -146,7 +146,7 @@ namespace OurWord.Edit
             Focus();
 
             // Load, layout amd paint any secondary windows
-            foreach (OWWindow w in SecondaryWindows)
+            foreach (var w in SecondaryWindows)
                 w.LoadData();
         }
         #endregion
@@ -162,7 +162,7 @@ namespace OurWord.Edit
             Width = nWidth;
             Height = nHeight;
 
-            Draw = new DrawBuffer(this);
+            Draw = new ScreenDraw(this);
             DoLayout();
         }
         #endregion
@@ -425,225 +425,22 @@ namespace OurWord.Edit
         #endregion
 
         // Layout & Paint --------------------------------------------------------------------
-        #region CLASS: DrawBuffer
-        public class DrawBuffer
-        {
-            // Attrs (Mostly only used internally) -------------------------------------------
-            #region Attr{g}: Bitmap DoubleBuffer
-            public Bitmap DoubleBuffer
-            {
-                get
-                {
-                    Debug.Assert(null != m_bmpDoubleBuffer);
-                    return m_bmpDoubleBuffer;
-                }
-            }
-            Bitmap m_bmpDoubleBuffer;
-            #endregion
-            #region Attr{g}: Graphics Graphics
-            public Graphics Graphics
-            {
-                get
-                {
-                    Debug.Assert(null != m_graphics);
-                    return m_graphics;
-                }
-            }
-            Graphics m_graphics;
-            #endregion
-            #region Attr{g}: OWWindow Wnd
-            OWWindow Wnd
-            {
-                get
-                {
-                    Debug.Assert(null != m_wnd);
-                    return m_wnd;
-                }
-            }
-            OWWindow m_wnd;
-            #endregion
-
-            // Scaffolding -------------------------------------------------------------------
-            #region Constructor(OWWindow)
-            public DrawBuffer(OWWindow wnd)
-            {
-                // Save a pointer to the window
-                m_wnd = wnd;
-
-                // Create space for the double buffer
-                m_bmpDoubleBuffer = new Bitmap(wnd.Width, wnd.Height);
-
-                // Set a graphics object to it
-                m_graphics = Graphics.FromImage(DoubleBuffer);
-
-                // Turn off Hinting. This means that, yes, the text will not be as pretty to
-                // read, but it makes the cursor appear in the correct place; and eliminates
-                // the moving around that was happening when selecting text.
-                m_graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            }
-            #endregion
-            #region Method: void Dispose() -good to call this manually to free memory
-            public void Dispose()
-            {
-                if (null != DoubleBuffer)
-                    DoubleBuffer.Dispose();
-                m_bmpDoubleBuffer = null;
-
-                if (null != Graphics)
-                    Graphics.Dispose();
-                m_graphics = null;
-            }
-            #endregion
-
-            // Drawing Methods ---------------------------------------------------------------
-			#region Method: void FillRectangle(Color clrBackground, RectangleF rect)
-			public void FillRectangle(Color clrBackground, RectangleF rect)
-            {
-                Brush brush = new SolidBrush(clrBackground);
-
-                RectangleF r = new RectangleF(rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-
-                Graphics.FillRectangle(brush, r);
-            }
-            #endregion
-            #region Method: void DrawString(string s, Font font, Brush brush, PointF pt)
-            public void DrawString(string s, Font font, Brush brush, PointF pt)
-            {
-                Graphics.DrawString(s, font, brush, pt.X, pt.Y - Wnd.ScrollBarPosition,
-                    StringFormat.GenericTypographic);
-            }
-            #endregion
-            #region Method: void DrawString(string s, Font font, Brush brush, RectangleF rect)
-            public void DrawString(string s, Font font, Brush brush, RectangleF rect)
-            {
-                var r = new RectangleF(rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-
-                Graphics.DrawString(s, font, brush, r);
-            }
-            #endregion
-            #region Method: void DrawRectangle(Pen, RectangleF)
-            public void DrawRectangle(Pen pen, RectangleF rect)
-            {
-                Graphics.DrawRectangle(pen, 
-                    rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-            }
-            #endregion
-            #region Method: void DrawRoundedRectangle(Pen, FillBrush, Rect, Radius)
-            public void DrawRoundedRectangle(Pen BorderPen, Brush FillBrush, RectangleF Rect, float Radius)
-            {
-                float xLeft = Rect.Left;
-                float xRight = Rect.Right;
-                float yTop = Rect.Top - Wnd.ScrollBarPosition;
-                float yBottom = Rect.Bottom - Wnd.ScrollBarPosition;
-
-                float diameter = Radius * 2;
-
-                GraphicsPath gp = new GraphicsPath();
-
-                gp.StartFigure();
-
-                // Top Horz line
-                gp.AddLine(xLeft + Radius, yTop, xRight - Radius, yTop);
-
-                // Top-right arc
-                gp.AddArc(xRight - diameter, yTop, diameter, diameter, 270, 90);
-
-                // Right Vert line
-                gp.AddLine(xRight, yTop + Radius, xRight, yBottom - Radius);
-
-                // Bottom-right arc
-                gp.AddArc(xRight - diameter, yBottom - diameter, diameter, diameter, 0, 90);
-
-                // Bottom Horz line
-                gp.AddLine(xRight - Radius, yBottom, xLeft + Radius, yBottom);
-
-                // Bottom-left arc
-                gp.AddArc(xLeft, yBottom - diameter, diameter, diameter, 90, 90);
-
-                // Left Vert line
-                gp.AddLine(xLeft, yBottom - Radius, xLeft, yTop + Radius);
-
-                // Top-Left arc
-                gp.AddArc(xLeft, yTop, diameter, diameter, 180, 90);
-
-                gp.CloseFigure();
-
-                // Fill the interior if requested
-                if (null != FillBrush)
-                    Graphics.FillPath(FillBrush, gp);
-
-                // Draw the border if requested
-                if (null != BorderPen)
-                    Graphics.DrawPath(BorderPen, gp);
-            }
-            #endregion
-            #region Method: void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
-            public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
-            {
-                Graphics.DrawLine(pen,
-                    x1, y1 - Wnd.ScrollBarPosition,
-                    x2, y2 - Wnd.ScrollBarPosition);
-            }
-            #endregion
-            #region Method: void DrawLine(Pen pen, PointF pt1, PointF pt2)
-            public void DrawLine(Pen pen, PointF pt1, PointF pt2)
-            {
-                Graphics.DrawLine(pen,
-                    pt1.X, pt1.Y - Wnd.ScrollBarPosition,
-                    pt2.X, pt2.Y - Wnd.ScrollBarPosition);
-            }
-            #endregion
-            #region Method: void DrawVertLine(Pen pen, float x, float y1, float y2)
-            public void DrawVertLine(Pen pen, float x, float y1, float y2)
-            {
-                Graphics.DrawLine(pen,
-                    x, y1 - Wnd.ScrollBarPosition,
-                    x, y2 - Wnd.ScrollBarPosition);
-            }
-            #endregion
-			#region Method: void DrawBullet(Color, PointF, fRadius)
-			public void DrawBullet(Color color, PointF pt, float Radius)
-			{
-				Brush brush = new SolidBrush(color);
-
-				float xLeft = pt.X - Radius;
-				float yTop = pt.Y - Radius - Wnd.ScrollBarPosition;
-				float diameter = Radius * 2;
-
-				Graphics.FillEllipse(brush, xLeft, yTop, diameter, diameter);
-			}
-			#endregion
-            #region Method: void DrawImage(Image image, PointF pt)
-            public void DrawImage(Image image, PointF pt)
-            {
-                var point = new Point(
-                    (int)pt.X, 
-                    (int)(pt.Y - Wnd.ScrollBarPosition));
-
-                Graphics.DrawImage(image, point);
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g/s}: DrawBuffer Draw
-        public DrawBuffer Draw
+        #region Attr{g/s}: ScreenDraw Draw
+        public ScreenDraw Draw
         {
             get
             {
                 Debug.Assert(null != m_Draw);
                 return m_Draw;
             }
-            set
+            protected set
             {
                 if (null != m_Draw)
                     Draw.Dispose();
                 m_Draw = value;
             }
         }
-        DrawBuffer m_Draw = null;
+        ScreenDraw m_Draw;
         #endregion
         #region Attr{g/s}: EditableBackgroundColor - The background color for words which can be edited. Default is White
         public Color EditableBackgroundColor
@@ -723,12 +520,12 @@ namespace OurWord.Edit
             if (Contents.Count == 0)
             {
                 PaintNoDataMessage(e);
-                e.Graphics.DrawImageUnscaled(Draw.DoubleBuffer, 0, 0);
+                Draw.TransferToScreen(e.Graphics);
                 return;
             }
 
             // Paint the contents
-            Contents.OnPaint(r);
+            Contents.OnPaint(Draw, r);
 
 			// Paint any controls (otherwise, the ones we don't paint due to the
 			// clip rectangle, tend to stay around on the screen.)
@@ -736,10 +533,10 @@ namespace OurWord.Edit
 
             // Text Selection
             if (null != Selection)
-                Selection.Paint();
+                Selection.Paint(Draw);
 
             // Transfer from the DoubleBuffer to our actual window
-            e.Graphics.DrawImageUnscaled(Draw.DoubleBuffer, 0, 0);
+            Draw.TransferToScreen(e.Graphics);
         }
         #endregion
         #region Cmd: OnPaintBackground - do nothing!
@@ -852,7 +649,7 @@ namespace OurWord.Edit
             public CLineNumberAttrs(Graphics g)
             {
                 // We'll use a fixed-space font so that the numbers line up
-                float fSize = 10 * G.ZoomFactor;
+                var fSize = 10 * G.ZoomFactor;
                 m_fLineNumberFont = new Font("Courier New", fSize);
 
                 // Get the default Brush color; the window can overridei this
@@ -860,8 +657,8 @@ namespace OurWord.Edit
 
                 // Calculate the width required for the line number column
                 // We'll measure a fat, 3-digit string plus a trailing space
-                string s = "000 ";
-                StringFormat fmt = StringFormat.GenericTypographic;
+                const string s = "000 ";
+                var fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
                 m_fLineNumberColumnWidth = g.MeasureString(s, Font, 1000, fmt).Width;
             }
@@ -1650,8 +1447,8 @@ namespace OurWord.Edit
             #endregion
 
             // Misc Methods ------------------------------------------------------------------
-            #region Method: void Paint()
-            public void Paint()
+            #region Method: void Paint(IDraw)
+            public void Paint(IDraw draw)
                 // Here, we only paint the verticle insertion point. If the IP is supposed
                 // to be in the "off" state, then it is turned off because we re-draw the
                 // underlying Word.
@@ -1659,17 +1456,17 @@ namespace OurWord.Edit
                 if (IsInsertionIcon & Window.Focused)
                 {
                     if (m_bFlashOn)
-                        Anchor.Word.PaintSelection(-1, -1);
+                        Anchor.Word.PaintSelection(draw, -1, -1);
                     return;
                 }
 
                 if (m_bFlashOn && IsInsertionPoint && Window.Focused)
                 {
-                    Pen pen = new Pen(System.Drawing.Color.Black, 2);
+                    var pen = new Pen(System.Drawing.Color.Black, 2);
 
-                    EWord word = Anchor.Word;
+                    var word = Anchor.Word;
 
-                    float x = word.Position.X + Anchor.xFromWordLeft;
+                    var x = word.Position.X + Anchor.xFromWordLeft;
 
                     // Adjust off of the boundary, so we can make certain it is in the
                     // word's drawing area (rounding areas on the Screen can affect this.)
@@ -1678,7 +1475,7 @@ namespace OurWord.Edit
                     if (Anchor.iChar == Anchor.Word.Text.Length)
                         x--;
 
-                    Window.Draw.DrawVertLine(pen, x, word.Position.Y,
+                    draw.DrawVertLine(pen, x, word.Position.Y,
                         word.Position.Y + word.Height);
 
                     return;
@@ -1695,24 +1492,24 @@ namespace OurWord.Edit
                     // Selection is within a single Word: simple and we're done
                     if (SelFirst.Word == SelLast.Word)
                     {
-                        First.Word.PaintSelection(SelFirst.iChar, SelLast.iChar);
+                        First.Word.PaintSelection(draw, SelFirst.iChar, SelLast.iChar);
                         return;
                     }
 
                     // Paint the first partial word
-                    First.Word.PaintSelection(SelFirst.iChar, -1);
+                    First.Word.PaintSelection(draw, SelFirst.iChar, -1);
 
                     // Paint the whole words in-between
                     for (int i = SelFirst.iBlock + 1; i < SelLast.iBlock; i++)
                     {
-                        EWord word = Paragraph.SubItems[i] as EWord;
+                        var word = Paragraph.SubItems[i] as EWord;
                         Debug.Assert(null != word);
                         if (null != word)
-                            word.PaintSelection(-1, -1);
+                            word.PaintSelection(draw, -1, -1);
                     }
 
                     // Paint the final partial word
-                    Last.Word.PaintSelection(-1, SelLast.iChar);
+                    Last.Word.PaintSelection(draw, -1, SelLast.iChar);
                 }
             }
             #endregion

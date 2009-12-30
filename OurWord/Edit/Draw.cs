@@ -1,6 +1,7 @@
 ﻿using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
+using System.Windows.Forms;
 
 namespace OurWord.Edit
 {
@@ -96,92 +97,101 @@ namespace OurWord.Edit
         public ScreenDraw(OWWindow window)
         {
             m_bmpDoubleBuffer = new Bitmap(window.Width, window.Height);
-            m_Graphics = Graphics.FromImage(m_bmpDoubleBuffer);
+            Graphics = Graphics.FromImage(m_bmpDoubleBuffer);
 
             // Turn off Hinting. This means that, yes, the text will not be as pretty to
             // read, but it makes the cursor appear in the correct place; and eliminates
             // the moving around that was happening when selecting text.
-            m_Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+            Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
 
-            m_ScrollBarPosition = window.ScrollBarPosition;
+            m_ScrollBar = window.ScrollBar;
         }
         #endregion
-        private readonly Bitmap m_bmpDoubleBuffer;
-        private readonly Graphics m_Graphics;
-        private readonly float m_ScrollBarPosition;
+        private Bitmap m_bmpDoubleBuffer;
+        private readonly VScrollBar m_ScrollBar;
+        #region Attr{g}: float ScrollBarPosition
+        private float ScrollBarPosition
+        {
+            get
+            {
+                return (null == m_ScrollBar) ? 0 : m_ScrollBar.Value;
+            }
+        }
+        #endregion
+        public Graphics Graphics { get; private set; }
 
         // IDraw Interface -------------------------------------------------------------------
         #region Method: void FillRectangle(clrBackground, rect)
         public void FillRectangle(Color clrBackground, RectangleF rect)
         {
-            var r = new RectangleF(rect.X, rect.Y - m_ScrollBarPosition,
+            var r = new RectangleF(rect.X, rect.Y - ScrollBarPosition,
                 rect.Width, rect.Height);
 
-            m_Graphics.FillRectangle(new SolidBrush(clrBackground), r);
+            Graphics.FillRectangle(new SolidBrush(clrBackground), r);
         }
         #endregion
         #region Method: void DrawString(s, font, Brush, pt)
         public void DrawString(string s, Font font, Brush brush, PointF pt)
         {
-            pt = new PointF(pt.X, pt.Y - m_ScrollBarPosition);
-            DrawString(m_Graphics, s, font, brush, pt);
+            pt = new PointF(pt.X, pt.Y - ScrollBarPosition);
+            DrawString(Graphics, s, font, brush, pt);
         }
         #endregion
         #region Method: void DrawString(s, font, Brush, pt)
         public void DrawString(string s, Font font, Brush brush, RectangleF rect)
         {
-            var r = new RectangleF(rect.X, rect.Y - m_ScrollBarPosition,
+            var r = new RectangleF(rect.X, rect.Y - ScrollBarPosition,
                 rect.Width, rect.Height);
 
-            m_Graphics.DrawString(s, font, brush, r);
+            Graphics.DrawString(s, font, brush, r);
         }
         #endregion
         #region Method: void DrawRectangle(Pen, RectangleF)
         public void DrawRectangle(Pen pen, RectangleF rect)
         {
-            m_Graphics.DrawRectangle(pen,
-                rect.X, rect.Y - m_ScrollBarPosition,
+            Graphics.DrawRectangle(pen,
+                rect.X, rect.Y - ScrollBarPosition,
                 rect.Width, rect.Height);
         }
         #endregion
         #region Method: void DrawRoundedRectangle(borderPen, fillBrush, rect, fRadius)
         public void DrawRoundedRectangle(Pen borderPen, Brush fillBrush, RectangleF rect, float fRadius)
         {
-            var rectAdjusted = new RectangleF(rect.X - m_ScrollBarPosition, rect.Y, 
+            var rectAdjusted = new RectangleF(rect.X - ScrollBarPosition, rect.Y, 
                 rect.Width, rect.Height);
 
-            DrawRoundedRectangle(m_Graphics, borderPen, fillBrush, rectAdjusted, fRadius);
+            DrawRoundedRectangle(Graphics, borderPen, fillBrush, rectAdjusted, fRadius);
         }
         #endregion
         #region Method: void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
-            m_Graphics.DrawLine(pen,
-                x1, y1 - m_ScrollBarPosition,
-                x2, y2 - m_ScrollBarPosition);
+            Graphics.DrawLine(pen,
+                x1, y1 - ScrollBarPosition,
+                x2, y2 - ScrollBarPosition);
         }
         #endregion
         #region Method: void DrawLine(Pen pen, PointF pt1, PointF pt2)
         public void DrawLine(Pen pen, PointF pt1, PointF pt2)
         {
-            m_Graphics.DrawLine(pen,
-                pt1.X, pt1.Y - m_ScrollBarPosition,
-                pt2.X, pt2.Y - m_ScrollBarPosition);
+            Graphics.DrawLine(pen,
+                pt1.X, pt1.Y - ScrollBarPosition,
+                pt2.X, pt2.Y - ScrollBarPosition);
         }
         #endregion
         #region Method: void DrawVertLine(Pen pen, float x, float y1, float y2)
         public void DrawVertLine(Pen pen, float x, float y1, float y2)
         {
-            m_Graphics.DrawLine(pen,
-                x, y1 - m_ScrollBarPosition,
-                x, y2 - m_ScrollBarPosition);
+            Graphics.DrawLine(pen,
+                x, y1 - ScrollBarPosition,
+                x, y2 - ScrollBarPosition);
         }
         #endregion
         #region Method: void DrawBullet(Color, PointF, fRadius)
         public void DrawBullet(Color color, PointF pt, float fRadius)
         {
-            DrawBullet(m_Graphics, color, 
-                new PointF(pt.X, pt.Y - m_ScrollBarPosition), 
+            DrawBullet(Graphics, color, 
+                new PointF(pt.X, pt.Y - ScrollBarPosition), 
                 fRadius);
         }
         #endregion
@@ -190,9 +200,29 @@ namespace OurWord.Edit
         {
             var point = new Point(
                 (int)pt.X,
-                (int)(pt.Y - m_ScrollBarPosition));
+                (int)(pt.Y - ScrollBarPosition));
 
-            m_Graphics.DrawImage(image, point);
+            Graphics.DrawImage(image, point);
+        }
+        #endregion
+
+        // Unique to ScreenDraw --------------------------------------------------------------
+        #region Method: void Dispose()
+        public void Dispose()
+        {
+            if (null != m_bmpDoubleBuffer)
+                m_bmpDoubleBuffer.Dispose();
+            m_bmpDoubleBuffer = null;
+
+            if (null != Graphics)
+                Graphics.Dispose();
+            Graphics = null;
+        }
+        #endregion
+        #region Method: void TransferToScreen(Graphics destinationGraphics)
+        public void TransferToScreen(Graphics destinationGraphics)
+        {
+            destinationGraphics.DrawImageUnscaled(m_bmpDoubleBuffer, 0, 0);
         }
         #endregion
     }

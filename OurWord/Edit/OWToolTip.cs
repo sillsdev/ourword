@@ -305,7 +305,7 @@ namespace OurWord.Edit
             // we would call SetSize, but this requires another call to DoLayout; thus this
             // situation where the layout drives the window size causes us to do things
             // like this.
-            Draw = new DrawBuffer(this);
+            Draw = new ScreenDraw(this);
         }
         #endregion
         #region Cmd: OnSizeChanged

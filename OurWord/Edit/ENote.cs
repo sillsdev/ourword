@@ -72,10 +72,10 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: override void Paint()
-        public override void Paint()
+        #region Method: override void Paint(IDraw)
+        public override void Paint(IDraw draw)
         {
-            Draw.DrawImage(Bmp, Position);
+            draw.DrawImage(Bmp, Position);
         }
         #endregion
 

@@ -115,6 +115,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        /*
         #region VAttr{g}: OWWindow.DrawBuffer Draw
         public OWWindow.DrawBuffer Draw
         {
@@ -124,6 +125,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        */
         #region VAttr{g}: int PositionWithinPara
         public int PositionWithinPara
         {
@@ -196,8 +198,8 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: virtual void Paint() - for the editor
-        virtual public void Paint()
+        #region Method: virtual void Paint(IDraw)
+        virtual public void Paint(IDraw draw)
         {
         }
         #endregion
@@ -372,19 +374,19 @@ namespace OurWord.Edit
         #endregion
 
         // Painting --------------------------------------------------------------------------
-        #region Method: void PaintBackgroundRectangle(Color color)
-        void PaintBackgroundRectangle(Color color)
+        #region Method: void PaintBackgroundRectangle(IDraw, Color color)
+        void PaintBackgroundRectangle(IDraw draw, Color color)
         {
-            RectangleF r = new RectangleF(Position,
+            var r = new RectangleF(Position,
                 new SizeF(Width + JustificationPaddingAdded - HyphenWidth, Height));
-            Draw.FillRectangle(color, r);
+            draw.FillRectangle(color, r);
         }
         #endregion
-        #region Method: override void Paint()
-        public override void Paint()
+        #region Method: override void Paint(IDraw)
+        public override void Paint(IDraw draw)
         {
             // The white background
-            PaintBackgroundRectangle(
+            PaintBackgroundRectangle(draw,
                 (Para.IsEditable && !Para.IsLocked) ?
                     Para.EditableBackgroundColor :
                     Para.NonEditableBackgroundColor);
@@ -392,30 +394,30 @@ namespace OurWord.Edit
             // The text
             if (!IsInsertionIcon)
             {
-                Draw.DrawString(Text, Font, GetBrush(), Position);
+                draw.DrawString(Text, Font, GetBrush(), Position);
 
                 if (Hyphenated)
                 {
-                    Draw.DrawString("-", Font, GetBrush(), 
+                    draw.DrawString("-", Font, GetBrush(), 
                         new PointF(Position.X + Width - HyphenWidth, Position.Y));
                 }
             }
         }
         #endregion
-        #region Method: void PaintSelection(int iCharLeft, int iCharRight)
-        public void PaintSelection(int iCharLeft, int iCharRight)
+        #region Method: void PaintSelection(IDraw, int iCharLeft, int iCharRight)
+        public void PaintSelection(IDraw draw, int iCharLeft, int iCharRight)
         {
             // Create the colors and brushes we'll need
-            Color clrSelectedBackground = SystemColors.Highlight;
-            Color clrSelectedText = SystemColors.HighlightText;
+            var clrSelectedBackground = SystemColors.Highlight;
+            var clrSelectedText = SystemColors.HighlightText;
             Brush brushSelectedText = new SolidBrush(clrSelectedText);
             Brush brushNormalText = new SolidBrush(FontForWS.FontColor);
 
             // Insertion Icon
             if (IsInsertionIcon)
             {
-                PaintBackgroundRectangle(clrSelectedBackground);
-                Draw.DrawString(G.GetLoc_String("TypeHere", "[Type Here]"),
+                PaintBackgroundRectangle(draw, clrSelectedBackground);
+                draw.DrawString(G.GetLoc_String("TypeHere", "[Type Here]"),
                     Font, brushSelectedText, Position);
                 return;
             }
@@ -429,8 +431,8 @@ namespace OurWord.Edit
             // Optimization/Shortcut: Paint the entire word as selected if apropriate
             if (iCharLeft == 0 && iCharRight == Text.Length)
             {
-                PaintBackgroundRectangle(clrSelectedBackground);
-                Draw.DrawString(Text, Font, brushSelectedText, Position);
+                PaintBackgroundRectangle(draw, clrSelectedBackground);
+                draw.DrawString(Text, Font, brushSelectedText, Position);
                 return;
             }
 
@@ -439,39 +441,39 @@ namespace OurWord.Edit
                 return;
 
             // Figure out the selection texts
-            string sLeft = (iCharLeft == 0) ? "" : Text.Substring(0, iCharLeft);
-            string sTemp = (iCharLeft == 0) ? Text : Text.Substring(iCharLeft);
-            string sSelected = (iCharRight == Text.Length) ? sTemp :
+            var sLeft = (iCharLeft == 0) ? "" : Text.Substring(0, iCharLeft);
+            var sTemp = (iCharLeft == 0) ? Text : Text.Substring(iCharLeft);
+            var sSelected = (iCharRight == Text.Length) ? sTemp :
                 sTemp.Substring(0, iCharRight - iCharLeft);
-            string sRight = (iCharRight == Text.Length) ? "" :
+            var sRight = (iCharRight == Text.Length) ? "" :
                 sTemp.Substring(iCharRight - iCharLeft);
 
             // Figure out the boundaries
-            float fTotalWidth = Width + JustificationPaddingAdded;
-            float xSelLeft = Position.X +
+            var fTotalWidth = Width + JustificationPaddingAdded;
+            var xSelLeft = Position.X +
                 ((iCharLeft == 0) ? 0 : Context.Measure(sLeft, Font));
-            float xSelRight = xSelLeft + ((iCharRight == Text.Length) ?
+            var xSelRight = xSelLeft + ((iCharRight == Text.Length) ?
                 fTotalWidth - Context.Measure(sLeft, Font) :
                 Context.Measure(sSelected, Font));
 
             // Paint the white background, for those portions that are not selected
-            PaintBackgroundRectangle(
+            PaintBackgroundRectangle(draw,
                 Para.IsLocked ? Para.NonEditableBackgroundColor : Para.EditableBackgroundColor);
 
             // Paint the selected background
-            RectangleF rectSelected = new RectangleF(xSelLeft, Position.Y, xSelRight - xSelLeft, Height);
-            Draw.FillRectangle(clrSelectedBackground, rectSelected);
+            var rectSelected = new RectangleF(xSelLeft, Position.Y, xSelRight - xSelLeft, Height);
+            draw.FillRectangle(clrSelectedBackground, rectSelected);
 
             // Paint the text
             if (sLeft.Length > 0)
-                Draw.DrawString(sLeft, Font, brushNormalText, Position);
+                draw.DrawString(sLeft, Font, brushNormalText, Position);
 
-            Draw.DrawString(sSelected, Font, brushSelectedText,
+            draw.DrawString(sSelected, Font, brushSelectedText,
                 new PointF(xSelLeft, Position.Y));
 
             if (sRight.Length > 0)
             {
-                Draw.DrawString(sRight, Font, brushNormalText,
+                draw.DrawString(sRight, Font, brushNormalText,
                     new PointF(xSelRight, Position.Y));
             }
         }

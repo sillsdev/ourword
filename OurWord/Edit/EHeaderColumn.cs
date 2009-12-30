@@ -173,25 +173,25 @@ namespace OurWord.Edit
             Height = (y - Position.Y);
         }
         #endregion
-        #region OMethod: void OnPaint(Rectangle ClipRectangle)
-        public override void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(IDraw, ClipRectangle)
+        public override void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
             // For performance, make sure we need to paint this container
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
+            if (!clipRectangle.IntersectsWith(IntRectangle))
                 return;
 
             // Footnote Separator if indicated
-            Border.Paint();
+            Border.Paint(draw);
 
             // Header
-            Header.OnPaint(ClipRectangle);
+            Header.OnPaint(draw, clipRectangle);
 
             // Bitmap if indicated
-            PaintBitmap();
+            PaintBitmap(draw);
 
             // Paint the subcontainers
-            foreach (EItem item in SubItems)
-                item.OnPaint(ClipRectangle);
+            foreach (var item in SubItems)
+                item.OnPaint(draw, clipRectangle);
         }
         #endregion
         #region OMethod: EBlock GetBlockAt(PointF pt)

@@ -235,7 +235,7 @@ namespace OurWord.Edit
 
         // Painting --------------------------------------------------------------------------
         #region VirtMethod: void OnPaint(ClipRectangle)
-        virtual public void OnPaint(Rectangle ClipRectangle)
+        virtual public void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
         }
         #endregion
@@ -526,15 +526,6 @@ namespace OurWord.Edit
             }
             EItem m_Item;
             #endregion
-            #region VAttr{g}: OWWindow.DrawBuffer Draw
-            protected OWWindow.DrawBuffer Draw
-            {
-                get
-                {
-                    return Item.Window.Draw;
-                }
-            }
-            #endregion
 
             // Border locations (i.e., adjusted for margin) ----------------------------------
             #region Attr{g}: float LeftBorder
@@ -575,8 +566,8 @@ namespace OurWord.Edit
             #endregion
 
             // Layout and Drawing ------------------------------------------------------------
-            #region VMethod: void Paint()
-            virtual public void Paint()
+            #region VMethod: void Paint(IDraw)
+            virtual public void Paint(IDraw draw)
             {
             }
             #endregion
@@ -595,29 +586,28 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Pen pen = BorderPen;
-                OWWindow.DrawBuffer d = Draw;
+                var pen = BorderPen;
 
                 if (Color.Empty != FillColor)
-                    Draw.FillRectangle(FillColor, BorderRectangle);
+                    draw.FillRectangle(FillColor, BorderRectangle);
 
-                PointF LeftTop = new PointF(LeftBorder, TopBorder);
-                PointF LeftBottom = new PointF(LeftBorder, BottomBorder);
-                PointF RightTop = new PointF(RightBorder, TopBorder);
-                PointF RightBottom = new PointF(RightBorder, BottomBorder);
+                var fLeftTop = new PointF(LeftBorder, TopBorder);
+                var fLeftBottom = new PointF(LeftBorder, BottomBorder);
+                var fRightTop = new PointF(RightBorder, TopBorder);
+                var fRightBottom = new PointF(RightBorder, BottomBorder);
 
                 if ((BorderPlacement & BorderSides.Top) == BorderSides.Top)
-                    d.DrawLine(pen, LeftTop, RightTop);
+                    draw.DrawLine(pen, fLeftTop, fRightTop);
                 if ((BorderPlacement & BorderSides.Bottom) == BorderSides.Bottom)
-                    d.DrawLine(pen, LeftBottom, RightBottom);
+                    draw.DrawLine(pen, fLeftBottom, fRightBottom);
 
                 if ((BorderPlacement & BorderSides.Left) == BorderSides.Left)
-                    d.DrawLine(pen, LeftTop, LeftBottom);
+                    draw.DrawLine(pen, fLeftTop, fLeftBottom);
                 if ((BorderPlacement & BorderSides.Right) == BorderSides.Right)
-                    d.DrawLine(pen, RightTop, RightBottom);
+                    draw.DrawLine(pen, fRightTop, fRightBottom);
             }
             #endregion
         }
@@ -652,10 +642,10 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawRoundedRectangle(BorderPen, FillBrush,
+                draw.DrawRoundedRectangle(BorderPen, FillBrush,
                     BorderRectangle, RoundedBorderRadius);
             }
             #endregion
@@ -691,13 +681,13 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
                 if (0 == SeparatorWidth)
                     return;
 
-                Draw.DrawLine(BorderPen,
+                draw.DrawLine(BorderPen,
                    new PointF(LeftBorder, TopBorder),
                    new PointF(LeftBorder + SeparatorWidth, TopBorder));
             }
@@ -736,8 +726,8 @@ namespace OurWord.Edit
         }
         Bitmap m_bmp = null;
         #endregion
-        protected const int c_BitmapMargin = 5;         // vert marg above/below the bitmap
-        protected const int c_BitmapPadAtBottom = 2;    // pixels at bottom to ensure line gets drawn
+        private const int c_BitmapMargin = 5;         // vert marg above/below the bitmap
+        private const int c_BitmapPadAtBottom = 2;    // pixels at bottom to ensure line gets drawn
         #region Attr{g}: bool HasBitmap
         public bool HasBitmap
         {
@@ -747,25 +737,25 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: void PaintBitmap()
-        protected void PaintBitmap()
+        #region Method: void PaintBitmap(IDraw)
+        protected void PaintBitmap(IDraw draw)
         {
             if (!HasBitmap)
                 return;
 
             // Line above and below
-            Pen pen = new Pen(Color.Black);
-            Window.Draw.DrawLine(pen,
+            var pen = new Pen(Color.Black);
+            draw.DrawLine(pen,
                 Position,
                 new PointF(Position.X + Rectangle.Width, Position.Y));
-            Window.Draw.DrawLine(pen,
+            draw.DrawLine(pen,
                 new PointF(Position.X, Position.Y + Rectangle.Height - 2),
                 new PointF(Position.X + Rectangle.Width, Position.Y + Rectangle.Height - 2));
 
             // Draw the bitmap
-            float xBmp = Position.X + (Rectangle.Width - Bmp.Width) / 2;
-            float yBmp = Position.Y + 1 + c_BitmapMargin;
-            Window.Draw.DrawImage(Bmp, new PointF(xBmp, yBmp));
+            var xBmp = Position.X + (Rectangle.Width - Bmp.Width) / 2;
+            var yBmp = Position.Y + 1 + c_BitmapMargin;
+            draw.DrawImage(Bmp, new PointF(xBmp, yBmp));
         }
         #endregion
         #region Method: float CalculateBitmapHeightRequirement()
@@ -1542,28 +1532,28 @@ namespace OurWord.Edit
         #endregion
 
         // Painting --------------------------------------------------------------------------
-        #region OMethod: void OnPaint(ClipRectangle)
-        override public void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(IDraw, ClipRectangle)
+        override public void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
             // For performance, make sure we need to paint this container
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
+            if (!clipRectangle.IntersectsWith(IntRectangle))
                 return;
 
             // Borders as indicated
-            Border.Paint();
+            Border.Paint(draw);
 
             // Bitmap if indicated
-            PaintBitmap();
+            PaintBitmap(draw);
 
             // Paint the subcontainers
-            foreach (EItem item in SubItems)
-                item.OnPaint(ClipRectangle);
+            foreach (var item in SubItems)
+                item.OnPaint(draw, clipRectangle);
         }
         #endregion
 		#region OMethod: void PaintControls()
 		public override void PaintControls()
 		{
-			foreach (EItem item in SubItems)
+			foreach (var item in SubItems)
 				item.PaintControls();
 		}
 		#endregion
