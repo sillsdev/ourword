@@ -44,6 +44,8 @@ namespace OurWord.Edit
         {
             get
             {
+                if (Context.IsSendingToPrinter)
+                    return 0;
                 return Bmp.Width;
             }
             set
@@ -72,10 +74,11 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: override void Paint(IDraw)
-        public override void Paint(IDraw draw)
+        #region Method: override void Draw(IDraw)
+        public override void Draw(IDraw draw)
         {
-            draw.DrawImage(Bmp, Position);
+            if (!draw.IsSendingToPrinter)
+                draw.DrawImage(Bmp, Position);
         }
         #endregion
 

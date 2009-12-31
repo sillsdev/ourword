@@ -514,7 +514,7 @@ namespace OurWord.Edit
             // AllPaintingInWmPaint style in the constructor, so that all 
             // painting (including the background) goes through the double
             // buffer.
-            Draw.FillRectangle(BackColor, r);
+            Draw.DrawBackground(BackColor, r);
 
             // If there is no data, then display a help message
             if (Contents.Count == 0)

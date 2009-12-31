@@ -31,8 +31,7 @@ namespace OurWord.Edit
             IsLocked = (8 | IsEditable),     // Can only Select & Copy; no changes (requires IsEditable to enable Select/Copy)
             ShowBackTranslation = 16,
             CanRestructureParagraphs = 32,
-            CanItalic = 64,                  // Italics are permitted in thie paragraph
-            ShowIBT = 128                    // Show the interlinear back translation
+            CanItalic = 64                   // Italics are permitted in thie paragraph
         };
         #endregion
         #region Attr{g}: Flags Options
@@ -125,15 +124,6 @@ namespace OurWord.Edit
             get
             {
                 return (Options & Flags.CanItalic) == Flags.CanItalic;
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool ShowIBT - true if the Interlinear BT should be shown
-        public bool ShowIBT
-        {
-            get
-            {
-                return (Options & Flags.ShowIBT) == Flags.ShowIBT;
             }
         }
         #endregion
@@ -242,16 +232,8 @@ namespace OurWord.Edit
             #endregion
 
             // Drawing -----------------------------------------------------------------------
-            public override void Print(Graphics g)
-            {
-                var x = Position.X;
-                var y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
-                g.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(),
-                    x, y, StringFormat.GenericTypographic);
-            }
-
-            #region Method: override void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region Method: override void Draw(IDraw)
+            public override void Draw(IDraw draw)
             {
                 // Position "x" at the left margin
                 var x = Position.X; 
@@ -328,8 +310,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region Method: override void Draw(IDraw)
+            public override void Draw(IDraw draw)
                 // The verse size in the stylesheet reflects a normal style; we need to
                 // decrease it for the superscript.
             {
@@ -340,7 +322,7 @@ namespace OurWord.Edit
                     if (Para.IsEditable && !Para.IsLocked)
                     {
                         var r = new RectangleF(Position, new SizeF(Width, Height));
-                        draw.FillRectangle(Para.EditableBackgroundColor, r);
+                        draw.DrawBackground(Para.EditableBackgroundColor, r);
                     }
                     return;
                 }
@@ -442,8 +424,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region Method: override void Draw(IDraw)
+            public override void Draw(IDraw draw)
             {
                 draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
             }
@@ -527,8 +509,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region Method: override void Draw(IDraw)
+            public override void Draw(IDraw draw)
             {
                 draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
@@ -560,8 +542,8 @@ namespace OurWord.Edit
                 }
             }
             #endregion
-            #region OMethod: void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region OMethod: void Draw(IDraw)
+            public override void Draw(IDraw draw)
             {
                 draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
@@ -610,8 +592,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region Method: override void Draw(IDraw)
+            public override void Draw(IDraw draw)
             {
                 draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
             }
@@ -663,8 +645,8 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Method: override void Paint(IDraw)
-            public override void Paint(IDraw draw)
+            #region Method: override void Draw(IDraw)
+            public override void Draw(IDraw draw)
             {
                 draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
             }
@@ -674,26 +656,26 @@ namespace OurWord.Edit
 
         // Initialize to a paragraph's contents ----------------------------------------------
         #region Method: EWord[] ParseBasicTextIntoWords(DBasicText t)
-        EWord[] ParseBasicTextIntoWords(DBasicText t, JCharacterStyle CStyleOverride)
+        List<EWord> ParseBasicTextIntoWords(DBasicText t, JCharacterStyle CStyleOverride)
         {
             // Select between the Vernacular vs the Back Translation text
-            DBasicText.DPhrases<DPhrase> phrases = (DisplayBT) ? t.PhrasesBT : t.Phrases;
+            var phrases = (DisplayBT) ? t.PhrasesBT : t.Phrases;
             Debug.Assert(phrases.Count > 0);
 
-            // We'll temporarily collect the EWords here
-            ArrayList a = new ArrayList();
+            // We'll collect the EWords here
+            var vWords = new List<EWord>();
 
             // Loop through all of the phrases in this DBasicText
             foreach (DPhrase phrase in phrases)
             {
                 // We'll collect individual words here
-                string sWord = "";
+                var sWord = "";
 
                 // Determine which character style goes with the word. We default to
                 // the "Override" which is passed in, but if this is null, then we
                 // get it from the normal source (the paragraph's style)
-                FontStyle mods = FontStyle.Regular;
-                JCharacterStyle cs = CStyleOverride;
+                var mods = FontStyle.Regular;
+                var cs = CStyleOverride;
                 if (null == cs)
                 {
                     cs = t.Paragraph.Style.CharacterStyle;
@@ -709,16 +691,16 @@ namespace OurWord.Edit
                 }
 
                 // Get the font for the style
-                JFontForWritingSystem fontForWS = cs.FindOrAddFontForWritingSystem(WritingSystem);
+                var fontForWS = cs.FindOrAddFontForWritingSystem(WritingSystem);
 
                 // Process through the phrase's text string
-                for (int i = 0; i < phrase.Text.Length; i++)
+                for (var i = 0; i < phrase.Text.Length; i++)
                 {
                     // If we are sitting at a word break, then add the word and reset
                     // in order to build the next one.
                     if (WritingSystem.IsWordBreak(phrase.Text, i) && sWord.Length > 0)
                     {
-                        a.Add(new EWord(fontForWS, phrase, sWord, mods));
+                        vWords.Add(new EWord(fontForWS, phrase, sWord, mods));
                         sWord = "";
                     }
 
@@ -729,31 +711,26 @@ namespace OurWord.Edit
                 // Pick up the final word in the string, IsWordBreak will not have 
                 // caught it.
                 if (sWord.Length > 0)
-                    a.Add(new EWord(fontForWS, phrase, sWord, mods));
+                    vWords.Add(new EWord(fontForWS, phrase, sWord, mods));
             }
 
             // If we did not find any words, then we want to create an InsertionIcon
-            if (a.Count == 0)
+            if (vWords.Count == 0)
             {
-                JCharacterStyle cStyle = t.Paragraph.Style.CharacterStyle;
-                JFontForWritingSystem fontForWS = cStyle.FindOrAddFontForWritingSystem(
-                    WritingSystem);
+                var cStyle = t.Paragraph.Style.CharacterStyle;
+                var fontForWS = cStyle.FindOrAddFontForWritingSystem(WritingSystem);
 
-                a.Add(EWord.CreateAsInsertionIcon(fontForWS, phrases[0]));
+                vWords.Add(EWord.CreateAsInsertionIcon(fontForWS, phrases[0]));
             }
 
-            // Convert to an array of EWords
-            EWord[] v = new EWord[a.Count];
-            for (int k = 0; k < a.Count; k++)
-                v[k] = a[k] as EWord;
-            return v;
+            return vWords;
         }
         #endregion
         #region Method: void _InitializeBasicTextWords(DBasicText, CStyleOverride)
         void _InitializeBasicTextWords(DBasicText t, JCharacterStyle CStyleOverride)
         {
-            EWord[] vWords = ParseBasicTextIntoWords(t, CStyleOverride);
-            Append(vWords);
+            var vWords = ParseBasicTextIntoWords(t, CStyleOverride);
+            Append(vWords.ToArray());
         }
         #endregion
         #region Method: void InitializeNoteIcons(DText)
@@ -779,27 +756,32 @@ namespace OurWord.Edit
         {
             // We are interested both in the Block passed in (iLeft) and the word immediately
             // to its right.
-            int iRight = iLeft + 1;
+            var iRight = iLeft + 1;
 
             // Make sure we've passed in words that exist in the list
             Debug.Assert(iLeft >= 0);
             Debug.Assert(iRight < SubItems.Length);
 
             // Retrieve their EBlock objects
-            EBlock blockLeft = SubItems[iLeft] as EBlock;
-            EBlock blockRight = SubItems[iRight] as EBlock;
+            var blockLeft = SubItems[iLeft] as EBlock;
+            var blockRight = SubItems[iRight] as EBlock;
             Debug.Assert(null != blockLeft && null != blockRight);
 
             // The default is not to glue
             blockLeft.GlueToNext = false;
 
-            // But we do glue in the case, e.g., where we are followed by certain objects
+            // Glue to following footnotes letters
             if (blockRight as EFoot != null)
                 blockLeft.GlueToNext = true;
-            // We glue the first note after text, but not subsequent ones; because Manado data
-            // has so many notes that they would take up the entire line.
+
+            // Glue to following TranslatorNotes (but not subsequent ones, as the Manado
+            // data exhibits so many that by themselve they can take up an entire line.
             if (blockLeft as ENote == null && blockRight as ENote != null)
                 blockLeft.GlueToNext = true;
+
+            // For the footnote paragraphs themselves, we want the preceeding labels
+            // (which house the Scripture reference) to be glued, so that any justification
+            // will not give them a ragged-looking alignment.
             if (blockLeft as EFootnoteLabel != null)
                 blockLeft.GlueToNext = true;
         }
@@ -1604,7 +1586,7 @@ namespace OurWord.Edit
         // y - The top coordinate of the paragraph. We'll use "y" to work through the 
         //     height of the paragraph, setting the individula paragraph parts.
         #region DOC - Leading Space before Verses
-        /* Leading Space before Verses - Whether or not to have leading space before
+            /* Leading Space before Verses - Whether or not to have leading space before
              *   a verse is a Layout issue. If the verse number is at the beginning of a
              *   line, no leading space is required. But if it is in the middle of a line,
              *   then we need the space.
@@ -1853,7 +1835,7 @@ namespace OurWord.Edit
 
             // Paint the contents
             foreach (EBlock block in SubItems)
-                block.Paint(draw);
+                block.Draw(draw);
 
             // Paint the line numbers, if turned on
             if (!ShowLineNumbers) 
@@ -2371,9 +2353,9 @@ namespace OurWord.Edit
         {
             int iBlockFirst = selection.DBT_iBlockFirst;
             RemoveAt(selection.DBT_iBlockFirst, selection.DBT_BlockCount);
-            EWord[] vWords = ParseBasicTextIntoWords(DBT, null);
-            InsertAt(iBlockFirst, vWords);
-            foreach (EWord w in vWords)
+            var vWords = ParseBasicTextIntoWords(DBT, null);
+            InsertAt(iBlockFirst, vWords.ToArray());
+            foreach (var w in vWords)
                 w.CalculateWidth();
 
             var context = new WindowContext(Window);

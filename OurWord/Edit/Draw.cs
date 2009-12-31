@@ -7,7 +7,9 @@ namespace OurWord.Edit
 {
     public interface IDraw
     {
+        bool IsSendingToPrinter { get; }
         void FillRectangle(Color clrBackground, RectangleF rect);
+        void DrawBackground(Color clrBackground, RectangleF rect);
         void DrawString(string s, Font f, Brush brush, PointF position);
         void DrawString(string s, Font f, Brush brush, RectangleF rect);
         void DrawRectangle(Pen pen, RectangleF rect);
@@ -121,6 +123,12 @@ namespace OurWord.Edit
         public Graphics Graphics { get; private set; }
 
         // IDraw Interface -------------------------------------------------------------------
+        #region Method: bool IsSendingToPrinter()
+        public bool IsSendingToPrinter
+        {
+            get { return false; }
+        }
+        #endregion
         #region Method: void FillRectangle(clrBackground, rect)
         public void FillRectangle(Color clrBackground, RectangleF rect)
         {
@@ -128,6 +136,13 @@ namespace OurWord.Edit
                 rect.Width, rect.Height);
 
             Graphics.FillRectangle(new SolidBrush(clrBackground), r);
+        }
+        #endregion
+        #region Method: void DrawBackground(clrBackground, rect)
+        public void DrawBackground(Color clrBackground, RectangleF rect)
+            // See PrinterDraw implementation for why we have this method
+        {
+            FillRectangle(clrBackground, rect);
         }
         #endregion
         #region Method: void DrawString(s, font, Brush, pt)
@@ -239,10 +254,24 @@ namespace OurWord.Edit
         private readonly Graphics m_Graphics;
 
         // IDraw Interface -------------------------------------------------------------------
+        #region Method: bool IsSendingToPrinter()
+        public bool IsSendingToPrinter
+        {
+            get { return true; }
+        }
+        #endregion
         #region Method: void FillRectangle(clrBackground, rect)
         public void FillRectangle(Color clrBackground, RectangleF rect)
         {
             m_Graphics.FillRectangle(new SolidBrush(clrBackground), rect);
+        }
+        #endregion
+        #region Method: void DrawBackground(clrBackground, rect)
+        public void DrawBackground(Color clrBackground, RectangleF rect)
+        {
+            // Do nothing: when printing we don't want to do the backgrounds that
+            // we do on the screen. If a filled rectangle is wanted, use 
+            // FillRectangle instead.
         }
         #endregion
         #region Method: void DrawString(s, font, Brush, pt)

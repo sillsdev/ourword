@@ -648,7 +648,6 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(p.ContentEquals(pNew), "Paragraphs should be equal.");
         }
         #endregion
-
         #region Test: oxesIO
         [Test] public void oxesIO()
         {

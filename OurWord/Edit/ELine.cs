@@ -285,14 +285,14 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region Method: void Print(g)
-        public void Print(Graphics g)
+        #region Method: void Draw(IDraw)
+        public void Draw(IDraw draw)
         {
             if (null != Chapter)
-                Chapter.Print(g);
+                Chapter.Draw(draw);
 
             foreach (EBlock block in SubItems)
-                block.Print(g);
+                block.Draw(draw);
         }
         #endregion
     }

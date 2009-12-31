@@ -94,7 +94,7 @@ namespace OurWord.Printing
 
             // A body line will appear on a page with all of its associated footnotes
             var vLineGroups = AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes);
-            SetReferences(vLineGroups);
+            SetScriptureReferences(vLineGroups);
 
             // Create the pages based on the heights that will fit
             while(vLineGroups.Count > 0)
@@ -136,14 +136,12 @@ namespace OurWord.Printing
             return vDisplayParagraphs;
         }
         #endregion
-        #region Method: List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
-        List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
+        #region SMethod: List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
+        static List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
         {
             var n = 0;
 
             var vFootnotes = new List<OWPara>();
-
-            var writingSystem = BookToPrint.Translation.WritingSystemVernacular;
 
             foreach (var paragraph in vDisplayParagraphs)
             {
@@ -240,14 +238,14 @@ namespace OurWord.Printing
             return vGroups;
         }
         #endregion
-        #region SMethod: void SetReferences(vGroups)
-        static void SetReferences(IEnumerable<AssociatedLines> vGroups)
+        #region SMethod: void SetScriptureReferences(vGroups)
+        static void SetScriptureReferences(IEnumerable<AssociatedLines> vGroups)
         {
             var nChapter = 1;
             var nVerse = 1;
 
             foreach(var group in vGroups)
-                group.SetReferences(ref nChapter, ref nVerse);
+                group.SetScriptureReferences(ref nChapter, ref nVerse);
         }
         #endregion
 
@@ -291,14 +289,14 @@ namespace OurWord.Printing
         {
             try
             {
-                pdoc.PrintPage += new PrintPageEventHandler(PrintPage);
+                pdoc.PrintPage += PrintPage;
                 pdoc.Print();
             }
             catch (Exception e)
             {
                 LocDB.Message("msgPrintFailed",
-                    "Printing failed with Windows message:\n\n{0}.",
-                    new string[] { e.Message },
+                    "Printing failed with operating system message:\n\n{0}.",
+                    new[] { e.Message },
                     LocDB.MessageTypes.Error);
             }
         }
@@ -308,7 +306,7 @@ namespace OurWord.Printing
 		{
             // Take the page off the beginning of the list and draw it
 		    var page = Pages[0];
-		    page.Draw(ev.Graphics);
+            page.Draw(new PrinterDraw(ev.Graphics));
 
             // Still more to do?
 		    Pages.RemoveAt(0);

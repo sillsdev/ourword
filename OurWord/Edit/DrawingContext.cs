@@ -6,6 +6,7 @@ namespace OurWord.Edit
     public interface IDrawingContext
     {
         // Attributes ------------------------------------------------------------------------
+        bool IsSendingToPrinter { get; }
         Graphics Graphics { get; }
         float AvailableWidthForContent { get; }
         float LeftMargin { get; }
@@ -34,6 +35,12 @@ namespace OurWord.Edit
     public class PrintContext : DrawingContext, IDrawingContext
     {
         // IDrawingContext Implementation ----------------------------------------------------
+        #region Method: bool IsSendingToPrinter()
+        public bool IsSendingToPrinter
+        {
+            get { return true; }
+        }
+        #endregion
         #region Attr{g}: Graphics Graphics
         public Graphics Graphics
         {
@@ -134,6 +141,12 @@ namespace OurWord.Edit
     public class WindowContext : DrawingContext, IDrawingContext
     {
         // IDrawingContext Implementation ----------------------------------------------------
+        #region Method: bool IsSendingToPrinter()
+        public bool IsSendingToPrinter
+        {
+            get { return false; }
+        }
+        #endregion
         #region Attr{g}: Graphics Graphics
         public Graphics Graphics
         {

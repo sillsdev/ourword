@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -59,7 +58,7 @@ namespace OurWord.Printing
                 - m_PageSettings.Margins.Top - m_PageSettings.Margins.Bottom;
 
             // Setup and measure the running footer
-            m_RunningFooter = new RunningFooter(nPageNumber, vLineGroups[0].Reference,
+            m_RunningFooter = new RunningFooter(nPageNumber, vLineGroups[0].ScriptureReference,
                 new PrintContext(pdoc));
             RunningFooter.Layout(pdoc);
 
@@ -151,15 +150,38 @@ namespace OurWord.Printing
             }
         }
         #endregion
-
-        public void Draw(Graphics g)
+        #region Method: void Draw(IDraw draw)
+        public void Draw(IDraw draw)
         {
             var allLines = new List<ELine>();
             allLines.AddRange(BodyLines);
             allLines.AddRange(FootnoteLines);
 
             foreach (var line in allLines)
-                line.Print(g);
+            {
+                line.Draw(draw);
+            }
+
         }
+        #endregion
+        void DrawPicture(IDraw draw, ELine line)
+        {
+            // Get the line's owning paragraph
+            var paragraph = line.Owner as OWPara;
+            if (null == paragraph)
+                return;
+
+            // We're only interested if this is the initial line in the paragraph, and
+            // if the paragraph has a picture to be drawn.
+            if (!paragraph.HasBitmap)
+                return;
+            if (paragraph.Lines.Count == 0 ||  line != paragraph.Lines[0])
+                return;
+
+
+
+
+        }
+
     }
 }

@@ -1640,8 +1640,8 @@ namespace OurWordData
                 return true;
 
             // Get the two characters of interest
-            char chWhitespace = s[iPos - 1];
-            char chNonWhitespace = s[iPos];
+            var chWhitespace = s[iPos - 1];
+            var chNonWhitespace = s[iPos];
 
             // Do the test
             if (char.IsWhiteSpace(chWhitespace) && !char.IsWhiteSpace(chNonWhitespace))

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using OurWord.Edit;
 using OurWordData.DataModel;
 
@@ -11,10 +9,11 @@ namespace OurWord.Printing
         public readonly List<ELine> BodyLines;
         public readonly List<ELine> FootnoteLines;
 
-        public int ChapterNumber { get; set; }
-        public int VerseNumber { get; set; }
-        #region Attr{g}: DReference Reference
-        public DReference Reference
+        // Chapter/Verse Scripture References ------------------------------------------------
+        private int ChapterNumber { get; set; }
+        private int VerseNumber { get; set; }
+        #region Attr{g}: DReference ScriptureReference
+        public DReference ScriptureReference
         {
             get
             {
@@ -22,10 +21,42 @@ namespace OurWord.Printing
             }
         }
         #endregion
+        #region Method: void SetScriptureReferences(ref nChapterNumber, ref nVerseNumber)
+        public void SetScriptureReferences(ref int nChapterNumber, ref int nVerseNumber)
+        {
+            // By default, these will be what is passed in
+            ChapterNumber = nChapterNumber;
+            VerseNumber = nVerseNumber;
 
-        public float SpaceAbove { get; set; }
-        public float SpaceBelow { get; set; }
+            // Update if we encounter a number within our body lines
+            foreach(var line in BodyLines)
+            {
+                foreach (var item in line.SubItems) 
+                {
+                    var chapter = item as OWPara.EChapter;
+                    if (null != chapter)
+                    {
+                        ChapterNumber = chapter.Number;
+                        VerseNumber = 1;
+                    }
 
+                    var verse = item as OWPara.EVerse;
+                    if (null != verse)
+                    {
+                        VerseNumber = verse.Number;
+                    }
+                }
+            }
+
+            // The caller needs the updated values to pass to the next one
+            nChapterNumber = ChapterNumber;
+            nVerseNumber = VerseNumber;
+        }
+        #endregion
+
+        // Line height -----------------------------------------------------------------------
+        public float SpaceAbove { private get; set; }
+        public float SpaceBelow { private get; set; }
         #region VAttr{g}: float TotalHeight
         public float TotalHeight
         {
@@ -47,6 +78,7 @@ namespace OurWord.Printing
         }
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor(ELine, vDisplayFootnotes)
         public AssociatedLines(ELine line, IEnumerable<OWPara> vDisplayFootnotes)
             : this(new List<ELine> {line}, vDisplayFootnotes )
@@ -82,35 +114,5 @@ namespace OurWord.Printing
         }
         #endregion
 
-        public void SetReferences(ref int nChapterNumber, ref int nVerseNumber)
-        {
-            // By default, these will be what is passed in
-            ChapterNumber = nChapterNumber;
-            VerseNumber = nVerseNumber;
-
-            // Update if we encounter a number within our body lines
-            foreach(var line in BodyLines)
-            {
-                foreach (var item in line.SubItems) 
-                {
-                    var chapter = item as OWPara.EChapter;
-                    if (null != chapter)
-                    {
-                        ChapterNumber = chapter.Number;
-                        VerseNumber = 1;
-                    }
-
-                    var verse = item as OWPara.EVerse;
-                    if (null != verse)
-                    {
-                        VerseNumber = verse.Number;
-                    }
-                }
-            }
-
-            // The caller needs the updated values to pass to the next one
-            nChapterNumber = ChapterNumber;
-            nVerseNumber = VerseNumber;
-        }
     }
 }
