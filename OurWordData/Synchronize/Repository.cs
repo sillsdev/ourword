@@ -357,7 +357,7 @@ namespace OurWordData.Synchronize
 
         // Repository Version ----------------------------------------------------------------
         private const string c_VersionTag = "OurWordVersion";
-        public const int c_CurrentVersionNo = 1;
+        public const int c_CurrentVersionNo = 2;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {
@@ -805,7 +805,7 @@ namespace OurWordData.Synchronize
             // the Execute command.
         {
             var pathToChorusMerge = Repository.SurroundWithQuotes(
-                Path.Combine(Other.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
+                Path.Combine(ExecutionEnvironment.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
 
             using (new ShortTermEnvironmentalVariable("OurWordDataVersion", LocalRepository.c_CurrentVersionNo.ToString()))
             using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", m_LocalRepository.FullPathToRepositoryRoot))
