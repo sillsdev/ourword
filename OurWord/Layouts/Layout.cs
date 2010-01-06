@@ -70,12 +70,10 @@ namespace OurWord.Layouts
 
         const int c_xMaxPictureWidth = 300;
         #region Method: Bitmap GetPicture(DParagraph p)
-        protected Bitmap GetPicture(DParagraph p)
+        static public Bitmap GetPicture(DParagraph p)
         {
-            DPicture pict = p as DPicture;
-            if (null != pict)
-                return pict.GetBitmap(c_xMaxPictureWidth);
-            return null;
+            var pict = p as DPicture;
+            return null != pict ? pict.GetBitmap(c_xMaxPictureWidth) : null;
         }
         #endregion
 

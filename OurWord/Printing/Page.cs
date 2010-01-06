@@ -9,27 +9,16 @@ namespace OurWord.Printing
     public class Page
     {
         // Major Page Components -------------------------------------------------------------
-        #region Attr{g}: List<ELine> BodyLines
-        List<ELine> BodyLines
+        #region Attr{g}: List<AssociatedLines> Groups
+        List<AssociatedLines> Groups
         {
             get
             {
-                Debug.Assert(null != m_BodyLines);
-                return m_BodyLines;
+                Debug.Assert(null != m_vGroups);
+                return m_vGroups;
             }
         }
-        private readonly List<ELine> m_BodyLines;
-        #endregion
-        #region Attr{g}: List<ELine> FootnoteLines
-        List<ELine> FootnoteLines
-        {
-            get
-            {
-                Debug.Assert(null != m_FootnoteLines);
-                return m_FootnoteLines;
-            }
-        }
-        private readonly List<ELine> m_FootnoteLines;
+        private readonly List<AssociatedLines> m_vGroups;
         #endregion
         #region Attr{g}: RunningFooter RunningFooter
         RunningFooter RunningFooter
@@ -47,41 +36,37 @@ namespace OurWord.Printing
         private readonly float m_fTotalAvailableContentHeight;
 
         #region Constructor(pDoc, nPageNumber, vGroups)
-        public Page(PrintDocument pdoc, int nPageNumber, IList<AssociatedLines> vLineGroups)
+        public Page(PrintDocument pdoc, int nPageNumber, IList<AssociatedLines> vSourceGroups)
         {
-            m_BodyLines = new List<ELine>();
-            m_FootnoteLines = new List<ELine>();
-
             m_PageSettings = pdoc.PrinterSettings.DefaultPageSettings;
 
             m_fTotalAvailableContentHeight = m_PageSettings.Bounds.Height
                 - m_PageSettings.Margins.Top - m_PageSettings.Margins.Bottom;
 
             // Setup and measure the running footer
-            m_RunningFooter = new RunningFooter(nPageNumber, vLineGroups[0].ScriptureReference,
+            m_RunningFooter = new RunningFooter(nPageNumber, vSourceGroups[0].ScriptureReference,
                 new PrintContext(pdoc));
             RunningFooter.Layout(pdoc);
 
             // Extract from the source list the groups which will fit on this page
-            var vGroupsThisPage = GetGroupsThatWillFit(vLineGroups);
+            m_vGroups = new List<AssociatedLines>();
+            CalculateGroupsThatWillFit(vSourceGroups);
 
-            // Place them on the page
-            LayoutBody(vGroupsThisPage);
-            LayoutFootnotes(vGroupsThisPage);
+            // Lay them out on the page
+            LayoutBody();
+            LayoutFootnotes();
         }
         #endregion
 
         // Layout (done during construction) -------------------------------------------------
-        #region Method: List<AssociatedLines> GetGroupsThatWillFit(vSourceGroups)
-        List<AssociatedLines> GetGroupsThatWillFit(IList<AssociatedLines> vSourceGroups)
+        #region Method: void CalculateGroupsThatWillFit(vSourceGroups)
+        void CalculateGroupsThatWillFit(IList<AssociatedLines> vSourceGroups)
         {
-            var vGroupsThisPage = new List<AssociatedLines>();
-
             var fHeightRemaining = m_fTotalAvailableContentHeight;
 
             // Make sure the page has at least one group, even if it is too large
             var firstGroup = vSourceGroups[0];
-            vGroupsThisPage.Add(firstGroup);
+            Groups.Add(firstGroup);
             vSourceGroups.Remove(firstGroup);
             fHeightRemaining -= firstGroup.TotalHeight;
 
@@ -96,54 +81,74 @@ namespace OurWord.Printing
                 fHeightRemaining -= group.TotalHeight;
 
                 vSourceGroups.Remove(group);
-                vGroupsThisPage.Add(group);
+                Groups.Add(group);
             }
-
-            return vGroupsThisPage;
         }
         #endregion
-        #region Method: void LayoutBody(IList<AssociatedLines> vGroups)
-        void LayoutBody(IList<AssociatedLines> vGroups)
-        {
-            float fTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
 
-            if (vGroups.Count == 0 || vGroups[0].BodyLines.Count == 0)
+        float HeightRequiredForFootnotes
+        {
+            get
+            {
+                var fHeight = 0.0F;
+
+                foreach (var group in Groups)
+                    foreach (var line in group.FootnoteLines)
+                        fHeight += line.LargestItemHeight;
+
+                return fHeight;
+            }
+        }
+
+        void Layout()
+        {
+            float yPrintAreaTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
+            var yBodyTop = yPrintAreaTop;
+
+            float yPrintAreaBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
+            var yFootnoteTop = yPrintAreaBottom - HeightRequiredForFootnotes;
+          
+            foreach(var group in Groups)
+            {
+                group.Layout(ref yBodyTop, ref yFootnoteTop);
+            }
+        }
+
+        #region Method: void LayoutBody()
+        void LayoutBody()
+        {
+            if (Groups.Count == 0 || Groups[0].BodyLines.Count == 0)
                 return;
-            var firstLine = vGroups[0].BodyLines[0];
+
+            float fTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
+            var firstLine = Groups[0].BodyLines[0];
             var fAdjust = firstLine.Position.Y - fTop;
 
-            foreach(var group in vGroups)
-            {
+            foreach(var group in Groups)
                 foreach(var line in group.BodyLines)
-                {
                     foreach(var item in line.SubItems)
                         item.Position = new PointF(item.Position.X, item.Position.Y - fAdjust);
-
-                    BodyLines.Add(line);
-                }
-            }
         }
         #endregion
-        #region Method: void LayoutFootnotes(IEnumerable<AssociatedLines> vGroups)
-        void LayoutFootnotes(IEnumerable<AssociatedLines> vGroups)
+        #region Method: void LayoutFootnotes()
+        void LayoutFootnotes()
         {
             // Calculate the top of the footnotes area
             float fBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
 
-            foreach (var group in vGroups)
+            foreach (var group in Groups)
             {
                 foreach (var line in group.FootnoteLines)
                     fBottom -= line.LargestItemHeight;
             }
 
             // Layout the footnotes
-            foreach(var group in vGroups)
+            foreach(var group in Groups)
             {
                 foreach(var line in group.FootnoteLines)
                 {
                     foreach (var item in line.SubItems)
                         item.Position = new PointF(item.Position.X, fBottom);
-                    FootnoteLines.Add(line);
 
                     fBottom += line.LargestItemHeight;               
                 }
@@ -153,35 +158,9 @@ namespace OurWord.Printing
         #region Method: void Draw(IDraw draw)
         public void Draw(IDraw draw)
         {
-            var allLines = new List<ELine>();
-            allLines.AddRange(BodyLines);
-            allLines.AddRange(FootnoteLines);
-
-            foreach (var line in allLines)
-            {
-                line.Draw(draw);
-            }
-
+            foreach(var group in Groups)
+                group.Draw(draw);
         }
         #endregion
-        void DrawPicture(IDraw draw, ELine line)
-        {
-            // Get the line's owning paragraph
-            var paragraph = line.Owner as OWPara;
-            if (null == paragraph)
-                return;
-
-            // We're only interested if this is the initial line in the paragraph, and
-            // if the paragraph has a picture to be drawn.
-            if (!paragraph.HasBitmap)
-                return;
-            if (paragraph.Lines.Count == 0 ||  line != paragraph.Lines[0])
-                return;
-
-
-
-
-        }
-
     }
 }

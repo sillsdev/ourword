@@ -6,6 +6,7 @@ using System.Drawing.Printing;
 using System.Windows.Forms;
 using JWTools;
 using OurWord.Edit;
+using OurWord.Layouts;
 using OurWordData.DataModel;
 
 namespace OurWord.Printing
@@ -131,6 +132,7 @@ namespace OurWord.Printing
                 var owp = new OWPara(writingSystem, paragraph.Style,
                     paragraph, Color.White, OWPara.Flags.None);
                 vDisplayParagraphs.Add(owp);
+                owp.Bmp = WLayout.GetPicture(paragraph);
             }
 
             return vDisplayParagraphs;
@@ -179,7 +181,7 @@ namespace OurWord.Printing
             root.DoLayout();
         }
         #endregion
-        #region SMethod: List<LineGroup> AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes)
+        #region SMethod: List<AssociatedLines> AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes)
         static List<AssociatedLines> AssociateBodyWithFootnotes(
             IEnumerable<OWPara> vDisplayParagraphs, 
             IEnumerable<OWPara> vDisplayFootnotes)
@@ -190,49 +192,39 @@ namespace OurWord.Printing
 
             foreach(var owp in vDisplayParagraphs)
             {
-                if (owp.Lines.Count == 0)
-                    continue;
-
                 // Shorthand
+                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.PStyle.SpaceBefore);
+                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.PStyle.SpaceAfter);
                 var count = owp.Lines.Count;
-
-                // Space above and  below the lines
-                var firstLine = owp.Lines[0];
-                var fSpaceAbove = firstLine.Position.X - owp.Position.X;
-                var lastLine = owp.Lines[owp.Lines.Count - 1];
-                var fSpaceBelow = owp.Position.X + owp.Height - 
-                    (lastLine.Position.X + lastLine.Height);
 
                 // Widow/orphan control: small paragraphs always go together
                 if (count <= 3)
                 {
-                    vGroups.Add(
-                        new AssociatedLines(owp.Lines, vDisplayFootnotes)
-                            {
-                                SpaceAbove = fSpaceAbove, 
-                                SpaceBelow = fSpaceBelow
-                            });
+                    vGroups.Add( new AssociatedLines(owp.Lines, vDisplayFootnotes)
+                        {
+                            SpaceBefore = fSpaceBefore,
+                            SpaceAfter = fSpaceAfter,
+                            Picture = owp.Bmp
+                        });
                     continue;
                 }
 
                 // The first two lines are a group
-                vGroups.Add(
-                    new AssociatedLines( owp.Lines.GetRange(0, 2), vDisplayFootnotes)
-                        {
-                            SpaceAbove = fSpaceAbove
-                        });
+                vGroups.Add( new AssociatedLines( owp.Lines.GetRange(0, 2), vDisplayFootnotes)
+                    {
+                        SpaceBefore = fSpaceBefore,
+                        Picture = owp.Bmp
+                    });
 
                 // The middle lines are individually separate
                 for (var i = 2; i < count - 2; i++)
                     vGroups.Add(new AssociatedLines(owp.Lines[i], vDisplayFootnotes));
 
                 // The final two lines are a group
-                vGroups.Add(
-                    new AssociatedLines(owp.Lines.GetRange(count - 2, 2), vDisplayFootnotes)
-                        {
-                            SpaceBelow = fSpaceBelow
-                        }
-                    );
+                vGroups.Add( new AssociatedLines(owp.Lines.GetRange(count - 2, 2), vDisplayFootnotes)
+                    {
+                        SpaceAfter = fSpaceAfter
+                    });
             }
 
             return vGroups;

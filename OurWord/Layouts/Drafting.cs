@@ -556,8 +556,8 @@ namespace OurWord.Layouts
         void LoadParagraphs()
         {
             // We'll work our way through both the Front and the Target paragraphs
-            int iFront = 0;
-            int iTarget = 0;
+            var iFront = 0;
+            var iTarget = 0;
 
             // Loop until all paragraphs have been accounted for
             while (iFront < DB.FrontSection.Paragraphs.Count ||
@@ -567,22 +567,20 @@ namespace OurWord.Layouts
                 // add one so that something will get displayed.
                 if (iFront == DB.FrontSection.Paragraphs.Count)
                 {
-                    DParagraph pNew = new DParagraph();
-                    pNew.AddedByCluster = true;
+                    var pNew = new DParagraph {AddedByCluster = true};
                     DB.FrontSection.Paragraphs.Append(pNew);
                 }
                 if (iTarget == DB.TargetSection.Paragraphs.Count)
                 {
-                    DParagraph pNew = new DParagraph();
-                    pNew.AddedByCluster = true;
+                    var pNew = new DParagraph {AddedByCluster = true};
                     DB.TargetSection.Paragraphs.Append(pNew);
                 }
 
                 // We use Pictures to help us re-allign paragraphs; thus, we count 
                 // the number of paragraphs in both Front and Target that are the
                 // same type.
-                int cFront = _CountMatchingParagraphTypes(iFront, DB.FrontSection.Paragraphs);
-                int cTarget = _CountMatchingParagraphTypes(iTarget, DB.TargetSection.Paragraphs);
+                var cFront = _CountMatchingParagraphTypes(iFront, DB.FrontSection.Paragraphs);
+                var cTarget = _CountMatchingParagraphTypes(iTarget, DB.TargetSection.Paragraphs);
 
                 if (!_CanSideBySideParagraphs(iFront, cFront, iTarget, cTarget))
                 {
@@ -590,17 +588,17 @@ namespace OurWord.Layouts
                 }
                 else
                 {
-                    for (int k = 0; k < cFront; k++)
+                    for (var k = 0; k < cFront; k++)
                     {                       
                         // Start the row
                         EColumn colFront;
                         EColumn colTarget;
-                        ERowOfColumns row = CreateRow(Contents, out colFront, out colTarget, false);
+                        var row = CreateRow(Contents, out colFront, out colTarget, false);
                         row.Bmp = GetPicture(DB.TargetSection.Paragraphs[iTarget + k]);
 
                         // Synchronize the Vernacular to the Target
-                        DParagraph pFront = DB.FrontSection.Paragraphs[iFront + k] as DParagraph;
-                        DParagraph pTarget = DB.TargetSection.Paragraphs[iTarget + k] as DParagraph;
+                        var pFront = DB.FrontSection.Paragraphs[iFront + k];
+                        var pTarget = DB.TargetSection.Paragraphs[iTarget + k];
                         pTarget.SynchRunsToModelParagraph(pFront);
 
                         // If we have no content in the Front and Target, then we don't add the paragraphs.

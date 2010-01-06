@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 using OurWord.Edit;
 using OurWordData.DataModel;
 
@@ -8,6 +9,7 @@ namespace OurWord.Printing
     {
         public readonly List<ELine> BodyLines;
         public readonly List<ELine> FootnoteLines;
+        public Bitmap Picture { private get; set; }
 
         // Chapter/Verse Scripture References ------------------------------------------------
         private int ChapterNumber { get; set; }
@@ -55,8 +57,8 @@ namespace OurWord.Printing
         #endregion
 
         // Line height -----------------------------------------------------------------------
-        public float SpaceAbove { private get; set; }
-        public float SpaceBelow { private get; set; }
+        public float SpaceBefore { private get; set; }
+        public float SpaceAfter { private get; set; }
         #region VAttr{g}: float TotalHeight
         public float TotalHeight
         {
@@ -70,8 +72,10 @@ namespace OurWord.Printing
                 foreach (var line in FootnoteLines)
                     fHeight += line.LargestItemHeight;
 
-                fHeight += SpaceAbove;
-                fHeight += SpaceBelow;
+                fHeight += SpaceBefore;
+                fHeight += SpaceAfter;
+
+                fHeight += Picture.Height;
 
                 return fHeight;
             }
@@ -113,6 +117,55 @@ namespace OurWord.Printing
             }
         }
         #endregion
+
+        // Drawing ---------------------------------------------------------------------------
+        #region Method: void Draw(IDraw)
+        public void Draw(IDraw draw)
+        {
+            var vLines = AllLines;
+            foreach (var line in vLines)
+                line.Draw(draw);
+
+            DrawPicture(draw);
+        }
+        #endregion
+        #region VAttr{g}: List<ELine> AllLines
+        public List<ELine> AllLines
+        {
+            get
+            {
+                var v = new List<ELine>();
+                v.AddRange(BodyLines);
+                v.AddRange(FootnoteLines);
+                return v;
+            }
+        }
+        #endregion
+        void DrawPicture(IDraw draw)
+        {
+            if (null == Picture)
+                return;
+
+            var xBmp = 100F;
+            var yBmp = 100F;
+            draw.DrawImage(Picture, new PointF(xBmp, yBmp));
+        }
+
+        public void Layout(ref float yBodyTop, ref float yFootnoteTop)
+        {
+
+ //           float fTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
+ //           var firstLine = Groups[0].BodyLines[0];
+ //           var fAdjust = firstLine.Position.Y - yPrintAreaTop;
+
+            /*
+            foreach (var line in BodyLines)
+            {
+                foreach (var item in line.SubItems)
+                    item.Position = new PointF(item.Position.X, item.Position.Y - fAdjust);
+            }
+            */
+        }
 
     }
 }

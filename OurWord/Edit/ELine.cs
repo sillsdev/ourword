@@ -33,7 +33,7 @@ namespace OurWord.Edit
         OWPara.EChapter m_Chapter;
         #endregion
         #region Attr{g/s}: float LeftIndent - how much to indent the line for the chapter
-        public float LeftIndent { get; set; }
+        public float LeftIndent { private get; set; }
         #endregion
 
         // Virtual attrs ---------------------------------------------------------------------
@@ -64,7 +64,7 @@ namespace OurWord.Edit
             }
         }
         #endregion
-
+        #region Attr{g}: float LargestItemHeight
         public float LargestItemHeight
         {
             get
@@ -75,6 +75,7 @@ namespace OurWord.Edit
                 return fLargestItemHeight;
             }
         }
+        #endregion
 
         // Line numbers ----------------------------------------------------------------------
         #region Attr{g}: int LineNo
@@ -103,7 +104,7 @@ namespace OurWord.Edit
                 return;
 
             // Get the string we'll draw, including trailing space for a margin
-            var s = LineNo.ToString() + " ";
+            var s = LineNo + " ";
 
             // Calculate the width of this number
             var fWidth = Context.Measure(s, window.LineNumberAttrs.Font);
@@ -232,12 +233,12 @@ namespace OurWord.Edit
         // the spot on a line closest so the requested pt.
         {
             // Attempt to find a block exactly where we want it, that is, at the indicated "x".
-            EBlock block = GetBlockAt(pt);
+            var block = GetBlockAt(pt);
             if (null != block as EWord)
             {
-                EWord word = block as EWord;
-                int iBlock = word.PositionWithinPara;
-                int iChar = word.GetCharacterIndex(pt);
+                var word = block as EWord;
+                var iBlock = word.PositionWithinPara;
+                var iChar = word.GetCharacterIndex(pt);
                 block.Window.Selection = new OWWindow.Sel(word.Para,
                     new OWWindow.Sel.SelPoint(iBlock, iChar));
                 return true;
@@ -248,18 +249,18 @@ namespace OurWord.Edit
             // Examine all of the blocks in the line for the one which is closest to x
             float fDistance = 10000;
             EWord ClosestWord = null;
-            bool bBeginningIsClosest = true;
+            var bBeginningIsClosest = true;
             foreach (EItem b in SubItems)
             {
                 // Retrieve each EWord in the line
-                EWord w = b as EWord;
+                var w = b as EWord;
                 if (null == w)
                     continue;
 
                 // Calculate its distance
-                float d1 = Math.Abs(pt.X - w.Position.X);
-                float d2 = Math.Abs(pt.X - (w.Position.X + w.Width));
-                float d = Math.Min(d1, d2);
+                var d1 = Math.Abs(pt.X - w.Position.X);
+                var d2 = Math.Abs(pt.X - (w.Position.X + w.Width));
+                var d = Math.Min(d1, d2);
 
                 // Do we have a new shortest one?
                 if (d < fDistance)
@@ -273,8 +274,8 @@ namespace OurWord.Edit
             // If we found a block, then put the selection into it
             if (null != ClosestWord)
             {
-                int iBlock = ClosestWord.PositionWithinPara;
-                int iChar = (bBeginningIsClosest) ? 0 : ClosestWord.Text.Length;
+                var iBlock = ClosestWord.PositionWithinPara;
+                var iChar = (bBeginningIsClosest) ? 0 : ClosestWord.Text.Length;
                 ClosestWord.Window.Selection = new OWWindow.Sel(
                     ClosestWord.Para,
                     new OWWindow.Sel.SelPoint(iBlock, iChar));
