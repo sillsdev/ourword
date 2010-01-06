@@ -357,7 +357,7 @@ namespace OurWordData.Synchronize
 
         // Repository Version ----------------------------------------------------------------
         private const string c_VersionTag = "OurWordVersion";
-        public const int c_CurrentVersionNo = 1;
+        public const int c_CurrentVersionNo = 2;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {
