@@ -600,6 +600,7 @@
     <Compile Include="Edit\EIcon.cs" />
     <Compile Include="Edit\ELine.cs" />
     <Compile Include="Edit\ENote.cs" />
+    <Compile Include="Edit\EPicture.cs" />
     <Compile Include="Edit\OWToolTip.cs">
       <SubType>Form</SubType>
     </Compile>

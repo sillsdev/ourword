@@ -107,7 +107,7 @@ namespace OurWord.Edit
                 m_fHeight = value;
             }
         }
-        float m_fHeight = 0;
+        float m_fHeight;
         #endregion
         #region VirtAttr{g/s}: float Width - pixel width of this item
         virtual public float Width
@@ -712,28 +712,46 @@ namespace OurWord.Edit
         #endregion
 
         // Optional Bitmap at top of container -----------------------------------------------
-        #region Attr{g/s}: Bitmap Bmp - the picture's bitmap
-        public Bitmap Bmp
+        #region Attr{g}: EPicture Picture
+        public EPicture Picture
         {
             get
             {
-                return m_bmp;
-            }
-            set
-            {
-                m_bmp = value;
+                return m_Picture;
             }
         }
-        Bitmap m_bmp = null;
+        private EPicture m_Picture;
         #endregion
-        private const int c_BitmapMargin = 5;         // vert marg above/below the bitmap
-        private const int c_BitmapPadAtBottom = 2;    // pixels at bottom to ensure line gets drawn
+        #region Method: void SetPicture(Bitmap bmp)
+        public void SetPicture(Bitmap bmp, bool bUseTopAndBottomBorders)
+        {
+            if (null == bmp)
+            {
+                m_Picture = null;
+                return;
+            }
+
+            m_Picture = new EPicture(bmp, this);
+
+            // We add a bottom margin (space outside the border) to account for the
+            // Windows rounding error when drawing, to make sure the bottom line gets
+            // drawn (and, to allow a bit of extra space before the next row.)
+            if (bUseTopAndBottomBorders)
+            {
+                Border = new SquareBorder(this)
+                    {
+                        BorderPlacement = BorderBase.BorderSides.TopAndBottom,
+                        Margin = new BorderBase.RectOffset() {Bottom = 5}
+                    };
+            }
+        }
+        #endregion
         #region Attr{g}: bool HasBitmap
-        public bool HasBitmap
+        bool HasBitmap
         {
             get
             {
-                return (Bmp != null);
+                return (null != m_Picture);
             }
         }
         #endregion
@@ -742,48 +760,15 @@ namespace OurWord.Edit
         {
             if (!HasBitmap)
                 return;
-
-            // Line above and below
-            var pen = new Pen(Color.Black);
-            draw.DrawLine(pen,
-                Position,
-                new PointF(Position.X + Rectangle.Width, Position.Y));
-            draw.DrawLine(pen,
-                new PointF(Position.X, Position.Y + Rectangle.Height - 2),
-                new PointF(Position.X + Rectangle.Width, Position.Y + Rectangle.Height - 2));
-
-            // Draw the bitmap
-            var xBmp = Position.X + (Rectangle.Width - Bmp.Width) / 2;
-            var yBmp = Position.Y + 1 + c_BitmapMargin;
-            draw.DrawImage(Bmp, new PointF(xBmp, yBmp));
+            m_Picture.Draw(draw);
         }
         #endregion
         #region Method: float CalculateBitmapHeightRequirement()
         protected float CalculateBitmapHeightRequirement()
         {
-            if (!HasBitmap)
-                return 0;
-
-            // Allow one pixel room for the line above the drawing
-            float fHeightBmp = 1;
-
-            // Allow room for the margin above the bitmap
-            fHeightBmp += c_BitmapMargin;
-
-            // Allow room for the bitmap itself
-            fHeightBmp += Bmp.Height;
-
-            // Allow room for the margin below the bitmap
-            fHeightBmp += c_BitmapMargin;
-
-            // Allow one pixel for the line below the drawing
-            fHeightBmp += 1;
-
-            // Allow a touch of extra padding so the line draws correctly
-            fHeightBmp += c_BitmapPadAtBottom;
-
-            return fHeightBmp;
+            return !HasBitmap ? 0 : m_Picture.Height;
         }
+
         #endregion
 
         // Owned containers ------------------------------------------------------------------
@@ -1634,7 +1619,7 @@ namespace OurWord.Edit
 
             // Calculate for the tallest pile
             float fHighest = 0;
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
                 item.CalculateVerticals(y);
 				fHighest = Math.Max(fHighest, item.Height);

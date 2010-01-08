@@ -212,7 +212,7 @@ namespace OurWord.Layouts
                     p,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
-                op.Bmp = GetPicture(p);
+                op.SetPicture(GetPicture(p), true);
                 Contents.Append(op);
             }
 

@@ -1584,7 +1584,7 @@ namespace OurWord.Edit
         #region OMethod: void CalculateVerticals(y)
         public override void CalculateVerticals(float y)
         // y - The top coordinate of the paragraph. We'll use "y" to work through the 
-        //     height of the paragraph, setting the individula paragraph parts.
+        //     height of the paragraph, setting the individual paragraph parts.
         #region DOC - Leading Space before Verses
             /* Leading Space before Verses - Whether or not to have leading space before
              *   a verse is a Layout issue. If the verse number is at the beginning of a

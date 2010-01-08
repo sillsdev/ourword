@@ -23,13 +23,13 @@ namespace OurWord.Edit
 
     public class Draw
     {
-        #region SMethod: void DrawString(Graphics g, string s, Font font, Brush brush, PointF pt)
+        #region SMethod: void DrawString(Graphics, s, Font, Brush, PointF)
         static protected void DrawString(Graphics g, string s, Font font, Brush brush, PointF pt)
         {
             g.DrawString(s, font, brush, pt.X, pt.Y, StringFormat.GenericTypographic);
         }
         #endregion
-        #region SMethod: void DrawBullet(Color, PointF, fRadius)
+        #region SMethod: void DrawBullet(Graphics, Color, PointF, fRadius)
         protected static void DrawBullet(Graphics g, Color color, PointF pt, float fRadius)
         {
             Brush brush = new SolidBrush(color);
@@ -41,7 +41,7 @@ namespace OurWord.Edit
             g.FillEllipse(brush, xLeft, yTop, diameter, diameter);
         }
         #endregion
-        #region SMethod: void DrawRoundedRectangle(Pen, FillBrush, Rect, Radius)
+        #region SMethod: void DrawRoundedRectangle(Graphics, Pen, FillBrush, Rect, Radius)
         protected static void DrawRoundedRectangle(Graphics g, Pen BorderPen, Brush FillBrush, RectangleF Rect, float fRadius)
         {
             var xLeft = Rect.Left;
@@ -88,6 +88,28 @@ namespace OurWord.Edit
             // Draw the border if requested
             if (null != BorderPen)
                 g.DrawPath(BorderPen, gp);
+        }
+        #endregion
+        #region SMethod: void DrawImage(Graphics, Image, PointF)
+        protected static void DrawImage(Graphics g, Image image, PointF pt)
+            //    This was taken from www.codeproject.com/KB/graphics/BorderBug.aspx,
+            // which deals with the way DrawImage wants to, seemingly randomly, shift 
+            // an image a pixel sometimes. 
+            //    The use of GraphicsUnit.Pixel prevents unwanted scaling, which seems
+            // to happen even when I try DrawImageUnscaled. 
+        {
+            // Start the source image a half pixel in, because the system works from
+            // the middle of pixels, not from their top-left.
+            var sourceRectangle = new RectangleF(0.5F, 0.5F, image.Width, image.Height);
+
+            var destinationRectangle = new RectangleF(pt.X, pt.Y, image.Width, image.Height);
+
+            var oldInterpolationMode = g.InterpolationMode;
+            g.InterpolationMode = InterpolationMode.NearestNeighbor;
+
+            g.DrawImage(image, destinationRectangle, sourceRectangle, GraphicsUnit.Pixel);
+
+            g.InterpolationMode = oldInterpolationMode;
         }
         #endregion
     }
@@ -213,11 +235,8 @@ namespace OurWord.Edit
         #region Method: void DrawImage(Image image, PointF pt)
         public void DrawImage(Image image, PointF pt)
         {
-            var point = new Point(
-                (int)pt.X,
-                (int)(pt.Y - ScrollBarPosition));
-
-            Graphics.DrawImage(image, point);
+            var point = new PointF( pt.X, pt.Y - ScrollBarPosition);
+            Draw.DrawImage(Graphics, image, point);
         }
         #endregion
 
@@ -327,9 +346,7 @@ namespace OurWord.Edit
         #region Method: void DrawImage(Image image, PointF pt)
         public void DrawImage(Image image, PointF pt)
         {
-            var point = new Point( (int)pt.X, (int)(pt.Y) );
-
-            m_Graphics.DrawImage(image, point);
+            Draw.DrawImage(m_Graphics, image, pt);
         }
         #endregion
     }

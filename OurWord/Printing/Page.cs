@@ -51,10 +51,7 @@ namespace OurWord.Printing
             // Extract from the source list the groups which will fit on this page
             m_vGroups = new List<AssociatedLines>();
             CalculateGroupsThatWillFit(vSourceGroups);
-
-            // Lay them out on the page
-            LayoutBody();
-            LayoutFootnotes();
+            Layout();
         }
         #endregion
 
@@ -85,7 +82,7 @@ namespace OurWord.Printing
             }
         }
         #endregion
-
+        #region Attr{g}: float HeightRequiredForFootnotes
         float HeightRequiredForFootnotes
         {
             get
@@ -93,68 +90,43 @@ namespace OurWord.Printing
                 var fHeight = 0.0F;
 
                 foreach (var group in Groups)
-                    foreach (var line in group.FootnoteLines)
-                        fHeight += line.LargestItemHeight;
+                    fHeight += group.FootnotesHeight;
 
                 return fHeight;
             }
         }
+        #endregion
 
         void Layout()
         {
             float yPrintAreaTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
-            var yBodyTop = yPrintAreaTop;
+            var yFirstGroupTop = Groups[0].TopY;
+            var fBodyAdjustment = yPrintAreaTop - yFirstGroupTop;
 
             float yPrintAreaBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
             var yFootnoteTop = yPrintAreaBottom - HeightRequiredForFootnotes;
           
             foreach(var group in Groups)
             {
-                group.Layout(ref yBodyTop, ref yFootnoteTop);
-            }
-        }
+                group.MoveYs(fBodyAdjustment);
 
-        #region Method: void LayoutBody()
-        void LayoutBody()
-        {
-            if (Groups.Count == 0 || Groups[0].BodyLines.Count == 0)
-                return;
-
-            float fTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
-            var firstLine = Groups[0].BodyLines[0];
-            var fAdjust = firstLine.Position.Y - fTop;
-
-            foreach(var group in Groups)
-                foreach(var line in group.BodyLines)
-                    foreach(var item in line.SubItems)
-                        item.Position = new PointF(item.Position.X, item.Position.Y - fAdjust);
-        }
-        #endregion
-        #region Method: void LayoutFootnotes()
-        void LayoutFootnotes()
-        {
-            // Calculate the top of the footnotes area
-            float fBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
-
-            foreach (var group in Groups)
-            {
-                foreach (var line in group.FootnoteLines)
-                    fBottom -= line.LargestItemHeight;
-            }
-
-            // Layout the footnotes
-            foreach(var group in Groups)
-            {
-                foreach(var line in group.FootnoteLines)
+                /*
+                foreach (var line in group.BodyLines)
                 {
                     foreach (var item in line.SubItems)
-                        item.Position = new PointF(item.Position.X, fBottom);
+                        item.Position = new PointF(item.Position.X, item.Position.Y - fAdjust);
+                }
+                */
 
-                    fBottom += line.LargestItemHeight;               
+                foreach (var line in group.FootnoteLines)
+                {
+                    foreach (var item in line.SubItems)
+                        item.Position = new PointF(item.Position.X, yFootnoteTop);
+                    yFootnoteTop += line.LargestItemHeight;
                 }
             }
         }
-        #endregion
+
         #region Method: void Draw(IDraw draw)
         public void Draw(IDraw draw)
         {

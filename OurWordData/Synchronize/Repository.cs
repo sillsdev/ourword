@@ -357,7 +357,10 @@ namespace OurWordData.Synchronize
 
         // Repository Version ----------------------------------------------------------------
         private const string c_VersionTag = "OurWordVersion";
-        public const int c_CurrentVersionNo = 2;
+        // 1 - setup of the initial feature
+        // 2 - preventing AuSIL-TopEnd from being able to synch during case folding problem
+        // 3 - new Style implementation
+        public const int c_CurrentVersionNo = 3;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {

@@ -594,7 +594,9 @@ namespace OurWord.Layouts
                         EColumn colFront;
                         EColumn colTarget;
                         var row = CreateRow(Contents, out colFront, out colTarget, false);
-                        row.Bmp = GetPicture(DB.TargetSection.Paragraphs[iTarget + k]);
+                        row.SetPicture(
+                            GetPicture(DB.TargetSection.Paragraphs[iTarget + k]), 
+                            true);
 
                         // Synchronize the Vernacular to the Target
                         var pFront = DB.FrontSection.Paragraphs[iFront + k];

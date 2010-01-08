@@ -9,7 +9,17 @@ namespace OurWord.Printing
     {
         public readonly List<ELine> BodyLines;
         public readonly List<ELine> FootnoteLines;
-        public Bitmap Picture { private get; set; }
+
+        // Picture ---------------------------------------------------------------------------
+        public EPicture Picture;
+        #region Method: void DrawPicture(IDraw draw)
+        void DrawPicture(IDraw draw)
+        {
+            if (null == Picture)
+                return;
+            Picture.Draw(draw);
+        }
+        #endregion
 
         // Chapter/Verse Scripture References ------------------------------------------------
         private int ChapterNumber { get; set; }
@@ -57,25 +67,33 @@ namespace OurWord.Printing
         #endregion
 
         // Line height -----------------------------------------------------------------------
-        public float SpaceBefore { private get; set; }
-        public float SpaceAfter { private get; set; }
+        public float TopY { get; set; }
+        public float BottomY { private get; set; }
+        public bool IsParagraphContinuation { private get; set; }
+
         #region VAttr{g}: float TotalHeight
         public float TotalHeight
         {
             get
             {
-                var fHeight = 0.0F;
+                // Start with the height of the main body
+                var fHeight = BottomY - TopY;
 
-                foreach (var line in BodyLines)
-                    fHeight += line.Height;
+                fHeight += FootnotesHeight;
+
+                return fHeight;
+            }
+        }
+        #endregion
+        #region VAttr{g}: float FootnotesHeight
+        public float FootnotesHeight
+        {
+            get
+            {
+                var fHeight = 0F;
 
                 foreach (var line in FootnoteLines)
                     fHeight += line.LargestItemHeight;
-
-                fHeight += SpaceBefore;
-                fHeight += SpaceAfter;
-
-                fHeight += Picture.Height;
 
                 return fHeight;
             }
@@ -141,31 +159,21 @@ namespace OurWord.Printing
             }
         }
         #endregion
-        void DrawPicture(IDraw draw)
+
+        public void MoveYs(float fBodyAdjustment)
         {
-            if (null == Picture)
-                return;
-
-            var xBmp = 100F;
-            var yBmp = 100F;
-            draw.DrawImage(Picture, new PointF(xBmp, yBmp));
-        }
-
-        public void Layout(ref float yBodyTop, ref float yFootnoteTop)
-        {
-
- //           float fTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
- //           var firstLine = Groups[0].BodyLines[0];
- //           var fAdjust = firstLine.Position.Y - yPrintAreaTop;
-
-            /*
             foreach (var line in BodyLines)
             {
                 foreach (var item in line.SubItems)
-                    item.Position = new PointF(item.Position.X, item.Position.Y - fAdjust);
-            }
-            */
+                    item.Position = new PointF(item.Position.X, item.Position.Y + fBodyAdjustment);
+            }        
+    
+            if (null != Picture)
+                Picture.MoveYs(fBodyAdjustment);
         }
+
+
+
 
     }
 }

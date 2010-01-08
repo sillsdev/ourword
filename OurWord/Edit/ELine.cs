@@ -60,7 +60,7 @@ namespace OurWord.Edit
                 return (Count == 0) ? 0 : SubItems[0].Height;
             }
             set
-            {
+            {                
             }
         }
         #endregion
@@ -107,7 +107,7 @@ namespace OurWord.Edit
             var s = LineNo + " ";
 
             // Calculate the width of this number
-            var fWidth = Context.Measure(s, window.LineNumberAttrs.Font);
+            var fWidth = para.Context.Measure(s, window.LineNumberAttrs.Font);
 
             // The X coordinate is the x of the window (root) left, 
             var x = para.Root.Position.X;

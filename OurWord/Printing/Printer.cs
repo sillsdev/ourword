@@ -94,7 +94,8 @@ namespace OurWord.Printing
             LayoutDisplayLines(vDisplayFootnotes, pdoc);
 
             // A body line will appear on a page with all of its associated footnotes
-            var vLineGroups = AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes);
+            var vLineGroups = AssociateBodyWithFootnotes(pdoc, 
+                vDisplayParagraphs, vDisplayFootnotes);
             SetScriptureReferences(vLineGroups);
 
             // Create the pages based on the heights that will fit
@@ -132,7 +133,7 @@ namespace OurWord.Printing
                 var owp = new OWPara(writingSystem, paragraph.Style,
                     paragraph, Color.White, OWPara.Flags.None);
                 vDisplayParagraphs.Add(owp);
-                owp.Bmp = WLayout.GetPicture(paragraph);
+                owp.SetPicture(WLayout.GetPicture(paragraph), false);
             }
 
             return vDisplayParagraphs;
@@ -183,6 +184,7 @@ namespace OurWord.Printing
         #endregion
         #region SMethod: List<AssociatedLines> AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes)
         static List<AssociatedLines> AssociateBodyWithFootnotes(
+            PrintDocument pdoc,
             IEnumerable<OWPara> vDisplayParagraphs, 
             IEnumerable<OWPara> vDisplayFootnotes)
             // Handles widow/orphan control, by grouping Body Lines together that would otherwise
@@ -193,8 +195,8 @@ namespace OurWord.Printing
             foreach(var owp in vDisplayParagraphs)
             {
                 // Shorthand
-                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.PStyle.SpaceBefore);
-                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.PStyle.SpaceAfter);
+//                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.PStyle.SpaceBefore);
+//                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.PStyle.SpaceAfter);
                 var count = owp.Lines.Count;
 
                 // Widow/orphan control: small paragraphs always go together
@@ -202,9 +204,10 @@ namespace OurWord.Printing
                 {
                     vGroups.Add( new AssociatedLines(owp.Lines, vDisplayFootnotes)
                         {
-                            SpaceBefore = fSpaceBefore,
-                            SpaceAfter = fSpaceAfter,
-                            Picture = owp.Bmp
+                            TopY = owp.Rectangle.Top,
+                            BottomY = owp.Rectangle.Bottom,
+                            IsParagraphContinuation = false,
+                            Picture = owp.Picture
                         });
                     continue;
                 }
@@ -212,24 +215,34 @@ namespace OurWord.Printing
                 // The first two lines are a group
                 vGroups.Add( new AssociatedLines( owp.Lines.GetRange(0, 2), vDisplayFootnotes)
                     {
-                        SpaceBefore = fSpaceBefore,
-                        Picture = owp.Bmp
+                        TopY = owp.Rectangle.Top,
+                        BottomY = owp.Lines[2].Rectangle.Bottom,
+                        IsParagraphContinuation = false,
+                        Picture = owp.Picture
                     });
 
                 // The middle lines are individually separate
                 for (var i = 2; i < count - 2; i++)
-                    vGroups.Add(new AssociatedLines(owp.Lines[i], vDisplayFootnotes));
+                    vGroups.Add(new AssociatedLines(owp.Lines[i], vDisplayFootnotes) 
+                        {
+                            TopY = owp.Lines[i].Rectangle.Top,
+                            BottomY = owp.Lines[i].Rectangle.Bottom,
+                            IsParagraphContinuation = true,
+                        });
 
                 // The final two lines are a group
                 vGroups.Add( new AssociatedLines(owp.Lines.GetRange(count - 2, 2), vDisplayFootnotes)
                     {
-                        SpaceAfter = fSpaceAfter
+                        TopY = owp.Lines[count - 2].Rectangle.Top,
+                        BottomY = owp.Rectangle.Bottom,
+                        IsParagraphContinuation = true,
                     });
             }
 
             return vGroups;
         }
         #endregion
+
         #region SMethod: void SetScriptureReferences(vGroups)
         static void SetScriptureReferences(IEnumerable<AssociatedLines> vGroups)
         {
