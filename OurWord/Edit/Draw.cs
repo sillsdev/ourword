@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Windows.Forms;
@@ -19,6 +20,7 @@ namespace OurWord.Edit
         void DrawVertLine(Pen pen, float x, float y1, float y2);
         void DrawBullet(Color color, PointF pt, float fRadius);
         void DrawImage(Image image, PointF pt);
+        Graphics Graphics { get; }
     }
 
     public class Draw
@@ -267,10 +269,10 @@ namespace OurWord.Edit
         #region Constructor(graphics)
         public PrinterDraw(Graphics graphics)
         {
-            m_Graphics = graphics;
+            Graphics = graphics;
         }
         #endregion
-        private readonly Graphics m_Graphics;
+        public Graphics Graphics { get; private set; }
 
         // IDraw Interface -------------------------------------------------------------------
         #region Method: bool IsSendingToPrinter()
@@ -282,7 +284,7 @@ namespace OurWord.Edit
         #region Method: void FillRectangle(clrBackground, rect)
         public void FillRectangle(Color clrBackground, RectangleF rect)
         {
-            m_Graphics.FillRectangle(new SolidBrush(clrBackground), rect);
+            Graphics.FillRectangle(new SolidBrush(clrBackground), rect);
         }
         #endregion
         #region Method: void DrawBackground(clrBackground, rect)
@@ -296,19 +298,19 @@ namespace OurWord.Edit
         #region Method: void DrawString(s, font, Brush, pt)
         public void DrawString(string s, Font font, Brush brush, PointF pt)
         {
-            DrawString(m_Graphics, s, font, brush, pt);
+            DrawString(Graphics, s, font, brush, pt);
         }
         #endregion
         #region Method: void DrawString(s, font, Brush, rect)
         public void DrawString(string s, Font font, Brush brush, RectangleF rect)
         {
-            m_Graphics.DrawString(s, font, brush, rect);
+            Graphics.DrawString(s, font, brush, rect);
         }
         #endregion
         #region Method: void DrawRectangle(Pen, RectangleF)
         public void DrawRectangle(Pen pen, RectangleF rect)
         {
-            m_Graphics.DrawRectangle(pen,
+            Graphics.DrawRectangle(pen,
                 rect.X, rect.Y,
                 rect.Width, rect.Height);
         }
@@ -316,37 +318,37 @@ namespace OurWord.Edit
         #region Method: void DrawRoundedRectangle(borderPen, fillBrush, rect, fRadius)
         public void DrawRoundedRectangle(Pen borderPen, Brush fillBrush, RectangleF rect, float fRadius)
         {
-            DrawRoundedRectangle(m_Graphics, borderPen, fillBrush, rect, fRadius);
+            DrawRoundedRectangle(Graphics, borderPen, fillBrush, rect, fRadius);
         }
         #endregion
         #region Method: void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         public void DrawLine(Pen pen, float x1, float y1, float x2, float y2)
         {
-            m_Graphics.DrawLine(pen, x1, y1, x2, y2);
+            Graphics.DrawLine(pen, x1, y1, x2, y2);
         }
         #endregion
         #region Method: void DrawLine(Pen pen, PointF pt1, PointF pt2)
         public void DrawLine(Pen pen, PointF pt1, PointF pt2)
         {
-            m_Graphics.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
+            Graphics.DrawLine(pen, pt1.X, pt1.Y, pt2.X, pt2.Y);
         }
         #endregion
         #region Method: void DrawVertLine(Pen pen, float x, float y1, float y2)
         public void DrawVertLine(Pen pen, float x, float y1, float y2)
         {
-            m_Graphics.DrawLine(pen, x, y1, x, y2);
+            Graphics.DrawLine(pen, x, y1, x, y2);
         }
         #endregion
         #region Method: void DrawBullet(Color, PointF, fRadius)
         public void DrawBullet(Color color, PointF pt, float fRadius)
         {
-            DrawBullet(m_Graphics, color, pt, fRadius);
+            DrawBullet(Graphics, color, pt, fRadius);
         }
         #endregion
         #region Method: void DrawImage(Image image, PointF pt)
         public void DrawImage(Image image, PointF pt)
         {
-            Draw.DrawImage(m_Graphics, image, pt);
+            DrawImage(Graphics, image, pt);
         }
         #endregion
     }

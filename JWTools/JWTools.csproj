@@ -1,7 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="3.5">
   <PropertyGroup>
     <ProjectType>Local</ProjectType>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A70FCB84-8A6D-471E-9582-1E2D24415E31}</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -201,6 +201,7 @@
     <Compile Include="PropertyBag.cs" />
     <EmbeddedResource Include="DlgCheckTree.resx">
       <DependentUpon>DlgCheckTree.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Help.ico" />
     <EmbeddedResource Include="JW_FeaturesPassword.resx">
@@ -233,6 +234,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="EnumeratedStepsProgressDlg.resx">
       <DependentUpon>EnumeratedStepsProgressDlg.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <SubType>Designer</SubType>

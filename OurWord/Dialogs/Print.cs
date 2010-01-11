@@ -87,7 +87,6 @@ namespace OurWord
 				m_radioEntireBook.Checked = value;
 
 				m_radioThisSection.Checked = !value;
-				m_radioPages.Checked = !value;
 				m_radioChapters.Checked = !value;
 			}
 		}
@@ -104,24 +103,6 @@ namespace OurWord
 				m_radioThisSection.Checked = value;
 
 				m_radioEntireBook.Checked = !value;
-				m_radioPages.Checked = !value;
-				m_radioChapters.Checked = !value;
-			}
-		}
-		#endregion
-		#region Attr{g/s}: bool Pages
-		public bool Pages
-		{
-			get
-			{
-				return (m_radioPages.Checked == true);
-			}
-			set
-			{
-				m_radioPages.Checked = value;
-
-				m_radioEntireBook.Checked = !value;
-				m_radioThisSection.Checked = !value;
 				m_radioChapters.Checked = !value;
 			}
 		}
@@ -139,7 +120,6 @@ namespace OurWord
 
 				m_radioEntireBook.Checked = !value;
 				m_radioThisSection.Checked = !value;
-				m_radioPages.Checked = !value;
 			}
 		}
 		#endregion
@@ -163,52 +143,6 @@ namespace OurWord
 			set
 			{
 				m_checkWaterMark.Checked = value;
-			}
-		}
-		#endregion
-		#region Attr{g/s}: int StartPage
-		public int StartPage
-		{
-			get
-			{
-				string s = m_editStartPage.Text;
-
-				try
-				{
-					int n = Convert.ToInt16(s);
-					return n;
-				}
-				catch (Exception)
-				{
-				}
-				return 0;
-			}
-			set
-			{
-				m_editStartPage.Text = value.ToString();
-			}
-		}
-		#endregion
-		#region Attr{g/s}: int EndPage
-		public int EndPage
-		{
-			get
-			{
-				string s = m_editEndPage.Text;
-
-				try
-				{
-					int n = Convert.ToInt16(s);
-					return n;
-				}
-				catch (Exception)
-				{
-				}
-				return 0;
-			}
-			set
-			{
-				m_editEndPage.Text = value.ToString();
 			}
 		}
 		#endregion
@@ -318,13 +252,8 @@ namespace OurWord
 
 		private GroupBox m_groupRange;
 		private RadioButton m_radioEntireBook;
-		private RadioButton m_radioThisSection;
-		private RadioButton m_radioPages;
-		private RadioButton m_radioChapters;
-
-		private TextBox m_editStartPage;
-		private Label   m_labelToPage;
-		private TextBox m_editEndPage;
+        private RadioButton m_radioThisSection;
+        private RadioButton m_radioChapters;
 		private TextBox m_editStartChapter;
 		private Label   m_labelToChapter;
 		private TextBox m_editEndChapter;
@@ -368,10 +297,6 @@ namespace OurWord
             this.m_radioEntireBook = new System.Windows.Forms.RadioButton();
             this.m_radioThisSection = new System.Windows.Forms.RadioButton();
             this.m_groupRange = new System.Windows.Forms.GroupBox();
-            this.m_radioPages = new System.Windows.Forms.RadioButton();
-            this.m_editStartPage = new System.Windows.Forms.TextBox();
-            this.m_editEndPage = new System.Windows.Forms.TextBox();
-            this.m_labelToPage = new System.Windows.Forms.Label();
             this.m_editEndChapter = new System.Windows.Forms.TextBox();
             this.m_labelToChapter = new System.Windows.Forms.Label();
             this.m_radioChapters = new System.Windows.Forms.RadioButton();
@@ -390,7 +315,7 @@ namespace OurWord
             // 
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(256, 336);
+            this.m_btnHelp.Location = new System.Drawing.Point(255, 315);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 15;
@@ -400,7 +325,7 @@ namespace OurWord
             // m_btnCancel
             // 
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(168, 336);
+            this.m_btnCancel.Location = new System.Drawing.Point(167, 315);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 14;
@@ -409,7 +334,7 @@ namespace OurWord
             // m_btnOK
             // 
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(80, 336);
+            this.m_btnOK.Location = new System.Drawing.Point(79, 315);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 13;
@@ -453,58 +378,20 @@ namespace OurWord
             // 
             // m_groupRange
             // 
-            this.m_groupRange.Controls.Add(this.m_radioPages);
-            this.m_groupRange.Controls.Add(this.m_editStartPage);
-            this.m_groupRange.Controls.Add(this.m_editEndPage);
-            this.m_groupRange.Controls.Add(this.m_labelToPage);
             this.m_groupRange.Controls.Add(this.m_editEndChapter);
             this.m_groupRange.Controls.Add(this.m_labelToChapter);
             this.m_groupRange.Controls.Add(this.m_radioChapters);
             this.m_groupRange.Controls.Add(this.m_editStartChapter);
             this.m_groupRange.Location = new System.Drawing.Point(16, 56);
             this.m_groupRange.Name = "m_groupRange";
-            this.m_groupRange.Size = new System.Drawing.Size(376, 120);
+            this.m_groupRange.Size = new System.Drawing.Size(376, 102);
             this.m_groupRange.TabIndex = 21;
             this.m_groupRange.TabStop = false;
             this.m_groupRange.Text = "Range";
             // 
-            // m_radioPages
-            // 
-            this.m_radioPages.Location = new System.Drawing.Point(16, 64);
-            this.m_radioPages.Name = "m_radioPages";
-            this.m_radioPages.Size = new System.Drawing.Size(72, 24);
-            this.m_radioPages.TabIndex = 4;
-            this.m_radioPages.Text = "Pages:";
-            this.m_radioPages.Click += new System.EventHandler(this.cmdPagesChecked);
-            // 
-            // m_editStartPage
-            // 
-            this.m_editStartPage.Location = new System.Drawing.Point(88, 64);
-            this.m_editStartPage.Name = "m_editStartPage";
-            this.m_editStartPage.Size = new System.Drawing.Size(40, 20);
-            this.m_editStartPage.TabIndex = 5;
-            this.m_editStartPage.TextChanged += new System.EventHandler(this.cmdFromPageChanged);
-            // 
-            // m_editEndPage
-            // 
-            this.m_editEndPage.Location = new System.Drawing.Point(160, 64);
-            this.m_editEndPage.Name = "m_editEndPage";
-            this.m_editEndPage.Size = new System.Drawing.Size(40, 20);
-            this.m_editEndPage.TabIndex = 6;
-            this.m_editEndPage.TextChanged += new System.EventHandler(this.cmdToPageChanged);
-            // 
-            // m_labelToPage
-            // 
-            this.m_labelToPage.Location = new System.Drawing.Point(128, 64);
-            this.m_labelToPage.Name = "m_labelToPage";
-            this.m_labelToPage.Size = new System.Drawing.Size(32, 23);
-            this.m_labelToPage.TabIndex = 24;
-            this.m_labelToPage.Text = "to";
-            this.m_labelToPage.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            // 
             // m_editEndChapter
             // 
-            this.m_editEndChapter.Location = new System.Drawing.Point(160, 88);
+            this.m_editEndChapter.Location = new System.Drawing.Point(161, 66);
             this.m_editEndChapter.Name = "m_editEndChapter";
             this.m_editEndChapter.Size = new System.Drawing.Size(40, 20);
             this.m_editEndChapter.TabIndex = 9;
@@ -512,7 +399,7 @@ namespace OurWord
             // 
             // m_labelToChapter
             // 
-            this.m_labelToChapter.Location = new System.Drawing.Point(128, 88);
+            this.m_labelToChapter.Location = new System.Drawing.Point(129, 66);
             this.m_labelToChapter.Name = "m_labelToChapter";
             this.m_labelToChapter.Size = new System.Drawing.Size(32, 23);
             this.m_labelToChapter.TabIndex = 28;
@@ -521,7 +408,7 @@ namespace OurWord
             // 
             // m_radioChapters
             // 
-            this.m_radioChapters.Location = new System.Drawing.Point(16, 88);
+            this.m_radioChapters.Location = new System.Drawing.Point(17, 66);
             this.m_radioChapters.Name = "m_radioChapters";
             this.m_radioChapters.Size = new System.Drawing.Size(72, 24);
             this.m_radioChapters.TabIndex = 7;
@@ -530,7 +417,7 @@ namespace OurWord
             // 
             // m_editStartChapter
             // 
-            this.m_editStartChapter.Location = new System.Drawing.Point(88, 88);
+            this.m_editStartChapter.Location = new System.Drawing.Point(89, 66);
             this.m_editStartChapter.Name = "m_editStartChapter";
             this.m_editStartChapter.Size = new System.Drawing.Size(40, 20);
             this.m_editStartChapter.TabIndex = 8;
@@ -568,7 +455,7 @@ namespace OurWord
             this.m_groupOptions.Controls.Add(this.m_checkReplacements);
             this.m_groupOptions.Controls.Add(this.m_labelLineSpacing);
             this.m_groupOptions.Controls.Add(this.m_comboLineSpacing);
-            this.m_groupOptions.Location = new System.Drawing.Point(16, 192);
+            this.m_groupOptions.Location = new System.Drawing.Point(16, 171);
             this.m_groupOptions.Name = "m_groupOptions";
             this.m_groupOptions.Size = new System.Drawing.Size(376, 128);
             this.m_groupOptions.TabIndex = 24;
@@ -596,7 +483,7 @@ namespace OurWord
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(410, 368);
+            this.ClientSize = new System.Drawing.Size(410, 346);
             this.Controls.Add(this.m_radioThisSection);
             this.Controls.Add(this.m_radioEntireBook);
             this.Controls.Add(this.m_comboPrinter);
@@ -613,8 +500,8 @@ namespace OurWord
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Print";
-            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
             this.Load += new System.EventHandler(this.cmdLoad);
+            this.Closing += new System.ComponentModel.CancelEventHandler(this.cmdClosing);
             this.m_groupRange.ResumeLayout(false);
             this.m_groupRange.PerformLayout();
             this.m_groupOptions.ResumeLayout(false);
@@ -667,15 +554,6 @@ namespace OurWord
 			if (DialogResult != DialogResult.OK)
 				return;
 
-			// If the user has specified to print a range of pages, then make sure 
-			// he has also specified page numbers
-			if (Pages && (StartPage == 0 || EndPage == 0) )
-			{
-				Messages.MissingPageRange();
-				e.Cancel = true;
-				return;
-			}
-
 			// If the user has specified to print a range of chapters, then make sure 
 			// he has also specified chapter numbers
 			if (Chapters && (StartChapter == 0 || EndChapter == 0) )
@@ -704,28 +582,10 @@ namespace OurWord
 			CurrentSection = true;
 		}
 		#endregion
-		#region Cmd: cmdPagesChecked
-		private void cmdPagesChecked(object sender, System.EventArgs e)
-		{
-			Pages = true;
-		}
-		#endregion
 		#region Cmd: cmdChaptersChecked
 		private void cmdChaptersChecked(object sender, System.EventArgs e)
 		{
 			Chapters = true;
-		}
-		#endregion
-		#region Cmd: cmdToPageChanged
-		private void cmdToPageChanged(object sender, System.EventArgs e)
-		{
-			Pages = true;
-		}
-		#endregion
-		#region Cmd: cmdFromPageChanged
-		private void cmdFromPageChanged(object sender, System.EventArgs e)
-		{
-			Pages = true;		
 		}
 		#endregion
 		#region Cmd: cmdToChapterChanged
@@ -2556,21 +2416,12 @@ namespace OurWord
 				return true;
 			}
 
-			// If here, then we just want some pages
-			if (nPageNo < m_dlg.StartPage)
-				return false;
-			if (nPageNo > m_dlg.EndPage)
-				return false;
 			return true;
 		}
 		#endregion
 		#region Attr{g}: bool AreThereMorePagesToLayout(int nPageNo)
 		bool AreThereMorePagesToLayout(int nPageNo)
 		{
-			// Don't continue if we're past the desired range of pages
-			if (m_dlg.Pages && nPageNo > m_dlg.EndPage)
-				return false;
-
 			// Find out if the Pos object has more data that can be printed
 			return Pos.CanIncrement;
 		}

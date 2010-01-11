@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
@@ -34,6 +35,7 @@ namespace OurWord.Printing
 
         private readonly PageSettings m_PageSettings;
         private readonly float m_fTotalAvailableContentHeight;
+        public string WaterMarkText { private get; set; }
 
         #region Constructor(pDoc, nPageNumber, vGroups)
         public Page(PrintDocument pdoc, int nPageNumber, IList<AssociatedLines> vSourceGroups)
@@ -96,7 +98,7 @@ namespace OurWord.Printing
             }
         }
         #endregion
-
+        #region Method: void Layout()
         void Layout()
         {
             float yPrintAreaTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
@@ -110,14 +112,6 @@ namespace OurWord.Printing
             {
                 group.MoveYs(fBodyAdjustment);
 
-                /*
-                foreach (var line in group.BodyLines)
-                {
-                    foreach (var item in line.SubItems)
-                        item.Position = new PointF(item.Position.X, item.Position.Y - fAdjust);
-                }
-                */
-
                 foreach (var line in group.FootnoteLines)
                 {
                     foreach (var item in line.SubItems)
@@ -126,10 +120,65 @@ namespace OurWord.Printing
                 }
             }
         }
+        #endregion
+
+        // Drawing ---------------------------------------------------------------------------
+        #region Method: void DrawWatermark(IDraw)
+        void DrawWatermark(IDraw draw)
+        {
+            // Don't proceed if the water mark isn't wanted
+            if (string.IsNullOrEmpty(WaterMarkText))
+                return;
+
+            // Calculate the maximum length this text should appear (non-rotated). We'll
+            // assume a 30-degree angle. 
+            const float fAngle = 30;
+            const double fRadians = fAngle * Math.PI / 180.0;
+            var nPrintAreaWidth = m_PageSettings.PaperSize.Width - m_PageSettings.Margins.Left -
+                               m_PageSettings.Margins.Right;
+            var fTextWidthMax = nPrintAreaWidth / (float)Math.Cos(fRadians);
+            fTextWidthMax *= 0.90F; // Fudge down so we're sure to fit the margins.
+
+            // Find the largest font size that does not exceed this width
+            float fSize = 20;
+            var font = new Font("Arial", fSize, FontStyle.Bold);
+            do
+            {
+                var fWidth = draw.Graphics.MeasureString(WaterMarkText, font).Width;
+                if (fWidth > fTextWidthMax)
+                    break;
+
+                fSize += 1;
+                font = new Font("Arial", fSize, FontStyle.Bold);
+            } while (true);
+
+            // We want a very light gray
+            const int nGray = 225;
+            Brush brush = new SolidBrush(Color.FromArgb(nGray, nGray, nGray));
+
+            // Figure out where to put the text
+            float x = m_PageSettings.Margins.Left;
+            var szText = draw.Graphics.MeasureString(WaterMarkText, font);
+            var fAngledHeight = szText.Width * (float)Math.Tan(fRadians);
+            var fTextHeight = szText.Height * (float)Math.Cos(fRadians);
+            var y = m_PageSettings.Margins.Top +
+                (m_PageSettings.PaperSize.Height / 2) +
+                (fAngledHeight / 2) -
+                (fTextHeight / 2);
+
+            // Draw the text
+            draw.Graphics.TranslateTransform(x, y);
+            draw.Graphics.RotateTransform(-fAngle);
+            draw.Graphics.DrawString(WaterMarkText, font, brush, 0, 0);
+            draw.Graphics.ResetTransform();
+        }
+        #endregion
 
         #region Method: void Draw(IDraw draw)
         public void Draw(IDraw draw)
         {
+            DrawWatermark(draw);
+
             foreach(var group in Groups)
                 group.Draw(draw);
         }

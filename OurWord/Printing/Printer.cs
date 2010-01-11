@@ -99,8 +99,16 @@ namespace OurWord.Printing
             SetScriptureReferences(vLineGroups);
 
             // Create the pages based on the heights that will fit
-            while(vLineGroups.Count > 0)
-                Pages.Add(new Page(pdoc, Pages.Count, vLineGroups));
+            while (vLineGroups.Count > 0)
+            {
+                var page = new Page(pdoc, Pages.Count, vLineGroups)
+                    {
+                        WaterMarkText = (userSettings.PrintWaterMark) ?
+                            DB.TargetBook.Stage.LocalizedName : ""
+                    };
+
+                Pages.Add(page);
+            }
         }
         #endregion
         #region Method: List<DParagraph> GetParagraphsToPrint(userSettings)
