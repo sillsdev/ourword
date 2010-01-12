@@ -9,6 +9,7 @@
 #region Header: Using, etc.
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Data;
@@ -603,35 +604,24 @@ namespace OurWord.Dialogs
             #region WRITING SYSTEMS / FONT SETTINGS SETUP
             m_aFontBags = new ArrayList();
             CStyle.FontsForWritingSystems.ForceSort();
+
             foreach (JFontForWritingSystem fws in CStyle.FontsForWritingSystems)
             {
-                // We only want to display those writing systems that we are actually using
-                // in the project; rather than the whole universe of WS's that ship with OW.
-                JWritingSystem ws = fws.WritingSystem;
-                foreach (DTranslation t in DB.Project.AllTranslations)
-                {
-                    if (t.WritingSystemConsultant != ws && t.WritingSystemVernacular != ws)
-                        goto loop;
-                }
-
                 // Create the FontBag for this writing system
-                FontPropertyBag FontBag = new FontPropertyBag(fws);
-                PropertySpec ps = new PropertySpec(
+                var fontBag = new FontPropertyBag(fws);
+                var ps = new PropertySpec(
                     "propFonts",
-                    FontBag.Name,
+                    fontBag.Name,
                     typeof(FontPropertyBag),
                     c_sPropCharacterSettings,
                     "These are the font settings to use for this writing system.",
-                    FontBag,
+                    fontBag,
                     typeof(System.Drawing.Design.UITypeEditor),
-                    typeof(PropertyBagTypeConverter));
-                ps.DontLocalizeName = true;
+                    typeof(PropertyBagTypeConverter)) 
+                    {DontLocalizeName = true};
                 Bag.Properties.Add(ps);
 
-                m_aFontBags.Add(FontBag);
-
-            loop:
-                ;
+                m_aFontBags.Add(fontBag);
             }
             #endregion
 

@@ -121,6 +121,11 @@ namespace OurWord.Dialogs
         #region Method: void SetActivePage(string sID)
         public void SetActivePage(string sID)
 		{
+            // Harvest changes from the old page; do this now, in case
+            // harvesting involves regeinerating new pages
+            if (null != CurrentPage)
+                HarvestChangesFromCurrentPage();
+
             // Locate the page we want to make current
             DlgPropertySheet pageNew = null;
             foreach (DlgPropertySheet page in Pages)
@@ -131,10 +136,9 @@ namespace OurWord.Dialogs
             if (null == pageNew)
                 return;
 
-            // Turn off the old one
+            // Turn off the old page
             if (null != CurrentPage)
             {
-                HarvestChangesFromCurrentPage();
                 CurrentPage.Visible = false;
                 Controls.Remove(CurrentPage);
             }
