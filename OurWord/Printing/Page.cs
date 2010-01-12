@@ -188,8 +188,10 @@ namespace OurWord.Printing
         {
             DrawWatermark(draw);
 
-            foreach(var group in Groups)
+            foreach (var group in Groups)
+            {
                 group.Draw(draw);
+            }
         }
         #endregion
     }

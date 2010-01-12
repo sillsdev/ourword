@@ -226,7 +226,7 @@ namespace OurWord.Printing
                 vGroups.Add( new AssociatedLines( owp.Lines.GetRange(0, 2), vDisplayFootnotes)
                     {
                         TopY = owp.Rectangle.Top,
-                        BottomY = owp.Lines[2].Rectangle.Bottom,
+                        BottomY = owp.Lines[1].Rectangle.Bottom,
                         SpaceBefore = fSpaceBefore,
                         IsParagraphContinuation = false,
                         Picture = owp.Picture

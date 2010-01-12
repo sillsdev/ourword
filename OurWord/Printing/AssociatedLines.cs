@@ -162,9 +162,12 @@ namespace OurWord.Printing
             }
         }
         #endregion
-
+        #region Method: void MoveYs(float fBodyAdjustment)
         public void MoveYs(float fBodyAdjustment)
         {
+            TopY += fBodyAdjustment;
+            BottomY += fBodyAdjustment;
+
             foreach (var line in BodyLines)
             {
                 foreach (var item in line.SubItems)
@@ -174,9 +177,6 @@ namespace OurWord.Printing
             if (null != Picture)
                 Picture.MoveYs(fBodyAdjustment);
         }
-
-
-
-
+        #endregion
     }
 }
