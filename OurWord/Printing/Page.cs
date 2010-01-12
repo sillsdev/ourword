@@ -178,12 +178,15 @@ namespace OurWord.Printing
             // Figure out where to put the text
             float x = m_PageSettings.Margins.Left;
             var szText = draw.Graphics.MeasureString(WaterMarkText, font);
-            var fAngledHeight = szText.Width * (float)Math.Tan(fRadians);
-            var fTextHeight = szText.Height * (float)Math.Cos(fRadians);
-            var y = m_PageSettings.Margins.Top +
-                (m_PageSettings.PaperSize.Height / 2) +
-                (fAngledHeight / 2) -
-                (fTextHeight / 2);
+
+            var yPageMiddle = (m_PageSettings.Bounds.Height -
+                m_PageSettings.Margins.Top - 
+                m_PageSettings.Margins.Bottom) / 2F;
+
+            var fHeightDueToFont = szText.Height * (float) Math.Cos(fRadians) / 2F;
+            var fHeightDueToRise = szText.Width * (float) Math.Sin(fRadians) / 2F;
+
+            var y = yPageMiddle + fHeightDueToRise + fHeightDueToFont;
 
             // Draw the text
             draw.Graphics.TranslateTransform(x, y);
