@@ -595,12 +595,12 @@ namespace OurWord.Dialogs
         void BuildLiterateSettings()
         {
             // Get the list of currently-defined writing systems
-            string[] vsWritingSystems = new string[DB.StyleSheet.WritingSystems.Count];
-            for (int i = 0; i < DB.StyleSheet.WritingSystems.Count; i++)
-                vsWritingSystems[i] = (DB.StyleSheet.WritingSystems[i] as JWritingSystem).Name;
+            var vsWritingSystems = new string[DB.StyleSheet.WritingSystems.Count];
+            for (var i = 0; i < DB.StyleSheet.WritingSystems.Count; i++)
+                vsWritingSystems[i] = DB.StyleSheet.WritingSystems[i].Name;
 
             // Writing Systems
-            string sGroupWritingSystems = G.GetLoc_String("kWritingSystems", "Writing Systems");
+            var sGroupWritingSystems = G.GetLoc_String("kWritingSystems", "Writing Systems");
             LS.AddInformation("tr100", Information.PStyleHeading1,
                 "Writing Systems");
             LS.AddInformation("tr110", Information.PStyleNormal,
@@ -634,7 +634,7 @@ namespace OurWord.Dialogs
             m_WSAdvisor.Group = sGroupWritingSystems;
 
             // Footnotes
-            string sGroupFootnotes = G.GetLoc_String("kFootnotes", "Footnotes");
+            var sGroupFootnotes = G.GetLoc_String("kFootnotes", "Footnotes");
             LS.AddInformation("tr200", Information.PStyleHeading1,
                 "Footnote Letter Sequence");
             LS.AddInformation("tr210", Information.PStyleNormal,
@@ -663,7 +663,7 @@ namespace OurWord.Dialogs
                 "allows a means for you to specify multi-letter combinations, e.g., the 'll' " +
                 "and 'ng' in \"...j k l ll m n ng o p...\"");
 
-            string sEditText = "";
+            var sEditText = "";
             foreach (string s in Translation.FootnoteCustomSeq)
                 sEditText += (s + ' ');
             m_FootnoteCustomSequence = LS.AddEditText(

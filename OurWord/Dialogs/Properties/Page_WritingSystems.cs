@@ -8,28 +8,14 @@
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Globalization;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
 using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-
 using Palaso.UI.WindowsForms.Keyboarding;
 using JWTools;
 using OurWordData;
-using OurWord;
 using OurWordData.DataModel;
-using OurWord.Dialogs;
-using OurWord.Layouts;
 using OurWord.Edit;
 #endregion
 
@@ -206,6 +192,7 @@ namespace OurWord.Dialogs
         #region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
+            // Auto replace
             m_ctrlAutoReplace.Harvest();
             WritingSystem.BuildAutoReplace();
             WritingSystem.DeclareDirty();
@@ -221,7 +208,14 @@ namespace OurWord.Dialogs
 			catch (Exception)
 			{
 			}
+
+            // Need to make certain the renamed Writing System Name is propogated, e.g.,
+            // to the combo box in the Translation Settings page.
+            // So reset the pages; but don't actually go to one
+            ParentDlg.InitNavigation(null);
+
             return true;
+
         }
         #endregion
 

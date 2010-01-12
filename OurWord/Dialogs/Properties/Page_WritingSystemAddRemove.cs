@@ -10,7 +10,6 @@
 using System;
 using System.Diagnostics;
 using JWTools;
-using OurWordData;
 using OurWordData.DataModel;
 using OurWord.Edit;
 #endregion
@@ -176,11 +175,10 @@ namespace OurWord.Dialogs
 		#region Cmd: cmdAddWritingSystem
 		private void cmdAddWritingSystem(object sender, EventArgs e)
 		{
-            string sName = LocDB.GetValue(this, "NewWritingSystem", 
-                "New Writing System", null);
+            var sName = LocDB.GetValue(this, "NewWritingSystem", "New Writing System", null);
 
 			// Add it to the list if it is not already there
-			JWritingSystem ws = DB.StyleSheet.FindOrAddWritingSystem(sName);
+			DB.StyleSheet.FindOrAddWritingSystem(sName);
 			DB.StyleSheet.WritingSystems.ForceSort();
 
 			// Recompute the pages, then go to its property page
