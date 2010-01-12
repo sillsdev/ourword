@@ -37,6 +37,8 @@ namespace OurWord.Printing
         private readonly float m_fTotalAvailableContentHeight;
         public string WaterMarkText { private get; set; }
 
+        private const int c_nMarginBetweenBodyAndFootnotes = 10;
+
         #region Constructor(pDoc, nPageNumber, vGroups)
         public Page(PrintDocument pdoc, int nPageNumber, IList<AssociatedLines> vSourceGroups)
         {
@@ -62,6 +64,7 @@ namespace OurWord.Printing
         void CalculateGroupsThatWillFit(IList<AssociatedLines> vSourceGroups)
         {
             var fHeightRemaining = m_fTotalAvailableContentHeight;
+            var bFootnoteFound = false;
 
             do
             {
@@ -69,6 +72,13 @@ namespace OurWord.Printing
                 // always add at least one group, even if too high; thus avoiding an endless loop
                 var group = vSourceGroups[0];
                 Groups.Add(group);
+
+                // If we see footnotes, we need to allow room between body and footnote
+                if (group.HasFootnotes && !bFootnoteFound)
+                {
+                    fHeightRemaining -= c_nMarginBetweenBodyAndFootnotes;
+                    bFootnoteFound = true;
+                }
 
                 // Subtract this group's height from the height available on the page.6
                 // For the initial group on the page, we want to eat the SpaceBefore, as we don't
@@ -182,16 +192,32 @@ namespace OurWord.Printing
             draw.Graphics.ResetTransform();
         }
         #endregion
+        #region Method: void DrawFootnoteSeparator(IDraw draw)
+        void DrawFootnoteSeparator(IDraw draw)
+        {
+            if(HeightRequiredForFootnotes == 0)
+                return;
 
+            const int yPixelsAboveFootnotes = 2;
+            var x = m_PageSettings.Margins.Left;
+            var y = m_PageSettings.Bounds.Bottom - 
+                m_PageSettings.Margins.Bottom -
+                HeightRequiredForFootnotes - 
+                yPixelsAboveFootnotes;
+
+            const int xSeparatorLength = 100;
+
+            draw.DrawLine(Pens.Black, x, y, x + xSeparatorLength, y);
+        }
+        #endregion
         #region Method: void Draw(IDraw draw)
         public void Draw(IDraw draw)
         {
             DrawWatermark(draw);
+            DrawFootnoteSeparator(draw);
 
             foreach (var group in Groups)
-            {
                 group.Draw(draw);
-            }
         }
         #endregion
     }

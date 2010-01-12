@@ -10,6 +10,14 @@ namespace OurWord.Printing
         public readonly List<ELine> BodyLines;
         public readonly List<ELine> FootnoteLines;
 
+        public bool HasFootnotes
+        {
+            get
+            {
+                return FootnoteLines.Count > 0;
+            }
+        }
+
         // Picture ---------------------------------------------------------------------------
         public EPicture Picture;
         #region Method: void DrawPicture(IDraw draw)
