@@ -25,6 +25,7 @@ using System.IO;
 using Microsoft.Win32;
 
 using JWTools;
+using OurWord.Printing;
 using OurWordData;
 using OurWordData.DataModel;
 #endregion
@@ -2479,9 +2480,6 @@ namespace OurWord
 
 			// Printer to use
 			pdoc.PrinterSettings.PrinterName = m_dlg.PrinterName;
-
-			// Substitutions?
-            PWord.ShouldMakeReplacements = m_dlg.MakeSubstitutions;
 
 			// Disable the little "Print Progress" dialog, by using StandardPrintController
 			// instead of the PrintControllerWithStatusDialog that would normally be

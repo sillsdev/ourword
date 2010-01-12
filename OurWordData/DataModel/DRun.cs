@@ -2970,7 +2970,7 @@ namespace OurWordData.DataModel
         #endregion
 
         // Text Replacements -----------------------------------------------------------------
-        static public bool ShouldMakeReplacements = false;
+ //       static public bool ShouldMakeReplacements = false;
         #region SAttr{g}: TreeRoot ReplaceTree
         static public TreeRoot ReplaceTree
         {
@@ -3002,8 +3002,8 @@ namespace OurWordData.DataModel
         protected static string MakeReplacements(string s)
         {
             // Just return the source string if replacements are not desired
-            if (!ShouldMakeReplacements)
-                return s;
+//            if (!ShouldMakeReplacements)
+//                return s;
 
             // Make sure the tree has been built
             if (null == ReplaceTree)

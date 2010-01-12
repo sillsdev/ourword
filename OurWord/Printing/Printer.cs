@@ -1,4 +1,13 @@
-﻿using System;
+﻿#region ***** Printer.cs *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    Printer.cs
+ * Author:  John Wimbish
+ * Created: 20 Dec 2009
+ * Purpose: Printing (direct to printer)
+ * Legal:   Copyright (c) 2004-10, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -7,7 +16,9 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.Edit;
 using OurWord.Layouts;
+using OurWordData;
 using OurWordData.DataModel;
+#endregion
 
 namespace OurWord.Printing
 {
@@ -49,11 +60,16 @@ namespace OurWord.Printing
         // Public Interface ------------------------------------------------------------------
         #region Constructor(DSection)
         public Printer(DSection currentSectionOfBookToPrint)
+            : this()
         {
-            m_Pages = new List<Page>();
-
             m_CurrentSection = currentSectionOfBookToPrint;
             m_BookToPrint = CurrentSection.Book;
+        }
+        #endregion
+        #region Constructor() - for testing
+        protected Printer()
+        {
+            m_Pages = new List<Page>();
         }
         #endregion
         #region Method: void Do()
@@ -68,6 +84,9 @@ namespace OurWord.Printing
             if (userSettings.ShowDialog() != DialogResult.OK)
                 return;
 
+            // User settings
+            m_bShouldMakeQuoteReplacements = userSettings.MakeSubstitutions;
+
             // Print Document Settings
             pdoc.DocumentName = BookToPrint.DisplayName;
             pdoc.PrinterSettings.PrinterName = userSettings.PrinterName;
@@ -77,6 +96,48 @@ namespace OurWord.Printing
             // Layout & send to printer
             Layout(userSettings, pdoc);
             DoPrint(pdoc);
+        }
+        #endregion
+
+        // Substitutions ---------------------------------------------------------------------
+        protected bool m_bShouldMakeQuoteReplacements;
+        private TreeRoot m_ReplaceTree;
+        #region Method: string MakeQuoteReplacements(s)
+        protected string MakeQuoteReplacements(string s)
+        {
+            if (!m_bShouldMakeQuoteReplacements)
+                return s;
+
+            // Make sure the tree has been built
+            if (null == m_ReplaceTree)
+            {
+                m_ReplaceTree = new TreeRoot();
+
+                m_ReplaceTree.Add("<<<", "“‘");
+                m_ReplaceTree.Add("<<", "“");
+                m_ReplaceTree.Add("<", "‘");
+
+                m_ReplaceTree.Add(">>>", "’”");
+                m_ReplaceTree.Add(">>", "”");
+                m_ReplaceTree.Add(">", "’");                
+            }
+
+            // Do the replacements
+            return m_ReplaceTree.MakeReplacements(s);
+        }
+        #endregion
+        #region Method: void MakeQuoteReplacements(EContainer owp)
+        private void MakeQuoteReplacements(EContainer owp)
+        {
+            if (!m_bShouldMakeQuoteReplacements)
+                return;
+
+            foreach(var item in owp.SubItems)
+            {
+                var word = item as EWord;
+                if (null != word)
+                    word.Text = MakeQuoteReplacements(word.Text);
+            }
         }
         #endregion
 
@@ -140,6 +201,7 @@ namespace OurWord.Printing
             {
                 var owp = new OWPara(writingSystem, paragraph.Style,
                     paragraph, Color.White, OWPara.Flags.None);
+                MakeQuoteReplacements(owp);
                 vDisplayParagraphs.Add(owp);
                 owp.SetPicture(WLayout.GetPicture(paragraph), false);
             }
