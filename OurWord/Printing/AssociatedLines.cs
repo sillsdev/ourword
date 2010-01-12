@@ -71,6 +71,9 @@ namespace OurWord.Printing
         public float BottomY { private get; set; }
         public bool IsParagraphContinuation { private get; set; }
 
+        public float SpaceBefore { get; set; }
+        public float SpaceAfter { get; set; }
+
         #region VAttr{g}: float TotalHeight
         public float TotalHeight
         {

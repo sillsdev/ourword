@@ -203,8 +203,8 @@ namespace OurWord.Printing
             foreach(var owp in vDisplayParagraphs)
             {
                 // Shorthand
-//                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.PStyle.SpaceBefore);
-//                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.PStyle.SpaceAfter);
+                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.PStyle.SpaceBefore);
+                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.PStyle.SpaceAfter);
                 var count = owp.Lines.Count;
 
                 // Widow/orphan control: small paragraphs always go together
@@ -214,6 +214,8 @@ namespace OurWord.Printing
                         {
                             TopY = owp.Rectangle.Top,
                             BottomY = owp.Rectangle.Bottom,
+                            SpaceBefore = fSpaceBefore,
+                            SpaceAfter = fSpaceAfter,
                             IsParagraphContinuation = false,
                             Picture = owp.Picture
                         });
@@ -225,6 +227,7 @@ namespace OurWord.Printing
                     {
                         TopY = owp.Rectangle.Top,
                         BottomY = owp.Lines[2].Rectangle.Bottom,
+                        SpaceBefore = fSpaceBefore,
                         IsParagraphContinuation = false,
                         Picture = owp.Picture
                     });
@@ -243,6 +246,7 @@ namespace OurWord.Printing
                     {
                         TopY = owp.Lines[count - 2].Rectangle.Top,
                         BottomY = owp.Rectangle.Bottom,
+                        SpaceAfter = fSpaceAfter,
                         IsParagraphContinuation = true,
                     });
             }

@@ -63,25 +63,34 @@ namespace OurWord.Printing
         {
             var fHeightRemaining = m_fTotalAvailableContentHeight;
 
-            // Make sure the page has at least one group, even if it is too large
-            var firstGroup = vSourceGroups[0];
-            Groups.Add(firstGroup);
-            vSourceGroups.Remove(firstGroup);
-            fHeightRemaining -= firstGroup.TotalHeight;
-
-            // Transfer as many other groups over as will fit
-            while (vSourceGroups.Count > 0)
+            do
             {
+                // Add the next group: by doing it first in the do loop we ensure that we 
+                // always add at least one group, even if too high; thus avoiding an endless loop
                 var group = vSourceGroups[0];
+                Groups.Add(group);
 
-                if (group.TotalHeight > fHeightRemaining)
+                // Subtract this group's height from the height available on the page.6
+                // For the initial group on the page, we want to eat the SpaceBefore, as we don't
+                // need for the paragraph to appear lower when its at the top of the page.
+                var fGroupHeight = (Groups.Count == 1) ? 
+                    (group.TotalHeight - group.SpaceBefore) : 
+                    group.TotalHeight;
+                fHeightRemaining -= fGroupHeight;
+
+                // Remove the group we've just added from the queue
+                vSourceGroups.Remove(group);
+                if (vSourceGroups.Count == 0)
                     break;
 
-                fHeightRemaining -= group.TotalHeight;
+                // If the next group will not fit, then the next page will have to pick it up.
+                var nextGroup = vSourceGroups[0];
+                var nextGroupHeightIfAtPageBottom = nextGroup.TotalHeight - nextGroup.SpaceAfter;
+                if (fHeightRemaining < nextGroupHeightIfAtPageBottom)
+                    break;
 
-                vSourceGroups.Remove(group);
-                Groups.Add(group);
-            }
+            } while (true);
+
         }
         #endregion
         #region Attr{g}: float HeightRequiredForFootnotes
@@ -102,8 +111,8 @@ namespace OurWord.Printing
         void Layout()
         {
             float yPrintAreaTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
-            var yFirstGroupTop = Groups[0].TopY;
-            var fBodyAdjustment = yPrintAreaTop - yFirstGroupTop;
+            var yFirstGroupTopOfText = Groups[0].TopY + Groups[0].SpaceBefore;
+            var fBodyAdjustment = yPrintAreaTop - yFirstGroupTopOfText;
 
             float yPrintAreaBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
             var yFootnoteTop = yPrintAreaBottom - HeightRequiredForFootnotes;
