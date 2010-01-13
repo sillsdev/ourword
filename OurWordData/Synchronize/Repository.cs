@@ -356,17 +356,17 @@ namespace OurWordData.Synchronize
         #endregion
 
         // Repository Version ----------------------------------------------------------------
-        private const string c_VersionTag = "OurWordVersion";
+        private const string c_sVersionTag = "OurWordVersion";
         // 1 - setup of the initial feature
         // 2 - preventing AuSIL-TopEnd from being able to synch during case folding problem
         // 3 - new Style implementation
-        public const int c_CurrentVersionNo = 3;
+        public const int c_nCurrentVersionNo = 3;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {
             get
             {
-                return c_VersionTag + "=" + c_CurrentVersionNo;
+                return c_sVersionTag + "=" + c_nCurrentVersionNo;
             }
         }
         #endregion
@@ -379,12 +379,12 @@ namespace OurWordData.Synchronize
             var result = DoCommand("tags");
 
             var vsTags = result.StandardOutput.Split('\n');
-            var iStart = c_VersionTag.Length + 1;
+            var iStart = c_sVersionTag.Length + 1;
 
             var vsVersionStrings = new List<string>();
             foreach(var s in vsTags)
             {
-                if (!s.Contains(c_VersionTag + "=")) 
+                if (!s.Contains(c_sVersionTag + "=")) 
                     continue;
                 var sTag = s.Substring(iStart, s.IndexOf(' ') - iStart);
                 vsVersionStrings.Add(sTag);
@@ -417,7 +417,7 @@ namespace OurWordData.Synchronize
         {
             // Do nothing if we're already at the desired version
             var currentVersion = GetOurWordVersion();
-            if (currentVersion >= c_CurrentVersionNo)
+            if (currentVersion >= c_nCurrentVersionNo)
                 return;
 
             AddOurWordVersionTag();
@@ -810,7 +810,7 @@ namespace OurWordData.Synchronize
             var pathToChorusMerge = Repository.SurroundWithQuotes(
                 Path.Combine(ExecutionEnvironment.DirectoryOfExecutingAssembly, "ChorusMerge.exe"));
 
-            using (new ShortTermEnvironmentalVariable("OurWordDataVersion", LocalRepository.c_CurrentVersionNo.ToString()))
+            using (new ShortTermEnvironmentalVariable("OurWordDataVersion", LocalRepository.c_nCurrentVersionNo.ToString()))
             using (new ShortTermEnvironmentalVariable("ChorusPathToRepository", m_LocalRepository.FullPathToRepositoryRoot))
             using (new ShortTermEnvironmentalVariable("HGMERGE", pathToChorusMerge))
             {

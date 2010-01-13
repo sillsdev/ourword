@@ -93,10 +93,21 @@ namespace OurWord.Printing
             pdoc.PrinterSettings.PrinterName = userSettings.PrinterName;
             // Disable the default "Print Progress" dialog that would otherwise appear
             pdoc.PrintController = new StandardPrintController();
+
+            // Initialize the progress dialog
+            var vsProgressSteps = new[] 
+            { 
+                "Measuring the text",
+                "Layout out the pages",
+                "Sending to Printer"
+            };
+            EnumeratedStepsProgressDlg.Start("Printing", vsProgressSteps);
             
             // Layout & send to printer
             Layout(userSettings, pdoc);
             DoPrint(pdoc);
+
+            EnumeratedStepsProgressDlg.Stop();
         }
         #endregion
 
@@ -147,6 +158,9 @@ namespace OurWord.Printing
         #region Method: void Layout(DialogPrint userSettings, PrintDocument pdoc)
         void Layout(DialogPrint userSettings, PrintDocument pdoc)
         {
+            // Begin step: "Measuring the text"
+            EnumeratedStepsProgressDlg.IncrementStep();
+
             // Create OWParas for the body and footnotes we intend to print
             var vDataParagraphs = GetParagraphsToPrint(userSettings);
             var vDisplayParagraphs = GetDisplayParagraphsToPrint(vDataParagraphs);
@@ -164,6 +178,7 @@ namespace OurWord.Printing
             HandleLineSpacing(vLineGroups);
 
             // Create the pages based on the heights that will fit
+            EnumeratedStepsProgressDlg.IncrementStep();
             while (vLineGroups.Count > 0)
             {
                 var page = new Page(pdoc, Pages.Count, vLineGroups)
@@ -173,7 +188,9 @@ namespace OurWord.Printing
                     };
 
                 Pages.Add(page);
+                EnumeratedStepsProgressDlg.AppendToLabelText("..." + Pages.Count);
             }
+            EnumeratedStepsProgressDlg.ClearAppend();
         }
         #endregion
         #region Method: List<DParagraph> GetParagraphsToPrint(userSettings)
@@ -382,13 +399,19 @@ namespace OurWord.Printing
             return null;
         }
         #endregion
+        private int m_nCurrentPrintPage;
         #region Method: void DoPrint(PrintDocument pdoc)
         void DoPrint(PrintDocument pdoc)
         {
             try
             {
+                EnumeratedStepsProgressDlg.IncrementStep();
+                m_nCurrentPrintPage = 1;
+
                 pdoc.PrintPage += PrintPage;
                 pdoc.Print();
+
+                EnumeratedStepsProgressDlg.ClearAppend();
             }
             catch (Exception e)
             {
@@ -403,7 +426,8 @@ namespace OurWord.Printing
         private void PrintPage(object sender, PrintPageEventArgs ev)
 		{
             // Take the page off the beginning of the list and draw it
-		    var page = Pages[0];
+            EnumeratedStepsProgressDlg.AppendToLabelText("..." + m_nCurrentPrintPage++);
+            var page = Pages[0];
             page.Draw(new PrinterDraw(ev.Graphics));
 
             // Still more to do?

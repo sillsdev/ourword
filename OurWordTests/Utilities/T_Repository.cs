@@ -251,8 +251,8 @@ namespace OurWordTests.Utilities
 
             repo.UpdateVersionTag();
 
-            Assert.AreEqual(c_CurrentVersionNo, repo.GetOurWordVersion(),
-                "Version should be " + c_CurrentVersionNo);
+            Assert.AreEqual(c_nCurrentVersionNo, repo.GetOurWordVersion(),
+                "Version should be " + c_nCurrentVersionNo);
         }
         #endregion
     }
