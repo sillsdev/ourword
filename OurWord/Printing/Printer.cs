@@ -86,6 +86,7 @@ namespace OurWord.Printing
 
             // User settings
             m_bShouldMakeQuoteReplacements = userSettings.MakeSubstitutions;
+            m_fLineSpacing = userSettings.LineSpacing;
 
             // Print Document Settings
             pdoc.DocumentName = BookToPrint.DisplayName;
@@ -101,6 +102,7 @@ namespace OurWord.Printing
 
         // Substitutions ---------------------------------------------------------------------
         protected bool m_bShouldMakeQuoteReplacements;
+        protected float m_fLineSpacing = 1F;
         private TreeRoot m_ReplaceTree;
         #region Method: string MakeQuoteReplacements(s)
         protected string MakeQuoteReplacements(string s)
@@ -158,6 +160,8 @@ namespace OurWord.Printing
             var vLineGroups = AssociateBodyWithFootnotes(pdoc, 
                 vDisplayParagraphs, vDisplayFootnotes);
             SetScriptureReferences(vLineGroups);
+
+            HandleLineSpacing(vLineGroups);
 
             // Create the pages based on the heights that will fit
             while (vLineGroups.Count > 0)
@@ -316,7 +320,6 @@ namespace OurWord.Printing
             return vGroups;
         }
         #endregion
-
         #region SMethod: void SetScriptureReferences(vGroups)
         static void SetScriptureReferences(IEnumerable<AssociatedLines> vGroups)
         {
@@ -325,6 +328,22 @@ namespace OurWord.Printing
 
             foreach(var group in vGroups)
                 group.SetScriptureReferences(ref nChapter, ref nVerse);
+        }
+        #endregion
+        #region Method:  void HandleLineSpacing(vGroups)
+        void HandleLineSpacing(IEnumerable<AssociatedLines> vGroups)
+        {
+            if (m_fLineSpacing == 1F)
+                return;
+
+            var fTop = 0F;
+
+            foreach (var group in vGroups)
+            {
+                group.TopY = fTop;
+                group.HandleLineSpacing(m_fLineSpacing);
+                fTop += group.TotalHeight;
+            }
         }
         #endregion
 

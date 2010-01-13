@@ -7,9 +7,9 @@ namespace OurWord.Printing
 {
     public class AssociatedLines
     {
-        public readonly List<ELine> BodyLines;
+        private readonly List<ELine> BodyLines;
         public readonly List<ELine> FootnoteLines;
-
+        #region VAttr{g}: bool HasFootnotes
         public bool HasFootnotes
         {
             get
@@ -17,6 +17,7 @@ namespace OurWord.Printing
                 return FootnoteLines.Count > 0;
             }
         }
+        #endregion
 
         // Picture ---------------------------------------------------------------------------
         public EPicture Picture;
@@ -26,6 +27,15 @@ namespace OurWord.Printing
             if (null == Picture)
                 return;
             Picture.Draw(draw);
+        }
+        #endregion
+        #region Attr{g}: bool HasPicture
+        bool HasPicture
+        {
+            get
+            {
+                return Picture != null;
+            }
         }
         #endregion
 
@@ -173,6 +183,9 @@ namespace OurWord.Printing
         #region Method: void MoveYs(float fBodyAdjustment)
         public void MoveYs(float fBodyAdjustment)
         {
+            if (fBodyAdjustment == 0F)
+                return;
+
             TopY += fBodyAdjustment;
             BottomY += fBodyAdjustment;
 
@@ -184,6 +197,38 @@ namespace OurWord.Printing
     
             if (null != Picture)
                 Picture.MoveYs(fBodyAdjustment);
+        }
+        #endregion
+        #region Method: void HandleLineSpacing(float fMultiplier)
+        public void HandleLineSpacing(float fMultiplier)
+        {
+            var y = TopY;
+
+            // Add the SpaceBefore
+            SpaceBefore *= fMultiplier;
+            y += SpaceBefore;
+
+            // Add the picture
+            if (HasPicture)
+            {
+                Picture.SetY(y);
+                y += Picture.Height;
+            }
+
+            // Handle the lines of text
+            foreach (var line in BodyLines)
+            {
+                foreach (var item in line.SubItems)
+                    item.Position = new PointF(item.Position.X, y);
+                y += (line.LargestItemHeight * fMultiplier);
+            }
+
+            // Add the SpaceAfter
+            SpaceAfter *= fMultiplier;
+            y += SpaceAfter;
+
+            // Set the bottom
+            BottomY = y;
         }
         #endregion
     }
