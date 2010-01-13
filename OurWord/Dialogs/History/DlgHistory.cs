@@ -93,6 +93,7 @@ namespace OurWord.Dialogs.History
             : base(sName, 1)
         {
             m_history = history;
+            DontEverDim = true;
 
             var section = history.Owner as DSection;
             if (section != null)

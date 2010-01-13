@@ -95,17 +95,18 @@ namespace OurWord.Edit
 			m_wndVerbose = null;
 		}
 		#endregion
+	    const string c_sNamePrefix = "LS-";
 		#region Method: CreateVerbose()
 		void CreateVerbose()
 		{
-			m_wndVerbose = new OWWindow("LS-" + Name, 1);
+            m_wndVerbose = new OWWindow(c_sNamePrefix + Name, 1) {DontEverDim = true};
 			m_panelSettingsContainer.Controls.Add(Verbose);
 			Verbose.Dock = DockStyle.Fill;
 			Verbose.Visible = true;
 
 			// Populate the window
 			Verbose.Contents.Clear();
-			foreach (Setting setting in Settings)
+			foreach (var setting in Settings)
 				setting.BuildVerbose();
 			Verbose.LoadData();
 		}

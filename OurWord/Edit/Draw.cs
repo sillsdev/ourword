@@ -1,8 +1,18 @@
-﻿using System.Diagnostics;
+﻿#region ***** Draw.cs *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    Draw.cs
+ * Author:  John Wimbish
+ * Created: Jan 2010
+ * Purpose: Handles differences between Screen and Printer drawing
+ * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
 using System.Windows.Forms;
+using JWTools;
+#endregion
 
 namespace OurWord.Edit
 {
@@ -19,7 +29,7 @@ namespace OurWord.Edit
         void DrawLine(Pen pen, PointF pt1, PointF pt2);
         void DrawVertLine(Pen pen, float x, float y1, float y2);
         void DrawBullet(Color color, PointF pt, float fRadius);
-        void DrawImage(Image image, PointF pt);
+        void DrawImage(Bitmap bmp, PointF pt);
         Graphics Graphics { get; }
     }
 
@@ -92,8 +102,8 @@ namespace OurWord.Edit
                 g.DrawPath(BorderPen, gp);
         }
         #endregion
-        #region SMethod: void DrawImage(Graphics, Image, PointF)
-        protected static void DrawImage(Graphics g, Image image, PointF pt)
+        #region SMethod: void DrawImage(Graphics, Bitmap, PointF)
+        protected static void DrawImage(Graphics g, Bitmap bmp, PointF pt)
             //    This was taken from www.codeproject.com/KB/graphics/BorderBug.aspx,
             // which deals with the way DrawImage wants to, seemingly randomly, shift 
             // an image a pixel sometimes. 
@@ -102,14 +112,14 @@ namespace OurWord.Edit
         {
             // Start the source image a half pixel in, because the system works from
             // the middle of pixels, not from their top-left.
-            var sourceRectangle = new RectangleF(0.5F, 0.5F, image.Width, image.Height);
+            var sourceRectangle = new RectangleF(0.5F, 0.5F, bmp.Width, bmp.Height);
 
-            var destinationRectangle = new RectangleF(pt.X, pt.Y, image.Width, image.Height);
+            var destinationRectangle = new RectangleF(pt.X, pt.Y, bmp.Width, bmp.Height);
 
             var oldInterpolationMode = g.InterpolationMode;
             g.InterpolationMode = InterpolationMode.NearestNeighbor;
 
-            g.DrawImage(image, destinationRectangle, sourceRectangle, GraphicsUnit.Pixel);
+            g.DrawImage(bmp, destinationRectangle, sourceRectangle, GraphicsUnit.Pixel);
 
             g.InterpolationMode = oldInterpolationMode;
         }
@@ -122,6 +132,7 @@ namespace OurWord.Edit
         #region Constructor(OWWindow)
         public ScreenDraw(OWWindow window)
         {
+            m_window = window;
             m_bmpDoubleBuffer = new Bitmap(window.Width, window.Height);
             Graphics = Graphics.FromImage(m_bmpDoubleBuffer);
 
@@ -135,6 +146,7 @@ namespace OurWord.Edit
         #endregion
         private Bitmap m_bmpDoubleBuffer;
         private readonly VScrollBar m_ScrollBar;
+        private readonly OWWindow m_window;
         #region Attr{g}: float ScrollBarPosition
         private float ScrollBarPosition
         {
@@ -145,6 +157,43 @@ namespace OurWord.Edit
         }
         #endregion
         public Graphics Graphics { get; private set; }
+
+        // Dim -------------------------------------------------------------------------------
+        static private readonly Brush s_brushDim = new SolidBrush(Color.Black);
+        private readonly Color c_colorDimBackground = Color.DarkGray;
+        public static bool Dim { get; set; }
+        #region Attr{g}: bool IsDrawDimmed
+        bool IsDrawDimmed
+        {
+            get
+            {
+                return (Dim && !m_window.DontEverDim);
+            }
+        }
+        #endregion
+        #region Method: Color GetDimAwareBackgroundColor(clrRequested)
+        Color GetDimAwareBackgroundColor(Color clrRequested)
+        {
+            return (IsDrawDimmed) ? c_colorDimBackground : clrRequested;
+        }
+        #endregion
+        #region Method: Brush GetDimAwareForegroundBrush(brushRequested)
+        Brush GetDimAwareForegroundBrush(Brush brushRequested)
+        {
+            return (IsDrawDimmed) ? s_brushDim : brushRequested;
+        }
+        #endregion
+        #region Method: Bitmap GetDimAwareBitmap(Bitmap bmpRequested)
+        Bitmap GetDimAwareBitmap(Bitmap bmpRequested)
+        {
+            if (IsDrawDimmed)
+            {
+                var bitmapDimmed = (Bitmap)bmpRequested.Clone();
+                return JWU.ChangeBitmapBackground(bitmapDimmed, c_colorDimBackground);
+            }
+            return bmpRequested;
+        }
+        #endregion
 
         // IDraw Interface -------------------------------------------------------------------
         #region Method: bool IsSendingToPrinter()
@@ -166,23 +215,23 @@ namespace OurWord.Edit
         public void DrawBackground(Color clrBackground, RectangleF rect)
             // See PrinterDraw implementation for why we have this method
         {
-            FillRectangle(clrBackground, rect);
+            FillRectangle(GetDimAwareBackgroundColor(clrBackground), rect);
         }
         #endregion
         #region Method: void DrawString(s, font, Brush, pt)
         public void DrawString(string s, Font font, Brush brush, PointF pt)
         {
             pt = new PointF(pt.X, pt.Y - ScrollBarPosition);
-            DrawString(Graphics, s, font, brush, pt);
+            DrawString(Graphics, s, font, GetDimAwareForegroundBrush(brush), pt);
         }
         #endregion
-        #region Method: void DrawString(s, font, Brush, pt)
+        #region Method: void DrawString(s, font, Brush, rect)
         public void DrawString(string s, Font font, Brush brush, RectangleF rect)
         {
             var r = new RectangleF(rect.X, rect.Y - ScrollBarPosition,
                 rect.Width, rect.Height);
 
-            Graphics.DrawString(s, font, brush, r);
+            Graphics.DrawString(s, font, GetDimAwareForegroundBrush(brush), r);
         }
         #endregion
         #region Method: void DrawRectangle(Pen, RectangleF)
@@ -234,11 +283,11 @@ namespace OurWord.Edit
                 fRadius);
         }
         #endregion
-        #region Method: void DrawImage(Image image, PointF pt)
-        public void DrawImage(Image image, PointF pt)
+        #region Method: void DrawImage(Bitmap, PointF)
+        public void DrawImage(Bitmap bmp, PointF pt)
         {
             var point = new PointF( pt.X, pt.Y - ScrollBarPosition);
-            Draw.DrawImage(Graphics, image, point);
+            DrawImage(Graphics, GetDimAwareBitmap(bmp), point);
         }
         #endregion
 
@@ -345,10 +394,10 @@ namespace OurWord.Edit
             DrawBullet(Graphics, color, pt, fRadius);
         }
         #endregion
-        #region Method: void DrawImage(Image image, PointF pt)
-        public void DrawImage(Image image, PointF pt)
+        #region Method: void DrawImage(Bitmap, PointF)
+        public void DrawImage(Bitmap bmp, PointF pt)
         {
-            DrawImage(Graphics, image, pt);
+            DrawImage(Graphics, bmp, pt);
         }
         #endregion
     }

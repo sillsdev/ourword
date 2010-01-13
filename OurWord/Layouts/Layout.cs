@@ -90,7 +90,7 @@ namespace OurWord.Layouts
         }
         #endregion
 
-        public const int c_nFootnoteSeparatorWidth = 60;
+        protected const int c_nFootnoteSeparatorWidth = 60;
 
         // Synchronize Front and Target paragraphs -------------------------------------------
         protected class SynchronizedSection

@@ -104,7 +104,7 @@ namespace OurWord.Edit
         #endregion
 
         // Interaction with OurWord Main -----------------------------------------------------
-        bool m_bLoaded = false;
+        bool m_bLoaded;
         #region Method: virtual void LoadData() - the subclass should populate the window
         public virtual void LoadData()
             // Called by the Client (OurWordMain) whenever it is time to clear and then
@@ -262,6 +262,7 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         public enum WindowClass { Tooltip };
+        public bool DontEverDim;
         #region Constructor(WindowClass)
         public OWWindow(WindowClass wc)
         {
@@ -501,6 +502,7 @@ namespace OurWord.Edit
 
         }
         #endregion
+
         #region Cmd: OnPaint
         protected override void OnPaint(PaintEventArgs e)
         {
