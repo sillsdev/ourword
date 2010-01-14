@@ -18,14 +18,14 @@ namespace OurWordTests.Printing
         #region Test: TMakeReplacements
         [Test] public void TMakeReplacements()
         {
-            m_bShouldMakeQuoteReplacements = true;
+            UserSettings.MakeQuoteSubstitutions = true;
             Assert.AreEqual("kuna'”,", MakeQuoteReplacements("kuna'>>,"));
             Assert.AreEqual("“Au", MakeQuoteReplacements("<<Au"));
             Assert.AreEqual("“‘Au", MakeQuoteReplacements("<<<Au"));
             Assert.AreEqual("“‘Au’”", MakeQuoteReplacements("<<<Au>>>"));
             Assert.AreEqual("A‘u", MakeQuoteReplacements("A<u"));
 
-            m_bShouldMakeQuoteReplacements = false;
+            UserSettings.MakeQuoteSubstitutions = false;
             Assert.AreEqual("kuna'>>,", MakeQuoteReplacements("kuna'>>,"));
             Assert.AreEqual("<<Au", MakeQuoteReplacements("<<Au"));
             Assert.AreEqual("<<<Au", MakeQuoteReplacements("<<<Au"));

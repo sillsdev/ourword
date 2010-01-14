@@ -66,7 +66,7 @@ namespace OurWord
 
 		// Attrs -----------------------------------------------------------------------------
 		#region Attr{g}: PrintDocument PDoc
-		PrintDocument PDoc
+		public PrintDocument PDoc
 		{
 			get
 			{
@@ -207,12 +207,12 @@ namespace OurWord
 			}
 		}
 		#endregion
-		#region Attr{g/s}: bool MakeSubstitutions
-		public bool MakeSubstitutions
+		#region Attr{g/s}: bool MakeQuoteSubstitutions
+		public bool MakeQuoteSubstitutions
 		{
 			get
 			{
-				return this.m_checkReplacements.Checked;
+				return m_checkReplacements.Checked;
 			}
 			set
 			{
@@ -538,7 +538,7 @@ namespace OurWord
 			m_radioThisSection.AutoCheck = false;
 
 			// Substitutions
-			MakeSubstitutions = true;
+			MakeQuoteSubstitutions = true;
 
 			// Pictures
 			PrintPictures = true;

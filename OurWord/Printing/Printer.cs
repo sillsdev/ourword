@@ -56,6 +56,26 @@ namespace OurWord.Printing
         }
         private readonly DBook m_BookToPrint;
         #endregion
+        #region Attr{g}: DialogPrint UserSettings
+        protected DialogPrint UserSettings
+        {
+            get
+            {
+                Debug.Assert(null != m_dlgUserSettings);
+                return m_dlgUserSettings;
+            }
+        }
+        private readonly DialogPrint m_dlgUserSettings;
+        #endregion
+        #region Attr{g}: PrintDocument PDoc
+        PrintDocument PDoc
+        {
+            get
+            {
+                return UserSettings.PDoc;
+            }
+        }
+        #endregion
 
         // Public Interface ------------------------------------------------------------------
         #region Constructor(DSection)
@@ -69,6 +89,9 @@ namespace OurWord.Printing
         #region Constructor() - for testing
         protected Printer()
         {
+            var pdoc = new PrintDocument();
+            m_dlgUserSettings = new DialogPrint(pdoc);
+
             m_Pages = new List<Page>();
         }
         #endregion
@@ -79,20 +102,14 @@ namespace OurWord.Printing
                 return;
 
             // Determine how the user wishes to print
-            var pdoc = new PrintDocument();
-            var userSettings = new DialogPrint(pdoc);
-            if (userSettings.ShowDialog() != DialogResult.OK)
+            if (UserSettings.ShowDialog() != DialogResult.OK)
                 return;
 
-            // User settings
-            m_bShouldMakeQuoteReplacements = userSettings.MakeSubstitutions;
-            m_fLineSpacing = userSettings.LineSpacing;
-
             // Print Document Settings
-            pdoc.DocumentName = BookToPrint.DisplayName;
-            pdoc.PrinterSettings.PrinterName = userSettings.PrinterName;
+            PDoc.DocumentName = BookToPrint.DisplayName;
+            PDoc.PrinterSettings.PrinterName = UserSettings.PrinterName;
             // Disable the default "Print Progress" dialog that would otherwise appear
-            pdoc.PrintController = new StandardPrintController();
+            PDoc.PrintController = new StandardPrintController();
 
             // Initialize the progress dialog
             var vsProgressSteps = new[] 
@@ -104,21 +121,19 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.Start("Printing", vsProgressSteps);
             
             // Layout & send to printer
-            Layout(userSettings, pdoc);
-            DoPrint(pdoc);
+            Layout();
+            DoPrint();
 
             EnumeratedStepsProgressDlg.Stop();
         }
         #endregion
 
         // Substitutions ---------------------------------------------------------------------
-        protected bool m_bShouldMakeQuoteReplacements;
-        protected float m_fLineSpacing = 1F;
         private TreeRoot m_ReplaceTree;
         #region Method: string MakeQuoteReplacements(s)
         protected string MakeQuoteReplacements(string s)
         {
-            if (!m_bShouldMakeQuoteReplacements)
+            if (!UserSettings.MakeQuoteSubstitutions)
                 return s;
 
             // Make sure the tree has been built
@@ -142,7 +157,7 @@ namespace OurWord.Printing
         #region Method: void MakeQuoteReplacements(EContainer owp)
         private void MakeQuoteReplacements(EContainer owp)
         {
-            if (!m_bShouldMakeQuoteReplacements)
+            if (!UserSettings.MakeQuoteSubstitutions)
                 return;
 
             foreach(var item in owp.SubItems)
@@ -155,24 +170,23 @@ namespace OurWord.Printing
         #endregion
 
         // Layout ----------------------------------------------------------------------------
-        #region Method: void Layout(DialogPrint userSettings, PrintDocument pdoc)
-        void Layout(DialogPrint userSettings, PrintDocument pdoc)
+        #region Method: void Layout()
+        void Layout()
         {
             // Begin step: "Measuring the text"
             EnumeratedStepsProgressDlg.IncrementStep();
 
             // Create OWParas for the body and footnotes we intend to print
-            var vDataParagraphs = GetParagraphsToPrint(userSettings);
+            var vDataParagraphs = GetParagraphsToPrint();
             var vDisplayParagraphs = GetDisplayParagraphsToPrint(vDataParagraphs);
             var vDisplayFootnotes = CollectAndNumberFootnotes(vDisplayParagraphs);
 
             // Get them properly measured and laid out according to their styles
-            LayoutDisplayLines(vDisplayParagraphs, pdoc);
-            LayoutDisplayLines(vDisplayFootnotes, pdoc);
+            LayoutDisplayLines(vDisplayParagraphs);
+            LayoutDisplayLines(vDisplayFootnotes);
 
             // A body line will appear on a page with all of its associated footnotes
-            var vLineGroups = AssociateBodyWithFootnotes(pdoc, 
-                vDisplayParagraphs, vDisplayFootnotes);
+            var vLineGroups = AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes);
             SetScriptureReferences(vLineGroups);
 
             HandleLineSpacing(vLineGroups);
@@ -181,9 +195,9 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.IncrementStep();
             while (vLineGroups.Count > 0)
             {
-                var page = new Page(pdoc, Pages.Count, vLineGroups)
+                var page = new Page(PDoc, Pages.Count, vLineGroups)
                     {
-                        WaterMarkText = (userSettings.PrintWaterMark) ?
+                        WaterMarkText = (UserSettings.PrintWaterMark) ?
                             DB.TargetBook.Stage.LocalizedName : ""
                     };
 
@@ -193,12 +207,12 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.ClearAppend();
         }
         #endregion
-        #region Method: List<DParagraph> GetParagraphsToPrint(userSettings)
-        List<DParagraph> GetParagraphsToPrint(DialogPrint userSettings)
+        #region Method: List<DParagraph> GetParagraphsToPrint()
+        IEnumerable<DParagraph> GetParagraphsToPrint()
         {
             var vParagraphs = new List<DParagraph>();
 
-            var vSectionsToPrint = DetermineSectionsToPrint(userSettings);
+            var vSectionsToPrint = DetermineSectionsToPrint();
             if (null == vSectionsToPrint || vSectionsToPrint.Count == 0)
                 return vParagraphs;
 
@@ -220,10 +234,17 @@ namespace OurWord.Printing
 
             foreach (var paragraph in vParagraphs)
             {
+                // Skip over pictures if the user wants them ommited
+                var bIsPicture = (paragraph as DPicture != null);
+                if (bIsPicture && !UserSettings.PrintPictures)
+                    continue;
+
                 var owp = new OWPara(writingSystem, paragraph.Style,
                     paragraph, Color.White, OWPara.Flags.None);
-                MakeQuoteReplacements(owp);
                 vDisplayParagraphs.Add(owp);
+
+                MakeQuoteReplacements(owp);
+
                 owp.SetPicture(WLayout.GetPicture(paragraph), false);
             }
 
@@ -261,11 +282,11 @@ namespace OurWord.Printing
             return vFootnotes;
         }
         #endregion
-        #region SMethod: void LayoutDisplayLines(vDisplayParagraphs, pdoc)
-        static void LayoutDisplayLines(List<OWPara> vDisplayParagraphs, PrintDocument pdoc)
+        #region Method: void LayoutDisplayLines(vDisplayParagraphs)
+        void LayoutDisplayLines(List<OWPara> vDisplayParagraphs)
         {
             // Place the paragraphs into a root container
-            var root = new ERoot(null, new PrintContext(pdoc));
+            var root = new ERoot(null, new PrintContext(PDoc));
             root.Append(vDisplayParagraphs.ToArray());
 
             // Lay them out
@@ -275,7 +296,6 @@ namespace OurWord.Printing
         #endregion
         #region SMethod: List<AssociatedLines> AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes)
         static List<AssociatedLines> AssociateBodyWithFootnotes(
-            PrintDocument pdoc,
             IEnumerable<OWPara> vDisplayParagraphs, 
             IEnumerable<OWPara> vDisplayFootnotes)
             // Handles widow/orphan control, by grouping Body Lines together that would otherwise
@@ -350,7 +370,7 @@ namespace OurWord.Printing
         #region Method:  void HandleLineSpacing(vGroups)
         void HandleLineSpacing(IEnumerable<AssociatedLines> vGroups)
         {
-            if (m_fLineSpacing == 1F)
+            if (UserSettings.LineSpacing == 1F)
                 return;
 
             var fTop = 0F;
@@ -358,20 +378,20 @@ namespace OurWord.Printing
             foreach (var group in vGroups)
             {
                 group.TopY = fTop;
-                group.HandleLineSpacing(m_fLineSpacing);
+                group.HandleLineSpacing(UserSettings.LineSpacing);
                 fTop += group.TotalHeight;
             }
         }
         #endregion
 
         // Implementation --------------------------------------------------------------------
-        #region Method: List<DSection> DetermineSectionsToPrint(DialogPrint userSettings)
-        List<DSection> DetermineSectionsToPrint(DialogPrint userSettings)
+        #region Method: List<DSection> DetermineSectionsToPrint()
+        List<DSection> DetermineSectionsToPrint()
         {
-            if (userSettings.CurrentSection)
+            if (UserSettings.CurrentSection)
                 return new List<DSection> {CurrentSection};
 
-            if (userSettings.EntireBook)
+            if (UserSettings.EntireBook)
             {
                 var v = new List<DSection>();
                 foreach(DSection section in BookToPrint.Sections)
@@ -379,10 +399,10 @@ namespace OurWord.Printing
                 return v;
             }
 
-            if (userSettings.Chapters)
+            if (UserSettings.Chapters)
             {
-                var nStartAtChapter = userSettings.StartChapter;
-                var nEndAtChapter = Math.Max(userSettings.EndChapter, nStartAtChapter);
+                var nStartAtChapter = UserSettings.StartChapter;
+                var nEndAtChapter = Math.Max(UserSettings.EndChapter, nStartAtChapter);
 
                 var v = new List<DSection>();
                 foreach(DSection section in BookToPrint.Sections)
@@ -400,16 +420,16 @@ namespace OurWord.Printing
         }
         #endregion
         private int m_nCurrentPrintPage;
-        #region Method: void DoPrint(PrintDocument pdoc)
-        void DoPrint(PrintDocument pdoc)
+        #region Method: void DoPrint()
+        void DoPrint()
         {
             try
             {
                 EnumeratedStepsProgressDlg.IncrementStep();
                 m_nCurrentPrintPage = 1;
 
-                pdoc.PrintPage += PrintPage;
-                pdoc.Print();
+                PDoc.PrintPage += PrintPage;
+                PDoc.Print();
 
                 EnumeratedStepsProgressDlg.ClearAppend();
             }
