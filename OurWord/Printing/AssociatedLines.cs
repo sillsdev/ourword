@@ -1,7 +1,17 @@
-﻿using System.Collections.Generic;
+﻿#region ***** AssociatedLines.cs *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    AssociatedLines.cs
+ * Author:  John Wimbish
+ * Created: 20 Dec 2009
+ * Purpose: Groups of body lines and their corresponding footnotes
+ * Legal:   Copyright (c) 2004-10, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
+using System.Collections.Generic;
 using System.Drawing;
 using OurWord.Edit;
 using OurWordData.DataModel;
+#endregion
 
 namespace OurWord.Printing
 {
@@ -190,10 +200,7 @@ namespace OurWord.Printing
             BottomY += fBodyAdjustment;
 
             foreach (var line in BodyLines)
-            {
-                foreach (var item in line.SubItems)
-                    item.Position = new PointF(item.Position.X, item.Position.Y + fBodyAdjustment);
-            }        
+                line.MoveYs(fBodyAdjustment);
     
             if (null != Picture)
                 Picture.MoveYs(fBodyAdjustment);

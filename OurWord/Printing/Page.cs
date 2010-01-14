@@ -1,9 +1,19 @@
-﻿using System;
+﻿#region ***** Page.cs *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    Page.cs
+ * Author:  John Wimbish
+ * Created: 20 Dec 2009
+ * Purpose: A single printed page
+ * Legal:   Copyright (c) 2004-10, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using OurWord.Edit;
+#endregion
 
 namespace OurWord.Printing
 {

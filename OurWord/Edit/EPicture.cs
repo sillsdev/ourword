@@ -66,12 +66,12 @@ namespace OurWord.Edit
             m_OwningContainer.Position = new PointF(x, y);
         }
         #endregion
+        #region Method:  void SetY(float yNew)
         public void SetY(float yNew)
         {
             var x = m_OwningContainer.Position.X;
             m_OwningContainer.Position = new PointF(x, yNew);
         }
-
-
+        #endregion
     }
 }
