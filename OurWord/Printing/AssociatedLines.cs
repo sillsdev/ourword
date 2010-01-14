@@ -97,7 +97,6 @@ namespace OurWord.Printing
         // Line height -----------------------------------------------------------------------
         public float TopY { get; set; }
         public float BottomY { private get; set; }
-        public bool IsParagraphContinuation { private get; set; }
 
         public float SpaceBefore { get; set; }
         public float SpaceAfter { get; set; }
@@ -166,6 +165,40 @@ namespace OurWord.Printing
             }
         }
         #endregion
+        #region Attr{g}: bool KeepWithNex
+        public bool KeepWithNext
+        {
+            get
+            {
+                if (BodyLines.Count == 0)
+                    return false;
+
+                var lastLine = BodyLines[BodyLines.Count - 1];
+                var item = (lastLine.SubItems.Length > 0) ? lastLine.SubItems[0] : null;
+                if (null == item)
+                    return false;
+
+                var owp = item.Owner as OWPara;
+                if (null == owp)
+                    return false;
+
+                return owp.PStyle.KeepWithNext;
+            }
+        }
+        #endregion
+        #region Method: bool Append(group)
+        public bool Append(AssociatedLines group)
+        {
+            if (group.HasPicture)
+                return false;
+
+            BodyLines.AddRange(group.BodyLines);
+            FootnoteLines.AddRange(group.FootnoteLines);
+            SpaceAfter = group.SpaceAfter;
+            BottomY = group.BottomY;
+            return true;
+        }
+        #endregion
 
         // Drawing ---------------------------------------------------------------------------
         #region Method: void Draw(IDraw)
@@ -209,6 +242,9 @@ namespace OurWord.Printing
         #region Method: void HandleLineSpacing(float fMultiplier)
         public void HandleLineSpacing(float fMultiplier)
         {
+            if (fMultiplier == 1F)
+                return;
+
             var y = TopY;
 
             // Add the SpaceBefore
@@ -223,11 +259,18 @@ namespace OurWord.Printing
             }
 
             // Handle the lines of text
-            foreach (var line in BodyLines)
+            for (var i = 0; i < BodyLines.Count; i++)
             {
-                foreach (var item in line.SubItems)
-                    item.Position = new PointF(item.Position.X, y);
-                y += (line.LargestItemHeight * fMultiplier);
+                var thisLine = BodyLines[i];
+                var nextLine = (i < BodyLines.Count - 1) ? BodyLines[i + 1] : null;
+
+                var ySpaceBetweenLines = (null != nextLine) ?
+                    nextLine.Position.Y - thisLine.Position.Y :
+                    thisLine.LargestItemHeight;
+
+                thisLine.SetYs(y);
+
+                y += ySpaceBetweenLines * fMultiplier;
             }
 
             // Add the SpaceAfter

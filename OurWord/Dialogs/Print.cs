@@ -125,7 +125,8 @@ namespace OurWord
 		}
 		#endregion
 
-	    public bool Vernacular
+        #region Attr{g}: bool Vernacular
+        public bool Vernacular
 	    {
 	        get
 	        {
@@ -136,7 +137,9 @@ namespace OurWord
                 m_radioVernacular.Checked = value;
                 m_radioBackTranslation.Checked = !value;
             }
-	    }
+        }
+        #endregion
+        #region Attr{g}: bool BackTranslation
         public bool BackTranslation
         {
             get
@@ -149,9 +152,10 @@ namespace OurWord
                 m_radioVernacular.Checked = !value;
             }
         }
+        #endregion
 
-		#region Attr{g}: string PrinterName
-		public string PrinterName
+        #region Attr{g}: string PrinterName
+        public string PrinterName
 		{
 			get
 			{

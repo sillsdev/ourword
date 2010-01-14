@@ -188,7 +188,7 @@ namespace OurWord.Printing
             // A body line will appear on a page with all of its associated footnotes
             var vLineGroups = AssociateBodyWithFootnotes(vDisplayParagraphs, vDisplayFootnotes);
             SetScriptureReferences(vLineGroups);
-
+            HandleKeepWithNext(vLineGroups);
             HandleLineSpacing(vLineGroups);
 
             // Create the pages based on the heights that will fit
@@ -325,7 +325,6 @@ namespace OurWord.Printing
                             BottomY = owp.Rectangle.Bottom,
                             SpaceBefore = fSpaceBefore,
                             SpaceAfter = fSpaceAfter,
-                            IsParagraphContinuation = false,
                             Picture = owp.Picture
                         });
                     continue;
@@ -337,7 +336,6 @@ namespace OurWord.Printing
                         TopY = owp.Rectangle.Top,
                         BottomY = owp.Lines[1].Rectangle.Bottom,
                         SpaceBefore = fSpaceBefore,
-                        IsParagraphContinuation = false,
                         Picture = owp.Picture
                     });
 
@@ -346,8 +344,7 @@ namespace OurWord.Printing
                     vGroups.Add(new AssociatedLines(owp.Lines[i], vDisplayFootnotes) 
                         {
                             TopY = owp.Lines[i].Rectangle.Top,
-                            BottomY = owp.Lines[i].Rectangle.Bottom,
-                            IsParagraphContinuation = true,
+                            BottomY = owp.Lines[i].Rectangle.Bottom
                         });
 
                 // The final two lines are a group
@@ -355,8 +352,7 @@ namespace OurWord.Printing
                     {
                         TopY = owp.Lines[count - 2].Rectangle.Top,
                         BottomY = owp.Rectangle.Bottom,
-                        SpaceAfter = fSpaceAfter,
-                        IsParagraphContinuation = true,
+                        SpaceAfter = fSpaceAfter
                     });
             }
 
@@ -386,6 +382,29 @@ namespace OurWord.Printing
                 group.TopY = fTop;
                 group.HandleLineSpacing(UserSettings.LineSpacing);
                 fTop += group.TotalHeight;
+            }
+        }
+        #endregion
+        #region SMethod: void HandleKeepWithNext(vGroups)
+        static void HandleKeepWithNext(IList<AssociatedLines> vGroups)
+        {
+            for (var i = 0; i < vGroups.Count - 1;)
+            {
+                var thisGroup = vGroups[i];
+                if (!thisGroup.KeepWithNext)
+                {
+                    ++i;
+                    continue;
+                }
+
+                var nextGroup = vGroups[i + 1];
+                if (!thisGroup.Append(nextGroup))
+                {
+                    ++i;
+                    continue;
+                }
+
+                vGroups.Remove(nextGroup);
             }
         }
         #endregion
