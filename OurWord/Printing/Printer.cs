@@ -230,7 +230,13 @@ namespace OurWord.Printing
         {
             var vDisplayParagraphs = new List<OWPara>();
 
-            var writingSystem = BookToPrint.Translation.WritingSystemVernacular;
+            var writingSystem = (UserSettings.BackTranslation) ?
+                BookToPrint.Translation.WritingSystemConsultant :
+                BookToPrint.Translation.WritingSystemVernacular;
+
+            var flags = (UserSettings.BackTranslation) ?
+                OWPara.Flags.ShowBackTranslation :
+                OWPara.Flags.None;
 
             foreach (var paragraph in vParagraphs)
             {
@@ -240,7 +246,7 @@ namespace OurWord.Printing
                     continue;
 
                 var owp = new OWPara(writingSystem, paragraph.Style,
-                    paragraph, Color.White, OWPara.Flags.None);
+                    paragraph, Color.White,flags);
                 vDisplayParagraphs.Add(owp);
 
                 MakeQuoteReplacements(owp);

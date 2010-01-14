@@ -81,7 +81,7 @@ namespace OurWord
 		{
 			get
 			{
-				return (m_radioEntireBook.Checked == true);
+				return (m_radioEntireBook.Checked);
 			}
 			set
 			{
@@ -124,6 +124,31 @@ namespace OurWord
 			}
 		}
 		#endregion
+
+	    public bool Vernacular
+	    {
+	        get
+	        {
+	            return m_radioVernacular.Checked;
+	        }
+            private set
+            {
+                m_radioVernacular.Checked = value;
+                m_radioBackTranslation.Checked = !value;
+            }
+	    }
+        public bool BackTranslation
+        {
+            get
+            {
+                return m_radioBackTranslation.Checked;
+            }
+            private set
+            {
+                m_radioBackTranslation.Checked = value;
+                m_radioVernacular.Checked = !value;
+            }
+        }
 
 		#region Attr{g}: string PrinterName
 		public string PrinterName
@@ -265,6 +290,9 @@ namespace OurWord
 		private GroupBox m_groupOptions;
 		private CheckBox m_checkReplacements;
 		private System.Windows.Forms.CheckBox m_checkPrintPictures;
+        private RadioButton m_radioVernacular;
+        private RadioButton m_radioBackTranslation;
+        private GroupBox m_groupWhat;
 
 		private System.ComponentModel.Container components = null;
 		#endregion
@@ -308,15 +336,19 @@ namespace OurWord
             this.m_groupOptions = new System.Windows.Forms.GroupBox();
             this.m_checkPrintPictures = new System.Windows.Forms.CheckBox();
             this.m_checkReplacements = new System.Windows.Forms.CheckBox();
+            this.m_radioVernacular = new System.Windows.Forms.RadioButton();
+            this.m_radioBackTranslation = new System.Windows.Forms.RadioButton();
+            this.m_groupWhat = new System.Windows.Forms.GroupBox();
             this.m_groupRange.SuspendLayout();
             this.m_groupOptions.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_btnHelp
             // 
+            this.m_btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(255, 315);
+            this.m_btnHelp.Location = new System.Drawing.Point(255, 382);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 15;
@@ -325,8 +357,9 @@ namespace OurWord
             // 
             // m_btnCancel
             // 
+            this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(167, 315);
+            this.m_btnCancel.Location = new System.Drawing.Point(167, 382);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 14;
@@ -334,8 +367,9 @@ namespace OurWord
             // 
             // m_btnOK
             // 
+            this.m_btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(79, 315);
+            this.m_btnOK.Location = new System.Drawing.Point(79, 382);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 13;
@@ -359,7 +393,7 @@ namespace OurWord
             // 
             // m_radioEntireBook
             // 
-            this.m_radioEntireBook.Location = new System.Drawing.Point(32, 72);
+            this.m_radioEntireBook.Location = new System.Drawing.Point(32, 69);
             this.m_radioEntireBook.Name = "m_radioEntireBook";
             this.m_radioEntireBook.Size = new System.Drawing.Size(352, 24);
             this.m_radioEntireBook.TabIndex = 2;
@@ -369,7 +403,7 @@ namespace OurWord
             // 
             // m_radioThisSection
             // 
-            this.m_radioThisSection.Location = new System.Drawing.Point(32, 96);
+            this.m_radioThisSection.Location = new System.Drawing.Point(32, 91);
             this.m_radioThisSection.Name = "m_radioThisSection";
             this.m_radioThisSection.Size = new System.Drawing.Size(352, 24);
             this.m_radioThisSection.TabIndex = 3;
@@ -385,22 +419,22 @@ namespace OurWord
             this.m_groupRange.Controls.Add(this.m_editStartChapter);
             this.m_groupRange.Location = new System.Drawing.Point(16, 56);
             this.m_groupRange.Name = "m_groupRange";
-            this.m_groupRange.Size = new System.Drawing.Size(376, 102);
+            this.m_groupRange.Size = new System.Drawing.Size(376, 90);
             this.m_groupRange.TabIndex = 21;
             this.m_groupRange.TabStop = false;
             this.m_groupRange.Text = "Range";
             // 
             // m_editEndChapter
             // 
-            this.m_editEndChapter.Location = new System.Drawing.Point(161, 66);
+            this.m_editEndChapter.Location = new System.Drawing.Point(161, 60);
             this.m_editEndChapter.Name = "m_editEndChapter";
             this.m_editEndChapter.Size = new System.Drawing.Size(40, 20);
-            this.m_editEndChapter.TabIndex = 9;
+            this.m_editEndChapter.TabIndex = 6;
             this.m_editEndChapter.TextChanged += new System.EventHandler(this.cmdToChapterChanged);
             // 
             // m_labelToChapter
             // 
-            this.m_labelToChapter.Location = new System.Drawing.Point(129, 66);
+            this.m_labelToChapter.Location = new System.Drawing.Point(129, 59);
             this.m_labelToChapter.Name = "m_labelToChapter";
             this.m_labelToChapter.Size = new System.Drawing.Size(32, 23);
             this.m_labelToChapter.TabIndex = 28;
@@ -409,32 +443,33 @@ namespace OurWord
             // 
             // m_radioChapters
             // 
-            this.m_radioChapters.Location = new System.Drawing.Point(17, 66);
+            this.m_radioChapters.Location = new System.Drawing.Point(16, 59);
             this.m_radioChapters.Name = "m_radioChapters";
             this.m_radioChapters.Size = new System.Drawing.Size(72, 24);
-            this.m_radioChapters.TabIndex = 7;
+            this.m_radioChapters.TabIndex = 4;
+            this.m_radioChapters.TabStop = true;
             this.m_radioChapters.Text = "Chapters:";
             this.m_radioChapters.Click += new System.EventHandler(this.cmdChaptersChecked);
             // 
             // m_editStartChapter
             // 
-            this.m_editStartChapter.Location = new System.Drawing.Point(89, 66);
+            this.m_editStartChapter.Location = new System.Drawing.Point(89, 60);
             this.m_editStartChapter.Name = "m_editStartChapter";
             this.m_editStartChapter.Size = new System.Drawing.Size(40, 20);
-            this.m_editStartChapter.TabIndex = 8;
+            this.m_editStartChapter.TabIndex = 5;
             this.m_editStartChapter.TextChanged += new System.EventHandler(this.cmdFromChapterChanged);
             // 
             // m_checkWaterMark
             // 
-            this.m_checkWaterMark.Location = new System.Drawing.Point(16, 24);
+            this.m_checkWaterMark.Location = new System.Drawing.Point(16, 19);
             this.m_checkWaterMark.Name = "m_checkWaterMark";
             this.m_checkWaterMark.Size = new System.Drawing.Size(352, 24);
-            this.m_checkWaterMark.TabIndex = 10;
+            this.m_checkWaterMark.TabIndex = 9;
             this.m_checkWaterMark.Text = "Print Background Watermark (e.g., “Draft”)";
             // 
             // m_labelLineSpacing
             // 
-            this.m_labelLineSpacing.Location = new System.Drawing.Point(16, 96);
+            this.m_labelLineSpacing.Location = new System.Drawing.Point(16, 91);
             this.m_labelLineSpacing.Name = "m_labelLineSpacing";
             this.m_labelLineSpacing.Size = new System.Drawing.Size(100, 23);
             this.m_labelLineSpacing.TabIndex = 22;
@@ -443,7 +478,7 @@ namespace OurWord
             // 
             // m_comboLineSpacing
             // 
-            this.m_comboLineSpacing.Location = new System.Drawing.Point(120, 96);
+            this.m_comboLineSpacing.Location = new System.Drawing.Point(120, 91);
             this.m_comboLineSpacing.Name = "m_comboLineSpacing";
             this.m_comboLineSpacing.Size = new System.Drawing.Size(128, 21);
             this.m_comboLineSpacing.TabIndex = 12;
@@ -456,35 +491,68 @@ namespace OurWord
             this.m_groupOptions.Controls.Add(this.m_checkReplacements);
             this.m_groupOptions.Controls.Add(this.m_labelLineSpacing);
             this.m_groupOptions.Controls.Add(this.m_comboLineSpacing);
-            this.m_groupOptions.Location = new System.Drawing.Point(16, 171);
+            this.m_groupOptions.Location = new System.Drawing.Point(19, 244);
             this.m_groupOptions.Name = "m_groupOptions";
-            this.m_groupOptions.Size = new System.Drawing.Size(376, 128);
+            this.m_groupOptions.Size = new System.Drawing.Size(376, 119);
             this.m_groupOptions.TabIndex = 24;
             this.m_groupOptions.TabStop = false;
             this.m_groupOptions.Text = "Options";
             // 
             // m_checkPrintPictures
             // 
-            this.m_checkPrintPictures.Location = new System.Drawing.Point(16, 72);
+            this.m_checkPrintPictures.Location = new System.Drawing.Point(16, 67);
             this.m_checkPrintPictures.Name = "m_checkPrintPictures";
             this.m_checkPrintPictures.Size = new System.Drawing.Size(352, 24);
-            this.m_checkPrintPictures.TabIndex = 23;
+            this.m_checkPrintPictures.TabIndex = 11;
             this.m_checkPrintPictures.Text = "Print Pictures?";
             // 
             // m_checkReplacements
             // 
-            this.m_checkReplacements.Location = new System.Drawing.Point(16, 48);
+            this.m_checkReplacements.Location = new System.Drawing.Point(16, 43);
             this.m_checkReplacements.Name = "m_checkReplacements";
             this.m_checkReplacements.Size = new System.Drawing.Size(352, 24);
-            this.m_checkReplacements.TabIndex = 11;
+            this.m_checkReplacements.TabIndex = 10;
             this.m_checkReplacements.Text = "Make substitutions (e.g., <<Hi>> becomes \"Hi\") ?";
+            // 
+            // m_radioVernacular
+            // 
+            this.m_radioVernacular.AutoSize = true;
+            this.m_radioVernacular.Location = new System.Drawing.Point(32, 179);
+            this.m_radioVernacular.Name = "m_radioVernacular";
+            this.m_radioVernacular.Size = new System.Drawing.Size(76, 17);
+            this.m_radioVernacular.TabIndex = 7;
+            this.m_radioVernacular.TabStop = true;
+            this.m_radioVernacular.Text = "Vernacular";
+            this.m_radioVernacular.UseVisualStyleBackColor = true;
+            // 
+            // m_radioBackTranslation
+            // 
+            this.m_radioBackTranslation.AutoSize = true;
+            this.m_radioBackTranslation.Location = new System.Drawing.Point(32, 202);
+            this.m_radioBackTranslation.Name = "m_radioBackTranslation";
+            this.m_radioBackTranslation.Size = new System.Drawing.Size(105, 17);
+            this.m_radioBackTranslation.TabIndex = 8;
+            this.m_radioBackTranslation.TabStop = true;
+            this.m_radioBackTranslation.Text = "Back Translation";
+            this.m_radioBackTranslation.UseVisualStyleBackColor = true;
+            // 
+            // m_groupWhat
+            // 
+            this.m_groupWhat.Location = new System.Drawing.Point(19, 163);
+            this.m_groupWhat.Name = "m_groupWhat";
+            this.m_groupWhat.Size = new System.Drawing.Size(373, 65);
+            this.m_groupWhat.TabIndex = 27;
+            this.m_groupWhat.TabStop = false;
+            this.m_groupWhat.Text = "What do you want to print?";
             // 
             // DialogPrint
             // 
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(410, 346);
+            this.ClientSize = new System.Drawing.Size(410, 414);
+            this.Controls.Add(this.m_radioBackTranslation);
+            this.Controls.Add(this.m_radioVernacular);
             this.Controls.Add(this.m_radioThisSection);
             this.Controls.Add(this.m_radioEntireBook);
             this.Controls.Add(this.m_comboPrinter);
@@ -494,6 +562,7 @@ namespace OurWord
             this.Controls.Add(this.m_btnOK);
             this.Controls.Add(this.m_groupRange);
             this.Controls.Add(this.m_groupOptions);
+            this.Controls.Add(this.m_groupWhat);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -507,6 +576,7 @@ namespace OurWord
             this.m_groupRange.PerformLayout();
             this.m_groupOptions.ResumeLayout(false);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
 		}
 		#endregion
@@ -545,6 +615,9 @@ namespace OurWord
 
 			// Range
 			EntireBook = true;
+
+            // What to print
+		    Vernacular = true;
 		}
 		#endregion
 		#region Cmd: cmdClosing
