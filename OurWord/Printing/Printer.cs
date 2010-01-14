@@ -198,7 +198,7 @@ namespace OurWord.Printing
                 var page = new Page(PDoc, Pages.Count, vLineGroups)
                     {
                         WaterMarkText = (UserSettings.PrintWaterMark) ?
-                            DB.TargetBook.Stage.LocalizedName : ""
+                            UserSettings.WaterMarkText : ""
                     };
 
                 Pages.Add(page);

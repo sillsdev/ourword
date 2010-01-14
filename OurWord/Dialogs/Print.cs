@@ -32,8 +32,8 @@ using OurWordData.DataModel;
 
 namespace OurWord
 {
-	#region CLASS: PrintDlg - the dialog for the user entering his print desires
-	public class DialogPrint : System.Windows.Forms.Form
+    #region CLASS: DialogPrint - the dialog for the user entering his print desires
+    public class DialogPrint : System.Windows.Forms.Form
 	{
         // Strings ---------------------------------------------------------------------------
         #region VAttr{g}: string SingleSpace
@@ -163,19 +163,6 @@ namespace OurWord
 			}
 		}
 		#endregion
-		#region Attr{g/s}: bool PrintWaterMark
-		public bool PrintWaterMark
-		{
-			get
-			{
-				return m_checkWaterMark.Checked;
-			}
-			set
-			{
-				m_checkWaterMark.Checked = value;
-			}
-		}
-		#endregion
 		#region Attr{g/s}: int StartChapter
 		public int StartChapter
 		{
@@ -223,8 +210,27 @@ namespace OurWord
 		}
 		#endregion
 
-		#region Attr{g}: float LineSpacing
-		public float LineSpacing
+		#region Attr{g}: bool PrintWaterMark
+		public bool PrintWaterMark
+		{
+			get
+			{
+				return m_checkWaterMark.Checked;
+			}
+		}
+		#endregion
+        #region Attr{g}: string WaterMarkText
+        public string WaterMarkText
+        {
+            get
+            {
+                return m_textWatermark.Text;
+            }
+        }
+        #endregion
+
+        #region Attr{g}: float LineSpacing
+        public float LineSpacing
 		{
 			get
 			{
@@ -265,11 +271,14 @@ namespace OurWord
 
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor(PrintDocument)
-		public DialogPrint(PrintDocument _pdoc)
+		public DialogPrint(PrintDocument pdoc)
 		{
 			InitializeComponent();
 
-			m_pdoc = _pdoc;
+			m_pdoc = pdoc;
+
+            if (DB.IsValidProject)
+		        m_textWatermark.Text = DB.TargetBook.Stage.LocalizedName;
 		}
 		#endregion
 		#region DIALOG CONTROLS
@@ -297,6 +306,7 @@ namespace OurWord
         private RadioButton m_radioVernacular;
         private RadioButton m_radioBackTranslation;
         private GroupBox m_groupWhat;
+        private TextBox m_textWatermark;
 
 		private System.ComponentModel.Container components = null;
 		#endregion
@@ -338,6 +348,7 @@ namespace OurWord
             this.m_labelLineSpacing = new System.Windows.Forms.Label();
             this.m_comboLineSpacing = new System.Windows.Forms.ComboBox();
             this.m_groupOptions = new System.Windows.Forms.GroupBox();
+            this.m_textWatermark = new System.Windows.Forms.TextBox();
             this.m_checkPrintPictures = new System.Windows.Forms.CheckBox();
             this.m_checkReplacements = new System.Windows.Forms.CheckBox();
             this.m_radioVernacular = new System.Windows.Forms.RadioButton();
@@ -467,9 +478,9 @@ namespace OurWord
             // 
             this.m_checkWaterMark.Location = new System.Drawing.Point(16, 19);
             this.m_checkWaterMark.Name = "m_checkWaterMark";
-            this.m_checkWaterMark.Size = new System.Drawing.Size(352, 24);
+            this.m_checkWaterMark.Size = new System.Drawing.Size(182, 24);
             this.m_checkWaterMark.TabIndex = 9;
-            this.m_checkWaterMark.Text = "Print Background Watermark (e.g., “Draft”)";
+            this.m_checkWaterMark.Text = "Print Background Watermark:";
             // 
             // m_labelLineSpacing
             // 
@@ -490,6 +501,7 @@ namespace OurWord
             // 
             // m_groupOptions
             // 
+            this.m_groupOptions.Controls.Add(this.m_textWatermark);
             this.m_groupOptions.Controls.Add(this.m_checkPrintPictures);
             this.m_groupOptions.Controls.Add(this.m_checkWaterMark);
             this.m_groupOptions.Controls.Add(this.m_checkReplacements);
@@ -501,6 +513,13 @@ namespace OurWord
             this.m_groupOptions.TabIndex = 24;
             this.m_groupOptions.TabStop = false;
             this.m_groupOptions.Text = "Options";
+            // 
+            // m_textWatermark
+            // 
+            this.m_textWatermark.Location = new System.Drawing.Point(204, 21);
+            this.m_textWatermark.Name = "m_textWatermark";
+            this.m_textWatermark.Size = new System.Drawing.Size(161, 20);
+            this.m_textWatermark.TabIndex = 23;
             // 
             // m_checkPrintPictures
             // 
@@ -579,6 +598,7 @@ namespace OurWord
             this.m_groupRange.ResumeLayout(false);
             this.m_groupRange.PerformLayout();
             this.m_groupOptions.ResumeLayout(false);
+            this.m_groupOptions.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
