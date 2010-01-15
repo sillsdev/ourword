@@ -31,26 +31,20 @@ namespace OurWord.Printing
         }
         private readonly List<AssociatedLines> m_vGroups;
         #endregion
-        #region Attr{g}: RunningFooter RunningFooter
-        RunningFooter RunningFooter
-        {
-            get
-            {
-                Debug.Assert(null != m_RunningFooter);
-                return m_RunningFooter;
-            }
-        }
-        private readonly RunningFooter m_RunningFooter;
-        #endregion
+
+        private readonly RunningFooter m_runningFooter;
 
         private readonly PageSettings m_PageSettings;
         private readonly float m_fTotalAvailableContentHeight;
         public string WaterMarkText { private get; set; }
 
         private const int c_nMarginBetweenBodyAndFootnotes = 10;
+        private const int c_nMarginAboveRunningFooter = 10;
 
         #region Constructor(pDoc, nPageNumber, vGroups)
-        public Page(PrintDocument pdoc, int nPageNumber, IList<AssociatedLines> vSourceGroups)
+        public Page(PrintDocument pdoc, int nPageNumber, 
+            IList<AssociatedLines> vSourceGroups,
+            string sRunningFooterText)
         {
             m_PageSettings = pdoc.PrinterSettings.DefaultPageSettings;
 
@@ -58,9 +52,11 @@ namespace OurWord.Printing
                 - m_PageSettings.Margins.Top - m_PageSettings.Margins.Bottom;
 
             // Setup and measure the running footer
-            m_RunningFooter = new RunningFooter(nPageNumber, vSourceGroups[0].ScriptureReference,
-                new PrintContext(pdoc));
-            RunningFooter.Layout(pdoc);
+            m_runningFooter = new RunningFooter(nPageNumber, 
+                vSourceGroups[0].ScriptureReference, pdoc,
+                sRunningFooterText);
+            m_fTotalAvailableContentHeight -= m_runningFooter.Height;
+            m_fTotalAvailableContentHeight -= c_nMarginAboveRunningFooter;
 
             // Extract from the source list the groups which will fit on this page
             m_vGroups = new List<AssociatedLines>();
@@ -134,7 +130,7 @@ namespace OurWord.Printing
             var yFirstGroupTopOfText = Groups[0].TopY + Groups[0].SpaceBefore;
             var fBodyAdjustment = yPrintAreaTop - yFirstGroupTopOfText;
 
-            float yPrintAreaBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
+            var yPrintAreaBottom = yPrintAreaTop + m_fTotalAvailableContentHeight;
             var yFootnoteTop = yPrintAreaBottom - HeightRequiredForFootnotes;
           
             foreach(var group in Groups)
@@ -213,8 +209,9 @@ namespace OurWord.Printing
 
             const int yPixelsAboveFootnotes = 2;
             var x = m_PageSettings.Margins.Left;
-            var y = m_PageSettings.Bounds.Bottom - 
-                m_PageSettings.Margins.Bottom -
+            var y = m_PageSettings.Bounds.Top + 
+                m_PageSettings.Margins.Top +
+                m_fTotalAvailableContentHeight -
                 HeightRequiredForFootnotes - 
                 yPixelsAboveFootnotes;
 
@@ -231,6 +228,8 @@ namespace OurWord.Printing
 
             foreach (var group in Groups)
                 group.Draw(draw);
+
+            m_runningFooter.Draw(draw);
         }
         #endregion
     }

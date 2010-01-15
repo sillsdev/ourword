@@ -476,6 +476,10 @@ namespace OurWordData
 			{ 
 				return j_CharacterStyle.Value; 
 			}
+            set
+            {
+                j_CharacterStyle.Value = value;
+            }
 		}
 		private JOwn<JCharacterStyle> j_CharacterStyle = null; 
 		#endregion
@@ -566,8 +570,10 @@ namespace OurWordData
 		public JParagraphStyle()
 			: base()
 		{
-            j_CharacterStyle = new JOwn<JCharacterStyle>("CharStyle", this);
-            j_CharacterStyle.Value = new JCharacterStyle();
+            j_CharacterStyle = new JOwn<JCharacterStyle>("CharStyle", this) 
+            {
+                Value = new JCharacterStyle()
+            };
 		}
 		#endregion
 		#region Constructor(sAbbrev, sDisplayName)
@@ -578,7 +584,6 @@ namespace OurWordData
 			DisplayName = sDisplayName;
 		}
 		#endregion
-
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{
@@ -1270,7 +1275,6 @@ namespace OurWordData
 			DisplayName = sDisplayName;
 		}
 		#endregion
-
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{

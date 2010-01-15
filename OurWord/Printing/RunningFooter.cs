@@ -1,160 +1,156 @@
-﻿using System;
+﻿#region ***** RunningFooter *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    RunningFooter.cs
+ * Author:  John Wimbish
+ * Created: 20 Dec 2009
+ * Purpose: The three-column footer at the bottom of each page
+ * Legal:   Copyright (c) 2004-10, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Printing;
-using System.Text;
 using OurWord.Edit;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.Styles;
+
+#endregion
 
 namespace OurWord.Printing
 {
-    public sealed class RunningFooter : ERoot
+    public class RunningFooter
     {
-        // Content ---------------------------------------------------------------------------
-        #region Method: void SetColumnText(iColumn, sText)
-        void SetColumnText(int iColumn, string sText)
-        {
-            Debug.Assert(SubItems.Length == 1);
-            var rowOfColumns = SubItems[0] as ERowOfColumns;
-            Debug.Assert(null != rowOfColumns);
+        private readonly string m_sLeftColumn;
+        private readonly string m_sMiddleColumn;
+        private readonly string m_sRightColumn;
 
-            Debug.Assert(0 <= iColumn && iColumn < NumberOfColumns);
-            var owp = new OWPara(WritingSystem, ParagraphStyle, sText);
-            var column = rowOfColumns.GetColumn(iColumn);
-            column.Clear();
-            column.Append(owp);
-        }
-        #endregion
-        #region Method: void SetPageNumber(iColumn, nPageNumber)
-        public void SetPageNumber(int iColumn, int nPageNumber)
-        {
-            var sText = string.Format("- {0} -", nPageNumber);
-            SetColumnText(iColumn, sText);
+        private readonly Font m_font;
 
-        }
-        #endregion
-        #region Method: void SetCopyrightNotice(iColumn)
-        private void SetCopyrightNotice(int iColumn)
-        {
-            var sCopyright = DB.TeamSettings.CopyrightNotice;
-            if (DB.TargetBook.HasCopyrightNotice)
-                sCopyright = DB.TargetBook.Copyright;
+        private readonly int m_nPageNumber;
+        private readonly DReference m_refChapterAndVerse;
+        private readonly IDrawingContext m_Context;
 
-            if (!string.IsNullOrEmpty(sCopyright))
-                SetColumnText(iColumn, sCopyright);
-        }
-        #endregion
-        #region Method: void SetStageAndDate(iColumn)
-        private void SetStageAndDate(int iColumn)
-        {
-            var sStatus = DB.TargetBook.Stage.LocalizedName;
-            var sDate = DateTime.Today.ToShortDateString();
-            var sText = string.Format("{0} - {1}", sStatus, sDate);
-            SetColumnText(iColumn, sText);
-        }
-        #endregion
-        #region Method: void SetLanguageNameStageAndDate(iColumn)
-        private void SetLanguageNameStageAndDate(int iColumn)
-        {
-            var sLanguageName = DB.TargetBook.Translation.DisplayName;
-            var sStatus = DB.TargetBook.Stage.LocalizedName;
-            var sDate = DateTime.Today.ToShortDateString();
-            var sText = string.Format("{0} {1} - {2}", sLanguageName, sStatus, sDate);
-            SetColumnText(iColumn, sText);
-        }
-        #endregion
-        #region Method: void SetScriptureReference(iColumn, chapterAndVerse)
-        public void SetScriptureReference(int iColumn, DReference chapterAndVerse)
-        {
-            var nChapter = chapterAndVerse.Chapter;
-            var nVerse = chapterAndVerse.Verse;
-            var sText = string.Format("{0}:{1}", nChapter, nVerse);
-            SetColumnText(iColumn, sText);
-        }
-        #endregion
+        private readonly float m_yFooter;
+        private readonly float m_xFooter;
+        private readonly float m_FooterWidth;
 
-        // Context ---------------------------------------------------------------------------
-        #region SVAttr{g}: JParagraphStyle ParagraphStyle
-        static JParagraphStyle ParagraphStyle
+        private readonly string m_sRunningFooterText;
+
+        #region Attr{g}: float Height
+        public float Height
         {
             get
             {
-                return DB.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_sfmRunningHeader);
+                return m_font.Height;
             }
         }
         #endregion
-        #region SVAttr{g}: JWritingSystem WritingSystem
-        static JWritingSystem WritingSystem
+        #region VAttr{g}: bool IsEvenPage
+        public bool IsEvenPage
         {
             get
             {
-                return DB.TargetTranslation.WritingSystemVernacular;
+                // Divide the page number in half, any remainder (e.g., as will be true
+                // with an odd number) will be dropped
+                var nHalf = m_nPageNumber/2;
+
+                return nHalf*2 == m_nPageNumber;
             }
         }
         #endregion
 
-        // Scaffolding -----------------------------------------------------------------------
-        private const int NumberOfColumns = 3;
-        #region Constructor(nPageNumber)
-        public RunningFooter(int nPageNumber, DReference chapterAndVerse, IDrawingContext context)
-            : base(null, context)
+        #region Method: string GetFooterPartString(kFooterPart)
+        string GetFooterPartString(DTeamSettings.FooterParts kFooterPart)
         {
-            // We'll have exactly one element in this Root (which will itself have three columns)
-            Append(new ERowOfColumns(NumberOfColumns));
-
-            var vContent = new List<DTeamSettings.FooterParts>
+            switch (kFooterPart)
             {
-                (IsEvenPage(nPageNumber)) ? DB.TeamSettings.EvenLeft : DB.TeamSettings.OddLeft,
-                (IsEvenPage(nPageNumber)) ? DB.TeamSettings.EvenMiddle : DB.TeamSettings.OddMiddle,
-                (IsEvenPage(nPageNumber)) ? DB.TeamSettings.EvenRight : DB.TeamSettings.OddRight
-            };
+                case DTeamSettings.FooterParts.kPageNumber:
+                    return string.Format("- {0} -", m_nPageNumber); ;
 
-            for (var iColumn = 0; iColumn < vContent.Count; iColumn++)
-            {
-                switch (vContent[iColumn])
-                {
-                   case DTeamSettings.FooterParts.kBlank:
-                        SetColumnText(iColumn, "");
-                        break;
+                case DTeamSettings.FooterParts.kCopyrightNotice:
+                    return DB.TargetBook.HasCopyrightNotice ?
+                        DB.TargetBook.Copyright :
+                        DB.TeamSettings.CopyrightNotice;
 
-                   case DTeamSettings.FooterParts.kPageNumber:
-                        SetPageNumber(iColumn, nPageNumber);
-                        break;
+                case DTeamSettings.FooterParts.kScriptureReference:
+                    return string.Format("{0} {1}:{2}",
+                        m_sRunningFooterText,
+                        m_refChapterAndVerse.Chapter,
+                        m_refChapterAndVerse.Verse);
 
-                   case DTeamSettings.FooterParts.kCopyrightNotice:
-                        SetCopyrightNotice(iColumn);
-                        break;
+                case DTeamSettings.FooterParts.kStageAndDate:
+                    return string.Format("{0} - {1}",
+                        DB.TargetBook.Stage.LocalizedName, 
+                        DateTime.Today.ToShortDateString());
 
-                   case DTeamSettings.FooterParts.kStageAndDate:
-                        SetStageAndDate(iColumn);
-                        break;
+                case DTeamSettings.FooterParts.kLanguageStageAndDate:
+                    return string.Format("{0} {1} - {2}",
+                        DB.TargetBook.Translation.DisplayName,
+                        DB.TargetBook.Stage.LocalizedName,
+                        DateTime.Today.ToShortDateString()); 
 
-                   case DTeamSettings.FooterParts.kLanguageStageAndDate:
-                        SetLanguageNameStageAndDate(iColumn);
-                        break;
-
-                   case DTeamSettings.FooterParts.kScriptureReference:
-                        SetScriptureReference(iColumn, chapterAndVerse);
-                        break;
-                }
+                default:
+                    throw new NotImplementedException("Unknown RunningFooter Part.");
             }
         }
         #endregion
-        #region SMethod: bool IsEvenPage(int nPageNumber)
-        static bool IsEvenPage(int nPageNumber)
-            // Divide the page number in half, any remainder (e.g., as will be true
-            // with an odd number) will be dropped
+
+        #region Method: void Draw(IDraw)
+        public void Draw(IDraw draw)
         {
-            var nHalf = nPageNumber / 2;
-            return (nHalf * 2 == nPageNumber);
+            // Left side.
+            draw.DrawString(m_sLeftColumn, m_font, Brushes.Black, 
+                new PointF(m_xFooter, m_yFooter));
+
+            // Middle
+            var widthMid = m_Context.Measure(m_sMiddleColumn, m_font);
+            var x = m_xFooter + m_FooterWidth/2 - (widthMid / 2);
+            draw.DrawString(m_sMiddleColumn, m_font, Brushes.Black, 
+                new PointF(x, m_yFooter));
+
+            // Right side
+            var fDateWidth = m_Context.Measure(m_sRightColumn, m_font);
+            x = m_xFooter + m_FooterWidth - fDateWidth;
+            draw.DrawString(m_sRightColumn, m_font, Brushes.Black, 
+                new PointF(x, m_yFooter));
         }
         #endregion
 
-
-        public void Layout(PrintDocument pdoc)
+        #region Constructor(nPageNumber, DReference, pdoc)
+        public RunningFooter(int nPageNumber, DReference chapterAndVerse, 
+            PrintDocument pdoc, string sRunningFooterText)
         {
-            DoLayout();
+            m_nPageNumber = nPageNumber;
+            m_refChapterAndVerse = chapterAndVerse;
+            m_Context = new PrintContext(pdoc);
+            m_sRunningFooterText = sRunningFooterText;
+
+            // Retrieve the font from the stylesheet (needed for Height calculation below)
+            var ps = DB.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_sfmRunningHeader);
+            m_font = ps.CharacterStyle.FindOrAddFontForWritingSystem(
+                DB.TargetTranslation.WritingSystemVernacular).DefaultFont;
+
+            // Layout
+            m_FooterWidth = pdoc.DefaultPageSettings.Bounds.Width -
+                            pdoc.DefaultPageSettings.Margins.Left -
+                            pdoc.DefaultPageSettings.Margins.Right;
+            m_xFooter = pdoc.DefaultPageSettings.Margins.Left;
+            m_yFooter = pdoc.DefaultPageSettings.Bounds.Height -
+                        pdoc.DefaultPageSettings.Margins.Bottom -
+                        Height;
+
+            // Text in each column depends on even/odd page
+            m_sLeftColumn = GetFooterPartString( 
+                IsEvenPage ? DB.TeamSettings.EvenLeft : DB.TeamSettings.OddLeft);
+            m_sMiddleColumn = GetFooterPartString(
+                IsEvenPage ? DB.TeamSettings.EvenMiddle : DB.TeamSettings.OddMiddle);
+            m_sRightColumn = GetFooterPartString(
+                IsEvenPage ? DB.TeamSettings.EvenRight : DB.TeamSettings.OddRight);
         }
+        #endregion
     }
+
 }

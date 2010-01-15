@@ -1755,7 +1755,7 @@ namespace OurWord
 		}
 		#endregion
 
-		// Footer ----------------------------------------------------------------------------
+		// RunningFooter ----------------------------------------------------------------------------
 		#region Method: string _GetFooterPartString( DTeamSettings.FooterParts kFooterPart)
 		string _GetFooterPartString( DTeamSettings.FooterParts kFooterPart)
 		{

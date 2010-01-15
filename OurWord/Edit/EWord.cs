@@ -186,11 +186,6 @@ namespace OurWord.Edit
             return new Pen(FontForWS.FontColor);
         }
         #endregion
-        #region Method: virtual void Draw(IDraw)
-        virtual public void Draw(IDraw draw)
-        {
-        }
-        #endregion
 
         // Mousing
         #region Attr{g}: Cursor MouseOverCursor - Indicates what a Left-Click will do

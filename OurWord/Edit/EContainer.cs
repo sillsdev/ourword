@@ -244,6 +244,11 @@ namespace OurWord.Edit
 		{
 		}
 		#endregion
+        #region Method: virtual void Draw(IDraw)
+        virtual public void Draw(IDraw draw)
+        {
+        }
+        #endregion
 	}
     #endregion
 
@@ -1542,7 +1547,18 @@ namespace OurWord.Edit
 				item.PaintControls();
 		}
 		#endregion
-	}
+        #region OMethod: void Draw(IDraw draw)
+        override public void Draw(IDraw draw)
+        {
+            Border.Paint(draw);
+
+            PaintBitmap(draw);
+
+            foreach (var item in SubItems)
+                item.Draw(draw);
+        }
+        #endregion
+    }
     #endregion
 
     #region CLASS: ERowOfColumns : EContainer

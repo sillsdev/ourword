@@ -77,6 +77,8 @@ namespace OurWord.Printing
         }
         #endregion
 
+        private string m_sRunningFooterText;
+
         // Public Interface ------------------------------------------------------------------
         #region Constructor(DSection)
         public Printer(DSection currentSectionOfBookToPrint)
@@ -178,6 +180,7 @@ namespace OurWord.Printing
 
             // Create OWParas for the body and footnotes we intend to print
             var vDataParagraphs = GetParagraphsToPrint();
+            m_sRunningFooterText = ExtractRunningFooter(vDataParagraphs);
             var vDisplayParagraphs = GetDisplayParagraphsToPrint(vDataParagraphs);
             var vDisplayFootnotes = CollectAndNumberFootnotes(vDisplayParagraphs);
 
@@ -195,7 +198,7 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.IncrementStep();
             while (vLineGroups.Count > 0)
             {
-                var page = new Page(PDoc, Pages.Count, vLineGroups)
+                var page = new Page(PDoc, Pages.Count, vLineGroups, m_sRunningFooterText)
                     {
                         WaterMarkText = (UserSettings.PrintWaterMark) ?
                             UserSettings.WaterMarkText : ""
@@ -208,7 +211,7 @@ namespace OurWord.Printing
         }
         #endregion
         #region Method: List<DParagraph> GetParagraphsToPrint()
-        IEnumerable<DParagraph> GetParagraphsToPrint()
+        ICollection<DParagraph> GetParagraphsToPrint()
         {
             var vParagraphs = new List<DParagraph>();
 
@@ -223,6 +226,24 @@ namespace OurWord.Printing
             }
 
             return vParagraphs;
+        }
+        #endregion
+        #region SMethod: string ExtractRunningFooter(vParagraphs)
+        static string ExtractRunningFooter(ICollection<DParagraph> vParagraphs)
+        {
+            var styleRunningFooter = DB.StyleSheet.FindParagraphStyleOrNormal(
+                DStyleSheet.c_sfmRunningHeader);
+
+            foreach(var p in vParagraphs)
+            {
+                if (p.Style != styleRunningFooter) 
+                    continue;
+
+                vParagraphs.Remove(p);
+                return p.AsString;
+            }
+
+            return DB.TargetBook.DisplayName;
         }
         #endregion
         #region Method: List<OWPara> GetDisplayParagraphsToPrint(vDParagraphs)
