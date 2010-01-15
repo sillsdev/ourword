@@ -296,18 +296,6 @@ namespace OurWord.Edit
                 block.Draw(draw);
         }
         #endregion
-        #region Method: void MoveYs(float fAdjustment)
-        public void MoveYs(float fAdjustment)
-        {
-            Position = new PointF(Position.X, Position.Y + fAdjustment);
-
-            if (null != Chapter)
-                Chapter.Position = new PointF(Chapter.Position.X, Chapter.Position.Y + fAdjustment);
-
-            foreach (var item in SubItems)
-                item.Position = new PointF(item.Position.X, item.Position.Y + fAdjustment);
-        }
-        #endregion
         #region Method: void SetYs(float yNew)
         public void SetYs(float yNew)
         {

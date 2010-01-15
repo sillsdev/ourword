@@ -40,7 +40,7 @@ namespace OurWord.Printing
         }
         #endregion
         #region Attr{g}: bool HasPicture
-        bool HasPicture
+        public bool HasPicture
         {
             get
             {
@@ -95,7 +95,7 @@ namespace OurWord.Printing
         #endregion
 
         // Line height -----------------------------------------------------------------------
-        public float TopY { get; set; }
+        public float TopY { private get; set; }
         public float BottomY { private get; set; }
 
         public float SpaceBefore { get; set; }
@@ -106,12 +106,16 @@ namespace OurWord.Printing
         {
             get
             {
-                // Start with the height of the main body
-                var fHeight = BottomY - TopY;
-
-                fHeight += FootnotesHeight;
-
-                return fHeight;
+                return BodyHeight + FootnotesHeight;
+            }
+        }
+        #endregion
+        #region VAttr{g}: float BodyHeight
+        public float BodyHeight
+        {
+            get
+            {
+                return BottomY - TopY;
             }
         }
         #endregion
@@ -223,20 +227,24 @@ namespace OurWord.Printing
             }
         }
         #endregion
-        #region Method: void MoveYs(float fBodyAdjustment)
-        public void MoveYs(float fBodyAdjustment)
+        #region Method: void SetYs(float yTopNew)
+        public void SetYs(float yTopNew)
         {
-            if (fBodyAdjustment == 0F)
+            if (yTopNew == TopY)
                 return;
 
-            TopY += fBodyAdjustment;
-            BottomY += fBodyAdjustment;
+            // yTopNew is typically less that TopY, so yDifference will be negative;
+            // thus we typically expect to be moving the y's lower (smaller)
+            var yDifference = yTopNew - TopY;
+
+            TopY += yDifference;
+            BottomY += yDifference;
 
             foreach (var line in BodyLines)
-                line.MoveYs(fBodyAdjustment);
-    
+                line.SetYs(line.Position.Y + yDifference);
+
             if (null != Picture)
-                Picture.MoveYs(fBodyAdjustment);
+                Picture.SetY(TopY + SpaceAfter);
         }
         #endregion
         #region Method: void HandleLineSpacing(float fMultiplier)

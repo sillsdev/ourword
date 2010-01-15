@@ -117,8 +117,8 @@ namespace OurWord.Printing
             var vsProgressSteps = new[] 
             { 
                 "Measuring the text",
-                "Layout out the pages",
-                "Sending to Printer"
+                "Laying out the pages",
+                "Sending to the Printer"
             };
             EnumeratedStepsProgressDlg.Start("Printing", vsProgressSteps);
             
@@ -198,7 +198,8 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.IncrementStep();
             while (vLineGroups.Count > 0)
             {
-                var page = new Page(PDoc, Pages.Count, vLineGroups, m_sRunningFooterText)
+                var page = new Page(PDoc, Pages.Count, vLineGroups, 
+                    m_sRunningFooterText, UserSettings.AllowPicturesToFloatOnPage)
                     {
                         WaterMarkText = (UserSettings.PrintWaterMark) ?
                             UserSettings.WaterMarkText : ""

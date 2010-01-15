@@ -235,6 +235,16 @@ namespace OurWord.Printing
             }
         }
         #endregion
+        #region Attr{g/s}: bool AllowPicturesToFloatOnPage
+        public bool AllowPicturesToFloatOnPage
+        {
+            get
+            {
+                return m_checkAllowPictureFloat.Checked;
+            }
+        }
+        #endregion
+
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(PrintDocument)
@@ -274,6 +284,7 @@ namespace OurWord.Printing
         private RadioButton m_radioBackTranslation;
         private GroupBox m_groupWhat;
         private TextBox m_textWatermark;
+        private CheckBox m_checkAllowPictureFloat;
 
         private System.ComponentModel.Container components = null;
         #endregion
@@ -321,6 +332,7 @@ namespace OurWord.Printing
             this.m_radioVernacular = new System.Windows.Forms.RadioButton();
             this.m_radioBackTranslation = new System.Windows.Forms.RadioButton();
             this.m_groupWhat = new System.Windows.Forms.GroupBox();
+            this.m_checkAllowPictureFloat = new System.Windows.Forms.CheckBox();
             this.m_groupRange.SuspendLayout();
             this.m_groupOptions.SuspendLayout();
             this.SuspendLayout();
@@ -330,7 +342,7 @@ namespace OurWord.Printing
             this.m_btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
             this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(255, 382);
+            this.m_btnHelp.Location = new System.Drawing.Point(255, 402);
             this.m_btnHelp.Name = "m_btnHelp";
             this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
             this.m_btnHelp.TabIndex = 15;
@@ -341,7 +353,7 @@ namespace OurWord.Printing
             // 
             this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(167, 382);
+            this.m_btnCancel.Location = new System.Drawing.Point(167, 402);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 14;
@@ -351,7 +363,7 @@ namespace OurWord.Printing
             // 
             this.m_btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(79, 382);
+            this.m_btnOK.Location = new System.Drawing.Point(79, 402);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 13;
@@ -375,7 +387,7 @@ namespace OurWord.Printing
             // 
             // m_radioEntireBook
             // 
-            this.m_radioEntireBook.Location = new System.Drawing.Point(32, 69);
+            this.m_radioEntireBook.Location = new System.Drawing.Point(32, 65);
             this.m_radioEntireBook.Name = "m_radioEntireBook";
             this.m_radioEntireBook.Size = new System.Drawing.Size(352, 24);
             this.m_radioEntireBook.TabIndex = 2;
@@ -385,7 +397,7 @@ namespace OurWord.Printing
             // 
             // m_radioThisSection
             // 
-            this.m_radioThisSection.Location = new System.Drawing.Point(32, 91);
+            this.m_radioThisSection.Location = new System.Drawing.Point(32, 87);
             this.m_radioThisSection.Name = "m_radioThisSection";
             this.m_radioThisSection.Size = new System.Drawing.Size(352, 24);
             this.m_radioThisSection.TabIndex = 3;
@@ -399,7 +411,7 @@ namespace OurWord.Printing
             this.m_groupRange.Controls.Add(this.m_labelToChapter);
             this.m_groupRange.Controls.Add(this.m_radioChapters);
             this.m_groupRange.Controls.Add(this.m_editStartChapter);
-            this.m_groupRange.Location = new System.Drawing.Point(16, 56);
+            this.m_groupRange.Location = new System.Drawing.Point(16, 52);
             this.m_groupRange.Name = "m_groupRange";
             this.m_groupRange.Size = new System.Drawing.Size(376, 90);
             this.m_groupRange.TabIndex = 21;
@@ -451,7 +463,7 @@ namespace OurWord.Printing
             // 
             // m_labelLineSpacing
             // 
-            this.m_labelLineSpacing.Location = new System.Drawing.Point(16, 91);
+            this.m_labelLineSpacing.Location = new System.Drawing.Point(13, 118);
             this.m_labelLineSpacing.Name = "m_labelLineSpacing";
             this.m_labelLineSpacing.Size = new System.Drawing.Size(100, 23);
             this.m_labelLineSpacing.TabIndex = 22;
@@ -460,7 +472,7 @@ namespace OurWord.Printing
             // 
             // m_comboLineSpacing
             // 
-            this.m_comboLineSpacing.Location = new System.Drawing.Point(120, 91);
+            this.m_comboLineSpacing.Location = new System.Drawing.Point(117, 118);
             this.m_comboLineSpacing.Name = "m_comboLineSpacing";
             this.m_comboLineSpacing.Size = new System.Drawing.Size(128, 21);
             this.m_comboLineSpacing.TabIndex = 12;
@@ -468,15 +480,16 @@ namespace OurWord.Printing
             // 
             // m_groupOptions
             // 
+            this.m_groupOptions.Controls.Add(this.m_checkAllowPictureFloat);
             this.m_groupOptions.Controls.Add(this.m_textWatermark);
             this.m_groupOptions.Controls.Add(this.m_checkPrintPictures);
             this.m_groupOptions.Controls.Add(this.m_checkWaterMark);
             this.m_groupOptions.Controls.Add(this.m_checkReplacements);
             this.m_groupOptions.Controls.Add(this.m_labelLineSpacing);
             this.m_groupOptions.Controls.Add(this.m_comboLineSpacing);
-            this.m_groupOptions.Location = new System.Drawing.Point(19, 244);
+            this.m_groupOptions.Location = new System.Drawing.Point(19, 240);
             this.m_groupOptions.Name = "m_groupOptions";
-            this.m_groupOptions.Size = new System.Drawing.Size(376, 119);
+            this.m_groupOptions.Size = new System.Drawing.Size(376, 150);
             this.m_groupOptions.TabIndex = 24;
             this.m_groupOptions.TabStop = false;
             this.m_groupOptions.Text = "Options";
@@ -507,7 +520,7 @@ namespace OurWord.Printing
             // m_radioVernacular
             // 
             this.m_radioVernacular.AutoSize = true;
-            this.m_radioVernacular.Location = new System.Drawing.Point(32, 179);
+            this.m_radioVernacular.Location = new System.Drawing.Point(32, 175);
             this.m_radioVernacular.Name = "m_radioVernacular";
             this.m_radioVernacular.Size = new System.Drawing.Size(76, 17);
             this.m_radioVernacular.TabIndex = 7;
@@ -518,7 +531,7 @@ namespace OurWord.Printing
             // m_radioBackTranslation
             // 
             this.m_radioBackTranslation.AutoSize = true;
-            this.m_radioBackTranslation.Location = new System.Drawing.Point(32, 202);
+            this.m_radioBackTranslation.Location = new System.Drawing.Point(32, 198);
             this.m_radioBackTranslation.Name = "m_radioBackTranslation";
             this.m_radioBackTranslation.Size = new System.Drawing.Size(105, 17);
             this.m_radioBackTranslation.TabIndex = 8;
@@ -528,19 +541,27 @@ namespace OurWord.Printing
             // 
             // m_groupWhat
             // 
-            this.m_groupWhat.Location = new System.Drawing.Point(19, 163);
+            this.m_groupWhat.Location = new System.Drawing.Point(19, 159);
             this.m_groupWhat.Name = "m_groupWhat";
             this.m_groupWhat.Size = new System.Drawing.Size(373, 65);
             this.m_groupWhat.TabIndex = 27;
             this.m_groupWhat.TabStop = false;
             this.m_groupWhat.Text = "What do you want to print?";
             // 
+            // m_checkAllowPictureFloat
+            // 
+            this.m_checkAllowPictureFloat.Location = new System.Drawing.Point(16, 92);
+            this.m_checkAllowPictureFloat.Name = "m_checkAllowPictureFloat";
+            this.m_checkAllowPictureFloat.Size = new System.Drawing.Size(352, 24);
+            this.m_checkAllowPictureFloat.TabIndex = 24;
+            this.m_checkAllowPictureFloat.Text = "Allow pictures to move on page to save paper?";
+            // 
             // DialogPrint
             // 
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(410, 414);
+            this.ClientSize = new System.Drawing.Size(410, 434);
             this.Controls.Add(this.m_radioBackTranslation);
             this.Controls.Add(this.m_radioVernacular);
             this.Controls.Add(this.m_radioThisSection);
@@ -603,6 +624,7 @@ namespace OurWord.Printing
 
             // Pictures
             PrintPictures = true;
+            m_checkAllowPictureFloat.Checked = true;
 
             // Range
             EntireBook = true;

@@ -37,6 +37,7 @@ namespace OurWord.Printing
         private readonly PageSettings m_PageSettings;
         private readonly float m_fTotalAvailableContentHeight;
         public string WaterMarkText { private get; set; }
+        private readonly bool m_bAllowPicturesToFloatOnPage;
 
         private const int c_nMarginBetweenBodyAndFootnotes = 10;
         private const int c_nMarginAboveRunningFooter = 10;
@@ -44,16 +45,19 @@ namespace OurWord.Printing
         #region Constructor(pDoc, nPageNumber, vGroups)
         public Page(PrintDocument pdoc, int nPageNumber, 
             IList<AssociatedLines> vSourceGroups,
-            string sRunningFooterText)
+            string sRunningFooterText,
+            bool bAllowPicturesToFloatOnPage)
         {
             m_PageSettings = pdoc.PrinterSettings.DefaultPageSettings;
+            m_bAllowPicturesToFloatOnPage = bAllowPicturesToFloatOnPage;
 
             m_fTotalAvailableContentHeight = m_PageSettings.Bounds.Height
                 - m_PageSettings.Margins.Top - m_PageSettings.Margins.Bottom;
 
             // Setup and measure the running footer
             m_runningFooter = new RunningFooter(nPageNumber, 
-                vSourceGroups[0].ScriptureReference, pdoc,
+                vSourceGroups[0].ScriptureReference,  
+                pdoc,
                 sRunningFooterText);
             m_fTotalAvailableContentHeight -= m_runningFooter.Height;
             m_fTotalAvailableContentHeight -= c_nMarginAboveRunningFooter;
@@ -67,16 +71,43 @@ namespace OurWord.Printing
 
         // Layout (done during construction) -------------------------------------------------
         #region Method: void CalculateGroupsThatWillFit(vSourceGroups)
+        #region Method: AssociatedLines GetNextGroup(fHeightRemaining, vSourceGroups)
+        AssociatedLines GetNextGroup(float fHeightRemaining, IList<AssociatedLines> vSourceGroups)
+        {
+            if (vSourceGroups.Count == 0)
+                return null;
+
+            // Return the next group if it will fit
+            var nextGroup = vSourceGroups[0];
+            var printableHeight = nextGroup.TotalHeight - nextGroup.SpaceAfter;
+            if (printableHeight <= fHeightRemaining)
+                return nextGroup;
+
+            // If the next group is a picture, see if we can slide the following group
+            // ahead of it.
+            if (nextGroup.HasPicture && vSourceGroups.Count > 1 && m_bAllowPicturesToFloatOnPage)
+            {
+                var followingGroup = vSourceGroups[1];
+                printableHeight = followingGroup.TotalHeight - followingGroup.SpaceAfter;
+                if (printableHeight <= fHeightRemaining && !followingGroup.HasPicture)
+                    return followingGroup;
+            }
+
+            return null;
+        }
+        #endregion
+
         void CalculateGroupsThatWillFit(IList<AssociatedLines> vSourceGroups)
         {
             var fHeightRemaining = m_fTotalAvailableContentHeight;
             var bFootnoteFound = false;
 
+            // We want to always do one, whether it fits or not; otherwise we might have
+            // an infinite loop.
+            var group = vSourceGroups[0];
+
             do
             {
-                // Add the next group: by doing it first in the do loop we ensure that we 
-                // always add at least one group, even if too high; thus avoiding an endless loop
-                var group = vSourceGroups[0];
                 Groups.Add(group);
 
                 // If we see footnotes, we need to allow room between body and footnote
@@ -89,23 +120,16 @@ namespace OurWord.Printing
                 // Subtract this group's height from the height available on the page.6
                 // For the initial group on the page, we want to eat the SpaceBefore, as we don't
                 // need for the paragraph to appear lower when its at the top of the page.
-                var fGroupHeight = (Groups.Count == 1) ? 
-                    (group.TotalHeight - group.SpaceBefore) : 
-                    group.TotalHeight;
+                var fGroupHeight = (Groups.Count == 1) ? group.BodyHeight : group.TotalHeight;
                 fHeightRemaining -= fGroupHeight;
 
                 // Remove the group we've just added from the queue
                 vSourceGroups.Remove(group);
-                if (vSourceGroups.Count == 0)
-                    break;
 
                 // If the next group will not fit, then the next page will have to pick it up.
-                var nextGroup = vSourceGroups[0];
-                var nextGroupHeightIfAtPageBottom = nextGroup.TotalHeight - nextGroup.SpaceAfter;
-                if (fHeightRemaining < nextGroupHeightIfAtPageBottom)
-                    break;
+                group = GetNextGroup(fHeightRemaining, vSourceGroups);
 
-            } while (true);
+            } while (null != group);
 
         }
         #endregion
@@ -126,22 +150,32 @@ namespace OurWord.Printing
         #region Method: void Layout()
         void Layout()
         {
-            float yPrintAreaTop = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
-            var yFirstGroupTopOfText = Groups[0].TopY + Groups[0].SpaceBefore;
-            var fBodyAdjustment = yPrintAreaTop - yFirstGroupTopOfText;
+            // 1. BODY LINES
+            float yTopBody = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
 
-            var yPrintAreaBottom = yPrintAreaTop + m_fTotalAvailableContentHeight;
-            var yFootnoteTop = yPrintAreaBottom - HeightRequiredForFootnotes;
-          
+            // Since we're at the top of the page, we eat the SpaceBefore
+            var firstGroup = Groups[0];
+            yTopBody -= firstGroup.SpaceBefore;
+
             foreach(var group in Groups)
             {
-                group.MoveYs(fBodyAdjustment);
+                group.SetYs(yTopBody);
+                yTopBody += group.BodyHeight;
+            }
 
-                foreach (var line in group.FootnoteLines)
+            // 2. FOOTNOTE LINES
+            var yPrintAreaBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
+            var yTopFootnotes = yPrintAreaBottom - 
+                m_runningFooter.Height -
+                c_nMarginAboveRunningFooter -
+                HeightRequiredForFootnotes;
+
+            foreach(var group in Groups)
+            {
+                foreach(var line in group.FootnoteLines)
                 {
-                    foreach (var item in line.SubItems)
-                        item.Position = new PointF(item.Position.X, yFootnoteTop);
-                    yFootnoteTop += line.LargestItemHeight;
+                    line.SetYs(yTopFootnotes);
+                    yTopFootnotes += line.LargestItemHeight;
                 }
             }
         }

@@ -58,14 +58,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Method: void MoveYs(float fAdjustment)
-        public void MoveYs(float fAdjustment)
-        {
-            var x = m_OwningContainer.Position.X;
-            var y = m_OwningContainer.Position.Y + fAdjustment;
-            m_OwningContainer.Position = new PointF(x, y);
-        }
-        #endregion
         #region Method:  void SetY(float yNew)
         public void SetY(float yNew)
         {

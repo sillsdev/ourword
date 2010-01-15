@@ -108,7 +108,9 @@ namespace OurWord.Edit
         #region Method: float PointsToPixelsY(fPixels)
         public float PointsToDeviceY(float fPixels)
         {
-            return fPixels;
+            // Someday, I need to figure out what is really required here.
+            const float fKludge = 2F;
+            return fPixels * fKludge;
         }
         #endregion
         #region Method: float InchesToDeviceX(fInches)
