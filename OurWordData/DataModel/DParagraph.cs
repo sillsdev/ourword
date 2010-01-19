@@ -1219,6 +1219,7 @@ namespace OurWordData.DataModel
         }
         #endregion
 
+        /*
         #region Method: List<PWord> GetPWords()
         public List<PWord> GetPWords()
 		{
@@ -1228,6 +1229,7 @@ namespace OurWordData.DataModel
 		    return vWords;
 		}
 		#endregion
+        */
 
 		// Translator Notes ------------------------------------------------------------------
 		#region DText GetOrAddLastDText() - Used during the SF Read operation

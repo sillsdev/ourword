@@ -183,14 +183,6 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 
-		#region method: virtual PWord[] GetPWords()
-		public virtual List<PWord> GetPWords()
-		{
-			Debug.Assert(false);
-			return null;
-		}
-		#endregion
-
 		// Methods ---------------------------------------------------------------------------
 		#region Method: virtual void CopyBackTranslationsFromFront(DRun RFront)
 		public virtual void CopyBackTranslationsFromFront(DRun RFront, bool bReplaceTarget)
@@ -354,21 +346,6 @@ namespace OurWordData.DataModel
 			Text = s;
 		}
 		#endregion
-        #region method: override List<PWord> GetPWords()
-        public override List<PWord> GetPWords()
-		{
-            return new List<PWord>
-            {
-                new PWord(Text,
-                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevVerse),
-                    null) 
-                    {
-                        NeedsGlueToNext = true,
-                        IsVerseNumber = true
-                    }
-            };
-		}
-		#endregion
 		#region Attr{g}: override string AsString
 		public override string AsString
 		{
@@ -518,17 +495,6 @@ namespace OurWordData.DataModel
 			{
 				return "{c " + ChapterNo.ToString() + "}";
 			}
-		}
-		#endregion
-        #region method: override List<PWord> GetPWords()
-        public override List<PWord> GetPWords()
-		{
-            return new List<PWord>
-            {
-                new PWord(Text,
-                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevChapter),
-                    null)
-            };
 		}
 		#endregion
 		#region Attr{g}: override string AsString
@@ -847,22 +813,6 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region method: override List<PWord> GetPWords()
-        public override List<PWord> GetPWords()
-        {
-            return new List<PWord>
-            {
-                new PWord(Text,
-                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevFootLetter),
-                    null)
-                    {
-                        Footnote = this,
-                        IsFootnoteLetter = true,
-                        NeedsGlueToPrevious = true
-                    }
-            };
-        }
-        #endregion
 
         // Oxes ------------------------------------------------------------------------------
         public const string c_sNodeTag = "note";
@@ -1076,18 +1026,6 @@ namespace OurWordData.DataModel
 			Text = s;
 		}
 		#endregion
-
-        #region method: override List<PWord> GetPWords()
-        public override List<PWord> GetPWords()
-		{
-            return new List<PWord>
-            {
-                new PWord(Text,
-                    DB.StyleSheet.FindCharacterStyle(DStyleSheet.c_StyleAbbrevLabel),
-                    null)
-            };
-		}
-		#endregion
 		#region Attr{g}: override string AsString
 		public override string AsString
 		{
@@ -1097,8 +1035,6 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-
-		// Methods ---------------------------------------------------------------------------
 
 	}
 	#endregion
@@ -2116,21 +2052,6 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-        #region Method: override List<PWord> GetPWords()
-        public override List<PWord> GetPWords()
-		{
-		    var v = new List<PWord>();
-
-            foreach (DPhrase p in Phrases)
-            {
-                var words = p.GetPWords();
-                if (null != words)
-                    v.AddRange(words);
-            }
-
-            return v;
-		}
-		#endregion
 		#region Method: override void CopyBackTranslationsFromFront(DRun RFront)
 		public override void CopyBackTranslationsFromFront(DRun RFront, bool bReplaceTarget)
 		{
@@ -2704,374 +2625,6 @@ namespace OurWordData.DataModel
 			return sOut;
 		}
 		#endregion
-		#region method: override PWord[] GetPWords()
-		public PWord[] GetPWords()
-		{
-            // Get the true character style. 
-            JCharacterStyle cs = CharacterStyle;
-            if (cs.Abbrev == DStyleSheet.c_sfmParagraph)
-                cs = BasicText.Paragraph.Style.CharacterStyle;
-
-			// Get a working string we can play with
-			string s = EliminateSpuriousSpaces(Text);
-
-			// Eliminate any leading or trailing spaces
-			s = s.Trim();
-			if (s.Length == 0)
-				return null;
-
-			// Count the number of spaces.
-			int cSpaces = 0;
-			foreach(char ch in s)
-			{
-				if (ch == ' ')
-					++cSpaces;
-			}
-
-			// The number of words is one greater than the number of spaces
-			var cWords = cSpaces + 1;
-
-			// Create the string array to hold the results
-			PWord[] v = new PWord[cWords];
-
-			// Go through the string and collect the words
-			var sWord = "";
-			var i = 0;
-			foreach(var ch in s)
-			{
-				if (ch == ' ')
-				{
-                    sWord += ch;
-                    v[i] = new PWord(sWord, cs, BasicText.Paragraph.Style); 
-					i++;
-					sWord = "";
-				}
-				else
-					sWord += ch;
-			}
-            v[i] = new PWord(sWord, cs, BasicText.Paragraph.Style);
-
-
-			// Return the result
-			return v;
-		}
-		#endregion
-
 	}
 	#endregion
-
-    // For printing: hope to move printing to OWWindow and make this obsolete
-    #region CLASS: PWord
-    public class PWord
-    // "PrintWord" At the top level, single word to be printed. But it also
-    // includes PWords which might be glued to it, such as footnote letters.
-    {
-        // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: string Text - the string representing the word
-        public string Text
-        {
-            get
-            {
-                return m_Text;
-            }
-            set
-            {
-                m_Text = value;
-            }
-        }
-        string m_Text;
-        #endregion
-        #region Attr{g}: DRun Footnote - the DRun containing the footnote, or null
-        public DFoot Footnote
-        {
-            private get
-            {
-                return m_Footnote;
-            }
-            set
-            {
-                Debug.Assert(null != value);
-                m_Footnote = value;
-            }
-        }
-        DFoot m_Footnote;
-        #endregion
-
-        // Glue ------------------------------------------------------------------------------
-        public bool NeedsGlueToNext { get; set; }
-        public bool NeedsGlueToPrevious { get; set; }
-        #region Attr{g/s}: PWord GlueTo
-        public PWord GlueTo
-        {
-            get
-            {
-                return m_GlueTo;
-            }
-            set
-            {
-                m_GlueTo = value;
-            }
-        }
-        PWord m_GlueTo = null;
-        #endregion
-
-        // T if a letter in the text, or a letter just prior to the footnote itself
-        public bool IsFootnoteLetter { private get; set; }
-
-        public bool IsVerseNumber { get; set; }
-
-        #region Attr{g}: Font Font
-        public Font Font
-        {
-            get
-            {
-                Debug.Assert(null != m_Font);
-                return m_Font;
-            }
-        }
-        Font m_Font;
-        #endregion
-        #region Attr{g}: Brush TextBrush
-        public Brush TextBrush
-        {
-            get
-            {
-                return m_TextBrush;
-            }
-        }
-        private Brush m_TextBrush;
-        #endregion
-
-        #region Attr{g}: List<DRun> FootnoteRuns
-        public List<DRun> FootnoteRuns
-        {
-            get
-            {
-                var v = new List<DRun>();
-
-                if (null != Footnote)
-                    v.Add(Footnote);
-
-                if (null != GlueTo)
-                    v.AddRange(GlueTo.FootnoteRuns);
-
-                return v;
-            }
-        }
-        #endregion
-        #region Attr{g}: bool HasFootnotes
-        private bool HasFootnotes
-        {
-            get
-            {
-                return ((FootnoteRuns.Count > 0) ? true : false);
-            }
-        }
-        #endregion
-
-        // Methods ---------------------------------------------------------------------------
-        #region Attr{g}: float WidthShrinkage
-        float WidthShrinkage
-        // The words are too far apart, and I can't figure out why, so
-        // I'll arbitrarily subtract a tad. I'll probably need something more
-        // complicated than a raw number (e.g., a function of the font size),
-        // but for now, I'll try this.
-        {
-            get
-            {
-                return 2;
-            }
-        }
-        #endregion
-        #region Method: SizeF Measure(Graphics g)
-        public SizeF Measure(Graphics g)
-        {
-            // Measure this word
-            StringFormat fmt = StringFormat.GenericTypographic;
-            fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            SizeF sz = g.MeasureString(Text, Font, 1000, fmt);
-            // Old Way ---> SizeF sz = g.MeasureString(Text, Font);
-
-            // Add the measurements of words that we are glue'd to. This will recurse
-            // if the next word(s) are also glued to further words.
-            if (null != GlueTo)
-            {
-                SizeF szGlueTo = GlueTo.Measure(g);
-                sz.Width += szGlueTo.Width;
-                sz.Height = Math.Max(sz.Height, szGlueTo.Height);
-            }
-
-            // Return the result
-            return sz;
-        }
-        #endregion
-        #region Method: SizeF MeasureSpace(Graphics g)
-        public SizeF MeasureSpace(Graphics g)
-        {
-            // Get the measurement for a space in this font
-            SizeF sz = g.MeasureString(" ", Font);
-
-            // If we are glued to the next word, then we want the measurements of whichever
-            // space is in the largest font. (This recurses should other words be glued
-            // downstream.
-            if (null != GlueTo)
-            {
-                SizeF szGlueTo = GlueTo.MeasureSpace(g);
-
-                sz.Width = Math.Max(sz.Width, szGlueTo.Width);
-                sz.Height = Math.Max(sz.Height, szGlueTo.Height);
-            }
-
-            // Return the result
-            return sz;
-        }
-        #endregion
-        #region Method: void Draw(Graphics g, float x, float y)
-        public void Draw(Graphics g, float x, float y)
-        {
-            g.DrawString(Text, Font, TextBrush, x, y);
-
-            if (null != GlueTo)
-            {
-                x += g.MeasureString(Text, Font).Width - WidthShrinkage;
-                GlueTo.Draw(g, x, y);
-            }
-        }
-        #endregion
-        #region Method: void SetFootnoteLetter(ref char chFootnoteLetter)
-        public void SetFootnoteLetter(ref char chFootnoteLetter)
-        {
-            if (IsFootnoteLetter)
-            {
-                Text = chFootnoteLetter.ToString();
-                chFootnoteLetter++;
-            }
-
-            if (null != GlueTo)
-                GlueTo.SetFootnoteLetter(ref chFootnoteLetter);
-        }
-        #endregion
-        #region Attr{g}: char FirstFootnoteLetter
-        public char FirstFootnoteLetter
-        {
-            get
-            {
-                if (IsFootnoteLetter)
-                {
-                    return Text[0];
-                }
-
-                if (null != GlueTo)
-                    return GlueTo.FirstFootnoteLetter;
-
-                return ' ';
-            }
-        }
-        #endregion
-
-        // Text Replacements -----------------------------------------------------------------
- //       static public bool ShouldMakeReplacements = false;
-        #region SAttr{g}: TreeRoot ReplaceTree
-        static public TreeRoot ReplaceTree
-        {
-            get
-            {
-                return s_ReplaceTree;
-            }
-        }
-        static TreeRoot s_ReplaceTree = null;
-        #endregion
-        #region Method: static void BuildReplaceTree()
-        static public void BuildReplaceTree()
-        {
-            if (null != s_ReplaceTree)
-                return;
-
-            s_ReplaceTree = new TreeRoot();
-
-            s_ReplaceTree.Add("<<<", "“‘");
-            s_ReplaceTree.Add("<<", "“");
-            s_ReplaceTree.Add("<", "‘");
-
-            s_ReplaceTree.Add(">>>", "’”");
-            s_ReplaceTree.Add(">>", "”");
-            s_ReplaceTree.Add(">", "’");
-        }
-        #endregion
-        #region Method: static string MakeReplacements(string s)
-        protected static string MakeReplacements(string s)
-        {
-            // Just return the source string if replacements are not desired
-//            if (!ShouldMakeReplacements)
-//                return s;
-
-            // Make sure the tree has been built
-            if (null == ReplaceTree)
-                BuildReplaceTree();
-            Debug.Assert(null != ReplaceTree);
-
-            // Do the replacements
-            return ReplaceTree.MakeReplacements(s);
-        }
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        public PWord(string sText, Font font, Color foreColor)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(sText));
-            m_Text = MakeReplacements(sText);
-
-            m_Font = font;
-
-            m_TextBrush = new SolidBrush(foreColor);
-        }
-
-        #region Constructor(string _Text, JCharacterStyle, JParagraphStyle)
-        public PWord(string sText, JCharacterStyle _CStyle, JParagraphStyle _PStyle)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(sText));
-            m_Text =  MakeReplacements(sText);
-
-            Debug.Assert(null != _CStyle);
-
-            // Determine what, if any, mods are requested
-            FontStyle mods = FontStyle.Regular;
-            if (string.IsNullOrEmpty(_CStyle.Abbrev))
-            {
-                _CStyle = _PStyle.CharacterStyle;
-            }
-            else if (_CStyle.Abbrev == DStyleSheet.c_StyleAbbrevItalic)
-            {
-                mods = FontStyle.Italic;
-                Debug.Assert(null != _PStyle);
-                _CStyle = _PStyle.CharacterStyle;
-            }
-            else if (_CStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
-            {
-                mods = FontStyle.Bold;
-                Debug.Assert(null != _PStyle);
-                _CStyle = _PStyle.CharacterStyle;
-            }
-
-            // Get the font container for the writing system
-            var fws = _CStyle.FindOrAddFontForWritingSystem(
-                DB.TargetTranslation.WritingSystemVernacular);
-
-            // Adjust for any modifications
-            m_Font = fws.FindOrAddFont(false, mods);
-
-            // Adjust for superscript
-            if (_CStyle.IsSuperScript)
-            {
-                float fSize = (float)m_Font.Size * 0.8f;
-                m_Font = new Font(m_Font.FontFamily, fSize, m_Font.Style);
-            }
-
-            m_TextBrush = new SolidBrush(_CStyle.FontColor);
-        }
-        #endregion
-
-    }
-    #endregion
-
 }
