@@ -844,7 +844,7 @@ namespace OurWord.Edit
                 return m_WritingSystem;
             }
         }
-        JWritingSystem m_WritingSystem = null;
+        readonly JWritingSystem m_WritingSystem;
         #endregion
         #region Attr{g}: JParagraphStyle PStyle - pointer stored here for performance
         public JParagraphStyle PStyle
@@ -875,17 +875,17 @@ namespace OurWord.Edit
 
         #region private Constructor(JWS, PStyle, JObject, flags) - the stuff that is in common
         private OWPara(
-            JWritingSystem _ws,
-            JParagraphStyle _PStyle,
-            JObject _objDataSource,
-            Flags _Options)
+            JWritingSystem writingSystem,
+            JParagraphStyle style,
+            JObject objDataSource,
+            Flags options)
             : base()
         {
             // Keep track of the attributes passed in
-            m_WritingSystem = _ws;
-            m_pStyle = _PStyle;
-            m_objDataSource = _objDataSource;
-            m_Options = _Options;
+            m_WritingSystem = writingSystem;
+            m_pStyle = style;
+            m_objDataSource = objDataSource;
+            m_Options = options;
 
             // Initialize the vector of Blocks
             Clear();
@@ -901,7 +901,7 @@ namespace OurWord.Edit
             DParagraph p,
             Color clrEditableBackground, 
             Flags options)
-            : this(ws, PStyle, p as JObject, options)
+            : this(ws, PStyle, p, options)
         {
             // The paragraph itself may override to make itself uneditable, 
             // even though we received "true" from the _bEditable parameter.

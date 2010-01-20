@@ -5,7 +5,7 @@
  * Author:  John Wimbish
  * Created: 31 Jan 2005, move to separate file 19 Jan 2010
  * Purpose: A string of text, all with the same FontStyle
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 using System.Diagnostics;
 using System.Drawing;
@@ -140,7 +140,7 @@ namespace OurWordData.DataModel.Runs
             }
         }
         #endregion
-        #region VAttr{g}: DBasicText BasicText
+        #region VAttr{g}: DBasicText BasicText - required iff editable
         public DBasicText BasicText
         {
             get

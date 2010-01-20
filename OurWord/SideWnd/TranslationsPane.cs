@@ -26,6 +26,8 @@ using OurWordData.DataModel;
 
 using OurWord.Layouts;
 using OurWord.Edit;
+using OurWordData.DataModel.Runs;
+
 #endregion
 #endregion
 

@@ -11,7 +11,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Xml;
 using JWTools;
 using OurWordData.Tools;
@@ -570,6 +569,7 @@ namespace OurWordData.DataModel.Runs
         }
         #endregion
         #region SMethod: LogTheChange(...)
+        /*
         static void LogTheChange(string reference, string parent, string ours, string theirs)
         {
             try
@@ -592,6 +592,7 @@ namespace OurWordData.DataModel.Runs
             {
             }
         }
+        */
         #endregion
     }
 }

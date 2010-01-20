@@ -11,6 +11,8 @@
 using System.Diagnostics;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 namespace OurWord.Edit

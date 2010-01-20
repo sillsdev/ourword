@@ -951,6 +951,7 @@ namespace OurWordData
         private const string c_sAttrBold = "Bold";
         private const string c_sAttrItalic = "Italic";
         private const string c_sAttrStrikeout = "Strike";
+        #region Method: XmlNode Save(XmlDoc, nodeParent)
         public XmlNode Save(XmlDoc doc, XmlNode nodeParent)
         {
             var nodeFont = doc.AddNode(nodeParent, c_sTag);
@@ -964,6 +965,8 @@ namespace OurWordData
 
             return nodeFont;
         }
+        #endregion
+        #region Method: JFontForWritingSystem Create(nodeFont)
         static public JFontForWritingSystem Create(XmlNode nodeFont)
         {
             if (nodeFont.Name != c_sTag)
@@ -980,7 +983,7 @@ namespace OurWordData
 
             return font;
         }
-
+        #endregion
     }
     #endregion
 

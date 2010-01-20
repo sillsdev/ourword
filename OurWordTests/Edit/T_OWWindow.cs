@@ -26,6 +26,7 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
 using OurWordTests.DataModel;
 
 using OurWordTests.Cellar;
