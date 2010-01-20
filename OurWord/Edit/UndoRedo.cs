@@ -25,6 +25,8 @@ using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWord.SideWnd;
+using OurWordData.DataModel.Runs;
+
 #endregion
 #endregion
 
@@ -1113,7 +1115,7 @@ namespace OurWord.Edit
 
             // Retrieve the DBasicText and phrases we'll delete
             DBasicText DBT = selection.DBT;
-            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            DPhraseList<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
@@ -1374,12 +1376,12 @@ namespace OurWord.Edit
 
             // We now have the DPhrase insertion point
             var phrase = phrases[iPhrase];
-            var iPos = n;
 
             // Insert the text. We remove spurious spaces, so if the result of the insertion 
             // is that we have what we started with, then we need proceed no further.
             var sBeforeInsert = phrase.Text;
-            phrase.Text = DPhrase.EliminateSpuriousSpaces(phrase.Text.Insert(n, sInsert));
+            phrase.Insert(n, sInsert);
+            phrase.EliminateSpuriousSpaces();
             if (sBeforeInsert == phrase.Text)
             {
                 // The test is for a cursor right before a space, e.g., "Hello| World." In this case,
@@ -1871,7 +1873,7 @@ namespace OurWord.Edit
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
             DBasicText DBT = Window.Selection.DBT;
-            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            DPhraseList<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the

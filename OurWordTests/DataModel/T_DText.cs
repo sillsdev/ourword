@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using OurWord;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Runs;
 
 namespace OurWordTests.DataModel
 {

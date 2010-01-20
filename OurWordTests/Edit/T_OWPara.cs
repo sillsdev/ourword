@@ -25,6 +25,8 @@ using OurWord;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 namespace OurWordTests.Edit

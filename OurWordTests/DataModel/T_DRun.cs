@@ -23,6 +23,8 @@ using OurWordData.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 namespace OurWordTests.DataModel
@@ -277,7 +279,7 @@ namespace OurWordTests.DataModel
             // single leading and trailing space.)
             var sIn = "  This  has     too    many spaces.   ";
             var phrase = new DPhrase(sIn);
-            phrase.Text = DPhrase.EliminateSpuriousSpaces(phrase.Text);
+            phrase.EliminateSpuriousSpaces();
             Assert.AreEqual(phrase.Text, " This has too many spaces. ");
 
             // For a paragraph, we get rid of leading and trailing as well.
@@ -291,9 +293,9 @@ namespace OurWordTests.DataModel
             var phrase2 = text.Phrases[1];
             var phrase3 = text.Phrases[2];
 
-            phrase1.Text = DPhrase.EliminateSpuriousSpaces(phrase1.Text);
-            phrase2.Text = DPhrase.EliminateSpuriousSpaces(phrase2.Text);
-            phrase3.Text = DPhrase.EliminateSpuriousSpaces(phrase3.Text);
+            phrase1.EliminateSpuriousSpaces();
+            phrase2.EliminateSpuriousSpaces();
+            phrase3.EliminateSpuriousSpaces();
 
             text.EliminateSpuriousSpaces();
 

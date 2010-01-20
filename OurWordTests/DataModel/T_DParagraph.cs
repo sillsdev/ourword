@@ -22,6 +22,8 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 namespace OurWordTests.DataModel

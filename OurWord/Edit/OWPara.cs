@@ -15,6 +15,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 namespace OurWord.Edit

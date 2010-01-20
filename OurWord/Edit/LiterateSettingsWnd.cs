@@ -26,9 +26,9 @@ using System.Threading;
 
 using JWTools;
 using OurWordData;
-using OurWordData.DataModel;
-
+using OurWordData.DataModel.Runs;
 using OurWord.Dialogs;
+
 #endregion
 
 // TODO: How do we do error checking with this generic Settings mechanism?

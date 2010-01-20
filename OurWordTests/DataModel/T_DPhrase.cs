@@ -22,6 +22,7 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
 using OurWordData.Tools;
 using OurWordTests;
 #endregion
@@ -125,26 +126,111 @@ namespace OurWordTests.DataModel
         #region Test: TSfmSaveString
         [Test] public void TSfmSaveString()
         {
-            var phrase = new DPhrase 
+            var phrase = new DPhrase("Hi")
             {
-                Text="Hi",
                 FontModification = FontStyle.Italic
             };
             Assert.AreEqual("|iHi|r", phrase.SfmSaveString);
 
-            phrase = new DPhrase
+            phrase = new DPhrase("Hi")
             {
-                Text = "Hi",
                 FontModification = FontStyle.Bold
             };
             Assert.AreEqual("|bHi|r", phrase.SfmSaveString);
 
-            phrase = new DPhrase
+            phrase = new DPhrase("Hi")
             {
-                Text = "Hi",
                 FontModification = FontStyle.Underline
             };
             Assert.AreEqual("|uHi|r", phrase.SfmSaveString);
+        }
+        #endregion
+
+        #region Test: TEndsWithSpace
+        [Test] public void TEndsWithSpace()
+        {
+            var phrase = new DPhrase("This one ends with a space. ");
+            Assert.IsTrue(phrase.EndsWithSpace);
+
+            phrase = new DPhrase("Doesn't end with space.");
+            Assert.IsFalse(phrase.EndsWithSpace);
+        }
+        #endregion
+        #region Test: TBeginsWithSpace
+        [Test] public void TBeginsWithSpace()
+        {
+            var phrase = new DPhrase(" This one begins with a space.");
+            Assert.IsTrue(phrase.BeginsWithSpace);
+
+            phrase = new DPhrase("Doesn't begin with space.");
+            Assert.IsFalse(phrase.BeginsWithSpace);
+        }
+        #endregion
+        #region Test: TRemoveLeadingSpace
+        [Test] public void TRemoveLeadingSpace()
+        {
+            var phrase = new DPhrase(" This one begins with a space.");
+            phrase.RemoveLeadingSpace();
+            Assert.AreEqual("This one begins with a space.", phrase.Text);
+
+            phrase = new DPhrase("Doesn't begin with space.");
+            phrase.RemoveLeadingSpace();
+            Assert.AreEqual("Doesn't begin with space.", phrase.Text);
+
+            phrase = new DPhrase("  This one begins with spaces.");
+            phrase.RemoveLeadingSpace();
+            Assert.AreEqual(" This one begins with spaces.", phrase.Text);
+        }
+        #endregion
+        #region Test: TRemoveTrailingSpace
+        [Test] public void TRemoveTrailingSpace()
+        {
+            var phrase = new DPhrase("This one ends with a space. ");
+            phrase.RemoveTrailingSpace();
+            Assert.AreEqual("This one ends with a space.", phrase.Text);
+
+            phrase = new DPhrase("Doesn't end with space.");
+            phrase.RemoveTrailingSpace();
+            Assert.AreEqual("Doesn't end with space.", phrase.Text);
+
+            phrase = new DPhrase("This one ends with a spaces.  ");
+            phrase.RemoveTrailingSpace();
+            Assert.AreEqual("This one ends with a spaces. ", phrase.Text);
+        }
+        #endregion
+        #region Test: TEliminateSpuriousSpaces
+        [Test] public void TEliminateSpuriousSpaces()
+        {
+            var phrase = new DPhrase("Too  many     spaces.  ");
+            phrase.EliminateSpuriousSpaces();
+            Assert.AreEqual("Too many spaces. ", phrase.Text);
+
+            phrase = new DPhrase("Contains" + DPhrase.c_chInsertionSpace + "insertion space.");
+            phrase.EliminateSpuriousSpaces();
+            Assert.AreEqual("Containsinsertion space.", phrase.Text);
+
+            phrase = new DPhrase("Contains" + DPhrase.c_chInsertionSpace + 
+                DPhrase.c_chInsertionSpace + "insertion space.");
+            phrase.EliminateSpuriousSpaces();
+            Assert.AreEqual("Containsinsertion space.", phrase.Text);
+        }
+        #endregion
+        #region Test: TInsert
+        [Test] public void TInsert()
+        {
+            const string sBase = "Here is text.";
+
+            var phrase = new DPhrase(sBase);
+            phrase.Insert(8, "some ");
+            Assert.AreEqual("Here is some text.", phrase.Text);
+
+            phrase = new DPhrase(sBase);
+            phrase.Insert(0, "T");
+            Assert.AreEqual("THere is text.", phrase.Text);
+
+            phrase = new DPhrase(sBase);
+            phrase.Insert(sBase.Length, "..");
+            Assert.AreEqual("Here is text...", phrase.Text);
         }
         #endregion
     }
