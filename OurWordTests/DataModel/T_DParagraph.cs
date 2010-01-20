@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using System.Xml;
@@ -59,24 +60,24 @@ namespace OurWordTests.DataModel
         private DParagraph SplitParagraphSetup()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph();
+            var p = new DParagraph();
 
             // Add various runs
             p.AddRun(DChapter.Create("3"));
             p.AddRun(DVerse.Create("16"));
 
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "For God so loved the "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that he gave his one and only son"));
+            var text = new DText();
+            text.Phrases.Append(new DPhrase("For God so loved the "));
+            text.Phrases.Append(new DPhrase("world ") {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase("that he gave his one and only son"));
             p.AddRun(text);
 
             p.AddRun(DVerse.Create("17"));
 
             text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that whosoever believes in him "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "but have everlasting life."));
+            text.Phrases.Append(new DPhrase("that whosoever believes in him "));
+            text.Phrases.Append(new DPhrase("shall not perish, ") {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase("but have everlasting life."));
             p.AddRun(text);
 
             m_section.Paragraphs.Append(p);
@@ -474,18 +475,18 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_VerseAtBeginning()
         {
             // Build the paragraph
-            DParagraph p = new DParagraph();
+            var p = new DParagraph();
             p.AddRun(DVerse.Create("16"));
 
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, 
+            var text = new DText();
+            text.Phrases.Append(new DPhrase(
                 "For God so loved the world that he gave his one and only son "));
             p.AddRun(text);
 
             p.AddRun(DVerse.Create("17"));
 
             text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
+            text.Phrases.Append(new DPhrase(
                 "that whosoever believes in him shall not perish."));
             p.AddRun(text);
 
@@ -499,17 +500,17 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_VerseAtMiddle()
         {
             // Build the paragraph
-            DParagraph p = new DParagraph();
+            var p = new DParagraph();
 
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
+            var text = new DText();
+            text.Phrases.Append(new DPhrase(
                 "For God so loved the world that he gave his one and only son "));
             p.AddRun(text);
 
             p.AddRun(DVerse.Create("17"));
 
             text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
+            text.Phrases.Append(new DPhrase(
                 "that whosoever believes in him shall not perish."));
             p.AddRun(text);
 
@@ -526,7 +527,7 @@ namespace OurWordTests.DataModel
             DParagraph p = new DParagraph();
 
             DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
+            text.Phrases.Append(new DPhrase(
                 "For God so loved the world that he gave his one and only son "));
             p.AddRun(text);
 
@@ -630,18 +631,18 @@ namespace OurWordTests.DataModel
         [Test] public void IoAbbreviated()
         {
             // Create a paragraph with a single DText
-            DParagraph p = new DParagraph();
+            var p = new DParagraph();
             m_section.Paragraphs.Append(p);
-            DText text = new DText();
+            var text = new DText();
             p.Runs.Append(text);
-            text.Phrases.Append(new DPhrase("p", "This is some text."));
-            text.PhrasesBT.Append(new DPhrase("p", ""));
+            text.Phrases.Append(new DPhrase("This is some text."));
+            text.PhrasesBT.Append(new DPhrase(""));
 
             // Create the Xml Element from it
-            XElement x = p.ToXml(true);
+            var x = p.ToXml(true);
 
             // Create a new recipient paragraph and interpret the xml
-            DParagraph pNew = new DParagraph();
+            var pNew = new DParagraph();
             pNew.FromXml(x);
 
             // Should be the same

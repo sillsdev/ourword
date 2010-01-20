@@ -15,6 +15,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using System.Xml;
@@ -399,12 +400,7 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				foreach ( DPhrase phrase in Phrases )
-				{
-					if (phrase.CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic)
-						return true;
-				}
-				return false;
+			    return Phrases.Any(phrase => phrase.IsItalic);
 			}
 		}
 		#endregion
@@ -637,11 +633,11 @@ namespace OurWordData.DataModel
 					Runs.Clear();
 				if (Runs.Count == 0)
 					AddRun(new DText());
-				DText text = Runs[0] as DText;
+				var text = Runs[0] as DText;
 
 				text.Phrases.Clear();
 
-				DPhrase phrase = new DPhrase( StyleAbbrev, value);
+				var phrase = new DPhrase(value);
 				text.Phrases.Append( phrase );
 
 			}
@@ -678,11 +674,11 @@ namespace OurWordData.DataModel
 					Runs.Clear();
 				if (Runs.Count == 0)
 					AddRun(new DText());
-				DText text = Runs[0] as DText;
+				var text = Runs[0] as DText;
 
 				text.PhrasesBT.Clear();
 
-				DPhrase phrase = new DPhrase( StyleAbbrev, value);
+				var phrase = new DPhrase(value);
 				text.PhrasesBT.Append( phrase );
 
 			}
@@ -1004,7 +1000,7 @@ namespace OurWordData.DataModel
                         textRight.Phrases.Append(phrase);
                     }
 
-                    textRight.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                    textRight.PhrasesBT.Append(new DPhrase(""));
 
                     return textRight;
                 }
@@ -1045,7 +1041,7 @@ namespace OurWordData.DataModel
         #endregion
         DBasicText SplitText(DBasicText dbtToSplit, int iTextSplitPos)
         {
-            SplitTextMethod m = new SplitTextMethod(dbtToSplit, iTextSplitPos);
+            var m = new SplitTextMethod(dbtToSplit, iTextSplitPos);
             return m.Do();
         }
         #endregion
@@ -1218,18 +1214,6 @@ namespace OurWordData.DataModel
             CombineAdjacentDTexts(false);
         }
         #endregion
-
-        /*
-        #region Method: List<PWord> GetPWords()
-        public List<PWord> GetPWords()
-		{
-		    var vWords = new List<PWord>();
-            foreach(DRun run in Runs)
-                vWords.AddRange(run.GetPWords());
-		    return vWords;
-		}
-		#endregion
-        */
 
 		// Translator Notes ------------------------------------------------------------------
 		#region DText GetOrAddLastDText() - Used during the SF Read operation
@@ -1446,16 +1430,6 @@ namespace OurWordData.DataModel
                 return;
             }
 
-            /***
-            // If we have a Contents attribute, then it means we used our special override
-            // of ToXml.
-            if (null == x.FindAttr("Contents"))
-            {
-                base.FromXml(x);
-                return;
-            }
-            ***/
-
             // We want exactly one DText
             Clear();
             DText text = new DText();
@@ -1472,14 +1446,14 @@ namespace OurWordData.DataModel
             if (null != attr)
                 text.Phrases.FromSaveString(attr.Value);
             else
-                text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                text.Phrases.Append(new DPhrase(""));
 
             // Retrieve the back translation
             attr = x.FindAttr(c_sAttrBT);
             if (null != attr)
                 text.PhrasesBT.FromSaveString(attr.Value);
             else
-                text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                text.PhrasesBT.Append(new DPhrase(""));
         }
         #endregion
 

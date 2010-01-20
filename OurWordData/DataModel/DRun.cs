@@ -1131,10 +1131,10 @@ namespace OurWordData.DataModel
             {
                 for (int i = 0; i < Count - 1; )
                 {
-                    DPhrase left = this[i] as DPhrase;
-                    DPhrase right = this[i + 1] as DPhrase;
+                    var left = this[i] as DPhrase;
+                    var right = this[i + 1] as DPhrase;
 
-                    if (left.CharacterStyleAbbrev == right.CharacterStyleAbbrev)
+                    if (left.FontModification == right.FontModification)
                     {
                         left.Text += right.Text;
                         Remove(right);
@@ -1158,13 +1158,13 @@ namespace OurWordData.DataModel
                 if (iPos == 0 || iPos == phraseToSplit.Text.Length)
                     return phraseToSplit;
 
-                DPhrase phraseLeft = new DPhrase(phraseToSplit.CharacterStyleAbbrev,
-                    phraseToSplit.Text.Substring(0, iPos));
+                var phraseLeft = new DPhrase(phraseToSplit.Text.Substring(0, iPos)) 
+                    {FontModification = phraseToSplit.FontModification};
 
-                DPhrase phraseRight = new DPhrase(phraseToSplit.CharacterStyleAbbrev,
-                    phraseToSplit.Text.Substring(iPos));
+                var phraseRight = new DPhrase(phraseToSplit.Text.Substring(iPos))
+                    {FontModification = phraseToSplit.FontModification};
 
-                int iPhrasePosition = FindObj(phraseToSplit);
+                var iPhrasePosition = FindObj(phraseToSplit);
 
                 InsertAt(iPhrasePosition, phraseRight);
                 InsertAt(iPhrasePosition, phraseLeft);
@@ -1202,12 +1202,12 @@ namespace OurWordData.DataModel
                     Remove(phrase);
 
                 // If we now have two phrases of the same type, then we must combine them
-                for (int i = 0; i < Count - 1; )
+                for (var i = 0; i < Count - 1; )
                 {
                     DPhrase phraseLeft = this[i];
                     DPhrase phraseRight = this[i + 1];
 
-                    if (phraseLeft.CharacterStyleAbbrev == phraseRight.CharacterStyleAbbrev)
+                    if (phraseLeft.FontModification == phraseRight.FontModification)
                     {
                         phraseLeft.Text += phraseRight.Text;
                         Remove(phraseRight);
@@ -1244,7 +1244,7 @@ namespace OurWordData.DataModel
 
                 // If everything is deleted, we should at a minimum have a single, empty DPhrase
                 if (Count == 0)
-                    Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                    Append(new DPhrase(""));
             }
 
             public void Delete(int iStart, int iCount)
@@ -1267,11 +1267,11 @@ namespace OurWordData.DataModel
                 }
 
                 // Make a new phrase to house the Italics
-                string s = AsString.Substring(iStart, iCount);
-                string sStyleAbbrev = (bMakeItalic) ?
-                    DStyleSheet.c_StyleAbbrevItalic :
-                    DStyleSheet.c_sfmParagraph;
-                DPhrase phraseItalic = new DPhrase(sStyleAbbrev, s);
+                var s = AsString.Substring(iStart, iCount);
+                var phraseItalic = new DPhrase(s) 
+                    { 
+                        FontModification = (bMakeItalic) ? FontStyle.Italic : FontStyle.Regular
+                    };
 
                 // Remove the corresponding text from the existing DPhrases
                 Delete(iStart, iCount, false);
@@ -1335,15 +1335,15 @@ namespace OurWordData.DataModel
 
                 // Create DPhrases from these
                 Clear();
-                foreach (DSection.IO.Phrase phrase in v)
+                foreach (var phrase in v)
                 {
-                    Append(new DPhrase(phrase.StyleAbbrev, phrase.Text));
+                    Append(new DPhrase(phrase.Text) {FontModification = phrase.Modification} );
                 }
 
                 // At a minimum we want at least one empty phrase. If "s" was empty
-                // when passed in, then we wioll not have this.
-                if (this.Count == 0)
-                    Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                // when passed in, then we will not have this.
+                if (Count == 0)
+                    Append(new DPhrase(""));
             }
             #endregion
 
@@ -1352,31 +1352,33 @@ namespace OurWordData.DataModel
             const string c_sTagSpan = "span";
             const string c_sAttrStyle = "class";
 
-            const string c_sStyleNameItalic = "Italic";
-            const string c_sStyleNameBold = "Bold";
+            private const string c_sModItalic = "Italic";
+            private const string c_sModBold = "Bold";
+		    private const string c_sModUnderline = "Underline";
             #endregion
             #region Method: void ReadOxesPhrase(XmlNode)
             public void ReadOxesPhrase(XmlNode node)
             {
-                // If we have a Span, then get its style
-                var sStyle = DStyleSheet.c_sfmParagraph;
+                // If we have a Span, then get its style mod
+                var modification = FontStyle.Regular;
                 if (node.Name == c_sTagSpan)
                 {
-                    var sStyleName = XmlDoc.GetAttrValue(node, c_sAttrStyle, 
-                        DStyleSheet.c_sfmParagraph);
-                    switch (sStyleName)
+                    var sMods = XmlDoc.GetAttrValue(node, c_sAttrStyle, "");
+                    switch (sMods)
                     {
-                        case c_sStyleNameItalic:
-                            sStyle = DStyleSheet.c_StyleAbbrevItalic;
+                        case c_sModItalic:
+                            modification = FontStyle.Italic;
                             break;
-                        case c_sStyleNameBold:
-                            sStyle = DStyleSheet.c_StyleAbbrevBold;
+                        case c_sModBold:
+                            modification = FontStyle.Bold;
+                            break;
+                        case c_sModUnderline:
+                            modification = FontStyle.Underline;
                             break;
                     }
                 }
 
-                // Create the new phrase
-                var phrase = new DPhrase(sStyle, node.InnerText);
+                var phrase = new DPhrase(node.InnerText) { FontModification = modification };
                 Append(phrase);
             }
             #endregion
@@ -1386,24 +1388,26 @@ namespace OurWordData.DataModel
                 if (Count == 0 || string.IsNullOrEmpty(AsString))
                     return;
 
-                foreach (DPhrase p in this)
+                foreach (DPhrase phrase in this)
                 {
                     var nodeParent = nodeParagraph;
 
-                    if (p.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
+                    if (phrase.FontModification != FontStyle.Regular)
                     {
                         nodeParent = oxes.AddNode(nodeParent, c_sTagSpan);
 
-                        var sStyleName = p.CharacterStyleAbbrev;
-                        if (sStyleName == DStyleSheet.c_StyleAbbrevItalic)
-                            sStyleName = c_sStyleNameItalic;
-                        if (sStyleName == DStyleSheet.c_StyleAbbrevBold)
-                            sStyleName = c_sStyleNameBold;
+                        var sModification = "";
+                        if (phrase.IsBold)
+                            sModification = c_sModBold;
+                        if (phrase.IsItalic)
+                            sModification = c_sModItalic;
+                        if (phrase.IsUnderline)
+                            sModification = c_sModUnderline;
 
-                        oxes.AddAttr(nodeParent, c_sAttrStyle, sStyleName);
+                        oxes.AddAttr(nodeParent, c_sAttrStyle, sModification);
                     }
 
-                    oxes.AddText(nodeParent, p.Text);
+                    oxes.AddText(nodeParent, phrase.Text);
                 }
             }
             #endregion
@@ -1495,7 +1499,6 @@ namespace OurWordData.DataModel
                 }
             }
             #endregion
-
         }
         #endregion
         #region JAttr{g}: DPhrases Phrases
@@ -1503,14 +1506,14 @@ namespace OurWordData.DataModel
 		{
 			get { return m_osPhrases; }
 		}
-		private DPhrases<DPhrase> m_osPhrases;
+		private readonly DPhrases<DPhrase> m_osPhrases;
 		#endregion
 		#region JAttr{g}: DPhrases PhrasesBT
 		public DPhrases<DPhrase> PhrasesBT
 		{
 			get { return m_osPhrasesBT; }
 		}
-        private DPhrases<DPhrase> m_osPhrasesBT;
+        private readonly DPhrases<DPhrase> m_osPhrasesBT;
 		#endregion
 
 		// Derived / Const attrs -------------------------------------------------------------
@@ -1566,11 +1569,11 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 		#region Constructor(string sText)
-		public  DBasicText(string sText)
+		public DBasicText(string sText)
 			: this()
 		{
-			Phrases.Append(   new DPhrase(null,sText) );
-			PhrasesBT.Append( new DPhrase(null,"") );
+			Phrases.Append(   new DPhrase(sText) );
+			PhrasesBT.Append( new DPhrase("") );
 		}
 		#endregion
 		#region Constructor(DBasicText)
@@ -1660,9 +1663,9 @@ namespace OurWordData.DataModel
             // Make sure we have at least one phrase
         {
             if (Phrases.Count == 0)
-                Phrases.Append(new DPhrase(null, ""));
+                Phrases.Append(new DPhrase(""));
             if (PhrasesBT.Count == 0)
-                PhrasesBT.Append(new DPhrase(null, ""));
+                PhrasesBT.Append(new DPhrase(""));
         }
         #endregion
         #region Method: void CopyDataTo(DBasicText DBT)
@@ -1877,7 +1880,7 @@ namespace OurWordData.DataModel
 
             // Make sure there is at least one phrase present
             if (osPhrases.Count == 0)
-                osPhrases.Append(new DPhrase(null, ""));
+                osPhrases.Append(new DPhrase(""));
 
             return cSpacesRemoved;
         }
@@ -1927,7 +1930,7 @@ namespace OurWordData.DataModel
                 DPhrase phrase1 = osPhrases[i] as DPhrase;
                 DPhrase phrase2 = osPhrases[i + 1] as DPhrase;
 
-                if (phrase1.CharacterStyleAbbrev == phrase2.CharacterStyleAbbrev)
+                if (phrase1.FontModification == phrase2.FontModification)
                 {
                     phrase1.Text += phrase2.Text;
                     osPhrases.Remove(phrase2);
@@ -1965,7 +1968,7 @@ namespace OurWordData.DataModel
 
                 LastPhrase = (osPhrases.Count > 0) ? osPhrases[osPhrases.Count - 1] : null;
 
-				if (null != LastPhrase && phrase.CharacterStyleAbbrev == LastPhrase.CharacterStyleAbbrev)
+                if (null != LastPhrase && phrase.FontModification == LastPhrase.FontModification)
 				{
 					LastPhrase.Text += phrase.Text;
 				}
@@ -2171,9 +2174,9 @@ namespace OurWordData.DataModel
 		#region Method: static public DText CreateSimple(string sPhraseText, string sPhraseTextBT)
 		static public DText CreateSimple(string sPhraseText, string sPhraseTextBT)
 		{
-			DText text = new DText();
-			text.Phrases.Append( new DPhrase( DStyleSheet.c_sfmParagraph, sPhraseText ) );
-			text.PhrasesBT.Append( new DPhrase( DStyleSheet.c_sfmParagraph, sPhraseTextBT ) );
+			var text = new DText();
+			text.Phrases.Append( new DPhrase(sPhraseText ) );
+			text.PhrasesBT.Append( new DPhrase(sPhraseTextBT ) );
 			return text;
 		}
 		#endregion
@@ -2398,52 +2401,54 @@ namespace OurWordData.DataModel
 		}
 		string m_sText;
 		#endregion
-		#region BAttr{g/s}: public string CharacterStyleAbbrev
-		public string CharacterStyleAbbrev
-		{
-			get
-			{
-				return m_sCharacterStyleAbbrev;
-			}
-			set
-			{
-				Debug.Assert(!string.IsNullOrEmpty(value));
-                SetValue(ref m_sCharacterStyleAbbrev, value);
-			}
-		}
-		string m_sCharacterStyleAbbrev = DStyleSheet.c_sfmParagraph;
-		#endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
             DefineAttr("Text", ref m_sText);
-            DefineAttr("Style", ref m_sCharacterStyleAbbrev);
         }
         #endregion
 
         // Style Modifications ---------------------------------------------------------------
-        #region Attr{g/s}: FontStyle FontStyle
-        public FontStyle FontStyle
+        #region Attr{g/s}: FontStyle FontModification
+        public FontStyle FontModification
 	    {     
             get
             {
-                return m_FontStyle;
+                return m_FontModification;
             }
             set
             {
-                m_FontStyle = value;
+                m_FontModification = value;
                 DeclareDirty();
             }
 	    }
-	    private FontStyle m_FontStyle = FontStyle.Regular;
+        private FontStyle m_FontModification = FontStyle.Regular;
         #endregion
         #region VAttr{g}: bool IsItalic
         public bool IsItalic
         {
             get
             {
-                return ((FontStyle & FontStyle.Italic) == FontStyle.Italic);
+                return ((FontModification & FontStyle.Italic) == FontStyle.Italic);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsBold
+        public bool IsBold
+        {
+            get
+            {
+                return ((FontModification & FontStyle.Bold) == FontStyle.Bold);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsUnderline
+        public bool IsUnderline
+        {
+            get
+            {
+                return ((FontModification & FontStyle.Underline) == FontStyle.Underline);
             }
         }
         #endregion
@@ -2464,11 +2469,11 @@ namespace OurWordData.DataModel
                 }
 
                 // Font Modifications
-                if ((FontStyle & FontStyle.Bold) == FontStyle.Bold)
+                if (IsBold)
                     s = "|b" + s + "|r";
-                if ((FontStyle & FontStyle.Italic) == FontStyle.Italic)
+                if (IsItalic)
                     s = "|i" + s + "|r";
-                if ((FontStyle & FontStyle.Underline) == FontStyle.Underline)
+                if (IsUnderline)
                     s = "|u" + s + "|r";
 
 				return s;
@@ -2497,18 +2502,6 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-        #region VAttr{g}: JCharacterStyle CharacterStyle
-        public JCharacterStyle CharacterStyle
-        {
-            get
-            {
-                JCharacterStyle cs = DB.StyleSheet.FindCharacterStyleOrNormal(
-                    CharacterStyleAbbrev);
-                Debug.Assert(null != cs);
-                return cs;
-            }
-        }
-        #endregion
         #region VAttr{g}: DBasicText BasicText
         public DBasicText BasicText
         {
@@ -2527,38 +2520,19 @@ namespace OurWordData.DataModel
         {
         }
         #endregion
-        #region Constructor(sStyleAbbrev, sText)
-        public DPhrase(string sCharacterStyleAbbrev, string sText)
+        #region Constructor(sText)
+        public DPhrase(string sText)
 			: this()
 		{
-			// Make certain we have a valid Style; use the normal style if the StyleAbbrev
-			// passed in is empty, or if it represents a paragraph style.
-			if (string.IsNullOrEmpty(sCharacterStyleAbbrev) || 
-				false == DB.StyleSheet.IsCharacterStyle(sCharacterStyleAbbrev))
-			{
-				sCharacterStyleAbbrev = DStyleSheet.c_sfmParagraph;
-			}
-
-			// Attributes are now ready to store
-			CharacterStyleAbbrev = sCharacterStyleAbbrev;
 			Text = sText;
-
-            // Temp: Create FontStyle from char style
-            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic)
-                m_FontStyle = FontStyle.Italic;
-            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevBold)
-                m_FontStyle = FontStyle.Bold;
-            if (CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevUnderline)
-                m_FontStyle = FontStyle.Underline;
 		}
 		#endregion
 		#region Constructor(DPhrase source)
 		public DPhrase( DPhrase source )
             : this()
 		{
-			CharacterStyleAbbrev = source.CharacterStyleAbbrev;
 			Text = source.Text;
-		    m_FontStyle = source.FontStyle;
+		    m_FontModification = source.FontModification;
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -2573,9 +2547,7 @@ namespace OurWordData.DataModel
 
 			if (phrase.Text != Text)
                 return false;
-            if (phrase.CharacterStyleAbbrev != CharacterStyleAbbrev)
-                return false;
-            if (phrase.FontStyle != FontStyle)
+            if (phrase.FontModification != FontModification)
                 return false;
 
             return true;

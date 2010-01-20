@@ -1011,20 +1011,18 @@ namespace OurWord.Edit
 			if (string.IsNullOrEmpty(sText))
 				return null;
 
-			string sAbbrev =
-				(bBold && bItalic) ? c_sBoldItalic :
-				bBold ? c_sBold :
-				bItalic ? c_sItalic :
-				c_sNormal;
+		    var modification = FontStyle.Regular;
+            if (bBold)
+                modification = FontStyle.Bold;
+            else if (bItalic)
+                modification = FontStyle.Italic;
+
 
 			// Because we're not using the G.StyleSheet, we cannot use the DPhrase
 			// constructor we'd normally use to set these. So instead, we set them
 			// one at a time through their attribute sets. Kludgy, and worth
 			// repairing at some point.
-			DPhrase p = new DPhrase();
-			p.Text = sText;
-			if (!string.IsNullOrEmpty(sAbbrev))
-				p.CharacterStyleAbbrev = sAbbrev;
+            var p = new DPhrase(sText) { FontModification = modification };
 
 			return p;
 		}

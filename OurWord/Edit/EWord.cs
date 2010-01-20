@@ -163,7 +163,7 @@ namespace OurWord.Edit
                 return m_FontForWS;
             }
         }
-        protected JFontForWritingSystem m_FontForWS = null;
+        protected JFontForWritingSystem m_FontForWS;
         #endregion
         #region Method: Font GetSuperscriptFont()
         protected Font GetSuperscriptFont()
@@ -242,17 +242,17 @@ namespace OurWord.Edit
     public class EWord : EBlock
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: Font Font - returns the font for the WS, including Italic, Bold, etc.
+        #region VAttr{g}: Font Font - returns the drawing font, including Italic, Bold, etc.
         Font Font
         {
             get
             {
                 // Optimization
-                if (FontMods == FontStyle.Regular)
+                if (FontModification == FontStyle.Regular)
                     return FontForWS.DefaultFontZoomed;
 
                 // Generic find-or-create font as needed
-                return FontForWS.FindOrAddFont(true, FontMods);
+                return FontForWS.FindOrAddFont(true, FontModification);
             }
         }
         #endregion
@@ -265,17 +265,16 @@ namespace OurWord.Edit
                 return m_Phrase;
             }
         }
-        DPhrase m_Phrase = null;
+        readonly DPhrase m_Phrase;
         #endregion
-        #region Attr{g}: FontStyle FontMods
-        FontStyle FontMods
+        #region Attr{g}: FontStyle FontModification
+        FontStyle FontModification
         {
             get
-            {
-                return m_FontMods;
+            {               
+                return Phrase.FontModification;
             }
         }
-        readonly FontStyle m_FontMods;
         #endregion
 
         // Hyphenation
@@ -313,28 +312,26 @@ namespace OurWord.Edit
         public EWord( 
             JFontForWritingSystem fontForWritingSystem,
             DPhrase phrase, 
-            string sText, 
-            FontStyle fontMods)
+            string sText)
             : base(fontForWritingSystem, sText)
         {
+            Debug.Assert(null != phrase);
             m_Phrase = phrase;
-            m_FontMods = fontMods;
         }
         #endregion
         #region Method: EWord Clone()
         public virtual EWord Clone()
         {
-            var word = new EWord(FontForWS, Phrase, Text, FontMods);
+            var word = new EWord(FontForWS, Phrase, Text);
             return word;
         }
         #endregion
         #region static EWord CreateAsInsertionIcon(OWPara, JCharacterStyle, DPhrase)
         static public EWord CreateAsInsertionIcon(
-            JFontForWritingSystem _FontForWS,
+            JFontForWritingSystem fontForWritingSystem,
             DPhrase phrase)
         {
-            EWord word = new EWord(_FontForWS, phrase, c_chInsertionSpace.ToString(),
-                FontStyle.Regular);
+            var word = new EWord(fontForWritingSystem, phrase, c_chInsertionSpace.ToString());
             return word;
         }
         #endregion

@@ -136,16 +136,16 @@ namespace OurWordData.DataModel
             Status = sStatus;
 
             // Temporary kludge: remove ||'s that we've  been inserting by mistake
-            string sFixed = DSection.IO.EatSpuriousVerticleBars(sSimpleText);
+            var sFixed = DSection.IO.EatSpuriousVerticleBars(sSimpleText);
 
             // Parse the string into phrases and add them
             Runs.Clear();
-            List<DRun> vRuns = DSection.IO.CreateDRunsFromInputText(sFixed);
-            foreach (DRun run in vRuns)
+            var vRuns = DSection.IO.CreateDRunsFromInputText(sFixed);
+            foreach (var run in vRuns)
             {
-                DText text = run as DText;
+                var text = run as DText;
                 if (text != null && text.PhrasesBT.Count == 0)
-                    text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                    text.PhrasesBT.Append(new DPhrase(""));
                 Runs.Append(run);
             }
 

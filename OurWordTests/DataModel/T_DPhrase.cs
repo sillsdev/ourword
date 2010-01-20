@@ -128,28 +128,21 @@ namespace OurWordTests.DataModel
             var phrase = new DPhrase 
             {
                 Text="Hi",
-                FontStyle = FontStyle.Italic
+                FontModification = FontStyle.Italic
             };
             Assert.AreEqual("|iHi|r", phrase.SfmSaveString);
 
             phrase = new DPhrase
             {
                 Text = "Hi",
-                FontStyle = FontStyle.Bold
+                FontModification = FontStyle.Bold
             };
             Assert.AreEqual("|bHi|r", phrase.SfmSaveString);
 
             phrase = new DPhrase
             {
                 Text = "Hi",
-                FontStyle = FontStyle.Bold | FontStyle.Italic
-            };
-            Assert.AreEqual("|i|bHi|r|r", phrase.SfmSaveString);
-
-            phrase = new DPhrase
-            {
-                Text = "Hi",
-                FontStyle = FontStyle.Underline
+                FontModification = FontStyle.Underline
             };
             Assert.AreEqual("|uHi|r", phrase.SfmSaveString);
         }

@@ -10,6 +10,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -43,9 +44,9 @@ namespace OurWordTests.DataModel
 
         // Test GetPhrase---------------------------------------------------------------------
         #region Method: void _Evaluate(Phrase p, sStyleAbbrev, sText)
-        void _Evaluate(DSection.IO.Phrase p, string sStyleAbbrev, string sText)
+        void _Evaluate(DSection.IO.Phrase p, FontStyle modification, string sText)
         {
-            Assert.AreEqual(p.StyleAbbrev, sStyleAbbrev);
+            Assert.AreEqual(p.Modification, modification);
             Assert.AreEqual(p.Text, sText);
         }
         #endregion
@@ -53,92 +54,84 @@ namespace OurWordTests.DataModel
         [Test] public void Test_GetPhrase()
         {
             // Test: a footnote in the midst of text
-            string s = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
-            int iPos = 0;
+            var s = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
+            var iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "Ije lais alekot. Ije Uis-neno In Anmone");
+
+            Assert.IsTrue(DSection.IO.Phrase.GetPhrase(s, ref iPos).IsFootLetter);
+
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevFootLetter,
-                "");
-            _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "in na' monin.");
 
             // Test: Looks like a footnote, but isn't.
             s = "Ije lais alekot. Ije ||Uis-neno In Anmone||fn in na' monin.";
             iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "Ije lais alekot. Ije |Uis-neno In Anmone|fn in na' monin.");
 
             // Test: An italic phrase and a literal look-alike
             s = "This is |iitalic|r and this is ||inot.||r";
             iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "This is ");
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevItalic,
+                FontStyle.Italic,
                 "italic");
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 " and this is |inot.|r");
 
             // Test: Bold at the beginning and a literal look-alike.
             s = "|bThis is bold|r and this is ||bnot||r bold.";
             iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevBold,
+                FontStyle.Bold,
                 "This is bold");
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 " and this is |bnot|r bold.");
 
             // Test: Underline at the end and a literal look-alike
             s = "||uThis is not underlined||r and this is |uunderlined.|r";
             iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "|uThis is not underlined|r and this is ");
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevUnderline,
+                FontStyle.Underline,
                 "underlined.");
 
             // Test: Lots of literals
             s = "||||This i||s a str||ing with a b||unch of li||terals in it.||||";
             iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "||This i|s a str|ing with a b|unch of li|terals in it.||");
 
             // Test: Footnote at the end
             s = "There is a footnote at the end.|fn";
             iPos = 0;
             _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_sfmParagraph,
+                FontStyle.Regular,
                 "There is a footnote at the end.");
-            _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevFootLetter,
-                "");
+
+            Assert.IsTrue(DSection.IO.Phrase.GetPhrase(s, ref iPos).IsFootLetter);
 
             // Test: nothing but a footnote
             s = "|fn";
             iPos = 0;
-            _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevFootLetter,
-                "");
+            Assert.IsTrue(DSection.IO.Phrase.GetPhrase(s, ref iPos).IsFootLetter);
 
             // Test: nothing but two footnotes
             s = "|fn|fn";
             iPos = 0;
-            _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevFootLetter,
-                "");
-            _Evaluate(DSection.IO.Phrase.GetPhrase(s, ref iPos),
-                DStyleSheet.c_StyleAbbrevFootLetter,
-                "");
-
+            Assert.IsTrue(DSection.IO.Phrase.GetPhrase(s, ref iPos).IsFootLetter);
+            Assert.IsTrue(DSection.IO.Phrase.GetPhrase(s, ref iPos).IsFootLetter);
         }
         #endregion
 
@@ -177,8 +170,8 @@ namespace OurWordTests.DataModel
         #region Test: FieldToRuns
         [Test] public void FieldToRuns()
         {
-            SfField field = new SfField("vt", "", 1);
-            List<DRun> vRuns = null;
+            var field = new SfField("vt", "", 1);
+            List<DRun> vRuns;
 
             // Test: data with footnote in the middle
             field.Data = "Ije lais alekot. Ije Uis-neno In Anmone|fn in na' monin.";
@@ -282,19 +275,21 @@ namespace OurWordTests.DataModel
         {
             // For an individual phrase, it should remove all doubles (but leave a
             // single leading and trailing space.)
-            string sIn = "  This  has     too    many spaces.   ";
-            DPhrase phrase = new DPhrase("p", sIn);
+            var sIn = "  This  has     too    many spaces.   ";
+            var phrase = new DPhrase(sIn);
             phrase.Text = DPhrase.EliminateSpuriousSpaces(phrase.Text);
             Assert.AreEqual(phrase.Text, " This has too many spaces. ");
 
             // For a paragraph, we get rid of leading and trailing as well.
-            DText text = DText.CreateSimple(sIn);
-            text.Phrases.InsertAt(0, new DPhrase("i", " Leading    Italic Phrase. "));
-            text.Phrases.Append(new DPhrase("i", " Trailing Italic    Phrase.  "));
+            var text = DText.CreateSimple(sIn);
+            text.Phrases.InsertAt(0, new DPhrase(" Leading    Italic Phrase. ") 
+                {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase(" Trailing Italic    Phrase.  ") 
+                {FontModification = FontStyle.Italic});
 
-            DPhrase phrase1 = text.Phrases[0] as DPhrase;
-            DPhrase phrase2 = text.Phrases[1] as DPhrase;
-            DPhrase phrase3 = text.Phrases[2] as DPhrase;
+            var phrase1 = text.Phrases[0];
+            var phrase2 = text.Phrases[1];
+            var phrase3 = text.Phrases[2];
 
             phrase1.Text = DPhrase.EliminateSpuriousSpaces(phrase1.Text);
             phrase2.Text = DPhrase.EliminateSpuriousSpaces(phrase2.Text);
@@ -302,7 +297,7 @@ namespace OurWordTests.DataModel
 
             text.EliminateSpuriousSpaces();
 
-            string sComposite = phrase1.Text + phrase2.Text + phrase3.Text;
+            var sComposite = phrase1.Text + phrase2.Text + phrase3.Text;
             Assert.AreEqual("Leading Italic Phrase. This has too many spaces. Trailing Italic Phrase.",
                 sComposite);
         }
@@ -317,16 +312,16 @@ namespace OurWordTests.DataModel
         }
         [Test] public void TextToWordList()
         {
-            ArrayList aWords = new ArrayList();
-            ArrayList aPositions = new ArrayList();
+            var aWords = new ArrayList();
+            var aPositions = new ArrayList();
 
             // Normal example of text that we would expect
-            DText text = DText.CreateSimple("A hard worker has plenty ");
-            text.Phrases.Append(new DPhrase("i", "of food, "));
-            text.Phrases.Append(new DPhrase("b", "but "));
-            text.Phrases.Append(new DPhrase("p", "a person who chases fantasies "));
-            text.Phrases.Append(new DPhrase("i", "ends up "));
-            text.Phrases.Append(new DPhrase("p", "in poverty."));
+            var text = DText.CreateSimple("A hard worker has plenty ");
+            text.Phrases.Append(new DPhrase("of food, ") { FontModification = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase("but ") { FontModification = FontStyle.Bold });
+            text.Phrases.Append(new DPhrase("a person who chases fantasies "));
+            text.Phrases.Append(new DPhrase("ends up ") { FontModification = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase("in poverty."));
 
             text.GetWordOffsetPairs(ref aWords, ref aPositions);
 
@@ -458,10 +453,10 @@ namespace OurWordTests.DataModel
             // Create a footnote
             var footnoteIn = new DFootnote("1:2", DFootnote.Types.kExplanatory);
             var text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "This is "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "very, very "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevBold, "cool "));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "indeed!"));
+            text.Phrases.Append(new DPhrase("This is "));
+            text.Phrases.Append(new DPhrase("very, very ") {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase("cool ") {FontModification = FontStyle.Bold});
+            text.Phrases.Append(new DPhrase("indeed!"));
             footnoteIn.Runs.Append(text);
             var footIn = new DFoot(footnoteIn);
 

@@ -287,7 +287,7 @@ namespace OurWord.Edit
         #endregion
 
         #region Method: void Draw(IDraw)
-        public void Draw(IDraw draw)
+        public override void Draw(IDraw draw)
         {
             if (null != Chapter)
                 Chapter.Draw(draw);

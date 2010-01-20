@@ -1326,8 +1326,8 @@ namespace OurWordData.DataModel
 				}
 			}
 			#endregion
-			static public int s_nChapter = 0;
-			static public int s_nVerse   = 0;
+			static public int s_nChapter;
+			static public int s_nVerse;
 
 			// Converting SfField > DRun -----------------------------------------------------
 			#region Class: Phrase - Helper for parsing input string into Scripture Text phrases
@@ -1335,6 +1335,9 @@ namespace OurWordData.DataModel
 			{
 				// Constants ---------------------------------------------------------------------
 				const char c_chVerticalBar = '|';
+			    private const char c_chItalic = 'i';
+			    private const char c_chBold = 'b';
+			    private const char c_chUnderline = 'u';
 
 				// Attrs -------------------------------------------------------------------------
 				#region Attr{g/s}: string Text
@@ -1351,28 +1354,14 @@ namespace OurWordData.DataModel
 				}
 				string m_text;
 				#endregion
-				#region Attr{g/s}: string StyleAbbrev
-				public string StyleAbbrev
-				{
-					get
-					{
-						return m_sStyleAbbrev;
-					}
-					set
-					{
-						Debug.Assert(null != value && value.Length > 0);
-						m_sStyleAbbrev = value;
-					}
-				}
-				string m_sStyleAbbrev = "p";
-				#endregion
+			    public FontStyle Modification = FontStyle.Regular;
+			    public bool IsFootLetter;
 
 				// Scaffolding -------------------------------------------------------------------
-				#region Constructor(sText, Type)
-				private Phrase(string sText, string sStyleAbbrev)
+				#region Constructor(sText)
+				private Phrase(string sText)
 				{
 					Text = sText;
-					StyleAbbrev = sStyleAbbrev;
 				}
 				#endregion
 
@@ -1472,7 +1461,7 @@ namespace OurWordData.DataModel
 				static public Phrase GetPhrase(string sIn, ref int iPos)
 				{
 					// We'll collect the phrase here
-					string sText = "";
+					var sText = "";
 
 					// Are we setting at a footnote marker? This is defined as a |fn. 
 					// If so, then declare the type and we are done.
@@ -1484,20 +1473,25 @@ namespace OurWordData.DataModel
 						while (iPos < sIn.Length-1 && sIn[iPos] == ' ')
 							++iPos;
 
-						return new Phrase("", DStyleSheet.c_StyleAbbrevFootLetter);
+						return new Phrase("") {IsFootLetter = true};
 					}
 
 					// Default to Normal; if we encounter a style we will change it.
-					string sStyleAbbrev = DStyleSheet.c_sfmParagraph;
+				    var modification = FontStyle.Regular;
 
-					// Are we sitting at a style? This is defined as a opening bar followed
-					// by a recognized style character. If so, then retrieve the
-					// styleabbrev (which is that character) and increment beyond the style 
-					// declaration.segment
+					// Are we sitting at a font modification? This is defined as a opening 
+                    // bar followed by a recognized style character. If so, then retrieve the
+					// character, interpret it and increment beyond it.
 					if (IsStyleBegin(sIn, iPos))
 					{
-						sStyleAbbrev = (sIn[iPos + 1]).ToString();
-						iPos += 2;
+						var chMod = (sIn[iPos + 1]);
+                        if (chMod == c_chBold)
+                            modification = FontStyle.Bold;
+                        if (chMod == c_chItalic)
+                            modification = FontStyle.Italic;
+                        if (chMod == c_chUnderline)
+                            modification = FontStyle.Underline;
+                        iPos += 2;
 					}
 
 					// Loop through the input string to collect the text
@@ -1532,7 +1526,9 @@ namespace OurWordData.DataModel
 						sText += sIn[iPos++];
 					}
 
-					return (sText.Length > 0) ? new Phrase(sText, sStyleAbbrev) : null ;
+					return (sText.Length > 0) ? 
+                        new Phrase(sText) {Modification = modification} : 
+                        null ;
 				}
 				#endregion
 			}
@@ -1571,12 +1567,12 @@ namespace OurWordData.DataModel
 			#region Method: static void CombineLikePhrases( JOwnSeq os )
 			static private void CombineLikePhrases(JOwnSeq<DPhrase> os)
 			{
-				for(int i=0; i<os.Count - 1; )
+				for(var i=0; i<os.Count - 1; )
 				{
-					DPhrase p1 = os[i] as DPhrase;
-					DPhrase p2 = os[i+1] as DPhrase;
+					var p1 = os[i] as DPhrase;
+					var p2 = os[i+1] as DPhrase;
 
-					if (p1.CharacterStyleAbbrev == p2.CharacterStyleAbbrev)
+                    if (p1.FontModification == p2.FontModification)
 					{
 						p1.Text = CombineStrings(p1.Text, p2.Text);
 						os.Remove(p2);
@@ -1633,9 +1629,9 @@ namespace OurWordData.DataModel
 			{
 				if (i < vRaw.Count)
 				{
-					Phrase raw = vRaw[i];
+					var raw = vRaw[i];
 
-					if (raw.StyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
+					if (raw.IsFootLetter)
 						i++;
 				}
 
@@ -1650,12 +1646,12 @@ namespace OurWordData.DataModel
 
 				// Loop to create the DRun's and populate the vRuns list
 				var vRuns = new List<DRun>();
-				for( int i=0; i<vTextRawPhrases.Count; i++ )
+				for( var i=0; i<vTextRawPhrases.Count; i++ )
 				{
-					Phrase raw = vTextRawPhrases[i];
+					var raw = vTextRawPhrases[i];
 
 					// Footnote: add the new run into the array, then loop to the next one
-					if (raw.StyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
+					if (raw.IsFootLetter)
 					{
                         vRuns.Add(new DFoot(null));
 						continue;
@@ -1674,7 +1670,7 @@ namespace OurWordData.DataModel
 					}
 
 					// Create the phrase and add it to the DScriptureText's sequence
-					DPhrase phrase = new DPhrase( raw.StyleAbbrev, raw.Text);
+					var phrase = new DPhrase(raw.Text) {FontModification = raw.Modification};
 					txt.Phrases.Append(phrase);
 				}
 
@@ -1691,15 +1687,15 @@ namespace OurWordData.DataModel
 				while (i < vRaw.Count)
 				{
 					// Retrieve the next phrase
-					Phrase raw = vRaw[i] as Phrase;
+					var raw = vRaw[i] as Phrase;
 
 					// If the Phrases's style is a foot letter, then we are done, as
 					// we are not dealing with a DPhrase.
-					if (raw.StyleAbbrev == DStyleSheet.c_StyleAbbrevFootLetter)
+					if (raw.IsFootLetter)
 						break;
 
 					// Create the phrase and add it to the destination array
-					DPhrase phrase = new DPhrase( raw.StyleAbbrev, raw.Text);
+					var phrase = new DPhrase( raw.Text) {FontModification = raw.Modification};
 					vPhrases.Add(phrase);
 
 					// Move on to process the next item in vRaw
@@ -1713,29 +1709,26 @@ namespace OurWordData.DataModel
             static public List<DRun> FieldToRuns(SfField field)
 			{
 				// Loop to create the DRun's and populate the vRuns list
-				List<DRun> vRuns = CreateDRunsFromInputText(field.Data);
+				var vRuns = CreateDRunsFromInputText(field.Data);
 
 				// Retrieve the raw phrases (Vernacular and Back Translation)
 				var vBTRawPhrases = GetPhrases( field.BT );
-				var vIBTRawPhrases = GetPhrases( field.IBT );
 
 				// Reconcile the BT Phrases into the Runs
-				int iBT = 0;
-				int iIBT = 0;
-				foreach( DRun run in vRuns)
+				var iBT = 0;
+				foreach( var run in vRuns)
 				{
 					// Deal with a footnote if that is what we currently have
-					DFoot foot = run as DFoot;
+					var foot = run as DFoot;
 					if (null != foot) 
 					{
 						iBT  = _AdvancePastFootnote(iBT,  vBTRawPhrases);
-						iIBT = _AdvancePastFootnote(iIBT, vIBTRawPhrases);
 						continue;
 					}
 
 					// If we are here, then we are dealing with Scripture Text. So
 					// get the DText we'll be working with.
-					DText txt = run as DText;
+					var txt = run as DText;
 
 					// Retrieve the Prose BT's DPhrases and add them into the DText's
 					// BT attribute.
@@ -1746,7 +1739,7 @@ namespace OurWordData.DataModel
 					// Make sure there is at least an empty phrase for the run's Prose BT
 					if (txt.PhrasesBT.Count == 0)
 					{
-						DPhrase phrase = new DPhrase(DStyleSheet.c_sfmParagraph, "");
+						var phrase = new DPhrase("");
 						txt.PhrasesBT.Append(phrase);
 					}
 
@@ -1778,7 +1771,7 @@ namespace OurWordData.DataModel
 						// the back translation into it.
 						if ( null != txt )
 						{
-							DPhrase phrase = new DPhrase(DStyleSheet.c_sfmParagraph, sBT);
+							var phrase = new DPhrase(sBT);
 							txt.PhrasesBT.Append(phrase);
 							break;
 						}

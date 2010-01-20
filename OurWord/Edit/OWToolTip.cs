@@ -349,7 +349,8 @@ namespace OurWord.Edit
             if (Note.Behavior != TranslatorNote.General && 
                 !string.IsNullOrEmpty(Note.Behavior.Title))
             {
-                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold, Note.Behavior.Title);
+                var pNoteTitle = new DPhrase(Note.Behavior.Title) 
+                    {FontModification = FontStyle.Bold};
                 dbt.Phrases.Append(pNoteTitle);
             }
 
@@ -359,12 +360,13 @@ namespace OurWord.Edit
             {
                 if (dbt.Phrases.Count > 0)
                 {
-                    dbt.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevBold,
-                        DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace));
+                    var sText = DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace;
+                    var phrase = new DPhrase(sText){FontModification = FontStyle.Bold};
+                    dbt.Phrases.Append(phrase);
                 }
 
-                var pRef = new DPhrase(DStyleSheet.c_StyleAbbrevItalic,
-                    sBookRef + ":" + DPhrase.c_chInsertionSpace);
+                var pRef = new DPhrase(sBookRef + ":" + DPhrase.c_chInsertionSpace)
+                    {FontModification = FontStyle.Italic};
                 dbt.Phrases.Append(pRef);
             }
 
@@ -375,7 +377,7 @@ namespace OurWord.Edit
                 if (sSelectedText.Length > 40)
                     sSelectedText = sSelectedText.Substring(0, 40) + "...";
                 sSelectedText = "\"" + sSelectedText + "\"";
-                var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
+                var pSelectedText = new DPhrase(sSelectedText);
                 dbt.Phrases.Append(pSelectedText);
             }
 
@@ -837,10 +839,9 @@ namespace OurWord.Edit
                 var p = new OWPara(writingSystem,
                     styleHeader,
                     new[] { 
-                        new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
-                            message.LocalTimeCreated.ToShortDateString())
+                        new DPhrase(message.Author),
+                        new DPhrase(", "),
+                        new DPhrase(message.LocalTimeCreated.ToShortDateString())
                     });
                 return p;
             }
@@ -1144,11 +1145,9 @@ namespace OurWord.Edit
                 Note.Behavior.GetWritingSystem(Note),
                 pStyle,
                 new[] { 
-                    new DPhrase( DStyleSheet.c_StyleToolTipHeader, 
-                        message.EventDate.ToShortDateString()),
-                    new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
-                    new DPhrase( DStyleSheet.c_StyleToolTipText, 
-                        sStage)
+                    new DPhrase( message.EventDate.ToShortDateString()),
+                    new DPhrase( ", "),
+                    new DPhrase( sStage)
                 });
             return pTitle;
         }

@@ -522,15 +522,15 @@ namespace OurWord.Edit
             // As a literal of EWord, hyphenation is possible.
         {
             #region Constructor(sText)
-            public ELiteral(JFontForWritingSystem f, string sText)
-                : base(f, null, sText, FontStyle.Regular)
+            public ELiteral(JFontForWritingSystem f, DPhrase phrase, string sText)
+                : base(f, phrase, sText)
             {
             }
             #endregion
             #region OMethod: EWord Clone()
             public override EWord Clone()
             {
-               return new ELiteral(FontForWS, Text);
+               return new ELiteral(FontForWS, Phrase, Text);
             }
             #endregion
             #region OMethod: Cursor MouseOverCursor
@@ -655,8 +655,8 @@ namespace OurWord.Edit
         #endregion
 
         // Initialize to a paragraph's contents ----------------------------------------------
-        #region Method: EWord[] ParseBasicTextIntoWords(DBasicText t)
-        List<EWord> ParseBasicTextIntoWords(DBasicText t, JCharacterStyle CStyleOverride)
+        #region Method: List<EWord> ParseBasicTextIntoWords(DBasicText t)
+        List<EWord> ParseBasicTextIntoWords(DBasicText t)
         {
             // Select between the Vernacular vs the Back Translation text
             var phrases = (DisplayBT) ? t.PhrasesBT : t.Phrases;
@@ -671,27 +671,9 @@ namespace OurWord.Edit
                 // We'll collect individual words here
                 var sWord = "";
 
-                // Determine which character style goes with the word. We default to
-                // the "Override" which is passed in, but if this is null, then we
-                // get it from the normal source (the paragraph's style)
-                var mods = FontStyle.Regular;
-                var cs = CStyleOverride;
-                if (null == cs)
-                {
-                    cs = t.Paragraph.Style.CharacterStyle;
-                    if (phrase.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-                    {
-                        if (phrase.CharacterStyle.Abbrev == DStyleSheet.c_StyleAbbrevBold)
-                            mods = FontStyle.Bold;
-                        else if (phrase.CharacterStyle.Abbrev == DStyleSheet.c_StyleAbbrevItalic)
-                            mods = FontStyle.Italic;
-                        else
-                            cs = phrase.CharacterStyle;
-                    }
-                }
-
                 // Get the font for the style
-                var fontForWS = cs.FindOrAddFontForWritingSystem(WritingSystem);
+                var style = t.Paragraph.Style;
+                var fontForWS = style.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
 
                 // Process through the phrase's text string
                 for (var i = 0; i < phrase.Text.Length; i++)
@@ -700,7 +682,7 @@ namespace OurWord.Edit
                     // in order to build the next one.
                     if (WritingSystem.IsWordBreak(phrase.Text, i) && sWord.Length > 0)
                     {
-                        vWords.Add(new EWord(fontForWS, phrase, sWord, mods));
+                        vWords.Add(new EWord(fontForWS, phrase, sWord));
                         sWord = "";
                     }
 
@@ -711,7 +693,7 @@ namespace OurWord.Edit
                 // Pick up the final word in the string, IsWordBreak will not have 
                 // caught it.
                 if (sWord.Length > 0)
-                    vWords.Add(new EWord(fontForWS, phrase, sWord, mods));
+                    vWords.Add(new EWord(fontForWS, phrase, sWord));
             }
 
             // If we did not find any words, then we want to create an InsertionIcon
@@ -726,10 +708,10 @@ namespace OurWord.Edit
             return vWords;
         }
         #endregion
-        #region Method: void _InitializeBasicTextWords(DBasicText, CStyleOverride)
-        void _InitializeBasicTextWords(DBasicText t, JCharacterStyle CStyleOverride)
+        #region Method: void _InitializeBasicTextWords(DBasicText)
+        void _InitializeBasicTextWords(DBasicText t)
         {
-            var vWords = ParseBasicTextIntoWords(t, CStyleOverride);
+            var vWords = ParseBasicTextIntoWords(t);
             Append(vWords.ToArray());
         }
         #endregion
@@ -806,11 +788,11 @@ namespace OurWord.Edit
             Clear();
 
             // Compute the fonts
-            JFontForWritingSystem fChapter = RetrieveFont(DStyleSheet.c_StyleAbbrevChapter);
-            JFontForWritingSystem fVerse = RetrieveFont(DStyleSheet.c_StyleAbbrevVerse);
-            JFontForWritingSystem fFootLetter = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
-            JFontForWritingSystem fLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevLabel);
-            JFontForWritingSystem fFootnoteLabel = fFootLetter;
+            var fChapter = RetrieveFont(DStyleSheet.c_StyleAbbrevChapter);
+            var fVerse = RetrieveFont(DStyleSheet.c_StyleAbbrevVerse);
+            var fFootLetter = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
+            var fLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevLabel);
+            var fFootnoteLabel = fFootLetter;
 
             // Loop through the paragraph's runs
             foreach (DRun r in p.Runs)
@@ -830,10 +812,10 @@ namespace OurWord.Edit
                         Append(new ELabel(fLabel, r as DLabel));
                         break;
                     case "DBasicText":
-                        _InitializeBasicTextWords(r as DBasicText, null);
+                        _InitializeBasicTextWords(r as DBasicText);
                         break;
                     case "DText":
-                        _InitializeBasicTextWords(r as DBasicText, null);
+                        _InitializeBasicTextWords(r as DBasicText);
                         InitializeNoteIcons(r as DText, DisplayBT);
                         break;
                     default:
@@ -845,7 +827,7 @@ namespace OurWord.Edit
             }
 
             // Loop through to set the GlueToNext values
-            for (int i = 0; i < SubItems.Length - 1; i++)
+            for (var i = 0; i < SubItems.Length - 1; i++)
                 _InitializeGlueToNext(i);
         }
         #endregion
@@ -953,7 +935,7 @@ namespace OurWord.Edit
             if (!string.IsNullOrEmpty(sLabel))
             {
                 JFontForWritingSystem f = RetrieveFont(DStyleSheet.c_StyleAbbrevBigHeader);
-                Append(new EBigHeader(f, /*WritingSystem,*/ sLabel));
+                Append(new EBigHeader(f, sLabel));
             }
 
             // Add the text (we only care about verses and text)
@@ -967,7 +949,7 @@ namespace OurWord.Edit
                         break;
                     case "DText":
                     case "DBasicText":
-                        _InitializeBasicTextWords(run as DBasicText, PStyle.CharacterStyle);
+                        _InitializeBasicTextWords(run as DBasicText);
                         break;
                 }
             }
@@ -992,7 +974,7 @@ namespace OurWord.Edit
             JWritingSystem _ws, 
             JParagraphStyle pStyle, 
             string sLiteralText)
-            : this(_ws, pStyle, new DPhrase[] { new DPhrase(null, sLiteralText) })
+            : this(_ws, pStyle, new DPhrase[] { new DPhrase(sLiteralText) })
         {
         }
         #endregion
@@ -1008,41 +990,29 @@ namespace OurWord.Edit
                 WritingSystem).LineHeightZoomed;
 
             // Each Literal String will potentially have its own character style
-            foreach (DPhrase p in vLiteralPhrases)
+            foreach (DPhrase phrase in vLiteralPhrases)
             {
                 // The Split method we're about to call will remove spaces, including
                 // a trailing one. We need to know if we had a trailing one, so we
                 // can add it back in.
-                bool bEndsWithSpace = false;
-                if (p.Text.Length > 0 && p.Text[p.Text.Length - 1] == ' ')
+                var bEndsWithSpace = false;
+                if (phrase.Text.Length > 0 && phrase.Text[phrase.Text.Length - 1] == ' ')
                     bEndsWithSpace = true;
 
                 // Parse the Literal Test into its parts
-                string[] vs = p.Text.Split(new char[] { ' ' },
-                    StringSplitOptions.RemoveEmptyEntries);
+                var vs = phrase.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 // Create the literal strings
-                for (int i = 0; i < vs.Length; i++)
+                for (var i = 0; i < vs.Length; i++)
                 {
                     if (i < vs.Length - 1 || bEndsWithSpace)
                         vs[i] = vs[i] + " ";
 
-                    // Figure out the font for this literal string
-                    // Start with the paragraph's character style
-                    JCharacterStyle cs = PStyle.CharacterStyle;
-                    // Override with the phrases's character style if it is different
-                    if (!string.IsNullOrEmpty(p.CharacterStyleAbbrev) &&
-                        p.CharacterStyleAbbrev != DStyleSheet.c_sfmParagraph)
-                    {
-						JStyleSheet ss = PStyle.StyleSheet;
-						cs = ss.FindCharacterStyle(p.CharacterStyleAbbrev);
-                        //cs = G.StyleSheet.FindCharacterStyle(p.CharacterStyleAbbrev);
-                    }
-                    // Get the font from whatever character style we wound up with
-                    JFontForWritingSystem f = cs.FindOrAddFontForWritingSystem(WritingSystem);
+                    // Get the font from the character style
+                    var fws = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
 
                     // Add the literal
-                    Append(new ELiteral(f, vs[i]));
+                    Append(new ELiteral(fws, phrase, vs[i]));
                 }
             }
         }
@@ -2353,7 +2323,7 @@ namespace OurWord.Edit
         {
             int iBlockFirst = selection.DBT_iBlockFirst;
             RemoveAt(selection.DBT_iBlockFirst, selection.DBT_BlockCount);
-            var vWords = ParseBasicTextIntoWords(DBT, null);
+            var vWords = ParseBasicTextIntoWords(DBT);
             InsertAt(iBlockFirst, vWords.ToArray());
             foreach (var w in vWords)
                 w.CalculateWidth();

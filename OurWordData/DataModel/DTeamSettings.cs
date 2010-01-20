@@ -548,9 +548,9 @@ namespace OurWordData.DataModel
         public const string c_StyleAbbrevPictureCaption   = "cap";
         public const string c_StyleFootnote               = "ft";
 
-		public const string c_StyleAbbrevItalic           = "i";
-		public const string c_StyleAbbrevBold             = "b";
-		public const string c_StyleAbbrevUnderline        = "u";
+//		public const string c_StyleAbbrevItalic           = "i";
+//		public const string c_StyleAbbrevBold             = "b";
+//		public const string c_StyleAbbrevUnderline        = "u";
 
         // User-Interface Only
         public const string c_CStyleRevisionDeletion = "del";
@@ -924,27 +924,6 @@ namespace OurWordData.DataModel
 			{
 				charStyle = AddCharacterStyle( c_StyleAbbrevLabel, "Label");
 				charStyle.SetFonts(10, false, false, false, false, Color.Crimson);
-			}
-
-			// Italic
-			if (null == FindCharacterStyle(DStyleSheet.c_StyleAbbrevItalic))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevItalic, "Italic");
-				charStyle.SetFonts(10, false, true, false, false, Color.Black);
-			}
-
-			// Bold
-			if (null == FindCharacterStyle(c_StyleAbbrevBold))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevBold, "Bold");
-                charStyle.SetFonts(10, true, false, false, false, Color.Black);
-			}
-
-			// Underlined
-			if (null == FindCharacterStyle(c_StyleAbbrevUnderline))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevUnderline, "Underline");
-                charStyle.SetFonts(10, false, false, false, true, Color.Black);
 			}
 
 			// Note Character (ntc)
