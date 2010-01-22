@@ -1856,7 +1856,7 @@ namespace OurWord.Edit
         bool Italics()
         {
             // Retrieve the selected paragraph
-            OWPara op = Window.Selection.Paragraph;
+            var op = Window.Selection.Paragraph;
             if (null == op)
                 return false;
 
@@ -1872,10 +1872,10 @@ namespace OurWord.Edit
             m_bookmark_Italics = Window.CreateBookmark();
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
-            DBasicText DBT = Window.Selection.DBT;
-            DPhraseList<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            var DBT = Window.Selection.DBT;
+            var phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
-            // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
+            // We'll make a copy of the data for Undo;...this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
             // original object, not replace it.
             m_dbtCopyOfOriginal = new DBasicText(Window.Selection.DBT);

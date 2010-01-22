@@ -48,58 +48,58 @@ namespace OurWordData.Styles
         private Color m_Color = Color.Black;
         #endregion
 
-        // Fonts for Writing System ----------------------------------------------------------
-        #region Attr{g}: List<FontForWritingSystem> FontsForWritingSystem
-        public List<FontForWritingSystem> FontsForWritingSystem
+        // FontFactories ---------------------------------------------------------------------
+        #region Attr{g}: List<FontFactory> FontFactories
+        public List<FontFactory> FontFactories
         {
             get
             {
-                return m_FontsForWritingSystem;
+                return m_FontFactories;
             }
         }
-        private readonly List<FontForWritingSystem> m_FontsForWritingSystem;
+        private readonly List<FontFactory> m_FontFactories;
         #endregion
         #region Method: void ResetFonts()
         public void ResetFonts()
         {
-            foreach(var fws in FontsForWritingSystem)
-                fws.ResetFonts();
+            foreach (var factory in FontFactories)
+                factory.ResetFonts();
         }
         #endregion
-        #region Method: FontForWritingSystem FindFont(sWritingSystemName)
-        public FontForWritingSystem FindFont(string sWritingSystemName)
+        #region Method: FontFactory FindFontFactory(sWritingSystemName)
+        public FontFactory FindFontFactory(string sWritingSystemName)
         {
-            foreach(var fws in FontsForWritingSystem)
+            foreach (var factory in FontFactories)
             {
-                if (fws.WritingSystemName == sWritingSystemName)
-                    return fws;
+                if (factory.WritingSystemName == sWritingSystemName)
+                    return factory;
             }
             return null;
         }
         #endregion
-        #region Method: FontForWritingSystem FindOrAddFont(sWritingSystemName)
-        public FontForWritingSystem FindOrAddFont(string sWritingSystemName)
+        #region Method: FontFactory FindOrAddFontFactory(sWritingSystemName)
+        public FontFactory FindOrAddFontFactory(string sWritingSystemName)
         {
-            var fws = FindFont(sWritingSystemName);
+            var factory = FindFontFactory(sWritingSystemName);
 
-            if (null == fws)
+            if (null == factory)
             {
-                fws = new FontForWritingSystem 
+                factory = new FontFactory 
                 {
                     WritingSystemName = sWritingSystemName,
                     FontName = m_DefaultFont.FontName,
                     FontSize = m_DefaultFont.FontSize,
                     FontStyle = m_DefaultFont.FontStyle
                 };
-                FontsForWritingSystem.Add(fws);
+                FontFactories.Add(factory);
             }
 
-            Debug.Assert(null != fws);
-            return fws;
+            Debug.Assert(null != factory);
+            return factory;
         }
         #endregion
 
-        // Default (factory) font settings --------------------------------------------------
+        // Default (factory) font settings ---------------------------------------------------
         #region Attr{s}: string DefaultFontName
         public string DefaultFontName
         {
@@ -127,7 +127,7 @@ namespace OurWordData.Styles
             }
         }
         #endregion
-        protected readonly FontForWritingSystem m_DefaultFont;
+        protected readonly FontFactory m_DefaultFont;
         #region Method: void SetDefaults(pattern)
         public void SetDefaults(CharacterStyle pattern)
         {
@@ -143,11 +143,11 @@ namespace OurWordData.Styles
         {
             m_sStyleName = sStyleName;
 
-            m_FontsForWritingSystem = new List<FontForWritingSystem>();
+            m_FontFactories = new List<FontFactory>();
 
-            m_DefaultFont = new FontForWritingSystem 
+            m_DefaultFont = new FontFactory 
             {
-                WritingSystemName = "Factory",
+                WritingSystemName = "Default",
                 FontName = "Arial",
                 FontSize = 10.0F,
                 FontStyle = FontStyle.Regular
@@ -190,8 +190,8 @@ namespace OurWordData.Styles
             doc.AddAttr(node, c_sAttrStyleName, StyleName);
             doc.AddAttr(node, c_sAttrColor, FontColor.Name);
 
-            foreach (var fws in FontsForWritingSystem)
-                fws.Save(doc, node);
+            foreach (var factory in FontFactories)
+                factory.Save(doc, node);
         }
         #endregion
         #region VirtMethod: void ReadContent(XmlNode node)
@@ -204,11 +204,11 @@ namespace OurWordData.Styles
             // FontsForWritingSystem
             foreach (XmlNode child in node.ChildNodes)
             {
-                var fws = FontForWritingSystem.Create(child);
-                if (null == fws)
+                var factory = FontFactory.Create(child);
+                if (null == factory)
                     continue;
 
-                FontsForWritingSystem.Add(fws);
+                FontFactories.Add(factory);
             }
         }
         #endregion
@@ -246,21 +246,21 @@ namespace OurWordData.Styles
                 FontColor = theirs.FontColor;
 
             // Merge those fonts which exist in all three
-            foreach(var ourFont in FontsForWritingSystem)
+            foreach (var ourFont in FontFactories)
             {
-                var parentFont = parent.FindFont(ourFont.WritingSystemName);
-                var theirFont = theirs.FindFont(ourFont.WritingSystemName);
+                var parentFont = parent.FindFontFactory(ourFont.WritingSystemName);
+                var theirFont = theirs.FindFontFactory(ourFont.WritingSystemName);
                 if (null != parentFont && null != theirFont)
                     ourFont.Merge(parentFont, theirFont);
             }
 
             // Add any new fonts that only exist in theirs
-            foreach(var theirFont in theirs.FontsForWritingSystem)
+            foreach (var theirFactory in theirs.FontFactories)
             {
-                var ourFont = FindFont(theirFont.WritingSystemName);
-                var parentFont = parent.FindFont(theirFont.WritingSystemName);
-                if (null == parentFont && null == ourFont)
-                    FontsForWritingSystem.Add(theirFont.Clone());
+                var ourFactory = FindFontFactory(theirFactory.WritingSystemName);
+                var parentFactory = parent.FindFontFactory(theirFactory.WritingSystemName);
+                if (null == parentFactory && null == ourFactory)
+                    FontFactories.Add(theirFactory.Clone());
             }
         }
         #endregion

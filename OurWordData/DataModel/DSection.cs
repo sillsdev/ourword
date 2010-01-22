@@ -1356,7 +1356,7 @@ namespace OurWordData.DataModel
 				}
 				string m_text;
 				#endregion
-			    public FontStyle Modification = FontStyle.Regular;
+			    public FontStyle FontToggles = FontStyle.Regular;
 			    public bool IsFootLetter;
 
 				// Scaffolding -------------------------------------------------------------------
@@ -1479,7 +1479,7 @@ namespace OurWordData.DataModel
 					}
 
 					// Default to Normal; if we encounter a style we will change it.
-				    var modification = FontStyle.Regular;
+				    var toggles = FontStyle.Regular;
 
 					// Are we sitting at a font modification? This is defined as a opening 
                     // bar followed by a recognized style character. If so, then retrieve the
@@ -1488,11 +1488,11 @@ namespace OurWordData.DataModel
 					{
 						var chMod = (sIn[iPos + 1]);
                         if (chMod == c_chBold)
-                            modification = FontStyle.Bold;
+                            toggles = FontStyle.Bold;
                         if (chMod == c_chItalic)
-                            modification = FontStyle.Italic;
+                            toggles = FontStyle.Italic;
                         if (chMod == c_chUnderline)
-                            modification = FontStyle.Underline;
+                            toggles = FontStyle.Underline;
                         iPos += 2;
 					}
 
@@ -1528,8 +1528,8 @@ namespace OurWordData.DataModel
 						sText += sIn[iPos++];
 					}
 
-					return (sText.Length > 0) ? 
-                        new Phrase(sText) {Modification = modification} : 
+					return (sText.Length > 0) ?
+                        new Phrase(sText) { FontToggles = toggles } : 
                         null ;
 				}
 				#endregion
@@ -1574,7 +1574,7 @@ namespace OurWordData.DataModel
 					var p1 = os[i] as DPhrase;
 					var p2 = os[i+1] as DPhrase;
 
-                    if (p1.FontModification == p2.FontModification)
+                    if (p1.FontToggles == p2.FontToggles)
 					{
 						p1.Text = CombineStrings(p1.Text, p2.Text);
 						os.Remove(p2);
@@ -1672,7 +1672,7 @@ namespace OurWordData.DataModel
 					}
 
 					// Create the phrase and add it to the DScriptureText's sequence
-					var phrase = new DPhrase(raw.Text) {FontModification = raw.Modification};
+                    var phrase = new DPhrase(raw.Text) { FontToggles = raw.FontToggles };
 					txt.Phrases.Append(phrase);
 				}
 
@@ -1697,7 +1697,7 @@ namespace OurWordData.DataModel
 						break;
 
 					// Create the phrase and add it to the destination array
-					var phrase = new DPhrase( raw.Text) {FontModification = raw.Modification};
+					var phrase = new DPhrase( raw.Text) {FontToggles = raw.FontToggles};
 					vPhrases.Add(phrase);
 
 					// Move on to process the next item in vRaw

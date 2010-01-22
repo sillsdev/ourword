@@ -56,7 +56,7 @@ namespace OurWordData.Styles
         }
         private static List<CharacterStyle> s_StyleList;
         #endregion
-        #region Method: CharacterStyle Find(string sStyleName)
+        #region Method: CharacterStyle Find(sStyleName)
         static CharacterStyle Find(string sStyleName)
         {
             foreach (var style in StyleList)

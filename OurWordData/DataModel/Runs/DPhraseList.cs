@@ -121,7 +121,7 @@ namespace OurWordData.DataModel.Runs
                 var left = this[i] as DPhrase;
                 var right = this[i + 1] as DPhrase;
 
-                if (left.FontModification == right.FontModification)
+                if (left.FontToggles == right.FontToggles)
                 {
                     left.Text += right.Text;
                     Remove(right);
@@ -145,10 +145,10 @@ namespace OurWordData.DataModel.Runs
                 return phraseToSplit;
 
             var phraseLeft = new DPhrase(phraseToSplit.Text.Substring(0, iPos)) 
-                { FontModification = phraseToSplit.FontModification };
+                { FontToggles = phraseToSplit.FontToggles };
 
             var phraseRight = new DPhrase(phraseToSplit.Text.Substring(iPos)) 
-                { FontModification = phraseToSplit.FontModification };
+                { FontToggles = phraseToSplit.FontToggles };
 
             var iPhrasePosition = FindObj(phraseToSplit);
 
@@ -192,7 +192,7 @@ namespace OurWordData.DataModel.Runs
                 DPhrase phraseLeft = this[i];
                 DPhrase phraseRight = this[i + 1];
 
-                if (phraseLeft.FontModification == phraseRight.FontModification)
+                if (phraseLeft.FontToggles == phraseRight.FontToggles)
                 {
                     phraseLeft.Text += phraseRight.Text;
                     Remove(phraseRight);
@@ -240,22 +240,31 @@ namespace OurWordData.DataModel.Runs
         #region Method: ToggleItalics(iStart, iCount)
         public void ToggleItalics(int iStart, int iCount)
         {
-            // Determine which direction we're taking it. If anything in the selection is
-            // not Italic, then we want to make the entire selection Italic
-            var bMakeItalic = false;
+            FontStyle newToggleValue;
+
+            // There may be multiple phrases within the selection. If they are of different
+            // toggle states, then we'll want to make them all the same, which will be to make
+            // them the opposite of the underlying paragraph
+            var bIsMixed = false;
             for (var i = iStart; i < iStart + iCount; i++)
             {
                 var phrase = GetPhraseAt(i);
-                if (!phrase.IsItalic)
-                    bMakeItalic = true;
+                if (!phrase.ItalicIsToggled)
+                    bIsMixed = true;
+            }
+            if (bIsMixed)
+                newToggleValue = FontStyle.Italic;
+
+            // Otherwise, we want to do the reverse of whatever the phrase(s) are
+            else
+            {
+                newToggleValue = (GetPhraseAt(iStart).ItalicIsToggled) ? 
+                    FontStyle.Regular : FontStyle.Italic;
             }
 
             // Make a new phrase to house the Italics
             var s = AsString.Substring(iStart, iCount);
-            var phraseItalic = new DPhrase(s)
-            {
-                FontModification = (bMakeItalic) ? FontStyle.Italic : FontStyle.Regular
-            };
+            var phraseItalic = new DPhrase(s) { FontToggles = newToggleValue };
 
             // Remove the corresponding text from the existing DPhrases
             Delete(iStart, iCount, false);
@@ -306,7 +315,7 @@ namespace OurWordData.DataModel.Runs
                 var phrase1 = this[i];
                 var phrase2 = this[i + 1];
 
-                if (phrase1.FontModification == phrase2.FontModification)
+                if (phrase1.FontToggles == phrase2.FontToggles)
                 {
                     phrase1.Text += phrase2.Text;
                     Remove(phrase2);
@@ -382,7 +391,7 @@ namespace OurWordData.DataModel.Runs
                 var phrase = other.FirstPhrase;
                 other.RemoveAt(0);
 
-                if (null != LastPhrase && phrase.FontModification == LastPhrase.FontModification)
+                if (null != LastPhrase && phrase.FontToggles == LastPhrase.FontToggles)
                 {
                     LastPhrase.Text += phrase.Text;
                 }
@@ -428,7 +437,7 @@ namespace OurWordData.DataModel.Runs
             Clear();
             foreach (var phrase in v)
             {
-                Append(new DPhrase(phrase.Text) { FontModification = phrase.Modification });
+                Append(new DPhrase(phrase.Text) { FontToggles = phrase.FontToggles });
             }
 
             // At a minimum we want at least one empty phrase. If "s" was empty
@@ -451,25 +460,25 @@ namespace OurWordData.DataModel.Runs
         public void ReadOxesPhrase(XmlNode node)
         {
             // If we have a Span, then get its style mod
-            var modification = FontStyle.Regular;
+            var toggles = FontStyle.Regular;
             if (node.Name == c_sTagSpan)
             {
                 var sMods = XmlDoc.GetAttrValue(node, c_sAttrStyle, "");
                 switch (sMods)
                 {
                     case c_sModItalic:
-                        modification = FontStyle.Italic;
+                        toggles = FontStyle.Italic;
                         break;
                     case c_sModBold:
-                        modification = FontStyle.Bold;
+                        toggles = FontStyle.Bold;
                         break;
                     case c_sModUnderline:
-                        modification = FontStyle.Underline;
+                        toggles = FontStyle.Underline;
                         break;
                 }
             }
 
-            var phrase = new DPhrase(node.InnerText) { FontModification = modification };
+            var phrase = new DPhrase(node.InnerText) { FontToggles = toggles };
             Append(phrase);
         }
         #endregion
@@ -483,16 +492,16 @@ namespace OurWordData.DataModel.Runs
             {
                 var nodeParent = nodeParagraph;
 
-                if (phrase.FontModification != FontStyle.Regular)
+                if (phrase.FontToggles != FontStyle.Regular)
                 {
                     nodeParent = oxes.AddNode(nodeParent, c_sTagSpan);
 
                     var sModification = "";
-                    if (phrase.IsBold)
+                    if (phrase.BoldIsToggled)
                         sModification = c_sModBold;
-                    if (phrase.IsItalic)
+                    if (phrase.ItalicIsToggled)
                         sModification = c_sModItalic;
-                    if (phrase.IsUnderline)
+                    if (phrase.UnderlineIsToggled)
                         sModification = c_sModUnderline;
 
                     oxes.AddAttr(nodeParent, c_sAttrStyle, sModification);

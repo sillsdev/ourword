@@ -70,7 +70,7 @@ namespace OurWordTests.DataModel
 
             var text = new DText();
             text.Phrases.Append(new DPhrase("For God so loved the "));
-            text.Phrases.Append(new DPhrase("world ") {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase("world ") { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase("that he gave his one and only son"));
             p.AddRun(text);
 
@@ -78,7 +78,7 @@ namespace OurWordTests.DataModel
 
             text = new DText();
             text.Phrases.Append(new DPhrase("that whosoever believes in him "));
-            text.Phrases.Append(new DPhrase("shall not perish, ") {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase("shall not perish, ") { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase("but have everlasting life."));
             p.AddRun(text);
 

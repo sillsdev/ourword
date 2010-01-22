@@ -548,10 +548,6 @@ namespace OurWordData.DataModel
         public const string c_StyleAbbrevPictureCaption   = "cap";
         public const string c_StyleFootnote               = "ft";
 
-//		public const string c_StyleAbbrevItalic           = "i";
-//		public const string c_StyleAbbrevBold             = "b";
-//		public const string c_StyleAbbrevUnderline        = "u";
-
         // User-Interface Only
         public const string c_CStyleRevisionDeletion = "del";
         public const string c_CStyleRevisionAddition = "add";
@@ -893,6 +889,8 @@ namespace OurWordData.DataModel
 				charStyle.SetFonts(20, true);
 			}
 
+            /*
+            */
 			// Verse Number (v)
 			if (null == FindCharacterStyle(c_StyleAbbrevVerse))
 			{
@@ -900,8 +898,6 @@ namespace OurWordData.DataModel
 				charStyle.SetFonts(10, false, false, false, false, Color.Red);
 				charStyle.IsSuperScript = true;
 			}
-            /*
-            */
 
 			// Footnote Character (fn)
 			if (null == FindCharacterStyle(c_StyleAbbrevFootLetter))

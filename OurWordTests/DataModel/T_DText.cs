@@ -29,10 +29,10 @@ namespace OurWordTests.DataModel
             // Create a DText that has several phrases
             var text = new DText();
             text.Phrases.Append(new DPhrase("These are the "));
-            text.Phrases.Append(new DPhrase("times ") {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase("times ") { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase("that "));
-            text.Phrases.Append(new DPhrase("try ") {FontModification = FontStyle.Underline});
-            text.Phrases.Append(new DPhrase("men's souls.") {FontModification = FontStyle.Bold});
+            text.Phrases.Append(new DPhrase("try ") { FontToggles = FontStyle.Underline });
+            text.Phrases.Append(new DPhrase("men's souls.") { FontToggles = FontStyle.Bold });
 
             // Is the output what we expect?
             var sSave = text.Phrases.ToSaveString;

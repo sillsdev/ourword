@@ -46,9 +46,9 @@ namespace OurWordTests.DataModel
 
         // Test GetPhrase---------------------------------------------------------------------
         #region Method: void _Evaluate(Phrase p, sStyleAbbrev, sText)
-        void _Evaluate(DSection.IO.Phrase p, FontStyle modification, string sText)
+        void _Evaluate(DSection.IO.Phrase p, FontStyle toggles, string sText)
         {
-            Assert.AreEqual(p.Modification, modification);
+            Assert.AreEqual(p.FontToggles, toggles);
             Assert.AreEqual(p.Text, sText);
         }
         #endregion
@@ -285,9 +285,9 @@ namespace OurWordTests.DataModel
             // For a paragraph, we get rid of leading and trailing as well.
             var text = DText.CreateSimple(sIn);
             text.Phrases.InsertAt(0, new DPhrase(" Leading    Italic Phrase. ") 
-                {FontModification = FontStyle.Italic});
+                { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase(" Trailing Italic    Phrase.  ") 
-                {FontModification = FontStyle.Italic});
+                { FontToggles = FontStyle.Italic });
 
             var phrase1 = text.Phrases[0];
             var phrase2 = text.Phrases[1];
@@ -319,10 +319,10 @@ namespace OurWordTests.DataModel
 
             // Normal example of text that we would expect
             var text = DText.CreateSimple("A hard worker has plenty ");
-            text.Phrases.Append(new DPhrase("of food, ") { FontModification = FontStyle.Italic });
-            text.Phrases.Append(new DPhrase("but ") { FontModification = FontStyle.Bold });
+            text.Phrases.Append(new DPhrase("of food, ") { FontToggles = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase("but ") { FontToggles = FontStyle.Bold });
             text.Phrases.Append(new DPhrase("a person who chases fantasies "));
-            text.Phrases.Append(new DPhrase("ends up ") { FontModification = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase("ends up ") { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase("in poverty."));
 
             text.GetWordOffsetPairs(ref aWords, ref aPositions);
@@ -456,8 +456,8 @@ namespace OurWordTests.DataModel
             var footnoteIn = new DFootnote("1:2", DFootnote.Types.kExplanatory);
             var text = new DText();
             text.Phrases.Append(new DPhrase("This is "));
-            text.Phrases.Append(new DPhrase("very, very ") {FontModification = FontStyle.Italic});
-            text.Phrases.Append(new DPhrase("cool ") {FontModification = FontStyle.Bold});
+            text.Phrases.Append(new DPhrase("very, very ") { FontToggles = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase("cool ") { FontToggles = FontStyle.Bold });
             text.Phrases.Append(new DPhrase("indeed!"));
             footnoteIn.Runs.Append(text);
             var footIn = new DFoot(footnoteIn);

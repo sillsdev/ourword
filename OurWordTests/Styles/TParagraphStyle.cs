@@ -56,7 +56,7 @@ namespace OurWordTests.Styles
                 Bulleted = true,
                 Alignment = Align.Justified
             };
-            style.FontsForWritingSystem.Add(new FontForWritingSystem
+            style.FontFactories.Add(new FontFactory
             {
                 WritingSystemName = "Latin",
                 FontName = "Playbill",
@@ -78,8 +78,8 @@ namespace OurWordTests.Styles
             Assert.AreEqual("SillyParagraph", style.StyleName);
             Assert.AreEqual(Color.Red, style.FontColor);
 
-            Assert.AreEqual(1, style.FontsForWritingSystem.Count);
-            Assert.AreEqual("Playbill", style.FontsForWritingSystem[0].FontName);
+            Assert.AreEqual(1, style.FontFactories.Count);
+            Assert.AreEqual("Playbill", style.FontFactories[0].FontName);
 
             Assert.AreEqual(3, style.PointsBefore);
             Assert.AreEqual(6, style.PointsAfter);

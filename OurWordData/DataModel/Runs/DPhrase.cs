@@ -43,45 +43,51 @@ namespace OurWordData.DataModel.Runs
         #endregion
 
         // Style Modifications ---------------------------------------------------------------
-        #region Attr{g/s}: FontStyle FontModification
-        public FontStyle FontModification
+        /* DOCUMENTATION
+         * Anything other than "Regular" is interpreted as meaning that the setting has
+         * been toggled. Thus if the underlying CharacterStyle is Italic, and this value
+         * is also Italic, then it means Italic has been toggled to off, and the phrase
+         * should not be displayed as Italic.
+         */
+        #region Attr{g/s}: FontStyle FontToggles
+        public FontStyle FontToggles
         {
             get
             {
-                return m_FontModification;
+                return m_FontToggles;
             }
             set
             {
-                m_FontModification = value;
+                m_FontToggles = value;
                 DeclareDirty();
             }
         }
-        private FontStyle m_FontModification = FontStyle.Regular;
+        private FontStyle m_FontToggles = FontStyle.Regular;
         #endregion
-        #region VAttr{g}: bool IsItalic
-        public bool IsItalic
+        #region VAttr{g}: bool ItalicIsToggled
+        public bool ItalicIsToggled
         {
             get
             {
-                return ((FontModification & FontStyle.Italic) == FontStyle.Italic);
+                return ((FontToggles & FontStyle.Italic) == FontStyle.Italic);
             }
         }
         #endregion
-        #region VAttr{g}: bool IsBold
-        public bool IsBold
+        #region VAttr{g}: bool BoldIsToggled
+        public bool BoldIsToggled
         {
             get
             {
-                return ((FontModification & FontStyle.Bold) == FontStyle.Bold);
+                return ((FontToggles & FontStyle.Bold) == FontStyle.Bold);
             }
         }
         #endregion
-        #region VAttr{g}: bool IsUnderline
-        public bool IsUnderline
+        #region VAttr{g}: bool UnderlineIsToggled
+        public bool UnderlineIsToggled
         {
             get
             {
-                return ((FontModification & FontStyle.Underline) == FontStyle.Underline);
+                return ((FontToggles & FontStyle.Underline) == FontStyle.Underline);
             }
         }
         #endregion
@@ -102,11 +108,11 @@ namespace OurWordData.DataModel.Runs
                 }
 
                 // Font Modifications
-                if (IsBold)
+                if (BoldIsToggled)
                     s = "|b" + s + "|r";
-                if (IsItalic)
+                if (ItalicIsToggled)
                     s = "|i" + s + "|r";
-                if (IsUnderline)
+                if (UnderlineIsToggled)
                     s = "|u" + s + "|r";
 
                 return s;
@@ -162,7 +168,7 @@ namespace OurWordData.DataModel.Runs
         public DPhrase(DPhrase source)
             : this(source.Text)
         {
-            m_FontModification = source.FontModification;
+            m_FontToggles = source.FontToggles;
         }
         #endregion
         #region Method: override bool ContentEquals(obj) - required override to prevent duplicates
@@ -177,7 +183,7 @@ namespace OurWordData.DataModel.Runs
 
             if (other.Text != Text)
                 return false;
-            if (other.FontModification != FontModification)
+            if (other.FontToggles != FontToggles)
                 return false;
 
             return true;

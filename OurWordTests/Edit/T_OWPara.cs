@@ -119,7 +119,7 @@ namespace OurWordTests.Edit
 
             m_DBT1 = new DText();
             m_DBT1.Phrases.Append(new DPhrase("For God so loved the "));
-            m_DBT1.Phrases.Append(new DPhrase("world ") {FontModification = FontStyle.Italic});
+            m_DBT1.Phrases.Append(new DPhrase("world ") { FontToggles = FontStyle.Italic });
             m_DBT1.Phrases.Append(new DPhrase("that he gave his one and only son"));
             p.AddRun(m_DBT1);
 
@@ -127,7 +127,7 @@ namespace OurWordTests.Edit
 
             m_DBT2 = new DText();
             m_DBT2.Phrases.Append(new DPhrase("that whosoever believes in him "));
-            m_DBT2.Phrases.Append(new DPhrase("shall not perish, ") {FontModification = FontStyle.Italic});
+            m_DBT2.Phrases.Append(new DPhrase("shall not perish, ") { FontToggles = FontStyle.Italic });
             m_DBT2.Phrases.Append(new DPhrase("but have everlasting life."));
             p.AddRun(m_DBT2);
 
@@ -1106,7 +1106,7 @@ namespace OurWordTests.Edit
 
             m_DBT1 = new DText();
             m_DBT1.Phrases.Append(new DPhrase("Mepücatemaicai memü memüteyurieniquecai. "));
-            m_DBT1.Phrases.Append(new DPhrase("yuxexuitü ") {FontModification = FontStyle.Italic});
+            m_DBT1.Phrases.Append(new DPhrase("yuxexuitü ") { FontToggles = FontStyle.Italic });
             m_DBT1.Phrases.Append(new DPhrase("ivaviyacaitüni tineunaque quetatineutaxatüa."));
             p.AddRun(m_DBT1);
 
@@ -1114,7 +1114,7 @@ namespace OurWordTests.Edit
 
             m_DBT2 = new DText();
             m_DBT2.Phrases.Append(new DPhrase("Haqueva pepeyetüa? "));
-            m_DBT2.Phrases.Append(new DPhrase("Quenanucuqueca! 'Acacaüyari queneutahivi! ") {FontModification = FontStyle.Italic});
+            m_DBT2.Phrases.Append(new DPhrase("Quenanucuqueca! 'Acacaüyari queneutahivi! ") { FontToggles = FontStyle.Italic });
             m_DBT2.Phrases.Append(new DPhrase("Mücü canicacaüyaritüni."));
             p.AddRun(m_DBT2);
 

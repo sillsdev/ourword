@@ -1,11 +1,11 @@
-﻿#region ***** TFontForWritingSystem.cs *****
+﻿#region ***** TFontFactory.cs *****
 /**********************************************************************************************
  * Project: Our Word!
- * File:    TFontForWritingSystem.cs
+ * File:    TFontFactory.cs
  * Author:  John Wimbish
  * Created: 7 Dec 2009
  * Purpose: Tests class FontForWritingSystem
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 using System.Drawing;
 using JWTools;
@@ -16,10 +16,10 @@ using OurWordData.Styles;
 namespace OurWordTests.Styles
 {
     [TestFixture]
-    public class TFontForWritingSystem : FontForWritingSystem
+    public class TFontFactory : FontFactory
     {
-        #region SMethod: FontForWritingSystem CreateFromXml(string sXml)
-        static FontForWritingSystem CreateFromXml(string sXml)
+        #region SMethod: FontFactory CreateFromXml(string sXml)
+        static FontFactory CreateFromXml(string sXml)
         {
             var doc = new XmlDoc(sXml);
             var node = XmlDoc.FindNode(doc, c_sTag);
@@ -32,7 +32,7 @@ namespace OurWordTests.Styles
         #region Test: TFontStyleAsString_Get
         [Test] public void TFontStyleAsString_Get()
         {
-            var obj = new TFontForWritingSystem();
+            var obj = new TFontFactory();
 
             Assert.AreEqual("", obj.FontStyleAsString);
 
@@ -58,7 +58,7 @@ namespace OurWordTests.Styles
         #region Test: TFontStyleAsString_Set
         [Test] public void TFontStyleAsString_Set()
         {
-            var obj = new TFontForWritingSystem();
+            var obj = new TFontFactory();
 
             Assert.AreEqual("", obj.FontStyleAsString);
 
@@ -92,7 +92,7 @@ namespace OurWordTests.Styles
         #region Test: TClone
         [Test] public void TClone()
         {
-            var original = new FontForWritingSystem
+            var original = new FontFactory
             {
                 WritingSystemName = "Latin",
                 FontName = "PLaybill",
@@ -115,7 +115,7 @@ namespace OurWordTests.Styles
         #region Test: TSave
         [Test] public void TSave()
         {
-            var obj = new FontForWritingSystem
+            var obj = new FontFactory
             {
                 FontName = "Gentium",
                 FontSize = 10.3F,
@@ -170,5 +170,43 @@ namespace OurWordTests.Styles
             Assert.AreEqual(sExpected, sActual);
         }
         #endregion
+
+        // Dictionary ------------------------------------------------------------------------
+        #region Test: TMakeKey
+        [Test] public void TMakeKey()
+        {
+            Assert.AreEqual("100-Regular", MakeKey(FontStyle.Regular, 100F));
+
+            Assert.AreEqual("90-Italic", MakeKey(FontStyle.Italic, 90F));
+
+            Assert.AreEqual("150-BoldItalic", MakeKey(FontStyle.Italic | FontStyle.Bold, 150F));
+
+            Assert.AreEqual("100-BoldItalicUnderlineStrikeout", 
+                MakeKey(FontStyle.Italic | FontStyle.Bold | 
+                FontStyle.Underline | FontStyle.Strikeout, 100F));
+        }
+        #endregion
+
+        [Test] public void TGetToggledFontStyle()
+        {
+            // If the underlying is Bold, and the Bold toggle is set, then we want to turn Bold off.
+            FontStyle = FontStyle.Bold;
+            Assert.AreEqual(FontStyle.Regular, GetToggledFontStyle(FontStyle.Bold));
+
+            // If the underlying is regular, and the Bold toggle is set, then we want to turn Bold on.
+            FontStyle = FontStyle.Regular;
+            Assert.AreEqual(FontStyle.Bold, GetToggledFontStyle(FontStyle.Bold));
+
+            // If the underlying is Bold plus other stuff, and the Bold toggle is set, 
+            // then we want to turn Bold off, but keep the other settings.
+            FontStyle = FontStyle.Bold | FontStyle.Italic;
+            Assert.AreEqual(FontStyle.Italic, GetToggledFontStyle(FontStyle.Bold));
+
+            // If the underlying is Italic, and the Bold toggle is set, 
+            // then we want to turn Bold on and also keep Italic.
+            FontStyle = FontStyle.Italic;
+            Assert.AreEqual(FontStyle.Bold | FontStyle.Italic, GetToggledFontStyle(FontStyle.Bold));
+        }
+
     }
 }

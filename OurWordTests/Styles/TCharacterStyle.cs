@@ -46,8 +46,8 @@ namespace OurWordTests.Styles
 
             var style = CreateFromXml(sStyle);
 
-            Assert.IsNotNull(style.FindFont("Latin"));
-            Assert.IsNotNull(style.FindFont("Timor"));
+            Assert.IsNotNull(style.FindFontFactory("Latin"));
+            Assert.IsNotNull(style.FindFontFactory("Timor"));
         }
         #endregion
         #region Test: TFindFontReturnsNullIfNotPresent
@@ -64,27 +64,27 @@ namespace OurWordTests.Styles
 
             var style = CreateFromXml(sStyle);
 
-            Assert.IsNull(style.FindFont("Tomohon"));
+            Assert.IsNull(style.FindFontFactory("Tomohon"));
         }
         #endregion
         #region Test: TFindOrAddFont
         [Test] public void TFindOrAddFont()
         {
-            Assert.AreEqual(0, FontsForWritingSystem.Count);
+            Assert.AreEqual(0, FontFactories.Count);
 
             // Add a font
-            var font = FindOrAddFont("Tomohon");
+            var font = FindOrAddFontFactory("Tomohon");
 
             // The defaults should be what we're set to
-            Assert.AreEqual(1, FontsForWritingSystem.Count);
+            Assert.AreEqual(1, FontFactories.Count);
             Assert.AreEqual(m_DefaultFont.FontName, font.FontName);
             Assert.AreEqual(m_DefaultFont.FontSize, font.FontSize);
             Assert.AreEqual(m_DefaultFont.FontStyle, font.FontStyle);
 
             // Searching for it again should not add it again
-            font = FindOrAddFont("Tomohon");
+            font = FindOrAddFontFactory("Tomohon");
             Assert.IsNotNull(font);
-            Assert.AreEqual(1, FontsForWritingSystem.Count);
+            Assert.AreEqual(1, FontFactories.Count);
         }
         #endregion
 
@@ -100,7 +100,7 @@ namespace OurWordTests.Styles
             {
                 FontColor = Color.Red
             };
-            style.FontsForWritingSystem.Add(new FontForWritingSystem 
+            style.FontFactories.Add(new FontFactory 
                 {
                     WritingSystemName = "Latin", 
                     FontName = "Arial", 
@@ -123,8 +123,8 @@ namespace OurWordTests.Styles
             Assert.AreEqual("Verse", style.StyleName);
             Assert.AreEqual(Color.Red, style.FontColor);
 
-            Assert.AreEqual(1, style.FontsForWritingSystem.Count);
-            Assert.AreEqual("Arial", style.FontsForWritingSystem[0].FontName);
+            Assert.AreEqual(1, style.FontFactories.Count);
+            Assert.AreEqual("Arial", style.FontFactories[0].FontName);
         }
         #endregion
         #region Test: TMerge

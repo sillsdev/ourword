@@ -397,12 +397,12 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: bool HasItalics - T if the italics style is within the paragraph
-		public bool HasItalics
+        #region Attr{g}: bool HasItalicsToggled - T if the italics style is within the paragraph
+        public bool HasItalicsToggled
 		{
 			get
 			{
-			    return Phrases.Any(phrase => phrase.IsItalic);
+			    return Phrases.Any(phrase => phrase.ItalicIsToggled);
 			}
 		}
 		#endregion

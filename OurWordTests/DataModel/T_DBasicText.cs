@@ -52,7 +52,7 @@ namespace OurWordTests.DataModel
             // Create a multi-phrase text
             var text = new DText();
             text.Phrases.Append(new DPhrase(s1));
-            text.Phrases.Append(new DPhrase(s2) {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase(s2) { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase(s3));
 
             // Test it's length
@@ -139,7 +139,7 @@ namespace OurWordTests.DataModel
             // Create a multi-phrase text
             var text = new DText();
             text.Phrases.Append(new DPhrase(s1));
-            text.Phrases.Append(new DPhrase(s2) {FontModification = FontStyle.Italic});
+            text.Phrases.Append(new DPhrase(s2) { FontToggles = FontStyle.Italic });
             text.Phrases.Append(new DPhrase(s3));
 
             return text;

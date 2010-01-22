@@ -528,7 +528,7 @@ namespace OurWord.Layouts
 
                 // Append the two
                 colFront.Append( CreateFrontPara( FrontFootnotes[k] ));
-                colTarget.Append( CreateTargetPara( TargetFootnotes[k], FrontFootnotes[k].HasItalics));
+                colTarget.Append(CreateTargetPara(TargetFootnotes[k], FrontFootnotes[k].HasItalicsToggled));
             }
         }
         #endregion
@@ -610,7 +610,7 @@ namespace OurWord.Layouts
 
                         // Add the left and right paragraphs
                         colFront.Append(CreateFrontPara(pFront));
-                        colTarget.Append(CreateTargetPara(pTarget, pFront.HasItalics));
+                        colTarget.Append(CreateTargetPara(pTarget, pFront.HasItalicsToggled));
                     }
                 }
 

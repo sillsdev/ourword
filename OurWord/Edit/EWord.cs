@@ -250,11 +250,11 @@ namespace OurWord.Edit
             get
             {
                 // Optimization
-                if (FontModification == FontStyle.Regular)
+                if (FontToggles == FontStyle.Regular)
                     return FontForWS.DefaultFontZoomed;
 
                 // Generic find-or-create font as needed
-                return FontForWS.FindOrAddFont(true, FontModification);
+                return FontForWS.FindOrAddFont(true, FontToggles);
             }
         }
         #endregion
@@ -269,12 +269,12 @@ namespace OurWord.Edit
         }
         readonly DPhrase m_Phrase;
         #endregion
-        #region Attr{g}: FontStyle FontModification
-        FontStyle FontModification
+        #region Attr{g}: FontStyle FontToggles
+        FontStyle FontToggles
         {
             get
             {               
-                return Phrase.FontModification;
+                return Phrase.FontToggles;
             }
         }
         #endregion

@@ -350,8 +350,7 @@ namespace OurWord.Edit
             if (Note.Behavior != TranslatorNote.General && 
                 !string.IsNullOrEmpty(Note.Behavior.Title))
             {
-                var pNoteTitle = new DPhrase(Note.Behavior.Title) 
-                    {FontModification = FontStyle.Bold};
+                var pNoteTitle = new DPhrase(Note.Behavior.Title) { FontToggles = FontStyle.Bold };
                 dbt.Phrases.Append(pNoteTitle);
             }
 
@@ -362,12 +361,12 @@ namespace OurWord.Edit
                 if (dbt.Phrases.Count > 0)
                 {
                     var sText = DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace;
-                    var phrase = new DPhrase(sText){FontModification = FontStyle.Bold};
+                    var phrase = new DPhrase(sText) { FontToggles = FontStyle.Bold };
                     dbt.Phrases.Append(phrase);
                 }
 
-                var pRef = new DPhrase(sBookRef + ":" + DPhrase.c_chInsertionSpace)
-                    {FontModification = FontStyle.Italic};
+                var pRef = new DPhrase(sBookRef + ":" + DPhrase.c_chInsertionSpace) 
+                    { FontToggles = FontStyle.Italic };
                 dbt.Phrases.Append(pRef);
             }
 

@@ -1022,7 +1022,7 @@ namespace OurWord.Edit
 			// constructor we'd normally use to set these. So instead, we set them
 			// one at a time through their attribute sets. Kludgy, and worth
 			// repairing at some point.
-            var p = new DPhrase(sText) { FontModification = modification };
+            var p = new DPhrase(sText) { FontToggles = modification };
 
 			return p;
 		}

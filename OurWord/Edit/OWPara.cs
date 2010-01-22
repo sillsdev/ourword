@@ -921,12 +921,12 @@ namespace OurWord.Edit
         #endregion
         #region Constructor(JWS, PStyle, DRun[], sLabel, Flags)
         public OWPara(
-            JWritingSystem _ws,
-            JParagraphStyle PStyle,
+            JWritingSystem writingSystem,
+            JParagraphStyle style,
             DRun[] vRuns, 
             string sLabel, 
-            Flags _Options)
-            : this(_ws, PStyle, vRuns[0].Owner, _Options)
+            Flags options)
+            : this(writingSystem, style, vRuns[0].Owner, options)
             // For the Related Languages window
         {
             // Line height

@@ -135,7 +135,7 @@
     <Compile Include="DataModel\Runs\DPhraseGroup.cs" />
     <Compile Include="DataModel\Runs\DPhraseList.cs" />
     <Compile Include="Styles\CharacterStyle.cs" />
-    <Compile Include="Styles\FontForWritingSystem.cs" />
+    <Compile Include="Styles\FontFactory.cs" />
     <Compile Include="Styles\ParagraphStyle.cs" />
     <Compile Include="Styles\StyleSheet.cs" />
     <Compile Include="Styles\WritingSystem.cs" />

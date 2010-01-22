@@ -128,19 +128,19 @@ namespace OurWordTests.DataModel
         {
             var phrase = new DPhrase("Hi")
             {
-                FontModification = FontStyle.Italic
+                FontToggles = FontStyle.Italic
             };
             Assert.AreEqual("|iHi|r", phrase.SfmSaveString);
 
             phrase = new DPhrase("Hi")
             {
-                FontModification = FontStyle.Bold
+                FontToggles = FontStyle.Bold
             };
             Assert.AreEqual("|bHi|r", phrase.SfmSaveString);
 
             phrase = new DPhrase("Hi")
             {
-                FontModification = FontStyle.Underline
+                FontToggles = FontStyle.Underline
             };
             Assert.AreEqual("|uHi|r", phrase.SfmSaveString);
         }

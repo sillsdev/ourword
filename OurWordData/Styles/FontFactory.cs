@@ -1,13 +1,14 @@
-﻿#region ***** FontForWritingSystem.cs *****
+﻿#region ***** FontFactory.cs *****
 /**********************************************************************************************
  * Project: Our Word!
- * File:    FontForWritingSystem.cs
+ * File:    FontFactory.cs
  * Author:  John Wimbish
  * Created: 7 Dec 2009
  * Purpose: Each character style stores a font for each of the writing systems. This permits,
  *          e.g., a larger size for writing systems that need it.
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Xml;
@@ -16,7 +17,7 @@ using JWTools;
 
 namespace OurWordData.Styles
 {
-    public class FontForWritingSystem
+    public class FontFactory
     {
         // Content Attrs ---------------------------------------------------------------------
         #region Attr{g/s}: string FontName
@@ -92,6 +93,45 @@ namespace OurWordData.Styles
         private string m_sWritingSystemName = "Latin";
         #endregion
 
+        // Fonts Dictionary ------------------------------------------------------------------
+        private Dictionary<string, Font> m_FontsDictionary;
+        #region SMethod: string MakeKey(FontStyle toggles, float zoomPercent)
+        static protected string MakeKey(FontStyle toggles, float zoomPercent)
+        {
+            var sKey = zoomPercent + "-";
+
+            if (toggles == FontStyle.Regular)
+                sKey += "Regular";
+            else
+                sKey += GetFontStyleAsString(toggles);
+
+            return sKey;
+        }
+        #endregion
+
+        protected FontStyle GetToggledFontStyle(FontStyle toggles)
+            // To determine the FontStyle we want, we wish to toggle anything that
+            // is set in the "toggles" parameter.
+        {
+            return FontStyle ^ toggles;
+        }
+
+        public Font GetFont(FontStyle toggles, float zoomPercent)
+        {
+            var actualFontStyle = GetToggledFontStyle(toggles);
+
+            var sKey = MakeKey(actualFontStyle, zoomPercent);
+
+            Font font;
+            if (!m_FontsDictionary.TryGetValue(sKey, out font))
+            {
+                font = new Font(FontName, FontSize, actualFontStyle);
+                m_FontsDictionary.Add(sKey, font);
+            }
+
+            return font;
+        }
+
         // Fonts -----------------------------------------------------------------------------
         #region Attr{g}: Font UnzoomedFont
         public Font UnzoomedFont
@@ -129,10 +169,16 @@ namespace OurWordData.Styles
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Method: FontForWritingSystem Clone()
-        public FontForWritingSystem Clone()
+        #region Constructor()
+        public FontFactory()
         {
-            return new FontForWritingSystem
+            m_FontsDictionary = new Dictionary<string, Font>();
+        }
+        #endregion
+        #region Method: FontFactory Clone()
+        public FontFactory Clone()
+        {
+            return new FontFactory
             {
                 WritingSystemName = WritingSystemName,
                 FontName = FontName,
@@ -150,23 +196,29 @@ namespace OurWordData.Styles
         private const string c_sAttrSize = "Size";
         private const string c_sAttrStyle = "Style";
         #endregion
+
+        static string GetFontStyleAsString(FontStyle style)
+        {
+            var s = "";
+
+            if ((style & FontStyle.Bold) == FontStyle.Bold)
+                s += c_sBold;
+            if ((style & FontStyle.Italic) == FontStyle.Italic)
+                s += c_sItalic;
+            if ((style & FontStyle.Underline) == FontStyle.Underline)
+                s += c_sUnderline;
+            if ((style & FontStyle.Strikeout) == FontStyle.Strikeout)
+                s += c_sStrikeout;
+
+            return s;
+        }
+
         #region Attr{g/s}: string FontStyleAsString
         protected string FontStyleAsString
         {
             get
             {
-                var s = "";
-
-                if ((FontStyle & FontStyle.Bold) == FontStyle.Bold)
-                    s += c_sBold;
-                if ((FontStyle & FontStyle.Italic) == FontStyle.Italic)
-                    s += c_sItalic;
-                if ((FontStyle & FontStyle.Underline) == FontStyle.Underline)
-                    s += c_sUnderline;
-                if ((FontStyle & FontStyle.Strikeout) == FontStyle.Strikeout)
-                    s += c_sStrikeout;
-
-                return s;
+                return GetFontStyleAsString(FontStyle);
             }
             set
             {
@@ -205,13 +257,13 @@ namespace OurWordData.Styles
             return nodeFont;
         }
         #endregion
-        #region SMethod: FontForWritingSystem Create(nodeFont)
-        static public FontForWritingSystem Create(XmlNode nodeFont)
+        #region SMethod: FontFactory Create(nodeFont)
+        static public FontFactory Create(XmlNode nodeFont)
         {
             if (nodeFont.Name != c_sTag)
                 return null;
 
-            var obj = new FontForWritingSystem
+            var factory = new FontFactory
             {
                 WritingSystemName = XmlDoc.GetAttrValue(nodeFont, c_sAttrWritingSystem, 
                     WritingSystem.DefaultWritingSystemName),
@@ -220,11 +272,11 @@ namespace OurWordData.Styles
                 FontStyleAsString = XmlDoc.GetAttrValue(nodeFont, c_sAttrStyle, "")
             };
 
-            return obj;
+            return factory;
         }
         #endregion
         #region Method: void Merge(parent, theirs)
-        public void Merge(FontForWritingSystem parent, FontForWritingSystem theirs)
+        public void Merge(FontFactory parent, FontFactory theirs)
         {
             Debug.Assert(parent != null);
             Debug.Assert(theirs != null);
