@@ -131,6 +131,10 @@ namespace OurWordData.Styles
 
             return font;
         }
+        public Font GetFont(float zoomPercent)
+        {
+            return GetFont(FontStyle.Regular, zoomPercent);
+        }
 
         // Fonts -----------------------------------------------------------------------------
         #region Attr{g}: Font UnzoomedFont
@@ -196,8 +200,8 @@ namespace OurWordData.Styles
         private const string c_sAttrSize = "Size";
         private const string c_sAttrStyle = "Style";
         #endregion
-
-        static string GetFontStyleAsString(FontStyle style)
+        #region SMethod: string GetFontStyleAsString(FontStyle style)
+        static public string GetFontStyleAsString(FontStyle style)
         {
             var s = "";
 
@@ -212,7 +216,24 @@ namespace OurWordData.Styles
 
             return s;
         }
+        #endregion
+        #region SMethod: FontStyle GetFontStyleFromString(string s)
+        static public FontStyle GetFontStyleFromString(string s)
+        {
+            var fs = new FontStyle();
 
+            if (s.Contains(c_sBold))
+                fs |= FontStyle.Bold;
+            if (s.Contains(c_sItalic))
+                fs |= FontStyle.Italic;
+            if (s.Contains(c_sUnderline))
+                fs |= FontStyle.Underline;
+            if (s.Contains(c_sStrikeout))
+                fs |= FontStyle.Strikeout;
+
+            return fs;
+        }
+        #endregion
         #region Attr{g/s}: string FontStyleAsString
         protected string FontStyleAsString
         {
@@ -225,18 +246,7 @@ namespace OurWordData.Styles
                 if (string.IsNullOrEmpty(value))
                     return;
 
-                var fs = new FontStyle();
-
-                if (value.Contains(c_sBold))
-                    fs |= FontStyle.Bold;
-                if (value.Contains(c_sItalic))
-                    fs |= FontStyle.Italic;
-                if (value.Contains(c_sUnderline))
-                    fs |= FontStyle.Underline;
-                if (value.Contains(c_sStrikeout))
-                    fs |= FontStyle.Strikeout;
-
-                FontStyle = fs;
+                FontStyle = GetFontStyleFromString(value);
             }
         }
         private const string c_sBold = "Bold";
@@ -295,6 +305,5 @@ namespace OurWordData.Styles
                 FontStyle = theirs.FontStyle;
         }
         #endregion
-
     }
 }

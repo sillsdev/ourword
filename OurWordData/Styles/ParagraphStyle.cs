@@ -8,6 +8,7 @@
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 using System;
+using System.Diagnostics;
 using System.Xml;
 using JWTools;
 #endregion
@@ -153,6 +154,36 @@ namespace OurWordData.Styles
             }
         }
         private Align m_Alignment = Align.Left;
+        #endregion
+
+        // Mapping Information ---------------------------------------------------------------
+        public class Mapping
+        {
+            public readonly string UsfmMarker;
+            public string ToolboxMarker { get; set;}
+
+            public Mapping(string sUsfmMarker)
+            {
+                UsfmMarker = sUsfmMarker;
+
+                // In most cases, the markers are identical
+                ToolboxMarker = sUsfmMarker;
+            }
+        }
+        #region Attr{g/s}: Mapping Map
+        public Mapping Map
+        {
+            get
+            {
+                Debug.Assert(null != m_Mapping);
+                return m_Mapping;
+            }
+            set
+            {
+                m_Mapping = value;
+            }
+        }
+        private Mapping m_Mapping;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------

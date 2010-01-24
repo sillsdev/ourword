@@ -484,7 +484,7 @@ namespace OurWordData.DataModel
 	    {
 	        get
 	        {
-	            var sFileName = DisplayName + ".owStyles";
+	            var sFileName = DisplayName + ".StyleSheet";
                 return Path.Combine(SettingsFolder, sFileName);
 	        }
         }
@@ -540,17 +540,8 @@ namespace OurWordData.DataModel
 		#endregion
 
 		// Character Style Abbreviations -----------------------------------------------------
-		public const string c_StyleAbbrevVerse            = "v";
-		public const string c_StyleAbbrevChapter          = "c";
-		public const string c_StyleAbbrevFootLetter       = "fn";
-        public const string c_StyleAbbrevBigHeader        = "bh";
-		public const string c_StyleAbbrevLabel            = "L";
         public const string c_StyleAbbrevPictureCaption   = "cap";
         public const string c_StyleFootnote               = "ft";
-
-        // User-Interface Only
-        public const string c_CStyleRevisionDeletion = "del";
-        public const string c_CStyleRevisionAddition = "add";
 
         // SFM Markers -----------------------------------------------------------------------
         // Book Title / Header
@@ -655,20 +646,13 @@ namespace OurWordData.DataModel
 		{
 			JParagraphStyle style;
 
+            // DONE ---------------------------------------------------------------------------
 			// Running Header (h)
 			if (null == FindParagraphStyle(c_sfmRunningHeader))
 			{
                 style = AddParagraphStyle(c_sfmRunningHeader, "Running Header");
 				style.SetFonts(10, true);
 				style.IsJustified = true;
-			}
-
-			// UI Title
-			if (null == FindParagraphStyle("uiTitle"))
-			{
-				style = AddParagraphStyle("uiTitle", "UI Title");
-				style.SetFonts(18, true);
-				style.IsCentered = true;
 			}
 
 			// Main Book Title (mt)
@@ -702,6 +686,16 @@ namespace OurWordData.DataModel
                 style.SpaceAfter = 3;
             }
 
+            // Major Section Cross Reference (mr)
+            if (null == FindParagraphStyle(c_sfmMajorSectionCrossRef))
+            {
+                style = AddParagraphStyle(c_sfmMajorSectionCrossRef, "Major Cross References");
+                style.SetFonts(10, false, true, false, false, Color.Black);
+                style.IsCentered = true;
+                style.KeepWithNext = true;
+                style.SpaceAfter = 3;
+            }
+
 			// Section Header (s)
             if (null == FindParagraphStyle(c_sfmSectionHead))
 			{
@@ -713,32 +707,22 @@ namespace OurWordData.DataModel
                 style.SpaceAfter = 3;
 			}
 
+            // Cross Reference (r)
+            if (null == FindParagraphStyle(c_sfmCrossReference))
+			{
+                style = AddParagraphStyle(c_sfmCrossReference, "Cross References");
+				style.SetFonts(10, false, true, false, false, Color.Black);
+				style.IsCentered = true;
+				style.KeepWithNext = true;
+                style.SpaceAfter = 3;
+			}
+
 			// Section Header Level 2 (s2)
             if (null == FindParagraphStyle(c_sfmSectionHeadMinor))
 			{
                 style = AddParagraphStyle(c_sfmSectionHeadMinor, "Section Title 2");
 				style.SetFonts(12, true);
 				style.SpaceBefore = 9;
-				style.IsCentered = true;
-				style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-			}
-
-            // Major Section Cross Reference (mr)
-            if (null == FindParagraphStyle(c_sfmMajorSectionCrossRef))
-            {
-                style = AddParagraphStyle(c_sfmMajorSectionCrossRef, "Major Cross References");
-                style.SetFonts(10, false, true, false, false, Color.Black);
-                style.IsCentered = true;
-                style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-            }
-
-            // Cross Reference (r)
-            if (null == FindParagraphStyle(c_sfmCrossReference))
-			{
-                style = AddParagraphStyle(c_sfmCrossReference, "Cross References");
-				style.SetFonts(10, false, true, false, false, Color.Black);
 				style.IsCentered = true;
 				style.KeepWithNext = true;
                 style.SpaceAfter = 3;
@@ -796,6 +780,15 @@ namespace OurWordData.DataModel
 				style.RightMargin = 0.2;
 			}
 
+            // Picture caption (cap)
+            if (null == FindParagraphStyle(c_StyleAbbrevPictureCaption))
+            {
+                style = AddParagraphStyle(c_StyleAbbrevPictureCaption, "Picture Caption");
+                style.SetFonts(10, false, true, false, false, Color.Black);
+                style.IsCentered = true;
+            }
+
+
 			// Footnote paragraph (ft)
             if (null == FindParagraphStyle(c_StyleFootnote))
 			{
@@ -805,6 +798,7 @@ namespace OurWordData.DataModel
                 style.SpaceAfter = 3;
             }
 
+            // BELUM --------------------------------------------------------------------------
 			// SeeAlso Footnote paragraph (cft)
 			if (null == FindParagraphStyle("cft"))
 			{
@@ -813,6 +807,14 @@ namespace OurWordData.DataModel
 				style.IsJustified = true;
                 style.SpaceAfter = 3;
             }
+
+			// UI Title
+			if (null == FindParagraphStyle("uiTitle"))
+			{
+				style = AddParagraphStyle("uiTitle", "UI Title");
+				style.SetFonts(18, true);
+				style.IsCentered = true;
+			}
 
             // Notes
             // Note Header
@@ -857,14 +859,6 @@ namespace OurWordData.DataModel
                 style.SpaceAfter = 3;
             }
 
-			// Picture caption (cap)
-            if (null == FindParagraphStyle(c_StyleAbbrevPictureCaption))
-			{
-                style = AddParagraphStyle(c_StyleAbbrevPictureCaption, "Picture Caption");
-				style.SetFonts(10, false, true, false, false, Color.Black);
-				style.IsCentered = true;
-			}
-
             // Reference Translations
             if (null == FindParagraphStyle(c_StyleReferenceTranslation))
             {
@@ -881,46 +875,6 @@ namespace OurWordData.DataModel
         private void _InitializeCharacterStyles()
 		{
 			JCharacterStyle charStyle;
-
-			// Chapter Number (c)
-			if (null == FindCharacterStyle(c_StyleAbbrevChapter))
-			{
-				charStyle = AddCharacterStyle(c_StyleAbbrevChapter, "Chapter Number");
-				charStyle.SetFonts(20, true);
-			}
-
-            /*
-            */
-			// Verse Number (v)
-			if (null == FindCharacterStyle(c_StyleAbbrevVerse))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevVerse, "Verse Number");
-				charStyle.SetFonts(10, false, false, false, false, Color.Red);
-				charStyle.IsSuperScript = true;
-			}
-
-			// Footnote Character (fn)
-			if (null == FindCharacterStyle(c_StyleAbbrevFootLetter))
-			{
-				charStyle = AddCharacterStyle( 	c_StyleAbbrevFootLetter, "Footnote Character");
-                charStyle.SetFonts(10, false, false, false, false, Color.Navy);
-                charStyle.IsSuperScript = true;
-			}
-
-            // Footnote Character (cf)
-            if (null == FindCharacterStyle(c_StyleAbbrevBigHeader))
-            {
-                charStyle = AddCharacterStyle(c_StyleAbbrevBigHeader,
-                    "Header in Window Panes");
-                charStyle.SetFonts(12, true);
-            }
-
-            // Label (L) - e.g., the verse reference at the beginning of a footnote
-			if (null == FindCharacterStyle(c_StyleAbbrevLabel))
-			{
-				charStyle = AddCharacterStyle( c_StyleAbbrevLabel, "Label");
-				charStyle.SetFonts(10, false, false, false, false, Color.Crimson);
-			}
 
 			// Note Character (ntc)
 			if (null == FindCharacterStyle("ntc"))
@@ -989,40 +943,7 @@ namespace OurWordData.DataModel
 
         }
         #endregion
-        #region Method: void _InitializeUICharacterStyles()
-        private void _InitializeUICharacterStyles()
-        {
-            JCharacterStyle charStyle;
 
-            // Revision Deletions
-            if (null == FindCharacterStyle(c_CStyleRevisionDeletion))
-            {
-                charStyle = AddCharacterStyle(c_CStyleRevisionDeletion, "Revision Deletion");
-                charStyle.SetFonts(10, false);
-            }
-
-            // Revision Additions
-            if (null == FindCharacterStyle(c_CStyleRevisionAddition))
-            {
-                charStyle = AddCharacterStyle(c_CStyleRevisionAddition, "Revision Addition");
-                charStyle.SetFonts(10, false);
-            }
-
-            // Int BT Glosses
-            if (null == FindCharacterStyle("ibtGloss"))
-            {
-                charStyle = AddCharacterStyle("ibtGloss", "BT - Glosses");
-                charStyle.SetFonts(11, true);
-            }
-
-            // Int BT Analysis
-            if (null == FindCharacterStyle("ibtAn"))
-            {
-                charStyle = AddCharacterStyle("ibtAn", "BT - Analysis Line");
-                charStyle.SetFonts(8, true);
-            }
-        }
-        #endregion
 
 		#region Method: void Initialize(bool bClearOutPrevious)
 		public void Initialize(bool bClearOutPrevious)
@@ -1041,7 +962,6 @@ namespace OurWordData.DataModel
 			_InitializeParagraphStyles();
             _InitializeUIParagraphStyles();
 			_InitializeCharacterStyles();
-            _InitializeUICharacterStyles();
 		}
 		#endregion
 

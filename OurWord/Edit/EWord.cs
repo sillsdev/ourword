@@ -131,61 +131,34 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(JFontForWritingSystem, sText)
-        public EBlock(JFontForWritingSystem _FontForWS, string _sText)
-            : base()
+        #region Constructor(Font, sText)
+        protected EBlock(Font font, string sText)
         {
-            m_sText = _sText;
-            m_FontForWS = _FontForWS;
-        }
-        #endregion
-        #region VirtMethod: bool ContentEquals(EBlock block)
-        public virtual bool ContentEquals(EBlock block)
-        {
-            if (null == block)
-                return false;
-
-            if (Text != block.Text)
-                return false;
-
-            if (GlueToNext != block.GlueToNext)
-                return false;
-
-            return true;
+            m_sText = sText;
+            m_Font = font;
         }
         #endregion
 
         // Painting ----------------------------------------------------------------------
-        #region Attr{g}: JFontForWritingSystem FontForWS - remember it here for performance
-        public JFontForWritingSystem FontForWS
+        protected readonly Font m_Font;
+        #region Attr{s}: Color TextColor
+        public Color TextColor
         {
-            get
+            protected get
             {
-                Debug.Assert(null != m_FontForWS);
-                return m_FontForWS;
+                return m_TextColor;
+            }
+            set
+            {
+                m_TextColor = value;
             }
         }
-        protected JFontForWritingSystem m_FontForWS;
-        #endregion
-        #region Method: Font GetSuperscriptFont()
-        protected Font GetSuperscriptFont()
-        {
-            Font f = FontForWS.DefaultFontZoomed;
-            return new Font(f.FontFamily,
-                f.Size * 0.8F,
-                f.Style);
-        }
+        public Color m_TextColor = Color.Black;
         #endregion
         #region Method: Brush GetBrush()
         protected Brush GetBrush()
         {
-            return new SolidBrush(FontForWS.FontColor);
-        }
-        #endregion
-        #region Method: Pen GetPen()
-        protected Pen GetPen()
-        {
-            return new Pen(FontForWS.FontColor);
+            return new SolidBrush(TextColor);
         }
         #endregion
 
@@ -234,7 +207,7 @@ namespace OurWord.Edit
         virtual public void CalculateWidth()
             // Those subclasses which override will not need to call this base method.
         {
-            Width = Context.Measure(Text, FontForWS.DefaultFontZoomed);
+            Width = Context.Measure(Text, m_Font);
         }
         #endregion
     }
@@ -244,20 +217,6 @@ namespace OurWord.Edit
     public class EWord : EBlock
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: Font Font - returns the drawing font, including Italic, Bold, etc.
-        Font Font
-        {
-            get
-            {
-                // Optimization
-                if (FontToggles == FontStyle.Regular)
-                    return FontForWS.DefaultFontZoomed;
-
-                // Generic find-or-create font as needed
-                return FontForWS.FindOrAddFont(true, FontToggles);
-            }
-        }
-        #endregion
         #region Attr{g}: DPhrase Phrase - the phrase from which this EWord was generated
         public DPhrase Phrase
         {
@@ -268,15 +227,6 @@ namespace OurWord.Edit
             }
         }
         readonly DPhrase m_Phrase;
-        #endregion
-        #region Attr{g}: FontStyle FontToggles
-        FontStyle FontToggles
-        {
-            get
-            {               
-                return Phrase.FontToggles;
-            }
-        }
         #endregion
 
         // Hyphenation
@@ -310,12 +260,9 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(...)
-        public EWord( 
-            JFontForWritingSystem fontForWritingSystem,
-            DPhrase phrase, 
-            string sText)
-            : base(fontForWritingSystem, sText)
+        #region Constructor(font, DPhrase, sText)
+        public EWord(Font font, DPhrase phrase, string sText)
+            : base(font, sText)
         {
             Debug.Assert(null != phrase);
             m_Phrase = phrase;
@@ -324,16 +271,14 @@ namespace OurWord.Edit
         #region Method: EWord Clone()
         public virtual EWord Clone()
         {
-            var word = new EWord(FontForWS, Phrase, Text);
+            var word = new EWord(m_Font, Phrase, Text);
             return word;
         }
         #endregion
-        #region static EWord CreateAsInsertionIcon(OWPara, JCharacterStyle, DPhrase)
-        static public EWord CreateAsInsertionIcon(
-            JFontForWritingSystem fontForWritingSystem,
-            DPhrase phrase)
+        #region static EWord CreateAsInsertionIcon(font, DPhrase)
+        static public EWord CreateAsInsertionIcon(Font font, DPhrase phrase)
         {
-            var word = new EWord(fontForWritingSystem, phrase, c_chInsertionSpace.ToString());
+            var word = new EWord(font, phrase, c_chInsertionSpace.ToString());
             return word;
         }
         #endregion
@@ -362,12 +307,12 @@ namespace OurWord.Edit
             if (IsInsertionIcon) 
                 return;
 
-            draw.DrawString(Text, Font, GetBrush(), Position);
+            draw.DrawString(Text, m_Font, GetBrush(), Position);
 
             if (Hyphenated)
             {
                 var ptHyphenPosition = new PointF(Position.X + Width - HyphenWidth, Position.Y);
-                draw.DrawString("-", Font, GetBrush(), ptHyphenPosition);
+                draw.DrawString("-", m_Font, GetBrush(), ptHyphenPosition);
             }
         }
         #endregion
@@ -378,14 +323,14 @@ namespace OurWord.Edit
             var clrSelectedBackground = SystemColors.Highlight;
             var clrSelectedText = SystemColors.HighlightText;
             Brush brushSelectedText = new SolidBrush(clrSelectedText);
-            Brush brushNormalText = new SolidBrush(FontForWS.FontColor);
+            Brush brushNormalText = new SolidBrush(TextColor);
 
             // Insertion Icon
             if (IsInsertionIcon)
             {
                 PaintBackgroundRectangle(draw, clrSelectedBackground);
                 draw.DrawString(G.GetLoc_String("TypeHere", "[Type Here]"),
-                    Font, brushSelectedText, Position);
+                    m_Font, brushSelectedText, Position);
                 return;
             }
 
@@ -399,7 +344,7 @@ namespace OurWord.Edit
             if (iCharLeft == 0 && iCharRight == Text.Length)
             {
                 PaintBackgroundRectangle(draw, clrSelectedBackground);
-                draw.DrawString(Text, Font, brushSelectedText, Position);
+                draw.DrawString(Text, m_Font, brushSelectedText, Position);
                 return;
             }
 
@@ -418,10 +363,10 @@ namespace OurWord.Edit
             // Figure out the boundaries
             var fTotalWidth = Width + JustificationPaddingAdded;
             var xSelLeft = Position.X +
-                ((iCharLeft == 0) ? 0 : Context.Measure(sLeft, Font));
+                ((iCharLeft == 0) ? 0 : Context.Measure(sLeft, m_Font));
             var xSelRight = xSelLeft + ((iCharRight == Text.Length) ?
-                fTotalWidth - Context.Measure(sLeft, Font) :
-                Context.Measure(sSelected, Font));
+                fTotalWidth - Context.Measure(sLeft, m_Font) :
+                Context.Measure(sSelected, m_Font));
 
             // Paint the white background, for those portions that are not selected
             PaintBackgroundRectangle(draw,
@@ -433,14 +378,14 @@ namespace OurWord.Edit
 
             // Paint the text
             if (sLeft.Length > 0)
-                draw.DrawString(sLeft, Font, brushNormalText, Position);
+                draw.DrawString(sLeft, m_Font, brushNormalText, Position);
 
-            draw.DrawString(sSelected, Font, brushSelectedText,
+            draw.DrawString(sSelected, m_Font, brushSelectedText,
                 new PointF(xSelLeft, Position.Y));
 
             if (sRight.Length > 0)
             {
-                draw.DrawString(sRight, Font, brushNormalText,
+                draw.DrawString(sRight, m_Font, brushNormalText,
                     new PointF(xSelRight, Position.Y));
             }
         }
@@ -451,7 +396,7 @@ namespace OurWord.Edit
             if (i == 0)
                 return 0;
 
-            return Context.Measure(Text.Substring(0, i), Font);
+            return Context.Measure(Text.Substring(0, i), m_Font);
         }
         #endregion
 
@@ -481,7 +426,7 @@ namespace OurWord.Edit
                 string sPortion = Text.Substring(0, iChar + 1);
 
                 // Get the position right after this character
-                float x2 = Position.X + Context.Measure(sPortion, Font);
+                float x2 = Position.X + Context.Measure(sPortion, m_Font);
 
                 // The average should thus be right in the midst of this character,
                 // since x1 represents the position to the char's left.
@@ -647,19 +592,18 @@ namespace OurWord.Edit
 
             if (IsInsertionIcon)
             {
-                Width = Context.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);
+                Width = Context.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), m_Font);
             }
             else if (Hyphenated)
             {
-                Width = Context.Measure(Text, Font);
+                Width = Context.Measure(Text, m_Font);
 
-                HyphenWidth = Context.Measure("-", Font);
+                HyphenWidth = Context.Measure("-", m_Font);
                 Width += HyphenWidth;
             }
             else
             {
-                Width = Context.Measure(Text, Font);
-                // base.CalculateWidth();
+                Width = Context.Measure(Text, m_Font);
             }
         }
         #endregion

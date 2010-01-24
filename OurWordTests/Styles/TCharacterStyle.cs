@@ -89,8 +89,8 @@ namespace OurWordTests.Styles
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        private const string c_sXmlForIoTest = 
-            "<CharacterStyle Name=\"Verse\" Color=\"Red\">" +
+        private const string c_sXmlForIoTest =
+            "<CharacterStyle Name=\"Verse\" Color=\"Red\" FontName=\"Gentium\" FontSize=\"8\" FontStyle=\"Italic\">" +
                 "<Font WritingSystem=\"Latin\" Name=\"Arial\" Size=\"10\" />" +
             "</CharacterStyle>";
         #region Test: TSave
@@ -98,7 +98,10 @@ namespace OurWordTests.Styles
         {
             var style = new CharacterStyle("Verse")
             {
-                FontColor = Color.Red
+                FontColor = Color.Red,
+                DefaultFontName = "Gentium",
+                DefaultFontSize = 8,
+                DefaultFontStyle = FontStyle.Italic
             };
             style.FontFactories.Add(new FontFactory 
                 {
@@ -131,7 +134,7 @@ namespace OurWordTests.Styles
         [Test] public void TMerge()
         {
             const string sParent =
-               "<CharacterStyle Name=\"Verse\" Color=\"Red\">" +
+               "<CharacterStyle Name=\"Verse\" Color=\"Red\" FontName=\"Roman\" FontSize=\"8\">" +
                    "<Font WritingSystem=\"Latin\" Name=\"Arial\" Size=\"11\" />" +
                    "<Font WritingSystem=\"Timor\" Name=\"Gentium\" Size=\"10\" Style=\"Bold\" />" +
               "</CharacterStyle>";
@@ -143,7 +146,7 @@ namespace OurWordTests.Styles
             sTheirs = sTheirs.Replace("</C", "<Font WritingSystem=\"Tomohon\" Name=\"Courier\" Size=\"12\" /></C");
 
             const string sExpected =
-                "<CharacterStyle Name=\"Verse\" Color=\"Yellow\">" +
+                "<CharacterStyle Name=\"Verse\" Color=\"Yellow\" FontName=\"Roman\" FontSize=\"8\">" +
                     "<Font WritingSystem=\"Latin\" Name=\"Arial\" Size=\"12\" />" +
                     "<Font WritingSystem=\"Timor\" Name=\"Playbill\" Size=\"10\" Style=\"Bold\" />" +
                     "<Font WritingSystem=\"Tomohon\" Name=\"Courier\" Size=\"12\" />" +

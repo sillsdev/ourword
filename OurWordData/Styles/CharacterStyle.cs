@@ -8,6 +8,8 @@
  *          or footnote letters.
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -98,9 +100,16 @@ namespace OurWordData.Styles
             return factory;
         }
         #endregion
+        #region Method: Font GetFont(sWritingSystemName, fZoomPercent)
+        public Font GetFont(string sWritingSystemName, float fZoomPercent)
+        {
+            var factory = FindOrAddFontFactory(sWritingSystemName);
+            return factory.GetFont(fZoomPercent);
+        }
+        #endregion
 
         // Default (factory) font settings ---------------------------------------------------
-        #region Attr{s}: string DefaultFontName
+        #region VAttr{s}: string DefaultFontName
         public string DefaultFontName
         {
             set
@@ -128,16 +137,10 @@ namespace OurWordData.Styles
         }
         #endregion
         protected readonly FontFactory m_DefaultFont;
-        #region Method: void SetDefaults(pattern)
-        public void SetDefaults(CharacterStyle pattern)
-        {
-            DefaultFontName = pattern.m_DefaultFont.FontName;
-            DefaultFontSize = pattern.m_DefaultFont.FontSize;
-            DefaultFontStyle = pattern.m_DefaultFont.FontStyle;
-        }
-        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
+        private const string c_sDefaultFontName = "Arial";
+        private const float c_fDefaultFontSize = 10.0F;
         #region Constructor(sStyleName)
         public CharacterStyle(string sStyleName)
         {
@@ -148,10 +151,20 @@ namespace OurWordData.Styles
             m_DefaultFont = new FontFactory 
             {
                 WritingSystemName = "Default",
-                FontName = "Arial",
-                FontSize = 10.0F,
+                FontName = c_sDefaultFontName,
+                FontSize = c_fDefaultFontSize,
                 FontStyle = FontStyle.Regular
             };
+        }
+        #endregion
+        #region SMethod: int SortCompare(CharacterStyle x, CharacterStyle y)
+        public static int SortCompare(CharacterStyle x, CharacterStyle y)
+        {
+            // This will sort first by char vs para style, then by the style name
+            var xName = ((null != x as ParagraphStyle) ? "P-" : "C-") + x.StyleName;
+            var yName = ((null != y as ParagraphStyle) ? "P-" : "C-") + y.StyleName;
+
+            return string.Compare(xName, yName);
         }
         #endregion
 
@@ -169,6 +182,9 @@ namespace OurWordData.Styles
         #region I/O Constants
         private const string c_sAttrStyleName = "Name";
         private const string c_sAttrColor = "Color";
+        private const string c_sAttrDefaultFontName = "FontName";
+        private const string c_sAttrDefaultFontSize = "FontSize";
+        private const string c_sAttrDefaultFontStyle = "FontStyle";
         #endregion
         #region SMethod: string GetStyleNameFromXml(XmlNode node)
         static protected string GetStyleNameFromXml(XmlNode node)
@@ -189,6 +205,10 @@ namespace OurWordData.Styles
         {
             doc.AddAttr(node, c_sAttrStyleName, StyleName);
             doc.AddAttr(node, c_sAttrColor, FontColor.Name);
+            doc.AddAttr(node, c_sAttrDefaultFontName, m_DefaultFont.FontName);
+            doc.AddAttr(node, c_sAttrDefaultFontSize, m_DefaultFont.FontSize);
+            doc.AddAttr(node, c_sAttrDefaultFontStyle, 
+                FontFactory.GetFontStyleAsString(m_DefaultFont.FontStyle));
 
             foreach (var factory in FontFactories)
                 factory.Save(doc, node);
@@ -200,6 +220,10 @@ namespace OurWordData.Styles
             // Content Attributes
             m_Color = Color.FromName(XmlDoc.GetAttrValue(node, c_sAttrColor,
                 Color.Black.ToString()));
+            DefaultFontName = XmlDoc.GetAttrValue(node, c_sAttrDefaultFontName, c_sDefaultFontName);
+            DefaultFontSize = XmlDoc.GetAttrValue(node, c_sAttrDefaultFontSize, c_fDefaultFontSize);
+            DefaultFontStyle = FontFactory.GetFontStyleFromString(
+                XmlDoc.GetAttrValue(node, c_sAttrDefaultFontStyle, ""));
 
             // FontsForWritingSystem
             foreach (XmlNode child in node.ChildNodes)
@@ -264,6 +288,7 @@ namespace OurWordData.Styles
             }
         }
         #endregion
+
 
     }
 }

@@ -186,7 +186,7 @@ namespace OurWordTests.Styles
                 FontStyle.Underline | FontStyle.Strikeout, 100F));
         }
         #endregion
-
+        #region Test: TGetToggledFontStyle
         [Test] public void TGetToggledFontStyle()
         {
             // If the underlying is Bold, and the Bold toggle is set, then we want to turn Bold off.
@@ -207,6 +207,6 @@ namespace OurWordTests.Styles
             FontStyle = FontStyle.Italic;
             Assert.AreEqual(FontStyle.Bold | FontStyle.Italic, GetToggledFontStyle(FontStyle.Bold));
         }
-
+        #endregion
     }
 }

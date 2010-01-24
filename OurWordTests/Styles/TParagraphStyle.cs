@@ -36,7 +36,8 @@ namespace OurWordTests.Styles
 
         // I/O -------------------------------------------------------------------------------
         private const string c_sXmlForIoTest =
-            "<ParagraphStyle Name=\"SillyParagraph\" Color=\"Red\" Before=\"3\" After=\"6\" " +
+            "<ParagraphStyle Name=\"SillyParagraph\" Color=\"Red\" FontName=\"Arial\" " +
+                "FontSize=\"10\" Before=\"3\" After=\"6\" " +
                 "FirstLineIndent=\"-0.25\" LeftMargin=\"0.5\" RightMargin=\"0.25\" " +
                 "KeepWithNext=\"true\" Bulleted=\"true\" Alignment=\"Justified\">" +
                     "<Font WritingSystem=\"Latin\" Name=\"Playbill\" Size=\"11\" />" +

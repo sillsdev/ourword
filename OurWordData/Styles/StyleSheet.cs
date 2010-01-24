@@ -36,27 +36,45 @@ namespace OurWordData.Styles
         static public CharacterStyle VerseNumber;
         static public CharacterStyle ChapterNumber;
         static public CharacterStyle FootnoteLetter;
+        static public CharacterStyle BigHeader;
+        static public CharacterStyle Label;
 
-        // Paragraph Styles
-        static public ParagraphStyle Normal;
-        static public ParagraphStyle Line1;
-        static public ParagraphStyle Line2;
+        // Paragraph Styles: Book Organization
+        static public ParagraphStyle RunningHeader;
+        static public ParagraphStyle BookTitle;
+        static public ParagraphStyle BookSubTitle;
 
-        // List of Styles
+        static public ParagraphStyle MajorSection;
+        static public ParagraphStyle MajorSectionCrossReference;
+        static public ParagraphStyle Section;
+        static public ParagraphStyle SectionCrossReference;
+        static public ParagraphStyle MinorSection;
+
+        // Paragraph Styles: Scripture Content
+        static public ParagraphStyle Paragraph;
+        static public ParagraphStyle ParagraphContinuation;
+        static public ParagraphStyle QuoteLevel1;
+        static public ParagraphStyle QuoteLevel2;
+        static public ParagraphStyle QuoteLevel3;
+        static public ParagraphStyle CenteredQuote;
+        static public ParagraphStyle PictureCaption;
+        static public ParagraphStyle Footnote;
+
+        // List of Styles --------------------------------------------------------------------
         #region SAttr{g}: List<CharacterStyle> StyleList
         static List<CharacterStyle> StyleList
         {
             get
             {
-                if (null == s_StyleList)
-                    s_StyleList = new List<CharacterStyle>();
-                Debug.Assert(null != s_StyleList);
-                return s_StyleList;
+                if (null == s_vStyleList)
+                    s_vStyleList = new List<CharacterStyle>();
+                Debug.Assert(null != s_vStyleList);
+                return s_vStyleList;
             }
         }
-        private static List<CharacterStyle> s_StyleList;
+        private static List<CharacterStyle> s_vStyleList;
         #endregion
-        #region Method: CharacterStyle Find(sStyleName)
+        #region SMethod: CharacterStyle Find(sStyleName)
         static CharacterStyle Find(string sStyleName)
         {
             foreach (var style in StyleList)
@@ -67,27 +85,29 @@ namespace OurWordData.Styles
             return null;
         }
         #endregion
-        #region Method: CharacterStyle InitializeStyle(CharacterStyle)
-        static CharacterStyle InitializeStyle(CharacterStyle style)
+        #region SMethod: CharacterStyle FindOrAdd(CharacterStyle)
+        static CharacterStyle FindOrAdd(CharacterStyle styleToAddIfNotAlreadyPresent)
         {
-            var existing = Find(style.StyleName);
+            var style = Find(styleToAddIfNotAlreadyPresent.StyleName);
 
-            if (null == existing)
+            if (null == style)
             {
-                StyleList.Add(style);
-                return style;
+                StyleList.Add(styleToAddIfNotAlreadyPresent);
+                StyleList.Sort(CharacterStyle.SortCompare);
+                style = styleToAddIfNotAlreadyPresent;
+                DeclareDirty();
             }
 
-            existing.SetDefaults(style);
-            return existing;
+            Debug.Assert(null != style);
+            return style;
         }
         #endregion
 
-        // Initialize 
+        // Initialization -------------------------------------------------------------------- 
         #region SMethod: void Clear()
         static void Clear()
         {
-            s_StyleList = null;
+            s_vStyleList = null;
             s_WritingSystems = null;
         }
         #endregion
@@ -118,50 +138,162 @@ namespace OurWordData.Styles
         #region SMethod: void EnsureFactoryCharacterStylesInitialized()
         static void EnsureFactoryCharacterStylesInitialized()
         {
-            VerseNumber = InitializeStyle(new CharacterStyle("Verse Number") 
-            {
-                FontColor = Color.Red
-            });
+            VerseNumber = FindOrAdd(new CharacterStyle("Verse Number") 
+                { DefaultFontSize = 8, FontColor = Color.Red });
 
-            ChapterNumber = InitializeStyle(new CharacterStyle("Chapter Number") 
-            { 
-                DefaultFontSize = 20,
-                DefaultFontStyle = FontStyle.Bold
-            });
+            ChapterNumber = FindOrAdd(new CharacterStyle("Chapter Number")
+                { DefaultFontSize = 20, DefaultFontStyle = FontStyle.Bold });
 
-            FootnoteLetter = InitializeStyle(new CharacterStyle("Footnote Letter")
-            {
-                FontColor = Color.Navy
-            });
+            FootnoteLetter = FindOrAdd(new CharacterStyle("Footnote Letter") 
+                { DefaultFontSize = 8, FontColor = Color.Navy });
+
+            BigHeader = FindOrAdd(new CharacterStyle("Header in Window Panes")
+                { DefaultFontSize = 12, DefaultFontStyle = FontStyle.Bold });
+
+            Label = FindOrAdd(new CharacterStyle("Label")
+                { FontColor = Color.Crimson });
         }
         #endregion
         #region SMethod: void EnsureFactoryParagraphStylesInitialized()
         static void EnsureFactoryParagraphStylesInitialized()
         {
-            Normal = InitializeStyle(new ParagraphStyle("Normal")
-            {
-                Alignment = ParagraphStyle.Align.Justified
-            }) as ParagraphStyle;
+            // Book Organization Paragraphs
+            RunningHeader = EnsureInitialized(
+                new ParagraphStyle("Running Header") { 
+                        DefaultFontStyle = FontStyle.Bold, 
+                        Alignment = ParagraphStyle.Align.Justified },
+                new ParagraphStyle.Mapping("h"));
 
-            Line1 = InitializeStyle(new ParagraphStyle("Line 1")
-            {
-                Alignment = ParagraphStyle.Align.Justified,
-                LeftMarginInches = 0.2
-            }) as ParagraphStyle;
+            BookTitle = EnsureInitialized(
+                new ParagraphStyle("Book Title") {
+                        DefaultFontStyle = FontStyle.Bold,
+                        DefaultFontSize = 16,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsAfter = 9,
+                        KeepWithNextParagraph = true },
+                new ParagraphStyle.Mapping("mt"));
 
-            Line2 = InitializeStyle(new ParagraphStyle("Line 2")
-            {
-                Alignment = ParagraphStyle.Align.Justified,
-                LeftMarginInches = 0.4
-            }) as ParagraphStyle;
+            BookSubTitle = EnsureInitialized(
+                new ParagraphStyle("Book SubTitle") {
+                        DefaultFontStyle = FontStyle.Bold,
+                        DefaultFontSize = 14,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsAfter = 9,
+                        KeepWithNextParagraph = true },
+                new ParagraphStyle.Mapping("mt2") {ToolboxMarker = "st"});
+
+            MajorSection = EnsureInitialized(
+                new ParagraphStyle("Major Section Title") {
+                        DefaultFontStyle = FontStyle.Bold,
+                        DefaultFontSize = 14,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsBefore = 12,
+                        PointsAfter = 3,
+                        KeepWithNextParagraph = true },
+                new ParagraphStyle.Mapping("ms"));
+
+            MajorSectionCrossReference = EnsureInitialized(
+                new ParagraphStyle("Major Cross References") {
+                        DefaultFontStyle = FontStyle.Italic,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsAfter = 3,
+                        KeepWithNextParagraph = true}, 
+                new ParagraphStyle.Mapping("mr"));
+
+            Section = EnsureInitialized(
+                new ParagraphStyle("Section Title") {
+                        DefaultFontStyle = FontStyle.Bold,
+                        DefaultFontSize = 12,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsBefore = 12,
+                        PointsAfter = 3,
+                        KeepWithNextParagraph = true }, 
+                new ParagraphStyle.Mapping("s1") {ToolboxMarker = "s"});
+
+            SectionCrossReference = EnsureInitialized(
+                new ParagraphStyle("Cross References") {
+                        DefaultFontStyle = FontStyle.Italic,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsAfter = 3,
+                        KeepWithNextParagraph = true },
+                new ParagraphStyle.Mapping("r"));
+
+            MinorSection = EnsureInitialized(
+                new ParagraphStyle("Section Title 2") {
+                        DefaultFontStyle = FontStyle.Bold,
+                        DefaultFontSize = 12,
+                        Alignment = ParagraphStyle.Align.Centered,
+                        PointsBefore = 9,
+                        PointsAfter = 3,
+                        KeepWithNextParagraph = true}, 
+                new ParagraphStyle.Mapping("s2"));
+
+            // Scripture Content Paragraphs
+            Paragraph = EnsureInitialized(
+                new ParagraphStyle("Paragraph") {
+                        Alignment = ParagraphStyle.Align.Justified }, 
+                new ParagraphStyle.Mapping("p"));
+
+            ParagraphContinuation = EnsureInitialized(
+                new ParagraphStyle("Paragraph Continuation") {
+                        Alignment = ParagraphStyle.Align.Justified },
+                new ParagraphStyle.Mapping("p"));
+
+            QuoteLevel1 = EnsureInitialized(
+                new ParagraphStyle("Quote Level 1") {
+                        Alignment = ParagraphStyle.Align.Justified,
+                        LeftMarginInches = 0.2 }, 
+                new ParagraphStyle.Mapping("q1"));
+
+            QuoteLevel2 = EnsureInitialized(
+                new ParagraphStyle("Quote Level 2") {
+                        Alignment = ParagraphStyle.Align.Justified,
+                        LeftMarginInches = 0.4 },
+                new ParagraphStyle.Mapping("q2"));
+
+            QuoteLevel3 = EnsureInitialized(
+                new ParagraphStyle("Quote Level 3") {
+                        Alignment = ParagraphStyle.Align.Justified,
+                        LeftMarginInches = 0.6 },
+                new ParagraphStyle.Mapping("q3"));
+
+            CenteredQuote = EnsureInitialized(
+                new ParagraphStyle("Centered Quote") {
+                        Alignment = ParagraphStyle.Align.Justified,
+                        LeftMarginInches = 0.2,
+                        RightMarginInches = 0.2 },
+                new ParagraphStyle.Mapping("qc"));
+
+            PictureCaption = EnsureInitialized(
+                new ParagraphStyle("Picture Caption") {
+                        DefaultFontStyle = FontStyle.Italic,
+                        Alignment = ParagraphStyle.Align.Centered },
+                new ParagraphStyle.Mapping("fig") {ToolboxMarker = "cap"});
+
+            Footnote = EnsureInitialized(
+                new ParagraphStyle("Footnote") {
+                        Alignment = ParagraphStyle.Align.Justified,
+                        PointsAfter = 3 },
+                new ParagraphStyle.Mapping("f") { ToolboxMarker = "fn" });
+
         }
         #endregion
+
+        static ParagraphStyle EnsureInitialized(ParagraphStyle defaultStyle, ParagraphStyle.Mapping map)
+        {
+            var style = FindOrAdd(defaultStyle) as ParagraphStyle;
+            Debug.Assert(null != style);
+            style.Map = map;
+            return style;
+        }
+
         #region SMethod: void EnsureFactoryWritingSystemsInitialized()
         static void EnsureFactoryWritingSystemsInitialized()
         {
             DefaultWritingSystem = FindOrCreate(WritingSystem.DefaultWritingSystemName);
         }
         #endregion
+
 
         // WritingSystems --------------------------------------------------------------------
         #region SAttr{g}: List<WritingSystem> WritingSystems
@@ -317,12 +449,13 @@ namespace OurWordData.Styles
             // Attenpt to load and read the Xml stylesheet (an empty path is ignored)
             ReadStyleSheet(sPath);
 
-            // Make sure the styles we expect are indeed in this stylesheet
-            EnsureFactoryInitialized();
-
             // The reading process sets attributes, which in turn sets the dirty
             // flag; so we need to clear it now that we're all done
             s_bIsDirty = false;
+
+            // Make sure the styles we expect are indeed in this stylesheet; anything added
+            // here will DeclareDirty and result in a save.
+            EnsureFactoryInitialized();
         }
         #endregion
     }

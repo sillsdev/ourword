@@ -16,6 +16,7 @@ using System.Windows.Forms;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 
@@ -210,13 +211,15 @@ namespace OurWord.Edit
             #endregion
 
             // Scaffolding -------------------------------------------------------------------
-            #region Constructor(DChapter)
-            public EChapter(JFontForWritingSystem f, DChapter chapter)
-                : base(f, chapter.Text)
+            #region Constructor(font, DChapter)
+            public EChapter(Font font, DChapter chapter)
+                : base(font, chapter.Text)
             {
                 // Add a little space to the end so that it appears a bit nicer in the 
                 // display. It is uneditable, so this only affects the display.
                 m_sText = Text + "\u00A0";
+
+                TextColor = StyleSheet.ChapterNumber.FontColor;
             }
             #endregion
 
@@ -241,10 +244,10 @@ namespace OurWord.Edit
                 var x = Position.X; 
 
                 // Calculate "y" to be centered horizontally
-                var y = Position.Y + (Height / 2) - (FontForWS.LineHeightZoomed / 2);
+                var y = Position.Y + (Height / 2) - (m_Font.Height / 2F);
 
                 // Draw the string
-                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), new PointF(x, y));
+                draw.DrawString(Text, m_Font, GetBrush(), new PointF(x, y));
             }
             #endregion
             #region Attr{g}: int Number
@@ -292,10 +295,11 @@ namespace OurWord.Edit
             bool m_bNeedsExtraLeadingSpace = false;
             #endregion
 
-            #region Constructor(DVerse)
-            public EVerse(JFontForWritingSystem f, DVerse verse)
-                : base(f, verse.Text)
+            #region Constructor(font, DVerse)
+            public EVerse(Font font, DVerse verse)
+                : base(font, verse.Text)
             {
+                TextColor = StyleSheet.VerseNumber.FontColor;
             }
             #endregion
 
@@ -332,7 +336,7 @@ namespace OurWord.Edit
                 var s = Text;
                 if (NeedsExtraLeadingSpace)
                     s = c_sLeadingSpace + Text;
-                draw.DrawString(s, GetSuperscriptFont(), GetBrush(), Position);
+                draw.DrawString(s, m_Font, GetBrush(), Position);
             }
             #endregion
 
@@ -361,7 +365,7 @@ namespace OurWord.Edit
                 // Do the measurement
                 var fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-                Width = Context.Graphics.MeasureString(s, FontForWS.DefaultFontZoomed, 
+                Width = Context.Graphics.MeasureString(s, m_Font, 
                     1000, fmt).Width;
             }
             #endregion
@@ -418,18 +422,19 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region Constructor(JFontForWritingSystem, DFoot)
-            public EFoot(JFontForWritingSystem f, DFoot foot)
-                : base(f, foot.Text)
+            #region Constructor(font, DFoot)
+            public EFoot(Font font, DFoot foot)
+                : base(font, foot.Text)
             {
                 m_Foot = foot;
+                TextColor = StyleSheet.FootnoteLetter.FontColor;
             }
             #endregion
 
             #region Method: override void Draw(IDraw)
             public override void Draw(IDraw draw)
             {
-                draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
+                draw.DrawString(Text, m_Font, GetBrush(), Position);
             }
             #endregion
 
@@ -504,9 +509,9 @@ namespace OurWord.Edit
         {
             public const string c_Spaces = "\u00A0\u00A0";
 
-            #region Constructor(JFontForWritingSystem, DLabel)
-            public ELabel(JFontForWritingSystem f, DLabel label)
-                : base(f, label.Text + c_Spaces)
+            #region Constructor(font, DLabel)
+            public ELabel(Font font, DLabel label)
+                : base(font, label.Text + c_Spaces)
             {
             }
             #endregion
@@ -514,7 +519,7 @@ namespace OurWord.Edit
             #region Method: override void Draw(IDraw)
             public override void Draw(IDraw draw)
             {
-                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                draw.DrawString(Text, m_Font, GetBrush(), Position);
             }
             #endregion
         }
@@ -523,16 +528,16 @@ namespace OurWord.Edit
         class ELiteral : EWord 
             // As a literal of EWord, hyphenation is possible.
         {
-            #region Constructor(sText)
-            public ELiteral(JFontForWritingSystem f, DPhrase phrase, string sText)
-                : base(f, phrase, sText)
+            #region Constructor(font, DPhrase, sText)
+            public ELiteral(Font font, DPhrase phrase, string sText)
+                : base(font, phrase, sText)
             {
             }
             #endregion
             #region OMethod: EWord Clone()
             public override EWord Clone()
             {
-               return new ELiteral(FontForWS, Phrase, Text);
+               return new ELiteral(m_Font, Phrase, Text);
             }
             #endregion
             #region OMethod: Cursor MouseOverCursor
@@ -547,7 +552,7 @@ namespace OurWord.Edit
             #region OMethod: void Draw(IDraw)
             public override void Draw(IDraw draw)
             {
-                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                draw.DrawString(Text, m_Font, GetBrush(), Position);
             }
             #endregion
             #region OMethod: void cmdLeftMouseClick(PointF pt)
@@ -586,18 +591,19 @@ namespace OurWord.Edit
             readonly DFootnote m_Footnote = null;
             #endregion
 
-            #region Constructor(DFootLetter)
-            public EFootnoteLabel(JFontForWritingSystem f, DFootnote footnote)
-                : base(f, footnote.Letter + " ")
+            #region Constructor(font, DFootLetter)
+            public EFootnoteLabel(Font font, DFootnote footnote)
+                : base(font, footnote.Letter + " ")
             {             
                 m_Footnote = footnote;
+                TextColor = StyleSheet.FootnoteLetter.FontColor;
             }
             #endregion
 
             #region Method: override void Draw(IDraw)
             public override void Draw(IDraw draw)
             {
-                draw.DrawString(Text, GetSuperscriptFont(), GetBrush(), Position);
+                draw.DrawString(Text, m_Font, GetBrush(), Position);
             }
             #endregion
 
@@ -627,10 +633,12 @@ namespace OurWord.Edit
         #region CLASS: EBigHeader
         class EBigHeader : EBlock
         {
-            #region Constructor(string sText)
-            public EBigHeader(JFontForWritingSystem f, string sText)
-                : base(f, sText + " ")
+            #region Constructor(font, sText)
+            public EBigHeader(Font font, string sText)
+                : base(font, sText + " ")
             {
+                TextColor = StyleSheet.BigHeader.FontColor;
+
             }
             #endregion
 
@@ -650,7 +658,7 @@ namespace OurWord.Edit
             #region Method: override void Draw(IDraw)
             public override void Draw(IDraw draw)
             {
-                draw.DrawString(Text, FontForWS.DefaultFontZoomed, GetBrush(), Position);
+                draw.DrawString(Text, m_Font, GetBrush(), Position);
             }
             #endregion
         }
@@ -667,15 +675,15 @@ namespace OurWord.Edit
             // We'll collect the EWords here
             var vWords = new List<EWord>();
 
+            // Get the font factory for everything in this DBT
+            var style = t.Paragraph.Style;
+            var fontForWS = style.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
+
             // Loop through all of the phrases in this DBasicText
             foreach (DPhrase phrase in phrases)
             {
                 // We'll collect individual words here
                 var sWord = "";
-
-                // Get the font for the style
-                var style = t.Paragraph.Style;
-                var fontForWS = style.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
 
                 // Process through the phrase's text string
                 for (var i = 0; i < phrase.Text.Length; i++)
@@ -684,7 +692,8 @@ namespace OurWord.Edit
                     // in order to build the next one.
                     if (WritingSystem.IsWordBreak(phrase.Text, i) && sWord.Length > 0)
                     {
-                        vWords.Add(new EWord(fontForWS, phrase, sWord));
+                        var fontZoomed = fontForWS.FindOrAddFont(true, phrase.FontToggles);
+                        vWords.Add(new EWord(fontZoomed, phrase, sWord));
                         sWord = "";
                     }
 
@@ -695,16 +704,17 @@ namespace OurWord.Edit
                 // Pick up the final word in the string, IsWordBreak will not have 
                 // caught it.
                 if (sWord.Length > 0)
-                    vWords.Add(new EWord(fontForWS, phrase, sWord));
+                {
+                    var fontZoomed = fontForWS.FindOrAddFont(true, phrase.FontToggles);
+                    vWords.Add(new EWord(fontZoomed, phrase, sWord));
+                }
             }
 
             // If we did not find any words, then we want to create an InsertionIcon
             if (vWords.Count == 0)
             {
-                var cStyle = t.Paragraph.Style.CharacterStyle;
-                var fontForWS = cStyle.FindOrAddFontForWritingSystem(WritingSystem);
-
-                vWords.Add(EWord.CreateAsInsertionIcon(fontForWS, phrases[0]));
+                var fontZoomed = fontForWS.DefaultFontZoomed;
+                vWords.Add(EWord.CreateAsInsertionIcon(fontZoomed, phrases[0]));
             }
 
             return vWords;
@@ -770,31 +780,17 @@ namespace OurWord.Edit
                 blockLeft.GlueToNext = true;
         }
         #endregion
-        #region Method: JFontForWritingSystem RetrieveFont(sCharStyleAbbrev)
-        protected JFontForWritingSystem RetrieveFont(string sCharStyleAbbrev)
-        {
-            JCharacterStyle cs = DB.StyleSheet.FindCharacterStyle(sCharStyleAbbrev);
-            return cs.FindOrAddFontForWritingSystem(WritingSystem);
-        }
-        #endregion
-        #region Method: JFontForWritingSystem RetrieveFont()
-        JFontForWritingSystem RetrieveFont()
-        {
-            return PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
-        }
-        #endregion
         #region Method: void _Initialize(DParagraph)
         void _Initialize(DParagraph p)
         {
             // Clear out any previous list contents
             Clear();
 
-            // Compute the fonts
-            var fChapter = RetrieveFont(DStyleSheet.c_StyleAbbrevChapter);
-            var fVerse = RetrieveFont(DStyleSheet.c_StyleAbbrevVerse);
-            var fFootLetter = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
-            var fLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevLabel);
-            var fFootnoteLabel = fFootLetter;
+            // Get the fonts
+            var fontChapter = StyleSheet.ChapterNumber.GetFont(WritingSystem.Name, G.ZoomPercent);
+            var fontVerse = StyleSheet.VerseNumber.GetFont(WritingSystem.Name, G.ZoomPercent);
+            var fontFootLetter = StyleSheet.FootnoteLetter.GetFont(WritingSystem.Name, G.ZoomPercent);
+            var fontLabel = StyleSheet.Label.GetFont(WritingSystem.Name, G.ZoomPercent);              
 
             // Loop through the paragraph's runs
             foreach (DRun r in p.Runs)
@@ -802,16 +798,16 @@ namespace OurWord.Edit
                 switch (r.GetType().Name)
                 {
                     case "DChapter":
-                        Append(new EChapter(fChapter, r as DChapter));
+                        Append(new EChapter(fontChapter, r as DChapter));
                         break;
                     case "DVerse":
-                        Append(new EVerse(fVerse, r as DVerse));
+                        Append(new EVerse(fontVerse, r as DVerse));
                         break;
                     case "DFoot":
-                        Append(new EFoot(fFootLetter, r as DFoot));
+                        Append(new EFoot(fontFootLetter, r as DFoot));
                         break;
                     case "DLabel":
-                        Append(new ELabel(fLabel, r as DLabel));
+                        Append(new ELabel(fontLabel, r as DLabel));
                         break;
                     case "DBasicText":
                         _InitializeBasicTextWords(r as DBasicText);
@@ -936,8 +932,8 @@ namespace OurWord.Edit
             // We'll add the language name as a BigHeader
             if (!string.IsNullOrEmpty(sLabel))
             {
-                JFontForWritingSystem f = RetrieveFont(DStyleSheet.c_StyleAbbrevBigHeader);
-                Append(new EBigHeader(f, sLabel));
+                var fontBigHeader = StyleSheet.BigHeader.GetFont(writingSystem.Name, G.ZoomPercent);
+                Append(new EBigHeader(fontBigHeader, sLabel));
             }
 
             // Add the text (we only care about verses and text)
@@ -946,8 +942,10 @@ namespace OurWord.Edit
                 switch (run.GetType().Name)
                 {
                     case "DVerse":
-                        Append(new EVerse(RetrieveFont(DStyleSheet.c_StyleAbbrevVerse), 
-                            run as DVerse));
+                        {
+                            var fontVerse = StyleSheet.VerseNumber.GetFont(writingSystem.Name, G.ZoomPercent);
+                            Append(new EVerse(fontVerse, run as DVerse));
+                        }
                         break;
                     case "DText":
                     case "DBasicText":
@@ -963,7 +961,7 @@ namespace OurWord.Edit
             // a space to such EWords.
             for (int i = 0; i < SubItems.Length - 1; i++)
             {
-                EWord word = SubItems[i] as EWord;
+                var word = SubItems[i] as EWord;
                 if (null == word || !word.IsBesideEWord(true))
                     continue;
                 if (!word.EndsWithWhiteSpace)
@@ -988,11 +986,11 @@ namespace OurWord.Edit
             : this(_ws, pStyle, (JObject)null, Flags.None)
         {
             // Line height
-            m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).LineHeightZoomed;
+            var fontFactory = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
+            m_fLineHeight = fontFactory.LineHeightZoomed;
 
             // Each Literal String will potentially have its own character style
-            foreach (DPhrase phrase in vLiteralPhrases)
+            foreach (var phrase in vLiteralPhrases)
             {
                 // The Split method we're about to call will remove spaces, including
                 // a trailing one. We need to know if we had a trailing one, so we
@@ -1010,11 +1008,8 @@ namespace OurWord.Edit
                     if (i < vs.Length - 1 || bEndsWithSpace)
                         vs[i] = vs[i] + " ";
 
-                    // Get the font from the character style
-                    var fws = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
-
                     // Add the literal
-                    Append(new ELiteral(fws, phrase, vs[i]));
+                    Append(new ELiteral(fontFactory.DefaultFontZoomed, phrase, vs[i]));
                 }
             }
         }
@@ -1264,11 +1259,10 @@ namespace OurWord.Edit
             bool CalcNextHyphenPos()
                 // Returns false if there are no hyphenation positions
             {
-                EWord word = HyphenedWord;
-                JWritingSystem ws = word.FontForWS.WritingSystem;
-                string s = word.Text;
+                var word = HyphenedWord;
+                var writingSystem = Para.WritingSystem;
 
-                for (iHyphenPos = s.Length - 1; iHyphenPos > 0; iHyphenPos--)
+                for (iHyphenPos = word.Text.Length - 1; iHyphenPos > 0; iHyphenPos--)
                 {
                     // This is triggered if a hyphen is required, because there
                     // is nothing on the line yet, and we've already tried
@@ -1279,7 +1273,7 @@ namespace OurWord.Edit
 
                     // This is the preferred way of doing a hyphen: asking the
                     // writing system if we can.
-                    if (ws.IsHyphenBreak(OriginalTextToHyphen, iHyphenPos))
+                    if (writingSystem.IsHyphenBreak(OriginalTextToHyphen, iHyphenPos))
                         return true;
                 }
 
@@ -2341,13 +2335,16 @@ namespace OurWord.Edit
     public class OWFootnotePara : OWPara
     {
         // Construction ----------------------------------------------------------------------
-        public OWFootnotePara(DFootnote footnote, Color cldEditableBackground, Flags options)
+        #region Constructor(DFootnote, colorBackground, options)
+        public OWFootnotePara(DFootnote footnote, Color clrEditableBackground, Flags options)
             : base(GetWritingSystem(footnote, options),            
-                footnote.Style, footnote, cldEditableBackground, options)
+                footnote.Style, footnote, clrEditableBackground, options)
         {
             ConstructFootnoteReference(footnote, options);
             ConstructFootnoteLetter(footnote);
         }
+        #endregion
+
         #region Method: void ConstructFootnoteReference(DFootnote, Flags)
         void ConstructFootnoteReference(DFootnote footnote, Flags options)
         {
@@ -2355,18 +2352,22 @@ namespace OurWord.Edit
                 return;
 
             var font = footnote.Style.CharacterStyle.FindOrAddFontForWritingSystem(
-                GetWritingSystem(footnote, options));
+                GetWritingSystem(footnote, options)).DefaultFontZoomed;
+
             var label = new DLabel(footnote.VerseReference + ": ");
 
             InsertAt(0, new ELabel(font, label));
         }
         #endregion
 
+        #region Method: void ConstructFootnoteLetter(DFootnote)
         void ConstructFootnoteLetter(DFootnote footnote)
         {
-            var fFootnoteLabel = RetrieveFont(DStyleSheet.c_StyleAbbrevFootLetter);
-            InsertAt(0, new EFootnoteLabel(fFootnoteLabel, footnote));
+            var fontFootnoteLabel = StyleSheet.FootnoteLetter.GetFont(WritingSystem.Name, G.ZoomPercent);
+            var label = new EFootnoteLabel(fontFootnoteLabel, footnote);
+            InsertAt(0, label);
         }
+        #endregion
 
         #region SMethod: JWritingSystem GetWritingSystem(DParagraph p, Flags options)
         static JWritingSystem GetWritingSystem(DParagraph p, Flags options)
