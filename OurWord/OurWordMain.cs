@@ -511,23 +511,19 @@ namespace OurWord
                 return;
 
             // Get the paragraph's possible styles
-            List<string> vPossibilities = p.CanChangeParagraphStyleTo;
+            var vPossibileStyles = p.CanChangeParagraphStyleTo;
 
             // Create menu items for each of these
-            foreach (string sAbbrev in vPossibilities)
+            foreach (var style in vPossibileStyles)
             {
-                JParagraphStyle pstyle = DB.StyleSheet.FindParagraphStyle(sAbbrev);
-                if (null == pstyle)
-                    continue;
-
-                ToolStripMenuItem mi = new ToolStripMenuItem(
-                    pstyle.DisplayName,
+                var mi = new ToolStripMenuItem(
+                    style.StyleName,
                     null,
                     cmdChangeParagraphStyle,
-                    "m_menuChangeParagraphStyle_" + sAbbrev);
-                mi.Tag = sAbbrev;
+                    "m_menuChangeParagraphStyle_" + style.StyleName);
+                mi.Tag = style;
 
-                if (sAbbrev == p.StyleAbbrev)
+                if (style == p.Style)
                     mi.Checked = true;
 
                 m_menuChangeParagraphTo.DropDownItems.Add(mi);
@@ -2831,17 +2827,17 @@ namespace OurWord
         #region Cmd: cmdChangeParagraphStyle
         private void cmdChangeParagraphStyle(Object sender, EventArgs e)
         {
-            ToolStripMenuItem mi = sender as ToolStripMenuItem;
+            var mi = sender as ToolStripMenuItem;
             if (null == mi)
                 return;
 
-            string sStyleAbbrev = mi.Tag as string;
-            if (string.IsNullOrEmpty(sStyleAbbrev))
+            var style = mi.Tag as ParagraphStyle;
+            if (null == style)
                 return;
 
-            OWWindow wnd = FocusedWindow;
+            var wnd = FocusedWindow;
             if (null != wnd)
-                wnd.cmdChangeParagraphTo(sStyleAbbrev);
+                wnd.cmdChangeParagraphTo(style);
         }
         #endregion
 		#region Can: canItalic

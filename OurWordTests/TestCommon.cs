@@ -16,6 +16,8 @@ using System.Reflection;
 using System.Text;
 using JWTools;
 using OurWordData.DataModel;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -45,6 +47,8 @@ namespace OurWordTests
 
             // Set the resource location
             JWU.ResourceLocation = "OurWord.Res.";
+
+            StyleSheet.EnsureFactoryInitialized();
         }
         #endregion
 
@@ -82,7 +86,7 @@ namespace OurWordTests
         public DParagraph CreateHierarchyThroughTargetParagraph(string sBookAbbrev, string sSimpleText)
         {
             var section = CreateHierarchyThroughTargetSection(sBookAbbrev);
-            var paragraph = new DParagraph();
+            var paragraph = new DParagraph(StyleSheet.Paragraph);
             section.Paragraphs.Append(paragraph);
             paragraph.SimpleText = sSimpleText;
             return paragraph;

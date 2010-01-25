@@ -788,7 +788,6 @@ namespace OurWordData.DataModel
                 style.IsCentered = true;
             }
 
-
 			// Footnote paragraph (ft)
             if (null == FindParagraphStyle(c_StyleFootnote))
 			{
@@ -798,25 +797,16 @@ namespace OurWordData.DataModel
                 style.SpaceAfter = 3;
             }
 
-            // BELUM --------------------------------------------------------------------------
-			// SeeAlso Footnote paragraph (cft)
-			if (null == FindParagraphStyle("cft"))
-			{
-				style = AddParagraphStyle("cft", "SeeAlso Footnote Paragraph");
+            // Reference Translations
+            if (null == FindParagraphStyle(c_StyleReferenceTranslation))
+            {
+                style = AddParagraphStyle(c_StyleReferenceTranslation, "Reference Translation");
                 style.SetFonts(10, false);
-				style.IsJustified = true;
-                style.SpaceAfter = 3;
+                style.IsJustified = true;
+                style.FirstLineIndent = -0.20;
+                style.LeftMargin = 0.20;
             }
 
-			// UI Title
-			if (null == FindParagraphStyle("uiTitle"))
-			{
-				style = AddParagraphStyle("uiTitle", "UI Title");
-				style.SetFonts(18, true);
-				style.IsCentered = true;
-			}
-
-            // Notes
             // Note Header
             if (null == FindParagraphStyle(c_StyleNoteHeader))
             {
@@ -825,6 +815,9 @@ namespace OurWordData.DataModel
                 style.SpaceBefore = 0;
                 style.SpaceAfter = 0;
             }
+
+            // BELUM --------------------------------------------------------------------------
+            // Notes
             if (null == FindParagraphStyle(c_StyleNoteDate))
             {
                 style = AddParagraphStyle(c_StyleNoteDate, "Note Date");
@@ -859,16 +852,24 @@ namespace OurWordData.DataModel
                 style.SpaceAfter = 3;
             }
 
-            // Reference Translations
-            if (null == FindParagraphStyle(c_StyleReferenceTranslation))
+            // SeeAlso Footnote paragraph (cft)
+            if (null == FindParagraphStyle("cft"))
             {
-                style = AddParagraphStyle(c_StyleReferenceTranslation, "Reference Translation");
+                style = AddParagraphStyle("cft", "SeeAlso Footnote Paragraph");
                 style.SetFonts(10, false);
                 style.IsJustified = true;
-                style.FirstLineIndent = -0.20;
-                style.LeftMargin = 0.20;
+                style.SpaceAfter = 3;
             }
-		}
+
+            // UI Title
+            if (null == FindParagraphStyle("uiTitle"))
+            {
+                style = AddParagraphStyle("uiTitle", "UI Title");
+                style.SetFonts(18, true);
+                style.IsCentered = true;
+            }
+
+        }
 		#endregion
 
         #region Method: void _InitializeCharacterStyles()

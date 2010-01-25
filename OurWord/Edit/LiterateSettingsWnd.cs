@@ -28,6 +28,7 @@ using JWTools;
 using OurWordData;
 using OurWordData.DataModel.Runs;
 using OurWord.Dialogs;
+using OurWordData.Styles;
 
 #endregion
 
@@ -262,9 +263,9 @@ namespace OurWord.Edit
 		}
 		#endregion
 		#region Method: Information AddInformation(sID, JParagraphStyle, sParagraphText)
-		public Information AddInformation(string sID, JParagraphStyle pstyle, string sParagraphText)
+		public Information AddInformation(string sID, ParagraphStyle style, string sParagraphText)
 		{
-			Information setting = new Information(this, sID, sParagraphText, pstyle);
+			var setting = new Information(this, sID, sParagraphText, style);
 			return AddSetting(setting) as Information;
 		}
 		#endregion
@@ -853,22 +854,23 @@ namespace OurWord.Edit
 	public class Information : Setting
 	{
 		// Scaffolding -----------------------------------------------------------------------
-		#region Attr{g}: JParagraphStyle PStyle
-		JParagraphStyle PStyle
+		#region Attr{g}: ParagraphStyle Style
+		ParagraphStyle Style
 		{
 			get
 			{
-				Debug.Assert(null != m_PStyle);
-				return m_PStyle;
+				Debug.Assert(null != m_style);
+				return m_style;
 			}
 		}
-		JParagraphStyle m_PStyle;
+		readonly ParagraphStyle m_style;
 		#endregion
 		#region Constructor(...)
-		public Information(LiterateSettingsWnd ls, string sID, string sParagraphText, JParagraphStyle PStyle)
+		public Information(LiterateSettingsWnd ls, string sID, string sParagraphText, ParagraphStyle style)
 			: base(ls, sID, sParagraphText, null, null)
 		{
-			m_PStyle = PStyle;
+		    Debug.Assert(null != style);
+			m_style = style;
 		}
 		#endregion
 
@@ -1066,14 +1068,11 @@ namespace OurWord.Edit
 		#region OMethod: void BuildVerbose()
 		public override void BuildVerbose()
 		{
-			// Make sure its in our own stylesheet
-			Debug.Assert(StyleSheet.ParagraphStyles.FindObj(PStyle) != -1);
-
 			// Deal with italic/bold
-			DPhrase[] vPhrases = ParseIntoPhrases(LabelText).ToArray();
+			var vPhrases = ParseIntoPhrases(LabelText).ToArray();
 
 			// Create and append the paragraph
-			OWPara para = new OWPara(WritingSystem, PStyle, vPhrases);
+			var para = new OWPara(WritingSystem, Style, vPhrases);
 			Verbose.Contents.Append(para);
 		}
 		#endregion

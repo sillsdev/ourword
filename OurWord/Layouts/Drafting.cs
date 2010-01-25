@@ -22,6 +22,8 @@ using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -365,7 +367,7 @@ namespace OurWord.Layouts
                 DParagraph pFront = DB.FrontSection.Paragraphs[iFront + i] as DParagraph;
                 DParagraph pTarget = DB.TargetSection.Paragraphs[iTarget + i] as DParagraph;
 
-                if (pFront.StyleAbbrev != pTarget.StyleAbbrev)
+                if (pFront.Style != pTarget.Style)
                     return false;
                 if (!pFront.IsSameReferenceAs(pTarget))
                     return false;
@@ -567,12 +569,12 @@ namespace OurWord.Layouts
                 // add one so that something will get displayed.
                 if (iFront == DB.FrontSection.Paragraphs.Count)
                 {
-                    var pNew = new DParagraph {AddedByCluster = true};
+                    var pNew = new DParagraph(StyleSheet.Paragraph) {AddedByCluster = true};
                     DB.FrontSection.Paragraphs.Append(pNew);
                 }
                 if (iTarget == DB.TargetSection.Paragraphs.Count)
                 {
-                    var pNew = new DParagraph {AddedByCluster = true};
+                    var pNew = new DParagraph(StyleSheet.Paragraph) {AddedByCluster = true};
                     DB.TargetSection.Paragraphs.Append(pNew);
                 }
 

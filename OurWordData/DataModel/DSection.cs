@@ -21,6 +21,7 @@ using System.Xml;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 #endregion
@@ -270,15 +271,6 @@ namespace OurWordData.DataModel
 			get { return Book.Project; }
 		}
 		#endregion
-		#region Attr{g}: JStyleSheet StyleSheet - returns the Project-owned stylesheet
-		private JStyleSheet StyleSheet
-		{
-			get
-			{
-				return DB.TeamSettings.OldStyleSheet;
-			}
-		}
-		#endregion
 		#region Attr{g}: public DSFMapping Map - used only during SF Read operation
 		// This object allows us to map from the read.Marker to the way to handle each
 		// field, e.g., which one is a Section Title, which one is a back translation,
@@ -300,7 +292,7 @@ namespace OurWordData.DataModel
 			{ 
 				foreach( DParagraph p in Paragraphs)
 				{
-					if (p.StyleAbbrev == Map.StyleSection)
+					if (p.Style == StyleSheet.Section)
 						return p.SimpleText;
 				}
 				return ""; 
@@ -314,7 +306,7 @@ namespace OurWordData.DataModel
 			{ 
 				foreach( DParagraph pg in Paragraphs)
 				{
-					if (pg.StyleAbbrev == Map.StyleCrossRef)
+                    if (pg.Style == StyleSheet.SectionCrossReference)
 						return pg;
 				}
 				return null; 
@@ -448,7 +440,7 @@ namespace OurWordData.DataModel
                 var PThis = this.Paragraphs[i];
 
                 // Are the styles the same?
-                if (PFront.StyleAbbrev != PThis.StyleAbbrev)
+                if (PFront.Style != PThis.Style)
                     return false;
 
                 // Collect the footnotes
@@ -460,7 +452,7 @@ namespace OurWordData.DataModel
                     return false;
                 for (int k = 0; k < ThisFoots.Count; k++)
                 {
-                    if (FrontFoots[k].StyleAbbrev != ThisFoots[k].StyleAbbrev)
+                    if (FrontFoots[k].Style != ThisFoots[k].Style)
                         return false;
                 }
             }
@@ -578,7 +570,7 @@ namespace OurWordData.DataModel
 				if (null != pFront as DPicture)
 					p = new DPicture();
 				else
-					p = new DParagraph();
+					p = new DParagraph(pFront.Style);
 
 				Paragraphs.Append(p);
 				p.CopyFrom(pFront, true);
@@ -609,7 +601,7 @@ namespace OurWordData.DataModel
 			ArrayList v = new ArrayList();
 			foreach(DParagraph p in section.Paragraphs)
 			{
-				if (Map.StyleCrossRef == p.StyleAbbrev)
+				if (StyleSheet.SectionCrossReference == p.Style)
 					v.Add(p);
 			}
 			return v;
@@ -726,7 +718,7 @@ namespace OurWordData.DataModel
 		{
 			foreach(DParagraph p in Paragraphs)
 			{
-				if (DStyleSheet.IsQuoteStyle( p.StyleAbbrev ))
+                if (p.Style.Map.IsPoetry)
 					return true;
 			}
 			return false;
@@ -836,21 +828,18 @@ namespace OurWordData.DataModel
 		private bool _MissingParagraphFinalPunctuation(DParagraph p, string sEndPunctuation)
 		{
 			// We don't care with certain types of paragraphs
-			string sAbbrev = p.StyleAbbrev;
-			if (DB.Map.IsTitleStyle(sAbbrev))
-				return false;
-			if (DB.Map.StyleSection == sAbbrev)
-				return false;
-			if (DB.Map.StyleSection2 == sAbbrev)
-				return false;
-			if (DB.Map.StyleSubTitle == sAbbrev)
-				return false;
-			if (DB.Map.StylePicCaption == sAbbrev)
-				return false;
-			if (DB.Map.StyleCrossRef == sAbbrev)
-				return false;
-			if (DB.Map.StyleHeader == sAbbrev)
-				return false;
+		    var vExcludedStyles = new List<ParagraphStyle>()
+            {
+                StyleSheet.BookTitle,
+                StyleSheet.BookSubTitle,
+                StyleSheet.Section,
+                StyleSheet.MinorSection,
+                StyleSheet.PictureCaption,
+                StyleSheet.SectionCrossReference,
+                StyleSheet.RunningHeader
+            };
+            if (vExcludedStyles.Contains(p.Style))
+                return false;
 
 			// Get the last DText in the paragraph
 			for(int i = p.Runs.Count - 1; i >=0; i--)
@@ -1816,22 +1805,19 @@ namespace OurWordData.DataModel
 						return Map.MkrFootnote;
 				}
 				// Simple Paragraphs (no verses)
-				if (p.StyleAbbrev ==  Map.StyleHeader )    
-					return Map.MkrHeader;
-				if (p.StyleAbbrev ==  Map.StyleMainTitle )  
-					return "mt";
-				if (p.StyleAbbrev ==  Map.StyleSubTitle )  
-					return "st";
-				if (p.StyleAbbrev ==  Map.StyleSection )   
-					return Map.MkrSection;
-				if (p.StyleAbbrev ==  Map.StyleSection2 )   
-					return Map.MkrSection2;
-				if (p.StyleAbbrev ==  Map.StyleCrossRef )  
-					return Map.MkrCrossRef;
-                if (p.StyleAbbrev == DStyleSheet.c_sfmMajorSection)
-                    return DStyleSheet.c_sfmMajorSection;
-                if (p.StyleAbbrev == DStyleSheet.c_sfmMajorSectionCrossRef)
-                    return DStyleSheet.c_sfmMajorSectionCrossRef;
+			    var vSimpleParagraphs = new List<ParagraphStyle>()
+			    {
+                    StyleSheet.RunningHeader,
+                    StyleSheet.BookTitle,
+                    StyleSheet.BookSubTitle,
+                    StyleSheet.Section,
+                    StyleSheet.MinorSection,
+                    StyleSheet.SectionCrossReference,
+                    StyleSheet.MajorSection,
+                    StyleSheet.MajorSectionCrossReference
+			    };
+                if (vSimpleParagraphs.Contains(p.Style))
+                    return p.Style.Map.ToolboxMarker;
 
 				// Otherwise, we want a \vt for verse text
 				return Map.MkrVerseText;
@@ -2018,10 +2004,13 @@ namespace OurWordData.DataModel
 				// If the current field's marker is a match, then create a new paragraph
 				if (field.Mkr == sMkr)
 				{
-					DParagraph p = new DParagraph();
+
+				    var style = StyleSheet.FindFromToolboxMarker(sStyle) ??
+				                StyleSheet.Paragraph;
+                    var p = new DParagraph(style);
+
 					Section.Paragraphs.Append(p);
 
-					p.StyleAbbrev = sStyle;
 					AddParagraphText(p, field);
 
 					return true;
@@ -2179,9 +2168,10 @@ namespace OurWordData.DataModel
 				}
 
 				// Create the new paragraph. The style is the same as the field marker
-				DParagraph p = new DParagraph();
+			    var style = StyleSheet.FindFromToolboxMarker(field.Mkr) ??
+			                StyleSheet.Paragraph;
+                DParagraph p = new DParagraph(style);
                 Section.Paragraphs.Append(p);
-				p.StyleAbbrev = field.Mkr;
    				AddParagraphText(p, field);
 
 				return true;
@@ -2232,7 +2222,7 @@ namespace OurWordData.DataModel
 				// already happened, so we just get another error (about section
 				// mismatches) down the road, with no good way to correct it.
                 DParagraph last = LastParagraph;
-                if (null == last || !Map.IsVernacularParagraph(last.StyleAbbrev))
+                if (null == last || !Map.IsVernacularParagraph(last.Style.Map.ToolboxMarker))
                 {
                     throw new eBookReadException(
                         Loc.GetMessages("msgMissingParagraphMarker",
@@ -2286,7 +2276,7 @@ namespace OurWordData.DataModel
 					return false;
 
 				// Make sure the paragraph is a valid place for a See Also.
-				if ( ! Map.IsVernacularParagraph( LastParagraph.StyleAbbrev ) )
+				if ( ! Map.IsVernacularParagraph( LastParagraph.Style.Map.ToolboxMarker ) )
 					throw new eBookReadException(
                         Loc.GetMessages( "msgMissingParagraphMarkerForCF",
                             "A cross-reference field (\\cf) was encountered but there was no " +
@@ -2484,10 +2474,10 @@ namespace OurWordData.DataModel
 						continue;
 
 					// Vernacular (verse containing) and simple paragraphs
-					if (Map.IsVernacularParagraph(p.StyleAbbrev))
+					if (Map.IsVernacularParagraph(p.Style.Map.ToolboxMarker))
 					{
                         // Create a field containing just the marker, e.g., \p
-                        SfField f = new SfField(p.StyleAbbrev);
+                        SfField f = new SfField(p.Style.Map.ToolboxMarker);
                         SDB.Append(f);
 
                         // Add fields for the paragraph's individual runs
@@ -2564,14 +2554,14 @@ namespace OurWordData.DataModel
 			{
 				DParagraph p = Paragraphs[i] as DParagraph;
 
-				if ( ! Map.IsSectionEmptyReferenceStyle(p.StyleAbbrev) )
+				if ( ! Map.IsSectionEmptyReferenceStyle(p.Style.Map.ToolboxMarker) )
 					continue;
 
 				for(int k = i + 1; k < Paragraphs.Count; k++)
 				{
 					DParagraph pNext = Paragraphs[k] as DParagraph;
 
-					if ( ! Map.IsSectionEmptyReferenceStyle(pNext.StyleAbbrev) )
+					if ( ! Map.IsSectionEmptyReferenceStyle(pNext.Style.Map.ToolboxMarker) )
 					{
 						p.ChapterI = pNext.ChapterI;
 						p.VerseI   = pNext.VerseI;
@@ -2680,20 +2670,19 @@ namespace OurWordData.DataModel
         #region SMethod: bool ParagraphHasNoReference(DParagraph p)
         public static bool ParagraphHasNoReference(DParagraph p)
         {
-            if (p.StyleAbbrev == DB.Map.StyleSection)
+            var v = new List<ParagraphStyle>()
+            { 
+                StyleSheet.Section,
+                StyleSheet.MinorSection,
+                StyleSheet.SectionCrossReference,
+                StyleSheet.BookTitle,
+                StyleSheet.BookSubTitle,
+                StyleSheet.RunningHeader,
+                StyleSheet.PictureCaption
+            };
+            if (v.Contains(p.Style))
                 return true;
-            if (p.StyleAbbrev == DB.Map.StyleSection2)
-                return true;
-            if (p.StyleAbbrev == DB.Map.StyleCrossRef)
-                return true;
-            if (p.StyleAbbrev == DB.Map.StyleMainTitle)
-                return true;
-            if (p.StyleAbbrev == DB.Map.StyleSubTitle)
-                return true;
-            if (p.StyleAbbrev == DB.Map.StyleHeader)
-                return true;
-            if (p.StyleAbbrev == DB.Map.StylePicCaption)
-                return true;
+
             return false;
         }
         #endregion
@@ -2725,14 +2714,14 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        #region Method: int CountParagraphsWithStyle(string sStyleAbbrev)
-        public int CountParagraphsWithStyle(string sStyleAbbrev)
+        #region Method: int CountParagraphsWithStyle(style)
+        public int CountParagraphsWithStyle(ParagraphStyle style)
         {
-            int c = 0;
+            var c = 0;
 
             foreach (DParagraph p in Paragraphs)
             {
-                if (p.StyleAbbrev == sStyleAbbrev)
+                if (p.Style == style)
                     ++c;
             }
 
@@ -2899,7 +2888,7 @@ namespace OurWordData.DataModel
                         var p1 = one.Paragraphs[k];
                         var p2 = two.Paragraphs[k];
 
-                        if (p1.StyleAbbrev != p2.StyleAbbrev)
+                        if (p1.Style != p2.Style)
                             return false;
                         if (p1.TypeCodes != p2.TypeCodes)
                             return false;

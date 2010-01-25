@@ -23,6 +23,7 @@ using System.Xml;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 #endregion
@@ -111,11 +112,8 @@ namespace OurWordData.DataModel
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public DMessage()
-            : base()
+            : base(StyleSheet.TipMessage)
         {
-            // This paragraph will always have the Message style
-            StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
-
             // Start with a simple, empty text
             SimpleText = "";
             SimpleTextBT = "";
@@ -351,7 +349,7 @@ namespace OurWordData.DataModel
             // The paragraph's ReadOxes method will attempt to set StyyleAbbrev to "p", because
             // we don't actually have an attr in the xml. So even though the call
             // to "this" constructor set it originally, we have to set it again here.
-            StyleAbbrev = DStyleSheet.c_StyleAnnotationMessage;
+            Style = StyleSheet.TipMessage;
 
             return true;
         }

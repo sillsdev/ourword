@@ -24,6 +24,8 @@ using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -198,7 +200,7 @@ namespace OurWord.Layouts
                             var pFront = FrontParagraphs[i];
                             var pTarget = TargetParagraphs[i];
 
-                            if (pFront.StyleAbbrev != pTarget.StyleAbbrev)
+                            if (pFront.Style != pTarget.Style)
                                 return false;
                             if (!pFront.IsSameReferenceAs(pTarget))
                                 return false;
@@ -286,7 +288,7 @@ namespace OurWord.Layouts
             {
                 if (i == vParagraphs.Count)
                 {
-                    DParagraph pNew = new DParagraph();
+                    var pNew = new DParagraph(StyleSheet.Paragraph);
                     pNew.AddedByCluster = true;
                     vParagraphs.Append(pNew);
                 }

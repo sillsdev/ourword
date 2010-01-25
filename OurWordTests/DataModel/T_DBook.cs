@@ -24,6 +24,7 @@ using OurWord;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 #endregion
@@ -294,10 +295,9 @@ namespace OurWordTests.DataModel
             book.Version = "A";
 
             // Add an extra paragraph
-            DParagraph p = new DParagraph();
+            DParagraph p = new DParagraph(StyleSheet.Line1);
             DSection section = book.Sections[0] as DSection;
             section.Paragraphs.Append(p);
-            p.StyleAbbrev = "q";
             SetSimpleParagraphText(p, sTextO);
 
             // Save the book. Then save it again, so that "Original" gets placed

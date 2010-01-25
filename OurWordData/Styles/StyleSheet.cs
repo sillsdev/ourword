@@ -53,12 +53,25 @@ namespace OurWordData.Styles
         // Paragraph Styles: Scripture Content
         static public ParagraphStyle Paragraph;
         static public ParagraphStyle ParagraphContinuation;
-        static public ParagraphStyle QuoteLevel1;
-        static public ParagraphStyle QuoteLevel2;
-        static public ParagraphStyle QuoteLevel3;
-        static public ParagraphStyle CenteredQuote;
+        static public ParagraphStyle Line1;
+        static public ParagraphStyle Line2;
+        static public ParagraphStyle Line3;
+        static public ParagraphStyle LineCentered;
         static public ParagraphStyle PictureCaption;
         static public ParagraphStyle Footnote;
+
+        // Paragraph Styles: Literate Settings
+        static public ParagraphStyle LiterateParagraph;
+        static public ParagraphStyle LiterateHeading;
+        static public ParagraphStyle LiterateAttention;
+        static public ParagraphStyle LiterateList;
+
+        // Paragraph Styles: User Interface
+        static public ParagraphStyle ReferenceTranslation;
+        public static ParagraphStyle TipHeader;
+        public static ParagraphStyle TipContent;
+        public static ParagraphStyle TipText;
+        public static ParagraphStyle TipMessage;
 
         // List of Styles --------------------------------------------------------------------
         #region SAttr{g}: List<CharacterStyle> StyleList
@@ -75,7 +88,7 @@ namespace OurWordData.Styles
         private static List<CharacterStyle> s_vStyleList;
         #endregion
         #region SMethod: CharacterStyle Find(sStyleName)
-        static CharacterStyle Find(string sStyleName)
+        static public CharacterStyle Find(string sStyleName)
         {
             foreach (var style in StyleList)
             {
@@ -102,6 +115,18 @@ namespace OurWordData.Styles
             return style;
         }
         #endregion
+        static public ParagraphStyle FindFromToolboxMarker(string sMarker)
+        {
+            foreach(var style in StyleList)
+            {
+                var paragraphStyle = style as ParagraphStyle;
+                if (null == paragraphStyle)
+                    continue;
+                if (paragraphStyle.Map.ToolboxMarker == sMarker)
+                    return paragraphStyle;
+            }
+            return null;
+        }
 
         // Initialization -------------------------------------------------------------------- 
         #region SMethod: void Clear()
@@ -112,7 +137,7 @@ namespace OurWordData.Styles
         }
         #endregion
         #region SMethod: void EnsureFactoryInitialized()
-        private static void EnsureFactoryInitialized()
+        public static void EnsureFactoryInitialized()
             // Defaults in the style system; anything different must be explicitly 
             // declared here
             //
@@ -129,6 +154,8 @@ namespace OurWordData.Styles
             EnsureFactoryWritingSystemsInitialized();
             EnsureFactoryCharacterStylesInitialized();
             EnsureFactoryParagraphStylesInitialized();
+            EnsureLiterateSettingsStyleInitialized();
+            EnsureUserInterfaceParagraphsInitialized();
 
             // The initialize process sets attributes, which in turn sets the dirty
             // flag; so we need to clear it now that we're all done
@@ -159,13 +186,13 @@ namespace OurWordData.Styles
         {
             // Book Organization Paragraphs
             RunningHeader = EnsureInitialized(
-                new ParagraphStyle("Running Header") { 
+                new ParagraphStyle("Header") { 
                         DefaultFontStyle = FontStyle.Bold, 
                         Alignment = ParagraphStyle.Align.Justified },
                 new ParagraphStyle.Mapping("h"));
 
             BookTitle = EnsureInitialized(
-                new ParagraphStyle("Book Title") {
+                new ParagraphStyle("Title Main") {
                         DefaultFontStyle = FontStyle.Bold,
                         DefaultFontSize = 16,
                         Alignment = ParagraphStyle.Align.Centered,
@@ -174,7 +201,7 @@ namespace OurWordData.Styles
                 new ParagraphStyle.Mapping("mt"));
 
             BookSubTitle = EnsureInitialized(
-                new ParagraphStyle("Book SubTitle") {
+                new ParagraphStyle("Title Secondary") {
                         DefaultFontStyle = FontStyle.Bold,
                         DefaultFontSize = 14,
                         Alignment = ParagraphStyle.Align.Centered,
@@ -183,7 +210,7 @@ namespace OurWordData.Styles
                 new ParagraphStyle.Mapping("mt2") {ToolboxMarker = "st"});
 
             MajorSection = EnsureInitialized(
-                new ParagraphStyle("Major Section Title") {
+                new ParagraphStyle("Major Section Head") {
                         DefaultFontStyle = FontStyle.Bold,
                         DefaultFontSize = 14,
                         Alignment = ParagraphStyle.Align.Centered,
@@ -193,7 +220,7 @@ namespace OurWordData.Styles
                 new ParagraphStyle.Mapping("ms"));
 
             MajorSectionCrossReference = EnsureInitialized(
-                new ParagraphStyle("Major Cross References") {
+                new ParagraphStyle("Major Section Range") {
                         DefaultFontStyle = FontStyle.Italic,
                         Alignment = ParagraphStyle.Align.Centered,
                         PointsAfter = 3,
@@ -201,7 +228,7 @@ namespace OurWordData.Styles
                 new ParagraphStyle.Mapping("mr"));
 
             Section = EnsureInitialized(
-                new ParagraphStyle("Section Title") {
+                new ParagraphStyle("Section Head") {
                         DefaultFontStyle = FontStyle.Bold,
                         DefaultFontSize = 12,
                         Alignment = ParagraphStyle.Align.Centered,
@@ -211,7 +238,7 @@ namespace OurWordData.Styles
                 new ParagraphStyle.Mapping("s1") {ToolboxMarker = "s"});
 
             SectionCrossReference = EnsureInitialized(
-                new ParagraphStyle("Cross References") {
+                new ParagraphStyle("Parallel Passage Reference") {
                         DefaultFontStyle = FontStyle.Italic,
                         Alignment = ParagraphStyle.Align.Centered,
                         PointsAfter = 3,
@@ -219,7 +246,7 @@ namespace OurWordData.Styles
                 new ParagraphStyle.Mapping("r"));
 
             MinorSection = EnsureInitialized(
-                new ParagraphStyle("Section Title 2") {
+                new ParagraphStyle("Section Head 2") {
                         DefaultFontStyle = FontStyle.Bold,
                         DefaultFontSize = 12,
                         Alignment = ParagraphStyle.Align.Centered,
@@ -232,40 +259,46 @@ namespace OurWordData.Styles
             Paragraph = EnsureInitialized(
                 new ParagraphStyle("Paragraph") {
                         Alignment = ParagraphStyle.Align.Justified }, 
-                new ParagraphStyle.Mapping("p"));
+                new ParagraphStyle.Mapping("p") {
+                        IsScripture = true });
 
             ParagraphContinuation = EnsureInitialized(
                 new ParagraphStyle("Paragraph Continuation") {
                         Alignment = ParagraphStyle.Align.Justified },
-                new ParagraphStyle.Mapping("p"));
+                new ParagraphStyle.Mapping("m") {
+                    IsScripture = true });
 
-            QuoteLevel1 = EnsureInitialized(
-                new ParagraphStyle("Quote Level 1") {
+            Line1 = EnsureInitialized(
+                new ParagraphStyle("Line 1") {
                         Alignment = ParagraphStyle.Align.Justified,
-                        LeftMarginInches = 0.2 }, 
-                new ParagraphStyle.Mapping("q1"));
+                        LeftMarginInches = 0.2 },
+                new ParagraphStyle.Mapping("q1") {
+                    ToolboxMarker = "q", IsScripture = true, IsPoetry = true});
 
-            QuoteLevel2 = EnsureInitialized(
-                new ParagraphStyle("Quote Level 2") {
+            Line2 = EnsureInitialized(
+                new ParagraphStyle("Line 2") {
                         Alignment = ParagraphStyle.Align.Justified,
                         LeftMarginInches = 0.4 },
-                new ParagraphStyle.Mapping("q2"));
+                new ParagraphStyle.Mapping("q2") {
+                    IsScripture = true, IsPoetry = true});
 
-            QuoteLevel3 = EnsureInitialized(
-                new ParagraphStyle("Quote Level 3") {
+            Line3 = EnsureInitialized(
+                new ParagraphStyle("Line 3") {
                         Alignment = ParagraphStyle.Align.Justified,
                         LeftMarginInches = 0.6 },
-                new ParagraphStyle.Mapping("q3"));
+                new ParagraphStyle.Mapping("q3") {
+                    IsScripture = true, IsPoetry = true});
 
-            CenteredQuote = EnsureInitialized(
-                new ParagraphStyle("Centered Quote") {
+            LineCentered = EnsureInitialized(
+                new ParagraphStyle("Line Centered") {
                         Alignment = ParagraphStyle.Align.Justified,
                         LeftMarginInches = 0.2,
                         RightMarginInches = 0.2 },
-                new ParagraphStyle.Mapping("qc"));
+                new ParagraphStyle.Mapping("qc") {
+                    IsScripture = true, IsPoetry = true});
 
             PictureCaption = EnsureInitialized(
-                new ParagraphStyle("Picture Caption") {
+                new ParagraphStyle("Caption") {
                         DefaultFontStyle = FontStyle.Italic,
                         Alignment = ParagraphStyle.Align.Centered },
                 new ParagraphStyle.Mapping("fig") {ToolboxMarker = "cap"});
@@ -278,14 +311,115 @@ namespace OurWordData.Styles
 
         }
         #endregion
+        #region SMethod: void EnsureLiterateSettingsStyleInitialized()
+        static void EnsureLiterateSettingsStyleInitialized()
+        {
+            LiterateParagraph = EnsureInitialized(
+                new ParagraphStyle("Literate Paragraph") {
+                        DefaultFontSize = 8,
+                        Alignment = ParagraphStyle.Align.Justified,
+                        PointsBefore = 3,
+                        PointsAfter = 3 },
+                new ParagraphStyle.Mapping("LitParagraph") {
+                        IsUserInterface = true });
 
-        static ParagraphStyle EnsureInitialized(ParagraphStyle defaultStyle, ParagraphStyle.Mapping map)
+            LiterateHeading = EnsureInitialized(
+                new ParagraphStyle("Literate Heading") {
+                    DefaultFontSize = 9,
+                    DefaultFontStyle = FontStyle.Bold,
+                    Alignment = ParagraphStyle.Align.Justified,
+                    PointsBefore = 6,
+                    PointsAfter = 3 },
+                new ParagraphStyle.Mapping("LitHeading") {
+                    IsUserInterface = true });
+
+            LiterateAttention = EnsureInitialized(
+                new ParagraphStyle("Literate Attention") {
+                    DefaultFontSize = 8,
+                    DefaultFontStyle = FontStyle.Bold,
+                    FontColor = Color.DarkRed,
+                    Alignment = ParagraphStyle.Align.Justified,
+                    PointsBefore = 3,
+                    PointsAfter = 3 },
+                new ParagraphStyle.Mapping("LitAttention") {
+                    IsUserInterface = true });
+
+            LiterateList = EnsureInitialized(
+                new ParagraphStyle("Literate List") {
+                    DefaultFontSize = 8,
+                    Alignment = ParagraphStyle.Align.Justified,
+                    LeftMarginInches = 0.2,
+                    PointsBefore = 0,
+                    PointsAfter = 0,
+                    Bulleted = true },
+                new ParagraphStyle.Mapping("LitList") {
+                    IsUserInterface = true });
+        }
+        #endregion
+        #region SMethod: void EnsureUserInterfaceParagraphsInitialized()
+        static void EnsureUserInterfaceParagraphsInitialized()
+        {
+            ReferenceTranslation = EnsureInitialized(
+               new ParagraphStyle("Reference Translation") {
+                   DefaultFontSize = 10,
+                   Alignment = ParagraphStyle.Align.Justified,
+                   FirstLineIndentInches = -0.20,
+                   LeftMarginInches = 0.20 },
+               new ParagraphStyle.Mapping("ReferenceTranslation") {
+                   IsUserInterface = true });
+
+            TipHeader = EnsureInitialized(
+               new ParagraphStyle("Tip Header") {
+                   Alignment = ParagraphStyle.Align.Left,
+                   PointsBefore = 0,
+                   PointsAfter = 0 },
+               new ParagraphStyle.Mapping("TipHeader") {
+                   IsUserInterface = true });
+
+            TipContent = EnsureInitialized(
+               new ParagraphStyle("Tip Content") {
+                   DefaultFontSize = 9,
+                   DefaultFontStyle = FontStyle.Bold,
+                   Alignment = ParagraphStyle.Align.Justified,
+                   PointsBefore = 0,
+                   PointsAfter = 0,
+                   LeftMarginInches = 0.1 },
+               new ParagraphStyle.Mapping("TipContent") {
+                   IsUserInterface = true });
+
+            TipText = EnsureInitialized(
+               new ParagraphStyle("Tip Text") {
+                   DefaultFontSize = 9,
+                   DefaultFontStyle = FontStyle.Bold,
+                   Alignment = ParagraphStyle.Align.Justified,
+                   PointsBefore = 5,
+                   PointsAfter = 0 },
+               new ParagraphStyle.Mapping("TipText") {
+                   IsUserInterface = true });
+
+            TipMessage = EnsureInitialized(
+               new ParagraphStyle("Tip Note Discussion")
+               {
+                   Alignment = ParagraphStyle.Align.Justified,
+                   PointsBefore = 3,
+                   PointsAfter = 3
+               },
+               new ParagraphStyle.Mapping("TipText")
+               {
+                   IsUserInterface = true
+               });
+        }
+        #endregion
+
+        #region SMethod: ParagraphStyle EnsureInitialized(defaultStyle, map)
+        static ParagraphStyle EnsureInitialized(CharacterStyle defaultStyle, ParagraphStyle.Mapping map)
         {
             var style = FindOrAdd(defaultStyle) as ParagraphStyle;
             Debug.Assert(null != style);
             style.Map = map;
             return style;
         }
+        #endregion
 
         #region SMethod: void EnsureFactoryWritingSystemsInitialized()
         static void EnsureFactoryWritingSystemsInitialized()

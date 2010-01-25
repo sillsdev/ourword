@@ -154,11 +154,11 @@ namespace OurWordTests.Edit
         static void _InitBook(string[] vsRawData)
         {
             // We'll use a temporary file name to read the data in
-            string sPath = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + "TestBook.x";
+            var sPath = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + "TestBook.x";
 
             // Write out the raw data to this temporary file
-            TextWriter W = JW_Util.GetTextWriter(sPath);
-            foreach (string s in vsRawData)
+            var W = JW_Util.GetTextWriter(sPath);
+            foreach (var s in vsRawData)
                 W.WriteLine(s);
             W.Close();
 

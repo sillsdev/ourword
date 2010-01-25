@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
+using OurWordData.Styles;
 using Palaso.UI.WindowsForms.Keyboarding;
 using JWTools;
 using OurWordData;
@@ -45,15 +46,15 @@ namespace OurWord.Dialogs
 			Information.InitStyleSheet();
 
 			// Introduction
-			LS.AddInformation("ah100", Information.PStyleNormal, 
+            LS.AddInformation("ah100", StyleSheet.LiterateParagraph, 
 				"_OurWord_ offers a quick-and-dirty means of hyphenation, which you may find useful if " +
 				"your language has long words. It is probably not sufficient if your language requires " +
 				"complex hyphenation rules, but perhaps it will be enough for drafting purposes.");
 
 			// Section: Setup
-			LS.AddInformation("ah200", Information.PStyleHeading1, "A. Setup");
+            LS.AddInformation("ah200", StyleSheet.LiterateHeading, "A. Setup");
 
-			LS.AddInformation("ah210", Information.PStyleNormal, 
+            LS.AddInformation("ah210", StyleSheet.LiterateParagraph, 
 				"*1. You must first turn on the feature.* By default it is turned off because automated " +
 				"hyphenation has a high potential to comfuse new computer users.");
 			m_TurnOnHyphenation = LS.AddYesNo( 
@@ -63,14 +64,14 @@ namespace OurWord.Dialogs
                     "are not physically placed in the data; they merely appear on screen.",
 				WritingSystem.UseAutomatedHyphenation);
 
-			LS.AddInformation("ah220", Information.PStyleNormal, 
+            LS.AddInformation("ah220", StyleSheet.LiterateParagraph, 
 				"*2. At the heart of hyphenation you must specify a CV pattern,* in which you indicate " +
 				"where the hyphen is permitted.");
-			LS.AddInformation("ah221", Information.PStyleList1, 
+            LS.AddInformation("ah221", StyleSheet.LiterateList, 
 				"\"VC-C\" works for many English words, such as \"bog-gle\", \"com-mit\", and \"" +
 				"air-plane.\" (Unfortunately it fails for words such as \"pa-per,\" thus we recognize " +
 				"that _OurWord_ will not completely cover all of the hyphenation rules of many languages.)");
-			LS.AddInformation("ah222", Information.PStyleList1,
+            LS.AddInformation("ah222", StyleSheet.LiterateList,
 				"\"V-C\" works for Huichol words, where closed syllables do not exist, thus " +
 				"\"pü-ca-heu-xü-ca-cai-ri.\"");
 			m_HyphenationCVPattern = LS.AddEditText("ahCV",
@@ -78,7 +79,7 @@ namespace OurWord.Dialogs
 				"Indicate where the hyphen will go, e.g., V-C, or VC-CV.",
 				WritingSystem.HyphenationCVPattern);
 
-			LS.AddInformation("ah230", Information.PStyleNormal, 
+            LS.AddInformation("ah230", StyleSheet.LiterateParagraph, 
 				"*3. You need to tell _OurWord_ what your consonants are.* Once we know the consonants, " +
 				"and because we already know the punctuation, we can infer that everything else is a " +
 				"vowel; and thus we can check against the CV pattern you supplied.");
@@ -88,7 +89,7 @@ namespace OurWord.Dialogs
 					"consonant or punctuation is considered to be a vowel.)",
 				WritingSystem.Consonants);
 
-			LS.AddInformation("ah240", Information.PStyleNormal, 
+            LS.AddInformation("ah240", StyleSheet.LiterateParagraph, 
 				"*4. Finally, you can specify a minimum size,* so that _OurWord_ will not break a word " +
 				"down into parts that are too small. Thus a minimum size of three letters would " +
 				"prevent \"ap-ple\", because \"ap\" would be too small.");
@@ -97,13 +98,13 @@ namespace OurWord.Dialogs
 				"Hyphenation will not result in a word-part that is smaller than this value.",
 				WritingSystem.MinHyphenSplit, 1);
 
-			LS.AddInformation("ah250", Information.PStyleNormal, 
+            LS.AddInformation("ah250", StyleSheet.LiterateParagraph, 
 				"That should cover it. You can now go to the main drafting screen and see how words " +
 				"are hyphenating, and come back here and tweak until you are happy with the result.");
 
 			// Section: Behavior
-			LS.AddInformation("ah300", Information.PStyleHeading1, "B. Behavior");
-			LS.AddInformation("ah301", Information.PStyleNormal, 
+            LS.AddInformation("ah300", StyleSheet.LiterateHeading, "B. Behavior");
+            LS.AddInformation("ah301", StyleSheet.LiterateParagraph, 
 				"If turned on, hyphens are automatically created, and then automatically update as " +
 				"you type or otherwise edit the text. They are never inserted into the data, and thus " +
 				"never are stored in the file. When editing, the hyphens appear outside of the white " +
@@ -111,21 +112,21 @@ namespace OurWord.Dialogs
 				"will not be tempted to type in hyphens, because doing so would cause them to be part " +
 				"of the data. If you ever see a hyphen with a white background, it was inserted by the " +
 				"user, not by _OurWord._");
-			LS.AddInformation("ah302", Information.PStyleNormal, 
+            LS.AddInformation("ah302", StyleSheet.LiterateParagraph, 
 				"If a single word becomes too long to fit in a line, and if hyphenation is turned " +
 				"off (or if the hyphen rule does not apply), then _OurWord_ will arbitrarily display a " +
 				"hyphen in order to keep the line from overflowing from view on the screen. Again, " +
 				"these hyphens are not inserted into the data, they merely appear on the screen.");
 
 			// Section: Future
-			LS.AddInformation("ah400", Information.PStyleHeading1, "C. Future");
-			LS.AddInformation("ah401", Information.PStyleNormal, 
+            LS.AddInformation("ah400", StyleSheet.LiterateHeading, "C. Future");
+            LS.AddInformation("ah401", StyleSheet.LiterateParagraph, 
 				"Depending on expressed user interest, future versions may incorporate a more " +
 				"rigorous approach to the problem. Possibilities include permitting multiple " +
 				"CV patterns, regular expressions, or use of the very-rigorous International " +
 				"Components for Unicode (ICU) library. So please build your case for further " +
 				"work in this area.");
-			LS.AddInformation("ah402", Information.PStyleNormal, 
+            LS.AddInformation("ah402", StyleSheet.LiterateParagraph, 
 				"Secondly, automatic hyphenation is not yet implemented in the Print routine. " +
 				"I know, I know......stay tuned.....and the more voices that request it, the " +
 				"higher this stuff moves up on my To Do list.");

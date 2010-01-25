@@ -16,6 +16,7 @@ using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 #endregion
@@ -384,7 +385,7 @@ namespace OurWord.Edit
             // Create the paragraph
             var pTitle = new OWPara(
                 Note.Behavior.GetWritingSystem(Note),
-                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipHeader),
+                StyleSheet.TipHeader,
                 dbt.Phrases.AsVector);
 
             // Pre-pend the icon
@@ -436,14 +437,8 @@ namespace OurWord.Edit
                 (OWPara.Flags.None);
 
             // Create the paragraph
-            string sStyle = (message.IsEditable) ?
-                DStyleSheet.c_StyleMessageContent : DStyleSheet.c_StyleToolTipText;
-            var p = new OWPara(
-                writingSystem,
-                DB.StyleSheet.FindParagraphStyle(sStyle),
-                message,
-                clrBackground,
-                flags);
+            var style = (message.IsEditable) ? StyleSheet.TipContent : StyleSheet.TipText;
+            var p = new OWPara(writingSystem, style, message, clrBackground, flags);
 
             // If the message is editable, we want to make it stand out by placing it inside
             // a container that shows the color better.
@@ -480,11 +475,7 @@ namespace OurWord.Edit
             // Create the paragraph
             var writingSystem = Note.Behavior.GetWritingSystem(Note);
             Debug.Assert(null != writingSystem);
-            var p = new OWPara(
-                writingSystem,
-                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipText),
-                message,
-                clrBackground,
+            var p = new OWPara(writingSystem, StyleSheet.TipText, message, clrBackground,
                 flags);
 
             // If the message is editable, we want to make it stand out by placing it inside
@@ -829,15 +820,13 @@ namespace OurWord.Edit
             Debug.Assert(null != writingSystem);
 
             // Header style and font
-            var styleHeader = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
-            var fontHeader = styleHeader.CharacterStyle.FindOrAddFontForWritingSystem(
-                writingSystem).FindOrAddFont(true, FontStyle.Regular);
+            var fontHeader = StyleSheet.TipHeader.GetFont(writingSystem.Name, G.ZoomPercent);
 
             // Uneditable messages are just a line of text
             if (!message.IsEditable)
             {
                 var p = new OWPara(writingSystem,
-                    styleHeader,
+                    StyleSheet.TipHeader,
                     new[] { 
                         new DPhrase(message.Author),
                         new DPhrase(", "),
@@ -1134,16 +1123,11 @@ namespace OurWord.Edit
                 return boxToolstrip;
             }
 
-            // Override any spacing the user entered, so it looks "right"
-            var pStyle = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
-            pStyle.SpaceBefore = 2;
-            pStyle.SpaceAfter = 0;
-
             var sStage = (null == message.Stage) ? "" : message.Stage.LocalizedAbbrev;
 
             var pTitle = new OWPara(
                 Note.Behavior.GetWritingSystem(Note),
-                pStyle,
+                StyleSheet.TipHeader,
                 new[] { 
                     new DPhrase( message.EventDate.ToShortDateString()),
                     new DPhrase( ", "),

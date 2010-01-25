@@ -143,10 +143,7 @@ namespace OurWord.Edit
                 if (!CanRestructureParagraphs)
                     return false;
 
-                if (!DB.Map.IsVernacularParagraph(PStyle.SFM))
-                    return false;
-
-                return true;
+                return Style.Map.IsScripture;
             }
         }
         #endregion
@@ -677,7 +674,7 @@ namespace OurWord.Edit
 
             // Get the font factory for everything in this DBT
             var style = t.Paragraph.Style;
-            var fontForWS = style.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
+            var fontFactory = style.FindFontFactory(WritingSystem.Name);
 
             // Loop through all of the phrases in this DBasicText
             foreach (DPhrase phrase in phrases)
@@ -692,7 +689,7 @@ namespace OurWord.Edit
                     // in order to build the next one.
                     if (WritingSystem.IsWordBreak(phrase.Text, i) && sWord.Length > 0)
                     {
-                        var fontZoomed = fontForWS.FindOrAddFont(true, phrase.FontToggles);
+                        var fontZoomed = fontFactory.GetFont(phrase.FontToggles, G.ZoomPercent);
                         vWords.Add(new EWord(fontZoomed, phrase, sWord));
                         sWord = "";
                     }
@@ -705,7 +702,7 @@ namespace OurWord.Edit
                 // caught it.
                 if (sWord.Length > 0)
                 {
-                    var fontZoomed = fontForWS.FindOrAddFont(true, phrase.FontToggles);
+                    var fontZoomed = fontFactory.GetFont(phrase.FontToggles, G.ZoomPercent);
                     vWords.Add(new EWord(fontZoomed, phrase, sWord));
                 }
             }
@@ -713,7 +710,7 @@ namespace OurWord.Edit
             // If we did not find any words, then we want to create an InsertionIcon
             if (vWords.Count == 0)
             {
-                var fontZoomed = fontForWS.DefaultFontZoomed;
+                var fontZoomed = fontFactory.GetFont(G.ZoomPercent);
                 vWords.Add(EWord.CreateAsInsertionIcon(fontZoomed, phrases[0]));
             }
 
@@ -842,22 +839,23 @@ namespace OurWord.Edit
         }
         readonly JWritingSystem m_WritingSystem;
         #endregion
-        #region Attr{g}: JParagraphStyle PStyle - pointer stored here for performance
-        public JParagraphStyle PStyle
+        #region Attr{g}: ParagraphStyle Style
+        public ParagraphStyle Style
         {
             get
             {
-                Debug.Assert(null != m_pStyle);
-                return m_pStyle;
+                Debug.Assert(null != m_style);
+                return m_style;
             }
         }
-        JParagraphStyle m_pStyle = null;
+        readonly ParagraphStyle m_style;
         #endregion
         #region Attr{g}: float LineHeight
         public float LineHeight
         {
             get
             {
+
                 Debug.Assert(0.0F != m_fLineHeight);
 
                 // Round up to nearest int. The problem is that if line spacing is rounded down,
@@ -866,22 +864,25 @@ namespace OurWord.Edit
                 return (float)((int)m_fLineHeight);
             }
         }
-        float m_fLineHeight = 0;
+        readonly float m_fLineHeight;
         #endregion      
 
-        #region private Constructor(JWS, PStyle, JObject, flags) - the stuff that is in common
+        #region private Constructor(JWS, style, JObject, flags) - the stuff that is in common
         private OWPara(
             JWritingSystem writingSystem,
-            JParagraphStyle style,
+            ParagraphStyle style,
             JObject objDataSource,
             Flags options)
             : base()
         {
             // Keep track of the attributes passed in
             m_WritingSystem = writingSystem;
-            m_pStyle = style;
+            m_style = style;
             m_objDataSource = objDataSource;
             m_Options = options;
+
+            // Calculate the line height for the paragraph
+            m_fLineHeight = style.GetFont(writingSystem.Name, G.ZoomPercent).Height;
 
             // Initialize the vector of Blocks
             Clear();
@@ -890,23 +891,19 @@ namespace OurWord.Edit
             m_vLines = new List<ELine>();
         }
         #endregion
-        #region Constructor(JWS, PStyle, DParagraph, clrEditableBackground, Flags) - for DParagraph
+        #region Constructor(JWS, style, DParagraph, clrEditableBackground, Flags) - for DParagraph
         public OWPara(
             JWritingSystem ws, 
-            JParagraphStyle PStyle,
+            ParagraphStyle style,
             DParagraph p,
             Color clrEditableBackground, 
             Flags options)
-            : this(ws, PStyle, p, options)
+            : this(ws, style, p, options)
         {
             // The paragraph itself may override to make itself uneditable, 
             // even though we received "true" from the _bEditable parameter.
             if (!p.IsUserEditable)
                 IsEditable = false;
-
-            // Line height
-            m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).LineHeightZoomed;
 
             // Interpret the paragraph's contents into our internal data structure
             _Initialize(p);
@@ -915,20 +912,16 @@ namespace OurWord.Edit
             m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion
-        #region Constructor(JWS, PStyle, DRun[], sLabel, Flags)
+        #region Constructor(JWS, style, DRun[], sLabel, Flags)
         public OWPara(
             JWritingSystem writingSystem,
-            JParagraphStyle style,
+            ParagraphStyle style,
             DRun[] vRuns, 
             string sLabel, 
             Flags options)
             : this(writingSystem, style, vRuns[0].Owner, options)
             // For the Related Languages window
         {
-            // Line height
-            m_fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                WritingSystem).LineHeightZoomed;
-
             // We'll add the language name as a BigHeader
             if (!string.IsNullOrEmpty(sLabel))
             {
@@ -969,25 +962,22 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(JWS, PStyle, sLiteralString)
+        #region Constructor(JWS, style, sLiteralString)
         public OWPara(
             JWritingSystem _ws, 
-            JParagraphStyle pStyle, 
+            ParagraphStyle style, 
             string sLiteralText)
-            : this(_ws, pStyle, new DPhrase[] { new DPhrase(sLiteralText) })
+            : this(_ws, style, new DPhrase[] { new DPhrase(sLiteralText) })
         {
         }
         #endregion
-        #region Constructor(JWS, PStyle, DPhrase[] vLiteralPhrases)
+        #region Constructor(JWS, style, DPhrase[] vLiteralPhrases)
         public OWPara(
-            JWritingSystem _ws, 
-            JParagraphStyle pStyle, 
+            JWritingSystem writingSystem, 
+            ParagraphStyle style, 
             DPhrase[] vLiteralPhrases)
-            : this(_ws, pStyle, (JObject)null, Flags.None)
+            : this(writingSystem, style, (JObject)null, Flags.None)
         {
-            // Line height
-            var fontFactory = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(WritingSystem);
-            m_fLineHeight = fontFactory.LineHeightZoomed;
 
             // Each Literal String will potentially have its own character style
             foreach (var phrase in vLiteralPhrases)
@@ -1002,6 +992,9 @@ namespace OurWord.Edit
                 // Parse the Literal Test into its parts
                 var vs = phrase.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+                // Determine the font for this phrase
+                var font = style.GetFont(writingSystem.Name, phrase.FontToggles, G.ZoomPercent);
+
                 // Create the literal strings
                 for (var i = 0; i < vs.Length; i++)
                 {
@@ -1009,7 +1002,7 @@ namespace OurWord.Edit
                         vs[i] = vs[i] + " ";
 
                     // Add the literal
-                    Append(new ELiteral(fontFactory.DefaultFontZoomed, phrase, vs[i]));
+                    Append(new ELiteral(font, phrase, vs[i]));
                 }
             }
         }
@@ -1502,7 +1495,7 @@ namespace OurWord.Edit
                 // Whether or not the line is justified depends first on the
                 // paragraph style; but the final line is not justified in
                 // any case.
-                bool bJustify = PStyle.IsJustified;
+                var bJustify = Style.IsJustified;
                 if (ln == Lines[Lines.Count - 1])
                     bJustify = false;
 
@@ -1523,10 +1516,10 @@ namespace OurWord.Edit
                 // (assuming there is no chapter number; as we ignore first-line indentation
                 // where we have chapter numbers)
                 if (ln == Lines[0] && null == ln.Chapter)
-                    x += Context.InchesToDeviceX((float)PStyle.FirstLineIndent);
-                if (PStyle.IsRight)
+                    x += Context.InchesToDeviceX((float)Style.FirstLineIndentInches);
+                if (Style.IsRight)
                     x += (xMaxWidth - ln.Width);
-                if (PStyle.IsCentered)
+                if (Style.IsCentered)
                     x += (xMaxWidth - ln.Width) / 2;
 
                 // Calculate the width to be filled. If we are working on the first line, we need
@@ -1534,7 +1527,7 @@ namespace OurWord.Edit
                 // the fill-width. Hence we subtract.
                 var xWidthToFill = xMaxWidth;
                 if (ln == Lines[0])
-                    xWidthToFill -= Context.InchesToDeviceX((float)PStyle.FirstLineIndent);
+                    xWidthToFill -= Context.InchesToDeviceX((float)Style.FirstLineIndentInches);
 
                 ln.SetPositions(x, y, xWidthToFill, bJustify);
                 y += LineHeight;
@@ -1578,8 +1571,8 @@ namespace OurWord.Edit
             var xMaxWidth = Width;
 
             // Decrease the width by the paragraph margins
-            xMaxWidth -= Context.InchesToDeviceX((float)PStyle.LeftMargin);
-            xMaxWidth -= Context.InchesToDeviceX((float)PStyle.RightMargin);
+            xMaxWidth -= Context.InchesToDeviceX((float)Style.LeftMarginInches);
+            xMaxWidth -= Context.InchesToDeviceX((float)Style.RightMarginInches);
 
             // Decrease the width if line numbers are requested
             if (ShowLineNumbers)
@@ -1587,7 +1580,7 @@ namespace OurWord.Edit
 
             // Add any SpaceBefore. This comes to us in Points, so we divide by 72 to
             // get Inches, then multiply by the screen's DPI to get pixels.
-            var ySpaceBefore = Context.PointsToDeviceY(PStyle.SpaceBefore);
+            var ySpaceBefore = Context.PointsToDeviceY(Style.PointsBefore);
             ySpaceBefore *= G.ZoomFactor;
             y += ySpaceBefore;
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
@@ -1595,7 +1588,7 @@ namespace OurWord.Edit
 
             // We'll add to x until we get to xMaxWidth, to know how much can fit on a line.
             // For this first x, we need to allow for the paragraph's FirstLineIndent
-            var x = Context.InchesToDeviceX((float)PStyle.FirstLineIndent);
+            var x = Context.InchesToDeviceX((float)Style.FirstLineIndentInches);
 
             // We'll build the lines here
             Lines.Clear();
@@ -1690,16 +1683,16 @@ namespace OurWord.Edit
 
             // Finally, we need to loop and actually assign Screen Coordinates to these objects,
             // now that we've broken them down into lines.
-            var xLeft = Position.X + Context.InchesToDeviceX((float)PStyle.LeftMargin);
+            var xLeft = Position.X + Context.InchesToDeviceX((float)Style.LeftMarginInches);
             Layout_SetCoordinates(g, new PointF(xLeft, y), xMaxWidth);
 
-            // Add any SpaceBefore and Space-After to the Height. 
-            // Convert from Points (See SpaceBefore above.)
+            // Add any PointsBefore and PointsAfter to the Height. 
+            // Convert from Points (See comment on PointsBefore above.)
             Height += ySpaceBefore;
             Height += Border.GetTotalWidth(BorderBase.BorderSides.Top);
             Height += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
             Height += CalculateBitmapHeightRequirement();
-            var ySpaceAfter = Context.PointsToDeviceY(PStyle.SpaceAfter);
+            var ySpaceAfter = Context.PointsToDeviceY(Style.PointsAfter);
             ySpaceAfter *= G.ZoomFactor;
             Height += ySpaceAfter;
         }
@@ -1813,7 +1806,7 @@ namespace OurWord.Edit
 		#region Method: void PaintBullet(IDraw)
 		void PaintBullet(IDraw draw)
 		{
-			if (!PStyle.Bulleted)
+			if (!Style.Bulleted)
 				return;
 
 			// The radius is 1/5 of the line height
@@ -2338,7 +2331,7 @@ namespace OurWord.Edit
         #region Constructor(DFootnote, colorBackground, options)
         public OWFootnotePara(DFootnote footnote, Color clrEditableBackground, Flags options)
             : base(GetWritingSystem(footnote, options),            
-                footnote.Style, footnote, clrEditableBackground, options)
+                StyleSheet.Footnote, footnote, clrEditableBackground, options)
         {
             ConstructFootnoteReference(footnote, options);
             ConstructFootnoteLetter(footnote);
@@ -2351,8 +2344,8 @@ namespace OurWord.Edit
             if (string.IsNullOrEmpty(footnote.VerseReference))
                 return;
 
-            var font = footnote.Style.CharacterStyle.FindOrAddFontForWritingSystem(
-                GetWritingSystem(footnote, options)).DefaultFontZoomed;
+            var writngSystem = GetWritingSystem(footnote, options);
+            var font = StyleSheet.Footnote.GetFont(writngSystem.Name, G.ZoomPercent);
 
             var label = new DLabel(footnote.VerseReference + ": ");
 

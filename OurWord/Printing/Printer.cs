@@ -18,6 +18,8 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWord.Printing
@@ -237,7 +239,7 @@ namespace OurWord.Printing
 
             foreach(var p in vParagraphs)
             {
-                if (p.Style != styleRunningFooter) 
+                if (p.Style != StyleSheet.RunningHeader) 
                     continue;
 
                 vParagraphs.Remove(p);
@@ -334,8 +336,8 @@ namespace OurWord.Printing
             foreach(var owp in vDisplayParagraphs)
             {
                 // Shorthand
-                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.PStyle.SpaceBefore);
-                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.PStyle.SpaceAfter);
+                var fSpaceBefore = owp.Context.PointsToDeviceY(owp.Style.PointsBefore);
+                var fSpaceAfter = owp.Context.PointsToDeviceY(owp.Style.PointsAfter);
                 var count = owp.Lines.Count;
 
                 // Widow/orphan control: small paragraphs always go together

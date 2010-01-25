@@ -186,7 +186,7 @@ namespace OurWord.Printing
                 if (null == owp)
                     return false;
 
-                return owp.PStyle.KeepWithNext;
+                return owp.Style.KeepWithNextParagraph;
             }
         }
         #endregion

@@ -103,8 +103,15 @@ namespace OurWordData.Styles
         #region Method: Font GetFont(sWritingSystemName, fZoomPercent)
         public Font GetFont(string sWritingSystemName, float fZoomPercent)
         {
-            var factory = FindOrAddFontFactory(sWritingSystemName);
-            return factory.GetFont(fZoomPercent);
+            return GetFont(sWritingSystemName, FontStyle.Regular, fZoomPercent);
+        }
+        #endregion
+        #region Method: Font GetFont(sWritingSystemName, toggles, fZoomPercent)
+        public Font GetFont(string sWritingSystem, FontStyle toggles, float fZoomPercent)
+        {
+            var factory = FindOrAddFontFactory(sWritingSystem);
+            Debug.Assert(null != factory);
+            return factory.GetFont(toggles, fZoomPercent);
         }
         #endregion
 

@@ -3,6 +3,7 @@ using NUnit.Framework;
 using OurWord;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 namespace OurWordTests.DataModel
 {
@@ -98,8 +99,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region Test: Merge_BothChanged
-        [Test]
-        public void Merge_BothChanged()
+        [Test] public void Merge_BothChanged()
         {
             // Create the three versions
             string sParent = "These are the |itimes |rthat try men's souls.";
@@ -117,7 +117,7 @@ namespace OurWordTests.DataModel
             section.ReferenceSpan = new DReferenceSpan();
             section.ReferenceSpan.Start = new DReference(3, 8);
             section.ReferenceSpan.End = new DReference(3, 15);
-            DParagraph p = new DParagraph();
+            DParagraph p = new DParagraph(StyleSheet.Paragraph);
             section.Paragraphs.Append(p);
             p.Runs.Append(Ours);
 

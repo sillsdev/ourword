@@ -26,6 +26,7 @@ using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 
@@ -111,7 +112,7 @@ namespace OurWordTests.Edit
         private DParagraph CreateParagraph_John_3_16()
         {
             // Create a paragraph
-            var p = new DParagraph {StyleAbbrev = "p"};
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             // Add various runs
             p.AddRun(DChapter.Create("3"));
@@ -1098,8 +1099,7 @@ namespace OurWordTests.Edit
         private DParagraph CreateParagraph_LongHuicholWords()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph();
-            p.StyleAbbrev = "p";
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             // Add various runs
             p.AddRun(DVerse.Create("16"));

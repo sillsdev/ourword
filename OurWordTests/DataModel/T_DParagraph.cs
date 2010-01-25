@@ -23,6 +23,7 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 
@@ -62,7 +63,7 @@ namespace OurWordTests.DataModel
         private DParagraph SplitParagraphSetup()
         {
             // Create a paragraph
-            var p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             // Add various runs
             p.AddRun(DChapter.Create("3"));
@@ -334,19 +335,19 @@ namespace OurWordTests.DataModel
         [Test] public void PreventSplitForSomeParagraphStyles()
         {
             // Create a test paragraph
-            DParagraph p = SplitParagraphSetup();
+            var p = SplitParagraphSetup();
 
             // The styles we don't allow
-            string[] vs = new string[] { 
-                DStyleSheet.c_StyleAbbrevPictureCaption,
-                DStyleSheet.c_StyleNote,
-                DStyleSheet.c_StyleFootnote
+            var vs = new ParagraphStyle[] { 
+                StyleSheet.PictureCaption,
+                StyleSheet.TipContent,
+                StyleSheet.Footnote
             };
 
             // Try out each one
-            foreach (string sAbbrev in vs)
+            foreach (var style in vs)
             {
-                p.StyleAbbrev = sAbbrev;
+                p.Style = style;
                 p.Split(p.Runs[2] as DBasicText, 23);
                 Assert.AreEqual(1, m_section.Paragraphs.Count);
             }
@@ -477,7 +478,7 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_VerseAtBeginning()
         {
             // Build the paragraph
-            var p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
             p.AddRun(DVerse.Create("16"));
 
             var text = new DText();
@@ -502,7 +503,7 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_VerseAtMiddle()
         {
             // Build the paragraph
-            var p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             var text = new DText();
             text.Phrases.Append(new DPhrase(
@@ -526,7 +527,7 @@ namespace OurWordTests.DataModel
         [Test] public void FirstActualVerseNumber_NoVerse()
         {
             // Build the paragraph
-            DParagraph p = new DParagraph();
+            DParagraph p = new DParagraph(StyleSheet.Paragraph);
 
             DText text = new DText();
             text.Phrases.Append(new DPhrase(
@@ -553,7 +554,7 @@ namespace OurWordTests.DataModel
         [Test] public void AsString()
         {
             // Set up a paragraph
-            DParagraph p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
             p.AddRun(DChapter.Create("3"));
             p.AddRun(DVerse.Create("1"));
             p.AddRun(DText.CreateSimple("In the beginning was the word."));
@@ -575,7 +576,7 @@ namespace OurWordTests.DataModel
         [Test] public void CombineDTexts()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             // Place an initial phrase into the paragraph
             p.SimpleText = "This is a phrase.";
@@ -600,13 +601,13 @@ namespace OurWordTests.DataModel
         [Test] public void BestGuessAtInsertingTextPositions()
         {
             // An empty paragraph should be given a DText
-            DParagraph p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(1, p.Runs.Count);
             Assert.IsNotNull(p.Runs[0] as DText);
 
             // There should be DText after verses
-            p = new DParagraph();
+            p = new DParagraph(StyleSheet.Paragraph);
             p.Runs.Append(DVerse.Create("3"));
             p.Runs.Append(DVerse.Create("4"));
             p.Runs.Append( new DFoot( new DFootnote(2, 4, DFootnote.Types.kExplanatory)));
@@ -619,7 +620,7 @@ namespace OurWordTests.DataModel
             Assert.IsNotNull(p.Runs[4] as DFoot);
 
             // There should be a DText before a paragraph-initial footnote
-            p = new DParagraph();
+            p = new DParagraph(StyleSheet.Paragraph);
             p.Runs.Append(new DFoot( new DFootnote(2, 4, DFootnote.Types.kExplanatory)));
             p.BestGuessAtInsertingTextPositions();
             Assert.AreEqual(2, p.Runs.Count);
@@ -629,28 +630,6 @@ namespace OurWordTests.DataModel
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        #region Test: IoAbbreviated
-        [Test] public void IoAbbreviated()
-        {
-            // Create a paragraph with a single DText
-            var p = new DParagraph();
-            m_section.Paragraphs.Append(p);
-            var text = new DText();
-            p.Runs.Append(text);
-            text.Phrases.Append(new DPhrase("This is some text."));
-            text.PhrasesBT.Append(new DPhrase(""));
-
-            // Create the Xml Element from it
-            var x = p.ToXml(true);
-
-            // Create a new recipient paragraph and interpret the xml
-            var pNew = new DParagraph();
-            pNew.FromXml(x);
-
-            // Should be the same
-            Assert.IsTrue(p.ContentEquals(pNew), "Paragraphs should be equal.");
-        }
-        #endregion
         #region Test: oxesIO
         [Test] public void oxesIO()
         {
@@ -673,14 +652,14 @@ namespace OurWordTests.DataModel
             // Attribute data
             string sText = "Ini adalah sesuatu paragraph";
             string sBT = "This is a paragraph.";
-            string sStyle = "q2";
+            var style = StyleSheet.Line2;
 
             // Create a paragraph. The ID will be automatically set to 0.
-            var paragraphIn = new DParagraph();
+            var paragraphIn = new DParagraph(StyleSheet.Paragraph);
             Section.Paragraphs.Append(paragraphIn);
             paragraphIn.SimpleText = sText;
             paragraphIn.SimpleTextBT = sBT;
-            paragraphIn.StyleAbbrev = sStyle;
+            paragraphIn.Style = style;
 
             // Save it to an xml node
             var nodeParagraph = paragraphIn.SaveToOxesBook(oxes, nodeBook);
@@ -691,7 +670,7 @@ namespace OurWordTests.DataModel
             // Should be identical
             Assert.AreEqual(sText, paragraphOut.SimpleText);
             Assert.AreEqual(sBT, paragraphOut.SimpleTextBT);
-            Assert.AreEqual(sStyle, paragraphOut.StyleAbbrev);
+            Assert.AreEqual(style.StyleName, paragraphOut.Style.StyleName);
             Assert.IsTrue(paragraphOut.ContentEquals(paragraphIn), "Paras are the same");
         }
         #endregion
@@ -700,7 +679,7 @@ namespace OurWordTests.DataModel
     public class TParagraph : DParagraph
     {
         public TParagraph(string oxesXml)
-            : base()
+            : base(StyleSheet.Paragraph)
         {
             try
             {

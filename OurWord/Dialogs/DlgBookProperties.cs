@@ -23,6 +23,8 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWord.Edit;
+using OurWordData.Styles;
+
 #endregion
 #region TODO
 /* - Remove hard-coded standard format; set up in a table somewhere.
@@ -92,12 +94,12 @@ namespace OurWord.Dialogs
             Information.InitStyleSheet();
 
             // Intro
-            LS.AddInformation("Bp100", Information.PStyleNormal,
+            LS.AddInformation("Bp100", StyleSheet.LiterateParagraph,
                 "This dialog allows you to input optional additional information about " +
                 "the status of the book: _" + Book.DisplayName + "._");
 
             // Book Stage
-            LS.AddInformation("Bp200", Information.PStyleNormal,
+            LS.AddInformation("Bp200", StyleSheet.LiterateParagraph,
                 "The Stage is where you classify your progress in working through a book. " +
                 "Books start with a Draft, and work their way through such stages as " +
                 "Community Check, Team Check, Back Translation, etc., until they finally " +
@@ -114,7 +116,7 @@ namespace OurWord.Dialogs
                 vsAllNames);
 
             // Version
-            LS.AddInformation("Bp300", Information.PStyleNormal,
+            LS.AddInformation("Bp300", StyleSheet.LiterateParagraph,
                 "You can add an optional Version Letter to further help you keep track " +
                 "of your progress in the book. Thus the Stage might be at Revision, but " +
                 "you can declare that you are at Version A, B, C, etc. You can then click " +
@@ -129,7 +131,7 @@ namespace OurWord.Dialogs
 
 
             // Locked from Editing
-            LS.AddInformation("Bp500", Information.PStyleNormal,
+            LS.AddInformation("Bp500", StyleSheet.LiterateParagraph,
                 "If you lock a book from editing on this machine, then the user will not " +
                 "be able to make any changes to the text. He can still enter notes, " +
                 "however. The Collaboration feature makes this Locked feature less of " +
@@ -143,7 +145,7 @@ namespace OurWord.Dialogs
                 Book.Locked);
 
             // Copyright
-            LS.AddInformation("Bp600", Information.PStyleNormal,
+            LS.AddInformation("Bp600", StyleSheet.LiterateParagraph,
                 "You can give a broad copyright for the entire work, in the Print Options " +
                 "section of the Configuration Dialog. But you can override that here, if " +
                 "you want to do something different when you print out this book. Most " +

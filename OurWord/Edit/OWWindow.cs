@@ -24,6 +24,7 @@ using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 using Palaso.UI.WindowsForms.Keyboarding;
 #endregion
 #endregion
@@ -1843,21 +1844,6 @@ namespace OurWord.Edit
             return true;
         }
         #endregion
-        #region Method: string GetCurrentParagraphStyle()
-        public string GetCurrentParagraphStyle()
-        {
-            if (null == Selection)
-                return null;
-
-            OWPara p = Selection.Paragraph;
-
-            DParagraph paragraph = p.DataSource as DParagraph;
-            if (null != paragraph)
-                return paragraph.StyleAbbrev;
-
-            return null;
-        }
-        #endregion
         #region Cmd: cmdEnter - react to the Enter key, either split a paragraph, or move to the next paragraph
         void cmdEnter()
         {
@@ -1884,10 +1870,10 @@ namespace OurWord.Edit
             (new SplitParagraphAction(this)).Do();
         }
         #endregion
-        #region URCmd: cmdChangeParagraphTo(sStyleAbbrev)
-        public void cmdChangeParagraphTo(string sStyleAbbrev)
+        #region URCmd: cmdChangeParagraphTo(ParagraphStyle)
+        public void cmdChangeParagraphTo(ParagraphStyle style)
         {
-            (new ChangeParagraphStyleAction(this, sStyleAbbrev)).Do();
+            (new ChangeParagraphStyleAction(this, style)).Do();
         }
         #endregion
 

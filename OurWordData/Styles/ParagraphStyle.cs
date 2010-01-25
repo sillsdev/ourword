@@ -156,11 +156,75 @@ namespace OurWordData.Styles
         private Align m_Alignment = Align.Left;
         #endregion
 
+        // Derived Attrs ---------------------------------------------------------------------
+        #region VAttr{g/s}: book IsLeft - paragraph is left-aligned
+        public bool IsLeft
+        {
+            get
+            {
+                return Alignment == Align.Left;
+            }
+            set
+            {
+                Alignment = Align.Left;
+            }
+        }
+        #endregion
+        #region VAttr{g/s}: book IsRight - paragraph is right-aligned
+        public bool IsRight
+        {
+            get
+            {
+                return Alignment == Align.Right;
+            }
+            set
+            {
+                Alignment = Align.Right;
+            }
+        }
+        #endregion
+        #region VAttr{g/s}: book IsCentered - paragraph is centered
+        public bool IsCentered
+        {
+            get
+            {
+                return Alignment == Align.Centered;
+            }
+            set
+            {
+                Alignment = Align.Centered;
+            }
+        }
+        #endregion
+        #region VAttr{g/s}: book IsJustified - paragraph is justified
+        public bool IsJustified
+        {
+            get
+            {
+                return Alignment == Align.Justified;
+            }
+            set
+            {
+                Alignment = Align.Justified;
+            }
+        }
+        #endregion
+
         // Mapping Information ---------------------------------------------------------------
         public class Mapping
         {
             public readonly string UsfmMarker;
             public string ToolboxMarker { get; set;}
+
+            // Scripture is, e.g., p, q1, q2; but isn't things like section heads, cross
+            // references, picture captions.
+            public bool IsScripture { get; set; }
+
+            // These styles are for things in the UI such as the Literate Settings paragraphs
+            public bool IsUserInterface { get; set; }
+
+            // Lines 1,2,3 and CenteredLine
+            public bool IsPoetry { get; set; }
 
             public Mapping(string sUsfmMarker)
             {

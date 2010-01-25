@@ -20,6 +20,7 @@ using System.Xml;
 using JWTools;
 using Chorus.merge;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 using Palaso.Email;
 using Palaso.Reporting;
 
@@ -894,7 +895,7 @@ namespace OurWordData.DataModel
             var section1 = Sections[0];
             foreach (DParagraph p in section1.Paragraphs)
             {
-                if (p.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
+                if (p.Style == StyleSheet.Section)
                     return;
             }
 
@@ -902,7 +903,7 @@ namespace OurWordData.DataModel
             var section2 = Sections[1];
             while (section2.Paragraphs.Count > 0)
             {
-                DParagraph p = section2.Paragraphs[0];
+                var p = section2.Paragraphs[0];
                 section2.Paragraphs.Remove(p);
                 section1.Paragraphs.Append(p);
             }
@@ -1108,9 +1109,8 @@ namespace OurWordData.DataModel
             {
                 if (Map.IsBookNotesMarker(field.Mkr))
                 {
-                    DParagraph p = new DParagraph();
+                    var p = new DParagraph(StyleSheet.Paragraph);
                     Book.Notes.Append(p);
-                    p.StyleAbbrev = "p";
                     p.SimpleText = field.Data;
                     return true;
                 }
@@ -1646,7 +1646,7 @@ namespace OurWordData.DataModel
                         paragraph = DParagraph.CreateParagraph(child);
 
                     // A section for it to go into
-                    if (null == section || paragraph.StyleAbbrev == DStyleSheet.c_sfmSectionHead)
+                    if (null == section || paragraph.Style == StyleSheet.Section)
                     {
                         section = new DSection();
                         Sections.Append(section);

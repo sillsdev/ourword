@@ -20,6 +20,8 @@ using System.Xml;
 
 using JWTools;
 using OurWordData;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWordData.DataModel
@@ -83,12 +85,10 @@ namespace OurWordData.DataModel
 		// Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DPicture()
-			: base()
+			: base(StyleSheet.PictureCaption)
 		{
 			j_Reference = new JOwn<DReference>("Reference", this);
 			j_Reference.Value = new DReference();
-
-			StyleAbbrev = DB.TeamSettings.SFMapping.StylePicCaption;
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to preventn duplicates
@@ -271,7 +271,7 @@ namespace OurWordData.DataModel
             picture.ReadOxes(nodePicture);
 
             // Except that we override the style with out own
-            picture.StyleAbbrev = DB.TeamSettings.SFMapping.StylePicCaption;
+            picture.Style = StyleSheet.PictureCaption;
 
             return picture;
         }
