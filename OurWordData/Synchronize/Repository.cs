@@ -775,8 +775,6 @@ namespace OurWordData.Synchronize
         #region PullNewerFiles
         public void PullNewerFiles()
         {
-            var nRepoVersion = m_LocalRepository.GetOurWordVersion();
-
             var result = m_LocalRepository.PullFrom(m_OtherRepository.FullPathToRepositoryRoot);
             if (0 != result.ExitCode)
             {
@@ -787,7 +785,8 @@ namespace OurWordData.Synchronize
             }
 
             var nPulledVersion = m_LocalRepository.GetOurWordVersion();
-            if (nPulledVersion > nRepoVersion && nRepoVersion > 0)
+            if (nPulledVersion > LocalRepository.c_CurrentVersionNo && 
+                LocalRepository.c_CurrentVersionNo > 0)
             {
                 m_LocalRepository.Rollback();
                 throw new SynchException("msgYouNeedToUpgrade", 
