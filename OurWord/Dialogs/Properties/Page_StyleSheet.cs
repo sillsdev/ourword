@@ -834,10 +834,6 @@ namespace OurWord.Dialogs
             foreach (JCharacterStyle style in DB.StyleSheet.CharacterStyles)
             {
                 bool bInternal = false;
-                if (style.Abbrev == DStyleSheet.c_StyleAbbrevUnderline)
-                    bInternal = true;
-                if (style.Abbrev == DStyleSheet.c_StyleAbbrevDashed)
-                    bInternal = true;
                 if (style.Abbrev == "ibtGloss")
                     bInternal = true;
                 if (style.Abbrev == "ibtAn")

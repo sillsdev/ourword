@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Drawing;
 using NUnit.Framework;
 using OurWord;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 namespace OurWordTests.DataModel
 {
@@ -25,24 +25,23 @@ namespace OurWordTests.DataModel
         #endregion
 
         #region Test: ToFromString
-        [Test]
-        public void ToFromString()
+        [Test] public void ToFromString()
         {
             // Create a DText that has several phrases
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase("p", "These are the "));
-            text.Phrases.Append(new DPhrase("i", "times "));
-            text.Phrases.Append(new DPhrase("p", "that "));
-            text.Phrases.Append(new DPhrase("u", "try "));
-            text.Phrases.Append(new DPhrase("b", "men's souls."));
+            var text = new DText();
+            text.Phrases.Append(new DPhrase("These are the "));
+            text.Phrases.Append(new DPhrase("times ") { FontToggles = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase("that "));
+            text.Phrases.Append(new DPhrase("try ") { FontToggles = FontStyle.Underline });
+            text.Phrases.Append(new DPhrase("men's souls.") { FontToggles = FontStyle.Bold });
 
             // Is the output what we expect?
-            string sSave = text.Phrases.ToSaveString;
+            var sSave = text.Phrases.ToSaveString;
             Assert.AreEqual("These are the |itimes |rthat |utry |r|bmen's souls.|r",
                 sSave);
 
             // Create a recipient DText
-            DText text2 = new DText();
+            var text2 = new DText();
             text2.Phrases.FromSaveString(sSave);
 
             // Are the two texts equal?
@@ -100,8 +99,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #region Test: Merge_BothChanged
-        [Test]
-        public void Merge_BothChanged()
+        [Test] public void Merge_BothChanged()
         {
             // Create the three versions
             string sParent = "These are the |itimes |rthat try men's souls.";
@@ -119,7 +117,7 @@ namespace OurWordTests.DataModel
             section.ReferenceSpan = new DReferenceSpan();
             section.ReferenceSpan.Start = new DReference(3, 8);
             section.ReferenceSpan.End = new DReference(3, 15);
-            DParagraph p = new DParagraph();
+            DParagraph p = new DParagraph(StyleSheet.Paragraph);
             section.Paragraphs.Append(p);
             p.Runs.Append(Ours);
 

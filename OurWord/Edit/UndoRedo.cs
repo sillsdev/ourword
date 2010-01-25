@@ -25,6 +25,9 @@ using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWord.SideWnd;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -579,22 +582,23 @@ namespace OurWord.Edit
         }
         OWBookmark m_bookmark_AfterJoin;
         #endregion
-        #region Attr{g/s}: string FollowingParagraphStyle
-        // If we Join two paragraphs with different styles, we need to rememver the style
+        #region Attr{g/s}: ParagraphStyle FollowingParagraphStyle
+        // If we Join two paragraphs with different styles, we need to remember the style
         // of the second one, in case the user does an Undo. Otherwise, the default 
         // behavior is that the second paragraph will have the same style as the first.
-        string FollowingParagraphStyle
+        ParagraphStyle FollowingParagraphStyle
         {
             get
             {
-                return m_sFollowingParagraphStyle;
+                return m_FollowingParagraphStyle;
             }
             set
             {
-                m_sFollowingParagraphStyle = value;
+                m_FollowingParagraphStyle = value;
+                Debug.Assert(m_FollowingParagraphStyle != null);
             }
         }
-        string m_sFollowingParagraphStyle;
+        ParagraphStyle m_FollowingParagraphStyle;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -654,8 +658,8 @@ namespace OurWord.Edit
             DParagraph paraNew = para.Split(text, iPos);
             if (null == paraNew)
                 return false;
-            if (!string.IsNullOrEmpty(FollowingParagraphStyle))
-                paraNew.StyleAbbrev = FollowingParagraphStyle;
+            if (null != FollowingParagraphStyle)
+                paraNew.Style = FollowingParagraphStyle;
 
             // Reload the window's data. This is time-consuming, but it is the only way to make 
             // paragraphs line up correctly side-by-side.
@@ -685,7 +689,7 @@ namespace OurWord.Edit
             DParagraph p = selection.Paragraph.DataSource as DParagraph;
             if (null == p)
                 return false;
-            FollowingParagraphStyle = p.StyleAbbrev;
+            FollowingParagraphStyle = p.Style;
 
             // Retrieve the paragraph previous to it
             JOwnSeq<DParagraph> seq = p.GetMyOwningAttr() as JOwnSeq<DParagraph>;
@@ -813,27 +817,27 @@ namespace OurWord.Edit
     public class ChangeParagraphStyleAction : Action
     {
         // Protected Attrs -------------------------------------------------------------------
-        #region Attr{g}: string RequestedStyleAbbrev
-        string RequestedStyleAbbrev
+        #region Attr{g}: ParagraphStyle RequestedStyle
+        ParagraphStyle RequestedStyle
         {
             get
             {
-                Debug.Assert(!string.IsNullOrEmpty(m_sRequestedStyleAbbrev));
-                return m_sRequestedStyleAbbrev;
+                Debug.Assert(null != m_RequestedStyle);
+                return m_RequestedStyle;
             }
         }
-        string m_sRequestedStyleAbbrev;
+        ParagraphStyle m_RequestedStyle;
         #endregion
-        #region Attr{g}: string OriginalStyleAbbrev
-        string OriginalStyleAbbrev
+        #region Attr{g}: ParagraphStyle OriginalStyle
+        ParagraphStyle OriginalStyle
         {
             get
             {
-                Debug.Assert(!string.IsNullOrEmpty(m_sOriginalStyleAbbrev));
-                return m_sOriginalStyleAbbrev;
+                Debug.Assert(null != m_OriginalStyle);
+                return m_OriginalStyle;
             }
         }
-        string m_sOriginalStyleAbbrev;
+        ParagraphStyle m_OriginalStyle;
         #endregion
         #region Attr{g}: OWBookmark Bookmark
         protected OWBookmark Bookmark
@@ -849,10 +853,10 @@ namespace OurWord.Edit
 
         // Scaffolding ----------------------------------------------------------------------
         #region Constructor(OWWindow)
-        public ChangeParagraphStyleAction(OWWindow window, string sRequestedStyleAbbrev)
+        public ChangeParagraphStyleAction(OWWindow window,  ParagraphStyle requestedStyle)
             : base(window, "Change Paragraph Style")
         {
-            m_sRequestedStyleAbbrev = sRequestedStyleAbbrev;
+            m_RequestedStyle = requestedStyle;
         }
         #endregion
 
@@ -861,11 +865,11 @@ namespace OurWord.Edit
         bool _IsValidRequest(DParagraph p)
         {
             // If we're requesting a Section Title.... 
-            bool bIsScripture = (p.Owner == p.Section);
-            if (bIsScripture && RequestedStyleAbbrev == DStyleSheet.c_sfmSectionHead)
+            var bIsScripture = (p.Owner == p.Section);
+            if (bIsScripture && RequestedStyle == StyleSheet.Section)
             {
                 // ...there must not already be a section title
-                if (p.Section.CountParagraphsWithStyle(DStyleSheet.c_sfmSectionHead) > 0)
+                if (p.Section.CountParagraphsWithStyle(StyleSheet.Section) > 0)
                 {
                     LocDB.Message("msgSectionTitleAlreadyExists",
                         "You cannot change this paragraph to a Section Title, because a Section Title " +
@@ -889,14 +893,14 @@ namespace OurWord.Edit
             return true;
         }
         #endregion
-        #region Helper: void _ChangeStyle(DParagraph p, string sNewStyleAbbrev)
-        OWBookmark _ChangeStyle(DParagraph p, string sNewStyleAbbrev)
+        #region Helper: void _ChangeStyle(DParagraph p, ParagraphStyle newStyle)
+        OWBookmark _ChangeStyle(DParagraph p, ParagraphStyle newStyle)
         {
             // Remember the cursor position so that we can restore back to it after the re-LoadData.
             OWBookmark bm = Window.CreateBookmark();
 
             // Change the underlying paragraph's style
-            p.StyleAbbrev = sNewStyleAbbrev;
+            p.Style = newStyle;
 
             // Re-Load the window's data. This is time-consuming, but it is the only way to make
             // sure the paragraphs line correctly side-by-side.
@@ -913,12 +917,12 @@ namespace OurWord.Edit
         public override bool Do()
         {
             // Retrieve the underlying paragraph
-            DParagraph p = Window.Selection.Paragraph.DataSource as DParagraph;
+            var p = Window.Selection.Paragraph.DataSource as DParagraph;
             if (null == p)
                 return false;
 
             // Nothing to do if this is already the requested style
-            if (p.StyleAbbrev == RequestedStyleAbbrev)
+            if (p.Style == RequestedStyle)
                 return false;
 
             // Make sure it is valid to assign this style to this paragraph
@@ -926,10 +930,10 @@ namespace OurWord.Edit
                 return false;
 
             // Remember the former style so we can undo it
-            m_sOriginalStyleAbbrev = p.StyleAbbrev;
+            m_OriginalStyle = p.Style;
 
             // Perform the change
-            m_Bookmark = _ChangeStyle(p, RequestedStyleAbbrev);
+            m_Bookmark = _ChangeStyle(p, RequestedStyle);
 
             // We performed the action, so add it to the stack
             Push();
@@ -946,7 +950,7 @@ namespace OurWord.Edit
             DParagraph p = Window.Selection.Paragraph.DataSource as DParagraph;
 
             // Change back to the original style
-            _ChangeStyle(p, OriginalStyleAbbrev);
+            _ChangeStyle(p, OriginalStyle);
 
         }
         #endregion
@@ -960,7 +964,7 @@ namespace OurWord.Edit
             DParagraph p = Window.Selection.Paragraph.DataSource as DParagraph;
 
             // Change back to the new style
-            _ChangeStyle(p, RequestedStyleAbbrev);
+            _ChangeStyle(p, RequestedStyle);
         }
         #endregion
         #region OMethod: string Contents
@@ -968,7 +972,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return DB.StyleSheet.FindParagraphStyle(OriginalStyleAbbrev).DisplayName;
+                return OriginalStyle.StyleName;
             }
         }
         #endregion
@@ -1113,7 +1117,7 @@ namespace OurWord.Edit
 
             // Retrieve the DBasicText and phrases we'll delete
             DBasicText DBT = selection.DBT;
-            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            DPhraseList<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
             // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
@@ -1374,12 +1378,12 @@ namespace OurWord.Edit
 
             // We now have the DPhrase insertion point
             var phrase = phrases[iPhrase];
-            var iPos = n;
 
             // Insert the text. We remove spurious spaces, so if the result of the insertion 
             // is that we have what we started with, then we need proceed no further.
             var sBeforeInsert = phrase.Text;
-            phrase.Text = DPhrase.EliminateSpuriousSpaces(phrase.Text.Insert(n, sInsert));
+            phrase.Insert(n, sInsert);
+            phrase.EliminateSpuriousSpaces();
             if (sBeforeInsert == phrase.Text)
             {
                 // The test is for a cursor right before a space, e.g., "Hello| World." In this case,
@@ -1854,7 +1858,7 @@ namespace OurWord.Edit
         bool Italics()
         {
             // Retrieve the selected paragraph
-            OWPara op = Window.Selection.Paragraph;
+            var op = Window.Selection.Paragraph;
             if (null == op)
                 return false;
 
@@ -1870,10 +1874,10 @@ namespace OurWord.Edit
             m_bookmark_Italics = Window.CreateBookmark();
 
             // Retrieve which phrase we'll be working on (Vernacular or Back Translation)
-            DBasicText DBT = Window.Selection.DBT;
-            DBasicText.DPhrases<DPhrase> phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
+            var DBT = Window.Selection.DBT;
+            var phrases = (op.DisplayBT) ? DBT.PhrasesBT : DBT.Phrases;
 
-            // We'll make a copy of the data for Undo; note this is only a copy of the DBasicText,
+            // We'll make a copy of the data for Undo;...this is only a copy of the DBasicText,
             // not the DText, so when we do the Undo, we must copy the data back to the
             // original object, not replace it.
             m_dbtCopyOfOriginal = new DBasicText(Window.Selection.DBT);
@@ -2742,7 +2746,7 @@ namespace OurWord.Edit
             wnd.LoadData();
 
             // Update the underlying window's icon
-            ENote.InitializeBitmap();
+            ENote.InitializeBitmap(wnd.BackColor);
             G.App.CurrentLayout.Invalidate();
         }
         #endregion

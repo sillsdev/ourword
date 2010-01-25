@@ -26,6 +26,9 @@ using OurWordData.DataModel;
 
 using OurWord.Layouts;
 using OurWord.Edit;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -268,15 +271,11 @@ namespace OurWord.SideWnd
                     continue;
 
                 // Determine the writing system from the translation
-                JWritingSystem ws = t.WritingSystemVernacular;
-
-                // The style for Ref Translation paragraphs
-                JParagraphStyle PStyle = DB.StyleSheet.FindParagraphStyleOrNormal(
-                    DStyleSheet.c_StyleReferenceTranslation);
+                var ws = t.WritingSystemVernacular;
 
                 // Create and add a OWParagraph for the translation paragraph
-                OWPara p = new OWPara(
-                    ws, PStyle, vRuns, t.DisplayName, OWPara.Flags.None);
+                var p = new OWPara(ws, StyleSheet.ReferenceTranslation, vRuns, 
+                    t.DisplayName, OWPara.Flags.None);
                 Contents.Append(p);
             }
 

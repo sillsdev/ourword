@@ -118,7 +118,7 @@ namespace OurWord.Layouts
                 string.IsNullOrEmpty(pictureTarget.SimpleTextBT))
             {
                 var rowSimple = new ERowOfColumns(1);
-                rowSimple.Bmp = GetPicture(pictureTarget);
+                rowSimple.SetPicture(GetPicture(pictureTarget), true);
                 Contents.Append(rowSimple);
                 return true;
             }
@@ -127,7 +127,7 @@ namespace OurWord.Layouts
             var row = new ERowOfColumns(4);
 
             // Load the picture into the row
-            row.Bmp = GetPicture(pictureTarget);
+            row.SetPicture(GetPicture(pictureTarget), true);
 
             // Place the Front paragraphs into the columns (uneditable)
             row.Append(new OWPara(pictureFront.Translation.WritingSystemVernacular,

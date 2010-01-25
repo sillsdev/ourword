@@ -23,6 +23,8 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 using Palaso.UI.WindowsForms.Keyboarding;
 #endregion
 #endregion
@@ -32,20 +34,6 @@ namespace OurWord.Edit
     public class OWWindow : Panel
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g/s}: float WidthBetweenColumns
-        public float WidthBetweenColumns
-        {
-            get
-            {
-                return m_fWidthBetweenColumns;
-            }
-            set
-            {
-                m_fWidthBetweenColumns = value;
-            }
-        }
-        float m_fWidthBetweenColumns;
-        #endregion
         #region Attr{g}: SizeF WindowMargins - the pixels between window edge and content (top & bottom)
         public SizeF WindowMargins
         {
@@ -118,7 +106,7 @@ namespace OurWord.Edit
         #endregion
 
         // Interaction with OurWord Main -----------------------------------------------------
-        bool m_bLoaded = false;
+        bool m_bLoaded;
         #region Method: virtual void LoadData() - the subclass should populate the window
         public virtual void LoadData()
             // Called by the Client (OurWordMain) whenever it is time to clear and then
@@ -129,13 +117,13 @@ namespace OurWord.Edit
         {
             // Get the window's background color (it may have changed since the window was 
             // first created.
-            string sBackColor = GetRegistryBackgroundColor(RegistrySettingsSubKey, "Wheat");
+            var sBackColor = GetRegistryBackgroundColor(RegistrySettingsSubKey, "Wheat");
             BackColor = Color.FromName(sBackColor);
 
             // Instantiate a draw object (Assumption is that if we need to do a Resize,
             // then the Draw object's double buffer needs to be recreated so it will be
             // of the correct size.
-            Draw = new DrawBuffer(this);
+            Draw = new ScreenDraw(this);
 
             // Start with a fresh calculation of the font size, window width, etc., for
             // the LineNumbers column, should it be turned on by the user.
@@ -143,7 +131,7 @@ namespace OurWord.Edit
 
             // Measure all of the EBlocks. This is a one-time thing; we only do it again when
             // individual EWords are edited/added/etc.
-            Contents.CalculateBlockWidths(Draw.Graphics);
+            Contents.CalculateBlockWidths();
 
             // Signal that we have a Draw object and that the blocks are all measured.
             // Otherwise, DoLayout would choke.
@@ -160,7 +148,7 @@ namespace OurWord.Edit
             Focus();
 
             // Load, layout amd paint any secondary windows
-            foreach (OWWindow w in SecondaryWindows)
+            foreach (var w in SecondaryWindows)
                 w.LoadData();
         }
         #endregion
@@ -176,7 +164,7 @@ namespace OurWord.Edit
             Width = nWidth;
             Height = nHeight;
 
-            Draw = new DrawBuffer(this);
+            Draw = new ScreenDraw(this);
             DoLayout();
         }
         #endregion
@@ -276,6 +264,7 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         public enum WindowClass { Tooltip };
+        public bool DontEverDim;
         #region Constructor(WindowClass)
         public OWWindow(WindowClass wc)
         {
@@ -289,7 +278,7 @@ namespace OurWord.Edit
             m_cColumnCount = 1;
             Name = "ToolTip";
             m_sRegistrySettingsSubKey = Name;
-            m_Contents = new ERoot(this);
+            m_Contents = new ERoot(this, new WindowContext(this));
             WindowMargins = new SizeF(7, 5);
             m_vSecondaryWindows = new OWWindow[0];
             m_LineUpDownX = new LineUpDownX();
@@ -321,8 +310,10 @@ namespace OurWord.Edit
 
             // Initialize ScrollBar
             AutoScroll = false;             // Don't use Panel's built-in scrollbar
-            m_ScrollBar = new VScrollBar();
-            m_ScrollBar.Dock = DockStyle.Right;
+            m_ScrollBar = new VScrollBar 
+            {
+                Dock = DockStyle.Right
+            };
             Controls.Add(m_ScrollBar);
             ScrollBarPosition = 0;
             ScrollBar.ValueChanged += new EventHandler(OnScrollBarValueChanged);
@@ -331,11 +322,10 @@ namespace OurWord.Edit
             m_LineUpDownX = new LineUpDownX();
 
             // Initialize the EItems root container (to empty subitems)
-            m_Contents = new ERoot(this);
+            m_Contents = new ERoot(this, new WindowContext(this));
 
             // Default margins
             WindowMargins = new SizeF(7, 5);
-            WidthBetweenColumns = 10;
 
             // Set up a double buffer for flicker-free painting (it must be re-created
             // upon any resize.)
@@ -432,294 +422,28 @@ namespace OurWord.Edit
             Selection = null;
 
             // Have the secondary windows do the same
-            foreach (OWWindow w in SecondaryWindows)
+            foreach (var w in SecondaryWindows)
                 w.Clear();
         }
         #endregion
 
         // Layout & Paint --------------------------------------------------------------------
-        #region CLASS: DrawBuffer
-        public class DrawBuffer
-        {
-            // Attrs (Mostly only used internally) -------------------------------------------
-            #region Attr{g}: Bitmap DoubleBuffer
-            public Bitmap DoubleBuffer
-            {
-                get
-                {
-                    Debug.Assert(null != m_bmpDoubleBuffer);
-                    return m_bmpDoubleBuffer;
-                }
-            }
-            Bitmap m_bmpDoubleBuffer;
-            #endregion
-            #region Attr{g}: Graphics Graphics
-            public Graphics Graphics
-            {
-                get
-                {
-                    Debug.Assert(null != m_graphics);
-                    return m_graphics;
-                }
-            }
-            Graphics m_graphics;
-            #endregion
-            #region Attr{g}: OWWindow Wnd
-            OWWindow Wnd
-            {
-                get
-                {
-                    Debug.Assert(null != m_wnd);
-                    return m_wnd;
-                }
-            }
-            OWWindow m_wnd;
-            #endregion
-
-            // Scaffolding -------------------------------------------------------------------
-            #region Constructor(OWWindow)
-            public DrawBuffer(OWWindow wnd)
-            {
-                // Save a pointer to the window
-                m_wnd = wnd;
-
-                // Create space for the double buffer
-                m_bmpDoubleBuffer = new Bitmap(wnd.Width, wnd.Height);
-
-                // Set a graphics object to it
-                m_graphics = Graphics.FromImage(DoubleBuffer);
-
-                // Turn off Hinting. This means that, yes, the text will not be as pretty to
-                // read, but it makes the cursor appear in the correct place; and eliminates
-                // the moving around that was happening when selecting text.
-                m_graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
-            }
-            #endregion
-            #region Method: void Dispose() -good to call this manually to free memory
-            public void Dispose()
-            {
-                if (null != DoubleBuffer)
-                    DoubleBuffer.Dispose();
-                m_bmpDoubleBuffer = null;
-
-                if (null != Graphics)
-                    Graphics.Dispose();
-                m_graphics = null;
-            }
-            #endregion
-
-            // Drawing Methods ---------------------------------------------------------------
-            #region Method: void DrawRoundedRectangle(Pen, FillBrush, Rect, Radius)
-            public void DrawRoundedRectangle(Pen BorderPen, Brush FillBrush, RectangleF Rect, float Radius)
-            {
-                float xLeft = Rect.Left;
-                float xRight = Rect.Right;
-                float yTop = Rect.Top - Wnd.ScrollBarPosition;
-                float yBottom = Rect.Bottom - Wnd.ScrollBarPosition;
-
-                float diameter = Radius * 2;
-
-                GraphicsPath gp = new GraphicsPath();
-
-                gp.StartFigure();
-
-                // Top Horz line
-                gp.AddLine(xLeft + Radius, yTop, xRight - Radius, yTop);
-
-                // Top-right arc
-                gp.AddArc(xRight - diameter, yTop, diameter, diameter, 270, 90);
-
-                // Right Vert line
-                gp.AddLine(xRight, yTop + Radius, xRight, yBottom - Radius);
-
-                // Bottom-right arc
-                gp.AddArc(xRight - diameter, yBottom - diameter, diameter, diameter, 0, 90);
-
-                // Bottom Horz line
-                gp.AddLine(xRight - Radius, yBottom, xLeft + Radius, yBottom);
-
-                // Bottom-left arc
-                gp.AddArc(xLeft, yBottom - diameter, diameter, diameter, 90, 90);
-
-                // Left Vert line
-                gp.AddLine(xLeft, yBottom - Radius, xLeft, yTop + Radius);
-
-                // Top-Left arc
-                gp.AddArc(xLeft, yTop, diameter, diameter, 180, 90);
-
-                gp.CloseFigure();
-
-                // Fill the interior if requested
-                if (null != FillBrush)
-                    Graphics.FillPath(FillBrush, gp);
-
-                // Draw the border if requested
-                if (null != BorderPen)
-                    Graphics.DrawPath(BorderPen, gp);
-            }
-            #endregion
-            #region Method: void DrawRectangle(Pen, RectangleF)
-            public void DrawRectangle(Pen pen, RectangleF rect)
-            {
-                Graphics.DrawRectangle(pen, 
-                    rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-            }
-            #endregion
-			#region Method: void DrawBullet(Color, PointF, fRadius)
-			public void DrawBullet(Color color, PointF pt, float Radius)
-			{
-				Brush brush = new SolidBrush(color);
-
-				float xLeft = pt.X - Radius;
-				float yTop = pt.Y - Radius - Wnd.ScrollBarPosition;
-				float diameter = Radius * 2;
-
-				Graphics.FillEllipse(brush, xLeft, yTop, diameter, diameter);
-			}
-			#endregion
-			#region Method: void FillRectangle(Color clrBackground, RectangleF rect)
-			public void FillRectangle(Color clrBackground, RectangleF rect)
-            {
-                Brush brush = new SolidBrush(clrBackground);
-
-                RectangleF r = new RectangleF(rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-
-                Graphics.FillRectangle(brush, r);
-            }
-            #endregion
-            #region Method: void String(string s, Font font, Brush brush, PointF pt)
-            public void String(string s, Font font, Brush brush, PointF pt)
-            {
-                Graphics.DrawString(s, font, brush, pt.X, pt.Y - Wnd.ScrollBarPosition,
-                    StringFormat.GenericTypographic);
-            }
-            #endregion
-            #region Method: void Line(Pen pen, float x1, float y1, float x2, float y2)
-            public void Line(Pen pen, float x1, float y1, float x2, float y2)
-            {
-                Graphics.DrawLine(pen,
-                    x1, y1 - Wnd.ScrollBarPosition,
-                    x2, y2 - Wnd.ScrollBarPosition);
-            }
-            #endregion
-            #region Method: void Line(Pen pen, PointF pt1, PointF pt2)
-            public void Line(Pen pen, PointF pt1, PointF pt2)
-            {
-                Graphics.DrawLine(pen,
-                    pt1.X, pt1.Y - Wnd.ScrollBarPosition,
-                    pt2.X, pt2.Y - Wnd.ScrollBarPosition);
-            }
-            #endregion
-            #region Method: void VertLine(Pen pen, float x, float y1, float y2)
-            public void VertLine(Pen pen, float x, float y1, float y2)
-            {
-                Graphics.DrawLine(pen,
-                    x, y1 - Wnd.ScrollBarPosition,
-                    x, y2 - Wnd.ScrollBarPosition);
-            }
-            #endregion
-            #region Method: void Image(Image image, PointF pt)
-            public void Image(Image image, PointF pt)
-            {
-                Point point = new Point(
-                    (int)pt.X, 
-                    (int)(pt.Y - Wnd.ScrollBarPosition));
-
-                Graphics.DrawImage(image, point);
-            }
-            #endregion
-
-            #region Method: void Invalidate()
-            public void Invalidate()
-            {
-                Wnd.Invalidate();
-            }
-            #endregion
-            #region Method: void Invalidate(RectangleF rect)
-            public void Invalidate(RectangleF rect)
-            {
-                RectangleF r = new RectangleF(
-                    rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-                Wnd.Invalidate(new Region(r), false);
-            }
-            #endregion
-            #region Method: void InvalidateBlock(EBlock)
-            delegate void InvalidateBlockCallback(EBlock block);
-            public void InvalidateBlock(EBlock block)
-                // This can be called with the Sel Timer wants to redraw the flashing
-                // cursor; thus an asynchronic call from a different thread.
-            {
-                if (Wnd.InvokeRequired)
-                {
-                    InvalidateBlockCallback cb = new InvalidateBlockCallback(InvalidateBlock);
-                    Wnd.Invoke(cb, new object[] { block });
-                }
-                else
-                {
-                    if (!Wnd.Focused)
-                        return;
-
-                    RectangleF r = new RectangleF(
-                        block.Position.X,
-                        block.Position.Y - Wnd.ScrollBarPosition,
-                        block.Width + block.JustificationPaddingAdded,
-                        block.Height);
-
-                    Wnd.Invalidate(new Region(r), false);
-                }
-            }
-            #endregion
-            #region Method: void InvalidateParagraph(OWPara)
-            public void InvalidateParagraph(OWPara para)
-            {
-                RectangleF r = new RectangleF(
-                    para.Position.X,
-                    para.Position.Y - Wnd.ScrollBarPosition,
-                    para.Width,
-                    para.Height);
-
-                Wnd.Invalidate(new Region(r), false);
-            }
-            #endregion
-
-            #region Method: float Measure(string sText, Font font)
-            public float Measure(string sText, Font font)
-            {
-                StringFormat fmt = StringFormat.GenericTypographic;
-                fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-                return Graphics.MeasureString(sText, font, 1000, fmt).Width;
-            }
-            #endregion
-            #region Method: void MultilineText(string s, Font font, Brush brush, RectangleF rect)
-            public void MultilineText(string s, Font font, Brush brush, RectangleF rect)
-            {
-                RectangleF r = new RectangleF(rect.X, rect.Y - Wnd.ScrollBarPosition,
-                    rect.Width, rect.Height);
-
-                Graphics.DrawString(s, font, brush, r);
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g/s}: DrawBuffer Draw
-        public DrawBuffer Draw
+        #region Attr{g/s}: ScreenDraw Draw
+        public ScreenDraw Draw
         {
             get
             {
                 Debug.Assert(null != m_Draw);
                 return m_Draw;
             }
-            set
+            protected set
             {
                 if (null != m_Draw)
                     Draw.Dispose();
                 m_Draw = value;
             }
         }
-        DrawBuffer m_Draw = null;
+        ScreenDraw m_Draw;
         #endregion
         #region Attr{g/s}: EditableBackgroundColor - The background color for words which can be edited. Default is White
         public Color EditableBackgroundColor
@@ -744,19 +468,15 @@ namespace OurWord.Edit
             if (!m_bLoaded)
                 return;
 
-            // Calculate the Lefts and Widths for the EContainer hierarchy
-            Contents.CalculateContainerHorizontals();
-
-			// Calculate the vertical layout
-            float yTop = WindowMargins.Height;   // Top of the window, taking margin into account
-            Contents.CalculateVerticals(yTop, false);
+            // Layout
+            Contents.DoLayout();
 
             // Now that the lines have been defined in the low-level OWPara's,
             // give each line a line number
             Contents.CalculateLineNumbers();
 
-            // Set the ScrollBar, adding some (30 pixels) padding at the bottom
-            Layout_SetupScrollBar((int)(yTop + Contents.Height));
+            // Set the ScrollBar
+            Layout_SetupScrollBar((int)(WindowMargins.Height + Contents.Height));
         }
         #endregion
         #region Method: void PaintNoDataMessage(PaintEventArgs e)
@@ -765,49 +485,51 @@ namespace OurWord.Edit
             if (!IsMainWindow)
                 return;
 
-            string sText = G.GetLoc_GeneralUI("NoDataToDisplayMsg", 
+            var sText = G.GetLoc_GeneralUI("NoDataToDisplayMsg", 
                 "(There is no data to display. Use the Project menu to create a new Project or " +
 				"open an existing project; or use Tools-Configure to set up both a Front and " +
 				"a Target translation.)"); 
 
             Brush brush = new SolidBrush(Color.Black);
-			Font font = new Font(SystemFonts.MenuFont.FontFamily, 
+			var font = new Font(SystemFonts.MenuFont.FontFamily, 
 				SystemFonts.MenuFont.Size * 1.5F);
 
-			Rectangle rect = new Rectangle(
+			var rect = new Rectangle(
 				ClientRectangle.X + 20,
 				ClientRectangle.Y + 20,
 				ClientRectangle.Width - 40,
 				ClientRectangle.Height - 40);
 
-			Draw.MultilineText(sText, font, brush, rect);
+			Draw.DrawString(sText, font, brush, rect);
+
         }
         #endregion
+
         #region Cmd: OnPaint
         protected override void OnPaint(PaintEventArgs e)
         {
             // Background
             // The rectangle passed in will be in Client coordinates, not taking
             // into account the ScrollBar's position. So we must convert it here.
-            Rectangle r = new Rectangle(e.ClipRectangle.X,
+            var r = new Rectangle(e.ClipRectangle.X,
                 e.ClipRectangle.Y + (int)ScrollBarPosition,
                 e.ClipRectangle.Width, e.ClipRectangle.Height);
             // We do the background fill here, because we've set the
             // AllPaintingInWmPaint style in the constructor, so that all 
             // painting (including the background) goes through the double
             // buffer.
-            Draw.FillRectangle(BackColor, r);
+            Draw.DrawBackground(BackColor, r);
 
             // If there is no data, then display a help message
             if (Contents.Count == 0)
             {
                 PaintNoDataMessage(e);
-                e.Graphics.DrawImageUnscaled(Draw.DoubleBuffer, 0, 0);
+                Draw.TransferToScreen(e.Graphics);
                 return;
             }
 
             // Paint the contents
-            Contents.OnPaint(r);
+            Contents.OnPaint(Draw, r);
 
 			// Paint any controls (otherwise, the ones we don't paint due to the
 			// clip rectangle, tend to stay around on the screen.)
@@ -815,10 +537,10 @@ namespace OurWord.Edit
 
             // Text Selection
             if (null != Selection)
-                Selection.Paint();
+                Selection.Paint(Draw);
 
             // Transfer from the DoubleBuffer to our actual window
-            e.Graphics.DrawImageUnscaled(Draw.DoubleBuffer, 0, 0);
+            Draw.TransferToScreen(e.Graphics);
         }
         #endregion
         #region Cmd: OnPaintBackground - do nothing!
@@ -837,39 +559,52 @@ namespace OurWord.Edit
             DoLayout();
         }
         #endregion
-        #region Cmd: OnParagraphHeightChanged - recalculate positions to accomdate the new-sized paragraph
-        public void OnParagraphHeightChanged(EContainer TopLevelContainer)
-            // Each paragraph needs to recalculate its position and be redrawn
+
+        #region Method: void Invalidate(RectangleF rect)
+        public void Invalidate(RectangleF rect)
         {
-            // Start at the top margin for the window
-            float y = WindowMargins.Height;
+            var r = new RectangleF(
+                rect.X, rect.Y - ScrollBarPosition,
+                rect.Width, rect.Height);
+            Invalidate(new Region(r), false);
+        }
+        #endregion
+        #region Method: void InvalidateParagraph(OWPara)
+        public void InvalidateParagraph(OWPara para)
+        {
+            var r = new RectangleF(
+                para.Position.X,
+                para.Position.Y - ScrollBarPosition,
+                para.Width,
+                para.Height);
 
-            // We'll not redraw until we encounter the row that has changed; thus we'll use
-            // bFound to indicate when we've located that row
-            bool bFound = false;
-
-            // Process through each row
-            foreach (EContainer container in Contents.SubItems)
+            Invalidate(new Region(r), false);
+        }
+        #endregion
+        #region Method: void InvalidateBlock(EBlock)
+        delegate void InvalidateBlockCallback(EBlock block);
+        public void InvalidateBlock(EBlock block)
+        // This can be called with the Sel Timer wants to redraw the flashing
+        // cursor; thus an asynchronic call from a different thread.
+        {
+            if (InvokeRequired)
             {
-                // Set the bFound flag once we encounter the target row
-                if (container == TopLevelContainer)
-                    bFound = true;
-
-                // RePosition each row from the target to the end of the screen
-                if (bFound)
-                    container.CalculateVerticals(y, true);
-
-                y += container.Height;
+                var cb = new InvalidateBlockCallback(InvalidateBlock);
+                Invoke(cb, new object[] { block });
             }
+            else
+            {
+                if (!Focused)
+                    return;
 
-            // Recalculate the lines numbers, as they may have changed
-            Contents.CalculateLineNumbers();
+                var r = new RectangleF(
+                    block.Position.X,
+                    block.Position.Y - ScrollBarPosition,
+                    block.Width + block.JustificationPaddingAdded,
+                    block.Height);
 
-            // Change the scrollbar to reflect the new height
-            Layout_SetupScrollBar((int)y);
-
-            // Tell the window to do some painting
-            Invalidate();
+                Invalidate(new Region(r), false);
+            }
         }
         #endregion
 
@@ -918,7 +653,7 @@ namespace OurWord.Edit
             public CLineNumberAttrs(Graphics g)
             {
                 // We'll use a fixed-space font so that the numbers line up
-                float fSize = 10 * G.ZoomFactor;
+                var fSize = 10 * G.ZoomFactor;
                 m_fLineNumberFont = new Font("Courier New", fSize);
 
                 // Get the default Brush color; the window can overridei this
@@ -926,8 +661,8 @@ namespace OurWord.Edit
 
                 // Calculate the width required for the line number column
                 // We'll measure a fat, 3-digit string plus a trailing space
-                string s = "000 ";
-                StringFormat fmt = StringFormat.GenericTypographic;
+                const string s = "000 ";
+                var fmt = StringFormat.GenericTypographic;
                 fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
                 m_fLineNumberColumnWidth = g.MeasureString(s, Font, 1000, fmt).Width;
             }
@@ -943,20 +678,29 @@ namespace OurWord.Edit
                 return m_LineNumberAttrs;
             }
         }
-        public CLineNumberAttrs m_LineNumberAttrs = null;
+        private CLineNumberAttrs m_LineNumberAttrs;
         #endregion
 
         // Scroll Bar ------------------------------------------------------------------------
         #region Scroll Bar
         #region Attr{g}: VScrollBar ScrollBar
-        VScrollBar ScrollBar
+        public VScrollBar ScrollBar
         {
             get
             {
                 return m_ScrollBar;
             }
         }
-        public VScrollBar m_ScrollBar;
+        private readonly VScrollBar m_ScrollBar;
+        #endregion
+        #region VAttr{g}: bool HasScrollbar
+        public bool HasScrollbar
+        {
+            get
+            {
+                return (null != m_ScrollBar);
+            }
+        }
         #endregion
         #region Attr{g/s}: float ScrollBarRange
         float ScrollBarRange
@@ -1689,7 +1433,7 @@ namespace OurWord.Edit
                 m_bFlashOn = !m_bFlashOn;
 
                 // Invalidate the word that contains the insertion point
-                Window.Draw.InvalidateBlock(Anchor.Word);
+                Window.InvalidateBlock(Anchor.Word);
 
                 // Let the window do anything it wants
                 Window.OnCursorTimerTick();
@@ -1707,8 +1451,8 @@ namespace OurWord.Edit
             #endregion
 
             // Misc Methods ------------------------------------------------------------------
-            #region Method: void Paint()
-            public void Paint()
+            #region Method: void Paint(IDraw)
+            public void Paint(IDraw draw)
                 // Here, we only paint the verticle insertion point. If the IP is supposed
                 // to be in the "off" state, then it is turned off because we re-draw the
                 // underlying Word.
@@ -1716,17 +1460,17 @@ namespace OurWord.Edit
                 if (IsInsertionIcon & Window.Focused)
                 {
                     if (m_bFlashOn)
-                        Anchor.Word.PaintSelection(-1, -1);
+                        Anchor.Word.PaintSelection(draw, -1, -1);
                     return;
                 }
 
                 if (m_bFlashOn && IsInsertionPoint && Window.Focused)
                 {
-                    Pen pen = new Pen(System.Drawing.Color.Black, 2);
+                    var pen = new Pen(System.Drawing.Color.Black, 2);
 
-                    EWord word = Anchor.Word;
+                    var word = Anchor.Word;
 
-                    float x = word.Position.X + Anchor.xFromWordLeft;
+                    var x = word.Position.X + Anchor.xFromWordLeft;
 
                     // Adjust off of the boundary, so we can make certain it is in the
                     // word's drawing area (rounding areas on the Screen can affect this.)
@@ -1735,7 +1479,7 @@ namespace OurWord.Edit
                     if (Anchor.iChar == Anchor.Word.Text.Length)
                         x--;
 
-                    Window.Draw.VertLine(pen, x, word.Position.Y,
+                    draw.DrawVertLine(pen, x, word.Position.Y,
                         word.Position.Y + word.Height);
 
                     return;
@@ -1752,24 +1496,24 @@ namespace OurWord.Edit
                     // Selection is within a single Word: simple and we're done
                     if (SelFirst.Word == SelLast.Word)
                     {
-                        First.Word.PaintSelection(SelFirst.iChar, SelLast.iChar);
+                        First.Word.PaintSelection(draw, SelFirst.iChar, SelLast.iChar);
                         return;
                     }
 
                     // Paint the first partial word
-                    First.Word.PaintSelection(SelFirst.iChar, -1);
+                    First.Word.PaintSelection(draw, SelFirst.iChar, -1);
 
                     // Paint the whole words in-between
                     for (int i = SelFirst.iBlock + 1; i < SelLast.iBlock; i++)
                     {
-                        EWord word = Paragraph.SubItems[i] as EWord;
+                        var word = Paragraph.SubItems[i] as EWord;
                         Debug.Assert(null != word);
                         if (null != word)
-                            word.PaintSelection(-1, -1);
+                            word.PaintSelection(draw, -1, -1);
                     }
 
                     // Paint the final partial word
-                    Last.Word.PaintSelection(-1, SelLast.iChar);
+                    Last.Word.PaintSelection(draw, -1, SelLast.iChar);
                 }
             }
             #endregion
@@ -1861,9 +1605,9 @@ namespace OurWord.Edit
                 // to the user if he is moving around doing a mouse click.
                 m_bFlashOn = true;
                 if (IsInsertionPoint || IsInsertionIcon)
-                    Window.Draw.InvalidateBlock(Anchor.Word);
+                    Window.InvalidateBlock(Anchor.Word);
                 else
-                    Window.Draw.InvalidateParagraph(Paragraph);
+                    Window.InvalidateParagraph(Paragraph);
 
                 // Set the keyboard if necessary (we check the writing system of this
                 // new selection, and switch the keyboard if its name has changed.)
@@ -1899,12 +1643,12 @@ namespace OurWord.Edit
                 // Insertion Point
                 if (IsInsertionPoint)
                 {
-                    Window.Draw.InvalidateBlock(Anchor.Word);
+                    Window.InvalidateBlock(Anchor.Word);
                     return;
                 }
 
                 // Selection
-                Window.Draw.InvalidateParagraph(Paragraph);
+                Window.InvalidateParagraph(Paragraph);
             }
             #endregion
         }
@@ -2100,21 +1844,6 @@ namespace OurWord.Edit
             return true;
         }
         #endregion
-        #region Method: string GetCurrentParagraphStyle()
-        public string GetCurrentParagraphStyle()
-        {
-            if (null == Selection)
-                return null;
-
-            OWPara p = Selection.Paragraph;
-
-            DParagraph paragraph = p.DataSource as DParagraph;
-            if (null != paragraph)
-                return paragraph.StyleAbbrev;
-
-            return null;
-        }
-        #endregion
         #region Cmd: cmdEnter - react to the Enter key, either split a paragraph, or move to the next paragraph
         void cmdEnter()
         {
@@ -2141,10 +1870,10 @@ namespace OurWord.Edit
             (new SplitParagraphAction(this)).Do();
         }
         #endregion
-        #region URCmd: cmdChangeParagraphTo(sStyleAbbrev)
-        public void cmdChangeParagraphTo(string sStyleAbbrev)
+        #region URCmd: cmdChangeParagraphTo(ParagraphStyle)
+        public void cmdChangeParagraphTo(ParagraphStyle style)
         {
-            (new ChangeParagraphStyleAction(this, sStyleAbbrev)).Do();
+            (new ChangeParagraphStyleAction(this, style)).Do();
         }
         #endregion
 
@@ -2436,7 +2165,7 @@ namespace OurWord.Edit
         #region Cmd: OnMouseWheel
         protected override void OnMouseWheel(MouseEventArgs e)
         {
-            if (null == m_ScrollBar)
+            if (!HasScrollbar)
                 return;
 
             // We'll take a Wheel Delta as being the equivalent of one line of text multipled

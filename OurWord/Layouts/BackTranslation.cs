@@ -122,7 +122,7 @@ namespace OurWord.Layouts
                 EColumn colBackTranslation;
                 ERowOfColumns row = WndDrafting.CreateRow(Contents,
                     out colVernacular, out colBackTranslation, false);
-                row.Bmp = GetPicture(p);
+                row.SetPicture(GetPicture(p), true);
 
                 // If we have no content, then we don't add the paragraphs.
                 // (E.g., a picture with no caption.)

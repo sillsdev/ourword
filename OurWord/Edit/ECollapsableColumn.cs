@@ -162,8 +162,8 @@ namespace OurWord.Edit
                 Position.Y);
         }
         #endregion
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y)
+        public override void CalculateVerticals(float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -179,7 +179,7 @@ namespace OurWord.Edit
             // Header
             if (ShowHeaderWhenExpanded || IsCollapsed)
             {
-                Header.CalculateVerticals(y, bRepositionOnly);
+                Header.CalculateVerticals(y);
                 y += Header.Height;
             }
 
@@ -192,7 +192,7 @@ namespace OurWord.Edit
                 // Layout the owned subitems, one below the other
                 foreach (EItem item in SubItems)
                 {
-					item.CalculateVerticals(y, bRepositionOnly);
+					item.CalculateVerticals(y);
 					y += item.Height;
                 }
             }
@@ -204,8 +204,8 @@ namespace OurWord.Edit
             Height = (y - Position.Y);
         }
         #endregion
-        #region OMethod: void OnPaint(ClipRectangle)
-        public override void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(IDraw, ClipRectangle)
+        public override void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
             // Set the owned controls visibility according to whether or not
             // we are collapsed. We want them invisible if collapsed, so that
@@ -217,28 +217,28 @@ namespace OurWord.Edit
             SetOwnedControlsVisibility(!IsCollapsed);
 
             // For performance, make sure we need to paint this container
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
+            if (!clipRectangle.IntersectsWith(IntRectangle))
                 return;
 
             // Borders if indicated
-            Border.Paint();
+            Border.Paint(draw);
 
             // PlusMinus Control
-            PlusMinusIcon.OnPaint(ClipRectangle);
+            PlusMinusIcon.OnPaint(draw, clipRectangle);
 
             // Header
             if (ShowHeaderWhenExpanded || IsCollapsed)
-                Header.OnPaint(ClipRectangle);
+                Header.OnPaint(draw, clipRectangle);
 
             // If we're expanded, then show the subitems
             if (!IsCollapsed)
             {
                 // Bitmap if indicated
-                PaintBitmap();
+                PaintBitmap(draw);
 
                 // Paint the subcontainers
-                foreach (EItem item in SubItems)
-                    item.OnPaint(ClipRectangle);
+                foreach (var item in SubItems)
+                    item.OnPaint(draw, clipRectangle);
             }
         }
         #endregion
@@ -347,34 +347,33 @@ namespace OurWord.Edit
             cmdLeftMouseClick(pt);
         }
         #endregion
-        #region OMethod: override void Paint(ClipRectangle)
-        public override void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: override void Paint(IDraw, ClipRectangle)
+        public override void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
-            int cOffset = 2;
+            const int cOffset = 2;
 
-            Pen pen = Pens.Navy;
+            var pen = Pens.Navy;
 
             // Draw the rectangle
-            Draw.DrawRectangle(pen, Rectangle);
+            draw.DrawRectangle(pen, Rectangle);
 
             // Draw the horizontal line
-            float yMid = Rectangle.Y + (Height / 2.0F);
-            Draw.Line(pen,
+            var yMid = Rectangle.Y + (Height / 2.0F);
+            draw.DrawLine(pen,
                 Position.X + cOffset, yMid,
                 Position.X + Width - cOffset, yMid);
 
             // If collapsed, add the vertical line
-            if (IsCollapsed)
-            {
-                float xMid = Rectangle.X + (Width / 2.0F);
-                Draw.Line(pen,
-                    xMid, Position.Y + cOffset,
-                    xMid, Position.Y + Height - cOffset);
-            }
+            if (!IsCollapsed) 
+                return;
+            var xMid = Rectangle.X + (Width / 2.0F);
+            draw.DrawLine(pen,
+                xMid, Position.Y + cOffset,
+                xMid, Position.Y + Height - cOffset);
         }
         #endregion
-        #region OMethod: void CalculateWidth(Graphics g)
-        public override void CalculateWidth(Graphics g)
+        #region OMethod: void CalculateWidth()
+        public override void CalculateWidth()
         {
             // No need to do anyting
         }

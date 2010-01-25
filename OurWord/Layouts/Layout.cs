@@ -24,6 +24,8 @@ using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -54,29 +56,7 @@ namespace OurWord.Layouts
             Color backColor, 
             OWPara.Flags flags)
         {
-            // Create the basic paragraph
-            var owp = new OWPara(
-                ws,
-                footnote.Style,
-                footnote,
-                backColor,
-                flags);
-
-            // Insert the reference (e.g., "3:16") right after the footnote letter if present,
-            // or else at the beginning.
-            if (!string.IsNullOrEmpty(footnote.VerseReference))
-            {
-                var f = footnote.Style.CharacterStyle.FindOrAddFontForWritingSystem(ws);
-                var label = new DLabel(footnote.VerseReference + ": ");
-
-                int iPos = 0;
-                if (owp.SubItems.Length > 0 && owp.SubItems[0] as OWPara.EFootnoteLabel != null)
-                    iPos = 1;
-
-                owp.InsertAt(iPos, new OWPara.ELabel(f, label));
-            }
-
-            return owp;
+            return new OWFootnotePara(footnote, backColor, flags);
         }
         #endregion
 
@@ -92,12 +72,10 @@ namespace OurWord.Layouts
 
         const int c_xMaxPictureWidth = 300;
         #region Method: Bitmap GetPicture(DParagraph p)
-        protected Bitmap GetPicture(DParagraph p)
+        static public Bitmap GetPicture(DParagraph p)
         {
-            DPicture pict = p as DPicture;
-            if (null != pict)
-                return pict.GetBitmap(c_xMaxPictureWidth);
-            return null;
+            var pict = p as DPicture;
+            return null != pict ? pict.GetBitmap(c_xMaxPictureWidth) : null;
         }
         #endregion
 
@@ -114,7 +92,7 @@ namespace OurWord.Layouts
         }
         #endregion
 
-        public const int c_nFootnoteSeparatorWidth = 60;
+        protected const int c_nFootnoteSeparatorWidth = 60;
 
         // Synchronize Front and Target paragraphs -------------------------------------------
         protected class SynchronizedSection
@@ -222,7 +200,7 @@ namespace OurWord.Layouts
                             var pFront = FrontParagraphs[i];
                             var pTarget = TargetParagraphs[i];
 
-                            if (pFront.StyleAbbrev != pTarget.StyleAbbrev)
+                            if (pFront.Style != pTarget.Style)
                                 return false;
                             if (!pFront.IsSameReferenceAs(pTarget))
                                 return false;
@@ -310,7 +288,7 @@ namespace OurWord.Layouts
             {
                 if (i == vParagraphs.Count)
                 {
-                    DParagraph pNew = new DParagraph();
+                    var pNew = new DParagraph(StyleSheet.Paragraph);
                     pNew.AddedByCluster = true;
                     vParagraphs.Append(pNew);
                 }

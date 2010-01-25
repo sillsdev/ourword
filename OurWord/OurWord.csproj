@@ -446,7 +446,7 @@
     <Compile Include="Dialogs\oHelpAbout.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Print.cs">
+    <Compile Include="Printing\PrintDialog.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgCreateTranslation.cs">
@@ -599,8 +599,12 @@
     <Compile Include="Dialogs\WizNewProject\WizNew_Cluster.Designer.cs">
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </Compile>
+    <Compile Include="Edit\Draw.cs" />
+    <Compile Include="Edit\DrawingContext.cs" />
     <Compile Include="Edit\EIcon.cs" />
+    <Compile Include="Edit\ELine.cs" />
     <Compile Include="Edit\ENote.cs" />
+    <Compile Include="Edit\EPicture.cs" />
     <Compile Include="Edit\OWToolTip.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -646,6 +650,10 @@
     <Compile Include="OurWordMain.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Printing\AssociatedLines.cs" />
+    <Compile Include="Printing\Printer.cs" />
+    <Compile Include="Printing\RunningFooter.cs" />
+    <Compile Include="Printing\Page.cs" />
     <Compile Include="SideWnd\SideWindows.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -710,8 +718,8 @@
       <DependentUpon>oHelpAbout.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Print.resx">
-      <DependentUpon>Print.cs</DependentUpon>
+    <EmbeddedResource Include="Printing\PrintDialog.resx">
+      <DependentUpon>PrintDialog.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\DlgCreateTranslation.resx">

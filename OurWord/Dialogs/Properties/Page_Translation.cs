@@ -30,6 +30,8 @@ using OurWord;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -601,18 +603,18 @@ namespace OurWord.Dialogs
 
             // Writing Systems
             var sGroupWritingSystems = G.GetLoc_String("kWritingSystems", "Writing Systems");
-            LS.AddInformation("tr100", Information.PStyleHeading1,
+            LS.AddInformation("tr100", StyleSheet.LiterateHeading,
                 "Writing Systems");
-            LS.AddInformation("tr110", Information.PStyleNormal,
+            LS.AddInformation("tr110", StyleSheet.LiterateParagraph,
                 "Writing Systems are defined in another section of this Configuration Dialog. " +
                 "They have information such as which keyboard to use when typing, autor-replace, " +
                 "which letters constitute punctuation, and how to do hyphenation. Once these " +
                 "have been defined, you need to tell OurWord which writing system to use for this " +
                 "translation.");
-            LS.AddInformation("tr120", Information.PStyleNormal,
+            LS.AddInformation("tr120", StyleSheet.LiterateParagraph,
                 "The Vernacular Writing System is the one in which the translation is done. Thus " +
                 "it will be used in the right-hand column of the drafting view.");
-            LS.AddInformation("tr130", Information.PStyleNormal,
+            LS.AddInformation("tr130", StyleSheet.LiterateParagraph,
                 "The Advisor Writing System is the one in which materials are typically created " +
                 "for the advisor or consultant. Thus it is the one used in the right-hand column " +
                 "of the back translation view.");
@@ -635,17 +637,17 @@ namespace OurWord.Dialogs
 
             // Footnotes
             var sGroupFootnotes = G.GetLoc_String("kFootnotes", "Footnotes");
-            LS.AddInformation("tr200", Information.PStyleHeading1,
+            LS.AddInformation("tr200", StyleSheet.LiterateHeading,
                 "Footnote Letter Sequence");
-            LS.AddInformation("tr210", Information.PStyleNormal,
+            LS.AddInformation("tr210", StyleSheet.LiterateParagraph,
                 "When a footnote is encountered within the Scriptures, it typically is signaled " +
                 "by a letter (such as 'a', 'b', 'c', etc.). By looking for that letter at the " +
                 "bottom of the page one can quickly see the corresponding footnote paragraph.");
-            LS.AddInformation("tr220", Information.PStyleNormal,
+            LS.AddInformation("tr220", StyleSheet.LiterateParagraph,
                 "OurWord defaults to the \"a, b, c, ...\" sequence, which is suitable for many " +
                 "alphabets. But a great many languages will need to define a different sequence. " +
                 "Thus if you cannot use one of the built-in sequences, you should enter your own.");
-            LS.AddInformation("tr230", Information.PStyleNormal,
+            LS.AddInformation("tr230", StyleSheet.LiterateParagraph,
                 "First, choose either one of the built-in sequences, or indicate that you are " +
                 "using a \"custom\" sequence that you will define.");
 
@@ -658,7 +660,7 @@ namespace OurWord.Dialogs
                 DFoot.FootnoteSequenceChoices);
             m_FootnoteLetterType.Group = sGroupFootnotes;
 
-            LS.AddInformation("tr240", Information.PStyleNormal,
+            LS.AddInformation("tr240", StyleSheet.LiterateParagraph,
                 "To define a custom sequence, enter its letters, with spaces in-between. This " +
                 "allows a means for you to specify multi-letter combinations, e.g., the 'll' " +
                 "and 'ng' in \"...j k l ll m n ng o p...\"");
@@ -674,7 +676,7 @@ namespace OurWord.Dialogs
                 sEditText);
             m_FootnoteCustomSequence.Group = sGroupFootnotes;
 
-            LS.AddInformation("tr250", Information.PStyleNormal,
+            LS.AddInformation("tr250", StyleSheet.LiterateParagraph,
                 "If you have more footnotes than you have letters, then OurWord will just roll " +
                 "over back to the beginning. E.g., after 'z' comes 'a'.");
         }

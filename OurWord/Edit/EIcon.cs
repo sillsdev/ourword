@@ -83,16 +83,16 @@ namespace OurWord.Edit
             m_sIconResource = sIconResource;
         }
         #endregion
-        #region OMethod: void CalculateWidth(Graphics g)
-        public override void CalculateWidth(Graphics g)
+        #region OMethod: void CalculateWidth()
+        public override void CalculateWidth()
         {
             // Do-nothing override
         }
         #endregion
-        #region Method: override void Paint()
-        public override void Paint()
+        #region Method: override void Draw(IDraw)
+        public override void Draw(IDraw draw)
         {
-            Draw.Image(Bmp, Position);
+            draw.DrawImage(Bmp, Position);
         }
         #endregion
 

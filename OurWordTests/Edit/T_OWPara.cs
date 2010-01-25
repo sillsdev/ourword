@@ -25,6 +25,9 @@ using OurWord;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWordTests.Edit
@@ -109,25 +112,24 @@ namespace OurWordTests.Edit
         private DParagraph CreateParagraph_John_3_16()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph();
-            p.StyleAbbrev = "p";
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             // Add various runs
             p.AddRun(DChapter.Create("3"));
             p.AddRun(DVerse.Create("16"));
 
             m_DBT1 = new DText();
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "For God so loved the "));
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "world "));
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that he gave his one and only son"));
+            m_DBT1.Phrases.Append(new DPhrase("For God so loved the "));
+            m_DBT1.Phrases.Append(new DPhrase("world ") { FontToggles = FontStyle.Italic });
+            m_DBT1.Phrases.Append(new DPhrase("that he gave his one and only son"));
             p.AddRun(m_DBT1);
 
             p.AddRun(DVerse.Create("17"));
 
             m_DBT2 = new DText();
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "that whosoever believes in him "));
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, "shall not perish, "));
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, "but have everlasting life."));
+            m_DBT2.Phrases.Append(new DPhrase("that whosoever believes in him "));
+            m_DBT2.Phrases.Append(new DPhrase("shall not perish, ") { FontToggles = FontStyle.Italic });
+            m_DBT2.Phrases.Append(new DPhrase("but have everlasting life."));
             p.AddRun(m_DBT2);
 
             m_section.Paragraphs.Append(p);
@@ -1097,30 +1099,23 @@ namespace OurWordTests.Edit
         private DParagraph CreateParagraph_LongHuicholWords()
         {
             // Create a paragraph
-            DParagraph p = new DParagraph();
-            p.StyleAbbrev = "p";
+            var p = new DParagraph(StyleSheet.Paragraph);
 
             // Add various runs
             p.AddRun(DVerse.Create("16"));
 
             m_DBT1 = new DText();
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
-                "Mepücatemaicai memü memüteyurieniquecai. "));
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, 
-                "yuxexuitü "));
-            m_DBT1.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, 
-                "ivaviyacaitüni tineunaque quetatineutaxatüa."));
+            m_DBT1.Phrases.Append(new DPhrase("Mepücatemaicai memü memüteyurieniquecai. "));
+            m_DBT1.Phrases.Append(new DPhrase("yuxexuitü ") { FontToggles = FontStyle.Italic });
+            m_DBT1.Phrases.Append(new DPhrase("ivaviyacaitüni tineunaque quetatineutaxatüa."));
             p.AddRun(m_DBT1);
 
             p.AddRun(DVerse.Create("17"));
 
             m_DBT2 = new DText();
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
-                "Haqueva pepeyetüa? "));
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic,
-                "Quenanucuqueca! 'Acacaüyari queneutahivi! "));
-            m_DBT2.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph,
-                "Mücü canicacaüyaritüni."));
+            m_DBT2.Phrases.Append(new DPhrase("Haqueva pepeyetüa? "));
+            m_DBT2.Phrases.Append(new DPhrase("Quenanucuqueca! 'Acacaüyari queneutahivi! ") { FontToggles = FontStyle.Italic });
+            m_DBT2.Phrases.Append(new DPhrase("Mücü canicacaüyaritüni."));
             p.AddRun(m_DBT2);
 
             m_section.Paragraphs.Append(p);

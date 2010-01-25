@@ -107,7 +107,7 @@ namespace OurWord.Edit
                 m_fHeight = value;
             }
         }
-        float m_fHeight = 0;
+        float m_fHeight;
         #endregion
         #region VirtAttr{g/s}: float Width - pixel width of this item
         virtual public float Width
@@ -189,8 +189,17 @@ namespace OurWord.Edit
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
-        public EItem()
+        protected EItem()
         {
+        }
+        #endregion
+        #region Atrr{g}: IDrawingContext Context
+        virtual public IDrawingContext Context
+        {
+            get
+            {
+                return Root.Context;
+            }
         }
         #endregion
         #region VAttr{g}: OWWindow Window
@@ -212,16 +221,12 @@ namespace OurWord.Edit
         #endregion
 
 		// Layout Calculations ---------------------------------------------------------------
-		#region VirtMethod: void CalculateVerticals(y, bRepositionOnly)
-		virtual public void CalculateVerticals(float y, bool bRepositionOnly)
+		#region VirtMethod: void CalculateVerticals(y)
+		virtual public void CalculateVerticals(float y)
 		// Layout any children, and calculate the Height. 
 		//
 		// Parameters
 		//   yTop - the top pixel for the container
-		//   bRepositionOnly - we just adjust the y values, we don't recalculate the heights,
-		//        or, e.g., in the case of a paragraph, re-layout all of the elements.
-		//        (e.g., when one paragraph has gotten larger, and the ones below it need to 
-		//        shift down.
 		{
 			// This will be different for every subclass
 			Debug.Assert(false);
@@ -230,7 +235,7 @@ namespace OurWord.Edit
 
         // Painting --------------------------------------------------------------------------
         #region VirtMethod: void OnPaint(ClipRectangle)
-        virtual public void OnPaint(Rectangle ClipRectangle)
+        virtual public void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
         }
         #endregion
@@ -239,6 +244,11 @@ namespace OurWord.Edit
 		{
 		}
 		#endregion
+        #region Method: virtual void Draw(IDraw)
+        virtual public void Draw(IDraw draw)
+        {
+        }
+        #endregion
 	}
     #endregion
 
@@ -521,15 +531,6 @@ namespace OurWord.Edit
             }
             EItem m_Item;
             #endregion
-            #region VAttr{g}: OWWindow.DrawBuffer Draw
-            protected OWWindow.DrawBuffer Draw
-            {
-                get
-                {
-                    return Item.Window.Draw;
-                }
-            }
-            #endregion
 
             // Border locations (i.e., adjusted for margin) ----------------------------------
             #region Attr{g}: float LeftBorder
@@ -570,8 +571,8 @@ namespace OurWord.Edit
             #endregion
 
             // Layout and Drawing ------------------------------------------------------------
-            #region VMethod: void Paint()
-            virtual public void Paint()
+            #region VMethod: void Paint(IDraw)
+            virtual public void Paint(IDraw draw)
             {
             }
             #endregion
@@ -590,29 +591,28 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Pen pen = BorderPen;
-                OWWindow.DrawBuffer d = Draw;
+                var pen = BorderPen;
 
                 if (Color.Empty != FillColor)
-                    Draw.FillRectangle(FillColor, BorderRectangle);
+                    draw.FillRectangle(FillColor, BorderRectangle);
 
-                PointF LeftTop = new PointF(LeftBorder, TopBorder);
-                PointF LeftBottom = new PointF(LeftBorder, BottomBorder);
-                PointF RightTop = new PointF(RightBorder, TopBorder);
-                PointF RightBottom = new PointF(RightBorder, BottomBorder);
+                var fLeftTop = new PointF(LeftBorder, TopBorder);
+                var fLeftBottom = new PointF(LeftBorder, BottomBorder);
+                var fRightTop = new PointF(RightBorder, TopBorder);
+                var fRightBottom = new PointF(RightBorder, BottomBorder);
 
                 if ((BorderPlacement & BorderSides.Top) == BorderSides.Top)
-                    d.Line(pen, LeftTop, RightTop);
+                    draw.DrawLine(pen, fLeftTop, fRightTop);
                 if ((BorderPlacement & BorderSides.Bottom) == BorderSides.Bottom)
-                    d.Line(pen, LeftBottom, RightBottom);
+                    draw.DrawLine(pen, fLeftBottom, fRightBottom);
 
                 if ((BorderPlacement & BorderSides.Left) == BorderSides.Left)
-                    d.Line(pen, LeftTop, LeftBottom);
+                    draw.DrawLine(pen, fLeftTop, fLeftBottom);
                 if ((BorderPlacement & BorderSides.Right) == BorderSides.Right)
-                    d.Line(pen, RightTop, RightBottom);
+                    draw.DrawLine(pen, fRightTop, fRightBottom);
             }
             #endregion
         }
@@ -647,10 +647,10 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
-                Draw.DrawRoundedRectangle(BorderPen, FillBrush,
+                draw.DrawRoundedRectangle(BorderPen, FillBrush,
                     BorderRectangle, RoundedBorderRadius);
             }
             #endregion
@@ -686,13 +686,13 @@ namespace OurWord.Edit
             }
             #endregion
 
-            #region OMethod: void Paint()
-            public override void Paint()
+            #region OMethod: void Paint(IDraw)
+            public override void Paint(IDraw draw)
             {
                 if (0 == SeparatorWidth)
                     return;
 
-                Draw.Line(BorderPen,
+                draw.DrawLine(BorderPen,
                    new PointF(LeftBorder, TopBorder),
                    new PointF(LeftBorder + SeparatorWidth, TopBorder));
             }
@@ -717,78 +717,63 @@ namespace OurWord.Edit
         #endregion
 
         // Optional Bitmap at top of container -----------------------------------------------
-        #region Attr{g/s}: Bitmap Bmp - the picture's bitmap
-        public Bitmap Bmp
+        #region Attr{g}: EPicture Picture
+        public EPicture Picture
         {
             get
             {
-                return m_bmp;
-            }
-            set
-            {
-                m_bmp = value;
+                return m_Picture;
             }
         }
-        Bitmap m_bmp = null;
+        private EPicture m_Picture;
         #endregion
-        protected const int c_BitmapMargin = 5;         // vert marg above/below the bitmap
-        protected const int c_BitmapPadAtBottom = 2;    // pixels at bottom to ensure line gets drawn
+        #region Method: void SetPicture(Bitmap bmp)
+        public void SetPicture(Bitmap bmp, bool bUseTopAndBottomBorders)
+        {
+            if (null == bmp)
+            {
+                m_Picture = null;
+                return;
+            }
+
+            m_Picture = new EPicture(bmp, this);
+
+            // We add a bottom margin (space outside the border) to account for the
+            // Windows rounding error when drawing, to make sure the bottom line gets
+            // drawn (and, to allow a bit of extra space before the next row.)
+            if (bUseTopAndBottomBorders)
+            {
+                Border = new SquareBorder(this)
+                    {
+                        BorderPlacement = BorderBase.BorderSides.TopAndBottom,
+                        Margin = new BorderBase.RectOffset() {Bottom = 5}
+                    };
+            }
+        }
+        #endregion
         #region Attr{g}: bool HasBitmap
-        public bool HasBitmap
+        bool HasBitmap
         {
             get
             {
-                return (Bmp != null);
+                return (null != m_Picture);
             }
         }
         #endregion
-        #region Method: void PaintBitmap()
-        protected void PaintBitmap()
+        #region Method: void PaintBitmap(IDraw)
+        protected void PaintBitmap(IDraw draw)
         {
             if (!HasBitmap)
                 return;
-
-            // Line above and below
-            Pen pen = new Pen(Color.Black);
-            Window.Draw.Line(pen,
-                Position,
-                new PointF(Position.X + Rectangle.Width, Position.Y));
-            Window.Draw.Line(pen,
-                new PointF(Position.X, Position.Y + Rectangle.Height - 2),
-                new PointF(Position.X + Rectangle.Width, Position.Y + Rectangle.Height - 2));
-
-            // Draw the bitmap
-            float xBmp = Position.X + (Rectangle.Width - Bmp.Width) / 2;
-            float yBmp = Position.Y + 1 + c_BitmapMargin;
-            Window.Draw.Image(Bmp, new PointF(xBmp, yBmp));
+            m_Picture.Draw(draw);
         }
         #endregion
         #region Method: float CalculateBitmapHeightRequirement()
         protected float CalculateBitmapHeightRequirement()
         {
-            if (!HasBitmap)
-                return 0;
-
-            // Allow one pixel room for the line above the drawing
-            float fHeightBmp = 1;
-
-            // Allow room for the margin above the bitmap
-            fHeightBmp += c_BitmapMargin;
-
-            // Allow room for the bitmap itself
-            fHeightBmp += Bmp.Height;
-
-            // Allow room for the margin below the bitmap
-            fHeightBmp += c_BitmapMargin;
-
-            // Allow one pixel for the line below the drawing
-            fHeightBmp += 1;
-
-            // Allow a touch of extra padding so the line draws correctly
-            fHeightBmp += c_BitmapPadAtBottom;
-
-            return fHeightBmp;
+            return !HasBitmap ? 0 : m_Picture.Height;
         }
+
         #endregion
 
         // Owned containers ------------------------------------------------------------------
@@ -1470,18 +1455,18 @@ namespace OurWord.Edit
             return Position.X + Border.GetTotalWidth(BorderBase.BorderSides.Left);
         }
         #endregion
-        #region Method: void CalculateBlockWidths(g) - calculate all EBlocks
-        public virtual void CalculateBlockWidths(Graphics g)
+        #region Method: void CalculateBlockWidths() - calculate all EBlocks
+        public virtual void CalculateBlockWidths()
         {
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
-                    container.CalculateBlockWidths(g);
+                    container.CalculateBlockWidths();
 
-                EBlock block = item as EBlock;
+                var block = item as EBlock;
                 if (null != block)
-                    block.CalculateWidth(g);
+                    block.CalculateWidth();
             }
         }
         #endregion
@@ -1506,19 +1491,19 @@ namespace OurWord.Edit
             {
                 Width = Owner.AvailableWidthForOneSubitem;
 
-                float xleft = Owner.CalculateSubItemX(this);
+                var xleft = Owner.CalculateSubItemX(this);
                 Position = new PointF(xleft, Position.Y);
             }
 
             // Then calculate the width of the owned items (as they may need to
             // refer to this object via the AvailableWidthForOneSubitem call.)
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                     container.CalculateContainerHorizontals();
 
-                EControl control = item as EControl;
+                var control = item as EControl;
                 if (null != control)
                     control.CalculateHorizontals();
             }
@@ -1537,32 +1522,43 @@ namespace OurWord.Edit
         #endregion
 
         // Painting --------------------------------------------------------------------------
-        #region OMethod: void OnPaint(ClipRectangle)
-        override public void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(IDraw, ClipRectangle)
+        override public void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
             // For performance, make sure we need to paint this container
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
+            if (!clipRectangle.IntersectsWith(IntRectangle))
                 return;
 
             // Borders as indicated
-            Border.Paint();
+            Border.Paint(draw);
 
             // Bitmap if indicated
-            PaintBitmap();
+            PaintBitmap(draw);
 
             // Paint the subcontainers
-            foreach (EItem item in SubItems)
-                item.OnPaint(ClipRectangle);
+            foreach (var item in SubItems)
+                item.OnPaint(draw, clipRectangle);
         }
         #endregion
 		#region OMethod: void PaintControls()
 		public override void PaintControls()
 		{
-			foreach (EItem item in SubItems)
+			foreach (var item in SubItems)
 				item.PaintControls();
 		}
 		#endregion
-	}
+        #region OMethod: void Draw(IDraw draw)
+        override public void Draw(IDraw draw)
+        {
+            Border.Paint(draw);
+
+            PaintBitmap(draw);
+
+            foreach (var item in SubItems)
+                item.Draw(draw);
+        }
+        #endregion
+    }
     #endregion
 
     #region CLASS: ERowOfColumns : EContainer
@@ -1582,7 +1578,7 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(EContainer Owner, cColumnsCount)
+        #region Constructor(cColumnsCount)
         public ERowOfColumns(int cColumnsCount)
             : base()
         {
@@ -1620,13 +1616,13 @@ namespace OurWord.Edit
 
                 // Get the width available for a single subitem
                 float fAvailableContentWidth = fTotalContentWidth - 
-                    ((ColumnsCount - 1) * Window.WidthBetweenColumns);
+                    ((ColumnsCount - 1) * Context.WidthBetweenColumns);
                 return fAvailableContentWidth / ColumnsCount;
             }
         }
         #endregion
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y)
+        public override void CalculateVerticals(float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -1639,9 +1635,9 @@ namespace OurWord.Edit
 
             // Calculate for the tallest pile
             float fHighest = 0;
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                item.CalculateVerticals(y, bRepositionOnly);
+                item.CalculateVerticals(y);
 				fHighest = Math.Max(fHighest, item.Height);
             }
             y += fHighest;
@@ -1666,7 +1662,7 @@ namespace OurWord.Edit
             float xLeftMost = Position.X + Border.GetTotalWidth(BorderBase.BorderSides.Left);
 
             float x = xLeftMost + iColumn *
-                (AvailableWidthForOneSubitem + Window.WidthBetweenColumns);
+                (AvailableWidthForOneSubitem + Context.WidthBetweenColumns);
 
             return x;
         }
@@ -1686,8 +1682,8 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateVerticals(y, bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(y)
+        public override void CalculateVerticals(float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -1701,7 +1697,7 @@ namespace OurWord.Edit
             // Layout the owned subitems, one below the other
             foreach (EItem item in SubItems)
             {
-				item.CalculateVerticals(y, bRepositionOnly);
+				item.CalculateVerticals(y);
 				y += item.Height;
             }
 
@@ -1737,15 +1733,27 @@ namespace OurWord.Edit
                 return m_wndWindow;
             }
         }
-        OWWindow m_wndWindow = null;
+        readonly OWWindow m_wndWindow = null;
+        #endregion
+        #region Atrr{g}: IDrawingContext Context
+        override public IDrawingContext Context
+        {
+            get
+            {
+                Debug.Assert(null != m_Context);
+                return m_Context;
+            }
+        }
+        private readonly IDrawingContext m_Context;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(OWWindow)
-        public ERoot(OWWindow _Window)
+        #region Constructor(IDrawingContext, OWWindow)
+        public ERoot(OWWindow window, IDrawingContext context)
             : base()
         {
-            m_wndWindow = _Window;
+            m_wndWindow = window;
+            m_Context = context;
         }
         #endregion
 
@@ -1848,37 +1856,39 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
+        #region Method: void DoLayout()
+        public void DoLayout()
+        {
+            CalculateContainerHorizontals();
+            CalculateVerticals(Context.TopMargin);
+        }
+        #endregion
         #region OMethod: void CalculateContainerHorizontals()
         override public void CalculateContainerHorizontals()
         {
-            // The width of this root container is the width of the window, less the
-            // left and right margins.
-            int nScroolBarWidth = (null == Window.m_ScrollBar) ? 0 : Window.m_ScrollBar.Width;
-            Width = Window.Width - nScroolBarWidth - Window.WindowMargins.Width * 2;
-
-            // The Left is the margin width
-            Position = new PointF(Window.WindowMargins.Width, Position.Y);
+            Width = Context.AvailableWidthForContent;
+            Position = new PointF(Context.LeftMargin, Position.Y);
 
             // Process the sub-items as per usual
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                     container.CalculateContainerHorizontals();
 
-				EControl control = item as EControl;
+				var control = item as EControl;
 				if (null != control)
 					control.CalculateHorizontals();
             }
         }
         #endregion
-		#region OMethod:  void CalculateVerticals(float y, bool bRepositionOnly)
-		public override void CalculateVerticals(float y, bool bRepositionOnly)
+		#region OMethod: void CalculateVerticals(float y)
+		public override void CalculateVerticals(float y)
 		{
 			// Lay out the items
-			foreach (EItem item in SubItems)
+			foreach (var item in SubItems)
 			{
-				item.CalculateVerticals(y, false);
+				item.CalculateVerticals(y);
 				y += item.Height;
 			}
 
@@ -1888,7 +1898,7 @@ namespace OurWord.Edit
 		#region Method: void CalculateLineNumbers()
 		public void CalculateLineNumbers()
         {
-            int nLineNo = 1;
+            var nLineNo = 1;
             CalculateLineNumbers(ref nLineNo);
         }
         #endregion

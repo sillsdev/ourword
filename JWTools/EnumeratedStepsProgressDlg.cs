@@ -62,6 +62,13 @@ namespace JWTools
                 };
             }
             #endregion
+
+            #region Method: void AppendToLabelText(sAppend)
+            public void AppendToLabelText(string sAppend)
+            {
+                LabelControl.Text = LocalizedName + sAppend;
+            }
+            #endregion
         }
         #endregion
         private List<Step> m_Steps;
@@ -83,6 +90,34 @@ namespace JWTools
             {
                 return m_Steps[m_CurrentStep].PictureControl;
             }
+        }
+        #endregion
+
+        // Appended Text
+        #region SMethod: void AppendToLabelText(string sAppend)
+        delegate void AppendToTextDelegate(string sAppend);
+        static public void AppendToLabelText(string sAppend)
+        {
+            if (!s_Dialog.IsValidStep)
+                return;
+
+            if (s_Dialog.InvokeRequired)
+            {
+                var d = new AppendToTextDelegate(AppendToLabelText);
+                s_Dialog.Invoke(d, new object[] { sAppend });                
+            }
+            else
+            {
+                var step = s_Dialog.m_Steps[s_Dialog.m_CurrentStep];
+                step.AppendToLabelText(sAppend);           
+                
+            }
+        }
+        #endregion
+        #region SMethod: void ClearAppend()
+        static public void ClearAppend()
+        {
+            AppendToLabelText("");
         }
         #endregion
 
@@ -300,10 +335,11 @@ namespace JWTools
             s_StepStrings = stepStrings;
             s_Dialog = null;
 
-            var t = new Thread(new ThreadStart(EnumeratedStepsProgressDlg.StartDialog));
-            t.IsBackground = true;
-            t.Name = "Synchronize Progress";
-            //t.SetApartmentState(ApartmentState.STA);
+            var t = new Thread(new ThreadStart(EnumeratedStepsProgressDlg.StartDialog))
+            {
+                IsBackground = true,
+                Name = "Progress Window"
+            };
             t.Start();
 
             while (null == s_Dialog)

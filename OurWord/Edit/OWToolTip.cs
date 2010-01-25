@@ -15,6 +15,8 @@ using System.Windows.Forms;
 using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 #endregion
 #endregion
@@ -305,7 +307,7 @@ namespace OurWord.Edit
             // we would call SetSize, but this requires another call to DoLayout; thus this
             // situation where the layout drives the window size causes us to do things
             // like this.
-            Draw = new DrawBuffer(this);
+            Draw = new ScreenDraw(this);
         }
         #endregion
         #region Cmd: OnSizeChanged
@@ -349,7 +351,7 @@ namespace OurWord.Edit
             if (Note.Behavior != TranslatorNote.General && 
                 !string.IsNullOrEmpty(Note.Behavior.Title))
             {
-                var pNoteTitle = new DPhrase(DStyleSheet.c_StyleAbbrevBold, Note.Behavior.Title);
+                var pNoteTitle = new DPhrase(Note.Behavior.Title) { FontToggles = FontStyle.Bold };
                 dbt.Phrases.Append(pNoteTitle);
             }
 
@@ -359,12 +361,13 @@ namespace OurWord.Edit
             {
                 if (dbt.Phrases.Count > 0)
                 {
-                    dbt.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevBold,
-                        DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace));
+                    var sText = DPhrase.c_chInsertionSpace + "-" + DPhrase.c_chInsertionSpace;
+                    var phrase = new DPhrase(sText) { FontToggles = FontStyle.Bold };
+                    dbt.Phrases.Append(phrase);
                 }
 
-                var pRef = new DPhrase(DStyleSheet.c_StyleAbbrevItalic,
-                    sBookRef + ":" + DPhrase.c_chInsertionSpace);
+                var pRef = new DPhrase(sBookRef + ":" + DPhrase.c_chInsertionSpace) 
+                    { FontToggles = FontStyle.Italic };
                 dbt.Phrases.Append(pRef);
             }
 
@@ -375,14 +378,14 @@ namespace OurWord.Edit
                 if (sSelectedText.Length > 40)
                     sSelectedText = sSelectedText.Substring(0, 40) + "...";
                 sSelectedText = "\"" + sSelectedText + "\"";
-                var pSelectedText = new DPhrase(DStyleSheet.c_sfmParagraph, sSelectedText);
+                var pSelectedText = new DPhrase(sSelectedText);
                 dbt.Phrases.Append(pSelectedText);
             }
 
             // Create the paragraph
             var pTitle = new OWPara(
                 Note.Behavior.GetWritingSystem(Note),
-                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipHeader),
+                StyleSheet.TipHeader,
                 dbt.Phrases.AsVector);
 
             // Pre-pend the icon
@@ -434,14 +437,8 @@ namespace OurWord.Edit
                 (OWPara.Flags.None);
 
             // Create the paragraph
-            string sStyle = (message.IsEditable) ?
-                DStyleSheet.c_StyleMessageContent : DStyleSheet.c_StyleToolTipText;
-            var p = new OWPara(
-                writingSystem,
-                DB.StyleSheet.FindParagraphStyle(sStyle),
-                message,
-                clrBackground,
-                flags);
+            var style = (message.IsEditable) ? StyleSheet.TipContent : StyleSheet.TipText;
+            var p = new OWPara(writingSystem, style, message, clrBackground, flags);
 
             // If the message is editable, we want to make it stand out by placing it inside
             // a container that shows the color better.
@@ -478,11 +475,7 @@ namespace OurWord.Edit
             // Create the paragraph
             var writingSystem = Note.Behavior.GetWritingSystem(Note);
             Debug.Assert(null != writingSystem);
-            var p = new OWPara(
-                writingSystem,
-                DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleToolTipText),
-                message,
-                clrBackground,
+            var p = new OWPara(writingSystem, StyleSheet.TipText, message, clrBackground,
                 flags);
 
             // If the message is editable, we want to make it stand out by placing it inside
@@ -827,20 +820,17 @@ namespace OurWord.Edit
             Debug.Assert(null != writingSystem);
 
             // Header style and font
-            var styleHeader = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
-            var fontHeader = styleHeader.CharacterStyle.FindOrAddFontForWritingSystem(
-                writingSystem).FindOrAddFont(true, FontStyle.Regular);
+            var fontHeader = StyleSheet.TipHeader.GetFont(writingSystem.Name, G.ZoomPercent);
 
             // Uneditable messages are just a line of text
             if (!message.IsEditable)
             {
                 var p = new OWPara(writingSystem,
-                    styleHeader,
+                    StyleSheet.TipHeader,
                     new[] { 
-                        new DPhrase( DStyleSheet.c_StyleToolTipHeader, message.Author),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
-                        new DPhrase( DStyleSheet.c_StyleToolTipText, 
-                            message.LocalTimeCreated.ToShortDateString())
+                        new DPhrase(message.Author),
+                        new DPhrase(", "),
+                        new DPhrase(message.LocalTimeCreated.ToShortDateString())
                     });
                 return p;
             }
@@ -1133,22 +1123,15 @@ namespace OurWord.Edit
                 return boxToolstrip;
             }
 
-            // Override any spacing the user entered, so it looks "right"
-            var pStyle = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_StyleMessageHeader);
-            pStyle.SpaceBefore = 2;
-            pStyle.SpaceAfter = 0;
-
             var sStage = (null == message.Stage) ? "" : message.Stage.LocalizedAbbrev;
 
             var pTitle = new OWPara(
                 Note.Behavior.GetWritingSystem(Note),
-                pStyle,
+                StyleSheet.TipHeader,
                 new[] { 
-                    new DPhrase( DStyleSheet.c_StyleToolTipHeader, 
-                        message.EventDate.ToShortDateString()),
-                    new DPhrase( DStyleSheet.c_StyleToolTipText, ", "),
-                    new DPhrase( DStyleSheet.c_StyleToolTipText, 
-                        sStage)
+                    new DPhrase( message.EventDate.ToShortDateString()),
+                    new DPhrase( ", "),
+                    new DPhrase( sStage)
                 });
             return pTitle;
         }

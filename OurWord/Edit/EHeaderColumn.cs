@@ -119,14 +119,14 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations & Painting ----------------------------------------------------
-        #region OMethod: void CalculateBlockWidths(Graphics g) - Include Header blocks
-        public override void CalculateBlockWidths(Graphics g)
+        #region OMethod: void CalculateBlockWidths() - Include Header blocks
+        public override void CalculateBlockWidths()
         {
             // Subitems as usual
-            base.CalculateBlockWidths(g);
+            base.CalculateBlockWidths();
 
             // Header
-            Header.CalculateBlockWidths(g);
+            Header.CalculateBlockWidths();
         }
         #endregion
         #region OMethod: void CalculateContainerHorizontals()
@@ -140,8 +140,8 @@ namespace OurWord.Edit
             Header.CalculateContainerHorizontals();
         }
         #endregion
-        #region OMethod: void CalculateVerticals(float y, bool bRepositionOnly)
-        public override void CalculateVerticals(float y, bool bRepositionOnly)
+        #region OMethod: void CalculateVerticals(float y)
+        public override void CalculateVerticals(float y)
         {
             // Remember the top-left position and width
             Position = new PointF(Position.X, y);
@@ -150,7 +150,7 @@ namespace OurWord.Edit
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
 
             // Header
-            Header.CalculateVerticals(y, bRepositionOnly);
+            Header.CalculateVerticals(y);
             y += Header.Height;
 
             m_yContentsTop = y;
@@ -161,7 +161,7 @@ namespace OurWord.Edit
             // Layout the owned subitems, one below the other
             foreach (EItem item in SubItems)
             {
-				item.CalculateVerticals(y, bRepositionOnly);
+				item.CalculateVerticals(y);
 				y += item.Height;
             }
 
@@ -173,25 +173,25 @@ namespace OurWord.Edit
             Height = (y - Position.Y);
         }
         #endregion
-        #region OMethod: void OnPaint(Rectangle ClipRectangle)
-        public override void OnPaint(Rectangle ClipRectangle)
+        #region OMethod: void OnPaint(IDraw, ClipRectangle)
+        public override void OnPaint(IDraw draw, Rectangle clipRectangle)
         {
             // For performance, make sure we need to paint this container
-            if (!ClipRectangle.IntersectsWith(IntRectangle))
+            if (!clipRectangle.IntersectsWith(IntRectangle))
                 return;
 
             // Footnote Separator if indicated
-            Border.Paint();
+            Border.Paint(draw);
 
             // Header
-            Header.OnPaint(ClipRectangle);
+            Header.OnPaint(draw, clipRectangle);
 
             // Bitmap if indicated
-            PaintBitmap();
+            PaintBitmap(draw);
 
             // Paint the subcontainers
-            foreach (EItem item in SubItems)
-                item.OnPaint(ClipRectangle);
+            foreach (var item in SubItems)
+                item.OnPaint(draw, clipRectangle);
         }
         #endregion
         #region OMethod: EBlock GetBlockAt(PointF pt)

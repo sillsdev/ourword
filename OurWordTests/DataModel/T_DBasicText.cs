@@ -9,6 +9,7 @@
 #region Using
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -21,6 +22,8 @@ using OurWordData.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 
@@ -40,28 +43,26 @@ namespace OurWordTests.DataModel
         #endregion
 
         #region Test: PhrasesLength
-        [Test]
-        public void PhrasesLength()
+        [Test] public void PhrasesLength()
         {
-            string s1 = "For God so loved the ";
-            string s2 = "world ";
-            string s3 = "that he gave his one and only son";
+            var s1 = "For God so loved the ";
+            var s2 = "world ";
+            var s3 = "that he gave his one and only son";
 
             // Create a multi-phrase text
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s1));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, s2));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s3));
+            var text = new DText();
+            text.Phrases.Append(new DPhrase(s1));
+            text.Phrases.Append(new DPhrase(s2) { FontToggles = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase(s3));
 
             // Test it's length
-            int n = s1.Length + s2.Length + s3.Length;
+            var n = s1.Length + s2.Length + s3.Length;
             Assert.AreEqual(n, text.PhrasesLength);
         }
         #endregion
 
         #region Test: Delete
-        [Test]
-        public void Delete()
+        [Test] public void Delete()
         {
             // Total = "For God so loved the world that he gave his one and only son";
             //          0         1         2         3         4         5         6
@@ -131,15 +132,15 @@ namespace OurWordTests.DataModel
         DText _Delete_Setup()
         {
             // Total = "For God so loved the world that he gave his one and only son";
-            string s1 = "For God so loved the ";
-            string s2 = "world ";
-            string s3 = "that he gave his one and only son";
+            var s1 = "For God so loved the ";
+            var s2 = "world ";
+            var s3 = "that he gave his one and only son";
 
             // Create a multi-phrase text
-            DText text = new DText();
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s1));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_StyleAbbrevItalic, s2));
-            text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, s3));
+            var text = new DText();
+            text.Phrases.Append(new DPhrase(s1));
+            text.Phrases.Append(new DPhrase(s2) { FontToggles = FontStyle.Italic });
+            text.Phrases.Append(new DPhrase(s3));
 
             return text;
         }
@@ -159,7 +160,6 @@ namespace OurWordTests.DataModel
         }
         #endregion
         #endregion
-
 
     }
 }

@@ -18,6 +18,8 @@ using System.IO;
 
 using JWTools;
 using OurWordData;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWordData.DataModel
@@ -33,14 +35,9 @@ namespace OurWordData.DataModel
 			{
 				return (Types)m_nNoteType;
 			}
-			set
+			private set
 			{
 				SetValue(ref m_nNoteType, (int)value);
-
-				if ( value == Types.kSeeAlso)
-					StyleAbbrev = DB.Map.StyleSeeAlsoPara;
-				else
-					StyleAbbrev = DB.Map.StyleFootnotePara;
 			}
 		}
 		private int m_nNoteType = (int)Types.kSeeAlso;
@@ -111,7 +108,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region VAttr{g}: DFoot Foot - the owner
-        DFoot Foot
+        public DFoot Foot
         {
             get
             {
@@ -123,7 +120,7 @@ namespace OurWordData.DataModel
         // Scaffolding -----------------------------------------------------------------------
         #region private Constructor()
         private DFootnote()
-            : base()
+            : base(StyleSheet.Footnote)
         {
         }
         #endregion
@@ -140,14 +137,14 @@ namespace OurWordData.DataModel
 			: this()
 		{
             if (nChapter>0 && nVerse>0)
-                VerseReference = nChapter.ToString() + ":" + nVerse.ToString();
+                VerseReference = nChapter + ":" + nVerse;
             NoteType = nNoteType;
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to prevent duplicates
 		public override bool ContentEquals(JObject obj)
 		{
-			if (this.GetType() != obj.GetType())
+			if (GetType() != obj.GetType())
 				return false;
 			// We're just going to assume we did it correctly in the calling method for now.
 			return false;
@@ -180,7 +177,7 @@ namespace OurWordData.DataModel
             //                  iPos
             //
             // The "27:28:" will be interpreted as the Label, and
-            // the "20 fathoms is 37 meters"" will be the note.
+            // the "20 fathoms is 37 meters"" will be the footnote.
         {
             if (iPos < 0)
                 return false;
@@ -207,7 +204,7 @@ namespace OurWordData.DataModel
 			// We want to extract the verse reference. We expect a somewhat
 			// unpredictable sequence of numbers and certain types of punctuation. 
 			int i = 0;
-			string sPunctChars = ":;.-";
+			const string sPunctChars = ":;.-";
 			for(; i < s.Length; i++)
 			{
                 // Shorthand: categorize the current/previous characters

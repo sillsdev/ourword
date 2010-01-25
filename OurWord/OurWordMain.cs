@@ -23,8 +23,10 @@ using System.Text;
 using System.Threading;
 
 using JWTools;
+using OurWord.Printing;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.Styles;
 
 using OurWord.Edit;
 using OurWord.Layouts;
@@ -277,6 +279,26 @@ namespace OurWord
             DB.StyleSheet.ZoomFactor = G.ZoomFactor;
         }
         #endregion
+        #region Method: void Dim()
+        void Dim()
+        {
+            if (ScreenDraw.Dim)
+                return;
+
+            ScreenDraw.Dim = true;
+            CurrentLayout.Invalidate();
+        }
+        #endregion
+        #region Method: void UnDim()
+        void UnDim()
+        {
+            if (!ScreenDraw.Dim)
+                return;
+
+            ScreenDraw.Dim = false;
+            CurrentLayout.Invalidate();
+        }
+        #endregion
         #endregion
 
         // Autosave --------------------------------------------------------------------------
@@ -489,23 +511,19 @@ namespace OurWord
                 return;
 
             // Get the paragraph's possible styles
-            List<string> vPossibilities = p.CanChangeParagraphStyleTo;
+            var vPossibileStyles = p.CanChangeParagraphStyleTo;
 
             // Create menu items for each of these
-            foreach (string sAbbrev in vPossibilities)
+            foreach (var style in vPossibileStyles)
             {
-                JParagraphStyle pstyle = DB.StyleSheet.FindParagraphStyle(sAbbrev);
-                if (null == pstyle)
-                    continue;
-
-                ToolStripMenuItem mi = new ToolStripMenuItem(
-                    pstyle.DisplayName,
+                var mi = new ToolStripMenuItem(
+                    style.StyleName,
                     null,
                     cmdChangeParagraphStyle,
-                    "m_menuChangeParagraphStyle_" + sAbbrev);
-                mi.Tag = sAbbrev;
+                    "m_menuChangeParagraphStyle_" + style.StyleName);
+                mi.Tag = style;
 
-                if (sAbbrev == p.StyleAbbrev)
+                if (style == p.Style)
                     mi.Checked = true;
 
                 m_menuChangeParagraphTo.DropDownItems.Add(mi);
@@ -2416,16 +2434,19 @@ namespace OurWord
         #endregion
 
         // Commands --------------------------------------------------------------------------
-		#region COMMANDS
+        #region COMMANDS
         // Stand-Alone Toolbar Buttons
 		#region Cmd: cmdPrint
         private void cmdPrint(Object sender, EventArgs e)
 		{
+            Dim();;
 			OnLeaveSection();
 
-			Print p = new Print();
+            var p = new Printer(DB.TargetSection);
 			p.Do();
-		}
+
+            UnDim();
+        }
 		#endregion
         #region Cmd: cmdExit
         private void cmdExit(Object sender, EventArgs e)
@@ -2442,25 +2463,29 @@ namespace OurWord
             // even though the menu command is hidden!)
             if (!m_btnProject.Visible)
                 return;
+            Dim();
 
             // Walk through the wizard; we do nothing unless the User makes it through
             // (as signaled by DialogResult.OK).
-            Dialogs.WizNewProject.WizNewProject wiz = new Dialogs.WizNewProject.WizNewProject();
+            var wiz = new Dialogs.WizNewProject.WizNewProject();
             if (DialogResult.OK != wiz.ShowDialog())
-                return;
+                goto done;
 
             // Make sure the current project is saved and up-to-date, before we create
             // the new one. Commit to the Repository, to have a restoreo  point if we need it.
             OnLeaveProject(true);
 
             // Create and initialize the new project according to the settings
-            DProject project = new DProject(wiz.ProjectName);
+            var project = new DProject(wiz.ProjectName)
+            {
+                TeamSettings = new DTeamSettings(wiz.ChosenCluster.Name)
+            };
 
             // Team Settings: start with the factory default; load over it if a file already exists,
             // otherwise create the new cluster
-            project.TeamSettings = new DTeamSettings(wiz.ChosenCluster.Name);
             project.TeamSettings.EnsureInitialized();
             project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
+            StyleSheet.Initialize(null);
 
             // Create the front translation. If the settings file exists, load it; otherwise
             // create its folder, settings file, etc.
@@ -2485,11 +2510,16 @@ namespace OurWord
             // Edit properties?
             if (wiz.LaunchPropertiesDialogWhenDone)
                 cmdConfigure(null, null);
+
+        done:
+            UnDim();
         }
 		#endregion
         #region Cmd: cmdDownloadRepository
         private void cmdDownloadRepository(Object sender, EventArgs e)
         {
+            Dim();
+
             // We'll contruct the wizard outside of the loop, in case we have to go
             // back and change settings (e.g., on an error)
             var wiz = new WizInitializeFromRepository();
@@ -2503,7 +2533,7 @@ namespace OurWord
             {
                 // Get the user's settings for the to-be-downloaded cluster
                 if (DialogResult.OK != wiz.ShowDialog(this))
-                    return;
+                    goto done;
 
                 // The ClusterInfo tells us where the new cluster will be stored
                 var sParentFolder = (wiz.IsInMyDocuments) ?
@@ -2535,7 +2565,7 @@ namespace OurWord
                         null,
                         LocDB.MessageTypes.YN);
                     if (!bAgain)
-                        return;
+                        goto done;
                     continue;
                 }
 
@@ -2558,6 +2588,10 @@ namespace OurWord
             LocDB.Message("msgRepoCreated",
                 "The Respository has been sucessfully downloaded to your computer.",
                 null, LocDB.MessageTypes.Info);
+
+            done:
+                UnDim();
+
         }
         #endregion
 
@@ -2570,7 +2604,7 @@ namespace OurWord
                 return;
 
             // Get the path from the tag
-            string sPath = (string)m.Tag;
+            var sPath = (string)m.Tag;
             if (string.IsNullOrEmpty(sPath))
                 return;
 
@@ -2595,7 +2629,7 @@ namespace OurWord
             var vs = new List<string>();
             if (!ClusterList.UserCanAccessAllProjects)
             {
-                foreach (string s in vsRaw)
+                foreach (var s in vsRaw)
                 {
                     var bUserCanAccess = ClusterList.GetUserCanAccessProject(ci.Name, s);
                     if (bUserCanAccess)
@@ -2618,15 +2652,12 @@ namespace OurWord
             }
 
             // Add them to the menu
-            foreach (string s in vs)
+            foreach (var s in vs)
             {
- //               string sPath = ci.ClusterFolder + 
- //                   ".Settings" + Path.DirectorySeparatorChar +
- //                   s + ".owp";
-
-                var mi = new ToolStripMenuItem(s, null, onClick);
- //               mi.Tag = sPath;
-                mi.Tag = ci.GetProjectPath(s);
+                var mi = new ToolStripMenuItem(s, null, onClick) 
+                {
+                    Tag = ci.GetProjectPath(s)
+                };
                 miParent.DropDownItems.Add(mi);
             }
         }
@@ -2690,18 +2721,19 @@ namespace OurWord
                 return;
             if (DB.TargetTranslation.BookList.Count == 0)
                 return;
+            Dim();
 
             // Get the user's desires (or cancel)
-            DialogExport dlgDesires = new DialogExport(DB.TargetTranslation);
+            var dlgDesires = new DialogExport(DB.TargetTranslation);
             if (DialogResult.OK != dlgDesires.ShowDialog(this))
-                return;
+                goto done;
 
             // Create and display the progress dialog
             DlgExportProgress.Start();
             DlgExportProgress.SetCurrentBook("Setting up...");
 
             // Loop through the books of the requested translation
-            foreach (DBook book in DB.TargetTranslation.BookList)
+            foreach (var book in DB.TargetTranslation.BookList)
             {
                 // Does the user wish to cancel?
                 if (DlgExportProgress.UserSaysCancel)
@@ -2712,13 +2744,13 @@ namespace OurWord
                     book.DisplayName);
 
                 // Load the book if not already in memory
-                bool bIsLoaded = book.Loaded;
+                var bIsLoaded = book.Loaded;
                 book.LoadBook(G.CreateProgressIndicator());
                 if (!book.Loaded)
                     continue;
 
                 // Compute the file name
-                string sExportPath = JWU.GetMyDocumentsFolder(dlgDesires.ExportSubFolderName);
+                var sExportPath = JWU.GetMyDocumentsFolder(dlgDesires.ExportSubFolderName);
                 sExportPath += book.BaseName;
 
                 // Export it to paratext if requested
@@ -2746,6 +2778,9 @@ namespace OurWord
 
             // Done with the progress dialog
             DlgExportProgress.Stop();
+
+        done:
+            UnDim();
 
         }
         #endregion
@@ -2792,17 +2827,17 @@ namespace OurWord
         #region Cmd: cmdChangeParagraphStyle
         private void cmdChangeParagraphStyle(Object sender, EventArgs e)
         {
-            ToolStripMenuItem mi = sender as ToolStripMenuItem;
+            var mi = sender as ToolStripMenuItem;
             if (null == mi)
                 return;
 
-            string sStyleAbbrev = mi.Tag as string;
-            if (string.IsNullOrEmpty(sStyleAbbrev))
+            var style = mi.Tag as ParagraphStyle;
+            if (null == style)
                 return;
 
-            OWWindow wnd = FocusedWindow;
+            var wnd = FocusedWindow;
             if (null != wnd)
-                wnd.cmdChangeParagraphTo(sStyleAbbrev);
+                wnd.cmdChangeParagraphTo(style);
         }
         #endregion
 		#region Can: canItalic
@@ -3143,17 +3178,21 @@ namespace OurWord
 				return;
 
 			// Perform the dialog to get the increment desired
-			DBook book = DB.Project.STarget.Book;
-			IncrementBookStatus dlg = new IncrementBookStatus(book);
-			DialogResult result = dlg.ShowDialog();
+			var book = DB.Project.STarget.Book;
+			var dlg = new IncrementBookStatus(book);
+            Dim();
+            if (dlg.ShowDialog() != DialogResult.OK)
+            {
+                UnDim(); 
+                return; 
+            }
 
 			// If we incremented, then we need to save the file, so that it will be
 			// stored on the disk under the new filename (and thus synchronized with
 			// what is in the Project. (See Bug0084)
-			if (result != DialogResult.OK)
-				return;
             book.DeclareDirty();
 			cmdSaveProject(null, null);
+            UnDim();
 
             // Make sure the UI updates to show the correct file name
             ResetWindowContents();
@@ -3167,9 +3206,10 @@ namespace OurWord
 			if (!canIncrementBookStatus)
 				return;
 
-			DBook BTarget = DB.Project.STarget.Book;
+			var BTarget = DB.Project.STarget.Book;
 
-			DialogRestoreFromBackup dlg = new DialogRestoreFromBackup(BTarget);
+            Dim();
+			var dlg = new DialogRestoreFromBackup(BTarget);
 			if (DialogResult.OK == dlg.ShowDialog())
 			{
 				OnLeaveProject(true);
@@ -3179,6 +3219,7 @@ namespace OurWord
 				DB.Project.Nav.GoToFirstSection();
 				OnEnterSection();
 			}
+            UnDim();
 		}
 		#endregion
 		#region Cmd: cmdFilter
@@ -3251,11 +3292,12 @@ namespace OurWord
 			// Make sure we have a project with Front and Target book
 			if (!DB.IsValidProject)
 				return;
+            Dim();
 
 			// Get the user's pleasure
 			if (null == m_dlgFilter)
 				m_dlgFilter = new DialogFilter();
-			DialogResult result = m_dlgFilter.ShowDialog(this);
+			var result = m_dlgFilter.ShowDialog(this);
 
 			// If the user Canceled out, then we remove any existing filter
 			if (result == DialogResult.Cancel || m_dlgFilter.NothingIsChecked)
@@ -3263,12 +3305,12 @@ namespace OurWord
 				DB.TargetBook.RemoveFilter();
 				G.StatusSecondaryMessage = "";
                 SetupMenusAndToolbarsVisibility();    // Reset the Navigation toolbar popups
-				return;
+			    goto done;
 			}
 
 			// Calculate the filter according to the user's requests, and position
 			// at the first match.
-            IProgressIndicator progress = G.CreateProgressIndicator();
+            var progress = G.CreateProgressIndicator();
             progress.Start(
                 G.GetLoc_String("strCalculatingMatchingSections", "Calculating matching sections..."), 
                 DB.TargetBook.Sections.Count);
@@ -3280,7 +3322,7 @@ namespace OurWord
 				section.MatchesFilter = false;
 
 				// Conduct the test for this section
-				bool b = FilterTest(section);
+				var b = FilterTest(section);
 
 				// If the test passed, then indicate it in the Section
 				if (b)
@@ -3310,6 +3352,9 @@ namespace OurWord
 				Messages.NoFilterMatches();
 				G.StatusSecondaryMessage = "";
 			}
+
+        done:
+            UnDim();
 		}
 		#endregion
 
@@ -3324,7 +3369,9 @@ namespace OurWord
 
             // Let the user change the properties
             DialogProperties dlg = new DialogProperties();
+            Dim();
             dlg.ShowDialog(this);
+            UnDim();
 
             // The zoom factor may have changed, so we need to recalculate the fonts
             SetZoomFactor();
@@ -3336,12 +3383,14 @@ namespace OurWord
 		#region Cmd: cmdSetUpFeatures
         private void cmdSetUpFeatures(Object sender, EventArgs e)
 		{
+            Dim();
 			if (true == s_Features.ShowDialog(this) )
 			{
 				OnLeaveSection();
                 SetupMenusAndToolbarsVisibility();
                 OnEnterProject();  // Makes sure we reset the side windows
             }
+            UnDim();
 		}
 		#endregion
 		#region Cmd: cmdDebugTesting
@@ -3358,16 +3407,22 @@ namespace OurWord
         #region Cmd: cmdLocalizer
         private void cmdLocalizer(Object sender, EventArgs e)
         {
+            Dim();
+
             OnLeaveProject(false);
 
             Localizer dlg = new Localizer(LocDB.DB);
             if (DialogResult.OK == dlg.ShowDialog())
                 OnEnterProject();
+
+            UnDim();
         }
         #endregion
         #region Cmd: cmdSynchronize
         private void cmdSynchronize(object sender, EventArgs e)
         {
+            Dim();
+
             // Save everything, but don't commit, cause Synchronize will do a commit
             DB.Project.Nav.SavePositionToRegistry();
             OnLeaveProject(false);
@@ -3386,13 +3441,17 @@ namespace OurWord
             DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
             DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
             OnEnterProject();
+
+            UnDim();
         }
         #endregion
         #region Cmd: cmdHistory
         private void cmdHistory(object sender, EventArgs e)
         {
+            Dim();
             var history = new DlgHistory(DB.TargetSection);
             history.ShowDialog(this);
+            UnDim();
         }
         #endregion
 
@@ -3406,8 +3465,10 @@ namespace OurWord
 		#region Cmd: cmdHelpAbout
         private void cmdHelpAbout(Object sender, EventArgs e)
 		{
+            Dim();
 			DialogHelpAbout dlg = new DialogHelpAbout();
 			dlg.ShowDialog(this);
+            UnDim();
 		}
 		#endregion
 

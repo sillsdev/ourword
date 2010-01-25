@@ -20,6 +20,8 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Runs;
+
 #endregion
 #endregion
 
@@ -115,15 +117,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region VAttr{g}: OWWindow.DrawBuffer Draw
-        public OWWindow.DrawBuffer Draw
-        {
-            get
-            {
-                return Owner.Window.Draw;
-            }
-        }
-        #endregion
         #region VAttr{g}: int PositionWithinPara
         public int PositionWithinPara
         {
@@ -138,68 +131,34 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(JFontForWritingSystem, sText)
-        public EBlock(JFontForWritingSystem _FontForWS, string _sText)
-            : base()
+        #region Constructor(Font, sText)
+        protected EBlock(Font font, string sText)
         {
-            m_sText = _sText;
-            m_FontForWS = _FontForWS;
-        }
-        #endregion
-        #region VirtMethod: bool ContentEquals(EBlock block)
-        public virtual bool ContentEquals(EBlock block)
-        {
-            if (null == block)
-                return false;
-
-            if (Text != block.Text)
-                return false;
-
-            if (GlueToNext != block.GlueToNext)
-                return false;
-
-            return true;
+            m_sText = sText;
+            m_Font = font;
         }
         #endregion
 
         // Painting ----------------------------------------------------------------------
-        #region Attr{g}: JFontForWritingSystem FontForWS - remember it here for performance
-        public JFontForWritingSystem FontForWS
+        protected readonly Font m_Font;
+        #region Attr{s}: Color TextColor
+        public Color TextColor
         {
-            get
+            protected get
             {
-                Debug.Assert(null != m_FontForWS);
-                return m_FontForWS;
+                return m_TextColor;
+            }
+            set
+            {
+                m_TextColor = value;
             }
         }
-        protected JFontForWritingSystem m_FontForWS = null;
-        #endregion
-        #region Method: Font GetSuperscriptFont()
-        protected Font GetSuperscriptFont()
-        {
-            Font f = FontForWS.DefaultFontZoomed;
-            return new Font(f.FontFamily,
-                f.Size * 0.8F,
-                f.Style);
-        }
+        public Color m_TextColor = Color.Black;
         #endregion
         #region Method: Brush GetBrush()
         protected Brush GetBrush()
         {
-            return new SolidBrush(FontForWS.FontColor);
-        }
-        #endregion
-        #region Method: Pen GetPen()
-        protected Pen GetPen()
-        {
-            return new Pen(FontForWS.FontColor);
-        }
-        #endregion
-
-        #region Method: virtual void Paint()
-        virtual public void Paint()
-        {
-            //                Debug.Assert(false);
+            return new SolidBrush(TextColor);
         }
         #endregion
 
@@ -244,18 +203,13 @@ namespace OurWord.Edit
         #endregion
 
         // Layout Calculations ---------------------------------------------------------------
-        #region VirtMethod: void CalculateWidth(Graphics g)
-        virtual public void CalculateWidth(Graphics g)
+        #region VirtMethod: void CalculateWidth()
+        virtual public void CalculateWidth()
             // Those subclasses which override will not need to call this base method.
         {
-            // For the most cases, we'll measure the width of Text according to the
-            // font stored in the CharacterStyle.
-            StringFormat fmt = StringFormat.GenericTypographic;
-            fmt.FormatFlags |= StringFormatFlags.MeasureTrailingSpaces;
-            Width = g.MeasureString(Text, FontForWS.DefaultFontZoomed, 1000, fmt).Width;
+            Width = Context.Measure(Text, m_Font);
         }
         #endregion
-
     }
     #endregion
 
@@ -263,20 +217,6 @@ namespace OurWord.Edit
     public class EWord : EBlock
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: Font Font - returns the font for the WS, including Italic, Bold, etc.
-        Font Font
-        {
-            get
-            {
-                // Optimization
-                if (FontMods == FontStyle.Regular)
-                    return FontForWS.DefaultFontZoomed;
-
-                // Generic find-or-create font as needed
-                return FontForWS.FindOrAddFont(true, FontMods);
-            }
-        }
-        #endregion
         #region Attr{g}: DPhrase Phrase - the phrase from which this EWord was generated
         public DPhrase Phrase
         {
@@ -286,17 +226,7 @@ namespace OurWord.Edit
                 return m_Phrase;
             }
         }
-        DPhrase m_Phrase = null;
-        #endregion
-        #region Attr{g}: FontStyle FontMods
-        FontStyle FontMods
-        {
-            get
-            {
-                return m_FontMods;
-            }
-        }
-        FontStyle m_FontMods;
+        readonly DPhrase m_Phrase;
         #endregion
 
         // Hyphenation
@@ -330,89 +260,77 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(...)
-        public EWord( 
-            JFontForWritingSystem _FontForWS,
-            DPhrase phrase, 
-            string sText, 
-            FontStyle _FontMods)
-            : base(_FontForWS, sText)
+        #region Constructor(font, DPhrase, sText)
+        public EWord(Font font, DPhrase phrase, string sText)
+            : base(font, sText)
         {
-            // Remember the phrase from which this EWord was generated
+            Debug.Assert(null != phrase);
             m_Phrase = phrase;
-
-            // Retrieve the JFont as passed in.
-            m_FontMods = _FontMods;
         }
         #endregion
         #region Method: EWord Clone()
         public virtual EWord Clone()
         {
-            EWord word = new EWord(
-                FontForWS,
-                Phrase,
-                Text, 
-                FontMods);
+            var word = new EWord(m_Font, Phrase, Text);
             return word;
         }
         #endregion
-        #region static EWord CreateAsInsertionIcon(OWPara, JCharacterStyle, DPhrase)
-        static public EWord CreateAsInsertionIcon(
-            JFontForWritingSystem _FontForWS,
-            DPhrase phrase)
+        #region static EWord CreateAsInsertionIcon(font, DPhrase)
+        static public EWord CreateAsInsertionIcon(Font font, DPhrase phrase)
         {
-            EWord word = new EWord(_FontForWS, phrase, c_chInsertionSpace.ToString(),
-                FontStyle.Regular);
+            var word = new EWord(font, phrase, c_chInsertionSpace.ToString());
             return word;
         }
         #endregion
 
         // Painting --------------------------------------------------------------------------
-        #region Method: void PaintBackgroundRectangle(Color color)
-        void PaintBackgroundRectangle(Color color)
+        #region Method: void PaintBackgroundRectangle(IDraw, Color color)
+        void PaintBackgroundRectangle(IDraw draw, Color color)
         {
-            RectangleF r = new RectangleF(Position,
-                new SizeF(Width + JustificationPaddingAdded - HyphenWidth, Height));
-            Draw.FillRectangle(color, r);
+            var fWidthWithPadding = Width + JustificationPaddingAdded - HyphenWidth;
+            var r = new RectangleF(Position, new SizeF(fWidthWithPadding, Height));
+            draw.DrawBackground(color, r);
         }
         #endregion
-        #region Method: override void Paint()
-        public override void Paint()
+        #region Method: override void Draw(IDraw)
+        public override void Draw(IDraw draw)
         {
             // The white background
-            PaintBackgroundRectangle(
-                (Para.IsEditable && !Para.IsLocked) ?
-                    Para.EditableBackgroundColor :
-                    Para.NonEditableBackgroundColor);
+            if (!draw.IsSendingToPrinter)
+            {
+                var backgroundColor = (Para.IsEditable && !Para.IsLocked) ?
+                    Para.EditableBackgroundColor : Para.NonEditableBackgroundColor;
+                PaintBackgroundRectangle(draw, backgroundColor);
+            }
 
             // The text
-            if (!IsInsertionIcon)
-            {
-                Draw.String(Text, Font, GetBrush(), Position);
+            if (IsInsertionIcon) 
+                return;
 
-                if (Hyphenated)
-                {
-                    Draw.String("-", Font, GetBrush(), 
-                        new PointF(Position.X + Width - HyphenWidth, Position.Y));
-                }
+            draw.DrawString(Text, m_Font, GetBrush(), Position);
+
+            if (Hyphenated)
+            {
+                var ptHyphenPosition = new PointF(Position.X + Width - HyphenWidth, Position.Y);
+                draw.DrawString("-", m_Font, GetBrush(), ptHyphenPosition);
             }
         }
         #endregion
-        #region Method: void PaintSelection(int iCharLeft, int iCharRight)
-        public void PaintSelection(int iCharLeft, int iCharRight)
+        #region Method: void PaintSelection(IDraw, int iCharLeft, int iCharRight)
+        public void PaintSelection(IDraw draw, int iCharLeft, int iCharRight)
         {
             // Create the colors and brushes we'll need
-            Color clrSelectedBackground = SystemColors.Highlight;
-            Color clrSelectedText = SystemColors.HighlightText;
+            var clrSelectedBackground = SystemColors.Highlight;
+            var clrSelectedText = SystemColors.HighlightText;
             Brush brushSelectedText = new SolidBrush(clrSelectedText);
-            Brush brushNormalText = new SolidBrush(FontForWS.FontColor);
+            Brush brushNormalText = new SolidBrush(TextColor);
 
             // Insertion Icon
             if (IsInsertionIcon)
             {
-                PaintBackgroundRectangle(clrSelectedBackground);
-                Draw.String(G.GetLoc_String("TypeHere", "[Type Here]"),
-                    Font, brushSelectedText, Position);
+                PaintBackgroundRectangle(draw, clrSelectedBackground);
+                draw.DrawString(G.GetLoc_String("TypeHere", "[Type Here]"),
+                    m_Font, brushSelectedText, Position);
                 return;
             }
 
@@ -425,8 +343,8 @@ namespace OurWord.Edit
             // Optimization/Shortcut: Paint the entire word as selected if apropriate
             if (iCharLeft == 0 && iCharRight == Text.Length)
             {
-                PaintBackgroundRectangle(clrSelectedBackground);
-                Draw.String(Text, Font, brushSelectedText, Position);
+                PaintBackgroundRectangle(draw, clrSelectedBackground);
+                draw.DrawString(Text, m_Font, brushSelectedText, Position);
                 return;
             }
 
@@ -435,39 +353,39 @@ namespace OurWord.Edit
                 return;
 
             // Figure out the selection texts
-            string sLeft = (iCharLeft == 0) ? "" : Text.Substring(0, iCharLeft);
-            string sTemp = (iCharLeft == 0) ? Text : Text.Substring(iCharLeft);
-            string sSelected = (iCharRight == Text.Length) ? sTemp :
+            var sLeft = (iCharLeft == 0) ? "" : Text.Substring(0, iCharLeft);
+            var sTemp = (iCharLeft == 0) ? Text : Text.Substring(iCharLeft);
+            var sSelected = (iCharRight == Text.Length) ? sTemp :
                 sTemp.Substring(0, iCharRight - iCharLeft);
-            string sRight = (iCharRight == Text.Length) ? "" :
+            var sRight = (iCharRight == Text.Length) ? "" :
                 sTemp.Substring(iCharRight - iCharLeft);
 
             // Figure out the boundaries
-            float fTotalWidth = Width + JustificationPaddingAdded;
-            float xSelLeft = Position.X +
-                ((iCharLeft == 0) ? 0 : Draw.Measure(sLeft, Font));
-            float xSelRight = xSelLeft + ((iCharRight == Text.Length) ?
-                fTotalWidth - Draw.Measure(sLeft, Font) :
-                Draw.Measure(sSelected, Font));
+            var fTotalWidth = Width + JustificationPaddingAdded;
+            var xSelLeft = Position.X +
+                ((iCharLeft == 0) ? 0 : Context.Measure(sLeft, m_Font));
+            var xSelRight = xSelLeft + ((iCharRight == Text.Length) ?
+                fTotalWidth - Context.Measure(sLeft, m_Font) :
+                Context.Measure(sSelected, m_Font));
 
             // Paint the white background, for those portions that are not selected
-            PaintBackgroundRectangle(
+            PaintBackgroundRectangle(draw,
                 Para.IsLocked ? Para.NonEditableBackgroundColor : Para.EditableBackgroundColor);
 
             // Paint the selected background
-            RectangleF rectSelected = new RectangleF(xSelLeft, Position.Y, xSelRight - xSelLeft, Height);
-            Draw.FillRectangle(clrSelectedBackground, rectSelected);
+            var rectSelected = new RectangleF(xSelLeft, Position.Y, xSelRight - xSelLeft, Height);
+            draw.FillRectangle(clrSelectedBackground, rectSelected);
 
             // Paint the text
             if (sLeft.Length > 0)
-                Draw.String(sLeft, Font, brushNormalText, Position);
+                draw.DrawString(sLeft, m_Font, brushNormalText, Position);
 
-            Draw.String(sSelected, Font, brushSelectedText,
+            draw.DrawString(sSelected, m_Font, brushSelectedText,
                 new PointF(xSelLeft, Position.Y));
 
             if (sRight.Length > 0)
             {
-                Draw.String(sRight, Font, brushNormalText,
+                draw.DrawString(sRight, m_Font, brushNormalText,
                     new PointF(xSelRight, Position.Y));
             }
         }
@@ -478,21 +396,18 @@ namespace OurWord.Edit
             if (i == 0)
                 return 0;
 
-            return Draw.Measure(Text.Substring(0, i), Font);
+            return Context.Measure(Text.Substring(0, i), m_Font);
         }
         #endregion
 
         // Insertion Point ---------------------------------------------------------------
         public const char c_chInsertionSpace = '\u2004';   // Unicode's "Four-Per-EM space"
-        public const float c_xInsertionSize = 50;          // Pixels for insertion display
         #region Attr{g}: bool IsInsertionIcon
         public bool IsInsertionIcon
         {
             get
             {
-                if (Text.Length == 1 && Text[0] == c_chInsertionSpace)
-                    return true;
-                return false;
+                return (Text.Length == 1 && Text[0] == c_chInsertionSpace);
             }
         }
         #endregion
@@ -511,7 +426,7 @@ namespace OurWord.Edit
                 string sPortion = Text.Substring(0, iChar + 1);
 
                 // Get the position right after this character
-                float x2 = Position.X + Draw.Measure(sPortion, Font);
+                float x2 = Position.X + Context.Measure(sPortion, m_Font);
 
                 // The average should thus be right in the midst of this character,
                 // since x1 represents the position to the char's left.
@@ -669,314 +584,30 @@ namespace OurWord.Edit
         }
         #endregion
 
-        #region IBT STUFF
-        /***
-        // Interlinear Back Translation ------------------------------------------------------
-        #region Attr{g}: string WordGloss
-        public string WordGloss
-        {
-            get
-            {
-                return m_sWordGloss;
-            }
-        }
-        string m_sWordGloss;
-        #endregion
-        #region Attr{g}: string PhraseGloss
-        public string PhraseGloss
-        {
-            get
-            {
-                return m_sPhraseGloss;
-            }
-        }
-        string m_sPhraseGloss;
-        #endregion
-        #region Attr{g}: int WordsInPhrase
-        public int WordsInPhrase
-        {
-            get
-            {
-                return m_cWordsInPhease;
-            }
-        }
-        int m_cWordsInPhease = 1;
-        #endregion
-        ***/
-        #endregion
-
         // Layout Calculations ---------------------------------------------------------------
-        #region OMethod: void CalculateWidth(Graphics g)
-        override public void CalculateWidth(Graphics g)
+        #region OMethod: void CalculateWidth()
+        override public void CalculateWidth()
         {
 			HyphenWidth = 0;
 
             if (IsInsertionIcon)
             {
-                Width = Draw.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), Font);
+                Width = Context.Measure(G.GetLoc_String("TypeHere", "[Type Here]"), m_Font);
             }
             else if (Hyphenated)
             {
-                Width = Draw.Measure(Text, Font);
+                Width = Context.Measure(Text, m_Font);
 
-                HyphenWidth = Draw.Measure("-", Font);
+                HyphenWidth = Context.Measure("-", m_Font);
                 Width += HyphenWidth;
             }
             else
             {
-                base.CalculateWidth(g);
+                Width = Context.Measure(Text, m_Font);
             }
         }
         #endregion
     }
     #endregion
 
-    #region CLASS: EInterlinear : EBlock
-    public class EInterlinear : EBlock
-    {
-        // Attrs -----------------------------------------------------------------------------
-        #region Attr{g/s}: string Meaning
-        public string Meaning
-        {
-            get
-            {
-                return m_sMeaning;
-            }
-            set
-            {
-                m_sMeaning = value;
-            }
-        }
-        string m_sMeaning;
-        #endregion
-
-        // Bundles ---------------------------------------------------------------------------
-        #region CLASS: EBundle
-        public class EBundle
-        {
-            #region Attr{g}: string Text
-            public string Text
-            {
-                get
-                {
-                    return m_sText;
-                }
-            }
-            string m_sText;
-            #endregion
-            #region Attr{g}: string Meaning
-            public string Meaning
-            {
-                get
-                {
-                    return m_sMeaning;
-                }
-            }
-            string m_sMeaning;
-            #endregion
-
-            // Scaffolding -------------------------------------------------------------------
-            #region Constructor(sText, sMeaning)
-            public EBundle(string _sText, string _sMeaning)
-            {
-                m_sText = _sText;
-                m_sMeaning = _sMeaning;
-            }
-            #endregion
-            #region Method: bool ContentEquals(EBundle item)
-            public bool ContentEquals(EBundle item)
-            {
-                if (null == item)
-                    return false;
-
-                if (item.Text != Text)
-                    return false;
-
-                if (item.Meaning != Meaning)
-                    return false;
-
-                return true;
-            }
-            #endregion
-
-            // I/O ---------------------------------------------------------------------------
-            #region I/O CONSTANTS
-            const string c_sTag = "B";
-            const string c_sAttrText = "T";
-            const string c_sAttrMeaning = "M";
-            #endregion
-            #region VAttr{g}: XElement ToXml
-            public XElement ToXml
-            {
-                get
-                {
-                    XElement x = new XElement(c_sTag);
-                    x.AddAttr(c_sAttrText, Text);
-                    x.AddAttr(c_sAttrMeaning, Meaning);
-                    return x;
-                }
-            }
-            #endregion
-            #region SMethod: EBundle CreateFromXml(XElement x)
-            static public EBundle CreateFromXml(XElement x)
-            {
-                if (x.Tag != c_sTag)
-                    return null;
-
-                string sText = x.GetAttrValue(c_sAttrText, "");
-                string sMeaning = x.GetAttrValue(c_sAttrMeaning, "");
-
-                EBundle bundle = new EBundle(sText, sMeaning);
-
-                return bundle;
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g}: EBundle[] Bundles
-        EBundle[] Bundles
-        {
-            get
-            {
-                Debug.Assert(null != m_vBundles);
-                return m_vBundles;
-            }
-        }
-        EBundle[] m_vBundles;
-        #endregion
-        #region Method: void AppendBundle(EBundle bundle)
-        public void AppendBundle(EBundle bundle)
-        {
-            EBundle[] v = new EBundle[Bundles.Length + 1];
-            for (int i = 0; i < Bundles.Length; i++)
-                v[i] = Bundles[i];
-            v[Bundles.Length] = bundle;
-            m_vBundles = v;
-        }
-        #endregion
-
-        // VAttrs ----------------------------------------------------------------------------
-        #region VAttr{g}: bool IsEmpty
-        public bool IsEmpty
-        {
-            get
-            {
-                if (!string.IsNullOrEmpty(Meaning))
-                    return false;
-
-                if (Bundles.Length != 0)
-                    return false;
-
-                return true;
-            }
-        }
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public EInterlinear(JFontForWritingSystem f)
-            : base(f, "")
-        {
-            m_vBundles = new EBundle[0];
-        }
-        #endregion
-        #region OMethod: bool ContentEquals(EBlock block)
-        public override bool ContentEquals(EBlock block)
-        {
-            EInterlinear item = block as EInterlinear;
-            if (null == item)
-                return false;
-
-            if (!base.ContentEquals(item))
-                return false;
-
-            if (item.Meaning != Meaning)
-                return false;
-
-            if (item.Bundles.Length != Bundles.Length)
-                return false;
-
-            for (int i = 0; i < Bundles.Length; i++)
-            {
-                if (!Bundles[i].ContentEquals(item.Bundles[i]))
-                    return false;
-            }
-
-            return true;
-        }
-        #endregion
-
-        // I/O -------------------------------------------------------------------------------
-        #region I/O CONSTANTS
-        const string c_sTag = "I";
-        const string c_sAttrText = "T";
-        const string c_sAttrMeaning = "M";
-        const string c_sAttrGlue = "G";
-        #endregion
-        #region VAttr{g}: XElement ToXml
-        public XElement ToXml
-        {
-            get
-            {
-                if (IsEmpty)
-                    return null;
-
-                XElement x = new XElement(c_sTag);
-
-                x.AddAttr(c_sAttrText, Text);
-                x.AddAttr(c_sAttrMeaning, Meaning);
-                x.AddAttr(c_sAttrGlue, GlueToNext);
-
-                foreach (EBundle bundle in Bundles)
-                    x.AddSubItem(bundle.ToXml);
-
-                return x;
-            }
-        }
-        #endregion
-        #region VAttr{g}: string XmlOneLiner
-        public string XmlOneLiner
-        {
-            get
-            {
-                XElement x = ToXml;
-
-                return (null == x) ? "" : x.OneLiner;
-            }
-        }
-        #endregion
-        #region SMethod: EInterlinear CreateFromXml(string s)
-        static public EInterlinear CreateFromXml(OWPara p, string s)
-        {
-            // Parse into an element tree
-            XElement[] vx = XElement.CreateFrom(s);
-            if (null == vx || vx.Length != 1)
-                return null;
-            XElement x = vx[0];
-            if (x.Tag != c_sTag)
-                return null;
-
-            // Retrieve the Meaning
-            EInterlinear ei = new EInterlinear(null);
-            ei.m_sMeaning = x.GetAttrValue(c_sAttrMeaning, "");
-            ei.m_sText = x.GetAttrValue(c_sAttrText, "");
-            ei.GlueToNext = x.GetAttrValue(c_sAttrGlue, false);
-
-            // Retrieve the bundles
-            foreach (XItem item in x.Items)
-            {
-                XElement xSub = item as XElement;
-                if (null == xSub)
-                    continue;
-
-                EBundle bundle = EBundle.CreateFromXml(xSub);
-                if (null != bundle)
-                    ei.AppendBundle(bundle);
-            }
-
-            return ei;
-        }
-        #endregion
-    }
-    #endregion
 }

@@ -12,6 +12,8 @@ using System.Diagnostics;
 using JWTools;
 using OurWordData.DataModel;
 using OurWord.Edit;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWord.Dialogs
@@ -36,26 +38,26 @@ namespace OurWord.Dialogs
             Information.InitStyleSheet();
 
 			// Introduction
-			LS.AddInformation("ws100", Information.PStyleHeading1, 
+            LS.AddInformation("ws100", StyleSheet.LiterateHeading, 
 				"A. Introduction");
-			LS.AddInformation("ws110", Information.PStyleNormal, 
+            LS.AddInformation("ws110", StyleSheet.LiterateParagraph, 
 				"We have struggled with the best way to handle writing systems for decades " +
 				"now. I do not claim to have done any better than other software; in fact, " +
 				"it is highly probable that what I've done here in _OurWord_ is quite " +
 				"inadequate. Which likely means a revision is in the future. But in the " +
 				"meantime.....here is what we have:");
-			LS.AddInformation("ws120", Information.PStyleNormal, 
+            LS.AddInformation("ws120", StyleSheet.LiterateParagraph, 
 				"A writing system, loosely defined, is intended to be all of the information " +
 				"about displaying, sorting, and keyboarding for a given alphabet. A language " +
 				"might have multiple such systems; but in most cases a language has only one." +
 				"Some examples of what writing systems describe:");
-            LS.AddInformation("ws130", Information.PStyleList1,
+            LS.AddInformation("ws130", StyleSheet.LiterateList,
 				"That in Spanish, \"ll\" should be sorted as a single symbol");
-            LS.AddInformation("ws140", Information.PStyleList1,
+            LS.AddInformation("ws140", StyleSheet.LiterateList,
 				"That in Tagalog, \"ng\", \"n\" and \"g\" are all separate symbols.");
-            LS.AddInformation("ws150", Information.PStyleList1,
+            LS.AddInformation("ws150", StyleSheet.LiterateList,
 				"That in many Chinese languages, a \"SimSun\" font will display its fonts correctly");
-            LS.AddInformation("ws160", Information.PStyleNormal, 
+            LS.AddInformation("ws160", StyleSheet.LiterateParagraph, 
 				"In designing _OurWord,_ I have had a goal of wanting the software to work " +
 				"for many languages with as little setup as possible. Part of this strategy, and " +
 				"where I depart from most other software, is that I permit a Writing System to " +
@@ -63,37 +65,37 @@ namespace OurWord.Dialogs
 				"language. Thus if all of the languages in a cluster can use a single Writing " +
 				"System, it is not necessary define it over and over again each time a new " +
 				"translation is begun.");
-            LS.AddInformation("ws170", Information.PStyleNormal, 
+            LS.AddInformation("ws170", StyleSheet.LiterateParagraph, 
 				"Within the StyleSheet, for each individual style, you are able to define a " +
 				"different font (font name, size, etc.) for each writing system. Thus a Book " +
 				"Title in Chinese will likely have a different font than in English; and yet " +
 				"for the paragraph style, you only need to define \"centered\" once.");
-            LS.AddInformation("ws180", Information.PStyleNormal, 
+            LS.AddInformation("ws180", StyleSheet.LiterateParagraph, 
 				"I realize that as _OurWord_'s features expand I may be unable to keep using " +
                 "this simple system. At that time, I will likely merge _OurWord_ writing " +
                 "systems with the model that is supported by _WeSay._");
 
-            LS.AddInformation("ws200", Information.PStyleHeading1,
+            LS.AddInformation("ws200", StyleSheet.LiterateHeading,
                 "B. Usage");
-            LS.AddInformation("ws210", Information.PStyleNormal,
+            LS.AddInformation("ws210", StyleSheet.LiterateParagraph,
                 "Each translation needs to know about two writing systems:");
-            LS.AddInformation("ws220", Information.PStyleList1,
+            LS.AddInformation("ws220", StyleSheet.LiterateList,
                 "*Vernacular* represents which system you will use to enter Scripture Text " +
                 "and other materials in the language");
-            LS.AddInformation("ws230", Information.PStyleList1,
+            LS.AddInformation("ws230", StyleSheet.LiterateList,
                 "*Advisor* is the system that you will use for such items as the Back " +
                 "Translation and notes for the consultant to read.");
-            LS.AddInformation("ws240", Information.PStyleNormal,
+            LS.AddInformation("ws240", StyleSheet.LiterateParagraph,
                 "Each translation settings page in this dialog has a tab, where you identify " +
                 "the Vernacular and Advisor systems.");
-            LS.AddInformation("ws250", Information.PStyleNormal,
+            LS.AddInformation("ws250", StyleSheet.LiterateParagraph,
                 "For more about the types of information that you can configure in a writing " +
                 "system, click on the _Latin Writing System_ to the left and examine the " +
                 "settings that are available there. ");
 
-            LS.AddInformation("ws300", Information.PStyleHeading1,
+            LS.AddInformation("ws300", StyleSheet.LiterateHeading,
                 "C. Re-Use");
-            LS.AddInformation("ws310", Information.PStyleNormal,
+            LS.AddInformation("ws310", StyleSheet.LiterateParagraph,
                 "As I mentioned above, it is normal in language software to set up a separate " +
                 "writing system for each language. However, if you note that the various " +
                 "languages in a cluster all use the same orthography, keyboardings, etc., it " +
@@ -103,9 +105,9 @@ namespace OurWord.Dialogs
                 "ahead and use _OurWord_ out of the box; others with more complicated " +
                 "languages will need to do additional setup.");
 
-            LS.AddInformation("ws400", Information.PStyleHeading1,
+            LS.AddInformation("ws400", StyleSheet.LiterateHeading,
                 "D. Windows Repeated Keyboard Name Bug");
-            LS.AddInformation("ws410", Information.PStyleNormal,
+            LS.AddInformation("ws410", StyleSheet.LiterateParagraph,
                 "(This applies to the page upon which you set up a keyboard.) Windows has " +
                 "an unfortunate idea of what a program wants when it asks it for the list of " +
                 "keyboards. Rather than give the actual name of the keyboard, it often gives " +

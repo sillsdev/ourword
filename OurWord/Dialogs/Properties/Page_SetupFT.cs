@@ -9,26 +9,13 @@
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
 using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
-using OurWord;
-using OurWord.Dialogs;
-using OurWord.Layouts;
+
 #endregion
 #endregion
 
@@ -45,14 +32,14 @@ namespace OurWord.Dialogs
                 Debug.Assert(false);
                 return null;
 			}
-			set
-			{
+            set
+            {
                 Debug.Assert(false);
-			}
+            }
 		}
 		#endregion
-        #region Attr{g}: List<string> Languages
-        List<string> Languages
+        #region Attr{g}: IEnumerable<string> Languages
+        IEnumerable<string> Languages
         {
             get
             {
@@ -81,11 +68,13 @@ namespace OurWord.Dialogs
 		private System.ComponentModel.Container components = null;
 		#endregion
 		#region Constructor()
-		public Page_SetupFT(DialogProperties _dlg)
-            : base(_dlg)
+        protected Page_SetupFT(DialogProperties dlg)
+            : base(dlg)
 		{
 			// This call is required by the Windows.Forms Form Designer.
 			InitializeComponent();
+
+            m_vLanguages = new List<string>();
 		}
 		#endregion
 		#region Method: void Dispose(...)
@@ -190,7 +179,7 @@ namespace OurWord.Dialogs
 
 		// Command Handlers ------------------------------------------------------------------
 		#region Handler: cmdLoad
-		private void cmdLoad(object sender, System.EventArgs e)
+		private void cmdLoad(object sender, EventArgs e)
 		{
 			// Label text in the appropriate language
 			Localization();
@@ -202,7 +191,7 @@ namespace OurWord.Dialogs
 
             // Populate the combo
             m_comboChooseLanguage.Items.Clear();
-            foreach (string s in Languages)
+            foreach (var s in Languages)
                 m_comboChooseLanguage.Items.Add(s);
 
             // Don't enable the button until we have something in it
@@ -241,9 +230,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                if (null != DB.Project)
-                    return DB.Project.FrontTranslation;
-                return null;
+                return (null != DB.Project) ? DB.Project.FrontTranslation : null;
             }
             set
             {
@@ -255,8 +242,8 @@ namespace OurWord.Dialogs
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DlgProperties)
-        public Page_SetupFront(DialogProperties _dlg)
-            : base(_dlg)
+        public Page_SetupFront(DialogProperties dlg)
+            : base(dlg)
 		{
 		}
 		#endregion
@@ -316,8 +303,8 @@ namespace OurWord.Dialogs
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DlgProperties)
-		public Page_SetupTarget(DialogProperties _dlg)
-            : base(_dlg)
+		public Page_SetupTarget(DialogProperties dlg)
+            : base(dlg)
 		{
 		}
 		#endregion

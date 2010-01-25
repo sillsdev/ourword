@@ -24,6 +24,8 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -58,14 +60,14 @@ namespace OurWordTests.DataModel
             DB.Project.FrontTranslation.AddBook(bookFront);
             DSection sectionFront = new DSection();
             bookFront.Sections.Append(sectionFront);
-            DParagraph paraFront = new DParagraph();
+            DParagraph paraFront = new DParagraph(StyleSheet.SectionCrossReference);
             sectionFront.Paragraphs.Append(paraFront);
 
             DBook bookTarget = new DBook("MRK");
             DB.Project.TargetTranslation.AddBook(bookTarget);
             DSection sectionTarget = new DSection();
             bookTarget.Sections.Append(sectionTarget);
-            DParagraph paraTarget = new DParagraph();
+            DParagraph paraTarget = new DParagraph(StyleSheet.SectionCrossReference);
             sectionTarget.Paragraphs.Append(paraTarget);
 
             DB.Project.FrontTranslation.BookNamesTable.Clear();

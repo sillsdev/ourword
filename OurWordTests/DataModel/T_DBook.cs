@@ -23,6 +23,9 @@ using OurWordData.DataModel;
 using OurWord;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -236,11 +239,11 @@ namespace OurWordTests.DataModel
         {
             if (p.Runs.Count == 0)
                 p.AddRun(new DText());
-            DText text = p.Runs[0] as DText;
+            var text = p.Runs[0] as DText;
 
             if (text.Phrases.Count == 0)
-                text.Phrases.Append(new DPhrase(p.StyleAbbrev, ""));
-            DPhrase phrase = text.Phrases[0] as DPhrase;
+                text.Phrases.Append(new DPhrase(""));
+            var phrase = text.Phrases[0] as DPhrase;
 
             return phrase.Text;
         }
@@ -250,11 +253,11 @@ namespace OurWordTests.DataModel
         {
             if (p.Runs.Count == 0)
                 p.AddRun(new DText());
-            DText text = p.Runs[0] as DText;
+            var text = p.Runs[0] as DText;
 
             if (text.Phrases.Count == 0)
-                text.Phrases.Append(new DPhrase(p.StyleAbbrev, ""));
-            DPhrase phrase = text.Phrases[0] as DPhrase;
+                text.Phrases.Append(new DPhrase(""));
+            var phrase = text.Phrases[0];
 
             phrase.Text = s;
         }
@@ -292,10 +295,9 @@ namespace OurWordTests.DataModel
             book.Version = "A";
 
             // Add an extra paragraph
-            DParagraph p = new DParagraph();
+            DParagraph p = new DParagraph(StyleSheet.Line1);
             DSection section = book.Sections[0] as DSection;
             section.Paragraphs.Append(p);
-            p.StyleAbbrev = "q";
             SetSimpleParagraphText(p, sTextO);
 
             // Save the book. Then save it again, so that "Original" gets placed

@@ -1487,7 +1487,7 @@
       <English>Options</English>
     </Item>
     <Item ID="m_checkWaterMark">
-      <English>Print Background Watermark (e.g., “Draft”)</English>
+      <English>Print Background Watermark:</English>
     </Item>
     <Item ID="m_checkReplacements">
       <English>Make substitutions (e.g., &lt;&lt;Hi&gt;&gt; becomes 'Hi') ?</English>

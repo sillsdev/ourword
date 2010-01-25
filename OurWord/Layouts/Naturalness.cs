@@ -199,7 +199,7 @@ namespace OurWord.Layouts
                 if (bAllParagraphsMatchFront)
                 {
                     DParagraph pFront = DB.FrontSection.Paragraphs[ip] as DParagraph;
-                    if (pFront.HasItalics)
+                    if (pFront.HasItalicsToggled)
                         options |= OWPara.Flags.CanItalic;
                 }
                 else
@@ -212,7 +212,7 @@ namespace OurWord.Layouts
                     p,
                     ((OurWordMain.TargetIsLocked) ? BackColor : EditableBackgroundColor),
                     options);
-                op.Bmp = GetPicture(p);
+                op.SetPicture(GetPicture(p), true);
                 Contents.Append(op);
             }
 
@@ -235,7 +235,7 @@ namespace OurWord.Layouts
                 // Italics?
                 if (bAllParagraphsMatchFront)
                 {
-                    if (FrontFootnotes[iFn].HasItalics)
+                    if (FrontFootnotes[iFn].HasItalicsToggled)
                         options |= OWPara.Flags.CanItalic;
                 }
                 else

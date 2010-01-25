@@ -15,12 +15,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Linq;
 using System.Windows.Forms;
 using System.IO;
 using System.Xml;
 
 using JWTools;
 using OurWordData;
+using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -30,20 +34,6 @@ namespace OurWordData.DataModel
 	public class DParagraph : JObject 
 	{
 		// ZAttrs ----------------------------------------------------------------------------
-        #region BAttr{g/s}: string StyleAbbrev - e.g., "p", "q", "q2".
-        public string StyleAbbrev
-        {
-            get
-            {
-                return m_sStyleAbbrev;
-            }
-            set
-            {
-                SetValue(ref m_sStyleAbbrev, value);
-            }
-        }
-        private string m_sStyleAbbrev = "p";
-        #endregion
         #region JAttr{g}: JOwnSeq Runs - seq of DRun (verse no, chapter no, TextElement)
 		public JOwnSeq<DRun> Runs
 		{
@@ -58,7 +48,6 @@ namespace OurWordData.DataModel
         protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
-            DefineAttr("Abbrev", ref m_sStyleAbbrev);
         }
 		#endregion
 
@@ -79,6 +68,21 @@ namespace OurWordData.DataModel
 		}
 		private bool m_AddedByCluster = false;
 		#endregion
+
+	    public ParagraphStyle Style
+	    {
+	        get
+	        {
+                Debug.Assert(null != m_style);
+	            return m_style;
+	        }
+            set
+            {
+                Debug.Assert(null != value);
+                m_style = value;
+            }
+	    }
+	    protected ParagraphStyle m_style;
 
 		// Run-Time Only Attrs: Chapter / Verse ----------------------------------------------
 		#region Attr{g}: int ChapterI - the initial chapter number of this paragraph
@@ -385,26 +389,12 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: bool HasStyleAssigned - T if StyleAbbrev is not ""
-		public bool HasStyleAssigned
-		{
-			get 
-			{ 
-				return "" != StyleAbbrev; 
-			}
-		}
-		#endregion
-		#region Attr{g}: bool HasItalics - T if the italics style is within the paragraph
-		public bool HasItalics
+        #region Attr{g}: bool HasItalicsToggled - T if the italics style is within the paragraph
+        public bool HasItalicsToggled
 		{
 			get
 			{
-				foreach ( DPhrase phrase in Phrases )
-				{
-					if (phrase.CharacterStyleAbbrev == DStyleSheet.c_StyleAbbrevItalic)
-						return true;
-				}
-				return false;
+			    return Phrases.Any(phrase => phrase.ItalicIsToggled);
 			}
 		}
 		#endregion
@@ -413,18 +403,9 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				if (DB.Map.StyleCrossRef == StyleAbbrev)
+                if (Style == StyleSheet.SectionCrossReference)
 					return false;
 				return true;
-			}
-		}
-		#endregion
-		#region Attr{g/s}: JParagraphStyle Style - the paragraph style for this paragraph
-		public JParagraphStyle Style
-		{
-			get 
-			{ 
-				return DB.StyleSheet.FindParagraphStyle(StyleAbbrev);
 			}
 		}
 		#endregion
@@ -515,7 +496,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region VAttr{g}: List<string> CanChangeParagraphStyleTo
-        public List<string> CanChangeParagraphStyleTo
+        public List<ParagraphStyle> CanChangeParagraphStyleTo
         {
             get
             {
@@ -524,34 +505,34 @@ namespace OurWordData.DataModel
                     return null;
 
                 // We'll compile the possible styles here
-                var vPossibilities = new List<string>();
+                var vPossibilities = new List<ParagraphStyle>();
 
                 // Some styles are always possibilities
-                vPossibilities.Add(DStyleSheet.c_sfmParagraph);
-                vPossibilities.Add(DStyleSheet.c_sfmLine1);
-                vPossibilities.Add(DStyleSheet.c_sfmLine2);
-                vPossibilities.Add(DStyleSheet.c_sfmLine3);
+                vPossibilities.Add(StyleSheet.Paragraph);
+                vPossibilities.Add(StyleSheet.Line1);
+                vPossibilities.Add(StyleSheet.Line2);
+                vPossibilities.Add(StyleSheet.Line3);
 
                 // Is Scripture (rather than, e.g., a Translator Note)
-                bool bIsScripture = (Owner == Section);
+                var bIsScripture = (Owner == Section);
                 if (bIsScripture)
                 {
-                    vPossibilities.Add(DStyleSheet.c_sfmMajorSection);
-                    vPossibilities.Add(DStyleSheet.c_sfmSectionHead);
-                    vPossibilities.Add(DStyleSheet.c_sfmSectionHeadMinor);
+                    vPossibilities.Add(StyleSheet.MajorSection);
+                    vPossibilities.Add(StyleSheet.Section);
+                    vPossibilities.Add(StyleSheet.MinorSection);
                 }
 
                 // Scripture in the First Section of the book
-                bool bIsFirstSection = (Book.Sections.FindObj(Section) == 0);
+                var bIsFirstSection = (Book.Sections.FindObj(Section) == 0);
                 if (bIsFirstSection && bIsScripture)
                 {
-                    vPossibilities.Add(DStyleSheet.c_sfmBookTitle);
-                    vPossibilities.Add(DStyleSheet.c_sfmBookSubTitle);
+                    vPossibilities.Add(StyleSheet.BookTitle);
+                    vPossibilities.Add(StyleSheet.BookSubTitle);
                 }
 
                 // Make sure our current style is present.
-                if (!vPossibilities.Contains(StyleAbbrev))
-                    vPossibilities.Add(StyleAbbrev);
+                if (!vPossibilities.Contains(Style))
+                    vPossibilities.Add(Style);
 
                 return vPossibilities;
             }
@@ -637,11 +618,11 @@ namespace OurWordData.DataModel
 					Runs.Clear();
 				if (Runs.Count == 0)
 					AddRun(new DText());
-				DText text = Runs[0] as DText;
+				var text = Runs[0] as DText;
 
 				text.Phrases.Clear();
 
-				DPhrase phrase = new DPhrase( StyleAbbrev, value);
+				var phrase = new DPhrase(value);
 				text.Phrases.Append( phrase );
 
 			}
@@ -678,11 +659,11 @@ namespace OurWordData.DataModel
 					Runs.Clear();
 				if (Runs.Count == 0)
 					AddRun(new DText());
-				DText text = Runs[0] as DText;
+				var text = Runs[0] as DText;
 
 				text.PhrasesBT.Clear();
 
-				DPhrase phrase = new DPhrase( StyleAbbrev, value);
+				var phrase = new DPhrase(value);
 				text.PhrasesBT.Append( phrase );
 
 			}
@@ -884,22 +865,22 @@ namespace OurWordData.DataModel
 
             // Helper methods ----------------------------------------------------------------
             #region VAttr{g}: bool SplitIsLegal
-            protected bool SplitIsLegal
+            private bool SplitIsLegal
             {
                 get
                 {
                     // Styles for which splitting text is not permitted
-                    string[] vs = new string[] 
+                    var vs = new ParagraphStyle[] 
                         { 
-                        DStyleSheet.c_StyleAbbrevPictureCaption,
-                        DStyleSheet.c_StyleNote,
-                        DStyleSheet.c_StyleFootnote
+                        StyleSheet.PictureCaption,
+                        StyleSheet.TipContent,
+                        StyleSheet.Footnote
                         };
 
                     // See if this style is one of the forbidden ones
-                    foreach (string sAbbrev in vs)
+                    foreach (var style in vs)
                     {
-                        if (Paragraph.StyleAbbrev == sAbbrev)
+                        if (Paragraph.Style == style)
                             return false;
                     }
 
@@ -1004,7 +985,7 @@ namespace OurWordData.DataModel
                         textRight.Phrases.Append(phrase);
                     }
 
-                    textRight.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                    textRight.PhrasesBT.Append(new DPhrase(""));
 
                     return textRight;
                 }
@@ -1045,7 +1026,7 @@ namespace OurWordData.DataModel
         #endregion
         DBasicText SplitText(DBasicText dbtToSplit, int iTextSplitPos)
         {
-            SplitTextMethod m = new SplitTextMethod(dbtToSplit, iTextSplitPos);
+            var m = new SplitTextMethod(dbtToSplit, iTextSplitPos);
             return m.Do();
         }
         #endregion
@@ -1068,10 +1049,9 @@ namespace OurWordData.DataModel
                 return null;
 
             // Create and insert  a new, empty paragraph to receive the right-side of the split
-            JOwnSeq<DParagraph> seq = Paragraph.GetMyOwningAttr() as JOwnSeq<DParagraph>;
-            DParagraph paraNew = new DParagraph();
-            paraNew.StyleAbbrev = Paragraph.StyleAbbrev;
-            int iParaNew = seq.FindObj(Paragraph) + 1;
+            var seq = Paragraph.GetMyOwningAttr() as JOwnSeq<DParagraph>;
+            var paraNew = new DParagraph(Paragraph.Style);
+            var iParaNew = seq.FindObj(Paragraph) + 1;
             seq.InsertAt(iParaNew, paraNew);
 
             // Move the runs to the new paragraph
@@ -1219,33 +1199,6 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-		#region Method: PWord[] GetPWords()
-		public PWord[] GetPWords()
-		{
-			ArrayList al = new ArrayList();
-			foreach(DRun r in Runs)
-			{
-				al.Add( r.GetPWords() );
-			}
-
-			int c = 0;
-			foreach( PWord[] vpw in al )
-				c += vpw.Length;
-
-			PWord[] v = new PWord[ c ];
-
-			int i = 0;
-			foreach( PWord[] vpw in al )
-			{
-				foreach( PWord pw in vpw )
-				{
-					v[i++] = pw;
-				}
-			}
-			return v;
-		}
-		#endregion
-
 		// Translator Notes ------------------------------------------------------------------
 		#region DText GetOrAddLastDText() - Used during the SF Read operation
 		public DText GetOrAddLastDText()
@@ -1296,13 +1249,13 @@ namespace OurWordData.DataModel
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public DParagraph()
-            : base()
+        #region Constructor(style)
+        public DParagraph(ParagraphStyle style)
         {
             j_osRuns = new JOwnSeq<DRun>("Runs", this, false, false);
 
-            StyleAbbrev = "";
+            Debug.Assert(null != style, "Can't have a null style");
+            m_style = style;
         }
         #endregion
 		#region Method: void CopyFrom(DParagraph pFront)
@@ -1313,10 +1266,10 @@ namespace OurWordData.DataModel
 			VerseI   = pFront.VerseI;
 
 			// Same style
-			StyleAbbrev = pFront.StyleAbbrev;
+			Style = pFront.Style;
 
 			// If a cross reference, then convert it
-			if (DB.TeamSettings.SFMapping.IsCrossRef( StyleAbbrev ) )
+			if (Style == StyleSheet.SectionCrossReference)
 			{
 				Translation.ConvertCrossReferences(pFront, this);
 				return;
@@ -1391,7 +1344,7 @@ namespace OurWordData.DataModel
 
 			DParagraph p = obj as DParagraph;
 
-			if (this.StyleAbbrev != p.StyleAbbrev)
+			if (this.Style != p.Style)
 				return false;
 
 			if (this.Runs.Count != p.Runs.Count)
@@ -1410,6 +1363,7 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 
+        /*
         // I/O -------------------------------------------------------------------------------
         const string c_sAttrContents = "Contents";
         const string c_sAttrBT = "BT";
@@ -1436,7 +1390,7 @@ namespace OurWordData.DataModel
             XElement x = new XElement(GetType().Name);
 
             // Do the basic attributes
-            x.AddAttr("Abbrev", m_sStyleAbbrev);
+            x.AddAttr("Abbrev", Style.StyleName);
 
             // Do our one-and-only DText
             DText text = Runs[0] as DText;
@@ -1461,16 +1415,6 @@ namespace OurWordData.DataModel
                 return;
             }
 
-            /***
-            // If we have a Contents attribute, then it means we used our special override
-            // of ToXml.
-            if (null == x.FindAttr("Contents"))
-            {
-                base.FromXml(x);
-                return;
-            }
-            ***/
-
             // We want exactly one DText
             Clear();
             DText text = new DText();
@@ -1487,16 +1431,17 @@ namespace OurWordData.DataModel
             if (null != attr)
                 text.Phrases.FromSaveString(attr.Value);
             else
-                text.Phrases.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                text.Phrases.Append(new DPhrase(""));
 
             // Retrieve the back translation
             attr = x.FindAttr(c_sAttrBT);
             if (null != attr)
                 text.PhrasesBT.FromSaveString(attr.Value);
             else
-                text.PhrasesBT.Append(new DPhrase(DStyleSheet.c_sfmParagraph, ""));
+                text.PhrasesBT.Append(new DPhrase(""));
         }
         #endregion
+        */
 
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagParagraph = "p";
@@ -1522,14 +1467,8 @@ namespace OurWordData.DataModel
             // Note that DPicture.CreatePicture calls this, too.
         {
             // Style attribute
-            string sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
-            var map = DB.Map.FindMappingFromName(sStyleName);
-            if (null == map)
-            {
-                throw (new XmlDocException(nodeParagraph,
-                    "Missing or unknown paragraph style name."));
-            }
-            StyleAbbrev = map.ToolboxCode;
+            var sStyleName = XmlDoc.GetAttrValue(nodeParagraph, c_sAttrStyle, "Paragraph");
+            m_style = StyleSheet.Find(sStyleName) as ParagraphStyle ?? StyleSheet.Paragraph;
 
             // Populate the runs from the child nodes
             foreach (XmlNode child in nodeParagraph.ChildNodes)
@@ -1577,7 +1516,7 @@ namespace OurWordData.DataModel
             if (null == nodeParagraph || nodeParagraph.Name != c_sTagParagraph)
                 return null;
 
-            var p = new DParagraph();
+            var p = new DParagraph(StyleSheet.Paragraph);
             p.ReadOxes(nodeParagraph);
             return p;
         }
@@ -1587,15 +1526,11 @@ namespace OurWordData.DataModel
         public virtual XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
             // Saves the paragraph to the oxes document.
         {
-            var map = DB.Map.FindMappingFromOurWord(StyleAbbrev);
-            Debug.Assert(null != map, "No map for style: " + StyleAbbrev);
-
             var nodeParagraph = oxes.AddNode(nodeBook, c_sTagParagraph);
 
-            oxes.AddAttr(nodeParagraph, c_sAttrStyle, map.StyleName);
+            oxes.AddAttr(nodeParagraph, c_sAttrStyle, Style.StyleName);
 
-            if (!string.IsNullOrEmpty(map.UsfmCode))
-                oxes.AddAttr(nodeParagraph, c_sAttrUsfm, map.UsfmCode);
+            oxes.AddAttr(nodeParagraph, c_sAttrUsfm, Style.Map.UsfmMarker);
 
             foreach (DRun run in Runs)
                 run.SaveToOxesBook(oxes, nodeParagraph);

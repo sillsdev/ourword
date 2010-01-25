@@ -188,10 +188,10 @@ namespace JWTools
 
             // Set its transparent color to the background color. We assume that the
             // pixel at 0,0 is a background pixel.
-            Color clrTransparent = bmp.GetPixel(0, 0);
-            for (int h = 0; h < bmp.Height; h++)
+            var clrTransparent = bmp.GetPixel(0, 0);
+            for (var h = 0; h < bmp.Height; h++)
             {
-                for (int w = 0; w < bmp.Width; w++)
+                for (var w = 0; w < bmp.Width; w++)
                 {
                     if (bmp.GetPixel(w, h) == clrTransparent)
                         bmp.SetPixel(w, h, clrBackground);
