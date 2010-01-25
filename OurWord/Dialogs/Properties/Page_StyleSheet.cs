@@ -1,3 +1,4 @@
+#region ***** Page_StyleSheet.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    Page_StyleSheet.cs
@@ -6,30 +7,16 @@
  * Purpose: Create settings for the Front, or open existing ones.
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Header: Using, etc.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Drawing.Drawing2D;
-using System.Resources;
 using System.Windows.Forms;
-using System.Windows.Forms.Design;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-
 using JWTools;
-using OurWordData;
-using OurWord;
 using OurWordData.DataModel;
-using OurWord.Dialogs;
-using OurWord.Layouts;
+using OurWordData.Styles;
 #endregion
 
 namespace OurWord.Dialogs
@@ -37,33 +24,29 @@ namespace OurWord.Dialogs
     public class Page_StyleSheet : DlgPropertySheet
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g/s}: JParagraphStyle PStyle
-        JParagraphStyle PStyle
+        #region Attr{g/s}: CharacterStyle CurrentStyle
+        CharacterStyle CurrentStyle
         {
             get
             {
-                return m_PStyle;
+                Debug.Assert(null != m_Style);
+                return m_Style;
             }
             set
             {
-                m_PStyle = value;
+                m_Style = value;
             }
         }
-        JParagraphStyle m_PStyle = null;
+        private CharacterStyle m_Style;
         #endregion
-        #region Attr{g/s}: JCharacterStyle CStyle
-        JCharacterStyle CStyle
+        #region VAttr{g}: ParagraphStyle CurrentParagraphStyle
+        ParagraphStyle CurrentParagraphStyle
         {
             get
             {
-                return m_CStyle;
-            }
-            set
-            {
-                m_CStyle = value;
+                return CurrentStyle as ParagraphStyle;
             }
         }
-        JCharacterStyle m_CStyle = null;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -80,8 +63,8 @@ namespace OurWord.Dialogs
         private System.ComponentModel.Container components = null;
         #endregion
         #region Constructor()
-        public Page_StyleSheet(DialogProperties _ParentDlg)
-            : base(_ParentDlg)
+        public Page_StyleSheet(DialogProperties parentDlg)
+            : base(parentDlg)
         {
             // This call is required by the Windows.Forms Form Designer.
             InitializeComponent();
@@ -254,12 +237,12 @@ namespace OurWord.Dialogs
         ArrayList m_aFontBags;
         #endregion
 
-        #region Method: double GetDoubleFromGridText(string s)
-        static public double GetDoubleFromGridText(string s)
+        #region SMethod: double GetDoubleFromGridText(string s)
+        private static double GetDoubleFromGridText(IEnumerable<char> s)
         {
             // Extract the numerical part of the string
-            string sValue = "";
-            foreach (char ch in s)
+            var sValue = "";
+            foreach (var ch in s)
             {
                 if (char.IsDigit(ch) || ch == '-' || ch == '.' || ch == ',')
                     sValue += ch;
@@ -276,16 +259,16 @@ namespace OurWord.Dialogs
             return 0.0;
         }
         #endregion
-        #region Method: string SetDoubleToGridText(double d, sTag)
-        string SetDoubleToGridText(double d, string sTag)
+        #region SMethod: string SetDoubleToGridText(double d, sTag)
+        static string SetDoubleToGridText(double d, string sTag)
         {
             return (d.ToString("0.00") + sTag);
         }
         #endregion
-        #region Method: string SetIntToGridText(double d, sTag)
-        string SetIntToGridText(int n, string sTag)
+        #region SMethod: string SetIntToGridText(double d, sTag)
+        static string SetIntToGridText(int n, string sTag)
         {
-            return (n.ToString() + sTag);
+            return (n + sTag);
         }
         #endregion
 
@@ -298,24 +281,23 @@ namespace OurWord.Dialogs
             const string c_sPropItalic = "propItalic";
             const string c_sPropStrikeout = "propStrikeout";
 
-            #region Attr{g}: JFontForWritingSystem FWS
-            public JFontForWritingSystem FWS
+            #region Attr{g}: FontFactory Factory
+            private FontFactory Factory
             {
                 get
                 {
-                    Debug.Assert(null != m_fws);
-                    return m_fws;
+                    Debug.Assert(null != m_factory);
+                    return m_factory;
                 }
             }
-            JFontForWritingSystem m_fws;
+            readonly FontFactory m_factory;
             #endregion
-
             #region VAttr{g}: string Name
             public string Name
             {
                 get
                 {
-                    return FWS.WritingSystem.Name;
+                    return Factory.WritingSystemName;
                 }
             }
             #endregion
@@ -323,71 +305,82 @@ namespace OurWord.Dialogs
             #region Method: void FontPropertyBag_GetValue(...)
             private void FontPropertyBag_GetValue(object sender, PropertySpecEventArgs e)
             {
-                if (e.Property.ID == c_sPropFontName)
+                switch (e.Property.ID)
                 {
-                    e.Value = FWS.FontName;
-                }
-                else if (e.Property.ID == c_sPropFontHeight)
-                {
-                    e.Value = FWS.Size;
-                }
-                else if (e.Property.ID == c_sPropBold)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    e.Value = ps.GetBoolString(FWS.IsBold);
-                }
-                else if (e.Property.ID == c_sPropItalic)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    e.Value = ps.GetBoolString(FWS.IsItalic);
-                }
-                else if (e.Property.ID == c_sPropStrikeout)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    e.Value = ps.GetBoolString(FWS.IsStrikeout);
+                    case c_sPropFontName:
+                        e.Value = Factory.FontName;
+                        break;
+                    case c_sPropFontHeight:
+                        e.Value = Factory.FontSize;
+                        break;
+                    case c_sPropBold:
+                        {
+                            var ps = e.Property as YesNoPropertySpec;
+                            Debug.Assert(null != ps);
+                            e.Value = ps.GetBoolString(Factory.IsBold);
+                        }
+                        break;
+                    case c_sPropItalic:
+                        {
+                            var ps = e.Property as YesNoPropertySpec;
+                            Debug.Assert(null != ps);
+                            e.Value = ps.GetBoolString(Factory.IsItalic);
+                        }
+                        break;
+                    case c_sPropStrikeout:
+                        {
+                            var ps = e.Property as YesNoPropertySpec;
+                            Debug.Assert(null != ps);
+                            e.Value = ps.GetBoolString(Factory.IsStrikeout);
+                        }
+                        break;
                 }
             }
+
             #endregion
             #region Method: void FontPropertyBag_SetValue(...)
             private void FontPropertyBag_SetValue(object sender, PropertySpecEventArgs e)
             {
-                if (e.Property.ID == c_sPropFontName)
+                switch (e.Property.ID)
                 {
-                    FWS.FontName = (string)e.Value;
-                }
-                else if (e.Property.ID == c_sPropFontHeight)
-                {
-                    FWS.Size = Convert.ToInt16(e.Value);
-                }
-                else if (e.Property.ID == c_sPropBold)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    FWS.IsBold = ps.IsTrue(e.Value);
-                }
-                else if (e.Property.ID == c_sPropItalic)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    FWS.IsItalic = ps.IsTrue(e.Value);
-                }
-                else if (e.Property.ID == c_sPropStrikeout)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    FWS.IsStrikeout = ps.IsTrue(e.Value);
+                    case c_sPropFontName:
+                        Factory.FontName = (string)e.Value;
+                        break;
+                    case c_sPropFontHeight:
+                        Factory.FontSize = Convert.ToInt16(e.Value);
+                        break;
+                    case c_sPropBold:
+                        {
+                            var ps = e.Property as YesNoPropertySpec;
+                            Debug.Assert(null != ps);
+                            Factory.IsBold = ps.IsTrue(e.Value);
+                        }
+                        break;
+                    case c_sPropItalic:
+                        {
+                            var ps = e.Property as YesNoPropertySpec;
+                            Debug.Assert(null != ps);
+                            Factory.IsItalic = ps.IsTrue(e.Value);
+                        }
+                        break;
+                    case c_sPropStrikeout:
+                        {
+                            var ps = e.Property as YesNoPropertySpec;
+                            Debug.Assert(null != ps);
+                            Factory.IsStrikeout = ps.IsTrue(e.Value);
+                        }
+                        break;
                 }
             }
+
             #endregion
 
-            #region Constructor(JFontForWritingSystem)
-            public FontPropertyBag(JFontForWritingSystem fws)
+            #region Constructor(FontFactory)
+            public FontPropertyBag(FontFactory factory)
             {
                 // Remember the parameters
-                m_fws = fws;
+                Debug.Assert(null != factory);
+                m_factory = factory;
 
                 // Add the properties
                 Properties.Add(new PropertySpec(
@@ -437,8 +430,8 @@ namespace OurWord.Dialogs
                    ));
 
                 // Listen for the callbacks
-                GetValue += new PropertySpecEventHandler(FontPropertyBag_GetValue);
-                SetValue += new PropertySpecEventHandler(FontPropertyBag_SetValue);
+                GetValue += FontPropertyBag_GetValue;
+                SetValue += FontPropertyBag_SetValue;
             }
             #endregion
 
@@ -446,13 +439,13 @@ namespace OurWord.Dialogs
             public override string ToString()
             {
                 // Start with the font name and the height
-                string s = FWS.FontName + ", " + FWS.Size.ToString();
+                var s = Factory.FontName + ", " + Factory.FontSize;
 
                 // Add Bold if bold is true
-                if (FWS.IsBold)
+                if (Factory.IsBold)
                 {
                     s += (", ");
-                    foreach (char ch in FindPropertySpec(c_sPropBold).Name)
+                    foreach (var ch in FindPropertySpec(c_sPropBold).Name)
                     {
                         if (!char.IsPunctuation(ch))
                             s += ch;
@@ -460,10 +453,10 @@ namespace OurWord.Dialogs
                 }
 
                 // Add Italic if italic is true
-                if (FWS.IsItalic)
+                if (Factory.IsItalic)
                 {
                     s += (", ");
-                    foreach (char ch in FindPropertySpec(c_sPropItalic).Name)
+                    foreach (var ch in FindPropertySpec(c_sPropItalic).Name)
                     {
                         if (!char.IsPunctuation(ch))
                             s += ch;
@@ -471,10 +464,10 @@ namespace OurWord.Dialogs
                 }
 
                 // Add Strikeout if strikeout is true
-                if (FWS.IsStrikeout)
+                if (Factory.IsStrikeout)
                 {
                     s += (", ");
-                    foreach (char ch in FindPropertySpec(c_sPropStrikeout).Name)
+                    foreach (var ch in FindPropertySpec(c_sPropStrikeout).Name)
                     {
                         if (!char.IsPunctuation(ch))
                             s += ch;
@@ -503,44 +496,44 @@ namespace OurWord.Dialogs
             // Other Character Settings
             if (e.Property.ID == c_sPropForeColor)
             {
-                e.Value = CStyle.FontColor.Name;
+                e.Value = CurrentStyle.FontColor.Name;
             }
 
             // Paragraph Settings
-            if (null != PStyle)
+            if (null == CurrentParagraphStyle) 
+                return;
+
+            switch (e.Property.ID)
             {
-                if (e.Property.ID == c_sPropAlignment)
-                {
-                    EnumPropertySpec ps = e.Property as EnumPropertySpec;
-                    Debug.Assert(null != ps);
-                    e.Value = ps.GetEnumValueFor((int)PStyle.Alignment);
-                }
-                else if (e.Property.ID == c_sPropKeepWithNext)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    e.Value = ps.GetBoolString(PStyle.KeepWithNext);
-                }
-                else if (e.Property.ID == c_sPropLeftMargin)
-                {
-                    e.Value = SetDoubleToGridText(PStyle.LeftMargin, "\"");
-                }
-                else if (e.Property.ID == c_sPropRightMargin)
-                {
-                    e.Value = SetDoubleToGridText(PStyle.RightMargin, "\"");
-                }
-                else if (e.Property.ID == c_sPropFirstLine)
-                {
-                    e.Value = SetDoubleToGridText(PStyle.FirstLineIndent, "\"");
-                }
-                else if (e.Property.ID == c_sPropSpaceBefore)
-                {
-                    e.Value = SetIntToGridText(PStyle.SpaceBefore, " pt");
-                }
-                else if (e.Property.ID == c_sPropSpaceAfter)
-                {
-                    e.Value = SetIntToGridText(PStyle.SpaceAfter, " pt");
-                }
+                case c_sPropAlignment:
+                    {
+                        var ps = e.Property as EnumPropertySpec;
+                        Debug.Assert(null != ps);
+                        e.Value = ps.GetEnumValueFor((int)CurrentParagraphStyle.Alignment);
+                    }
+                    break;
+                case c_sPropKeepWithNext:
+                    {
+                        var ps = e.Property as YesNoPropertySpec;
+                        Debug.Assert(null != ps);
+                        e.Value = ps.GetBoolString(CurrentParagraphStyle.KeepWithNextParagraph);
+                    }
+                    break;
+                case c_sPropLeftMargin:
+                    e.Value = SetDoubleToGridText(CurrentParagraphStyle.LeftMarginInches, "\"");
+                    break;
+                case c_sPropRightMargin:
+                    e.Value = SetDoubleToGridText(CurrentParagraphStyle.RightMarginInches, "\"");
+                    break;
+                case c_sPropFirstLine:
+                    e.Value = SetDoubleToGridText(CurrentParagraphStyle.FirstLineIndentInches, "\"");
+                    break;
+                case c_sPropSpaceBefore:
+                    e.Value = SetIntToGridText(CurrentParagraphStyle.PointsBefore, " pt");
+                    break;
+                case c_sPropSpaceAfter:
+                    e.Value = SetIntToGridText(CurrentParagraphStyle.PointsAfter, " pt");
+                    break;
             }
         }
         #endregion
@@ -550,45 +543,44 @@ namespace OurWord.Dialogs
             // Character Settings
             if (e.Property.ID == c_sPropForeColor)
             {
-                CStyle.FontColor = Color.FromName((string)e.Value);
+                CurrentStyle.FontColor = Color.FromName((string)e.Value);
             }
 
             // Paragraph Settings
-            if (null != PStyle)
+            if (null == CurrentParagraphStyle) 
+                return;
+            switch (e.Property.ID)
             {
-                if (e.Property.ID == c_sPropAlignment)
-                {
-                    EnumPropertySpec ps = e.Property as EnumPropertySpec;
-                    Debug.Assert(null != ps);
-                    PStyle.Alignment = (JParagraphStyle.AlignType)
-                        ps.GetEnumNumberFor((string)e.Value);
-                }
-                else if (e.Property.ID == c_sPropKeepWithNext)
-                {
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    PStyle.KeepWithNext = ps.IsTrue(e.Value);
-                }
-                else if (e.Property.ID == c_sPropLeftMargin)
-                {
-                    PStyle.LeftMargin = GetDoubleFromGridText((string)e.Value);
-                }
-                else if (e.Property.ID == c_sPropRightMargin)
-                {
-                    PStyle.RightMargin = GetDoubleFromGridText((string)e.Value);
-                }
-                else if (e.Property.ID == c_sPropFirstLine)
-                {
-                    PStyle.FirstLineIndent = GetDoubleFromGridText((string)e.Value);
-                }
-                else if (e.Property.ID == c_sPropSpaceBefore)
-                {
-                    PStyle.SpaceBefore = (int)GetDoubleFromGridText((string)e.Value);
-                }
-                else if (e.Property.ID == c_sPropSpaceAfter)
-                {
-                    PStyle.SpaceAfter = (int)GetDoubleFromGridText((string)e.Value);
-                }
+                case c_sPropAlignment:
+                    {
+                        var ps = e.Property as EnumPropertySpec;
+                        Debug.Assert(null != ps);
+                        CurrentParagraphStyle.Alignment = (ParagraphStyle.Align)
+                                                          ps.GetEnumNumberFor((string)e.Value);
+                    }
+                    break;
+                case c_sPropKeepWithNext:
+                    {
+                        var ps = e.Property as YesNoPropertySpec;
+                        Debug.Assert(null != ps);
+                        CurrentParagraphStyle.KeepWithNextParagraph = ps.IsTrue(e.Value);
+                    }
+                    break;
+                case c_sPropLeftMargin:
+                    CurrentParagraphStyle.LeftMarginInches = GetDoubleFromGridText((string)e.Value);
+                    break;
+                case c_sPropRightMargin:
+                    CurrentParagraphStyle.RightMarginInches = GetDoubleFromGridText((string)e.Value);
+                    break;
+                case c_sPropFirstLine:
+                    CurrentParagraphStyle.FirstLineIndentInches = GetDoubleFromGridText((string)e.Value);
+                    break;
+                case c_sPropSpaceBefore:
+                    CurrentParagraphStyle.PointsBefore = (int)GetDoubleFromGridText((string)e.Value);
+                    break;
+                case c_sPropSpaceAfter:
+                    CurrentParagraphStyle.PointsAfter = (int)GetDoubleFromGridText((string)e.Value);
+                    break;
             }
         }
         #endregion
@@ -597,18 +589,17 @@ namespace OurWord.Dialogs
         {
             // Create the PropertyBag for this style
             m_bag = new PropertyBag();
-            Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
-            Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
+            Bag.GetValue += bag_GetValue;
+            Bag.SetValue += bag_SetValue;
 
             // WritingSystem / Font Settings
             #region WRITING SYSTEMS / FONT SETTINGS SETUP
             m_aFontBags = new ArrayList();
-            CStyle.FontsForWritingSystems.ForceSort();
 
-            foreach (JFontForWritingSystem fws in CStyle.FontsForWritingSystems)
+            foreach (var factory in CurrentStyle.FontFactories)
             {
                 // Create the FontBag for this writing system
-                var fontBag = new FontPropertyBag(fws);
+                var fontBag = new FontPropertyBag(factory);
                 var ps = new PropertySpec(
                     "propFonts",
                     fontBag.Name,
@@ -616,7 +607,7 @@ namespace OurWord.Dialogs
                     c_sPropCharacterSettings,
                     "These are the font settings to use for this writing system.",
                     fontBag,
-                    typeof(System.Drawing.Design.UITypeEditor),
+                    typeof(UITypeEditor),
                     typeof(PropertyBagTypeConverter)) 
                     {DontLocalizeName = true};
                 Bag.Properties.Add(ps);
@@ -637,12 +628,14 @@ namespace OurWord.Dialogs
 
             // Paragraph Settings
             #region PARAGRAPH SETTINGS SETUP
-            if (null != PStyle)
+            if (null != CurrentParagraphStyle)
             {
                 // The HorzMargin + FirstLine must be >= 0; we cannot have a 
                 // negative first line that is not compensated for by the HorzMargin
-                if (PStyle.FirstLineIndent < 0)
-                    PStyle.LeftMargin = Math.Max(PStyle.LeftMargin, -PStyle.FirstLineIndent);
+                if (CurrentParagraphStyle.FirstLineIndentInches < 0)
+                    CurrentParagraphStyle.LeftMarginInches = Math.Max(
+                        CurrentParagraphStyle.LeftMarginInches, 
+                        -CurrentParagraphStyle.FirstLineIndentInches);
 
                 // Alignment
                 Bag.Properties.Add(new EnumPropertySpec(
@@ -650,14 +643,14 @@ namespace OurWord.Dialogs
                     "Alignment",
                     c_sPropParagraphSettings,
                     "Specify Centered, Left, Right, or Justified paragraph alignment.",
-                    typeof(JParagraphStyle.AlignType),
-                    new int[] { 
-                        (int)JParagraphStyle.AlignType.kLeft, 
-                        (int)JParagraphStyle.AlignType.kCentered,
-                        (int)JParagraphStyle.AlignType.kRight,
-                        (int)JParagraphStyle.AlignType.kJustified
+                    typeof(ParagraphStyle.Align),
+                    new[] { 
+                        (int)ParagraphStyle.Align.Left, 
+                        (int)ParagraphStyle.Align.Centered,
+                        (int)ParagraphStyle.Align.Right,
+                        (int)ParagraphStyle.Align.Justified
                         },
-                    new string[] { 
+                    new[] { 
                         "Left", 
                         "Centered", 
                         "Right", 
@@ -732,17 +725,17 @@ namespace OurWord.Dialogs
 
         // Command Handlers ------------------------------------------------------------------
         #region Command: cmdLoad
-        private void cmdLoad(object sender, System.EventArgs e)
+        private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
-            Control[] vExclude = new Control[] { m_PropGrid };
+            var vExclude = new Control[] { m_PropGrid };
             LocDB.Localize(this, vExclude);
 
             // Create the image list for the list view
-            ImageList images = new ImageList();
-            Icon ic = JWU.GetIcon("Character.ico");
+            var images = new ImageList();
+            var ic = JWU.GetIcon("Character.ico");
             images.Images.Add(ic);
-            Icon ip = JWU.GetIcon("Paragraph.ico");
+            var ip = JWU.GetIcon("Paragraph.ico");
             images.Images.Add(ip);
             m_listStyles.SmallImageList = images;
 
@@ -754,46 +747,38 @@ namespace OurWord.Dialogs
         }
         #endregion
         #region Command: cmdListSelectionChanged
-        private void cmdListSelectionChanged(object sender, System.EventArgs e)
+        private void cmdListSelectionChanged(object sender, EventArgs e)
         {
             // Retrieve the stylename from the list
             if (m_listStyles.SelectedItems.Count != 1)
                 return;
-            ListViewItem item = m_listStyles.SelectedItems[0];
-            string sStyleName = item.Text;
+            var item = m_listStyles.SelectedItems[0];
+            var sStyleName = item.Text;
 
             // Retrieve the style from the stylesheet
-            JParagraphStyle pstyle = DB.StyleSheet.FindParagraphStyleByDisplayName(sStyleName);
-            JCharacterStyle cstyle = (null == pstyle) ?
-                DB.StyleSheet.FindCharacterStyleByDisplayName(sStyleName) :
-                pstyle.CharacterStyle;
-            if (null == cstyle)
-                return;
-            PStyle = pstyle;
-            CStyle = cstyle;
-            CStyle.EnsureFontsForWritingSystems();
+            CurrentStyle = StyleSheet.Find(sStyleName);
+            CurrentStyle.EnsureFontsForWritingSystems();
 
             // Set up the Grid Control
             SetupPropertyGrid();
         }
         #endregion
         #region Command: cmdRestoreDefaultValues
-        private void cmdRestoreDefaultValues(object sender, System.EventArgs e)
+        private void cmdRestoreDefaultValues(object sender, EventArgs e)
         {
             // Make sure the user really wants to do this; as this applies to the entire
             // stylesheet, not just to the currently-selected individual style.
             if (false == Messages.ConfirmResetStylesToDefaults())
                 return;
 
-            // Zero out the current styles, so we don't attempt to harvest settings to
+            // Zero out the current style, so we don't attempt to harvest settings to
             // objects we no longer care about.
-            CStyle = null;
-            PStyle = null;
+            CurrentStyle = null;
 
             // Rebuild the styles
             DB.StyleSheet.Initialize(true);
 
-            // Reset the underlying window. (See bug 0292). The issue is that when we rebuild
+            // Reset the underlying window. (See B0292). The issue is that when we rebuild
             // the styles, we leave the underlying window in a bad state; the blocks are 
             // pointing to obsolete JFontForWritingSystem objects. If OW is minimized (prior
             // to the dialog being closed), then restored, we get a crash if we don't first
@@ -807,7 +792,7 @@ namespace OurWord.Dialogs
         }
         #endregion
         #region Command: cmdKeyPress - restricts contents of the edit boxes
-        private void cmdKeyPress(object sender, System.Windows.Forms.KeyPressEventArgs e)
+        private void cmdKeyPress(object sender, KeyPressEventArgs e)
         {
             if (false == char.IsDigit(e.KeyChar) &&
                 e.KeyChar != '.' &&
@@ -826,21 +811,11 @@ namespace OurWord.Dialogs
             // Remove any items currently in the list (else we'd be adding duplicates)
             m_listStyles.Items.Clear();
 
-            // Add the paragraph styles
-            foreach (JParagraphStyle style in DB.StyleSheet.ParagraphStyles)
-                m_listStyles.Items.Add(new ListViewItem(style.DisplayName, 1));
-
-            // Add the character styles which are not OW-internal ones
-            foreach (JCharacterStyle style in DB.StyleSheet.CharacterStyles)
+            foreach(var style in StyleSheet.StyleList)
             {
-                bool bInternal = false;
-                if (style.Abbrev == "ibtGloss")
-                    bInternal = true;
-                if (style.Abbrev == "ibtAn")
-                    bInternal = true;
-
-                if (!bInternal)
-                    m_listStyles.Items.Add(new ListViewItem(style.DisplayName, 0));
+                var iImage = style.IsParagraphStyle ? 1 : 0;
+                var item = new ListViewItem(style.StyleName, iImage);
+                m_listStyles.Items.Add(item);
             }
         }
         #endregion

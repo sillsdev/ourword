@@ -757,14 +757,13 @@ namespace OurWord.Edit
 
             // A small change will be enough to move a normal line at a time. We're guessing
             // a value based on the Target Translation's normal (zoomed) line height.
-            JParagraphStyle PStyle = DB.StyleSheet.FindParagraphStyle(DStyleSheet.c_sfmParagraph);
+            var style = StyleSheet.Paragraph;
 
-            JWritingSystem ws = (null == DB.TargetTranslation) ?
+            var ws = (null == DB.TargetTranslation) ?
                 DB.StyleSheet.FindWritingSystem(DStyleSheet.c_Latin) :
                 DB.TargetTranslation.WritingSystemVernacular;
 
-            float fLineHeight = PStyle.CharacterStyle.FindOrAddFontForWritingSystem(
-                ws).LineHeightZoomed;
+            float fLineHeight = style.GetFont(ws.Name, G.ZoomPercent).Height;
             ScrollBar.SmallChange = (int)fLineHeight;
 
             // A large change will scroll 4/5 of the window's height

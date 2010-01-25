@@ -828,8 +828,8 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Attr{g}: JWritingSystem WritingSystem
-        public JWritingSystem WritingSystem
+        #region Attr{g}: WritingSystem WritingSystem
+        public WritingSystem WritingSystem
         {
             get
             {
@@ -837,7 +837,7 @@ namespace OurWord.Edit
                 return m_WritingSystem;
             }
         }
-        readonly JWritingSystem m_WritingSystem;
+        readonly WritingSystem m_WritingSystem;
         #endregion
         #region Attr{g}: ParagraphStyle Style
         public ParagraphStyle Style
@@ -867,9 +867,9 @@ namespace OurWord.Edit
         readonly float m_fLineHeight;
         #endregion      
 
-        #region private Constructor(JWS, style, JObject, flags) - the stuff that is in common
+        #region private Constructor(WS, style, JObject, flags) - the stuff that is in common
         private OWPara(
-            JWritingSystem writingSystem,
+            WritingSystem writingSystem,
             ParagraphStyle style,
             JObject objDataSource,
             Flags options)
@@ -891,9 +891,9 @@ namespace OurWord.Edit
             m_vLines = new List<ELine>();
         }
         #endregion
-        #region Constructor(JWS, style, DParagraph, clrEditableBackground, Flags) - for DParagraph
+        #region Constructor(WS, style, DParagraph, clrEditableBackground, Flags) - for DParagraph
         public OWPara(
-            JWritingSystem ws, 
+            WritingSystem ws, 
             ParagraphStyle style,
             DParagraph p,
             Color clrEditableBackground, 

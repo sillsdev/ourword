@@ -9,25 +9,13 @@
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
 using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-
 using JWTools;
-using OurWordData;
+using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
-using OurWord.Dialogs;
 using OurWordData.Styles;
 
 #endregion
@@ -275,8 +263,6 @@ namespace OurWord.Edit
 		#region Constructor()
 		public LiterateSettingsWnd()
 		{
-			Information.InitStyleSheet();
-
 			InitializeComponent();
 		}
 		#endregion
@@ -874,138 +860,6 @@ namespace OurWord.Edit
 		}
 		#endregion
 
-		// StyleSheet ------------------------------------------------------------------------
-		const string c_sNormal = "";
-		const string c_sBold = "Bold";
-		const string c_sItalic = "Italic";
-		const string c_sBoldItalic = "BoldItalic";
-		#region SAttr{g}: JStyleSheet StyleSheet
-		static JStyleSheet StyleSheet
-		{
-			get
-			{
-				Debug.Assert(null != s_StyleSheet);
-				return s_StyleSheet;
-			}
-		}
-		static JStyleSheet s_StyleSheet;
-		#endregion
-		#region SAttr{g}: JWritingSystem WritingSystem
-		static JWritingSystem WritingSystem
-		{
-			get
-			{
-				return s_WritingSystem;
-			}
-		}
-		static JWritingSystem s_WritingSystem;
-		#endregion
-		#region SAttr{g}: JParagraphStyle PStyleHeading1
-		static public JParagraphStyle PStyleHeading1
-		{
-			get
-			{
-				Debug.Assert(null != s_PStyleHeading1);
-				return s_PStyleHeading1;
-			}
-		}
-		static JParagraphStyle s_PStyleHeading1;
-		#endregion
-		#region SAttr{g}: JParagraphStyle PStyleNormal
-		static public JParagraphStyle PStyleNormal
-		{
-			get
-			{
-				Debug.Assert(null != s_PStyleNormal);
-				return s_PStyleNormal;
-			}
-		}
-		static JParagraphStyle s_PStyleNormal;
-		#endregion
-		#region SAttr{g}: JParagraphStyle PStyleList1
-		static public JParagraphStyle PStyleList1
-		{
-			get
-			{
-				Debug.Assert(null != s_PStyleList1);
-				return s_PStyleList1;
-			}
-		}
-		static JParagraphStyle s_PStyleList1;
-		#endregion
-
-        #region SAttr{g}: JParagraphStyle PStyleAttention
-        static public JParagraphStyle PStyleAttention
-        {
-            get
-            {
-                Debug.Assert(null != s_PStyleAttention);
-                return s_PStyleAttention;
-            }
-        }
-        static JParagraphStyle s_PStyleAttention;
-        #endregion
-
-		#region SMethod: void InitStyleSheet()
-		static public void InitStyleSheet()
-		{
-			if (null != s_StyleSheet)
-				return;
-
-			// Create the new style sheet
-			s_StyleSheet = new JStyleSheet();
-
-			// Create an 'English' writing system, using default values
-			string sWritingSystem = "English";
-			s_WritingSystem = StyleSheet.FindOrAddWritingSystem(sWritingSystem);
-
-			// Create the paragraph styles we'll need
-
-			// Header
-			s_PStyleHeading1 = StyleSheet.AddParagraphStyle("s", "Heading 1");
-			PStyleHeading1.SetFonts(9, true);
-			PStyleHeading1.IsJustified = true;
-			PStyleHeading1.SpaceBefore = 6;
-            PStyleHeading1.SpaceAfter = 3;
-
-			// Normal
-			s_PStyleNormal = StyleSheet.AddParagraphStyle("p", "Normal");
-			PStyleNormal.SetFonts(8, false);
-			PStyleNormal.IsJustified = true;
-			PStyleNormal.SpaceBefore = 3;
-            PStyleNormal.SpaceAfter = 3;
-
-            // Attention
-            s_PStyleAttention = StyleSheet.AddParagraphStyle("a", "Attention");
-            PStyleAttention.SetFonts(8, true, false, false, false, Color.DarkRed);
-            PStyleAttention.IsJustified = true;
-            PStyleAttention.SpaceBefore = 3;
-            PStyleAttention.SpaceAfter = 3;
-
-			// List
-			s_PStyleList1 = StyleSheet.AddParagraphStyle("L1", "List 1");
-			PStyleList1.SetFonts(8, false);
-			PStyleList1.IsJustified = true;
-			PStyleList1.LeftMargin = 0.2;
-			PStyleList1.SpaceBefore = 0;
-            PStyleList1.SpaceAfter = 0;
-            PStyleList1.Bulleted = true;
-
-			// Character Styles
-			JCharacterStyle cs = StyleSheet.AddCharacterStyle(c_sBold, "Bold");
-			cs.SetFonts(8, true);
-
-			cs = StyleSheet.AddCharacterStyle(c_sItalic, "Italic");
-			cs.SetFonts(8, false, true, false, false, Color.Black);
-
-			cs = StyleSheet.AddCharacterStyle(c_sBoldItalic, "BoldItalic");
-			cs.SetFonts(8, true, true, false, false, Color.Black);
-
-			// Zoom factor set to 1.0, no zoom
-			StyleSheet.ZoomFactor = 1;
-		}
-		#endregion
-
 		// Helper Methods --------------------------------------------------------------------
 		#region Method: CreatePhrase(bIsBold, bIsItalic, sText)
 		DPhrase CreatePhrase(bool bBold, bool bItalic, string sText)
@@ -1071,8 +925,10 @@ namespace OurWord.Edit
 			// Deal with italic/bold
 			var vPhrases = ParseIntoPhrases(LabelText).ToArray();
 
+		    var writingSystem = DB.StyleSheet.FindOrAddWritingSystem("English");
+
 			// Create and append the paragraph
-			var para = new OWPara(WritingSystem, Style, vPhrases);
+			var para = new OWPara(writingSystem, Style, vPhrases);
 			Verbose.Contents.Append(para);
 		}
 		#endregion

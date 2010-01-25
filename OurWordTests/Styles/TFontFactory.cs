@@ -108,6 +108,29 @@ namespace OurWordTests.Styles
             Assert.AreEqual(original.FontStyle, cloned.FontStyle);
         }
         #endregion
+        #region Test: void TIsXsetter()
+        [Test] public void TIsXsetter()
+            // Doing this because I'm not certain of the bit logic, since I rarely use these
+        {
+            // Turn on italic; by default it is off
+            Assert.IsFalse(IsItalic);
+            IsItalic = true;
+            Assert.IsTrue(IsItalic);
+
+            // Bold should be off. Turn it on, and make sure the setter was effective.
+            Assert.IsFalse(IsBold);
+            IsBold = true;
+            Assert.IsTrue(IsBold);
+
+            // The bold setter should not have changed italic
+            Assert.IsTrue(IsItalic);
+
+            // Now verify that bold can be turned off
+            IsBold = false;
+            Assert.IsFalse(IsBold);
+            Assert.IsTrue(IsItalic);
+        }
+        #endregion
 
         // I/O & Merge -----------------------------------------------------------------------
         private const string c_sXmlForIoTest = "<Font WritingSystem=\"Cherokee\" " +

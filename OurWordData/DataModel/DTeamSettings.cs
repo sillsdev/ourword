@@ -510,35 +510,6 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 
- 		// Finding Styles --------------------------------------------------------------------
-		#region Method: JParagraphStyle FindParagraphStyleOrNormal(string sStyleAbbrev)
-		public JParagraphStyle FindParagraphStyleOrNormal(string sStyleAbbrev)
-		{
-			JParagraphStyle pStyle = FindParagraphStyle(sStyleAbbrev);
-			if (null == pStyle)
-				pStyle = FindParagraphStyle(c_sfmParagraph);
-			Debug.Assert(null != pStyle);
-			return pStyle;
-		}
-		#endregion
-		#region Method: JCharacterStyle FindCharacterStyleOrNormal(string sAbbrev)
-		public JCharacterStyle FindCharacterStyleOrNormal(string sAbbrev)
-		{
-			// Look amongst the character styles
-			JCharacterStyle cStyle = FindCharacterStyle(sAbbrev);
-
-			// If we dont find it there, look amongst the paragraph styles
-			if (null == cStyle)
-			{
-				JParagraphStyle pStyle = FindParagraphStyleOrNormal(sAbbrev);
-				cStyle = pStyle.CharacterStyle;
-			}
-
-			Debug.Assert(null != cStyle);
-			return cStyle;
-		}
-		#endregion
-
 		// Character Style Abbreviations -----------------------------------------------------
         public const string c_StyleAbbrevPictureCaption   = "cap";
         public const string c_StyleFootnote               = "ft";
@@ -641,7 +612,8 @@ namespace OurWordData.DataModel
 			***/
 		}
 		#endregion
-		#region Method: void _InitializeParagraphStyles()
+		#region Method: void _InitializeParagraphStyles() - GONE
+        /*
 		private void _InitializeParagraphStyles()
 		{
 			JParagraphStyle style;
@@ -870,9 +842,11 @@ namespace OurWordData.DataModel
             }
 
         }
+        */
 		#endregion
 
-        #region Method: void _InitializeCharacterStyles()
+        #region Method: void _InitializeCharacterStyles() - GONE
+        /*
         private void _InitializeCharacterStyles()
 		{
 			JCharacterStyle charStyle;
@@ -886,9 +860,11 @@ namespace OurWordData.DataModel
 			}
 
 		}
+        */
 		#endregion
 
-        #region Method: void _InitializeUIParagraphStyles()
+        #region Method: void _InitializeUIParagraphStyles() - GONE
+        /*
         private void _InitializeUIParagraphStyles()
             // TODO: Move appropriate styles to this section
         {
@@ -943,12 +919,14 @@ namespace OurWordData.DataModel
             }
 
         }
+        */
         #endregion
 
 
 		#region Method: void Initialize(bool bClearOutPrevious)
 		public void Initialize(bool bClearOutPrevious)
 		{
+            /*
 			// Remove the previous data if asked. (Leave the Writing Systems alone for now,
 			// as we have the CurrentWS stuff going on.....and I think I'll just want to
 			// get rid of WS's anyway before too long.)
@@ -957,12 +935,15 @@ namespace OurWordData.DataModel
 				ParagraphStyles.Clear();
 				CharacterStyles.Clear();
 			}
+            */
 
 			// Initialize the various parts of the stylesheet
 			_InitializeWritingSystems();
+            /*
 			_InitializeParagraphStyles();
             _InitializeUIParagraphStyles();
 			_InitializeCharacterStyles();
+            */
 		}
 		#endregion
 

@@ -129,9 +129,8 @@ namespace OurWord.Printing
             m_sRunningFooterText = sRunningFooterText;
 
             // Retrieve the font from the stylesheet (needed for Height calculation below)
-            var ps = DB.StyleSheet.FindParagraphStyleOrNormal(DStyleSheet.c_sfmRunningHeader);
-            m_font = ps.CharacterStyle.FindOrAddFontForWritingSystem(
-                DB.TargetTranslation.WritingSystemVernacular).DefaultFont;
+            var style = StyleSheet.RunningHeader;
+            m_font = style.GetFont(DB.TargetTranslation.WritingSystemVernacular.Name, 100F);
 
             // Layout
             m_FooterWidth = pdoc.DefaultPageSettings.Bounds.Width -

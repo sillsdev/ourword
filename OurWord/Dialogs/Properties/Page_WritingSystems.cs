@@ -42,9 +42,6 @@ namespace OurWord.Dialogs
 		#region Method: BuildHyphenationWindow()
 		void BuildHyphenationWindow()
 		{
-			// Make sure the styles have been defined
-			Information.InitStyleSheet();
-
 			// Introduction
             LS.AddInformation("ah100", StyleSheet.LiterateParagraph, 
 				"_OurWord_ offers a quick-and-dirty means of hyphenation, which you may find useful if " +

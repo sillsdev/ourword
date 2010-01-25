@@ -36,9 +36,6 @@ namespace OurWord.Dialogs
         {
             var internetRepository = DB.TeamSettings.GetInternetRepository();
 
-            // Make sure the styles have been defined
-            Information.InitStyleSheet();
-
             // Introduction
             LS.AddInformation("co100", StyleSheet.LiterateHeading,
                 "A. Introduction");

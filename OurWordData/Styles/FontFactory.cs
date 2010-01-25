@@ -93,6 +93,80 @@ namespace OurWordData.Styles
         private string m_sWritingSystemName = "Latin";
         #endregion
 
+        // Convient shorthand ----------------------------------------------------------------
+        #region Attr{g/s}: bool IsBold
+        public bool IsBold
+        {
+            get
+            {
+                return ((FontStyle & FontStyle.Bold) == FontStyle.Bold);
+            }
+            set
+            {
+                if (value)
+                    FontStyle |= FontStyle.Bold;
+                else if (IsBold)
+                    FontStyle ^= FontStyle.Bold;
+                ResetFonts();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool IsItalic
+        public bool IsItalic
+        {
+            get
+            {
+                return ((FontStyle & FontStyle.Italic) == FontStyle.Italic);
+            }
+            set
+            {
+                if (value)
+                    FontStyle |= FontStyle.Italic;
+                else if (IsBold)
+                    FontStyle ^= FontStyle.Italic;
+                ResetFonts();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool IsUnderline
+        public bool IsUnderline
+        {
+            get
+            {
+                return ((FontStyle & FontStyle.Underline) == FontStyle.Underline);
+            }
+            set
+            {
+                if (value)
+                    FontStyle |= FontStyle.Underline;
+                else if (IsBold)
+                    FontStyle ^= FontStyle.Underline;
+                ResetFonts();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool IsStrikeout
+        public bool IsStrikeout
+        {
+            get
+            {
+                return ((FontStyle & FontStyle.Strikeout) == FontStyle.Strikeout);
+            }
+            set
+            {
+                if (value)
+                    FontStyle |= FontStyle.Strikeout;
+                else if (IsBold)
+                    FontStyle ^= FontStyle.Strikeout;
+                ResetFonts();
+                StyleSheet.DeclareDirty();
+            }
+        }
+        #endregion
+
         // Fonts Dictionary ------------------------------------------------------------------
         private Dictionary<string, Font> m_FontsDictionary;
         #region SMethod: string MakeKey(FontStyle toggles, float zoomPercent)
@@ -108,14 +182,17 @@ namespace OurWordData.Styles
             return sKey;
         }
         #endregion
-
+        #region Method: FontStyle GetToggledFontStyle(FontStyle toggles)
         protected FontStyle GetToggledFontStyle(FontStyle toggles)
             // To determine the FontStyle we want, we wish to toggle anything that
             // is set in the "toggles" parameter.
+            //
+            // 1010 ^ 0010 = 1000
         {
             return FontStyle ^ toggles;
         }
-
+        #endregion
+        #region Method: Font GetFont(FontStyle toggles, float zoomPercent)
         public Font GetFont(FontStyle toggles, float zoomPercent)
         {
             var actualFontStyle = GetToggledFontStyle(toggles);
@@ -131,44 +208,17 @@ namespace OurWordData.Styles
 
             return font;
         }
+        #endregion
+        #region Method: Font GetFont(float zoomPercent)
         public Font GetFont(float zoomPercent)
         {
             return GetFont(FontStyle.Regular, zoomPercent);
         }
-
-        // Fonts -----------------------------------------------------------------------------
-        #region Attr{g}: Font UnzoomedFont
-        public Font UnzoomedFont
-        {
-            get
-            {
-                if (null == m_UnzoomedFont)
-                    m_UnzoomedFont = new Font(FontName, FontSize, FontStyle);
-                return m_UnzoomedFont;
-            }
-        }
-        private Font m_UnzoomedFont;
-        #endregion
-        #region Attr{g}: Font ZoomedFont
-        public Font ZoomedFont
-        {
-            get
-            {
-                if (null == m_ZoomedFont)
-                {
-                    var zoomedSize = FontSize * 1.5F;
-                    m_ZoomedFont = new Font(FontName, zoomedSize, FontStyle);
-                }
-                return m_ZoomedFont;
-            }
-        }
-        private Font m_ZoomedFont;
         #endregion
         #region Method: void ResetFonts()
         public void ResetFonts()
         {
-            m_UnzoomedFont = null;
-            m_ZoomedFont = null;
+            m_FontsDictionary.Clear();
         }
         #endregion
 

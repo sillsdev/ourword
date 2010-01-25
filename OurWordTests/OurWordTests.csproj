@@ -61,7 +61,6 @@
     <Compile Include="Cellar\T_AutoReplace.cs" />
     <Compile Include="Cellar\T_JAttr.cs" />
     <Compile Include="Cellar\T_JObject.cs" />
-    <Compile Include="Cellar\T_JObjectOnDemand.cs" />
     <Compile Include="Cellar\T_JOwn.cs" />
     <Compile Include="Cellar\T_JOwnSeq.cs" />
     <Compile Include="Cellar\T_JRef.cs" />

@@ -75,7 +75,7 @@ namespace OurWordData.Styles
 
         // List of Styles --------------------------------------------------------------------
         #region SAttr{g}: List<CharacterStyle> StyleList
-        static List<CharacterStyle> StyleList
+        static public List<CharacterStyle> StyleList
         {
             get
             {
@@ -431,7 +431,7 @@ namespace OurWordData.Styles
 
         // WritingSystems --------------------------------------------------------------------
         #region SAttr{g}: List<WritingSystem> WritingSystems
-        static List<WritingSystem> WritingSystems
+        static public List<WritingSystem> WritingSystems
         {
             get
             {

@@ -234,9 +234,6 @@ namespace OurWord.Printing
         #region SMethod: string ExtractRunningFooter(vParagraphs)
         static string ExtractRunningFooter(ICollection<DParagraph> vParagraphs)
         {
-            var styleRunningFooter = DB.StyleSheet.FindParagraphStyleOrNormal(
-                DStyleSheet.c_sfmRunningHeader);
-
             foreach(var p in vParagraphs)
             {
                 if (p.Style != StyleSheet.RunningHeader) 

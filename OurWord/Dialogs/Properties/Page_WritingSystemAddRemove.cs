@@ -34,9 +34,6 @@ namespace OurWord.Dialogs
         #region Method: BuildLiterateSettings()
         void BuildLiterateSettings()
 		{
-            // Make sure the styles have been defined
-            Information.InitStyleSheet();
-
 			// Introduction
             LS.AddInformation("ws100", StyleSheet.LiterateHeading, 
 				"A. Introduction");

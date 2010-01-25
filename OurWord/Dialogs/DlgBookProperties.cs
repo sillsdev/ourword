@@ -90,9 +90,6 @@ namespace OurWord.Dialogs
    		#region Method: BuildLsWindow()
         void BuildLsWindow()
         {
-            // Make sure the styles have been defined
-            Information.InitStyleSheet();
-
             // Intro
             LS.AddInformation("Bp100", StyleSheet.LiterateParagraph,
                 "This dialog allows you to input optional additional information about " +

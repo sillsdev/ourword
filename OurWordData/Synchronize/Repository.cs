@@ -788,8 +788,8 @@ namespace OurWordData.Synchronize
             }
 
             var nPulledVersion = m_LocalRepository.GetOurWordVersion();
-            if (nPulledVersion > LocalRepository.c_CurrentVersionNo && 
-                LocalRepository.c_CurrentVersionNo > 0)
+            if (nPulledVersion > LocalRepository.c_nCurrentVersionNo &&
+                LocalRepository.c_nCurrentVersionNo > 0)
             {
                 m_LocalRepository.Rollback();
                 throw new SynchException("msgYouNeedToUpgrade", 

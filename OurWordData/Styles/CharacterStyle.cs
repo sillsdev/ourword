@@ -114,6 +114,13 @@ namespace OurWordData.Styles
             return factory.GetFont(toggles, fZoomPercent);
         }
         #endregion
+        #region Method: void EnsureFontsForWritingSystems()
+        public void EnsureFontsForWritingSystems()
+        {
+            foreach (var ws in StyleSheet.WritingSystems)
+                FindOrAddFontFactory(ws.Name);
+        }
+        #endregion
 
         // Default (factory) font settings ---------------------------------------------------
         #region VAttr{s}: string DefaultFontName
@@ -172,6 +179,15 @@ namespace OurWordData.Styles
             var yName = ((null != y as ParagraphStyle) ? "P-" : "C-") + y.StyleName;
 
             return string.Compare(xName, yName);
+        }
+        #endregion
+        #region VAttr{g}: bool IsParagraphStyle
+        public bool IsParagraphStyle
+        {
+            get
+            {
+                return (this as ParagraphStyle != null);
+            }
         }
         #endregion
 
