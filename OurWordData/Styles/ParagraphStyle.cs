@@ -157,60 +157,45 @@ namespace OurWordData.Styles
         #endregion
 
         // Derived Attrs ---------------------------------------------------------------------
-        #region VAttr{g/s}: book IsLeft - paragraph is left-aligned
+        #region VAttr{g}: book IsLeft - paragraph is left-aligned
         public bool IsLeft
         {
             get
             {
                 return Alignment == Align.Left;
             }
-            set
-            {
-                Alignment = Align.Left;
-            }
         }
         #endregion
-        #region VAttr{g/s}: book IsRight - paragraph is right-aligned
+        #region VAttr{g}: book IsRight - paragraph is right-aligned
         public bool IsRight
         {
             get
             {
                 return Alignment == Align.Right;
             }
-            set
-            {
-                Alignment = Align.Right;
-            }
         }
         #endregion
-        #region VAttr{g/s}: book IsCentered - paragraph is centered
+        #region VAttr{g}: book IsCentered - paragraph is centered
         public bool IsCentered
         {
             get
             {
                 return Alignment == Align.Centered;
             }
-            set
-            {
-                Alignment = Align.Centered;
-            }
         }
         #endregion
-        #region VAttr{g/s}: book IsJustified - paragraph is justified
+        #region VAttr{g}: book IsJustified - paragraph is justified
         public bool IsJustified
         {
             get
             {
                 return Alignment == Align.Justified;
             }
-            set
-            {
-                Alignment = Align.Justified;
-            }
         }
         #endregion
 
         // Mapping Information ---------------------------------------------------------------
+        #region CLASS: Mapping
         public class Mapping
         {
             public readonly string UsfmMarker;
@@ -226,6 +211,7 @@ namespace OurWordData.Styles
             // Lines 1,2,3 and CenteredLine
             public bool IsPoetry { get; set; }
 
+            #region Constructor(sUsfmMarker)
             public Mapping(string sUsfmMarker)
             {
                 UsfmMarker = sUsfmMarker;
@@ -233,7 +219,9 @@ namespace OurWordData.Styles
                 // In most cases, the markers are identical
                 ToolboxMarker = sUsfmMarker;
             }
+            #endregion
         }
+        #endregion
         #region Attr{g/s}: Mapping Map
         public Mapping Map
         {
@@ -248,6 +236,26 @@ namespace OurWordData.Styles
             }
         }
         private Mapping m_Mapping;
+        #endregion
+
+        // Default (original, out-of-the-box) style ------------------------------------------
+        #region OMethod: void ResetToOriginal()
+        public override void ResetToOriginal()
+        {
+            var original = OriginalStyle as ParagraphStyle;
+            Debug.Assert(null != original);
+
+            PointsBefore = original.PointsBefore;
+            PointsAfter = original.PointsAfter;
+            FirstLineIndentInches = original.FirstLineIndentInches;
+            LeftMarginInches = original.LeftMarginInches;
+            RightMarginInches = original.RightMarginInches;
+            KeepWithNextParagraph = original.KeepWithNextParagraph;
+            Bulleted = original.Bulleted;
+            Alignment = original.Alignment;
+
+            base.ResetToOriginal();
+        }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -295,7 +303,7 @@ namespace OurWordData.Styles
         }
         #endregion
         #region OMethod: void ReadContent(XmlNode node)
-        override protected void ReadContent(XmlNode node)
+        override public void ReadContent(XmlNode node)
         {
             base.ReadContent(node);
 
@@ -320,23 +328,6 @@ namespace OurWordData.Styles
             {
                 Alignment = Align.Left;
             }
-        }
-        #endregion
-        #region SMethod: new ParagraphStyle Create(node)
-        static new public ParagraphStyle Create(XmlNode node)
-        {
-            if (node.Name != c_sTag)
-                return null;
-
-            // Abort if we have an invalid style name
-            var sStyleName = GetStyleNameFromXml(node);
-            if (string.IsNullOrEmpty(sStyleName))
-                return null;
-
-            // Create the style with its attributes
-            var style = new ParagraphStyle(sStyleName);
-            style.ReadContent(node);
-            return style;
         }
         #endregion
         #region Method: void Merge(ParagraphStyle parent, ParagraphStyle theirs)

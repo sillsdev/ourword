@@ -29,7 +29,12 @@ namespace OurWordTests.Styles
         {
             var doc = new XmlDoc(sXml);
             var node = XmlDoc.FindNode(doc, "CharacterStyle");
-            var style = Create(node);
+            var sStyleName = CharacterStyle.GetStyleNameFromXml(node);
+
+            StyleSheet.StyleList.Clear();
+            var style = new CharacterStyle(sStyleName);
+
+            style.ReadContent(node);
             return style;
         }
         #endregion
@@ -119,9 +124,7 @@ namespace OurWordTests.Styles
         #region Test: TCreate
         [Test] public void TCreate()
         {
-            var doc = new XmlDoc(c_sXmlForIoTest);
-            var node = XmlDoc.FindNode(doc, "CharacterStyle");
-            var style = Create(node);
+            var style = CreateFromXml(c_sXmlForIoTest);
 
             Assert.AreEqual("Verse", style.StyleName);
             Assert.AreEqual(Color.Red, style.FontColor);

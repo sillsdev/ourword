@@ -168,7 +168,7 @@ namespace OurWordData.Styles
         #endregion
 
         // Fonts Dictionary ------------------------------------------------------------------
-        private Dictionary<string, Font> m_FontsDictionary;
+        private readonly Dictionary<string, Font> m_FontsDictionary;
         #region SMethod: string MakeKey(FontStyle toggles, float zoomPercent)
         static protected string MakeKey(FontStyle toggles, float zoomPercent)
         {

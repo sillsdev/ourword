@@ -8,8 +8,6 @@
  *          or footnote letters.
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -80,7 +78,7 @@ namespace OurWordData.Styles
         }
         #endregion
         #region Method: FontFactory FindOrAddFontFactory(sWritingSystemName)
-        public FontFactory FindOrAddFontFactory(string sWritingSystemName)
+        protected FontFactory FindOrAddFontFactory(string sWritingSystemName)
         {
             var factory = FindFontFactory(sWritingSystemName);
 
@@ -119,6 +117,37 @@ namespace OurWordData.Styles
         {
             foreach (var ws in StyleSheet.WritingSystems)
                 FindOrAddFontFactory(ws.Name);
+        }
+        #endregion
+
+        // Default (original, out-of-the-box) style ------------------------------------------
+        public const string c_sOriginalStyle = "Original";
+        #region Attr{s}: CharacterStyle OriginalStyle
+        public CharacterStyle OriginalStyle
+        {
+            protected get
+            {
+                return m_OriginalStyle;
+            }
+            set
+            {
+                m_OriginalStyle = value;
+                ResetToOriginal();
+            }
+        }
+        private CharacterStyle m_OriginalStyle;
+        #endregion
+        #region VMethod: void ResetToOriginal()
+        public virtual void ResetToOriginal()
+        {
+            Debug.Assert(null != OriginalStyle);
+
+            FontColor = OriginalStyle.FontColor;
+            DefaultFontName = OriginalStyle.m_DefaultFont.FontName;
+            DefaultFontSize = OriginalStyle.m_DefaultFont.FontSize;
+            DefaultFontStyle = OriginalStyle.m_DefaultFont.FontStyle;
+
+            StyleSheet.DeclareDirty();
         }
         #endregion
 
@@ -169,10 +198,20 @@ namespace OurWordData.Styles
                 FontSize = c_fDefaultFontSize,
                 FontStyle = FontStyle.Regular
             };
+
+            // Any styles we create go into the stylesheet's list so they can be read/write
+            // Thus all we have to do is to declare styles (as we do in as static members
+            // of the StyleSheet class, and they are automatically added to the list
+            if (sStyleName != c_sOriginalStyle)
+            {
+                Debug.Assert(null == StyleSheet.Find(sStyleName));
+                StyleSheet.StyleList.Add(this);
+                StyleSheet.StyleList.Sort(SortCompare);
+            }
         }
         #endregion
         #region SMethod: int SortCompare(CharacterStyle x, CharacterStyle y)
-        public static int SortCompare(CharacterStyle x, CharacterStyle y)
+        static int SortCompare(CharacterStyle x, CharacterStyle y)
         {
             // This will sort first by char vs para style, then by the style name
             var xName = ((null != x as ParagraphStyle) ? "P-" : "C-") + x.StyleName;
@@ -210,7 +249,7 @@ namespace OurWordData.Styles
         private const string c_sAttrDefaultFontStyle = "FontStyle";
         #endregion
         #region SMethod: string GetStyleNameFromXml(XmlNode node)
-        static protected string GetStyleNameFromXml(XmlNode node)
+        static public string GetStyleNameFromXml(XmlNode node)
         {
             return XmlDoc.GetAttrValue(node, c_sAttrStyleName, "");
         }
@@ -238,7 +277,7 @@ namespace OurWordData.Styles
         }
         #endregion
         #region VirtMethod: void ReadContent(XmlNode node)
-        virtual protected void ReadContent(XmlNode node)
+        virtual public void ReadContent(XmlNode node)
         {
             // Content Attributes
             m_Color = Color.FromName(XmlDoc.GetAttrValue(node, c_sAttrColor,
@@ -257,24 +296,6 @@ namespace OurWordData.Styles
 
                 FontFactories.Add(factory);
             }
-        }
-        #endregion
-        #region SMethod: CharacterStyle Create(node)
-        static public CharacterStyle Create(XmlNode node)
-        {
-            if (node.Name != c_sTag)
-                return null;
-
-            // Abort if we have an invalid style name
-            var sStyleName = GetStyleNameFromXml(node);
-            if (string.IsNullOrEmpty(sStyleName))
-                return null;
-
-            // Create the style
-            var style = new CharacterStyle(sStyleName);
-            style.ReadContent(node);
-
-            return style;
         }
         #endregion
         #region Method: void Merge(parent, theirs)
@@ -311,7 +332,5 @@ namespace OurWordData.Styles
             }
         }
         #endregion
-
-
     }
 }

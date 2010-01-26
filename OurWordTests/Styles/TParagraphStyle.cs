@@ -29,7 +29,10 @@ namespace OurWordTests.Styles
         {
             var doc = new XmlDoc(sXml);
             var node = XmlDoc.FindNode(doc, "ParagraphStyle");
-            var style = Create(node);
+            var sStyleName = CharacterStyle.GetStyleNameFromXml(node);
+            StyleSheet.StyleList.Clear();
+            var style = new ParagraphStyle(sStyleName);
+            style.ReadContent(node);
             return style;
         }
         #endregion
@@ -72,9 +75,7 @@ namespace OurWordTests.Styles
         #region Test: TCreate
         [Test] public void TCreate()
         {
-            var doc = new XmlDoc(c_sXmlForIoTest);
-            var node = XmlDoc.FindNode(doc, "ParagraphStyle");
-            var style = Create(node);
+            var style = CreateFromXml(c_sXmlForIoTest);
 
             Assert.AreEqual("SillyParagraph", style.StyleName);
             Assert.AreEqual(Color.Red, style.FontColor);

@@ -210,7 +210,7 @@ namespace OurWordData.Styles
                 return m_AutoReplace;
             }
         }
-        TreeRoot m_AutoReplace = null;
+        TreeRoot m_AutoReplace;
         #endregion
         #region Method: void BuildAutoReplace()
         public void BuildAutoReplace()

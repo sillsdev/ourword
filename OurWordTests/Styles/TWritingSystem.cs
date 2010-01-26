@@ -9,6 +9,7 @@
  *********************************************************************************************/
 using JWTools;
 using NUnit.Framework;
+using OurWordData;
 using OurWordData.Styles;
 #endregion
 
@@ -50,6 +51,9 @@ namespace OurWordTests.Styles
                 HyphenationCVPattern = "V-VC",
                 MinHyphenSplit = 5
             };
+
+            ws.AutoReplaceSource.Clear();
+            ws.AutoReplaceResult.Clear();
 
             ws.AutoReplaceSource.Append("^a");
             ws.AutoReplaceResult.Append("á");

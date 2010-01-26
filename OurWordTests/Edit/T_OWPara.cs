@@ -656,7 +656,7 @@ namespace OurWordTests.Edit
         [Test] public void AdjacentTypingIsSingleUndo_TwoChars()
         {
             // At "F|or God"
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(OP, DBT1, 1);
+            var selection = OWWindow.Sel.CreateSel(OP, DBT1, 1);
             Wnd.Selection = OP.NormalizeSelection(selection);
 
             // Type several letters
@@ -671,7 +671,7 @@ namespace OurWordTests.Edit
         [Test] public void AdjacentTypingIsSingleUndo_ManyChars()
         {
             // At "F|or God"
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(OP, DBT1, 1);
+            var selection = OWWindow.Sel.CreateSel(OP, DBT1, 1);
             Wnd.Selection = OP.NormalizeSelection(selection);
 
             // Type several letters
@@ -699,7 +699,7 @@ namespace OurWordTests.Edit
             WSVernacular.AutoReplace.Add("sov", "very much");
 
             // At "For God| so"
-            OWWindow.Sel selection = OWWindow.Sel.CreateSel(OP, DBT1, 7);
+            var selection = OWWindow.Sel.CreateSel(OP, DBT1, 7);
             Wnd.Selection = OP.NormalizeSelection(selection);
 
             // Type several letters
