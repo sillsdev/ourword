@@ -275,8 +275,6 @@ namespace OurWord
 
             if (null != SideWindows)
                 SideWindows.SetZoomFactor(G.ZoomFactor);
-
-            DB.StyleSheet.ZoomFactor = G.ZoomFactor;
         }
         #endregion
         #region Method: void Dim()

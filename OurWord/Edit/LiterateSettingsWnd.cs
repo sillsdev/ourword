@@ -14,7 +14,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using JWTools;
-using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 
@@ -925,7 +924,7 @@ namespace OurWord.Edit
 			// Deal with italic/bold
 			var vPhrases = ParseIntoPhrases(LabelText).ToArray();
 
-		    var writingSystem = DB.StyleSheet.FindOrAddWritingSystem("English");
+		    var writingSystem = StyleSheet.FindOrCreate("English");
 
 			// Create and append the paragraph
 			var para = new OWPara(writingSystem, Style, vPhrases);

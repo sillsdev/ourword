@@ -23,6 +23,8 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData;
 using JWTools;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -158,7 +160,7 @@ namespace OurWord.Layouts
         }
         #endregion
         #region Method: OWPara BuildParagraph(p, ws, backColor, flags)
-        OWPara BuildParagraph(DParagraph p, JWritingSystem ws, Color backColor, OWPara.Flags flags)
+        OWPara BuildParagraph(DParagraph p, WritingSystem ws, Color backColor, OWPara.Flags flags)
             // Creates an OWPara, but switches based on whether we're dealing with a footnote or
             // a normal paragraph (the Footnote code inserts the footnote reference/label.)
         {

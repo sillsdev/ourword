@@ -912,9 +912,9 @@ namespace OurWord.Edit
             m_EditableBackgroundColor = clrEditableBackground;
         }
         #endregion
-        #region Constructor(JWS, style, DRun[], sLabel, Flags)
+        #region Constructor(WS, style, DRun[], sLabel, Flags)
         public OWPara(
-            JWritingSystem writingSystem,
+            WritingSystem writingSystem,
             ParagraphStyle style,
             DRun[] vRuns, 
             string sLabel, 
@@ -962,18 +962,18 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Constructor(JWS, style, sLiteralString)
+        #region Constructor(WS, style, sLiteralString)
         public OWPara(
-            JWritingSystem _ws, 
+            WritingSystem _ws, 
             ParagraphStyle style, 
             string sLiteralText)
             : this(_ws, style, new DPhrase[] { new DPhrase(sLiteralText) })
         {
         }
         #endregion
-        #region Constructor(JWS, style, DPhrase[] vLiteralPhrases)
+        #region Constructor(WS, style, DPhrase[] vLiteralPhrases)
         public OWPara(
-            JWritingSystem writingSystem, 
+            WritingSystem writingSystem, 
             ParagraphStyle style, 
             DPhrase[] vLiteralPhrases)
             : this(writingSystem, style, (JObject)null, Flags.None)
@@ -2363,7 +2363,7 @@ namespace OurWord.Edit
         #endregion
 
         #region SMethod: JWritingSystem GetWritingSystem(DParagraph p, Flags options)
-        static JWritingSystem GetWritingSystem(DParagraph p, Flags options)
+        static WritingSystem GetWritingSystem(DParagraph p, Flags options)
         {
             return ((options & Flags.ShowBackTranslation) == Flags.ShowBackTranslation) ?
                 p.Translation.WritingSystemVernacular :

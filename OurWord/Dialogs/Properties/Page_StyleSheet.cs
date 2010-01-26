@@ -776,7 +776,7 @@ namespace OurWord.Dialogs
             CurrentStyle = null;
 
             // Rebuild the styles
-            DB.StyleSheet.Initialize(true);
+            StyleSheet.ResetStylesToFactory();
 
             // Reset the underlying window. (See B0292). The issue is that when we rebuild
             // the styles, we leave the underlying window in a bad state; the blocks are 

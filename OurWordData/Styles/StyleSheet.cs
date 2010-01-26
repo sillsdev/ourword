@@ -115,6 +115,7 @@ namespace OurWordData.Styles
             return style;
         }
         #endregion
+        #region SMethod: ParagraphStyle FindFromToolboxMarker(sMarker)
         static public ParagraphStyle FindFromToolboxMarker(string sMarker)
         {
             foreach(var style in StyleList)
@@ -127,6 +128,7 @@ namespace OurWordData.Styles
             }
             return null;
         }
+        #endregion
 
         // Initialization -------------------------------------------------------------------- 
         #region SMethod: void Clear()
@@ -427,7 +429,13 @@ namespace OurWordData.Styles
             DefaultWritingSystem = FindOrCreate(WritingSystem.DefaultWritingSystemName);
         }
         #endregion
-
+        #region SMethod: void ResetStylesToFactory()
+        public static void ResetStylesToFactory()
+        {
+            s_vStyleList.Clear();
+            EnsureFactoryInitialized();
+        }
+        #endregion
 
         // WritingSystems --------------------------------------------------------------------
         #region SAttr{g}: List<WritingSystem> WritingSystems
@@ -455,7 +463,7 @@ namespace OurWordData.Styles
         }
         #endregion
         #region SMethod: WritingSystem FindOrCreate(string sWritingSystemName)
-        static WritingSystem FindOrCreate(string sWritingSystemName)
+        static public WritingSystem FindOrCreate(string sWritingSystemName)
         {
             var ws = FindWritingSystem(sWritingSystemName);
 
@@ -463,9 +471,27 @@ namespace OurWordData.Styles
             {
                 ws = new WritingSystem {Name = sWritingSystemName};
                 WritingSystems.Add(ws);
+                SortWritingSystems();
+                DeclareDirty();
             }
 
+            Debug.Assert(null != ws);
             return ws;
+        }
+        #endregion
+        #region SMethod: void SortWritingSystems()
+        static public void SortWritingSystems()
+        {
+            WritingSystems.Sort(WritingSystem.SortCompare);
+        }
+        #endregion
+        #region SMethod: void RemoveWritingSystem(string sWritingSystem)
+        static public void RemoveWritingSystem(string sWritingSystem)
+        {
+            var ws = FindWritingSystem(sWritingSystem);
+            if (null == ws)
+                return;
+            WritingSystems.Remove(ws);
         }
         #endregion
 
@@ -591,6 +617,27 @@ namespace OurWordData.Styles
             // here will DeclareDirty and result in a save.
             EnsureFactoryInitialized();
         }
+        #endregion
+
+        // Misc ------------------------------------------------------------------------------
+        #region SAttr{g}: Font LargeDialogFont
+        public static Font LargeDialogFont
+        // This font is used for examining raw oxes files. I use a slightly larger
+        // font due to the possible presence of diacritics which can otherwise be
+        // difficult to read.
+        {
+            get
+            {
+                if (null == s_LargeDialogFont)
+                {
+                    s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
+                        SystemFonts.DialogFont.Size * 1.2F,
+                        FontStyle.Regular);
+                }
+                return s_LargeDialogFont;
+            }
+        }
+        private static Font s_LargeDialogFont;
         #endregion
     }
 }

@@ -52,7 +52,7 @@ namespace OurWord.Layouts
 
         #region Method: OWPara CreateFootnotePara(...)
         protected OWPara CreateFootnotePara(DFootnote footnote, 
-            JWritingSystem ws,
+            WritingSystem ws,
             Color backColor, 
             OWPara.Flags flags)
         {

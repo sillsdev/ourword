@@ -21,6 +21,8 @@ using OurWord;
 using OurWordData.DataModel;
 using JWTools;
 using OurWordData;
+using OurWordData.Styles;
+
 #endregion
 
 
@@ -43,14 +45,14 @@ namespace OurWordTests.DataModel
         #region Test: HuicholHyphenation
         [Test] public void HuicholHyphenation()
         {
-            JWritingSystem ws = DB.StyleSheet.FindWritingSystem("Latin");
+            var ws = StyleSheet.FindOrCreate(WritingSystem.DefaultWritingSystemName);
 
             ws.UseAutomatedHyphenation = true;
             ws.Consonants = "bcdfghjklmnpqrstvwxyz";
             ws.HyphenationCVPattern = "V-C";
             ws.MinHyphenSplit = 3;
 
-            string sLongWord = "caniyemieximecaitüni";
+            var sLongWord = "caniyemieximecaitüni";
 
             Assert.IsTrue(ws.IsHyphenBreak(sLongWord, 9), "caniyemie-ximecaitüni");
             Assert.IsFalse(ws.IsHyphenBreak(sLongWord, 8), "caniyemi-eximecaitüni");
@@ -61,14 +63,14 @@ namespace OurWordTests.DataModel
         #region Test: EnglishHyphenation
         [Test] public void EnglishHyphenation()
         {
-            JWritingSystem ws = DB.StyleSheet.FindWritingSystem("Latin");
+            var ws = StyleSheet.FindOrCreate(WritingSystem.DefaultWritingSystemName);
 
             ws.UseAutomatedHyphenation = true;
             ws.Consonants = "bcdfghjklmnpqrstvwxyz";
             ws.HyphenationCVPattern = "VC-C";
             ws.MinHyphenSplit = 3;
 
-            string sLongWord = "itbogglesthemind";
+            var sLongWord = "itbogglesthemind";
 
             Assert.IsTrue(ws.IsHyphenBreak(sLongWord, 5), "itbog-glesthemind");
             Assert.IsFalse(ws.IsHyphenBreak(sLongWord, 2), "it-bogglesthemind");

@@ -1257,7 +1257,7 @@ namespace OurWordData.DataModel
             StyleMappings.Add(new StyleMapping("mr", "mr", "Major Section Range", false));
             StyleMappings.Add(new StyleMapping("cf", "x", "Note Cross Reference Paragraph", false));
             StyleMappings.Add(new StyleMapping("fn", "f", "Note General Paragraph", false));
-            StyleMappings.Add(new StyleMapping(DStyleSheet.c_StyleAnnotationMessage, "", "Annotation Message", false));
+            StyleMappings.Add(new StyleMapping("NoteMessage", "", "Annotation Message", false));
 
 			// TODO: Need to persist these array values
 

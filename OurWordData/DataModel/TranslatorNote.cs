@@ -732,8 +732,8 @@ namespace OurWordData.DataModel
             }
             readonly bool m_bConsultantWritingSystem;
             #endregion
-            #region Method: JWritingSystem GetWritingSystem(TranslatorNote note)
-            public JWritingSystem GetWritingSystem(TranslatorNote note)
+            #region Method: WritingSystem GetWritingSystem(TranslatorNote note)
+            public WritingSystem GetWritingSystem(TranslatorNote note)
             {
                 Debug.Assert(null != note.OwningBook);
                 var translation = note.OwningBook.Translation;

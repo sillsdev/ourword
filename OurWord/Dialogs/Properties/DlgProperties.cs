@@ -31,6 +31,8 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWord.Utilities;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -209,7 +211,7 @@ namespace OurWord.Dialogs
             GroupedTasks gtWritingSystems = NavList.AddGroup(Strings.PropDlgTab_WritingSystems);
             gtWritingSystems.Expanded = false;
             AddPage(gtWritingSystems, new Page_AddWritingSystem(this), c_iImageAddWritingSystem);
-            foreach (JWritingSystem ws in DB.StyleSheet.WritingSystems)
+            foreach (var ws in StyleSheet.WritingSystems)
                 AddPage(gtWritingSystems, new Page_WritingSystems(this, ws), c_iImageWritingSystem);
 
             // Go to the requested page

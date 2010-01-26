@@ -177,8 +177,7 @@ namespace OurWord.Dialogs
             var sName = LocDB.GetValue(this, "NewWritingSystem", "New Writing System", null);
 
 			// Add it to the list if it is not already there
-			DB.StyleSheet.FindOrAddWritingSystem(sName);
-			DB.StyleSheet.WritingSystems.ForceSort();
+			StyleSheet.FindOrCreate(sName);
 
 			// Recompute the pages, then go to its property page
             ParentDlg.InitNavigation(Page_WritingSystems.ComputeID(sName));

@@ -26,14 +26,16 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.Layouts;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWordTests.Edit
 {
     public class TestWindow : OWWindow
     {
-        #region VAttr{g}: JWritingSystem WSVernacular
-        JWritingSystem WSVernacular
+        #region VAttr{g}: WritingSystem WSVernacular
+        WritingSystem WSVernacular
         {
             get
             {

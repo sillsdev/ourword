@@ -961,7 +961,7 @@ namespace OurWordData.DataModel
 		public bool FilterTest_PunctuationProblem()
 		{
 			// Retrieve the writing system's punctuation
-			JWritingSystem ws = DB.Project.TargetTranslation.WritingSystemVernacular;
+			WritingSystem ws = DB.Project.TargetTranslation.WritingSystemVernacular;
 			string sPunctuation = ws.PunctuationChars;
 			string sEndPunctuation = ws.EndPunctuationChars;
 
@@ -2359,10 +2359,10 @@ namespace OurWordData.DataModel
 					if ( AddSimple( field, Map.MkrSubTitle, Map.StyleSubTitle))
 						continue;
                     if ( AddSimple(field, Map.MkrMajorSection, 
-                        DStyleSheet.c_sfmMajorSection))
+                        StyleSheet.MajorSection.Map.ToolboxMarker))
                         continue;
                     if ( AddSimple(field, Map.MkrMajorSectionCrossRef, 
-                        DStyleSheet.c_sfmMajorSectionCrossRef))
+                        StyleSheet.MajorSectionCrossReference.Map.ToolboxMarker))
                         continue;
 
 					// Checking Status, DateStamp

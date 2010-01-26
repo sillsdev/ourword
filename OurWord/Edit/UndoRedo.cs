@@ -1498,7 +1498,7 @@ namespace OurWord.Edit
             if (null == selection)
                 return null;
             OWPara op = selection.Paragraph;
-            JWritingSystem jws = op.WritingSystem;
+            var writingSystem = op.WritingSystem;
 
             // Edits not permitted here
             if (Window.HandleLockedFromEditing())
@@ -1509,7 +1509,7 @@ namespace OurWord.Edit
             if (selection.IsInsertionIcon)
             {
                 int c = 0;
-                string sInsert = jws.SearchAutoReplace(chKey.ToString(), ref c);
+                string sInsert = writingSystem.SearchAutoReplace(chKey.ToString(), ref c);
                 if (null == sInsert || sInsert.Length == 0)
                     return null;
                 return sInsert;
@@ -1531,7 +1531,7 @@ namespace OurWord.Edit
 
             // Check for a match
             int cSelectionCount = 0;
-            string sReplace = jws.SearchAutoReplace(sSource, ref cSelectionCount);
+            string sReplace = writingSystem.SearchAutoReplace(sSource, ref cSelectionCount);
             if (null == sReplace || sReplace.Length == 0)
                 return null;
             Debug.Assert(cSelectionCount > 0);

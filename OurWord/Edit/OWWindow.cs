@@ -760,7 +760,7 @@ namespace OurWord.Edit
             var style = StyleSheet.Paragraph;
 
             var ws = (null == DB.TargetTranslation) ?
-                DB.StyleSheet.FindWritingSystem(DStyleSheet.c_Latin) :
+                StyleSheet.FindOrCreate(WritingSystem.DefaultWritingSystemName) :
                 DB.TargetTranslation.WritingSystemVernacular;
 
             float fLineHeight = style.GetFont(ws.Name, G.ZoomPercent).Height;

@@ -132,7 +132,7 @@ namespace OurWord.Dialogs
 
 		// Scaffolding -----------------------------------------------------------------------
         #region Constructor(ParentDlg, JWritingSystem)
-        public Page_WritingSystems(DialogProperties _ParentDlg, JWritingSystem ws)
+        public Page_WritingSystems(DialogProperties _ParentDlg, WritingSystem ws)
             : base(_ParentDlg)
         {
             InitializeComponent();
@@ -145,7 +145,7 @@ namespace OurWord.Dialogs
         }
         #endregion
         #region Attr{g}: JWritingSystem WritingSystem
-        JWritingSystem WritingSystem
+        WritingSystem WritingSystem
         {
             get
             {
@@ -153,7 +153,7 @@ namespace OurWord.Dialogs
                 return m_WritingSystem;
             }
         }
-        JWritingSystem m_WritingSystem = null;
+        WritingSystem m_WritingSystem;
         #endregion
 
 		// DlgPropertySheet overrides --------------------------------------------------------
@@ -193,7 +193,7 @@ namespace OurWord.Dialogs
             // Auto replace
             m_ctrlAutoReplace.Harvest();
             WritingSystem.BuildAutoReplace();
-            WritingSystem.DeclareDirty();
+            StyleSheet.DeclareDirty();
 
 			// Automated Hyphenation
 			WritingSystem.UseAutomatedHyphenation = m_TurnOnHyphenation.Value;
@@ -246,12 +246,6 @@ namespace OurWord.Dialogs
                 e.Value = WritingSystem.Name;
             }
             #endregion
-            #region Abbrev
-            if (e.Property.ID == c_sPropAbbrev)
-            {
-                e.Value = WritingSystem.Abbrev;
-            }
-            #endregion
             #region Keyboard
             if (e.Property.ID == c_sPropKeyboard)
             {
@@ -285,14 +279,14 @@ namespace OurWord.Dialogs
 
                 // We don't permit "Latin" to be changed, as we need it elsewhere
                 // in the system
-                if (WritingSystem.Name == DStyleSheet.c_Latin)
+                if (WritingSystem.Name ==WritingSystem.DefaultWritingSystemName)
                     return;
 
                 // We cannot accept the name change if it would result
                 // in a duplicate
-                foreach (JWritingSystem ws in DB.StyleSheet.WritingSystems)
+                foreach (var writingSystem in StyleSheet.WritingSystems)
                 {
-                    if (ws.Name == (string)e.Value)
+                    if (writingSystem.Name == (string)e.Value)
                         return;
                 }
 
@@ -300,16 +294,8 @@ namespace OurWord.Dialogs
                 WritingSystem.Name = (string)e.Value;
 
                 // Update the list
-                DB.StyleSheet.WritingSystems.ForceSort();
+                StyleSheet.SortWritingSystems();
                 ParentDlg.UpdateNavigationControls();
-//                PopulateList();
-//                m_listWritingSystems.SelectedItem = WritingSystem.Name;
-            }
-            #endregion
-            #region Abbreviation
-            if (e.Property.ID == c_sPropAbbrev)
-            {
-                WritingSystem.Abbrev = (string)e.Value;
             }
             #endregion
             #region Keyboard Name
@@ -337,8 +323,8 @@ namespace OurWord.Dialogs
         {
             // Create the PropertyBag for this style
             m_bag = new PropertyBag();
-            Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
-            Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
+            Bag.GetValue += bag_GetValue;
+            Bag.SetValue += bag_SetValue;
 
             // General Properties
             #region string: Name
@@ -351,22 +337,8 @@ namespace OurWord.Dialogs
                 "",
                 "",
                 null);
-            if (WritingSystem.Name == DStyleSheet.c_Latin)
+            if (WritingSystem.Name == WritingSystem.DefaultWritingSystemName)
                 ps.Attributes = new Attribute[] { ReadOnlyAttribute.Yes };
-            ps.DontLocalizeCategory = true;
-            Bag.Properties.Add(ps);
-            #endregion
-            #region string: Abbreviation / ID
-            ps = new PropertySpec(
-                c_sPropAbbrev,
-                "Abbreviation / ID",
-                typeof(string),
-                WritingSystem.Name,
-                "A short abbreviation of the Writing System's name. This is used as an " +
-                    "ID for the WeSay dictionary.",
-                "",
-                "",
-                null);
             ps.DontLocalizeCategory = true;
             Bag.Properties.Add(ps);
             #endregion
@@ -396,7 +368,7 @@ namespace OurWord.Dialogs
                 typeof(string),
                 WritingSystem.Name,
                 "A list of those letters that are punctuation in this writing system.", 
-                JWritingSystem.c_sDefaultPunctuationChars,
+                WritingSystem.c_sDefaultPunctuationChars,
                 "",
                 null);
             ps.DontLocalizeCategory = true;
@@ -409,7 +381,7 @@ namespace OurWord.Dialogs
                 typeof(string),
                 WritingSystem.Name,
                 "A list of punctuation that can occur at the end of a sentence.", 
-                JWritingSystem.c_sDefaultEndPunctuationChars,
+                WritingSystem.c_sDefaultEndPunctuationChars,
                 "",
                 null);
             ps.DontLocalizeCategory = true;
@@ -453,12 +425,12 @@ namespace OurWord.Dialogs
 			// So display an error message to the effect. (We can't disable the button
 			// for this, because Microsoft does not permit a tooltip for disabled
 			// buttons.)
-			if (WritingSystem.Name == DStyleSheet.c_Latin)
+			if (WritingSystem.Name == WritingSystem.DefaultWritingSystemName)
 			{
 				Messages.UnableToRemoveLatin();
 				return;
 			}
-			foreach (DTranslation t in DB.Project.AllTranslations)
+			foreach (var t in DB.Project.AllTranslations)
 			{
 				if (t.WritingSystemConsultant == WritingSystem ||
 					t.WritingSystemVernacular == WritingSystem)
@@ -473,7 +445,7 @@ namespace OurWord.Dialogs
 				return;
             
             // Remove it from the StyleSheet
-			DB.StyleSheet.RemoveWritingSystem(WritingSystem);
+			StyleSheet.RemoveWritingSystem(WritingSystem.Name);
 
 			// Update the nav tree, and navigate to the Add page
             ParentDlg.InitNavigation(Page_AddWritingSystem.ComputeID());

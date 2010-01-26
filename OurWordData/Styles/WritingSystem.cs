@@ -67,7 +67,7 @@ namespace OurWordData.Styles
             }
         }
         private string m_sPunctuationChars = c_sDefaultPunctuationChars;
-        const string c_sDefaultPunctuationChars = "“‘.,;:<>?!()[]’”";
+        public const string c_sDefaultPunctuationChars = "“‘.,;:<>?!()[]’”";
         #endregion
         #region Attr{g/s}: string EndPunctuationChars - punctuation that occurs sentence-final.
         public string EndPunctuationChars
@@ -85,7 +85,7 @@ namespace OurWordData.Styles
             }
         }
         private string m_sEndPunctuationChars = c_sDefaultEndPunctuationChars;
-        const string c_sDefaultEndPunctuationChars = ".>?!)],:;’”";
+        public const string c_sDefaultEndPunctuationChars = ".>?!)],:;’”";
         #endregion
         #region Attr{g/s}: string KeyboardName - the name of the keyboard to use with this WS
         public string KeyboardName
@@ -178,7 +178,7 @@ namespace OurWordData.Styles
         private const int c_DefaultMinHiphenSplit = 3;
         #endregion
 
-        // AutoReplace Attrs
+        // AutoReplace -----------------------------------------------------------------------
         #region Attr{g}: BStringArray AutoReplaceSource
         public BStringArray AutoReplaceSource
         {
@@ -201,14 +201,193 @@ namespace OurWordData.Styles
         }
         private readonly BStringArray m_bsaAutoReplaceResult;
         #endregion
+        #region Attr{g}: TreeRoot AutoReplace
+        public TreeRoot AutoReplace
+        {
+            get
+            {
+                Debug.Assert(null != m_AutoReplace);
+                return m_AutoReplace;
+            }
+        }
+        TreeRoot m_AutoReplace = null;
+        #endregion
+        #region Method: void BuildAutoReplace()
+        public void BuildAutoReplace()
+        {
+            m_AutoReplace = new TreeRoot();
+            for (var i = 0; i < AutoReplaceSource.Length; i++)
+            {
+                m_AutoReplace.Add(AutoReplaceSource[i], AutoReplaceResult[i]);
+            }
+        }
+        #endregion
+        #region Method: string SearchAutoReplace(string sSource, ref int cSourceLen)
+        public string SearchAutoReplace(string sSource, ref int cSourceLen)
+        {
+            if (null == m_AutoReplace)
+                BuildAutoReplace();
+            return m_AutoReplace.Search(sSource, ref cSourceLen);
+        }
+        #endregion
+
+        // Methods ---------------------------------------------------------------------------
+        #region Method: bool IsPunctuation(char) - T if char is a punct character
+        public bool IsPunctuation(char cTest)
+        {
+            foreach (var c in PunctuationChars)
+            {
+                if (c == cTest)
+                    return true;
+            }
+            return false;
+        }
+        #endregion
+        #region Method: bool IsEndPunctuation(char) - T if char is a punct character
+        public bool IsEndPunctuation(char cTest)
+        {
+            foreach (var c in EndPunctuationChars)
+            {
+                if (c == cTest)
+                    return true;
+            }
+            return false;
+        }
+        #endregion
+        #region Method: bool IsWhiteSpace(char) - T if char is a whitespace character
+        public bool IsWhiteSpace(char ch)
+        {
+            return ch == ' ';
+        }
+
+        #endregion
+        #region Method: bool IsWordBreak(s, iPos)
+        public static bool IsWordBreak(string s, int iPos)
+        // At this point, I define a word break as occuring at either the beginning of the
+        // string, or following a whitespace. This method is more of a place-holder, as I
+        // anticipate that there will be writing systems where other types of word break
+        // rules will be necessary.
+        {
+            // Make sure we have valid input
+            Debug.Assert(iPos >= 0);
+            Debug.Assert(iPos < s.Length);
+            Debug.Assert(null != s);
+
+            // If at beginning of string, this is a word break.
+            if (iPos == 0)
+                return true;
+
+            // Get the two characters of interest
+            var chWhitespace = s[iPos - 1];
+            var chNonWhitespace = s[iPos];
+
+            // Do the test
+            return char.IsWhiteSpace(chWhitespace) && !char.IsWhiteSpace(chNonWhitespace);
+        }
+        #endregion
+        #region Method: bool IsHyphenBreak(sWord, iPosWithinWord)
+        public bool IsHyphenBreak(string s, int iPos)
+        /* OK, this is quick-and-dirty, to see if I can get a simple hyphenation
+         * support working. I will need to do more than this. But this implementation
+         * will be that I can hyphen if:
+         * - I'm four letters from either end of a word
+         * - I'm located at a consonant
+         * - The preveeding letter is not a consonant
+         * 
+         * E.g., this is a V-C type of rule.
+         * 
+         * I'm going to need to install that ICU stuff (sigh) to do this right.
+         * Pity the poor user that must download it.
+         * 
+         * Or maybe I can do something where users can enter rules for simple
+         * stuff. Joe tells me that Huichol hyphens after CV's. So saying CV-
+         * plus enumerating the consonants is sufficient for Huichol.
+         */
+        {
+            // Don't bother if automated hyphenation is not turned on
+            if (UseAutomatedHyphenation == false)
+                return false;
+
+            // 1 - Don't be too close to an end of a word
+            if (iPos < MinHyphenSplit)
+                return false;
+            if (iPos > s.Length - MinHyphenSplit)
+                return false;
+
+            // Find the position of the hyphen in our string
+            var iHyphenPos = HyphenationCVPattern.IndexOf('-');
+            if (-1 == iHyphenPos)
+                return false;
+
+            // Get the pattern string, minus the hyphen
+            var sPattern = HyphenationCVPattern.Remove(iHyphenPos, 1);
+
+            // Determine where to start, and if we have room for the test
+            var iStart = iPos - iHyphenPos;
+            if (iStart < 0)
+                return false;
+            var cPositions = sPattern.Length;
+            if (iStart + cPositions > s.Length)
+                return false;
+
+            // Check against our pattern
+            for (var k = 0; k < cPositions; k++)
+            {
+                var chPattern = sPattern[k];
+                var chTest = s[iStart + k];
+
+                // Sitting on a consonant?
+                if (char.ToUpper(chPattern) == 'C')
+                {
+                    if (Consonants.IndexOf(char.ToLower(chTest)) == -1)
+                        return false;
+                }
+
+                // Sitting on a vowel?
+                if (char.ToUpper(chPattern) != 'V') 
+                    continue;
+                if (Consonants.IndexOf(char.ToLower(chTest)) != -1)
+                    return false;
+            }
+
+            return true;
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         public const string DefaultWritingSystemName = "Latin";
         #region Constructor()
         public WritingSystem()
         {
-            m_bsaAutoReplaceSource = new BStringArray();
-            m_bsaAutoReplaceResult = new BStringArray();
+            string[] rgSource = 
+			{ 
+				// `V
+				"`a",     "`A",     "`e",     "`E",     "`i",     "`I",   
+				"`o",     "`O",     "`u",     "`U" ,
+				// ^V
+				"^a",     "^A",     "^e",     "^E",     "^i",     "^I",   
+				"^o",     "^O",     "^u",     "^U"   
+			};
+            string[] rgResult = 
+			{ 
+				// `V
+				"\u00E0", "\u00C0", "\u00E8", "\u00C8", "\u00EC", "\u00CC", 
+				"\u00F2", "\u00D2", "\u00F9", "\u00D9",
+				// ^V
+				"\u00E1", "\u00C1", "\u00E9", "\u00C9", "\u00ED", "\u00CD", 
+				"\u00F3", "\u00D3", "\u00FA", "\u00DA" 
+			};
+
+            m_bsaAutoReplaceSource = new BStringArray(rgSource);
+            m_bsaAutoReplaceResult = new BStringArray(rgResult);
+
+            BuildAutoReplace();  
+        }
+        #endregion
+        #region SMethod: int SortCompare(WritingSystem x, WritingSystem y)
+        public static int SortCompare(WritingSystem x, WritingSystem y)
+        {
+            return string.Compare(x.Name, y.Name);
         }
         #endregion
 

@@ -59,15 +59,6 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region SAttr{g}: static public DStyleSheet StyleSheet
-        static public DStyleSheet StyleSheet
-        {
-            get
-            {
-                return TeamSettings.OldStyleSheet;
-            }
-        }
-        #endregion
 
         #region SAttr{g}: DTranslation FrontTranslation
         static public DTranslation FrontTranslation

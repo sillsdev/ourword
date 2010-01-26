@@ -47,8 +47,8 @@ namespace OurWordTests.Edit
         #endregion
         Form m_Form;
         DSection m_section;
-        #region VAttr{g}: JWritingSystem WSVernacular
-        JWritingSystem WSVernacular
+        #region VAttr{g}: WritingSystem WSVernacular
+        WritingSystem WSVernacular
         {
             get
             {

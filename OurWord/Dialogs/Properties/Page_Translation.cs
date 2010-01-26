@@ -597,9 +597,9 @@ namespace OurWord.Dialogs
         void BuildLiterateSettings()
         {
             // Get the list of currently-defined writing systems
-            var vsWritingSystems = new string[DB.StyleSheet.WritingSystems.Count];
-            for (var i = 0; i < DB.StyleSheet.WritingSystems.Count; i++)
-                vsWritingSystems[i] = DB.StyleSheet.WritingSystems[i].Name;
+            var vsWritingSystems = new string[StyleSheet.WritingSystems.Count];
+            for (var i = 0; i < StyleSheet.WritingSystems.Count; i++)
+                vsWritingSystems[i] = StyleSheet.WritingSystems[i].Name;
 
             // Writing Systems
             var sGroupWritingSystems = G.GetLoc_String("kWritingSystems", "Writing Systems");

@@ -20,6 +20,7 @@ using System.Windows.Forms;
 
 using JWTools;
 using OurWordData;
+using OurWordData.Styles;
 
 #endregion
 #endregion
@@ -73,8 +74,8 @@ namespace OurWordData.DataModel
 		}
 		eBookReadException m_BookReadError;
 		#endregion
-        #region Attr{g}: JWritingSystem WritingSystem
-        JWritingSystem WritingSystem
+        #region Attr{g}: WritingSystem WritingSystem
+        WritingSystem WritingSystem
         {
             get
             {
@@ -82,7 +83,7 @@ namespace OurWordData.DataModel
                 return m_WritingSystem;
             }
         }
-        JWritingSystem m_WritingSystem = null;
+        WritingSystem m_WritingSystem = null;
         #endregion
 
         static Size  s_SaveWindowSize = new Size(0,0);
@@ -192,7 +193,7 @@ namespace OurWordData.DataModel
             m_AnErrorOccured.Text = LocDB.Insert(sBase, new string[] { BookName });
 
             // Use a slightly larger font than the system font for better readability of diacritics
-            DataFile.Font = DStyleSheet.LargeDialogFont;
+            DataFile.Font = StyleSheet.LargeDialogFont;
 
 			// Place the error message into the control
 			ErrorText = BookReadError.UserMessage;
@@ -658,7 +659,7 @@ namespace OurWordData.DataModel
 			base.cmdLoad(sender, e);
 
 			// Use a slightly larger font than the system font for better readability of diacritics
-            FrontFile.Font = DStyleSheet.LargeDialogFont;
+            FrontFile.Font = StyleSheet.LargeDialogFont;
 
 			// Front Path
 			m_FrontPathName.Text = FrontPathName;

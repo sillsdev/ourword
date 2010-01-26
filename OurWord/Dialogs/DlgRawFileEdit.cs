@@ -21,6 +21,8 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -68,7 +70,7 @@ namespace OurWord.Dialogs
             Text = Text + " - " + Book.StorageFileName;
 
             // Use a slightly larger font than the system font for better readability of diacritics
-            DataFile.Font = DStyleSheet.LargeDialogFont;
+            DataFile.Font = StyleSheet.LargeDialogFont;
 
             // Hanging indent so the lines are easy to see
             DataFile.SelectionHangingIndent = 20;

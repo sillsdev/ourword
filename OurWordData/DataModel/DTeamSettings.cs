@@ -209,16 +209,6 @@ namespace OurWordData.DataModel
 		#endregion
 
 		// JAttrs ----------------------------------------------------------------------------
-		#region JAttr{g}: DStyleSheet StyleSheet
-		public DStyleSheet OldStyleSheet
-		{
-			get 
-			{ 
-				return m_StyleSheet.Value; 
-			}
-		}
-		private JOwn<DStyleSheet> m_StyleSheet = null;  
-		#endregion
 		#region JAttr{g}: DSFMapping SFMapping
 		public DSFMapping SFMapping
 		{
@@ -267,9 +257,6 @@ namespace OurWordData.DataModel
 			// Our Default Display Name is simply "Our Word." Since this is the name of the
 			// cluster, users will likely change it to something more meaningful, like "Timor"
             DisplayName = LanguageResources.AppTitle;
-
-			// Style Sheet
-			m_StyleSheet = new JOwn<DStyleSheet>("StyleSheet", this);
 
             // Stages
             m_Stages = new StageList();
@@ -329,18 +316,16 @@ namespace OurWordData.DataModel
             // to make sure it reflects our current needs, as OurWord may change 
         {
             // Style Sheet
-            if (null == m_StyleSheet.Value)
-                m_StyleSheet.Value = new DStyleSheet();
-            OldStyleSheet.Initialize(false);
+            StyleSheet.EnsureFactoryInitialized();
 
 			// Make sure we have writing systems for the current project. Just create
 			// blank ones if we need to.
 			if (null != DB.Project)
 			{
-				foreach (DTranslation t in DB.Project.AllTranslations)
+				foreach (var t in DB.Project.AllTranslations)
 				{
-					OldStyleSheet.FindOrAddWritingSystem(t.WritingSystemVernacular.Name);
-					OldStyleSheet.FindOrAddWritingSystem(t.WritingSystemConsultant.Name);
+					StyleSheet.FindOrCreate(t.WritingSystemVernacular.Name);
+                    StyleSheet.FindOrCreate(t.WritingSystemConsultant.Name);
 				}
 			}
 
@@ -499,7 +484,8 @@ namespace OurWordData.DataModel
 	}
 	#endregion
 
-	#region CLASS: DStyleSheet : JStyleSheet
+	#region CLASS: DStyleSheet : JStyleSheet - GONE
+    /*
 	public class DStyleSheet : JStyleSheet
 	{
 		// Scaffolding -----------------------------------------------------------------------
@@ -586,364 +572,18 @@ namespace OurWordData.DataModel
                 JWritingSystem wsLatin = FindOrAddWritingSystem(c_Latin);
             }
 
-			/***
-			 * I HAD THESE in OurWord 1.0, but think it better to not do them
-			 * any longer; users try to delete them but they keep coming back
-			 * if I leave them here....and they are meaningless for most people.
-			 * 
-			// Chinese
-            if (null == FindWritingSystem("Chinese"))
-            {
-                JWritingSystem wsChinese = FindOrAddWritingSystem("Chinese");
-                wsChinese.IsIdeaGraph = true;
-            }
-
-			// Aboriginal languages
-            if (null == FindWritingSystem("Aboriginal"))
-            {
-                JWritingSystem wsAboriginal = FindOrAddWritingSystem("Aboriginal");
-            }
-
-			// Northern Nigeria
-            if (null == FindWritingSystem("Nigeria"))
-            {
-                JWritingSystem wsDoulos = FindOrAddWritingSystem("Nigeria");
-            }
-			***/
-		}
-		#endregion
-		#region Method: void _InitializeParagraphStyles() - GONE
-        /*
-		private void _InitializeParagraphStyles()
-		{
-			JParagraphStyle style;
-
-            // DONE ---------------------------------------------------------------------------
-			// Running Header (h)
-			if (null == FindParagraphStyle(c_sfmRunningHeader))
-			{
-                style = AddParagraphStyle(c_sfmRunningHeader, "Running Header");
-				style.SetFonts(10, true);
-				style.IsJustified = true;
-			}
-
-			// Main Book Title (mt)
-            if (null == FindParagraphStyle(c_sfmBookTitle))
-			{
-                style = AddParagraphStyle(c_sfmBookTitle, "Book Title");
-				style.SetFonts(16, true);
-				style.IsCentered = true;
-				style.KeepWithNext = true;
-                style.SpaceAfter = 9;
-			}
-
-			// Book SubTitle (st)
-            if (null == FindParagraphStyle(c_sfmBookSubTitle))
-			{
-                style = AddParagraphStyle(c_sfmBookSubTitle, "Book SubTitle");
-				style.SetFonts(14, true);
-				style.IsCentered = true;
-				style.KeepWithNext = true;
-                style.SpaceAfter = 9;
-			}
-
-            // Major Section header (ms)
-            if (null == FindParagraphStyle(c_sfmMajorSection))
-            {
-                style = AddParagraphStyle(c_sfmMajorSection, "Major Section Title");
-                style.SetFonts(14, true);
-                style.SpaceBefore = 12;
-                style.IsCentered = true;
-                style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-            }
-
-            // Major Section Cross Reference (mr)
-            if (null == FindParagraphStyle(c_sfmMajorSectionCrossRef))
-            {
-                style = AddParagraphStyle(c_sfmMajorSectionCrossRef, "Major Cross References");
-                style.SetFonts(10, false, true, false, false, Color.Black);
-                style.IsCentered = true;
-                style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-            }
-
-			// Section Header (s)
-            if (null == FindParagraphStyle(c_sfmSectionHead))
-			{
-                style = AddParagraphStyle(c_sfmSectionHead, "Section Title");
-				style.SetFonts(12, true);
-				style.SpaceBefore = 12;
-				style.IsCentered = true;
-				style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-			}
-
-            // Cross Reference (r)
-            if (null == FindParagraphStyle(c_sfmCrossReference))
-			{
-                style = AddParagraphStyle(c_sfmCrossReference, "Cross References");
-				style.SetFonts(10, false, true, false, false, Color.Black);
-				style.IsCentered = true;
-				style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-			}
-
-			// Section Header Level 2 (s2)
-            if (null == FindParagraphStyle(c_sfmSectionHeadMinor))
-			{
-                style = AddParagraphStyle(c_sfmSectionHeadMinor, "Section Title 2");
-				style.SetFonts(12, true);
-				style.SpaceBefore = 9;
-				style.IsCentered = true;
-				style.KeepWithNext = true;
-                style.SpaceAfter = 3;
-			}
-
-			// Normal paragraph (p)
-			if (null == FindParagraphStyle(c_sfmParagraph))
-			{
-				style = AddParagraphStyle(c_sfmParagraph, "Paragraph");
-				style.SetFonts(10, false);
-				style.IsJustified = true;
-			}
-
-			// Paragraph continuation (m)
-            if (null == FindParagraphStyle(c_sfmParagraphContinuation))
-			{
-                style = AddParagraphStyle(c_sfmParagraphContinuation, "Paragraph Continuation");
-				style.SetFonts(10, false);
-				style.IsJustified = true;
-			}
-
-			// Quote Level 1 (q)
-			if (null == FindParagraphStyle( c_sfmLine1 ))
-			{
-				style = AddParagraphStyle(c_sfmLine1, "Quote Level 1");
-				style.SetFonts(10, false);
-				style.LeftMargin = 0.2;
-				style.IsJustified = true;
-			}
-
-			// Quote Level 2 (q2)
-			if (null == FindParagraphStyle(c_sfmLine2))
-			{
-				style = AddParagraphStyle(c_sfmLine2, "Quote Level 2");
-				style.SetFonts(10, false);
-				style.LeftMargin = 0.4;
-				style.IsJustified = true;
-			}
-
-			// Quote Level 3 (q3)
-			if (null == FindParagraphStyle(c_sfmLine3))
-			{
-				style = AddParagraphStyle(c_sfmLine3, "Quote Level 3");
-                style.SetFonts(10, false);
-				style.LeftMargin = 0.6;
-				style.IsJustified = true;
-			}
-
-			// Centered quote (qc)
-			if (null == FindParagraphStyle(c_StyleQuoteCentered))
-			{
-				style = AddParagraphStyle(c_StyleQuoteCentered, "Centered Quote");
-                style.SetFonts(10, false);
-				style.LeftMargin = 0.2;
-				style.RightMargin = 0.2;
-			}
-
-            // Picture caption (cap)
-            if (null == FindParagraphStyle(c_StyleAbbrevPictureCaption))
-            {
-                style = AddParagraphStyle(c_StyleAbbrevPictureCaption, "Picture Caption");
-                style.SetFonts(10, false, true, false, false, Color.Black);
-                style.IsCentered = true;
-            }
-
-			// Footnote paragraph (ft)
-            if (null == FindParagraphStyle(c_StyleFootnote))
-			{
-                style = AddParagraphStyle(c_StyleFootnote, "Footnote Paragraph");
-                style.SetFonts(10, false);
-				style.IsJustified = true;
-                style.SpaceAfter = 3;
-            }
-
-            // Reference Translations
-            if (null == FindParagraphStyle(c_StyleReferenceTranslation))
-            {
-                style = AddParagraphStyle(c_StyleReferenceTranslation, "Reference Translation");
-                style.SetFonts(10, false);
-                style.IsJustified = true;
-                style.FirstLineIndent = -0.20;
-                style.LeftMargin = 0.20;
-            }
-
-            // Note Header
-            if (null == FindParagraphStyle(c_StyleNoteHeader))
-            {
-                style = AddParagraphStyle(c_StyleNoteHeader, "Note Header");
-                style.IsLeft = true;
-                style.SpaceBefore = 0;
-                style.SpaceAfter = 0;
-            }
-
-            // BELUM --------------------------------------------------------------------------
-            // Notes
-            if (null == FindParagraphStyle(c_StyleNoteDate))
-            {
-                style = AddParagraphStyle(c_StyleNoteDate, "Note Date");
-                style.IsRight = true;
-                style.SpaceBefore = 0;
-                style.SpaceAfter = 0;
-                style.SetFonts(9, false);
-            }
-            // Note Discussion
-            if (null == FindParagraphStyle(c_StyleAnnotationMessage))
-            {
-                style = AddParagraphStyle(c_StyleAnnotationMessage, "Note Discussion");
-                style.IsJustified = true;
-                style.SpaceBefore = 3;
-                style.SpaceAfter = 3;
-            }
-            // Note Paragraph (soon to be deprecated)
-            if (null == FindParagraphStyle(c_StyleNote))
-			{
-                style = AddParagraphStyle(c_StyleNote, "Note");
-				style.IsJustified = true;
-				style.FirstLineIndent = -0.20;
-				style.LeftMargin = 0.20;
-                style.SpaceAfter = 3;
-            }
-
-			// Consultant Note Paragraph (ntck)
-			if (null == FindParagraphStyle("ntck"))
-			{
-				style = AddParagraphStyle("ntck", "Note for Consultant");
-				style.IsJustified = true;
-                style.SpaceAfter = 3;
-            }
-
-            // SeeAlso Footnote paragraph (cft)
-            if (null == FindParagraphStyle("cft"))
-            {
-                style = AddParagraphStyle("cft", "SeeAlso Footnote Paragraph");
-                style.SetFonts(10, false);
-                style.IsJustified = true;
-                style.SpaceAfter = 3;
-            }
-
-            // UI Title
-            if (null == FindParagraphStyle("uiTitle"))
-            {
-                style = AddParagraphStyle("uiTitle", "UI Title");
-                style.SetFonts(18, true);
-                style.IsCentered = true;
-            }
-
-        }
-        */
-		#endregion
-
-        #region Method: void _InitializeCharacterStyles() - GONE
-        /*
-        private void _InitializeCharacterStyles()
-		{
-			JCharacterStyle charStyle;
-
-			// Note Character (ntc)
-			if (null == FindCharacterStyle("ntc"))
-			{
-				charStyle = AddCharacterStyle("ntc", "Note Character");
-				charStyle.SetFonts(10, false, false, false, false, Color.Navy);
-				charStyle.IsSuperScript = true;
-			}
 
 		}
-        */
 		#endregion
-
-        #region Method: void _InitializeUIParagraphStyles() - GONE
-        /*
-        private void _InitializeUIParagraphStyles()
-            // TODO: Move appropriate styles to this section
-        {
-            JParagraphStyle style;
-
-            // Merge Window: Header
-            if (null == FindParagraphStyle(c_PStyleMergeHeader))
-            {
-                style = AddParagraphStyle(c_PStyleMergeHeader, "Merge Window Header");
-                style.SetFonts(12, true);
-                style.SpaceAfter = 0;
-            }
-            // Merge Window: Paragraph
-            if (null == FindParagraphStyle(c_PStyleMergeParagraph))
-            {
-                style = AddParagraphStyle(c_PStyleMergeParagraph, "Merge Window Paragraph");
-                style.SetFonts(10, false);
-                style.Alignment = JParagraphStyle.AlignType.kJustified;
-            }
-
-            // ToolTip: Header
-            if (null == FindParagraphStyle(c_StyleToolTipHeader))
-            {
-                style = AddParagraphStyle(c_StyleToolTipHeader, "ToolTip Header");
-                style.SetFonts(10, false);
-                style.SpaceAfter = 0;
-                style.SpaceBefore = 0;
-            }
-            // ToolTip: Text
-            if (null == FindParagraphStyle(c_StyleToolTipText))
-            {
-                style = AddParagraphStyle(c_StyleToolTipText, "ToolTip Text");
-                style.SetFonts(9, true);
-                style.SpaceAfter = 0;
-                style.SpaceBefore = 5;
-            }
-            // General Translator Notes
-            if (null == FindParagraphStyle(c_StyleMessageContent))
-            {
-                style = AddParagraphStyle(c_StyleMessageContent, "Message Content");
-                style.SetFonts(9, true);
-                style.SpaceBefore = 0;
-                style.SpaceAfter = 0;
-                style.LeftMargin = 0.1;
-            }
-            if (null == FindParagraphStyle(c_StyleMessageHeader))
-            {
-                style = AddParagraphStyle(c_StyleMessageHeader, "Message Header");
-                style.SetFonts(9, true);
-                style.SpaceBefore = 0;
-                style.SpaceAfter = 0;
-            }
-
-        }
-        */
-        #endregion
-
 
 		#region Method: void Initialize(bool bClearOutPrevious)
 		public void Initialize(bool bClearOutPrevious)
 		{
-            /*
-			// Remove the previous data if asked. (Leave the Writing Systems alone for now,
-			// as we have the CurrentWS stuff going on.....and I think I'll just want to
-			// get rid of WS's anyway before too long.)
-			if (bClearOutPrevious)
-			{
-				ParagraphStyles.Clear();
-				CharacterStyles.Clear();
-			}
-            */
+
 
 			// Initialize the various parts of the stylesheet
 			_InitializeWritingSystems();
-            /*
-			_InitializeParagraphStyles();
-            _InitializeUIParagraphStyles();
-			_InitializeCharacterStyles();
-            */
+
 		}
 		#endregion
 
@@ -969,6 +609,7 @@ namespace OurWordData.DataModel
         #endregion
 
 	}
+    */
 	#endregion
 
 }

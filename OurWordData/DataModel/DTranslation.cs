@@ -21,6 +21,8 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData;
 using Chorus.merge;
+using OurWordData.Styles;
+
 #endregion
 #endregion
 
@@ -205,20 +207,20 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 		#region Attr{g}: JWritingSystem WritingSystemVernacular
-		public JWritingSystem WritingSystemVernacular
+		public WritingSystem WritingSystemVernacular
 		{
 			get 
-			{ 
-				return DB.StyleSheet.FindOrAddWritingSystem( VernacularWritingSystemName );
+			{
+                return StyleSheet.FindOrCreate(VernacularWritingSystemName);
 			}
 		}
 		#endregion
 		#region Attr{g}: JWritingSystem WritingSystemConsultant
-		public JWritingSystem WritingSystemConsultant
+		public WritingSystem WritingSystemConsultant
 		{
 			get 
-			{ 
-				return DB.StyleSheet.FindOrAddWritingSystem( ConsultantWritingSystemName );
+			{
+                return StyleSheet.FindOrCreate(ConsultantWritingSystemName);
 			}
 		}
 		#endregion
@@ -297,7 +299,6 @@ namespace OurWordData.DataModel
         // Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DTranslation()
-			: base()
 		{
             // LocDB.DB.PrimaryLanguage
 			// Complex basic attrs
@@ -312,8 +313,8 @@ namespace OurWordData.DataModel
             m_vBookList = new List<DBook>();
 
 			// Default Writing Systems
-			VernacularWritingSystemName = DStyleSheet.c_Latin;
-			ConsultantWritingSystemName = DStyleSheet.c_Latin;
+			VernacularWritingSystemName = WritingSystem.DefaultWritingSystemName;
+            ConsultantWritingSystemName = WritingSystem.DefaultWritingSystemName;
 		}
 		#endregion
 		#region Constructor(sDisplayName)
