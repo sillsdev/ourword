@@ -55,7 +55,7 @@ namespace OurWordTests
         {
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
             DB.Project.TargetTranslation = Translation;

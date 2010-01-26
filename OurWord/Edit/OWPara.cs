@@ -143,7 +143,7 @@ namespace OurWord.Edit
                 if (!CanRestructureParagraphs)
                     return false;
 
-                return Style.Map.IsScripture;
+                return Style.IsCannonicalScriptureText;
             }
         }
         #endregion
@@ -674,7 +674,7 @@ namespace OurWord.Edit
 
             // Get the font factory for everything in this DBT
             var style = t.Paragraph.Style;
-            var fontFactory = style.FindFontFactory(WritingSystem.Name);
+            var fontFactory = style.FindOrAddFontFactory(WritingSystem.Name);
 
             // Loop through all of the phrases in this DBasicText
             foreach (DPhrase phrase in phrases)

@@ -2481,7 +2481,7 @@ namespace OurWord
 
             // Team Settings: start with the factory default; load over it if a file already exists,
             // otherwise create the new cluster
-            project.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
             StyleSheet.Initialize(null);
 

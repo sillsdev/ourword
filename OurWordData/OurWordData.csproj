@@ -175,9 +175,6 @@
     <Compile Include="Cellar\JSeq.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Cellar\JStyleSheet.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Cellar\SfDB.cs">
       <SubType>Code</SubType>
     </Compile>

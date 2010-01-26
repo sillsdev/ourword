@@ -813,6 +813,9 @@ namespace OurWord.Dialogs
 
             foreach(var style in StyleSheet.StyleList)
             {
+                if (style.OnlyInUserInterface)
+                    continue;
+
                 var iImage = style.IsParagraphStyle ? 1 : 0;
                 var item = new ListViewItem(style.StyleName, iImage);
                 m_listStyles.Items.Add(item);

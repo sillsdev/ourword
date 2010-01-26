@@ -151,7 +151,7 @@ namespace OurWordTests.DataModel
             // Setup
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
             DB.Project.TargetTranslation = Translation;
@@ -184,7 +184,7 @@ namespace OurWordTests.DataModel
             // Set up a book
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Amarasi", "Latin", "Latin");
             DB.Project.TargetTranslation = Translation;
@@ -277,7 +277,7 @@ namespace OurWordTests.DataModel
             // Setup a project/translation/book
             DB.Project = new DProject("Waxhaw");
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.InitialCreation(new NullProgress());
             DTranslation translation = new DTranslation("Waxhaw", "Latin", "Latin");
             DB.Project.FrontTranslation = translation;

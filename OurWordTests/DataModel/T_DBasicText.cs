@@ -37,7 +37,7 @@ namespace OurWordTests.DataModel
             TestCommon.GlobalTestSetup();
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
         }
         #endregion

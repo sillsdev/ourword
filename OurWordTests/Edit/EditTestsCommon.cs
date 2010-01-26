@@ -144,7 +144,7 @@ namespace OurWordTests.Edit
             OurWordMain.App = new OurWordMain();
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             s_book = new DBook("MRK");

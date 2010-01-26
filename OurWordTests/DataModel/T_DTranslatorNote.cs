@@ -406,7 +406,7 @@ namespace OurWordTests.DataModel
 
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Test Project";
             DB.Project.TargetTranslation = new DTranslation();
 

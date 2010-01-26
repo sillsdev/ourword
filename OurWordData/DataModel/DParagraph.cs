@@ -68,8 +68,8 @@ namespace OurWordData.DataModel
 		}
 		private bool m_AddedByCluster = false;
 		#endregion
-
-	    public ParagraphStyle Style
+        #region Attr{g}: ParagraphStyle Style
+        public ParagraphStyle Style
 	    {
 	        get
 	        {
@@ -82,9 +82,10 @@ namespace OurWordData.DataModel
                 m_style = value;
             }
 	    }
-	    protected ParagraphStyle m_style;
+	    private ParagraphStyle m_style;
+        #endregion
 
-		// Run-Time Only Attrs: Chapter / Verse ----------------------------------------------
+        // Run-Time Only Attrs: Chapter / Verse ----------------------------------------------
 		#region Attr{g}: int ChapterI - the initial chapter number of this paragraph
 		public int ChapterI
 		{
@@ -1363,86 +1364,6 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 
-        /*
-        // I/O -------------------------------------------------------------------------------
-        const string c_sAttrContents = "Contents";
-        const string c_sAttrBT = "BT";
-        #region OMethod: XElement ToXml(bool bIncludeNonBasicAttrs)
-        public override XElement ToXml(bool bIncludeNonBasicAttrs)
-        {
-            // Afraid of future changes to the class definition. This first assertion means
-            // that the only JAttr we have is Runs.
-            Debug.Assert(AllAttrs.Count == 1);
-            // This next assertion means we have exactly two BAttrs (OID and StyleAbbrev)
-            Debug.Assert(BAttrCount == 1);
-            // If any of this changes, then ToXml and FromXml will need to be updated.
-
-            // If we have exactly one DText, and no other runs, then we do a shorter
-            // output, in order to make the disk files a bit more human readable
-            // and concise.
-            // So first we test to see if the condition applies. If it doesn't, then
-            // we let the normal mechanism do the work.
-            bool bCanShorthand = (Runs.Count == 1 && Runs[0] as DText != null);
-            if (!bCanShorthand)
-                return base.ToXml(bIncludeNonBasicAttrs);
-
-            // Create the XElement for this object
-            XElement x = new XElement(GetType().Name);
-
-            // Do the basic attributes
-            x.AddAttr("Abbrev", Style.StyleName);
-
-            // Do our one-and-only DText
-            DText text = Runs[0] as DText;
-            string sContents = text.Phrases.ToSaveString;
-            string sBT = text.PhrasesBT.ToSaveString;
-            x.AddAttr(c_sAttrContents, sContents);
-            if (!string.IsNullOrEmpty(sBT))
-                x.AddAttr(c_sAttrBT, sBT);
-
-            // Done
-            return x;
-        }
-        #endregion
-        #region OMethod: void FromXml(XElement x)
-        public override void FromXml(XElement x)
-        {
-            // If we have no subitems, ite means we used our special override of ToXml
-            // Thus if we have subitems, then we let the base method take care of it.
-            if (x.Items.Count > 0)
-            {
-                base.FromXml(x);
-                return;
-            }
-
-            // We want exactly one DText
-            Clear();
-            DText text = new DText();
-            Runs.Append(text);
-
-            // So if we are here, we do the reverse of ToXml
-            // First, get the abbrev
-            XElement.XAttr attr = x.FindAttr("Abbrev");
-            if (null != attr)
-                m_sStyleAbbrev = attr.Value;
-
-            // Retrieve the contents
-            attr = x.FindAttr(c_sAttrContents);
-            if (null != attr)
-                text.Phrases.FromSaveString(attr.Value);
-            else
-                text.Phrases.Append(new DPhrase(""));
-
-            // Retrieve the back translation
-            attr = x.FindAttr(c_sAttrBT);
-            if (null != attr)
-                text.PhrasesBT.FromSaveString(attr.Value);
-            else
-                text.PhrasesBT.Append(new DPhrase(""));
-        }
-        #endregion
-        */
-
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagParagraph = "p";
         const string c_sAttrStyle = "class";
@@ -1530,7 +1451,7 @@ namespace OurWordData.DataModel
 
             oxes.AddAttr(nodeParagraph, c_sAttrStyle, Style.StyleName);
 
-            oxes.AddAttr(nodeParagraph, c_sAttrUsfm, Style.Map.UsfmMarker);
+            oxes.AddAttr(nodeParagraph, c_sAttrUsfm, Style.UsfmMarker);
 
             foreach (DRun run in Runs)
                 run.SaveToOxesBook(oxes, nodeParagraph);

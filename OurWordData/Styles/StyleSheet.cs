@@ -79,7 +79,8 @@ namespace OurWordData.Styles
                 {
                     DefaultFontSize = 12,
                     DefaultFontStyle = FontStyle.Bold
-                }
+                },
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region CharacterStyle Label
@@ -89,7 +90,8 @@ namespace OurWordData.Styles
                 OriginalStyle = new CharacterStyle(CharacterStyle.c_sOriginalStyle)
                 {
                     FontColor = Color.Crimson
-                }
+                },
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
 
@@ -103,9 +105,7 @@ namespace OurWordData.Styles
                     DefaultFontStyle = FontStyle.Bold,
                     Alignment = ParagraphStyle.Align.Justified
                 },
-                Map = new ParagraphStyle.Mapping("h")
-                {
-                }
+                UsfmMarker = "h"
             };
         #endregion
         #region ParagraphStyle BookTitle
@@ -120,9 +120,7 @@ namespace OurWordData.Styles
                     PointsAfter = 9,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("mt")
-                {
-                }
+                UsfmMarker = "mt"
             };
         #endregion
         #region ParagraphStyle BookSubTitle
@@ -137,10 +135,8 @@ namespace OurWordData.Styles
                     PointsAfter = 9,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("mt2")
-                {
-                    ToolboxMarker = "st"
-                }
+                UsfmMarker = "mt2",
+                ToolboxMarker = "st"
             };
         #endregion
         #region ParagraphStyle MajorSection
@@ -156,9 +152,7 @@ namespace OurWordData.Styles
                     PointsAfter = 3,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("ms")
-                {
-                }
+                UsfmMarker = "ms",
             };
         #endregion
         #region ParagraphStyle MajorSectionCrossReference
@@ -172,9 +166,7 @@ namespace OurWordData.Styles
                     PointsAfter = 3,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("mr")
-                {
-                }
+                UsfmMarker = "mr",
             };
         #endregion
         #region ParagraphStyle Section
@@ -190,10 +182,8 @@ namespace OurWordData.Styles
                     PointsAfter = 3,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("s1")
-                {
-                    ToolboxMarker = "s"
-                }
+                UsfmMarker = "s1",
+                ToolboxMarker = "s"
             };
         #endregion
         #region ParagraphStyle SectionCrossReference
@@ -207,9 +197,7 @@ namespace OurWordData.Styles
                     PointsAfter = 3,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("r")
-                {
-                }
+                UsfmMarker = "r"
             };
         #endregion
         #region ParagraphStyle MinorSection
@@ -225,9 +213,7 @@ namespace OurWordData.Styles
                     PointsAfter = 3,
                     KeepWithNextParagraph = true
                 },
-                Map = new ParagraphStyle.Mapping("s2")
-                {
-                }
+                UsfmMarker = "s2"
             };
         #endregion
 
@@ -240,10 +226,8 @@ namespace OurWordData.Styles
                 {
                     Alignment = ParagraphStyle.Align.Justified 
                 },
-                Map = new ParagraphStyle.Mapping("p") 
-                {
-                    IsScripture = true 
-                }
+                Uses = CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "p"
            };
         #endregion
         #region ParagraphStyle ParagraphContinuation
@@ -254,10 +238,8 @@ namespace OurWordData.Styles
                 {
                     Alignment = ParagraphStyle.Align.Justified 
                 },
-                Map = new ParagraphStyle.Mapping("m") 
-                {
-                    IsScripture = true
-                }
+                Uses = CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "m"
             };
         #endregion
         #region ParagraphStyle Line1
@@ -269,12 +251,10 @@ namespace OurWordData.Styles
                     Alignment = ParagraphStyle.Align.Justified,
                     LeftMarginInches = 0.2
                 },
-                Map = new ParagraphStyle.Mapping("q1")
-                {
-                    ToolboxMarker = "q",
-                    IsScripture = true,
-                    IsPoetry = true
-                }
+                Uses = CharacterStyle.Usage.IsScripturePoetry | 
+                       CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "q1",
+                ToolboxMarker = "q"
             };
         #endregion
         #region ParagraphStyle Line2
@@ -286,11 +266,9 @@ namespace OurWordData.Styles
                     Alignment = ParagraphStyle.Align.Justified,
                     LeftMarginInches = 0.4
                 },
-                Map = new ParagraphStyle.Mapping("q2")
-                {
-                    IsScripture = true,
-                    IsPoetry = true
-                }
+                Uses = CharacterStyle.Usage.IsScripturePoetry |
+                       CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "q2",
             };
         #endregion
         #region ParagraphStyle Line3
@@ -302,11 +280,9 @@ namespace OurWordData.Styles
                     Alignment = ParagraphStyle.Align.Justified,
                     LeftMarginInches = 0.6
                 },
-                Map = new ParagraphStyle.Mapping("q3")
-                {
-                    IsScripture = true,
-                    IsPoetry = true
-                }
+                Uses = CharacterStyle.Usage.IsScripturePoetry |
+                       CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "q3",
             };
         #endregion
         #region ParagraphStyle LineCentered
@@ -319,11 +295,9 @@ namespace OurWordData.Styles
                     LeftMarginInches = 0.2,
                     RightMarginInches = 0.2
                 },
-                Map = new ParagraphStyle.Mapping("qc")
-                {
-                    IsScripture = true,
-                    IsPoetry = true
-                }
+                Uses = CharacterStyle.Usage.IsScripturePoetry |
+                       CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "qc",
             };
         #endregion
         #region ParagraphStyle PictureCaption
@@ -335,10 +309,8 @@ namespace OurWordData.Styles
                     DefaultFontStyle = FontStyle.Italic,
                     Alignment = ParagraphStyle.Align.Centered
                 },
-                Map = new ParagraphStyle.Mapping("fig")
-                {
-                    ToolboxMarker = "cap"
-                }
+                UsfmMarker = "fig",
+                ToolboxMarker = "cap"
             };
         #endregion
         #region ParagraphStyle Footnote
@@ -350,10 +322,8 @@ namespace OurWordData.Styles
                     Alignment = ParagraphStyle.Align.Justified,
                     PointsAfter = 3
                 },
-                Map = new ParagraphStyle.Mapping("f")
-                {
-                    ToolboxMarker = "fn"
-                }
+                UsfmMarker = "f",
+                ToolboxMarker = "fn"
             };
         #endregion
 
@@ -369,10 +339,7 @@ namespace OurWordData.Styles
                     PointsBefore = 3,
                     PointsAfter = 3
                 },
-                Map = new ParagraphStyle.Mapping("LitParagraph")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle LiterateHeading
@@ -387,10 +354,7 @@ namespace OurWordData.Styles
                     PointsBefore = 6,
                     PointsAfter = 3
                 },
-                Map = new ParagraphStyle.Mapping("LitHeading")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle LiterateAttention
@@ -406,10 +370,7 @@ namespace OurWordData.Styles
                     PointsBefore = 3,
                     PointsAfter = 3
                 },
-                Map = new ParagraphStyle.Mapping("LitAttention")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle LiterateList
@@ -425,10 +386,7 @@ namespace OurWordData.Styles
                     PointsAfter = 0,
                     Bulleted = true
                 },
-                Map = new ParagraphStyle.Mapping("LitList")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
 
@@ -444,10 +402,7 @@ namespace OurWordData.Styles
                     FirstLineIndentInches = -0.20,
                     LeftMarginInches = 0.20
                 },
-                Map = new ParagraphStyle.Mapping("ReferenceTranslation")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle TipHeader
@@ -460,10 +415,7 @@ namespace OurWordData.Styles
                     PointsBefore = 0,
                     PointsAfter = 0
                 },
-                Map = new ParagraphStyle.Mapping("TipHeader")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle TipContent
@@ -479,10 +431,7 @@ namespace OurWordData.Styles
                     PointsAfter = 0,
                     LeftMarginInches = 0.1
                 },
-                Map = new ParagraphStyle.Mapping("TipContent")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle TipText
@@ -497,10 +446,7 @@ namespace OurWordData.Styles
                     PointsBefore = 5,
                     PointsAfter = 0
                 },
-                Map = new ParagraphStyle.Mapping("TipText")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
         #region ParagraphStyle TipMessage
@@ -513,10 +459,7 @@ namespace OurWordData.Styles
                     PointsBefore = 3,
                     PointsAfter = 3
                 },
-                Map = new ParagraphStyle.Mapping("TipNoteDiscussion")
-                {
-                    IsUserInterface = true
-                }
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
 
@@ -553,7 +496,7 @@ namespace OurWordData.Styles
                 var paragraphStyle = style as ParagraphStyle;
                 if (null == paragraphStyle)
                     continue;
-                if (paragraphStyle.Map.ToolboxMarker == sMarker)
+                if (paragraphStyle.ToolboxMarker == sMarker)
                     return paragraphStyle;
             }
             return null;
@@ -568,7 +511,7 @@ namespace OurWordData.Styles
         #endregion
 
         // List of Writing Systems -----------------------------------------------------------
-        static public WritingSystem DefaultWritingSystem;
+        static private WritingSystem DefaultWritingSystem;
         #region SAttr{g}: List<WritingSystem> WritingSystems
         static public List<WritingSystem> WritingSystems
         {
@@ -736,7 +679,8 @@ namespace OurWordData.Styles
         #endregion
         static public void Initialize(string sPath)
         {
-            // Start with no writing systems
+            // Start with no writing systems; otherwise we might be keeping around some
+            // from a previously loaded project.
             s_WritingSystems = null;
 
             // Attenpt to load and read the Xml stylesheet (an empty path is ignored)

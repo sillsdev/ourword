@@ -311,7 +311,7 @@ namespace OurWordData.DataModel
 		}
 		#endregion
         #region void EnsureInitialized()
-        public void EnsureInitialized()
+        public static void EnsureInitialized()
             // This is re-entrant; we want to be able to scan an existing TeamSettings
             // to make sure it reflects our current needs, as OurWord may change 
         {
@@ -479,134 +479,6 @@ namespace OurWordData.DataModel
         }
         #endregion
 	}
-	#endregion
-
-	#region CLASS: DStyleSheet : JStyleSheet - GONE
-    /*
-	public class DStyleSheet : JStyleSheet
-	{
-		// Scaffolding -----------------------------------------------------------------------
-		#region Constructor()
-		public DStyleSheet()
-			: base()
-		{
-		}
-		#endregion
-
-		// Character Style Abbreviations -----------------------------------------------------
-        public const string c_StyleAbbrevPictureCaption   = "cap";
-        public const string c_StyleFootnote               = "ft";
-
-        // SFM Markers -----------------------------------------------------------------------
-        // Book Title / Header
-        public const string c_sfmRunningHeader          = "h";
-        public const string c_sfmBookTitle              = "mt";
-        public const string c_sfmBookSubTitle           = "st";
-        // Vernacular Paragraphs
-        public const string c_sfmMajorSection           = "ms";
-        public const string c_sfmMajorSectionCrossRef   = "mr";
-        public const string c_sfmSectionHead            = "s";
-        public const string c_sfmSectionHeadMinor       = "s2";
-        public const string c_sfmCrossReference         = "r";
-		public const string c_sfmParagraph              = "p";
-        public const string c_sfmParagraphContinuation  = "m";
-		public const string c_sfmLine1                  = "q";
-		public const string c_sfmLine2                  = "q2";
-		public const string c_sfmLine3                  = "q3";
-
-        // Other
-        public const string c_sfmTranslatorNote         = "tn";
-
-		// Paragraph Style Abbreviations -----------------------------------------------------
-        // Scripture Text
-
-        public const string c_StyleQuoteCentered          = "qc";
-        public const string c_StyleReferenceTranslation   = "RefTrans";
-
-        // Translator Notes
-        public const string c_StyleNoteHeader             = "NoteHeader";
-        public const string c_StyleNoteDate               = "NoteDate";
-        public const string c_StyleAnnotationMessage      = "NoteMessage";
-        public const string c_StyleNote                   = "nt";
-
-        public const string c_StyleToolTipText            = "ToolTipText";
-        public const string c_StyleToolTipHeader          = "ToolTipHeader";
-
-        public const string c_StyleMessageContent         = "MessageContent";
-        public const string c_StyleMessageHeader          = "MessageHeader";
-
-        // User-Interface Only
-        public const string c_PStyleMergeHeader = "MergeHeader";
-        public const string c_PStyleMergeParagraph = "MergeParagraph";
-
-		#region Method: bool IsQuoteStyle(string sAbbrev)
-		static public bool IsQuoteStyle(string sAbbrev)
-		{
-			if (sAbbrev == c_sfmLine1)
-				return true;
-			if (sAbbrev == c_sfmLine2)
-				return true;
-			if (sAbbrev == c_sfmLine3)
-				return true;
-			if (sAbbrev == c_StyleQuoteCentered)
-				return true;
-			return false;
-		}
-		#endregion
-
-        // Classifications -------------------------------------------------------------------
-
-
-		// Initialization --------------------------------------------------------------------
-        public const string c_Latin = "Latin";
-        public const string c_DefaultWritingSystem = c_Latin;
-		#region Method: void _InitializeWritingSystems()
-		private void _InitializeWritingSystems()
-		{
-			// A general-purpose writing system that will handle most situations
-            if (null == FindWritingSystem(c_Latin))
-            {
-                JWritingSystem wsLatin = FindOrAddWritingSystem(c_Latin);
-            }
-
-
-		}
-		#endregion
-
-		#region Method: void Initialize(bool bClearOutPrevious)
-		public void Initialize(bool bClearOutPrevious)
-		{
-
-
-			// Initialize the various parts of the stylesheet
-			_InitializeWritingSystems();
-
-		}
-		#endregion
-
-
-        #region SAttr{g}: Font LargeDialogFont
-        public static Font LargeDialogFont
-        // This font is used for examining raw oxes files. I use a slightly larger
-        // font due to the possible presence of diacritics which can otherwise be
-        // difficult to read.
-        {
-            get
-            {
-                if (null == s_LargeDialogFont)
-                {
-                    s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
-                        SystemFonts.DialogFont.Size * 1.2F,
-                        FontStyle.Regular);
-                }
-                return s_LargeDialogFont;
-            }
-        }
-        private static Font s_LargeDialogFont;
-        #endregion
-
-	}
-    */
 	#endregion
 
 }

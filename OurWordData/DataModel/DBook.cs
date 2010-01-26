@@ -2422,7 +2422,7 @@ namespace OurWordData.DataModel
 
             // Create an owning project, because currently stuff depends on having it
             DB.Project = new DProject("Merge") {TeamSettings = new DTeamSettings("Merge")};
-            DB.Project.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
 
             // Extract the book's Abbrev from the path
             var sBaseFileName = Path.GetFileNameWithoutExtension(mergeOrder.pathToOurs);

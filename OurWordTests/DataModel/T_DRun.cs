@@ -40,7 +40,7 @@ namespace OurWordTests.DataModel
             OurWordMain.App = new OurWordMain();
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
         }
         #endregion
 
@@ -418,7 +418,7 @@ namespace OurWordTests.DataModel
         {
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
 
             var oxes = new XmlDoc();
             var node = oxes.AddNode(null, "para");
@@ -447,7 +447,7 @@ namespace OurWordTests.DataModel
         {
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
 
             var oxes = new XmlDoc();
             var node = oxes.AddNode(null, "para");

@@ -41,7 +41,7 @@ namespace OurWordTests.DataModel
 
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
             DBook book = new DBook("MRK");
@@ -636,7 +636,7 @@ namespace OurWordTests.DataModel
             // Set up a hierarchy all the way down to our paragraph
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DTranslation Translation = new DTranslation("Translation", "Latin", "Latin");
             DB.Project.TargetTranslation = Translation;

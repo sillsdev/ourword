@@ -858,7 +858,7 @@ namespace OurWordData.DataModel
 			else
                 TeamSettings.New();
 			TeamSettings.TemporaryFixes();
-            TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             StyleSheet.Initialize(DB.TeamSettings.StyleSheetStoragePath);
 
             // Read the LoadOnDemand translation objects

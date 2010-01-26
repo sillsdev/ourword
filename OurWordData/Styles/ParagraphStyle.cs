@@ -195,21 +195,28 @@ namespace OurWordData.Styles
         #endregion
 
         // Mapping Information ---------------------------------------------------------------
+        public string UsfmMarker { get; set; }
+        #region Attr{g/s}: string ToolboxMarker
+        public string ToolboxMarker 
+        { 
+            get
+            {
+                return string.IsNullOrEmpty(m_sToolboxMarker) ? UsfmMarker : m_sToolboxMarker;
+            }
+            set
+            {
+                m_sToolboxMarker = value;
+            }
+        }
+        private string m_sToolboxMarker;
+        #endregion
+
+        /*
         #region CLASS: Mapping
         public class Mapping
         {
             public readonly string UsfmMarker;
             public string ToolboxMarker { get; set;}
-
-            // Scripture is, e.g., p, q1, q2; but isn't things like section heads, cross
-            // references, picture captions.
-            public bool IsScripture { get; set; }
-
-            // These styles are for things in the UI such as the Literate Settings paragraphs
-            public bool IsUserInterface { get; set; }
-
-            // Lines 1,2,3 and CenteredLine
-            public bool IsPoetry { get; set; }
 
             #region Constructor(sUsfmMarker)
             public Mapping(string sUsfmMarker)
@@ -237,6 +244,7 @@ namespace OurWordData.Styles
         }
         private Mapping m_Mapping;
         #endregion
+        */
 
         // Default (original, out-of-the-box) style ------------------------------------------
         #region OMethod: void ResetToOriginal()

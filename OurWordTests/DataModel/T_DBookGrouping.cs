@@ -44,7 +44,7 @@ namespace OurWordTests.DataModel
 
             // Create a project with a whole bunch of books
             m_TeamSettings = new DTeamSettings();
-            m_TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
 
             m_Project = new DProject();
             m_Project.TeamSettings = m_TeamSettings;

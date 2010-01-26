@@ -8,6 +8,7 @@
  *          or footnote letters.
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -48,6 +49,43 @@ namespace OurWordData.Styles
         private Color m_Color = Color.Black;
         #endregion
 
+        // Meta-data -------------------------------------------------------------------------
+        [Flags] public enum Usage
+        {
+            None = 0, 
+            OnlyInUserInterface = 1,       // E.g., Label or TextTip, as opposed to Scripture
+            IsScripturePoetry = 2,         // E.g., q, q2, q3, qc
+            IsCannonicalScriptureText = 4  // p, s2, m; but not organizational like v, c, s, mt
+        };
+        public Usage Uses = Usage.None;
+        #region VAttr{g}: bool OnlyInUserInterface
+        public bool OnlyInUserInterface
+        {
+            get
+            {
+                return ((Uses & Usage.OnlyInUserInterface) == Usage.OnlyInUserInterface);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsScripturePoetry
+        public bool IsScripturePoetry
+        {
+            get
+            {
+                return ((Uses & Usage.IsScripturePoetry) == Usage.IsScripturePoetry);
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsCannonicalScriptureText
+        public bool IsCannonicalScriptureText
+        {
+            get
+            {
+                return ((Uses & Usage.IsCannonicalScriptureText) == Usage.IsCannonicalScriptureText);
+            }
+        }
+        #endregion
+
         // FontFactories ---------------------------------------------------------------------
         #region Attr{g}: List<FontFactory> FontFactories
         public List<FontFactory> FontFactories
@@ -78,7 +116,7 @@ namespace OurWordData.Styles
         }
         #endregion
         #region Method: FontFactory FindOrAddFontFactory(sWritingSystemName)
-        protected FontFactory FindOrAddFontFactory(string sWritingSystemName)
+        public FontFactory FindOrAddFontFactory(string sWritingSystemName)
         {
             var factory = FindFontFactory(sWritingSystemName);
 

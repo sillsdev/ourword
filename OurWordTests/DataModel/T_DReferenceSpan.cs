@@ -22,7 +22,7 @@ namespace OurWordTests.DataModel
 
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings();
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Test Project";
         }
         #endregion

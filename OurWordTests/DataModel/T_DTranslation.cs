@@ -41,7 +41,7 @@ namespace OurWordTests.DataModel
 
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings("Test");
-            DB.TeamSettings.EnsureInitialized();
+            DTeamSettings.EnsureInitialized();
         }
         #endregion
 

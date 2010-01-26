@@ -718,7 +718,7 @@ namespace OurWordData.DataModel
 		{
 			foreach(DParagraph p in Paragraphs)
 			{
-                if (p.Style.Map.IsPoetry)
+                if (p.Style.IsScripturePoetry)
 					return true;
 			}
 			return false;
@@ -1817,7 +1817,7 @@ namespace OurWordData.DataModel
                     StyleSheet.MajorSectionCrossReference
 			    };
                 if (vSimpleParagraphs.Contains(p.Style))
-                    return p.Style.Map.ToolboxMarker;
+                    return p.Style.ToolboxMarker;
 
 				// Otherwise, we want a \vt for verse text
 				return Map.MkrVerseText;
@@ -2222,7 +2222,7 @@ namespace OurWordData.DataModel
 				// already happened, so we just get another error (about section
 				// mismatches) down the road, with no good way to correct it.
                 DParagraph last = LastParagraph;
-                if (null == last || !Map.IsVernacularParagraph(last.Style.Map.ToolboxMarker))
+                if (null == last || !Map.IsVernacularParagraph(last.Style.ToolboxMarker))
                 {
                     throw new eBookReadException(
                         Loc.GetMessages("msgMissingParagraphMarker",
@@ -2276,7 +2276,7 @@ namespace OurWordData.DataModel
 					return false;
 
 				// Make sure the paragraph is a valid place for a See Also.
-				if ( ! Map.IsVernacularParagraph( LastParagraph.Style.Map.ToolboxMarker ) )
+				if ( ! Map.IsVernacularParagraph( LastParagraph.Style.ToolboxMarker ) )
 					throw new eBookReadException(
                         Loc.GetMessages( "msgMissingParagraphMarkerForCF",
                             "A cross-reference field (\\cf) was encountered but there was no " +
@@ -2359,10 +2359,10 @@ namespace OurWordData.DataModel
 					if ( AddSimple( field, Map.MkrSubTitle, Map.StyleSubTitle))
 						continue;
                     if ( AddSimple(field, Map.MkrMajorSection, 
-                        StyleSheet.MajorSection.Map.ToolboxMarker))
+                        StyleSheet.MajorSection.ToolboxMarker))
                         continue;
                     if ( AddSimple(field, Map.MkrMajorSectionCrossRef, 
-                        StyleSheet.MajorSectionCrossReference.Map.ToolboxMarker))
+                        StyleSheet.MajorSectionCrossReference.ToolboxMarker))
                         continue;
 
 					// Checking Status, DateStamp
@@ -2474,10 +2474,10 @@ namespace OurWordData.DataModel
 						continue;
 
 					// Vernacular (verse containing) and simple paragraphs
-					if (Map.IsVernacularParagraph(p.Style.Map.ToolboxMarker))
+					if (Map.IsVernacularParagraph(p.Style.ToolboxMarker))
 					{
                         // Create a field containing just the marker, e.g., \p
-                        SfField f = new SfField(p.Style.Map.ToolboxMarker);
+                        SfField f = new SfField(p.Style.ToolboxMarker);
                         SDB.Append(f);
 
                         // Add fields for the paragraph's individual runs
@@ -2554,14 +2554,14 @@ namespace OurWordData.DataModel
 			{
 				DParagraph p = Paragraphs[i] as DParagraph;
 
-				if ( ! Map.IsSectionEmptyReferenceStyle(p.Style.Map.ToolboxMarker) )
+				if ( ! Map.IsSectionEmptyReferenceStyle(p.Style.ToolboxMarker) )
 					continue;
 
 				for(int k = i + 1; k < Paragraphs.Count; k++)
 				{
 					DParagraph pNext = Paragraphs[k] as DParagraph;
 
-					if ( ! Map.IsSectionEmptyReferenceStyle(pNext.Style.Map.ToolboxMarker) )
+					if ( ! Map.IsSectionEmptyReferenceStyle(pNext.Style.ToolboxMarker) )
 					{
 						p.ChapterI = pNext.ChapterI;
 						p.VerseI   = pNext.VerseI;
