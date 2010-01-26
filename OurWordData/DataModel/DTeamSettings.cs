@@ -315,9 +315,6 @@ namespace OurWordData.DataModel
             // This is re-entrant; we want to be able to scan an existing TeamSettings
             // to make sure it reflects our current needs, as OurWord may change 
         {
-            // Style Sheet
-            StyleSheet.EnsureFactoryInitialized();
-
 			// Make sure we have writing systems for the current project. Just create
 			// blank ones if we need to.
 			if (null != DB.Project)

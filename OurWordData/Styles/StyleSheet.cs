@@ -568,29 +568,6 @@ namespace OurWordData.Styles
         #endregion
 
         // List of Writing Systems -----------------------------------------------------------
-
-        // Initialization -------------------------------------------------------------------- 
-
-        #region SMethod: void EnsureFactoryInitialized()
-        public static void EnsureFactoryInitialized()
-        {
-            EnsureFactoryWritingSystemsInitialized();
-
-            // The initialize process sets attributes, which in turn sets the dirty
-            // flag; so we need to clear it now that we're all done
-            s_bIsDirty = false;
-        }
-        #endregion
-
-
-        #region SMethod: void EnsureFactoryWritingSystemsInitialized()
-        static void EnsureFactoryWritingSystemsInitialized()
-        {
-            DefaultWritingSystem = FindOrCreate(WritingSystem.DefaultWritingSystemName);
-        }
-        #endregion
-
-        // WritingSystems --------------------------------------------------------------------
         static public WritingSystem DefaultWritingSystem;
         #region SAttr{g}: List<WritingSystem> WritingSystems
         static public List<WritingSystem> WritingSystems
@@ -598,39 +575,33 @@ namespace OurWordData.Styles
             get
             {
                 if (null == s_WritingSystems)
+                {
                     s_WritingSystems = new List<WritingSystem>();
+                    DefaultWritingSystem = FindOrCreate(WritingSystem.DefaultWritingSystemName);
+                    s_bIsDirty = false;
+                }
                 Debug.Assert(null != s_WritingSystems);
                 return s_WritingSystems;
             }
         }
         static private List<WritingSystem> s_WritingSystems;
         #endregion
-        #region SMethod: WritingSystem FindWritingSystem(sWritingSystemName)
-        static WritingSystem FindWritingSystem(string sWritingSystemName)
+        #region SMethod: WritingSystem FindOrCreate(sWritingSystemName)
+        static public WritingSystem FindOrCreate(string sWritingSystemName)
         {
-            foreach (var ws in WritingSystems)
+            // Return it if it is already in the list
+            foreach(var ws in WritingSystems)
             {
                 if (ws.Name == sWritingSystemName)
                     return ws;
             }
-            return null;
-        }
-        #endregion
-        #region SMethod: WritingSystem FindOrCreate(string sWritingSystemName)
-        static public WritingSystem FindOrCreate(string sWritingSystemName)
-        {
-            var ws = FindWritingSystem(sWritingSystemName);
 
-            if (null == ws)
-            {
-                ws = new WritingSystem {Name = sWritingSystemName};
-                WritingSystems.Add(ws);
-                SortWritingSystems();
-                DeclareDirty();
-            }
-
-            Debug.Assert(null != ws);
-            return ws;
+            // Otherwise create the new one and add it
+            var writingSystem = new WritingSystem {Name = sWritingSystemName};
+            WritingSystems.Add(writingSystem);
+            SortWritingSystems();
+            DeclareDirty();
+            return writingSystem;
         }
         #endregion
         #region SMethod: void SortWritingSystems()
@@ -639,13 +610,13 @@ namespace OurWordData.Styles
             WritingSystems.Sort(WritingSystem.SortCompare);
         }
         #endregion
-        #region SMethod: void RemoveWritingSystem(string sWritingSystem)
-        static public void RemoveWritingSystem(string sWritingSystem)
+        #region SMethod: void RemoveWritingSystem(WritingSystem)
+        static public void RemoveWritingSystem(WritingSystem writingSystem)
         {
-            var ws = FindWritingSystem(sWritingSystem);
-            if (null == ws)
+            if (-1 == WritingSystems.IndexOf(writingSystem))
                 return;
-            WritingSystems.Remove(ws);
+
+            WritingSystems.Remove(writingSystem);
         }
         #endregion
 
@@ -774,10 +745,6 @@ namespace OurWordData.Styles
             // The reading process sets attributes, which in turn sets the dirty
             // flag; so we need to clear it now that we're all done
             s_bIsDirty = false;
-
-            // Make sure the styles we expect are indeed in this stylesheet; anything added
-            // here will DeclareDirty and result in a save.
-            EnsureFactoryInitialized();
         }
         #endregion
 

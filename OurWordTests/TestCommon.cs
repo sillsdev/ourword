@@ -47,8 +47,6 @@ namespace OurWordTests
 
             // Set the resource location
             JWU.ResourceLocation = "OurWord.Res.";
-
-            StyleSheet.EnsureFactoryInitialized();
         }
         #endregion
 

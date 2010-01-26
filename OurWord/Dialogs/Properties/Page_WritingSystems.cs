@@ -445,7 +445,7 @@ namespace OurWord.Dialogs
 				return;
             
             // Remove it from the StyleSheet
-			StyleSheet.RemoveWritingSystem(WritingSystem.Name);
+			StyleSheet.RemoveWritingSystem(WritingSystem);
 
 			// Update the nav tree, and navigate to the Add page
             ParentDlg.InitNavigation(Page_AddWritingSystem.ComputeID());

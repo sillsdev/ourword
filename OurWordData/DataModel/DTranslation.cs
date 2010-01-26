@@ -206,7 +206,7 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: JWritingSystem WritingSystemVernacular
+		#region Attr{g}: WritingSystem WritingSystemVernacular
 		public WritingSystem WritingSystemVernacular
 		{
 			get 
@@ -215,7 +215,7 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: JWritingSystem WritingSystemConsultant
+		#region Attr{g}: WritingSystem WritingSystemConsultant
 		public WritingSystem WritingSystemConsultant
 		{
 			get 
