@@ -2326,8 +2326,16 @@ namespace OurWord
             // Init the Help system
             HelpSystem.Initialize(this, "OurWordHelp.chm");
 
-            // Retrieve the most recent item
-            string sPath = JW_Registry.GetValue(c_sLastProjectOpened, "" );
+            // Retrieve the most recent project
+            var sPath = JW_Registry.GetValue(c_sLastProjectOpened, "");
+
+            // If the most recent is blank, see if we have the Sample Project available
+            if (string.IsNullOrEmpty(sPath))
+            {
+                var clusterInfo = ClusterList.FindClusterInfo("OurWordSample");
+                if (null != clusterInfo)
+                    sPath = clusterInfo.GetProjectPath("Hawai'i Creole English");
+            }
 
 			// Read in the project
 			DB.Project = new DProject();
