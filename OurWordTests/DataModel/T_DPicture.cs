@@ -60,7 +60,7 @@ namespace OurWordTests.DataModel
             // Create a picture. 
             var pictureIn = new DPicture();
             section.Paragraphs.Append(pictureIn);
-            pictureIn.PathName = sPath;
+            pictureIn.RelativePathName = sPath;
             pictureIn.WordRtfInfo = sRtf;
             pictureIn.SimpleText = sCap;
             pictureIn.SimpleTextBT = sCapBT;
@@ -72,7 +72,7 @@ namespace OurWordTests.DataModel
             var pictureOut = DPicture.CreatePicture(nodePicture);
 
             // Should be identical
-            Assert.AreEqual(sPath, pictureOut.PathName);
+            Assert.AreEqual(sPath, pictureOut.RelativePathName);
             Assert.AreEqual(sRtf, pictureOut.WordRtfInfo);
             Assert.AreEqual(sCap, pictureOut.SimpleText);
             Assert.AreEqual(sCapBT, pictureOut.SimpleTextBT);

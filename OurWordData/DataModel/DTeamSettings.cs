@@ -416,7 +416,7 @@ namespace OurWordData.DataModel
                     return null;
 
 				// Make sure the folder exists
-				string sFolder = ClusterFolder + SettingsFolderName + Path.DirectorySeparatorChar;
+				var sFolder = ClusterFolder + SettingsFolderName + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(sFolder))
 					Directory.CreateDirectory(sFolder);
 
@@ -424,13 +424,13 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: string BackupFolder - Top-level, e.g., "MyDocuments\OurWord\Backup"
+		#region Attr{g}: string BackupFolder - Top-level, e.g., "MyDocuments\OurWord\.Backup"
 		public string BackupFolder
 		{
 			get
 			{
 				// Make sure the folder exists
-				string sFolder = ClusterFolder + BackupFolderName + Path.DirectorySeparatorChar;
+				var sFolder = ClusterFolder + BackupFolderName + Path.DirectorySeparatorChar;
 				if (!Directory.Exists(sFolder))
 					Directory.CreateDirectory(sFolder);
 
@@ -438,6 +438,18 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
+        #region Attr{g}: string PicturesFolder - Top-level, e.g., "MyDocuments\OurWord\.Pictures"
+        public string PicturesFolder
+        {
+            get
+            {
+                var sFolder = ClusterFolder + ".Pictures" + Path.DirectorySeparatorChar;
+                if (!Directory.Exists(sFolder))
+                    Directory.CreateDirectory(sFolder);
+                return sFolder;
+            }
+        }
+        #endregion
 		#region OAttr{g}: string StoragePath
 		public override string StoragePath
 		{

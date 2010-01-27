@@ -173,21 +173,6 @@ namespace OurWordData.DataModel
 
         // Options stored in the registry ----------------------------------------------------
         const string c_sSubKey = "Options";
-        const string c_keyPictureSearchPath = "PictureSearchPath";
-        #region SAttr{g/s}: string PictureSearchPath
-        static public string PictureSearchPath
-        {
-            get
-            {
-                return JW_Registry.GetValue(c_sSubKey, c_keyPictureSearchPath, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sSubKey, c_keyPictureSearchPath, value);
-            }
-        }
-        #endregion
-
         const string c_sRegistryName = "UserName";
         #region SAttr{g/s}: string UserName
         static public string UserName

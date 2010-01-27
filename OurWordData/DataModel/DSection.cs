@@ -994,17 +994,12 @@ namespace OurWordData.DataModel
 			foreach(DParagraph p in this.Paragraphs)
 			{
 				// Filter out everything that isn't a picture
-				DPicture pict = p as DPicture;
+				var pict = p as DPicture;
 				if (null == pict)
 					continue;
 
-				// If there is no directory, we'll consider this a problem (e.g., we
-				// can't locate the picture becquse no picture has been defined!)
-				if (pict.PathName.Length == 0)
-					return true;
-
 				// See if the picture exists
-				bool bFileExists = File.Exists(pict.PathName);
+				var bFileExists = File.Exists(pict.FullPathName);
 				if (!bFileExists)
 					return true;
 			}
@@ -1970,7 +1965,7 @@ namespace OurWordData.DataModel
 
 				// Add the data depending on the marker
                 if (DSFMapping.c_sMkrPicturePath == field.Mkr)
-                    pict.PathName = field.Data;
+                    pict.RelativePathName = field.Data;
 				if (DSFMapping.c_sMkrPictureWordRtf == field.Mkr)
 					pict.WordRtfInfo = field.Data;
                 if (DSFMapping.c_sMkrPictureCaption == field.Mkr)
@@ -1986,7 +1981,7 @@ namespace OurWordData.DataModel
 
 				DPicture pict = p as DPicture;
 
-                SfField fPath = new SfField(DSFMapping.c_sMkrPicturePath, pict.PathName);
+                SfField fPath = new SfField(DSFMapping.c_sMkrPicturePath, pict.FullPathName);
 				SDB.Append(fPath);
 
 				SDB.Append( new SfField(DSFMapping.c_sMkrPictureWordRtf,pict.WordRtfInfo));
@@ -3392,7 +3387,5 @@ namespace OurWordData.DataModel
             m.Run();
         }
         #endregion
-
-
     }
 }

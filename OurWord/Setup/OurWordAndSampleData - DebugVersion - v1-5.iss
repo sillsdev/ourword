@@ -20,7 +20,7 @@ Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: strin
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\MRU; ValueType: string; ValueData: 1; Flags: uninsdeletevalue createvalueifdoesntexist
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\MRU; ValueType: string; ValueData: {userdocs}\OurWordSample\Settings\OurWordSample.owp; Flags: uninsdeletevalue createvalueifdoesntexist; ValueName: 001
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!; ValueName: AppDir; ValueData: {app}; ValueType: string
-Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Options\; ValueType: string; ValueData: {userdocs}\OurWordSample\Pictures; Flags: createvalueifdoesntexist uninsdeletekey; ValueName: PictureSearchPath
+
 [Dirs]
 Name: {app}\Help
 [Setup]

@@ -287,7 +287,12 @@ namespace OurWordData.Synchronize
         #region Method: bool CheckUnrecognizedAddFiles()
         public bool CheckUnrecognizedAddFiles()
         {
-            var recognizedExtensions = new List<string> {".otrans", ".owp", ".owt", ".oxes"};
+            // Pictures seem to mostly be "tif" format now. 
+            var recognizedExtensions = new List<string> 
+            {
+                ".otrans", ".owp", ".owt", ".oxes", ".StyleSheet",
+                ".tif", ".pcx", ".jpg"
+            };
 
             // Get a list of the files that have changed
             var vsChangedFiles = GetChangedFiles();
@@ -359,7 +364,7 @@ namespace OurWordData.Synchronize
         private const string c_sVersionTag = "OurWordVersion";
         // 1 - setup of the initial feature
         // 2 - preventing AuSIL-TopEnd from being able to synch during case folding problem
-        // 3 - new Style implementation
+        // 3 - new Style implementation, Pictures
         public const int c_nCurrentVersionNo = 3;
         #region SAttr{g}: string TagContents
         public static string TagContents

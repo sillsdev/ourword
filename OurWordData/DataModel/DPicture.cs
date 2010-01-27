@@ -1,47 +1,51 @@
+#region ***** DPicture.cs *****
 /**********************************************************************************************
  * Project: Our Word!
  * File:    DPicture.cs
  * Author:  John Wimbish
  * Created: 26 Jan 2004
  * Purpose: Handles a picture (including its caption, caption BT, filename, etc.) 
+ * 
+ * Pictures are stored under the cluster's ".Pictures" folder, which may then hsve subfolders
+ * underneath. Thus in Oxes we store the relative path name (although on export to Toolbox
+ * we save an absolute path so that the pictures can be located by external software.) 
+ * 
+ * On encountering an absolute path, the Repair() method converts it to relative, and
+ * copies the pictures into the ".Pictures" folder (if not already there) so that it can
+ * be included in the repository.
+ * 
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
-using System.ComponentModel;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Windows.Forms;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 
 using JWTools;
-using OurWordData;
 using OurWordData.Styles;
-
 #endregion
 
 namespace OurWordData.DataModel
 {
 	public class DPicture : DParagraph
 	{
-		// BAttrs ----------------------------------------------------------------------------
-		#region BAttr{g/s}: string PathName - the path/file where the picture is stored
-		public string PathName
+        // BAttrs ----------------------------------------------------------------------------
+        #region BAttr{g/s}: string RelativePathName - the path/file where the picture is stored
+        public string RelativePathName
 		{
 			get
 			{
-				return m_sPathName;
+                return m_sRelativePathName;
 			}
 			set
 			{
-                SetValue(ref m_sPathName, value);
+                SetValue(ref m_sRelativePathName, value);
 			}
 		}
-		private string m_sPathName = "";
+        private string m_sRelativePathName = "";
 		#endregion
 		#region BAttr{g/s}: string WordRtfInfo - Info needed by Word to properly display the pic
 		public string WordRtfInfo
@@ -61,14 +65,14 @@ namespace OurWordData.DataModel
 		protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
-			DefineAttr("PathName",    ref m_sPathName);
+            DefineAttr("PathName", ref m_sRelativePathName);
 			DefineAttr("WordRtfInfo", ref m_sWordRtfInfo);
 		}
 		#endregion
 
 		// JAttrs ----------------------------------------------------------------------------
 		#region JAttr{g/s}: DReference Reference - the verse before this picture
-		public DReference Reference
+	    private DReference Reference
 		{
 			get 
 			{ 
@@ -79,30 +83,40 @@ namespace OurWordData.DataModel
                 j_Reference.Value.Copy(value);
 			}
 		}
-		private JOwn<DReference> j_Reference = null;
+		private readonly JOwn<DReference> j_Reference ;
 		#endregion
+        #region VAttr{g}: string FullPathName
+        public string FullPathName
+	    {
+	        get
+	        {
+                return Path.Combine(DB.TeamSettings.PicturesFolder, RelativePathName);
+	        }
+        }
+        #endregion
 
-		// Scaffolding -----------------------------------------------------------------------
+        // Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DPicture()
 			: base(StyleSheet.PictureCaption)
 		{
-			j_Reference = new JOwn<DReference>("Reference", this);
-			j_Reference.Value = new DReference();
+			j_Reference = new JOwn<DReference>("Reference", this) {Value = new DReference()};
 		}
 		#endregion
 		#region Method: override bool ContentEquals(obj) - required override to preventn duplicates
 		public override bool ContentEquals(JObject obj)
 		{
-			if (this.GetType() != obj.GetType())
+			if (GetType() != obj.GetType())
 				return false;
 
 			if (false == base.ContentEquals(obj))
 				return false;
 
-			DPicture picture = obj as DPicture;
+			var picture = obj as DPicture;
+            if (null == picture)
+                return false;
 
-			if (PathName != picture.PathName)
+			if (RelativePathName != picture.RelativePathName)
 				return false;
 
 			if (WordRtfInfo != picture.WordRtfInfo)
@@ -114,26 +128,26 @@ namespace OurWordData.DataModel
         #region Method: override void CopyFrom(DParagraph pFront, bTruncateText))
         public override void CopyFrom(DParagraph pFront, bool bTruncateText)
 		{
-			DPicture pictFront = pFront as DPicture;
+			var pictFront = pFront as DPicture;
 			Debug.Assert(null != pictFront);
 
 			// Copy the paragraph contents
             base.CopyFrom(pFront, bTruncateText);
 
 			// Copy the picture information from the Front's picture
-			PathName = pictFront.PathName;
+			RelativePathName = pictFront.RelativePathName;
 			WordRtfInfo = pictFront.WordRtfInfo;
 			Reference.Copy( pictFront.Reference );
 		}
 		#endregion
 
         // Methods ---------------------------------------------------------------------------
-        #region Method: Bitmap GetBitmapNotFound(Size size, string sFileName)
-        public Bitmap GetBitmapNotFound(Size size, string sFileName)
+        #region SMethod: Bitmap GetBitmapNotFound(Size size, string sFileName)
+	    private static Bitmap GetBitmapNotFound(Size size, string sFileName)
         {
-            Bitmap bmp = new Bitmap(size.Width, size.Height);
+            var bmp = new Bitmap(size.Width, size.Height);
 
-            Graphics g = Graphics.FromImage(bmp);
+            var g = Graphics.FromImage(bmp);
 
             // Solid white background
             g.FillRectangle(new SolidBrush(Color.White), 0, 0, bmp.Width, bmp.Height);
@@ -142,13 +156,13 @@ namespace OurWordData.DataModel
             g.DrawRectangle(new Pen(Color.Black), 1, 1, bmp.Width - 2, bmp.Height - 2);
 
             // Retrieve the message, typically "Unable to display "filename"".
-            string sMessage = "Unable to display \"" + sFileName + "\"";
+            var sMessage = "Unable to display \"" + sFileName + "\"";
 
             // Compute where it shall appear (centered)
-            Font font = SystemFonts.MenuFont;
-            SizeF szMessage = g.MeasureString(sMessage, font);
-            int x = (bmp.Width - (int)szMessage.Width) / 2;
-            int y = (bmp.Height - (int)szMessage.Height) / 2;
+            var font = SystemFonts.MenuFont;
+            var szMessage = g.MeasureString(sMessage, font);
+            var x = (bmp.Width - (int)szMessage.Width) / 2;
+            var y = (bmp.Height - (int)szMessage.Height) / 2;
 
             // Draw the string
             g.DrawString(sMessage, font, new SolidBrush(Color.Black), x, y);
@@ -160,45 +174,36 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method: bool _LocateThePicture()
-        bool _LocateThePicture()
+        bool LocateThePicture()
         {
             // If we have a zero pathname, then there is nothing to locate
-            if (string.IsNullOrEmpty(PathName))
+            if (string.IsNullOrEmpty(RelativePathName))
                 return false;
 
-            // See if we have the file on disk; we're done if we do.
-            if (File.Exists(PathName))
+            // We want to move pictures from C:\graphics to be underneath ".Pictures"
+            Repair();
+
+            // If we already have a file, we're done
+            if (File.Exists(FullPathName))
                 return true;
 
-            // Do we have a PictureSearchPath to work with?
-            string sPictureSearchPath = DB.PictureSearchPath;
-            if (string.IsNullOrEmpty(sPictureSearchPath))
-                return false;
+            // Extract the filename from the user-supplied full path
+            var sFileName = Path.GetFileName(RelativePathName);
 
-            // Extract the filename
-            string sFileName = Path.GetFileName(PathName);
+            // Directories to search: toplevel plus any subdirectories
+            var vDirectories = new List<string> {DB.TeamSettings.PicturesFolder};
+            vDirectories.AddRange(Directory.GetDirectories(DB.TeamSettings.PicturesFolder));
 
-            // First check the PictureSearchDirectory
-            string sTop = sPictureSearchPath + Path.DirectorySeparatorChar + sFileName;
-            if (File.Exists(sTop))
+            foreach (var sDirectory in vDirectories)
             {
-                PathName = sTop;
+                var sPath = Path.Combine(sDirectory, sFileName);
+                if (!File.Exists(sPath)) 
+                    continue;
+                RelativePathName = sPath.Substring(DB.TeamSettings.PicturesFolder.Length);
                 return true;
             }
 
-            // Otherwise, check all of the subdirectories
-            string[] vsDirectories = Directory.GetDirectories(sPictureSearchPath);
-            foreach (string sDir in vsDirectories)
-            {
-                string s = sDir + Path.DirectorySeparatorChar + sFileName;
-                if (File.Exists(s))
-                {
-                    PathName = s;
-                    return true;
-                }
-            }
-
-            // If we're here, we're out of options
+            // If we're here, we didn't find it
             return false;
         }
         #endregion
@@ -208,22 +213,22 @@ namespace OurWordData.DataModel
             try
 			{
                 // Verify that the PathName exists, or try to find it otherwise
-                if (!_LocateThePicture())
+                if (!LocateThePicture())
                 {
                     return GetBitmapNotFound(new Size(nMaxDimension, nMaxDimension / 3),
-                        Path.GetFileName(PathName));
+                        Path.GetFileName(FullPathName));
                 }
 
 				// Read in the file into a bitmap
-				Bitmap bmpFromFile = new Bitmap(PathName);
+				var bmpFromFile = new Bitmap(FullPathName);
 
                 // Just return the bitmap unsized
                 if (nMaxDimension <= 0)
                     return bmpFromFile;
 
 				// Calculate width based on width being greater than height
-				int nWidth  = Math.Min(bmpFromFile.Width, nMaxDimension);
-				int nHeight = (nWidth * bmpFromFile.Height) / bmpFromFile.Width;
+				var nWidth  = Math.Min(bmpFromFile.Width, nMaxDimension);
+				var nHeight = (nWidth * bmpFromFile.Height) / bmpFromFile.Width;
 
 				// If the height was greater, then recalculate
 				if (bmpFromFile.Height > bmpFromFile.Width)
@@ -233,16 +238,60 @@ namespace OurWordData.DataModel
 				}
 
 				// Create a new bitmap that will fit property
-				Bitmap bmpResized = new Bitmap(bmpFromFile, nWidth, nHeight);
+				var bmpResized = new Bitmap(bmpFromFile, nWidth, nHeight);
 				return bmpResized;
 			}
 			catch
 			{
                 return GetBitmapNotFound(new Size(nMaxDimension, nMaxDimension/3), 
-                    Path.GetFileName(PathName));
+                    Path.GetFileName(FullPathName));
             }
 		}
 		#endregion
+        #region Method: void Repair()
+        void Repair()
+            // This moves any pictures referenced so that they live under the ".Pictures"
+            // folder, rather than hard coded on the disk. This makes them part of the repository.
+            //
+            // Thus where we have a slug of pictures that look like
+            //   "C:\Graphics\cook\cot\co00600c.tif"
+            // they now become
+            //   "cook\cot\co00600c.tif"
+            // and moved to .Pictures
+        {
+            // If the file exists, then it means we don't have a relative path name; but rather
+            // an absolute name.
+            if (!File.Exists(RelativePathName))
+                return;
+            if (!Path.IsPathRooted(RelativePathName))
+                return;
+
+            var sRoot = Path.GetPathRoot(RelativePathName);
+            var sWithoutRoot = RelativePathName.Substring(sRoot.Length);
+
+            if (sWithoutRoot.StartsWith("graphics\\", true, CultureInfo.InvariantCulture))
+                sWithoutRoot = sWithoutRoot.Substring("graphics\\".Length);
+
+            var sDestination = Path.Combine(DB.TeamSettings.PicturesFolder, sWithoutRoot);
+
+            if (!File.Exists(sDestination))
+            {
+                try 
+                {
+                    var sDestinationFolder = Path.GetDirectoryName(sDestination);
+                    if (!Directory.Exists(sDestinationFolder))
+                        Directory.CreateDirectory(sDestinationFolder);
+                    File.Copy(RelativePathName, sDestination); 
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            RelativePathName = sWithoutRoot;
+        }
+        #endregion
 
         // Oxes ------------------------------------------------------------------------------
         #region Constants
@@ -260,8 +309,8 @@ namespace OurWordData.DataModel
             var picture = new DPicture();
 
             // We expect to have a path name
-            picture.PathName = XmlDoc.GetAttrValue(nodePicture, c_sAttrPath, "");
-            if (string.IsNullOrEmpty(picture.PathName))
+            picture.RelativePathName = XmlDoc.GetAttrValue(nodePicture, c_sAttrPath, "");
+            if (string.IsNullOrEmpty(picture.FullPathName))
                 throw new XmlDocException(nodePicture, "Missing picture path in oxes file.");
 
             // The Rtf info is optional
@@ -277,11 +326,11 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region OMethod: XmlNode SaveToOxesBook(oxes, nodeBook)
-        public override XmlNode SaveToOxesBook(XmlDoc oxes, System.Xml.XmlNode nodeBook)
+        public override XmlNode SaveToOxesBook(XmlDoc oxes, XmlNode nodeBook)
         {
             var nodePicture = oxes.AddNode(nodeBook, c_sTagPicture);
 
-            oxes.AddAttr(nodePicture, c_sAttrPath, PathName);
+            oxes.AddAttr(nodePicture, c_sAttrPath, RelativePathName);
 
             if (!string.IsNullOrEmpty(WordRtfInfo))
                 oxes.AddAttr(nodePicture, c_sAttrRtf, WordRtfInfo);

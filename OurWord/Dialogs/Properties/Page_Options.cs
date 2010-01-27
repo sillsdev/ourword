@@ -55,7 +55,6 @@ namespace OurWord.Dialogs
         const string c_sSecondaryLanguage = "propSecondaryLanguage";
 
         const string c_sMaximizeWindowOnStartup = "propMaximizeWindowOnStartup";
-        const string c_sPicturesPath = "propPicturesPath";
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
         const string c_sZoomFactor = "propZoomFactor";
@@ -120,10 +119,6 @@ namespace OurWord.Dialogs
 
                 case c_sBackupPath:
                     e.Value = BackupSystem.RegistryBackupFolder;
-                    break;
-
-                case c_sPicturesPath:
-                    e.Value = DB.PictureSearchPath;
                     break;
 
                 case c_sProjectAccess:
@@ -198,10 +193,6 @@ namespace OurWord.Dialogs
 
                 case c_sBackupPath:
                     BackupSystem.RegistryBackupFolder = (string)e.Value;
-                    break;
-
-                case c_sPicturesPath:
-                    DB.PictureSearchPath = (string)e.Value;
                     break;
 
                 case c_sZoomFactor:
@@ -307,17 +298,6 @@ namespace OurWord.Dialogs
                 "Choose a folder in which OurWord will automatically make backups of your files.",
                 "",
                 typeof(BackupFolderBrowseTypeEditor),
-                null));
-
-            // Pictures Path
-            Bag.Properties.Add(new PropertySpec(
-                c_sPicturesPath,
-                "Folder to search for pictures",
-                typeof(string),
-                "",
-                "If a picture cannot be found, OurWord will search in this folder to attempt to locate it.",
-                "",
-                typeof(PictureFolderBrowseTypeEditor),
                 null));
 
             // Project Access
