@@ -2,7 +2,7 @@
 Source: ..\bin\Debug\OurWord.exe; DestDir: {app}
 Source: ..\bin\Debug\JWTools.dll; DestDir: {app}
 Source: ..\bin\Debug\OurWordData.dll; DestDir: {app}
-Source: ..\..\Help\OurWordHelp.chm; DestDir: {app}\Help
+Source: ..\bin\Debug\OurWordHelp.chm; DestDir: {app}
 Source: SampleData\*.*; DestDir: {userdocs}\OurWordSample; Flags: recursesubdirs createallsubdirs
 Source: ..\Loc\*.*; DestDir: {commonappdata}\OurWord\Loc
 
@@ -15,7 +15,6 @@ Source: ..\bin\Debug\KeymanLink.dll; DestDir: {app}
 Source: ..\bin\Debug\PalasoUIWindowsForms.dll; DestDir: {app}
  
 [Registry]
-Root: HKCU; Subkey: Software\The Seed Company\Our Word!; ValueType: string; ValueName: HelpFile; ValueData: {app}\Help\OurWordHelp.chm; Flags: uninsdeletevalue
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: string; ValueName: Folder; ValueData: {userdocs}\OurWordSample\BackupFiles; Flags: uninsdeletevalue
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: string; ValueName: Enabled; ValueData: true; Flags: uninsdeletevalue
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\MRU; ValueType: string; ValueData: 1; Flags: uninsdeletevalue createvalueifdoesntexist

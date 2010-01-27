@@ -843,7 +843,6 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>
-    </PostBuildEvent>
+    <PostBuildEvent>copy "$(SolutionDir)Help\OurWordHelp.*"  "$(TargetDir)"</PostBuildEvent>
   </PropertyGroup>
 </Project>

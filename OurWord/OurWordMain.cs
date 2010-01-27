@@ -2324,7 +2324,7 @@ namespace OurWord
         private void cmdLoad(object sender, System.EventArgs e)
 		{
             // Init the Help system
-            HelpSystem.Initialize(this, "OurWordMain.chm");
+            HelpSystem.Initialize(this, "OurWordHelp.chm");
 
             // Retrieve the most recent item
             string sPath = JW_Registry.GetValue(c_sLastProjectOpened, "" );

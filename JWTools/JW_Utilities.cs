@@ -124,9 +124,9 @@ namespace JWTools
 		// 1. ResourceLocation must be set first, e.g., "OurWord.Res." Note that there
 		//      is a trailing period. This is typically set up as part of the Main()
 		//      method, so that resources are immediately available.
-		// 2. The resource must be embedded in the main exe (not a lower dll)
-		#region Attr{g/s}: void ResourceLocation
-		static public string ResourceLocation
+        // 2. The resource must be embedded in the main exe (not a lower dll)
+        #region SAttr{g/s}: string ResourceLocation
+        static public string ResourceLocation
 		{
 			get
 			{
@@ -362,7 +362,7 @@ namespace JWTools
             return GetSpecialFolder(Environment.SpecialFolder.MyDocuments, sSubFolder);
 		}
 		#endregion
-		#region SMethod: GetAllUsersDocumentsFolder() - (not currently used)
+		#region SMethod: string GetAllUsersDocumentsFolder() - (not currently used)
 		/*** KEEPING THE CODE, SHOULD I EVER WANT TO DO THIS
 		 * 
 		[DllImport("shell32.dll")]

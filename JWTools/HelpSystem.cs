@@ -73,62 +73,30 @@ namespace JWTools
 		static Form s_Form = null;
 		#endregion
 		#region Attr{g}: string FileName
-		static public string FileName
+		static private string FileName
 		{
 			get
 			{
-				Debug.Assert(null != s_FileName);
-				Debug.Assert(0 != s_FileName.Length);
+                Debug.Assert(!string.IsNullOrEmpty(s_FileName));
 				return s_FileName;
 			}
 		}
 		static string s_FileName = "";
 		#endregion
-		#region Attr{g/s}: static string RegistryHelpFile
-		static public string RegistryHelpFile
-		{
-			get
-			{
-				string sPath =  JW_Registry.GetValue(c_sRegName, "");
+        #region SAttr{g}: string PathToHelpFile
+        static string PathToHelpFile
+	    {
+	        get
+	        {
+	            var assembly = Assembly.GetEntryAssembly();
+	            var folder = Path.GetDirectoryName(assembly.Location);
+	            return Path.Combine(folder, FileName);
+	        }
+        }
+        #endregion
 
-				// If we got nothing, we need to prompt the user; if the user chickens out
-				// (via the Cancel button), then we cannot supply help.
-				if (0 == sPath.Length)
-				{
-					OpenFileDialog dlg = new OpenFileDialog();
-
-					// We only want to return a single file
-					dlg.Multiselect = false;
-
-					// Default to the install directory
-					dlg.FileName = Path.GetDirectoryName(Application.ExecutablePath) +
-						"\\" + FileName;
-
-					// Filter on HtmlHelp files
-					dlg.Filter = "Help Files (*.chm)|*.chm";
-					dlg.FilterIndex = 1;
-
-					// Retrieve Dialog Title from resources
-					dlg.Title = "Locate the \"" + FileName + "\" help file";
-
-					if (DialogResult.OK == dlg.ShowDialog(Form))
-					{
-						sPath = dlg.FileName;
-						RegistryHelpFile = dlg.FileName;
-					}
-				}
-
-				return sPath;
-			}
-			set
-			{
-				JW_Registry.SetValue(c_sRegName, value);
-			}
-		}
-		const string c_sRegName  = "HelpFile";
-		#endregion
-		#region Attr{g}: ArrayList Topics - the list of help topics
-		static public ArrayList Topics
+        #region Attr{g}: ArrayList Topics - the list of help topics
+        static public ArrayList Topics
 		{
 			get
 			{
@@ -193,6 +161,7 @@ namespace JWTools
 		static public void Initialize(Form form, string sFileName)
 		{
 			s_Topics   = new ArrayList();
+		    Debug.Assert(!string.IsNullOrEmpty(sFileName));
 			s_FileName = sFileName;
 			s_Form     = form;
 
@@ -277,7 +246,7 @@ namespace JWTools
 		{
             try
             {
-                Help.ShowHelp(Form, RegistryHelpFile);
+                Help.ShowHelp(Form, PathToHelpFile);
             }
             catch (Exception) 
             {
@@ -285,21 +254,22 @@ namespace JWTools
 		}
 		#endregion
 		#region Method: void ShowTopic(int nID)
-		static public void ShowTopic(int nID)
+	    private static void ShowTopic(int nID)
 		{
 			foreach(HelpTopic topic in Topics)
 			{
-				if (topic.ID == nID)
-				{
-                    try
-                    {
-                        Help.ShowHelp(Form, RegistryHelpFile, topic.Url);
-                    }
-                    catch (Exception)
-                    {
-                    }
-					return;
-				}
+			    if (topic.ID != nID) 
+                    continue;
+
+			    try
+			    {
+			        Help.ShowHelp(Form, PathToHelpFile, topic.Url);
+			        return;
+			    }
+			    catch (Exception)
+			    {
+			    }
+			    return;
 			}
 
 			ShowDefaultTopic();
