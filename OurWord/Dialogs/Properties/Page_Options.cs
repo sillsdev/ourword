@@ -286,7 +286,7 @@ namespace OurWord.Dialogs
                 "Make Automatic Backups?",
                 "",
                 "If Yes, OurWord will automatically back up your fields to the folder specified below.",
-                true
+                false
                 ));
 
             // Backups Path

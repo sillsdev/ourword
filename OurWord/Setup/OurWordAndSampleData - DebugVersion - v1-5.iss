@@ -15,8 +15,6 @@ Source: ..\bin\Debug\KeymanLink.dll; DestDir: {app}
 Source: ..\bin\Debug\PalasoUIWindowsForms.dll; DestDir: {app}
  
 [Registry]
-Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: string; ValueName: Folder; ValueData: {userdocs}\OurWordSample\BackupFiles; Flags: uninsdeletevalue
-Root: HKCU; Subkey: Software\The Seed Company\Our Word!\Backup; ValueType: string; ValueName: Enabled; ValueData: true; Flags: uninsdeletevalue
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\MRU; ValueType: string; ValueData: 1; Flags: uninsdeletevalue createvalueifdoesntexist
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!\MRU; ValueType: string; ValueData: {userdocs}\OurWordSample\Settings\OurWordSample.owp; Flags: uninsdeletevalue createvalueifdoesntexist; ValueName: 001
 Root: HKCU; Subkey: Software\The Seed Company\Our Word!; ValueName: AppDir; ValueData: {app}; ValueType: string
