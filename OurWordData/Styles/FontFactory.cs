@@ -202,7 +202,9 @@ namespace OurWordData.Styles
             Font font;
             if (!m_FontsDictionary.TryGetValue(sKey, out font))
             {
-                font = new Font(FontName, FontSize, actualFontStyle);
+                var actualSize = FontSize * zoomPercent / 100F;
+
+                font = new Font(FontName, actualSize, actualFontStyle);
                 m_FontsDictionary.Add(sKey, font);
             }
 
