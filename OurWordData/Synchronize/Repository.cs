@@ -828,7 +828,7 @@ namespace OurWordData.Synchronize
                 m_LocalRepository.Rollback();
                 throw new SynchException("msgUnableToMerge",
                     "OurWord was unable to merge. This is most likely a bug with OurWord. " +
-                    "If you are runing the latest version, then  please contact us " +
+                    "If you are running the latest version, then please contact us " +
                     "at http://ourword.TheSeedCompany.org so that we can work with you to " +
                     "solve the problem.");
             }
@@ -839,7 +839,9 @@ namespace OurWordData.Synchronize
             {
                 throw new SynchException("msgUnableToCommitMerge",
                     "OurWord was unable to store the results of the merge. \n\n" +
-                    "This is an odd thing to happen. If it continues, please contact us at http://ourword.TheSeedCompany.org so that we can work with you to solve the problem.");
+                    "This is an odd thing to happen. If it continues, please contact " +
+                    "us at http://ourword.TheSeedCompany.org so that we can work with " +
+                    "you to solve the problem.");
             }
         }
         #endregion
