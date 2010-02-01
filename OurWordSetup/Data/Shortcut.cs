@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text;
+using System.Windows.Forms;
 using IWshRuntimeLibrary;
 
 // For creating the desktop shortcut
@@ -62,6 +61,7 @@ namespace OurWordSetup.Data
         }
         #endregion
 
+        #region Method: void CreateIfDoesntExist()
         public void CreateIfDoesntExist()
             // sAppName should be something like "OurWord". It is used to create the shortcut
             // filename (which is then OurWord.lnk), and to find the application
@@ -70,19 +70,34 @@ namespace OurWordSetup.Data
             if (Exists)
                 return;
 
-            var shell = new WshShell();
-            var shortcut = (IWshShortcut)shell.CreateShortcut(ShortcutPath);
-            shortcut.TargetPath = ApplicationExecutablePath;
-            shortcut.Save();
+            try
+            {
+                var shell = new WshShell();
+                var shortcut = (IWshShortcut)shell.CreateShortcut(ShortcutPath);
+                shortcut.TargetPath = ApplicationExecutablePath;
+                shortcut.Save();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(null, "Unable to create shortcut with error\n" + e.Message,
+                                "OurWord Setup", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-
+        #endregion
         #region VAttr{g}: bool Exists
-        bool Exists
+        public bool Exists
         {
             get
             {
                 return System.IO.File.Exists(ShortcutPath);
             }
+        }
+        #endregion
+        #region Method: void DeleteIfExists()
+        public void DeleteIfExists()
+        {
+            if (Exists)
+                System.IO.File.Delete(ShortcutPath);
         }
         #endregion
     }
