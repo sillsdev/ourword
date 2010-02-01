@@ -12,14 +12,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows.Forms;
 using System.IO;
-using System.Data;
-using System.Globalization;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
 
 using JWTools;
@@ -33,9 +28,8 @@ using OurWord.Layouts;
 using OurWord.Dialogs;
 using OurWord.Dialogs.History;
 using OurWord.SideWnd;
-using OurWord.Utilities;
 using OurWordData.Synchronize;
-
+using OurWordSetup.Data;
 #endregion
 
 namespace OurWord
@@ -2273,8 +2267,8 @@ namespace OurWord
             G.URStack.Clear();
         }
 		#endregion
-        #region Method: void OnLeaveProject(bCommitToRepository)
-        private void OnLeaveProject(bool bCommitToRepository)
+        #region Method: void OnLeaveProject()
+        private void OnLeaveProject()
 		{
 			// Do everything we would normally do on leaving a section (e.g., getting
 			// the data from the cache.)
@@ -2384,7 +2378,7 @@ namespace OurWord
         private void cmdClosing(object sender, FormClosingEventArgs e)
         {
 			// Save data
-			OnLeaveProject(true);
+			OnLeaveProject();
 
 			// Save the current project's registry info
             if (!string.IsNullOrEmpty(DB.Project.StoragePath))
@@ -2478,8 +2472,8 @@ namespace OurWord
                 goto done;
 
             // Make sure the current project is saved and up-to-date, before we create
-            // the new one. Commit to the Repository, to have a restoreo  point if we need it.
-            OnLeaveProject(true);
+            // the new one. 
+            OnLeaveProject();
 
             // Create and initialize the new project according to the settings
             var project = new DProject(wiz.ProjectName)
@@ -2531,8 +2525,8 @@ namespace OurWord
             var wiz = new WizInitializeFromRepository();
 
             // Make sure the current project is saved and up-to-date, before we create
-            // the new one. Commit to the Repository, to have a restore  point if we need it.
-            OnLeaveProject(true);
+            // the new one. 
+            OnLeaveProject();
 
             // Loop until success or give up
             while (true)
@@ -2615,7 +2609,7 @@ namespace OurWord
                 return;
 
             // Open the requested project
-            OnLeaveProject(true);
+            OnLeaveProject();
             DB.Project = new DProject();
             DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
             DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
@@ -3218,7 +3212,7 @@ namespace OurWord
 			var dlg = new DialogRestoreFromBackup(BTarget);
 			if (DialogResult.OK == dlg.ShowDialog())
 			{
-				OnLeaveProject(true);
+				OnLeaveProject();
 
 				DBook.RestoreFromBackup(BTarget, dlg.BackupPathName, G.CreateProgressIndicator());
 
@@ -3371,10 +3365,10 @@ namespace OurWord
             // Retrieve data and save the project to disk. We don't know if the
 			// user might remove the book from the project, so we need to make sure
 			// it was saved just in case.
-			OnLeaveProject(true);
+			OnLeaveProject();
 
             // Let the user change the properties
-            DialogProperties dlg = new DialogProperties();
+            var dlg = new DialogProperties();
             Dim();
             dlg.ShowDialog(this);
             UnDim();
@@ -3415,7 +3409,7 @@ namespace OurWord
         {
             Dim();
 
-            OnLeaveProject(false);
+            OnLeaveProject();
 
             Localizer dlg = new Localizer(LocDB.DB);
             if (DialogResult.OK == dlg.ShowDialog())
@@ -3429,9 +3423,16 @@ namespace OurWord
         {
             Dim();
 
+            if(CheckForUpdates())
+                return;
+
+            //////////////////////////////////////////
+            UnDim(); return; //REMOVE THIS LINE LATER
+            //////////////////////////////////////////
+
             // Save everything, but don't commit, cause Synchronize will do a commit
             DB.Project.Nav.SavePositionToRegistry();
-            OnLeaveProject(false);
+            OnLeaveProject();
 
             // Do the Synchronize
             var local = DB.TeamSettings.GetLocalRepository();
@@ -3541,6 +3542,19 @@ namespace OurWord
         }
         #endregion
         #endregion
+
+        bool CheckForUpdates()
+            // Returns true if OurWord is shutting down. Any caller should immediately
+            // halt anything it is doing and permit OW to shut down as soon as possible.
+            // There is a clock ticking, and the setup program will eventually force
+            // the shutdown.
+        {
+            DB.Project.Nav.SavePositionToRegistry();
+            OnLeaveProject();
+
+            var setup = new SetupManager(this) {InformUserIfThereWereNoUpdates = false};
+            return setup.CheckForUpdates();
+        }
     }
 
 	#region CLASS G - Globals for convenient access

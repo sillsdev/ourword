@@ -3,6 +3,7 @@ OurWord\Setup\Output/*.exe
 OurWord\Setup\Output\Old/*.exe
 bin
 obj
+Deploy
 _ReSharper.OurWord
 *.suo
 *.bak

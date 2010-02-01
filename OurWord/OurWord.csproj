@@ -172,6 +172,10 @@
       <Project>{12DD196B-D08E-4197-8DC1-AE94307E55B5}</Project>
       <Name>OurWordData</Name>
     </ProjectReference>
+    <ProjectReference Include="..\OurWordSetup\OurWordSetup.csproj">
+      <Project>{EB4121B1-7F9C-4C59-BACC-77CEB60C18CD}</Project>
+      <Name>OurWordSetup</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.ico" />
@@ -843,6 +847,23 @@
   <PropertyGroup>
     <PreBuildEvent>
     </PreBuildEvent>
-    <PostBuildEvent>copy "$(SolutionDir)Help\OurWordHelp.*"  "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>copy "$(SolutionDir)Help\OurWordHelp.*"  "$(TargetDir)"
+
+copy "$(TargetDir)OurWord.exe" "$(SolutionDir)Deploy"
+copy "$(TargetDir)OurWordData.dll" "$(SolutionDir)Deploy"
+copy "$(TargetDir)JWTools.dll" "$(SolutionDir)Deploy"
+copy "$(TargetDir)OurWordSetup.exe" "$(SolutionDir)Deploy"
+
+copy "$(TargetDir)Chorus.exe" "$(SolutionDir)Deploy"
+copy "$(TargetDir)ChorusMerge.exe" "$(SolutionDir)Deploy"
+copy "$(TargetDir)LibChorus.dll" "$(SolutionDir)Deploy"
+copy "$(TargetDir)LinqBridge.dll" "$(SolutionDir)Deploy"
+copy "$(TargetDir)Palaso.dll" "$(SolutionDir)Deploy"
+copy "$(TargetDir)KeymanLink.dll" "$(SolutionDir)Deploy"
+copy "$(TargetDir)PalasoUIWindowsForms.dll" "$(SolutionDir)Deploy"
+
+copy "$(SolutionDir)Help\OurWordHelp.chm" "$(SolutionDir)Deploy"
+
+"$(TargetDir)OurWordSetup.exe" -g "$(SolutionDir)Deploy"</PostBuildEvent>
   </PropertyGroup>
 </Project>

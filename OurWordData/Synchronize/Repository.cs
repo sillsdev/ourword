@@ -593,8 +593,8 @@ namespace OurWordData.Synchronize
         private readonly string m_UserNameForCommits;
 
         // Helper Methods --------------------------------------------------------------------
-        #region Method: bool CanPingGoogle()
-        static bool CanPingGoogle()
+        #region SMethod: bool CanPingGoogle()
+        static public bool CanPingGoogle()
             // We'll just ping on Google, since they're up most of the time.
         {
             try
@@ -778,7 +778,7 @@ namespace OurWordData.Synchronize
                      "http://ourword.TheSeedCompany.org so that we can determine how to " +
                      "solve this problem.");
             }
-                    }
+        }
         #endregion
         #region PullNewerFiles
         public void PullNewerFiles()

@@ -109,6 +109,7 @@
     <Compile Include="Styles\TStyleSheet.cs" />
     <Compile Include="Styles\TWritingSystem.cs" />
     <Compile Include="TestCommon.cs" />
+    <Compile Include="Setup\TManifest.cs" />
     <Compile Include="Utilities\TStringMerger.cs" />
     <Compile Include="Utilities\T_Repository.cs" />
   </ItemGroup>
@@ -120,6 +121,10 @@
     <ProjectReference Include="..\OurWordData\OurWordData.csproj">
       <Project>{12DD196B-D08E-4197-8DC1-AE94307E55B5}</Project>
       <Name>OurWordData</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\OurWordSetup\OurWordSetup.csproj">
+      <Project>{EB4121B1-7F9C-4C59-BACC-77CEB60C18CD}</Project>
+      <Name>OurWordSetup</Name>
     </ProjectReference>
     <ProjectReference Include="..\OurWord\OurWord.csproj">
       <Project>{52AD44E7-0E1D-43EE-BCF4-712E0BC42A02}</Project>

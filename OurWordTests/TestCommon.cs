@@ -186,7 +186,17 @@ namespace OurWordTests
 
     public class TestFile
     {
+        #region Attr{g}: string FullPath
+        public string FullPath
+        {
+            get 
+            {
+                Debug.Assert(!string.IsNullOrEmpty(m_FullPath));
+                return m_FullPath; 
+            }
+        }
         private readonly string m_FullPath;
+        #endregion
         private readonly string m_FileName;
 
         #region Constructor(sSubFolder, sFileName)
