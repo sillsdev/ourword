@@ -25,10 +25,10 @@ namespace OurWordSetup.Data
     {
         // Locations and Files ---------------------------------------------------------------
         public const string c_sRemoteWebSite = "http://ourword.TheSeedCompany.org/Install/";
-        public const string c_sOurWordSetupFileName = "OurWordSetup.exe";
+        public const string c_sOurWordSetupFileName = "SetupOurWord.exe";
         public const string c_sOurWordApplication = "OurWord.exe";
         #region SVattr{g}: string ApplicationsFolder
-        static public string ApplicationsFolder
+        private static string ApplicationsFolder
         {
             get
             {
@@ -156,7 +156,8 @@ namespace OurWordSetup.Data
             var vItemsToDownload = DetermineItemsToDownload();
             var downloader = new DlgDownloader(vItemsToDownload) 
                 { PleaseWaitMessage = ui.PleaseWaitWhileDownloading };
-            if (DialogResult.OK != downloader.ShowDialog(ParentWindow))
+            downloader.ShowDialog(ParentWindow);
+            if (downloader.DownloadCanceledByUser)
                 return false;
 
             // At this point, files are downloaded. We now need to shut down and 
@@ -171,11 +172,12 @@ namespace OurWordSetup.Data
             // We can't copy files into the App folder if OurWord is still running
             WaitForOurWordToClose();
 
-            // Removes stale files from previous installs
+            // Removes files from previous installs that we no longer use
+            LocalManifest.ReadFile();
             RemoteManifest.ReadFile();
-            ClearOutApplicationFolder(RemoteManifest);
+            RemoveStaleFilesFromPreviousInstall();
 
-            // Move the files from the Download folder to where they belong
+            // Move the new files from the Download folder to where they belong
             InstallDownloadedFiles();
 
             // Restart OurWord and exit
@@ -184,7 +186,7 @@ namespace OurWordSetup.Data
         }
         #endregion
         #region Method: bool DoFullSetup()
-        public bool DoFullSetup()
+        public void DoFullSetup()
         {
             #region UI Strings
             var ui = new CommonUserInterfaceStrings
@@ -210,30 +212,25 @@ namespace OurWordSetup.Data
 
             // Check for prerequisites, give instructions for anything missing
 
-
             // We need the Manifest in order to know what to download
             if (!CheckInternetAccessAndDownloadManifest(ui))
-                return false;
+                return;
 
             // Clear out the App folder completely
-            ClearOutApplicationFolder(null);
+            InitializeEmptyApplicationsFolder();
 
             // Download all of the files
             var downloader = new DlgDownloader(RemoteManifest) 
                 { PleaseWaitMessage = ui.PleaseWaitWhileDownloading };
             if (DialogResult.Abort == downloader.ShowDialog(ParentWindow))
-                return false;
+                return;
 
             // Place them in the App folder
             InstallDownloadedFiles();
 
-            // Windows install stuff
-            (new Shortcut("OurWord")).CreateIfDoesntExist();
-
             // Launch OurWord and Exit
             LaunchOurWord();
             Application.Exit();
-            return true;
         }
         #endregion
 
@@ -272,6 +269,7 @@ namespace OurWordSetup.Data
         List<ManifestItem> DetermineItemsToDownload()
         {
             // If the local manifest is empty, then we must download everything
+            LocalManifest.ReadFile();
             if (LocalManifest.Count == 0)
                 return RemoteManifest;
 
@@ -392,6 +390,10 @@ namespace OurWordSetup.Data
 
                 // Move the downloaded file to the app folder
                 File.Move(sDownloadPath, sInstallPath);
+
+                // Extract any zipped contents
+                if (Zip.IsZipFile(sInstallPath))
+                    (new Zip(sInstallPath)).Extract();
             }
 
             // Copy the Remote Manifest over, it is now the Local Manifest
@@ -425,7 +427,7 @@ namespace OurWordSetup.Data
         #region SMethod: string BuildFriendlyVersion(Version)
         static string BuildFriendlyVersion(Version v)
         {
-            var chBuild = (char)((int)'a' + v.Build);
+            var chBuild = (char)('a' + v.Build);
             var sBuild = (v.Build == 0) ? "" : chBuild.ToString();
 
             return string.Format("{0}.{1}{2}", v.Major, v.Minor, sBuild);
@@ -440,20 +442,26 @@ namespace OurWordSetup.Data
             }
         }
         #endregion
-        #region SMethod: void ClearOutApplicationFolder(exceptions)
-        static void ClearOutApplicationFolder(Manifest exceptions)
+        #region Method: void ClearOutApplicationFolder()
+        void RemoveStaleFilesFromPreviousInstall()
             // We want to clear out stale files from old versions. That is, anything that
             // is not in the new (remote) manifest
         {
-            var vsFilePaths = Directory.GetFiles(ApplicationsFolder);
-
-            foreach (var sPath in vsFilePaths)
+            var vsFilesToClearOut = RemoteManifest.GetStaleFiles(LocalManifest);
+            foreach(var sPath in vsFilesToClearOut)
             {
-                if (null != exceptions && exceptions.ContainsFile(sPath))
-                    continue;
-
-                File.Delete(sPath);
+                if (File.Exists(sPath))
+                    File.Delete(sPath);
             }
+        }
+        #endregion
+        #region Method: void InitializeEmptyApplicationsFolder()
+        static void InitializeEmptyApplicationsFolder()
+        {
+            if (Directory.Exists(ApplicationsFolder))
+                Directory.Delete(ApplicationsFolder, true);
+            Directory.CreateDirectory(ApplicationsFolder);
+            return;
         }
         #endregion
         #region struct CommonUserInterfaceStrings
@@ -474,8 +482,8 @@ namespace OurWordSetup.Data
         bool CheckInternetAccessAndDownloadManifest(CommonUserInterfaceStrings ui)
         {
             // Display a separate-threaded dialog telling the user what we're doing
+            DlgCheckingForUpdates.InformationMessage = ui.PleaseWaitWhileChecking;
             DlgCheckingForUpdates.Start(ParentWindow);
-            DlgCheckingForUpdates.SetInformationText(ui.PleaseWaitWhileChecking);
 
             // Abort if there's no Internet
             DlgCheckingForUpdates.SetStatusText(ui.CheckingInternetAccessStatus);

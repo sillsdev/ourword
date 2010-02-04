@@ -62,6 +62,7 @@
             // m_btnCancel
             // 
             this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Abort;
             this.m_btnCancel.Location = new System.Drawing.Point(218, 139);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);

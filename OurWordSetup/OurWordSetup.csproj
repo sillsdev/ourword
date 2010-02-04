@@ -34,6 +34,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.85.5.452, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
@@ -44,7 +48,7 @@
   <ItemGroup>
     <Compile Include="Data\Manifest.cs" />
     <Compile Include="Data\SetupManager.cs" />
-    <Compile Include="Data\Shortcut.cs" />
+    <Compile Include="Data\Zip.cs" />
     <Compile Include="UI\DlgDownloader.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -105,16 +109,6 @@
       <DependentUpon>DlgFullSetup.cs</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="IWshRuntimeLibrary">
-      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -123,4 +117,9 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <PropertyGroup>
+    <PostBuildEvent>ilmerge /out:"$(TargetDir)SetupOurWord.exe" "$(TargetDir)OurWordSetup.exe" "$(TargetDir)ICSharpCode.SharpZipLib.dll"
+
+copy "$(TargetDir)SetupOurWord.exe" "$(SolutionDir)Deploy"</PostBuildEvent>
+  </PropertyGroup>
 </Project>

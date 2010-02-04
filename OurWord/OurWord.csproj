@@ -702,6 +702,7 @@
     <Compile Include="Utilities\GroupedTasksList.Designer.cs">
       <DependentUpon>GroupedTasksList.cs</DependentUpon>
     </Compile>
+    <Compile Include="Utilities\Shortcut.cs" />
     <EmbeddedResource Include="Dialogs\DlgBookProperties.resx">
       <DependentUpon>DlgBookProperties.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -843,6 +844,16 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="IWshRuntimeLibrary">
+      <Guid>{F935DC20-1CF0-11D0-ADB9-00C04FD58A0B}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
@@ -852,15 +863,6 @@
 copy "$(TargetDir)OurWord.exe" "$(SolutionDir)Deploy"
 copy "$(TargetDir)OurWordData.dll" "$(SolutionDir)Deploy"
 copy "$(TargetDir)JWTools.dll" "$(SolutionDir)Deploy"
-copy "$(TargetDir)OurWordSetup.exe" "$(SolutionDir)Deploy"
-
-copy "$(TargetDir)Chorus.exe" "$(SolutionDir)Deploy"
-copy "$(TargetDir)ChorusMerge.exe" "$(SolutionDir)Deploy"
-copy "$(TargetDir)LibChorus.dll" "$(SolutionDir)Deploy"
-copy "$(TargetDir)LinqBridge.dll" "$(SolutionDir)Deploy"
-copy "$(TargetDir)Palaso.dll" "$(SolutionDir)Deploy"
-copy "$(TargetDir)KeymanLink.dll" "$(SolutionDir)Deploy"
-copy "$(TargetDir)PalasoUIWindowsForms.dll" "$(SolutionDir)Deploy"
 
 copy "$(SolutionDir)Help\OurWordHelp.chm" "$(SolutionDir)Deploy"
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using OurWordSetup.Data;
+using OurWord.Utilities;
 
 namespace OurWordTests.Setup
 {

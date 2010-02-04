@@ -40,21 +40,6 @@ namespace OurWordSetup.UI
             }
         }
         #endregion
-        #region SMethod: void SetInformationText(string sMessage)
-        delegate void SetInformationTextDelegate(string sMessage);
-        static public void SetInformationText(string sMessage)
-        {
-            if (s_Dialog.InvokeRequired)
-            {
-                var d = new SetInformationTextDelegate(SetStatusText);
-                s_Dialog.Invoke(d, new object[] { sMessage });
-            }
-            else
-            {
-                s_Dialog.m_labelIsChecking.Text = sMessage;
-            }
-        }
-        #endregion
 
         #region Constructor()
         public DlgCheckingForUpdates()
@@ -66,6 +51,7 @@ namespace OurWordSetup.UI
         // Startup / Shutdown ----------------------------------------------------------------
         static private DlgCheckingForUpdates s_Dialog;
         private static Form s_ParentWindow;
+        static public string InformationMessage;
         #region SMethod: public void Start()
         static public void Start(Form parent)
         {
@@ -86,6 +72,10 @@ namespace OurWordSetup.UI
         static private void StartDialog()
         {
             s_Dialog = new DlgCheckingForUpdates();
+
+            // Override the default message of "OurWord is checking the Internet for updates..."
+            if (!string.IsNullOrEmpty(InformationMessage))
+                s_Dialog.m_labelIsChecking.Text = InformationMessage;
 
             if (null != s_ParentWindow)
             {
@@ -112,6 +102,5 @@ namespace OurWordSetup.UI
             }
         }
         #endregion
-       
     }
 }

@@ -244,7 +244,7 @@ namespace OurWordSetup.Data
         }
         #endregion
         #region SMethod: string ComputeHash(string sPath)
-        static string ComputeHash(string sPath)
+        static public string ComputeHash(string sPath)
         {
             try
             {
@@ -268,6 +268,53 @@ namespace OurWordSetup.Data
             }
         }
         #endregion
+
+
+
+        public List<string> GetStaleFiles(Manifest obsoleteLocalManifest)
+            // Intended to be called as "Remote.GetObsoleteFiles(Local)", meaning
+            // that we're seeing what files in the local install are obsolete.
+        {
+            var vsObsoleteFileNames = new List<string>();
+
+            // Get a list of all Items in the obsolete manifest that are not in ours;
+            // these are the ones we'll want to delete during the install process
+            foreach (var localItem in obsoleteLocalManifest)
+            {
+                // A file is obsolete if it exists in local (obsolete) but does not
+                // exist in ours (the remote manifest)
+                if (ContainsFile(localItem.Filename))
+                {
+                    // But if it is a zip file, we need to check the internal files
+                    // for any that might be obsolete
+                    if (Zip.IsZipFile(localItem.Filename))
+                    {
+                        var sLocalZipPath = localItem.Filename;
+                        var sRemoteZipPath = Find(localItem.Filename).Filename;
+                        var zipLocal = new Zip(sLocalZipPath);
+                        var zipRemote = new Zip(sRemoteZipPath);
+                        var vsObsoletePathsFromZip = zipRemote.GetFullPathNamesOfAdditionalFiles(zipLocal);
+                        vsObsoleteFileNames.AddRange(vsObsoletePathsFromZip);
+                    }
+
+                    continue;
+                }
+
+                var sPath = Path.Combine(FilePath, localItem.Filename);
+                vsObsoleteFileNames.Add(sPath);
+
+                // If any of the obsolete items are zip files, then we need to add all of
+                // the files that were installed from it
+                if (Zip.IsZipFile(sPath))
+                {
+                    var zip = new Zip(sPath);
+                    vsObsoleteFileNames.AddRange(zip.GetFullPathNames());
+                }
+            }
+
+            return vsObsoleteFileNames;
+        }
+
 
     }
 }

@@ -43,7 +43,7 @@ namespace OurWordSetup
             // Collect the input parameters
             for(var i=0; i<vArgs.Length; i++)
             {
-                switch (vArgs[i].ToLower())
+                switch (vArgs[i])
                 {
                     // The caller wants to generate the manifest, based on the files
                     // in the folder which will be the following arg

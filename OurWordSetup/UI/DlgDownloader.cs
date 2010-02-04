@@ -61,7 +61,7 @@ namespace OurWordSetup.UI
             return new Uri(SetupManager.c_sRemoteWebSite + item.Filename);
         }
         #endregion
-        #region SMethod: string MakeDestinationPath(ManifestItem item)
+        #region SMethod: string MakeDestinationPath(ManifestItem)
         static string MakeDestinationPath(ManifestItem item)
         {
             return Path.Combine(DownloadFolder, item.Filename);
@@ -94,7 +94,7 @@ namespace OurWordSetup.UI
             DialogResult = DialogResult.OK;
         }
         #endregion
-        private bool m_bDownloadCanceledByUser;
+        public bool DownloadCanceledByUser { get; private set; }
         #region Attr{g}: string PleaseWaitMessage
         public string PleaseWaitMessage
         {
@@ -125,7 +125,7 @@ namespace OurWordSetup.UI
         #region Cmd: cmdCancel
         private void cmdCancel(object sender, EventArgs e)
         {
-            m_bDownloadCanceledByUser = true;
+            DownloadCanceledByUser = true;
         }
         #endregion
 
@@ -192,7 +192,7 @@ namespace OurWordSetup.UI
 
             SetFileDownloadStatusMessage(e.ProgressPercentage, nTotalK);
 
-            if (!m_bDownloadCanceledByUser) 
+            if (!DownloadCanceledByUser) 
                 return;
 
             var web = sender as WebClient;
@@ -214,7 +214,28 @@ namespace OurWordSetup.UI
                 return;
             }
 
-            if (m_bDownloadCanceledByUser)
+            /* 
+             * GOOD IDEA, But doesn't want to work. Apparently the file gets changed
+             * somehow as a result of the download. Need to research it. I'd likek to
+             * have some sort of checksum working for this.
+             * 
+            // If the computed hash doesn't match, then it was corrupted during the
+            // download
+            var hash = Manifest.ComputeHash(MakeDestinationPath(CurrentItem));
+            if (hash != CurrentItem.Hash)
+            {
+                const string sMessage = 
+                    "File {0} appears to have been corrupted during the download.\n" + 
+                    "Please try again. If the problem continues, please notify us as a \n" + 
+                    "corrupt file may have been stored on the Internet.";
+                SetupManager.DisplayMessage(this, string.Format(sMessage, CurrentItem.Filename));
+                DialogResult = DialogResult.Abort;
+                Close();
+                return;
+            }
+            */
+
+            if (DownloadCanceledByUser)
             {
                 SetupManager.DisplayMessage(this, 
                     "The download was canceled. Installation did not finish.");

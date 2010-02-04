@@ -4,11 +4,8 @@ using System.IO;
 using System.Windows.Forms;
 using IWshRuntimeLibrary;
 
-// For creating the desktop shortcut
 
-
-
-namespace OurWordSetup.Data
+namespace OurWord.Utilities
 {
     public class Shortcut
     {
@@ -46,7 +43,7 @@ namespace OurWordSetup.Data
             get
             {
                 var sBaseFolder = Environment.GetFolderPath(
-                     Environment.SpecialFolder.LocalApplicationData);
+                    Environment.SpecialFolder.LocalApplicationData);
                 var sAppFolder = Path.Combine(sBaseFolder, ApplicationName);
                 var sAppPath = Path.Combine(sAppFolder, ApplicationName + ".exe");
                 return sAppPath;

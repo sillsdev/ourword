@@ -30,6 +30,8 @@ using OurWord.Dialogs.History;
 using OurWord.SideWnd;
 using OurWordData.Synchronize;
 using OurWordSetup.Data;
+using Shortcut=OurWord.Utilities.Shortcut;
+
 #endregion
 
 namespace OurWord
@@ -1854,7 +1856,7 @@ namespace OurWord
             // Display a splash screen while we're loading. We want to retrieve everything
             // needed from the localization database, so that the SplashScreen, which runs
             // on its own thread, isn't having to go cross-thread to get them.
-			foreach (string s in vArgs)
+			foreach (var s in vArgs)
 			{
 				if (s == "-nosplash")
 					SplashScreen.IsEnabled = false;
@@ -1867,6 +1869,14 @@ namespace OurWord
             SplashScreen.ProgramName = G.GetLoc_DialogCommon("m_lblProgramName", "Our Word!", null);
             SplashScreen.StatusBase = G.GetLoc_Splash("sLoading", "Loading {0}...");
             SplashScreen.Start();
+
+            // First time we run, we create a shortcut. Since the first time is a result of being
+            // called from the Setup program, the user should have a shortcut immediately after
+            // installing.
+            const string sShortcutCreated = "ShortcutCreated";
+            if (JW_Registry.GetValue(sShortcutCreated, false) == false)
+                (new Shortcut("OurWord")).CreateIfDoesntExist();
+            JW_Registry.SetValue(sShortcutCreated, true);
 
             // Now start loading & run the program
             OurWordMain.s_App = new OurWordMain();

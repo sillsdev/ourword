@@ -60,17 +60,16 @@ namespace OurWordTests.Setup
     public class TManifest : Manifest
     {
         #region Setup
-        [SetUp]
-        public void Setup()
+        [SetUp] public void Setup()
         {
             TestCommon.GlobalTestSetup();
         }
         #endregion
-
         #region Constructor()
         public TManifest()
             : base((new TestFile("manifest", "OurWordManifest.xml")).FullPath)
-        { }
+        {           
+        }
         #endregion
 
         #region Test: IO

@@ -103,7 +103,8 @@
     <Compile Include="DataModel\T_XmlDoc.cs" />
     <Compile Include="Printing\TPrinter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Setup\TShortcut.cs" />
+    <Compile Include="Setup\TZip.cs" />
+    <Compile Include="Utilities\TShortcut.cs" />
     <Compile Include="Styles\TCharacterStyle.cs" />
     <Compile Include="Styles\TFontFactory.cs" />
     <Compile Include="Styles\TParagraphStyle.cs" />
