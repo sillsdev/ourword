@@ -10,6 +10,7 @@
 #region Using
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Windows.Forms;
 using OurWordData.DataModel;
 using OurWord.Edit;
@@ -30,12 +31,12 @@ namespace OurWord.Dialogs.History
         {
             m_section = section;
 
+            m_wndEntireBook = new WndHistory(section.Book.History, "BookHistory");
+            m_wndThisSection = new WndHistory(section.History, "SectionHistory");
+
             InitializeComponent();
 
-            m_wndEntireBook = new WndHistory(section.Book.History, "BookHistory");
             m_tabBook.Controls.Add(m_wndEntireBook);
-
-            m_wndThisSection = new WndHistory(section.History, "SectionHistory");
             m_tabSection.Controls.Add(m_wndThisSection);
         }
         #endregion
@@ -56,10 +57,14 @@ namespace OurWord.Dialogs.History
         #region Cmd: cmdSizeChanged
         private void cmdSizeChanged(object sender, EventArgs e)
         {
-            m_wndEntireBook.SetSize(m_tabs.DisplayRectangle.Size);
-            m_wndThisSection.SetSize(m_tabs.DisplayRectangle.Size);
+            var clientSize = m_tabs.DisplayRectangle.Size;
+            m_wndEntireBook.SetSize(clientSize);
+            m_wndThisSection.SetSize(clientSize);
+            m_ctrlTranslationProgress.Location = new Point(0,0);
+            m_ctrlTranslationProgress.Size = clientSize;
         }
         #endregion
+
     }
     #endregion
 
