@@ -7,13 +7,10 @@
  * Purpose: Show progress to the user during a process which is of indeterminate duration
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-#endregion
 #endregion
 
 namespace JWTools
@@ -24,6 +21,7 @@ namespace JWTools
         #region Embedded Class Step
         class Step
         {
+            public const int RowHeight = 22;
             readonly string ID;
             readonly string LocalizedName;
             public readonly Label LabelControl;
@@ -35,8 +33,7 @@ namespace JWTools
                 ID = GetIdFor(sEnglishName);
                 LocalizedName = GetLocalizationFor(ID, sEnglishName);
 
-                const int nRowHeight = 22;
-                var y = yTop + nStepNumber * nRowHeight;
+                var y = yTop + nStepNumber * RowHeight;
 
                 PictureControl = new PictureBox
                 {
@@ -54,7 +51,7 @@ namespace JWTools
                     Name = "m_label" + ID,
                     Text = LocalizedName, 
                     Location = new Point(30, y),
-                    Size = new Size(315, nRowHeight),
+                    Size = new Size(315, RowHeight),
                     TextAlign = ContentAlignment.TopLeft,
                     TabStop = false,
                     TabIndex = nStepNumber * 2 + 100,
@@ -291,7 +288,7 @@ namespace JWTools
             var yLastStepBottom = m_Steps[m_Steps.Count - 1].LabelControl.Bottom;
 
             var nBottomMargin = Bottom - m_progressBar.Bottom;
-            const int nMarginBeforeProgressBar = 20;
+            const int nMarginBeforeProgressBar = (int)(Step.RowHeight * 1.2);
 
             var nDesiredClientHeight = yLastStepBottom + nMarginBeforeProgressBar +
                 m_progressBar.Height + nBottomMargin;
@@ -322,7 +319,7 @@ namespace JWTools
         #endregion
 
         // Startup / Shutdown ----------------------------------------------------------------
-        static public bool DisableForTesting { get; set; }
+        static public bool DisableForTesting { private get; set; }
         static private EnumeratedStepsProgressDlg s_Dialog;
         private static string s_ProcessTitle;
         #region SMethod: public void Start(string[] steps)
@@ -374,7 +371,7 @@ namespace JWTools
         #region Cmd: OnDone
         private void OnDone(object sender, System.EventArgs e)
         {
-            EnumeratedStepsProgressDlg.Stop();
+            Stop();
         }
         #endregion
     }
