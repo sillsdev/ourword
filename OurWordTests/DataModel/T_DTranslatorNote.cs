@@ -22,6 +22,8 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
+using OurWordData.DataModel.Annotations;
+
 #endregion
 #endregion
 
@@ -64,27 +66,27 @@ namespace OurWordTests.DataModel
             // Create a base Message object
             var sAuthor = "John";
             var dt = new DateTime(2008, 11, 23);
-            var sStatus = "David";
+            var status = Role.Translator;
             var sMessage = "Is bibit the correct term for seed here?";
-            var message = new DMessage(sAuthor, dt, sStatus, sMessage);
+            var message = new DMessage(sAuthor, dt, status, sMessage);
 
             // Test equality
             Assert.IsTrue(message.ContentEquals(message));
 
             // Test if author gets changed
-            var m2 = new DMessage("Sandra", dt, sStatus, sMessage);
+            var m2 = new DMessage("Sandra", dt, status, sMessage);
             Assert.IsFalse(message.ContentEquals(m2));
 
             // Test if date gets changed
-            var m3 = new DMessage(sAuthor, DateTime.Now, sStatus, sMessage);
+            var m3 = new DMessage(sAuthor, DateTime.Now, status, sMessage);
             Assert.IsFalse(message.ContentEquals(m3));
 
             // Test if status gets changed
-            var m4 = new DMessage(sAuthor, dt, "Emily", sMessage);
+            var m4 = new DMessage(sAuthor, dt, Role.Advisor, sMessage);
             Assert.IsFalse(message.ContentEquals(m3));
 
             // Test if content gets changed
-            var m5 = new DMessage(sAuthor, dt, sStatus, "This is different");
+            var m5 = new DMessage(sAuthor, dt, status, "This is different");
             Assert.IsFalse(message.ContentEquals(m4));
         }
         #endregion
@@ -158,45 +160,45 @@ namespace OurWordTests.DataModel
         #region Test: MergeMessage_WeChanged
         [Test] public void MergeMessage_WeChanged()
         {
-            var Parent = new DMessage("John", new DateTime(2008, 11, 23), "David",
+            var Parent = new DMessage("John", new DateTime(2008, 11, 23), Role.Translator,
                 "Is bibit the correct term for seed here?");
-            var Mine = new DMessage("John", new DateTime(2008, 11, 23), "Emily",
+            var Mine = new DMessage("John", new DateTime(2008, 11, 23), Role.Advisor,
                 "I say Bibit is the correct term.");
-            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), "David",
+            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), Role.Translator,
                 "Is bibit the correct term for seed here?");
 
             Mine.Merge(Parent, Theirs);
 
             Assert.AreEqual(
-                "M: Author={John} Created={11/23/2008} Status={Emily} Content={I say Bibit is the correct term.}",
+                "M: Author={John} Created={11/23/2008} Status={Advisor} Content={I say Bibit is the correct term.}",
                 Mine.DebugString);
         }
         #endregion
         #region Test: MergeMessage_TheyChanged
         [Test] public void MergeMessage_TheyChanged()
         {
-            var Parent = new DMessage("John", new DateTime(2008, 11, 23), "David",
+            var Parent = new DMessage("John", new DateTime(2008, 11, 23), Role.Translator,
                 "Is bibit the correct term for seed here?");
-            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), "Emily",
+            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), Role.Advisor,
                 "They say Bibit is the correct term.");
-            var Mine = new DMessage("John", new DateTime(2008, 11, 23), "David",
+            var Mine = new DMessage("John", new DateTime(2008, 11, 23), Role.Translator,
                 "Is bibit the correct term for seed here?");
 
             Mine.Merge(Parent, Theirs);
 
             Assert.AreEqual(
-                "M: Author={John} Created={11/23/2008} Status={Emily} Content={They say Bibit is the correct term.}",
+                "M: Author={John} Created={11/23/2008} Status={Advisor} Content={They say Bibit is the correct term.}",
                 Mine.DebugString);
         }
         #endregion
         #region Test: MergeMessage_BothChanged
         [Test] public void MergeMessage_BothChanged()
         {
-            var Parent = new DMessage("John", new DateTime(2008, 11, 23), "David",
+            var Parent = new DMessage("John", new DateTime(2008, 11, 23), Role.Translator,
                 "Is bibit the correct term for seed here?");
-            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), "Emily",
+            var Theirs = new DMessage("John", new DateTime(2008, 11, 23), Role.Advisor,
                 "They say Bibit is the correct term.");
-            var Mine = new DMessage("John", new DateTime(2008, 11, 23), "Robert",
+            var Mine = new DMessage("John", new DateTime(2008, 11, 23), Role.Consultant,
                 "I say Bibit is the wrong term.");
 
             // TEST 1: They Win
@@ -206,18 +208,18 @@ namespace OurWordTests.DataModel
             Mine.Merge(Parent, Theirs);
             DB.UserName = sDefaultAuthor;
             Assert.AreEqual(
-                "M: Author={John} Created={11/23/2008} Status={Emily} Content={They say Bibit is the correct term.}",
+                "M: Author={John} Created={11/23/2008} Status={Advisor} Content={They say Bibit is the correct term.}",
                 Mine.DebugString);
 
             // TEST 2: We Win
             // Go again, but this time with "John" so that "We" win
-            Mine = new DMessage("John", new DateTime(2008, 11, 23), "Robert",
+            Mine = new DMessage("John", new DateTime(2008, 11, 23), Role.Consultant,
                 "I say Bibit is the wrong term.");
             DB.UserName = "John";
             Mine.Merge(Parent, Theirs);
             DB.UserName = sDefaultAuthor;
             Assert.AreEqual(
-                "M: Author={John} Created={11/23/2008} Status={Robert} Content={I say Bibit is the wrong term.}",
+                "M: Author={John} Created={11/23/2008} Status={Consultant} Content={I say Bibit is the wrong term.}",
                 Mine.DebugString);
         }
         #endregion
@@ -248,7 +250,7 @@ namespace OurWordTests.DataModel
             var message = new DEventMessage();
             message.Author = "John";
             message.UtcCreated = new DateTime(2008, 11, 23);
-            message.Status = "David";
+            message.Status = Role.Translator;
             message.SimpleText = "Revisi kadua by Yuli deng Yohanis berdasarkan masukan dari Ibu Jackline.";
             message.Stage = DB.TeamSettings.Stages.Draft;
             message.EventDate = dtEventDate;
@@ -429,12 +431,12 @@ namespace OurWordTests.DataModel
         #region Method: TranslatorNote CreateTestTranslatorNote()
         TranslatorNote CreateTestTranslatorNote()
         {
-            TranslatorNote tn = new TranslatorNote("so loved the world");
+            var tn = new TranslatorNote("so loved the world");
             tn.Behavior = TranslatorNote.General;
-            tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), "Sandra",
-                "Check exegesis here."));
-            tn.Messages.Append(new DMessage("Sandra", new DateTime(2008, 11, 3), DMessage.Closed,
-                "Exegesis is fine."));
+            tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), 
+                Role.Translator, "Check exegesis here."));
+            tn.Messages.Append(new DMessage("Sandra", new DateTime(2008, 11, 3), 
+                Role.Closed, "Exegesis is fine."));
             return tn;
         }
         #endregion
@@ -455,14 +457,14 @@ namespace OurWordTests.DataModel
             TranslatorNote tn1 = new TranslatorNote("so loved the world");
             tn1.Behavior = TranslatorNote.General;
             tn1.Messages.Append(
-                new DMessage("John", new DateTime(2008, 11, 1), "David",
+                new DMessage("John", new DateTime(2008, 11, 1), Role.Translator,
                     "Check exegesis here."));
 
             // Set up a duplicate
             TranslatorNote tn2 = new TranslatorNote("so loved the world");
             tn2.Behavior = TranslatorNote.General;
             tn2.Messages.Append(
-                new DMessage("John", new DateTime(2008, 11, 1), "David",
+                new DMessage("John", new DateTime(2008, 11, 1), Role.Translator,
                     "Check exegesis here."));
 
             // Equality
@@ -474,7 +476,7 @@ namespace OurWordTests.DataModel
             tn2.Behavior = tn1.Behavior;
 
             // AssignedTo differs
-            tn2.Status = "Sandra";
+            tn2.Status = Role.Advisor;
             Assert.IsFalse(tn1.ContentEquals(tn2));
             tn2.Status = tn1.Status;
 

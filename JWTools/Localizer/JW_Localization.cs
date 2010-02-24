@@ -1829,7 +1829,7 @@ namespace JWTools
                 (DB.PrimaryIsEnglish ? tsi.ToolTipText : null));
 
             // Get its Shortcut key
-            ToolStripMenuItem mi = tsi as ToolStripMenuItem;
+            var mi = tsi as ToolStripMenuItem;
             if (null != mi)
             {
                 // The ShortcutKeyDisplayString does not always work; we'll just fix
@@ -1838,7 +1838,7 @@ namespace JWTools
                 {
                     if ( (mi.ShortcutKeys & Keys.Control ) == Keys.Control)
                     {
-                        string s = "Ctrl+";
+                        var s = "Ctrl+";
                         s += mi.ShortcutKeys.ToString()[0];
                         mi.ShortcutKeyDisplayString = s;
                     }
@@ -1852,7 +1852,7 @@ namespace JWTools
             }
             
             // Recurse if this is a drop-down item
-            ToolStripDropDownItem tsiDropDown = tsi as ToolStripDropDownItem;
+            var tsiDropDown = tsi as ToolStripDropDownItem;
             if (tsiDropDown != null)
             {
                 foreach (ToolStripItem tsiChild in tsiDropDown.DropDownItems)
@@ -2222,10 +2222,10 @@ namespace JWTools
             // Convert to the Keys type
             try
             {
-                KeysConverter converter = new KeysConverter();
+                var converter = new KeysConverter();
                 if (!string.IsNullOrEmpty(sKeys))
                 {
-                    Keys k = (Keys)converter.ConvertFromString(sKeys);
+                    var k = (Keys)converter.ConvertFromString(sKeys);
                     return k;
                 }
             }

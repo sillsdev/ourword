@@ -455,9 +455,13 @@ namespace OurWordData.Styles
             {
                 OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
                 {
-                    Alignment = ParagraphStyle.Align.Justified,
-                    PointsBefore = 3,
-                    PointsAfter = 3
+                    DefaultFontSize = 10,
+                    DefaultFontName = "Gentium",
+                    Alignment = ParagraphStyle.Align.Left,
+                    PointsBefore = 0,
+                    PointsAfter = 3,
+                    LeftMarginInches = 0.15,
+                    FirstLineIndentInches = -0.15
                 },
                 Uses = CharacterStyle.Usage.OnlyInUserInterface
             };

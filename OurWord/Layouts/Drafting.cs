@@ -22,6 +22,7 @@ using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
+using OurWordData.DataModel.Annotations;
 using OurWordData.Styles;
 
 #endregion
@@ -626,16 +627,15 @@ namespace OurWord.Layouts
         public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
         {
             // Front Translation (which will be the Vernacular by definition) we are only 
-            // interested in HintForDrafting notes. 
+            // interested in notes assigned to the DaughterTeam. 
             // - Not editable (info for the MTT)
             // + Bright icon to draw user's attention
-            if (note.IsFrontTranslationNote && note.Behavior == TranslatorNote.HintForDrafting)
+            if (note.IsFrontTranslationNote && note.Status == Role.DaughterTeam)
                 return ENote.Flags.DisplayMeIcon | ENote.Flags.FirstMessageOnly;
 
-            // In the Target Translation, just show the General notes (e.g., what's for use by
-            // the MTT, as opposed to stuff for the consultant.)
+            // In the Target Translation, just show the notes this user has permission to see
             // + Editable (user action desired)
-            if (note.IsTargetTranslationNote && note.Behavior == TranslatorNote.General)
+            if (note.IsTargetTranslationNote && note.Status.ThisUserCanAccess)
                 return ENote.Flags.UserEditable;
 
             return ENote.Flags.None;

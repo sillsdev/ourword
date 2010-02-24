@@ -16,6 +16,8 @@ using System.Data;
 using System.IO;
 using JWTools;
 using OurWordData;
+using OurWordData.DataModel.Annotations;
+
 #endregion
 
 namespace OurWordData.DataModel

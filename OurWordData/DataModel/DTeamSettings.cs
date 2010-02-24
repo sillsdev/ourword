@@ -189,6 +189,17 @@ namespace OurWordData.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
+        #region BAttr{g}:  BStringArray NotesCategories
+        public BStringArray NotesCategories
+        {
+            get
+            {
+                return m_bsaNotesCategories;
+            }
+        }
+        public BStringArray m_bsaNotesCategories = null;
+        #endregion
+
 		#region Method: void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
@@ -205,6 +216,8 @@ namespace OurWordData.DataModel
 			DefineAttr("EvenLeft",     ref m_EvenLeft);
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
+
+            DefineAttr("NotesCategories", ref m_bsaNotesCategories);
         }
 		#endregion
 
@@ -275,6 +288,9 @@ namespace OurWordData.DataModel
 				CopyrightNotice = "Copyright © " + 
 					DateTime.Today.Year.ToString() + ".";
 			}
+
+            // Notes Categories
+            m_bsaNotesCategories = new BStringArray();
         }
 		#endregion
         #region Constructor(sDisplayName)

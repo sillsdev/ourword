@@ -4,28 +4,18 @@
  * File:    TranslatorNote.cs
  * Author:  John Wimbish
  * Created: 04 Nov 2008
- * Purpose: Handles a translator's (or consultant's) note in Scripture. 
+ * Purpose: Handles a translator's (or consultant's) annotation in Scripture. 
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Text;
-using System.Windows.Forms;
-using System.IO;
+using System.Drawing;
 using System.Xml;
-
 using JWTools;
-using OurWordData;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
-
-#endregion
 #endregion
 
 // TODO: Do we want a Context for the vernacular, and another for the BT? Thus different things
@@ -34,574 +24,8 @@ using OurWordData.Styles;
 // meaningful, in that we don't highlight it in the text. But when we do, we'll regret contexts
 // that don't work for us.
 
-namespace OurWordData.DataModel
+namespace OurWordData.DataModel.Annotations
 {
-    #region Class: DMessage : DParagraph
-    public class DMessage : DParagraph
-    {
-        // Content Attrs ---------------------------------------------------------------------
-        #region BAttr{g/s}: string Author
-        public string Author
-        {
-            get
-            {
-                return m_sAuthor;
-            }
-            set
-            {
-                SetValue(ref m_sAuthor, value);
-            }
-        }
-        private string m_sAuthor = "";
-        #endregion
-        #region BAttr{g/s}: DateTime UtcCreated
-        public DateTime UtcCreated
-        {
-            get
-            {
-                return m_utcDtCreated;
-            }
-            set
-            {
-                SetValue(ref m_utcDtCreated, value);
-            }
-        }
-        private DateTime m_utcDtCreated;
-        #endregion
-        #region BAttr{g/s}: string Status
-        public string Status
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(m_sStatus))
-                    return Closed;
-
-                return m_sStatus;
-            }
-            set
-            {
-                string sValue = value;
-                if (sValue == Closed)
-                    sValue = "";
-
-                SetValue(ref m_sStatus, value);
-            }
-        }
-        private string m_sStatus = "";
-        #endregion
-        #region Method void DeclareAttrs()
-        protected override void DeclareAttrs()
-        {
-            base.DeclareAttrs();
-            DefineAttr("Author", ref m_sAuthor);
-            DefineAttr("Created", ref m_utcDtCreated);
-            DefineAttr("Status", ref m_sStatus);
-        }
-        #endregion
-
-        #region VAttr{g}: DateTime LocalTimeCreated
-        public DateTime LocalTimeCreated
-        {
-            get
-            {
-                return m_utcDtCreated.ToLocalTime();
-            }
-        }
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public DMessage()
-            : base(StyleSheet.TipMessage)
-        {
-            // Start with a simple, empty text
-            SimpleText = "";
-            SimpleTextBT = "";
-
-            // The Default date is "Today"
-            m_utcDtCreated = DateTime.UtcNow;
-
-            // The author
-            Author = DB.UserName;
-
-            Debug_VerifyIntegrity();
-        }
-        #endregion
-        #region Constructor(sAuthor, UtcDtCreated, sStatus, string sSimpleText)
-        public DMessage(string sAuthor, DateTime utcDtCreated, string sStatus, string sSimpleText)
-            : this()
-        {
-            Author = sAuthor;
-            m_utcDtCreated = utcDtCreated;
-            Status = sStatus;
-
-            // Temporary kludge: remove ||'s that we've  been inserting by mistake
-            var sFixed = DSection.IO.EatSpuriousVerticleBars(sSimpleText);
-
-            // Parse the string into phrases and add them
-            Runs.Clear();
-            var vRuns = DSection.IO.CreateDRunsFromInputText(sFixed);
-            foreach (var run in vRuns)
-            {
-                var text = run as DText;
-                if (text != null && text.PhrasesBT.Count == 0)
-                    text.PhrasesBT.Append(new DPhrase(""));
-                Runs.Append(run);
-            }
-
-            Debug_VerifyIntegrity();
-        }
-        #endregion
-        #region Constructor(XmlNode)
-        public DMessage(XmlNode node)
-            : this()
-        {
-            ReadFromOxes(node);
-            Debug_VerifyIntegrity();
-        }
-        #endregion
-        #region OMethod: bool ContentEquals(DMessage)
-        public override bool ContentEquals(JObject obj)
-        {
-            var message = obj as DMessage;
-            if (null == message)
-                return false;
-
-            if (message.Author != Author)
-                return false;
-            if (message.UtcCreated.CompareTo(UtcCreated) != 0)
-                return false;
-            if (message.Status != Status)
-                return false;
-
-            if (!base.ContentEquals(message))
-                return false;
-
-            return true;
-        }
-        #endregion
-        #region VirtMethod: DMessage Clone()
-        public virtual DMessage Clone()
-        {
-            var message = new DMessage();
-            message.Author = Author;
-            message.UtcCreated = UtcCreated;
-            message.Status = Status;
-            message.CopyFrom(this, false);
-            return message;
-        }
-        #endregion
-        #region OAttr{g}: string SortKey
-        public override string SortKey
-        {
-            get
-            {
-                // Return Created in the universal invariant form of
-                //    "2006-04-17 21:22:48Z"
-                return UtcCreated.ToString("u");
-            }
-        }
-        #endregion
-        #region VAttr{g}: TranslatorNote Note
-        public TranslatorNote Note
-        {
-            get
-            {
-                var tn = Owner as TranslatorNote;
-                Debug.Assert(null != tn);
-                return tn;
-            }
-        }
-        #endregion
-        #region DEBUG SUPPORT
-        #region Method: void Debug_VerifyIntegrity()
-        public void Debug_VerifyIntegrity()
-        {
-        #if DEBUG
-            // Make sure we have a DText in every paragraph
-            Debug.Assert(Runs.Count > 0);
-            DText text = null;
-            foreach (DRun r in Runs)
-            {
-                text = r as DText;
-                if (null != text)
-                    break;
-            }
-            Debug.Assert(null != text);
-
-            // Make sure we have a phrase in the DText
-            Debug.Assert(text.Phrases.Count > 0);
-        #endif
-        }
-        #endregion
-        #region Attr{g}: string DebugString
-        public override string DebugString
-        {
-            get
-            {
-                string s = "M: "+
-                    "Author={" + Author + "} " +
-                    "Created={" + UtcCreated.ToShortDateString() + "} " +
-                    "Status={" + Status + "} " +
-                    "Content={" + base.DebugString + "}";
-                return s;
-            }
-        }
-        #endregion
-        #endregion
-
-        // Localized Status Values -----------------------------------------------------------
-        #region SAttr{g}: string Anyone
-        static public string Anyone
-        {
-            get
-            {
-                return Loc.GetNotes("kAnyone", "Anyone");
-            }
-        }
-        #endregion
-        #region SAttr{g}: string Closed
-        static public string Closed
-        {
-            get
-            {
-                return Loc.GetNotes("kClosed", "Closed");
-            }
-        }
-        #endregion
-
-        // View Construction -----------------------------------------------------------------
-        #region VAttr{g}: bool IsEditable
-        public bool IsEditable
-        {
-            get
-            {
-                // If the owning Annotation isn't editable, then this Message isn't.
-                if (!Note.IsEditable)
-                    return false;
-
-                // If not the last one in the Annotation, it isn't
-                if (this != Note.LastMessage)
-                    return false;
-
-                // If the author is someone different from me, it isn't
-                if (Author != DB.UserName)
-                    return false;
-
-                return true;
-            }
-        }
-        #endregion
-
-        // Oxes I/O --------------------------------------------------------------------------
-        #region Constants
-        public const string c_sTagMessage = "Message";
-
-        const string c_sAttrAuthor = "author";
-        const string c_sAttrCreated = "created";
-        const string c_sAttrStatus = "status";
-        #endregion
-        #region Method: bool ImportOldToolboxXmlParagraphContents(XmlNode nodeMessage)
-        bool ImportOldToolboxXmlParagraphContents(XmlNode nodeMessage)
-        {
-            // Our clue it is old format is if we have an "ownseq" child node
-            var nodeOwnSeq = XmlDoc.FindNode(nodeMessage, "ownseq");
-            if (null == nodeOwnSeq)
-                return false;
-
-            // Retrieve the paragraph node
-            var nodeParagraph = XmlDoc.FindNode(nodeOwnSeq, "DParagraph");
-            if (null == nodeParagraph)
-                return false;
-
-            // If the paragraph has an ownseq node, then we have something more
-            // complicated going on. I'm hoping there's none in the data. If there
-            // is, then I'll need to have the JObject's FromXml code execute here.
-            var nodeUhOh = XmlDoc.FindNode(nodeParagraph, "ownseq");
-            Debug.Assert(null == nodeUhOh);
-
-            // The text is the contents attr of that node
-            SimpleText = XmlDoc.GetAttrValue(nodeParagraph, "Contents", "");
-
-            return true;
-        }
-        #endregion
-        #region VirtMethod: void ReadFromOxes(XmlNode node)
-        public virtual bool ReadFromOxes(XmlNode node)
-        {
-            if (!XmlDoc.IsNode(node, c_sTagMessage) && 
-                !XmlDoc.IsNode(node, "Discussion") &&
-                !XmlDoc.IsNode(node, "DEvent"))
-                return false;
-
-            // Attrs
-            Author = XmlDoc.GetAttrValue(node, c_sAttrAuthor, "");
-            UtcCreated = XmlDoc.GetAttrValue(node, c_sAttrCreated, DateTime.Now);
-            Status = XmlDoc.GetAttrValue(node, c_sAttrStatus, "");
-
-            // Import old-style paragraph contents; if successful, we're done.
-            if (ImportOldToolboxXmlParagraphContents(node))
-                return true;
-
-            // Otherwise, normally-stored paragraph contents
-            ReadOxes(node);
-
-            // The paragraph's ReadOxes method will attempt to set StyyleAbbrev to "p", because
-            // we don't actually have an attr in the xml. So even though the call
-            // to "this" constructor set it originally, we have to set it again here.
-            Style = StyleSheet.TipMessage;
-
-            return true;
-        }
-        #endregion
-        #region VirtMethod: XmlNode Save(oxes, nodeAnnotation)
-        public virtual XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
-        {
-            var nodeMessage = oxes.AddNode(nodeAnnotation, c_sTagMessage);
-
-            // Attrs
-            if (!string.IsNullOrEmpty(Author))
-                oxes.AddAttr(nodeMessage, c_sAttrAuthor, Author);
-            oxes.AddAttr(nodeMessage, c_sAttrCreated, UtcCreated);
-
-            // An empty Status is interpreted as "closed", so we want to not
-            // add the status attr unless we have content.
-            if (!string.IsNullOrEmpty(Status) && Status != Closed)
-                oxes.AddAttr(nodeMessage, c_sAttrStatus, Status);
-
-            // Paragraph contents
-            foreach (DRun run in Runs)
-                run.SaveToOxesBook(oxes, nodeMessage);
-
-            return nodeMessage;
-        }
-        #endregion
-
-        // Merging ---------------------------------------------------------------------------
-        #region Method: bool IsSameOriginAs(Theirs)
-        public bool IsSameOriginAs(DMessage Theirs)
-            // Two messages started out the same if they have the same Author and 
-            // Create date.
-        {
-            if (0 != UtcCreated.CompareTo(Theirs.UtcCreated))
-                return false;
-            if (Author != Theirs.Author)
-                return false;
-            return true;
-        }
-        #endregion
-        #region Method: void Merge(Parent, Theirs)
-        public void Merge(DMessage Parent, DMessage Theirs)
-        {
-            // The caller needs to make sure these are the same Author and Created
-            Debug.Assert(IsSameOriginAs(Theirs), "Theirs wasn't the same message");
-            Debug.Assert(IsSameOriginAs(Parent), "Parent wasn't the same message");
-
-            // If they are the same, we're done
-            if (ContentEquals(Theirs))
-                return;
-
-            // If we equal the parent, but they don't, then keep theirs
-            if (ContentEquals(Parent) && !Theirs.ContentEquals(Parent))
-            {
-                Status = Theirs.Status;
-                CopyFrom(Theirs, false);
-                return;
-            }
-
-            // If they equal the parent, but we don't, then keep ours
-            if (!ContentEquals(Parent) && Theirs.ContentEquals(Parent))
-                return;
-
-            // If we are here, then we have a conflict. We resolve via the Author.
-            // If the author is the person on this machine, then we win.
-            if (Author == DB.UserName)
-                return;
-            // If the author is someone else, then they win
-            Status = Theirs.Status;
-            CopyFrom(Theirs, false);
-            Status = Theirs.Status;
-        }
-        #endregion
-    }
-    #endregion
-
-    #region CLASS: DEventMessage
-    public class DEventMessage : DMessage
-    {
-        // Content Attrs ---------------------------------------------------------------------
-        #region BAttr{g/s}: DateTime EventDate - Date this event took place
-        public DateTime EventDate
-        {
-            get
-            {
-                if (m_dtEventDate.CompareTo(DefaultDate) == 0)
-                    m_dtEventDate = UtcCreated;
-
-                return m_dtEventDate;
-            }
-            set
-            {
-                SetValue(ref m_dtEventDate, value);
-            }
-        }
-        private DateTime m_dtEventDate;
-        #endregion
-        #region Method void DeclareAttrs()
-        protected override void DeclareAttrs()
-        {
-            base.DeclareAttrs();
-            DefineAttr("Date", ref m_dtEventDate);
-        }
-        #endregion
-
-        #region Attr{g/s}: Stage Stage
-        public Stage Stage
-        {
-            get
-            {
-                return m_Stage;
-            }
-            set
-            {
-                if (m_Stage != value)
-                {
-                    m_Stage = value;
-                    DeclareDirty();
-                }
-            }
-        }
-        Stage m_Stage;
-        #endregion
-
-        // VAttrs ----------------------------------------------------------------------------
-        #region VAttr{g}: DateTime DefaultDate - default for the Date attr
-        public static DateTime DefaultDate
-        {
-            get
-            {
-                return new DateTime(2009, 1, 1);
-            }
-        }
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public DEventMessage()
-            : base()
-        {
-        }
-        #endregion
-        #region Constructor(XmlNode)
-        public DEventMessage(XmlNode node)
-            : this()
-        {
-            ReadFromOxes(node);
-        }
-        #endregion
-        #region Constructor(utcDate, sStage, sDescription)
-        public DEventMessage(DateTime utcDate, Stage stage, string sDescription)
-            : this()
-        {
-            EventDate = utcDate;
-            UtcCreated = EventDate;
-            m_Stage = stage;
-            SimpleText = sDescription;
-        }
-        #endregion
-        #region OMethod: bool ContentEquals(DEventMessage)
-        public override bool ContentEquals(JObject obj)
-        {
-            var e = obj as DEventMessage;
-            if (null == e)
-                return false;
-
-            if (e.EventDate != EventDate)
-                return false;
-            if (e.Stage.EnglishAbbrev != Stage.EnglishAbbrev)
-                return false;
-
-            return base.ContentEquals(obj);
-            ;
-        }
-        #endregion
-        #region OMethod: DMessage Clone() - returns a DEventMessage
-        public override DMessage Clone()
-        {
-            var em = new DEventMessage();
-            em.Author = Author;
-            em.UtcCreated = UtcCreated;
-            em.Status = Status;
-            em.CopyFrom(this, false);
-
-            em.EventDate = EventDate;
-            em.Stage = Stage;
-
-            return em;
-        }
-        #endregion
-
-        // I/O -------------------------------------------------------------------------------
-        #region Constants
-        const string c_sAttrEventDate = "when";
-        const string c_sAttrStage = "stage";
-        #endregion
-        #region OMethod: bool ReadFromOxes(XmlNode node)
-        public override bool ReadFromOxes(XmlNode node)
-        {
-            // Read all of the base data
-            if (!base.ReadFromOxes(node))
-                return false;
-
-            // Add the DEventMessage data
-            // Stage
-            var sStage = XmlDoc.GetAttrValue(node, c_sAttrStage, Stage.c_sDraft);
-            // Normally we expect this to be the English Abbreviation
-            Stage = DB.TeamSettings.Stages.Find(sStage);
-            // But old data may have been saved some other way
-            if (null == Stage)
-                Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.LocalizedAbbrev, sStage);
-            if (null == Stage)
-                Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.LocalizedName, sStage);
-            if (null == Stage)
-                Stage = DB.TeamSettings.Stages.Find(StageList.FindBy.EnglishName, sStage);
-            // Give Up
-            if (null == Stage)
-                Stage = DB.TeamSettings.Stages.Draft;
-
-            // EventDate, including old-style which was "Date"
-            EventDate = XmlDoc.GetAttrValue(node,
-                new string[] { c_sAttrEventDate, "Date" },
-                DateTime.Now);
-
-            return true;
-        }
-        #endregion
-        #region OMethod: XmlNode Save(oxes, nodeAnnotation)
-        public override XmlNode Save(XmlDoc oxes, XmlNode nodeAnnotation)
-        {
-            // Save the superclass values
-            XmlNode nodeEventMessage = base.Save(oxes, nodeAnnotation);
-
-            // Add in our additional attributes
-            oxes.AddAttr(nodeEventMessage, c_sAttrEventDate, EventDate);
-            oxes.AddAttr(nodeEventMessage, c_sAttrStage, Stage.EnglishAbbrev);
-
-            return nodeEventMessage;
-        }
-        #endregion
-        #region SMethod: bool IsEventMessageNode(XmlNode node)
-        static public bool IsEventMessageNode(XmlNode node)
-        {
-            if (XmlDoc.HasAttr(node, c_sAttrEventDate))
-                return true;
-            return false;
-        }
-        #endregion
-    }
-    #endregion
-
-    #region Class: TranslatorNote
     public class TranslatorNote : JObject, IComparable<TranslatorNote>
     {
         // Content Attrs ---------------------------------------------------------------------
@@ -619,11 +43,47 @@ namespace OurWordData.DataModel
         }
         private string m_sSelectedText;
         #endregion
+        #region BAttr{g/s}: string Title
+        public string Title
+            // We only store something if it is different from the SelectedText attribute.
+            // Thus the SelectedText is the default title
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(m_sTitle))
+                    return SelectedText;
+                return m_sTitle;
+            }
+            set
+            {
+                if (value == SelectedText)
+                    value = "";
+                SetValue(ref m_sTitle, value);
+            }
+        }
+        private string m_sTitle;
+        #endregion
+        #region BAttr{g/s}: string Category
+        public string Category
+        {
+            get
+            {
+                return m_sCategory;
+            }
+            set
+            {
+                SetValue(ref m_sCategory, value);
+            }
+        }
+        private string m_sCategory;
+        #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
             DefineAttr("SelectedText", ref m_sSelectedText);
+            DefineAttr("Title", ref m_sTitle);
+            DefineAttr("Category", ref m_sCategory);
         }
         #endregion
 
@@ -637,7 +97,7 @@ namespace OurWordData.DataModel
                 return m_osMessages;
             }
         }
-        JOwnSeq<DMessage> m_osMessages;
+        readonly JOwnSeq<DMessage> m_osMessages;
         #endregion
         #region Method: DMessage AddMessage(utcDate, sStage, sDescription)
         public DMessage AddMessage(DateTime utcDate, Stage stage, string sDescription)
@@ -685,12 +145,24 @@ namespace OurWordData.DataModel
             Messages.Remove(m);
         }
         #endregion
-        #region VAttr{g}: bool HasMessages
+        #region Attr{g}: bool HasMessages
         public bool HasMessages
         {
             get
             {
                 return (Messages.Count > 0);
+            }
+        }
+        #endregion
+        #region Method: void RemoveEmptyMessages()
+        public void RemoveEmptyMessages()
+        {
+            for(var i=0; i<Messages.Count;)
+            {
+                if (Messages[i].IsCompletelyEmpty)
+                    RemoveMessage(Messages[i]);
+                else
+                    i++;
             }
         }
         #endregion
@@ -723,14 +195,7 @@ namespace OurWordData.DataModel
 
             // Writing System
             #region Attr{g}: bool ConsultantWritingSystem
-            public bool ConsultantWritingSystem
-            {
-                get
-                {
-                    return m_bConsultantWritingSystem;
-                }
-            }
-            readonly bool m_bConsultantWritingSystem;
+            public bool ConsultantWritingSystem { private get; set; }
             #endregion
             #region Method: WritingSystem GetWritingSystem(TranslatorNote note)
             public WritingSystem GetWritingSystem(TranslatorNote note)
@@ -745,6 +210,21 @@ namespace OurWordData.DataModel
             #endregion
 
             // Title
+            static public string GetLocTitle(string sId, string sEnglishDefault)
+            {
+                return Loc.GetString(sId, sEnglishDefault);
+                
+            }
+            public string Title { get; set; }
+            public bool HasTitle
+            {
+                get
+                {
+                    return !string.IsNullOrEmpty(Title);
+                }
+            }
+
+            /*
             #region VAttr{g}: string Title
             public string Title
             {
@@ -756,6 +236,7 @@ namespace OurWordData.DataModel
             #endregion
             readonly string m_sTitleLocID;
             readonly string m_sTitleEnglishDefault;
+            */
 
             // Icons
             #region Attr{g}: private string IconResourceBaseName
@@ -800,17 +281,11 @@ namespace OurWordData.DataModel
             #region Constructor(sName, sIconResource, sSfn, bIsConsultant, sIdTitle, sEnglishTitle)
             public Properties(string sName, 
                 string sIconResourceBaseName, 
-                string sSfmMarker, 
-                bool bConsultantWS,
-                string sTitleLocID,
-                string sTitleEnglishDefault)
+                string sSfmMarker)
             {
                 m_sName = sName;
                 m_sIconResourceBaseName = sIconResourceBaseName;
                 m_sSfmMarker = sSfmMarker;
-                m_bConsultantWritingSystem = bConsultantWS;
-                m_sTitleLocID = sTitleLocID;
-                m_sTitleEnglishDefault = sTitleEnglishDefault;
 
                 if (null == s_vProperties)
                     s_vProperties = new List<Properties>();
@@ -850,25 +325,35 @@ namespace OurWordData.DataModel
         Properties m_Behavior = General;
         #endregion
         #region Definitions: General, Exegetical, Consultant, HintForDrafting, History
-        static readonly public Properties General = new Properties("General", "NoteGeneric", 
-            "nt", false, "kGeneralNote", "Note");
+        public static readonly Properties General = new Properties("General", "NoteGeneric", "nt");
 
-        static readonly public Properties Exegetical = new Properties("Exegetical", "NoteExegesis", 
-            "ntcn", true, "kExegeticalNote", "Exegetical Note");
+        public static readonly Properties Exegetical = new Properties("Exegetical", "NoteExegesis", "ntcn")
+            { 
+                ConsultantWritingSystem = true,
+                Title = Properties.GetLocTitle("kExegeticalNote", "Exegetical Note")
+            };
 
-        static readonly public Properties Consultant = new Properties("Consultant", "NoteConsultant",
-            "ntBT", true, "kConsultantNote", "Consultant Note");
+        static readonly public Properties Consultant = new Properties("Consultant", "NoteConsultant", "ntBT")
+            {
+                ConsultantWritingSystem = true,
+                Title = Properties.GetLocTitle("kConsultantNote", "Consultant Note")
+            };
 
-        static readonly public Properties HintForDrafting = new Properties("HintForDrafting", "NoteHint",
-            "ntHint", false, "kDraftingHint", "Drafting Hint");
+        public static readonly Properties HintForDrafting = new Properties("HintForDrafting", "NoteHint", "ntHint") 
+            {
+                Title = Properties.GetLocTitle("kDraftingHint", "Drafting Hint") 
+            };
 
-        static readonly public Properties History = new Properties("History", "Note_OldVersions", 
-            "History", false, "kHistory", "History");
+        public static readonly Properties History = new Properties("History", "Note_OldVersions", "History")
+            {
+                Title = Properties.GetLocTitle("kHistory", "History")
+            };
+
         #endregion
 
         // Virtual Attrs ---------------------------------------------------------------------
-        #region VAttr{g/s}: string Status
-        public string Status
+        #region VAttr{g/s}: Role Status
+        public Role Status
         {
             get
             {
@@ -934,14 +419,14 @@ namespace OurWordData.DataModel
             get
             {
                 // Get the owning text and paragraph 
-                if (null == Owner || null == Text || null == Text.Paragraph)
+                var text = OwningTextOrNull;
+                if (null == Owner || null == text || null == text.Paragraph)
                     return null;
-                var text = Text;
-                var paragraph = Text.Paragraph;
+                var paragraph = text.Paragraph;
                 
                 // We'll start with the initial chapter/verse of the paragraph
-                int nChapter = paragraph.ReferenceSpan.Start.Chapter;
-                int nVerse = paragraph.ReferenceSpan.Start.Verse;
+                var nChapter = paragraph.ReferenceSpan.Start.Chapter;
+                var nVerse = paragraph.ReferenceSpan.Start.Verse;
 
                 // Now loop through the runs, looking for our Text, incrementing 
                 // chapter and verse as we encounter them.
@@ -1001,9 +486,18 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
+        #region SAttr{g}: string NoCategory
+        static public string NoCategory
+        {
+            get
+            {
+                return Loc.GetNotes("kNoCategory", "No Category");
+            }
+        }
+        #endregion
 
         // Settings --------------------------------------------------------------------------
-        public const string c_sRegistrySubkey = "TranslatorNotes";
+        private const string c_sRegistrySubkey = "TranslatorNotes";
         #region Attr{g/s}: bool CanDeleteAnything
         static public bool CanDeleteAnything
         {
@@ -1016,6 +510,51 @@ namespace OurWordData.DataModel
             {
                 JW_Registry.SetValue(c_sRegistrySubkey,
                     "CanDeleteAnything", value);
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool DismissWhenMouseLeaves
+        static public bool DismissWhenMouseLeaves
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sRegistrySubkey,
+                        "DismissWhenMouseLeaves", false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "DismissWhenMouseLeaves", value);
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool ShowTitleWithNoteIcon
+        static public bool ShowTitleWithNoteIcon
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sRegistrySubkey,
+                        "ShowTitleWithNoteIcon", false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "ShowTitleWithNoteIcon", value);
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool CanSetCategories
+        static public bool CanSetCategories
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sRegistrySubkey,
+                        "CanSetCategories", false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "CanSetCategories", value);
             }
         }
         #endregion
@@ -1109,19 +648,15 @@ namespace OurWordData.DataModel
             return note;
         }
         #endregion
-        #region Attr{g}: DText Text - the owning DText
-        public DText Text
+        #region Method: DText OwningTextOrNull
+        public DText OwningTextOrNull
+            // Sometimes TranslatorNotes are not owned by a DText (e.g., if they
+            // are History notes, or if they have been deleted; in which case
+            // null is returned.
         {
             get
             {
-                DText text = Owner as DText;
-
-                // History notes are not owned by a text, so we want to avoid the 
-                // assertion for them.
-                if (Behavior == History)
-                    return null;
-                Debug.Assert(null != text);
-
+                var text = Owner as DText;
                 return text;
             }
         }
@@ -1134,6 +669,29 @@ namespace OurWordData.DataModel
             foreach (DMessage m in Messages)
                 m.Debug_VerifyIntegrity();
         #endif
+        }
+        #endregion       
+        #region SMethod: Bitmap GetIcon()
+        static public Bitmap GetIcon()
+        {
+            const string sResourceName = "Annotation.bmp";
+            return JWU.GetBitmap(sResourceName);
+        }
+        #endregion
+        #region SMethod: Bitmap GetCheckedIcon()
+        static public Bitmap GetCheckedIcon()
+        {
+            const string sResourceName = "AnnotationChecked.bmp";
+            return JWU.GetBitmap(sResourceName);
+        }
+        #endregion
+        #region SAttr{g}: Color OriginalBitmapNoteColor
+        static public Color OriginalBitmapNoteColor
+        {
+            get
+            {
+                return Color.FromArgb(245, 245, 100);
+            }
         }
         #endregion
 
@@ -1180,13 +738,13 @@ namespace OurWordData.DataModel
                 return null;
 
             // The author is set to "Unknown Author".
-            string sAuthor = UnknownAuthor;
+            var sAuthor = UnknownAuthor;
 
             // The date is set to today
-            DateTime dtCreated = DateTime.Now;
+            var dtCreated = DateTime.Now;
 
             // Create the Note. We will not have a context for it.
-            TranslatorNote tn = new TranslatorNote("");
+            var tn = new TranslatorNote("");
 
             // Set its class
             switch (field.Mkr)
@@ -1223,13 +781,13 @@ namespace OurWordData.DataModel
             if (string.IsNullOrEmpty(sData))
                 return null;
 
-            // The note needs a context. We'll go with the first five words
-            // of the note. Its messy in that it gets repeated when the note is
+            // The annotation needs a context. We'll go with the first five words
+            // of the annotation. Its messy in that it gets repeated when the annotation is
             // expanded, unless we clear the ShowHeaderWhenExpanded flag.
             tn.SelectedText = GetWordsRight(sData, 0, 5);
 
             // Add the Message
-            var message = new DMessage(sAuthor, dtCreated, "", sData);
+            var message = new DMessage(sAuthor, dtCreated, Role.Closed, sData);
             tn.Messages.Append(message);          
 
             // Done
@@ -1374,19 +932,21 @@ namespace OurWordData.DataModel
         // Oxes I/O --------------------------------------------------------------------------
         #region Constants
         public const string c_sTagTranslatorNote = "Annotation";
-        const string c_sAttrClass = "class";
-        const string c_sAttrSelectedText = "selectedText";
+        private const string c_sAttrClass = "class";
+        private const string c_sAttrSelectedText = "selectedText";
+        private const string c_sAttrTitle = "title";
+        private const string c_sAttrCategory = "category";
         #endregion
         #region Class: CreateNote
         class CreateNote
         {
-            XmlNode m_nodeNote;
+            readonly XmlNode m_nodeNote;
 
             // Methods for retrieving the attributes -----------------------------------------
             #region Method: string GetSelectedText()
             string GetSelectedText()
             {
-                string s = XmlDoc.GetAttrValue(m_nodeNote,
+                var s = XmlDoc.GetAttrValue(m_nodeNote,
                     new string[] { c_sAttrSelectedText, "context" },
                     "");
                 return s;
@@ -1428,9 +988,9 @@ namespace OurWordData.DataModel
                 // that the messages will have been read in and the final one can
                 // therefore be modified.
             {
-                string sAssignedTo = XmlDoc.GetAttrValue(m_nodeNote, "assignedTo", "");
+                var sAssignedTo = XmlDoc.GetAttrValue(m_nodeNote, "assignedTo", "");
                 if (!string.IsNullOrEmpty(sAssignedTo) && note.Messages.Count > 0)
-                    note.LastMessage.Status = sAssignedTo;
+                    note.LastMessage.Status = Role.FindFromOxesName(sAssignedTo);
             }
             #endregion
 
@@ -1461,6 +1021,8 @@ namespace OurWordData.DataModel
 
                 // Attrs
                 note.SelectedText = GetSelectedText();
+                note.Title = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrTitle, "");
+                note.Category = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrCategory, "");
 
                 // Messages
                 GetMessages(note);
@@ -1491,8 +1053,13 @@ namespace OurWordData.DataModel
             // Attrs
             oxes.AddAttr(nodeNote, c_sAttrClass, Behavior.Name);
 
+            if (Category != NoCategory)
+                oxes.AddAttr(nodeNote, c_sAttrCategory, Category);
+
             if (!string.IsNullOrEmpty(SelectedText))
                 oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
+            if (!string.IsNullOrEmpty(Title))
+                oxes.AddAttr(nodeNote, c_sAttrTitle, Title);
 
             // Message objects
             foreach (DMessage m in Messages)
@@ -1569,6 +1136,15 @@ namespace OurWordData.DataModel
             return sRight.Trim();
         }
         #endregion
+        #region Method: string GetFullReference()
+        public string GetFullReference()
+        {
+            return string.Format("{0} {1} {2}", 
+                OwningBook.Translation.DisplayName,
+                OwningBook.DisplayName, 
+                GetDisplayableReference());
+        }
+        #endregion
 
         // View Construction -----------------------------------------------------------------
         #region VAttr{g}: Message FirstMessage
@@ -1621,9 +1197,9 @@ namespace OurWordData.DataModel
             // Find out who had the most recent message. They will be the
             // winner for the basic attrs. (Thus if it was them, copy the values
             // over; otherwise by default we just keep ours.)
-            DateTime TheirLastMessageDate = (Theirs.HasMessages) ? 
+            var TheirLastMessageDate = (Theirs.HasMessages) ? 
                 Theirs.LastMessage.UtcCreated : DateTime.UtcNow;
-            DateTime OurLastMessageDate = (HasMessages) ?
+            var OurLastMessageDate = (HasMessages) ?
                 LastMessage.UtcCreated : DateTime.UtcNow;
 
             if (TheirLastMessageDate.CompareTo(OurLastMessageDate) > 1)
@@ -1638,7 +1214,7 @@ namespace OurWordData.DataModel
             foreach (DMessage msgTheirs in Theirs.Messages)
             {
                 // If we have it, then merge the two
-                bool bFound = false;
+                var bFound = false;
                 foreach (DMessage msgOurs in Messages)
                 {
                     if (msgTheirs.IsSameOriginAs(msgOurs))
@@ -1663,5 +1239,4 @@ namespace OurWordData.DataModel
         }
         #endregion
     }
-    #endregion
 }

@@ -21,6 +21,7 @@ using JWTools;
 using OurWord.Printing;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Annotations;
 using OurWordData.Styles;
 
 using OurWord.Edit;
@@ -800,7 +801,7 @@ namespace OurWord
 			}
 		}
 		#endregion
-		private JW_WindowState  m_WindowState;   // Save/restore state on close/launch of app
+		private readonly JW_WindowState m_WindowState;   // Save/restore state on close/launch of app
 
 		// Scaffolding -----------------------------------------------------------------------
         const string c_sLastProjectOpened = "LastProjectOpened";
@@ -2829,7 +2830,7 @@ namespace OurWord
 		#region Cmd: cmdEditPaste
         private void cmdEditPaste(Object sender, EventArgs e)
 		{
-            OWWindow wnd = FocusedWindow;
+            var wnd = FocusedWindow;
             if (null != wnd)
                 wnd.cmdPaste();
 		}
@@ -3514,7 +3515,7 @@ namespace OurWord
                 return;
 
             // If we don't have a selection, we inform the user; as we want our notes to be
-            // about someohing (and it gives us a title for our annotation.)
+            // about something (and it gives us an initial title for our annotation.)
             var selection = CurrentLayout.Selection;
             if (null == selection || !selection.IsContentSelection)
             {
@@ -3523,7 +3524,6 @@ namespace OurWord
                     "Please select the text for which your note will be about.",
                     null,
                     LocDB.MessageTypes.Warning);
-
                 return;
             }
 
@@ -3544,8 +3544,7 @@ namespace OurWord
                     var en = item as ENote;
                     if (null != en && en.Note == action.Note)
                     {
-                        OWToolTip.ToolTip.LaunchToolTipWindow(en);
-                        return;
+                        en.LaunchToolTip();
                     }
                 }
             }

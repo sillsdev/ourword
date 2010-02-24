@@ -20,6 +20,8 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Annotations;
+
 #endregion
 #endregion
 
@@ -156,6 +158,15 @@ namespace OurWord.Edit
         {
             Debug.Assert(false, "Subclasses need to implement this.");
             return null;
+        }
+        #endregion
+        #region Attr{g}: Point Middle
+        public Point Middle
+        {
+            get
+            {
+                return new Point((int)(Position.X + Width/2), (int)(Position.Y + Height/2));
+            }
         }
         #endregion
 

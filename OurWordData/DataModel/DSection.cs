@@ -7,23 +7,17 @@
  * Purpose: Handles a section (passage) of Scripture
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Windows.Forms;
 using System.IO;
 using System.Xml;
 using JWTools;
-using OurWordData;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
-
-#endregion
 #endregion
 
 namespace OurWordData.DataModel
@@ -2982,21 +2976,23 @@ namespace OurWordData.DataModel
                 if (bTheirsHasChanged && bMineHasChanged)
                 {
                     // Get the first DParagraph and DText we can write a note onto
-                    DParagraph paragraph = FirstAvailableNoteParagraph;
-                    DText text = FirstAvailableNoteText;
+                    var paragraph = FirstAvailableNoteParagraph;
+                    var text = FirstAvailableNoteText;
                     if (null == paragraph || null == text)
                         return;
 
                     // Create our note
-                    TranslatorNote note = new TranslatorNote();
-                    note.SelectedText = TranslatorNote.MergeAuthor;
-                    note.Behavior = TranslatorNote.General;
-                    string sMessage = Loc.GetString("kStructureConflictInMerge",
+                    var note = new TranslatorNote
+                    {
+                        SelectedText = TranslatorNote.MergeAuthor,
+                        Behavior = TranslatorNote.General
+                    };
+                    var sMessage = Loc.GetString("kStructureConflictInMerge",
                         "This section's paragraphing was changed by more than one user. " +
                         "We kept one; you'll need to look at Mercurial's history to see " +
                         "what the other user did; we were not able to keep their changes.");
                     var message = new DMessage(TranslatorNote.MergeAuthor,
-                        DateTime.Now, DMessage.Anyone, sMessage);
+                        DateTime.Now, Role.Anyone, sMessage);
                     note.Messages.Append(message);
                     text.TranslatorNotes.Append(note);
                 }
@@ -3316,19 +3312,19 @@ namespace OurWordData.DataModel
                     // be done by casting MyRun to a DText. That fails, though, in 
                     // the case of a footnote, in which case we just ignore the
                     // change. (TODO: handles it when MyRun is a DFoot). 
-                    DText AttachTo = itemx.MyRun as DText;
+                    var AttachTo = itemx.MyRun as DText;
                     if (null == AttachTo)
                         continue;
                     
-                    TranslatorNote note = new TranslatorNote();
-                    DReference reference = Mine.GetReferenceAt(itemx.MyRun);
+                    var note = new TranslatorNote();
+                    var reference = Mine.GetReferenceAt(itemx.MyRun);
                     if (null == reference)
                         continue;
                     note.SelectedText = itemx.Context;
                     var message = new DMessage(
                         TranslatorNote.MergeAuthor,
                         DateTime.UtcNow,
-                        DMessage.Anyone,
+                        Role.Anyone,
                         itemx.NoteText);
                     note.Messages.Append(message);
 

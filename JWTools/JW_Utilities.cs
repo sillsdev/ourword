@@ -201,6 +201,21 @@ namespace JWTools
             return bmp;
         }
         #endregion
+        #region SMethod: void ChangeBitmapColor(Bitmap, oldColor, newColor)
+        static public void ChangeBitmapColor(Bitmap bmp, Color oldColor, Color newColor)
+        {
+            Debug.Assert(null != bmp);
+
+            for (var h = 0; h < bmp.Height; h++)
+            {
+                for (var w = 0; w < bmp.Width; w++)
+                {
+                    if (bmp.GetPixel(w, h) == oldColor)
+                        bmp.SetPixel(w, h, newColor);
+                }
+            }
+        }
+        #endregion
 
         // Round a float up to the nearest int value
         #region Method: int RoundUpToInt(float f)
@@ -559,7 +574,8 @@ namespace JWTools
         }
         #endregion
 
-	    public static string BuildFriendlyVersion(Version v)
+        #region SMethod: string BuildFriendlyVersion(Version v)
+        public static string BuildFriendlyVersion(Version v)
         {
             var chBuild = (char)((int)'a' + v.Build);
 
@@ -567,9 +583,29 @@ namespace JWTools
                 v.Minor.ToString() +
                 ((v.Build == 0) ? "" : chBuild.ToString());
 
-            return sVersionNo;           
+            return sVersionNo;
         }
+        #endregion
 
+        #region Method: int MeasureTextDisplayWidth()
+        static public int MeasureTextDisplayWidth(string sText, Graphics graphics, Font font)
+        {
+            // Perform the measurement
+            var format = new StringFormat();
+            var rect = new RectangleF(0, 0, 1000, 1000);
+            CharacterRange[] ranges = { new CharacterRange(0, sText.Length) };
+
+            format.SetMeasurableCharacterRanges(ranges);
+
+            var regions = graphics.MeasureCharacterRanges(sText,
+                font, rect, format);
+            rect = regions[0].GetBounds(graphics);
+
+            var width = (int)(rect.Right + 1.0f);
+
+            return width;
+        }
+        #endregion
     }
 
     #region CLASS: JW_Util

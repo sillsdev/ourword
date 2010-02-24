@@ -22,6 +22,8 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData;
 using JWTools;
+using OurWordData.DataModel.Annotations;
+
 #endregion
 #endregion
 
@@ -224,7 +226,9 @@ namespace OurWord.Layouts
             // In the back translation view, we only want to display notes in back translation 
             //  paragraphs; if this is a vernacular we don't display the note.
             // + editable (we expect dialog between, e.g., advisor and consultant)
-            if ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) == OWPara.Flags.ShowBackTranslation)
+            var bIsBackTranslation = (ParagraphFlags & OWPara.Flags.ShowBackTranslation) ==
+                                     OWPara.Flags.ShowBackTranslation;
+            if (bIsBackTranslation && note.Status.ThisUserCanAccess)
                 return ENote.Flags.UserEditable;
 
             return ENote.Flags.None;

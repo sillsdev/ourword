@@ -9,12 +9,17 @@
  *********************************************************************************************/
 #region Using
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using OurWord.ToolTips;
+using OurWord.Utilities;
 using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 
@@ -23,256 +28,9 @@ using OurWordData.Styles;
 
 namespace OurWord.Edit
 {
-    public partial class OWToolTip : Form
-    {
-        // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: ToolTipContents ContentWindow
-        public ToolTipContents ContentWindow
-        {
-            get
-            {
-                return m_ContentWindow;
-            }
-        }
-        readonly ToolTipContents m_ContentWindow;
-        #endregion
-
-        // Launch Window ---------------------------------------------------------------------
-        #region Method: Screen GetScreenContainingPoint(Point pt)
-        static Screen GetScreenContainingPoint(Point pt)
-        {
-            var screen = Screen.PrimaryScreen;
-            foreach (var sc in Screen.AllScreens)
-            {
-                if (sc.Bounds.Contains(pt))
-                    screen = sc;
-            }
-            return screen;
-        }
-        #endregion
-        #region Method: void MoveMouseIntoWindow()
-        void MoveMouseIntoWindow()
-            // We want to move the Mouse to be within the window, so that it is easier on
-            // the user; otherwise a faulty mouse movement would easily dismiss the window.
-            // So we want to move it vertically so that it is within the window.
-        {
-            const int nOffset = 5;
-
-            var rectToolTipScreenCoords = RectangleToScreen(ClientRectangle);
-
-            var yCursor = Cursor.Position.Y;
-            yCursor = Math.Max(yCursor, rectToolTipScreenCoords.Top + nOffset);
-            yCursor = Math.Min(yCursor, rectToolTipScreenCoords.Bottom - nOffset);
-
-            var xCursor = Math.Max(Cursor.Position.X, rectToolTipScreenCoords.Left + nOffset);
-
-            Cursor.Position = new Point(xCursor, yCursor);
-        }
-        #endregion
-        #region Method: void LaunchToolTipWindow()
-        public void LaunchToolTipWindow()
-        {
-            // Since this can be called independently of the timer, we want to make sure
-            // that it doesn't get called twice due to different threads.
-            m_cTicksCountdown = -1;
-
-            // Make sure the EBlock supports a tooltip window
-            if (!Block.HasToolTip())
-                return;
-
-            // Load its contents; this sets the window's height
-            ContentWindow.LoadData();
-
-            // Get the underlying block's location on the screen
-            var ptWindowScreenLocation = Block.Window.PointToScreen(Block.Window.Location);
-
-            // Get the screen that contains this block; we want to prevent the ToolTip
-            // from being split across multiple displays
-            var screen = GetScreenContainingPoint(ptWindowScreenLocation);
-
-            // We want to position the Tooltip horizontally so that it is left-aligned with 
-            // the block; but moving it to the left if it will not fit on the current screen
-            int nleft = ptWindowScreenLocation.X + (int)Block.Position.X;
-            if (nleft + Width > screen.Bounds.Right)
-                nleft = screen.Bounds.Right - Width;
-
-            // Vertical:
-            // 1. Our top desire is to position so we're just under the block
-            int nTop = ptWindowScreenLocation.Y +
-                (int)Block.Position.Y -
-                (int)Block.Window.ScrollBarPosition +
-                (int)Block.Height;
-            // 2. The block could be scrolled out of view, in which case, move it up into the window
-            int yWindowBottom = Block.Window.PointToScreen(new Point(0, 0)).Y + Block.Window.Height;
-            nTop = Math.Min(nTop, yWindowBottom);
-            // 3. If we're below the screen, move it just above the block
-            if (nTop + Height > screen.Bounds.Bottom)
-            {
-                nTop -= Height;
-                nTop -= (int)Block.Height;
-            }
-            // 4. But make sure we're not above the screen
-            nTop = Math.Max(nTop, 0);
-
-            // Calculations done: move and show the window
-            Location = new Point(nleft, nTop);
-            Show();
-
-            // Select the last thing possible, or make sure we have a null selection
-            // if a selection can't be made (otherwise the window tries to use the
-            // selection from the previous time.
-            if (false == ContentWindow.Contents.Select_LastWord_End())
-                ContentWindow.Selection = null;
-
-            // If we don't focus the window, the selection will not flash and keyboard entry
-            // will not be received.
-            ContentWindow.Focus();
-
-            // Make sure the mouse is within the window rectangle
-            MoveMouseIntoWindow();
-        }
-        #endregion
-        #region Method: void LaunchToolTipWindow(EBlock)
-        public void LaunchToolTipWindow(EBlock block)
-        {
-            SetBlock(block);
-            LaunchToolTipWindow();
-        }
-        #endregion
-        #region Method: void CloseWindow()
-        public void CloseWindow()
-        {
-            Hide();
-        }
-        #endregion
-
-        // Timer -----------------------------------------------------------------------------
-        readonly System.Windows.Forms.Timer m_TooltipTimer;
-        const int c_nTooltipTimerInterval = 400;
-        #region Cmd: OnTooltipTimerTick
-        void OnTooltipTimerTick(object sender, EventArgs e)
-        {
-            // We want to make sure we hover at least two ticks before displaying the
-            // popup, rather than displaying whenever the mouse moves across the item.
-            if (m_cTicksCountdown >= 0)
-                m_cTicksCountdown--;
-
-            // When the countdown reaches 0, we're ready to display the popup
-            if (m_cTicksCountdown == 0)
-                LaunchToolTipWindow();
-        }
-        #endregion
-
-        // Set current block -----------------------------------------------------------------
-        #region Attr{g}: EBlock Block
-        public EBlock Block
-        {
-            get
-            {
-                return m_Block;
-            }
-        }
-        EBlock m_Block;
-        #endregion
-        int m_cTicksCountdown = -1;
-        #region Method: void SetBlock(EBlock block)
-        public void SetBlock(EBlock block)
-        {
-            Debug.Assert(null != block);
-
-            // If we've moved off of the current block, then we want to hide
-            // any visible tooltip.
-            if (block != Block)
-            {
-                m_Block = block;
-                Hide();
-            }
-
-            // Start the countdown. SetBlock is only called when the mouse is moved,
-            // so if the countdown makes it to zero, it means the mouse has remained
-            // stationary
-            m_cTicksCountdown = 2;
-        }
-        #endregion
-        #region Method: void ClearBlock()
-        public void ClearBlock()
-        {
-            m_cTicksCountdown = -1;
-            m_Block = null;
-        }
-        #endregion
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region SAttr{g}: OWToolTip ToolTip - the one-and-only ToolTip
-        static public OWToolTip ToolTip
-        {
-            get
-            {
-                if (null == s_ToolTip)
-                    s_ToolTip = new OWToolTip();
-                return s_ToolTip;
-            }
-        }
-        static OWToolTip s_ToolTip;
-        #endregion
-        #region Constructor()
-        public OWToolTip()
-        {
-            InitializeComponent();
-
-            // Create and add the content OWWindow
-            m_ContentWindow = new ToolTipContents(this);
-            ContentWindow.Dock = DockStyle.Fill;
-            Controls.Add(ContentWindow);
-
-            // Settings for this window
-            Visible = false;
-
-            // Turn on the timer
-            m_TooltipTimer = new Timer {Interval = c_nTooltipTimerInterval};
-            m_TooltipTimer.Tick += OnTooltipTimerTick;
-            m_TooltipTimer.Start();
-        }
-        #endregion
-        #region Cmd: OnVisibleChanged
-        protected override void OnVisibleChanged(EventArgs e)
-            // Every time we show or hid a window, we want to restart the UndoStack.
-            // The idea is that while a window is showing, subsequent actions can
-            // be undone; but when the Tooltip is dismissed, the actions are no
-            // longer on the stack; we return the stack back to the state prior to
-            // launching the ToolTip.
-        {
-            base.OnVisibleChanged(e);
-
-            var UndoStack = OurWordMain.App.URStack;
-
-            if (Visible)
-            {
-                UndoStack.BookmarkStack();
-            }
-            else
-            {
-                UndoStack.RestoreBookmarkedStack();
-            }
-        }
-        #endregion
-    }
-
-    public class ToolTipContents : OWWindow
-    {
-        // Attrs -----------------------------------------------------------------------------
-        private readonly OWToolTip m_Tip;
-
-        // Scaffolding -----------------------------------------------------------------------
-        #region Constructor(Tip)
-        public ToolTipContents(OWToolTip tip)
-            : base(WindowClass.Tooltip)
-        {
-            Debug.Assert(null != tip);
-            m_Tip = tip;
-        }
-        #endregion
-
+    #region CODE FROM ToolTip ContentWindow, when we automatically adjusted Height
+    /* CODE FROM ToolTip ContentWindow, when we automatically adjusted Height
+         * 
         // Layout and Dynamic Window Height --------------------------------------------------
         #region OMethod: void LoadData()
         public override void LoadData()
@@ -318,8 +76,10 @@ namespace OurWord.Edit
         {
         }
         #endregion
-    }
+        */
+    #endregion
 
+    #region CLASS: AnnotationTipBuilder
     public class AnnotationTipBuilder
     {
         protected readonly OWWindow Tip;
@@ -400,14 +160,15 @@ namespace OurWord.Edit
         #region virtual void LoadInteractiveMessages()
         public virtual void LoadInteractiveMessages()
         {
-            // We'll place the meessages in their own container, so we can have a top and
-            // bottom border separating them from the annotation's title at the top, and 
-            // the toolbar / controls at the bottom.
+            // We'll place the meessages in their own container, so we can have a 
+            // bottom border separating them from the next message.
             var messagesBox = new EColumn();
-            messagesBox.Border = new EContainer.SquareBorder(messagesBox);
-            messagesBox.Border.BorderPlacement = EContainer.BorderBase.BorderSides.TopAndBottom;
-            messagesBox.Border.Padding.Bottom = 5;     // So not too tight with bottom horz line
-            messagesBox.Border.Margin.Top = 5;         // So not too tight with the title
+            messagesBox.Border = new EContainer.SquareBorder(messagesBox)
+            {
+                BorderPlacement = EContainer.BorderBase.BorderSides.Bottom,
+                Padding = {Bottom = 5},
+                Margin = {Top = 5}
+            };
             Tip.Contents.Append(messagesBox);
 
             // Add each message to the container
@@ -552,7 +313,7 @@ namespace OurWord.Edit
             if (null == note)
                 return;
 
-            (new AddMessageAction(Tip, note)).Do();
+//            (new AddMessageAction(Tip, note)).Do();
         }
         #endregion
         #region ToolStripButton BuildRespondControl()
@@ -608,35 +369,22 @@ namespace OurWord.Edit
                 Cursor.Position = new Point(Cursor.Position.X, yWndBottom - 3);
 
             // Make the change
-            (new ChangeStatus(Tip, Note, item)).Do();
+//            (new ChangeStatus(Tip, Note, item)).Do();
         }
         #endregion
         #region static void SetStatusToolTip(TranslatorNote, ToolStripDropDownButton)
         static public void SetStatusToolTip(TranslatorNote note, ToolStripDropDownButton item)
         {
-            string sTip;
-            if (note.Status == DMessage.Closed)
-            {
-                sTip = Loc.GetNotes("btnStatusClosed",
-                    "This note has been closed out (considered finished).\n" +
-                    "Click here to re-open it, by assigning it to someone.");
-            }
-            else
-            {
-                var sBase = Loc.GetNotes("btnStatusOpen",
-                    "This note has been assigned to {0}.");
-                sTip = LocDB.Insert(sBase, new[] { note.Status });
-            }
-            item.ToolTipText = sTip;
+            item.ToolTipText = note.Status.LocalizedToolTipText;
         }
         #endregion
-        #region var BuildAssignStatusItem(sDisplayValue)
-        ToolStripMenuItem BuildAssignStatusItem(string sDisplayValue)
+        #region var BuildAssignStatusItem(Role)
+        ToolStripMenuItem BuildAssignStatusItem(Role role)
         {
-            var item = new ToolStripMenuItem(sDisplayValue);
+            var item = new ToolStripMenuItem(role.LocalizedName);
             item.Click += new EventHandler(OnAssignStatus);
 
-            if (sDisplayValue == Note.Status)
+            if (role == Note.Status)
                 item.Checked = true;
 
             return item;
@@ -650,20 +398,14 @@ namespace OurWord.Edit
             btnStatus.Name = "Status";
             SetStatusToolTip(Note, btnStatus);
 
-            // At a minimum we have "Anyone" and "Closed"
-            btnStatus.DropDownItems.Add(BuildAssignStatusItem(DMessage.Anyone));
-            btnStatus.DropDownItems.Add(BuildAssignStatusItem(DMessage.Closed));
-
-            // If we have additional people, then we add a separator line
-            if (DB.Project.People.Length > 0)
-                btnStatus.DropDownItems.Add(new ToolStripSeparator());
-
-            // Add in the people
-            foreach (string sPerson in DB.Project.People)
-                btnStatus.DropDownItems.Add(BuildAssignStatusItem(sPerson));
+            foreach(var role in Role.AllRoles)
+            {
+                var item = BuildAssignStatusItem(role);
+                btnStatus.DropDownItems.Add(item);
+            }
 
             // The text on the button is the Annotation's status
-            btnStatus.Text = Note.Status;
+            btnStatus.Text = Note.Status.LocalizedName;
 
             return btnStatus;
         }
@@ -690,7 +432,7 @@ namespace OurWord.Edit
                 return;
 
             // Close the ToolTip window
-            OWToolTip.ToolTip.CloseWindow();
+//            OWToolTip.ToolTip.CloseWindow();
 
             // Remove the note
             (new DeleteNoteAction(Tip, note)).Do();
@@ -718,7 +460,7 @@ namespace OurWord.Edit
                 return;
 
             // Remove the message
-            (new RemoveMessageAction(Tip, message)).Do();
+ //           (new RemoveMessageAction(Tip, message)).Do();
         }
         #endregion
         #region ToolStripButton BuildDeleteSimpleButton(JObject objWhatToDelete)
@@ -915,7 +657,9 @@ namespace OurWord.Edit
         }
         #endregion
     }
+    #endregion
 
+    #region CLASS: HistoryBuilder
     public class HistoryBuilder : AnnotationTipBuilder
         // TODO: Can we inherit the Delete control?
     {
@@ -1252,5 +996,5 @@ namespace OurWord.Edit
         #endregion
 
     }
-
+    #endregion
 }

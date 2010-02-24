@@ -7,7 +7,6 @@
  * Purpose: A book within the translation (e.g., Mark, Philemon)
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Diagnostics;
 using System.Collections;
@@ -19,12 +18,11 @@ using System.IO;
 using System.Xml;
 using JWTools;
 using Chorus.merge;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 using Palaso.Email;
 using Palaso.Reporting;
-
-#endregion
 #endregion
 
 namespace OurWordData.DataModel

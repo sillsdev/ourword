@@ -277,10 +277,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>WizNew_Cluster.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Edit\OWToolTip.resx">
-      <DependentUpon>OWToolTip.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Edit\LiterateSettingsWnd.resx">
       <DependentUpon>LiterateSettingsWnd.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -297,6 +293,9 @@
     <EmbeddedResource Include="Res\Failure.ico" />
     <EmbeddedResource Include="Res\Delete.ico" />
     <EmbeddedResource Include="Res\BlueDot.ico" />
+    <EmbeddedResource Include="Res\Annotation.bmp" />
+    <EmbeddedResource Include="Res\AnnotationChecked.bmp" />
+    <EmbeddedResource Include="Res\Category.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
       <SubType>Designer</SubType>
@@ -610,10 +609,6 @@
     <Compile Include="Edit\ENote.cs" />
     <Compile Include="Edit\EPicture.cs" />
     <Compile Include="Edit\OWToolTip.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Edit\OWToolTip.Designer.cs">
-      <DependentUpon>OWToolTip.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ConsultantPreparation.cs">
       <SubType>Component</SubType>
@@ -675,6 +670,13 @@
     <Compile Include="Test.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ToolTips\EditableNoteTip.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolTips\EditableNoteTip.Designer.cs">
+      <DependentUpon>EditableNoteTip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolTips\ToolTipLauncher.cs" />
     <Compile Include="Utilities\ClusterListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -701,6 +703,12 @@
     </Compile>
     <Compile Include="Utilities\GroupedTasksList.Designer.cs">
       <DependentUpon>GroupedTasksList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolTips\ShadowedBalloon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolTips\ShadowedBalloon.Designer.cs">
+      <DependentUpon>ShadowedBalloon.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Shortcut.cs" />
     <EmbeddedResource Include="Dialogs\DlgBookProperties.resx">
@@ -800,6 +808,9 @@
       <DependentUpon>SideWindows.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="ToolTips\EditableNoteTip.resx">
+      <DependentUpon>EditableNoteTip.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Utilities\ClusterListView.resx">
       <DependentUpon>ClusterListView.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -815,6 +826,9 @@
     <EmbeddedResource Include="Utilities\GroupedTasksList.resx">
       <DependentUpon>GroupedTasksList.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolTips\ShadowedBalloon.resx">
+      <DependentUpon>ShadowedBalloon.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

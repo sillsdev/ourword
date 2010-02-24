@@ -22,6 +22,7 @@ using System.Xml;
 
 using JWTools;
 using OurWordData;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 

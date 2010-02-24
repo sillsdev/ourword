@@ -21,8 +21,10 @@ using System.Timers;
 using System.Threading;
 using System.Windows.Forms;
 using JWTools;
+using OurWord.ToolTips;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 using Palaso.UI.WindowsForms.Keyboarding;
@@ -283,6 +285,8 @@ namespace OurWord.Edit
             m_vSecondaryWindows = new OWWindow[0];
             m_LineUpDownX = new LineUpDownX();
 
+            InitializeScrollbar();
+
             // Typical tooltip color
             SetRegistryBackgroundColor(Name, "Cornsilk");
 
@@ -309,14 +313,7 @@ namespace OurWord.Edit
                 m_sRegistrySettingsSubKey = LiterateSettingsWnd.c_sRegSubKey;
 
             // Initialize ScrollBar
-            AutoScroll = false;             // Don't use Panel's built-in scrollbar
-            m_ScrollBar = new VScrollBar 
-            {
-                Dock = DockStyle.Right
-            };
-            Controls.Add(m_ScrollBar);
-            ScrollBarPosition = 0;
-            ScrollBar.ValueChanged += new EventHandler(OnScrollBarValueChanged);
+            InitializeScrollbar();
 
             // Used for Up/Down arrow behavior
             m_LineUpDownX = new LineUpDownX();
@@ -336,11 +333,9 @@ namespace OurWord.Edit
 
             // Vector of secondary windows
             m_vSecondaryWindows = new OWWindow[0];
-
-            // Initialize the tooltips
-            m_ToolTip = OWToolTip.ToolTip;
         }
         #endregion
+
         #region Method: void TypingErrorBeep()
         static public void TypingErrorBeep()
         {
@@ -691,7 +686,7 @@ namespace OurWord.Edit
                 return m_ScrollBar;
             }
         }
-        private readonly VScrollBar m_ScrollBar;
+        private VScrollBar m_ScrollBar;
         #endregion
         #region VAttr{g}: bool HasScrollbar
         public bool HasScrollbar
@@ -814,6 +809,19 @@ namespace OurWord.Edit
                 sp.Word.Position.Y - Height + sp.Word.Height + ScrollPositionBufferMargin);
             if (ScrollBarPosition < yBottom)
                 ScrollBarPosition = yBottom;
+        }
+        #endregion
+        #region Method: void InitializeScrollbar()
+        void InitializeScrollbar()
+        {
+            AutoScroll = false;             // Don't use Panel's built-in scrollbar
+            m_ScrollBar = new VScrollBar
+            {
+                Dock = DockStyle.Right
+            };
+            Controls.Add(m_ScrollBar);
+            ScrollBarPosition = 0;
+            ScrollBar.ValueChanged += new EventHandler(OnScrollBarValueChanged);
         }
         #endregion
         #endregion
@@ -2015,6 +2023,9 @@ namespace OurWord.Edit
         }
         #endregion
 
+        // ToolTips
+        private static ToolTipLauncher s_ToolTipLauncher = new ToolTipLauncher();
+
         // Mousing ---------------------------------------------------------------------------
         #region DOC: Mouse Behavior
         /* Mouse Behavior: Selecting vs Drag/Drop
@@ -2060,7 +2071,7 @@ namespace OurWord.Edit
             m_bMouseDown = true;
 
             // The point of the mouse click, accounting for the scroll bar
-            PointF pt = new PointF(e.X, e.Y + ScrollBarPosition);
+            var pt = new PointF(e.X, e.Y + ScrollBarPosition);
 
             // Is this a possible DragAndDrop operation? It is if (1) there is already
             // a selection, and (2) the mouse click is within it.
@@ -2071,7 +2082,7 @@ namespace OurWord.Edit
  //           }
 
             // Get the EBlock we're over, and perform that block's action
-            EBlock block = Contents.GetBlockAt(pt);
+            var block = Contents.GetBlockAt(pt);
             if (null == block)
                 return;
             block.cmdLeftMouseClick(pt);
@@ -2084,29 +2095,20 @@ namespace OurWord.Edit
             base.OnMouseMove(e);
 
             // The point of the mouse, accounting for the scroll bar
-            PointF pt = new PointF(e.X, e.Y + ScrollBarPosition);
+            var pt = new PointF(e.X, e.Y + ScrollBarPosition);
 
             // Get the EBlock we are currently over
             if (m_MouseState == MouseStates.kNone)
             {
-                EBlock block = Contents.GetBlockAt(pt);
-                if (null != block)
-                {
-                    Cursor = block.MouseOverCursor;
-                    if (null != m_ToolTip)
-                        m_ToolTip.SetBlock(block);
-                }
-                else
-                {
-                    Cursor = Cursors.Default;
-                    if (null != m_ToolTip)
-                        m_ToolTip.ClearBlock();
-                }
+                var block = Contents.GetBlockAt(pt);
+                ToolTipLauncher.SetBlock(block);
+
+                Cursor = (null == block) ? Cursors.Default : block.MouseOverCursor;
             }
 
             if (m_MouseState == MouseStates.kSelectingText)
             {
-                EBlock block = Contents.GetBlockAt(pt);
+                var block = Contents.GetBlockAt(pt);
                 if (null != block)
                     block.cmdMouseMove(pt);
             }
@@ -2180,7 +2182,6 @@ namespace OurWord.Edit
             base.OnMouseWheel(e);
         }
         #endregion
-        OWToolTip m_ToolTip;
 
         // Movement --------------------------------------------------------------------------
         #region Selection Movement & Extend Commands

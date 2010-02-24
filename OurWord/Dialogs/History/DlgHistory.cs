@@ -7,14 +7,13 @@
  * Purpose: For displaying the History of a section or book
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using OurWordData.DataModel;
 using OurWord.Edit;
-#endregion
+using OurWordData.DataModel.Annotations;
 #endregion
 
 namespace OurWord.Dialogs.History

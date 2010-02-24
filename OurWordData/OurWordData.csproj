@@ -116,6 +116,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModel\Annotations\DEventMessage.cs" />
+    <Compile Include="DataModel\Annotations\DMessage.cs" />
+    <Compile Include="DataModel\Annotations\Roles.cs" />
     <Compile Include="DataModel\BookInfo.cs" />
     <Compile Include="DataModel\BookNames.cs" />
     <Compile Include="DataModel\ClusterInfo.cs" />
@@ -147,7 +150,7 @@
     <Compile Include="DataModel\SfMapping.cs" />
     <Compile Include="DataModel\StdFmtTransform.cs" />
     <Compile Include="DataModel\Stage.cs" />
-    <Compile Include="DataModel\TranslatorNote.cs" />
+    <Compile Include="DataModel\Annotations\TranslatorNote.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

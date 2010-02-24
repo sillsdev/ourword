@@ -23,6 +23,8 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData;
 using JWTools;
+using OurWordData.DataModel.Annotations;
+
 #endregion
 #endregion
 
@@ -271,9 +273,9 @@ namespace OurWord.Layouts
             if (!note.IsTargetTranslationNote)
                 return ENote.Flags.None;
 
-            // Only general notes (interaction is only with the MTT, not the consultant)
+            // Only notes this user has permission for)
             // + Editable (user action desired)
-            if (note.Behavior == TranslatorNote.General)
+            if (note.Status.ThisUserCanAccess)
                 return ENote.Flags.UserEditable;
 
             return ENote.Flags.None;

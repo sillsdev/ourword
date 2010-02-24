@@ -23,6 +23,7 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData;
 using JWTools;
+using OurWordData.DataModel.Annotations;
 using OurWordData.Styles;
 
 #endregion
@@ -316,24 +317,21 @@ namespace OurWord.Layouts
         public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
         {
             // Is the containing paragraph displaying the back translation?
-            bool bIsBT = ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) == OWPara.Flags.ShowBackTranslation);
+            var bIsBT = ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) 
+                == OWPara.Flags.ShowBackTranslation);
 
             // In the Target Translation, we display all back translation notes
             // + editable: conversations desired
-            if (note.IsTargetTranslationNote && bIsBT)
+            if (note.IsTargetTranslationNote && bIsBT && note.Status.ThisUserCanAccess)
                 return ENote.Flags.UserEditable;
 
-            // In the Front Translation's Back Translation paragraph, we are not interested in general
-            // MTT notes, but rather, notes that the consultant might want to see. But since we're
-            // preparing for the consultant, we permit the user (advisor) to edit these
+            // In the Front Translation's Back Translation paragraph, we are only interested 
+            // in notes that the consultant might want to see. Since we're preparing for
+            // the consultant, we permit the user (advisor) to edit these
             // + editable: conversations desired
             if (note.IsFrontTranslationNote && bIsBT)
             {
-                if (note.Behavior == TranslatorNote.Exegetical)
-                    return ENote.Flags.UserEditable;
-                if (note.Behavior == TranslatorNote.Consultant)
-                    return ENote.Flags.UserEditable;
-                if (note.Behavior == TranslatorNote.HintForDrafting)
+                if (note.Status == Role.Consultant)
                     return ENote.Flags.UserEditable;
             }
 

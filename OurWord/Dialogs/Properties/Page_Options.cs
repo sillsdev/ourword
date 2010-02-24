@@ -32,6 +32,8 @@ using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWord.SideWnd;
 using OurWord.Layouts;
+using OurWordData.DataModel.Annotations;
+
 #endregion
 
 
@@ -65,7 +67,7 @@ namespace OurWord.Dialogs
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
         const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
-        const string c_sGroup_BackgroundColors = "propBackgroundColors";
+        const string c_sGroupBackgroundColors = "propBackgroundColors";
         const string c_sColorDrafting = "propBackColorDraftingWindow";
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
         const string c_sColorConsultantPreparation = "propBackColorConsultantPreparation";
@@ -312,7 +314,7 @@ namespace OurWord.Dialogs
                 null));
 
             // Zoom Factor (displays as a combo, showing, e.g., "120 %")
-            ZoomPropertySpec zps = new ZoomPropertySpec(
+            var zps = new ZoomPropertySpec(
                 c_sZoomFactor,
                 "Zoom Factor",
                 "",
@@ -358,31 +360,31 @@ namespace OurWord.Dialogs
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorDrafting,
                 "Drafting",
-                c_sGroup_BackgroundColors,
+                c_sGroupBackgroundColors,
                 "The color of the Drafting window background.",
                 "Wheat"));
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorBackTranslation,
                 "Back Translation",
-                c_sGroup_BackgroundColors,
+                c_sGroupBackgroundColors,
                 "The color of the Back Translation window background.",
                 "Wheat"));
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorConsultantPreparation,
                 "Consultant Preparation",
-                c_sGroup_BackgroundColors,
+                c_sGroupBackgroundColors,
                 "The color of the Consultant Preparation window background.",
                 "LilghtYellow"));
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorNaturalnessCheck,
                 "Naturalness Check",
-                c_sGroup_BackgroundColors,
+                c_sGroupBackgroundColors,
                 "The color of the Naturalness Check window background.",
                 "Wheat"));
             Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
                 c_sColorOtherTranslations,
                 "Other Translations",
-                c_sGroup_BackgroundColors,
+                c_sGroupBackgroundColors,
                 "The color of the Other Translations window background.",
                 "Wheat"));
             #endregion
@@ -486,12 +488,12 @@ namespace OurWord.Dialogs
         #region Method: void CreateCheckTreeItems(DlgCheckTree dlg)
         void CreateCheckTreeItems(DlgCheckTree dlg)
         {
-            foreach (ClusterInfo ci in ClusterList.Clusters)
+            foreach (var ci in ClusterList.Clusters)
             {
                 var ciItem = new CheckTreeItem(ci.Name, false, ci);
                 dlg.Items.Add(ciItem);
 
-                foreach (string sProject in ci.GetClusterLanguageList(true))
+                foreach (var sProject in ci.GetClusterLanguageList(true))
                 {
                     var item = new CheckTreeItem(sProject, ci.GetUserCanAccess(sProject), sProject);
                     ciItem.SubItems.Add(item);
@@ -502,13 +504,13 @@ namespace OurWord.Dialogs
         #region Method: void HarvestCheckTreeItems(DlgCheckTree dlg)
         void HarvestCheckTreeItems(DlgCheckTree dlg)
         {
-            foreach (CheckTreeItem ctiCluster in dlg.Items)
+            foreach (var ctiCluster in dlg.Items)
             {
                 var ci = ClusterList.FindClusterInfo(ctiCluster.Name);
                 if (null == ci)
                     continue;
 
-                foreach (CheckTreeItem ctiProject in ctiCluster.SubItems)
+                foreach (var ctiProject in ctiCluster.SubItems)
                 {
                     ci.SetUserCanAccess(ctiProject.Name, ctiProject.Checked);
                 }
@@ -516,7 +518,7 @@ namespace OurWord.Dialogs
         }
         #endregion
 
-        #region OMethod: UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        #region OMethod: UITypeEditorEditStyle GetEditStyle(context)
         public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
         {
             return UITypeEditorEditStyle.Modal;

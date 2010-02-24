@@ -798,6 +798,7 @@ namespace OurWordData.DataModel
 			m_osOtherTranslations = new JOwnSeq<DTranslation>("OtherTrans", this,
                 true, false);
 
+            // People
             m_bsaPeople = new BStringArray();
 
             // Default for a display name

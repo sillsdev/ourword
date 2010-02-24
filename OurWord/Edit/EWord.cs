@@ -189,16 +189,17 @@ namespace OurWord.Edit
         #endregion
 
         // Tooltips
+        #region VirtMethod: void LaunchToolTip()
+        public virtual void LaunchToolTip()
+        {
+            // Those subclasses which suppport tooltips will launch here
+        }
+        #endregion
         #region Attr{g}: HasTooltip
         virtual public bool HasToolTip()
         {
             // Return false if no tooltip is desired
             return false;
-        }
-        #endregion
-        #region Method: void LoadToolTip(ToolTipContents)
-        virtual public void LoadToolTip(ToolTipContents wnd)
-        {
         }
         #endregion
 

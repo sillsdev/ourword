@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Xml;
 using JWTools;
+using OurWordData.DataModel.Annotations;
 using OurWordData.Tools;
 #endregion
 
@@ -529,7 +530,7 @@ namespace OurWordData.DataModel.Runs
                  AsString, theirPhrases.AsString);
 
             var message = new DMessage(TranslatorNote.MergeAuthor,
-                DateTime.Now, DMessage.Anyone, sMessageContents);
+                DateTime.Now, Role.Anyone, sMessageContents);
             note.Messages.Append(message);
 
             text.TranslatorNotes.Append(note);

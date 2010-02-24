@@ -1,6 +1,6 @@
-﻿namespace OurWord.Edit
+﻿namespace OurWord.ToolTips
 {
-    partial class OWToolTip
+    partial class ShadowedBalloon
     {
         /// <summary>
         /// Required designer variable.
@@ -30,26 +30,28 @@
         {
             this.SuspendLayout();
             // 
-            // OWToolTip
+            // ShadowedBalloon
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.BackColor = System.Drawing.Color.Cornsilk;
-            this.ClientSize = new System.Drawing.Size(379, 264);
+            this.ClientSize = new System.Drawing.Size(387, 290);
             this.ControlBox = false;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "OWToolTip";
-            this.ShowIcon = false;
+            this.Name = "ShadowedBalloon";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "OWToolTip";
-            this.TopMost = true;
+            this.Text = "ShadowedBalloon";
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.cmdPaint);
+            this.Shown += new System.EventHandler(this.cmdFirstShown);
+            this.MouseLeave += new System.EventHandler(this.OnMouseLeave);
+            this.Resize += new System.EventHandler(this.cmdResize);
             this.ResumeLayout(false);
 
         }
 
         #endregion
+
     }
 }

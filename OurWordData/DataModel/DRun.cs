@@ -1016,9 +1016,9 @@ namespace OurWordData.DataModel
 		public override void EliminateSpuriousSpaces()
 			// There should be no spaces at all within a label
 		{
-			string s = "";
+			var s = "";
 
-			foreach(char ch in Text)
+			foreach(var ch in Text)
 			{
 				if (ch != ' ')
 					s += ch;
@@ -1036,7 +1036,6 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-
 	}
 	#endregion
 

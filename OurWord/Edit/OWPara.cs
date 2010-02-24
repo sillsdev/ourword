@@ -15,6 +15,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 
@@ -504,7 +505,7 @@ namespace OurWord.Edit
         #region CLASS: ELabel
         public class ELabel : EBlock
         {
-            public const string c_Spaces = "\u00A0\u00A0";
+            private const string c_Spaces = "\u00A0";
 
             #region Constructor(font, DLabel)
             public ELabel(Font font, DLabel label)
@@ -975,8 +976,8 @@ namespace OurWord.Edit
         public OWPara(
             WritingSystem writingSystem, 
             ParagraphStyle style, 
-            DPhrase[] vLiteralPhrases)
-            : this(writingSystem, style, (JObject)null, Flags.None)
+            IEnumerable<DPhrase> vLiteralPhrases)
+            : this(writingSystem, style, null, Flags.None)
         {
 
             // Each Literal String will potentially have its own character style
@@ -1021,7 +1022,7 @@ namespace OurWord.Edit
         readonly List<ELine> m_vLines = null;
         #endregion
         #region Method: Line LineContainingBlock(EBlock block)
-        ELine LineContainingBlock(EBlock block)
+        public ELine LineContainingBlock(EBlock block)
         {
             foreach (var ln in Lines)
             {

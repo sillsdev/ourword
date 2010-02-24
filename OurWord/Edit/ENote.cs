@@ -4,24 +4,19 @@
  * File:    ENote.cs
  * Author:  John Wimbish
  * Created: 02 Sep 2009
- * Purpose: An note icon, pointing to a not
+ * Purpose: An icon, pointing to a TranslatorNote
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Text;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using JWTools;
-using OurWordData;
+using OurWord.ToolTips;
 using OurWordData.DataModel;
-#endregion
+using OurWordData.DataModel.Annotations;
+using OurWordData.Styles;
 #endregion
 
 namespace OurWord.Edit
@@ -37,7 +32,7 @@ namespace OurWord.Edit
                 return m_Note;
             }
         }
-        readonly TranslatorNote m_Note = null;
+        readonly TranslatorNote m_Note;
         #endregion
         #region OAttr{g}: float Width
         public override float Width
@@ -94,20 +89,20 @@ namespace OurWord.Edit
         #region Method: override void cmdLeftMouseClick(PointF pt)
         public override void cmdLeftMouseClick(PointF pt)
         {
-            OWToolTip.ToolTip.LaunchToolTipWindow();
+            ToolTipLauncher.LaunchNow(this);
         }
         #endregion
 
         // Bitmap ----------------------------------------------------------------------------
         #region Attr{g}: Bitmap Bmp - the note's bitmap
-        Bitmap Bmp
+        public Bitmap Bmp
         {
             get
             {
                 // Get this when we first need it. We previously had this in the constructor; but the 
                 // problem was that we do not have access to the Window at the time of construction.
                 if (null == m_bmp)
-                    InitializeBitmap(Context.BackgroundColor); // Window.BackColor);
+                    InitializeBitmap(Context.BackgroundColor); 
 
                 Debug.Assert(null != m_bmp);
                 return m_bmp;
@@ -115,38 +110,101 @@ namespace OurWord.Edit
         }
         Bitmap m_bmp;
         #endregion
+
+        static public Bitmap BuildBitmap(Color backgroundColor, Color internalColor, bool bUseCheckedVersion)
+        {
+            var bmp = (bUseCheckedVersion) ? 
+                TranslatorNote.GetCheckedIcon() : 
+                TranslatorNote.GetIcon();
+
+            // Set its transparent color to the background color.
+            JWU.ChangeBitmapBackground(bmp, backgroundColor);
+
+            // Set its internal color
+            JWU.ChangeBitmapColor(bmp, TranslatorNote.OriginalBitmapNoteColor,
+                internalColor);
+
+            return bmp;
+        }
+
+        #region Method: bool InitializeBitmapWithNoteTitle()
+        bool InitializeBitmapWithNoteTitle()
+            // Returns true if this expanded style of TranslatorNote is what was drawn.
+            // Otherwise the caller should draw the icon only.
+        {
+            // We do this if (1) the user setting requires it, and (2) the TranslatorNote
+            // does not have the Closed status
+            if (!TranslatorNote.ShowTitleWithNoteIcon)
+                return false;
+            if (Note.Status == Role.Closed)
+                return false;
+
+            const int xIconPosition = 3;
+            const int xSpaceBetweenBitmapAndTitle = 2;
+
+            // Retrieve the bitmap
+            var bmpIcon = BuildBitmap(Note.Status.IconColor, Note.Status.IconColor, false);
+            Debug.Assert(null != bmpIcon);
+
+            // The maximum width will be arbitrarily set to 150 pixels
+            const int maxWidth = 150;
+
+            // The desired width is the length of the TranslatorNote's title
+            var title = Note.Title;
+            var graphics = Window.CreateGraphics();
+            var font = StyleSheet.TipText.GetFont(Note.Behavior.GetWritingSystem(Note).Name, 
+                FontStyle.Regular, G.ZoomPercent);
+            var desiredWidth = JWU.MeasureTextDisplayWidth(title, graphics, font);
+            graphics.Dispose();
+
+            // Add room for the picture
+            desiredWidth += xIconPosition;
+            desiredWidth += bmpIcon.Width;
+            desiredWidth += xSpaceBetweenBitmapAndTitle;
+
+            // Our actual width is the smaller of the two
+            var actualWidth = Math.Min(maxWidth, desiredWidth);
+
+            // The height will be the containing line's line height; but larger if
+            // needed in order to accomodate the icon
+            var paragraph = Owner as OWPara;
+            if (null == paragraph)
+                return false;
+            var actualHeight = (int)Math.Max(paragraph.LineHeight, bmpIcon.Height + 2);
+            
+            // Create the full bitmap
+            var bitmap = new Bitmap(actualWidth, actualHeight);
+
+            // Its a pain to get the Graphics to draw predictably
+            graphics = Graphics.FromImage(bitmap);
+            graphics.CompositingQuality = CompositingQuality.HighQuality;
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            // We'll fill the color depending on the TranslatorNote's assign-to, 
+            // and add a border to help it stand out
+            var colorBackground = Note.Status.IconColor;
+            graphics.FillRectangle(new SolidBrush(colorBackground), 0, 0, bitmap.Width, bitmap.Height);
+            graphics.DrawRectangle(new Pen(Color.Brown), 1, 1, bitmap.Width-1, bitmap.Height-1 );
+
+            // Draw the contents
+            graphics.DrawImage(bmpIcon, xIconPosition, 2);
+            graphics.DrawString(title, font, new SolidBrush(Color.Brown),
+                xIconPosition + bmpIcon.Width + xSpaceBetweenBitmapAndTitle, 2);
+
+            // Done
+            graphics.Dispose();
+            m_bmp = bitmap;
+            return true;
+        }
+        #endregion
         #region Method: void InitializeBitmap(backgroundColor)
         public void InitializeBitmap(Color backgroundColor)
         {
-            // Get the name of the file; this depends on the type and context
-            var sResource = NoteIconResource;
+            if (InitializeBitmapWithNoteTitle())
+                return;
 
-            // Retrieve the bitmap from resources
-            var bmp = JWU.GetBitmap(sResource);
-            Debug.Assert(null != bmp);
-
-            // Set its transparent color to the background color.
-            m_bmp = JWU.ChangeBitmapBackground(bmp, backgroundColor);
-        }
-        #endregion
-        #region VAttr{g}: string NoteIconResource
-        public string NoteIconResource
-        {
-            get
-            {
-                // If DisplayMe is set, it overrides all other logic
-                if (DisplayMeIcon)
-                    return Note.Behavior.IconResourceMe;
-
-                if (Note.Status == DMessage.Closed)
-                    return Note.Behavior.IconResourceClosed;
-
-                if (Note.Status == DB.UserName)
-                    return Note.Behavior.IconResourceMe;
-
-                // Default
-                return Note.Behavior.IconResourceAnyone;
-            }
+            m_bmp = BuildBitmap(backgroundColor, Note.Status.IconColor, false);
         }
         #endregion
 
@@ -155,7 +213,7 @@ namespace OurWord.Edit
         [Flags]
         public enum Flags
         {
-            None = 0,             // Don't display the note
+            None = 0,             // Don't display the TranslatorNote
             UserEditable = 1,     // Display in conversational mode
             FirstMessageOnly = 2, // Don't display more than one message
             DisplayMeIcon = 4     // Override to display only Me, not Anyone or Closed
@@ -196,29 +254,20 @@ namespace OurWord.Edit
         #endregion
 
         // Tooltip ---------------------------------------------------------------------------
-        #region Method: void LoadToolTip(ToolTipContents)
-        override public void LoadToolTip(ToolTipContents wnd)
-        {
-            var builder = new AnnotationTipBuilder(wnd, Note);
-
-            // Title
-            builder.LoadNoteTitle(NoteIconResource);
-
-            if (FirstMessageOnly)
-            {
-                builder.LoadSingleMessageContents();
-            }
-            else if (UserEditable)
-            {
-                builder.LoadInteractiveMessages();
-                builder.LoadToolStrip();
-            }
-        }
-        #endregion
         #region Attr{g}: bool HasToolTip()
         public override bool HasToolTip()
         {
             return true;
+        }
+        #endregion        
+        #region OMethod: void LaunchToolTip()
+        public override void LaunchToolTip()
+        {
+            var y = (int)(Middle.Y - Window.ScrollBarPosition);
+            var ptScreenLocation = Window.PointToScreen(new Point(Middle.X, y));
+
+            var tip = new EditableNoteTip(this);
+            tip.Launch(ptScreenLocation);
         }
         #endregion
     }
