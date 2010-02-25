@@ -54,18 +54,18 @@ namespace OurWordTests.DataModel
             DB.Project.FrontTranslation = new DTranslation("Front", "Latin", "Latin");
             DB.Project.TargetTranslation = new DTranslation("Target", "Latin", "Latin");
 
-            DBook bookFront = new DBook("MRK");
+            var bookFront = new DBook("MRK");
             DB.Project.FrontTranslation.AddBook(bookFront);
-            DSection sectionFront = new DSection();
+            var sectionFront = new DSection();
             bookFront.Sections.Append(sectionFront);
-            DParagraph paraFront = new DParagraph();
+            var paraFront = new DParagraph();
             sectionFront.Paragraphs.Append(paraFront);
 
-            DBook bookTarget = new DBook("MRK");
+            var bookTarget = new DBook("MRK");
             DB.Project.TargetTranslation.AddBook(bookTarget);
-            DSection sectionTarget = new DSection();
+            var sectionTarget = new DSection();
             bookTarget.Sections.Append(sectionTarget);
-            DParagraph paraTarget = new DParagraph();
+            var paraTarget = new DParagraph();
             sectionTarget.Paragraphs.Append(paraTarget);
 
             DB.Project.FrontTranslation.BookNamesTable.Clear();
@@ -86,13 +86,13 @@ namespace OurWordTests.DataModel
             DB.Project.TargetTranslation.BookNamesTable.Append("2 Yohanes");
             DB.Project.TargetTranslation.BookNamesTable.Append("Kejadian");
 
-            string sSource = "(Genesis 3:4; Exodus 12:4, 3; Ex 3:4, " +
-                "Genesissy 23:4; 2 Kings 13:3; Carita (Mula-Mula) 5:5, 23";
-            string sExpected = "(Kejadian 3:4; Keluaran 12:4, 3; Ex 3:4, " +
+            var sSource = "(Genesis 3:4; Exodus 12:4, 3; Ex 3:4, " +
+                "Genesissy 23:4; 2 Kings 13:3; Carita (Mula-mula) 5:5, 23";
+            var sExpected = "(Kejadian 3:4; Keluaran 12:4, 3; Ex 3:4, " +
                 "Genesissy 23:4; 2 Raja-Raja 13:3; Kejadian 5:5, 23";
             paraFront.SimpleText = sSource;
 
-            DB.Project.TargetTranslation.ConvertCrossReferences(paraFront, paraTarget);
+            DTranslation.ConvertCrossReferences(paraFront, paraTarget);
 
             Assert.AreEqual(sExpected, paraTarget.SimpleText);
         }

@@ -166,7 +166,7 @@ namespace OurWordData.DataModel
 				return;
 
 			// Convert the source
-			Translation.ConvertCrossReferences( fnFront, this ); 
+			DTranslation.ConvertCrossReferences( fnFront, this ); 
 		}
 		#endregion
 

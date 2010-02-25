@@ -347,14 +347,14 @@ namespace OurWordData.DataModel
 		#endregion
 
         // Misc ------------------------------------------------------------------------------
-        #region Method: void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
-        public void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
+        #region SMethod: void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
+        static public void ConvertCrossReferences(DParagraph pSource, DParagraph pDest)
         {
             pDest.Runs.Clear();
 
             foreach (DRun run in pSource.Runs)
             {
-                DRun runDest = run.ConvertCrossRefs(
+                var runDest = run.ConvertCrossRefs(
                     pSource.Translation.BookNamesTable,
                     pDest.Translation.BookNamesTable);
 

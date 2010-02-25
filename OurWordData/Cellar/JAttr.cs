@@ -718,37 +718,39 @@ namespace OurWordData
 		#region Method: int FindSubstringMatch(sLongString, iStartPos, bEndAtWordBoundary)
 		public int FindSubstringMatch(string sLongString, int iStartPos, bool bEndAtWordBoundary)
 		{
-			for(int i=0; i<Length; i++)
+			for(var i=0; i<Length; i++)
 			{
-				// Is the string long enough for the test?
+			    // Is the string long enough for the test?
 				//
 				// This is a test.
 				// 0123456789 1234  - Length = 15
 				//           ^
 				// "test." length = 5
 				// If iPos = 10, then iPos + test.length = 15.
-				if (iStartPos + this[i].Length <= sLongString.Length)
-				{
-					// Do we have a match with one of our strings?
-					if (this[i] == sLongString.Substring(iStartPos, this[i].Length) )
-					{
-						if (bEndAtWordBoundary)
-						{
-							// If we're at the end of the long string, then we succeeed.
-							if (iStartPos + this[i].Length == sLongString.Length)
-								return i;
-							// Otherwise, the long string exceeds the length, and we can
-							// examine the next character to see if it is a word boundary.
-							char ch = sLongString[iStartPos + this[i].Length ];
-							if (!Char.IsLetter(ch))
-								return i;
-						}
-						else
-							return i;
-					}
-				}
+			    if (iStartPos + this[i].Length > sLongString.Length) 
+                    continue;
+
+			    // Do we have a match with one of our strings?
+                // Third param of "true" means a caseless compare
+                if (string.Compare(this[i], sLongString.Substring(iStartPos, this[i].Length), true) != 0)
+//			    if (this[i] != sLongString.Substring(iStartPos, this[i].Length)) 
+                    continue;
+
+			    if (bEndAtWordBoundary)
+			    {
+			        // If we're at the end of the long string, then we succeeed.
+			        if (iStartPos + this[i].Length == sLongString.Length)
+			            return i;
+			        // Otherwise, the long string exceeds the length, and we can
+			        // examine the next character to see if it is a word boundary.
+			        var ch = sLongString[iStartPos + this[i].Length ];
+			        if (!Char.IsLetter(ch))
+			            return i;
+			    }
+			    else
+			        return i;
 			}
-			return -1;
+		    return -1;
 		}
 		#endregion
 

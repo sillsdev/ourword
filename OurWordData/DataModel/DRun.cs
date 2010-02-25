@@ -1802,19 +1802,19 @@ namespace OurWordData.DataModel
             BStringArray bsaDestSubstitutions)
         {
             // We assume a simple, one-phrase text
-            string sSource = "";
+            var sSource = "";
             foreach (DPhrase phr in Phrases)
                 sSource += phr.Text;
 
             // Create the converted string
-            int i = 0;
-            string sDest = "";
+            var i = 0;
+            var sDest = "";
 
             // Loop through the source string, comparing for matches
             while (i < sSource.Length)
             {
                 // Look for a match from amongst the book names
-                int iBookName = bsaSourceSubstitutions.FindSubstringMatch(sSource, i, true);
+                var iBookName = bsaSourceSubstitutions.FindSubstringMatch(sSource, i, true);
 
                 // If not found, add the current character and move on to the next one
                 if (-1 == iBookName)

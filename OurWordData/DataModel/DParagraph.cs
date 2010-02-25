@@ -1318,7 +1318,7 @@ namespace OurWordData.DataModel
 			// If a cross reference, then convert it
 			if (DB.TeamSettings.SFMapping.IsCrossRef( StyleAbbrev ) )
 			{
-				Translation.ConvertCrossReferences(pFront, this);
+				DTranslation.ConvertCrossReferences(pFront, this);
 				return;
 			}
 
