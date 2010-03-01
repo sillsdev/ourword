@@ -2212,19 +2212,29 @@ namespace OurWord.Edit
         #endregion
         #endregion
         #region OMethod: bool MoveLineDown(aiStack, ptCurrentLocation)
-        public override bool MoveLineDown(ArrayList aiStack, PointF ptCurrentLocation)
+        public override bool MoveLineDown(ArrayList aiStack, string sColumnId, PointF ptCurrentLocation)
+            // Moves to the next line within this paragraph, as close as possible to the
+            // x location. Returns true if successful, false if there is no lower line
+            // in the paragraph to move to.
         {
-            // Loop through the subitems
-            for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
-            {
-                EItem item = SubItems[i] as EItem;
-                EWord word = item as EWord;
+            // Fail if this is not an allowed destination for the downarrow move
+            if (IsLocked)
+                return false;
 
+            // Fail if we're not in the correct column
+            if (ColumnId != sColumnId)
+                return false;
+
+            // Loop through the subitems
+            for (var i = PopSelectionStack(aiStack, true); i < Count; i++)
+            {
                 // If uneditable, skip it
+                var item = SubItems[i];
                 if (!item.IsEditable)
                     continue;
 
                 // If not a word, skip it
+                var word = item as EWord;
                 if (null == word)
                     continue;
 
@@ -2242,19 +2252,26 @@ namespace OurWord.Edit
         }
         #endregion
         #region OMethod: bool MoveLineUp(aiStack, ptCurrentLocation)
-        public override bool MoveLineUp(ArrayList aiStack, PointF ptCurrentLocation)
+        public override bool MoveLineUp(ArrayList aiStack, string sColumnId, PointF ptCurrentLocation)
         {
-            // Loop through the subitems
-            for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
-            {
-                EItem item = SubItems[i] as EItem;
-                EWord word = item as EWord;
+            // Fail if this is not an allowed destination for the downarrow move
+            if (IsLocked)
+                return false;
 
+            // Fail if we're not in the correct column
+            if (ColumnId != sColumnId)
+                return false;
+
+            // Loop through the subitems
+            for (var i = PopSelectionStack(aiStack, false); i >= 0; i--)
+            {
                 // If uneditable, skip it
+                var item = SubItems[i];
                 if (!item.IsEditable)
                     continue;
 
                 // If not a word, skip it
+                var word = item as EWord;
                 if (null == word)
                     continue;
 

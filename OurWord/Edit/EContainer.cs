@@ -1102,6 +1102,15 @@ namespace OurWord.Edit
             }
         }
         #endregion
+        #region VirtAttr{g}: string ColumnId
+        public virtual string ColumnId
+        {
+            get
+            {
+                return (null != Owner) ? Owner.ColumnId : "";
+            }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -1139,7 +1148,7 @@ namespace OurWord.Edit
         {
             if (aiStack.Count > 0)
             {
-                int i = (int)aiStack[0];
+                var i = (int)aiStack[0];
                 aiStack.RemoveAt(0);
                 return i;
             }
@@ -1148,22 +1157,22 @@ namespace OurWord.Edit
         }
         #endregion
         #region VMethod: bool MoveLineDown(aiStack, ptCurrentLocation)
-        virtual public bool MoveLineDown(ArrayList aiStack, PointF ptCurrentLocation)
+        virtual public bool MoveLineDown(ArrayList aiStack, string sColumnId, PointF ptCurrentLocation)
         {
             // Loop through the subitems
-            for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
+            for (var i = PopSelectionStack(aiStack, true); i < Count; i++)
             {
-                EItem item = SubItems[i] as EItem;
+                var item = SubItems[i];
 
                 // If uneditable, skip it
                 if (!item.IsEditable)
                     continue;
 
                 // If we're at a container, we keep working downwards
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
-                    if (container.MoveLineDown(aiStack, ptCurrentLocation))
+                    if (container.MoveLineDown(aiStack, sColumnId, ptCurrentLocation))
                         return true;
                 }
             }
@@ -1172,22 +1181,22 @@ namespace OurWord.Edit
         }
         #endregion
         #region VMethod: bool MoveLineUp(aiStack, ptCurrentLocation)
-        virtual public bool MoveLineUp(ArrayList aiStack, PointF ptCurrentLocation)
+        virtual public bool MoveLineUp(ArrayList aiStack, string sColumnId, PointF ptCurrentLocation)
         {
             // Loop through the subitems
-            for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
+            for (var i = PopSelectionStack(aiStack, false); i >= 0; i--)
             {
-                EItem item = SubItems[i] as EItem;
+                var item = SubItems[i];
 
                 // If uneditable, skip it
                 if (!item.IsEditable)
                     continue;
 
                 // If we're at a container, we keep working downwards
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
-                    if (container.MoveLineUp(aiStack, ptCurrentLocation))
+                    if (container.MoveLineUp(aiStack, sColumnId, ptCurrentLocation))
                         return true;
                 }
             }
@@ -1689,6 +1698,45 @@ namespace OurWord.Edit
         public EColumn()
             : base()
         {
+        }
+        #endregion
+
+        #region Attr{g}: int PositionWithinOwningRow
+        int PositionWithinOwningRow
+        {
+            get
+            {
+                if (null == Owner)
+                    return -1;
+
+                var row = Owner as ERowOfColumns;
+                if (null == row)
+                    return -1;
+
+                for(var i=0; i<row.SubItems.Length; i++)
+                {
+                    if (row.SubItems[i] == this)
+                        return i;
+                }
+
+                return -1;
+            }
+        }
+        #endregion
+        #region OAttr{g}: string ColumnId
+        public override string ColumnId
+        {
+            get
+            {
+                var i = PositionWithinOwningRow;
+                if (i == -1)
+                    return base.ColumnId;
+
+                if (null == Owner)
+                    return "";
+
+                return Owner.ColumnId + i;
+            }
         }
         #endregion
 

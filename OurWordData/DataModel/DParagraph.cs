@@ -1273,7 +1273,7 @@ namespace OurWordData.DataModel
 			// If a cross reference, then convert it
 			if (Style == StyleSheet.SectionCrossReference)
 			{
-				Translation.ConvertCrossReferences(pFront, this);
+				DTranslation.ConvertCrossReferences(pFront, this);
 				return;
 			}
 

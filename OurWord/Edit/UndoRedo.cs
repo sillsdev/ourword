@@ -1495,15 +1495,11 @@ namespace OurWord.Edit
         string ProcessAutoReplace()
         {
             // Shorthand
-            OWWindow.Sel selection = Window.Selection;
+            var selection = Window.Selection;
             if (null == selection)
                 return null;
-            OWPara op = selection.Paragraph;
+            var op = selection.Paragraph;
             var writingSystem = op.WritingSystem;
-
-            // Edits not permitted here
-            if (Window.HandleLockedFromEditing())
-                return null;
 
             // An Insertion Icon is simple, we just check for the chKey, and insert it
             // if a match
@@ -1511,7 +1507,7 @@ namespace OurWord.Edit
             {
                 int c = 0;
                 string sInsert = writingSystem.SearchAutoReplace(chKey.ToString(), ref c);
-                if (null == sInsert || sInsert.Length == 0)
+                if (string.IsNullOrEmpty(sInsert))
                     return null;
                 return sInsert;
             }
@@ -1533,7 +1529,7 @@ namespace OurWord.Edit
             // Check for a match
             int cSelectionCount = 0;
             string sReplace = writingSystem.SearchAutoReplace(sSource, ref cSelectionCount);
-            if (null == sReplace || sReplace.Length == 0)
+            if (string.IsNullOrEmpty(sReplace))
                 return null;
             Debug.Assert(cSelectionCount > 0);
 
@@ -1661,10 +1657,14 @@ namespace OurWord.Edit
             if (Char.IsControl(chKey))
                 return false;
 
+            // If locked for editing, we don't do anything
+            if (Window.HandleLockedFromEditing())
+                return false;
+
             // We Need to copy the "Before" state, because the Insert process will
             // do something mid-process (after the AutoReplace); and we really need the
             // start Going In.
-            OWBookmark bm = Window.CreateBookmark();
+            var bm = Window.CreateBookmark();
 
             // Get the AutoReplace text
             TextToInsert = ProcessAutoReplace();

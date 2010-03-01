@@ -624,7 +624,7 @@ namespace OurWordData.DataModel
 				DParagraph pTarget = vTarget[i] as DParagraph;
 				DParagraph pFront  = vFront[i]  as DParagraph;
 
-				pTarget.Translation.ConvertCrossReferences(pFront, pTarget);
+				DTranslation.ConvertCrossReferences(pFront, pTarget);
 			}
 		}
 		#endregion
