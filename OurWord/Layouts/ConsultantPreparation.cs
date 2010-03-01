@@ -162,45 +162,44 @@ namespace OurWord.Layouts
             // Creates an OWPara, but switches based on whether we're dealing with a footnote or
             // a normal paragraph (the Footnote code inserts the footnote reference/label.)
         {
-            DFootnote fn = p as DFootnote;
+            var fn = p as DFootnote;
             if (null != fn)
                 return CreateFootnotePara(fn, ws, backColor, flags);
 
             return new OWPara(ws, p.Style, p, backColor, flags);
         }
         #endregion
-        #region Method: OWPara.Flags GetBTOptions(p, bIsFront)
-        OWPara.Flags GetBTOptions(DParagraph p, bool bIsFront)
+        #region Method: OWPara BuildParagraph(p, bMakeEditable, bShowBackTranslation)
+        OWPara BuildParagraph(DParagraph p, bool bMakeEditable, bool bShowBackTranslation)
         {
-            // If an uneditable paragraph, nothing to do here
-            if (!p.IsUserEditable)
-                return OWPara.Flags.None;
+            var writingSystem = (bShowBackTranslation) ?
+                p.Translation.WritingSystemConsultant :
+                p.Translation.WritingSystemVernacular;
 
-            // By default we can't do anything (think cross references)
-            var options = OWPara.Flags.None;
+            var backgroundColor = BackColor;
 
-            // Front translation's BT
-            if (bIsFront)
+            var options = (bShowBackTranslation) ? 
+                OWPara.Flags.ShowBackTranslation :
+                OWPara.Flags.None;
+
+            if (bMakeEditable && p.IsUserEditable)
             {
-                options = OWPara.Flags.ShowBackTranslation | OWPara.Flags.IsLocked;
-            }
-
-            // Target translation's BT
-            else
-            {
-                options = (
-                    OWPara.Flags.ShowBackTranslation |
-                    OWPara.Flags.IsEditable |
-                    OWPara.Flags.CanItalic);
+                options |= OWPara.Flags.IsEditable | OWPara.Flags.CanItalic;
                 if (OurWordMain.TargetIsLocked)
                     options |= OWPara.Flags.IsLocked;
+
+                backgroundColor = EditableBackgroundColor;
+            }
+            else
+            {
+                options |= OWPara.Flags.IsLocked;
             }
 
-            return options;
+            return BuildParagraph(p, writingSystem, backgroundColor, options);
         }
         #endregion
         #region Method: void LoadLanguage(EColumn, group, bUseFront)
-        void LoadLanguage(EColumn column, SynchronizedSection.ParagraphGroup group, bool bUseFront)
+        void LoadLanguage(EContainer column, SynchronizedSection.ParagraphGroup group, bool bUseFront)
         {
             // Decide which paragraphs we are wanting to display in this row
             var vParagraphs = (bUseFront) ?
@@ -208,37 +207,31 @@ namespace OurWord.Layouts
                 group.TargetParagraphs;
 
             // Each paragraph will have its own row
-            foreach (DParagraph p in vParagraphs)
+            foreach (var p in vParagraphs)
             {
                 // We want a two-column row; the left will be the vernacular, the right the BT
                 var row = new ERowOfColumns(2);
                 column.Append(row);
 
-                // Uneditable Vernacular
-                var pVernacular = BuildParagraph(
-                    p,
-                    p.Translation.WritingSystemVernacular,
-                    BackColor,
-                    OWPara.Flags.None);
+                // Both the vernacular and the BT are editable in this view if they are the daughter;
+                // but the Front translation we don't make editable.
+                var bMakeEditable = !bUseFront;
+
+                // Vernacular
+                var pVernacular = BuildParagraph(p, bMakeEditable, false);
                 row.GetColumn(0).Append(pVernacular);
 
                 // Back Translation
-                var BTColor = (p.IsUserEditable && !bUseFront) ? EditableBackgroundColor : BackColor;
-                var pBT = BuildParagraph(
-                    p,
-                    p.Translation.WritingSystemConsultant,
-                    BTColor,
-                    GetBTOptions(p, bUseFront));
-                row.GetColumn(1).Append(pBT);
+                var pBackTranslation = BuildParagraph(p, bMakeEditable, true);
+                row.GetColumn(1).Append(pBackTranslation);
 
                 // Footnote Separator
-                if (FootnotesEncountered == 1)
+                if (FootnotesEncountered != 1) 
+                    continue;
+                foreach (EColumn col in row.SubItems)
                 {
-                    foreach (EColumn col in row.SubItems)
-                    {
-                        col.Border = new EContainer.FootnoteSeparatorBorder(col,
-                            c_nFootnoteSeparatorWidth);
-                    }
+                    col.Border = new EContainer.FootnoteSeparatorBorder(col,
+                        c_nFootnoteSeparatorWidth);
                 }
             }
         }
@@ -274,7 +267,7 @@ namespace OurWord.Layouts
 
             // Create each group
             FootnotesEncountered = 0;
-            foreach (SynchronizedSection.ParagraphGroup group in vGroups)
+            foreach (var group in vGroups)
             {
                 // Handle a picture if this is what the group is
                 if (LoadPicture(group))

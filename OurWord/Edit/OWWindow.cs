@@ -2741,14 +2741,15 @@ namespace OurWord.Edit
                 return;
 
             // Get the desired horizontal position
-            float x = (UpDownX.IsActive) ? UpDownX.X : Selection.Last.X;
+            var x = (UpDownX.IsActive) ? UpDownX.X : Selection.Last.X;
             UpDownX.Set(x);
 
             // Retrieve our current position in the container heirarchy
-            ArrayList aiStack = Selection.ContainerIndicesStack;
+            var aiStack = Selection.ContainerIndicesStack;
 
-            // Select at the same position on the next line
-            Contents.MoveLineUp(aiStack, new PointF(x, Selection.Last.Word.Position.Y));
+            // Select at the same position on the next line           
+            Contents.MoveLineUp(aiStack, Selection.Paragraph.ColumnId, 
+                new PointF(x, Selection.Last.Word.Position.Y));
         }
         #endregion
         #region Cmd: cmdMoveLineDown
@@ -2758,14 +2759,15 @@ namespace OurWord.Edit
                 return;
 
             // Get the desired horizontal position
-            float x = (UpDownX.IsActive) ? UpDownX.X : Selection.Last.X;
+            var x = (UpDownX.IsActive) ? UpDownX.X : Selection.Last.X;
             UpDownX.Set(x);
 
             // Retrieve our current position in the container heirarchy
-            ArrayList aiStack = Selection.ContainerIndicesStack;
+            var aiStack = Selection.ContainerIndicesStack;
 
             // Select at the same position on the next line
-            Contents.MoveLineDown(aiStack, new PointF(x, Selection.Last.Word.Position.Y));
+            Contents.MoveLineDown(aiStack, Selection.Paragraph.ColumnId, 
+                new PointF(x, Selection.Last.Word.Position.Y));
         }
         #endregion
         #region Cmd: cmdExtendLineUp
