@@ -702,7 +702,7 @@ namespace OurWord.Edit
         {
             get
             {
-                return (float)ScrollBar.Maximum;
+                return ScrollBar.Maximum;
             }
             set
             {
@@ -727,11 +727,11 @@ namespace OurWord.Edit
                 if (null == ScrollBar)
                     return;
 
-                int nRequested = (int)value;
+                var nRequested = (int)value;
 
                 // Don't let it go beyond the possible range
-                int nMax = (int)ScrollBarRange - (int)((float)Height * 0.7F);
-                int n = Math.Min(nRequested, nMax);
+                var nMax = (int)ScrollBarRange - (int)((float)Height * 0.7F);
+                var n = Math.Min(nRequested, nMax);
 
                 // Don't let it go below zero
                 n = Math.Max(n, 0);
@@ -762,7 +762,7 @@ namespace OurWord.Edit
             ScrollBar.SmallChange = (int)fLineHeight;
 
             // A large change will scroll 4/5 of the window's height
-            ScrollBar.LargeChange = (int)((float)Height * 0.80F);
+            ScrollBar.LargeChange = (int)(Height * 0.80F);
         }
         #endregion
         #region Cmd: OnScrollBarValueChanged
@@ -821,7 +821,7 @@ namespace OurWord.Edit
             };
             Controls.Add(m_ScrollBar);
             ScrollBarPosition = 0;
-            ScrollBar.ValueChanged += new EventHandler(OnScrollBarValueChanged);
+            ScrollBar.ValueChanged += OnScrollBarValueChanged;
         }
         #endregion
         #endregion
@@ -890,6 +890,15 @@ namespace OurWord.Edit
                     get
                     {
                         return Word.Position.X + xFromWordLeft;
+                    }
+                }
+                #endregion
+                #region VAttr{g}: float Y
+                public float Y
+                {
+                    get
+                    {
+                        return Word.Position.Y;
                     }
                 }
                 #endregion
@@ -1798,16 +1807,18 @@ namespace OurWord.Edit
                 e.Handled = true;
                 switch (e.KeyCode)
                 {
-                    case Keys.Left:   cmdMoveCharLeft();      return;
-                    case Keys.Right:  cmdMoveCharRight();     return;
-                    case Keys.Home:   cmdMoveLineBegin();     return;
-                    case Keys.End:    cmdMoveLineEnd();       return;
-                    case Keys.Up:     cmdMoveLineUp();        return;
-                    case Keys.Down:   cmdMoveLineDown();      return;
-                    case Keys.Delete: cmdDelete();            return;
-                    case Keys.Back:   cmdBackspace();         return;
-                    case Keys.Enter:  cmdEnter();             return;
-                    case Keys.Tab:    cmdMoveNextBasicText(); return;
+                    case Keys.Left:     cmdMoveCharLeft();      return;
+                    case Keys.Right:    cmdMoveCharRight();     return;
+                    case Keys.Home:     cmdMoveLineBegin();     return;
+                    case Keys.End:      cmdMoveLineEnd();       return;
+                    case Keys.Up:       cmdMoveLineUp();        return;
+                    case Keys.Down:     cmdMoveLineDown();      return;
+                    case Keys.PageUp:   cmdMovePageUp();        return;
+                    case Keys.PageDown: cmdMovePageDown();      return;
+                    case Keys.Delete:   cmdDelete();            return;
+                    case Keys.Back:     cmdBackspace();         return;
+                    case Keys.Enter:    cmdEnter();             return;
+                    case Keys.Tab:      cmdMoveNextBasicText(); return;
                 }
                 e.Handled = false;
             }
@@ -2529,7 +2540,65 @@ namespace OurWord.Edit
             Selection.Paragraph.ExtendSelection_LineUpDown(true, x);
         }
         #endregion
+        #region Cmd: cmdMovePageUp
+        void cmdMovePageUp()
+            // See the explanation on cmdMovePageDown
+        {
+            if (null == Selection)
+                return;
 
+            var yStart = Selection.Last.Y;
+            var yTarget = yStart - ScrollBar.LargeChange;
+
+            do
+            {
+                cmdMoveLineUp();
+
+                var yDelta = yStart - Selection.Last.Y;
+
+                if (yDelta == 0)
+                    break;
+
+                yStart -= yDelta;
+                ScrollBarPosition -= yDelta;
+
+                if (yStart <= yTarget)
+                    break;
+
+            } while (true);
+        }
+        #endregion
+        #region Cmd: cmdMovePageDown
+        void cmdMovePageDown()
+            // For simplicity, I just call the code to move down a line repeatedly until
+            // reaching the amount we define as a page (which we define when we set up
+            // the scrollbar. The code in MoveLineDown and in the ScrollBarPosition
+            // take care of boundaries. 
+        {
+            if (null == Selection)
+                return;
+
+            var yStart = Selection.Last.Y;
+            var yTarget = yStart + ScrollBar.LargeChange;
+
+            do
+            {
+                cmdMoveLineDown();
+
+                var yDelta = Selection.Last.Y - yStart;
+
+                if (yDelta == 0)
+                    break;
+
+                yStart += yDelta;
+                ScrollBarPosition += yDelta;
+
+                if (yStart >= yTarget)
+                    break;
+
+            } while (true);
+        }
+        #endregion
         #region Cmd: cmdExtendCharRight
         void cmdExtendCharRight()
         {

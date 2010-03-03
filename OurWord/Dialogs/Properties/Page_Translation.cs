@@ -943,7 +943,11 @@ namespace OurWord.Dialogs
                 // don't update it.
                 if (!string.IsNullOrEmpty(sName))
                 {
-                    Translation.BookNamesTable[iBook] = sName;
+                    if (Translation.BookNamesTable[iBook] != sName)
+                    {
+                        Translation.BookNamesTable[iBook] = sName;
+                        Translation.DeclareDirty();
+                    }
                     if (null != book && book.DisplayName != sName)
                     {
                         book.LoadBook(new NullProgress());
