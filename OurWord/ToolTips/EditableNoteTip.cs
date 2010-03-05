@@ -158,7 +158,6 @@ namespace OurWord.ToolTips
             m_Title.Text = Note.Title;
 
             PopulateAssignedTo();
-            PopulateCategory();
 
             BuildDeleteControl();
 
@@ -317,69 +316,6 @@ namespace OurWord.ToolTips
 
             PopulateAssignedTo();
             SetAssignedToText();
-        }
-        #endregion
-
-        // Categories ------------------------------------------------------------------------
-        #region Method: void PopulateCategory()
-        void PopulateCategory()
-        {
-            if (DB.TeamSettings.NotesCategories.Length == 0)
-            {
-                m_Category.Visible = false;
-                return;
-            }
-
-            m_Category.DropDownItems.Clear();
-
-            foreach(string category in DB.TeamSettings.NotesCategories)
-            {
-                var item = BuildCategoryItem(category);
-                m_Category.DropDownItems.Add(item);
-            }
-
-            m_Category.DropDownItems.Add(BuildCategoryItem(TranslatorNote.NoCategory));
-
-            m_Category.Text = (string.IsNullOrEmpty(Note.Category)) ? 
-                Loc.GetNotes("category", "(category)") : 
-                Note.Category;
-        }
-        #endregion
-        #region Method: ToolStripMenuItem BuildCategoryItem(sCategoryName)
-        ToolStripMenuItem BuildCategoryItem(string sCategoryName)
-        {
-            var item = new ToolStripMenuItem(sCategoryName);
-            item.Click += OnCategory;
-
-            var bIsCurrentRole = (sCategoryName == Note.Category);
-
-            if (bIsCurrentRole)
-            {
-                item.ForeColor = Color.Navy;
-                item.Checked = true;
-            }
-
-            return item;
-        }
-        #endregion
-        #region Cmd: OnCategory
-        private void OnCategory(object sender, EventArgs e)
-        {
-            var item = sender as ToolStripMenuItem;
-            if (null == item)
-                return;
-            Note.Category = item.Text;
-
-            MoveMouseIntoWindow();
-
-            if (Note.LastMessage.IsCompletelyEmpty)
-            {
-                var sBase = Loc.GetNotes("kChangedCategory", "Changed category to {0}.");
-                Note.LastMessage.SimpleText = string.Format(sBase, Note.Category);
-                BuildContentWindow();
-            }
-
-            PopulateCategory();
         }
         #endregion
 

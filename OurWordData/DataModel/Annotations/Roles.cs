@@ -223,17 +223,18 @@ namespace OurWordData.DataModel.Annotations
                 "help on translating this passage.",
             IconColor = Color.LightCyan
         };
-        static public readonly Role FrontTeam = new Role("Front Team")
-        {
-            EnglishToolTipText = "Assign to the Front Team if you wish to alert them\n" +
-                "to an issue or suggestion for their translation.",
-            IconColor = Color.LightCoral
-        };
         public static readonly Role Closed = new Role("Closed") 
         {
             EnglishToolTipText = "This note has been closed out (considered finished).\n" +
                 "Click here to re-open it, by assigning it to someone.",
             IconColor = Color.Gray,
+            AlwaysAvailable = true
+        };
+        public static readonly Role Reference = new Role("Reference")
+        {
+            EnglishToolTipText = "This note is general-purpose information. It does not \n" + 
+                "contain replies.",
+            IconColor = Color.Goldenrod,
             AlwaysAvailable = true
         };
         #endregion

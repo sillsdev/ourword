@@ -63,27 +63,12 @@ namespace OurWordData.DataModel.Annotations
         }
         private string m_sTitle;
         #endregion
-        #region BAttr{g/s}: string Category
-        public string Category
-        {
-            get
-            {
-                return m_sCategory;
-            }
-            set
-            {
-                SetValue(ref m_sCategory, value);
-            }
-        }
-        private string m_sCategory;
-        #endregion
         #region Method void DeclareAttrs()
         protected override void DeclareAttrs()
         {
             base.DeclareAttrs();
             DefineAttr("SelectedText", ref m_sSelectedText);
             DefineAttr("Title", ref m_sTitle);
-            DefineAttr("Category", ref m_sCategory);
         }
         #endregion
 
@@ -1022,7 +1007,6 @@ namespace OurWordData.DataModel.Annotations
                 // Attrs
                 note.SelectedText = GetSelectedText();
                 note.Title = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrTitle, "");
-                note.Category = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrCategory, "");
 
                 // Messages
                 GetMessages(note);
@@ -1052,9 +1036,6 @@ namespace OurWordData.DataModel.Annotations
 
             // Attrs
             oxes.AddAttr(nodeNote, c_sAttrClass, Behavior.Name);
-
-            if (Category != NoCategory)
-                oxes.AddAttr(nodeNote, c_sAttrCategory, Category);
 
             if (!string.IsNullOrEmpty(SelectedText))
                 oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);

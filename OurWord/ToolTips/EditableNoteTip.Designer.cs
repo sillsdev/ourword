@@ -38,7 +38,6 @@
             this.m_btnItalics = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.m_AssignedTo = new System.Windows.Forms.ToolStripDropDownButton();
-            this.m_Category = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_Reference = new System.Windows.Forms.Label();
             this.m_Title = new System.Windows.Forms.TextBox();
             this.m_btnClose = new System.Windows.Forms.Button();
@@ -77,11 +76,10 @@
             this.m_btnPaste,
             this.m_btnItalics,
             this.toolStripSeparator1,
-            this.m_AssignedTo,
-            this.m_Category});
+            this.m_AssignedTo});
             this.m_toolStrip.Location = new System.Drawing.Point(12, 48);
             this.m_toolStrip.Name = "m_toolStrip";
-            this.m_toolStrip.Size = new System.Drawing.Size(282, 25);
+            this.m_toolStrip.Size = new System.Drawing.Size(192, 25);
             this.m_toolStrip.TabIndex = 11;
             this.m_toolStrip.Text = "toolStrip1";
             // 
@@ -138,14 +136,6 @@
             this.m_AssignedTo.Name = "m_AssignedTo";
             this.m_AssignedTo.Size = new System.Drawing.Size(91, 22);
             this.m_AssignedTo.Text = "(assign to)";
-            // 
-            // m_Category
-            // 
-            this.m_Category.Image = ((System.Drawing.Image)(resources.GetObject("m_Category.Image")));
-            this.m_Category.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_Category.Name = "m_Category";
-            this.m_Category.Size = new System.Drawing.Size(90, 22);
-            this.m_Category.Text = "(category)";
             // 
             // m_Reference
             // 
@@ -246,6 +236,5 @@
         private System.Windows.Forms.Button m_btnClose;
         private System.Windows.Forms.ToolStripButton m_btnItalics;
         private System.Windows.Forms.Button m_btnExpandWindow;
-        private System.Windows.Forms.ToolStripDropDownButton m_Category;
     }
 }

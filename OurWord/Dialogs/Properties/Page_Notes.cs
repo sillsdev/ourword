@@ -41,10 +41,6 @@ namespace OurWord.Dialogs
         const string c_sDismissWhenMouseLeaves = "propDismissWhenMouseLeaves";
         const string c_sShowTitleWithNoteIcon = "propShowTitleWithNoteIcon";
 
-        private const string c_sGroupCategories = "Categories";
-        private const string c_sCategories = "propCategories";
-        private const string c_sCanSetCategories = "propCanSetCategories";
-
         const string c_sGroupPeople = "People";
         private const string c_sVisibleRoles = "propVisibleRoles";
         private const string c_sPeople = "propPeople";
@@ -99,20 +95,6 @@ namespace OurWord.Dialogs
                 case c_sVisibleRoles:
                     e.Value = Role.RolesTurnedOnForThisUser;
                     break;
-
-                case c_sCategories:
-                    {
-                        e.Value = DB.TeamSettings.NotesCategories.ToCommaDelimitedString();
-                        break;
-                    }
-                case c_sCanSetCategories:
-                    {
-                        var ps = e.Property as YesNoPropertySpec;
-                        Debug.Assert(null != ps);
-                        e.Value = ps.GetBoolString(TranslatorNote.CanSetCategories);
-                        break;
-                    }
-
             }
         }
         #endregion
@@ -154,19 +136,6 @@ namespace OurWord.Dialogs
                     }
                 case c_sVisibleRoles:
                     break;
-
-                case c_sCategories:
-                    {
-                        DB.TeamSettings.NotesCategories.FromCommaDelimitedString((string)e.Value);
-                        break;
-                    }
-                case c_sCanSetCategories:
-                    {
-                        var ps = e.Property as YesNoPropertySpec;
-                        Debug.Assert(null != ps);
-                        TranslatorNote.CanSetCategories = ps.IsTrue(e.Value);
-                        break;
-                    }
             }
         }
         #endregion
@@ -177,31 +146,6 @@ namespace OurWord.Dialogs
             m_bag = new PropertyBag();
             Bag.GetValue += bag_GetValue;
             Bag.SetValue += bag_SetValue;
-
-            // Categories
-            #region Categories
-            Bag.Properties.Add(new PropertySpec(
-                c_sCategories,
-                "Notes categories",
-                typeof(string),
-                c_sGroupCategories,
-                "You can optionally provide a list of categories for classifying notes, such as " +
-                    "Exegetical, Study Bible, etc.",
-                "",
-                "",
-                null
-                ));
-            #endregion
-            #region Can Set Notes Categories
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanSetCategories,
-                "Can Set Notes Categories?",
-                c_sGroupCategories,
-                "If Yes, you will have the ability to change the category of a note. If No, " + 
-                    "the Categories dropdown will not even be visible.",
-                false
-                ));
-            #endregion
 
             // People
             #region People

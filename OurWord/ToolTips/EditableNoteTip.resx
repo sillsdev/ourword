@@ -203,22 +203,6 @@
         QmCC
 </value>
   </data>
-  <data name="m_Category.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAI8SURBVDhPjZPbTxpREIf9i/vQJ7VovBK02tprmtg2TZOm
-        D03apzYKyLqAwrLKzXBbdkEl0VhlkRWFZcGvh20aY+ulJ5mck5zMNzO/mRkaEkdRFEKhEJIkIcuyew8s
-        HA4z+L/zqKpKvV7HaoLjONi27b4ty6JQKBCPx++GSP409EGv7JBIrVA73sHhAhs4akDB+IYc/Uy/17kZ
-        FJHS2Bd9cvkkbecnamYD+xJsAb3oCmsfUiwmiW/GbgGsq/QdODjcJ6ZEKek1nB5oJZgcV2lbcHoCO1mN
-        YND/LyQsbdLt2Jyfn9ETUXvCOb0FM2Ma3nGTpZk8ttCkaULZ0FkJfr0OkaUwjbrpCtduQ2q7xdxUCs/D
-        Gm+XwDdisjBpuJk0hZUExC8FriAROUrVqGCaJl2h3NPF78yOJ1kWzstP4ONz8I4c45vI0RUBGiJQOldG
-        2ohcQdYCQTRNE20U7TtFAFS8nhNezcE7AXo9D1PDR/imdDfTRgsSuRihrS9XkMEA5XJVWmeiA8KmR2v4
-        xvq8f/Y7kw8vhC6jdWYn0hyL9mYMhVXlzXU9IuEE2UyJM6uL3YHFhZdMP7D5JMp4/OgAnydJqy50yDcJ
-        BCJoeumGrsgxDH1fQDquJr7hGvOeCt7RLcwDyGds/Ksqlere7ROqxJPo5T0X4ohyFr1B6odQ1R1Ca9to
-        5er9OxKWN0U5ec6FYJZ1SVYM0rq8we7+fzj/2b5oNEoqq1Asp8U+rLJbK94f+e/VHTiG5B9oRvZG519Z
-        3kenMs34AgAAAABJRU5ErkJggg==
-</value>
-  </data>
   <data name="m_btnClose.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
