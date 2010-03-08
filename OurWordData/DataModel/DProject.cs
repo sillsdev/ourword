@@ -886,9 +886,9 @@ namespace OurWordData.DataModel
             }
 
             // Load the other translations; remove them from the list if unsuccessful
-            for (int i = 0; i < OtherTranslations.Count; )
+            for (var i = 0; i < OtherTranslations.Count; )
             {
-                DTranslation t = OtherTranslations[i] as DTranslation;
+                var t = OtherTranslations[i];
 
                 t.LoadFromFile();
 

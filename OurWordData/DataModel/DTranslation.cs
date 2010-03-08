@@ -422,13 +422,24 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-        #region OMethod: void InitialCreation(IProgressIndicator)
-        public override void InitialCreation(IProgressIndicator progress)
-            // The override makes sure the translation's folder exists, so that the
-            // books have a place to be stored.
+        #region Method: void Initialize()
+        public void Initialize()
         {
-            base.InitialCreation(progress);
-            Directory.CreateDirectory(BookStorageFolder);
+            // Create its folder if not already present (this will be the .Settings folder)
+            var sFolder = Path.GetDirectoryName(StoragePath);
+            if (!Directory.Exists(sFolder))
+                Directory.CreateDirectory(sFolder);
+
+            // If the file already exists where we expect it, then load its settings; 
+            // otherwise write a file with the default settings
+            if (File.Exists(StoragePath))
+                LoadFromFile(StoragePath);
+            else
+                WriteToFile(StoragePath);
+
+            // Create the folder which will house the Oxes book files
+            if (!Directory.Exists(BookStorageFolder))
+                Directory.CreateDirectory(BookStorageFolder);
         }
         #endregion
 
@@ -446,6 +457,8 @@ namespace OurWordData.DataModel
 
         #region Method: void LoadFromFile(string sPath)
         public void LoadFromFile(string sPath)
+            // The parameterized version of LoadFromFile (with sPath) is needed in order to
+            // support merging, where we don't already know the pathname.
         {
             if (Loaded)
                 return;
@@ -465,19 +478,19 @@ namespace OurWordData.DataModel
                 ConsultantWritingSystemName = XmlDoc.GetAttrValue(node, c_sAttrConsultantWS, "Latin");
                 Comment = XmlDoc.GetAttrValue(node, c_sAttrComment, "");
 
-                string sBookNames = XmlDoc.GetAttrValue(node, c_sBookNamesTable, "");
+                var sBookNames = XmlDoc.GetAttrValue(node, c_sBookNamesTable, "");
                 BookNamesTable.Read(sBookNames);
 
                 try
                 {
-                    string sFootnoteType = XmlDoc.GetAttrValue(node, c_sFootnoteSeqType, "0");
+                    var sFootnoteType = XmlDoc.GetAttrValue(node, c_sFootnoteSeqType, "0");
                     FootnoteSequenceType = (DFoot.FootnoteSequenceTypes)Convert.ToInt16(sFootnoteType);
                 }
                 catch (Exception)
                 {
                 }
 
-                string sCustomSeq = XmlDoc.GetAttrValue(node, c_sFootnoteCustomSeq, "");
+                var sCustomSeq = XmlDoc.GetAttrValue(node, c_sFootnoteCustomSeq, "");
                 FootnoteCustomSeq.Read(sCustomSeq);
 
                 // Scan the disk to load the BookList
@@ -507,8 +520,8 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        #region Method: void WriteToFile(string sPath, IProgressIndicator progress)
-        public void WriteToFile(string sPath, IProgressIndicator progress)
+        #region Method: void WriteToFile(string sPath)
+        public void WriteToFile(string sPath)
         {
             if (IsDirty)
             {
@@ -530,14 +543,14 @@ namespace OurWordData.DataModel
             }
 
             // Save any books that have been modified
-            foreach (DBook book in BookList)
+            foreach (var book in BookList)
                 book.WriteBook(new NullProgress());
         }
         #endregion
         #region Method: void WriteToFile(IProgressIndicator progress)
         public override void WriteToFile(IProgressIndicator progress)
         {
-            WriteToFile(StoragePath, progress);
+            WriteToFile(StoragePath);
         }
         #endregion
 
@@ -591,7 +604,7 @@ namespace OurWordData.DataModel
                 ourTranslation.FootnoteCustomSeq.Read(theirTranslation.FootnoteCustomSeq.SaveLine);
 
             // Save the result
-            ourTranslation.WriteToFile(mergeOrder.pathToOurs, new NullProgress());
+            ourTranslation.WriteToFile(mergeOrder.pathToOurs);
         }
         #endregion
     }

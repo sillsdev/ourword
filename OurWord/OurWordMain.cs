@@ -2445,7 +2445,7 @@ namespace OurWord
 
             // Walk through the wizard; we do nothing unless the User makes it through
             // (as signaled by DialogResult.OK).
-            Dialogs.WizNewProject.WizNewProject wiz = new Dialogs.WizNewProject.WizNewProject();
+            var wiz = new Dialogs.WizNewProject.WizNewProject();
             if (DialogResult.OK != wiz.ShowDialog())
                 return;
 
@@ -2454,7 +2454,7 @@ namespace OurWord
             OnLeaveProject(true);
 
             // Create and initialize the new project according to the settings
-            DProject project = new DProject(wiz.ProjectName);
+            var project = new DProject(wiz.ProjectName);
 
             // Team Settings: start with the factory default; load over it if a file already exists,
             // otherwise create the new cluster
@@ -2465,11 +2465,11 @@ namespace OurWord
             // Create the front translation. If the settings file exists, load it; otherwise
             // create its folder, settings file, etc.
             project.FrontTranslation = new DTranslation(wiz.FrontName);
-            project.FrontTranslation.InitialCreation(G.CreateProgressIndicator());
+            project.FrontTranslation.Initialize();
 
             // Target Translation
             project.TargetTranslation = new DTranslation(wiz.ProjectName);
-            project.TargetTranslation.InitialCreation(G.CreateProgressIndicator());
+            project.TargetTranslation.Initialize();
 
             // Set OW to this project
             DB.Project = project;
