@@ -1343,38 +1343,38 @@ namespace OurWord.Dialogs
 		}
 		#endregion
         #region Cmd: cmdCreateBook
-        private void cmdCreateBook(object sender, System.EventArgs e)
+        private void cmdCreateBook(object sender, EventArgs e)
 		{
             // Get the book we wish to create from the selected row
-            string sAbbrev = SelectedBookAbbrev;
+            var sAbbrev = SelectedBookAbbrev;
             if (string.IsNullOrEmpty(sAbbrev))
                 return;
-            string sBookName = DBook.GetBookName(sAbbrev, Translation);
+            var sBookName = DBook.GetBookName(sAbbrev, Translation);
 
             // Make sure the book exists in the Front
-            DBook bFront = DB.FrontTranslation.FindBook(sAbbrev);
+            var bFront = DB.FrontTranslation.FindBook(sAbbrev);
             if (null == bFront)
             {
                 LocDB.Message("msgNoCorrespondingBookInFront",
                     "OurWord uses the Source translation as a template when it creates a book\n" +
                     "in the Target. Therefore, you need to first import {0} into\n" +
                     "{1}, before you will be able to create it here in {2}.",
-                    new string[] { sBookName, DB.FrontTranslation.DisplayName, Translation.DisplayName },
+                    new[] { sBookName, DB.FrontTranslation.DisplayName, Translation.DisplayName },
                     LocDB.MessageTypes.Error);
                 return;
             }
 
             // Get confirmation as a courtesy to the user
-            bool bProceed = LocDB.Message("msgConfirmCreateBook",
+            var bProceed = LocDB.Message("msgConfirmCreateBook",
                 "Do you want OurWord to create a blank book for drafting {0} into {1}?",
-                new string[] { sBookName, Translation.DisplayName },
+                new[] { sBookName, Translation.DisplayName },
                 LocDB.MessageTypes.YN);
             if (!bProceed)
                 return;
 
             // Create the book, with "Drafting" defaults
-            DBook book = new DBook(sAbbrev);
-            int iBook = DBook.FindBookAbbrevIndex(sAbbrev);
+            var book = new DBook(sAbbrev);
+            var iBook = DBook.FindBookAbbrevIndex(sAbbrev);
             if (-1 == iBook)
                 return;
             book.DisplayName = Translation.BookNamesTable[iBook];
@@ -1400,7 +1400,7 @@ namespace OurWord.Dialogs
 
             // Put up the dialog and allow the user to edit
             var dlg = new DlgRawFileEdit(SelectedBook);
-            if (dlg.ShowDialog(this.ParentDlg) != DialogResult.OK)
+            if (dlg.ShowDialog(ParentDlg) != DialogResult.OK)
                 return;
 
             // If they did edit, we must unload the book so that it will be re-loaded

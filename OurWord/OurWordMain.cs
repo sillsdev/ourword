@@ -2501,11 +2501,11 @@ namespace OurWord
             // Create the front translation. If the settings file exists, load it; otherwise
             // create its folder, settings file, etc.
             project.FrontTranslation = new DTranslation(wiz.FrontName);
-            project.FrontTranslation.InitialCreation(G.CreateProgressIndicator());
+            project.FrontTranslation.Initialize();
 
             // Target Translation
             project.TargetTranslation = new DTranslation(wiz.ProjectName);
-            project.TargetTranslation.InitialCreation(G.CreateProgressIndicator());
+            project.TargetTranslation.Initialize();
 
             // Set OW to this project
             DB.Project = project;

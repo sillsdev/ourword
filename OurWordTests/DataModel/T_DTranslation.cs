@@ -197,7 +197,7 @@ namespace OurWordTests.DataModel
 
             // A. TEST the WRITE implementation
             // Write it to a temporary file
-            t.WriteToFile(JWU.NUnit_TestFilePathName, new NullProgress());
+            t.WriteToFile(JWU.NUnit_TestFilePathName);
 
             // Read it in and see if we got what we expected
             var vs = JWU.ReadFile(JWU.NUnit_TestFilePathName);
@@ -329,7 +329,7 @@ namespace OurWordTests.DataModel
             #endregion
 
             // Write the three files
-            string sFolder = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar;
+            var sFolder = JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar;
 
             var sFileParent = sFolder + "parent.otrans";
             JWU.WriteFile(sFileParent, sParent);
@@ -355,10 +355,10 @@ namespace OurWordTests.DataModel
             var t = new DTranslation();
             t.LoadFromFile(sFileOurs);
             t.IsDirty = true;
-            t.WriteToFile(JWU.NUnit_TestFilePathName, new NullProgress());
+            t.WriteToFile(JWU.NUnit_TestFilePathName);
             var vs = JWU.ReadFile(JWU.NUnit_TestFilePathName);
-            string sActual = "";
-            foreach (string s in vs)
+            var sActual = "";
+            foreach (var s in vs)
                 sActual += s;
             Assert.AreEqual(sExpected, sActual);
         }

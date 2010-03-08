@@ -206,10 +206,10 @@ namespace OurWordData
                 return;
 
             // Store a copy of the DisplayName going in
-            string sOriginalDisplayName = DisplayName;
+            var sOriginalDisplayName = DisplayName;
 
 			// Call the path-aware version of Load
-			string sPathActuallyLoaded = StoragePath;
+			var sPathActuallyLoaded = StoragePath;
             LoadFromFile(ref sPathActuallyLoaded, progress);
 
             // By default, we are using the DisplayName to come up with the path.
@@ -319,7 +319,7 @@ namespace OurWordData
         #endregion
 
         #region Method: void InitialCreation(IProgressIndicator)
-        public virtual void InitialCreation(IProgressIndicator progress)
+        public void InitialCreation(IProgressIndicator progress)
             // Done as part of Project-New, we load a file if it exists; but otherwise
             // make sure its directory and settings file are present and ready.
         {
@@ -332,7 +332,7 @@ namespace OurWordData
             }
 
             // Otherwise, create its directory, and write its (most likely empty) file
-            string sFolder = Path.GetDirectoryName(StoragePath);
+            var sFolder = Path.GetDirectoryName(StoragePath);
             if (!Directory.Exists(sFolder))
                 Directory.CreateDirectory(sFolder);
             WriteToFile(progress);
