@@ -221,10 +221,10 @@ namespace OurWordData.DataModel.Annotations
         {
             get
             {
-                string s = "M: " +
+                var s = "M: " +
                     "Author={" + Author + "} " +
                     "Created={" + UtcCreated.ToShortDateString() + "} " +
-                    "Status={" + Status + "} " +
+                    "Status={" + Status.EnglishName + "} " +
                     "Content={" + base.DebugString + "}";
                 return s;
             }

@@ -203,7 +203,7 @@ namespace OurWordTests.DataModel
 
             // TEST 1: They Win
             // Set the DefaultAuthor to "Mary" so that "They" should win
-            string sDefaultAuthor = DB.UserName;
+            var sDefaultAuthor = DB.UserName;
             DB.UserName = "Mary";
             Mine.Merge(Parent, Theirs);
             DB.UserName = sDefaultAuthor;
@@ -431,12 +431,16 @@ namespace OurWordTests.DataModel
         #region Method: TranslatorNote CreateTestTranslatorNote()
         TranslatorNote CreateTestTranslatorNote()
         {
-            var tn = new TranslatorNote("so loved the world");
-            tn.Behavior = TranslatorNote.General;
+            var tn = new TranslatorNote("so loved the world") 
+            {
+                Behavior = TranslatorNote.General
+            };
+
             tn.Messages.Append(new DMessage("John", new DateTime(2008, 11, 1), 
                 Role.Translator, "Check exegesis here."));
             tn.Messages.Append(new DMessage("Sandra", new DateTime(2008, 11, 3), 
                 Role.Closed, "Exegesis is fine."));
+
             return tn;
         }
         #endregion
@@ -495,7 +499,7 @@ namespace OurWordTests.DataModel
         #region Test: ImportNoteFromToolboxXml
         [Test] public void ImportNoteFromToolboxXml()
         {
-            var vsToImport = new string[] {
+            var vsToImport = new[] {
                 "<TranslatorNote Category=\"To Do\" AssignedTo=\"\" Context=\"mbambuninda\" Reference=\"001:005\" ShowInDaughter=\"false\">",
                     "<ownseq Name=\"Discussions\">",
                         "<Discussion Author=\"Mandowen\" Created=\"2009-04-29 02:32:42Z\"><ownseq Name=\"paras\"><DParagraph Abbrev=\"NoteDiscussion\" Contents=\"ratoe tumaimbe &quot;mbambuninda&quot;=yara gwaravainy=&quot;mbambunin indamu&quot; weramu tumainy ngkov.\"/></ownseq></Discussion>",
@@ -504,7 +508,7 @@ namespace OurWordTests.DataModel
                     "</ownseq>",
                 "</TranslatorNote>"
             };
-            var vsOxesExpected = new string[] {
+            var vsOxesExpected = new[] {
                 "<Annotation class=\"General\" selectedText=\"mbambuninda\">",
                     "<Message author=\"Mandowen\" created=\"2009-04-29 02:32:42Z\">ratoe tumaimbe &quot;mbambuninda&quot;=yara gwaravainy=&quot;mbambunin indamu&quot; weramu tumainy ngkov.</Message>",
                     "<Message author=\"Ibu Linda\" created=\"2009-05-07 09:27:24Z\">Inanayanambe nyo raura kakavimbe indamu syo ranaun. Weti no kai,  weramu syare wamo raporar taiso: &quot;mbambunin dai&quot;.</Message>",
@@ -525,30 +529,30 @@ namespace OurWordTests.DataModel
             note.Save(xmlOxesActual, xmlOxesActual);
 
             // Are they the same?
-            bool bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
+            var bIsSame = XmlDoc.Compare(xmlOxesExpected, xmlOxesActual);
             Assert.IsTrue(bIsSame, "Note xmls should be the same.");
         }
         #endregion
         #region Test: OxesIO
         [Test] public void OxesIO()
         {
-            // Set up a Translator Note
-            TranslatorNote tn = CreateTestTranslatorNote();
+            // Set up a TranslatorNote
+            var tn = CreateTestTranslatorNote();
 
             // Do we get the XML save that we expect?
             var oxes = new XmlDoc();
             tn.Save(oxes, oxes);
             var nodeNote = XmlDoc.FindNode(oxes, TranslatorNote.c_sTagTranslatorNote);
-            string sSaved = XmlDoc.OneLiner(nodeNote);
+            var sSaved = XmlDoc.OneLiner(nodeNote);
             Assert.AreEqual(
                 "<Annotation class=\"General\" selectedText=\"so loved the world\">" +
-                    "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\" status=\"Sandra\">Check exegesis here.</Message>" +
+                    "<Message author=\"John\" created=\"2008-11-01 00:00:00Z\" status=\"Translator\">Check exegesis here.</Message>" +
                     "<Message author=\"Sandra\" created=\"2008-11-03 00:00:00Z\">Exegesis is fine.</Message>" +
                 "</Annotation>",
                 sSaved,
                 "Does the XML save as we expect?");
 
-            // Create a new Translator Note from this Oxes element; they should be identical
+            // Create a new TranslatorNote from this Oxes element; they should be identical
             var tnNew = TranslatorNote.Create(nodeNote);
             var oxesNew = new XmlDoc();
             tnNew.Save(oxesNew, oxesNew);

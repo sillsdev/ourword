@@ -1039,7 +1039,7 @@ namespace OurWordData.DataModel.Annotations
 
             if (!string.IsNullOrEmpty(SelectedText))
                 oxes.AddAttr(nodeNote, c_sAttrSelectedText, SelectedText);
-            if (!string.IsNullOrEmpty(Title))
+            if (!string.IsNullOrEmpty(Title) && Title != SelectedText)
                 oxes.AddAttr(nodeNote, c_sAttrTitle, Title);
 
             // Message objects
