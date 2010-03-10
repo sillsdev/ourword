@@ -94,40 +94,15 @@ namespace OurWord.Dialogs
         }
         #endregion
 
-        // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: DTranslation SelectedTranslation
-        DTranslation SelectedTranslation
-        {
-            get
-            {
-                // Nothing to do if there is nothing selected in the list
-                if (List.SelectedIndex == -1)
-                    return null;
-
-                // Retrieve the name of the selected translation
-                string sDisplayName = List.SelectedItem.ToString();
-
-                // Find it in the list
-                foreach (DTranslation t in DB.Project.OtherTranslations)
-                {
-                    if (t.DisplayName == sDisplayName)
-                        return t;
-                }
-
-                return null;
-            }
-        }
-        #endregion
-
         // Scaffolding -----------------------------------------------------------------------
 		#region Dialog Controls
-        protected System.Windows.Forms.Label m_lblSetup;
-		private System.Windows.Forms.Button m_btnCreate;
-        protected System.Windows.Forms.Label m_lblCreate;
+        private Label m_lblSetup;
+		private Button m_btnCreate;
+        private Label m_lblCreate;
         private CheckedListBox m_listTranslations;
         private Label m_labelInstructions;
 		// Required designer variable.
-		private System.ComponentModel.Container components = null;
+		private Container components;
 		#endregion
         #region Constructor(DlgProperties)
         public Page_OtherTranslations(DialogProperties _ParentDlg)
@@ -266,7 +241,7 @@ namespace OurWord.Dialogs
 
 		// Command Handlers ------------------------------------------------------------------
 		#region Cmd: cmdLoad
-		private void cmdLoad(object sender, System.EventArgs e)
+		private void cmdLoad(object sender, EventArgs e)
 		{
             Control[] vExclude = { m_listTranslations };
             LocDB.Localize(this, vExclude);
@@ -277,7 +252,7 @@ namespace OurWord.Dialogs
 		}
 		#endregion
         #region Cmd: cmdCreate - Add a new translation to the list
-        private void cmdCreate(object sender, System.EventArgs e)
+        private void cmdCreate(object sender, EventArgs e)
 		{
             // Ask the user to supply a valid name for this new translation
             var dlg = new DlgCreateTranslation();
@@ -285,7 +260,7 @@ namespace OurWord.Dialogs
                 return;
 
             // Create and store the new translation
-            DTranslation t = new DTranslation(dlg.TranslationName);
+            var t = new DTranslation(dlg.TranslationName);
             DB.Project.OtherTranslations.Append(t);
             t.WriteToFile(new NullProgress());
 
@@ -298,21 +273,21 @@ namespace OurWord.Dialogs
         private void cmdItemCheck(object sender, ItemCheckEventArgs e)
         {
             // Retrieve the item
-            string sItem = (string)List.Items[e.Index];
-            bool bChecked = (e.NewValue == CheckState.Checked);
+            var sItem = (string)List.Items[e.Index];
+            var bChecked = (e.NewValue == CheckState.Checked);
 
             // Locate the trtanslation in the list, if it is there
-            int iPos = DB.Project.OtherTranslations.Find(sItem);
+            var iPos = DB.Project.OtherTranslations.Find(sItem);
 
             // If it is being unchecked, then remove it from the list.
             if (!bChecked)
             {
                 if (-1 != iPos)
                 {
-                    DTranslation tRemove = DB.Project.OtherTranslations[iPos];
+                    var tRemove = DB.Project.OtherTranslations[iPos];
                     if (null != tRemove)
                         DB.Project.OtherTranslations.Remove(tRemove);
-                    ParentDlg.InitNavigation(Page_OtherTranslations.c_sID);
+                    ParentDlg.InitNavigation(c_sID);
                 }
             }
 
@@ -322,10 +297,10 @@ namespace OurWord.Dialogs
             {
                 if (-1 == iPos)
                 {
-                    DTranslation tInsert = new DTranslation(sItem);
+                    var tInsert = new DTranslation(sItem);
                     DB.Project.OtherTranslations.Append(tInsert);
-                    tInsert.LoadFromFile(G.CreateProgressIndicator());
-                    ParentDlg.InitNavigation(Page_OtherTranslations.c_sID);
+                    tInsert.LoadFromFile();
+                    ParentDlg.InitNavigation(c_sID);
                 }
             }
         }

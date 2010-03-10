@@ -412,7 +412,7 @@ namespace OurWordTests.DataModel
             DB.Project.DisplayName = "Test Project";
             DB.Project.TargetTranslation = new DTranslation();
 
-            DBook book = new DBook("LUK");
+            var book = new DBook("LUK");
             DB.Project.TargetTranslation.AddBook(book);
 
             m_Section = new DSection();
