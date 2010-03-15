@@ -7,26 +7,10 @@
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
-
 using NUnit.Framework;
-
-using JWTools;
-using OurWordData;
-
-using OurWord;
-using OurWordData.DataModel;
-using OurWord.Dialogs;
 using OurWord.Edit;
 using OurWordTests.DataModel;
-using OurWord.Layouts;
 
-using OurWordTests.Cellar;
 #endregion
 
 namespace OurWordTests.Edit

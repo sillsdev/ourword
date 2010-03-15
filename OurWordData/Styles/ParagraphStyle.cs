@@ -211,41 +211,6 @@ namespace OurWordData.Styles
         private string m_sToolboxMarker;
         #endregion
 
-        /*
-        #region CLASS: Mapping
-        public class Mapping
-        {
-            public readonly string UsfmMarker;
-            public string ToolboxMarker { get; set;}
-
-            #region Constructor(sUsfmMarker)
-            public Mapping(string sUsfmMarker)
-            {
-                UsfmMarker = sUsfmMarker;
-
-                // In most cases, the markers are identical
-                ToolboxMarker = sUsfmMarker;
-            }
-            #endregion
-        }
-        #endregion
-        #region Attr{g/s}: Mapping Map
-        public Mapping Map
-        {
-            get
-            {
-                Debug.Assert(null != m_Mapping);
-                return m_Mapping;
-            }
-            set
-            {
-                m_Mapping = value;
-            }
-        }
-        private Mapping m_Mapping;
-        #endregion
-        */
-
         // Default (original, out-of-the-box) style ------------------------------------------
         #region OMethod: void ResetToOriginal()
         public override void ResetToOriginal()

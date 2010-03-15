@@ -24,13 +24,14 @@ namespace OurWordTests.Styles
         {
         }
         #endregion
-        #region SMethod: ParagraphStyle CreateFromXml(string sXml)
-        static ParagraphStyle CreateFromXml(string sXml)
+        #region SMethod: ParagraphStyle CreateFromXml(bClearStylesheet, string sXml)
+        static public ParagraphStyle CreateFromXml(bool bClearStylesheet, string sXml)
         {
             var doc = new XmlDoc(sXml);
             var node = XmlDoc.FindNode(doc, "ParagraphStyle");
             var sStyleName = CharacterStyle.GetStyleNameFromXml(node);
-            StyleSheet.StyleList.Clear();
+            if (bClearStylesheet)
+                StyleSheet.StyleList.Clear();
             var style = new ParagraphStyle(sStyleName);
             style.ReadContent(node);
             return style;
@@ -75,7 +76,7 @@ namespace OurWordTests.Styles
         #region Test: TCreate
         [Test] public void TCreate()
         {
-            var style = CreateFromXml(c_sXmlForIoTest);
+            var style = CreateFromXml(true, c_sXmlForIoTest);
 
             Assert.AreEqual("SillyParagraph", style.StyleName);
             Assert.AreEqual(Color.Red, style.FontColor);
@@ -112,9 +113,9 @@ namespace OurWordTests.Styles
             sExpected = sExpected.Replace("RightMargin=\"0.25\"", "RightMargin=\"0.15\"");
             sExpected = sExpected.Replace("Alignment=\"Justified\"", "Alignment=\"Left\"");
 
-            var parent = CreateFromXml(sParent);
-            var ours = CreateFromXml(sOurs);
-            var theirs = CreateFromXml(sTheirs);
+            var parent = CreateFromXml(true, sParent);
+            var ours = CreateFromXml(true, sOurs);
+            var theirs = CreateFromXml(true, sTheirs);
 
             ours.Merge(parent, theirs);
 
@@ -122,6 +123,7 @@ namespace OurWordTests.Styles
             Assert.AreEqual(sExpected, sActual);
         }
         #endregion
+
 
     }
 }

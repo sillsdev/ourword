@@ -2776,9 +2776,25 @@ namespace OurWord
                     book.ExportToGoBible(sExportPath + ".GoBible.Ptx", G.CreateProgressIndicator());
                 }
 
+                // Toolbox
                 if (dlgDesires.ExportToToolbox)
                 {
                     book.ExportToToolbox(sExportPath + ".db", G.CreateProgressIndicator());
+                }
+
+                // Word 2007
+                if (dlgDesires.ExportToWord)
+                {
+                    var whatToExport = (dlgDesires.ExportBackTranslation) ?
+                            WordExport.Target.BackTranslation :
+                            WordExport.Target.Vernacular;
+
+                    if (whatToExport == WordExport.Target.BackTranslation)
+                        sExportPath += ".bt";
+                    sExportPath += ".docx";
+
+                    using (var export = new WordExport(book, sExportPath, whatToExport))
+                        export.Do();
                 }
 
                 // Unload the book if it was previously unloaded, so that we don't clog

@@ -396,7 +396,12 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-			    return Phrases.Any(phrase => phrase.ItalicIsToggled);
+                foreach(var phrase in Phrases)
+                {
+                    if (phrase.ItalicIsToggled)
+                        return true;
+                }
+			    return false;
 			}
 		}
 		#endregion
@@ -1364,6 +1369,7 @@ namespace OurWordData.DataModel
 			return true;
 		}
 		#endregion
+
 
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagParagraph = "p";

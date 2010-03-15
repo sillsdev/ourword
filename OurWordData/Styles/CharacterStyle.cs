@@ -49,6 +49,9 @@ namespace OurWordData.Styles
         private Color m_Color = Color.Black;
         #endregion
 
+        public enum Position { Baseline, Superscript, Subscript };
+        public Position VerticalPosition { get; set; }
+
         // Meta-data -------------------------------------------------------------------------
         [Flags] public enum Usage
         {
@@ -184,6 +187,7 @@ namespace OurWordData.Styles
             DefaultFontName = OriginalStyle.m_DefaultFont.FontName;
             DefaultFontSize = OriginalStyle.m_DefaultFont.FontSize;
             DefaultFontStyle = OriginalStyle.m_DefaultFont.FontStyle;
+            VerticalPosition = OriginalStyle.VerticalPosition;
 
             StyleSheet.DeclareDirty();
         }
@@ -225,6 +229,7 @@ namespace OurWordData.Styles
         #region Constructor(sStyleName)
         public CharacterStyle(string sStyleName)
         {
+            VerticalPosition = Position.Baseline;
             m_sStyleName = sStyleName;
 
             m_FontFactories = new List<FontFactory>();
@@ -285,6 +290,7 @@ namespace OurWordData.Styles
         private const string c_sAttrDefaultFontName = "FontName";
         private const string c_sAttrDefaultFontSize = "FontSize";
         private const string c_sAttrDefaultFontStyle = "FontStyle";
+        private const string c_sAttrVertPosition = "Position";
         #endregion
         #region SMethod: string GetStyleNameFromXml(XmlNode node)
         static public string GetStyleNameFromXml(XmlNode node)
@@ -310,6 +316,9 @@ namespace OurWordData.Styles
             doc.AddAttr(node, c_sAttrDefaultFontStyle, 
                 FontFactory.GetFontStyleAsString(m_DefaultFont.FontStyle));
 
+            if (VerticalPosition != Position.Baseline)
+                doc.AddAttr(node, c_sAttrVertPosition, VerticalPosition.ToString());
+
             foreach (var factory in FontFactories)
                 factory.Save(doc, node);
         }
@@ -324,6 +333,18 @@ namespace OurWordData.Styles
             DefaultFontSize = XmlDoc.GetAttrValue(node, c_sAttrDefaultFontSize, c_fDefaultFontSize);
             DefaultFontStyle = FontFactory.GetFontStyleFromString(
                 XmlDoc.GetAttrValue(node, c_sAttrDefaultFontStyle, ""));
+
+            try
+            {
+                VerticalPosition = (Position)Enum.Parse(
+                    typeof(Position),
+                    XmlDoc.GetAttrValue(node, c_sAttrVertPosition, Position.Baseline.ToString()),
+                    true);
+            }
+            catch (Exception)
+            {
+                VerticalPosition = Position.Baseline;
+            }
 
             // FontsForWritingSystem
             foreach (XmlNode child in node.ChildNodes)

@@ -243,6 +243,24 @@ namespace OurWordData.Styles
             };
         }
         #endregion
+        #region VAttr{g}: string RtfCodes
+        public string RtfCodes
+        {
+            get
+            {
+                var s = "";
+                if (IsBold)
+                    s += "\\b";
+                if (IsItalic)
+                    s += "\\i";
+                if (IsUnderline)
+                    s += "\\ul";
+                if (IsStrikeout)
+                    s += "\\strike";
+                return s;
+            }
+        }
+        #endregion
 
         // I/O & Merge -----------------------------------------------------------------------
         #region I/O Constants

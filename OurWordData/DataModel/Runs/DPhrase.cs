@@ -91,6 +91,15 @@ namespace OurWordData.DataModel.Runs
             }
         }
         #endregion
+        #region VAttr{g}: bool StrikeoutIsToggled
+        public bool StrikeoutIsToggled
+        {
+            get
+            {
+                return ((FontToggles & FontStyle.Strikeout) == FontStyle.Strikeout);
+            }
+        }
+        #endregion
 
         // Derived Attrs ---------------------------------------------------------------------
         #region VAttr{g}: public string SfmSaveString -  For saving to an SFM file

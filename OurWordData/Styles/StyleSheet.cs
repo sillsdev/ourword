@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Xml;
 using JWTools;
 #endregion
@@ -45,7 +47,8 @@ namespace OurWordData.Styles
                 OriginalStyle = new CharacterStyle(CharacterStyle.c_sOriginalStyle)
                 {
                     DefaultFontSize = 8,
-                    FontColor = Color.Red
+                    FontColor = Color.Red,
+                    VerticalPosition = CharacterStyle.Position.Superscript
                 }
             };
         #endregion
@@ -67,7 +70,8 @@ namespace OurWordData.Styles
                 OriginalStyle = new CharacterStyle(CharacterStyle.c_sOriginalStyle)
                 {
                     DefaultFontSize = 8,
-                    FontColor = Color.Navy
+                    FontColor = Color.Navy,
+                    VerticalPosition = CharacterStyle.Position.Superscript
                 }
             };
         #endregion
@@ -716,5 +720,6 @@ namespace OurWordData.Styles
         }
         private static Font s_LargeDialogFont;
         #endregion
+
     }
 }

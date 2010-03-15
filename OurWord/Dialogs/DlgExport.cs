@@ -42,7 +42,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return (m_radioToolbox.Checked == true);
+                return m_radioToolbox.Checked;
             }
         }
         #endregion
@@ -51,7 +51,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return (m_radioParatext.Checked == true);
+                return m_radioParatext.Checked;
             }
         }
         #endregion
@@ -60,10 +60,29 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return (m_radioGoBible.Checked == true);
+                return m_radioGoBible.Checked;
             }
         }
         #endregion
+        #region VAttr{g}: bool ExportToWord
+        public bool ExportToWord
+        {
+            get
+            {
+                return m_radioWord.Checked;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool ExportBackTranslation
+        public bool ExportBackTranslation
+        {
+            get
+            {
+                return (m_comboWhatToExport.Text == Loc.GetString("BackTranslation", "Back Translation"));
+            }
+        }
+        #endregion
+
         #region Attr{g}: DTranslation Translation
         DTranslation Translation
         {
@@ -80,7 +99,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                string sSubFolder = "OurWordExport" + Path.DirectorySeparatorChar;
+                var sSubFolder = "OurWordExport" + Path.DirectorySeparatorChar;
 
                 sSubFolder += Translation.DisplayName + Path.DirectorySeparatorChar;
 
@@ -92,6 +111,9 @@ namespace OurWord.Dialogs
 
                 if (ExportToToolbox)
                     sSubFolder += "Toolbox" + Path.DirectorySeparatorChar;
+
+                if (ExportToWord)
+                    sSubFolder += "Word 2007" + Path.DirectorySeparatorChar;
 
                 return sSubFolder;
             }
@@ -112,8 +134,13 @@ namespace OurWord.Dialogs
         private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
-            Control[] vExclude = { };
+            Control[] vExclude = { m_comboWhatToExport };
             LocDB.Localize(this, vExclude);
+
+            m_comboWhatToExport.Items.Clear();
+            m_comboWhatToExport.Items.Add(Loc.GetString("Vernacular", "Vernacular"));
+            m_comboWhatToExport.Items.Add(Loc.GetString("BackTranslation", "Back Translation"));
+            m_comboWhatToExport.Text = Loc.GetString("Vernacular", "Vernacular");
 
             // Default to Paratext
             m_radioParatext.Checked = true;
@@ -123,12 +150,12 @@ namespace OurWord.Dialogs
         private void cmdUpdateLocation(object sender, EventArgs e)
         {
             // Retrieve the location of My Documents within this OS
-            string sMyDocs = JWU.GetMyDocumentsFolder(null);
+            var sMyDocs = JWU.GetMyDocumentsFolder(null);
 
             // Strip off folders prior to the My Documents folder
             do
             {
-                int i = sMyDocs.IndexOf(Path.DirectorySeparatorChar);
+                var i = sMyDocs.IndexOf(Path.DirectorySeparatorChar);
 
                 if (i == -1)
                     break;
