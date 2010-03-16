@@ -1130,6 +1130,10 @@ namespace OurWord.Edit
                 {
                     return m_bTooLarge;
                 }
+                set
+                {
+                    m_bTooLarge = value;
+                }
             }
             bool m_bTooLarge;
             #endregion
@@ -1165,10 +1169,11 @@ namespace OurWord.Edit
                 ChunkSize = 0;
                 ChunkWidth = 0;
 
-                for (int i = iStartItem; i < Para.SubItems.Length; i++)
+                for (var i = iStartItem; i < Para.SubItems.Length; i++)
                 {
                     // Get the next block: could be a verse, footnote letter, etc.
-                    EBlock block = Para.SubItems[i] as EBlock;
+                    var block = Para.SubItems[i] as EBlock;
+                    Debug.Assert(null != block);
 
                     // Keep track of our chunk width and size thus far
                     ChunkWidth += block.Width;
@@ -1196,7 +1201,7 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    for (int i = iStartItem; i < iStartItem + ChunkSize; i++)
+                    for (var i = iStartItem; i < iStartItem + ChunkSize; i++)
                     {
                         if (Para.SubItems[i] as EWord != null)
                             return Para.SubItems[i] as EWord;
@@ -1247,8 +1252,9 @@ namespace OurWord.Edit
                     return m_sOriginalWordToHyphen;
                 }
             }
-            string m_sOriginalWordToHyphen = "";
+            readonly string m_sOriginalWordToHyphen = "";
             #endregion
+
             #region Method: bool CalcNextHyphenPos()
             bool CalcNextHyphenPos()
                 // Returns false if there are no hyphenation positions
@@ -1274,6 +1280,8 @@ namespace OurWord.Edit
                 return false;
             }
             #endregion
+
+
             #region Method: void CreateHyphenedWordPair()
             void CreateHyphenedWordPair()
             // Creates the hyphened word / overflow word pair, if they do not already exist
@@ -1359,17 +1367,22 @@ namespace OurWord.Edit
 
                 while (true)
                 {
+                    // This returns the next bunch of blocks that, due to glue, are
+                    // expected to be together. 
+                    // ChunkWidth is how many pixels are needed to display it,
+                    // ChunkSize is how many blocks are involved
                     CalculateChunkContents();
 
-                    // This chunk fits; it qualifies to place into the line
+                    // This chunk fits; it qualifies to place into the line; so we're done.
                     if (ChunkFitsWithinWidth)
                     {
                         m_bTooLarge = false;
                         return;
                     }
 
-                    // If there is no hyphenable entity, then we are by definition 
-                    // too large.
+                    // If there is no part of the chunk that can be hyphened (e.g., there
+                    // is no EWord in the chunk), then we are by definition too large; and
+                    // there's no possibility to break it into smaller, hyphened chunks.
                     if (null == HyphenedWord)
                     {
                         m_bTooLarge = true;
@@ -1385,13 +1398,11 @@ namespace OurWord.Edit
                     // isn't, then this chunk will not fit into the line.
                     if (CalcNextHyphenPos() == false)
                     {
-
-                        // This means we've yet to put anything on the current line. So
-                        // even though CalcNextHyphenPos turned out negative, we now
-                        // have to reset and try again, this time not asking the 
-                        // writing system, but instead, just carving off letters until
-                        // the resultant word fits on the line.
-                        if (bMustForceHyphen)
+                        // If we have said to attempt to Force it (bMustForceHyphen==true), 
+                        // but haven't actually tried yet (m_bForcedHyphen==false), 
+                        // then this is our last-ditch effort. Here, we just
+                        // carve off letters until the resultant word fits the line
+                        if (bMustForceHyphen && m_bForcedHyphen == false)
                         {
                             RemoveAnyHyphenation();
                             m_bForcedHyphen = true;
@@ -1399,6 +1410,7 @@ namespace OurWord.Edit
                             continue;
                         }
 
+                        // Give up. Nothing else to try
                         RemoveAnyHyphenation();
                         m_bTooLarge = true;
                         return;
@@ -1641,8 +1653,15 @@ namespace OurWord.Edit
                 var chunk = new ProposeNextLayoutChunk(
                     g, this, fAvailWidth, i, bMustForceHyphen);
 
-                Debug.Assert( !(chunk.TooLarge && line.SubItems.Length == 0),
-                    "Word too long for the line, and wasn't hyphenated. Shouldn't happen.");
+                // In extreme zoom situations, we may get a chunk that is too large to fit
+                // on the line, and that cannot be broken down (e.g., the flashing insertion
+                // spaces. In this case, we have to just let it overflow the window. So we
+                // lie and tell it the chunk is not too large after all. In theory this should
+                // not happen, but in practise it occasionally does.
+                if (chunk.TooLarge && line.SubItems.Length == 0)
+                {
+                    chunk.TooLarge = false;
+                }
 
                 // Will the Chunk fit on the line? If not, start a new line
                 if (chunk.TooLarge)
