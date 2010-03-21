@@ -92,7 +92,7 @@ namespace OurWordData.DataModel.Annotations
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public DMessage()
-            : base(StyleSheet.TipMessage)
+            : base(StyleSheet.TipMessageHanging)
         {
             // Start with a simple, empty text
             SimpleText = "";
@@ -311,7 +311,7 @@ namespace OurWordData.DataModel.Annotations
             // The paragraph's ReadOxes method will attempt to set StyyleAbbrev to "p", because
             // we don't actually have an attr in the xml. So even though the call
             // to "this" constructor set it originally, we have to set it again here.
-            Style = StyleSheet.TipMessage;
+            Style = StyleSheet.TipMessageHanging;
 
             return true;
         }

@@ -243,7 +243,7 @@ namespace OurWord.Edit
                 m_Hyphenated = value;
             }
         }
-        bool m_Hyphenated = false;
+        bool m_Hyphenated;
         #endregion
         #region Attr{g/s}: float HyphenWidth
         float HyphenWidth
@@ -257,7 +257,7 @@ namespace OurWord.Edit
                 m_fHyphenWidth = value;
             }
         }
-        float m_fHyphenWidth = 0;
+        float m_fHyphenWidth;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------

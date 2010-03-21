@@ -623,22 +623,23 @@ namespace OurWord.Layouts
             }
         }
         #endregion
-        #region OMethod: ENote.Flags GetNoteContext(note, OWPara.Flags)
-        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
+        public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
             // Front Translation (which will be the Vernacular by definition) we are only 
             // interested in notes assigned to the DaughterTeam. 
             // - Not editable (info for the MTT)
             // + Bright icon to draw user's attention
             if (note.IsFrontTranslationNote && note.Status == Role.DaughterTeam)
-                return ENote.Flags.DisplayMeIcon | ENote.Flags.FirstMessageOnly;
+                return true;
 
-            // In the Target Translation, just show the notes this user has permission to see
+            // In the Target Translation, just show the notes this user has permission to 
+            // create / assign to.
             // + Editable (user action desired)
-            if (note.IsTargetTranslationNote && note.Status.ThisUserCanAccess)
-                return ENote.Flags.UserEditable;
+            if (note.IsTargetTranslationNote && note.Status.ThisUserCanAssignTo)
+                return true;
 
-            return ENote.Flags.None;
+            return false;
         }
         #endregion
     }

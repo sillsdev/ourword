@@ -14,7 +14,6 @@ using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using JWTools;
 using OurWord.ToolTips;
-using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
 using OurWordData.Styles;
 #endregion
@@ -51,14 +50,10 @@ namespace OurWord.Edit
         #endregion
 
         #region Constructor(TranslatorNote)
-        public ENote(TranslatorNote _Note, Flags _ContextOptions)
+        public ENote(TranslatorNote note) 
             : base(null, "")
         {
-            m_Note = _Note;
-
-            // Don't create the ENote for "None" notes
-            Debug.Assert(_ContextOptions != Flags.None);
-            ContextOptions = _ContextOptions;
+            m_Note = note;
         }
         #endregion
 
@@ -95,7 +90,7 @@ namespace OurWord.Edit
 
         // Bitmap ----------------------------------------------------------------------------
         #region Attr{g}: Bitmap Bmp - the note's bitmap
-        public Bitmap Bmp
+        private Bitmap Bmp
         {
             get
             {
@@ -110,7 +105,7 @@ namespace OurWord.Edit
         }
         Bitmap m_bmp;
         #endregion
-
+        #region SMethod: Bitmap BuildBitmap(backgroundColor, internalColor, bUseCheckedVersion)
         static public Bitmap BuildBitmap(Color backgroundColor, Color internalColor, bool bUseCheckedVersion)
         {
             var bmp = (bUseCheckedVersion) ? 
@@ -126,7 +121,7 @@ namespace OurWord.Edit
 
             return bmp;
         }
-
+        #endregion
         #region Method: bool InitializeBitmapWithNoteTitle()
         bool InitializeBitmapWithNoteTitle()
             // Returns true if this expanded style of TranslatorNote is what was drawn.
@@ -208,51 +203,6 @@ namespace OurWord.Edit
         }
         #endregion
 
-        // View Context ----------------------------------------------------------------------
-        #region Flags enum - UserEditable, FirstMessageOnly, DisplayMeIcon, etc.
-        [Flags]
-        public enum Flags
-        {
-            None = 0,             // Don't display the TranslatorNote
-            UserEditable = 1,     // Display in conversational mode
-            FirstMessageOnly = 2, // Don't display more than one message
-            DisplayMeIcon = 4     // Override to display only Me, not Anyone or Closed
-        };
-        #endregion
-        readonly Flags ContextOptions;
-        #region VAttr{g}: bool UserEditable
-        public bool UserEditable
-        // If T, display all messages in conversational mode; else display just
-        // the first message, non-editable.
-        {
-            get
-            {
-                return ((ContextOptions & Flags.UserEditable) == Flags.UserEditable);
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool FirstMessageOnly
-        public bool FirstMessageOnly
-        {
-            get
-            {
-                return ((ContextOptions & Flags.FirstMessageOnly) == Flags.FirstMessageOnly);
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool DisplayMeIcon
-        public bool DisplayMeIcon
-        // If T, display the "Me" icon rather than "Anyone" or "Closed", regardless
-        // of the context. (We do this for HintsForDaughters in the Drafting
-        // window, to make sure the user sees the note.)
-        {
-            get
-            {
-                return ((ContextOptions & Flags.DisplayMeIcon) == Flags.DisplayMeIcon);
-            }
-        }
-        #endregion
-
         // Tooltip ---------------------------------------------------------------------------
         #region Attr{g}: bool HasToolTip()
         public override bool HasToolTip()
@@ -266,8 +216,13 @@ namespace OurWord.Edit
             var y = (int)(Middle.Y - Window.ScrollBarPosition);
             var ptScreenLocation = Window.PointToScreen(new Point(Middle.X, y));
 
-            var tip = new EditableNoteTip(this);
+            var bConversationalMode = Note.Status.IsConversational;
+            if (Note.Status.ThisUserCanAssignTo)
+                bConversationalMode = true;
+
+            var tip = new EditableNoteTip(this, bConversationalMode);
             tip.Launch(ptScreenLocation);
+
         }
         #endregion
     }

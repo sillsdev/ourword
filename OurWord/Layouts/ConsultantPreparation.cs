@@ -306,17 +306,17 @@ namespace OurWord.Layouts
             btnInsertNote.ShowDropDownArrow = true;
         }
         #endregion
-
-        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
+        public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
             // Is the containing paragraph displaying the back translation?
-            var bIsBT = ((ParagraphFlags & OWPara.Flags.ShowBackTranslation) 
+            var bIsBT = ((flags & OWPara.Flags.ShowBackTranslation)
                 == OWPara.Flags.ShowBackTranslation);
 
             // In the Target Translation, we display all back translation notes
             // + editable: conversations desired
-            if (note.IsTargetTranslationNote && bIsBT && note.Status.ThisUserCanAccess)
-                return ENote.Flags.UserEditable;
+            if (note.IsTargetTranslationNote && bIsBT && note.Status.ThisUserCanAssignTo)
+                return true;
 
             // In the Front Translation's Back Translation paragraph, we are only interested 
             // in notes that the consultant might want to see. Since we're preparing for
@@ -324,12 +324,13 @@ namespace OurWord.Layouts
             // + editable: conversations desired
             if (note.IsFrontTranslationNote && bIsBT)
             {
-                if (note.Status == Role.Consultant)
-                    return ENote.Flags.UserEditable;
+                if (note.Status == Role.Consultant && TranslatorNote.ShowSourceReferenceNotes)
+                    return true;
             }
 
-            return ENote.Flags.None;
+            return false;
         }
+        #endregion
     }
 
 

@@ -742,16 +742,13 @@ namespace JWTools
     #endregion
 
     #region CLASS: PropertySpecEventArgs : EventArgs
-
     /// <summary>
 	/// Provides data for the GetValue and SetValue events of the PropertyBag class.
 	/// </summary>
 	public class PropertySpecEventArgs : EventArgs
-	{
-		private PropertySpec property;
-		private object val;
-
-		/// <summary>
+    {
+        #region Constructor(property, val)
+        /// <summary>
 		/// Initializes a new instance of the PropertySpecEventArgs class.
 		/// </summary>
 		/// <param name="property">The PropertySpec that represents the property whose
@@ -759,29 +756,45 @@ namespace JWTools
 		/// <param name="val">The current value of the property.</param>
 		public PropertySpecEventArgs(PropertySpec property, object val)
 		{
-			this.property = property;
-			this.val = val;
-		}
-
-		/// <summary>
-		/// Gets the PropertySpec that represents the property whose value is being
-		/// requested or set.
-		/// </summary>
-		public PropertySpec Property
-		{
-			get { return property; }
-		}
-
-		/// <summary>
-		/// Gets or sets the current value of the property.
-		/// </summary>
-		public object Value
-		{
-			get { return val; }
-			set { val = value; }
-		}
-	}
-
+			this.Property = property;
+			this.Value = val;
+        }
+        #endregion
+        #region Attr{g}: PropertySpec Property
+        /// <summary>
+        /// Gets the PropertySpec that represents the property whose value is being
+        /// requested or set.
+        /// </summary>
+        public PropertySpec Property { get; private set; }
+        #endregion
+        #region Attr{g}: object Value
+        /// <summary>
+        /// Gets or sets the current value of the property.
+        /// </summary>
+        public object Value { get; set; }
+        #endregion
+        #region Attr{g/s}: bool YesNoValue
+        /// <summary>
+        ///  Gets or sets the current value of a property provided it is a boolean
+        /// (YesNoPropertySpec)
+        /// </summary>
+        public bool YesNoValue
+        {
+            set
+            {
+                var ps = Property as YesNoPropertySpec;
+                Debug.Assert(null != ps);
+                Value = ps.GetBoolString(value);
+            }
+            get
+            {
+                var ps = Property as YesNoPropertySpec;
+                Debug.Assert(null != ps);
+                return ps.IsTrue(Value);
+            }
+        }
+        #endregion
+    }
 	#endregion
 
     #region CLASS: FontSizeConverter : Int16Converter

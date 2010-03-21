@@ -220,20 +220,20 @@ namespace OurWord.Layouts
             btnInsertNote.ShowDropDownArrow = true;
         }
         #endregion
-
-        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
+        public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
             // In the back translation view, we only want to display notes in back translation 
-            //  paragraphs; if this is a vernacular we don't display the note.
+            //  paragraphs; if this is a vernacular we don't display them.
             // + editable (we expect dialog between, e.g., advisor and consultant)
-            var bIsBackTranslation = (ParagraphFlags & OWPara.Flags.ShowBackTranslation) ==
+            var bIsBackTranslation = (flags & OWPara.Flags.ShowBackTranslation) ==
                                      OWPara.Flags.ShowBackTranslation;
-            if (bIsBackTranslation && note.Status.ThisUserCanAccess)
-                return ENote.Flags.UserEditable;
+            if (bIsBackTranslation && note.Status.ThisUserCanAssignTo)
+                return true;
 
-            return ENote.Flags.None;
+            return false;
         }
-
+        #endregion
     }
 
 

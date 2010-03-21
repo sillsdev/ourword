@@ -81,6 +81,9 @@ namespace OurWord.Edit
         float m_fZoomFactor = 1.0F;
         #endregion
 
+        // Delegates -------------------------------------------------------------------------
+        private EventHandler OnLayoutFinished;
+
         // Registry-Stored Settings ----------------------------------------------------------
         #region Attr{g}: string RegistrySettingsSubKey
         string RegistrySettingsSubKey
@@ -256,47 +259,63 @@ namespace OurWord.Edit
                 Focus();
         }
         #endregion
-        #region VirtMethod: ENote.Flags GetNoteContext(note, ParagraphFlags)
-        public virtual ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        #region VirtMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
+        public virtual bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
-            Debug.Assert(false, "Views must override GetNoteContext so that notes will display");
-            return ENote.Flags.None;
+            Debug.Assert(false, "Views must override GetShouldDisplayNote so that notes will display");
+            return false;
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        public enum WindowClass { Tooltip };
-        public bool DontEverDim;
-        #region Constructor(WindowClass)
-        public OWWindow(WindowClass wc)
+        // TODO: Convert all OurWord constructors to this WindowDefinition strategy
+        public class WindowDefinition
         {
-            if (wc != WindowClass.Tooltip)
-            {
-                Debug.Assert(false, "This constructor is only for tooltips.");
-                return;
-            }
+            // Contructor attrs (required)
+            public readonly string Name;
 
-            // General setup
-            m_cColumnCount = 1;
-            Name = "ToolTip";
-            m_sRegistrySettingsSubKey = Name;
+            // Optional attrs whose default values can be changed during obj initialization
+            public int ColumnCount = 1;
+            public Color BackgroundColor = Color.LightGoldenrodYellow;
+            public BorderStyle BorderStyle = BorderStyle.FixedSingle;
+            public bool HasScrollBar = true;
+            public EventHandler OnLayoutFinished;
+
+            #region Contructor(sName)
+            public WindowDefinition(string sName)
+            {
+                Name = sName;
+            }
+            #endregion
+        }
+
+        public OWWindow(WindowDefinition wd)
+        {
+            // Window Definition attributes
+            Name = wd.Name;
+            m_sRegistrySettingsSubKey = wd.Name;
+            m_cColumnCount = wd.ColumnCount;
+            BorderStyle = wd.BorderStyle;
+            OnLayoutFinished = wd.OnLayoutFinished;
+
+            // Initializations
             m_Contents = new ERoot(this, new WindowContext(this));
             WindowMargins = new SizeF(7, 5);
             m_vSecondaryWindows = new OWWindow[0];
             m_LineUpDownX = new LineUpDownX();
 
-            InitializeScrollbar();
-
-            // Typical tooltip color
-            SetRegistryBackgroundColor(Name, "Cornsilk");
+            // Window Definition initialization
+            if (wd.HasScrollBar)
+                InitializeScrollbar();
+            SetRegistryBackgroundColor(Name, wd.BackgroundColor.Name);
 
             // Double buffer for flicker-free painting 
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
-
-            // Single line for the border
-            BorderStyle = BorderStyle.FixedSingle;
         }
-        #endregion
+
+
+        public bool DontEverDim;
+
         #region Constructor(sName, cColumnCount)
         public OWWindow(string _sName, int _cColumnCount)
             : base()
@@ -472,6 +491,10 @@ namespace OurWord.Edit
 
             // Set the ScrollBar
             Layout_SetupScrollBar((int)(WindowMargins.Height + Contents.Height));
+
+            // Let the caller finish up if desired
+            if (null != OnLayoutFinished)
+                OnLayoutFinished(this, EventArgs.Empty);
         }
         #endregion
         #region Method: void PaintNoDataMessage(PaintEventArgs e)

@@ -45,7 +45,7 @@ namespace OurWord.ToolTips
         }
         #endregion
 
-        #region Attr{g}: ToolTipContents ContentWindow
+        #region Attr{g}: OWWindow ContentWindow
         OWWindow ContentWindow
         {
             get
@@ -69,14 +69,37 @@ namespace OurWord.ToolTips
 
         private bool m_bMustRegenerateUnderlyingWindow;
 
+        #region Attr{s}: bool Editable
+        bool Editable
+            // If false, then we remove the toolbar, remove the ability to edit,
+            // and for smaller notes we resize so that the window's height is 
+            // only what is needed to see the TranslatorNote
+        {
+            get
+            {
+                return m_bEditable;
+            }
+        }
+        private readonly bool m_bEditable;
+        #endregion
+
         #region Constructor()
-        public EditableNoteTip(ENote noteBlock)
+        public EditableNoteTip(ENote noteBlock, bool bEditable)
         {
             // References the TranslatorNote that this tip is about
             m_NoteBlock = noteBlock;
+            m_bEditable = bEditable;
 
             // Need to have created our controls prior to InitComponent
-            m_ContentWindow = new OWWindow(OWWindow.WindowClass.Tooltip);
+            var definition = new OWWindow.WindowDefinition("ToolTip")
+            {
+                BackgroundColor = (Editable) ? Color.Cornsilk : BackgroundColor,
+                BorderStyle = (Editable) ? BorderStyle.FixedSingle : BorderStyle.None,
+                HasScrollBar = Editable,
+                OnLayoutFinished = OnContentWindowLayoutFinished
+            };
+            m_ContentWindow = new OWWindow(definition);
+
             InitializeComponent();
 
             // Bookmark the current position. That way, if on cleaning up we remove the 
@@ -84,11 +107,14 @@ namespace OurWord.ToolTips
             // to where it was (including scroll position)
             m_Bookmark = new OWBookmark(UnderlyingWindow);
 
-            // Content window
-            ContentWindow.Dock = DockStyle.Fill;
+            // Content window additional setup
             m_panelClientArea.Controls.Add(ContentWindow);
-
             m_toolStrip.Renderer = new TrulyTransparentToolStripRenderer();
+            if (!Editable)
+            {
+                OWWindow.SetRegistryBackgroundColor(m_ContentWindow.Name,
+                    BackgroundColor.Name);
+            }
 
             // Shortcut key localizations. Do it here once, rather than as part
             // of ProcessCmdKey every time a key is pressed.
@@ -103,53 +129,223 @@ namespace OurWord.ToolTips
 
         // ToolTip Overrides -----------------------------------------------------------------
         #region OMethod: void OnLayoutControls()
+        #region CLASS: LayoutControls
+        class LayoutControlsMethod
+        {
+            private readonly EditableNoteTip m_tip;
+            private readonly int m_xLeft;
+            private readonly int m_xRight;
+            private readonly int m_yTop;
+            private readonly int m_yBottom;
+            #region VAttr{g}: TranslatorNote Note
+            TranslatorNote Note
+            {
+                get
+                {
+                    return m_tip.Note;
+                }
+            }
+            #endregion
+
+            const int c_xSpaceBetweenIconAndReference = 2;
+            const int c_ySpaceBetweenElementRows = 3;
+
+            // Shorthand - Controls we're laying out
+            #region VAttr{g}: PictureBox IconCtrl
+            PictureBox IconCtrl
+            {
+                get
+                {
+                    return m_tip.m_NoteIcon;
+                }
+            }
+            #endregion
+            #region VAttr{g}: Label ReferenceCtrl
+            Label ReferenceCtrl
+            {
+                get
+                {
+                    return m_tip.m_Reference;
+                }
+            }
+            #endregion
+            #region VAttr{g}: Button CloseBtn
+            Button CloseBtn
+            {
+                get
+                {
+                    return m_tip.m_btnClose;
+                }
+            }
+            #endregion
+            #region VAttr{g}: Button ExpandBtn
+            Button ExpandBtn
+            {
+                get
+                {
+                    return m_tip.m_btnExpandWindow;
+                }
+            }
+            #endregion
+            #region VAttr{g}: TextBox TitleCtrl
+            TextBox TitleCtrl
+            {
+                get
+                {
+                    return m_tip.m_Title;
+                }
+            }
+            #endregion
+            #region VAttr{g}: ToolStrip ToolStripCtrl
+            ToolStrip ToolStripCtrl
+            {
+                get
+                {
+                    return m_tip.m_toolStrip;
+                }
+            }
+            #endregion
+            #region VAttr{g}: Panel ClientPanel
+            Panel ClientPanel
+            {
+                get
+                {
+                    return m_tip.m_panelClientArea;
+                }
+            }
+            #endregion
+            #region VAttr{g}: OWWindow ContentWindow
+            OWWindow ContentWindow
+            {
+                get
+                {
+                    return m_tip.ContentWindow;
+                }
+            }
+            #endregion
+
+            // Layout Methods
+            #region Method: int MeasureReferenceWidth()
+            int MeasureReferenceWidth()
+            // Determine the width of the reference, so we can shorten the control, so that
+            // we don't have extra space prior to the Title
+            {
+                // Make sure we have the correct text
+                ReferenceCtrl.Text = string.Format("{0}:", Note.GetDisplayableReference());
+
+                // Perform the measurement
+                var format = new StringFormat();
+                var rect = new RectangleF(0, 0, 1000, 1000);
+                CharacterRange[] ranges = { new CharacterRange(0, ReferenceCtrl.Text.Length) };
+
+                format.SetMeasurableCharacterRanges(ranges);
+
+                var graphics = ReferenceCtrl.CreateGraphics();
+
+                var regions = graphics.MeasureCharacterRanges(ReferenceCtrl.Text,
+                    ReferenceCtrl.Font, rect, format);
+                rect = regions[0].GetBounds(graphics);
+
+                graphics.Dispose();
+
+                var width = (int)(rect.Right + 1.0f);
+
+                // Add a bit of extra padding to be on the safe side
+                width += 2;
+
+                return width;
+            }
+            #endregion
+            #region Method: LayoutTitleRow(y)
+            void LayoutTitleRow(int y)
+                // Lays out the title row. We lay out the fixed-length elements working
+                // from  both the left and the right; then whatever is left over in the 
+                // the center area is what we used for displaying the Title's width
+            {
+                // Icon
+                IconCtrl.Location = new Point(m_xLeft, y);
+
+                // Reference
+                var xReference = IconCtrl.Right + c_xSpaceBetweenIconAndReference;
+                var yReference = IconCtrl.Bottom - ReferenceCtrl.Height;
+                ReferenceCtrl.Location = new Point(xReference, yReference);
+                ReferenceCtrl.Size = new Size(MeasureReferenceWidth(), ReferenceCtrl.Height);
+
+                // Close Button
+                CloseBtn.Location = new Point(m_xRight - CloseBtn.Width, y);
+
+                // Expand Buttom
+                ExpandBtn.Location = new Point(CloseBtn.Left - ExpandBtn.Width, y);
+
+                // Title takes up whatever's left in the middle
+                var xTitleRight = (m_tip.PaintAsBalloon) ? ExpandBtn.Left : m_xRight;
+                var xTitleLeft = ReferenceCtrl.Right;
+                var yTitle = IconCtrl.Bottom - TitleCtrl.Height;
+                TitleCtrl.Location = new Point(xTitleLeft, yTitle);
+                TitleCtrl.Width = (xTitleRight - TitleCtrl.Left);
+
+                // Whether or not the Title can be changed depends on the window's editability
+                TitleCtrl.ReadOnly = !m_tip.Editable;
+            }
+            #endregion
+            #region Method: int LayoutToolstripRow(y)
+            int LayoutToolstripRow(int y)
+                // The toolstrip is visible only if we allow editing.
+                // 
+                // Returns the height taken up by the toolstrip, or 0 if the toolstrip 
+                // is not visible.
+            {
+                if (m_tip.Editable)
+                {
+                    ToolStripCtrl.Visible = true;
+                    ToolStripCtrl.Location = new Point(m_xLeft, y);
+                    return ToolStripCtrl.Height + c_ySpaceBetweenElementRows;
+                }
+
+                ToolStripCtrl.Visible = false;
+                return 0;
+            }
+            #endregion
+            #region Method: void LayoutContentArea(y)
+            void LayoutContentArea(int y)
+            {
+                ClientPanel.Location = new Point(m_xLeft, y);
+                ClientPanel.Size = new Size(m_xRight - m_xLeft, m_yBottom - y);
+                ContentWindow.SetSize(ClientPanel.Width, ClientPanel.Height);
+                ContentWindow.Invalidate();
+            }
+            #endregion
+
+            // Public Interface
+            #region Constructor(EditableNoteTip)
+            public LayoutControlsMethod(EditableNoteTip tip)
+            {
+                m_tip = tip;
+
+                var rect = tip.ContentAreaInsideMargins;
+                m_xLeft = rect.X;
+                m_xRight = rect.Right;
+                m_yTop = rect.Y;
+                m_yBottom = rect.Bottom;
+            }
+            #endregion
+            #region Method: void Do()
+            public void Do()
+            {
+                LayoutTitleRow(m_yTop);
+
+                var y = IconCtrl.Bottom + c_ySpaceBetweenElementRows;
+                y += LayoutToolstripRow(y);
+
+                LayoutContentArea(y);
+            }
+            #endregion
+        }
+        #endregion
+
         protected override void OnLayoutControls()
         {
-            var rect = ContentAreaInsideMargins;
-
-            const int xSpaceBetweenIconAndReference = 2;
-            const int ySpaceBetweenTitleRowAndToolbar = 3;
-            const int ySpaceBetweenToolbarAndContent = 3;
-
-            var x = rect.X;
-            var y = rect.Y;
-
-            // TITLE ROW
-            // Icon
-            m_NoteIcon.Location = new Point(x, y);
-
-            // Reference
-            var xReference = m_NoteIcon.Right + xSpaceBetweenIconAndReference;
-            var yReference = m_NoteIcon.Bottom - m_Reference.Height;
-            m_Reference.Location = new Point(xReference, yReference);
-            m_Reference.Size = new Size(MeasureReferenceWidth(), m_Reference.Height);
-
-            // Close Button
-            m_btnClose.Location = new Point(rect.Right - m_btnClose.Width, y);
-
-            // Expand Buttom
-            m_btnExpandWindow.Location = new Point(m_btnClose.Left - m_btnExpandWindow.Width, y);
-
-            // Title
-            var xTitleRight = (!PaintAsBalloon) ?
-                rect.Right : m_btnExpandWindow.Left;
-            var xTitle = m_Reference.Right;
-            var yTitle = m_NoteIcon.Bottom - m_Title.Height;
-            m_Title.Location = new Point(xTitle, yTitle);
-            m_Title.Width = (xTitleRight - m_Title.Left);
-
-            // TOOLBAR
-            y = m_NoteIcon.Bottom + ySpaceBetweenTitleRowAndToolbar;
-            m_toolStrip.Location = new Point(x,y);
-
-            // EDITABLE CONTENT AREA
-            y = m_toolStrip.Bottom + ySpaceBetweenToolbarAndContent;
-            m_panelClientArea.Location = new Point(x, y);
-            m_panelClientArea.Size = new Size(
-                rect.Width,
-                rect.Bottom - y);
-            ContentWindow.SetSize(m_panelClientArea.Width, m_panelClientArea.Height);
-            ContentWindow.Invalidate();
+            (new LayoutControlsMethod(this)).Do();
         }
         #endregion
         #region OMethod: void OnPopulateControls()
@@ -173,39 +369,6 @@ namespace OurWord.ToolTips
                 return;
 
             base.OnMouseLeave(e);
-        }
-        #endregion
-
-        // Reference -------------------------------------------------------------------------
-        #region Method: int MeasureReferenceWidth()
-        int MeasureReferenceWidth()
-            // Determine the width of the reference, so we can shorten the control, so that
-            // we don't have extra space prior to the Title
-        {
-            // Make sure we have the correct text
-            m_Reference.Text = string.Format("{0}:", Note.GetDisplayableReference());
-
-            // Perform the measurement
-            var format = new StringFormat();
-            var rect = new RectangleF(0, 0, 1000, 1000);
-            CharacterRange[] ranges = { new CharacterRange(0, m_Reference.Text.Length) };
-
-            format.SetMeasurableCharacterRanges(ranges);
-
-            var graphics = m_Reference.CreateGraphics();
-
-            var regions = graphics.MeasureCharacterRanges(m_Reference.Text, 
-                m_Reference.Font, rect, format);
-            rect = regions[0].GetBounds(graphics);
-
-            graphics.Dispose();
-
-            var width = (int)(rect.Right + 1.0f);
-
-            // Add a bit of extra padding to be on the safe side
-            width += 2;
-
-            return width;
         }
         #endregion
 
@@ -266,7 +429,7 @@ namespace OurWord.ToolTips
 
             foreach(var role in Role.AllRoles)
             {
-                if (role.ThisUserCanAccess)
+                if (role.ThisUserCanAssignTo)
                 {
                     var item = BuildAssignedToItem(role);
                     m_AssignedTo.DropDownItems.Add(item);
@@ -494,12 +657,19 @@ namespace OurWord.ToolTips
         #region Method: void BuildContentWindow()
         void BuildContentWindow()
         {
+            // Non-editable window is a special case
+            if (!Editable)
+            {
+                BuildNonEditableWindow();
+                return;
+            }
+
+            ContentWindow.Clear();
+
             // We automatically insert a DMessage (response) with today's date and the current
             // user as author, so there is no Response button they have to click on; its just
             // automatically there and ready for typing.
             EnsureHasEditableResponseToday();
-
-            ContentWindow.Clear();
 
             foreach(DMessage message in Note.Messages)
             {
@@ -517,7 +687,7 @@ namespace OurWord.ToolTips
         {
             var owp = new OWPara(
                 Note.Behavior.GetWritingSystem(Note),
-                StyleSheet.TipMessage,
+                StyleSheet.TipMessageHanging,
                 message,
                 BackgroundColor,
                 OWPara.Flags.None);
@@ -528,16 +698,16 @@ namespace OurWord.ToolTips
             return owp;
         }
         #endregion
-        #region Method: void PrependAuthorAndDate(EContainer pDestination, DMessage message)
+        #region Method: void PrependAuthorAndDate(EContainer pDestination, DMessage)
         void PrependAuthorAndDate(EContainer pDestination, DMessage message)
         {
             var writingSystem = Note.Behavior.GetWritingSystem(Note).Name;
 
-            var fontLabel = StyleSheet.TipMessage.GetFont(writingSystem, FontStyle.Bold, G.ZoomPercent);
+            var fontLabel = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Bold, G.ZoomPercent);
             var sAuthor = message.Author + ",";
             var author = new OWPara.ELabel(fontLabel, new DLabel(sAuthor));
 
-            var fontDate = StyleSheet.TipMessage.GetFont(writingSystem, FontStyle.Italic, G.ZoomPercent);
+            var fontDate = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Italic, G.ZoomPercent);
             var sDate = message.LocalTimeCreated.ToShortDateString() + ":\u00A0";
             var date = new OWPara.ELabel(fontDate, new DLabel(sDate));
 
@@ -545,7 +715,7 @@ namespace OurWord.ToolTips
             pDestination.InsertAt(1, date);
         }
         #endregion
-        #region Method: EItem BuildEditableMessage(DMessage message)
+        #region Method: EItem BuildEditableMessage(DMessage)
         EItem BuildEditableMessage(DMessage message)
         {
             Debug.Assert(null != Note);
@@ -553,7 +723,7 @@ namespace OurWord.ToolTips
 
             // Create the paragraph
             var owp = new OWPara(
-                writingSystem, StyleSheet.TipMessage, message, Color.White,
+                writingSystem, StyleSheet.TipMessageHanging, message, Color.White,
                 (OWPara.Flags.IsEditable | OWPara.Flags.CanItalic));
 
             // Add the author's name and the date as uneditable labels
@@ -572,7 +742,7 @@ namespace OurWord.ToolTips
             return eEdit;
         }
         #endregion
-        #region Method: bool IsEditableResponse(DMessage message)
+        #region Method: bool IsEditableResponse(DMessage)
         bool IsEditableResponse(DMessage message)
         {
             // The message must have been entered by the current user
@@ -609,6 +779,72 @@ namespace OurWord.ToolTips
             var newMessage = new DMessage();
             Note.Messages.Append(newMessage);
             Note.Debug_VerifyIntegrity();
+        }
+        #endregion
+        #region Method: void BuildNonEditableWindow()
+        void BuildNonEditableWindow()
+        {
+            ContentWindow.Clear();
+
+            // Pathalogical: Make sure we have a message (e.g., what if s.o. deleted
+            // it from the Oxes file?)
+            if (null == Note.LastMessage)
+                Note.Messages.Append(new DMessage());
+
+            // We just want a single paragraph...the first message of the TranslatorNote.
+            // (Any subsequent messages represent discussions, e.g., between advisors,
+            // as they hammered out the issue at hand.)
+            ContentWindow.Contents.Append(new OWPara(
+                Note.Behavior.GetWritingSystem(Note),
+                StyleSheet.TipBlockParagraph,
+                Note.FirstMessage,
+                BackgroundColor,
+                OWPara.Flags.None));
+
+            ContentWindow.LoadData();
+        }
+        #endregion
+        #region Cmd: OnContentWindowLayoutFinished(...)
+        bool s_IsDoingLayout;
+        void OnContentWindowLayoutFinished(object sender, EventArgs e)
+            // For a non-editable window, we want to resize the window to just fit
+            // the tooltip contents
+        {
+            if (Editable)
+                return;
+
+            // Prevent recursion, as setting the Height causes OWWindow.DoLayout
+            // to be called, which then calls this method over and over otherwise.
+            if (s_IsDoingLayout)
+                return;
+            s_IsDoingLayout = true;
+
+            // Get the Height required by the ContentWindow
+            var nContentHeight = (int)ContentWindow.Contents.Height;
+
+            // We don't want to allow this height to be too big. We define 'too big'
+            // as 1/3 of the screen's height, realizing that the title bar will add
+            // a bit more.
+            var screen = Screen.FromPoint(Location);
+            var nMaxHeight = screen.Bounds.Height/3;
+            nContentHeight = Math.Min(nContentHeight, nMaxHeight);
+
+            // How much does the ContentWindow need to shrink/grow?
+            var diff = ContentWindow.Height - nContentHeight;
+            if (diff == 0)
+                return;
+
+            // Change our height. 
+            // CAUTION: If observing strange  behavior, it is necessary to set the 
+            // ShadowedBalloon's AutoSizeMode to "GrowAndShrink" instead of "GrowOnly",
+            // and its AutoSize to false. It appears that when you use Visual Studio
+            // to set AutoSizeMode, it automatically turns AutoSize to true. So these
+            // asserts let us know if we change something someday.
+            Debug.Assert(AutoSizeMode == AutoSizeMode.GrowAndShrink);
+            Debug.Assert(!AutoSize);
+            Height -= diff;
+
+            s_IsDoingLayout = false;
         }
         #endregion
 
@@ -655,9 +891,9 @@ namespace OurWord.ToolTips
             // If this results in an empty TranslatorNote, we need to completely delete it
             if (!Note.HasMessages)
             {
-                var OwningText = Note.OwningTextOrNull;
-                Debug.Assert(null != OwningText);
-                OwningText.TranslatorNotes.Remove(Note);
+                var owningText = Note.OwningTextOrNull;
+                Debug.Assert(null != owningText);
+                owningText.TranslatorNotes.Remove(Note);
                 m_bMustRegenerateUnderlyingWindow = true;
             }
 
@@ -666,8 +902,9 @@ namespace OurWord.ToolTips
             {
                 UnderlyingWindow.LoadData();
                 Bookmark.RestoreWindowSelectionAndScrollPosition();
-//                UnderlyingWindow.Focus();
             }
+
+            UnderlyingWindow.Focus();
         }
         #endregion
         #region Cmd: cmdExpandToNormalDialogWindow
@@ -725,7 +962,6 @@ namespace OurWord.ToolTips
             return base.ProcessCmdKey(ref msg, keyData);
         }
         #endregion
-
-
     }
+
 }

@@ -373,6 +373,9 @@ namespace OurWord.ToolTips
                 {
                     FormBorderStyle = FormBorderStyle.Sizable;
                     ControlBox = true;
+                    // Having trouble getting the window to be sizeable, but
+                    // as lone as we see the Grip, it can be sized.
+                    SizeGripStyle = SizeGripStyle.Show;
                 }
                 else
                 {
@@ -385,8 +388,8 @@ namespace OurWord.ToolTips
         }
         private bool m_bPaintAsBalloon = true;
         #endregion
-        #region Attr{g}: Color BackgroundColor
-        protected Color BackgroundColor
+        #region SAttr{g}: Color BackgroundColor
+        protected static Color BackgroundColor
         {
             get
             {

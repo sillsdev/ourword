@@ -54,57 +54,49 @@ namespace OurWordData.DataModel.Annotations
         }
         private string EnglishToolTipText;
         #endregion
+        #region Attr{g/s}: bool IsConversational
+        // If set to true, then annotations of this role will by default be displayed having
+        // multiple messages; that is, having a conversation. If false, then only the first
+        // message is shown by default. Thus for example we would expect MTTs looking at
+        // DaughterTeam annotations to only need to see the initial message.
+        public bool IsConversational { get; set; }
+        #endregion
+        #region Attr{g/s}: string SfmMarker
+        public string SfmMarker
+            // Used for import/export to Toolbox sfm. Some of the roles are saved to markers
+            // other than the \nt of most notes. As of v1.6 this is a small subset of the
+            // many markers previously in use, though.
+        {
+            get
+            {
+                return m_sSfmMarker;
+            }
+            private set
+            {
+                Debug.Assert(!string.IsNullOrEmpty(value));
+                m_sSfmMarker = value;
+            }
+        }
+        private string m_sSfmMarker = "nt";
+        #endregion
 
         // User Access -----------------------------------------------------------------------
-        private const string c_sUserAccessRegKey = "Roles";
-        #region Attr{g/s}: bool ThisUserCanAccess
-        public bool ThisUserCanAccess
+        #region Attr{g/s}: CanCreatePropertyName
+        // If it has a value, then we call the TranslatorNote.GetNoteSetting method to 
+        // learn whether or not this Role is turned on for this User. If it is turned
+        // on, then (1) it is displayed in the appropriate views, and (2) it appears
+        // in the AssignedTo dropdown.
+        private string CanCreatePropertyName { get; set; }
+        #endregion
+        #region Attr{g/s}: bool ThisUserCanAssignTo
+        public bool ThisUserCanAssignTo
         {
             get
             {
-                return JW_Registry.GetValue(c_sUserAccessRegKey, EnglishName, AlwaysAvailable);
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sUserAccessRegKey, EnglishName, value);
-            }
-        }
-        #endregion
-        #region Attr{g}: bool AlwaysAvailable
-        // If True, then this Role is available for all users in all views. Otherwise,
-        // it can be turned on or off for particular users.
-        public bool AlwaysAvailable;
-        #endregion
-        // For Config Dlg UI
-        #region SAttr{g}: string RolesTurnedOnForThisUser
-        static public string RolesTurnedOnForThisUser
-        {
-            get
-            {
-                var sAdditionalUserNames = "";
-                foreach(var role in AllRoles)
-                {
-                    if (role.ThisUserCanAccess && !role.AlwaysAvailable)
-                    {
-                        if (!string.IsNullOrEmpty(sAdditionalUserNames))
-                            sAdditionalUserNames += ", ";
-                        sAdditionalUserNames += role.LocalizedName;
-                    }
-                }
+                if (string.IsNullOrEmpty(CanCreatePropertyName))
+                    return true;
 
-                if (string.IsNullOrEmpty(sAdditionalUserNames))
-                    sAdditionalUserNames = NoExtraRoles;
-
-                return sAdditionalUserNames;
-            }
-        }
-        #endregion
-        #region SAttr{g}: string NoExtraRoles
-        static public string NoExtraRoles
-        {
-            get
-            {
-                return Loc.GetNotes("None", "None");
+                return TranslatorNote.GetNoteSetting(CanCreatePropertyName);
             }
         }
         #endregion
@@ -115,6 +107,9 @@ namespace OurWordData.DataModel.Annotations
         {
             m_sEnglishName = sEnglishName;
             s_vRoles.Add(this);
+
+            // By default, users can create Chats on annotation assigned to this Role
+            IsConversational = true;
         }
         #endregion
 
@@ -195,47 +190,49 @@ namespace OurWordData.DataModel.Annotations
         {
             EnglishToolTipText = "This note needs attention. Click here to assign it\n" +
                 "to someone, or to close it out as being finished.",
-            IconColor = TranslatorNote.OriginalBitmapNoteColor,
-            AlwaysAvailable = true
+            IconColor = TranslatorNote.OriginalBitmapNoteColor
         };
         static public readonly Role Translator = new Role("Translator")
         {
             EnglishToolTipText = "One of the translators on the team needs to address\n" +
                 "the issue raised in this note.",
-            IconColor = Color.Yellow,
-            AlwaysAvailable = true
+            IconColor = Color.Yellow
         };
         static public readonly Role Consultant = new Role("Consultant")
         {
             EnglishToolTipText = "This note is either a question of,\n" +
                 "or information for, the consultant.",
-            IconColor = Color.LightGreen
+            IconColor = Color.LightGreen,
+            CanCreatePropertyName = TranslatorNote.c_sCanCreateConsultantNotes
         };
         static public readonly Role Advisor = new Role("Advisor")
         {
             EnglishToolTipText = "This note needs input from the advisor.",
-            IconColor = Color.LightBlue,
-            AlwaysAvailable = true
-        };
-        static public readonly Role DaughterTeam = new Role("Daughter Team")
-        {
-            EnglishToolTipText = "Assign to the Daughter Team if you wish to give them\n" +
-                "help on translating this passage.",
-            IconColor = Color.LightCyan
+            IconColor = Color.LightBlue
         };
         public static readonly Role Closed = new Role("Closed") 
         {
             EnglishToolTipText = "This note has been closed out (considered finished).\n" +
                 "Click here to re-open it, by assigning it to someone.",
-            IconColor = Color.Gray,
-            AlwaysAvailable = true
+            IconColor = Color.Gray
+        };
+        static public readonly Role DaughterTeam = new Role("Daughter Team")
+        {
+            EnglishToolTipText = "Assign to the Daughter Team if you wish to give them\n" +
+                "help on translating this passage.",
+            IconColor = Color.LightCyan,
+            IsConversational = false,
+            SfmMarker = "ntHint",
+            CanCreatePropertyName = TranslatorNote.c_sCanCreateHintForDaughter
         };
         public static readonly Role Reference = new Role("Reference")
         {
             EnglishToolTipText = "This note is general-purpose information. It does not \n" + 
                 "contain replies.",
             IconColor = Color.Goldenrod,
-            AlwaysAvailable = true
+            IsConversational = false,
+            SfmMarker = "ntcn",
+            CanCreatePropertyName = TranslatorNote.c_sCanCreateReferenceNotes
         };
         #endregion
     }

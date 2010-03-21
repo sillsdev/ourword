@@ -266,19 +266,20 @@ namespace OurWord.Layouts
             base.LineNumberAttrs.Brush = new SolidBrush(clr);
         }
         #endregion
-
-        public override ENote.Flags GetNoteContext(TranslatorNote note, OWPara.Flags ParagraphFlags)
+        #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
+        public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
             // Only display TargetTranslation notes (since the Target is all we're showing)
             if (!note.IsTargetTranslationNote)
-                return ENote.Flags.None;
+                return false;
 
             // Only notes this user has permission for)
             // + Editable (user action desired)
-            if (note.Status.ThisUserCanAccess)
-                return ENote.Flags.UserEditable;
+            if (note.Status.ThisUserCanAssignTo)
+                return true;
 
-            return ENote.Flags.None;
+            return false;
         }
+        #endregion
     }
 }

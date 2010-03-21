@@ -457,27 +457,20 @@ namespace OurWordTests.DataModel
         #region Test: ContentEquals_Note
         [Test] public void ContentEquals_Note()
         {
-            // Set up a Translator Note
-            TranslatorNote tn1 = new TranslatorNote("so loved the world");
-            tn1.Behavior = TranslatorNote.General;
+            // Set up a TranslatorNote
+            var tn1 = new TranslatorNote("so loved the world");
             tn1.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), Role.Translator,
                     "Check exegesis here."));
 
             // Set up a duplicate
-            TranslatorNote tn2 = new TranslatorNote("so loved the world");
-            tn2.Behavior = TranslatorNote.General;
+            var tn2 = new TranslatorNote("so loved the world");
             tn2.Messages.Append(
                 new DMessage("John", new DateTime(2008, 11, 1), Role.Translator,
                     "Check exegesis here."));
 
             // Equality
             Assert.IsTrue(tn1.ContentEquals(tn2));
-
-            // Behavior differs
-            tn2.Behavior = TranslatorNote.Exegetical;
-            Assert.IsFalse(tn1.ContentEquals(tn2));
-            tn2.Behavior = tn1.Behavior;
 
             // AssignedTo differs
             tn2.Status = Role.Advisor;

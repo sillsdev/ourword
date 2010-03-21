@@ -167,22 +167,12 @@ namespace OurWordData.DataModel.Annotations
             }
             readonly string m_sName;
             #endregion
-            #region Attr{g}: string SfmMarker
-            public string SfmMarker
-            {
-                get
-                {
-                    return m_sSfmMarker;
-                }
-            }
-            readonly string m_sSfmMarker;
-            #endregion
 
             // Writing System
             #region Attr{g}: bool ConsultantWritingSystem
             public bool ConsultantWritingSystem { private get; set; }
             #endregion
-            #region Method: WritingSystem GetWritingSystem(TranslatorNote note)
+            #region Method: WritingSystem GetWritingSystem(TranslatorNote)
             public WritingSystem GetWritingSystem(TranslatorNote note)
             {
                 Debug.Assert(null != note.OwningBook);
@@ -195,12 +185,15 @@ namespace OurWordData.DataModel.Annotations
             #endregion
 
             // Title
+            #region SMethod: string GetLocTitle(sId, sEnglishDefault)
             static public string GetLocTitle(string sId, string sEnglishDefault)
             {
                 return Loc.GetString(sId, sEnglishDefault);
-                
+
             }
+            #endregion
             public string Title { get; set; }
+            #region Attr{g}: bool HasTitle
             public bool HasTitle
             {
                 get
@@ -208,69 +201,13 @@ namespace OurWordData.DataModel.Annotations
                     return !string.IsNullOrEmpty(Title);
                 }
             }
-
-            /*
-            #region VAttr{g}: string Title
-            public string Title
-            {
-                get
-                {
-                    return Loc.GetString(m_sTitleLocID, m_sTitleEnglishDefault);
-                }
-            }
-            #endregion
-            readonly string m_sTitleLocID;
-            readonly string m_sTitleEnglishDefault;
-            */
-
-            // Icons
-            #region Attr{g}: private string IconResourceBaseName
-            private string IconResourceBaseName
-            {
-                get
-                {
-                    return m_sIconResourceBaseName;
-                }
-            }
-            readonly string m_sIconResourceBaseName;
-            #endregion
-            #region Attr{g}: string IconResourceAnyone
-            public string IconResourceAnyone
-            {
-                get
-                {
-                    return IconResourceBaseName + "_Anyone.ico";
-                }
-            }
-            #endregion
-            #region Attr{g}: string IconResourceClosed
-            public string IconResourceClosed
-            {
-                get
-                {
-                    return IconResourceBaseName + "_Closed.ico";
-                }
-            }
-            #endregion
-            #region Attr{g}: string IconResourceMe
-            public string IconResourceMe
-            {
-                get
-                {
-                    return IconResourceBaseName + "_Me.ico";
-                }
-            }
             #endregion
 
             // Scaffolding
-            #region Constructor(sName, sIconResource, sSfn, bIsConsultant, sIdTitle, sEnglishTitle)
-            public Properties(string sName, 
-                string sIconResourceBaseName, 
-                string sSfmMarker)
+            #region Constructor(sName)
+            public Properties(string sName)
             {
                 m_sName = sName;
-                m_sIconResourceBaseName = sIconResourceBaseName;
-                m_sSfmMarker = sSfmMarker;
 
                 if (null == s_vProperties)
                     s_vProperties = new List<Properties>();
@@ -310,29 +247,17 @@ namespace OurWordData.DataModel.Annotations
         Properties m_Behavior = General;
         #endregion
         #region Definitions: General, Exegetical, Consultant, HintForDrafting, History
-        public static readonly Properties General = new Properties("General", "NoteGeneric", "nt");
 
-        public static readonly Properties Exegetical = new Properties("Exegetical", "NoteExegesis", "ntcn")
-            { 
-                ConsultantWritingSystem = true,
-                Title = Properties.GetLocTitle("kExegeticalNote", "Exegetical Note")
-            };
+        // Conversation / dialog annotations
+        public static readonly Properties General = new Properties("General") 
+        {
+        };
 
-        static readonly public Properties Consultant = new Properties("Consultant", "NoteConsultant", "ntBT")
-            {
-                ConsultantWritingSystem = true,
-                Title = Properties.GetLocTitle("kConsultantNote", "Consultant Note")
-            };
-
-        public static readonly Properties HintForDrafting = new Properties("HintForDrafting", "NoteHint", "ntHint") 
-            {
-                Title = Properties.GetLocTitle("kDraftingHint", "Drafting Hint") 
-            };
-
-        public static readonly Properties History = new Properties("History", "Note_OldVersions", "History")
-            {
-                Title = Properties.GetLocTitle("kHistory", "History")
-            };
+        // Support of the History dialog
+        public static readonly Properties History = new Properties("History")
+        {
+            Title = Properties.GetLocTitle("kHistory", "History")
+        };
 
         #endregion
 
@@ -397,7 +322,7 @@ namespace OurWordData.DataModel.Annotations
         }
         #endregion
 
-        // Scripture Reference containing the note -------------------------------------------
+        // Scripture Reference containing the TranslatorNote ---------------------------------
         #region VAttr{g}: DReference ChapterVerse
         public DReference ChapterVerse
         {
@@ -461,7 +386,7 @@ namespace OurWordData.DataModel.Annotations
         }
         #endregion
 
-        // Localizations --------------------------------------------------------------------
+        // Localizations ---------------------------------------------------------------------
         #region SAttr{g}: string MergeAuthor
         static public string MergeAuthor
         {
@@ -543,6 +468,90 @@ namespace OurWordData.DataModel.Annotations
             }
         }
         #endregion
+        #region Attr{g/s}: bool ShowSourceReferenceNotes
+        static public bool ShowSourceReferenceNotes
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sRegistrySubkey,
+                        "ShowSourceReferenceNotes", false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    "ShowSourceReferenceNotes", value);
+            }
+        }
+        #endregion
+
+        public const string c_sCanCreateHintForDaughter = "CanCreateHintForDaughter";
+        public const string c_sCanCreateReferenceNotes = "CanCreateReferenceNotes";
+        public const string c_sCanCreateConsultantNotes = "CanCreateConsultantNotes";
+        public const string c_sCanCreateNotesInFront = "CanCreateNotesInFront";
+
+        static public bool GetNoteSetting(string sProperty)
+        {
+            return JW_Registry.GetValue(c_sRegistrySubkey, sProperty, false);
+        }
+
+        #region Attr{g/s}: bool CanCreateHintForDaughter
+        static public bool CanCreateHintForDaughter
+        {
+            get
+            {
+                return GetNoteSetting(c_sCanCreateHintForDaughter);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    c_sCanCreateHintForDaughter, value);
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool CanCreateReferenceNotes
+        static public bool CanCreateReferenceNotes
+        {
+            get
+            {
+                return GetNoteSetting(c_sCanCreateReferenceNotes);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    c_sCanCreateReferenceNotes, value);
+            }
+        }
+        #endregion
+        #region Attr{g/s}: bool CanCreateConsultantNotes
+        static public bool CanCreateConsultantNotes
+        {
+            get
+            {
+                return GetNoteSetting(c_sCanCreateConsultantNotes);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    c_sCanCreateConsultantNotes, value);
+            }
+        }
+        #endregion
+
+        #region Attr{g/s}: bool CanCreateNotesInFront
+        static public bool CanCreateNotesInFront
+        {
+            get
+            {
+                return GetNoteSetting(c_sCanCreateNotesInFront);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sRegistrySubkey,
+                    c_sCanCreateNotesInFront, value);
+            }
+        }
+        #endregion
+
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -728,34 +737,29 @@ namespace OurWordData.DataModel.Annotations
             // The date is set to today
             var dtCreated = DateTime.Now;
 
-            // Create the Note. We will not have a context for it.
-            var tn = new TranslatorNote("");
+            // Create the TranslatorNote. We will not have a context for it.
+            var tn = new TranslatorNote("") {Behavior = General};
 
-            // Set its class
+            // Interpret its Role
+            var role = Role.Closed;
             switch (field.Mkr)
             {
                 case "ntHint":
-                    tn.Behavior = HintForDrafting;
+                    role = Role.DaughterTeam;
                     break;
                 case "ntBT":
-                    tn.Behavior = Consultant;
-                    break;
                 case "ntgk":
                 case "nthb":
                 case "ntcn":
-                    tn.Behavior = Exegetical;
-                    break;
-                default:
-                    tn.Behavior = General;
+                    role = Role.Reference;
                     break;
             }
-
 
             // For now, we'll preserve the SFM marker so we can round-trip
             tn.m_sSfmMarker = field.Mkr;
 
             // Remove any reference from the data
-            string sData = tn.RemoveInitialReferenceFromText(field.Data);
+            var sData = tn.RemoveInitialReferenceFromText(field.Data);
 
             // Old data (e.g., \ov's) might have footnotes |fn in them. Remove them, as
             // we don't allow notes to have footnotes. (We saw this in Manado Malay data.)
@@ -772,7 +776,7 @@ namespace OurWordData.DataModel.Annotations
             tn.SelectedText = GetWordsRight(sData, 0, 5);
 
             // Add the Message
-            var message = new DMessage(sAuthor, dtCreated, Role.Closed, sData);
+            var message = new DMessage(sAuthor, dtCreated, role, sData);
             tn.Messages.Append(message);          
 
             // Done
@@ -797,7 +801,7 @@ namespace OurWordData.DataModel.Annotations
         #endregion
         #region Method: SfField ToSfField()
         public SfField ToSfField()
-            // This allows us to write the note in the old style, which we
+            // This allows us to write the TranslatorNote in the old style, which we
             // do for now, until we're ready to convert everyone for good.
             //
             // I do want to delete this at some point, and just convert everyone
@@ -814,12 +818,12 @@ namespace OurWordData.DataModel.Annotations
                 return null;
 
             // The old style's author is "Unknown Author"
-            string sAuthor = Loc.GetString("kUnknownAuthor", "Unknown Author");
+            var sAuthor = Loc.GetString("kUnknownAuthor", "Unknown Author");
             if (Messages[0].Author != sAuthor)
                 return null;
 
             // Create the note
-            return new SfField(Behavior.SfmMarker, Messages[0].Runs[0].ContentsSfmSaveString);
+            return new SfField(Status.SfmMarker, Messages[0].Runs[0].ContentsSfmSaveString);
         }
         #endregion
         #region Method: void AddToSfmDB(ScriptureDB DB)
@@ -829,8 +833,8 @@ namespace OurWordData.DataModel.Annotations
             if (!HasMessages)
                 return;
 
-            // Attempt to write to the old style. Fails if the note is too complicated.
-            SfField f = ToSfField();
+            // Attempt to write to the old style. Fails if the TranslatorNote is too complicated.
+            var f = ToSfField();
 
             // Failed. Must do a new style
             if (null == f)
@@ -999,11 +1003,6 @@ namespace OurWordData.DataModel.Annotations
                 // Create the new note
                 var note = new TranslatorNote();
 
-                // Class (Properties)
-                var sBehavior = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrClass,
-                    TranslatorNote.General.Name);
-                note.Behavior = TranslatorNote.Properties.Find(sBehavior);
-
                 // Attrs
                 note.SelectedText = GetSelectedText();
                 note.Title = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrTitle, "");
@@ -1011,6 +1010,26 @@ namespace OurWordData.DataModel.Annotations
                 // Messages
                 GetMessages(note);
                 HandleOldStatus(note);
+
+                // Class (Properties)
+                var sBehavior = XmlDoc.GetAttrValue(m_nodeNote, c_sAttrClass,
+                    TranslatorNote.General.Name);
+                // Convert old-style classes into roles
+                switch (sBehavior.ToLowerInvariant())
+                {
+                    case "hintfordrafting":
+                        note.Status = Role.DaughterTeam;
+                        note.Behavior = TranslatorNote.General;
+                        break;
+                    case "consultant":
+                    case "exegetical":
+                        note.Status = Role.Reference;
+                        note.Behavior = TranslatorNote.General;
+                        break;
+                    default:
+                        note.Behavior = TranslatorNote.Properties.Find(sBehavior);
+                        break;
+                }
 
                 return note;
             }
@@ -1044,9 +1063,7 @@ namespace OurWordData.DataModel.Annotations
 
             // Message objects
             foreach (DMessage m in Messages)
-            {
                 m.Save(oxes, nodeNote);
-            }
 
             return nodeNote;
         }

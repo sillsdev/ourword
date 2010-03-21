@@ -198,7 +198,6 @@
             // EditableNoteTip
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
-            this.AutoSize = true;
             this.CancelButton = this.m_btnClose;
             this.CausesValidation = false;
             this.ClientSize = new System.Drawing.Size(383, 275);

@@ -128,7 +128,7 @@ namespace JWTools
 				m_form.WindowState = FormWindowState.Normal;
 
 			// Retrieve the available screen size
-			Rectangle rectBound = SystemInformation.VirtualScreen;
+			var rectBound = SystemInformation.VirtualScreen;
 
 			// Make sure the window is not too big to fit on the screen
 			m_form.Width  = Math.Min(m_form.Width,  rectBound.Width);
@@ -139,8 +139,8 @@ namespace JWTools
 			m_form.Top  = Math.Max(m_form.Top,  rectBound.Top);
 
 			// Make sure the window is not too far right or below to be seen.
-			int maxLeft = rectBound.Left + rectBound.Width  - m_form.Width;
-			int maxTop  = rectBound.Top  + rectBound.Height - m_form.Height;
+			var maxLeft = rectBound.Left + rectBound.Width  - m_form.Width;
+			var maxTop  = rectBound.Top  + rectBound.Height - m_form.Height;
 			m_form.Left = Math.Min(maxLeft, m_form.Left);
 			m_form.Top  = Math.Min(maxTop,  m_form.Top);
 		}

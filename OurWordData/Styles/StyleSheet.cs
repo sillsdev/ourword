@@ -453,9 +453,12 @@ namespace OurWordData.Styles
                 Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
-        #region ParagraphStyle TipMessage
-        static public readonly ParagraphStyle TipMessage =
-            new ParagraphStyle("Tip Note Discussion")
+        #region ParagraphStyle TipMessageHanging
+        // Used for a hanging-indent paragraph for displaying multiple messages within a
+        // TranslationNote. Hanging-indent helps to distinquish individual messages from
+        // each other.
+        static public readonly ParagraphStyle TipMessageHanging =
+            new ParagraphStyle("Tip: Note Discussion")
             {
                 OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
                 {
@@ -466,6 +469,22 @@ namespace OurWordData.Styles
                     PointsAfter = 3,
                     LeftMarginInches = 0.15,
                     FirstLineIndentInches = -0.15
+                },
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
+            };
+        #endregion
+        #region ParagraphStyle TipBlockParagraph
+        // Used for displaying a single-paragraph tooltip; presents a block paragraph
+        static public readonly ParagraphStyle TipBlockParagraph =
+            new ParagraphStyle("Tip: Block Paragraph")
+            {
+                OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
+                {
+                    DefaultFontSize = 10,
+                    DefaultFontName = "Gentium",
+                    Alignment = ParagraphStyle.Align.Left,
+                    PointsBefore = 0,
+                    PointsAfter = 0
                 },
                 Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
