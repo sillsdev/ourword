@@ -122,7 +122,7 @@ namespace OurWord.Layouts
                 // Start the new row and add the left side (vernacular)
                 EColumn colVernacular;
                 EColumn colBackTranslation;
-                ERowOfColumns row = WndDrafting.CreateRow(Contents,
+                var row = WndDrafting.CreateRow(Contents,
                     out colVernacular, out colBackTranslation, false);
                 row.SetPicture(GetPicture(p), true);
 
@@ -144,7 +144,7 @@ namespace OurWord.Layouts
                 // than back-translating them. These paragraphs are ones we generated from the 
                 // Front, rather than ones the translator will have edited. (E.g., cross
                 // references.)
-                OWPara.Flags options = OWPara.Flags.None;
+                var options = OWPara.Flags.None;
                 // If the vernacular was editable, then we want to show the back translation
                 if (p.IsUserEditable)
                 {
@@ -167,14 +167,13 @@ namespace OurWord.Layouts
             }
 
             // Load the footnotes
-            bool bFirstFootnote = true;
+            var bFirstFootnote = true;
             var vFootnotes = DB.TargetSection.AllFootnotes;
-            foreach (DFootnote fn in vFootnotes)
+            foreach (var fn in vFootnotes)
             {
                 EColumn colVernacular;
                 EColumn colBackTranslation;
-                ERowOfColumns row = WndDrafting.CreateRow(Contents, 
-                    out colVernacular, out colBackTranslation, bFirstFootnote);
+                WndDrafting.CreateRow(Contents, out colVernacular, out colBackTranslation, bFirstFootnote);
                 bFirstFootnote = false;
 
                 // Add the vernacular paragraph to the left side
@@ -185,7 +184,7 @@ namespace OurWord.Layouts
                 colVernacular.Append(op);
 
                 // Options for the display paragraph
-                OWPara.Flags options = OWPara.Flags.None;
+                var options = OWPara.Flags.None;
                 if (fn.IsUserEditable)
                 {
                     options = (

@@ -469,7 +469,7 @@ namespace OurWord.Layouts
         static public ERowOfColumns CreateRow(EContainer Container, out EColumn colLeft, out EColumn colRight, bool bIncludeSeparator)
         {
             // A single row with two columns
-            ERowOfColumns row = new ERowOfColumns(2);
+            var row = new ERowOfColumns(2);
             Container.Append(row);
             colLeft = new EColumn();
             colRight = new EColumn();

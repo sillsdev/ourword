@@ -181,7 +181,10 @@ namespace OurWord.Layouts
 
             var backgroundColor = BackColor;
 
-            var options = (bShowBackTranslation) ? 
+            // IsUserEditable here returns false for cross references and see-also footnotes,
+            // resulting in the vernacular being shown for these on both sides of the
+            // display (as we don't do a BT of these types of paragraphs.)
+            var options = (bShowBackTranslation && p.IsUserEditable) ? 
                 OWPara.Flags.ShowBackTranslation :
                 OWPara.Flags.None;
 
