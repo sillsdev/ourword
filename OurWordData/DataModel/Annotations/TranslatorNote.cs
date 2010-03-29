@@ -246,7 +246,7 @@ namespace OurWordData.DataModel.Annotations
         }
         Properties m_Behavior = General;
         #endregion
-        #region Definitions: General, Exegetical, Consultant, HintForDrafting, History
+        #region Definitions: General, History
 
         // Conversation / dialog annotations
         public static readonly Properties General = new Properties("General") 
@@ -468,24 +468,9 @@ namespace OurWordData.DataModel.Annotations
             }
         }
         #endregion
-        #region Attr{g/s}: bool ShowSourceReferenceNotes
-        static public bool ShowSourceReferenceNotes
-        {
-            get
-            {
-                return JW_Registry.GetValue(c_sRegistrySubkey,
-                        "ShowSourceReferenceNotes", false);
-            }
-            set
-            {
-                JW_Registry.SetValue(c_sRegistrySubkey,
-                    "ShowSourceReferenceNotes", value);
-            }
-        }
-        #endregion
 
         public const string c_sCanCreateHintForDaughter = "CanCreateHintForDaughter";
-        public const string c_sCanCreateReferenceNotes = "CanCreateReferenceNotes";
+        public const string c_sCanCreateInformationNotes = "CanCreateInformationNotes";
         public const string c_sCanCreateConsultantNotes = "CanCreateConsultantNotes";
         public const string c_sCanCreateNotesInFront = "CanCreateNotesInFront";
 
@@ -508,17 +493,17 @@ namespace OurWordData.DataModel.Annotations
             }
         }
         #endregion
-        #region Attr{g/s}: bool CanCreateReferenceNotes
-        static public bool CanCreateReferenceNotes
+        #region Attr{g/s}: bool CanCreateInformationNotes
+        static public bool CanCreateInformationNotes
         {
             get
             {
-                return GetNoteSetting(c_sCanCreateReferenceNotes);
+                return GetNoteSetting(c_sCanCreateInformationNotes);
             }
             set
             {
                 JW_Registry.SetValue(c_sRegistrySubkey,
-                    c_sCanCreateReferenceNotes, value);
+                    c_sCanCreateInformationNotes, value);
             }
         }
         #endregion
@@ -751,7 +736,7 @@ namespace OurWordData.DataModel.Annotations
                 case "ntgk":
                 case "nthb":
                 case "ntcn":
-                    role = Role.Reference;
+                    role = Role.Information;
                     break;
             }
 
@@ -1023,7 +1008,7 @@ namespace OurWordData.DataModel.Annotations
                         break;
                     case "consultant":
                     case "exegetical":
-                        note.Status = Role.Reference;
+                        note.Status = Role.Information;
                         note.Behavior = TranslatorNote.General;
                         break;
                     default:

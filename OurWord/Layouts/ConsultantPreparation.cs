@@ -313,18 +313,16 @@ namespace OurWord.Layouts
             var bIsBT = ((flags & OWPara.Flags.ShowBackTranslation)
                 == OWPara.Flags.ShowBackTranslation);
 
-            // In the Target Translation, we display all back translation notes
-            // + editable: conversations desired
-            if (note.IsTargetTranslationNote && bIsBT && note.Status.ThisUserCanAssignTo)
+            // In the Target Translation, we display all back translation notes, whether
+            // editable or not.
+            if (note.IsTargetTranslationNote && bIsBT)
                 return true;
 
             // In the Front Translation's Back Translation paragraph, we are only interested 
-            // in notes that the consultant might want to see. Since we're preparing for
-            // the consultant, we permit the user (advisor) to edit these
-            // + editable: conversations desired
+            // in notes that the consultant might want to see. 
             if (note.IsFrontTranslationNote && bIsBT)
             {
-                if (note.Status == Role.Consultant && TranslatorNote.ShowSourceReferenceNotes)
+                if (note.Status == Role.Information)
                     return true;
             }
 

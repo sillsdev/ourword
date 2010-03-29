@@ -223,12 +223,22 @@ namespace OurWord.Layouts
         #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
         public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
-            // In the back translation view, we only want to display notes in back translation 
-            //  paragraphs; if this is a vernacular we don't display them.
-            // + editable (we expect dialog between, e.g., advisor and consultant)
+            // Don't display if the vernacular rather than the backtranslation. If we didn't
+            // do this, the TranslatorNote would show up in both places!
             var bIsBackTranslation = (flags & OWPara.Flags.ShowBackTranslation) ==
-                                     OWPara.Flags.ShowBackTranslation;
-            if (bIsBackTranslation && note.Status.ThisUserCanAssignTo)
+                OWPara.Flags.ShowBackTranslation;
+            if (!bIsBackTranslation)
+                return false;
+
+            // For the BT side, then, we generallu only show notes that the user can 
+            // actually edit. 
+            //     We make an exception for Information notes, as we can't really know if it is
+            // the advisor or the MTT who is using this view. The MTT will likely not want to
+            // see Information notes, but the Advisor will.
+            //     Likely no harm is done having Information always on here, because if a MTT
+            // is creating a BT, the Information notes will not have been created yet, anyway;
+            // as likely the advisor will come along and do that in a separate pass.
+            if (note.Status.ThisUserCanAssignTo || note.Status == Role.Information)
                 return true;
 
             return false;

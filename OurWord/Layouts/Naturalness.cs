@@ -273,8 +273,7 @@ namespace OurWord.Layouts
             if (!note.IsTargetTranslationNote)
                 return false;
 
-            // Only notes this user has permission for)
-            // + Editable (user action desired)
+            // Only notes this user has permission for) Thus all notes displayed here are editable.
             if (note.Status.ThisUserCanAssignTo)
                 return true;
 

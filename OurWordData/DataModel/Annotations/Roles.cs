@@ -225,14 +225,14 @@ namespace OurWordData.DataModel.Annotations
             SfmMarker = "ntHint",
             CanCreatePropertyName = TranslatorNote.c_sCanCreateHintForDaughter
         };
-        public static readonly Role Reference = new Role("Reference")
+        public static readonly Role Information = new Role("Information")
         {
             EnglishToolTipText = "This note is general-purpose information. It does not \n" + 
                 "contain replies.",
             IconColor = Color.Goldenrod,
             IsConversational = false,
             SfmMarker = "ntcn",
-            CanCreatePropertyName = TranslatorNote.c_sCanCreateReferenceNotes
+            CanCreatePropertyName = TranslatorNote.c_sCanCreateInformationNotes
         };
         #endregion
     }

@@ -42,11 +42,10 @@ namespace OurWord.Dialogs
         private const string c_sDefaultAuthor = "propDefaultAuthor";
         private const string c_sDismissWhenMouseLeaves = "propDismissWhenMouseLeaves";
         private const string c_sShowTitleWithNoteIcon = "propShowTitleWithNoteIcon";
-        private const string c_sShowSourceReferenceNotes = "propShowSourceReferenceNotes";
 
         private const string c_sGroupPermissions = "Permissions";
         private const string c_sCanCreateHintForDaughter = "propCanCreateHintForDaughter";
-        private const string c_sCanCreateReferenceNotes = "propCanCreateReference";
+        private const string c_sCanCreateInformationNotes = "propCanCreateInformationNote";
         private const string c_sCanCreateNotesToConsultants = "propCanCreateConsultantNote";
         private const string c_sCanCreateNotesInFront = "propCanCreateNotesInFront";
         private const string c_sCanDeleteAnything = "propCanDeleteAnything";
@@ -83,9 +82,6 @@ namespace OurWord.Dialogs
                 case c_sShowTitleWithNoteIcon:
                     e.YesNoValue = TranslatorNote.ShowTitleWithNoteIcon;
                     break;
-                case c_sShowSourceReferenceNotes:
-                    e.YesNoValue = TranslatorNote.ShowSourceReferenceNotes;
-                    break;
 
                 // Permissions Group
                 case c_sCanDeleteAnything:
@@ -94,8 +90,8 @@ namespace OurWord.Dialogs
                 case c_sCanCreateHintForDaughter:
                     e.YesNoValue = TranslatorNote.CanCreateHintForDaughter;
                     break;
-                case c_sCanCreateReferenceNotes:
-                    e.YesNoValue = TranslatorNote.CanCreateReferenceNotes;
+                case c_sCanCreateInformationNotes:
+                    e.YesNoValue = TranslatorNote.CanCreateInformationNotes;
                     break;
                 case c_sCanCreateNotesToConsultants:
                     e.YesNoValue = TranslatorNote.CanCreateConsultantNotes;
@@ -126,9 +122,6 @@ namespace OurWord.Dialogs
                 case c_sShowTitleWithNoteIcon:
                     TranslatorNote.ShowTitleWithNoteIcon = e.YesNoValue;
                     break;
-                case c_sShowSourceReferenceNotes:
-                    TranslatorNote.ShowSourceReferenceNotes = e.YesNoValue;
-                    break;
 
                 // Permissions Group
                 case c_sCanDeleteAnything:
@@ -137,8 +130,8 @@ namespace OurWord.Dialogs
                 case c_sCanCreateHintForDaughter:
                     TranslatorNote.CanCreateHintForDaughter = e.YesNoValue;
                     break;
-                case c_sCanCreateReferenceNotes:
-                    TranslatorNote.CanCreateReferenceNotes = e.YesNoValue;
+                case c_sCanCreateInformationNotes:
+                    TranslatorNote.CanCreateInformationNotes = e.YesNoValue;
                     break;
                 case c_sCanCreateNotesToConsultants:
                     TranslatorNote.CanCreateConsultantNotes = e.YesNoValue;
@@ -209,17 +202,6 @@ namespace OurWord.Dialogs
                 false
                 ));
             #endregion
-            #region Show Front Reference Notes
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sShowSourceReferenceNotes,
-                "Show the Front's Reference Notes?",
-                c_sGroupPermissions,
-                "If Yes, will see the Front Translations exegetical and other notes that " +
-                    "were written with an advisor or consultant audience in mind to " +
-                    "explain reasoning behind decisions made.",
-                false
-                ));
-            #endregion
 
             // Permissions
             #region Can Delete Other's Messages
@@ -244,18 +226,18 @@ namespace OurWord.Dialogs
                 false
                 ));
             #endregion
-            #region Can Create Reference Notes
+            #region Can Create Information Notes
             Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanCreateReferenceNotes,
-                "Can create \"Reference\" notes?",
+                c_sCanCreateInformationNotes,
+                "Can create \"Information\" notes?",
                 c_sGroupPermissions,
                 "If Yes, you will have the ability to set a note's Assign To to a " +
-                    "\"Reference\" note, which you might use for exegetical notes " +
-                    "or other notes the consultant might wish to see.",
+                    "\"Information\" note, which you might use for exegetical notes " +
+                    "or other notes the consultant might wish to see (but not comment on).",
                 false
                 ));
             #endregion
-            #region Can Create Reference Notes
+            #region Can Create Notes to Consultants
             Bag.Properties.Add(new YesNoPropertySpec(
                 c_sCanCreateNotesToConsultants,
                 "Can assign notes to the Consultant?",

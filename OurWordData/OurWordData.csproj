@@ -141,6 +141,7 @@
     <Compile Include="DataModel\Runs\DPhrase.cs" />
     <Compile Include="DataModel\Runs\DPhraseGroup.cs" />
     <Compile Include="DataModel\Runs\DPhraseList.cs" />
+    <Compile Include="DataModel\User.cs" />
     <Compile Include="Styles\CharacterStyle.cs" />
     <Compile Include="Styles\FontFactory.cs" />
     <Compile Include="Styles\ParagraphStyle.cs" />

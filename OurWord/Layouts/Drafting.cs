@@ -634,8 +634,7 @@ namespace OurWord.Layouts
                 return true;
 
             // In the Target Translation, just show the notes this user has permission to 
-            // create / assign to.
-            // + Editable (user action desired)
+            // create / assign to. Thus all notes displayed here are editable.
             if (note.IsTargetTranslationNote && note.Status.ThisUserCanAssignTo)
                 return true;
 
