@@ -34,17 +34,17 @@ namespace OurWord
     #region Messages
     class Messages
     {
-        #region Info:      void BookIsLocked(sBookDisplayName)
-        static public void BookIsLocked(string sBookDisplayName)
+        #region Info:      void BookIsLocked(DBook)
+        static public void BookIsLocked(DBook book)
         {
-            LocDB.Message("msgBookIsLocked",
-                "Please discuss suggested changes or improvements with your team " +
-                    "advisor. Further changes to {0} cannot be made directly on " +
-                    "this computer.",
-                new string[] { sBookDisplayName },
+            LocDB.Message("msgLockedBook",
+                "Please discuss suggested changes or improvements with your team advisor.\n\n" +
+                    "Further changes to {0}: {1} cannot be made directly on this computer." ,
+                new string[] { book.Translation.DisplayName, book.DisplayName },
                 LocDB.MessageTypes.Info);
         }
         #endregion
+
         #region Warning:   void BookNeedsImportFilename()
         static public void BookNeedsImportFilename()
         {
@@ -327,7 +327,6 @@ namespace OurWord
 				LocDB.MessageTypes.WarningYN);
 		}
 		#endregion
-
 
     }
     #endregion

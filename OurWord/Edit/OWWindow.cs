@@ -1453,6 +1453,17 @@ namespace OurWord.Edit
                 return null;
             }
             #endregion
+            public DBook Book
+            {
+                get
+                {
+                    if (null == DBT)
+                        return null;
+                    if (null == DBT.Paragraph)
+                        return null;
+                    return DBT.Paragraph.Book;
+                }
+            }
 
             // Timer -------------------------------------------------------------------------
             // TODO: MSDN says Windows.Form.Timer is in the same thread as the Form, and thus
@@ -1852,12 +1863,12 @@ namespace OurWord.Edit
 
         // Text Changes ----------------------------------------------------------------------
         #region Method: bool HandleLockedFromEditing()
-        virtual public bool HandleLockedFromEditing()
+        public bool HandleLockedFromEditing()
         {
             // If not locked from editing, nothing further is needed
             if (null == Selection)
                 return false;
-            OWPara SelectedParagraph = Selection.Paragraph;
+            var SelectedParagraph = Selection.Paragraph;
             if (null == SelectedParagraph)
                 return false;
             if (!SelectedParagraph.IsLocked)
@@ -1870,12 +1881,12 @@ namespace OurWord.Edit
                 return false;
 
             // Retrieve the book we're working on
-            DBook book = DB.TargetBook;
+            var book = Selection.Book;
 
             // Have we displayed the "Book is locked" message yet? Do so if not.
-            if (!book.UserHasSeenLockedMessage)
+            if (null != book && !book.UserHasSeenLockedMessage)
             {
-                Messages.BookIsLocked( book.DisplayName );
+                Messages.BookIsLocked( book );
                 book.UserHasSeenLockedMessage = true;
             }
             else
