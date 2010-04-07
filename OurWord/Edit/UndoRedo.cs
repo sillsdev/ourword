@@ -2340,15 +2340,18 @@ namespace OurWord.Edit
                 return false;
             BmMainWnd = G.App.CurrentLayout.CreateBookmark();
 
-            // Retrieve the DText to which this note will be attached
-            DText text = G.App.CurrentLayout.Selection.Anchor.BasicText as DText;
+            // Retrieve the DText to which this TranslatorNote will be attached
+            var text = G.App.CurrentLayout.Selection.Anchor.BasicText as DText;
+            Debug.Assert(null != text);
 
-            // Create a blank note and insert it
+            // Create a blank TranslatorNote and insert it
             m_Note = new TranslatorNote(G.App.CurrentLayout.Selection.SelectionString);
             Note.Behavior = Behavior;
             Note.Messages.Append(new DMessage());
             Note.Status = Role.Anyone;
             text.TranslatorNotes.Append(Note);
+            if (string.IsNullOrEmpty(Note.Title))
+                Note.Title = Loc.GetNotes("kNote", "(Note)");
 
             // Recalculate the entire display
             G.App.ResetWindowContents();

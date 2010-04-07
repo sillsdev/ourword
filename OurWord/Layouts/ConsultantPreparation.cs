@@ -301,14 +301,6 @@ namespace OurWord.Layouts
         #endregion
 
         // Notes -----------------------------------------------------------------------------
-        #region OMethod: void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
-        public override void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
-        {
-            foreach (ToolStripItem item in btnInsertNote.DropDownItems)
-                item.Visible = true;
-            btnInsertNote.ShowDropDownArrow = true;
-        }
-        #endregion
         #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
         public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {

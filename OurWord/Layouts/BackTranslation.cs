@@ -209,16 +209,6 @@ namespace OurWord.Layouts
             base.LoadData();
         }
         #endregion
-        #region OMethod: void SetupInsertNoteDropdown(btnInsertNote)
-        public override void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
-            // For the back translation, we want all types of notes to be visible
-            // and available.
-        {
-            foreach (ToolStripItem item in btnInsertNote.DropDownItems)
-                item.Visible = true;
-            btnInsertNote.ShowDropDownArrow = true;
-        }
-        #endregion
         #region OMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
         public override bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {

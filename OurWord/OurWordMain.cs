@@ -378,10 +378,6 @@ namespace OurWord
 
         private ToolStripMenuItem m_menuExportProject;
         private ToolStripDropDownButton m_btnInsertNote;
-        private ToolStripMenuItem m_itemInsertGeneralNote;
-        private ToolStripMenuItem m_itemInsertExegeticalNote;
-        private ToolStripMenuItem m_itemInsertHintNote;
-        private ToolStripMenuItem m_itemInsertConsultantNote;
 
         private ToolStripButton m_btnExit;
         private ToolStripButton m_btnProjectSave;
@@ -668,9 +664,6 @@ namespace OurWord
                     WndConsultantPreparation.c_sName, WndBackTranslation.c_sName } )
                 );
 
-            // Insert dropdown
-            CurrentLayout.SetupInsertNoteDropdown(m_btnInsertNote);
-
             // Clear dropdown subitems so we don't attempt to localize them
             m_btnGotoPreviousSection.DropDownItems.Clear();
             m_btnGotoNextSection.DropDownItems.Clear();
@@ -908,10 +901,6 @@ namespace OurWord
             this.m_menuCopyBTFromFrontTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnItalic = new System.Windows.Forms.ToolStripButton();
             this.m_btnInsertNote = new System.Windows.Forms.ToolStripDropDownButton();
-            this.m_itemInsertGeneralNote = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_itemInsertExegeticalNote = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_itemInsertHintNote = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_itemInsertConsultantNote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_btnGotoFirstSection = new System.Windows.Forms.ToolStripButton();
             this.m_btnGotoPreviousSection = new System.Windows.Forms.ToolStripSplitButton();
             this.m_btnGotoNextSection = new System.Windows.Forms.ToolStripSplitButton();
@@ -1004,7 +993,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(943, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(913, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1271,11 +1260,6 @@ namespace OurWord
             // 
             // m_btnInsertNote
             // 
-            this.m_btnInsertNote.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_itemInsertGeneralNote,
-            this.m_itemInsertExegeticalNote,
-            this.m_itemInsertHintNote,
-            this.m_itemInsertConsultantNote});
             this.m_btnInsertNote.Image = ((System.Drawing.Image)(resources.GetObject("m_btnInsertNote.Image")));
             this.m_btnInsertNote.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_btnInsertNote.Name = "m_btnInsertNote";
@@ -1286,47 +1270,6 @@ namespace OurWord
             this.m_btnInsertNote.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             this.m_btnInsertNote.ToolTipText = "Insert a Translator Note";
             this.m_btnInsertNote.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_itemInsertGeneralNote
-            // 
-            this.m_itemInsertGeneralNote.Image = global::OurWord.Properties.Resources.NoteGeneric_Me;
-            this.m_itemInsertGeneralNote.Name = "m_itemInsertGeneralNote";
-            this.m_itemInsertGeneralNote.Size = new System.Drawing.Size(196, 22);
-            this.m_itemInsertGeneralNote.Tag = "General";
-            this.m_itemInsertGeneralNote.Text = "General Note";
-            this.m_itemInsertGeneralNote.ToolTipText = "Insert a general note.";
-            this.m_itemInsertGeneralNote.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_itemInsertExegeticalNote
-            // 
-            this.m_itemInsertExegeticalNote.Image = global::OurWord.Properties.Resources.NoteExegesis_Me;
-            this.m_itemInsertExegeticalNote.Name = "m_itemInsertExegeticalNote";
-            this.m_itemInsertExegeticalNote.Size = new System.Drawing.Size(196, 22);
-            this.m_itemInsertExegeticalNote.Tag = "Exegetical";
-            this.m_itemInsertExegeticalNote.Text = "Exegetical Note";
-            this.m_itemInsertExegeticalNote.ToolTipText = "Insert a note explaining your exegesis";
-            this.m_itemInsertExegeticalNote.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_itemInsertHintNote
-            // 
-            this.m_itemInsertHintNote.Image = global::OurWord.Properties.Resources.NoteHint_Me;
-            this.m_itemInsertHintNote.Name = "m_itemInsertHintNote";
-            this.m_itemInsertHintNote.Size = new System.Drawing.Size(196, 22);
-            this.m_itemInsertHintNote.Tag = "HintForDrafting";
-            this.m_itemInsertHintNote.Text = "Hint for Daughter Note";
-            this.m_itemInsertHintNote.ToolTipText = "Insert a note to be used in drafting a daughter translation, when this translatio" +
-                "n is used as a front.";
-            this.m_itemInsertHintNote.Click += new System.EventHandler(this.cmdInsertNote);
-            // 
-            // m_itemInsertConsultantNote
-            // 
-            this.m_itemInsertConsultantNote.Image = global::OurWord.Properties.Resources.NoteConsultant_Me;
-            this.m_itemInsertConsultantNote.Name = "m_itemInsertConsultantNote";
-            this.m_itemInsertConsultantNote.Size = new System.Drawing.Size(196, 22);
-            this.m_itemInsertConsultantNote.Tag = "Consultant";
-            this.m_itemInsertConsultantNote.Text = "Consultant Note";
-            this.m_itemInsertConsultantNote.ToolTipText = "Insert a note for the Consultant";
-            this.m_itemInsertConsultantNote.Click += new System.EventHandler(this.cmdInsertNote);
             // 
             // m_btnGotoFirstSection
             // 
@@ -3522,8 +3465,6 @@ namespace OurWord
             // (without dropdowns), or a dropdown itself.
             var uiItem = sender as ToolStripItem;
             Debug.Assert(null != uiItem, "cmdInsertNote expects a ToolStripItem");
-            if (null == uiItem)
-                return;
 
             // If the Main Window is not focused, we don't have a context for inserting.
             Debug.Assert(null != CurrentLayout);

@@ -60,16 +60,6 @@ namespace OurWord.Layouts
         }
         #endregion
 
-        #region VMethod: void SetupInsertNoteDropdown(btnInsertNote)
-        public virtual void SetupInsertNoteDropdown(ToolStripDropDownButton btnInsertNote)
-            // Default is that we just insert a General Note, thus no dropdown items
-        {
-            foreach (ToolStripItem item in btnInsertNote.DropDownItems)
-                item.Visible = false;
-            btnInsertNote.ShowDropDownArrow = false;
-        }
-        #endregion
-
         const int c_xMaxPictureWidth = 300;
         #region Method: Bitmap GetPicture(DParagraph p)
         static public Bitmap GetPicture(DParagraph p)

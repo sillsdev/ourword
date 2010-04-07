@@ -590,6 +590,9 @@ namespace JWTools
         #region Method: int MeasureTextDisplayWidth()
         static public int MeasureTextDisplayWidth(string sText, Graphics graphics, Font font)
         {
+            if (string.IsNullOrEmpty(sText))
+                return 0;
+
             // Perform the measurement
             var format = new StringFormat();
             var rect = new RectangleF(0, 0, 1000, 1000);
