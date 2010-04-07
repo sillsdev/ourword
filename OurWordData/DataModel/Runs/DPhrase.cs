@@ -7,6 +7,7 @@
  * Purpose: A string of text, all with the same FontStyle
  * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
+using System;
 using System.Diagnostics;
 using System.Drawing;
 #endregion
@@ -221,7 +222,7 @@ namespace OurWordData.DataModel.Runs
             Text = Text.Replace(c_chInsertionSpace.ToString(), "");
 
             int n;
-            while (-1 != (n = Text.IndexOf("  ")))
+            while (-1 != (n = Text.IndexOf("  ", StringComparison.Ordinal)))
                 Text = Text.Remove(n + 1, 1);
         }
         #endregion

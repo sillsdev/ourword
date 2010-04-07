@@ -1453,6 +1453,7 @@ namespace OurWord.Edit
                 return null;
             }
             #endregion
+            #region Attr{g}: DBook Book
             public DBook Book
             {
                 get
@@ -1464,6 +1465,7 @@ namespace OurWord.Edit
                     return DBT.Paragraph.Book;
                 }
             }
+            #endregion
 
             // Timer -------------------------------------------------------------------------
             // TODO: MSDN says Windows.Form.Timer is in the same thread as the Form, and thus

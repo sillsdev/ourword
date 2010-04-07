@@ -1,4 +1,4 @@
-/**********************************************************************************************
+﻿/**********************************************************************************************
  * Project: OurWord! - Tests
  * File:    T_DPhrase.cs
  * Author:  John Wimbish
@@ -233,5 +233,24 @@ namespace OurWordTests.DataModel
             Assert.AreEqual("Here is text...", phrase.Text);
         }
         #endregion
+
+        [Test]
+        public void EthiopicEliminateSpuriousSpaces()
+            // This is Amharic script. If we call IndexOf("<space><space>"), it thinks there
+            // are adjacent spaces there. So we must instead call 
+            //   IndexOf("  ", StringComparison.Ordinal)
+            // This test makes sure we don't break this someday later.
+        {
+            const string sText = "አብርሃም ይስሐቅን ወለደ፤ ይስሐቅ ያዕቆብን ወለደ፤ ያዕቆብይሁዳንና ወንድሞቹን ወለደ";
+
+            var phrase = new DPhrase(sText);
+            phrase.EliminateSpuriousSpaces();
+            Assert.AreEqual(sText, phrase.Text, "Should be identical");
+
+            // An experiment for Sharon Correl, can delete once I know she doesn't need it. 7apr2010
+            //const string s = "አብርሃምይስሐቅን";
+            //Assert.AreEqual(-1, s.IndexOf(" "));
+
+        }
     }
 }
