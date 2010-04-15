@@ -29,7 +29,7 @@ namespace OurWordTests.Styles
         {
             var doc = new XmlDoc(sXml);
             var node = XmlDoc.FindNode(doc, "CharacterStyle");
-            var sStyleName = CharacterStyle.GetStyleNameFromXml(node);
+            var sStyleName = GetStyleNameFromXml(node);
 
             StyleSheet.StyleList.Clear();
             var style = new CharacterStyle(sStyleName);
@@ -101,6 +101,8 @@ namespace OurWordTests.Styles
         #region Test: TSave
         [Test] public void TSave()
         {
+            StyleSheet.StyleList.Clear();
+
             var style = new CharacterStyle("Verse")
             {
                 FontColor = Color.Red,
@@ -108,6 +110,7 @@ namespace OurWordTests.Styles
                 DefaultFontSize = 8,
                 DefaultFontStyle = FontStyle.Italic
             };
+
             style.FontFactories.Add(new FontFactory 
                 {
                     WritingSystemName = "Latin", 

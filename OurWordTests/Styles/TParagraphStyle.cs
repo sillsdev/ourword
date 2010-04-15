@@ -25,11 +25,11 @@ namespace OurWordTests.Styles
         }
         #endregion
         #region SMethod: ParagraphStyle CreateFromXml(bClearStylesheet, string sXml)
-        static public ParagraphStyle CreateFromXml(bool bClearStylesheet, string sXml)
+        private static ParagraphStyle CreateFromXml(bool bClearStylesheet, string sXml)
         {
             var doc = new XmlDoc(sXml);
             var node = XmlDoc.FindNode(doc, "ParagraphStyle");
-            var sStyleName = CharacterStyle.GetStyleNameFromXml(node);
+            var sStyleName = GetStyleNameFromXml(node);
             if (bClearStylesheet)
                 StyleSheet.StyleList.Clear();
             var style = new ParagraphStyle(sStyleName);
@@ -49,6 +49,8 @@ namespace OurWordTests.Styles
         #region Test: TSave
         [Test] public void TSave()
         {
+            StyleSheet.StyleList.Clear();
+
             var style = new ParagraphStyle("SillyParagraph")
             {
                 FontColor = Color.Red,
@@ -61,6 +63,7 @@ namespace OurWordTests.Styles
                 Bulleted = true,
                 Alignment = Align.Justified
             };
+
             style.FontFactories.Add(new FontFactory
             {
                 WritingSystemName = "Latin",

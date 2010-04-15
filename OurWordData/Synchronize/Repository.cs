@@ -12,6 +12,8 @@ using Chorus.VcsDrivers;
 using JWTools;
 using Chorus.Utilities;
 using Chorus.VcsDrivers.Mercurial;
+using OurWordData.DataModel;
+
 #endregion
 
 namespace OurWordData.Synchronize
@@ -191,6 +193,222 @@ namespace OurWordData.Synchronize
             return repo.GetFileExistsInRepo(pathFromRoot);
         }
         #endregion
+        #region Method: ExecutionResult Clone(string sourceRepoRoot, string destinationRepoRoot)
+
+        protected enum CloneOptions
+        {
+            None = 0,
+            NoWorkingCopyUpdate = 1
+        } ;
+
+        protected ExecutionResult Clone(string sourceRepoRoot, string destinationRepoRoot, 
+            CloneOptions options)
+        {
+            // Get rid of anything that might have been there; then create an empty
+            // folder so that Hg will not complain of an invalid working directory
+            if (Directory.Exists(destinationRepoRoot))
+                JWU.SafeFolderDelete(destinationRepoRoot);
+            Directory.CreateDirectory(destinationRepoRoot);
+
+            var sOptions = (options == CloneOptions.NoWorkingCopyUpdate) ? "-U" : "";
+
+            var destination = SurroundWithQuotes(StripTrailingPathSeparator(
+                destinationRepoRoot));
+
+            var source = SurroundWithQuotes(StripTrailingPathSeparator(
+                sourceRepoRoot));
+
+            var cloneCommand = string.Format("clone {0} {1} {2}", sOptions, source, destination);
+            return DoCommand(cloneCommand);
+        }
+        #endregion
+        #region Method: bool CheckIsCorruptRepository()
+        public bool CheckIsCorruptRepository()
+        {
+            // The following are error messages observed on Hg repo's upon running the Verify command,
+            // any one of which indicates we have a corrupt repository and need to restore it from backup.
+            string[] vsCorruptSignals = 
+            { 
+                "abandoned transaction found",
+                "points to nonexistent changeset",
+                "in manifest but not in changeset",
+                "in manifests not found",
+                "empty or missing",
+                "integrity errors encountered!"          
+            };
+
+            var result = DoCommand("verify");
+            var vsLines = result.StandardError.Split('\n');
+            foreach (var sLine in vsLines)
+            {
+                foreach (var sCorrupt in vsCorruptSignals)
+                {
+                    if (sLine.Contains(sCorrupt))
+                        return true;
+                }
+            }
+            return false;
+        }
+        #endregion
+    }
+    #endregion
+
+    #region Class: BackupRepository
+    public class BackupRepository : Repository
+    {
+        // Attrs -----------------------------------------------------------------------------
+        #region Attr{g}: LocalRepository Source
+        LocalRepository Source
+        {
+            get
+            {
+                Debug.Assert(null != m_SourceRepository);
+                return m_SourceRepository;
+            }
+        }
+        private readonly LocalRepository m_SourceRepository;
+        #endregion
+
+        // Physical disk storage -------------------------------------------------------------
+        #region OAttr{g} string FullPathToRepositoryRoot
+        public override string FullPathToRepositoryRoot
+        {
+            get
+            {
+                // Get the cluster name from the Source's path
+                var sPathSource = Source.FullPathToRepositoryRoot;
+                var vsFolders = sPathSource.Split(Path.DirectorySeparatorChar);
+                Debug.Assert(vsFolders.Length > 0);
+                var sClusterName = vsFolders[vsFolders.Length - 1];
+                Debug.Assert(!string.IsNullOrEmpty(sClusterName));
+
+                // Get the backup folder based on cluster name
+                const string c_sBackupRoot = "OurWordRepositoryBackups";
+                var sFolder = Path.Combine(c_sBackupRoot, sClusterName);
+                var sBackupRoot = JWU.GetLocalApplicationDataFolder(sFolder);
+
+                return sBackupRoot;
+            }
+        }
+        #endregion
+        #region Attr{g}: bool Exists
+        public bool Exists
+        {
+            get
+            {
+                var pathToRepositoryStorage = Path.Combine(FullPathToRepositoryRoot, ".hg");
+
+                return Directory.Exists(pathToRepositoryStorage);
+            }
+        }
+        #endregion
+        #region Method: void SafeDelete()
+        public void SafeDelete()
+        {
+            if (Directory.Exists(FullPathToRepositoryRoot))
+                JWU.SafeFolderDelete(FullPathToRepositoryRoot);
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
+        #region Constructor(LocalRepository)
+        public BackupRepository(LocalRepository source)
+        {
+            m_SourceRepository = source;
+        }
+        #endregion
+
+        // Helper Methods --------------------------------------------------------------------
+        #region Method: void CloneFromSource()
+        void CloneFromSource()
+        {
+            // The superclass Clone method deletes anything currently at the Backup destination,
+            // then clones the source to it.
+            var source = Source.FullPathToRepositoryRoot;
+            var destination = FullPathToRepositoryRoot;
+            Clone(source, destination, CloneOptions.NoWorkingCopyUpdate);
+
+            // Check that the operation was sucessful
+            if(CheckIsCorruptRepository())
+            {
+                if (Directory.Exists(FullPathToRepositoryRoot))
+                    JWU.SafeFolderDelete(FullPathToRepositoryRoot);
+
+                throw new SynchException("msgCantCloneToBackup", 
+                    "OurWord was unable to create a backup repository. The most likely cause is" + 
+                    "that your disk is full. Please delete some files, then try again");
+            }
+        }
+        #endregion
+        #region Method: void CheckSourceForErrors()
+        public void CheckSourceForErrors()
+        {
+            // Is the source ok?
+            if (!Source.CheckIsCorruptRepository())
+                return;
+
+            // If the backup doesn't exist, we can't restore from it. 
+            if (!Exists)
+            {
+                throw new SynchException("msgRepositoryCorruptedNoBackup",
+                    "We're sorry....your repository is corrupted, and there is no backup available.\n" +
+                    "(But more than likely your data is ok.) Please contact us for help.");
+            }
+
+            // If the Backup is corrupted, we can't restore from it
+            if (CheckIsCorruptRepository())
+            {
+                SafeDelete();
+                throw new SynchException("msgBackupRepositoryCorrupted",
+                    "The Backup repository was corrupted, so OurWord has removed it. \n" + 
+                    "(More than likely your data is ok.) Please contact us for help.");
+            }
+
+            // Delete the Source's "hg" folder
+            if (Directory.Exists(Source.FullPathToHgFolder))
+                JWU.SafeFolderDelete(Source.FullPathToHgFolder);
+
+            // Clone the backup to the Source repository folder. Unfortuantely we can't really
+            // clone, because this destroys the existing files; Hg gives no options for cloning
+            // while keeping existing files in the working directory.
+            var source = Path.Combine(FullPathToRepositoryRoot, ".hg");
+            var destination = Source.FullPathToHgFolder;
+            JWU.Copy(source, destination);
+
+            // If the restore failed, they're out of disk space or something is wrong that 
+            // needs diagnosis beyond what we can do here);
+            if (Source.CheckIsCorruptRepository())
+            {
+                throw new SynchException("msgRepositoryRestoreFailed",
+                    "OurWord's attempt to restore your repository failed. You may be out of disk space.\n" +
+                    "If disk space isn't the problem, then please contact us for help.");
+            }
+        }
+        #endregion
+
+        // Public interface ------------------------------------------------------------------
+        #region Method: void MakeOrUpdateBackup()
+        public void MakeOrUpdateBackup()
+        {
+            // If the Source is already corrupt, then restore it from backup
+            CheckSourceForErrors();
+
+            // If the backup doesn't exist, then clone a new one. 
+            if (!Exists)
+                CloneFromSource();
+
+            // Synch changes from Source to Backup. Shouldn't be any merges, just a straight push
+            Source.PushTo(SurroundWithQuotes(FullPathToRepositoryRoot));
+
+            // Make sure our Backup Repository has no errors
+            if (CheckIsCorruptRepository())
+            {
+                throw new SynchException("msgSynchToBackupFailed", 
+                    "OurWord was unable to synchronize to the backup repository. More than likely" + 
+                    "your disk is full. Please delete some files, and try again.");
+            }
+        }
+        #endregion
     }
     #endregion
 
@@ -209,7 +427,7 @@ namespace OurWordData.Synchronize
         #endregion
         readonly string m_RepositoryRootPath;
         #region VAttr{g}: string FullPathToHgFolder
-        string FullPathToHgFolder
+        public string FullPathToHgFolder
         {
             get
             {
@@ -338,7 +556,15 @@ namespace OurWordData.Synchronize
         #region Method: ExecutionResult CloneFrom(Repository other)
         public ExecutionResult CloneFrom(Repository other)
         {
-            // Get rid of anything that might have been there; then creat an empty
+            var source = other.FullPathToRepositoryRoot;
+            var destination = FullPathToRepositoryRoot;
+
+            return Clone(source, destination, CloneOptions.None);
+
+            /*
+             * Replaced with Superclass method 12apr2010; after testing, we can remove this
+             * 
+            // Get rid of anything that might have been there; then create an empty
             // folder so that Hg will not complain of an invalid working directory
             if (Directory.Exists(FullPathToRepositoryRoot))
                 JWU.SafeFolderDelete(FullPathToRepositoryRoot);
@@ -351,6 +577,8 @@ namespace OurWordData.Synchronize
 
             var cloneCommand = string.Format("clone {0} {1}", source, destination);
             return DoCommand(cloneCommand);
+             * 
+             */
         }
         #endregion
         #region Method: void Rollback()
@@ -585,6 +813,25 @@ namespace OurWordData.Synchronize
     }
     #endregion
 
+    #region Class: SynchException : Exception
+    class SynchException : Exception
+    {
+        public readonly string LocalizedMessage;
+
+        public SynchException(string sLocId, string sEnglishMessage)
+            : base(sEnglishMessage)
+        {
+            LocalizedMessage = LocDB.GetValue(
+                new[] { "Strings", "SynchMessages" },
+                sLocId,
+                sEnglishMessage,
+                null,
+                null);
+        }
+    }
+    #endregion
+
+
     #region Class: Synchronize
     public class Synchronize
     {
@@ -610,23 +857,6 @@ namespace OurWordData.Synchronize
                 Console.WriteLine(e.Message);
             }
             return false;
-        }
-        #endregion
-        #region Class: SynchException : Exception
-        class SynchException : Exception
-        {
-            public readonly string LocalizedMessage;
-
-            public SynchException(string sLocId, string sEnglishMessage)
-                : base(sEnglishMessage)
-            {
-                LocalizedMessage = LocDB.GetValue(
-                    new[] { "Strings", "SynchMessages" },
-                    sLocId,
-                    sEnglishMessage,
-                    null,
-                    null);
-            }
         }
         #endregion
         #region SMethod: void ThrowIfNoMercurial()
@@ -739,10 +969,10 @@ namespace OurWordData.Synchronize
                     "If this message continues to appear, try restarting your computer.");
             }
 
-            // If we had an interrupted transaction, then we need to recover from it. This
-            // command has  no effect if the repositiory is in good shape; but it repairs the
-            // repositiory if a transaction was interrupted.
-            m_LocalRepository.Recover();
+            // Make sure the Backup Repository is up to date; create one if we don't have one already
+            // This will also restore the Local repository if it has been corrupted in some way.
+            var backupRepository = new BackupRepository(m_LocalRepository);
+            backupRepository.MakeOrUpdateBackup();
 
             // If we have problem from a bad merge (from an old version), we need to report 
             // it to the user and get them to fix it (with help our help, I'm sure.)

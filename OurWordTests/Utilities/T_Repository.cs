@@ -12,6 +12,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Chorus.merge;
 using Chorus.Utilities;
 using Chorus.VcsDrivers.Mercurial;
@@ -189,6 +190,15 @@ namespace OurWordTests.Utilities
             // to test in that manner.
         }
         #endregion
+        #region SMethod: void CreateSimpleFile(sPath, sOneLinerContent)
+        static void CreateSimpleFile(string sPath, string sOneLinerContent)
+        {
+            var w = new StreamWriter(sPath, false, Encoding.UTF8);
+            var tw = TextWriter.Synchronized(w);
+            tw.WriteLine(sOneLinerContent);
+            tw.Close();
+        }
+        #endregion
 
         #region Test: TCreateIfDoesntExist
         [Test] public void TCreateIfDoesntExist()
@@ -253,6 +263,83 @@ namespace OurWordTests.Utilities
 
             Assert.AreEqual(c_nCurrentVersionNo, repo.GetOurWordVersion(),
                 "Version should be " + c_nCurrentVersionNo);
+        }
+        #endregion
+        #region Test: TBackupFileNotOverwritten
+        [Test] public void TBackupFileNotOverwritten()
+        {
+            try
+            {
+                TestFolder.CreateEmpty();
+
+                var originRepositoryFolder = TestFolder.CreateEmptySubFolder("origin");
+                var originRepository = new LocalRepository(originRepositoryFolder);
+                originRepository.CreateIfDoesntExist();
+
+                // Add a file, put it in our repository
+                var newFilePath = Path.Combine(originRepository.FullPathToRepositoryRoot, "hello.txt");
+                CreateSimpleFile(newFilePath, "Hello");
+                originRepository.CommitChangedFiles("jsw", "committing hello.txt");
+
+                // Create the backup
+                var backupRepository = new BackupRepository(originRepository);
+                backupRepository.SafeDelete();
+                backupRepository.MakeOrUpdateBackup();
+
+                // Add another file, but don't put it in our repository
+                newFilePath = Path.Combine(originRepository.FullPathToRepositoryRoot, "world.txt");
+                CreateSimpleFile(newFilePath, "World");
+
+                // Corrupt our repository!
+                var disasterFolder = Path.Combine(originRepository.FullPathToHgFolder, "store");
+                var disasterPath = Path.Combine(disasterFolder, "fncache");
+                Assert.IsTrue(File.Exists(disasterPath));
+                File.Delete(disasterPath);
+                Assert.IsTrue(originRepository.CheckIsCorruptRepository());
+
+                // This should restore things
+                backupRepository.CheckSourceForErrors();
+
+                // Test 1: Does out Hello file still exist?
+                Assert.IsTrue(File.Exists(newFilePath), "The uncommitted file world.txt should still exist.");
+
+                // Test 2: Is our repository no longer corrupt?
+                Assert.IsFalse(originRepository.CheckIsCorruptRepository(), "The new repo should not be corrupt.");
+
+                // Cleanup
+                backupRepository.SafeDelete();
+                TestFolder.DeleteIfExists();
+
+            }
+            catch (Exception e)
+            {
+                Assert.Fail("An error was thrown: ", e.Message);
+            }
+        }
+        #endregion
+        #region Test: TCorruptRepository
+        [Test] public void TCorruptRepository()
+        {
+            TestFolder.CreateEmpty();
+
+            // Create a repository
+            var repositoryFolder = TestFolder.CreateEmptySubFolder("origin");
+            var repository = new LocalRepository(repositoryFolder);
+            repository.CreateIfDoesntExist();
+
+            // Should be in good shape
+            Assert.IsFalse(repository.CheckIsCorruptRepository());
+
+            // Corrupt it
+            var disasterFolder = Path.Combine(repository.FullPathToHgFolder, "store");
+            var disasterPath = Path.Combine(disasterFolder, "fncache");
+            Assert.IsTrue(File.Exists(disasterPath));
+            File.Delete(disasterPath);
+
+            // Should be in bad shape
+            Assert.IsTrue(repository.CheckIsCorruptRepository());
+
+            TestFolder.DeleteIfExists();
         }
         #endregion
     }
@@ -469,11 +556,13 @@ namespace OurWordTests.Utilities
             var originRepositoryPath = GetFreshRepositoryRootPath("origin");
             var originRepository = new LocalRepository(originRepositoryPath);
             originRepository.CreateIfDoesntExist();
+            (new BackupRepository(originRepository)).SafeDelete();
             WriteAndCommitFile(originRepository, sFileBaseName, parentDoc, "Parent created");
 
             // Clone it to another repository; thus we have "parent" in two places
             var clonedRepositoryPath = GetFreshRepositoryRootPath("cloned");
             var clonedRepository = new LocalRepository(clonedRepositoryPath);
+            (new BackupRepository(clonedRepository)).SafeDelete();
             clonedRepository.CloneFrom(originRepository);
 
             // Update the repositories with "our" and "their" versions
@@ -494,6 +583,8 @@ namespace OurWordTests.Utilities
             // Remove the repositories we created
             CleanupByEnsuringIsDeleted(originRepositoryPath);
             CleanupByEnsuringIsDeleted(clonedRepositoryPath);
+            (new BackupRepository(originRepository)).SafeDelete();
+            (new BackupRepository(clonedRepository)).SafeDelete();
         }
         #endregion
         #region Test: DetectAndRecoverFromLaterVersion
@@ -548,6 +639,7 @@ namespace OurWordTests.Utilities
             // Create a original repository
             var folderLocal = TestFolder.CreateEmptySubFolder("original");
             var repoLocal = new LocalRepository(folderLocal);
+            (new BackupRepository(repoLocal)).SafeDelete();
             repoLocal.CreateIfDoesntExist();
 
             // Add a test file to it
@@ -558,6 +650,7 @@ namespace OurWordTests.Utilities
             // Clone it to "other"
             var folderOther = TestFolder.CreateEmptySubFolder("other");
             var repoOther = new LocalRepository(folderOther);
+            (new BackupRepository(repoOther)).SafeDelete();
             repoOther.CloneFrom(repoLocal);
 
             // Change the original to "one"
@@ -599,6 +692,10 @@ namespace OurWordTests.Utilities
             // There should be exactly one head in the repository
             heads = (new HgRepository(folderLocal, new NullProgress()).GetHeads());
             Assert.AreEqual(1, heads.Count);
+
+            // Cleannup
+            (new BackupRepository(repoLocal)).SafeDelete();
+            (new BackupRepository(repoOther)).SafeDelete();
         }
         #endregion
 

@@ -1148,17 +1148,18 @@ namespace OurWordTests.Edit
 
             // Add the widths of the first two EBlocks
             float fAvailWidth = 0;
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
                 fAvailWidth += m_op.SubItems[i].Width;
 
             // TEST 1 - SHOULD JUST FIT
             // Request chunking from the paragraph
-            OWPara.ProposeNextLayoutChunk chunk = new OWPara.ProposeNextLayoutChunk(
-                Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
+            new OWPara.ProposeNextLayoutChunk(Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
 
             // Check the two and three words
-            EWord wL = m_op.SubItems[1] as EWord;
-            EWord wR = m_op.SubItems[2] as EWord;
+            var wL = m_op.SubItems[1] as EWord;
+            var wR = m_op.SubItems[2] as EWord;
+            Assert.IsNotNull(wL);
+            Assert.IsNotNull(wR);
 
             Assert.IsFalse(wL.Hyphenated, "1-First word should not be hyphenated");
             Assert.IsFalse(wR.Hyphenated, "1-Second word should not be hyphenated");
@@ -1172,8 +1173,7 @@ namespace OurWordTests.Edit
             fAvailWidth -= 20;
 
             // Request chunking from the paragraph
-            chunk = new OWPara.ProposeNextLayoutChunk(
-                Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
+            new OWPara.ProposeNextLayoutChunk(Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
 
             // Check the two and three words
             wL = m_op.SubItems[1] as EWord;
@@ -1182,8 +1182,8 @@ namespace OurWordTests.Edit
             Assert.IsTrue(wL.Hyphenated, "2-First word should be hyphenated");
             Assert.IsFalse(wR.Hyphenated, "2-Second word should not be hyphenated");
 
-            Assert.AreEqual("Mepücate", wL.Text);
-            Assert.AreEqual("maicai ", wR.Text);
+            Assert.AreEqual("Mepücatemai", wL.Text);
+            Assert.AreEqual("cai ", wR.Text);
         }
         #endregion
         #region Test: void RemoveHyphenation()
@@ -1220,12 +1220,11 @@ namespace OurWordTests.Edit
             fAvailWidth -= 20;
 
             // Request chunking from the paragraph
-            OWPara.ProposeNextLayoutChunk chunk = new OWPara.ProposeNextLayoutChunk(
-                Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
+            new OWPara.ProposeNextLayoutChunk(Wnd.Draw.Graphics, m_op, fAvailWidth, 0, false);
 
             // Because we hyphenated, we should have an extra block
             Assert.IsTrue(m_op.SubItems.Length > cBlocks, "Hyphenation created new blocks");
-            Assert.AreEqual("Mepücate", (m_op.SubItems[1] as EWord).Text);
+            Assert.AreEqual("Mepücatemai", (m_op.SubItems[1] as EWord).Text);
 
             // Now remove them
             m_op.RemoveHyphenation();

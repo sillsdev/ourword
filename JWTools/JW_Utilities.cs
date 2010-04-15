@@ -474,27 +474,27 @@ namespace JWTools
         }
         #endregion
         #region SMethod: void Copy(string sSourceFolder, string sDestinationFolder)
-        static void Copy(string sSourceFolder, string sDestinationFolder)
+        static public void Copy(string sSourceFolder, string sDestinationFolder)
         {
             // Get the info about this folder
-            DirectoryInfo dir = new DirectoryInfo(sSourceFolder);
+            var dir = new DirectoryInfo(sSourceFolder);
 
             // Create the destination folder
             Directory.CreateDirectory(sDestinationFolder);
 
             // Copy the files over
-            FileInfo[] files = dir.GetFiles();
-            foreach (FileInfo file in files)
+            var files = dir.GetFiles();
+            foreach (var file in files)
             {
-                string temppath = Path.Combine(sDestinationFolder, file.Name);
+                var temppath = Path.Combine(sDestinationFolder, file.Name);
                 file.CopyTo(temppath, true);
             }
 
             // Copy the subfolders over via recursion
-            DirectoryInfo[] dirs = dir.GetDirectories();
-            foreach (DirectoryInfo subdir in dirs)
+            var dirs = dir.GetDirectories();
+            foreach (var subdir in dirs)
             {
-                string temppath = Path.Combine(sDestinationFolder, subdir.Name);
+                var temppath = Path.Combine(sDestinationFolder, subdir.Name);
                 Copy(subdir.FullName, temppath);
             }
         }

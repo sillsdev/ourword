@@ -72,7 +72,7 @@ namespace OurWordData.Styles
                 StyleSheet.DeclareDirty();
             }
         }
-        private FontStyle m_FontStyle;
+        private FontStyle m_FontStyle = FontStyle.Regular;
         #endregion
         #region Attr{g/s}: string WritingSystemName
         public string WritingSystemName

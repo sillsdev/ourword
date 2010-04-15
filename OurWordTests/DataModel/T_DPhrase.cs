@@ -10,6 +10,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Text;
 using System.Windows.Forms;
 
@@ -234,6 +235,7 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        #region Test: EthiopicEliminateSpuriousSpaces
         [Test]
         public void EthiopicEliminateSpuriousSpaces()
             // This is Amharic script. If we call IndexOf("<space><space>"), it thinks there
@@ -247,10 +249,22 @@ namespace OurWordTests.DataModel
             phrase.EliminateSpuriousSpaces();
             Assert.AreEqual(sText, phrase.Text, "Should be identical");
 
+            /*
             // An experiment for Sharon Correl, can delete once I know she doesn't need it. 7apr2010
             //const string s = "አብርሃምይስሐቅን";
             //Assert.AreEqual(-1, s.IndexOf(" "));
 
+            var s1 = "አብርሃም ይስሐቅን";
+            var s2 = s1;
+
+            s1 = s1.Insert(5, "\u2009");
+
+            var n = string.Compare(s1, s2, CultureInfo.GetCultureInfo("am"), CompareOptions.None);
+            Assert.IsTrue(n == 0);
+            */
+
+
         }
+        #endregion
     }
 }

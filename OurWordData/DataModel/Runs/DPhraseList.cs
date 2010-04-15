@@ -448,11 +448,6 @@ namespace OurWordData.DataModel.Runs
         }
         #endregion
 
-        public string GetRtf()
-        {
-            return AsString;
-        }
-
         // Oxes --------------------------------------------------------------------------
         #region Oxes Constants
         const string c_sTagSpan = "span";
