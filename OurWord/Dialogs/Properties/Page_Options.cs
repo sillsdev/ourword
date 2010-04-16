@@ -62,6 +62,9 @@ namespace OurWord.Dialogs
         const string c_sZoomFactor = "propZoomFactor";
         const string c_sProjectAccess = "propProjectAccess";
 
+        private const string c_sGroupBackTranlation = "BackTranslation";
+        private const string c_sCanEditTargetInBackTransView = "propCanEditTargetInBackTransView";
+
         const string c_sGroupNaturalnessCheck = "propNaturalnessCheck";
         const string c_sSuppressVerses = "propNCSuppressVerses";
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
@@ -102,19 +105,15 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sMaximizeWindowOnStartup:
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    e.Value = ps.GetBoolString(OurWordMain.App.StartMaximized);
+                    SetPropertySpecValue(e, OurWordMain.App.StartMaximized);
                     break;
 
                 case c_sMakeBackups:
-                    YesNoPropertySpec BackupPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != BackupPS);
-                    e.Value = BackupPS.GetBoolString(BackupSystem.Enabled);
+                    SetPropertySpecValue(e, BackupSystem.Enabled);
                     break;
 
                 case c_sZoomFactor:
-                    ZoomPropertySpec ZoomPS = e.Property as ZoomPropertySpec;
+                    var ZoomPS = e.Property as ZoomPropertySpec;
                     Debug.Assert(null != ZoomPS);
                     e.Value = ZoomPS.GetZoomString(G.ZoomPercent);
                     break;
@@ -127,16 +126,17 @@ namespace OurWord.Dialogs
                     e.Value = ClusterList.UserCanAccessAllProjectsFriendly;
                     break;
 
+                // Back Translation View
+                case c_sCanEditTargetInBackTransView:
+                    SetPropertySpecValue(e, WndBackTranslation.CanEditTarget);
+                    break;
+
                 // Naturalness Check view
                 case c_sSuppressVerses:
-                    YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != SuppressPS);
-                    e.Value = SuppressPS.GetBoolString(WndNaturalness.SupressVerseNumbers);
+                    SetPropertySpecValue(e, WndNaturalness.SupressVerseNumbers);
                     break;
                 case c_sShowLineNumbers:
-                    YesNoPropertySpec ShowLineNumbersPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ShowLineNumbersPS);
-                    e.Value = ShowLineNumbersPS.GetBoolString(WndNaturalness.ShowLineNumbers);
+                    SetPropertySpecValue(e, WndNaturalness.ShowLineNumbers);
                     break;
                 case c_sLineNumberColor:
                     e.Value = WndNaturalness.LineNumbersColor;
@@ -161,12 +161,21 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
-        #region Method: bool InterpretYesNo(PropertySpecEventArgs e)
-        bool InterpretYesNo(PropertySpecEventArgs e)
+        #region SMethod: void SetPropertySpecValue(PropertySpecEventArgs e, bool b)
+        static void SetPropertySpecValue(PropertySpecEventArgs e, bool b)
         {
-            YesNoPropertySpec PS = e.Property as YesNoPropertySpec;
-            Debug.Assert(null != PS);
-            return PS.IsTrue(e.Value);
+            var ps = e.Property as YesNoPropertySpec;
+            Debug.Assert(null != ps);
+            e.Value = ps.GetBoolString(b);
+
+        }
+        #endregion
+        #region SMethod: bool InterpretYesNo(PropertySpecEventArgs e)
+        static bool InterpretYesNo(PropertySpecEventArgs e)
+        {
+            var ps = e.Property as YesNoPropertySpec;
+            Debug.Assert(null != ps);
+            return ps.IsTrue(e.Value);
         }
         #endregion
         #region Method: void bag_SetValue(object sender, PropertySpecEventArgs e)
@@ -182,15 +191,11 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sMaximizeWindowOnStartup:
-                    YesNoPropertySpec ps = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ps);
-                    OurWordMain.App.StartMaximized = ps.IsTrue(e.Value);
+                    OurWordMain.App.StartMaximized = InterpretYesNo(e);
                     break;
 
                 case c_sMakeBackups:
-                    YesNoPropertySpec BackupPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != BackupPS);
-                    BackupSystem.Enabled = BackupPS.IsTrue(e.Value);
+                    BackupSystem.Enabled = InterpretYesNo(e);
                     break;
 
                 case c_sBackupPath:
@@ -198,7 +203,7 @@ namespace OurWord.Dialogs
                     break;
 
                 case c_sZoomFactor:
-                    ZoomPropertySpec ZoomPS = e.Property as ZoomPropertySpec;
+                    var ZoomPS = e.Property as ZoomPropertySpec;
                     Debug.Assert(null != ZoomPS);
                     G.ZoomPercent = ZoomPS.GetZoomFactor(e.Value);
                     break;
@@ -206,16 +211,17 @@ namespace OurWord.Dialogs
                 case c_sProjectAccess:
                     break;
 
+                // Back Translation view
+                case c_sCanEditTargetInBackTransView:
+                    WndBackTranslation.CanEditTarget = InterpretYesNo(e);
+                    break;
+
                 // Naturalness Check view
                 case c_sSuppressVerses:
-                    YesNoPropertySpec SuppressPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != SuppressPS);
-                    WndNaturalness.SupressVerseNumbers = SuppressPS.IsTrue(e.Value);
+                    WndNaturalness.SupressVerseNumbers = InterpretYesNo(e);
                     break;
                 case c_sShowLineNumbers:
-                    YesNoPropertySpec ShowLineNumbersPS = e.Property as YesNoPropertySpec;
-                    Debug.Assert(null != ShowLineNumbersPS);
-                    WndNaturalness.ShowLineNumbers = ShowLineNumbersPS.IsTrue(e.Value);
+                    WndNaturalness.ShowLineNumbers = InterpretYesNo(e);
                     break;
                 case c_sLineNumberColor:
                     WndNaturalness.LineNumbersColor = (string)e.Value;
@@ -325,6 +331,18 @@ namespace OurWord.Dialogs
                 );
             zps.DontLocalizeEnums = true;
             Bag.Properties.Add(zps);
+            #endregion
+
+            // Back Translation options
+            #region (Back Translation Options)
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sCanEditTargetInBackTransView,
+                "Can edit Draft in Back Translation view?",
+                c_sGroupBackTranlation,
+                "If Yes, you will be able to edit the vernacular while in the Back Translation window, rather than " +
+                    "having to flip back to the Draft window.",
+                false
+                ));
             #endregion
 
             // Naturalness Check options

@@ -9,21 +9,11 @@
  *********************************************************************************************/
 #region Using
 using System;
-using System.Diagnostics;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.Windows.Forms;
-using System.Data;
-using System.IO;
-
 using OurWordData.DataModel;
 using OurWord.Edit;
-using OurWord.Layouts;
-using OurWordData;
 using JWTools;
 using OurWordData.DataModel.Annotations;
-
 #endregion
 #endregion
 
@@ -38,11 +28,26 @@ namespace OurWord.Layouts
         {
             get
             {
-                return OWWindow.GetRegistryBackgroundColor(c_sName, "Linen");
+                return GetRegistryBackgroundColor(c_sName, "Linen");
             }
             set
             {
-                OWWindow.SetRegistryBackgroundColor(c_sName, value);
+                SetRegistryBackgroundColor(c_sName, value);
+            }
+        }
+        #endregion
+
+        private const string c_sKeyCanEditTarget = "CanEditTarget";
+        #region SAttr{g/s}: bool CanEditTarget
+        static public bool CanEditTarget
+        {
+            get
+            {
+                return JW_Registry.GetValue(c_sName, c_sKeyCanEditTarget, false);
+            }
+            set
+            {
+                JW_Registry.SetValue(c_sName, c_sKeyCanEditTarget, value);
             }
         }
         #endregion
@@ -92,13 +97,13 @@ namespace OurWord.Layouts
         {
             get
             {
-                string sBase = G.GetLoc_GeneralUI("BackTranslationReference", "{0}");
+                var sBase = G.GetLoc_GeneralUI("BackTranslationReference", "{0}");
 
-                string sTargetName = (null == DB.TargetTranslation) ?
+                var sTargetName = (null == DB.TargetTranslation) ?
                    G.GetLoc_GeneralUI("NoTargetDefined", "(no target defined)") :
                    DB.TargetTranslation.DisplayName.ToUpper();
 
-                string s = LocDB.Insert(sBase, new string[] { sTargetName });
+                var s = LocDB.Insert(sBase, new[] { sTargetName });
 
                 return s;
             }
@@ -109,6 +114,10 @@ namespace OurWord.Layouts
         #region Method: override void LoadData()
         public override void LoadData()
         {
+            // Set the background color, in case its changed; we use this later in giving
+            // the paragraphs their background color.
+            BackColor = Color.FromName(RegistryBackgroundColor);
+
             // Start with an empty window
             Clear();
 
@@ -131,13 +140,22 @@ namespace OurWord.Layouts
                 if (p.SimpleText.Length == 0 && p.SimpleTextBT.Length == 0)
                     continue;
 
-                // Add the vernacular paragraph to the left; we don't edit it
+                // Add the vernacular paragraph to the left; we don't edit it except under
+                // special circumstances
+                var vernacularOptions = OWPara.Flags.None;
+                if (p.IsUserEditable && CanEditTarget)
+                {
+                    vernacularOptions |= OWPara.Flags.IsEditable;
+                    vernacularOptions |= OWPara.Flags.CanItalic;
+                    if (OurWordMain.TargetIsLocked)
+                        vernacularOptions |= OWPara.Flags.IsLocked;
+                }
                 var op =  new OWPara(
                     p.Translation.WritingSystemVernacular,
                     p.Style,
                     p,
                     BackColor,
-                    OWPara.Flags.None);
+                    vernacularOptions);
                 colVernacular.Append(op);
 
                 // For certain types of paragraphs, we just display them on the BT side, rather

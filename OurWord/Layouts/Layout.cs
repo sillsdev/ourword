@@ -466,24 +466,26 @@ namespace OurWord.Layouts
             return JW_Registry.GetValue(c_sCurrentLayout, sDefaultLayout);
         }
         #endregion
+        #region SMethod: bool CurrentLayoutIs(string sLayoutName)
         static public bool CurrentLayoutIs(string sLayoutName)
         {
             if (CurrentLayout.LayoutName == sLayoutName)
                 return true;
             return false;
         }
-        static public bool CurrentLayoutIs(string[] vsLayoutName)
+        #endregion
+        #region SMethod: bool CurrentLayoutIs(vsLayoutName)
+        static public bool CurrentLayoutIs(IEnumerable<string> vsLayoutName)
         {
-            foreach (string s in vsLayoutName)
+            foreach (var s in vsLayoutName)
             {
                 if (CurrentLayoutIs(s))
                     return true;
             }
             return false;
         }
-
-        /*
-        */
+        #endregion
+        #region SMethod: void CheckWindowMenuItem(btnParent)
         static public void CheckWindowMenuItem(ToolStripDropDownButton btnParent)
         {
             if (null == CurrentLayout)
@@ -507,7 +509,7 @@ namespace OurWord.Layouts
                 menuItem.Checked = (sMenuItemLayoutName == CurrentLayout.LayoutName);
             }
         }
-
+        #endregion
 
     }
 }
