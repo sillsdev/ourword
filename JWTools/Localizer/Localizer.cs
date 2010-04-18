@@ -437,9 +437,9 @@ namespace JWTools
         #region Method: _TextToRtfBox(string sIn)
         string _TextToRtfBox(string sIn)
         {
-            string sOut = "";
+            var sOut = "";
 
-            foreach (char ch in sIn)
+            foreach (var ch in sIn)
             {
                 switch (ch)
                 {
@@ -580,7 +580,7 @@ namespace JWTools
             if (null == Item || -1 == iLanguage)
                 return;
 
-            LocAlternate alt = new LocAlternate(ItemYourLanguage, null, null);
+            var alt = new LocAlternate(ItemYourLanguage, null, null);
 
             Item.AddAlternate(iLanguage, alt);
             alt.ShortcutKey = m_comboShortcutKey.Text;
@@ -633,14 +633,14 @@ namespace JWTools
         {
             if (null == Item)
                 return;
-            LocAlternate alt = new LocAlternate(
+            var alt = new LocAlternate(
                 m_textYourLanguage.Text,
                 m_comboShortcutKey.Text,
                 m_textToolTip.Text);
 
             // Do the test
-            string sNeedsMessage = alt.NeedsAttention(Item);
-            bool bNeedsAttention = !string.IsNullOrEmpty(sNeedsMessage);
+            var sNeedsMessage = alt.NeedsAttention(Item);
+            var bNeedsAttention = !string.IsNullOrEmpty(sNeedsMessage);
 
             // Update the tree node
             if (null != Tree.SelectedNode && null != Tree.SelectedNode.Tag as LocItem)
@@ -731,14 +731,14 @@ namespace JWTools
             HarvestChanges();
 
             // Get the node's item, if any
-            LocItem item = Tree.SelectedNode.Tag as LocItem;
+            var item = Tree.SelectedNode.Tag as LocItem;
 
             // If no item, then clear the controls
             if (null == item)
             {
                 ClearItemControls();
 
-                LocGroup g = Tree.SelectedNode.Tag as LocGroup;
+                var g = Tree.SelectedNode.Tag as LocGroup;
                 if (null != g)
                     Group = g;
 
@@ -746,7 +746,7 @@ namespace JWTools
             }
 
             // Get the group from this node's parent
-            LocGroup group = Tree.SelectedNode.Parent.Tag as LocGroup;
+            var group = Tree.SelectedNode.Parent.Tag as LocGroup;
             if (null == group)
                 return;
             Group = group;
@@ -778,9 +778,9 @@ namespace JWTools
             // Save any edits that have been done
             HarvestChanges();
 
-            DialogResult result = MessageBox.Show(
-                "Do you want to save your changes permanently?",
-                "OurWord Localizer",
+            var result = MessageBox.Show(
+                @"Do you want to save your changes permanently?",
+                @"OurWord Localizer",
                 MessageBoxButtons.YesNoCancel,
                 MessageBoxIcon.Question,
                 MessageBoxDefaultButton.Button1);
@@ -800,7 +800,7 @@ namespace JWTools
         #region Cmd: cmdClose - Close button pressed
         private void cmdClose(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
         #endregion
         #region Cmd: cmdSave - write the LocDB to xml file
@@ -813,12 +813,12 @@ namespace JWTools
         #region Cmd: cmdNewLanguage - add a new language to the LocDB
         private void cmdNewLanguage(object sender, EventArgs e)
         {
-            DlgNewLanguage dlg = new DlgNewLanguage();
+            var dlg = new DlgNewLanguage();
             if (DialogResult.Cancel == dlg.ShowDialog(this))
                 return;
 
             // Create the new LocLanguage object
-            LocLanguage language = LocDB.DB.AppendLanguage(dlg.Abbreviation, dlg.LanguageName);
+            var language = LocDB.DB.AppendLanguage(dlg.Abbreviation, dlg.LanguageName);
             language.FontName = dlg.FontName;
             language.FontSize = dlg.FontSize;
 
@@ -842,11 +842,11 @@ namespace JWTools
         private void cmdProperties(object sender, EventArgs e)
         {
             // Get the current language object
-            LocLanguage language = LocDB.DB.FindLanguageByName(m_comboLanguage.Text);
+            var language = LocDB.DB.FindLanguageByName(m_comboLanguage.Text);
             if (null == language)
                 return;
 
-            DlgNewLanguage dlg = new DlgNewLanguage();
+            var dlg = new DlgNewLanguage();
             dlg.SetAsPropertiesMode(language.ID, language.Name);
             if (DialogResult.Cancel == dlg.ShowDialog(this))
                 return;
@@ -865,10 +865,11 @@ namespace JWTools
         {
             HarvestChanges();
 
-            DlgEditDescriptions dlg = new DlgEditDescriptions();
-
-            dlg.GroupDescription = Group.Description;
-            dlg.ItemDescription = Item.Information;
+            var dlg = new DlgEditDescriptions
+            {
+                GroupDescription = Group.Description,
+                ItemDescription = Item.Information
+            };
 
             dlg.ShowDialog(this);
 

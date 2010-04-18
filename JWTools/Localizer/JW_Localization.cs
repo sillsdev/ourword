@@ -1,25 +1,17 @@
+#region ***** JW_Localization.cs *****
 /**********************************************************************************************
  * Dll:     JWTools
  * File:    JW_Localization.cs
  * Author:  John Wimbish
  * Created: 12 May 2007
  * Purpose: Localization system.
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Windows.Forms;
 using System.IO;
-using Microsoft.Win32;
 #endregion
 
 namespace JWTools
@@ -28,7 +20,7 @@ namespace JWTools
     public class LocAlternate
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g/s}: string Value - the string in the language
+        #region Attr{g}: string Value - the string in the language
         public string Value
         {
             get
@@ -36,12 +28,8 @@ namespace JWTools
                 Debug.Assert(null != m_sValue);
                 return m_sValue;
             }
-            set
-            {
-                m_sValue = value;
-            }
         }
-        string m_sValue = "";
+        readonly string m_sValue = "";
         #endregion
         #region Attr{g/s}: string ShortcutKey
         public string ShortcutKey
@@ -77,8 +65,8 @@ namespace JWTools
         public LocAlternate(string sValue, string sKey, string sTip)
         {
             m_sValue = sValue;
-            m_sShortcutKey = ((null != sKey) ? sKey : "");
-            m_sToolTip = ((null != sTip) ? sTip : "");
+            m_sShortcutKey = (sKey ?? "");
+            m_sToolTip = (sTip ?? "");
         }
         #endregion
 
@@ -140,9 +128,7 @@ namespace JWTools
         #region Method: bool EndsWithColon(s)
         bool EndsWithColon(string s)
         {
-            if (s.Length > 0 && s[s.Length - 1] == ':')
-                return true;
-            return false;
+            return s.Length > 0 && s[s.Length - 1] == ':';
         }
         #endregion
         #region Method: bool EndsWithEllipsis(s)
@@ -231,18 +217,18 @@ namespace JWTools
         {
             get
             {
-                Debug.Assert(null != m_sID && m_sID.Length > 0);
+                Debug.Assert(!string.IsNullOrEmpty(m_sID));
                 return m_sID;
             }
         }
-        string m_sID;
+        readonly string m_sID;
         #endregion
         #region Attr{g/s}: string English - the string in English, always available
         public string English
         {
             get
             {
-                Debug.Assert(null != m_sEnglish && m_sEnglish.Length > 0);
+                Debug.Assert(!string.IsNullOrEmpty(m_sEnglish));
                 return m_sEnglish;
             }
             set
@@ -356,8 +342,8 @@ namespace JWTools
             // Extend the vector if we need to
             if (iIndex >= Alternates.Length )
             {
-                LocAlternate[] v = new LocAlternate[iIndex + 1];
-                for (int i = 0; i < Alternates.Length; i++)
+                var v = new LocAlternate[iIndex + 1];
+                for (var i = 0; i < Alternates.Length; i++)
                     v[i] = Alternates[i];
                 m_vAlternates = v;
             }
@@ -1049,7 +1035,7 @@ namespace JWTools
                 return m_vGroups;
             }
         }
-        LocGroup[] m_vGroups = null;
+        LocGroup[] m_vGroups;
         #endregion
         #region Method: LocGroup FindGroup(sID)
         public LocGroup FindGroup(string sID)
@@ -1376,9 +1362,9 @@ namespace JWTools
         {
             get
             {
-                string[] v = new string[Languages.Length + 1];
+                var v = new string[Languages.Length + 1];
 
-                for (int i = 0; i < Languages.Length; i++)
+                for (var i = 0; i < Languages.Length; i++)
                     v[i] = Languages[i].Name;
 
                 v[Languages.Length] = LocItem.c_sEnglish;
@@ -1443,19 +1429,19 @@ namespace JWTools
                 return s_sDataFolder;
             }
         }
-        string s_sDataFolder;
+        readonly string s_sDataFolder;
         #endregion
         const string c_sTag = "LocDB";
         #region Method: void WriteXML(XmlField xmlParent)
         public void WriteXML()
         {
             // Open a Text Writer to save to
-            TextWriter writer = JW_Util.GetTextWriter(BasePath);
+            var writer = JW_Util.GetTextWriter(BasePath);
 
-            XmlField xml = new XmlField(writer, c_sTag);
+            var xml = new XmlField(writer, c_sTag);
             xml.Begin();
 
-            foreach (LocGroup group in Groups)
+            foreach (var group in Groups)
                 group.WriteXML(xml);
 
             xml.End();
@@ -1464,7 +1450,7 @@ namespace JWTools
             writer.Close();
 
             // Write the language alternatives
-            foreach (LocLanguage lang in Languages)
+            foreach (var lang in Languages)
                 WriteLanguageData(lang);
         }
         #endregion
@@ -1503,21 +1489,21 @@ namespace JWTools
         void WriteLanguageData(LocLanguage lang)
         {
             // Build the language name
-            string sPath = DataFolder + Path.DirectorySeparatorChar + lang.ID + ".xml";
+            var sPath = DataFolder + Path.DirectorySeparatorChar + lang.ID + ".xml";
 
             // Save a backup in the current folder (See Bug0282.)
             JW_Util.CreateBackup(sPath, ".bak");
 
             // Open the xml writer
-            TextWriter w = JW_Util.GetTextWriter(sPath);
-            XmlField xml = new XmlField(w, c_sTag);
+            var w = JW_Util.GetTextWriter(sPath);
+            var xml = new XmlField(w, c_sTag);
             xml.Begin();
 
             // Write out the language information
             lang.WriteXML(xml);
 
             // Write out the group's data
-            foreach (LocGroup group in Groups)
+            foreach (var group in Groups)
                 group.WriteLanguageData(xml, lang);
 
             // Done
@@ -1527,7 +1513,7 @@ namespace JWTools
             // Make a backup to the remote device if enabled. We have to create a file with the
             // date in it so that the BackupSystem has something to copy; we then delete that
             // file as there's no need to keep filling up the disk. (Bug0282)
-            string sRemotePath = Path.GetFileNameWithoutExtension(sPath) + " " + 
+            var sRemotePath = Path.GetFileNameWithoutExtension(sPath) + " " + 
                 DateTime.Today.ToString("yyyy-MM-dd") + ".xml";
             try
             {
@@ -1589,7 +1575,7 @@ namespace JWTools
                 return s_LocDB;
             }
         }
-        static private LocDB s_LocDB = null;
+        static private LocDB s_LocDB;
         #endregion
         #region private Constructor(sPathApplicationFolder) - do not call (called by the Initialize Method above
         private LocDB(string sPathApplicationFolder)

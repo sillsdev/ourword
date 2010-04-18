@@ -2,22 +2,28 @@
   <Language ID="por" Name="Portuguese"></Language>
   <Group ID="m_ToolStrip">
     <Item ID="m_btnExit">
+      <Alt ID="por" Value="Sair"></Alt>
     </Item>
     <Item ID="m_btnProjectSave">
-      <Alt ID="por" Value="Salvar "></Alt>
+      <Alt ID="por" Value="Guardar"></Alt>
     </Item>
     <Item ID="m_btnProject">
       <Alt ID="por" Value="Projeto"></Alt>
     </Item>
     <Item ID="m_menuNewProject">
+      <Alt ID="por" Value="Novo"></Alt>
     </Item>
     <Item ID="m_menuOpenProject">
+      <Alt ID="por" Value="&amp;Abrir"></Alt>
     </Item>
     <Item ID="m_menuSaveProject">
+      <Alt ID="por" Value="&amp;Guardar"></Alt>
     </Item>
     <Item ID="m_menuSaveProjectAs">
+      <Alt ID="por" Value="Guardar &amp;Como"></Alt>
     </Item>
     <Item ID="m_btnPrint">
+      <Alt ID="por" Value="Imprimir"></Alt>
     </Item>
     <Item ID="m_btnEditCut">
       <Alt ID="por" Value="Recortar"></Alt>
@@ -55,22 +61,30 @@
     <Item ID="m_btnItalic">
     </Item>
     <Item ID="m_btnGotoFirstSection">
+      <Alt ID="por" Value="Primeiro"></Alt>
     </Item>
     <Item ID="m_btnGotoPreviousSection">
+      <Alt ID="por" Value="Anterior"></Alt>
     </Item>
     <Item ID="m_btnGotoNextSection">
+      <Alt ID="por" Value="Próximo"></Alt>
     </Item>
     <Item ID="m_btnGotoLastSection">
+      <Alt ID="por" Value="Ultimo"></Alt>
     </Item>
     <Item ID="m_btnChapter">
+      <Alt ID="por" Value="Capítulo"></Alt>
     </Item>
     <Item ID="m_btnGoToBook">
+      <Alt ID="por" Value="Livro"></Alt>
     </Item>
     <Item ID="m_btnTools">
+      <Alt ID="por" Value="Ferramentos"></Alt>
     </Item>
     <Item ID="m_menuIncrementBookStatus">
     </Item>
     <Item ID="m_menuRestoreFromBackup">
+      <Alt ID="por" Value="Restaurar versão antigo"></Alt>
     </Item>
     <Item ID="m_menuOnlyShowSectionsThat">
     </Item>
@@ -109,6 +123,74 @@
     <Item ID="m_menuAbout">
       <Alt ID="por" Value="&amp;Sobre OurWord!"></Alt>
     </Item>
+    <Item ID="m_menuUndo">
+    </Item>
+    <Item ID="m_menuRedo">
+    </Item>
+    <Item ID="m_menuPreviousSection">
+    </Item>
+    <Item ID="m_menuNextSection">
+    </Item>
+    <Item ID="m_menuToggleItalics">
+    </Item>
+    <Item ID="m_menuInitializeFromAnInternetRepositoryToolStripMenuItem">
+    </Item>
+    <Item ID="m_menuCreateANewProjectOnThisComputerToolStripMenuItem">
+    </Item>
+    <Item ID="m_menuExportProject">
+    </Item>
+    <Item ID="m_menuInsertFootnote">
+      <Alt ID="por" Value="Inserir rodapé"></Alt>
+    </Item>
+    <Item ID="m_menuDeleteFootnote">
+      <Alt ID="por" Value="Eliminar rodapé"></Alt>
+    </Item>
+    <Item ID="m_menuCopyBTFromFrontTranslation">
+    </Item>
+    <Item ID="m_btnInsertNote">
+    </Item>
+    <Item ID="m_itemInsertGeneralNote">
+    </Item>
+    <Item ID="m_itemInsertExegeticalNote">
+    </Item>
+    <Item ID="m_itemInsertHintNote">
+    </Item>
+    <Item ID="m_itemInsertConsultantNote">
+    </Item>
+    <Item ID="m_btnHistory">
+    </Item>
+    <Item ID="m_Synchronize">
+    </Item>
+    <Item ID="m_menuConsultantPreparationToolStripMenuItem">
+    </Item>
+    <Item ID="m_menuZoom">
+    </Item>
+    <Item ID="m_ToolStrip">
+    </Item>
+  </Group>
+  <Group ID="m_toolstripNotes">
+    <Item ID="m_btnInsert">
+    </Item>
+    <Item ID="m_menuInsertGeneral">
+    </Item>
+    <Item ID="m_menuInsertToDo">
+    </Item>
+    <Item ID="m_menuInsertAskUNS">
+    </Item>
+    <Item ID="m_menuInsertDefinition">
+    </Item>
+    <Item ID="m_menuInsertOldVersion">
+    </Item>
+    <Item ID="m_menuInsertReason">
+    </Item>
+    <Item ID="m_menuInsertFrontIssue">
+    </Item>
+    <Item ID="m_menuInsertHintForDaughter">
+    </Item>
+    <Item ID="m_menuInsertBT">
+    </Item>
+    <Item ID="m_btnDeleteNote">
+    </Item>
   </Group>
   <Group ID="Strings">
     <Item ID="kYes">
@@ -142,6 +224,18 @@
     <Item ID="NewNote">
     </Item>
     <Item ID="TypeHere">
+    </Item>
+    <Item ID="kWritingSystems">
+    </Item>
+    <Item ID="kFootnotes">
+    </Item>
+    <Item ID="kFootnoteCustom">
+    </Item>
+    <Item ID="kMyDocuments">
+    </Item>
+    <Item ID="Planned">
+    </Item>
+    <Item ID="kCopyBookNamesFrom">
     </Item>
     <Group ID="GeneralUI">
       <Item ID="DraftingWindowName">
@@ -288,15 +382,50 @@
         <Alt ID="por" Value="Versão  {0}"></Alt>
       </Item>
     </Group>
+    <Group ID="UndoRedo">
+      <Item ID="UndoTyping_what">
+      </Item>
+      <Item ID="RedoTyping_what">
+      </Item>
+      <Item ID="UndoBackspace_what">
+      </Item>
+      <Item ID="RedoBackspace_what">
+      </Item>
+      <Item ID="UndoDelete_what">
+      </Item>
+      <Item ID="RedoDelete_what">
+      </Item>
+      <Item ID="UndoCut_what">
+      </Item>
+      <Item ID="RedoCut_what">
+      </Item>
+      <Item ID="UndoCopy_what">
+      </Item>
+      <Item ID="RedoCopy_what">
+      </Item>
+      <Item ID="UndoPaste_what">
+      </Item>
+      <Item ID="RedoPaste_what">
+      </Item>
+      <Item ID="UndoSplitParagraph">
+      </Item>
+      <Item ID="RedoSplitParagraph">
+      </Item>
+      <Item ID="UndoJoinParagraph">
+      </Item>
+      <Item ID="RedoJoinParagraph">
+      </Item>
+      <Item ID="UndoChangeParagraphStyle_what">
+      </Item>
+      <Item ID="RedoChangeParagraphStyle_what">
+      </Item>
+    </Group>
   </Group>
   <Group ID="Messages">
     <Item ID="msgBookIsLocked">
-    </Item>
-    <Item ID="msgBookNeedsFolder">
+      <Alt ID="por" Value="Conversa com seu coordinador sobre outros mudanças e sugestões.  Mudanças ap {0} não podem ser feito neste computador."></Alt>
     </Item>
     <Item ID="msgBookNeedsImportFilename">
-    </Item>
-    <Item ID="msgBookNeedsName">
     </Item>
     <Item ID="msgCantInsertNoteHere">
     </Item>
@@ -378,6 +507,12 @@
     <Item ID="msgSectionTitleAlreadyExists">
     </Item>
     <Item ID="msgSectionTitleCannotHaveVerses">
+    </Item>
+    <Item ID="msgNoAvailableBooksInFront">
+    </Item>
+    <Item ID="msgNoInternetConnection">
+    </Item>
+    <Item ID="msgUnableToPull">
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
@@ -752,16 +887,18 @@
     <Item ID="Title">
       <Alt ID="por" Value="Configuração de Funções"></Alt>
     </Item>
-    <Item ID="m_btnResetDefaults">
-    </Item>
-    <Item ID="m_btnPasswordProtect">
-      <Alt ID="por" Value="&amp;Proteger com Senha"></Alt>
-    </Item>
     <Item ID="m_btnAllOff">
       <Alt ID="por" Value="Desativar Todos"></Alt>
     </Item>
     <Item ID="m_btnAllOn">
       <Alt ID="por" Value="Ativar Todos"></Alt>
+    </Item>
+    <Item ID="m_btnResetDefaults">
+    </Item>
+    <Item ID="m_btnPasswordProtect">
+      <Alt ID="por" Value="&amp;Proteger com Senha"></Alt>
+    </Item>
+    <Item ID="m_btnJustTheBasics">
     </Item>
     <Item ID="m_box">
       <Alt ID="por" Value="Descrição"></Alt>
@@ -778,6 +915,10 @@
     <Item ID="fJobNaturalness_CheckBox">
     </Item>
     <Item ID="fJobNaturalness_Description">
+    </Item>
+    <Item ID="fJobConsultantPreparation_CheckBox">
+    </Item>
+    <Item ID="fJobConsultantPreparation_Description">
     </Item>
     <Item ID="fProject_CheckBox">
     </Item>
@@ -799,10 +940,6 @@
     </Item>
     <Item ID="fRestoreBackup_Description">
     </Item>
-    <Item ID="fCopyBTfromFront_CheckBox">
-    </Item>
-    <Item ID="fCopyBTfromFront_Description">
-    </Item>
     <Item ID="fFilter_CheckBox">
     </Item>
     <Item ID="fFilter_Description">
@@ -819,6 +956,14 @@
     </Item>
     <Item ID="fStructuralEditing_Description">
     </Item>
+    <Item ID="fExport_CheckBox">
+    </Item>
+    <Item ID="fExport_Description">
+    </Item>
+    <Item ID="fCanDeleteNotes_CheckBox">
+    </Item>
+    <Item ID="fCanDeleteNotes_Description">
+    </Item>
     <Item ID="fMerge_CheckBox">
     </Item>
     <Item ID="fMerge_Description">
@@ -829,11 +974,15 @@
     </Item>
     <Item ID="m_checkListFeatures">
     </Item>
-    <Item ID="m_btnJustTheBasics">
-    </Item>
     <Item ID="fGoTo_Chapter_CheckBox">
     </Item>
     <Item ID="fGoTo_FirstLast_CheckBox">
+    </Item>
+    <Item ID="fUndoRedo_CheckBox">
+    </Item>
+    <Item ID="fConfigurationDialog_CheckBox">
+    </Item>
+    <Item ID="fTranslatorNotes_CheckBox">
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect">
@@ -1372,6 +1521,16 @@
       </Item>
       <Item ID="m_editLanguageName">
       </Item>
+      <Item ID="m_radioStartedBooks">
+      </Item>
+      <Item ID="m_radioOldTestament">
+      </Item>
+      <Item ID="m_radioNewTestament">
+      </Item>
+      <Item ID="m_radioAll">
+      </Item>
+      <Item ID="m_tabOther">
+      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Options">
       <Item ID="propMaximizeWindowOnStartup">
@@ -1493,8 +1652,6 @@
       <Item ID="strUnableToAccessFile">
       </Item>
       <Item ID="strNotStandardFormat">
-      </Item>
-      <Item ID="strFileNotInSupportedEncoding">
       </Item>
       <Item ID="strMore">
       </Item>
