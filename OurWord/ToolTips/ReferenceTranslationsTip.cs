@@ -102,8 +102,6 @@ namespace OurWord.ToolTips
             Debug.Assert(AutoSizeMode == AutoSizeMode.GrowAndShrink);
             Debug.Assert(!AutoSize);
             Height -= diff;
-            m_panelClientArea.Height -= diff;
-            ContentWindow.Height -= diff;
 
             s_IsDoingLayout = false;
         }
@@ -240,6 +238,16 @@ namespace OurWord.ToolTips
         #region OMethod: void OnLayoutControls()
         protected override void OnLayoutControls()
         {
+            if (!PaintAsBalloon)
+            {
+                m_panelClientArea.Size = ClientSize;
+            }
+            else
+            {
+                const int nMargin = 10;
+                m_panelClientArea.Height = ClientRectangle.Bottom - nMargin - m_panelClientArea.Top;
+            }
+
             ContentWindow.SetSize(m_panelClientArea.Width, m_panelClientArea.Height);
             ContentWindow.Invalidate();
         }

@@ -42,22 +42,6 @@ namespace OurWordData.DataModel
 		}
 		private string m_sComment = "";
 		#endregion
-        #region BAttr{g/s}: bool VD_ShowTranslationsPane
-        static public bool VD_ShowTranslationsPane
-		{
-			get
-			{
-				return m_bVD_ShowTranslationsPane;
-			}
-			set
-			{
-                m_bVD_ShowTranslationsPane = value;
-                if (DB.IsValidProject)
-                    DB.Project.DeclareDirty();
-			}
-		}
-        static private bool m_bVD_ShowTranslationsPane = false;
-		#endregion
         #region BAttr{g/s}: List<string>PlannedBooks
         public List<string> PlannedBooks
         {
@@ -119,8 +103,6 @@ namespace OurWordData.DataModel
 
 			DefineAttr("Comment", ref m_sComment);
             DefineAttr("Planned", ref m_sPlannedBooks);
-
-            DefineAttr("vdShowRelLangs", ref m_bVD_ShowTranslationsPane);
 
             DefineAttr("Persons", ref m_bsaPeople);
 			DefineAttr("Version", ref m_nVersion);
@@ -225,19 +207,6 @@ namespace OurWordData.DataModel
 		#endregion
 
         // Derived Attrs: Misc ---------------------------------------------------------------
-        #region Attr{g}: bool ShowTranslationsPane - T if pane should be visible
-        public bool ShowTranslationsPane
-		{
-			get
-			{
-                if (!m_bVD_ShowTranslationsPane)
-					return false;
-				if (OtherTranslations.Count == 0)
-					return false;
-				return true;
-			}
-		}
-		#endregion
 		#region Attr{g}: bool HasContent - if F, we don't bother saving the project
 		public bool HasContent
 		{

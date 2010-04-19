@@ -30,7 +30,6 @@ using OurWord;
 using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Edit;
-using OurWord.SideWnd;
 using OurWord.Layouts;
 using OurWordData.DataModel.Annotations;
 
@@ -75,7 +74,6 @@ namespace OurWord.Dialogs
         const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
         const string c_sColorConsultantPreparation = "propBackColorConsultantPreparation";
         const string c_sColorNaturalnessCheck = "propBackColorNaturalnessCheckWindow";
-        const string c_sColorOtherTranslations = "propBackColorOtherTranslationsWindow";
         #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
         PropertyBag Bag
@@ -154,9 +152,6 @@ namespace OurWord.Dialogs
                     break;
                 case c_sColorNaturalnessCheck:
                     e.Value = WndNaturalness.RegistryBackgroundColor;
-                    break;
-                case c_sColorOtherTranslations:
-                    e.Value = TranslationsWnd.RegistryBackgroundColor;
                     break;
             }
         }
@@ -239,9 +234,6 @@ namespace OurWord.Dialogs
                     break;
                 case c_sColorNaturalnessCheck:
                     WndNaturalness.RegistryBackgroundColor = (string)e.Value;
-                    break;
-                case c_sColorOtherTranslations:
-                    TranslationsWnd.RegistryBackgroundColor = (string)e.Value;
                     break;
             }
         }
@@ -398,12 +390,6 @@ namespace OurWord.Dialogs
                 "Naturalness Check",
                 c_sGroupBackgroundColors,
                 "The color of the Naturalness Check window background.",
-                "Wheat"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sColorOtherTranslations,
-                "Other Translations",
-                c_sGroupBackgroundColors,
-                "The color of the Other Translations window background.",
                 "Wheat"));
             #endregion
 

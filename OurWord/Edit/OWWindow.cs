@@ -152,10 +152,6 @@ namespace OurWord.Edit
             // Select the first possible item
             Contents.Select_FirstWord();
             Focus();
-
-            // Load, layout amd paint any secondary windows
-            foreach (var w in SecondaryWindows)
-                w.LoadData();
         }
         #endregion
         #region Method: void SetSize(Size)
@@ -200,66 +196,6 @@ namespace OurWord.Edit
         {
         }
         #endregion
-
-        // Messages To Secondary Windows -----------------------------------------------------
-        #region Attr{g}: OWWindow[] SecondaryWindows
-        OWWindow[] SecondaryWindows
-        {
-            get
-            {
-                Debug.Assert(null != m_vSecondaryWindows);
-                return m_vSecondaryWindows;
-            }
-        }
-        OWWindow[] m_vSecondaryWindows;
-        #endregion
-        #region Method: void ResetSecondaryWindows
-        public void ResetSecondaryWindows()
-        {
-            foreach (OWWindow w in SecondaryWindows)
-                w.m_wndMain = null;
-
-            m_vSecondaryWindows = new OWWindow[0];
-        }
-        #endregion
-        #region Method: void RegisterSecondaryWindow(OWWindow wnd)
-        public void RegisterSecondaryWindow(OWWindow wnd)
-        {
-            // Reciprocal: Make sure the secondary knows who its main is.
-            wnd.m_wndMain = this;
-
-            // Add the new window to our vector of windows
-            OWWindow[] v = new OWWindow[SecondaryWindows.Length + 1];
-            for (int i = 0; i < SecondaryWindows.Length; i++)
-                v[i] = SecondaryWindows[i];
-            v[SecondaryWindows.Length] = wnd;
-            m_vSecondaryWindows = v;
-        }
-        #endregion
-        #region Secondary Window Message: OnSelectAndScrollToNote
-        public virtual void OnSelectAndScrollToNote(TranslatorNote note)
-        {
-        }
-        public void Secondary_SelectAndScrollToNote(TranslatorNote note)
-        {
-            foreach (OWWindow w in SecondaryWindows)
-                w.OnSelectAndScrollToNote(note);
-        }
-        #endregion
-        #region Secondary Window Message: OnSelectionChanged
-        public virtual void OnSelectionChanged(DBasicText dbt)
-        {
-        }
-        public void Secondary_OnSelectionChanged(DBasicText dbt)
-        {
-            foreach (OWWindow w in SecondaryWindows)
-                w.OnSelectionChanged(dbt);
-
-            // Don't let a secondary window capture focus
-            if (!Focused)
-                Focus();
-        }
-        #endregion
         #region VirtMethod: bool GetShouldDisplayNote(TranslatorNote, flags)
         public virtual bool GetShouldDisplayNote(TranslatorNote note, OWPara.Flags flags)
         {
@@ -302,7 +238,6 @@ namespace OurWord.Edit
             // Initializations
             m_Contents = new ERoot(this, new WindowContext(this));
             WindowMargins = new SizeF(7, 5);
-            m_vSecondaryWindows = new OWWindow[0];
             m_LineUpDownX = new LineUpDownX();
 
             // Window Definition initialization
@@ -350,9 +285,6 @@ namespace OurWord.Edit
 
             // Give us a sunken border
             BorderStyle = BorderStyle.Fixed3D;
-
-            // Vector of secondary windows
-            m_vSecondaryWindows = new OWWindow[0];
         }
         #endregion
 
@@ -435,10 +367,6 @@ namespace OurWord.Edit
 
             // No longer is there a selection
             Selection = null;
-
-            // Have the secondary windows do the same
-            foreach (var w in SecondaryWindows)
-                w.Clear();
         }
         #endregion
 
@@ -1722,9 +1650,6 @@ namespace OurWord.Edit
 
                 ScrollSelectionIntoView();
 
-                if (null != m_Selection)
-                    Secondary_OnSelectionChanged( m_Selection.DBT );
-
                 G.App.EnableItalicsButton();
             }
         }
@@ -1792,7 +1717,6 @@ namespace OurWord.Edit
                     case Keys.End:   cmdExtendFarRight();  return;
                     case Keys.Right: cmdExtendWordRight(); return;
                     case Keys.Left:  cmdExtendWordLeft();  return;
-                    case Keys.Tab: G.App.CycleFocusToPreviousWindow(); return;
                 }
                 e.Handled = false;
             }
@@ -1813,7 +1737,6 @@ namespace OurWord.Edit
                     case Keys.Right:  cmdMoveWordRight(); return;
                     case Keys.Insert: cmdCopy();          return;
                     case Keys.Delete: cmdDelete();        return;
-                    case Keys.Tab: G.App.CycleFocusToNextWindow(); return;
                 }
 
  				e.Handled = false;

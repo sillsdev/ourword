@@ -29,7 +29,6 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWord.Dialogs;
 using OurWord.Dialogs.History;
-using OurWord.SideWnd;
 using OurWordData.Synchronize;
 using OurWordSetup.Data;
 using Shortcut=OurWord.Utilities.Shortcut;
@@ -84,35 +83,11 @@ namespace OurWord
 
         // Client Windows --------------------------------------------------------------------
         #region CLIENT WINDOWS
-        #region VAttr{g}: bool HasSideWindows
-        public bool HasSideWindows
-        {
-            get
-            {
-                return SideWindows.HasSideWindows;
-            }
-        }
-        #endregion
-        #region Attr{g}: SideWindows SideWindows
-        public SideWindows SideWindows
-        {
-            get
-            {
-                Debug.Assert(null != m_SideWindows);
-                return m_SideWindows;
-            }
-        }
-        SideWindows m_SideWindows = null;
-        #endregion
-
         #region Method: void SetCurrentLayout(sLayoutName)
         public void SetCurrentLayout(string sLayoutName)
         {
             if (WLayout.SetCurrentLayout(sLayoutName))
-            {
-                SetupSideWindows();
                 ResetWindowContents();
-            }
         }
         #endregion
         #region VAttr{g}: Layout CurrentLayout
@@ -124,6 +99,7 @@ namespace OurWord
             }
         }
         #endregion
+        private Panel m_panelContents;
 
         #region VAttr{g}: Control FocusedWindow - the window with current Focus, or null
         OWWindow FocusedWindow
@@ -134,46 +110,11 @@ namespace OurWord
                     return null;
                 if (CurrentLayout.Focused)
                     return CurrentLayout;
-                return SideWindows.FocusedWindow;
+                return null;
             }
         }
         #endregion
-        #region Method: void CycleFocusToNextWindow()
-        public void CycleFocusToNextWindow()
-        {
-            // Do nothing if we don't have side windows
-            if (!HasSideWindows)
-                return;
 
-            // If this window is focused, then send focus to the first tab
-            if (CurrentLayout.Focused)
-            {
-                SideWindows.SelectFirstTab();
-                return;
-            }
-
-            // Otherwise, tell the SideWindow to cycle to its next tab
-            SideWindows.CycleTabToNextWindow();
-        }
-        #endregion
-        #region Method: void CycleFocusToPreviousWindow()
-        public void CycleFocusToPreviousWindow()
-        {
-            // Do nothing if we don't have side windows
-            if (!HasSideWindows)
-                return;
-
-            // If this window is focused, then send focus to the first tab
-            if (CurrentLayout.Focused)
-            {
-                SideWindows.SelectLastTab();
-                return;
-            }
-
-            // Otherwise, tell the SideWindow to cycle to its previous tab
-            SideWindows.CycleTabToPreviousWindow();
-        }
-        #endregion
         #region ToolStripContentPanel ContentPanel - Where the TitleWindow, SideWindows, and the MainWindow reside
         ToolStripContentPanel ContentPanel
         {
@@ -183,32 +124,7 @@ namespace OurWord
             }
         }
         #endregion
-        #region Method: void SetupSideWindows() - called whenever different SideWindows are desired (startup, Tools-Options)
-        void SetupSideWindows()
-        {
-            SideWindows.ClearPages();
 
-            if (DB.IsValidProject)
-            {
-                if (DB.Project.ShowTranslationsPane && WLayout.CurrentLayoutIs(WndDrafting.c_sName))
-                    SideWindows.AddPage(new TranslationsPane(), "Translations");
-            }
-
-            // Tell the system which side windows are being displayed; thereafter events will be 
-            // automatically routed to these windows.
-            SideWindows.RegisterWindows(CurrentLayout);
-
-            if (HasSideWindows)
-            {
-                m_SplitContainer.Panel2Collapsed = false;
-                SideWindows.SetChildrenSizes();
-            }
-            else
-                m_SplitContainer.Panel2Collapsed = true;
-
-            SizeAndLayoutContentWindows();
-        }
-        #endregion
 		#region Method: void SetTitleBarText()
 		public void SetTitleBarText()
 			// Titlebar - sets title bar text to "OurWord - ProjName"
@@ -246,8 +162,6 @@ namespace OurWord
                 LanguageInfo = "";
                 Passage = "";
                 ShowPadlock = false;
-                if (HasSideWindows)
-                    SideWindows.Invalidate();
                 return;
             }
 
@@ -270,9 +184,6 @@ namespace OurWord
         {
             if (null != CurrentLayout)
                 CurrentLayout.ZoomFactor = G.ZoomFactor;
-
-            if (null != SideWindows)
-                SideWindows.SetZoomFactor(G.ZoomFactor);
         }
         #endregion
         #region Method: void Dim()
@@ -360,7 +271,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuBackTranslation;
         private ToolStripMenuItem m_menuNaturalnessCheck;
         private ToolStripSeparator m_separatorWindow;
-        private ToolStripMenuItem m_menuShowTranslationsPane;
         private ToolStripMenuItem m_menuZoom;
         private ToolStripDropDownButton m_btnHelp;
         private ToolStripMenuItem m_menuHelpTopics;
@@ -371,7 +281,6 @@ namespace OurWord
         private ToolStripMenuItem m_menuCopy;
         private ToolStripMenuItem m_menuPaste;
         private ToolStripSeparator m_seperatorEdit;
-        private SplitContainer m_SplitContainer;
         private ToolStripContainer m_toolStripContainer;
         private ToolStrip m_ToolStrip;
         private StatusStrip m_StatusStrip;
@@ -545,9 +454,6 @@ namespace OurWord
             m_menuInsertFootnote.Enabled = bCanEdit;
             m_menuDeleteFootnote.Enabled = bCanEdit;
 
-            // Side Windows controls
-            SideWindows.SetControlsEnabling();
-
             // Go To menu
             bool bIsAtFirstSection = bValidProjectWithData && DB.Project.Nav.IsAtFirstSection;
             m_btnGotoFirstSection.Enabled = bValidProjectWithData && !bIsAtFirstSection;
@@ -639,10 +545,6 @@ namespace OurWord
                 (bShowMainWindowSection && s_Features.F_ConsultantPreparation);
             m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && s_Features.F_JobNaturalness);
             m_separatorWindow.Visible = bShowMainWindowSection && bShowSideWindowsSection;
-
-            // Side Window Items
-            m_menuShowTranslationsPane.Visible = bShowTranslationsPane;
-            m_menuShowTranslationsPane.Checked = DProject.VD_ShowTranslationsPane;
 
             // Edit Menu / Structured Editing
             bool bStructuralEditing = s_Features.F_StructuralEditing &&
@@ -815,17 +717,11 @@ namespace OurWord
             // TO DO: Still necessary? Can we move this to OnLoad?
             SuspendLayout();
 
-            // Create the SideWindows; hide them initially
-            // TODO: Once we get rid of sidewindows, we  no longer need this layer
-            m_SideWindows = new SideWindows();
-            m_SplitContainer.Panel2.Controls.Add(SideWindows);
-            SideWindows.Dock = DockStyle.Fill;
-
             // Create the "job" windows
-            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndDrafting());
-            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndNaturalness());
-            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndBackTranslation());
-            WLayout.RegisterLayout(m_SplitContainer.Panel1, new WndConsultantPreparation());
+            WLayout.RegisterLayout(m_panelContents, new WndDrafting());
+            WLayout.RegisterLayout(m_panelContents, new WndNaturalness());
+            WLayout.RegisterLayout(m_panelContents, new WndBackTranslation());
+            WLayout.RegisterLayout(m_panelContents, new WndConsultantPreparation());
 
             // Let the window go ahead and proceed with the layout
             ResumeLayout();
@@ -835,7 +731,7 @@ namespace OurWord
 			m_WindowState = new JW_WindowState(this, true);
 
             // Create the Undo/Redo Stack
-            int nUndoRedoMaxDepth = 10;
+            const int nUndoRedoMaxDepth = 10;
             m_URStack = new UndoRedoStack(nUndoRedoMaxDepth, m_menuUndo, m_menuRedo);
 
 			// Initialize to a blank project (if there is a recent project
@@ -929,7 +825,6 @@ namespace OurWord
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuConsultantPreparationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
-            this.m_menuShowTranslationsPane = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separator4 = new System.Windows.Forms.ToolStripSeparator();
             this.m_btnHelp = new System.Windows.Forms.ToolStripDropDownButton();
@@ -940,7 +835,7 @@ namespace OurWord
             this.m_StatusMessage1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.m_ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.m_StatusMessage2 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.m_SplitContainer = new System.Windows.Forms.SplitContainer();
+            this.m_panelContents = new System.Windows.Forms.Panel();
             this.m_Taskbar = new System.Windows.Forms.ToolStrip();
             this.m_tbTaskName = new System.Windows.Forms.ToolStripLabel();
             this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
@@ -953,7 +848,6 @@ namespace OurWord
             this.m_toolStripContainer.TopToolStripPanel.SuspendLayout();
             this.m_toolStripContainer.SuspendLayout();
             this.m_StatusStrip.SuspendLayout();
-            this.m_SplitContainer.SuspendLayout();
             this.m_Taskbar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -994,7 +888,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(913, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(943, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1484,7 +1378,6 @@ namespace OurWord
             this.m_menuBackTranslation,
             this.m_menuConsultantPreparationToolStripMenuItem,
             this.m_separatorWindow,
-            this.m_menuShowTranslationsPane,
             this.m_menuZoom});
             this.m_btnWindow.Image = ((System.Drawing.Image)(resources.GetObject("m_btnWindow.Image")));
             this.m_btnWindow.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -1499,7 +1392,7 @@ namespace OurWord
             // 
             this.m_menuDrafting.Image = ((System.Drawing.Image)(resources.GetObject("m_menuDrafting.Image")));
             this.m_menuDrafting.Name = "m_menuDrafting";
-            this.m_menuDrafting.Size = new System.Drawing.Size(232, 22);
+            this.m_menuDrafting.Size = new System.Drawing.Size(196, 22);
             this.m_menuDrafting.Tag = "Draft";
             this.m_menuDrafting.Text = "&Drafting";
             this.m_menuDrafting.ToolTipText = "Set the main window to do Drafting.";
@@ -1509,7 +1402,7 @@ namespace OurWord
             // 
             this.m_menuNaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNaturalnessCheck.Image")));
             this.m_menuNaturalnessCheck.Name = "m_menuNaturalnessCheck";
-            this.m_menuNaturalnessCheck.Size = new System.Drawing.Size(232, 22);
+            this.m_menuNaturalnessCheck.Size = new System.Drawing.Size(196, 22);
             this.m_menuNaturalnessCheck.Tag = "Naturalness";
             this.m_menuNaturalnessCheck.Text = "&Naturalness Check";
             this.m_menuNaturalnessCheck.ToolTipText = "Set the main window to do a Naturalness Check (where the Front Translation is not" +
@@ -1520,7 +1413,7 @@ namespace OurWord
             // 
             this.m_menuBackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_menuBackTranslation.Image")));
             this.m_menuBackTranslation.Name = "m_menuBackTranslation";
-            this.m_menuBackTranslation.Size = new System.Drawing.Size(232, 22);
+            this.m_menuBackTranslation.Size = new System.Drawing.Size(196, 22);
             this.m_menuBackTranslation.Tag = "BT";
             this.m_menuBackTranslation.Text = "&Back Translation";
             this.m_menuBackTranslation.ToolTipText = "Set the main window to work on the Back Translation.";
@@ -1530,7 +1423,7 @@ namespace OurWord
             // 
             this.m_menuConsultantPreparationToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("m_menuConsultantPreparationToolStripMenuItem.Image")));
             this.m_menuConsultantPreparationToolStripMenuItem.Name = "m_menuConsultantPreparationToolStripMenuItem";
-            this.m_menuConsultantPreparationToolStripMenuItem.Size = new System.Drawing.Size(232, 22);
+            this.m_menuConsultantPreparationToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
             this.m_menuConsultantPreparationToolStripMenuItem.Tag = "ConsultantPreparation";
             this.m_menuConsultantPreparationToolStripMenuItem.Text = "Consultant &Preparation";
             this.m_menuConsultantPreparationToolStripMenuItem.Click += new System.EventHandler(this.cmdJobConsultantPreparation);
@@ -1538,20 +1431,12 @@ namespace OurWord
             // m_separatorWindow
             // 
             this.m_separatorWindow.Name = "m_separatorWindow";
-            this.m_separatorWindow.Size = new System.Drawing.Size(229, 6);
-            // 
-            // m_menuShowTranslationsPane
-            // 
-            this.m_menuShowTranslationsPane.Name = "m_menuShowTranslationsPane";
-            this.m_menuShowTranslationsPane.Size = new System.Drawing.Size(232, 22);
-            this.m_menuShowTranslationsPane.Text = "Show &Other Translations Pane";
-            this.m_menuShowTranslationsPane.ToolTipText = "Show the Other Translations Pane";
-            this.m_menuShowTranslationsPane.Click += new System.EventHandler(this.cmdToggleOtherTranslationsPane);
+            this.m_separatorWindow.Size = new System.Drawing.Size(193, 6);
             // 
             // m_menuZoom
             // 
             this.m_menuZoom.Name = "m_menuZoom";
-            this.m_menuZoom.Size = new System.Drawing.Size(232, 22);
+            this.m_menuZoom.Size = new System.Drawing.Size(196, 22);
             this.m_menuZoom.Text = "Zoom Text";
             // 
             // m_separator4
@@ -1599,7 +1484,7 @@ namespace OurWord
             // m_toolStripContainer.ContentPanel
             // 
             this.m_toolStripContainer.ContentPanel.AutoScroll = true;
-            this.m_toolStripContainer.ContentPanel.Controls.Add(this.m_SplitContainer);
+            this.m_toolStripContainer.ContentPanel.Controls.Add(this.m_panelContents);
             this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(946, 441);
             this.m_toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_toolStripContainer.LeftToolStripPanelVisible = false;
@@ -1647,21 +1532,13 @@ namespace OurWord
             this.m_StatusMessage2.Name = "m_StatusMessage2";
             this.m_StatusMessage2.Size = new System.Drawing.Size(0, 17);
             // 
-            // m_SplitContainer
+            // m_panelContents
             // 
-            this.m_SplitContainer.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.m_SplitContainer.Location = new System.Drawing.Point(0, 0);
-            this.m_SplitContainer.Name = "m_SplitContainer";
-            // 
-            // m_SplitContainer.Panel1
-            // 
-            this.m_SplitContainer.Panel1.Resize += new System.EventHandler(this.onMainWindowResize);
-            this.m_SplitContainer.Panel1MinSize = 100;
-            this.m_SplitContainer.Panel2MinSize = 100;
-            this.m_SplitContainer.Size = new System.Drawing.Size(946, 441);
-            this.m_SplitContainer.SplitterDistance = 630;
-            this.m_SplitContainer.TabIndex = 0;
-            this.m_SplitContainer.SplitterMoved += new System.Windows.Forms.SplitterEventHandler(this.cmdSplitterMoved);
+            this.m_panelContents.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.m_panelContents.Location = new System.Drawing.Point(0, 0);
+            this.m_panelContents.Name = "m_panelContents";
+            this.m_panelContents.Size = new System.Drawing.Size(946, 441);
+            this.m_panelContents.TabIndex = 0;
             // 
             // m_Taskbar
             // 
@@ -1736,7 +1613,6 @@ namespace OurWord
             this.m_toolStripContainer.PerformLayout();
             this.m_StatusStrip.ResumeLayout(false);
             this.m_StatusStrip.PerformLayout();
-            this.m_SplitContainer.ResumeLayout(false);
             this.m_Taskbar.ResumeLayout(false);
             this.m_Taskbar.PerformLayout();
             this.ResumeLayout(false);
@@ -2242,10 +2118,6 @@ namespace OurWord
             // If we aren't already navigated to a book, then attempt to find one.
 			DB.Project.Nav.GoToReasonableBook(G.CreateProgressIndicator());
 
-            // A new project may have different settings for whether or not the
-            // Side Windows are displayed.
-            SetupSideWindows();
-
             // Window Zoom factor
             SetZoomFactor();
 
@@ -2255,20 +2127,6 @@ namespace OurWord
 		#endregion
 
         // Event Handlers --------------------------------------------------------------------
-        #region Event: cmdSplitterMoved
-        float m_fSplitterPercent = 65;
-        private void cmdSplitterMoved(object sender, SplitterEventArgs e)
-            // Set minimum, maximum, and initial positions for the splitter, using a Percent
-            // basis rather than the pixel basis that DotNet provides.
-        {
-            if (!m_SplitContainer.Panel2Collapsed)
-            {
-                m_fSplitterPercent = ((float)m_SplitContainer.SplitterDistance / (float)Width) * 100.0F;
-                m_fSplitterPercent = Math.Max(m_fSplitterPercent, 50);
-                m_fSplitterPercent = Math.Min(m_fSplitterPercent, 80);
-            }
-        }
-        #endregion
         #region Event: cmdLoad
         private void cmdLoad(object sender, System.EventArgs e)
 		{
@@ -2290,9 +2148,6 @@ namespace OurWord
 			DB.Project = new DProject();
             if (!string.IsNullOrEmpty(sPath) && File.Exists(sPath))
                 DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
-
-            // Initial Splitter Position
-            m_SplitContainer.SplitterDistance = (int)((float)m_fSplitterPercent * (float)Width / 100.0F);
 
             // Restore which layout is active
             SetCurrentLayout(WLayout.GetLayoutFromRegistry(WndDrafting.c_sName));
@@ -2359,13 +2214,9 @@ namespace OurWord
                 Height = Math.Max(Height, 570);
             }
 
-            base.OnResize(e);
-        }
-        #endregion
-        #region Event: onMainWindowResize - its time to re-lay out the content window
-        private void onMainWindowResize(object sender, EventArgs e)
-        {
             SizeAndLayoutContentWindows();
+
+            base.OnResize(e);
         }
         #endregion
         #region Method: void SizeAndLayoutContentWindows()
@@ -2376,11 +2227,9 @@ namespace OurWord
                 return;
             if (null == CurrentLayout)
                 return;
-            if (m_SplitContainer.Panel1.Width == 0 || m_SplitContainer.Panel1.Height == 0)
-                return;   // Happens in Mono, not in Windows
 
             // the MainWindow needs to have a size for its double buffering
-            CurrentLayout.SetSize(m_SplitContainer.Panel1.Width, m_SplitContainer.Panel1.Height);
+            CurrentLayout.SetSize(m_panelContents.Width, m_panelContents.Height);
 
             // Re-do the layout and redraw
             CurrentLayout.DoLayout();
@@ -3028,30 +2877,6 @@ namespace OurWord
 		#endregion
 
         // Windows
-        #region Method: void _UpdateSideWindows()
-        private void _UpdateSideWindows()
-        {
-            // Add/Remove the various pane from the side windows
-            SetupSideWindows();
-
-            // Reset the window contents (1) to populate the Notes window if
-            // present, and (2) to show/hide the notes icons in the main 
-            // window.
-            ResetWindowContents();
-
-            // Reset the menus, so that the checkmark will appear
-            // next to the appropriate Toggle commands.
-            SetupMenusAndToolbarsVisibility();
-        }
-        #endregion
-        #region Cmd: cmdToggleOtherTranslationsPane
-        private void cmdToggleOtherTranslationsPane(Object sender, EventArgs e)
-        {
-            DProject.VD_ShowTranslationsPane = !DProject.VD_ShowTranslationsPane;
-            _UpdateSideWindows();
-        }
-        #endregion
-
         #region Cmd: cmdJobDrafting
         private void cmdJobDrafting(Object sender, EventArgs e)
 		{
@@ -3087,12 +2912,12 @@ namespace OurWord
             // Populate the Zoom Factor subwindow, if it hasn't been populated already
             if (0 == m_menuZoom.DropDownItems.Count)
             {
-                int[] v = new int[] { 
+                var v = new int[] { 
                 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 };
 
-                foreach (int n in v)
+                foreach (var n in v)
                 {
-                    ToolStripMenuItem mi = new ToolStripMenuItem(n.ToString() + "%", null,
+                    var mi = new ToolStripMenuItem(n.ToString() + "%", null,
                         cmdChangeZoomPercent, "zzom_" + n.ToString());
                     mi.Tag = n;
                     m_menuZoom.DropDownItems.Add(mi);

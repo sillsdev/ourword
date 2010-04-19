@@ -7,7 +7,6 @@
  * Purpose: Handles Undo / Redo actions
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -24,12 +23,9 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
-using OurWord.SideWnd;
 using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
-
-#endregion
 #endregion
 
 namespace OurWord.Edit
