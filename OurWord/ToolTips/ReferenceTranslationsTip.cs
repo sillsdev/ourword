@@ -69,7 +69,7 @@ namespace OurWord.ToolTips
         #endregion
 
         // Content Window --------------------------------------------------------------------
-        private bool m_bShowBackTranslation;
+        private readonly bool m_bShowBackTranslation;
         #region Cmd: OnContentWindowLayoutFinished
         bool s_IsDoingLayout;
         void OnContentWindowLayoutFinished(object sender, EventArgs e)
@@ -128,6 +128,8 @@ namespace OurWord.ToolTips
                 return;
 
             var vRunsToDisplay = CollectDisplayRuns(book);
+            if (vRunsToDisplay.Count == 0)
+                return;
 
             // Vernacular
             var owp = new OWPara(translation.WritingSystemVernacular, 
