@@ -47,9 +47,10 @@ namespace OurWord.ToolTips
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DVerse)
-        public ReferenceTranslationsTip(DVerse verse)
+        public ReferenceTranslationsTip(DVerse verse, bool bShowBackTranslation)
         {
             m_Verse = verse;
+            m_bShowBackTranslation = bShowBackTranslation;
 
             // Need to have created our controls prior to InitComponent
             var definition = new OWWindow.WindowDefinition("ToolTip") 
@@ -68,6 +69,7 @@ namespace OurWord.ToolTips
         #endregion
 
         // Content Window --------------------------------------------------------------------
+        private bool m_bShowBackTranslation;
         #region Cmd: OnContentWindowLayoutFinished
         bool s_IsDoingLayout;
         void OnContentWindowLayoutFinished(object sender, EventArgs e)
@@ -127,11 +129,21 @@ namespace OurWord.ToolTips
 
             var vRunsToDisplay = CollectDisplayRuns(book);
 
+            // Vernacular
             var owp = new OWPara(translation.WritingSystemVernacular, 
                 StyleSheet.ReferenceTranslation, vRunsToDisplay.ToArray(),
                 translation.DisplayName, OWPara.Flags.None);
-
             ContentWindow.Contents.Append(owp);
+
+            // Back Translation 
+            if (m_bShowBackTranslation)
+            {
+                var sBT = Loc.GetString("kBTAbbrev", "BT");
+                owp = new OWPara(translation.WritingSystemVernacular,
+                    StyleSheet.ReferenceTranslationContinued, vRunsToDisplay.ToArray(),
+                    sBT + ":", OWPara.Flags.ShowBackTranslation);
+                ContentWindow.Contents.Append(owp);
+            }
         }
         #endregion
         #region Method: int GetChapterNumber()

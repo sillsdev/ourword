@@ -409,6 +409,20 @@ namespace OurWordData.Styles
                 Uses = CharacterStyle.Usage.OnlyInUserInterface
             };
         #endregion
+        #region ParagraphStyle ReferenceTranslationContinued
+        public static readonly ParagraphStyle ReferenceTranslationContinued =
+            new ParagraphStyle("Reference Translation Continued")
+            {
+                OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
+                {
+                    DefaultFontSize = 10,
+                    Alignment = ParagraphStyle.Align.Justified,
+                    LeftMarginInches = 0.20
+                },
+                Uses = CharacterStyle.Usage.OnlyInUserInterface
+            };
+        #endregion
+
         #region ParagraphStyle TipHeader
         static public readonly ParagraphStyle TipHeader =
             new ParagraphStyle("Tip Header")

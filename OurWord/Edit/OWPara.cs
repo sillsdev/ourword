@@ -457,7 +457,7 @@ namespace OurWord.Edit
             }
 
             // Add the text (we only care about verses and text)
-            foreach (DRun run in vRuns)
+            foreach (var run in vRuns)
             {
                 switch (run.GetType().Name)
                 {
@@ -479,7 +479,7 @@ namespace OurWord.Edit
             // and so the end of a DParagraph that joins up to the beginning of another DParagraph
             // will have words that "runtogether" thusly. So we have this kludge here to append
             // a space to such EWords.
-            for (int i = 0; i < SubItems.Length - 1; i++)
+            for (var i = 0; i < SubItems.Length - 1; i++)
             {
                 var word = SubItems[i] as EWord;
                 if (null == word || !word.IsBesideEWord(true))

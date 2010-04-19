@@ -170,7 +170,11 @@ namespace OurWord.Edit.Blocks
             var y = (int)(Middle.Y - Window.ScrollBarPosition);
             var ptScreenLocation = Window.PointToScreen(new Point(Middle.X, y));
 
-            var tip = new ReferenceTranslationsTip(Verse);
+            var owp = Owner as OWPara;
+            if (null == owp)
+                return;
+
+            var tip = new ReferenceTranslationsTip(Verse, owp.DisplayBT);
             tip.Launch(ptScreenLocation);
         }
         #endregion
