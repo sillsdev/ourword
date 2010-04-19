@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
+using OurWord.Edit.Blocks;
 using OurWord.ToolTips;
 using OurWord.Utilities;
 using OurWordData;

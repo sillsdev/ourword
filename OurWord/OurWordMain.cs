@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using OurWord.Edit.Blocks;
 using OurWord.Printing;
 using OurWordData;
 using OurWordData.DataModel;

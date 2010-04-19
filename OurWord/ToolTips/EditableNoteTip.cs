@@ -13,6 +13,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using JWTools;
 using OurWord.Edit;
+using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
@@ -83,7 +84,7 @@ namespace OurWord.ToolTips
         private readonly bool m_bEditable;
         #endregion
 
-        #region Constructor()
+        #region Constructor(ENote, bEditable)
         public EditableNoteTip(ENote noteBlock, bool bEditable)
         {
             // References the TranslatorNote that this tip is about
@@ -705,11 +706,11 @@ namespace OurWord.ToolTips
 
             var fontLabel = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Bold, G.ZoomPercent);
             var sAuthor = message.Author + ",";
-            var author = new OWPara.ELabel(fontLabel, new DLabel(sAuthor));
+            var author = new ELabel(fontLabel, new DLabel(sAuthor));
 
             var fontDate = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Italic, G.ZoomPercent);
             var sDate = message.LocalTimeCreated.ToShortDateString() + ":\u00A0";
-            var date = new OWPara.ELabel(fontDate, new DLabel(sDate));
+            var date = new ELabel(fontDate, new DLabel(sDate));
 
             pDestination.InsertAt(0, author);
             pDestination.InsertAt(1, date);

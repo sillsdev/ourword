@@ -15,6 +15,7 @@ using System.Drawing.Printing;
 using System.Windows.Forms;
 using JWTools;
 using OurWord.Edit;
+using OurWord.Edit.Blocks;
 using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
@@ -289,7 +290,7 @@ namespace OurWord.Printing
             {
                 foreach (var item in paragraph.SubItems)
                 {
-                    var footLetter = item as OWPara.EFoot;
+                    var footLetter = item as EFoot;
                     if (null == footLetter)
                         continue;
 
@@ -300,7 +301,7 @@ namespace OurWord.Printing
                     var owfn = new OWFootnotePara(footnote, Color.White, OWPara.Flags.None);
                     vFootnotes.Add(owfn);
 
-                    var label = owfn.SubItems[0] as OWPara.EFootnoteLabel;
+                    var label = owfn.SubItems[0] as EFootnoteLabel;
                     if (null != label)
                         label.Text = sLetter;
                 }

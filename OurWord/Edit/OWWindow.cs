@@ -21,6 +21,7 @@ using System.Timers;
 using System.Threading;
 using System.Windows.Forms;
 using JWTools;
+using OurWord.Edit.Blocks;
 using OurWord.ToolTips;
 using OurWordData;
 using OurWordData.DataModel;

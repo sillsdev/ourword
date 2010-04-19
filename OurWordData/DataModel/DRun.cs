@@ -216,8 +216,8 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				string sDigits = "";
-				foreach( char ch in Text)
+				var sDigits = "";
+				foreach(var ch in Text)
 				{
 					if (char.IsDigit(ch))
 						sDigits += ch;
@@ -244,17 +244,17 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				int i = Text.IndexOf('-');
+				var i = Text.IndexOf('-');
 				if  (-1 == i )
 					return VerseNo;
 
-				string sEnd = Text.Substring(i);
+				var sEnd = Text.Substring(i);
 				if (sEnd.Length < 2)
 					return VerseNo;
 				sEnd = sEnd.Substring(1);
 
-				string sDigits = "";
-				foreach( char ch in sEnd)
+				var sDigits = "";
+				foreach(var ch in sEnd)
 				{
 					if (char.IsDigit(ch))
 						sDigits += ch;

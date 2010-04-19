@@ -7,213 +7,14 @@
  * Purpose: An individual word in a paragraph
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
-using JWTools;
-using OurWordData;
-using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
-
-#endregion
 #endregion
 
-namespace OurWord.Edit
+namespace OurWord.Edit.Blocks
 {
-    #region CLASS: EBlock
-    public class EBlock : EItem
-    {
-        // Main Content Attrs ------------------------------------------------------------
-        #region Attr{g/s}: string Text
-        public string Text
-        {
-            get
-            {
-                return m_sText;
-            }
-            set
-            {
-                m_sText = value;
-            }
-        }
-        protected string m_sText = "";
-        #endregion
-        #region Attr{g}: bool GlueToNext - T if this block must be beside the next one
-        public virtual bool GlueToNext
-        {
-            get
-            {
-                return m_bGlueToNext;
-            }
-            set
-            {
-                m_bGlueToNext = value;
-            }
-        }
-        bool m_bGlueToNext = false;
-        #endregion
-
-        // Screen Region -----------------------------------------------------------------
-        #region OAttr{g}: float Height
-        override public float Height
-        {
-            get
-            {
-                // we use the paragraph's line height, as some individual elements could
-                // be using different fonts.
-                return Para.LineHeight;
-            }
-            set
-            {
-                Debug.Assert(false, "Can't set the line height of an EBlock");
-            }
-        }
-        #endregion
-        #region OMethod: bool ContainsPoint(PointF pt)
-        public override bool ContainsPoint(PointF pt)
-        {
-            RectangleF r = new RectangleF(Position,
-                new SizeF(Width + JustificationPaddingAdded, Height));
-            return r.Contains(pt);
-        }
-        #endregion
-        #region OMethod: EBlock GetBlockAt(PointF)
-        public override EBlock GetBlockAt(PointF pt)
-        {
-            return this;
-        }
-        #endregion
-        #region Attr{g}: int JustificationPaddingAdded
-        public int JustificationPaddingAdded
-        {
-            get
-            {
-                return m_nJustificationPaddingAdded;
-            }
-            set
-            {
-                m_nJustificationPaddingAdded = value;
-            }
-        }
-        int m_nJustificationPaddingAdded = 0;
-        #endregion
-
-        // Scaffolding -------------------------------------------------------------------
-        #region VAttr{g}: OWPara Para - Keep a pointer back to the owner so we can get, e.g., the PStyle
-        public OWPara Para
-        {
-            get
-            {
-                OWPara para = Owner as OWPara;
-                Debug.Assert(null != para);
-                return para;
-            }
-        }
-        #endregion
-        #region VAttr{g}: int PositionWithinPara
-        public int PositionWithinPara
-        {
-            get
-            {
-                for (int i = 0; i < Para.SubItems.Length; i++)
-                {
-                    if (Para.SubItems[i] as EBlock == this)
-                        return i;
-                }
-                return -1;
-            }
-        }
-        #endregion
-        #region Constructor(Font, sText)
-        protected EBlock(Font font, string sText)
-        {
-            m_sText = sText;
-            m_Font = font;
-        }
-        #endregion
-
-        // Painting ----------------------------------------------------------------------
-        protected readonly Font m_Font;
-        #region Attr{s}: Color TextColor
-        public Color TextColor
-        {
-            protected get
-            {
-                return m_TextColor;
-            }
-            set
-            {
-                m_TextColor = value;
-            }
-        }
-        public Color m_TextColor = Color.Black;
-        #endregion
-        #region Method: Brush GetBrush()
-        protected Brush GetBrush()
-        {
-            return new SolidBrush(TextColor);
-        }
-        #endregion
-
-        // Mousing
-        #region Attr{g}: Cursor MouseOverCursor - Indicates what a Left-Click will do
-        public virtual Cursor MouseOverCursor
-        {
-            get
-            {
-                return Cursors.Arrow;
-            }
-        }
-        #endregion
-        #region Cmd: cmdLeftMouseClick
-        public virtual void cmdLeftMouseClick(PointF pt)
-        {
-        }
-        #endregion
-        #region Cmd: cmdLeftMouseDoubleClick
-        public virtual void cmdLeftMouseDoubleClick(PointF pt)
-        {
-        }
-        #endregion
-        #region Cmd: cmdMouseMove
-        public virtual void cmdMouseMove(PointF pt)
-        {
-        }
-        #endregion
-
-        // Tooltips
-        #region VirtMethod: void LaunchToolTip()
-        public virtual void LaunchToolTip()
-        {
-            // Those subclasses which suppport tooltips will launch here
-        }
-        #endregion
-        #region Attr{g}: HasTooltip
-        virtual public bool HasToolTip()
-        {
-            // Return false if no tooltip is desired
-            return false;
-        }
-        #endregion
-
-        // Layout Calculations ---------------------------------------------------------------
-        #region VirtMethod: void CalculateWidth()
-        virtual public void CalculateWidth()
-            // Those subclasses which override will not need to call this base method.
-        {
-            Width = Context.Measure(Text, m_Font);
-        }
-        #endregion
-    }
-    #endregion
-
     #region CLASS: EWord : EBlock
     public class EWord : EBlock
     {
@@ -232,32 +33,10 @@ namespace OurWord.Edit
 
         // Hyphenation
         #region Attr{g/s}: bool Hyphenated
-        public bool Hyphenated
-        {
-            get
-            {
-                return m_Hyphenated;
-            }
-            set
-            {
-                m_Hyphenated = value;
-            }
-        }
-        bool m_Hyphenated;
+        public bool Hyphenated { get; set; }
         #endregion
         #region Attr{g/s}: float HyphenWidth
-        float HyphenWidth
-        {
-            get
-            {
-                return m_fHyphenWidth;
-            }
-            set
-            {
-                m_fHyphenWidth = value;
-            }
-        }
-        float m_fHyphenWidth;
+        private float HyphenWidth { get; set; }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -446,9 +225,9 @@ namespace OurWord.Edit
         #region Method: bool IsBesideEWord(bool bOnRight)
         public bool IsBesideEWord(bool bOnRight)
         {
-            int iBlock = Para.Find(this);
+            var iBlock = Para.Find(this);
 
-            EBlock blockBeside = null;
+            EBlock blockBeside;
 
             if (bOnRight)
             {
@@ -463,10 +242,7 @@ namespace OurWord.Edit
                 blockBeside = Para.SubItems[iBlock - 1] as EBlock;
             }
 
-            if (null != blockBeside as EWord)
-                return true;
-
-            return false;
+            return (null != blockBeside as EWord);
         }
         #endregion
         #region Attr{g}: bool EndsWithWhiteSpace
@@ -507,10 +283,10 @@ namespace OurWord.Edit
                 return;
 
             // Find out the index of the character we've just clicked over
-            int iChar = GetCharacterIndex(pt);
+            var iChar = GetCharacterIndex(pt);
 
             // Get the number of this block within the paragraph
-            int iBlock = PositionWithinPara;
+            var iBlock = PositionWithinPara;
 
             // For an insertion icon, just select the entire word
             if (IsInsertionIcon)
@@ -522,8 +298,8 @@ namespace OurWord.Edit
             }
 
             // Create the Selection
-            OWWindow.Sel.SelPoint Anchor = new OWWindow.Sel.SelPoint(iBlock, iChar);
-            OWWindow.Sel selection = new OWWindow.Sel(Para, Anchor);
+            var Anchor = new OWWindow.Sel.SelPoint(iBlock, iChar);
+            var selection = new OWWindow.Sel(Para, Anchor);
             Para.Window.Selection = Para.NormalizeSelection(selection);
         }
         #endregion
@@ -544,16 +320,16 @@ namespace OurWord.Edit
                 return;
 
             // Is there anything between Here and the Anchor that is NOT an EWord?
-            int iEnd = PositionWithinPara;
-            int iAnchor = Window.Selection.Anchor.iBlock;
-            int iFirst = (iAnchor < iEnd) ? iAnchor : iEnd;
-            int iLast = (iEnd > iAnchor) ? iEnd : iAnchor;
-            for (int i = iFirst; i < iLast; i++)
+            var iEnd = PositionWithinPara;
+            var iAnchor = Window.Selection.Anchor.iBlock;
+            var iFirst = (iAnchor < iEnd) ? iAnchor : iEnd;
+            var iLast = (iEnd > iAnchor) ? iEnd : iAnchor;
+            for (var i = iFirst; i < iLast; i++)
             {
                 if (Para.SubItems[i] as EWord == null)
                     return;
             }
-            int iChar = GetCharacterIndex(pt);
+            var iChar = GetCharacterIndex(pt);
 
             // If this is the same position as our previous mouse move, then
             // do nothing. Seems that Windows keeps feeding these messages even when the
@@ -563,8 +339,8 @@ namespace OurWord.Edit
                 return;
 
             // Passed the test; so extend the selection to this new End point
-            OWWindow.Sel.SelPoint end = new OWWindow.Sel.SelPoint(iEnd, iChar);
-            OWWindow.Sel selection = new OWWindow.Sel(Para, Window.Selection.Anchor, end);
+            var end = new OWWindow.Sel.SelPoint(iEnd, iChar);
+            var selection = new OWWindow.Sel(Para, Window.Selection.Anchor, end);
             Window.Selection = Para.NormalizeSelection(selection);
         }
         #endregion

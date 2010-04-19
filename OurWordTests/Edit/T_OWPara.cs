@@ -18,6 +18,7 @@ using System.Windows.Forms;
 using NUnit.Framework;
 
 using JWTools;
+using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 

@@ -455,25 +455,18 @@ namespace OurWordData.DataModel
 			return true;
 		}
 		#endregion
-		#region Attr{g}: DRun[] AllParagraphRuns
-		public DRun[] AllParagraphRuns
+        #region Attr{g}: List<DRun> AllRuns
+        public List<DRun> AllRuns
 		{
 			get
 			{
-				ArrayList a = new ArrayList();
+			    var v = new List<DRun>();
 
-				foreach(DParagraph p in Paragraphs)
-				{
-					foreach(DRun r in p.Runs)
-						a.Add(r);
-				}
+                foreach(DParagraph paragraph in Paragraphs)
+                    foreach(DRun run in paragraph.Runs)
+                        v.Add(run);
 
-				// Convert into an array of runs
-				DRun[] vRuns = new DRun[ a.Count ];
-				for(int i=0; i<a.Count; i++)
-					vRuns[i] = a[i] as DRun;
-
-				return vRuns;
+			    return v;
 			}
 		}
 		#endregion

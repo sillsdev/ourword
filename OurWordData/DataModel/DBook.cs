@@ -454,6 +454,20 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
+        #region VAttr{g}: List<DRun> AllRuns
+        public List<DRun> AllRuns
+        {
+            get
+            {
+                var v = new List<DRun>();
+
+                foreach(DSection section in Sections)
+                    v.AddRange(section.AllRuns);
+
+                return v;
+            }
+        }
+        #endregion
 
         // BookAbbrev-To-BookNumber Conversions ----------------------------------------------
         public const int BookAbbrevsCount = 66;

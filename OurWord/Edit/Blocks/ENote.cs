@@ -18,7 +18,7 @@ using OurWordData.DataModel.Annotations;
 using OurWordData.Styles;
 #endregion
 
-namespace OurWord.Edit
+namespace OurWord.Edit.Blocks
 {
     public class ENote : EBlock
     {

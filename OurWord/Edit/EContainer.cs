@@ -18,6 +18,7 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using JWTools;
+using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
@@ -45,7 +46,7 @@ namespace OurWord.Edit
                 m_Owner = value;
             }
         }
-        protected EContainer m_Owner;
+        private EContainer m_Owner;
         #endregion
         #region VirtVAttr{g}: ERoot Root - top container of the entire hierarchy; owns All others
         virtual public ERoot Root
@@ -895,14 +896,14 @@ namespace OurWord.Edit
         #region Method: void InsertAt(iPos, EItem)
         public void InsertAt(int iPos, EItem item)
         {
-            EItem[] v = new EItem[SubItems.Length + 1];
+            var v = new EItem[SubItems.Length + 1];
 
-            for (int i = 0; i < iPos; i++)
+            for (var i = 0; i < iPos; i++)
                 v[i] = SubItems[i];
 
             v[iPos] = item;
 
-            for (int i = iPos; i < SubItems.Length; i++)
+            for (var i = iPos; i < SubItems.Length; i++)
                 v[i + 1] = SubItems[i];
 
             m_vSubItems = v;
@@ -1336,17 +1337,17 @@ namespace OurWord.Edit
             EWord wordToSelect = null;
 
             // We support either of the following
-            TranslatorNote note = obj as TranslatorNote;
-            DFootnote footnote = obj as DFootnote;
+            var note = obj as TranslatorNote;
+            var footnote = obj as DFootnote;
             Debug.Assert(null != note || null != footnote);
 
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
                 if (!item.IsEditable)
                     continue;
 
                 // Recurse down through the containers hierarchy
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
                     if (container.OnSelectAndScrollFrom(obj))
@@ -1355,19 +1356,19 @@ namespace OurWord.Edit
 
                 // Do we have a selectable word? If so, we want to remember it, so that
                 // it points to the word most adjacent to the note icon.
-                EWord word = item as EWord;
+                var word = item as EWord;
                 if (null != word)
                     wordToSelect = word;
 
-                bool bSelectionFound = false;
+                var bSelectionFound = false;
 
                 // Do we have a Translator Note?
-                ENote n = item as ENote;
+                var n = item as ENote;
                 if (n != null && note != null && n.Note == note)
                     bSelectionFound = true;
 
                 // Do we have a Footnote
-                OWPara.EFoot foot = item as OWPara.EFoot;
+                var foot = item as EFoot;
                 if (null != footnote && (foot != null && foot.Footnote == footnote) )
                 {
                     bSelectionFound = true;
@@ -1391,24 +1392,23 @@ namespace OurWord.Edit
         #region Method: OWPara FindParagraph(DFootnote)
         public OWPara FindParagraph(DFootnote footnote)
         {
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
                 // Recurse to lower levels of the hierarchy
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
-                    OWPara para = container.FindParagraph(footnote);
+                    var para = container.FindParagraph(footnote);
                     if (null != para)
                         return para;
                 }
 
                 // Test this item
-                OWPara.EFoot foot = item as OWPara.EFoot;
+                var foot = item as EFoot;
                 if (foot != null && foot.Footnote == footnote) 
                 {
                     return this as OWPara;
                 }
-
             }
 
             return null;

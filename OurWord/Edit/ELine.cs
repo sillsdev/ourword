@@ -10,6 +10,7 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
+using OurWord.Edit.Blocks;
 #endregion
 
 namespace OurWord.Edit
@@ -18,7 +19,7 @@ namespace OurWord.Edit
     {
         // Content attrs ---------------------------------------------------------------------
         #region Attr{g/s}: EChapter Chapter - the EChapter prior to this line (or null if none there)
-        public OWPara.EChapter Chapter
+        public EChapter Chapter
         {
             get
             {
@@ -30,7 +31,7 @@ namespace OurWord.Edit
                 m_Chapter = value;
             }
         }
-        OWPara.EChapter m_Chapter;
+        EChapter m_Chapter;
         #endregion
         #region Attr{g/s}: float LeftIndent - how much to indent the line for the chapter
         public float LeftIndent { private get; set; }

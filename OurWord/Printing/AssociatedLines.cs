@@ -10,6 +10,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using OurWord.Edit;
+using OurWord.Edit.Blocks;
 using OurWordData.DataModel;
 #endregion
 
@@ -73,14 +74,14 @@ namespace OurWord.Printing
             {
                 foreach (var item in line.SubItems) 
                 {
-                    var chapter = item as OWPara.EChapter;
+                    var chapter = item as EChapter;
                     if (null != chapter)
                     {
                         ChapterNumber = chapter.Number;
                         VerseNumber = 1;
                     }
 
-                    var verse = item as OWPara.EVerse;
+                    var verse = item as EVerse;
                     if (null != verse)
                     {
                         VerseNumber = verse.Number;
@@ -156,7 +157,7 @@ namespace OurWord.Printing
             {
                 foreach (var item in line.SubItems)
                 {
-                    var foot = item as OWPara.EFoot;
+                    var foot = item as EFoot;
                     if (null == foot)
                         continue;
 

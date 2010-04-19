@@ -7,24 +7,12 @@
  * Purpose: A icon with an optional associated action
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Text;
-using System.Windows.Forms;
 using JWTools;
-using OurWordData;
-using OurWordData.DataModel;
-#endregion
 #endregion
 
-namespace OurWord.Edit
+namespace OurWord.Edit.Blocks
 {
     public class EIcon : EBlock
     {
@@ -45,7 +33,7 @@ namespace OurWord.Edit
                 return m_bmp;
             }
         }
-        Bitmap m_bmp = null;
+        Bitmap m_bmp;
         #endregion
         #region OAttr{g}: float Width
         public override float Width

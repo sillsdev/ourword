@@ -460,6 +460,14 @@
     <Compile Include="Dialogs\oHelpAbout.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Edit\Blocks\EBigHeader.cs" />
+    <Compile Include="Edit\Blocks\EBlock.cs" />
+    <Compile Include="Edit\Blocks\EChapter.cs" />
+    <Compile Include="Edit\Blocks\EFoot.cs" />
+    <Compile Include="Edit\Blocks\EFootnoteLabel.cs" />
+    <Compile Include="Edit\Blocks\ELabel.cs" />
+    <Compile Include="Edit\Blocks\ELiteral.cs" />
+    <Compile Include="Edit\Blocks\EVerse.cs" />
     <Compile Include="Printing\PrintDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -615,9 +623,9 @@
     </Compile>
     <Compile Include="Edit\Draw.cs" />
     <Compile Include="Edit\DrawingContext.cs" />
-    <Compile Include="Edit\EIcon.cs" />
+    <Compile Include="Edit\Blocks\EIcon.cs" />
     <Compile Include="Edit\ELine.cs" />
-    <Compile Include="Edit\ENote.cs" />
+    <Compile Include="Edit\Blocks\ENote.cs" />
     <Compile Include="Edit\EPicture.cs" />
     <Compile Include="Edit\OWToolTip.cs">
     </Compile>
@@ -632,7 +640,7 @@
     <Compile Include="Edit\EContainer.cs" />
     <Compile Include="Edit\EControl.cs" />
     <Compile Include="Edit\EHeaderColumn.cs" />
-    <Compile Include="Edit\EWord.cs" />
+    <Compile Include="Edit\Blocks\EWord.cs" />
     <Compile Include="Edit\LiterateSettingsWnd.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -687,6 +695,12 @@
     </Compile>
     <Compile Include="ToolTips\EditableNoteTip.Designer.cs">
       <DependentUpon>EditableNoteTip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolTips\ReferenceTranslationsTip.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ToolTips\ReferenceTranslationsTip.Designer.cs">
+      <DependentUpon>ReferenceTranslationsTip.cs</DependentUpon>
     </Compile>
     <Compile Include="ToolTips\ToolTipLauncher.cs" />
     <Compile Include="Utilities\ClusterListView.cs">
@@ -822,6 +836,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ToolTips\EditableNoteTip.resx">
       <DependentUpon>EditableNoteTip.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ToolTips\ReferenceTranslationsTip.resx">
+      <DependentUpon>ReferenceTranslationsTip.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Utilities\ClusterListView.resx">
       <DependentUpon>ClusterListView.cs</DependentUpon>

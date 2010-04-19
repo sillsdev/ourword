@@ -9,7 +9,7 @@
  *********************************************************************************************/
 using System;
 using System.Windows.Forms;
-using OurWord.Edit;
+using OurWord.Edit.Blocks;
 #endregion
 
 namespace OurWord.ToolTips

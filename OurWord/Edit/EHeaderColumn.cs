@@ -18,6 +18,7 @@ using System.IO;
 using System.Windows.Forms;
 using System.Text;
 using JWTools;
+using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 #endregion
