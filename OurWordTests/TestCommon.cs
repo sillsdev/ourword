@@ -15,6 +15,7 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using JWTools;
+using OurWord;
 using OurWordData.DataModel;
 using OurWordData.Styles;
 
@@ -30,20 +31,20 @@ namespace OurWordTests
         {
         }
         #endregion
-
+        #region SMethod: void InitializeRegistry()
         public static void InitializeRegistry()
             // Needed, e.g., by Map and RootFolderPath
         {
-            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";           
+            JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
         }
-
+        #endregion
         #region Method: void GlobalTestSetup()
         public static void GlobalTestSetup()
         {
             InitializeRegistry();
 
             // Localization DB
-            LocDB.Initialize(JWU.GetApplicationDataFolder("OurWord"));
+            LocDB.Initialize(Loc.FolderOfLocFiles);
 
             // Set the resource location
             JWU.ResourceLocation = "OurWord.Res.";

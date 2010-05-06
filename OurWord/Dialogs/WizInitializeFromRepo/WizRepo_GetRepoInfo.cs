@@ -25,6 +25,8 @@ using Microsoft.Win32;
 using JWTools;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.Synchronize;
+
 #endregion
 #endregion
 
@@ -49,6 +51,7 @@ namespace OurWord.Dialogs
         public WizRepo_GetRepoInfo()
         {
             InitializeComponent();
+
         }
         #endregion
 
@@ -97,6 +100,9 @@ namespace OurWord.Dialogs
         #region Method: void OnActivate()
         public void OnActivate()
         {
+            // Default value
+            if (string.IsNullOrEmpty(Url))
+                Url = InternetRepository.c_sDefaultServer;
         }
         #endregion
         #region Method: bool CanGoToNextPage()

@@ -144,7 +144,7 @@ namespace OurWordData.DataModel
         #region Method: string GetProjectPath(sProjectName)
         public string GetProjectPath(string sProjectName)
         {
-            string sPath = ClusterFolder +
+            var sPath = ClusterFolder +
                 ".Settings" + Path.DirectorySeparatorChar +
                 sProjectName + ".owp";
             return sPath;

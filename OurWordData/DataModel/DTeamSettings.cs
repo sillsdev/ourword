@@ -427,16 +427,20 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-                string sClusterFolder = ClusterFolder;
+                var sClusterFolder = ClusterFolder;
                 if (string.IsNullOrEmpty(sClusterFolder))
                     return null;
 
 				// Make sure the folder exists
 				var sFolder = ClusterFolder + SettingsFolderName + Path.DirectorySeparatorChar;
-				if (!Directory.Exists(sFolder))
-					Directory.CreateDirectory(sFolder);
+                if (!Directory.Exists(sFolder))
+                {
+                    if (sFolder.Contains("OurWordData\\.Settings"))
+                        Debug.Fail("Attempt to create OurWordData\\.Settings; need a call stack to debug (DTeamSettings.SettingsFolder)");
+                    Directory.CreateDirectory(sFolder);
+                }
 
-				return sFolder;
+			    return sFolder;
 			}
 		}
 		#endregion

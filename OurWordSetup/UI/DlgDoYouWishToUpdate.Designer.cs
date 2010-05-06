@@ -45,7 +45,7 @@
             this.m_labelUpdateIsAvailable.Name = "m_labelUpdateIsAvailable";
             this.m_labelUpdateIsAvailable.Size = new System.Drawing.Size(309, 23);
             this.m_labelUpdateIsAvailable.TabIndex = 0;
-            this.m_labelUpdateIsAvailable.Text = "An newer version of OurWord is available.";
+            this.m_labelUpdateIsAvailable.Text = "A newer version of OurWord is available.";
             this.m_labelUpdateIsAvailable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // m_btnCancel
@@ -117,7 +117,7 @@
             this.m_labelShallWe.Text = "Do you wish to update?";
             this.m_labelShallWe.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // DlgUpdate
+            // DlgDoYouWishToUpdate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -132,7 +132,7 @@
             this.Controls.Add(this.m_btnYes);
             this.Controls.Add(this.m_labelUpdateIsAvailable);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Name = "DlgUpdate";
+            this.Name = "DlgDoYouWishToUpdate";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Update OurWord?";
             this.ResumeLayout(false);

@@ -115,6 +115,7 @@
     <Compile Include="Styles\TWritingSystem.cs" />
     <Compile Include="TestCommon.cs" />
     <Compile Include="Setup\TManifest.cs" />
+    <Compile Include="Utilities\TShortTermMercurialEnvironment.cs" />
     <Compile Include="Utilities\TStringMerger.cs" />
     <Compile Include="Utilities\T_Repository.cs" />
   </ItemGroup>

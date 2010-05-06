@@ -272,13 +272,15 @@ namespace OurWord.Utilities
         public void MoveCluster()
         {
             // Get the currently selected cluster
-            ClusterInfo ci = SelectedCluster;
+            var ci = SelectedCluster;
             if (null == ci)
                 return;
 
             // Find out where to move it to
-            var dlg = new DlgMoveCluster();
-            dlg.StoreInMyDocuments = ci.IsInMyDocuments;
+            var dlg = new DlgMoveCluster 
+            {
+                StoreInMyDocuments = ci.IsInMyDocuments
+            };
             if (DialogResult.OK != dlg.ShowDialog(this.Parent))
                 return;
 
@@ -286,11 +288,12 @@ namespace OurWord.Utilities
             if (ci.IsInMyDocuments == dlg.StoreInMyDocuments)
                 return;
 
-            // Get the new destination (Parent Folder)
-            string sParentFolder = (dlg.StoreInMyDocuments) ?
+            // Get the new destination (Parent Folder). LocalAppData must be the same as
+            // in the Zip in OurWordSetup
+            var sParentFolder = (dlg.StoreInMyDocuments) ?
                 JWU.GetMyDocumentsFolder(null) :
                 JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
-                ClusterInfo ciNew = new ClusterInfo(ci.Name, sParentFolder);
+            var ciNew = new ClusterInfo(ci.Name, sParentFolder);
 
             // If the new destination already exists, then we can't do the move
             if (Directory.Exists(ciNew.ClusterFolder))

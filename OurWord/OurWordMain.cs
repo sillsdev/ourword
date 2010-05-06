@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 2 Dec 2003
  * Purpose: Main window and app for the application.
- * Legal:   Copyright (c) 2004-08, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2004-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
@@ -29,8 +29,8 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWord.Dialogs;
 using OurWord.Dialogs.History;
+using OurWord.Utilities;
 using OurWordData.Synchronize;
-using OurWordSetup.Data;
 using Shortcut=OurWord.Utilities.Shortcut;
 
 #endregion
@@ -90,6 +90,8 @@ namespace OurWord
                 ResetWindowContents();
         }
         #endregion
+
+        private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         #region VAttr{g}: Layout CurrentLayout
         public WLayout CurrentLayout
         {
@@ -700,7 +702,6 @@ namespace OurWord
 		private readonly JW_WindowState m_WindowState;   // Save/restore state on close/launch of app
 
 		// Scaffolding -----------------------------------------------------------------------
-        const string c_sLastProjectOpened = "LastProjectOpened";
 		#region Constructor()
 		public OurWordMain()
 			// Constructor, initializes the application
@@ -812,6 +813,7 @@ namespace OurWord
             this.m_menuOnlyShowSectionsThat = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Synchronize = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorDebug = new System.Windows.Forms.ToolStripSeparator();
@@ -888,7 +890,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(943, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(913, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -1254,6 +1256,7 @@ namespace OurWord
             this.m_menuOnlyShowSectionsThat,
             this.m_menuConfigure,
             this.m_menuSetUpFeatures,
+            this.checkForUpdatesToolStripMenuItem,
             this.m_Synchronize,
             this.m_menuLocalizerTool,
             this.m_separatorDebug,
@@ -1310,6 +1313,13 @@ namespace OurWord
             this.m_menuSetUpFeatures.Text = "Set Up &Features...";
             this.m_menuSetUpFeatures.ToolTipText = "Set which features are turned on and off.";
             this.m_menuSetUpFeatures.Click += new System.EventHandler(this.cmdSetUpFeatures);
+            // 
+            // checkForUpdatesToolStripMenuItem
+            // 
+            this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
+            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
+            this.checkForUpdatesToolStripMenuItem.Text = "Check for &Updates...";
+            this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.cmdCheckForUpdates);
             // 
             // m_Synchronize
             // 
@@ -1602,6 +1612,7 @@ namespace OurWord
             this.Text = "Our Word!";
             this.Load += new System.EventHandler(this.cmdLoad);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdClosing);
+            this.Resize += new System.EventHandler(this.cmdResize);
             this.m_ToolStrip.ResumeLayout(false);
             this.m_ToolStrip.PerformLayout();
             this.m_toolStripContainer.BottomToolStripPanel.ResumeLayout(false);
@@ -1669,7 +1680,7 @@ namespace OurWord
 
             // Initialize the Localizations Database. We need this prior to the
             // splash screen being activated.
-            LocDB.Initialize(G.GetApplicationDataFolder());
+            LocDB.Initialize(Loc.FolderOfLocFiles);
 
             // Set the resource location (so the splash picture will be visible)
             JWU.ResourceLocation = "OurWord.Res.";
@@ -2133,27 +2144,17 @@ namespace OurWord
             // Init the Help system
             HelpSystem.Initialize(this, "OurWordHelp.chm");
 
-            // Retrieve the most recent project
-            var sPath = JW_Registry.GetValue(c_sLastProjectOpened, "");
-
-            // If the most recent is blank, see if we have the Sample Project available
-            if (string.IsNullOrEmpty(sPath))
+            // Retrieve the most recent project (and go to the book-section), 
+            // or load the Sample Project if the Most Recent is not available
+            if (DProject.LoadMostRecentProject(G.CreateProgressIndicator()))
             {
-                var clusterInfo = ClusterList.FindClusterInfo("OurWordSample");
-                if (null != clusterInfo)
-                    sPath = clusterInfo.GetProjectPath("Hawai'i Creole English");
+                SetCurrentLayout(WLayout.GetLayoutFromRegistry(WndDrafting.c_sName));
             }
-
-			// Read in the project
-			DB.Project = new DProject();
-            if (!string.IsNullOrEmpty(sPath) && File.Exists(sPath))
-                DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
-
-            // Restore which layout is active
-            SetCurrentLayout(WLayout.GetLayoutFromRegistry(WndDrafting.c_sName));
-
-            // Restore to where we last were.
-            DB.Project.Nav.RetrievePositionFromRegistry(G.CreateProgressIndicator());
+            else
+            {
+                DProject.LoadSampleProject();
+                SetCurrentLayout(WndDrafting.c_sName);
+            }
 
             // Set up the views, make the initial selection, etc.
             OnEnterProject();
@@ -2184,17 +2185,17 @@ namespace OurWord
             CurrentLayout.Focus();
         }
 		#endregion
+
         #region Event: cmdClosing - save window state, data, etc.
         private void cmdClosing(object sender, FormClosingEventArgs e)
         {
 			// Save data
 			OnLeaveProject();
 
-			// Save the current project's registry info
-            if (!string.IsNullOrEmpty(DB.Project.StoragePath))
-                JW_Registry.SetValue(c_sLastProjectOpened, DB.Project.StoragePath);
-			DB.Project.Nav.SavePositionToRegistry();
-			
+			// Save the current project's registry info so we can return to the same
+            // place the next time OW is launched.
+            DB.Project.SaveMostRecentRegistryInfo();
+		
 			// Save the window position
 			m_WindowState.SaveWindowState();
 
@@ -2203,6 +2204,10 @@ namespace OurWord
         #endregion
         #region Event: OnResize - prevent the size from becomming too small
         protected override void OnResize(EventArgs e)
+            // The form is being resized, but internals are not yet set. So
+            // we can't set our own internal sizes here; rather than must
+            // be done in the cmdResize method, which is called after the
+            // sizing is finished.
         {
             // We want to preserve a minimum size. We'll set this based on the OLPC spec,
             // which as of 6 Apr 07 at http://wiki.laptop.org/go/Hardware_specification 
@@ -2214,13 +2219,13 @@ namespace OurWord
                 Height = Math.Max(Height, 570);
             }
 
-            SizeAndLayoutContentWindows();
-
             base.OnResize(e);
         }
         #endregion
-        #region Method: void SizeAndLayoutContentWindows()
-        void SizeAndLayoutContentWindows()
+        #region Event: cmdResize - Adjust our controls to the window's new size
+        private void cmdResize(object sender, EventArgs e)
+            // The form has been resized and we now need to adjust our internal windows
+            // to match the correct sizes
         {
             // Tests to see if we can proceed with layout and sizing
             if (null != G.App && G.App.WindowState == FormWindowState.Minimized)
@@ -2323,6 +2328,10 @@ namespace OurWord
         private void cmdDownloadRepository(Object sender, EventArgs e)
         {
             Dim();
+
+            // If updates were found, the user will have to restart this command
+            if (CheckForUpdates(false))
+                return;
 
             // We'll contruct the wizard outside of the loop, in case we have to go
             // back and change settings (e.g., on an error)
@@ -3219,12 +3228,9 @@ namespace OurWord
         {
             Dim();
 
-            if(CheckForUpdates())
+            // If updates were found, the user will have to restart Synchronize
+            if(CheckForUpdates(false))
                 return;
-
-            //////////////////////////////////////////
-            UnDim(); return; //REMOVE THIS LINE LATER
-            //////////////////////////////////////////
 
             // Save everything, but don't commit, cause Synchronize will do a commit
             DB.Project.Nav.SavePositionToRegistry();
@@ -3335,7 +3341,7 @@ namespace OurWord
         #endregion
         #endregion
 
-        bool CheckForUpdates()
+        bool CheckForUpdates(bool bInformUserIfThereWereNoUpdates)
             // Returns true if OurWord is shutting down. Any caller should immediately
             // halt anything it is doing and permit OW to shut down as soon as possible.
             // There is a clock ticking, and the setup program will eventually force
@@ -3344,9 +3350,19 @@ namespace OurWord
             DB.Project.Nav.SavePositionToRegistry();
             OnLeaveProject();
 
-            var setup = new SetupManager(this) {InformUserIfThereWereNoUpdates = false};
-            return setup.CheckForUpdates();
+            // If we're on my developer's machine, don't do the check, because we're not 
+            // running from a proper installation.
+            if (G.FolderOfExe.ToLowerInvariant().Contains("debug"))
+                return false;
+
+            return InvokeOurWordSetup.CheckForUpdates(this, bInformUserIfThereWereNoUpdates);
         }
+
+        private void cmdCheckForUpdates(object sender, EventArgs e)
+        {
+            CheckForUpdates(true);
+        }
+
     }
 
 	#region CLASS G - Globals for convenient access
@@ -3456,12 +3472,30 @@ namespace OurWord
 		}
 		static string s_sBrowseDirectory = "";
 		#endregion
-        #region SMethod: string GetApplicationDataFolder()
-        static public string GetApplicationDataFolder()
+        #region SAttr{g}: string FolderOfExe
+        static public string FolderOfExe
         {
-            return JWU.GetApplicationDataFolder("OurWord");
+            get
+            {
+                string sPathOfExe;
+                var bUnitTesting = Assembly.GetEntryAssembly() == null;
+                if (bUnitTesting)
+                {
+                    sPathOfExe = new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+                    sPathOfExe = Uri.UnescapeDataString(sPathOfExe);
+                }
+                else
+                {
+                    sPathOfExe = Assembly.GetExecutingAssembly().Location;
+                }
+                Debug.Assert(!string.IsNullOrEmpty(sPathOfExe));
+
+                var sFolderOfExe = Path.GetDirectoryName(sPathOfExe);
+                return sFolderOfExe;
+            }
         }
         #endregion
+
 
         // Misc ------------------------------------------------------------------------------
         #region SAttr{g}: bool IsLinux

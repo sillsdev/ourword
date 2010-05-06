@@ -413,7 +413,7 @@ namespace OurWord.Layouts
         #region SMethod: WLayout Find(sLayoutName)
         static public WLayout Find(string sLayoutName)
         {
-            foreach (WLayout layout in RegisteredLayouts)
+            foreach (var layout in RegisteredLayouts)
             {
                 if (layout.LayoutName == sLayoutName)
                     return layout;
@@ -440,7 +440,7 @@ namespace OurWord.Layouts
         #region SMethod: bool SetCurrentLayout(string sLayoutName)
         static public bool SetCurrentLayout(string sLayoutName)
         {
-            WLayout layout = Find(sLayoutName);
+            var layout = Find(sLayoutName);
             Debug.Assert(null != layout, "Did you forget to register a window type?");
 
             // Don't do anything if we're already active

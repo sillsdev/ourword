@@ -224,6 +224,16 @@ namespace OurWordData.DataModel
     public class Loc
         // Shorthand for various localization sections used at the DB level
     {
+        #region SAttr{g}: string FolderOfLocFiles
+        static public string FolderOfLocFiles
+        {
+            get
+            {
+                return Path.Combine(JWU.GetLocalApplicationDataFolder("OurWord"), "loc");
+            }
+        }
+        #endregion
+
         #region SMethod: string GetTranslationStage(sItemID, sEnglish) - "TranslationStages"
         static public string GetTranslationStage(string sItemID, string sEnglish)
         {

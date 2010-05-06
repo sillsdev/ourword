@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.Zip;
 #endregion
@@ -22,10 +23,10 @@ namespace OurWordSetup.Data
         // Zip Prefixes ----------------------------------------------------------------------
         // The prefix on the zip's filename determines where we'll extract it to during the
         // install process. All zip files must have one of these prefixes.
-        const string DestinationLocalApps = "app";
-        const string DestinationMyDocuments = "mydocs";
-        const string DestinationLanguageData = "langdata";
-        const string DestinationTestFolder = "ziptest";
+        const string c_sDestinationLocalApps = "app";
+        const string c_sDestinationMyDocuments = "mydocs";
+        const string c_sDestinationLanguageData = "langdata";
+        const string c_sDestinationTestFolder = "ziptest";
 
         // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: string ZipPath
@@ -62,20 +63,19 @@ namespace OurWordSetup.Data
                 string sOutputFolder;
                 switch (sBasePart)
                 {
-                    case DestinationLocalApps:
-                        sOutputFolder = Path.Combine(
-                            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                            "OurWord");
+                    case c_sDestinationLocalApps:
+                        sOutputFolder = SetupManager.ApplicationsFolder;
                         break;
-                    case DestinationMyDocuments:
+                    case c_sDestinationMyDocuments:
                         sOutputFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                         break;
-                    case DestinationLanguageData:
+                    case c_sDestinationLanguageData:
+                        // Must be the same as in ClusterListView.cs
                         sOutputFolder = Path.Combine(
-                           Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                           Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                            "Language Data");
                         break;
-                    case DestinationTestFolder:
+                    case c_sDestinationTestFolder:
                         sOutputFolder = Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                             "ziptest");
@@ -143,23 +143,24 @@ namespace OurWordSetup.Data
 
             var sFolder = Path.GetDirectoryName(ZipPath);
 
-            var vs = new List<string>();
-            foreach(var s in vsFileNames)
-                vs.Add(Path.Combine(sFolder, s));
-            return vs;
+            return vsFileNames.Select(s => Path.Combine(sFolder, s)).ToList();
         }
         #endregion
         #region Method: void Extract()
         public void Extract()
         {
-            var sOutputFolder = OutputFolder;
-
+            Extract(OutputFolder);
+        }
+        #endregion
+        #region Method: void Extract(sOutputFolder)
+        public void Extract(string sOutputFolder)
+        {
             var zipInput = new ZipInputStream(File.OpenRead(ZipPath));
 
             ZipEntry item;
             while ((item = zipInput.GetNextEntry()) != null)
             {
-                if (!item.IsFile || string.IsNullOrEmpty(item.Name)) 
+                if (!item.IsFile || string.IsNullOrEmpty(item.Name))
                     continue;
 
                 // Convert the Unix forward slash to whatever our OS wants
@@ -187,6 +188,8 @@ namespace OurWordSetup.Data
             zipInput.Close();
         }
         #endregion
+
+
         #region Method: string MakeUnixRelativePath(string sRootPath, string sTargetPath)
         static public string MakeUnixRelativePath(string sRootPath, string sTargetPath)
         {
@@ -199,7 +202,7 @@ namespace OurWordSetup.Data
         }
         #endregion
         #region Method: void Create(string sRootPath, List<string> vsFullPaths)
-        public void Create(string sRootPath, List<string> vsFullPaths)
+        public void Create(string sRootPath, IEnumerable<string> vsFullPaths)
         {
             var buffer = new byte[4096];
             using (var zipOutput = new ZipOutputStream(File.Create(ZipPath)))
@@ -229,13 +232,7 @@ namespace OurWordSetup.Data
             var vsOurPaths = GetFullPathNames();
             var vsSupersetPaths = zipSuperset.GetFullPathNames();
 
-            var vs = new List<string>();
-            foreach (var s in vsSupersetPaths)
-            {
-                if (!vsOurPaths.Contains(s))
-                    vs.Add(s);
-            }
-            return vs;
+            return vsSupersetPaths.Where(s => !vsOurPaths.Contains(s)).ToList();
         }
         #endregion
     }

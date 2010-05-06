@@ -1130,7 +1130,7 @@ namespace JWTools
                 return m_Strings;
             }
         }
-        LocGroup m_Strings = null;
+        LocGroup m_Strings;
         #endregion      
         #region Attr{g}: LocGroup Menus - the Group that contains the menus
         LocGroup Menus
@@ -1190,7 +1190,7 @@ namespace JWTools
                 return m_vLanguages;
             }
         }
-        LocLanguage[] m_vLanguages = null;
+        LocLanguage[] m_vLanguages;
         #endregion
         #region Method: LocLanguage FindLanguage(sID)
         public LocLanguage FindLanguage(string sID)
@@ -1299,7 +1299,7 @@ namespace JWTools
                 m_langPrimary = value;
             }
         }
-        LocLanguage m_langPrimary = null;
+        LocLanguage m_langPrimary;
         #endregion
         #region Attr{g/s}: LocLanguage SecondaryLanguage
         public LocLanguage SecondaryLanguage
@@ -1314,7 +1314,7 @@ namespace JWTools
             }
 
         }
-        LocLanguage m_langSecondary = null;
+        LocLanguage m_langSecondary;
         #endregion
         #region VAttr{g}: bool PrimaryIsEnglish
         public bool PrimaryIsEnglish
@@ -1558,11 +1558,11 @@ namespace JWTools
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region SMethod: void Initialize(string sPathApplicationFolder)
-        static public void Initialize(string sPathApplicationFolder)
+        #region SMethod: void Initialize(string sFolderContainingLocalizationFiles)
+        static public void Initialize(string sFolderContainingLocalizationFiles)
         {
             if (null == s_LocDB)
-                s_LocDB = new LocDB(sPathApplicationFolder);
+                s_LocDB = new LocDB(sFolderContainingLocalizationFiles);
             Debug.Assert(null != s_LocDB);
         }
         #endregion
@@ -1577,20 +1577,20 @@ namespace JWTools
         }
         static private LocDB s_LocDB;
         #endregion
-        #region private Constructor(sPathApplicationFolder) - do not call (called by the Initialize Method above
-        private LocDB(string sPathApplicationFolder)
+        #region private Constructor(sFolderContainingLocalizationFiles) - do not call (called by the Initialize Method above
+        private LocDB(string sFolderContainingLocalizationFiles)
         {
             // Initialize the vectors
             m_vGroups = new LocGroup[0];
             m_vLanguages = new LocLanguage[0];
 
             // Folder containing the localization data
-            s_sDataFolder = sPathApplicationFolder + Path.DirectorySeparatorChar + "Loc";
-            if (!Directory.Exists(DataFolder))
-                Directory.CreateDirectory(DataFolder);
+            if (!Directory.Exists(sFolderContainingLocalizationFiles))
+                Directory.CreateDirectory(sFolderContainingLocalizationFiles);
 
             // The main localization file
-            s_sBasePath = DataFolder + Path.DirectorySeparatorChar + "OurWordLocalization.xml";
+            s_sDataFolder = sFolderContainingLocalizationFiles;
+            s_sBasePath = Path.Combine(DataFolder, "OurWordLocalization.xml");
 
             // Read in the file
             ReadXML();

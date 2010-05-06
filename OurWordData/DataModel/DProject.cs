@@ -368,8 +368,8 @@ namespace OurWordData.DataModel
 						// Retrieve the books. They will either come back as loaded, or as
 						// null (in which case, GetLoadedBook will have removed them from
 						// the translation.
-                        DBook bFront = GetLoadedBook(TFront, sBookAbbrev, progress);
-                        DBook bTarget = GetLoadedBook(TTarget, sBookAbbrev, progress);
+                        var bFront = GetLoadedBook(TFront, sBookAbbrev, progress);
+                        var bTarget = GetLoadedBook(TTarget, sBookAbbrev, progress);
 
 						// Make sure we got loaded books
 						if (null == bFront || null == bTarget)
@@ -747,7 +747,53 @@ namespace OurWordData.DataModel
 		Navigation m_Nav = null;
 		#endregion
 
-		// Scaffolding -----------------------------------------------------------------------
+        private const string c_sLastProjectOpened = "LastProjectOpened";
+        private const string c_sSampleProjectCluster = "OurWordSample";
+        private const string c_sSampleProjectName = "English";
+        #region SMethod: void LoadSampleProject()
+        static public void LoadSampleProject()
+        {
+            var clusterInfo = ClusterList.FindClusterInfo(c_sSampleProjectCluster);
+            if (null == clusterInfo)
+                return;
+
+            var sPath = clusterInfo.GetProjectPath(c_sSampleProjectName);
+            if (string.IsNullOrEmpty(sPath) || !File.Exists(sPath))
+                return;
+
+            DB.Project = new DProject();
+            DB.Project.LoadFromFile(ref sPath, null);
+        }
+        #endregion
+        #region SMethod: bool LoadMostRecentProject(IProgressIndicator progress)
+        static public bool LoadMostRecentProject(IProgressIndicator progress)
+        {
+            var sPath = JW_Registry.GetValue(c_sLastProjectOpened, "");
+            if (string.IsNullOrEmpty(sPath) || !File.Exists(sPath))
+                return false;
+
+            DB.Project = new DProject();
+            DB.Project.LoadFromFile(ref sPath, null);
+
+            // Restore to where we last were.
+            DB.Project.Nav.RetrievePositionFromRegistry(progress);
+
+            return true;
+        }
+        #endregion
+        #region SMethod: void SaveMostRecentRegistryInfo()
+        public void SaveMostRecentRegistryInfo()
+        {
+            // Review: This was left over from some time ago, do we really need this test anymore?
+            if (string.IsNullOrEmpty(StoragePath))
+                return;
+
+            JW_Registry.SetValue(c_sLastProjectOpened, StoragePath);
+            Nav.SavePositionToRegistry();
+        }
+        #endregion
+
+        // Scaffolding -----------------------------------------------------------------------
 		#region Constructor()
 		public DProject()
 			: base()
@@ -755,9 +801,8 @@ namespace OurWordData.DataModel
 			m_Nav = new Navigation(this);
 
             // Team Settings
-            j_oTeamSettings = new JOwn<DTeamSettings>("Team", this);
-            j_oTeamSettings.Value = new DTeamSettings();
-            TeamSettings.New();
+            j_oTeamSettings = new JOwn<DTeamSettings>("Team", this) {Value = new DTeamSettings()};
+		    TeamSettings.New();
 
 			// Owning Attrs
             m_FrontTranslation = new JOwn<DTranslation>("Front", this);

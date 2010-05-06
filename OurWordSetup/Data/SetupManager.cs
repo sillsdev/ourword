@@ -24,11 +24,11 @@ namespace OurWordSetup.Data
     public class SetupManager
     {
         // Locations and Files ---------------------------------------------------------------
-        public const string c_sRemoteWebSite = "http://ourword.TheSeedCompany.org/Install/";
+        public const string c_sRemoteWebSite = "http://ourwordsoftware.org/Download/Program/";
         public const string c_sOurWordSetupFileName = "SetupOurWord.exe";
         public const string c_sOurWordApplication = "OurWord.exe";
         #region SVattr{g}: string ApplicationsFolder
-        private static string ApplicationsFolder
+        public static string ApplicationsFolder
         {
             get
             {
@@ -58,7 +58,7 @@ namespace OurWordSetup.Data
         #endregion
 
         // Attrs -----------------------------------------------------------------------------
-        public bool InformUserIfThereWereNoUpdates { private get; set; }
+        private bool InformUserIfThereWereNoUpdates { get; set; }
         #region Attr{g}: Form ParentWindow
         Form ParentWindow
         {
@@ -107,8 +107,19 @@ namespace OurWordSetup.Data
                 Manifest.ManifestFileName));
         }
         #endregion
-        #region Method: bool CheckForUpdates()
-        public bool CheckForUpdates()
+        #region SMethod: bool CheckForUpdates(parentForm)
+        static public bool CheckForUpdates(Form parentForm, bool bInformUserIfThereWereNoUpdates)
+            // Entry point called from OurWord
+        {
+            var manager = new SetupManager(parentForm) 
+            { 
+                InformUserIfThereWereNoUpdates = bInformUserIfThereWereNoUpdates 
+            };
+            return manager.DoCheckForUpdates();
+        }
+        #endregion
+        #region Method: bool DoCheckForUpdates()
+        private bool DoCheckForUpdates()
             // Returns true if we're launching the external updater (and thus are shutting down),
             // as the caller may need to abort further processing. (See Synchronize for example)
         {
@@ -210,20 +221,27 @@ namespace OurWordSetup.Data
             };
             #endregion
 
-            // Check for prerequisites, give instructions for anything missing
-
-            // We need the Manifest in order to know what to download
-            if (!CheckInternetAccessAndDownloadManifest(ui))
-                return;
-
             // Clear out the App folder completely
             InitializeEmptyApplicationsFolder();
 
-            // Download all of the files
-            var downloader = new DlgDownloader(RemoteManifest) 
-                { PleaseWaitMessage = ui.PleaseWaitWhileDownloading };
-            if (DialogResult.Abort == downloader.ShowDialog(ParentWindow))
-                return;
+            // If we have an appropriately named zip file available, then we can bypass
+            // downloading from the Internet
+            if (ExpandZipIntoDownloadFolder())
+            {
+                RemoteManifest.ReadFile();
+            }
+            else
+            {
+                // We need the Manifest in order to know what to download
+                if (!CheckInternetAccessAndDownloadManifest(ui))
+                    return;
+
+                // Download all of the files
+                var downloader = new DlgDownloader(RemoteManifest) 
+                    { PleaseWaitMessage = ui.PleaseWaitWhileDownloading };
+                if (DialogResult.Abort == downloader.ShowDialog(ParentWindow))
+                    return;
+            }
 
             // Place them in the App folder
             InstallDownloadedFiles();
@@ -416,6 +434,39 @@ namespace OurWordSetup.Data
         }
         #endregion
 
+        // FullSetup Work Methods ------------------------------------------------------------
+        #region Method: void InitializeEmptyApplicationsFolder()
+        static void InitializeEmptyApplicationsFolder()
+        {
+            if (Directory.Exists(ApplicationsFolder))
+                Directory.Delete(ApplicationsFolder, true);
+
+            Directory.CreateDirectory(ApplicationsFolder);
+
+            if (!Directory.Exists(DownloadFolder))
+                Directory.CreateDirectory(DownloadFolder);
+
+            return;
+        }
+        #endregion
+
+        static bool ExpandZipIntoDownloadFolder()
+        {
+            // Check for an appropriately named zip file in this SetupManager's folder
+            var sSetupAssemblyPath = Assembly.GetAssembly(typeof(SetupManager)).Location;
+            var sSetupAssemblyFolder = Path.GetDirectoryName(sSetupAssemblyPath);
+            var sZipPath = Path.Combine(sSetupAssemblyFolder, Manifest.AllFilesZipFileName);
+            if (!File.Exists(sZipPath))
+                return false;
+
+            // Extract to the Downloads folder
+            var zip = new Zip(sZipPath);
+            zip.Extract(DownloadFolder);
+
+            return true;
+        }
+
+
         // Common Helper Methods -------------------------------------------------------------
         #region Method: void DisplayMessage(parentWnd, sErrorText)
         static public void DisplayMessage(Form parent, string sErrorText)
@@ -455,15 +506,6 @@ namespace OurWordSetup.Data
             }
         }
         #endregion
-        #region Method: void InitializeEmptyApplicationsFolder()
-        static void InitializeEmptyApplicationsFolder()
-        {
-            if (Directory.Exists(ApplicationsFolder))
-                Directory.Delete(ApplicationsFolder, true);
-            Directory.CreateDirectory(ApplicationsFolder);
-            return;
-        }
-        #endregion
         #region struct CommonUserInterfaceStrings
         struct CommonUserInterfaceStrings
         {
@@ -489,8 +531,8 @@ namespace OurWordSetup.Data
             DlgCheckingForUpdates.SetStatusText(ui.CheckingInternetAccessStatus);
             if (!PingForLiveInternetConnection())
             {
-                DisplayMessage(ParentWindow, ui.NoInternetConnectionErrorMessage);
                 DlgCheckingForUpdates.Stop();
+                DisplayMessage(ParentWindow, ui.NoInternetConnectionErrorMessage);
                 return false;
             }
 
@@ -498,16 +540,16 @@ namespace OurWordSetup.Data
             DlgCheckingForUpdates.SetStatusText(ui.DownloadingManifestStatus);
             if (!DownloadRemoteManifestFile())
             {
-                DisplayMessage(ParentWindow, ui.CantDownloadManifestErrorMessage);
                 DlgCheckingForUpdates.Stop();
+                DisplayMessage(ParentWindow, ui.CantDownloadManifestErrorMessage);
                 return false;
             }
 
             // Abort if the Remote Manifest file cannot parsed
             if (!ReadRemoteManifestFile())
             {
-                DisplayMessage(ParentWindow, ui.CantReadManifestFileErrorMessage);
                 DlgCheckingForUpdates.Stop();
+                DisplayMessage(ParentWindow, ui.CantReadManifestFileErrorMessage);
                 return false;
             }
 
@@ -541,14 +583,17 @@ namespace OurWordSetup.Data
 
                 // Make sure we actually download a file, rather than mistakenly
                 // using a stale one.
-                if (!File.Exists(RemoteManifest.FilePath))
+                if (File.Exists(RemoteManifest.FilePath))
                     File.Delete(RemoteManifest.FilePath);
 
                 var web = new WebClient();
                 web.DownloadFile(sRemoteUrl, RemoteManifest.FilePath);
                 return true;
             }
-            catch {}
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             return false;
         }
         #endregion

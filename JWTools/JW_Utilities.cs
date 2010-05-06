@@ -336,7 +336,7 @@ namespace JWTools
         #region SMethod: string GetSpecialFolder(Environment.SpecialFolder, sSubFolder)
         static public string GetSpecialFolder(Environment.SpecialFolder special, string sSubFolder)
         {
-            string sFolder = Environment.GetFolderPath(special);
+            var sFolder = Environment.GetFolderPath(special);
 
             if (sFolder[sFolder.Length - 1] != Path.DirectorySeparatorChar)
                 sFolder += Path.DirectorySeparatorChar;
@@ -650,21 +650,21 @@ namespace JWTools
 			if (!File.Exists(sPathName))
 			{
 				// Tell the user, and see if he wants to browse for it
-				string sMessage = "Unable to locate file \n\"" + sPathName +
+				var sMessage = "Unable to locate file \n\"" + sPathName +
 					".\" \n\nDo you want to browse for it?";
-				DialogResult result = MessageBox.Show( Form.ActiveForm, sMessage, 
+				var result = MessageBox.Show( Form.ActiveForm, sMessage, 
 					"File Not Found", MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 				if (result != DialogResult.Yes)
 					throw new IOException("Unable to locate file" + sPathName);
 
 				// Browse for the file
-				OpenFileDialog dlg = new OpenFileDialog();
+				var dlg = new OpenFileDialog();
 
 				// We only want to return a single file
 				dlg.Multiselect = false;
 
 				// Filter on the desired type of files
-				if (null != sFileFilter && sFileFilter.Length > 0)
+				if (!string.IsNullOrEmpty(sFileFilter))
 				{
 					dlg.Filter = sFileFilter;
 					dlg.FilterIndex = 0;

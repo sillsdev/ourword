@@ -22,19 +22,13 @@ namespace OurWordSetup.Data
     {
         // Identifying attributes ------------------------------------------------------------
         public string Filename { get; set; }
-        public string Destination { get; set; }
         public long Length { get; set; }
         public string Hash { get; set; }
-
-        // Possible Destinations -------------------------------------------------------------
-        public const string c_sAppFolder = "{app}";
-        public const string c_sMhDocumentsFolder = "{docs}";
 
         // I/O -------------------------------------------------------------------------------
         #region I/O Constants
         private const string c_sTag = "Item";
         private const string c_sAttrFilename = "filename";
-        private const string c_sAttrDestination = "destination";
         private const string c_sAttrLength = "length";
         private const string c_sAttrHash = "hash";
         #endregion
@@ -44,7 +38,6 @@ namespace OurWordSetup.Data
             var node = doc.AddNode(nodeParent, c_sTag);
 
             doc.AddAttr(node, c_sAttrFilename, Filename);
-            doc.AddAttr(node, c_sAttrDestination, Destination);
             doc.AddAttr(node, c_sAttrLength, Length);
             doc.AddAttr(node, c_sAttrHash, Hash);
 
@@ -60,7 +53,6 @@ namespace OurWordSetup.Data
             var item = new ManifestItem
                 {
                     Filename = XDoc.GetAttrValue(node, c_sAttrFilename, ""),
-                    Destination = XDoc.GetAttrValue(node, c_sAttrDestination, c_sAppFolder),
                     Length = XDoc.GetAttrValue(node, c_sAttrLength, 0L),
                     Hash = XDoc.GetAttrValue(node, c_sAttrHash, "")
                 };
@@ -82,7 +74,7 @@ namespace OurWordSetup.Data
             {
                 return new Version(Major, Minor, Build);
             }
-            set
+            private set
             {
                 Major = value.Major;
                 Minor = value.Minor;
@@ -93,6 +85,7 @@ namespace OurWordSetup.Data
 
         // Scaffolding ----------------------------------------------------------------------
         public const string ManifestFileName = "OurWordManifest.xml";
+        public const string AllFilesZipFileName = "OurWordSetupFiles.zip";
         #region Constructor(sFilePath)
         public Manifest(string sFilePath)
         {
@@ -111,7 +104,7 @@ namespace OurWordSetup.Data
                 return m_sFilePath;
             }
         }
-        private string m_sFilePath;
+        private readonly string m_sFilePath;
         #endregion
         #region I/O Constants
         private const string c_sTag = "Manifest";
@@ -120,7 +113,7 @@ namespace OurWordSetup.Data
         private const string c_sBuild = "build";
         #endregion
         #region Method: void Save()
-        public void Save()
+        protected void Save()
         {
             var doc = new XDoc(FilePath);
 
@@ -155,7 +148,7 @@ namespace OurWordSetup.Data
         }
         #endregion
         #region Method: void ReadXml(sXmlData)
-        public void ReadXml(string sXmlData)
+        private void ReadXml(string sXmlData)
         {
             var doc = new XmlDocument();
             doc.LoadXml(sXmlData);
@@ -195,10 +188,59 @@ namespace OurWordSetup.Data
             return null;
         }
         #endregion
+        #region Method: List<string> GetStaleFiles(Manifest obsoleteLocalManifest)
+        public List<string> GetStaleFiles(Manifest obsoleteLocalManifest)
+            // Intended to be called as "Remote.GetObsoleteFiles(Local)", meaning
+            // that we're seeing what files in the local install are obsolete.
+        {
+            var vsObsoleteFileNames = new List<string>();
+
+            // Get a list of all Items in the obsolete manifest that are not in ours;
+            // these are the ones we'll want to delete during the install process
+            foreach (var localItem in obsoleteLocalManifest)
+            {
+                // A file is obsolete if it exists in local (obsolete) but does not
+                // exist in ours (the remote, newly downloaded, manifest)
+                if (ContainsFile(localItem.Filename))
+                {
+                    // But if it is a zip file, we need to check the internal files
+                    // for any that might be obsolete. (We only check if we downloaded
+                    // a new version of it.)
+                    if (Zip.IsZipFile(localItem.Filename))
+                    {
+                        var sLocalZipPath = localItem.Filename;
+                        var sRemoteZipPath = Find(localItem.Filename).Filename;
+                        if (File.Exists(sRemoteZipPath))
+                        {
+                            var zipLocal = new Zip(sLocalZipPath);
+                            var zipRemote = new Zip(sRemoteZipPath);
+                            var vsObsoletePathsFromZip = zipRemote.GetFullPathNamesOfAdditionalFiles(zipLocal);
+                            vsObsoleteFileNames.AddRange(vsObsoletePathsFromZip);
+                        }
+                    }
+
+                    continue;
+                }
+
+                var sPath = Path.Combine(obsoleteLocalManifest.FilePath, localItem.Filename);
+                vsObsoleteFileNames.Add(sPath);
+
+                // If any of the obsolete items are zip files, then we need to add all of
+                // the files that were installed from it
+                if (Zip.IsZipFile(sPath))
+                {
+                    var zip = new Zip(sPath);
+                    vsObsoleteFileNames.AddRange(zip.GetFullPathNames());
+                }
+            }
+
+            return vsObsoleteFileNames;
+        }
+        #endregion
 
         // Generate Manifest -----------------------------------------------------------------
-        #region SMethod: void BuildFromFolderContents(string sFolder)
-        public static void BuildFromFolderContents(string sFolder)
+        #region SMethod: Manifest BuildFromFolderContents(string sFolder)
+        public static Manifest BuildFromFolderContents(string sFolder)
         {
             var sManifestPath = Path.Combine(sFolder, ManifestFileName);
 
@@ -213,14 +255,17 @@ namespace OurWordSetup.Data
             var vsFilePaths = Directory.GetFiles(sFolder);
             foreach (var sFilePath in vsFilePaths)
             {
+                // Skip the AllFilesZip if present; we don't want it in the manifest
+                if (sFilePath.Contains(AllFilesZipFileName))
+                    continue;
+
                 var info = new FileInfo(sFilePath);
 
-                var item = new ManifestItem() 
+                var item = new ManifestItem
                 {
                     Filename = Path.GetFileName(sFilePath),
-                    Destination = ManifestItem.c_sAppFolder,
                     Length = info.Length,
-                    Hash = ComputeHash(sFilePath)
+                    Hash = ComputeHashForFileContents(sFilePath)
                 };
 
                 manifest.Add(item);
@@ -241,10 +286,12 @@ namespace OurWordSetup.Data
             }
         
             manifest.Save();
+
+            return manifest;
         }
         #endregion
-        #region SMethod: string ComputeHash(string sPath)
-        static public string ComputeHash(string sPath)
+        #region SMethod: string ComputeHashForFileContents(string sPath)
+        protected static string ComputeHashForFileContents(string sPath)
         {
             try
             {
@@ -254,6 +301,7 @@ namespace OurWordSetup.Data
                 var hash = hasher.ComputeHash(reader.BaseStream);
 
                 reader.Close();
+                reader.Dispose();
 
                 // Convert bytes to hex
                 var s = "";
@@ -269,52 +317,30 @@ namespace OurWordSetup.Data
         }
         #endregion
 
-
-
-        public List<string> GetStaleFiles(Manifest obsoleteLocalManifest)
-            // Intended to be called as "Remote.GetObsoleteFiles(Local)", meaning
-            // that we're seeing what files in the local install are obsolete.
+        public void BuildZipOfAllManifestFiles()
         {
-            var vsObsoleteFileNames = new List<string>();
+            var sContainingFolder = Path.GetDirectoryName(FilePath);
+            var sZipPath = Path.Combine(sContainingFolder, AllFilesZipFileName);
 
-            // Get a list of all Items in the obsolete manifest that are not in ours;
-            // these are the ones we'll want to delete during the install process
-            foreach (var localItem in obsoleteLocalManifest)
+            if (File.Exists(sZipPath))
+                File.Delete(sZipPath);
+
+            var vsPaths = new List<string>();
+
+            // Add the manifest
+            vsPaths.Add(FilePath);
+
+            // Add the files within the manifest
+            foreach (var item in this)
             {
-                // A file is obsolete if it exists in local (obsolete) but does not
-                // exist in ours (the remote manifest)
-                if (ContainsFile(localItem.Filename))
-                {
-                    // But if it is a zip file, we need to check the internal files
-                    // for any that might be obsolete
-                    if (Zip.IsZipFile(localItem.Filename))
-                    {
-                        var sLocalZipPath = localItem.Filename;
-                        var sRemoteZipPath = Find(localItem.Filename).Filename;
-                        var zipLocal = new Zip(sLocalZipPath);
-                        var zipRemote = new Zip(sRemoteZipPath);
-                        var vsObsoletePathsFromZip = zipRemote.GetFullPathNamesOfAdditionalFiles(zipLocal);
-                        vsObsoleteFileNames.AddRange(vsObsoletePathsFromZip);
-                    }
-
-                    continue;
-                }
-
-                var sPath = Path.Combine(FilePath, localItem.Filename);
-                vsObsoleteFileNames.Add(sPath);
-
-                // If any of the obsolete items are zip files, then we need to add all of
-                // the files that were installed from it
-                if (Zip.IsZipFile(sPath))
-                {
-                    var zip = new Zip(sPath);
-                    vsObsoleteFileNames.AddRange(zip.GetFullPathNames());
-                }
+                var sPath = Path.Combine(sContainingFolder, item.Filename);
+                vsPaths.Add(sPath);
             }
 
-            return vsObsoleteFileNames;
+            // Create the zip file
+            var zip = new Zip(sZipPath);
+            zip.Create(sContainingFolder, vsPaths);
         }
-
 
     }
 }

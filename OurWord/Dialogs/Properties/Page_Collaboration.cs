@@ -61,7 +61,7 @@ namespace OurWord.Dialogs
                 "probably want to know.");
 
             // Need to install mercurial
-            if (!Repository.CheckMercialIsInstalled())
+            if (!Repository.CheckMercurialIsInstalled())
             {
                 LS.AddInformation("co200", StyleSheet.LiterateAttention,
                     "Note: OurWord has detected that Mercurial is not installed on this computer. " +

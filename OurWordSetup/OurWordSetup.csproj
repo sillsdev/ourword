@@ -15,6 +15,8 @@
     <StartupObject>OurWordSetup.Program</StartupObject>
     <TargetFrameworkSubset>
     </TargetFrameworkSubset>
+    <ApplicationManifest>OurWordSetup.manifest</ApplicationManifest>
+    <ApplicationIcon>Res\Install.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +85,7 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <None Include="app.config" />
+    <None Include="OurWordSetup.manifest" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -111,6 +114,9 @@
     <Compile Include="UI\DlgFullSetup.Designer.cs">
       <DependentUpon>DlgFullSetup.cs</DependentUpon>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Res\Install.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

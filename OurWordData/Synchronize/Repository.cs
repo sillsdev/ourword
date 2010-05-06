@@ -1,18 +1,24 @@
-﻿#region Using
+﻿#region ***** Respository.cs *****
+/**********************************************************************************************
+ * Project: Our Word!
+ * File:    Repository.cs
+ * Author:  John Wimbish
+ * Created: 27 Oct 2009
+ * Purpose: Mercurial repositories of various types
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
+ *********************************************************************************************/
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Net.NetworkInformation;
-using System.Reflection;
 using System.Threading;
 using Chorus.sync;
 using Chorus.VcsDrivers;
 using JWTools;
 using Chorus.Utilities;
 using Chorus.VcsDrivers.Mercurial;
-using OurWordData.DataModel;
 
 #endregion
 
@@ -85,14 +91,17 @@ namespace OurWordData.Synchronize
         #region Method: ExecutionResult DoCommand(commandLine)
         public ExecutionResult DoCommand(string commandLine)
         {
-            const int cSecondsBeforeTimeout = 60*60;
+            const int c_cSecondsBeforeTimeout = 60*60;
 
-            var result = HgRunner.Run(commandLine,
-                FullPathToRepositoryRoot,
-                cSecondsBeforeTimeout, 
-                new Chorus.Utilities.NullProgress());
+            using (new ShortTermMercurialEnvironment())
+            {
+                var result = HgRunner.Run(commandLine,
+                    FullPathToRepositoryRoot,
+                    c_cSecondsBeforeTimeout, 
+                    new Chorus.Utilities.NullProgress());
 
-            return result;
+                return result;
+            }
         }
         #endregion
         #region Method: ExecutionResult CommitChangedFiles(user, message)
@@ -176,21 +185,27 @@ namespace OurWordData.Synchronize
             return DoCommand(pushCommand);
         }
         #endregion
-        #region SMethod: bool CheckMercialIsInstalled()
-        static public bool CheckMercialIsInstalled()
+        #region SMethod: bool CheckMercurialIsInstalled()
+        static public bool CheckMercurialIsInstalled()
         {
-            // The Chorus routine calls "Hg version" and returns null if successful;
-            // returns a string with a message otherwise.
-            var notInstalledMessage = HgRepository.GetEnvironmentReadinessMessage("en");
-            return (string.IsNullOrEmpty(notInstalledMessage));
+            using (new ShortTermMercurialEnvironment())
+            {
+                // The Chorus routine calls "Hg version" and returns null if successful;
+                // returns a string with a message otherwise.
+                var notInstalledMessage = HgRepository.GetEnvironmentReadinessMessage("en");
+                return (string.IsNullOrEmpty(notInstalledMessage));
+            }
         }
         #endregion
         #region Method: bool GetFileExistsInRepo(string pathFromRoot)
         public bool GetFileExistsInRepo(string pathFromRoot)
         {
-            var repo = new HgRepository(FullPathToRepositoryRoot, 
-                new Chorus.Utilities.NullProgress());
-            return repo.GetFileExistsInRepo(pathFromRoot);
+            using (new ShortTermMercurialEnvironment())
+            {
+                var repo = new HgRepository(FullPathToRepositoryRoot,
+                                            new Chorus.Utilities.NullProgress());
+                return repo.GetFileExistsInRepo(pathFromRoot);
+            }
         }
         #endregion
         #region Method: ExecutionResult Clone(string sourceRepoRoot, string destinationRepoRoot)
@@ -587,6 +602,16 @@ namespace OurWordData.Synchronize
             DoCommand("rollback");
         }
         #endregion
+        #region List<Revision> GetHeads()
+        public List<Revision> GetHeads()
+        {
+            using (new ShortTermMercurialEnvironment())
+            {
+                return (new HgRepository(FullPathToRepositoryRoot, 
+                    new Chorus.Utilities.NullProgress()).GetHeads());
+            }
+        }
+        #endregion
 
         // Repository Version ----------------------------------------------------------------
         private const string c_sVersionTag = "OurWordVersion";
@@ -734,6 +759,7 @@ namespace OurWordData.Synchronize
         private const string c_registryUserName = "RemoteUserName";
         private const string c_registryPassword = "RemotePassword";
         private const string c_registryServer = "RemoteServer";
+        public const string c_sDefaultServer = "hg-public.languagedepot.org";
         #region SAttr{g/s}: string UserName
         public string UserName
         {
@@ -765,8 +791,8 @@ namespace OurWordData.Synchronize
         {
             get
             {
-                return JW_Registry.GetValue(RegistryClusterSubKey, c_registryServer, 
-                    "hg-public.languagedepot.org");
+                return JW_Registry.GetValue(RegistryClusterSubKey, c_registryServer,
+                    c_sDefaultServer);
             }
             set
             {
@@ -862,7 +888,7 @@ namespace OurWordData.Synchronize
         #region SMethod: void ThrowIfNoMercurial()
         static void ThrowIfNoMercurial()
         {
-            if (!Repository.CheckMercialIsInstalled())
+            if (!Repository.CheckMercurialIsInstalled())
             {
                 throw new SynchException("msgNoMercurial",
                     "The external program Mercurial did not respond.\n\n" +

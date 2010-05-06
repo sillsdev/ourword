@@ -68,7 +68,8 @@ namespace OurWordSetup
                 case c_sActionGenerateManifest:
                     {
                         // Build a manifest file from the files in the indicated folder
-                        Manifest.BuildFromFolderContents(sGenerateManifestInFolder);
+                        var manifest = Manifest.BuildFromFolderContents(sGenerateManifestInFolder);
+                        manifest.BuildZipOfAllManifestFiles();
                     }
                     return;
 

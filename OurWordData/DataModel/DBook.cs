@@ -2431,7 +2431,7 @@ namespace OurWordData.DataModel
 
             // Initializations (dependencies we should get rid of someday)
             JW_Registry.RootKey = "SOFTWARE\\The Seed Company\\Our Word!";
-            LocDB.Initialize(JWU.GetApplicationDataFolder("OurWord"));
+            LocDB.Initialize(Loc.FolderOfLocFiles);
 
             // Create an owning project, because currently stuff depends on having it
             DB.Project = new DProject("Merge") {TeamSettings = new DTeamSettings("Merge")};

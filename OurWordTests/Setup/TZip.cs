@@ -155,7 +155,7 @@ namespace OurWordTests.Setup
         [Test] public void TOutputFolder()
         {
             var sApplicationFolder = Environment.GetFolderPath(
-                Environment.SpecialFolder.ApplicationData);
+                Environment.SpecialFolder.LocalApplicationData);
             var sOurWordInstallFolder = Path.Combine(sApplicationFolder, "OurWord");
 
             // We expect ...\Local\OurWord\Loc\

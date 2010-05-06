@@ -71,17 +71,9 @@ namespace OurWordTests.Utilities
             //   And yet, if the test fails, it means the underlying Chorus that
             // the method is calling has changed in how it operates.
         {
-            // As a developer's machine, I expect Mercurial to be isntalled
-            Assert.IsTrue( CheckMercialIsInstalled(), 
+            // As a developer's machine, I expect Mercurial to be installed
+            Assert.IsTrue( CheckMercurialIsInstalled(), 
                 "Hg should be installed");
-
-            // If we remove the Path environment variable, the ability to run Hg
-            // should fail, thus simulating a not-installed situation.
-            using (new ShortTermEnvironmentalVariable("Path", ""))
-            {
-                Assert.IsFalse( CheckMercialIsInstalled(),
-                    "Hg should seem to not be installed");
-            }
         }
         #endregion
         #region Test: TGetChangedFiles
@@ -634,7 +626,7 @@ namespace OurWordTests.Utilities
         [Test] public void TestRollbackUponMergeFailure()
         {
             TestFolder.CreateEmpty();
-            const string filename = "01 GEN - Pura.MustFail.oxes";
+            const string c_filename = "01 GEN - Pura.MustFail.oxes";
 
             // Create a original repository
             var folderLocal = TestFolder.CreateEmptySubFolder("original");
@@ -643,7 +635,7 @@ namespace OurWordTests.Utilities
             repoLocal.CreateIfDoesntExist();
 
             // Add a test file to it
-            var fileLocal = new TestFile(folderLocal, filename);
+            var fileLocal = new TestFile(folderLocal, c_filename);
             fileLocal.CreateAndWrite("");
             repoLocal.CommitChangedFiles("jsw", "Created PuraGEN");
 
@@ -657,7 +649,7 @@ namespace OurWordTests.Utilities
             fileLocal.CreateAndWrite("one");
 
             // Change the "other" to "two" and commit it so that it will pull
-            var fileOther = new TestFile(folderOther, filename);
+            var fileOther = new TestFile(folderOther, c_filename);
             fileOther.CreateAndWrite("two");
             repoOther.CommitChangedFiles("jsw", "Changed PuraGEN");
 
@@ -674,7 +666,7 @@ namespace OurWordTests.Utilities
             Assert.AreEqual("one", vsContents[0]);
 
             // There should be exactly one head in the repository
-            var heads = (new HgRepository(folderLocal, new NullProgress()).GetHeads());
+            var heads = repoLocal.GetHeads();
             Assert.AreEqual(1, heads.Count);
 
             // Now change our local file to "one++"
@@ -690,7 +682,7 @@ namespace OurWordTests.Utilities
             Assert.AreEqual("one++", vsContents[0]);
 
             // There should be exactly one head in the repository
-            heads = (new HgRepository(folderLocal, new NullProgress()).GetHeads());
+            heads = repoLocal.GetHeads();
             Assert.AreEqual(1, heads.Count);
 
             // Cleannup

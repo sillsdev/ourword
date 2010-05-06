@@ -198,6 +198,7 @@
       <DependentUpon>ReportMergeErrorDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Synchronize\SendMergeProblemEmail.cs" />
+    <Compile Include="Synchronize\ShortTermMercurialEnvironment.cs" />
     <Compile Include="Tools\Diff.cs" />
     <Compile Include="Tools\Progress.cs" />
     <Compile Include="Tools\StringMerger.cs" />

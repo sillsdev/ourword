@@ -19,7 +19,7 @@ using System.Reflection;
 [assembly: AssemblyCulture("")]
 
 // IMPORTANT: Make sure we have the right year here
-[assembly: AssemblyCopyright("© 2004-09, John S. Wimbish")]
+[assembly: AssemblyCopyright("© 2004-10, John S. Wimbish")]
 
 // Version information consists of the following four values:
 //    Major Version - E.g., major functionality has been added
