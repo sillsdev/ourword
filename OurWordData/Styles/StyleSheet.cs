@@ -570,18 +570,27 @@ namespace OurWordData.Styles
         }
         static private List<WritingSystem> s_WritingSystems;
         #endregion
-        #region SMethod: WritingSystem FindOrCreate(sWritingSystemName)
-        static public WritingSystem FindOrCreate(string sWritingSystemName)
+        #region SMethod: WritingSystem FindWritingSystem(sWritingSystemName)
+        static WritingSystem FindWritingSystem(string sWritingSystemName)
         {
-            // Return it if it is already in the list
-            foreach(var ws in WritingSystems)
+            foreach (var ws in WritingSystems)
             {
                 if (ws.Name == sWritingSystemName)
                     return ws;
             }
+            return null;
+        }
+        #endregion
+        #region SMethod: WritingSystem FindOrCreate(sWritingSystemName)
+        static public WritingSystem FindOrCreate(string sWritingSystemName)
+        {
+            // Return it if it is already in the list
+            var writingSystem = FindWritingSystem(sWritingSystemName);
+            if (null != writingSystem)
+                return writingSystem;
 
             // Otherwise create the new one and add it
-            var writingSystem = new WritingSystem {Name = sWritingSystemName};
+            writingSystem = new WritingSystem {Name = sWritingSystemName};
             WritingSystems.Add(writingSystem);
             SortWritingSystems();
             DeclareDirty();
@@ -680,8 +689,15 @@ namespace OurWordData.Styles
             foreach (XmlNode node in nodeWritingSystems.ChildNodes)
             {
                 var ws = WritingSystem.Create(node);
-                if (null != ws)
-                    WritingSystems.Add(ws);
+                if (null == ws)
+                    continue;
+
+                // Prevent duplicates (e.g., read-in Latin replaces the default Latin)
+                var stale = FindWritingSystem(ws.Name);
+                if (null != stale)
+                    RemoveWritingSystem(stale);
+
+                WritingSystems.Add(ws);
             }
         }
         #endregion
