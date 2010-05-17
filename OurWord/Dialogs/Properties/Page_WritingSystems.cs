@@ -1,30 +1,48 @@
-/**********************************************************************************************
- * Project: Our Word!
- * File:    Page_WritingSystems.cs
- * Author:  John Wimbish
- * Created: 21 Apr 2006
- * Purpose: Setup all of the Writing Systems for the Team Settings
- * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
- *********************************************************************************************/
-#region Header: Using, etc.
+#region ***** Page_WritingSystems.cs *****
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows.Forms;
 using OurWordData.Styles;
 using Palaso.UI.WindowsForms.Keyboarding;
 using JWTools;
-using OurWordData;
 using OurWordData.DataModel;
 using OurWord.Edit;
 #endregion
 
-namespace OurWord.Dialogs
+namespace OurWord.Dialogs.Properties
 {
     public partial class Page_WritingSystems : DlgPropertySheet
     {
-		// Hyphenation -----------------------------------------------------------------------
+        // List of Writing Systems -----------------------------------------------------------
+        #region Method: void SetupList(sNameOfWritingSystemToSelect)
+        void SetupList(string sNameOfWritingSystemToSelect)
+        {
+
+            // Place our writing systems into the list
+            m_listWritingSystems.Items.Clear();
+            foreach (var ws in StyleSheet.WritingSystems)
+                m_listWritingSystems.Items.Add(ws.Name);
+
+            // Select in order to populate the other controls
+            if (string.IsNullOrEmpty(sNameOfWritingSystemToSelect))
+            {
+                m_listWritingSystems.SelectedIndex = 0;
+                return;
+            }
+            for(var i=0; i<StyleSheet.WritingSystems.Count; i++)
+            {
+                if (StyleSheet.WritingSystems[i].Name == sNameOfWritingSystemToSelect)
+                {
+                    m_listWritingSystems.SelectedIndex = i;
+                    return;
+                }
+            }
+            m_listWritingSystems.SelectedIndex = 0;
+        }
+        #endregion
+
+        // Hyphenation -----------------------------------------------------------------------
 		#region Attr{g}: LiterateSettingsWnd LS
 		LiterateSettingsWnd LS
 		{
@@ -42,6 +60,10 @@ namespace OurWord.Dialogs
 		#region Method: BuildHyphenationWindow()
 		void BuildHyphenationWindow()
 		{
+            m_LiterateSettingsWnd.Name = "AutomaticHyphenation";
+
+		    LS.Reset();
+
 			// Introduction
             LS.AddInformation("ah100", StyleSheet.LiterateParagraph, 
 				"_OurWord_ offers a quick-and-dirty means of hyphenation, which you may find useful if " +
@@ -132,16 +154,10 @@ namespace OurWord.Dialogs
 
 		// Scaffolding -----------------------------------------------------------------------
         #region Constructor(ParentDlg, JWritingSystem)
-        public Page_WritingSystems(DialogProperties _ParentDlg, WritingSystem ws)
-            : base(_ParentDlg)
+        public Page_WritingSystems(DialogProperties parentDlg)
+            : base(parentDlg)
         {
             InitializeComponent();
-
-			m_WritingSystem = ws;
-
-			// Setup the Hyphenation LiterateSettings control
-			m_LiterateSettingsWnd.Name = "AutomaticHyphenation";
-			BuildHyphenationWindow();
         }
         #endregion
         #region Attr{g}: JWritingSystem WritingSystem
@@ -157,18 +173,12 @@ namespace OurWord.Dialogs
         #endregion
 
 		// DlgPropertySheet overrides --------------------------------------------------------
-		#region SMethod: string ComputeID(string sWritingSystemName)
-		public static string ComputeID(string sWritingSystemName)
-		{
-			return "idWS_" + sWritingSystemName;
-		}
-		#endregion
 		#region OAttr{g}: string ID
 		public override string ID
 		{
 			get
 			{
-				return ComputeID(WritingSystem.Name);
+				return "idWritingSystems";
 			}
 		}
 		#endregion
@@ -183,7 +193,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return WritingSystem.Name;
+                return G.GetLoc_String("PropDlgTab_WritingSystems", "Writing Systems");
             }
         }
         #endregion
@@ -220,7 +230,6 @@ namespace OurWord.Dialogs
         // Property Grid ---------------------------------------------------------------------
         #region Property Grid Constants
         const string c_sPropName = "propName";
-        const string c_sPropAbbrev = "propAbbrev";
         const string c_sPropPunctuation = "propPunctuation";
         const string c_sPropEndPunctuation = "propEndPunctuation";
         const string c_sPropKeyboard = "propKeyboard";
@@ -295,7 +304,7 @@ namespace OurWord.Dialogs
 
                 // Update the list
                 StyleSheet.SortWritingSystems();
-                ParentDlg.UpdateNavigationControls();
+                SetupList(WritingSystem.Name);
             }
             #endregion
             #region Keyboard Name
@@ -328,7 +337,7 @@ namespace OurWord.Dialogs
 
             // General Properties
             #region string: Name
-            PropertySpec ps = new PropertySpec(
+            var ps = new PropertySpec(
                 c_sPropName,
                 "Name", 
                 typeof(string),
@@ -343,10 +352,9 @@ namespace OurWord.Dialogs
             Bag.Properties.Add(ps);
             #endregion
             #region List<>: Keyboard name: choose from a list
-            List<KeyboardController.KeyboardDescriptor> v =
-               KeyboardController.GetAvailableKeyboards(KeyboardController.Engines.All);
-            string[] vNames = new string[v.Count + 1];
-            for (int i = 0; i < v.Count; i++)
+            var v = KeyboardController.GetAvailableKeyboards(KeyboardController.Engines.All);
+            var vNames = new string[v.Count + 1];
+            for (var i = 0; i < v.Count; i++)
                 vNames[i] = v[i].Name;
             vNames[v.Count] = ""; // Provide for an empty one in case we don't want to specify one.
             ps = new PropertySpec(
@@ -356,9 +364,7 @@ namespace OurWord.Dialogs
                 "The name of the keyboard to use when typing in this writing system " +
                     "(Windows IME, Keyman, etc.) Use the full name, not the abbreviation.",
                 vNames,
-                "");
-            ps.DontLocalizeEnums = true;
-            ps.DontLocalizeCategory = true;
+                "") {DontLocalizeEnums = true, DontLocalizeCategory = true};
             Bag.Properties.Add(ps);
             #endregion
             #region string: Punctuation Charaters
@@ -370,8 +376,7 @@ namespace OurWord.Dialogs
                 "A list of those letters that are punctuation in this writing system.", 
                 WritingSystem.c_sDefaultPunctuationChars,
                 "",
-                null);
-            ps.DontLocalizeCategory = true;
+                null) {DontLocalizeCategory = true};
             Bag.Properties.Add(ps);
             #endregion
             #region string: End Punctuation Charaters
@@ -383,8 +388,7 @@ namespace OurWord.Dialogs
                 "A list of punctuation that can occur at the end of a sentence.", 
                 WritingSystem.c_sDefaultEndPunctuationChars,
                 "",
-                null);
-            ps.DontLocalizeCategory = true;
+                null) {DontLocalizeCategory = true};
             Bag.Properties.Add(ps);
             #endregion
 
@@ -396,25 +400,30 @@ namespace OurWord.Dialogs
         }
         #endregion
 
-		// Loading ---------------------------------------------------------------------------
+        // Command Handlers ------------------------------------------------------------------
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
             LocDB.Localize(this, new Control[] { } );
 
-			// Set up the Grid Control
-			SetupPropertyGrid();
-
-			// Set up the AutoReplace control
-			m_ctrlAutoReplace.Initialize(m_WritingSystem.AutoReplaceSource,
-				m_WritingSystem.AutoReplaceResult);
+            // List of writing systems
+            SetupList(null);
 		}
         #endregion
+        #region Cmd: cmdAdd
+        private void cmdAdd(object sender, EventArgs e)
+        {
+            var sName = LocDB.GetValue(this, "NewWritingSystem", "New Writing System", null);
 
-		// Command Handlers ------------------------------------------------------------------
-        #region Cmd: cmdRemoveBtnClicked
-        private void cmdRemoveBtnClicked(object sender, EventArgs e)
+            // Add it to the list if it is not already there
+            StyleSheet.FindOrCreate(sName);
+
+            SetupList(sName);
+        }
+        #endregion
+        #region Cmd: cmdRemove
+        private void cmdRemove(object sender, EventArgs e)
 			// We prevent deletions of WS's that are in use, so as to not mess up life
 			// for the current project. Of course, loading a new project, we need
 			// to create a WS if it needs it and it isn't in the Team Settings.
@@ -447,9 +456,27 @@ namespace OurWord.Dialogs
             // Remove it from the StyleSheet
 			StyleSheet.RemoveWritingSystem(WritingSystem);
 
-			// Update the nav tree, and navigate to the Add page
-            ParentDlg.InitNavigation(Page_AddWritingSystem.ComputeID());
+			// Update our display
+            SetupList(null);
         }
         #endregion
-	}
+        #region Cmd: cmdWritingSystemSelected
+        private void cmdWritingSystemSelected(object sender, EventArgs e)
+        {
+            var i = m_listWritingSystems.SelectedIndex;
+            if (i < 0 || i > StyleSheet.WritingSystems.Count)
+                return;
+
+            m_WritingSystem = StyleSheet.WritingSystems[i];
+
+            SetupPropertyGrid();
+
+            m_ctrlAutoReplace.Initialize(
+                m_WritingSystem.AutoReplaceSource,
+                m_WritingSystem.AutoReplaceResult);
+
+            BuildHyphenationWindow();
+        }
+        #endregion
+    }
 }

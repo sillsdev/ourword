@@ -890,7 +890,7 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(913, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(943, 38);
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -3362,6 +3362,7 @@ namespace OurWord
         {
             CheckForUpdates(true);
         }
+
 
     }
 

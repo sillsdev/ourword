@@ -31,10 +31,10 @@ namespace OurWord.Dialogs
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DialogProperties));
             this.m_btnOK = new System.Windows.Forms.Button();
-            this.m_NavTitle = new System.Windows.Forms.Label();
-            this.m_btnHelp = new System.Windows.Forms.Button();
             this.m_Images = new System.Windows.Forms.ImageList(this.components);
             this.m_NavTasks = new OurWord.Utilities.GroupedTasksList();
+            this.m_btnHelp = new System.Windows.Forms.Button();
+            this.PageContent = new OurWord.Dialogs.Properties.CtrlPageContent();
             this.SuspendLayout();
             // 
             // m_btnOK
@@ -46,32 +46,6 @@ namespace OurWord.Dialogs
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 10;
             this.m_btnOK.Text = "OK";
-            // 
-            // m_NavTitle
-            // 
-            this.m_NavTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_NavTitle.BackColor = System.Drawing.Color.LightSeaGreen;
-            this.m_NavTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_NavTitle.ForeColor = System.Drawing.Color.White;
-            this.m_NavTitle.Location = new System.Drawing.Point(180, 9);
-            this.m_NavTitle.Name = "m_NavTitle";
-            this.m_NavTitle.Size = new System.Drawing.Size(442, 26);
-            this.m_NavTitle.TabIndex = 22;
-            this.m_NavTitle.Text = "Navigation Title";
-            this.m_NavTitle.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_btnHelp
-            // 
-            this.m_btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
-            this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.m_btnHelp.Location = new System.Drawing.Point(316, 403);
-            this.m_btnHelp.Name = "m_btnHelp";
-            this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
-            this.m_btnHelp.TabIndex = 11;
-            this.m_btnHelp.Text = "Help...";
-            this.m_btnHelp.Click += new System.EventHandler(this.cmdHelp);
             // 
             // m_Images
             // 
@@ -99,14 +73,37 @@ namespace OurWord.Dialogs
             this.m_NavTasks.Size = new System.Drawing.Size(154, 417);
             this.m_NavTasks.TabIndex = 25;
             // 
+            // m_btnHelp
+            // 
+            this.m_btnHelp.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
+            this.m_btnHelp.Image = ((System.Drawing.Image)(resources.GetObject("m_btnHelp.Image")));
+            this.m_btnHelp.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.m_btnHelp.Location = new System.Drawing.Point(316, 403);
+            this.m_btnHelp.Name = "m_btnHelp";
+            this.m_btnHelp.Size = new System.Drawing.Size(75, 23);
+            this.m_btnHelp.TabIndex = 11;
+            this.m_btnHelp.Text = "Help...";
+            this.m_btnHelp.Click += new System.EventHandler(this.cmdHelp);
+            // 
+            // m_PropertiesContent
+            // 
+            this.PageContent.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.PageContent.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.PageContent.Location = new System.Drawing.Point(183, 9);
+            this.PageContent.Name = "PageContent";
+            this.PageContent.Size = new System.Drawing.Size(439, 388);
+            this.PageContent.TabIndex = 26;
+            // 
             // DialogProperties
             // 
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.ClientSize = new System.Drawing.Size(634, 438);
+            this.Controls.Add(this.PageContent);
             this.Controls.Add(this.m_NavTasks);
-            this.Controls.Add(this.m_NavTitle);
             this.Controls.Add(this.m_btnHelp);
             this.Controls.Add(this.m_btnOK);
             this.MaximizeBox = false;
@@ -125,8 +122,7 @@ namespace OurWord.Dialogs
         #endregion
 
         private System.Windows.Forms.Button m_btnHelp;
-		private System.Windows.Forms.Button m_btnOK;
-        private System.Windows.Forms.Label m_NavTitle;
+        private System.Windows.Forms.Button m_btnOK;
         private OurWord.Utilities.GroupedTasksList m_NavTasks;
         private System.Windows.Forms.ImageList m_Images;
     }

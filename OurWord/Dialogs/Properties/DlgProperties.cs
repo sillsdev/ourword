@@ -25,6 +25,7 @@ using System.Text;
 using System.Threading;
 
 using JWTools;
+using OurWord.Dialogs.Properties;
 using OurWordData;
 using OurWord;
 using OurWordData.DataModel;
@@ -43,24 +44,6 @@ namespace OurWord.Dialogs
     public partial class DialogProperties : Form
     {
 		// Controls --------------------------------------------------------------------------
-		#region VAttr{g}: Label NavTitle
-		Label NavTitle
-		{
-			get
-			{
-				return m_NavTitle;
-			}
-		}
-		#endregion
-		#region VAttr{s}: string NavTitleText
-		string NavTitleText
-        {
-            set
-            {
-                m_NavTitle.Text = value;
-            }
-        }
-        #endregion
         #region VAttr{g}: GroupedTasksList NavList
         GroupedTasksList NavList
         {
@@ -70,6 +53,9 @@ namespace OurWord.Dialogs
                 return m_NavTasks;
             }
         }
+        #endregion
+        #region Attr{g}: CtrlPageContent PageContent
+        private CtrlPageContent PageContent;
         #endregion
 
         // Pages -----------------------------------------------------------------------------
@@ -114,7 +100,7 @@ namespace OurWord.Dialogs
             if (null != gt)
                 sGroupTitle += (gt.GroupName + " - ");
 
-            NavTitleText = sGroupTitle + CurrentPage.Title;
+            PageContent.SetTitle(sGroupTitle + CurrentPage.Title);
 
             if (null != NavList.LastSelectedButton)
                 NavList.LastSelectedButton.Text = "  " + CurrentPage.Title;
@@ -130,7 +116,7 @@ namespace OurWord.Dialogs
 
             // Locate the page we want to make current
             DlgPropertySheet pageNew = null;
-            foreach (DlgPropertySheet page in Pages)
+            foreach (var page in Pages)
             {
                 if (page.ID == sID)
                     pageNew = page;
@@ -138,24 +124,8 @@ namespace OurWord.Dialogs
             if (null == pageNew)
                 return;
 
-            // Turn off the old page
-            if (null != CurrentPage)
-            {
-                CurrentPage.Visible = false;
-                Controls.Remove(CurrentPage);
-            }
-
-            // Display the new page
-            int nMargin = NavTitle.Left - NavList.Right;
+            PageContent.SetContent(pageNew);
             CurrentPage = pageNew;
-            CurrentPage.Left = NavTitle.Left;
-            CurrentPage.Top = NavTitle.Bottom + nMargin;
-            CurrentPage.Width = NavTitle.Width;
-            CurrentPage.Height = m_btnOK.Top - NavTitle.Bottom - nMargin * 2;
-            CurrentPage.Visible = true;
-            CurrentPage.Anchor = AnchorStyles.Bottom | AnchorStyles.Top |
-                AnchorStyles.Left | AnchorStyles.Right;
-            Controls.Add(CurrentPage);
             CurrentPage.Focus();
 
             // Update the Title Text
@@ -179,7 +149,7 @@ namespace OurWord.Dialogs
             NavList.ClearGroups();
 
             // Translations
-            GroupedTasks gtTranslations = NavList.AddGroup("Translations");
+            var gtTranslations = NavList.AddGroup("Translations");
 
             if (null == DB.TargetTranslation)
                 AddPage(gtTranslations, new Page_SetupTarget(this), c_iImageDefault);
@@ -192,13 +162,13 @@ namespace OurWord.Dialogs
                 AddPage(gtTranslations, new Page_Translation(this, DB.FrontTranslation, true), c_iImageDefault);
 
             // Reference Translations
-            GroupedTasks gtReferenceTranslations = NavList.AddGroup("Reference");
+            var gtReferenceTranslations = NavList.AddGroup("Reference");
             AddPage(gtReferenceTranslations, new Page_OtherTranslations(this), c_iImageDefault);
             foreach (DTranslation t in DB.Project.OtherTranslations)
                 AddPage(gtReferenceTranslations, new Page_Translation(this, t, true), c_iImageDefault);
 
             // Options
-            GroupedTasks gtOptions = NavList.AddGroup("Options");
+            var gtOptions = NavList.AddGroup("Options");
             AddPage(gtOptions, new Page_Options(this), c_iImageOptions);
             AddPage(gtOptions, new Page_Notes(this), c_iImageNotes);
             AddPage(gtOptions, new Page_Collaboration(this), c_iImageCollaboration);
@@ -206,13 +176,7 @@ namespace OurWord.Dialogs
             AddPage(gtOptions, new Page_StyleSheet(this), c_iImageStyleSheet);
             AddPage(gtOptions, new Page_AdvancedPrintOptions(this), c_iImageAdvancedPrint);
             AddPage(gtOptions, new Page_TranslationStages(this), c_iImageDefault);
-
-            // Writing Systems (start collapsed, as this is a less-frequent group)
-            GroupedTasks gtWritingSystems = NavList.AddGroup(Strings.PropDlgTab_WritingSystems);
-            gtWritingSystems.Expanded = false;
-            AddPage(gtWritingSystems, new Page_AddWritingSystem(this), c_iImageAddWritingSystem);
-            foreach (var ws in StyleSheet.WritingSystems)
-                AddPage(gtWritingSystems, new Page_WritingSystems(this, ws), c_iImageWritingSystem);
+            AddPage(gtOptions, new Page_WritingSystems(this), c_iImageWritingSystem);
 
             // Go to the requested page
             if (!string.IsNullOrEmpty(sIdActivePage))
@@ -229,7 +193,6 @@ namespace OurWord.Dialogs
         const int c_iImageNotes = 2;
         const int c_iImageOptions = 3;
         const int c_iImageWritingSystem = 4;
-        const int c_iImageAddWritingSystem = 5;
         const int c_iImageStyleSheet = 6;
         const int c_iImageCollaboration = 7;
         const int c_iImageClusters = 8;
@@ -268,7 +231,7 @@ namespace OurWord.Dialogs
         private void cmdLoad(object sender, EventArgs e)
         {
             // Localization
-            Control[] vExclude = { m_NavTitle, m_NavTasks };
+            Control[] vExclude = { m_NavTasks };
             LocDB.Localize(this, vExclude);
 
             // Set the TitleBar after the localization, as we override it
@@ -376,6 +339,7 @@ namespace OurWord.Dialogs
 			: this()
         {
             m_ParentDlg = _ParentDlg;
+            Dock = DockStyle.Fill;
         }
         #endregion
 		#region Constructor() - for VS 2008

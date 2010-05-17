@@ -208,6 +208,9 @@
       <DependentUpon>TranslationProgress.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\CtrlPageContent.resx">
+      <DependentUpon>CtrlPageContent.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\DlgMoveCluster.resx">
       <DependentUpon>DlgMoveCluster.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -243,10 +246,6 @@
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Page_Notes.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_WritingSystemAddRemove.resx">
-      <DependentUpon>Page_WritingSystemAddRemove.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\WizInitializeFromRepo\WizRepo_GetClusterName.resx">
       <DependentUpon>WizRepo_GetClusterName.cs</DependentUpon>
@@ -307,6 +306,7 @@
     <EmbeddedResource Include="Res\Annotation.bmp" />
     <EmbeddedResource Include="Res\AnnotationChecked.bmp" />
     <EmbeddedResource Include="Res\Category.ico" />
+    <EmbeddedResource Include="Res\EntireCluster.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
       <SubType>Designer</SubType>
@@ -354,6 +354,8 @@
     <Content Include="Res\NoteMerge.ico" />
     <None Include="Res\OurWord.png" />
     <Content Include="Res\ProgressIndicatorBackground.jpg" />
+    <EmbeddedResource Include="Res\ThisProject.ico" />
+    <EmbeddedResource Include="Res\ThisCluster.ico" />
     <EmbeddedResource Include="Res\Project.ico" />
     <EmbeddedResource Include="Res\SectionFirst.ico" />
     <EmbeddedResource Include="Res\SectionLast.ico" />
@@ -401,6 +403,12 @@
     </Compile>
     <Compile Include="Dialogs\History\TranslationProgress.Designer.cs">
       <DependentUpon>TranslationProgress.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\CtrlPageContent.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\CtrlPageContent.Designer.cs">
+      <DependentUpon>CtrlPageContent.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgMoveCluster.cs">
       <SubType>Form</SubType>
@@ -524,12 +532,6 @@
     </Compile>
     <Compile Include="Dialogs\Properties\Page_OtherTranslations.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_WritingSystemAddRemove.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_WritingSystemAddRemove.Designer.cs">
-      <DependentUpon>Page_WritingSystemAddRemove.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_WritingSystems.cs">
       <SubType>UserControl</SubType>

@@ -193,6 +193,10 @@ namespace OurWord.Edit
 		}
 		List<Setting> m_vSettings = new List<Setting>();
 		#endregion
+        public void Reset()
+        {
+            Settings.Clear();
+        }
 		#region Method: Setting GetSettingFor(string sID)
 		Setting GetSettingFor(string sID)
 		{

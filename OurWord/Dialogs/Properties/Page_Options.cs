@@ -417,7 +417,7 @@ namespace OurWord.Dialogs
             HelpSystem.ShowDefaultTopic();
         }
         #endregion
-        #region Attr{g}: string TabText
+        #region Attr{g}: string Title
         public override string Title
         {
             get
