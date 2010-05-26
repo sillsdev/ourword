@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Xml;
 using JWTools;
+using OurWordData.DataModel.Membership;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 #endregion
@@ -102,7 +103,7 @@ namespace OurWordData.DataModel.Annotations
             m_utcDtCreated = DateTime.UtcNow;
 
             // The author
-            Author = DB.UserName;
+            Author = Users.Current.NoteAuthorsName;
 
             Debug_VerifyIntegrity();
         }
@@ -247,7 +248,7 @@ namespace OurWordData.DataModel.Annotations
                     return false;
 
                 // If the author is someone different from me, it isn't
-                if (Author != DB.UserName)
+                if (Author != Users.Current.NoteAuthorsName)
                     return false;
 
                 return true;
@@ -377,7 +378,7 @@ namespace OurWordData.DataModel.Annotations
 
             // If we are here, then we have a conflict. We resolve via the Author.
             // If the author is the person on this machine, then we win.
-            if (Author == DB.UserName)
+            if (Author == Users.Current.NoteAuthorsName)
                 return;
             // If the author is someone else, then they win
             Status = theirs.Status;

@@ -23,6 +23,7 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 
 #endregion
 #endregion
@@ -203,10 +204,10 @@ namespace OurWordTests.DataModel
 
             // TEST 1: They Win
             // Set the DefaultAuthor to "Mary" so that "They" should win
-            var sDefaultAuthor = DB.UserName;
-            DB.UserName = "Mary";
+            var sDefaultAuthor = Users.Current.NoteAuthorsName;
+            Users.Current.NoteAuthorsName = "Mary";
             Mine.Merge(Parent, Theirs);
-            DB.UserName = sDefaultAuthor;
+            Users.Current.NoteAuthorsName = sDefaultAuthor;
             Assert.AreEqual(
                 "M: Author={John} Created={11/23/2008} Status={Advisor} Content={They say Bibit is the correct term.}",
                 Mine.DebugString);
@@ -215,9 +216,9 @@ namespace OurWordTests.DataModel
             // Go again, but this time with "John" so that "We" win
             Mine = new DMessage("John", new DateTime(2008, 11, 23), Role.Consultant,
                 "I say Bibit is the wrong term.");
-            DB.UserName = "John";
+            Users.Current.NoteAuthorsName = "John";
             Mine.Merge(Parent, Theirs);
-            DB.UserName = sDefaultAuthor;
+            Users.Current.NoteAuthorsName = sDefaultAuthor;
             Assert.AreEqual(
                 "M: Author={John} Created={11/23/2008} Status={Consultant} Content={I say Bibit is the wrong term.}",
                 Mine.DebugString);

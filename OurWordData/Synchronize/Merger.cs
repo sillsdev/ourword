@@ -12,6 +12,8 @@ using System.Collections.Generic;
 using System.IO;
 using Chorus.merge;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Membership;
+
 #endregion
 
 namespace OurWordData.Synchronize
@@ -23,13 +25,17 @@ namespace OurWordData.Synchronize
         private const string OurWordTranslationFileExtension = ".otrans";
         private const string OurWordProjectFileExtension = ".owp";
         private const string OurWordSettingsFileExtension = ".owt";
+        private const string OurWordUsers = ".user";
+        private const string OurWordStyleSheet = ".StyleSheet";
 
         private static readonly List<string> s_OurWordFileExtensions = new List<string>
         {
             OxesFileExtension, 
             OurWordTranslationFileExtension,
             OurWordProjectFileExtension,
-            OurWordSettingsFileExtension
+            OurWordSettingsFileExtension,
+            OurWordUsers,
+            OurWordStyleSheet
         };
 
         #region static IEnumerable<string> GetExtensionsOfKnownTextFileTypes()
@@ -81,6 +87,15 @@ namespace OurWordData.Synchronize
                     case OurWordSettingsFileExtension:
                         // TODO
                         break;
+
+                    case OurWordUsers:
+                        User.Merge(mergeOrder);
+                        break;
+
+                    case OurWordStyleSheet:
+                        // TODO
+                        break;
+
                 }
 
             }
@@ -102,5 +117,32 @@ namespace OurWordData.Synchronize
             (new SendMergeProblemEmail(mergeOrder, e)).Do();
         }
         #endregion
+
+        // Helper methods
+        #region SMethod: bool merge(bMine, bParent, bTheirs)
+        public static bool Merge(bool bMine, bool bParent, bool bTheirs)
+        {
+            if (bMine != bTheirs && bMine == bParent)
+                return bTheirs;
+            return bMine;
+        }
+        #endregion
+        #region SMethod: string Merge(sMine, sParent, sTheirs)
+        public static string Merge(string sMine, string sParent, string sTheirs)
+        {
+            if (sMine != sTheirs && sMine == sParent)
+                return sTheirs;
+            return sMine;
+        }
+        #endregion
+        #region SMethod: int merge(nMine, nParent, nTheirs)
+        public static int Merge(int nMine, int nParent, int nTheirs)
+        {
+            if (nMine != nTheirs && nMine == nParent)
+                return nTheirs;
+            return nMine;
+        }
+        #endregion
+
     }
 }

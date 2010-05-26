@@ -131,9 +131,6 @@
     <Compile Include="DlgCheckTree.Designer.cs">
       <DependentUpon>DlgCheckTree.cs</DependentUpon>
     </Compile>
-    <Compile Include="JW_FeaturesPassword.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="HelpSystem.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -151,9 +148,6 @@
     </Compile>
     <Compile Include="JW_UI.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="JW_UserFeatures.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="JW_Utilities.cs">
       <SubType>Code</SubType>
@@ -208,16 +202,8 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Help.ico" />
-    <EmbeddedResource Include="JW_FeaturesPassword.resx">
-      <DependentUpon>JW_FeaturesPassword.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="JW_MenuItem.resx">
       <DependentUpon>JW_MenuItem.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="JW_UserFeatures.resx">
-      <DependentUpon>JW_UserFeatures.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="JW_Wizard.resx">

@@ -18,11 +18,13 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using OurWord.Dialogs.Membership;
 using OurWord.Edit.Blocks;
 using OurWord.Printing;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 
 using OurWord.Edit;
@@ -37,7 +39,7 @@ using Shortcut=OurWord.Utilities.Shortcut;
 
 namespace OurWord
 {
-	public class OurWordMain : System.Windows.Forms.Form
+	public class OurWordMain : Form
 		// Main application window and top-level message routing
 	{
 		// Static Objects & Globals ----------------------------------------------------------
@@ -48,24 +50,13 @@ namespace OurWord
 			{
 				Debug.Assert(null != DB.Project);
 
-				DSection section = DB.Project.STarget;
+				var section = DB.Project.STarget;
 
-				DBook book = (null == section) ? null : section.Book;
+				var book = (null == section) ? null : section.Book;
 				if (null == book)
 					return false;
 
 				return book.Locked;
-			}
-		}
-		#endregion
-		#region Attr{g}: static DBook BTarget
-		static public DBook BTarget
-		{
-			get
-			{
-				if (null != DB.Project && null != DB.Project.STarget)
-					return DB.Project.STarget.Book;
-				return null;
 			}
 		}
 		#endregion
@@ -78,7 +69,7 @@ namespace OurWord
                 return m_URStack;
             }
         }
-        UndoRedoStack m_URStack;
+	    readonly UndoRedoStack m_URStack;
         #endregion
 
         // Client Windows --------------------------------------------------------------------
@@ -92,6 +83,7 @@ namespace OurWord
         #endregion
 
         private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
+        private ViewBar m_ViewBar;
         #region VAttr{g}: Layout CurrentLayout
         public WLayout CurrentLayout
         {
@@ -128,7 +120,7 @@ namespace OurWord
         #endregion
 
 		#region Method: void SetTitleBarText()
-		public void SetTitleBarText()
+		private void SetTitleBarText()
 			// Titlebar - sets title bar text to "OurWord - ProjName"
 		{
             // First, Display "Our Word"
@@ -155,23 +147,16 @@ namespace OurWord
             // Toolbar button enabling
             SetupMenusAndToolbarsVisibility();
 
+            // Information about the current view situation
+            m_ViewBar.SetToContext(CurrentLayout, DB.Project);
+
             // Do we have a valid project? Can't do much if not.
             if (null == DB.Project || null == DB.FrontSection || null == DB.TargetSection)
             {
                 CurrentLayout.Clear();
                 CurrentLayout.Invalidate();
-                TaskName = G.GetLoc_GeneralUI("NoProjectDefined", "No Project Defined");
-                LanguageInfo = "";
-                Passage = "";
-                ShowPadlock = false;
                 return;
             }
-
-            // Update the Title Window contents
-            TaskName = CurrentLayout.WindowName;
-            LanguageInfo = CurrentLayout.LanguageInfo;
-            Passage = CurrentLayout.PassageName;
-            ShowPadlock = TargetIsLocked;
 
             // Loading the main window should also load the data in the side windows, as this
             // is generally built as the main window is loaded (or as items there are selected)
@@ -179,13 +164,6 @@ namespace OurWord
 
             // Place focus in the main window, so that it is ready for editing
             CurrentLayout.Focus();
-        }
-        #endregion
-        #region Method: void SetZoomFactor()
-        void SetZoomFactor()
-        {
-            if (null != CurrentLayout)
-                CurrentLayout.ZoomFactor = G.ZoomFactor;
         }
         #endregion
         #region Method: void Dim()
@@ -304,7 +282,6 @@ namespace OurWord
         private ToolStripDropDownButton m_btnTools;
         private ToolStripMenuItem m_menuIncrementBookStatus;
         private ToolStripMenuItem m_menuRestoreFromBackup;
-        private ToolStripMenuItem m_menuSetUpFeatures;
         private ToolStripSeparator m_separator4;
 
         private ToolStripStatusLabel m_StatusMessage1;
@@ -312,11 +289,6 @@ namespace OurWord
         private ToolStripStatusLabel m_StatusMessage2;
 
         // Taskbar
-        private ToolStrip m_Taskbar;
-        private ToolStripLabel m_tbTaskName;
-        private ToolStripButton m_tbPadlock;
-        private ToolStripLabel m_tbLanguageInfo;
-        private ToolStripLabel m_tbCurrentPassage;
         #endregion
         #region Method: void SetupNavigationButtons()
         private const int c_cMaxMenuLength = 60; // Keep sub-menus from getting too long
@@ -485,86 +457,81 @@ namespace OurWord
             // Project - If we have an invalid project, we turn the Project menu on regardless
             // of the user setting. As for Export, we don't turn it on unless we do have
             // a valid project.
-            bool bShowNewOpenEtc = (!DB.IsValidProject || OurWordMain.Features.F_Project);
-            m_btnProject.Visible = bShowNewOpenEtc;
+            m_btnProject.Visible = (!DB.IsValidProject ||
+                                    Users.Current.CanCreateProject ||
+                                    Users.Current.CanOpenProject ||
+                                    Users.Current.CanExportProject);
+            m_menuNewProject.Visible = (!DB.IsValidProject || Users.Current.CanCreateProject);
+            m_menuOpenProject.Visible = (!DB.IsValidProject || Users.Current.CanOpenProject);
             m_menuExportProject.Visible = (
                 DB.IsValidProject && 
                 DB.TargetTranslation.BookList.Count > 0 &&
-                Features.F_Export);
+                Users.Current.CanExportProject);
 
             // Print
-            m_btnPrint.Visible = OurWordMain.Features.F_Print;
+            m_btnPrint.Visible = Users.Current.CanPrint;
 
             // Go To First / Last Section
-            m_btnGotoFirstSection.Visible = DB.IsValidProject && Features.F_GoTo_FirstLast;
-            m_btnGotoLastSection.Visible = DB.IsValidProject && Features.F_GoTo_FirstLast;
+            m_btnGotoFirstSection.Visible = DB.IsValidProject && Users.Current.CanNavigateFirstLast;
+            m_btnGotoLastSection.Visible = DB.IsValidProject && Users.Current.CanNavigateFirstLast;
 
             // Go To Chapter
-            m_btnChapter.Visible = DB.IsValidProject && Features.F_GoTo_Chapter;
+            m_btnChapter.Visible = DB.IsValidProject && Users.Current.CanNavigateChapter;
 
             // TEMP: TURN OFF UNTIL IMPLEMENTED
             //m_btnHistory.Visible = false;
 
-            // Configure - If we have an invalid project, we turn this on regardless
-            bool bShowConfigureDlg = (!DB.IsValidProject || OurWordMain.Features.F_PropertiesDialog);
-            m_menuConfigure.Visible = bShowConfigureDlg;
+            // Configure - Always visible, but password protected
+            m_menuConfigure.Visible = true;
 
             // Restore from Backup
-            m_menuRestoreFromBackup.Visible = OurWordMain.Features.F_RestoreBackup;
+            m_menuRestoreFromBackup.Visible = Users.Current.CanRestoreBackups;
 
             // Debug Test Suite
-            bool bShowDebugItems = JW_Registry.GetValue("Debug", false);
+            var bShowDebugItems = JW_Registry.GetValue("Debug", false);
             m_separatorDebug.Visible = bShowDebugItems;
             m_menuRunDebugTestSuite.Visible = bShowDebugItems;
 
             // Filters
-            m_menuOnlyShowSectionsThat.Visible = (DB.IsValidProject && OurWordMain.Features.F_Filter);
+            m_menuOnlyShowSectionsThat.Visible = (DB.IsValidProject && Users.Current.CanFilter);
 
             // Localizer Tool
-            m_menuLocalizerTool.Visible = OurWordMain.Features.F_Localizer;
+            m_menuLocalizerTool.Visible = Users.Current.CanLocalize;
 
             // Translator Notes
-            m_btnInsertNote.Visible = s_Features.TranslatorNotes;
+            m_btnInsertNote.Visible = Users.Current.CanMakeNotes;
 
             // Window Menu in its entirety
-            bool bShowMainWindowSection = s_Features.F_JobBT || 
-                s_Features.F_JobNaturalness ||
-                s_Features.F_ConsultantPreparation;
-            bool bShowTranslatorNotesMenu = (DB.IsValidProject && s_Features.TranslatorNotes);
-            bool bShowTranslationsPane = (DB.IsValidProject && DB.Project.OtherTranslations.Count > 0);
-            bool bShowHistoryMenu = false; // (DB.IsValidProject && s_Features.SectionHistory);
-            bool bShowSideWindowsSection = 
-                bShowTranslatorNotesMenu || 
-                bShowTranslationsPane || 
-                bShowHistoryMenu;
-
-            m_btnWindow.Visible = (bShowMainWindowSection || bShowSideWindowsSection);
-
-            // Main Window items: Drafting, Naturalness, BT
+            var bShowMainWindowSection = Users.Current.CanDoBackTranslation || 
+                Users.Current.CanDoNaturalnessCheck ||
+                Users.Current.CanDoConsultantPreparation;
             m_menuDrafting.Visible = bShowMainWindowSection;
-            m_menuBackTranslation.Visible = (bShowMainWindowSection && s_Features.F_JobBT);
-            m_menuConsultantPreparationToolStripMenuItem.Visible = 
-                (bShowMainWindowSection && s_Features.F_ConsultantPreparation);
-            m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && s_Features.F_JobNaturalness);
-            m_separatorWindow.Visible = bShowMainWindowSection && bShowSideWindowsSection;
+            m_menuBackTranslation.Visible = (bShowMainWindowSection && Users.Current.CanDoBackTranslation);
+            m_menuConsultantPreparationToolStripMenuItem.Visible =
+                (bShowMainWindowSection && Users.Current.CanDoConsultantPreparation);
+            m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && Users.Current.CanDoNaturalnessCheck);
+            // Separate Zoom from switch-task if both are present
+            m_separatorWindow.Visible = bShowMainWindowSection && Users.Current.CanZoom;
+            m_menuZoom.Visible = Users.Current.CanZoom;
+            m_btnWindow.Visible = bShowMainWindowSection || Users.Current.CanZoom; 
 
             // Edit Menu / Structured Editing
-            bool bStructuralEditing = s_Features.F_StructuralEditing &&
+            var bStructuralEditing = Users.Current.CanEditStructure &&
                 WLayout.CurrentLayoutIs(WndDrafting.c_sName);
-            bool bEditMenuVisible = bStructuralEditing || Features.F_UndoRedo;
+            var bEditMenuVisible = bStructuralEditing || Users.Current.CanUndoRedo;
             m_seperatorEdit.Visible = bStructuralEditing;
             m_menuChangeParagraphTo.Visible = bStructuralEditing;
             m_menuInsertFootnote.Visible = bStructuralEditing;
             m_menuDeleteFootnote.Visible = bStructuralEditing;
             m_menuEdit.Visible = bEditMenuVisible;
-            m_menuUndo.Visible = Features.F_UndoRedo;
-            m_menuRedo.Visible = Features.F_UndoRedo;
+            m_menuUndo.Visible = Users.Current.CanUndoRedo;
+            m_menuRedo.Visible = Users.Current.CanUndoRedo;
             m_btnEditCopy.Visible = !bEditMenuVisible;
             m_btnEditCut.Visible = !bEditMenuVisible;
             m_btnEditPaste.Visible = !bEditMenuVisible;
 
             m_menuCopyBTFromFrontTranslation.Visible = (
-                OurWordMain.Features.F_ConsultantPreparation && 
+                Users.Current.CanDoConsultantPreparation && 
                 WLayout.CurrentLayoutIs( new string[] {
                     WndConsultantPreparation.c_sName, WndBackTranslation.c_sName } )
                 );
@@ -588,7 +555,7 @@ namespace OurWord
         }
         #endregion
 
-       // Status Bar
+        // Status Bar
         #region Attr{g}: ToolStripStatusLabel StatusLabel1
         public ToolStripStatusLabel StatusLabel1
         {
@@ -635,70 +602,9 @@ namespace OurWord
             }
         }
         #endregion
-        // Taskbar
-        #region Attr{g/s}: string TaskName - e.g., "Drafting", "Back Translation"
-        public string TaskName
-        {
-            get
-            {
-                return m_tbTaskName.Text;
-            }
-            set
-            {
-                m_tbTaskName.Text = value;
-            }
-        }
-        #endregion
-        #region Attr{s}: string LanguageInfo - e.g., "Kupang to AMARASI"
-        public string LanguageInfo
-        {
-            set
-            {
-                if (string.IsNullOrEmpty(value))
-                    m_tbLanguageInfo.Text = "";
-                else
-                    m_tbLanguageInfo.Text = " (" + value + ") ";
-            }
-        }
-        #endregion
-        #region Attr{s}: string Passage - e.g., "John 3:16"
-        public string Passage
-        {
-            set
-            {
-                m_tbCurrentPassage.Text = value;
-            }
-        }
-        #endregion
-        #region Attr{g}: bool ShowPadlock - true if the book is locked for editing
-        bool ShowPadlock
-        {
-            get
-            {
-                return m_tbPadlock.Visible;
-            }
-            set
-            {
-                m_tbPadlock.Visible = value;
-            }
-        }
-        #endregion
         #endregion
 
         // Private attributes ----------------------------------------------------------------
-		#region Attr{g/s}: bool StartMaximized - If T, maximize the window on startup
-		public bool StartMaximized
-		{
-			get
-			{
-				return m_WindowState.StartMaximized;
-			}
-			set
-			{
-				m_WindowState.StartMaximized = value;
-			}
-		}
-		#endregion
 		private readonly JW_WindowState m_WindowState;   // Save/restore state on close/launch of app
 
 		// Scaffolding -----------------------------------------------------------------------
@@ -709,9 +615,6 @@ namespace OurWord
 			// Required for Windows Form Designer support
             this.components = new System.ComponentModel.Container();
 			InitializeComponent();
-
-			// Initialize the features we will make available
-			s_Features = new FeaturesMgr();
 
             // Suspend the layout while we create the windows. We create them here in order
             // to get the propert z-order
@@ -812,7 +715,6 @@ namespace OurWord
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOnlyShowSectionsThat = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuSetUpFeatures = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Synchronize = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
@@ -838,11 +740,7 @@ namespace OurWord
             this.m_ProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.m_StatusMessage2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.m_panelContents = new System.Windows.Forms.Panel();
-            this.m_Taskbar = new System.Windows.Forms.ToolStrip();
-            this.m_tbTaskName = new System.Windows.Forms.ToolStripLabel();
-            this.m_tbPadlock = new System.Windows.Forms.ToolStripButton();
-            this.m_tbLanguageInfo = new System.Windows.Forms.ToolStripLabel();
-            this.m_tbCurrentPassage = new System.Windows.Forms.ToolStripLabel();
+            this.m_ViewBar = new OurWord.Utilities.ViewBar();
             m_separator2 = new System.Windows.Forms.ToolStripSeparator();
             this.m_ToolStrip.SuspendLayout();
             this.m_toolStripContainer.BottomToolStripPanel.SuspendLayout();
@@ -850,7 +748,6 @@ namespace OurWord
             this.m_toolStripContainer.TopToolStripPanel.SuspendLayout();
             this.m_toolStripContainer.SuspendLayout();
             this.m_StatusStrip.SuspendLayout();
-            this.m_Taskbar.SuspendLayout();
             this.SuspendLayout();
             // 
             // m_separator2
@@ -1255,7 +1152,6 @@ namespace OurWord
             this.m_menuRestoreFromBackup,
             this.m_menuOnlyShowSectionsThat,
             this.m_menuConfigure,
-            this.m_menuSetUpFeatures,
             this.checkForUpdatesToolStripMenuItem,
             this.m_Synchronize,
             this.m_menuLocalizerTool,
@@ -1304,15 +1200,6 @@ namespace OurWord
             this.m_menuConfigure.Text = "&Configure...";
             this.m_menuConfigure.ToolTipText = "Edit the settings for OurWord and for the current project.";
             this.m_menuConfigure.Click += new System.EventHandler(this.cmdConfigure);
-            // 
-            // m_menuSetUpFeatures
-            // 
-            this.m_menuSetUpFeatures.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSetUpFeatures.Image")));
-            this.m_menuSetUpFeatures.Name = "m_menuSetUpFeatures";
-            this.m_menuSetUpFeatures.Size = new System.Drawing.Size(211, 22);
-            this.m_menuSetUpFeatures.Text = "Set Up &Features...";
-            this.m_menuSetUpFeatures.ToolTipText = "Set which features are turned on and off.";
-            this.m_menuSetUpFeatures.Click += new System.EventHandler(this.cmdSetUpFeatures);
             // 
             // checkForUpdatesToolStripMenuItem
             // 
@@ -1507,7 +1394,7 @@ namespace OurWord
             // 
             // m_toolStripContainer.TopToolStripPanel
             // 
-            this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_Taskbar);
+            this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ViewBar);
             this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ToolStrip);
             // 
             // m_StatusStrip
@@ -1550,56 +1437,17 @@ namespace OurWord
             this.m_panelContents.Size = new System.Drawing.Size(946, 441);
             this.m_panelContents.TabIndex = 0;
             // 
-            // m_Taskbar
+            // m_ViewBar
             // 
-            this.m_Taskbar.BackColor = System.Drawing.Color.Gray;
-            this.m_Taskbar.Dock = System.Windows.Forms.DockStyle.None;
-            this.m_Taskbar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.m_Taskbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_tbTaskName,
-            this.m_tbPadlock,
-            this.m_tbLanguageInfo,
-            this.m_tbCurrentPassage});
-            this.m_Taskbar.Location = new System.Drawing.Point(0, 0);
-            this.m_Taskbar.Name = "m_Taskbar";
-            this.m_Taskbar.Size = new System.Drawing.Size(946, 25);
-            this.m_Taskbar.Stretch = true;
-            this.m_Taskbar.TabIndex = 2;
-            // 
-            // m_tbTaskName
-            // 
-            this.m_tbTaskName.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_tbTaskName.ForeColor = System.Drawing.Color.White;
-            this.m_tbTaskName.Name = "m_tbTaskName";
-            this.m_tbTaskName.Size = new System.Drawing.Size(70, 22);
-            this.m_tbTaskName.Text = "Drafting";
-            // 
-            // m_tbPadlock
-            // 
-            this.m_tbPadlock.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.m_tbPadlock.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_tbPadlock.Image = ((System.Drawing.Image)(resources.GetObject("m_tbPadlock.Image")));
-            this.m_tbPadlock.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_tbPadlock.Name = "m_tbPadlock";
-            this.m_tbPadlock.Size = new System.Drawing.Size(23, 22);
-            this.m_tbPadlock.Text = "Locked";
-            this.m_tbPadlock.ToolTipText = "This book is locked and cannot be edited.";
-            // 
-            // m_tbLanguageInfo
-            // 
-            this.m_tbLanguageInfo.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_tbLanguageInfo.ForeColor = System.Drawing.Color.White;
-            this.m_tbLanguageInfo.Name = "m_tbLanguageInfo";
-            this.m_tbLanguageInfo.Size = new System.Drawing.Size(88, 22);
-            this.m_tbLanguageInfo.Text = "(Language)";
-            // 
-            // m_tbCurrentPassage
-            // 
-            this.m_tbCurrentPassage.Font = new System.Drawing.Font("Arial", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_tbCurrentPassage.ForeColor = System.Drawing.Color.Wheat;
-            this.m_tbCurrentPassage.Name = "m_tbCurrentPassage";
-            this.m_tbCurrentPassage.Size = new System.Drawing.Size(84, 22);
-            this.m_tbCurrentPassage.Text = "(passage)";
+            this.m_ViewBar.BackColor = System.Drawing.Color.Gray;
+            this.m_ViewBar.Dock = System.Windows.Forms.DockStyle.None;
+            this.m_ViewBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
+            this.m_ViewBar.Location = new System.Drawing.Point(0, 0);
+            this.m_ViewBar.Name = "m_ViewBar";
+            this.m_ViewBar.Size = new System.Drawing.Size(946, 25);
+            this.m_ViewBar.Stretch = true;
+            this.m_ViewBar.TabIndex = 1;
+            this.m_ViewBar.Text = "viewBar1";
             // 
             // OurWordMain
             // 
@@ -1624,8 +1472,6 @@ namespace OurWord
             this.m_toolStripContainer.PerformLayout();
             this.m_StatusStrip.ResumeLayout(false);
             this.m_StatusStrip.PerformLayout();
-            this.m_Taskbar.ResumeLayout(false);
-            this.m_Taskbar.PerformLayout();
             this.ResumeLayout(false);
 
 		}
@@ -1721,370 +1567,6 @@ namespace OurWord
         }
 		#endregion
 
-		// Features --------------------------------------------------------------------------
-		#region EMBEDDED CLASS: FeaturesMgr
-		public class FeaturesMgr
-		{
-			// Attrs -------------------------------------------------------------------------
-			DialogSetupFeatures m_Dlg = null;
-
-			// Values (obtain from current project) ------------------------------------------
-            #region Attr{g}: bool F_JobNaturalness
-            public bool F_JobNaturalness
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fJobNaturalness.ToString());
-                }
-            }
-            #endregion
-			#region Attr{g}: bool F_JobBT
-			public bool F_JobBT
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fJobBT.ToString());
-				}
-			}
-			#endregion
-            #region Attr{g}: bool F_ConsultantPreparation
-            public bool F_ConsultantPreparation
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fJobConsultantPreparation.ToString());
-                }
-            }
-            #endregion
-            #region Attr{g}: bool TranslatorNotes
-            public bool TranslatorNotes
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fTranslatorNotes.ToString());
-                }
-            }
-            #endregion
-
-            #region Attr{g}: bool F_Project
-			public bool F_Project
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fProject.ToString());
-				}
-			}
-			#endregion
-            #region Attr{g}: bool F_PropertiesDialog
-            public bool F_PropertiesDialog
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fConfigurationDialog.ToString());
-                }
-            }
-            #endregion
-			#region Attr{g}: bool F_Print
-			public bool F_Print
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fPrint.ToString());
-				}
-			}
-			#endregion
-			#region Attr{g}: bool F_RestoreBackup
-			public bool F_RestoreBackup
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fRestoreBackup.ToString());
-				}
-			}
-			#endregion
-			#region Attr{g}: bool F_Filter
-			public bool F_Filter
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fFilter.ToString());
-				}
-			}
-			#endregion
-            #region Attr{g}: bool F_Localizer
-            public bool F_Localizer
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fLocalizer.ToString());
-                }
-            }
-            #endregion
-            #region Attr{g}: bool F_StructuralEditing
-            public bool F_StructuralEditing
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fStructuralEditing.ToString());
-                }
-            }
-            #endregion
-            #region Attr{g}: bool F_UndoRedo
-            public bool F_UndoRedo
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fUndoRedo.ToString());
-                }
-            }
-            #endregion
-            #region Attr{g}: bool F_GoTo_FirstLast
-            public bool F_GoTo_FirstLast
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fGoTo_FirstLast.ToString());
-                }
-            }
-            #endregion
-            #region Attr{g}: bool F_GoTo_Chapter
-            public bool F_GoTo_Chapter
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fGoTo_Chapter.ToString());
-                }
-            }
-            #endregion
-            #region Attr{g}: bool F_JustTheBasics
-			public bool F_JustTheBasics
-			{
-				get
-				{
-					return m_Dlg.GetEnabledState( ID.fJustTheBasics.ToString());
-				}
-			}
-			#endregion
-            #region Attr{g}: bool F_Export
-            public bool F_Export
-            {
-                get
-                {
-                    return m_Dlg.GetEnabledState(ID.fExport.ToString());
-                }
-            }
-            #endregion
-
-            // Scaffolding -------------------------------------------------------------------
-			#region Constructor()
-			public FeaturesMgr()
-			{
-				m_Dlg = new DialogSetupFeatures();
-				Setup();
-			}
-			#endregion
-			#region Method: bool ShowDialog(Form formParent)
-			public bool ShowDialog(Form formParent)
-			{
-				// Make sure we are up-to-date with the settings
-				Setup();
-
-				// Show the dialog (return if the user canceled)
-				if (DialogResult.OK != m_Dlg.ShowDialog(formParent) )
-					return false;
-
-				return true;
-			}
-			#endregion
-
-            // Set up the features OW currently supports
-            // 1. Define an ID
-            // 2. Add it into the Setup method
-            // 3. Add it to the Localizations database
-            // 4. Set up an Attribute above for access elsewhere in the software
-            // 5. Typical other areas to code:
-            //    - Menu & toolbar visibility / enabling
-            #region IDs
-            public enum ID
-            {
-                fProject,
-                fConfigurationDialog,
-                fPrint,
-                fJobBT,
-                fJobNaturalness,
-                fJobConsultantPreparation,
-                fRestoreBackup,
-                fFilter,
-                fJustTheBasics,
-                fStructuralEditing,
-                fUndoRedo,
-                fLocalizer,
-                fGoTo_FirstLast,
-                fGoTo_Chapter,
-                fTranslatorNotes,
-                fExport,
-                kLast
-            };
-            #endregion
-            const string c_sNodeWindows = "Windows";
-            const string c_sNodeTools = "Tools";
-            const string c_sNodeNavigation = "Navigation";
-            const string c_sNodeEditing = "Editing";
-			#region Method: void Setup()
-			private void Setup()
-			{
-				Debug.Assert(null != m_Dlg);
-
-                // Clear out everything previous
-				m_Dlg.Clear();
-
-                // Add the various features
-                #region WINDOWS FEATURES
-                m_Dlg.Add(ID.fJobBT.ToString(),
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "Back Translation Window",
-                    "A layout where you can do a Back Translation; that is, where you provide " +
-                        "a translation  in the language the consultant understands.");
-
-                m_Dlg.Add(ID.fJobNaturalness.ToString(),           
-                    false, 
-                    false,
-                    c_sNodeWindows,
-                    "Naturalness Check Window",
-                    "A layout where only the translation is visible, so that you can read through " +
-                        "for naturalness, without being influenced by the front translation.");
-                       
-                m_Dlg.Add(ID.fJobConsultantPreparation.ToString(),  
-                    false,
-                    false,
-                    c_sNodeWindows,
-                    "Consultant Preparation Window",
-                    "Displays the Front/Model translation and the Target translation, with both " +
-                        "the vernacular and back translations. Use this to preparefor the " +
-                        "consultant (e.g., exegetical notes.)");
-
-                #endregion
-                #region EDITING FEATURES
-                m_Dlg.Add(ID.fStructuralEditing.ToString(),
-                    false,
-                    false,
-                    c_sNodeEditing,
-                    "Structural Editing",
-                    "Enables the translator to split and join paragraphs, or to assign different " +
-                        "styles to a paragraph. By doing this the translation will depart from " +
-                        "the paragraph structure of the front translation.");
-
-                m_Dlg.Add(ID.fUndoRedo.ToString(),
-                    true,
-                    false,
-                    c_sNodeEditing,
-                    "Undo",
-                    "Enables the Undo and Redo menus, by which you can undo actions such as " +
-                        "typing, deleting, splitting and joining paragraphs, etc.");
-
-                m_Dlg.Add(ID.fTranslatorNotes.ToString(),
-                    false,
-                    false,
-                    c_sNodeEditing,
-                    "Translator Notes",
-                    "Enables the Translator Notes button and icons, through which you can make notes " +
-                        "about the translation and share them with others on your team.");
-
-                #endregion
-                #region TOOLS FEATURES
-                m_Dlg.Add(ID.fRestoreBackup.ToString(),    
-                    false,
-                    false,
-                    c_sNodeTools,
-                    "Restore Backed-up Files",
-                    "Files can be automatically backed up (via the Tools-Options command) " +
-                        "to a flash card or other storage device. If you turn on this Restore " +
-                        "feature, the Tools menu will provide access to a dialog by which the " +
-                        "current file can be replaced by a previously stored backup.");
-
-                m_Dlg.Add(ID.fConfigurationDialog.ToString(),
-                    true,
-                    false,
-                    c_sNodeTools,
-                    "Configuration Dialog",
-                    "Turn this on if you are want to adjust the settings for a project.");
-
-                m_Dlg.Add(ID.fFilter.ToString(),           
-                    false,
-                    false,
-                    c_sNodeTools,
-                    "Only show Sections that have (Filter)",
-                    "The \"Go To\" Menu (e.g., Next, Previous commands) will only go to those " +
-                        "sections which match certain criteria. E.g., they must have a certain word " +
-                        "defined, or must have mismatched quotes. This can be a good way to locate " +
-                        "errors, or To Do Notes.");
-
-                m_Dlg.Add(ID.fLocalizer.ToString(),
-                    false,
-                    false,
-                    c_sNodeTools,
-                    "Localization Dialog",
-                    "This dialog, appearing in the Tools menu, allows you to translate the " +
-                        "user interface of OurWord into another language.");
-
-                m_Dlg.Add(ID.fExport.ToString(),
-                    false,
-                    false,
-                    c_sNodeTools,
-                    "Export",
-                    "Provides export to Toolbox, USFM, GoBible, and potentially other file formats.");
-                #endregion
-                #region NAVIGATION FEATURES
-                m_Dlg.Add(ID.fGoTo_FirstLast.ToString(),
-                    true,
-                    false,
-                    c_sNodeNavigation,
-                    "First & Last Buttons",
-                    "Makes the First and Last Buttons visible, by which you can navigate to the " +
-                        "first and last sections in the book. Experienced users may want to have " +
-                        "these buttons visible for easier movement around the book.");
-
-                m_Dlg.Add(ID.fGoTo_Chapter.ToString(),
-                    true,
-                    false,
-                    c_sNodeNavigation,
-                    "Chapter Button",
-                    "Makes the Chapter button visible, by which you can navigate directly to " +
-                        "the first section in the desired chapter. Experienced users may want " +
-                        "to have this button visible for easier movement around the book.");
-                #endregion
-
-                m_Dlg.Add(ID.fProject.ToString(),  
-                    true, 
-                    false,
-                    "",
-                    "Project New / Open / etc.",
-                    "Turn this on if you are working with multiple projects.");
-
-                m_Dlg.Add(ID.fPrint.ToString(),            
-                    false,
-                    false,
-                    "",
-                    "Printing",
-                    "The book can be formatted and printed. ");
-
-            }
-			#endregion
-		};
-		#endregion
-		#region Attr{g}: FeaturesMgr Features
-		static public FeaturesMgr Features
-		{
-			get
-			{
-				return s_Features;
-			}
-		}
-		static public FeaturesMgr s_Features = null;
-		#endregion
-
 		// Misc Methods ---------------------------------------------------------------------
 		#region Method: void OnLeaveSection()
 		private void OnLeaveSection()
@@ -2124,13 +1606,10 @@ namespace OurWord
 		}
 		#endregion
 		#region Method: void OnEnterProject()
-		private void OnEnterProject()
+	    internal void OnEnterProject()
 		{
             // If we aren't already navigated to a book, then attempt to find one.
 			DB.Project.Nav.GoToReasonableBook(G.CreateProgressIndicator());
-
-            // Window Zoom factor
-            SetZoomFactor();
 
             // Window contents, etc.
 			OnEnterSection();
@@ -2161,6 +1640,7 @@ namespace OurWord
 
 			// Remember the previous placement of the window on the screen (Do this late
 			// in the load sequence so that we avoid a multiple screen redraw.) 
+            m_WindowState.StartMaximized = Users.Current.MaximizeWindowOnStartup;
 			m_WindowState.RestoreWindowState();
 
 			// Initialize AutoSave Timer
@@ -2355,16 +1835,15 @@ namespace OurWord
                 var ci = new ClusterInfo(wiz.ClusterName, sParentFolder);
 
                 // Attempt the clone
-                var internetRepository = new InternetRepository(wiz.ClusterName)
+                var internetRepository = new InternetRepository(wiz.ClusterName, 
+                    wiz.UserName, wiz.Password)
                 {
                     Server = wiz.Url,
-                    UserName = wiz.UserName,
-                    Password = wiz.Password
                 };
-
                 var localRepository = new LocalRepository(ci.ClusterFolder);
 
-                var method = new Synchronize(localRepository, internetRepository, DB.UserName);
+                var method = new Synchronize(localRepository, internetRepository, 
+                    Users.Current.UserName);
                 var bSuccessful = method.CloneFromOther();
 
                 // If error, give the user opportunity to try again, so we don't lose
@@ -2390,6 +1869,7 @@ namespace OurWord
                     DB.Project = new DProject();
                     DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
                     DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
+                    Users.Current = Users.Observer;
                     OnEnterProject();
                 }
 
@@ -2618,14 +2098,14 @@ namespace OurWord
         #region Cmd: cmdUndo
         private void cmdUndo(object sender, EventArgs e)
         {
-            if (Features.F_UndoRedo)
+            if (Users.Current.CanUndoRedo)
                 URStack.Undo();
         }
         #endregion
         #region Cmd: cmdRedo
         private void cmdRedo(object sender, EventArgs e)
         {
-            if (Features.F_UndoRedo)
+            if (Users.Current.CanUndoRedo)
                 URStack.Redo();
         }
         #endregion
@@ -2921,10 +2401,7 @@ namespace OurWord
             // Populate the Zoom Factor subwindow, if it hasn't been populated already
             if (0 == m_menuZoom.DropDownItems.Count)
             {
-                var v = new int[] { 
-                60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 };
-
-                foreach (var n in v)
+                foreach (var n in User.PossibleZoomPercents)
                 {
                     var mi = new ToolStripMenuItem(n.ToString() + "%", null,
                         cmdChangeZoomPercent, "zzom_" + n.ToString());
@@ -2936,22 +2413,21 @@ namespace OurWord
             // Check the one that is current
             foreach (ToolStripMenuItem mi in m_menuZoom.DropDownItems)
             {
-                mi.Checked = ((int)mi.Tag == G.ZoomPercent) ? true : false;
+                mi.Checked = ((int)mi.Tag == Users.Current.ZoomPercent) ? true : false;
             }
         }
         #endregion
         #region Cmd: cmdChangeZoomPercent
         private void cmdChangeZoomPercent(Object sender, EventArgs e)
         {
-            ToolStripMenuItem mi = sender as ToolStripMenuItem;
+            var mi = sender as ToolStripMenuItem;
             if (null == mi)
                 return;
 
-            if (G.ZoomPercent != (int)mi.Tag)
+            if (Users.Current.ZoomPercent != (int)mi.Tag)
             {
 
-                G.ZoomPercent = (int)mi.Tag;
-                SetZoomFactor();
+                Users.Current.ZoomPercent = (int)mi.Tag;
                 OnEnterSection();
             }
         }
@@ -3167,6 +2643,27 @@ namespace OurWord
 		#region Cmd: cmdConfigure
         private void cmdConfigure(Object sender, EventArgs e)
 		{
+            if (!Users.HasAdministrator)
+            {
+                Messages.NeedAdministrator();
+                return;
+            }
+
+            Dim();
+
+            // An administrator login is required to access the Configuration
+            if (!Users.Current.IsAdministrator)
+            {
+                var dlgAuthenticate = new DlgAdministratorLogin();
+                var bAuthenticated = (DialogResult.OK == dlgAuthenticate.ShowDialog(this));
+                if (!bAuthenticated)
+                {
+                    UnDim();
+                    return;
+                }
+            }
+
+
             // Retrieve data and save the project to disk. We don't know if the
 			// user might remove the book from the project, so we need to make sure
 			// it was saved just in case.
@@ -3174,28 +2671,11 @@ namespace OurWord
 
             // Let the user change the properties
             var dlg = new DialogProperties();
-            Dim();
             dlg.ShowDialog(this);
             UnDim();
 
-            // The zoom factor may have changed, so we need to recalculate the fonts
-            SetZoomFactor();
-
             // Re-initialize everything
 			OnEnterProject();
-		}
-		#endregion
-		#region Cmd: cmdSetUpFeatures
-        private void cmdSetUpFeatures(Object sender, EventArgs e)
-		{
-            Dim();
-			if (true == s_Features.ShowDialog(this) )
-			{
-				OnLeaveSection();
-                SetupMenusAndToolbarsVisibility();
-                OnEnterProject();  // Makes sure we reset the side windows
-            }
-            UnDim();
 		}
 		#endregion
 		#region Cmd: cmdDebugTesting
@@ -3239,8 +2719,7 @@ namespace OurWord
             // Do the Synchronize
             var local = DB.TeamSettings.GetLocalRepository();
             var remote = DB.TeamSettings.GetInternetRepository();
-            var username = DB.UserName;
-            var synch = new Synchronize(local, remote, username);
+            var synch = new Synchronize(local, remote, Users.Current.UserName);
             using (new Chorus.Utilities.ShortTermEnvironmentalVariable("OurWordExeVersion", G.Version))
                 synch.SynchLocalToOther();
 
@@ -3367,38 +2846,8 @@ namespace OurWord
     }
 
 	#region CLASS G - Globals for convenient access
-	public class G
+	public static class G
 	{
-        // Options stored in the registry ----------------------------------------------------
-        const string c_sSubKey = "Options";
-        const string c_keyZoom = "Zoom";
-        #region SAttr{g}: float ZoomPercent
-        public static int ZoomPercent
-        {
-            get
-            {
-                if (-1 == s_nZoomPercent)
-                    s_nZoomPercent = JW_Registry.GetValue(c_sSubKey, c_keyZoom, 100);
-                return s_nZoomPercent;
-            }
-            set
-            {
-                s_nZoomPercent = value;
-                JW_Registry.SetValue(c_sSubKey, c_keyZoom, s_nZoomPercent);
-            }
-        }
-        private static int s_nZoomPercent = -1;
-        #endregion
-        #region SVAttr{g}: float ZoomFactor
-        public static float ZoomFactor
-        {
-            get
-            {
-                return ((float)ZoomPercent / 100.0F);
-            }
-        }
-        #endregion
-
         // Stuff still in OurWordMain
         #region Attr{g}: OurWordMain App
         static public OurWordMain App
@@ -3497,7 +2946,6 @@ namespace OurWord
         }
         #endregion
 
-
         // Misc ------------------------------------------------------------------------------
         #region SAttr{g}: bool IsLinux
         static public bool IsLinux
@@ -3523,108 +2971,66 @@ namespace OurWord
 
         // LocDB strings - access to various Groups in the LocDB -----------------------------
         #region SMethod: string GetLoc_String(sItemID, sEnglish) -        "Strings" 
-        static public string GetLoc_String(string sItemID, string sEnglishDefault)
+        static public string GetLoc_String(string sItemId, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                new string[] { "Strings" },
-                sItemID,
+                new[] { "Strings" },
+                sItemId,
                 sEnglishDefault,
                 null,
                 null);
         }
         #endregion
         #region SMethod: string GetLoc_GeneralUI(sItemID, sEnglish) -     "Strings\GeneralUI"
-        static public string GetLoc_GeneralUI(string sItemID, string sEnglishDefault)
+        static public string GetLoc_GeneralUI(string sItemId, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                new string[] { "Strings", "GeneralUI" },
-                sItemID, 
+                new[] { "Strings", "GeneralUI" },
+                sItemId, 
                 sEnglishDefault,
                 null,
                 null);
         }
         #endregion
         #region SMethod: string GetLoc_Files(sItemID, sEnglish) -         "Strings\Files"
-        static public string GetLoc_Files(string sItemID, string sEnglishDefault)
+        static public string GetLoc_Files(string sItemId, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                new string[] { "Strings", "Files" },
-                sItemID,
+                new[] { "Strings", "Files" },
+                sItemId,
                 sEnglishDefault,
                 null,
                 null);
         }
         #endregion
         #region SMethod: string GetLoc_UndoRedo(sItemID, sEnglish) -      "Strings/UndoRedo"
-        static public string GetLoc_UndoRedo(string sItemID, string sEnglishDefault)
+        static public string GetLoc_UndoRedo(string sItemId, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                new string[] { "Strings", "UndoRedo" },
-                sItemID,
+                new[] { "Strings", "UndoRedo" },
+                sItemId,
                 sEnglishDefault,
                 null,
                 null);
         }
         #endregion
-        #region SMethod: string GetLoc_StyleName(sEnglish) -              "Strings\Styles"
-        static public string GetLoc_StyleName(string sEnglish)
-        {
-            // Compute an ItemID from the name of the style by removing all whitespace
-            string sItemID = "";
-            foreach (char ch in sEnglish)
-            {
-                if (!char.IsWhiteSpace(ch))
-                    sItemID += ch;
-            }
-            Debug.Assert(!string.IsNullOrEmpty(sItemID));
-
-            // Retrieve the value
-            return LocDB.GetValue(
-                new string[] { "Strings", "Styles" },
-                sItemID,
-                sEnglish,
-                null,
-                null);
-        }
-        #endregion
-        #region SMethod: string GetLoc_Merge(sEnglish) -                  "Strings\Merge"
-        static public string GetLoc_Merge(string sEnglish)
-        {
-            // Compute an ItemID from the name of the style by removing all whitespace
-            string sItemID = "";
-            foreach (char ch in sEnglish)
-            {
-                if (!char.IsWhiteSpace(ch))
-                    sItemID += ch;
-            }
-            Debug.Assert(!string.IsNullOrEmpty(sItemID));
-
-            // Retrieve the value
-            return LocDB.GetValue(
-                new string[] { "Strings", "MergeWindow" },
-                sItemID,
-                sEnglish,
-                null,
-                null);
-        }
-        #endregion
         #region SMethod: string GetLoc_DialogCommon(sItemID, sEnglish, vsIns) -  "Strings\DialogCommon"
-        static public string GetLoc_DialogCommon(string sItemID, string sEnglish, string[] vsInsert)
+        static public string GetLoc_DialogCommon(string sItemId, string sEnglish, string[] vsInsert)
         {
             return LocDB.GetValue(
-                new string[] { "Strings", "DialogCommon" },
-                sItemID,
+                new[] { "Strings", "DialogCommon" },
+                sItemId,
                 sEnglish,
                 null,
                 vsInsert);
         }
         #endregion
         #region SMethod: string GetLoc_Splash(sItemID, sEnglish) -     "Strings\GeneralUI"
-        static public string GetLoc_Splash(string sItemID, string sEnglishDefault)
+        static public string GetLoc_Splash(string sItemId, string sEnglishDefault)
         {
             return LocDB.GetValue(
-                new string[] { "SplashScreen" },
-                sItemID,
+                new[] { "SplashScreen" },
+                sItemId,
                 sEnglishDefault,
                 null,
                 null);
@@ -3632,16 +3038,6 @@ namespace OurWord
         #endregion
     }
 	#endregion
-
-	#region Exception: eInvalidProjectFile - Project file was the wrong format
-	public class eInvalidProjectFile : Exception
-	{
-		public eInvalidProjectFile(string sFileName)
-			: base("Attempt to open a file with the wrong format - " + sFileName)
-		{}
-	}
-	#endregion
-
 
     public class SplashProgress : IProgressIndicator
     {
@@ -3652,8 +3048,7 @@ namespace OurWord
             {
                 if (SplashScreen.Wnd.InvokeRequired)
                 {
-                    SplashScreen.SetStatus_Callback d = new
-                        SplashScreen.SetStatus_Callback(SplashScreen.Wnd.SetStatus);
+                    var d = new SplashScreen.SetStatus_Callback(SplashScreen.Wnd.SetStatus);
                     G.App.Invoke(d, new object[] { sMessage, nCount });
                 }
                 else
@@ -3670,8 +3065,7 @@ namespace OurWord
             {
                 if (SplashScreen.Wnd.InvokeRequired)
                 {
-                    SplashScreen.IncrementProgress_Callback d = new
-                        SplashScreen.IncrementProgress_Callback(SplashScreen.Wnd.IncrementProgress);
+                    var d = new SplashScreen.IncrementProgress_Callback(SplashScreen.Wnd.IncrementProgress);
                     G.App.Invoke(d, new object[] { });
                 }
                 else
@@ -3688,8 +3082,7 @@ namespace OurWord
             {
                 if (SplashScreen.Wnd.InvokeRequired)
                 {
-                    SplashScreen.ResetProgress_Callback d = new
-                        SplashScreen.ResetProgress_Callback(SplashScreen.Wnd.ResetProgress);
+                    var d = new SplashScreen.ResetProgress_Callback(SplashScreen.Wnd.ResetProgress);
                     G.App.Invoke(d, new object[] { });
                 }
                 else

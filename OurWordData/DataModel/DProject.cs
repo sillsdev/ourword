@@ -5,21 +5,15 @@
  * Author:  John Wimbish
  * Created: 25 Jan 2004
  * Purpose: The entire group of translations currently being viewed / edited.
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
-using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Windows.Forms;
 using System.IO;
 using JWTools;
 using OurWordData.Styles;
-#endregion
+using OurWordData.DataModel.Membership;
 #endregion
 
 namespace OurWordData.DataModel
@@ -876,6 +870,9 @@ namespace OurWordData.DataModel
             DTeamSettings.EnsureInitialized();
             StyleSheet.Initialize(DB.TeamSettings.StyleSheetStoragePath);
 
+            // Users
+            Users.Read(TeamSettings);
+
             // Read the LoadOnDemand translation objects
             if (null != FrontTranslation)
             {
@@ -958,6 +955,8 @@ namespace OurWordData.DataModel
         #region Method: void Save(IProgressIndicator)
         public void Save(IProgressIndicator progress)
         {
+            Users.Save();
+
             // Nothing to do if we don't have anything to save
             if (!HasContent)
                 return;

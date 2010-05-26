@@ -3352,7 +3352,7 @@ namespace OurWordData.DataModel
                     return;
 
                 // Keep whichever DSection has changed structure. If both have changed,
-                // keep ours and make a translator note telling them we couldn't preserve
+                // keep ours and make a TranslatorNote telling them we couldn't preserve
                 // theirs.
                 DiffStructureMerge();
 

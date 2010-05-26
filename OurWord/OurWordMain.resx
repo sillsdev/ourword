@@ -378,15 +378,6 @@
         BX/o7MOXspOMAAAAAElFTkSuQmCC
 </value>
   </data>
-  <data name="m_menuSetUpFeatures.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAIxJREFUOE+tkwEO
-        gCAMA/ngvrlvosNUax0jJpAsMcKupc7Wdi0z6ygw+V08l1ru/gKg2d16VCYwgLERzQpQFwABdrtRm5nV
-        S+Sp1xkF9HMpZHadNJM4zJChTgGzm2mwDEEzZ/LJIbPCyrq//KTcnGVSzoMqaya/mvneSyfVnTFwJQST
-        WFnE1O76//ZwDr893SMGEktiAAAAAElFTkSuQmCC
-</value>
-  </data>
   <data name="m_menuPreviousSection.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
@@ -487,21 +478,9 @@
   <metadata name="m_StatusStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>416, 17</value>
   </metadata>
-  <metadata name="m_Taskbar.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>542, 17</value>
+  <metadata name="m_ViewBar.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>651, 17</value>
   </metadata>
-  <data name="m_tbPadlock.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAASRJREFUOE9jYKAF
-        WLNmzX90TLQ9II1KwTn/eeXU4Vg3rx9sIEFDQIokrHz+x6049//3v///v//++//qy8//baYc+i+kbUHY
-        EJDNEUvO/L/1+guKCw7cffPfccbR/xqJdfhdAXL2s08/wJqRnQvi77r1CkMcw0sUGYAcaITYWAMTpGnL
-        tRf/V1169n/uqYf/+w/d/d+4++b/os1X/qetuQAOG6+5J3B7A2SArFv0fwXflP9KIXn/1RNq/4Oiz6R+
-        GTgWoped/d+w6wZ+A2Ycf/C/5+Cd/7U7rv/P33j5f+Kq8/+DFp767zr7+H/rSfv/m7dvpLELKrdf/5+z
-        /tL/+JXn/wcsOAWOe6u+Xf/N29b/N21eDcboUQwPUEIhjyxPMEnTVQEAxSsEwWHQtD0AAAAASUVORK5C
-        YII=
-</value>
-  </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         AAABAAQAQEAAAAEAIAAoQgAARgAAADAwAAABACAAqCUAAG5CAAAgIAAAAQAgAKgQAAAWaAAAEBAAAAEA

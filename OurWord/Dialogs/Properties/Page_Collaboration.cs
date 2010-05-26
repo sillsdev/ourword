@@ -29,8 +29,6 @@ namespace OurWord.Dialogs
         }
         #endregion
         EditTextSetting m_RemoteServerUrl;
-        EditTextSetting m_RemoteServerUserName;
-        EditTextSetting m_RemoteServerPassword;
         #region Method: BuildLiterateSettings()
         void BuildLiterateSettings()
         {
@@ -96,14 +94,6 @@ namespace OurWord.Dialogs
                 "Central Repository URL:",
                 "The Url for accessing the remote, central respository.)",
                 internetRepository.Server);
-            m_RemoteServerUserName = LS.AddEditText("coUserName",
-                "User Name:",
-                "The central repositiory administrator will provide you with your user name.",
-                internetRepository.UserName);
-            m_RemoteServerPassword = LS.AddEditText("coPassword",
-                "Password",
-                "The central repositiory administrator will provide you with your password.",
-                internetRepository.Password);
         }
         #endregion
 
@@ -148,8 +138,6 @@ namespace OurWord.Dialogs
             var internetRepository = DB.TeamSettings.GetInternetRepository();
 
             internetRepository.Server = m_RemoteServerUrl.Value;
-            internetRepository.UserName = m_RemoteServerUserName.Value;
-            internetRepository.Password = m_RemoteServerPassword.Value;
             return true;
         }
         #endregion

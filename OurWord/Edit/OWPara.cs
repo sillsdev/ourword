@@ -17,6 +17,7 @@ using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 
@@ -158,7 +159,7 @@ namespace OurWord.Edit
                     return false;
                 if (IsLocked)
                     return false;
-                if (!OurWordMain.s_Features.F_StructuralEditing)
+                if (!Users.Current.CanEditStructure)
                     return false;
 
                 if (DataSource as DFootnote == null)
@@ -217,7 +218,8 @@ namespace OurWord.Edit
                     // in order to build the next one.
                     if (WritingSystem.IsWordBreak(phrase.Text, i) && sWord.Length > 0)
                     {
-                        var fontZoomed = fontFactory.GetFont(phrase.FontToggles, G.ZoomPercent);
+                        var fontZoomed = fontFactory.GetFont(phrase.FontToggles, 
+                            Users.Current.ZoomPercent);
                         vWords.Add(new EWord(fontZoomed, phrase, sWord));
                         sWord = "";
                     }
@@ -230,7 +232,8 @@ namespace OurWord.Edit
                 // caught it.
                 if (sWord.Length > 0)
                 {
-                    var fontZoomed = fontFactory.GetFont(phrase.FontToggles, G.ZoomPercent);
+                    var fontZoomed = fontFactory.GetFont(phrase.FontToggles, 
+                        Users.Current.ZoomPercent);
                     vWords.Add(new EWord(fontZoomed, phrase, sWord));
                 }
             }
@@ -238,7 +241,7 @@ namespace OurWord.Edit
             // If we did not find any words, then we want to create an InsertionIcon
             if (vWords.Count == 0)
             {
-                var fontZoomed = fontFactory.GetFont(G.ZoomPercent);
+                var fontZoomed = fontFactory.GetFont(Users.Current.ZoomPercent);
                 vWords.Add(EWord.CreateAsInsertionIcon(fontZoomed, phrases[0]));
             }
 
@@ -255,7 +258,7 @@ namespace OurWord.Edit
         #region Method: void InitializeNoteIcons(DText)
         void InitializeNoteIcons(DText text, bool bShowingBT)
         {
-            if (!OurWordMain.s_Features.TranslatorNotes)
+            if (!Users.Current.CanMakeNotes)
                 return;
 
             foreach (TranslatorNote note in text.TranslatorNotes)
@@ -311,10 +314,10 @@ namespace OurWord.Edit
             Clear();
 
             // Get the fonts
-            var fontChapter = StyleSheet.ChapterNumber.GetFont(WritingSystem.Name, G.ZoomPercent);
-            var fontVerse = StyleSheet.VerseNumber.GetFont(WritingSystem.Name, G.ZoomPercent);
-            var fontFootLetter = StyleSheet.FootnoteLetter.GetFont(WritingSystem.Name, G.ZoomPercent);
-            var fontLabel = StyleSheet.Label.GetFont(WritingSystem.Name, G.ZoomPercent);              
+            var fontChapter = StyleSheet.ChapterNumber.GetFont(WritingSystem.Name, Users.Current.ZoomPercent);
+            var fontVerse = StyleSheet.VerseNumber.GetFont(WritingSystem.Name, Users.Current.ZoomPercent);
+            var fontFootLetter = StyleSheet.FootnoteLetter.GetFont(WritingSystem.Name, Users.Current.ZoomPercent);
+            var fontLabel = StyleSheet.Label.GetFont(WritingSystem.Name, Users.Current.ZoomPercent);              
 
             // Loop through the paragraph's runs
             foreach (DRun r in p.Runs)
@@ -409,7 +412,7 @@ namespace OurWord.Edit
             m_Options = options;
 
             // Calculate the line height for the paragraph
-            m_fLineHeight = style.GetFont(writingSystem.Name, G.ZoomPercent).Height;
+            m_fLineHeight = style.GetFont(writingSystem.Name, Users.Current.ZoomPercent).Height;
 
             // Initialize the vector of Blocks
             Clear();
@@ -452,7 +455,8 @@ namespace OurWord.Edit
             // We'll add the language name as a BigHeader
             if (!string.IsNullOrEmpty(sLabel))
             {
-                var fontBigHeader = StyleSheet.BigHeader.GetFont(writingSystem.Name, G.ZoomPercent);
+                var fontBigHeader = StyleSheet.BigHeader.GetFont(writingSystem.Name, 
+                    Users.Current.ZoomPercent);
                 Append(new EBigHeader(fontBigHeader, sLabel));
             }
 
@@ -463,7 +467,8 @@ namespace OurWord.Edit
                 {
                     case "DVerse":
                         {
-                            var fontVerse = StyleSheet.VerseNumber.GetFont(writingSystem.Name, G.ZoomPercent);
+                            var fontVerse = StyleSheet.VerseNumber.GetFont(writingSystem.Name, 
+                                Users.Current.ZoomPercent);
                             Append(new EVerse(fontVerse, run as DVerse));
                         }
                         break;
@@ -520,7 +525,8 @@ namespace OurWord.Edit
                 var vs = phrase.Text.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
                 // Determine the font for this phrase
-                var font = style.GetFont(writingSystem.Name, phrase.FontToggles, G.ZoomPercent);
+                var font = style.GetFont(writingSystem.Name, phrase.FontToggles, 
+                    Users.Current.ZoomPercent);
 
                 // Create the literal strings
                 for (var i = 0; i < vs.Length; i++)
@@ -1120,7 +1126,7 @@ namespace OurWord.Edit
             // Add any SpaceBefore. This comes to us in Points, so we divide by 72 to
             // get Inches, then multiply by the screen's DPI to get pixels.
             var ySpaceBefore = Context.PointsToDeviceY(Style.PointsBefore);
-            ySpaceBefore *= G.ZoomFactor;
+            ySpaceBefore *= Users.Current.ZoomFactor;
             y += ySpaceBefore;
             y += Border.GetTotalWidth(BorderBase.BorderSides.Top);
             y += CalculateBitmapHeightRequirement();
@@ -1239,7 +1245,7 @@ namespace OurWord.Edit
             Height += Border.GetTotalWidth(BorderBase.BorderSides.Bottom);
             Height += CalculateBitmapHeightRequirement();
             var ySpaceAfter = Context.PointsToDeviceY(Style.PointsAfter);
-            ySpaceAfter *= G.ZoomFactor;
+            ySpaceAfter *= Users.Current.ZoomFactor;
             Height += ySpaceAfter;
         }
         #endregion
@@ -1908,7 +1914,8 @@ namespace OurWord.Edit
                 return;
 
             var writngSystem = GetWritingSystem(footnote, options);
-            var font = StyleSheet.Footnote.GetFont(writngSystem.Name, G.ZoomPercent);
+            var font = StyleSheet.Footnote.GetFont(writngSystem.Name, 
+                Users.Current.ZoomPercent);
 
             var label = new DLabel(footnote.VerseReference + ": ");
 
@@ -1919,7 +1926,8 @@ namespace OurWord.Edit
         #region Method: void ConstructFootnoteLetter(DFootnote)
         void ConstructFootnoteLetter(DFootnote footnote)
         {
-            var fontFootnoteLabel = StyleSheet.FootnoteLetter.GetFont(WritingSystem.Name, G.ZoomPercent);
+            var fontFootnoteLabel = StyleSheet.FootnoteLetter.GetFont(WritingSystem.Name,
+                Users.Current.ZoomPercent);
             var label = new EFootnoteLabel(fontFootnoteLabel, footnote);
             InsertAt(0, label);
         }

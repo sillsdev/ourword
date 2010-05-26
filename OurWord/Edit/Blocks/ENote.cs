@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.ToolTips;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 #endregion
 
@@ -129,7 +130,7 @@ namespace OurWord.Edit.Blocks
         {
             // We do this if (1) the user setting requires it, and (2) the TranslatorNote
             // does not have the Closed status
-            if (!TranslatorNote.ShowTitleWithNoteIcon)
+            if (!Users.Current.ShowExpandedNotesIcon)
                 return false;
             if (Note.Status == Role.Closed)
                 return false;
@@ -148,7 +149,7 @@ namespace OurWord.Edit.Blocks
             var title = Note.Title;
             var graphics = Window.CreateGraphics();
             var font = StyleSheet.TipText.GetFont(Note.Behavior.GetWritingSystem(Note).Name, 
-                FontStyle.Regular, G.ZoomPercent);
+                FontStyle.Regular, Users.Current.ZoomPercent);
             var desiredWidth = JWU.MeasureTextDisplayWidth(title, graphics, font);
             graphics.Dispose();
 

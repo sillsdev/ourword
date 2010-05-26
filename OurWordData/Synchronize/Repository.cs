@@ -19,7 +19,6 @@ using Chorus.VcsDrivers;
 using JWTools;
 using Chorus.Utilities;
 using Chorus.VcsDrivers.Mercurial;
-
 #endregion
 
 namespace OurWordData.Synchronize
@@ -523,7 +522,7 @@ namespace OurWordData.Synchronize
             // Pictures seem to mostly be "tif" format now. 
             var recognizedExtensions = new List<string> 
             {
-                ".otrans", ".owp", ".owt", ".oxes", ".StyleSheet",
+                ".otrans", ".owp", ".owt", ".oxes", ".StyleSheet", ".user",
                 ".tif", ".pcx", ".jpg"
             };
 
@@ -618,7 +617,8 @@ namespace OurWordData.Synchronize
         // 1 - setup of the initial feature
         // 2 - preventing AuSIL-TopEnd from being able to synch during case folding problem
         // 3 - new Style implementation, Pictures
-        public const int c_nCurrentVersionNo = 3;
+        // 4 - Version 1.7 - 
+        public const int c_nCurrentVersionNo = 4;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {
@@ -740,7 +740,10 @@ namespace OurWordData.Synchronize
             get
             {
                 var path = string.Format("http://{0}:{1}@{2}/{3}",
-                    UserName, Password, Server, m_ClusterName.ToLower());
+                    m_sRepositoryUserName,
+                    m_sRepositoryPassword,
+                    Server, 
+                    m_ClusterName.ToLower());
                 return path;
             }
         }
@@ -756,36 +759,10 @@ namespace OurWordData.Synchronize
             }
         }
         #endregion
-        private const string c_registryUserName = "RemoteUserName";
-        private const string c_registryPassword = "RemotePassword";
         private const string c_registryServer = "RemoteServer";
         public const string c_sDefaultServer = "hg-public.languagedepot.org";
-        #region SAttr{g/s}: string UserName
-        public string UserName
-        {
-            get
-            {
-                return JW_Registry.GetValue(RegistryClusterSubKey, c_registryUserName, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(RegistryClusterSubKey, c_registryUserName, value);
-            }
-        }
-        #endregion
-        #region SAttr{g/s}: string Password
-        public string Password
-        {
-            get
-            {
-                return JW_Registry.GetValue(RegistryClusterSubKey, c_registryPassword, "");
-            }
-            set
-            {
-                JW_Registry.SetValue(RegistryClusterSubKey, c_registryPassword, value);
-            }
-        }
-        #endregion
+        private readonly string m_sRepositoryUserName;
+        private readonly string m_sRepositoryPassword;
         #region SAttr{g/s}: string Server
         public string Server
         {
@@ -828,12 +805,15 @@ namespace OurWordData.Synchronize
         // Scaffolding -----------------------------------------------------------------------
         private readonly string m_ClusterName;
         #region Constructor(clusterDisplayName)
-        public InternetRepository(string clusterDisplayName)
+        public InternetRepository(string clusterDisplayName, 
+            string sRepositoryUserName, string sRepositoryPassword)
         {
             if (string.IsNullOrEmpty(clusterDisplayName)) 
                 throw new ArgumentNullException("clusterDisplayName");
-
             m_ClusterName = clusterDisplayName;
+
+            m_sRepositoryUserName = sRepositoryUserName;
+            m_sRepositoryPassword = sRepositoryPassword;
         }
         #endregion
     }

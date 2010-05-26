@@ -2560,7 +2560,10 @@ namespace OurWord.Edit
         {
             // Save the new status
             Note.LastMessage.Author = sAuthor;
-            DB.UserName = sAuthor;
+
+            // Deleted May2010 - With the new Users implementation, I don't think we want to
+            // be resetting this!
+            //DB.UserName = sAuthor;
 
             // Update the dropdown button text
             Combo.Text = sAuthor;

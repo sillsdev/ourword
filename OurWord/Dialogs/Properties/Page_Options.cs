@@ -55,10 +55,8 @@ namespace OurWord.Dialogs
         const string c_sPrimaryLanguage = "propPrimaryLanguage";
         const string c_sSecondaryLanguage = "propSecondaryLanguage";
 
-        const string c_sMaximizeWindowOnStartup = "propMaximizeWindowOnStartup";
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
-        const string c_sZoomFactor = "propZoomFactor";
         const string c_sProjectAccess = "propProjectAccess";
 
         private const string c_sGroupBackTranlation = "BackTranslation";
@@ -91,6 +89,8 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
+/*
+*/
                 case c_sPrimaryLanguage:
                     e.Value = (null != LocDB.DB.PrimaryLanguage) ?
                         LocDB.DB.PrimaryLanguage.Name :
@@ -102,19 +102,10 @@ namespace OurWord.Dialogs
                         LocItem.c_sEnglish;
                     break;
 
-                case c_sMaximizeWindowOnStartup:
-                    SetPropertySpecValue(e, OurWordMain.App.StartMaximized);
-                    break;
-
                 case c_sMakeBackups:
                     SetPropertySpecValue(e, BackupSystem.Enabled);
                     break;
 
-                case c_sZoomFactor:
-                    var ZoomPS = e.Property as ZoomPropertySpec;
-                    Debug.Assert(null != ZoomPS);
-                    e.Value = ZoomPS.GetZoomString(G.ZoomPercent);
-                    break;
 
                 case c_sBackupPath:
                     e.Value = BackupSystem.RegistryBackupFolder;
@@ -184,11 +175,6 @@ namespace OurWord.Dialogs
                 case c_sSecondaryLanguage:
                     LocDB.DB.SetSecondary((string)e.Value);
                     break;
-
-                case c_sMaximizeWindowOnStartup:
-                    OurWordMain.App.StartMaximized = InterpretYesNo(e);
-                    break;
-
                 case c_sMakeBackups:
                     BackupSystem.Enabled = InterpretYesNo(e);
                     break;
@@ -197,11 +183,8 @@ namespace OurWord.Dialogs
                     BackupSystem.RegistryBackupFolder = (string)e.Value;
                     break;
 
-                case c_sZoomFactor:
-                    var ZoomPS = e.Property as ZoomPropertySpec;
-                    Debug.Assert(null != ZoomPS);
-                    G.ZoomPercent = ZoomPS.GetZoomFactor(e.Value);
-                    break;
+/*
+*/
 
                 case c_sProjectAccess:
                     break;
@@ -270,16 +253,6 @@ namespace OurWord.Dialogs
 
             // Misc Options
             #region (Misc Options)
-            // Maxmimze window on startup
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sMaximizeWindowOnStartup,
-                "Maxmimize Window on Startup?",
-                "",
-                "If Yes, OurWord starts up maximized. This may help newer users to have sufficient " +
-                    "size on the screen for doing work.",
-                true
-                ));
-
             // Turn on the Backup System
             Bag.Properties.Add(new YesNoPropertySpec(
                 c_sMakeBackups,
@@ -311,6 +284,7 @@ namespace OurWord.Dialogs
                 typeof(CheckTreeEditor),
                 null));
 
+/*
             // Zoom Factor (displays as a combo, showing, e.g., "120 %")
             var zps = new ZoomPropertySpec(
                 c_sZoomFactor,
@@ -323,6 +297,7 @@ namespace OurWord.Dialogs
                 );
             zps.DontLocalizeEnums = true;
             Bag.Properties.Add(zps);
+*/
             #endregion
 
             // Back Translation options

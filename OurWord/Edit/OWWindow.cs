@@ -26,6 +26,7 @@ using OurWord.ToolTips;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 using Palaso.UI.WindowsForms.Keyboarding;
@@ -65,22 +66,6 @@ namespace OurWord.Edit
         }
         int m_cColumnCount = 0;
         #endregion
-        #region Attr{g/s}: float ZoomFactor
-        public float ZoomFactor
-        {
-            get
-            {
-                // We're supporting 60% through 250% in the dialog box currently
-                Debug.Assert(m_fZoomFactor > 0.5F && m_fZoomFactor < 2.6F);
-                return m_fZoomFactor;
-            }
-            set
-            {
-                m_fZoomFactor = value;
-            }
-        }
-        float m_fZoomFactor = 1.0F;
-        #endregion
 
         // Delegates -------------------------------------------------------------------------
         private EventHandler OnLayoutFinished;
@@ -100,14 +85,14 @@ namespace OurWord.Edit
         string m_sRegistrySettingsSubKey = null;
         #endregion
         #region REGISTRY: Background Color
-        const string c_NameBackColor = "BackColor";
+        const string c_NameBackColor = "WindowBackColor";
         static public void SetRegistryBackgroundColor(string sSubKey, string sColor)
         {
-            JW_Registry.SetValue(sSubKey, c_NameBackColor, sColor);
+            JW_Registry.SetValue(c_NameBackColor, sSubKey, sColor);
         }
         static public string GetRegistryBackgroundColor(string sSubKey, string sColorDefault)
         {
-            return JW_Registry.GetValue(sSubKey, c_NameBackColor, sColorDefault);
+            return JW_Registry.GetValue(c_NameBackColor, sSubKey, sColorDefault);
         }
         #endregion
 
@@ -600,7 +585,7 @@ namespace OurWord.Edit
             public CLineNumberAttrs(Graphics g)
             {
                 // We'll use a fixed-space font so that the numbers line up
-                var fSize = 10 * G.ZoomFactor;
+                var fSize = 10 * Users.Current.ZoomFactor;
                 m_fLineNumberFont = new Font("Courier New", fSize);
 
                 // Get the default Brush color; the window can overridei this
@@ -710,7 +695,7 @@ namespace OurWord.Edit
                 StyleSheet.FindOrCreate(WritingSystem.DefaultWritingSystemName) :
                 DB.TargetTranslation.WritingSystemVernacular;
 
-            float fLineHeight = style.GetFont(ws.Name, G.ZoomPercent).Height;
+            float fLineHeight = style.GetFont(ws.Name, Users.Current.ZoomPercent).Height;
             ScrollBar.SmallChange = (int)fLineHeight;
 
             // A large change will scroll 4/5 of the window's height

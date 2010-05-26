@@ -14,6 +14,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using JWTools;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 using OurWordData.Synchronize;
 
@@ -301,11 +302,12 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        // Repositor Factories ---------------------------------------------------------------
+        // Repository Factories --------------------------------------------------------------
         #region Method: InternetRepository GetInternetRepository()
         public InternetRepository GetInternetRepository()
         {
-            return new InternetRepository(DisplayName);
+            return new InternetRepository(DisplayName, Users.Current.CollaborationUserName,
+                Users.Current.CollaborationPassword);
         }
         #endregion
         #region Method: LocalRepository GetLocalRepository()
@@ -470,7 +472,19 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-		#region OAttr{g}: string StoragePath
+        #region Attr{g}: string UsersFolder - Top-level, e.g., "MyDocuments\OurWord\.Users"
+        public string UsersFolder
+        {
+            get
+            {
+                var sFolder = ClusterFolder + ".Users" + Path.DirectorySeparatorChar;
+                if (!Directory.Exists(sFolder))
+                    Directory.CreateDirectory(sFolder);
+                return sFolder;
+            }
+        }
+        #endregion
+        #region OAttr{g}: string StoragePath
 		public override string StoragePath
 		{
 			get

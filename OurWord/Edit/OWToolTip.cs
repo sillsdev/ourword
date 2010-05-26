@@ -21,6 +21,7 @@ using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 
@@ -338,7 +339,7 @@ namespace OurWord.Edit
             // If a user has already entered a message today, they just edit it directly,
             // rather than adding a new one. So we disable the button, but leave it there
             // so that the user isn't confused by a changing toolstrip.
-            if (Note.LastMessage.Author == DB.UserName &&
+            if (Note.LastMessage.Author == Users.Current.NoteAuthorsName &&
                 Note.LastMessage.UtcCreated.Date == DateTime.Today)
             {
                 // Disable the button
@@ -530,15 +531,15 @@ namespace OurWord.Edit
         protected ToolStripItem BuildDeleteNoteControl()
         {
             // If we do not have global delete priveledges, our options are limited.
-            if (!TranslatorNote.CanDeleteAnything)
+            if (!Users.Current.CanDeleteNotesAuthoredByOthers)
             {
                 // If there is one message and we authored it, we can delete the annotation
-                if (Note.Messages.Count == 1 && DB.UserName == Note.LastMessage.Author)
+                if (Note.Messages.Count == 1 && Users.Current.NoteAuthorsName == Note.LastMessage.Author)
                     return BuildDeleteSimpleButton(Note);
 
                 // If there are more than one message, but we authored the last one, then
                 // we can delete that message
-                if (Note.Messages.Count > 1 && DB.UserName == Note.LastMessage.Author)
+                if (Note.Messages.Count > 1 && Users.Current.NoteAuthorsName == Note.LastMessage.Author)
                     return BuildDeleteSimpleButton(Note.LastMessage);
 
                 // Otherwise, the button is disabled.
@@ -563,7 +564,8 @@ namespace OurWord.Edit
             Debug.Assert(null != writingSystem);
 
             // Header style and font
-            var fontHeader = StyleSheet.TipHeader.GetFont(writingSystem.Name, G.ZoomPercent);
+            var fontHeader = StyleSheet.TipHeader.GetFont(writingSystem.Name,
+                Users.Current.ZoomPercent);
 
             // Uneditable messages are just a line of text
             if (!message.IsEditable)
@@ -591,8 +593,8 @@ namespace OurWord.Edit
             combo.Tag = Note;
             foreach (string sPerson in DB.Project.People)
                 combo.Items.Add(sPerson);
-            if (!DB.Project.People.Contains(DB.UserName))
-                combo.Items.Add(DB.UserName);
+            if (!DB.Project.People.Contains(Users.Current.NoteAuthorsName))
+                combo.Items.Add(Users.Current.NoteAuthorsName);
             combo.DropDownClosed += new EventHandler(OnAuthorDropDownClosed);
             combo.TextChanged += new EventHandler(OnAuthorTextChanged);
 
@@ -644,7 +646,7 @@ namespace OurWord.Edit
                 return;
 
             // The Original Author is who we've stored as the Annotation's Author
-            var sOriginalAuthor = DB.UserName;
+            var sOriginalAuthor = Users.Current.NoteAuthorsName;
 
             // The New Author is now in the combo text
             var sNewAuthor = combo.Text;

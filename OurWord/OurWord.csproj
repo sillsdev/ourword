@@ -208,6 +208,15 @@
       <DependentUpon>TranslationProgress.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Membership\DlgAddNewUser.resx">
+      <DependentUpon>DlgAddNewUser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Membership\DlgAdministratorLogin.resx">
+      <DependentUpon>DlgAdministratorLogin.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Membership\DlgPassword.resx">
+      <DependentUpon>DlgPassword.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\CtrlPageContent.resx">
       <DependentUpon>CtrlPageContent.cs</DependentUpon>
     </EmbeddedResource>
@@ -218,6 +227,12 @@
     <EmbeddedResource Include="Dialogs\Properties\DlgNewCluster.resx">
       <DependentUpon>DlgNewCluster.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_UserFeatures.resx">
+      <DependentUpon>Page_UserFeatures.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_UserOptions.resx">
+      <DependentUpon>Page_UserOptions.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\RestoreFromBackup.resx">
       <DependentUpon>RestoreFromBackup.cs</DependentUpon>
@@ -354,6 +369,7 @@
     <Content Include="Res\NoteMerge.ico" />
     <None Include="Res\OurWord.png" />
     <Content Include="Res\ProgressIndicatorBackground.jpg" />
+    <Content Include="Res\TurnFeaturesOnOff.ico" />
     <EmbeddedResource Include="Res\ThisProject.ico" />
     <EmbeddedResource Include="Res\ThisCluster.ico" />
     <EmbeddedResource Include="Res\Project.ico" />
@@ -404,6 +420,24 @@
     <Compile Include="Dialogs\History\TranslationProgress.Designer.cs">
       <DependentUpon>TranslationProgress.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Membership\DlgAddNewUser.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Membership\DlgAddNewUser.Designer.cs">
+      <DependentUpon>DlgAddNewUser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Membership\DlgAdministratorLogin.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Membership\DlgAdministratorLogin.Designer.cs">
+      <DependentUpon>DlgAdministratorLogin.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Membership\DlgPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Membership\DlgPassword.Designer.cs">
+      <DependentUpon>DlgPassword.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Properties\CtrlPageContent.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -421,6 +455,18 @@
     </Compile>
     <Compile Include="Dialogs\Properties\DlgNewCluster.Designer.cs">
       <DependentUpon>DlgNewCluster.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_UserFeatures.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_UserFeatures.Designer.cs">
+      <DependentUpon>Page_UserFeatures.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_UserOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_UserOptions.Designer.cs">
+      <DependentUpon>Page_UserOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\RestoreFromBackup.cs">
       <SubType>Form</SubType>
@@ -731,6 +777,9 @@
       <DependentUpon>ShadowedBalloon.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Shortcut.cs" />
+    <Compile Include="Utilities\ViewBar.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Dialogs\DlgBookProperties.resx">
       <DependentUpon>DlgBookProperties.cs</DependentUpon>
       <SubType>Designer</SubType>

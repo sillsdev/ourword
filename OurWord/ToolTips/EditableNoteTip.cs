@@ -17,6 +17,7 @@ using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 #endregion
 
@@ -366,7 +367,7 @@ namespace OurWord.ToolTips
         #region OMethod: OnMouseLeave
         protected override void OnMouseLeave(EventArgs e)
         {
-            if (!TranslatorNote.DismissWhenMouseLeaves)
+            if (!Users.Current.CloseNotesWindowWhenMouseLeaves)
                 return;
 
             base.OnMouseLeave(e);
@@ -619,10 +620,11 @@ namespace OurWord.ToolTips
         void BuildDeleteControl()
         {
             // If we do not have global delete priviledges, our options are limited.
-            if (!TranslatorNote.CanDeleteAnything)
+            if (!Users.Current.CanDeleteNotesAuthoredByOthers)
             {
                 // If there is one message and we authored it, we can delete the annotation
-                if (Note.Messages.Count == 1 && DB.UserName == Note.LastMessage.Author)
+                if (Note.Messages.Count == 1 && 
+                    Users.Current.NoteAuthorsName == Note.LastMessage.Author)
                 {
                     BuildDeleteSimpleButton(Note);
                     return;
@@ -630,7 +632,8 @@ namespace OurWord.ToolTips
 
                 // If there are more than one message, but we authored the last one, then
                 // we can delete that message
-                if (Note.Messages.Count > 1 && DB.UserName == Note.LastMessage.Author)
+                if (Note.Messages.Count > 1 && 
+                    Users.Current.NoteAuthorsName == Note.LastMessage.Author)
                 {
                     BuildDeleteSimpleButton(Note.LastMessage);
                     return;
@@ -704,11 +707,13 @@ namespace OurWord.ToolTips
         {
             var writingSystem = Note.Behavior.GetWritingSystem(Note).Name;
 
-            var fontLabel = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Bold, G.ZoomPercent);
+            var fontLabel = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Bold, 
+                Users.Current.ZoomPercent);
             var sAuthor = message.Author + ",";
             var author = new ELabel(fontLabel, new DLabel(sAuthor));
 
-            var fontDate = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Italic, G.ZoomPercent);
+            var fontDate = StyleSheet.TipMessageHanging.GetFont(writingSystem, FontStyle.Italic,
+                Users.Current.ZoomPercent);
             var sDate = message.LocalTimeCreated.ToShortDateString() + ":\u00A0";
             var date = new ELabel(fontDate, new DLabel(sDate));
 
@@ -747,7 +752,7 @@ namespace OurWord.ToolTips
         bool IsEditableResponse(DMessage message)
         {
             // The message must have been entered by the current user
-            if (message.Author != DB.UserName)
+            if (message.Author != Users.Current.NoteAuthorsName)
                 return false;
 
             // The message should have been entered today

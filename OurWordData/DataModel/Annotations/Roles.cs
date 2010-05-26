@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using JWTools;
+using OurWordData.DataModel.Membership;
 
 #endregion
 
@@ -81,29 +82,19 @@ namespace OurWordData.DataModel.Annotations
         #endregion
 
         // User Access -----------------------------------------------------------------------
-        #region Attr{g/s}: CanCreatePropertyName
-        // If it has a value, then we call the TranslatorNote.GetNoteSetting method to 
-        // learn whether or not this Role is turned on for this User. If it is turned
-        // on, then (1) it is displayed in the appropriate views, and (2) it appears
-        // in the AssignedTo dropdown.
-        private string CanCreatePropertyName { get; set; }
-        #endregion
         #region Attr{g/s}: bool ThisUserCanAssignTo
-        public bool ThisUserCanAssignTo
+        virtual public bool ThisUserCanAssignTo
         {
             get
             {
-                if (string.IsNullOrEmpty(CanCreatePropertyName))
-                    return true;
-
-                return TranslatorNote.GetNoteSetting(CanCreatePropertyName);
+                return true;
             }
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sEnglishName)
-        private Role(string sEnglishName)
+        protected Role(string sEnglishName)
         {
             m_sEnglishName = sEnglishName;
             s_vRoles.Add(this);
@@ -198,12 +189,11 @@ namespace OurWordData.DataModel.Annotations
                 "the issue raised in this note.",
             IconColor = Color.Yellow
         };
-        static public readonly Role Consultant = new Role("Consultant")
+        static public readonly Role Consultant = new ConsultantRole("Consultant")
         {
             EnglishToolTipText = "This note is either a question of,\n" +
                 "or information for, the consultant.",
-            IconColor = Color.LightGreen,
-            CanCreatePropertyName = TranslatorNote.c_sCanCreateConsultantNotes
+            IconColor = Color.LightGreen
         };
         static public readonly Role Advisor = new Role("Advisor")
         {
@@ -216,25 +206,79 @@ namespace OurWordData.DataModel.Annotations
                 "Click here to re-open it, by assigning it to someone.",
             IconColor = Color.Gray
         };
-        static public readonly Role DaughterTeam = new Role("Daughter Team")
+        static public readonly Role DaughterTeam = new DaughterTeamRole("Daughter Team")
         {
             EnglishToolTipText = "Assign to the Daughter Team if you wish to give them\n" +
                 "help on translating this passage.",
             IconColor = Color.LightCyan,
             IsConversational = false,
-            SfmMarker = "ntHint",
-            CanCreatePropertyName = TranslatorNote.c_sCanCreateHintForDaughter
+            SfmMarker = "ntHint"
         };
-        public static readonly Role Information = new Role("Information")
+        public static readonly Role Information = new InformationRole("Information")
         {
             EnglishToolTipText = "This note is general-purpose information. It does not \n" + 
                 "contain replies.",
             IconColor = Color.Goldenrod,
             IsConversational = false,
-            SfmMarker = "ntcn",
-            CanCreatePropertyName = TranslatorNote.c_sCanCreateInformationNotes
+            SfmMarker = "ntcn"
         };
         #endregion
     }
+
+    public class ConsultantRole : Role
+    {
+        #region Constructor(sEnglishName)
+        public ConsultantRole(string sEnglishName)
+            : base(sEnglishName)
+        {
+        }
+        #endregion
+        #region OAttr{g}: bool ThisUserCanAssignTo
+        public override bool ThisUserCanAssignTo
+        {
+            get
+            {
+                return Users.Current.CanAssignNoteToConsultant;
+            }
+        }
+        #endregion
+    }
+    public class DaughterTeamRole : Role
+    {
+        #region Constructor(sEnglishName)
+        public DaughterTeamRole(string sEnglishName)
+            : base(sEnglishName)
+        {
+        }
+        #endregion
+        #region OAttr{g}: bool ThisUserCanAssignTo
+        public override bool ThisUserCanAssignTo
+        {
+            get
+            {
+                return Users.Current.CanAuthorHintForDaughterNotes;
+            }
+        }
+        #endregion
+    }
+    public class InformationRole : Role
+    {
+        #region Constructor(sEnglishName)
+        public InformationRole(string sEnglishName)
+            : base(sEnglishName)
+        {
+        }
+        #endregion
+        #region OAttr{g}: bool ThisUserCanAssignTo
+        public override bool ThisUserCanAssignTo
+        {
+            get
+            {
+                return Users.Current.CanAuthorInformationNotes;
+            }
+        }
+        #endregion
+    }
+
 
 }

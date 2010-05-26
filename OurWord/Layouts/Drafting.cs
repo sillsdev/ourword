@@ -23,6 +23,7 @@ using OurWordData;
 using OurWordData.DataModel;
 using JWTools;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 
 #endregion
@@ -433,7 +434,7 @@ namespace OurWord.Layouts
             if (p.IsUserEditable)
             {
                 DraftingOptions = OWPara.Flags.IsEditable;
-                if (OurWordMain.s_Features.F_StructuralEditing && null == p as DFootnote)
+                if (Users.Current.CanEditStructure && null == p as DFootnote)
                     DraftingOptions |= OWPara.Flags.CanRestructureParagraphs;
                 if (OurWordMain.TargetIsLocked)
                     DraftingOptions |= OWPara.Flags.IsLocked;

@@ -328,6 +328,56 @@ namespace OurWord
 		}
 		#endregion
 
+        // Users
+        #region Error:     void NeedUniqueUserName()
+        static public void NeedUniqueUserName()
+        {
+            LocDB.Message("msgNeedUniqueUserName",
+                "Please enter a name which is not already in use elsewhere in the cluster.",
+                null,
+                LocDB.MessageTypes.Error);
+        }
+        #endregion
+        #region Error:     void NeedUserName()
+        static public void NeedUserName()
+        {
+            LocDB.Message("msgNeedUserName",
+                "Please enter a user name.",
+                null,
+                LocDB.MessageTypes.Error);
+        }
+        #endregion
+        #region Error:     void NeedPassword()
+        static public void NeedPassword()
+        {
+            LocDB.Message("msgNeedPassword",
+                "Please enter a password of at least eight letters in length.",
+                null,
+                LocDB.MessageTypes.Error);
+        }
+        #endregion
+        #region Error:     bool TryPasswordAgain()
+        static public bool TryPasswordAgain()
+        {
+            return LocDB.Message("msgTryPasswordAgain",
+                "The password did not match. Keep in mind that passwords are case-sensitive.\n\n" +
+                    "Do you wish to try again?",
+                null,
+                LocDB.MessageTypes.YN);
+        }
+        #endregion
+        #region Error:     void NeedAdministrator()
+        static public void NeedAdministrator()
+        {
+            LocDB.Message("msgNeedAdministrator",
+                "An administrator is required to access the Configuration. " +
+                "Please add one by choosing \"Add New User\" from the User " +
+                "dropdown above.",
+                null,
+                LocDB.MessageTypes.Error);
+        }
+        #endregion
+
     }
     #endregion
 

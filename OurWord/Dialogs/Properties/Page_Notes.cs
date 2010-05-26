@@ -15,6 +15,7 @@ using System.Windows.Forms;
 using JWTools;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 
 #endregion
 
@@ -28,8 +29,6 @@ namespace OurWord.Dialogs
             : base(parentDlg)
         {
             InitializeComponent();
-
-            // Create a OWWindow as the one-and-only child
         }
         #endregion
 
@@ -38,17 +37,8 @@ namespace OurWord.Dialogs
         private const string c_sGroupPeople = "People";
         private const string c_sPeople = "propPeople";
 
-        private const string c_sGroupSettings = "Settings";
-        private const string c_sDefaultAuthor = "propDefaultAuthor";
-        private const string c_sDismissWhenMouseLeaves = "propDismissWhenMouseLeaves";
-        private const string c_sShowTitleWithNoteIcon = "propShowTitleWithNoteIcon";
-
-        private const string c_sGroupPermissions = "Permissions";
-        private const string c_sCanCreateHintForDaughter = "propCanCreateHintForDaughter";
-        private const string c_sCanCreateInformationNotes = "propCanCreateInformationNote";
-        private const string c_sCanCreateNotesToConsultants = "propCanCreateConsultantNote";
-        private const string c_sCanCreateNotesInFront = "propCanCreateNotesInFront";
-        private const string c_sCanDeleteAnything = "propCanDeleteAnything";
+        /*
+        */
 
         #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
@@ -72,33 +62,8 @@ namespace OurWord.Dialogs
                     e.Value = DB.Project.People.ToCommaDelimitedString();
                     break;
 
-                // Settings Group
-                case c_sDefaultAuthor:
-                    e.Value = DB.UserName;
-                    break;
-                case c_sDismissWhenMouseLeaves:
-                    e.YesNoValue = TranslatorNote.DismissWhenMouseLeaves;
-                    break;
-                case c_sShowTitleWithNoteIcon:
-                    e.YesNoValue = TranslatorNote.ShowTitleWithNoteIcon;
-                    break;
-
-                // Permissions Group
-                case c_sCanDeleteAnything:
-                    e.YesNoValue = TranslatorNote.CanDeleteAnything;
-                    break;
-                case c_sCanCreateHintForDaughter:
-                    e.YesNoValue = TranslatorNote.CanCreateHintForDaughter;
-                    break;
-                case c_sCanCreateInformationNotes:
-                    e.YesNoValue = TranslatorNote.CanCreateInformationNotes;
-                    break;
-                case c_sCanCreateNotesToConsultants:
-                    e.YesNoValue = TranslatorNote.CanCreateConsultantNotes;
-                    break;
-                case c_sCanCreateNotesInFront:
-                    e.YesNoValue = TranslatorNote.CanCreateNotesInFront;
-                    break;
+                    /*
+                    */
             }
         }
         #endregion
@@ -112,33 +77,8 @@ namespace OurWord.Dialogs
                     DB.Project.People.FromCommaDelimitedString((string)e.Value);
                     break;
 
-                // Settings Group
-                case c_sDefaultAuthor:
-                    DB.UserName = (string)e.Value;
-                    break;
-                case c_sDismissWhenMouseLeaves:
-                    TranslatorNote.DismissWhenMouseLeaves = e.YesNoValue;
-                    break;
-                case c_sShowTitleWithNoteIcon:
-                    TranslatorNote.ShowTitleWithNoteIcon = e.YesNoValue;
-                    break;
-
-                // Permissions Group
-                case c_sCanDeleteAnything:
-                    TranslatorNote.CanDeleteAnything = e.YesNoValue;
-                    break;
-                case c_sCanCreateHintForDaughter:
-                    TranslatorNote.CanCreateHintForDaughter = e.YesNoValue;
-                    break;
-                case c_sCanCreateInformationNotes:
-                    TranslatorNote.CanCreateInformationNotes = e.YesNoValue;
-                    break;
-                case c_sCanCreateNotesToConsultants:
-                    TranslatorNote.CanCreateConsultantNotes = e.YesNoValue;
-                    break;
-                case c_sCanCreateNotesInFront:
-                    TranslatorNote.CanCreateNotesInFront = e.YesNoValue;
-                    break;
+                    /*
+                    */
             }
         }
         #endregion
@@ -165,100 +105,8 @@ namespace OurWord.Dialogs
                 ));
             #endregion
 
-            // Settings
-            #region Author
-            Bag.Properties.Add(new PropertySpec(
-                c_sDefaultAuthor,
-                "New Note Author's Name",
-                typeof(string),
-                c_sGroupSettings,
-                "This defaults to your computer's name; you'll probably want " +
-                    "your real name here, so that others will know that " +
-                    "who wrote the note.",
-                "",
-                "",
-                null
-                ));
-            #endregion
-            #region Dismiss when Mouse Leaves
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sDismissWhenMouseLeaves,
-                "Close Notes Window when mouse leaves it?",
-                c_sGroupSettings,
-                "If Yes, when you move your mouse outside of the Notes window, it will " +
-                    "disappear. If No, you must click on the Close button to dismiss " +
-                    "the window.",
-                false
-                ));
-            #endregion
-            #region Show Title With Note Icon
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sShowTitleWithNoteIcon,
-                "Show title beside note icon?",
-                c_sGroupSettings,
-                "If Yes, then the title of the note will appear beside the note icon so " +
-                    "that you can see what the note is about without having to launch " +
-                    "the notes window.",
-                false
-                ));
-            #endregion
-
-            // Permissions
-            #region Can Delete Other's Messages
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanDeleteAnything,
-                "Can Delete Other's Notes & Messages?",
-                c_sGroupPermissions,
-                "If Yes, you will have the ability to delete notes and messages written by " +
-                    "other people; e.g., to clean up exegetical notes after all others have " +
-                    "finished commenting on them.",
-                false
-                ));
-            #endregion
-            #region Can Create Hint-For-Daughter Notes
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanCreateHintForDaughter,
-                "Can create \"Hint For Daughter\" notes?",
-                c_sGroupPermissions,
-                "If Yes, you will have the ability to set a note's Assign To to a " +
-                    "\"Hint For Daughter\" note, which will then show up on in the Source " + 
-                    "translation when someone is drafting a daughter translation.",
-                false
-                ));
-            #endregion
-            #region Can Create Information Notes
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanCreateInformationNotes,
-                "Can create \"Information\" notes?",
-                c_sGroupPermissions,
-                "If Yes, you will have the ability to set a note's Assign To to a " +
-                    "\"Information\" note, which you might use for exegetical notes " +
-                    "or other notes the consultant might wish to see (but not comment on).",
-                false
-                ));
-            #endregion
-            #region Can Create Notes to Consultants
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanCreateNotesToConsultants,
-                "Can assign notes to the Consultant?",
-                c_sGroupPermissions,
-                "If Yes, you will have the ability to set a note's Assign To to " +
-                    "\"Consultant,\" which means that the consultant can participate " +
-                    "in the notes conversation.",
-                false
-                ));
-            #endregion
-            #region Can Create Front Notes
-            Bag.Properties.Add(new YesNoPropertySpec(
-                c_sCanCreateNotesInFront,
-                "Can create notes in the Front translation?",
-                c_sGroupPermissions,
-                "If Yes, you will have the ability to create a note in the front / " +
-                    "source translation. Use this to notify the Front team of any " +
-                    "issues.",
-                false
-                ));
-            #endregion
+            /*
+            */
 
             // Localize the bag
             LocDB.Localize(this, Bag);
@@ -296,6 +144,18 @@ namespace OurWord.Dialogs
         #region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
+            var user = Users.Current;
+
+            user.CanMakeNotes = m_checkTurnOnNotes.Checked;
+            user.NoteAuthorsName = m_textNoteAuthorName.Text;
+            user.CloseNotesWindowWhenMouseLeaves = m_checkCloseWindowWhemMouseLeaves.Checked;
+            user.ShowExpandedNotesIcon = m_checkShowTitleBesideIcon.Checked;
+            user.CanDeleteNotesAuthoredByOthers = m_checkCanDeleteNotes.Checked;
+            user.CanAuthorHintForDaughterNotes = m_checkCanCreateHintForDaughterNotes.Checked;
+            user.CanAuthorInformationNotes = m_checkCanCreateInformationNotes.Checked;
+            user.CanAssignNoteToConsultant = m_checkCanAssignToConsultant.Checked;
+            user.CanCreateFrontTranslationNotes = m_checkCreateFrontNotes.Checked;
+
             return true;
         }
         #endregion
@@ -306,9 +166,47 @@ namespace OurWord.Dialogs
         {
             // Property Grid
             SetupPropertyGrid();
+
+            var user = Users.Current;
+            m_checkTurnOnNotes.Checked = user.CanMakeNotes;
+            m_textNoteAuthorName.Text = Users.Current.NoteAuthorsName;
+            m_textNoteAuthorName.Text = user.NoteAuthorsName;
+            m_checkCloseWindowWhemMouseLeaves.Checked = user.CloseNotesWindowWhenMouseLeaves;
+            m_checkShowTitleBesideIcon.Checked = user.ShowExpandedNotesIcon;
+            m_checkCanDeleteNotes.Checked = user.CanDeleteNotesAuthoredByOthers;
+            m_checkCanCreateHintForDaughterNotes.Checked = user.CanAuthorHintForDaughterNotes;
+            m_checkCanCreateInformationNotes.Checked = user.CanAuthorInformationNotes;
+            m_checkCanAssignToConsultant.Checked = user.CanAssignNoteToConsultant;
+            m_checkCreateFrontNotes.Checked = user.CanCreateFrontTranslationNotes;
+
+            SetEnabling(m_checkTurnOnNotes.Checked);
         }
         #endregion
 
+        #region Cmd: cmdTurnOnNotesCheckChanged
+        private void cmdTurnOnNotesCheckChanged(object sender, EventArgs e)
+        {
+            var checkbox = sender as CheckBox;
+            if (null == checkbox)
+                return;
+
+            SetEnabling(checkbox.Checked);
+        }
+        #endregion
+        #region Method: void SetEnabling(bEnabled)
+        private void SetEnabling(bool bEnabled)
+        {
+            m_labelAuthorName.Enabled = bEnabled;
+            m_textNoteAuthorName.Enabled = bEnabled;
+            m_checkCloseWindowWhemMouseLeaves.Enabled = bEnabled;
+            m_checkShowTitleBesideIcon.Enabled = bEnabled;
+            m_checkCanDeleteNotes.Enabled = bEnabled;
+            m_checkCanCreateHintForDaughterNotes.Enabled = bEnabled;
+            m_checkCanCreateInformationNotes.Enabled = bEnabled;
+            m_checkCanAssignToConsultant.Enabled = bEnabled;
+            m_checkCreateFrontNotes.Enabled = bEnabled;
+        }
+        #endregion
     }
 
 

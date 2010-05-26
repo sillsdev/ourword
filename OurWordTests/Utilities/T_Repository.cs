@@ -20,6 +20,7 @@ using NUnit.Framework;
 
 using JWTools;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Membership;
 using OurWordData.Synchronize;
 
 #endregion
@@ -349,10 +350,8 @@ namespace OurWordTests.Utilities
         #region Test: BuildUrlToInternetRepository
         [Test] public void BuildUrlToInternetRepository()
         {
-            var repository = new InternetRepository("Cherokee")
+            var repository = new InternetRepository("Cherokee", "Harry", "NoClue")
             {
-                UserName = "Harry",
-                Password = "NoClue",
                 Server = "hg-public.languagedepot.org"
             };
 
@@ -365,7 +364,7 @@ namespace OurWordTests.Utilities
         #region Test: StripLeadingHttpOnSettingServerValue
         [Test] public void StripLeadingHttpOnSettingServerValue()
         {
-            var repository = new InternetRepository("Cherokee") 
+            var repository = new InternetRepository("Cherokee", "Bob", "Tomato") 
             {
                 Server = "http://bitbucket.org"
             };
@@ -376,7 +375,7 @@ namespace OurWordTests.Utilities
         #region Test: StripTrailingSlashOnSettingServerValue
         [Test] public void StripTrailingSlashOnSettingServerValue()
         {
-            var repository = new InternetRepository("Cherokee") 
+            var repository = new InternetRepository("Cherokee", "Bob", "Tomato") 
             {
                 Server = "bitbucket.org/"
             };

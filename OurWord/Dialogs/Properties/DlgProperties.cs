@@ -32,6 +32,7 @@ using OurWordData.DataModel;
 using OurWord.Dialogs;
 using OurWord.Layouts;
 using OurWord.Utilities;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 
 #endregion
@@ -167,10 +168,15 @@ namespace OurWord.Dialogs
             foreach (DTranslation t in DB.Project.OtherTranslations)
                 AddPage(gtReferenceTranslations, new Page_Translation(this, t, true), c_iImageDefault);
 
+            // Current User Settings
+            var groupUser = NavList.AddGroup(Users.Current.UserName);
+            AddPage(groupUser, new Page_UserOptions(this), c_iImageOptions);
+            AddPage(groupUser, new Page_UserFeatures(this), c_iImageFeaturesOnOff);
+            AddPage(groupUser, new Page_Notes(this), c_iImageNotes);
+
             // Options
             var gtOptions = NavList.AddGroup("Options");
             AddPage(gtOptions, new Page_Options(this), c_iImageOptions);
-            AddPage(gtOptions, new Page_Notes(this), c_iImageNotes);
             AddPage(gtOptions, new Page_Collaboration(this), c_iImageCollaboration);
             AddPage(gtOptions, new Page_Cluster(this), c_iImageClusters);
             AddPage(gtOptions, new Page_StyleSheet(this), c_iImageStyleSheet);
@@ -188,14 +194,15 @@ namespace OurWord.Dialogs
         #endregion
 
         // Images ----------------------------------------------------------------------------
-        const int c_iImageDefault = 0;
-        const int c_iImageAdvancedPrint = 1;
-        const int c_iImageNotes = 2;
-        const int c_iImageOptions = 3;
-        const int c_iImageWritingSystem = 4;
-        const int c_iImageStyleSheet = 6;
-        const int c_iImageCollaboration = 7;
-        const int c_iImageClusters = 8;
+        private const int c_iImageDefault = 0;
+        private const int c_iImageAdvancedPrint = 1;
+        private const int c_iImageNotes = 2;
+        private const int c_iImageOptions = 3;
+        private const int c_iImageWritingSystem = 4;
+        private const int c_iImageStyleSheet = 6;
+        private const int c_iImageCollaboration = 7;
+        private const int c_iImageClusters = 8;
+        private const int c_iImageFeaturesOnOff = 9;
 
 		// Scaffolding -----------------------------------------------------------------------
         #region Constructor()
