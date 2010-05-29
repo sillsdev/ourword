@@ -24,6 +24,7 @@ using OurWord.Layouts;
 using OurWordData;
 using JWTools;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 
 #endregion
@@ -33,23 +34,8 @@ namespace OurWord.Layouts
 {
     class WndConsultantPreparation : WLayout
     {
-        // Registry-Stored Settings ----------------------------------------------------------
-        public const string c_sName = "ConsultantPreparation";
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
-        static public string RegistryBackgroundColor
-        {
-            get
-            {
-                return OWWindow.GetRegistryBackgroundColor(c_sName, "LightYellow");
-            }
-            set
-            {
-                OWWindow.SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
-
         // Scaffolding -----------------------------------------------------------------------
+        public const string c_sName = "ConsultantPreparation";
         const int c_cColumnCount = 2;
         #region Constructor()
         public WndConsultantPreparation()
@@ -61,6 +47,16 @@ namespace OurWord.Layouts
 
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
+        }
+        #endregion
+        #region OMethod: Color BackgroundColor
+        protected override Color BackgroundColor
+        {
+            get
+            {
+                var sColorName = Users.Current.ConsultantWindowBackground;
+                return Color.FromName(sColorName);
+            }
         }
         #endregion
         #region OAttr{g}: string LayoutName

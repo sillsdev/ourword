@@ -285,17 +285,7 @@ namespace OurWord
 				LocDB.MessageTypes.WarningYN);
 		}
 		#endregion
-		#region WarningYN: bool VerifyReplaceBook()
-		static public bool VerifyReplaceBook()
-		{
-			return LocDB.Message(
-				"msgVerifyOverwriteBook",
-				"This book already exists in the translation. Is it OK if OurWord replaces it?\n\n" +
-					"(Caution: Your current book's file will be deleted.)",
-				null,
-				LocDB.MessageTypes.WarningYN);
-		}
-		#endregion
+
 
 		#region Error:     void UnableToRemoveWritingSystem(sWritingSystemName)
 		static public void UnableToRemoveWritingSystem(string sWritingSystemName)

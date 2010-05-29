@@ -24,6 +24,7 @@ using OurWord.Layouts;
 using OurWordData;
 using JWTools;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
 
 #endregion
 #endregion
@@ -33,23 +34,9 @@ namespace OurWord.Layouts
     class WndNaturalness : WLayout
     {
         // Registry-Stored Settings ----------------------------------------------------------
-        public const string c_sName = "Naturalness";
         const string c_sRegNameLineNumbersColor = "LineNumbersColor";
         const string c_RegNameSuppressVerseNumbers = "SuppressVerseNos";
         const string c_RegNameShowLineNumbers = "ShowLineNumbers";
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
-        static public string RegistryBackgroundColor
-        {
-            get
-            {
-                return OWWindow.GetRegistryBackgroundColor(c_sName, "Honeydew");
-            }
-            set
-            {
-                OWWindow.SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
         #region SAttr{g/s}: string LineNumbersColor - color for the line numbers
         static public string LineNumbersColor
         {
@@ -106,6 +93,7 @@ namespace OurWord.Layouts
 
         // Scaffolding -----------------------------------------------------------------------
         const int c_cColumnCount = 1;
+        public const string c_sName = "Naturalness";
         #region Constructor()
         public WndNaturalness()
             : base(c_sName, c_cColumnCount)
@@ -119,6 +107,16 @@ namespace OurWord.Layouts
 
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
+        }
+        #endregion
+        #region OMethod: Color BackgroundColor
+        protected override Color BackgroundColor
+        {
+            get
+            {
+                var sColorName = Users.Current.NaturalnessWindowBackground;
+                return Color.FromName(sColorName);
+            }
         }
         #endregion
         #region OAttr{g}: string LayoutName

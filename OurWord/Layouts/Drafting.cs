@@ -33,23 +33,8 @@ namespace OurWord.Layouts
 {
     public class WndDrafting : WLayout
     {
-        // Registry-Stored Settings ----------------------------------------------------------
-        public const string c_sName = "Draft";
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
-        static public string RegistryBackgroundColor
-        {
-            get
-            {
-                return OWWindow.GetRegistryBackgroundColor(c_sName, "Wheat");
-            }
-            set
-            {
-                OWWindow.SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
-
         // Scaffolding -----------------------------------------------------------------------
+        public const string c_sName = "Draft";
         const int c_cColumnCount = 2;
         #region Constructor()
         public WndDrafting()
@@ -59,11 +44,18 @@ namespace OurWord.Layouts
             // there is nothing below when there actually is.
             ScrollPositionBufferMargin = 50;
 
-            // Background color for the window; default is "Linen"
-            BackColor = Color.Wheat;
-
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
+        }
+        #endregion
+        #region OMethod: Color BackgroundColor
+        protected override Color BackgroundColor
+        {
+            get
+            {
+                var sColorName = Users.Current.DraftingWindowBackground;
+                return Color.FromName(sColorName);
+            }
         }
         #endregion
         #region OAttr{g}: string LayoutName

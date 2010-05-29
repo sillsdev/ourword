@@ -228,6 +228,12 @@
       <DependentUpon>DlgNewCluster.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\DlgTranslationProperties.resx">
+      <DependentUpon>DlgTranslationProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_Translations.resx">
+      <DependentUpon>Page_Translations.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_UserFeatures.resx">
       <DependentUpon>Page_UserFeatures.cs</DependentUpon>
     </EmbeddedResource>
@@ -456,6 +462,18 @@
     <Compile Include="Dialogs\Properties\DlgNewCluster.Designer.cs">
       <DependentUpon>DlgNewCluster.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Properties\DlgTranslationProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\DlgTranslationProperties.Designer.cs">
+      <DependentUpon>DlgTranslationProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Translations.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_Translations.Designer.cs">
+      <DependentUpon>Page_Translations.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\Properties\Page_UserFeatures.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -561,9 +579,6 @@
     <Compile Include="Dialogs\Properties\Page_Options.Designer.cs">
       <DependentUpon>Page_Options.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_SetupFT.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="Dialogs\Properties\Page_StyleSheet.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -576,17 +591,11 @@
     <Compile Include="Dialogs\Properties\Page_TranslationStages.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Dialogs\Properties\Page_OtherTranslations.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="Dialogs\Properties\Page_WritingSystems.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_WritingSystems.Designer.cs">
       <DependentUpon>Page_WritingSystems.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_Translation.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Dialogs\WizImportBook\WizImportBook.cs">
       <SubType>Form</SubType>
@@ -812,24 +821,12 @@
       <DependentUpon>Page_AdvancedPrintOptions.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_SetupFT.resx">
-      <DependentUpon>Page_SetupFT.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_StyleSheet.resx">
       <DependentUpon>Page_StyleSheet.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_TranslationStages.resx">
       <DependentUpon>Page_TranslationStages.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_OtherTranslations.resx">
-      <DependentUpon>Page_OtherTranslations.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_Translation.resx">
-      <DependentUpon>Page_Translation.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="licenses.licx" />

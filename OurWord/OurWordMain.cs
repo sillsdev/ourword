@@ -457,16 +457,18 @@ namespace OurWord
             // Project - If we have an invalid project, we turn the Project menu on regardless
             // of the user setting. As for Export, we don't turn it on unless we do have
             // a valid project.
-            m_btnProject.Visible = (!DB.IsValidProject ||
-                                    Users.Current.CanCreateProject ||
-                                    Users.Current.CanOpenProject ||
-                                    Users.Current.CanExportProject);
-            m_menuNewProject.Visible = (!DB.IsValidProject || Users.Current.CanCreateProject);
-            m_menuOpenProject.Visible = (!DB.IsValidProject || Users.Current.CanOpenProject);
-            m_menuExportProject.Visible = (
+            m_menuNewProject.Available = (!DB.IsValidProject || 
+                Users.Current.CanCreateProject ||
+                !Users.HasAdministrator);
+            m_menuOpenProject.Available = (!DB.IsValidProject || 
+                Users.Current.CanOpenProject);
+            m_menuExportProject.Available = (
                 DB.IsValidProject && 
                 DB.TargetTranslation.BookList.Count > 0 &&
                 Users.Current.CanExportProject);
+            m_btnProject.Available = (m_menuNewProject.Available ||
+                                    m_menuOpenProject.Available ||
+                                    m_menuExportProject.Available);
 
             // Print
             m_btnPrint.Visible = Users.Current.CanPrint;
@@ -481,22 +483,21 @@ namespace OurWord
             // TEMP: TURN OFF UNTIL IMPLEMENTED
             //m_btnHistory.Visible = false;
 
+            // Tools Menu
             // Configure - Always visible, but password protected
             m_menuConfigure.Visible = true;
-
             // Restore from Backup
             m_menuRestoreFromBackup.Visible = Users.Current.CanRestoreBackups;
-
             // Debug Test Suite
             var bShowDebugItems = JW_Registry.GetValue("Debug", false);
             m_separatorDebug.Visible = bShowDebugItems;
             m_menuRunDebugTestSuite.Visible = bShowDebugItems;
-
             // Filters
             m_menuOnlyShowSectionsThat.Visible = (DB.IsValidProject && Users.Current.CanFilter);
-
             // Localizer Tool
             m_menuLocalizerTool.Visible = Users.Current.CanLocalize;
+            // Synchronize: Only if synch information is set up
+            m_Synchronize.Visible = Users.Current.CanSendReceive;
 
             // Translator Notes
             m_btnInsertNote.Visible = Users.Current.CanMakeNotes;
@@ -542,6 +543,8 @@ namespace OurWord
             m_btnGoToBook.DropDownItems.Clear();
 
             // Localization
+            LocDB.DB.SetPrimary(Users.Current.PrimaryUiLanguage);
+            LocDB.DB.SetSecondary(Users.Current.SecondaryUiLanguage);
             LocDB.Localize(m_ToolStrip); 
 
             // Some submenus happen after localization (otherwise, we'd be adding spurious
@@ -1213,7 +1216,7 @@ namespace OurWord
             this.m_Synchronize.Image = global::OurWord.Properties.Resources.MoveDown;
             this.m_Synchronize.Name = "m_Synchronize";
             this.m_Synchronize.Size = new System.Drawing.Size(211, 22);
-            this.m_Synchronize.Text = "S&ynchronize";
+            this.m_Synchronize.Text = "Send / &Receive";
             this.m_Synchronize.Click += new System.EventHandler(this.cmdSynchronize);
             // 
             // m_menuLocalizerTool
@@ -1233,7 +1236,7 @@ namespace OurWord
             // 
             this.m_menuRunDebugTestSuite.Name = "m_menuRunDebugTestSuite";
             this.m_menuRunDebugTestSuite.Size = new System.Drawing.Size(211, 22);
-            this.m_menuRunDebugTestSuite.Text = "&Run Debug Test Suite...";
+            this.m_menuRunDebugTestSuite.Text = "Run Debug Test Suite...";
             this.m_menuRunDebugTestSuite.ToolTipText = "Only programmers will generally see this; you should ignore it!";
             this.m_menuRunDebugTestSuite.Click += new System.EventHandler(this.cmdDebugTesting);
             // 

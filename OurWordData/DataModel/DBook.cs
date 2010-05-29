@@ -328,7 +328,7 @@ namespace OurWordData.DataModel
         private bool m_AllSectionsMatchFrontTestDone = false;
         #endregion
         #region Attr{g}: bool IsFrontBook - T if this book is part of the Front translation
-        bool IsFrontBook
+        public bool IsFrontBook
         {
             get
             {
@@ -832,23 +832,28 @@ namespace OurWordData.DataModel
         }
         #endregion
 
-        public void CheckSectionStructureAgainstFront(string sTargetPath, DBook BFront)
+        public void CheckSectionStructureAgainstFront(string sTargetPath)
         {
-            // If we don't have a Front book, or if we are not the TargetTranslation,
-            // then we have nothing to do here.
-            if (null == BFront || Translation != DB.Project.TargetTranslation)
+            // Nothing to do if this is not a TargetTranslation book
+            if (!IsTargetBook)
+                return;
+
+            // Nothing to do if no Front Book
+            var frontBook = DB.Project.Nav.GetLoadedBook(DB.Project.FrontTranslation, 
+                BookAbbrev, new NullProgress());
+            if (null == frontBook)
                 return;
 
             // Make sure we have the same number of sections
-            if (Sections.Count != BFront.Sections.Count)
+            if (Sections.Count != frontBook.Sections.Count)
             {
                 // Find the sections where the counts get off
                 DSection SFront = null;
                 DSection STarget = null;
-                for (int i = 0; i < BFront.Sections.Count && i < Sections.Count; i++)
+                for (var i = 0; i < frontBook.Sections.Count && i < Sections.Count; i++)
                 {
-                    SFront = BFront.Sections[i] as DSection;
-                    STarget = Sections[i] as DSection;
+                    SFront = frontBook.Sections[i];
+                    STarget = Sections[i];
                     if (!SFront.ReferenceSpan.ContentEquals(STarget.ReferenceSpan))
                         break;
                 }
@@ -857,7 +862,7 @@ namespace OurWordData.DataModel
                 throw new eBookReadException(
                     GetSectionMiscountMsg(SFront, STarget),
                     HelpSystem.Topic.kErrStructureSectionMiscount,
-                    eBookReadException.GetOffendingLineNumber(BFront.StoragePath, SFront),
+                    eBookReadException.GetOffendingLineNumber(frontBook.StoragePath, SFront),
                     eBookReadException.GetOffendingLineNumber(sTargetPath, STarget)
                     );
             }
@@ -865,8 +870,8 @@ namespace OurWordData.DataModel
             // Loop through all of the sections, looking for structures that do not match
             for (int i = 0; i < Sections.Count; i++)
             {
-                DSection SFront = BFront.Sections[i] as DSection;
-                DSection STarget = Sections[i] as DSection;
+                var SFront = frontBook.Sections[i];
+                var STarget = Sections[i];
 
                 if (GetFirstVerseInSection(SFront) != GetFirstVerseInSection(STarget) ||
                     GetLastVerseInSection(SFront) != GetLastVerseInSection(STarget))
@@ -874,7 +879,7 @@ namespace OurWordData.DataModel
                     throw new eBookReadException(
                         GetSpanMismatchMsg(i, SFront, STarget),
                         HelpSystem.Topic.kErrStructureSpanMismatch,
-                        eBookReadException.GetOffendingLineNumber(BFront.StoragePath, SFront),
+                        eBookReadException.GetOffendingLineNumber(frontBook.StoragePath, SFront),
                         eBookReadException.GetOffendingLineNumber(sTargetPath, STarget)
                     );
                 }
@@ -884,7 +889,7 @@ namespace OurWordData.DataModel
                     throw new eBookReadException(
                         GetStructureMismatchMsg(SFront, STarget),
                         HelpSystem.Topic.kErrStructureMismatch,
-                        eBookReadException.GetOffendingLineNumber(BFront.StoragePath, SFront),
+                        eBookReadException.GetOffendingLineNumber(frontBook.StoragePath, SFront),
                         eBookReadException.GetOffendingLineNumber(sTargetPath, STarget)
                         );
                 }
@@ -1011,19 +1016,6 @@ namespace OurWordData.DataModel
                 }
             }
             ScriptureDB m_db = null;
-            #endregion
-
-            // Progress Indiccator -----------------------------------------------------------
-            IProgressIndicator m_Progress;
-            #region Method: void StartProgress(string sAction)
-            private void StartProgress(string sAction, int nCount)
-            {
-                string sWhatIsLoading = Book.Translation.DisplayName + ": " + Book.DisplayName;
-
-                string sMessage = sAction + " " + sWhatIsLoading + "...";
-
-                m_Progress.Start(sMessage, nCount);
-            }
             #endregion
 
             // ID Field ----------------------------------------------------------------------
@@ -1156,7 +1148,6 @@ namespace OurWordData.DataModel
                 foreach (DSection s in Book.Sections)
                 {
                     s.WriteStandardFormat(DBS);
-                    m_Progress.Step();
                 }
 
                 return DBS;
@@ -1216,10 +1207,9 @@ namespace OurWordData.DataModel
 
             // Public Operations -------------------------------------------------------------
             #region Constructor()
-            public IO(DBook book, IProgressIndicator progress)
+            public IO(DBook book)
             {
                 m_book = book;
-                m_Progress = progress;
             }
             #endregion
             #region Method: bool Read(TextReader)
@@ -1233,9 +1223,6 @@ namespace OurWordData.DataModel
                 if (!DBS.Read(tr))
                     return false;
                 DBS.TransformIn();
-
-                // Setuo Progress indicator(s)
-                StartProgress("Reading", DBS.RecordCount);
 
                 // Look to read the first record, which is general information about the entire book.
                 DBS.AdvanceToFirstRecord();
@@ -1272,8 +1259,6 @@ namespace OurWordData.DataModel
                     Book.Sections.Append(section);
 
                     section.ReadStandardFormat(DBS);
-
-                    m_Progress.Step();
                 }
 
                 // Post Processing (calc versification, check structure against front)
@@ -1286,8 +1271,6 @@ namespace OurWordData.DataModel
             #region Method: bool Write()
             public bool Write()
             {
-                StartProgress("Saving", Book.Sections.Count);
-
                 DBS = _CreateDB();
                 DBS.Format = ScriptureDB.Formats.kToolbox;
 
@@ -1302,52 +1285,38 @@ namespace OurWordData.DataModel
                 {
                     RestoreFromBAK();
                     Book.IsDirty = true;  // Still needs to be saved
-                    m_Progress.End();
                     return false;
                 }
 
                 Book.IsDirty = false;
-                m_Progress.End();
                 return true;
             }
             #endregion
             #region Method: void ExportToParatext(sPathName)
             public void ExportToParatext(string sPathName)
             {
-                StartProgress("Exporting", Book.Sections.Count);
-
                 DBS = _CreateDB();
                 DBS.Format = ScriptureDB.Formats.kParatext;
 
                 DBS.Write(sPathName);
-
-                m_Progress.End();
             }
             #endregion
             #region Method: void ExportToGoBible(sPathName)
             public void ExportToGoBible(string sPathName)
             {
-                StartProgress("Exporting", Book.Sections.Count);
-
                 DBS = _CreateDB();
                 DBS.Format = ScriptureDB.Formats.kGoBibleCreator;
 
                 DBS.Write(sPathName);
-
-                m_Progress.End();
             }
             #endregion
             #region Method: void ExportToToolbox(sPathName) - (used in ChorusMerge)
             public void ExportToToolbox(string sPathName)
             {
-                StartProgress("Exporting", Book.Sections.Count);
-
                 DBS = _CreateDB();
                 DBS.Format = ScriptureDB.Formats.kToolbox;
 
                 DBS.Write(sPathName);
-
-                m_Progress.End();
             }
             #endregion
         } // End: Embedded Class IO
@@ -1355,23 +1324,23 @@ namespace OurWordData.DataModel
         #region Method: void ExportToParatext(sPathName, IProgressIndicator)
         public void ExportToParatext(string sPathName, IProgressIndicator progress)
         {
-            (new IO(this, progress)).ExportToParatext(sPathName);
+            (new IO(this)).ExportToParatext(sPathName);
         }
         #endregion
         #region Method: void ExportToGoBible(sPathName, IProgressIndicator)
         public void ExportToGoBible(string sPathName, IProgressIndicator progress)
         {
-            (new IO(this, progress)).ExportToGoBible(sPathName);
+            (new IO(this)).ExportToGoBible(sPathName);
         }
         #endregion
         #region Method: void ExportToToolbox(sPathName, IProgressIndicator)
         public void ExportToToolbox(string sPathName, IProgressIndicator progress)
         {
-            (new IO(this, progress)).ExportToToolbox(sPathName);
+            (new IO(this)).ExportToToolbox(sPathName);
         }
         #endregion
-        #region Method: bool LoadFromStandardFormat(sPath, progress)
-        bool LoadFromStandardFormat(string sPath, IProgressIndicator progress)
+        #region Method: bool LoadFromStandardFormat(sPath)
+        public void LoadFromStandardFormat(string sPath)
         {
             // Locate the file
             if (!File.Exists(sPath))
@@ -1380,11 +1349,11 @@ namespace OurWordData.DataModel
                     "Unable to find the file:\n{0}.",
                     new string[] { sPath },
                     LocDB.MessageTypes.Error);
-                return false;
+                return;
             }
 
             // Open the file
-            bool bSfmLoaded = false;
+            var bSfmLoaded = false;
             while (!bSfmLoaded)
             {
                 TextReader tr = null;
@@ -1393,8 +1362,8 @@ namespace OurWordData.DataModel
                     var sr = new StreamReader(sPath, Encoding.UTF8);
                     tr = TextReader.Synchronized(sr);
 
-                    IO io = new IO(this, progress);
-                    if (true == io.Read(tr))
+                    IO io = new IO(this);
+                    if (io.Read(tr))
                     {
                         IsDirty = false;  // We'll consider an object unchanged following a read. 
                         bSfmLoaded = true;
@@ -1403,17 +1372,17 @@ namespace OurWordData.DataModel
                 catch (eBookReadException bre)
                 {
                     // Decide which version of the Repair dialog to show
-                    DialogRepairImportBook dlgRepair = (bre.NeedToShowFront) ?
+                    var dlgRepair = (bre.NeedToShowFront) ?
                         new RepairImportBookStructure(FrontBook, this, sPath, bre) :
                         new DialogRepairImportBook(this, sPath, bre);
 
                     // Give the user the opportunity to fix the problem
-                    DialogResult result = dlgRepair.ShowDialog();
+                    var result = dlgRepair.ShowDialog();
 
                     // If he doesn't fix it, then we must remove the book from
                     // the project. (Thus we return "false")
                     if (DialogResult.Cancel == result)
-                        return false;
+                        return;
 
                     // Prepare to try the import again. 
                     Clear();
@@ -1425,22 +1394,18 @@ namespace OurWordData.DataModel
                         "Unable to load book {0} due to system message:\n\n{1}",
                         new string[] { e.Message },
                         LocDB.MessageTypes.Error);
-                    Console.WriteLine("Exception in DBook.Read: " + e.Message);
-                    return false;
+                    Console.WriteLine(@"Exception in DBook.Read: " + e.Message);
+                    return;
                 }
                 finally
                 {
                     if (null != tr)
-                    {
                         tr.Close();
-                        tr = null;
-                    }
-                    progress.End();
                 }
             }
 
             m_bIsLoaded = true;
-            return true;
+            return;
         }
         #endregion
 
@@ -1633,7 +1598,7 @@ namespace OurWordData.DataModel
                 {
                     progress.Step();
 
-                    // The first child node, if a History note, would be the History for the entire
+                    // The first child node, if a HistoryNote, would be the History for the entire
                     // book. (There will be no "section" defined yet. Otherwise, any History we
                     // encounter goes with the most recently defined section. (The only notes
                     // we should see at this level are History notes.)
@@ -1748,7 +1713,7 @@ namespace OurWordData.DataModel
             if (Translation == DB.Project.TargetTranslation && FrontBook != null)
             {
                 // Make sure that each section has the same structure as the front.
-                CheckSectionStructureAgainstFront(sPath, FrontBook);
+                CheckSectionStructureAgainstFront(sPath);
 
                 // E.g., Generate the \ref and \cf's from the Front Translation
                 // We do the test here to prevent the FrontBook from attempting
@@ -1765,11 +1730,10 @@ namespace OurWordData.DataModel
             if (Loaded || string.IsNullOrEmpty(sPath))
                 return;
 
-            // Load according to format, which we determine based on the file extension
-            if (sPath.ToLower().Contains(".oxes"))
-                LoadFromOxes(sPath, progress);
-            else
-                LoadFromStandardFormat(sPath, progress);
+            // We expect Oxes here, not standard format
+            Debug.Assert(sPath.ToLower().Contains(".oxes"));
+
+            LoadFromOxes(sPath, progress);
         }
         #endregion
         #region Method: bool LoadBook(progress)

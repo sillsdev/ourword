@@ -109,28 +109,28 @@ namespace OurWordTests.Edit
         [Test] public void BasicContentBookmarks()
         {
             // We'll use the 6th paragraph
-            int iPara = 5;
-            DParagraph p = EditTest.Section.Paragraphs[iPara] as DParagraph;
+            const int iPara = 5;
+            var p = EditTest.Section.Paragraphs[iPara];
             Assert.AreEqual(c_sBenchmark, p.DebugString, "Benchmark: Paragraph contents");
-            DBasicText DBT = p.Runs[1] as DBasicText;
+            var DBT = p.Runs[1] as DBasicText;
             Assert.IsNotNull(DBT, "DBT Found");
 
             // We'll use the OWBookmark code to locate its OWPara
-            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
+            var op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Select "Oke |te|" and bookmark it
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 4, 6);
             EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
-            string s1 = "te";
+            const string s1 = "te";
             Assert.AreEqual(s1, EditTest.Wnd.Selection.SelectionString);
-            OWBookmark bm1 = EditTest.Wnd.CreateBookmark();
+            var bm1 = EditTest.Wnd.CreateBookmark();
 
             // Select "a|ntei|n" and bookmark it
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, 23, 27);
             EditTest.Wnd.Selection = op.NormalizeSelection(EditTest.Wnd.Selection);
-            string s2 = "ntei";
+            const string s2 = "ntei";
             Assert.AreEqual(s2, EditTest.Wnd.Selection.SelectionString);
-            OWBookmark bm2 = EditTest.Wnd.CreateBookmark();
+            var bm2 = EditTest.Wnd.CreateBookmark();
 
             // Return to the first bookmark
             bm1.RestoreWindowSelectionAndScrollPosition();

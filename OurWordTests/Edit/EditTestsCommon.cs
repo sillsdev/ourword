@@ -165,7 +165,7 @@ namespace OurWordTests.Edit
             W.Close();
 
             // Now read it in, with full-blown book parsing mechanism
-            s_book.LoadBook(sPath, new NullProgress());
+            s_book.LoadFromStandardFormat(sPath);
 
             s_section = s_book.Sections[0] as DSection;
         }

@@ -489,6 +489,19 @@ namespace JWTools
             this.DefaultValue = (bDefaultYes) ? "Yes" : "No";
         }
         #endregion
+
+        static public bool Pull(PropertySpecEventArgs e)
+        {
+            var ps = e.Property as YesNoPropertySpec;
+            Debug.Assert(null != ps);
+            return ps.IsTrue(e.Value);
+        }
+        static public void Put(PropertySpecEventArgs e, bool b)
+        {
+            var ps = e.Property as YesNoPropertySpec;
+            Debug.Assert(null != ps);
+            e.Value = ps.GetBoolString(b);
+        }
     }
     #endregion
     #region CLASS: EnumPropertySpec : PropertySpec
@@ -635,6 +648,19 @@ namespace JWTools
             this.enumValues = vsValues;
         }
         #endregion
+
+        static public int Pull(PropertySpecEventArgs e)
+        {
+            var zoomPs = e.Property as ZoomPropertySpec;
+            Debug.Assert(null != zoomPs);
+            return zoomPs.GetZoomFactor(e.Value);
+        }
+        static public void Put(PropertySpecEventArgs e, int nZoomPercent)
+        {
+            var zoomPs = e.Property as ZoomPropertySpec;
+            Debug.Assert(null != zoomPs);
+            e.Value = zoomPs.GetZoomString(nZoomPercent);
+        }
     }
     #endregion
 

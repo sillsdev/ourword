@@ -70,7 +70,7 @@ namespace OurWordTests.Edit
             W.Close();
 
             // Now read it into the book
-			book.LoadBook(sPathname, new NullProgress());
+			book.LoadFromStandardFormat(sPathname);
         }
         #endregion
 

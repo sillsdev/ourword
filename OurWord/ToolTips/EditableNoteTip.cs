@@ -112,11 +112,6 @@ namespace OurWord.ToolTips
             // Content window additional setup
             m_panelClientArea.Controls.Add(ContentWindow);
             m_toolStrip.Renderer = new TrulyTransparentToolStripRenderer();
-            if (!Editable)
-            {
-                OWWindow.SetRegistryBackgroundColor(m_ContentWindow.Name,
-                    BackgroundColor.Name);
-            }
 
             // Shortcut key localizations. Do it here once, rather than as part
             // of ProcessCmdKey every time a key is pressed.
@@ -756,7 +751,7 @@ namespace OurWord.ToolTips
                 return false;
 
             // The message should have been entered today
-            if (message.UtcCreated.Date == DateTime.Today)
+            if (message.UtcCreated.Date == DateTime.UtcNow.Date)
                 return true;
 
             // If not today, then it is editable only if all following messages are also
@@ -777,7 +772,7 @@ namespace OurWord.ToolTips
             // Scan: if we have an editable message with today's date then we're done
             foreach(DMessage message in Note.Messages)
             {
-                if (IsEditableResponse(message) && message.UtcCreated.Date == DateTime.Today)
+                if (IsEditableResponse(message) && message.UtcCreated.Date == DateTime.UtcNow.Date)
                     return;
             }
 

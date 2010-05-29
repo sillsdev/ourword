@@ -40,6 +40,10 @@ namespace OurWord.Dialogs.WizImportBook
                 Debug.Assert(null != m_sPathName);
                 return m_sPathName;
             }
+            set
+            {
+                m_sPathName = value;
+            }
         }
         string m_sPathName = "";
         #endregion

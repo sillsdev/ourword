@@ -4,7 +4,7 @@
  * Author:  John Wimbish
  * Created: 21 Sep 2007
  * Purpose: Sets up the general options
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
@@ -51,9 +51,8 @@ namespace OurWord.Dialogs
 
         // Property Grid ---------------------------------------------------------------------
         #region BAG CONSTANTS
-        const string c_sGroupUILanguage = "propUserInterfaceLanguage";
-        const string c_sPrimaryLanguage = "propPrimaryLanguage";
-        const string c_sSecondaryLanguage = "propSecondaryLanguage";
+        /*
+        */
 
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
@@ -67,11 +66,7 @@ namespace OurWord.Dialogs
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
         const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
-        const string c_sGroupBackgroundColors = "propBackgroundColors";
-        const string c_sColorDrafting = "propBackColorDraftingWindow";
-        const string c_sColorBackTranslation = "propBackColorBackTranslationWindow";
-        const string c_sColorConsultantPreparation = "propBackColorConsultantPreparation";
-        const string c_sColorNaturalnessCheck = "propBackColorNaturalnessCheckWindow";
+
         #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
         PropertyBag Bag
@@ -91,17 +86,6 @@ namespace OurWord.Dialogs
             {
 /*
 */
-                case c_sPrimaryLanguage:
-                    e.Value = (null != LocDB.DB.PrimaryLanguage) ?
-                        LocDB.DB.PrimaryLanguage.Name :
-                        LocItem.c_sEnglish;
-                    break;
-                case c_sSecondaryLanguage:
-                    e.Value = (null != LocDB.DB.SecondaryLanguage) ?
-                        LocDB.DB.SecondaryLanguage.Name :
-                        LocItem.c_sEnglish;
-                    break;
-
                 case c_sMakeBackups:
                     SetPropertySpecValue(e, BackupSystem.Enabled);
                     break;
@@ -131,19 +115,6 @@ namespace OurWord.Dialogs
                     e.Value = WndNaturalness.LineNumbersColor;
                     break;
 
-                // Window background colors
-                case c_sColorDrafting:
-                    e.Value = WndDrafting.RegistryBackgroundColor;
-                    break;
-                case c_sColorBackTranslation:
-                    e.Value = WndBackTranslation.RegistryBackgroundColor;
-                    break;
-                case c_sColorConsultantPreparation:
-                    e.Value = WndConsultantPreparation.RegistryBackgroundColor;
-                    break;
-                case c_sColorNaturalnessCheck:
-                    e.Value = WndNaturalness.RegistryBackgroundColor;
-                    break;
             }
         }
         #endregion
@@ -169,12 +140,8 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-                case c_sPrimaryLanguage:
-                    LocDB.DB.SetPrimary((string)e.Value);
-                    break;
-                case c_sSecondaryLanguage:
-                    LocDB.DB.SetSecondary((string)e.Value);
-                    break;
+/*
+*/
                 case c_sMakeBackups:
                     BackupSystem.Enabled = InterpretYesNo(e);
                     break;
@@ -183,8 +150,6 @@ namespace OurWord.Dialogs
                     BackupSystem.RegistryBackupFolder = (string)e.Value;
                     break;
 
-/*
-*/
 
                 case c_sProjectAccess:
                     break;
@@ -205,19 +170,6 @@ namespace OurWord.Dialogs
                     WndNaturalness.LineNumbersColor = (string)e.Value;
                     break;
 
-                // Window background colors
-                case c_sColorDrafting:
-                    WndDrafting.RegistryBackgroundColor = (string)e.Value;
-                    break;
-                case c_sColorBackTranslation:
-                    WndBackTranslation.RegistryBackgroundColor = (string)e.Value;
-                    break;
-                case c_sColorConsultantPreparation:
-                    WndConsultantPreparation.RegistryBackgroundColor = (string)e.Value;
-                    break;
-                case c_sColorNaturalnessCheck:
-                    WndNaturalness.RegistryBackgroundColor = (string)e.Value;
-                    break;
             }
         }
         #endregion
@@ -226,30 +178,11 @@ namespace OurWord.Dialogs
         {
             // Create the PropertyBag for this page
             m_bag = new PropertyBag();
-            Bag.GetValue += new PropertySpecEventHandler(bag_GetValue);
-            Bag.SetValue += new PropertySpecEventHandler(bag_SetValue);
+            Bag.GetValue += bag_GetValue;
+            Bag.SetValue += bag_SetValue;
 
-            // User Interface Languages
-            #region (User Interface Languages)
-            PropertySpec PrimaryPS = new PropertySpec(
-                c_sPrimaryLanguage,
-                "Preferred (primary)",
-                c_sGroupUILanguage,
-                "Use this language for the User Interface.",
-                LocDB.DB.LanguageChoices,
-                LocItem.c_sEnglish);
-            PrimaryPS.DontLocalizeEnums = true;
-            Bag.Properties.Add(PrimaryPS);
-            PropertySpec SecondaryPS = new PropertySpec(
-                c_sSecondaryLanguage,
-                "Fallback (secondary)",
-                c_sGroupUILanguage,
-                "Use this language for the User Interface if the preferred (primary) language is unavailable.",
-                LocDB.DB.LanguageChoices,
-                LocItem.c_sEnglish);
-            SecondaryPS.DontLocalizeEnums = true;
-            Bag.Properties.Add(SecondaryPS);
-            #endregion
+/*
+*/
 
             // Misc Options
             #region (Misc Options)
@@ -284,20 +217,6 @@ namespace OurWord.Dialogs
                 typeof(CheckTreeEditor),
                 null));
 
-/*
-            // Zoom Factor (displays as a combo, showing, e.g., "120 %")
-            var zps = new ZoomPropertySpec(
-                c_sZoomFactor,
-                "Zoom Factor",
-                "",
-                "Text in the windows can be larger (or smaller) by the chosen percentage. (You can " +
-                    "also set this in the Window dropdown.)",
-                new int[] { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 },
-                100
-                );
-            zps.DontLocalizeEnums = true;
-            Bag.Properties.Add(zps);
-*/
             #endregion
 
             // Back Translation options
@@ -340,33 +259,6 @@ namespace OurWord.Dialogs
                 "DarkGray"));
             #endregion
 
-            // Window Background Colors
-            #region (Background Colors)
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sColorDrafting,
-                "Drafting",
-                c_sGroupBackgroundColors,
-                "The color of the Drafting window background.",
-                "Wheat"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sColorBackTranslation,
-                "Back Translation",
-                c_sGroupBackgroundColors,
-                "The color of the Back Translation window background.",
-                "Wheat"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sColorConsultantPreparation,
-                "Consultant Preparation",
-                c_sGroupBackgroundColors,
-                "The color of the Consultant Preparation window background.",
-                "LilghtYellow"));
-            Bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
-                c_sColorNaturalnessCheck,
-                "Naturalness Check",
-                c_sGroupBackgroundColors,
-                "The color of the Naturalness Check window background.",
-                "Wheat"));
-            #endregion
 
             // Localize the bag
             LocDB.Localize(this, Bag);

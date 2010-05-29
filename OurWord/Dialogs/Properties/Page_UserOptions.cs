@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
 using JWTools;
 using OurWordData.DataModel.Membership;
 
@@ -49,62 +42,232 @@ namespace OurWord.Dialogs.Properties
         #region Method: override bool HarvestChanges()
         public override bool HarvestChanges()
         {
-            var user = Users.Current;
-
-            user.MaximizeWindowOnStartup = m_cMaximizeWindowOnStartup.Checked;
-            user.ZoomPercent = ReadZoomPercentCombo();
-
-            user.CollaborationUserName = m_tUserName.Text;
-            user.CollaborationPassword = m_tPassword.Text;
-
             return true;
         }
         #endregion
 
-        #region Method: void PopulateZoomPercentCombo()
-        private void PopulateZoomPercentCombo()
-        {
-            m_cZoomPercent.Items.Clear();
-
-            foreach(var n in User.PossibleZoomPercents)
-            {
-                var sPercent = n + @"%";
-                m_cZoomPercent.Items.Add(sPercent);
-            }
-
-            m_cZoomPercent.Text = Users.Current.ZoomPercent + @"%";
-        }
-        #endregion
-        #region Method: int ReadZoomPercentCombo()
-        int ReadZoomPercentCombo()
-        {
-            try
-            {
-                var s = "";
-                foreach(var ch in m_cZoomPercent.Text)
-                {
-                    if (char.IsDigit(ch))
-                        s += ch;
-                }
-
-                return Convert.ToInt16(s);
-            }
-            catch (Exception) { }
-
-            return Users.Current.ZoomPercent;
-        }
-        #endregion
-
+        // Commands --------------------------------------------------------------------------
+        #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
-            PopulateZoomPercentCombo();
-            
-            var user = Users.Current;
-            m_cMaximizeWindowOnStartup.Checked = user.MaximizeWindowOnStartup;
-
-            m_tUserName.Text = user.CollaborationUserName;
-            m_tPassword.Text = user.CollaborationPassword;
+            bag_Setup();
         }
+        #endregion
 
+        // Property Bag ----------------------------------------------------------------------
+        private PropertyBag m_bag;
+        #region Constants
+        private const string c_sGroupBehavior = "Behavior";
+        private const string c_sMaximizeOnStartup = "propMaximizeOnStartup";
+        private const string c_sZoomPercent = "propZoomPercent";
+
+        private const string c_sGroupUILanguage = "Language of the User Interface";
+        private const string c_sPrimaryLanguage = "propPrimaryLanguage";
+        private const string c_sSecondaryLanguage = "propSecondaryLanguage";
+
+        private const string c_sGroupSendReceive = "Send / Receive";
+        private const string c_sUserName = "propUserName";
+        private const string c_sPaassword = "propPassword";
+
+        private const string c_sGroupBackgroundColors = "Window Background Colors";
+        private const string c_sColorDrafting = "propDrafting";
+        private const string c_sColorBackTranslation = "propBackTranslation";
+        private const string c_sColorNaturalnessCheck = "propNaturalness";
+        private const string c_sColorConsultantPreparation = "propConsultant";
+        #endregion
+        #region Cmd: bag_Get
+        static void bag_Get(object sender, PropertySpecEventArgs e)
+        {
+            switch (e.Property.ID)
+            {
+                // Behavior
+                case c_sMaximizeOnStartup:
+                    YesNoPropertySpec.Put(e, Users.Current.MaximizeWindowOnStartup);
+                    break;
+                case c_sZoomPercent:
+                    ZoomPropertySpec.Put(e, Users.Current.ZoomPercent);
+                    break;
+
+                // UI Languages
+                case c_sPrimaryLanguage:
+                    e.Value = Users.Current.PrimaryUiLanguage;
+                    break;
+                case c_sSecondaryLanguage:
+                   e.Value = Users.Current.SecondaryUiLanguage;
+                   break;
+
+                // Send / Receive
+                case c_sUserName:
+                    e.Value = Users.Current.CollaborationUserName;
+                   break;
+                case c_sPaassword:
+                    e.Value = Users.Current.CollaborationPassword;
+                   break;
+
+                // Window background colors
+                case c_sColorDrafting:
+                   e.Value = Users.Current.DraftingWindowBackground;
+                   break;
+                case c_sColorBackTranslation:
+                   e.Value = Users.Current.BackTranslationWindowBackground;
+                   break;
+                case c_sColorConsultantPreparation:
+                   e.Value = Users.Current.ConsultantWindowBackground;
+                   break;
+                case c_sColorNaturalnessCheck:
+                   e.Value = Users.Current.NaturalnessWindowBackground;
+                   break;
+            }
+        }
+        #endregion
+        #region Cmd: bag_Set
+        static void bag_Set(object sender, PropertySpecEventArgs e)
+        {
+            switch (e.Property.ID)
+            {
+                // Behavior
+                case c_sMaximizeOnStartup:
+                    Users.Current.MaximizeWindowOnStartup = YesNoPropertySpec.Pull(e);
+                    break;
+                case c_sZoomPercent:
+                    Users.Current.ZoomPercent = ZoomPropertySpec.Pull(e);
+                    break;
+
+                // UI Languages
+                case c_sPrimaryLanguage:
+                    Users.Current.PrimaryUiLanguage = (string) e.Value;
+                    break;
+                case c_sSecondaryLanguage:
+                    Users.Current.SecondaryUiLanguage = (string)e.Value;
+                    break;
+
+                // Send / Receive
+                case c_sUserName:
+                    Users.Current.CollaborationUserName = (string) e.Value;
+                    break;
+                case c_sPaassword:
+                    Users.Current.CollaborationPassword = (string) e.Value;
+                    break;
+
+                // Window background colors
+                case c_sColorDrafting:
+                    Users.Current.DraftingWindowBackground = (string)e.Value;
+                    break;
+                case c_sColorBackTranslation:
+                    Users.Current.BackTranslationWindowBackground = (string)e.Value;
+                    break;
+                case c_sColorConsultantPreparation:
+                    Users.Current.ConsultantWindowBackground = (string)e.Value;
+                    break;
+                case c_sColorNaturalnessCheck:
+                    Users.Current.NaturalnessWindowBackground = (string)e.Value;
+                    break;
+            }
+        }
+        #endregion
+        #region Method: void bag_Setup()
+        void bag_Setup()
+        {
+            m_bag = new PropertyBag();
+            m_bag.GetValue += bag_Get;
+            m_bag.SetValue += bag_Set;
+
+            #region Maximize on Startup
+            m_bag.Properties.Add(new YesNoPropertySpec(
+                c_sMaximizeOnStartup,
+                "Maxmimize Window on Startup?",
+                c_sGroupBehavior,
+                "If Yes, OurWord starts up maximized. This may help newer users to have sufficient " +
+                    "size on the screen for doing work.",
+                true
+                ));
+            #endregion
+            #region ZoomPercent
+            m_bag.Properties.Add(new ZoomPropertySpec(
+                c_sZoomPercent,
+                "Zoom Percent",
+                c_sGroupBehavior,
+                "Text in the windows can be larger (or smaller) by the chosen percentage. (You can " +
+                    "also set this in the Window dropdown.)",
+                new[] { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 },
+                100
+                ) {DontLocalizeEnums = true});
+            #endregion
+
+            #region Primary UI Language
+            m_bag.Properties.Add(new PropertySpec(
+                c_sPrimaryLanguage,
+                "Preferred (primary)",
+                c_sGroupUILanguage,
+                "Use this language for the User Interface.",
+                LocDB.DB.LanguageChoices,
+                LocItem.c_sEnglish) {DontLocalizeEnums = true});
+            #endregion
+            #region Secondary UI Language
+            m_bag.Properties.Add(new PropertySpec(
+                c_sSecondaryLanguage,
+                "Fallback (secondary)",
+                c_sGroupUILanguage,
+                "Use this language for the User Interface if the preferred (primary) language is unavailable.",
+                LocDB.DB.LanguageChoices,
+                LocItem.c_sEnglish) {DontLocalizeEnums = true});
+            #endregion
+
+            #region Send/Receive UserName
+            m_bag.Properties.Add(new PropertySpec(
+                c_sUserName,
+                "User Name",
+                typeof(string),
+                c_sGroupSendReceive,
+                "The username used to access LanguageDepot.org data; supplied by the LanguageDepot administrator.",
+                ""));
+            #endregion
+            #region Send/Receive Password
+            m_bag.Properties.Add(new PropertySpec(
+                c_sPaassword,
+                "Password",
+                typeof(string),
+                c_sGroupSendReceive,
+                "The password used to access LanguageDepot.org data; supplied by the LanguageDepot administrator.",
+                ""));
+            #endregion
+
+            #region Drafting Back Color
+            m_bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sColorDrafting,
+                "Drafting",
+                c_sGroupBackgroundColors,
+                "The color of the Drafting window background.",
+                "Wheat"));
+            #endregion
+            #region Back Translation Back Color
+            m_bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sColorBackTranslation,
+                "Back Translation",
+                c_sGroupBackgroundColors,
+                "The color of the Back Translation window background.",
+                "Wheat"));
+            #endregion
+            #region Consultant Prepartion Back Color
+            m_bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sColorConsultantPreparation,
+                "Consultant Preparation",
+                c_sGroupBackgroundColors,
+                "The color of the Consultant Preparation window background.",
+                "LilghtYellow"));
+            #endregion
+            #region Naturalness Back Color
+            m_bag.Properties.Add(PropertySpec.CreateColorPropertySpec(
+                c_sColorNaturalnessCheck,
+                "Naturalness Check",
+                c_sGroupBackgroundColors,
+                "The color of the Naturalness Check window background.",
+                "Wheat"));
+            #endregion
+
+            LocDB.Localize(this, m_bag);
+            m_grid.SelectedObject = m_bag;
+        }
+        #endregion
     }
 }

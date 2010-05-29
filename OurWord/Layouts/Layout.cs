@@ -463,7 +463,12 @@ namespace OurWord.Layouts
         #region SMethod: string GetLayoutFromRegistry(sDefaultLayout)
         static public string GetLayoutFromRegistry(string sDefaultLayout)
         {
-            return JW_Registry.GetValue(c_sCurrentLayout, sDefaultLayout);
+            var sLayoutName = JW_Registry.GetValue(c_sCurrentLayout, sDefaultLayout);
+
+            if (null == Find(sLayoutName))
+                sLayoutName = sDefaultLayout;
+
+            return sLayoutName;
         }
         #endregion
         #region SMethod: bool CurrentLayoutIs(string sLayoutName)

@@ -14,6 +14,8 @@ using OurWordData.DataModel;
 using OurWord.Edit;
 using JWTools;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Membership;
+
 #endregion
 #endregion
 
@@ -22,21 +24,6 @@ namespace OurWord.Layouts
     public class WndBackTranslation : WLayout
     {
         // Registry-Stored Settings ----------------------------------------------------------
-        public const string c_sName = "BT";
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
-        static public string RegistryBackgroundColor
-        {
-            get
-            {
-                return GetRegistryBackgroundColor(c_sName, "Linen");
-            }
-            set
-            {
-                SetRegistryBackgroundColor(c_sName, value);
-            }
-        }
-        #endregion
-
         private const string c_sKeyCanEditTarget = "CanEditTarget";
         #region SAttr{g/s}: bool CanEditTarget
         static public bool CanEditTarget
@@ -53,6 +40,7 @@ namespace OurWord.Layouts
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
+        public const string c_sName = "BT";
         const int c_cColumnCount = 2;
         #region Constructor()
         public WndBackTranslation()
@@ -64,6 +52,16 @@ namespace OurWord.Layouts
 
             // Background color for those parts that are editable
             EditableBackgroundColor = Color.White;
+        }
+        #endregion
+        #region OMethod: Color BackgroundColor
+        protected override Color BackgroundColor
+        {
+            get
+            {
+                var sColorName = Users.Current.BackTranslationWindowBackground;
+                return Color.FromName(sColorName);
+            }
         }
         #endregion
         #region OAttr{g}: string LayoutName
@@ -114,10 +112,6 @@ namespace OurWord.Layouts
         #region Method: override void LoadData()
         public override void LoadData()
         {
-            // Set the background color, in case its changed; we use this later in giving
-            // the paragraphs their background color.
-            BackColor = Color.FromName(RegistryBackgroundColor);
-
             // Start with an empty window
             Clear();
 

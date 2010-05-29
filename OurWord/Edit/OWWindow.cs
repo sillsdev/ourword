@@ -66,35 +66,23 @@ namespace OurWord.Edit
         }
         int m_cColumnCount = 0;
         #endregion
-
-        // Delegates -------------------------------------------------------------------------
-        private EventHandler OnLayoutFinished;
-
-        // Registry-Stored Settings ----------------------------------------------------------
-        #region Attr{g}: string RegistrySettingsSubKey
-        string RegistrySettingsSubKey
+        #region VirtAttr{g}: Color BackgroundColor
+        virtual protected Color BackgroundColor
         {
             get
             {
-                Debug.Assert(null != m_sRegistrySettingsSubKey && 
-                    m_sRegistrySettingsSubKey.Length > 0);
-
-                return m_sRegistrySettingsSubKey;
+                return m_BackgroundColor;
+            }
+            set
+            {
+                m_BackgroundColor = value;
             }
         }
-        string m_sRegistrySettingsSubKey = null;
+        private Color m_BackgroundColor = Color.Wheat;
         #endregion
-        #region REGISTRY: Background Color
-        const string c_NameBackColor = "WindowBackColor";
-        static public void SetRegistryBackgroundColor(string sSubKey, string sColor)
-        {
-            JW_Registry.SetValue(c_NameBackColor, sSubKey, sColor);
-        }
-        static public string GetRegistryBackgroundColor(string sSubKey, string sColorDefault)
-        {
-            return JW_Registry.GetValue(c_NameBackColor, sSubKey, sColorDefault);
-        }
-        #endregion
+
+        // Delegates -------------------------------------------------------------------------
+        private EventHandler OnLayoutFinished;
 
         // Interaction with OurWord Main -----------------------------------------------------
         bool m_bLoaded;
@@ -108,8 +96,7 @@ namespace OurWord.Edit
         {
             // Get the window's background color (it may have changed since the window was 
             // first created.
-            var sBackColor = GetRegistryBackgroundColor(RegistrySettingsSubKey, "Wheat");
-            BackColor = Color.FromName(sBackColor);
+            BackColor = BackgroundColor;
 
             // Instantiate a draw object (Assumption is that if we need to do a Resize,
             // then the Draw object's double buffer needs to be recreated so it will be
@@ -215,7 +202,7 @@ namespace OurWord.Edit
         {
             // Window Definition attributes
             Name = wd.Name;
-            m_sRegistrySettingsSubKey = wd.Name;
+            BackgroundColor = wd.BackgroundColor;
             m_cColumnCount = wd.ColumnCount;
             BorderStyle = wd.BorderStyle;
             OnLayoutFinished = wd.OnLayoutFinished;
@@ -228,7 +215,6 @@ namespace OurWord.Edit
             // Window Definition initialization
             if (wd.HasScrollBar)
                 InitializeScrollbar();
-            SetRegistryBackgroundColor(Name, wd.BackgroundColor.Name);
 
             // Double buffer for flicker-free painting 
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
@@ -238,19 +224,13 @@ namespace OurWord.Edit
         public bool DontEverDim;
 
         #region Constructor(sName, cColumnCount)
-        public OWWindow(string _sName, int _cColumnCount)
-            : base()
+        public OWWindow(string sName, int _cColumnCount)
         {
             // Number of columns in this window
             m_cColumnCount = _cColumnCount;
 
             // Name for the window
-            Name = _sName;
-
-            // Registry key for settings
-            m_sRegistrySettingsSubKey = _sName;
-            if (_sName.StartsWith("LS-"))
-                m_sRegistrySettingsSubKey = LiterateSettingsWnd.c_sRegSubKey;
+            Name = sName;
 
             // Initialize ScrollBar
             InitializeScrollbar();

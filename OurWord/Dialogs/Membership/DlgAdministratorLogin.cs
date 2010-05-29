@@ -50,10 +50,14 @@ namespace OurWord.Dialogs.Membership
             var user = Users.Find(m_comboAdministrators.Text);
             Debug.Assert(null != user);
 
+            // Password didn't match. Offer to let the user try again; if he chooses
+            // not to then pass "Abort" back to the caller.
             if (user.Password != m_textPassword.Text)
             {
-                if (!Messages.TryPasswordAgain())
+                if (Messages.TryPasswordAgain())
                     e.Cancel = true;
+                else
+                    DialogResult = DialogResult.Abort;
             }
         }
         #endregion

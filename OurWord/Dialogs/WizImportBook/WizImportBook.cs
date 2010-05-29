@@ -52,6 +52,10 @@ namespace OurWord.Dialogs.WizImportBook
             {
                 return m_pageGetFileName.PathName;
             }
+            set
+            {
+                m_pageGetFileName.PathName = value;
+            }
         }
         #endregion
         #region Attr{g}: string Format

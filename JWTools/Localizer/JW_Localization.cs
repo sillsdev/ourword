@@ -1338,8 +1338,6 @@ namespace JWTools
                 if (lang.Name == sName)
                     PrimaryLanguage = lang;
             }
-
-            SetToRegistry();
         }
         #endregion
         #region Method: void SetSecondary(string sName)
@@ -1352,8 +1350,6 @@ namespace JWTools
                 if (lang.Name == sName)
                     SecondaryLanguage = lang;
             }
-
-            SetToRegistry();
         }
         #endregion
 
@@ -1374,39 +1370,6 @@ namespace JWTools
         }
         #endregion
 
-        // Registry --------------------------------------------------------------------------
-        const string c_keyPrimary = "PrimaryUI";
-        const string c_keySecondary = "SecondaryUI";
-        #region Method: void GetFromRegistry()
-        public void GetFromRegistry()
-        {
-            string sPrimary = JW_Registry.GetValue(c_keyPrimary, "");
-            string sSecondary = JW_Registry.GetValue(c_keySecondary, "");
-
-            foreach (LocLanguage lang in Languages)
-            {
-                if (lang.Name == sPrimary)
-                    PrimaryLanguage = lang;
-
-                if (lang.Name == sSecondary)
-                    SecondaryLanguage = lang;
-            }
-        }
-        #endregion
-        #region Method: void SetToRegistry()
-        public void SetToRegistry()
-        {
-            if (null != PrimaryLanguage)
-                JW_Registry.SetValue(c_keyPrimary, PrimaryLanguage.Name);
-            else
-                JW_Registry.SetValue(c_keyPrimary, "");
-
-            if (null != SecondaryLanguage)
-                JW_Registry.SetValue(c_keySecondary, SecondaryLanguage.Name);
-            else
-                JW_Registry.SetValue(c_keySecondary, "");
-        }
-        #endregion
 
         // I/O -------------------------------------------------------------------------------
         #region Attr{g}: string BasePath - the file containing the basic information
@@ -1594,9 +1557,6 @@ namespace JWTools
 
             // Read in the file
             ReadXML();
-
-            // Retrieve the current settings from the registry
-            GetFromRegistry();
         }
         #endregion
 

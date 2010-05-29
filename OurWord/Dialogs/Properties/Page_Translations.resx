@@ -117,7 +117,35 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="m_lblDefinition.Text" xml:space="preserve">
-    <value>The Front Translation is a source text in a language accessible to  local translators.  It has been fully consultant checked, and is typically a regional language of wider communication that is suitable for local translators to use to draft into their own languages.</value>
+  <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="m_bSource.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAM1JREFUOE+lk70R
+        hCAQRrdYA8owuMDQwIACLOBKoARCC7jALvb8wO9EBhTnmNlxHHhvfxSRi9VLr9s24vkCrJOqF69GzDNR
+        CkOAsGLbRCWYVWAPUa2oBrMKgJTssznm0wJTAHgfcBzuHYz+08ymi5U0wxAgkBmwnaIwtEEznuyVUyeY
+        w8NrOAtgdM79ykzBHH7P4wGzfwjWzxIkPICKCCNjmuT0d+LgIqP6zgcJRawIIKR8L/7a+DyIXJTLbu9F
+        SXSZuXbFUtFfN7LlFn4BqNN8sP3+0DEAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="m_bTarget.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAM1JREFUOE+lk70R
+        hCAQRrdYA8owuMDQwIACLOBKoARCC7jALvb8wO9EBhTnmNlxHHhvfxSRi9VLr9s24vkCrJOqF69GzDNR
+        CkOAsGLbRCWYVWAPUa2oBrMKgJTssznm0wJTAHgfcBzuHYz+08ymi5U0wxAgkBmwnaIwtEEznuyVUyeY
+        w8NrOAtgdM79ykzBHH7P4wGzfwjWzxIkPICKCCNjmuT0d+LgIqP6zgcJRawIIKR8L/7a+DyIXJTLbu9F
+        SXSZuXbFUtFfN7LlFn4BqNN8sP3+0DEAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="m_bReference.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAM1JREFUOE+lk70R
+        hCAQRrdYA8owuMDQwIACLOBKoARCC7jALvb8wO9EBhTnmNlxHHhvfxSRi9VLr9s24vkCrJOqF69GzDNR
+        CkOAsGLbRCWYVWAPUa2oBrMKgJTssznm0wJTAHgfcBzuHYz+08ymi5U0wxAgkBmwnaIwtEEznuyVUyeY
+        w8NrOAtgdM79ykzBHH7P4wGzfwjWzxIkPICKCCNjmuT0d+LgIqP6zgcJRawIIKR8L/7a+DyIXJTLbu9F
+        SXSZuXbFUtFfN7LlFn4BqNN8sP3+0DEAAAAASUVORK5CYII=
+</value>
   </data>
 </root>

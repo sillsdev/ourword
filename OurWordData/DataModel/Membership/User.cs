@@ -337,13 +337,13 @@ namespace OurWordData.DataModel.Membership
             // Default values
             MaximizeWindowOnStartup = true;
             ZoomPercent = 100;
-            PrimaryUiLanguage = "English";
-            SecondaryUiLanguage = "English";
+            PrimaryUiLanguage = LocItem.c_sEnglish;
+            SecondaryUiLanguage = LocItem.c_sEnglish;
 
             DraftingWindowBackground = "Wheat";
             BackTranslationWindowBackground = "Linen";
             NaturalnessWindowBackground = "Wheat";
-            ConsultantWindowBackground = "Wheat";
+            ConsultantWindowBackground = "LightYellow";
         }
         #endregion
         #region Query: bool ContentEquals(other)
@@ -676,6 +676,23 @@ namespace OurWordData.DataModel.Membership
 
             // Save the results
             ours.Save(Path.GetDirectoryName(mergeOrder.pathToOurs));
+        }
+        #endregion
+
+        // Queries ---------------------------------------------------------------------------
+        #region Attr{g}: bool CanSendReceive
+        public bool CanSendReceive
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(CollaborationUserName))
+                    return false;
+
+                if (string.IsNullOrEmpty(CollaborationPassword))
+                    return false;
+
+                return true;
+            }
         }
         #endregion
 

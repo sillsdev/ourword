@@ -5,37 +5,17 @@
  * Author:  John Wimbish
  * Created: 17 Sep 2007
  * Purpose: Edit the settings that an advisor will typically handle.
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Header: Using, etc.
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
 using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading;
-
 using JWTools;
 using OurWord.Dialogs.Properties;
-using OurWordData;
-using OurWord;
 using OurWordData.DataModel;
-using OurWord.Dialogs;
-using OurWord.Layouts;
 using OurWord.Utilities;
 using OurWordData.DataModel.Membership;
-using OurWordData.Styles;
-
-#endregion
 #endregion
 
 // TODO: Check over Localization of pages, especially, e.g., "Front: Kupang"
@@ -149,24 +129,9 @@ namespace OurWord.Dialogs
             m_Pages = new List<DlgPropertySheet>();
             NavList.ClearGroups();
 
-            // Translations
-            var gtTranslations = NavList.AddGroup("Translations");
-
-            if (null == DB.TargetTranslation)
-                AddPage(gtTranslations, new Page_SetupTarget(this), c_iImageDefault);
-            else
-                AddPage(gtTranslations, new Page_Translation(this, DB.TargetTranslation, false), c_iImageDefault);
-
-            if (null == DB.FrontTranslation)
-                AddPage(gtTranslations, new Page_SetupFront(this), c_iImageDefault);
-            else
-                AddPage(gtTranslations, new Page_Translation(this, DB.FrontTranslation, true), c_iImageDefault);
-
-            // Reference Translations
-            var gtReferenceTranslations = NavList.AddGroup("Reference");
-            AddPage(gtReferenceTranslations, new Page_OtherTranslations(this), c_iImageDefault);
-            foreach (DTranslation t in DB.Project.OtherTranslations)
-                AddPage(gtReferenceTranslations, new Page_Translation(this, t, true), c_iImageDefault);
+            // Project Settings
+            var groupProject = NavList.AddGroup("Project");
+            AddPage(groupProject, new Page_Translations(this), c_iImageDefault);
 
             // Current User Settings
             var groupUser = NavList.AddGroup(Users.Current.UserName);
@@ -174,15 +139,15 @@ namespace OurWord.Dialogs
             AddPage(groupUser, new Page_UserFeatures(this), c_iImageFeaturesOnOff);
             AddPage(groupUser, new Page_Notes(this), c_iImageNotes);
 
-            // Options
-            var gtOptions = NavList.AddGroup("Options");
-            AddPage(gtOptions, new Page_Options(this), c_iImageOptions);
-            AddPage(gtOptions, new Page_Collaboration(this), c_iImageCollaboration);
-            AddPage(gtOptions, new Page_Cluster(this), c_iImageClusters);
-            AddPage(gtOptions, new Page_StyleSheet(this), c_iImageStyleSheet);
-            AddPage(gtOptions, new Page_AdvancedPrintOptions(this), c_iImageAdvancedPrint);
-            AddPage(gtOptions, new Page_TranslationStages(this), c_iImageDefault);
-            AddPage(gtOptions, new Page_WritingSystems(this), c_iImageWritingSystem);
+            // Entire Cluster Settings
+            var groupCluster = NavList.AddGroup("Cluster");
+            AddPage(groupCluster, new Page_Options(this), c_iImageOptions);
+            AddPage(groupCluster, new Page_Collaboration(this), c_iImageCollaboration);
+            AddPage(groupCluster, new Page_Cluster(this), c_iImageClusters);
+            AddPage(groupCluster, new Page_StyleSheet(this), c_iImageStyleSheet);
+            AddPage(groupCluster, new Page_AdvancedPrintOptions(this), c_iImageAdvancedPrint);
+            AddPage(groupCluster, new Page_TranslationStages(this), c_iImageDefault);
+            AddPage(groupCluster, new Page_WritingSystems(this), c_iImageWritingSystem);
 
             // Go to the requested page
             if (!string.IsNullOrEmpty(sIdActivePage))
@@ -244,18 +209,9 @@ namespace OurWord.Dialogs
             // Set the TitleBar after the localization, as we override it
             SetTitleBarText();
 
-			// The first page we'll go to
-			string sInitialPageID = Page_SetupFront.c_sID;
-			if (DB.FrontTranslation == null)
-				sInitialPageID = Page_SetupFront.c_sID;
-			else if (DB.TargetTranslation == null)
-				sInitialPageID = Page_SetupTarget.c_sID;
-			else
-				sInitialPageID = Page_Translation.ComputeID(DB.TargetTranslation.DisplayName);
-
             // Set up the pages
             NavList.Images = m_Images;
-            InitNavigation(sInitialPageID);
+            InitNavigation(Page_Translations.c_sID);
         }
         #endregion
         #region Cmd: cmdFormClosing
@@ -271,35 +227,6 @@ namespace OurWord.Dialogs
             {
                 e.Cancel = true;
                 return;
-            }
-
-            // The following warnings still permit the dialog to be closed; but we don't want
-            // to drive the user nuts with warnings; so we just show the first one we come to.
-            bool bCanCloseAnywayWarningIssued = false;
-
-            // The project should have a Front Translation. If not, we'll allow the user to
-            // exit, but we will at least have warned him.
-            if (null == DB.Project.FrontTranslation)
-            {
-                bCanCloseAnywayWarningIssued = true;
-                if (Messages.ProjectHasNoFront())
-                {
-					SetActivePage(Page_SetupFront.c_sID);
-                    e.Cancel = true;
-                    return;
-                }
-            }
-
-            // The project should have a Target Translation. If not, we'll allow the user to
-            // exit, but we will at least have warned him.
-            if (!bCanCloseAnywayWarningIssued && null == DB.Project.TargetTranslation)
-            {
-                if (Messages.ProjectHasNoTarget())
-                {
-					SetActivePage(Page_SetupTarget.c_sID);
-                    e.Cancel = true;
-                    return;
-                }
             }
 
             // Make sure the project has a reasonable name
@@ -325,7 +252,7 @@ namespace OurWord.Dialogs
 	}
 
     #region CLASS: DlgPropertySheet - Provides stubs for page behavior
-    public class DlgPropertySheet : System.Windows.Forms.UserControl
+    public class DlgPropertySheet : UserControl
     {
         // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: DlgProperties ParentDlg
@@ -337,7 +264,7 @@ namespace OurWord.Dialogs
                 return m_ParentDlg;
             }
         }
-        DialogProperties m_ParentDlg;
+        readonly DialogProperties m_ParentDlg;
         #endregion
 
 		// Scaffolding -----------------------------------------------------------------------

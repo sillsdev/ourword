@@ -92,6 +92,7 @@ namespace OurWord.Dialogs.History
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
+        const string c_sName = "History";
         #region Constructor(history, sWindowName)
         public WndHistory(TranslatorNote history, string sName)
             : base(sName, 1)
@@ -112,17 +113,12 @@ namespace OurWord.Dialogs.History
             }
         }
         #endregion
-        const string c_sName = "History";
-        #region SAttr{g/s}: string RegistryBackgroundColor - background color for this type of window
-        static public string RegistryBackgroundColor
+        #region OMethod: Color BackgroundColor
+        protected override Color BackgroundColor
         {
             get
             {
-                return GetRegistryBackgroundColor(c_sName, "LightPink");
-            }
-            set
-            {
-                SetRegistryBackgroundColor(c_sName, value);
+                return Color.FromName("LightPink");
             }
         }
         #endregion

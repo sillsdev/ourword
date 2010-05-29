@@ -521,10 +521,13 @@ namespace OurWordData.Synchronize
         {
             // Pictures seem to mostly be "tif" format now. 
             var recognizedExtensions = new List<string> 
+                // Extensions need to specified as all lower case, no matter how they 
+                // are stored.
             {
-                ".otrans", ".owp", ".owt", ".oxes", ".StyleSheet", ".user",
+                ".otrans", ".owp", ".owt", ".oxes", ".stylesheet", ".user",
                 ".tif", ".pcx", ".jpg"
             };
+
 
             // Get a list of the files that have changed
             var vsChangedFiles = GetChangedFiles();

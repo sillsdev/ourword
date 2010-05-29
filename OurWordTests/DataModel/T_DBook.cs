@@ -96,7 +96,7 @@ namespace OurWordTests.DataModel
         // Make certain we have a two-digit sort key, so that, e.g.,
         // Leviticus follows Exodus rather than Proverbs.
         {
-            DBook book = new DBook("LEV");
+            var book = CreateHierarchyThroughTargetBook("LEV");
             Assert.AreEqual("02", book.SortKey);
         }
         #endregion
@@ -163,7 +163,7 @@ namespace OurWordTests.DataModel
             // Now read it into the book. 
 			DBook Book = new DBook("MRK");
             Translation.AddBook(Book);
-            Book.LoadBook(sPathname, new NullProgress());
+            Book.LoadFromStandardFormat(sPathname);
             Book.DisplayName = "Mark";
 
             // Check for the the proper book references for each section
@@ -269,34 +269,25 @@ namespace OurWordTests.DataModel
             LocDB.SuppressMessages = true;
 
             // Original settings
-            string sTextO = "Original";
+            const string sTextO = "Original";
 
             // Later, changed settings (that backup will erase)
-            string sTextC = "Changed";
+            const string sTextC = "Changed";
 
             // Setup a project/translation/book
-            DB.Project = new DProject("Waxhaw");
-            DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
-            DTeamSettings.EnsureInitialized();
-            DB.Project.InitialCreation(new NullProgress());
-            DTranslation translation = new DTranslation("Waxhaw", "Latin", "Latin");
-            DB.Project.FrontTranslation = translation;
+            var book = CreateHierarchyThroughTargetBook("MRK");
 
-            // Create an initial book which we will save as a backup
-            var book = new DBook("MRK");
-            translation.AddBook(book);
-            TextWriter W = JWU.NUnit_OpenTextWriter("book.db");
-            foreach (string s in SectionTestData.BaikenoMark0101_ImportVariant)
-                W.WriteLine(s);
-            W.Close();
-            book.LoadBook(JWU.NUnit_TestFileFolder + Path.DirectorySeparatorChar + "book.db", 
-                new NullProgress());
+            var writer = JWU.NUnit_OpenTextWriter("book.db");
+            foreach (var s in SectionTestData.BaikenoMark0101_ImportVariant)
+                writer.WriteLine(s);
+            writer.Close();
+            book.LoadFromStandardFormat(Path.Combine(JWU.NUnit_TestFileFolder, "book.db"));
             book.Stage = DB.TeamSettings.Stages.Find(Stage.c_idDraft);
             book.Version = "A";
 
             // Add an extra paragraph
-            DParagraph p = new DParagraph(StyleSheet.Line1);
-            DSection section = book.Sections[0] as DSection;
+            var p = new DParagraph(StyleSheet.Line1);
+            var section = book.Sections[0];
             section.Paragraphs.Append(p);
             SetSimpleParagraphText(p, sTextO);
 
@@ -306,7 +297,7 @@ namespace OurWordTests.DataModel
             book.WriteBook(new NullProgress());
 
             // Compute the backup path we've just saved to
-            string sBackupPathName = book.Translation.Project.TeamSettings.BackupFolder +
+            var sBackupPathName = book.Translation.Project.TeamSettings.BackupFolder +
                     book.BaseNameForBackup + ".bak";
 
             // Change the book and the pathname and save it as a current version
@@ -320,10 +311,10 @@ namespace OurWordTests.DataModel
             DBook.RestoreFromBackup(book, sBackupPathName, new NullProgress());
 
             // Check for original data, stage, version,.
-            section = book.Sections[0] as DSection;
-            int iParaLast = section.Paragraphs.Count - 1;
-            var pLast = section.Paragraphs[iParaLast] as DParagraph;
-            string sActual = GetSimpleParagraphText(pLast);
+            section = book.Sections[0];
+            var iParaLast = section.Paragraphs.Count - 1;
+            var pLast = section.Paragraphs[iParaLast];
+            var sActual = GetSimpleParagraphText(pLast);
             Assert.AreEqual(sTextO, sActual);
             Assert.AreEqual(Stage.c_idDraft, book.Stage.ID);
             Assert.AreEqual("A", book.Version);

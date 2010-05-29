@@ -290,9 +290,9 @@ namespace JWTools
         #region SMethod: TextWriter NUnit_OpenTextWriter(sFileName)
         static public TextWriter NUnit_OpenTextWriter(string sFileName)
         {
-            string sPath = NUnit_TestFileFolder + Path.DirectorySeparatorChar + sFileName;
-            StreamWriter w = new StreamWriter(sPath, false, Encoding.UTF8);
-            TextWriter tw = TextWriter.Synchronized(w);
+            var sPath = NUnit_TestFileFolder + Path.DirectorySeparatorChar + sFileName;
+            var w = new StreamWriter(sPath, false, Encoding.UTF8);
+            var tw = TextWriter.Synchronized(w);
             return tw;
         }
         #endregion

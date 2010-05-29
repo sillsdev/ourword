@@ -308,13 +308,15 @@ namespace JWTools
         #region Method: void AddAttr(node, sAttrName, fValue)
         public void AddAttr(XmlNode node, string sAttrName, float fValue)
         {
-            AddAttr(node, sAttrName, fValue.ToString());
+            // Use the InvariantInfo so that 1,000.00 always, rather than 1.000,00 issues.
+            AddAttr(node, sAttrName, fValue.ToString(NumberFormatInfo.InvariantInfo));
         }
         #endregion
         #region Method: void AddAttr(node, sAttrName, dValue)
         public void AddAttr(XmlNode node, string sAttrName, double dValue)
         {
-            AddAttr(node, sAttrName, dValue.ToString());
+            // Use the InvariantInfo so that 1,000.00 always, rather than 1.000,00 issues.
+            AddAttr(node, sAttrName, dValue.ToString(NumberFormatInfo.InvariantInfo));
         }
         #endregion
 
@@ -382,7 +384,8 @@ namespace JWTools
 
             try
             {
-                return (float)Convert.ToDouble(sValue);
+                // Use the InvariantInfo so that 1,000.00 always, rather than 1.000,00 issues.
+                return (float)Convert.ToDouble(sValue, NumberFormatInfo.InvariantInfo);
             }
             catch (Exception e)
             {
@@ -397,7 +400,8 @@ namespace JWTools
 
             try
             {
-                return Convert.ToDouble(sValue);
+                // Use the InvariantInfo so that 1,000.00 always, rather than 1.000,00 issues.
+                return Convert.ToDouble(sValue, NumberFormatInfo.InvariantInfo);
             }
             catch (Exception e)
             {
