@@ -58,7 +58,7 @@ namespace OurWordSetup.Data
         #endregion
 
         // Attrs -----------------------------------------------------------------------------
-        private bool InformUserIfThereWereNoUpdates { get; set; }
+        private bool QuietMode { get; set; }
         #region Attr{g}: Form ParentWindow
         Form ParentWindow
         {
@@ -96,6 +96,11 @@ namespace OurWordSetup.Data
         #endregion
 
         // Public Interface ------------------------------------------------------------------
+        private const int c_nUserAborted = -2;
+        private const int c_nError = -1;
+        private const int c_nNoUpdatedNeeded = 0;
+        private const int c_nUpdateLaunched = 1;
+
         #region Constructor(parentWindow)
         public SetupManager(Form parentWindow)
         {
@@ -107,21 +112,26 @@ namespace OurWordSetup.Data
                 Manifest.ManifestFileName));
         }
         #endregion
-        #region SMethod: bool CheckForUpdates(parentForm)
-        static public bool CheckForUpdates(Form parentForm, bool bInformUserIfThereWereNoUpdates)
+        #region SMethod: int CheckForUpdates(parentForm, bInformUserIfThereWereNoUpdates)
+        static public int CheckForUpdates(Form parentForm, bool bQuietMode)
             // Entry point called from OurWord
         {
             var manager = new SetupManager(parentForm) 
-            { 
-                InformUserIfThereWereNoUpdates = bInformUserIfThereWereNoUpdates 
+            {
+                QuietMode = bQuietMode 
             };
             return manager.DoCheckForUpdates();
         }
         #endregion
-        #region Method: bool DoCheckForUpdates()
-        private bool DoCheckForUpdates()
+        #region Method: int DoCheckForUpdates()
+        private int DoCheckForUpdates()
             // Returns true if we're launching the external updater (and thus are shutting down),
             // as the caller may need to abort further processing. (See Synchronize for example)
+            //
+            // Returns:
+            //   0 - No update required
+            //  -1 - User canceled form an update
+            //   1 - Update is being done, caller needs to shut down
         {
             #region UI Strings
             var ui = new CommonUserInterfaceStrings
@@ -147,21 +157,21 @@ namespace OurWordSetup.Data
 
             // We need the Manifest in order to know if an update is available
             if(!CheckInternetAccessAndDownloadManifest(ui))
-                return false;
+                return c_nError;
 
             // For, e.g., synch, we will be silent here and not tell the user there
             // is no need; but if they explicitly ask to check for updates, then a
             // message needs to be presented. 
             if (!IsAnUpdateIndicated())
             {
-                if (InformUserIfThereWereNoUpdates)
+                if (QuietMode)
                     DisplayMessage(ParentWindow, "Your version of OurWord is up-to-date.");
-                return false;
+                return c_nNoUpdatedNeeded;
             }
 
             // Give the user opportunity to bail
             if (!DoesTheUserWantToUpdateNow())
-                return false;
+                return c_nUserAborted;
 
             // Download the files
             var vItemsToDownload = DetermineItemsToDownload();
@@ -169,12 +179,12 @@ namespace OurWordSetup.Data
                 { PleaseWaitMessage = ui.PleaseWaitWhileDownloading };
             downloader.ShowDialog(ParentWindow);
             if (downloader.DownloadCanceledByUser)
-                return false;
+                return c_nUserAborted;
 
             // At this point, files are downloaded. We now need to shut down and 
             // launch another app to copy the files into the application folder
             LaunchExternalSetup();
-            return true;
+            return c_nUpdateLaunched;
         }
         #endregion
         #region Method: void FinishUpdate()
@@ -449,7 +459,7 @@ namespace OurWordSetup.Data
             return;
         }
         #endregion
-
+        #region SMethod: bool ExpandZipIntoDownloadFolder()
         static bool ExpandZipIntoDownloadFolder()
         {
             // Check for an appropriately named zip file in this SetupManager's folder
@@ -465,7 +475,7 @@ namespace OurWordSetup.Data
 
             return true;
         }
-
+        #endregion
 
         // Common Helper Methods -------------------------------------------------------------
         #region Method: void DisplayMessage(parentWnd, sErrorText)
@@ -524,6 +534,7 @@ namespace OurWordSetup.Data
         bool CheckInternetAccessAndDownloadManifest(CommonUserInterfaceStrings ui)
         {
             // Display a separate-threaded dialog telling the user what we're doing
+            DlgCheckingForUpdates.QuietMode = QuietMode;
             DlgCheckingForUpdates.InformationMessage = ui.PleaseWaitWhileChecking;
             DlgCheckingForUpdates.Start(ParentWindow);
 

@@ -1812,10 +1812,6 @@ namespace OurWord
         {
             Dim();
 
-            // If updates were found, the user will have to restart this command
-            if (CheckForUpdates(false))
-                return;
-
             // We'll contruct the wizard outside of the loop, in case we have to go
             // back and change settings (e.g., on an error)
             var wiz = new WizInitializeFromRepository();
@@ -2711,10 +2707,6 @@ namespace OurWord
         {
             Dim();
 
-            // If updates were found, the user will have to restart Synchronize
-            if(CheckForUpdates(false))
-                return;
-
             // Save everything, but don't commit, cause Synchronize will do a commit
             DB.Project.Nav.SavePositionToRegistry();
             OnLeaveProject();
@@ -2743,6 +2735,21 @@ namespace OurWord
             var history = new DlgHistory(DB.TargetSection);
             history.ShowDialog(this);
             UnDim();
+        }
+        #endregion
+        #region Cmd: cmdCheckForUpdates
+        private void cmdCheckForUpdates(object sender, EventArgs e)
+        {
+            DB.Project.Nav.SavePositionToRegistry();
+            OnLeaveProject();
+
+            // Invoke
+            var checkForUpdateMethod = new InvokeCheckForUpdates()
+            {
+                QuietMode = true
+            };
+            
+            checkForUpdateMethod.Do(this);
         }
         #endregion
 
@@ -2822,28 +2829,6 @@ namespace OurWord
         }
         #endregion
         #endregion
-
-        bool CheckForUpdates(bool bInformUserIfThereWereNoUpdates)
-            // Returns true if OurWord is shutting down. Any caller should immediately
-            // halt anything it is doing and permit OW to shut down as soon as possible.
-            // There is a clock ticking, and the setup program will eventually force
-            // the shutdown.
-        {
-            DB.Project.Nav.SavePositionToRegistry();
-            OnLeaveProject();
-
-            // If we're on my developer's machine, don't do the check, because we're not 
-            // running from a proper installation.
-            if (G.FolderOfExe.ToLowerInvariant().Contains("debug"))
-                return false;
-
-            return InvokeOurWordSetup.CheckForUpdates(this, bInformUserIfThereWereNoUpdates);
-        }
-
-        private void cmdCheckForUpdates(object sender, EventArgs e)
-        {
-            CheckForUpdates(true);
-        }
 
 
     }

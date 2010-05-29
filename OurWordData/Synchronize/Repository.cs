@@ -826,6 +826,7 @@ namespace OurWordData.Synchronize
     class SynchException : Exception
     {
         public readonly string LocalizedMessage;
+        public bool AbortImmediately { get; set; }
 
         public SynchException(string sLocId, string sEnglishMessage)
             : base(sEnglishMessage)
@@ -938,6 +939,13 @@ namespace OurWordData.Synchronize
             }
             catch (SynchException e)
             {
+                if (e.AbortImmediately)
+                {
+                    EnumeratedStepsProgressDlg.Stop();
+                    return false;
+                }
+
+                // Display message so the user knows what happened
                 EnumeratedStepsProgressDlg.Fail(e.LocalizedMessage);
                 return false;
             }
@@ -957,6 +965,31 @@ namespace OurWordData.Synchronize
                 "Please check that you have an active Internet connection, then try again.");
         }
         #endregion
+
+        static void CheckForUpdates()
+        {
+            var checkForUpdateMethod = new InvokeCheckForUpdates()
+            {
+                QuietMode = true
+            };
+            var result = checkForUpdateMethod.Do(null);
+
+            switch (result)
+            {
+                case InvokeCheckForUpdates.Result.UserAborted:
+                    throw new SynchException("msgUpdateAborted",
+                       "You cannot Send/Receive until you install the update to OurWord.");
+
+                case InvokeCheckForUpdates.Result.Error:
+                    throw new SynchException("msgUpdateError",
+                      "An error occured during OurWord's \"Check For Update\" process.\n" + 
+                      "Pleace try again.");
+
+                case InvokeCheckForUpdates.Result.UpdateLaunched:
+                    throw new SynchException("msgUpdateLaunched", "Aborting Synch") 
+                        {AbortImmediately = true};
+            }
+        }
 
         // SynchLocalToOther
         #region CheckLocalIntegrity
@@ -1166,7 +1199,10 @@ namespace OurWordData.Synchronize
                 "Internet" : "other repository";
 
             if (m_OtherRepository.IsRemoteOnInternet)
+            {
                 AddSynchStep("Checking Internet access", CheckInternetAccess);
+                AddSynchStep("Checking for Updates to OurWord", CheckForUpdates);
+            }
             AddSynchStep("Checking data integrity", CheckLocalIntegrity);
             AddSynchStep("Storing any files you've changed", StoreChangedFiles);
             AddSynchStep("Retrieving any newer files from the " + sOtherName, PullNewerFiles);
@@ -1182,7 +1218,10 @@ namespace OurWordData.Synchronize
         // Returns true if successful
         {
             if (m_OtherRepository.IsRemoteOnInternet)
+            {
                 AddSynchStep("Checking Internet access", CheckInternetAccess);
+                AddSynchStep("Checking for Updates to OurWord", CheckForUpdates);
+            }
             AddSynchStep("Checking your local disk", PreliminaryCheckingBeforeClone);
             AddSynchStep("Downloading from the Internet", DoClone);
 

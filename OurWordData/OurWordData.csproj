@@ -148,6 +148,7 @@
     <Compile Include="Styles\ParagraphStyle.cs" />
     <Compile Include="Styles\StyleSheet.cs" />
     <Compile Include="Styles\WritingSystem.cs" />
+    <Compile Include="Synchronize\InvokeCheckForUpdates.cs" />
     <Compile Include="Synchronize\Repository.cs" />
     <Compile Include="Synchronize\Merger.cs" />
     <Compile Include="DataModel\RepairImportBook.cs">

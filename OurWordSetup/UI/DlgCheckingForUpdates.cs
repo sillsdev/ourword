@@ -16,8 +16,10 @@ namespace OurWordSetup.UI
 {
     public partial class DlgCheckingForUpdates : Form
     {
+        static public bool QuietMode { get; set; }
+
         #region Attr{s}: string StatusMessage
-        public string StatusMessage
+        private string StatusMessage
         {
             set
             {
@@ -29,6 +31,9 @@ namespace OurWordSetup.UI
         delegate void SetStatusTextDelegate(string sEnglishStatus);
         static public void SetStatusText(string sStatus)
         {
+            if (QuietMode)
+                return;
+
             if (s_Dialog.InvokeRequired)
             {
                 var d = new SetStatusTextDelegate(SetStatusText);
@@ -55,6 +60,9 @@ namespace OurWordSetup.UI
         #region SMethod: public void Start()
         static public void Start(Form parent)
         {
+            if (QuietMode)
+                return;
+
             s_Dialog = null;
             s_ParentWindow = parent;
 
@@ -69,6 +77,7 @@ namespace OurWordSetup.UI
                 Thread.Sleep(500);
             Thread.Sleep(2000);
         }
+        #region SMethod: void StartDialog()
         static private void StartDialog()
         {
             s_Dialog = new DlgCheckingForUpdates();
@@ -87,10 +96,14 @@ namespace OurWordSetup.UI
             Application.Run(s_Dialog);
         }
         #endregion
+        #endregion
         #region SMethod: void Stop()
         delegate void StopDelegate();
         static public void Stop()
         {
+            if (QuietMode)
+                return;
+
             if (s_Dialog.InvokeRequired)
             {
                 var d = new StopDelegate(Stop);

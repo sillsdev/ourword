@@ -751,7 +751,6 @@
       <DependentUpon>ReferenceTranslationsTip.cs</DependentUpon>
     </Compile>
     <Compile Include="ToolTips\ToolTipLauncher.cs" />
-    <Compile Include="Utilities\InvokeOurWordSetup.cs" />
     <Compile Include="Utilities\ClusterListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
