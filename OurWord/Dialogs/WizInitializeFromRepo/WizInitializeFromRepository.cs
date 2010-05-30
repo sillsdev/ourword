@@ -63,7 +63,7 @@ namespace OurWord.Dialogs
             }
             set
             {
-                m_pageGetRepoInfo.UserName = value;
+                m_pageGetRepoInfo.UserName = value ?? "";
             }
         }
         #endregion
@@ -76,7 +76,7 @@ namespace OurWord.Dialogs
             }
             set
             {
-                m_pageGetRepoInfo.Password = value;
+                m_pageGetRepoInfo.Password = value ?? "";
             }
         }
         #endregion
@@ -89,7 +89,7 @@ namespace OurWord.Dialogs
             }
             set
             {
-                m_pageGetClusterName.ClusterName = value;
+                m_pageGetClusterName.ClusterName = value ?? "";
             }
         }
         #endregion
@@ -106,6 +106,10 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
+
+        public string InitialUserName { get;  set; }
+        public string InitialPassword { get;  set; }
+        public string InitialClusterName { get; set; }
 
         // Scaffolding -----------------------------------------------------------------------
         public const string c_sEnglishTitle = "Initialize a Cluster by downloading from the Internet";

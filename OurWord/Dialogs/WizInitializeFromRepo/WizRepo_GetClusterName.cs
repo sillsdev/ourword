@@ -72,6 +72,9 @@ namespace OurWord.Dialogs
         #region Method: void OnActivate()
         public void OnActivate()
         {
+            if (string.IsNullOrEmpty(ClusterName))
+                ClusterName = Wizard.InitialClusterName;
+
         }
         #endregion
         #region Method: bool CanGoToNextPage()

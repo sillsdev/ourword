@@ -79,6 +79,9 @@
     <EmbeddedResource Include="UI\DlgFullSetup.resx">
       <DependentUpon>DlgFullSetup.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\DlgMessage.resx">
+      <DependentUpon>DlgMessage.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -113,6 +116,12 @@
     </Compile>
     <Compile Include="UI\DlgFullSetup.Designer.cs">
       <DependentUpon>DlgFullSetup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\DlgMessage.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\DlgMessage.Designer.cs">
+      <DependentUpon>DlgMessage.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

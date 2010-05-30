@@ -841,7 +841,6 @@ namespace OurWordData.Synchronize
     }
     #endregion
 
-
     #region Class: Synchronize
     public class Synchronize
     {
@@ -939,6 +938,8 @@ namespace OurWordData.Synchronize
             }
             catch (SynchException e)
             {
+                // This comes, e.g., if CheckForUpdates is installing a new version,
+                // and OW needs to shutdown so the new version can be installed.
                 if (e.AbortImmediately)
                 {
                     EnumeratedStepsProgressDlg.Stop();
@@ -965,7 +966,7 @@ namespace OurWordData.Synchronize
                 "Please check that you have an active Internet connection, then try again.");
         }
         #endregion
-
+        #region Method: void CheckForUpdates()
         static void CheckForUpdates()
         {
             var checkForUpdateMethod = new InvokeCheckForUpdates()
@@ -982,14 +983,15 @@ namespace OurWordData.Synchronize
 
                 case InvokeCheckForUpdates.Result.Error:
                     throw new SynchException("msgUpdateError",
-                      "An error occured during OurWord's \"Check For Update\" process.\n" + 
-                      "Pleace try again.");
+                      "An error occurred during OurWord's \"Check For Update\" process.\n" + 
+                      "Please try again.");
 
                 case InvokeCheckForUpdates.Result.UpdateLaunched:
                     throw new SynchException("msgUpdateLaunched", "Aborting Synch") 
                         {AbortImmediately = true};
             }
         }
+        #endregion
 
         // SynchLocalToOther
         #region CheckLocalIntegrity
@@ -1033,7 +1035,7 @@ namespace OurWordData.Synchronize
             {
                 throw new SynchException("msgCantDeleteFileBeforeCommit",
                     "A file with an unrecognized extension is in your data folder{n}{n}" +
-                    "OurWord was uable to delete it. Perhaps you have some other software " +
+                    "OurWord was unable to delete it. Perhaps you have some other software " +
                     "running which is using that file. Please delete the file, then try " +
                     "again. OurWord only recognizes files of type \".owp\", \".owt\", " +
                     "\".otrans\" and \".oxes\".");
@@ -1047,7 +1049,7 @@ namespace OurWordData.Synchronize
                 throw new SynchException("msgCantCommitRecentChanges",
                      "OurWord was unable to place your most recent changes into the local Repository.\n\n" +
                      "Please try again. If the problem continues, please contact us at " +
-                     "http://ourword.TheSeedCompany.org so that we can determine how to " +
+                     "http://OurWordSoftware.org so that we can determine how to " +
                      "solve this problem.");
             }
         }
@@ -1131,7 +1133,7 @@ namespace OurWordData.Synchronize
             {
                 if (result.StandardOutput.Contains("abort: push creates new remote heads"))
                     throw new SynchException("msgNewRemoteHeads",
-                        "Unable to save changes, because merge did not suceed (with the " +
+                        "Unable to save changes, because merge did not succeed (with the " +
                         "ccmplaint of having created new \"heads\") If this continues, " +
                         "please report it as a bug.");
 

@@ -103,6 +103,12 @@ namespace OurWord.Dialogs
             // Default value
             if (string.IsNullOrEmpty(Url))
                 Url = InternetRepository.c_sDefaultServer;
+
+            if (string.IsNullOrEmpty(UserName))
+                UserName = Wizard.InitialUserName;
+
+            if (string.IsNullOrEmpty(Password))
+                Password = Wizard.InitialPassword;
         }
         #endregion
         #region Method: bool CanGoToNextPage()

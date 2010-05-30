@@ -64,7 +64,6 @@ namespace OurWordSetup.Data
         {
             get
             {
-                Debug.Assert(null != m_ParentWindow);
                 return m_ParentWindow;
             }
         }
@@ -164,7 +163,7 @@ namespace OurWordSetup.Data
             // message needs to be presented. 
             if (!IsAnUpdateIndicated())
             {
-                if (QuietMode)
+                if (!QuietMode)
                     DisplayMessage(ParentWindow, "Your version of OurWord is up-to-date.");
                 return c_nNoUpdatedNeeded;
             }
@@ -177,8 +176,8 @@ namespace OurWordSetup.Data
             var vItemsToDownload = DetermineItemsToDownload();
             var downloader = new DlgDownloader(vItemsToDownload) 
                 { PleaseWaitMessage = ui.PleaseWaitWhileDownloading };
-            downloader.ShowDialog(ParentWindow);
-            if (downloader.DownloadCanceledByUser)
+            var result = downloader.ShowDialog(ParentWindow);
+            if (DialogResult.Abort == result || downloader.DownloadCanceledByUser)
                 return c_nUserAborted;
 
             // At this point, files are downloaded. We now need to shut down and 
@@ -481,8 +480,17 @@ namespace OurWordSetup.Data
         #region Method: void DisplayMessage(parentWnd, sErrorText)
         static public void DisplayMessage(Form parent, string sErrorText)
         {
-            MessageBox.Show(parent, sErrorText, "OurWord Setup",
-                MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // We do a custom dialog so that we can set it to TopMost, so that
+            // it will appear over the calling (other process) window; which
+            // MessageBox.Show does not do.
+            var message = new DlgMessage 
+            {
+                Message = sErrorText
+            };
+            message.ShowDialog();
+
+ //           MessageBox.Show(parent, sErrorText, "OurWord Setup",
+ //               MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         #endregion
         #region SMethod: string BuildFriendlyVersion(Version)

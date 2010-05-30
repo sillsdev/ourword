@@ -461,7 +461,8 @@ namespace OurWord
                 Users.Current.CanCreateProject ||
                 !Users.HasAdministrator);
             m_menuOpenProject.Available = (!DB.IsValidProject || 
-                Users.Current.CanOpenProject);
+                Users.Current.CanOpenProject ||
+                !Users.HasAdministrator);
             m_menuExportProject.Available = (
                 DB.IsValidProject && 
                 DB.TargetTranslation.BookList.Count > 0 &&
@@ -1213,7 +1214,7 @@ namespace OurWord
             // 
             // m_Synchronize
             // 
-            this.m_Synchronize.Image = global::OurWord.Properties.Resources.MoveDown;
+            this.m_Synchronize.Image = ((System.Drawing.Image)(resources.GetObject("m_Synchronize.Image")));
             this.m_Synchronize.Name = "m_Synchronize";
             this.m_Synchronize.Size = new System.Drawing.Size(211, 22);
             this.m_Synchronize.Text = "Send / &Receive";
@@ -1808,82 +1809,79 @@ namespace OurWord
         }
 		#endregion
         #region Cmd: cmdDownloadRepository
+
+	    private string m_sClusterName;
+	    private string m_sUserName;
+	    private string m_sPassword;
+
         private void cmdDownloadRepository(Object sender, EventArgs e)
         {
             Dim();
-
-            // We'll contruct the wizard outside of the loop, in case we have to go
-            // back and change settings (e.g., on an error)
-            var wiz = new WizInitializeFromRepository();
 
             // Make sure the current project is saved and up-to-date, before we create
             // the new one. 
             OnLeaveProject();
 
-            // Loop until success or give up
-            while (true)
+            // To make life easier in case things fail, we'll remember what the user
+            // entered in case he has to try again.
+            var wiz = new WizInitializeFromRepository() 
             {
-                // Get the user's settings for the to-be-downloaded cluster
-                if (DialogResult.OK != wiz.ShowDialog(this))
-                    goto done;
+                InitialUserName = m_sUserName,
+                InitialPassword = m_sPassword,
+                InitialClusterName = m_sClusterName
+            };
 
-                // The ClusterInfo tells us where the new cluster will be stored
-                var sParentFolder = (wiz.IsInMyDocuments) ?
-                    JWU.GetMyDocumentsFolder(null) :
-                    JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
-                var ci = new ClusterInfo(wiz.ClusterName, sParentFolder);
+            // Get the user's settings for the to-be-downloaded cluster
+            var wizResult = wiz.ShowDialog(this);
+            m_sClusterName = wiz.ClusterName;
+            m_sUserName = wiz.UserName;
+            m_sPassword = wiz.Password;
+            if (DialogResult.OK != wizResult)
+                goto done;
 
-                // Attempt the clone
-                var internetRepository = new InternetRepository(wiz.ClusterName, 
-                    wiz.UserName, wiz.Password)
-                {
-                    Server = wiz.Url,
-                };
-                var localRepository = new LocalRepository(ci.ClusterFolder);
+            // The ClusterInfo tells us where the new cluster will be stored
+            var sParentFolder = (wiz.IsInMyDocuments) ?
+                JWU.GetMyDocumentsFolder(null) :
+                JWU.GetLocalApplicationDataFolder(ClusterInfo.c_sLanguageDataFolder);
+            var ci = new ClusterInfo(wiz.ClusterName, sParentFolder);
 
-                var method = new Synchronize(localRepository, internetRepository, 
-                    Users.Current.UserName);
-                var bSuccessful = method.CloneFromOther();
+            // Attempt the clone
+            var internetRepository = new InternetRepository(m_sClusterName,
+                m_sUserName, m_sPassword)
+            {
+                Server = wiz.Url,
+            };
+            var localRepository = new LocalRepository(ci.ClusterFolder);
+            var method = new Synchronize(localRepository, internetRepository, 
+                Users.Current.UserName);
+            var bSuccessful = method.CloneFromOther();
 
-                // If error, give the user opportunity to try again, so we don't lose
-                // the wizards settings.
-                if (!bSuccessful)
-                {
-                    JWU.SafeFolderDelete(ci.ClusterFolder);
-
-                    var bAgain = LocDB.Message("msgTryAgain",
-                        "Do you wish to try again?",
-                        null,
-                        LocDB.MessageTypes.YN);
-                    if (!bAgain)
-                        goto done;
-                    continue;
-                }
-
-                // Open the first project we find
-                var vsProjects = ci.GetClusterLanguageList(true);
-                if (null != vsProjects && vsProjects.Count > 0)
-                {
-                    var sPath = ci.GetProjectPath(vsProjects[0]);
-                    DB.Project = new DProject();
-                    DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
-                    DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
-                    Users.Current = Users.Observer;
-                    OnEnterProject();
-                }
-
-                // If here, then we were successful
-                break;
+            // If an error, then abort
+            if (!bSuccessful)
+            {
+                JWU.SafeFolderDelete(ci.ClusterFolder);
+                goto done;
             }
 
-            // Display a dialog declaring Success, and giving a choice of which project to open
+            // Open the first project we find
+            var vsProjects = ci.GetClusterLanguageList(true);
+            if (null != vsProjects && vsProjects.Count > 0)
+            {
+                var sPath = ci.GetProjectPath(vsProjects[0]);
+                DB.Project = new DProject();
+                DB.Project.LoadFromFile(ref sPath, G.CreateProgressIndicator());
+                DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
+                Users.Current = Users.Observer;
+                OnEnterProject();
+            }
+
+            // Display a dialog declaring Success
             LocDB.Message("msgRepoCreated",
-                "The Respository has been sucessfully downloaded to your computer.",
+                "The Cluster has been successfully downloaded to your computer.",
                 null, LocDB.MessageTypes.Info);
 
             done:
                 UnDim();
-
         }
         #endregion
 
@@ -2744,9 +2742,9 @@ namespace OurWord
             OnLeaveProject();
 
             // Invoke
-            var checkForUpdateMethod = new InvokeCheckForUpdates()
+            var checkForUpdateMethod = new InvokeCheckForUpdates
             {
-                QuietMode = true
+                QuietMode = false
             };
             
             checkForUpdateMethod.Do(this);

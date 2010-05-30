@@ -375,6 +375,7 @@
     <Content Include="Res\NoteMerge.ico" />
     <None Include="Res\OurWord.png" />
     <Content Include="Res\ProgressIndicatorBackground.jpg" />
+    <EmbeddedResource Include="Res\Synchronize.ico" />
     <Content Include="Res\TurnFeaturesOnOff.ico" />
     <EmbeddedResource Include="Res\ThisProject.ico" />
     <EmbeddedResource Include="Res\ThisCluster.ico" />
