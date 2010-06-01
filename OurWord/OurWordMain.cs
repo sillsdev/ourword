@@ -2045,9 +2045,9 @@ namespace OurWord
                     continue;
 
                 // BEGIN HUICHOL FIX *******************************************************
-           //     book.OneOffForHuichol_StripOutOldTranslatorNotes();
-           //     book.DeclareDirty();
-           //     book.WriteBook(G.CreateProgressIndicator());
+            //    book.OneOffForHuichol_StripOutOldTranslatorNotes();
+            //    book.DeclareDirty();
+            //    book.WriteBook(G.CreateProgressIndicator());
                 // END HUICHOL FIX *********************************************************
 
                 // Compute the file name
