@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using OurWord.Ctrls;
 using OurWord.Dialogs.Membership;
 using OurWord.Edit.Blocks;
 using OurWord.Printing;
@@ -1732,6 +1733,10 @@ namespace OurWord
 		#region Cmd: cmdPrint
         private void cmdPrint(Object sender, EventArgs e)
 		{
+     //       var test = new TestDlg();
+     //       test.ShowDialog();
+            /////////////////////////////////////////////////////////////
+
             Dim();;
 			OnLeaveSection();
 
@@ -2038,6 +2043,12 @@ namespace OurWord
                 book.LoadBook(G.CreateProgressIndicator());
                 if (!book.Loaded)
                     continue;
+
+                // BEGIN HUICHOL FIX *******************************************************
+           //     book.OneOffForHuichol_StripOutOldTranslatorNotes();
+           //     book.DeclareDirty();
+           //     book.WriteBook(G.CreateProgressIndicator());
+                // END HUICHOL FIX *********************************************************
 
                 // Compute the file name
                 var sExportPath = JWU.GetMyDocumentsFolder(dlgDesires.ExportSubFolderName);

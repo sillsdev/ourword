@@ -207,16 +207,16 @@ namespace OurWordData.DataModel
             itemGoToBook.DropDownItems.Clear();
 
             // How many books do we have? (If too few, we will not want to nest with subitems)
-            int cBooks = DB.Project.Nav.PotentialTargetBooks.Length;
+            var cBooks = DB.Project.Nav.PotentialTargetBooks.Length;
 
             // Loop through the books, adding them to the appropriate place in the menu
-            foreach (DBook book in DB.Project.Nav.PotentialTargetBooks)
+            foreach (var book in DB.Project.Nav.PotentialTargetBooks)
             {
                 // Default to placing the book as a dropdown within the top-level GoToBook item
-                ToolStripDropDownItem itemParent = itemGoToBook;
+                var itemParent = itemGoToBook;
 
                 // Find the sub-grouping (if any) to which this book belongs
-                DBookGrouping group = FindGroupingFor(book.BookAbbrev);
+                var group = FindGroupingFor(book.BookAbbrev);
 
                 // Optionally, we'll place the book into a sub-grouping. Conditions are:
                 // 1. There are enough books in the project to justify subgroupings,
@@ -240,17 +240,23 @@ namespace OurWordData.DataModel
                     // If the Node does not exist, then create it.
                     if (itemParent == itemGoToBook)
                     {
-                        ToolStripMenuItem itemGrouping = new ToolStripMenuItem(group.GetUIText());
-                        itemGrouping.Name = "menu" + group.DefaultEnglishText;
+                        var itemGrouping = new ToolStripMenuItem(group.GetUIText())
+                        {
+                            Name = "menu" + group.DefaultEnglishText,
+                            Font = SystemFonts.DialogFont
+                        };
                         itemGoToBook.DropDownItems.Add(itemGrouping);
                         itemParent = itemGrouping;
                     }
                 }
 
                 // Create the menu item, showing the display name
-                ToolStripMenuItem itemBook = new ToolStripMenuItem(book.DisplayName, null, onClick);
-                itemBook.Name = "menu" + book.BookAbbrev;
-                itemBook.Tag = book.BookAbbrev;
+                var itemBook = new ToolStripMenuItem(book.DisplayName, null, onClick)
+                {
+                    Name = "menu" + book.BookAbbrev,
+                    Tag = book.BookAbbrev,
+                    Font = SystemFonts.DialogFont
+                };
 
                 // For a locked book, write its text as Red color
                 if (book.Locked)

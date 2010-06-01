@@ -436,7 +436,7 @@ namespace OurWordData.DataModel.Annotations
         #region Method: bool ContentEquals(JObject)
         public override bool ContentEquals(JObject obj)
         {
-            TranslatorNote tn = obj as TranslatorNote;
+            var tn = obj as TranslatorNote;
             if (null == tn)
                 return false;
 
@@ -448,7 +448,7 @@ namespace OurWordData.DataModel.Annotations
             if (Messages.Count != tn.Messages.Count)
                 return false;
 
-            for (int i = 0; i < Messages.Count; i++)
+            for (var i = 0; i < Messages.Count; i++)
             {
                 if (!Messages[i].ContentEquals(tn.Messages[i]))
                     return false;

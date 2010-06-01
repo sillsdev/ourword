@@ -2450,5 +2450,70 @@ namespace OurWordData.DataModel
             ourBook.WriteBook(mergeOrder.pathToOurs);
         }
         #endregion
+
+
+        bool OtherVersionHadNumberNote(TranslatorNote note)
+        {
+            if (note.FirstMessage.Author != TranslatorNote.MergeAuthor)
+                return false;
+            if (note.Messages.Count > 1)
+                return false;
+
+            // Extract what changed
+            var bInMessage = false;
+            var sContent = "";
+            foreach(char ch in note.LastMessage.AsString)
+            {
+                if (!bInMessage && ch == '\"')
+                {
+                    bInMessage = true;
+                    continue;
+                }
+
+                if (bInMessage && ch == '\"')
+                {
+                    bInMessage = false;
+                    continue;
+                }
+
+                if (bInMessage)
+                    sContent += ch;
+            }
+
+            // If anything is not a number, then it has content we want to examine
+            foreach(var ch in sContent)
+            {
+                if (!char.IsDigit(ch))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public void OneOffForHuichol_StripOutOldTranslatorNotes()
+        {
+            foreach (DSection section in Sections)
+                foreach (DParagraph paragraph in section.Paragraphs)
+                    foreach (DRun run in paragraph.Runs)
+                    {
+                        var text = run as DText;
+                        if (null == text)
+                            continue;
+
+                        for (var i = 0; i < text.TranslatorNotes.Count; )
+                        {
+                            var note = text.TranslatorNotes[i] as TranslatorNote;
+                            var message = note.LastMessage;
+                            if (message.UtcCreated.Year < 2010)
+                                text.TranslatorNotes.Remove(note);
+                            else if (message.UtcCreated.Year == 2010 && message.UtcCreated.Month < 4)
+                                text.TranslatorNotes.Remove(note);
+                            else if (OtherVersionHadNumberNote(note))
+                                text.TranslatorNotes.Remove(note);
+                            else
+                                i++;
+                        }
+                    }
+        }
     }
 }

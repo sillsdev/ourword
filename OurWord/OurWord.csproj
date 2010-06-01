@@ -191,7 +191,22 @@
   <ItemGroup>
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\Filter.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirst.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirstFiltered.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoLast.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoLastFiltered.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoNext.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoNextFiltered.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoPrevious.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\GoPreviousFiltered.ico" />
     <Content Include="OurWord.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\CtrlNavigation.resx">
+      <DependentUpon>CtrlNavigation.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ctrls\TestDlg.resx">
+      <DependentUpon>TestDlg.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DlgExportProgress.resx">
       <DependentUpon>DlgExportProgress.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -402,6 +417,18 @@
     <EmbeddedResource Include="Res\WizImportFile.gif" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\CtrlNavigation.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\CtrlNavigation.Designer.cs">
+      <DependentUpon>CtrlNavigation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ctrls\TestDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ctrls\TestDlg.Designer.cs">
+      <DependentUpon>TestDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DlgExportProgress.cs">
       <SubType>Form</SubType>

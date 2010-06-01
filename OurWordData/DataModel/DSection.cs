@@ -2751,7 +2751,7 @@ namespace OurWordData.DataModel
             #region Method: TranslatorNote GetCorrespondingNote(vNotes, note)
             TranslatorNote GetCorrespondingNote(List<TranslatorNote> v, TranslatorNote note)
             {
-                foreach (TranslatorNote n in v)
+                foreach (var n in v)
                 {
                     if (note.IsSameOriginAs(n))
                         return n;
@@ -2759,67 +2759,86 @@ namespace OurWordData.DataModel
                 return null;
             }
             #endregion
-            #region Method: void MergeNotes()
-            void MergeNotes()
+
+            #region method: void MergeCorrespondingNotes(vParents, vOurs, vTheirs)
+            void MergeCorrespondingNotes(
+                List<TranslatorNote> vParents, 
+                List<TranslatorNote> vOurs, 
+                List<TranslatorNote> vTheirs)
+                // For those where all three exist, do a merge; and then remove them from the
+                // Theirs and Parents lists as we no longer need to work with them.
             {
-                // Collect the relevant notes in lists
-                var OurNotes = Mine.GetAllTranslatorNotes();
-                var TheirNotes = Theirs.GetAllTranslatorNotes();
-                var ParentNotes = Parent.GetAllTranslatorNotes();
-
-                // Merge those that correspond
-                foreach (TranslatorNote OurNote in OurNotes)
+                foreach (var ourNote in vOurs)
                 {
-                    var TheirNote = GetCorrespondingNote(TheirNotes, OurNote);
-                    var ParentNote = GetCorrespondingNote(ParentNotes, OurNote);
+                    var theirNote = GetCorrespondingNote(vTheirs, ourNote);
+                    var parentNote = GetCorrespondingNote(vParents, ourNote);
+                    if (null == theirNote || null == parentNote)
+                        continue;
 
-                    if (null != TheirNote && null != ParentNote)
-                    {
-                        OurNote.Merge(ParentNote, TheirNote);
-                        TheirNotes.Remove(TheirNote);
-                        ParentNotes.Remove(ParentNote);
-                    }
+                    ourNote.Merge(parentNote, theirNote);
+
+                    vTheirs.Remove(theirNote);
+                    vParents.Remove(parentNote);
                 }
-
-                // Anything remaining in TheirNotes needs to be added in, provided
-                // that these are new notes (that is, they don't exist in the parent.
-                // If they exist in the parent, it means that We deleted the note, and
-                // so we don't want the Merge to bring the note back in; unless of
-                // course They changed it. So here, we delete from TheirNotes anything
-                // that is identical to the parent
-                foreach (TranslatorNote ParentNote in ParentNotes)
+            }
+            #endregion
+            #region method: void RemoveDeletedNotes(vParents, vOurs, vTheirs)
+            void RemoveDeletedNotes(
+                List<TranslatorNote> vParents,
+                List<TranslatorNote> vOurs,
+                List<TranslatorNote> vTheirs)
+                // If a TranslatorNote exists in the Parent and in Ours (and is identical),
+                // but has been deleted from Theirs, then the intention is to delete it, and
+                // we remove it from Parent and Ours
+            {
+                foreach (var parentNote in vParents)
                 {
-                    var TheirNote = GetCorrespondingNote(TheirNotes, ParentNote);
-                    if (null != TheirNote && TheirNote.ContentEquals(ParentNote))
-                        TheirNotes.Remove(TheirNote);
-                }
+                    var ourNote = GetCorrespondingNote(vOurs, parentNote);
+                    var theirNote = GetCorrespondingNote(vTheirs, parentNote);
 
-                // So what's left in TheirNotes are notes that "they" created, what we need 
-                // to add into this section.
-                foreach (TranslatorNote TheirNote in TheirNotes)
+                    // Must exist in Ours
+                    if (null == ourNote)
+                        continue;
+
+                    // Must be identical to the Parent
+                    if (!ourNote.ContentEquals(parentNote))
+                        continue;
+
+                    // Must not exist in Theirs
+                    if (null != theirNote)
+                        continue;
+
+                    // Remove it from Ours
+                    vOurs.Remove(ourNote);
+                }
+            }
+            #endregion
+            #region method: void AddTheirNewNotes(vTheirs)
+            void AddTheirNewNotes(IEnumerable<TranslatorNote> vTheirs)
+            {
+                foreach (var theirNote in vTheirs)
                 {
                     // Get their context (DText, paragraph, etc.)
-                    DText TheirDText = TheirNote.Owner as DText;
-                    Debug.Assert(null != TheirDText);
-                    DParagraph TheirParagraph = TheirDText.Paragraph;
-                    Debug.Assert(null != TheirParagraph);
-                    int iText = TheirParagraph.Runs.FindObj(TheirDText);
-                    int iParagraph = Theirs.Paragraphs.FindObj(TheirParagraph);
+                    var theirDText = theirNote.Owner as DText;
+                    Debug.Assert(null != theirDText);
+                    var theirParagraph = theirDText.Paragraph;
+                    Debug.Assert(null != theirParagraph);
+                    var iText = theirParagraph.Runs.FindObj(theirDText);
+                    var iParagraph = Theirs.Paragraphs.FindObj(theirParagraph);
                     Debug.Assert(-1 != iText);
                     Debug.Assert(-1 != iParagraph);
 
-                    // Make a copy of their note that we can add
-                    TranslatorNote note = TheirNote.Clone();
+                    // Make a copy of theirs that we can add
+                    var note = theirNote.Clone();
 
-                    // If the sections match in structure, then we can place the note in
-                    // the same place
-                    if (StructuresAreSame(new[] {Mine, Theirs}))
+                    // If the sections match in structure, then we can place the it in the same place
+                    if (StructuresAreSame(new[] { Mine, Theirs }))
                     {
-                        DParagraph OurParagraph = Mine.Paragraphs[iParagraph];
-                        Debug.Assert(null != OurParagraph);
-                        DText OurDText = OurParagraph.Runs[iText] as DText;
-                        Debug.Assert(null != OurDText);
-                        OurDText.TranslatorNotes.Append(note);
+                        var ourParagraph = Mine.Paragraphs[iParagraph];
+                        Debug.Assert(null != ourParagraph);
+                        var ourDText = ourParagraph.Runs[iText] as DText;
+                        Debug.Assert(null != ourDText);
+                        ourDText.TranslatorNotes.Append(note);
                         continue;
                     }
 
@@ -2843,11 +2862,31 @@ namespace OurWordData.DataModel
                     }
                     if (iParagraph >= 0 && iText >= 0)
                     {
-                        DText OurDText = Mine.Paragraphs[iParagraph].Runs[iText] as DText;
-                        if (null != OurDText)
-                            OurDText.TranslatorNotes.Append(note);
+                        var ourDText = Mine.Paragraphs[iParagraph].Runs[iText] as DText;
+                        if (null != ourDText)
+                            ourDText.TranslatorNotes.Append(note);
                     }
                 }
+            }
+            #endregion
+
+            #region Method: void MergeNotes()
+            void MergeNotes()
+            {
+                // Collect the relevant notes in lists
+                var vOurNotes = Mine.GetAllTranslatorNotes();
+                var vTheirNotes = Theirs.GetAllTranslatorNotes();
+                var vParentNotes = Parent.GetAllTranslatorNotes();
+
+                // Merge those that correspond
+                MergeCorrespondingNotes(vParentNotes, vOurNotes, vTheirNotes);
+
+                // Merge those that have been removed from either child
+                RemoveDeletedNotes(vParentNotes, vOurNotes, vTheirNotes);
+                RemoveDeletedNotes(vParentNotes, vTheirNotes, vOurNotes);
+
+                // Add whatever remains in "theirs" as new notes that they added.
+                AddTheirNewNotes(vTheirNotes);
             }
             #endregion
 
