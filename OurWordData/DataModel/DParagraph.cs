@@ -291,12 +291,12 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-		#region Attr{g}: string TypeCodes - A string representing the types of the DRun subclasses
-		public string TypeCodes
+		#region attr{g}: string TypeCodes - A string representing the types of the DRun subclasses
+	    private string TypeCodes
 		{
 			get
 			{
-				string s = "";
+				var s = "";
 
 				foreach(DRun run in Runs)
 				{
@@ -690,9 +690,9 @@ namespace OurWordData.DataModel
             // disk. 
 		{
 			// Case 1: If we have a DVerse, then we should have a place to type following it.
-			for(int i=0; i<Runs.Count; i++)
+			for(var i=0; i<Runs.Count; i++)
 			{
-				DVerse verse = Runs[i]   as DVerse;
+				var verse = Runs[i] as DVerse;
 
 				DText text = null;
 				if ( (i + 1 ) < Runs.Count )
@@ -1470,25 +1470,45 @@ namespace OurWordData.DataModel
         // Merging ---------------------------------------------------------------------------
         #region VirtMethod: void Merge(DParagraph Parent, DParagraph Theirs)
         public virtual void Merge(DParagraph Parent, DParagraph Theirs)
+            // TODO: If there are differences in structure that we haven't caught, then
+            // we are completely throwing away "theirs"
         {
-            // TODO: For now, we assume no changes in structure. If there are changes, it
-            // means we are completely throwing away Theirs. 
-            if (StructureCodes != Parent.StructureCodes || Runs.Count != Parent.Runs.Count)
-                return;
-            if (Theirs.StructureCodes != Parent.StructureCodes || Theirs.Runs.Count != Parent.Runs.Count)
+            // Can't merge if the structure has changed
+            if (StructureCodes != Parent.StructureCodes || StructureCodes != Theirs.StructureCodes)
                 return;
 
-            for (int i = 0; i < Runs.Count; i++)
+            // Insert missing places to type
+            Merge_InsertMissingPlacesToType(this);
+            Merge_InsertMissingPlacesToType(Parent);
+            Merge_InsertMissingPlacesToType(Theirs);
+
+            // If we don't have the same runs count, we can't merge
+            if (Runs.Count != Parent.Runs.Count || Runs.Count != Theirs.Runs.Count)
+                return;
+
+            // Do the merge
+            for (var i = 0; i < Runs.Count; i++)
             {
-                DText tOurs = Runs[i] as DText;
-                DText tParent = Parent.Runs[i] as DText;
-                DText tTheirs = Theirs.Runs[i] as DText;
+                var tOurs = Runs[i] as DText;
+                var tParent = Parent.Runs[i] as DText;
+                var tTheirs = Theirs.Runs[i] as DText;
 
                 if (null != tOurs && null != tParent && null != tTheirs)
                     tOurs.Merge(tParent, tTheirs);
             }
         }
         #endregion
+
+	    static void Merge_InsertMissingPlacesToType(DParagraph p)
+        {
+            p.BestGuessAtInsertingTextPositions();
+
+            // In theory there could be text before a verse; so for purposes of the merge
+            // we'll insert them, with plans to rip them back out afterwards
+            if (p.Runs.Count > 0 && p.Runs[0].TypeCode != DRun.c_codeNormal)
+                p.Runs.InsertAt(0, DText.CreateSimple(), true );
+        }
+
 
     }
 

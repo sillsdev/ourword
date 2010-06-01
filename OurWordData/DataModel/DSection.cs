@@ -2911,7 +2911,7 @@ namespace OurWordData.DataModel
 
                         if (p1.Style != p2.Style)
                             return false;
-                        if (p1.TypeCodes != p2.TypeCodes)
+                        if (p1.StructureCodes != p2.StructureCodes)
                             return false;
                     }
                 }

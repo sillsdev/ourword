@@ -674,6 +674,53 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(paragraphOut.ContentEquals(paragraphIn), "Paras are the same");
         }
         #endregion
+
+        [Test]
+        public void MergeContentWithEmpty()
+            // See B1.7.02. We had a skeleton paragraph of just verse numbers, and one child 
+            // drafted the contents, the other child left it alone. Merge was called on the
+            // book (for other reasons elsewhere), but on attemptingn to merge this paragraph,
+            // the result was a MergeNote for every verse complaining that "The other version
+            // had "10"" (that is, the verse number.)
+        {
+            var parent = new DParagraph(StyleSheet.Paragraph);
+            parent.AddRun(new DVerse("9"));
+            parent.AddRun(new DVerse("10"));
+            parent.AddRun(new DVerse("11"));
+            var parentSection = new DSection();
+            parentSection.Paragraphs.Append(parent);
+
+            var theirs = new DParagraph(StyleSheet.Paragraph);
+            theirs.AddRun(new DVerse("9"));
+            theirs.AddRun(new DVerse("10"));
+            theirs.AddRun(new DVerse("11"));
+            var theirSection = new DSection();
+            theirSection.Paragraphs.Append(theirs);
+
+            var ours = new DParagraph(StyleSheet.Paragraph);
+            ours.AddRun(new DVerse("9"));
+            ours.AddRun(DText.CreateSimple("Ne nexaütame yunaime xehesiemieme."));
+            ours.AddRun(new DVerse("10"));
+            ours.AddRun(DText.CreateSimple("Yave Xecacaüyaritütü caxetiutimüiriya."));
+            ours.AddRun(new DVerse("11"));
+            ours.AddRun(DText.CreateSimple("Masi Yave, mripaitü quiecatari Vacacaüyari."));
+            var ourSection = new DSection();
+            ourSection.Paragraphs.Append(ours);
+
+            const string c_sXmlExpected = "<p class=\"Paragraph\" usfm=\"p\">" +
+                "<v n=\"9\" />Ne nexaütame yunaime xehesiemieme." +
+                "<v n=\"10\" />Yave Xecacaüyaritütü caxetiutimüiriya." +
+                "<v n=\"11\" />Masi Yave, mripaitü quiecatari Vacacaüyari.</p>";
+
+            ourSection.Merge(parentSection, theirSection);
+
+            var oxes = new XmlDoc();
+            var nodeBook = oxes.AddNode(null, "book");
+            var nodeOurParagraph = ours.SaveToOxesBook(oxes, nodeBook);
+            var sXmlActual = nodeOurParagraph.OuterXml;
+
+            Assert.AreEqual(c_sXmlExpected, sXmlActual);
+        }
     }
 
     public class TParagraph : DParagraph
