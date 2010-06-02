@@ -51,9 +51,6 @@ namespace OurWord.Dialogs
 
         // Property Grid ---------------------------------------------------------------------
         #region BAG CONSTANTS
-        /*
-        */
-
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
         const string c_sProjectAccess = "propProjectAccess";
@@ -66,6 +63,9 @@ namespace OurWord.Dialogs
         const string c_sShowLineNumbers = "propNCShowLineNumbers";
         const string c_sLineNumberColor = "propNCLineNumbebrColor";
 
+        private const string c_sGroupSendReceive = "SendReceive";
+        private const string c_sRepositoryUrl = "propRepoUrl";
+        private const string c_sCheckForUpdates = "propUpdates";
 
         #endregion
         #region Attr{g}: PropertyBag Bag - Defines the properties to display (including localizations)
@@ -84,12 +84,9 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-/*
-*/
                 case c_sMakeBackups:
                     SetPropertySpecValue(e, BackupSystem.Enabled);
                     break;
-
 
                 case c_sBackupPath:
                     e.Value = BackupSystem.RegistryBackupFolder;
@@ -113,6 +110,14 @@ namespace OurWord.Dialogs
                     break;
                 case c_sLineNumberColor:
                     e.Value = WndNaturalness.LineNumbersColor;
+                    break;
+
+                // Send/Receive
+                case c_sCheckForUpdates:
+                    YesNoPropertySpec.Put(e, DB.TeamSettings.CheckForUpdatesBeforeSynchronize);
+                    break;
+                case c_sRepositoryUrl:
+                    e.Value = DB.TeamSettings.GetInternetRepository().Server;
                     break;
 
             }
@@ -140,8 +145,6 @@ namespace OurWord.Dialogs
         {
             switch (e.Property.ID)
             {
-/*
-*/
                 case c_sMakeBackups:
                     BackupSystem.Enabled = InterpretYesNo(e);
                     break;
@@ -170,6 +173,13 @@ namespace OurWord.Dialogs
                     WndNaturalness.LineNumbersColor = (string)e.Value;
                     break;
 
+                // Send/Receive
+                case c_sCheckForUpdates:
+                    DB.TeamSettings.CheckForUpdatesBeforeSynchronize = YesNoPropertySpec.Pull(e);
+                    break;
+                case c_sRepositoryUrl:
+                    DB.TeamSettings.GetInternetRepository().Server = (string)e.Value;
+                    break;
             }
         }
         #endregion
@@ -180,9 +190,6 @@ namespace OurWord.Dialogs
             m_bag = new PropertyBag();
             Bag.GetValue += bag_GetValue;
             Bag.SetValue += bag_SetValue;
-
-/*
-*/
 
             // Misc Options
             #region (Misc Options)
@@ -259,6 +266,27 @@ namespace OurWord.Dialogs
                 "DarkGray"));
             #endregion
 
+            // Send / Receive
+            #region Check for Updates before Send/Receive
+            Bag.Properties.Add(new YesNoPropertySpec(
+                c_sCheckForUpdates,
+                "Check for Updates before Send/Receive?",
+                c_sGroupSendReceive,
+                "If Yes, OurWord will check for updates prior to doing a Send/Receive. If No, " +
+                    "Send/Receive will display a message if a check is required, and you can" +
+                    "then do it manually.",
+                false
+                ));
+            #endregion
+            #region Central Repository URL
+            m_bag.Properties.Add(new PropertySpec(
+                c_sRepositoryUrl,
+                "Central Repository URL",
+                typeof(string),
+                c_sGroupSendReceive,
+                "The Url for accessing the remote, central respository.",
+                ""));
+            #endregion
 
             // Localize the bag
             LocDB.Localize(this, Bag);

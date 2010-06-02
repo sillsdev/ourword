@@ -142,14 +142,16 @@ namespace OurWord.Dialogs
             // Entire Cluster Settings
             var groupCluster = NavList.AddGroup("Cluster");
             AddPage(groupCluster, new Page_Options(this), c_iImageOptions);
-            AddPage(groupCluster, new Page_Collaboration(this), c_iImageCollaboration);
-            AddPage(groupCluster, new Page_Cluster(this), c_iImageClusters);
             AddPage(groupCluster, new Page_StyleSheet(this), c_iImageStyleSheet);
             AddPage(groupCluster, new Page_AdvancedPrintOptions(this), c_iImageAdvancedPrint);
             AddPage(groupCluster, new Page_TranslationStages(this), c_iImageDefault);
             AddPage(groupCluster, new Page_WritingSystems(this), c_iImageWritingSystem);
 
-            // Go to the requested page
+            // This Computer
+            var groupThisComputer = NavList.AddGroup("This Computer");
+            AddPage(groupThisComputer, new Page_Cluster(this), c_iImageClusters);
+
+            // Go to the requested page)
             if (!string.IsNullOrEmpty(sIdActivePage))
                 SetActivePage(sIdActivePage);
 
@@ -165,9 +167,8 @@ namespace OurWord.Dialogs
         private const int c_iImageOptions = 3;
         private const int c_iImageWritingSystem = 4;
         private const int c_iImageStyleSheet = 6;
-        private const int c_iImageCollaboration = 7;
-        private const int c_iImageClusters = 8;
-        private const int c_iImageFeaturesOnOff = 9;
+        private const int c_iImageClusters = 7;
+        private const int c_iImageFeaturesOnOff = 8;
 
 		// Scaffolding -----------------------------------------------------------------------
         #region Constructor()

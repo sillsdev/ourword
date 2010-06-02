@@ -19,6 +19,8 @@ using Chorus.VcsDrivers;
 using JWTools;
 using Chorus.Utilities;
 using Chorus.VcsDrivers.Mercurial;
+using OurWordData.DataModel;
+
 #endregion
 
 namespace OurWordData.Synchronize
@@ -620,8 +622,9 @@ namespace OurWordData.Synchronize
         // 1 - setup of the initial feature
         // 2 - preventing AuSIL-TopEnd from being able to synch during case folding problem
         // 3 - new Style implementation, Pictures
-        // 4 - Version 1.7 - 
-        public const int c_nCurrentVersionNo = 4;
+        // 4 - Version 1.7 - Users
+        // 5 - TeamSettings.CheckForUpdates option
+        public const int c_nCurrentVersionNo = 5;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {
@@ -1203,7 +1206,9 @@ namespace OurWordData.Synchronize
             if (m_OtherRepository.IsRemoteOnInternet)
             {
                 AddSynchStep("Checking Internet access", CheckInternetAccess);
-                AddSynchStep("Checking for Updates to OurWord", CheckForUpdates);
+
+                if (DB.TeamSettings.CheckForUpdatesBeforeSynchronize)
+                    AddSynchStep("Checking for Updates to OurWord", CheckForUpdates);
             }
             AddSynchStep("Checking data integrity", CheckLocalIntegrity);
             AddSynchStep("Storing any files you've changed", StoreChangedFiles);
@@ -1222,7 +1227,9 @@ namespace OurWordData.Synchronize
             if (m_OtherRepository.IsRemoteOnInternet)
             {
                 AddSynchStep("Checking Internet access", CheckInternetAccess);
-                AddSynchStep("Checking for Updates to OurWord", CheckForUpdates);
+
+                if (DB.TeamSettings.CheckForUpdatesBeforeSynchronize)
+                    AddSynchStep("Checking for Updates to OurWord", CheckForUpdates);
             }
             AddSynchStep("Checking your local disk", PreliminaryCheckingBeforeClone);
             AddSynchStep("Downloading from the Internet", DoClone);

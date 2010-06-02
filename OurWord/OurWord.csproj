@@ -275,10 +275,6 @@
       <SubType>Designer</SubType>
       <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Page_Collaboration.resx">
-      <DependentUpon>Page_Collaboration.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_Notes.resx">
       <SubType>Designer</SubType>
       <DependentUpon>Page_Notes.cs</DependentUpon>
@@ -588,12 +584,6 @@
     </Compile>
     <Compile Include="Dialogs\Properties\Page_AdvancedPrintOptions.cs">
       <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_Collaboration.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Page_Collaboration.Designer.cs">
-      <DependentUpon>Page_Collaboration.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_Notes.cs">
       <SubType>UserControl</SubType>

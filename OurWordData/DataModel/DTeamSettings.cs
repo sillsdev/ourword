@@ -39,7 +39,7 @@ namespace OurWordData.DataModel
                 m_nSettingsVersion = value;
             }
         }
-        int m_nSettingsVersion = 0;
+        int m_nSettingsVersion;
         #endregion
 
         #region BAttr{g/s}: string CopyrightNotice
@@ -190,8 +190,23 @@ namespace OurWordData.DataModel
 		int m_EvenRight = (int)FooterParts.kLanguageStageAndDate;
 		#endregion
 
-		#region Method: void DeclareAttrs()
-		protected override void DeclareAttrs()
+        #region bool CheckForUpdatesBeforeSynchronize
+	    public bool CheckForUpdatesBeforeSynchronize
+	    {
+	        get
+	        {
+	            return m_bCheckForUpdatesBeforeSynchronize;
+	        }
+            set
+            {
+                m_bCheckForUpdatesBeforeSynchronize = value;
+            }
+	    }
+        private bool m_bCheckForUpdatesBeforeSynchronize;
+        #endregion
+
+        #region Method: void DeclareAttrs()
+        protected override void DeclareAttrs()
 		{
 			base.DeclareAttrs();
 
@@ -206,6 +221,8 @@ namespace OurWordData.DataModel
 			DefineAttr("EvenLeft",     ref m_EvenLeft);
 			DefineAttr("EvenMiddle",   ref m_EvenMiddle);
 			DefineAttr("EvenRight",    ref m_EvenRight);
+
+            DefineAttr("Updates", ref m_bCheckForUpdatesBeforeSynchronize);
         }
 		#endregion
 

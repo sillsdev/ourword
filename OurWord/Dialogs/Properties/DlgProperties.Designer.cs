@@ -58,9 +58,8 @@ namespace OurWord.Dialogs
             this.m_Images.Images.SetKeyName(4, "Note_Hebrew.ico");
             this.m_Images.Images.SetKeyName(5, "Note_Greek.ico");
             this.m_Images.Images.SetKeyName(6, "Italic.ico");
-            this.m_Images.Images.SetKeyName(7, "Note_AskUns.ico");
-            this.m_Images.Images.SetKeyName(8, "Note_Hint.ico");
-            this.m_Images.Images.SetKeyName(9, "TurnFeaturesOnOff.ico");
+            this.m_Images.Images.SetKeyName(7, "Note_Hint.ico");
+            this.m_Images.Images.SetKeyName(8, "TurnFeaturesOnOff.ico");
             // 
             // m_btnHelp
             // 

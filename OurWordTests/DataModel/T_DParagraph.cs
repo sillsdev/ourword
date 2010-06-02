@@ -674,7 +674,7 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(paragraphOut.ContentEquals(paragraphIn), "Paras are the same");
         }
         #endregion
-
+        #region Test: MergeContentWithEmpty
         [Test]
         public void MergeContentWithEmpty()
             // See B1.7.02. We had a skeleton paragraph of just verse numbers, and one child 
@@ -721,6 +721,7 @@ namespace OurWordTests.DataModel
 
             Assert.AreEqual(c_sXmlExpected, sXmlActual);
         }
+        #endregion
     }
 
     public class TParagraph : DParagraph

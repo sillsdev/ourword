@@ -1498,8 +1498,8 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-
-	    static void Merge_InsertMissingPlacesToType(DParagraph p)
+        #region smethod: void Merge_InsertMissingPlacesToType(DParagraph p)
+        static void Merge_InsertMissingPlacesToType(DParagraph p)
         {
             p.BestGuessAtInsertingTextPositions();
 
@@ -1508,7 +1508,7 @@ namespace OurWordData.DataModel
             if (p.Runs.Count > 0 && p.Runs[0].TypeCode != DRun.c_codeNormal)
                 p.Runs.InsertAt(0, DText.CreateSimple(), true );
         }
-
+        #endregion
 
     }
 
