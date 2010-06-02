@@ -214,6 +214,44 @@
       <English>Toggle Italics</English>
       <Key>Ctrl+I</Key>
     </Item>
+    <Item ID="m_menuInitializeFromAnInternetRepositoryToolStripMenuItem">
+      <English>Initialize from an Internet Repository...</English>
+    </Item>
+    <Item ID="m_menuCreateANewProjectOnThisComputerToolStripMenuItem">
+      <English>Create a New Project on this computer...</English>
+    </Item>
+    <Item ID="m_menuExportProject">
+      <English>Export...</English>
+    </Item>
+    <Item ID="m_menuInsertFootnote">
+      <English>Insert Footnote</English>
+    </Item>
+    <Item ID="m_menuDeleteFootnote">
+      <English>Delete Footnote</English>
+    </Item>
+    <Item ID="m_menuCopyBTFromFrontTranslation">
+      <English>Copy BT from &amp;Front...</English>
+    </Item>
+    <Item ID="m_btnInsertNote" Tip="true">
+      <English>Insert</English>
+      <Tip>Insert a Translator Note</Tip>
+    </Item>
+    <Item ID="m_btnHistory" Tip="true">
+      <English>History</English>
+      <Tip>History</Tip>
+    </Item>
+    <Item ID="checkForUpdatesToolStripMenuItem">
+      <English>Check for &amp;Updates...</English>
+    </Item>
+    <Item ID="m_Synchronize">
+      <English>Send / &amp;Receive</English>
+    </Item>
+    <Item ID="m_menuConsultantPreparationToolStripMenuItem">
+      <English>Consultant &amp;Preparation</English>
+    </Item>
+    <Item ID="m_menuZoom">
+      <English>Zoom Text</English>
+    </Item>
   </Group>
   <Group ID="m_toolstripNotes" Title="002 - m_toolstripNotes" Translator="true">
     <Item ID="m_btnInsert" Tip="true">
@@ -305,6 +343,21 @@
     <Item ID="TypeHere">
       <English>[Type Here]</English>
       <Info>The flashing cursor to show where text will be entered should the user begin typing.</Info>
+    </Item>
+    <Item ID="kHistory">
+      <English>History</English>
+    </Item>
+    <Item ID="kEnterUrl">
+      <English>Please enter the repository's URL</English>
+    </Item>
+    <Item ID="kEnterUsername">
+      <English>Please enter your User Name for accessing the repository.</English>
+    </Item>
+    <Item ID="kEnterPassword">
+      <English>Please enter your User Name for accessing the repository.</English>
+    </Item>
+    <Item ID="kEnterClusterName">
+      <English>Please enter a name for the cluster.</English>
     </Item>
     <Group ID="GeneralUI" Title="Strings: General UI" Des="These are elements that appear in the main window of the user interface, such as the names of windows." Translator="true">
       <Item ID="DraftingWindowName">
@@ -597,6 +650,94 @@
         <English>&amp;Redo Change Paragraph Style '{0}'</English>
       </Item>
     </Group>
+    <Group ID="ProgressSteps" Title="ProgressSteps" Translator="false">
+      <Item ID="PerformingSend/Receive...">
+        <English>Performing Send / Receive...</English>
+      </Item>
+      <Item ID="CheckingInternetaccess">
+        <English>Checking Internet access</English>
+      </Item>
+      <Item ID="Checkingdataintegrity">
+        <English>Checking data integrity</English>
+      </Item>
+      <Item ID="Storinganyfilesyou'vechanged">
+        <English>Storing any files you've changed</English>
+      </Item>
+      <Item ID="RetrievinganynewerfilesfromtheInternet">
+        <English>Retrieving any newer files from the Internet</English>
+      </Item>
+      <Item ID="Mergingyourchangeswiththeirs">
+        <English>Merging your changes with theirs</English>
+      </Item>
+      <Item ID="SendingallchangesbacktotheInternet">
+        <English>Sending all changes back to the Internet</English>
+      </Item>
+      <Item ID="Updatingyourdatawiththechanged">
+        <English>Updating your data with the changed</English>
+      </Item>
+      <Item ID="CreatingaclusterfromtheInternet...">
+        <English>Creating a cluster from the Internet...</English>
+      </Item>
+      <Item ID="Checkingyourlocaldisk">
+        <English>Checking your local disk</English>
+      </Item>
+      <Item ID="DownloadingfromtheInternet">
+        <English>Downloading from the Internet</English>
+      </Item>
+    </Group>
+    <Group ID="SynchMessages" Title="SynchMessages" Translator="false">
+      <Item ID="msgNoInternetConnection">
+        <English>OurWord is unable to connect to the Internet.{n}{n}Please check that you have an active Internet connection, then try again.</English>
+      </Item>
+      <Item ID="msgUpdateAborted">
+        <English>You cannot Send/Receive until you install the update to OurWord.</English>
+      </Item>
+      <Item ID="msgUpdateError">
+        <English>An error occurred during OurWord's &quot;Check For Update&quot; process.{n}Please try again.</English>
+      </Item>
+      <Item ID="msgUpdateLaunched">
+        <English>Aborting Synch</English>
+      </Item>
+      <Item ID="msgRepositoryLocked">
+        <English>The Repository is in use by another process. Please wait, then try again.{n}{n}If this message continues to appear, try restarting your computer.</English>
+      </Item>
+      <Item ID="msgRepositoryProblem">
+        <English>Your local repository is in an error state. This is probably due to a version of OurWord previous to 1.5. Please contact us for help.</English>
+      </Item>
+      <Item ID="msgCantDeleteFileBeforeCommit">
+        <English>A file with an unrecognized extension is in your data folder.{n}{n}OurWord was unable to delete it. Perhaps you have some other software running which is using that file. Please delete the file, then try again.</English>
+      </Item>
+      <Item ID="msgCantCommitRecentChanges">
+        <English>OurWord was unable to place your most recent changes into the local Repository.{n}{n}Please try again. If the problem continues, please contact us at http://OurWordSoftware.org so that we can determine how to solve this problem.</English>
+      </Item>
+      <Item ID="msgUnableToPull">
+        <English>OurWord is unable to retrieve changes from the Internet.{n}{n}The remote computer may not be working, or you may have the username or password incorrectly entered. Please try again later.</English>
+      </Item>
+      <Item ID="msgYouNeedToUpgrade">
+        <English>The data on the Internet was created with a newer version of OurWord. You need to upgrade to the latest version before you will be able to send/receive.&quot;</English>
+      </Item>
+      <Item ID="msgUnableToMerge">
+        <English>OurWord was unable to merge. This is most likely a bug with OurWord. If you are running the latest version, then please contact us at http://ourword.TheSeedCompany.org so that we can work with you to solve the problem.</English>
+      </Item>
+      <Item ID="msgUnableToCommitMerge">
+        <English>OurWord was unable to store the results of the merge.{n}{n}This is an odd thing to happen. If it continues, please contact us at http://ourword.TheSeedCompany.org so that we can work with you to solve the problem.</English>
+      </Item>
+      <Item ID="msgNewRemoteHeads">
+        <English>Unable to save changes, because merge did not succeed (with the ccmplaint of having created new &quot;heads&quot;) If this continues, please report it as a bug.</English>
+      </Item>
+      <Item ID="msgPushFailed">
+        <English>Sending changes back to the Internet failed, perhaps due to a bad Internet connection. Please try again.</English>
+      </Item>
+      <Item ID="msgClusterAlreadyExists">
+        <English>OurWord cannot download this cluster because it already exists. Downloading would overwrite everything you already have. Please backup anything you wish to save, then delete the cluster, then try again.</English>
+      </Item>
+      <Item ID="msgCloneFailed">
+        <English>OurWord was unable to retrieve the data from the Internet.</English>
+      </Item>
+      <Item ID="msgNoMercurial">
+        <English>The external program Mercurial did not respond.{n}{n}Either it is not installed (most likely), or else you have a corrupt repository.</English>
+      </Item>
+    </Group>
   </Group>
   <Group ID="Messages" Title="004 - Messages" Des="These are various error messages that OurWord displays. The vast majority occur during setup. If you see anything enclosed by braces (e.g., {n}, {0}, etc., take care to reproduce these exactly in the error message. The {n} represents a new line, so that the error message does not spread across the entire with of the screen. The numbers ({0}, {1}, etc.,) are substitutions. Thus &quot;You do not have permission to write the file {0}&quot; will become, at runtime, &quot;You do not have permission to write the file MyFile.db.&quot; " Translator="false">
     <Item ID="msgBookIsLocked">
@@ -743,8 +884,7 @@
     <Item ID="msgUnableToPull">
       <English>OurWord is unable to retrieve changes from the Internet.{n}{n}The remote computer may not be working. Please try again sometime later.</English>
       <Info>This message is displayed when the user attempts to pull changes from the remote repository via the Internet via the Synchronize command.</Info>
-    </Item>    
-    
+    </Item>
     <Group ID="FileStructureMessages" Title="005 - File Structure Messages" Translator="false">
       <Item ID="paragraphs">
         <English>Paragraph(s)</English>
@@ -1329,7 +1469,6 @@
     <Item ID="fJobConsultantPreparation_Description">
       <English>Displays the Front/Model translation and the Target translation, with both the vernacular and back translations. Use this to preparefor the consultant (e.g., exegetical notes.)</English>
     </Item>
-    
     <Item ID="fProject_CheckBox">
       <English>Project New / Open / etc.</English>
     </Item>
@@ -2533,5 +2672,94 @@
         <English>Summary</English>
       </Item>
     </Group>
+  </Group>
+  <Group ID="WizInitializeFromRepository" Title="WizInitializeFromRepository" Translator="false">
+    <Item ID="Title">
+      <English>Initialize a Cluster by downloading from the Internet</English>
+    </Item>
+    <Item ID="m_btnFinish">
+      <English>Finish</English>
+    </Item>
+    <Item ID="m_btnPrev">
+      <English>Previous</English>
+    </Item>
+    <Item ID="m_btnNext">
+      <English>Next</English>
+    </Item>
+    <Group ID="WizInitializeFromRepository_WizRepo_Introduction" Title="WizInitializeFromRepository_WizRepo_Introduction" Translator="false">
+      <Item ID="m_lblDescription2">
+        <English>We assume that the cluster has already been created on another computer and exists on the Internet, and that you have a live connection to the Internet. You will need the location of the repository (url), your username and your password. The person who originally set up the repository should be able to give you this information.</English>
+      </Item>
+      <Item ID="m_lblDescription1">
+        <English>This wizard will guide you through the process of downloading an existing Cluster (repository) from the Internet and setting it up on your computer.</English>
+      </Item>
+      <Item ID="m_lblClickNextToStart">
+        <English>Click 'Next' to get started....</English>
+      </Item>
+      <Item ID="strIntroduction">
+        <English>Introduction</English>
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetRepoInfo" Title="WizInitializeFromRepository_WizRepo_GetRepoInfo" Translator="false">
+      <Item ID="m_labelPassword">
+        <English>Your Password:</English>
+      </Item>
+      <Item ID="label1">
+        <English>Your project administrator should provide you with a unique User Name and Password for accessing the repository. Without them, you will not be able to transfer data to/from the repository.</English>
+      </Item>
+      <Item ID="m_labelUserName">
+        <English>Your User Name:</English>
+      </Item>
+      <Item ID="m_descrURL">
+        <English>The location on the Internet for the repository host. Do not enter &quot;http&quot;. For example, &quot;hg-public.languagedepot.org&quot;.</English>
+      </Item>
+      <Item ID="m_labelUrl">
+        <English>Repository Server:</English>
+      </Item>
+      <Item ID="strRepositoryInfo">
+        <English>Repository Info</English>
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetClusterName" Title="WizInitializeFromRepository_WizRepo_GetClusterName" Translator="false">
+      <Item ID="m_descrClusterName">
+        <English>Enter the name of the cluster, e.g.,  &quot;Timor&quot; or &quot;Southern Languages.&quot; (You can rename it later in the Configuration Dialog if you wish.)</English>
+      </Item>
+      <Item ID="m_labelClusterName">
+        <English>Cluster Name:</English>
+      </Item>
+      <Item ID="strClusterName">
+        <English>Cluster Name</English>
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetLocation" Title="WizInitializeFromRepository_WizRepo_GetLocation" Translator="false">
+      <Item ID="m_labelInstruction">
+        <English>Choose the location for this cluster on your computer:</English>
+      </Item>
+      <Item ID="strLocation">
+        <English>Location</English>
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_Summary" Title="WizInitializeFromRepository_WizRepo_Summary" Translator="false">
+      <Item ID="m_labelClickToStart">
+        <English>Click on &quot;Finish&quot; to begin the process.</English>
+      </Item>
+      <Item ID="m_labelMoreInfo">
+        <English>This can take several minutes, depending on the speed of your Internet connection. If the process fails, you will have the opportunity to review your settings and try again.</English>
+      </Item>
+      <Item ID="m_labelReady">
+        <English>OurWord is ready to download the respository to your computer.</English>
+      </Item>
+      <Item ID="strSummary">
+        <English>Summary</English>
+      </Item>
+    </Group>
+  </Group>
+  <Group ID="DlgPassword" Title="DlgPassword" Translator="false">
+    <Item ID="Title">
+      <English>Enter Password</English>
+    </Item>
+    <Item ID="m_labelEnterPassword">
+      <English>Please enter the password for &quot;{0}&quot;:</English>
+    </Item>
   </Group>
 </LocDB>

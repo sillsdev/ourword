@@ -163,56 +163,30 @@
     <Item ID="m_menuToggleItalics">
       <Alt ID="sp" Value="Conmutar cursivas/no cursivas"></Alt>
     </Item>
+    <Item ID="m_menuInitializeFromAnInternetRepositoryToolStripMenuItem">
+    </Item>
+    <Item ID="m_menuCreateANewProjectOnThisComputerToolStripMenuItem">
+    </Item>
+    <Item ID="m_menuExportProject">
+    </Item>
     <Item ID="m_menuInsertFootnote">
-      <Alt ID="sp" Value="Insertar Nota de Pie"></Alt>
     </Item>
     <Item ID="m_menuDeleteFootnote">
-      <Alt ID="sp" Value="Remover Nota de Pie"></Alt>
+    </Item>
+    <Item ID="m_menuCopyBTFromFrontTranslation">
+    </Item>
+    <Item ID="m_btnInsertNote">
+    </Item>
+    <Item ID="m_btnHistory">
+    </Item>
+    <Item ID="checkForUpdatesToolStripMenuItem">
+    </Item>
+    <Item ID="m_Synchronize">
+      <Alt ID="sp" Value="Enviar / &amp;Recibir"></Alt>
+    </Item>
+    <Item ID="m_menuConsultantPreparationToolStripMenuItem">
     </Item>
     <Item ID="m_menuZoom">
-      <Alt ID="sp" Value="Zoom Texto"></Alt>
-    </Item>
-    <Item ID="zzom_60">
-      <Alt ID="sp" Value="60%"></Alt>
-    </Item>
-    <Item ID="zzom_70">
-      <Alt ID="sp" Value="70%"></Alt>
-    </Item>
-    <Item ID="zzom_80">
-      <Alt ID="sp" Value="80%"></Alt>
-    </Item>
-    <Item ID="zzom_90">
-      <Alt ID="sp" Value="90%"></Alt>
-    </Item>
-    <Item ID="zzom_100">
-      <Alt ID="sp" Value="100%"></Alt>
-    </Item>
-    <Item ID="zzom_110">
-      <Alt ID="sp" Value="110%"></Alt>
-    </Item>
-    <Item ID="zzom_120">
-      <Alt ID="sp" Value="120%"></Alt>
-    </Item>
-    <Item ID="zzom_130">
-      <Alt ID="sp" Value="130%"></Alt>
-    </Item>
-    <Item ID="zzom_140">
-      <Alt ID="sp" Value="140%"></Alt>
-    </Item>
-    <Item ID="zzom_150">
-      <Alt ID="sp" Value="150%"></Alt>
-    </Item>
-    <Item ID="zzom_175">
-      <Alt ID="sp" Value="175%"></Alt>
-    </Item>
-    <Item ID="zzom_200">
-      <Alt ID="sp" Value="200%"></Alt>
-    </Item>
-    <Item ID="zzom_225">
-      <Alt ID="sp" Value="225%"></Alt>
-    </Item>
-    <Item ID="zzom_250">
-      <Alt ID="sp" Value="250%"></Alt>
     </Item>
   </Group>
   <Group ID="m_toolstripNotes">
@@ -295,6 +269,16 @@
     </Item>
     <Item ID="TypeHere">
       <Alt ID="sp" Value="[Entrar aquí]"></Alt>
+    </Item>
+    <Item ID="kHistory">
+    </Item>
+    <Item ID="kEnterUrl">
+    </Item>
+    <Item ID="kEnterUsername">
+    </Item>
+    <Item ID="kEnterPassword">
+    </Item>
+    <Item ID="kEnterClusterName">
     </Item>
     <Group ID="GeneralUI">
       <Item ID="DraftingWindowName">
@@ -547,6 +531,92 @@
         <Alt ID="sp" Value="&amp;Rehacer Cambio de Estilo de Párrafo '{0}'"></Alt>
       </Item>
     </Group>
+    <Group ID="ProgressSteps">
+      <Item ID="PerformingSend/Receive...">
+        <Alt ID="sp" Value="Ejecutando “Enviar / Recibir”..."></Alt>
+      </Item>
+      <Item ID="CheckingInternetaccess">
+        <Alt ID="sp" Value="Verificando acceso a Internet"></Alt>
+      </Item>
+      <Item ID="Checkingdataintegrity">
+        <Alt ID="sp" Value="Verificando integridad de datos"></Alt>
+      </Item>
+      <Item ID="Storinganyfilesyou'vechanged">
+        <Alt ID="sp" Value="Almacenando archivos que hayas redactado"></Alt>
+      </Item>
+      <Item ID="RetrievinganynewerfilesfromtheInternet">
+        <Alt ID="sp" Value="Recibiendo archivos actuales del repositorio Internet"></Alt>
+      </Item>
+      <Item ID="Mergingyourchangeswiththeirs">
+        <Alt ID="sp" Value="Uniendo los cambios tuyos y los de ellos"></Alt>
+      </Item>
+      <Item ID="SendingallchangesbacktotheInternet">
+        <Alt ID="sp" Value="Devolviendo todos los cambios al repositorio de Internet"></Alt>
+      </Item>
+      <Item ID="Updatingyourdatawiththechanged">
+        <Alt ID="sp" Value="Actualizando sus datos con los cambios"></Alt>
+      </Item>
+      <Item ID="CreatingaclusterfromtheInternet...">
+        <Alt ID="sp" Value="Creando un clúster a base de Internet"></Alt>
+      </Item>
+      <Item ID="Checkingyourlocaldisk">
+        <Alt ID="sp" Value="Verificando la integridad de tu disco local"></Alt>
+      </Item>
+      <Item ID="DownloadingfromtheInternet">
+        <Alt ID="sp" Value="Descargando de Internet"></Alt>
+      </Item>
+    </Group>
+    <Group ID="SynchMessages">
+      <Item ID="msgNoInternetConnection">
+        <Alt ID="sp" Value="VozNuestra no puede comunicarse a Internet. {n}{n}Verifica que tienes una conexión activa con Internet, y sigue intentando."></Alt>
+      </Item>
+      <Item ID="msgUpdateAborted">
+        <Alt ID="sp" Value="No puedes emplear Enviar/Recibir antes de instalar la actualización de VozNuestra."></Alt>
+      </Item>
+      <Item ID="msgUpdateError">
+        <Alt ID="sp" Value="Hubo error durante el proceso “Buscar Actualización” de VozNuestra. {n}{n}Favor de seguir intentando."></Alt>
+      </Item>
+      <Item ID="msgUpdateLaunched">
+      </Item>
+      <Item ID="msgRepositoryLocked">
+        <Alt ID="sp" Value="El repositorio está en uso por otro proceso. Favor de esperar un rato, y seguir intentando. {n}{n}Si este mensaje vuelve a aparecer varias veces, trata de reiniciar tu equipo."></Alt>
+      </Item>
+      <Item ID="msgRepositoryProblem">
+        <Alt ID="sp" Value="Está en estado de error tu repositorio local. Probablemente estás utilizando una versión de VozNuestra anterior a 1.5. Por favor, ponte en contacto con nosotros en http://OurWordSoftware.org."></Alt>
+      </Item>
+      <Item ID="msgCantDeleteFileBeforeCommit">
+        <Alt ID="sp" Value="Un archivo de tu carpeta de datos tiene extensión desconocida, y VozNuestra no pudo borrarlo. Es posible que otro proceso activo esté utilizando el mismo archivo. Borra el archivo, y sigue intentando."></Alt>
+      </Item>
+      <Item ID="msgCantCommitRecentChanges">
+        <Alt ID="sp" Value="VozNuestra no pudo colocar tus cambios más recentes en el repositorio local de tu equipo. Sigue intentando, y si el problema se repite, ponte en contacto con nosotros en http://OurWordSoftware.org para que hagamos la determinación de cómo resolver este problema."></Alt>
+      </Item>
+      <Item ID="msgUnableToPull">
+        <Alt ID="sp" Value="VozNuestra no puede recuperar los cambios ya instalados en Internet. Sea que el equipo remoto no esté funcionando, sea que hayas errado al entrar el nombre de usuario o la contraseña – por favor sigue intentando."></Alt>
+      </Item>
+      <Item ID="msgYouNeedToUpgrade">
+        <Alt ID="sp" Value="Los datos en el repositorio de Internet son productos de una versión de VozNuestra más reciente que la tuya. Hay que actualizar tu versión antes de intentar Enviar/Recibir."></Alt>
+      </Item>
+      <Item ID="msgUnableToMerge">
+        <Alt ID="sp" Value="VozNuestra no pudo unir dos archivos. Probablemente se debe a un defecto lógico en VozNuestra. Si estás seguro de que estás utilizando la versión más reciente, ponte en contacto con nosotros en http://OurWordSoftware.org."></Alt>
+      </Item>
+      <Item ID="msgUnableToCommitMerge">
+        <Alt ID="sp" Value="VozNuestra no pudo almacenar el resultado de la unificación de dos archivos. Es extraño que así suceda, pero si se repite, favor de ponerse en contacto con nosotros en http://OurWordSoftware.org, para que podamos trabajar contigo para resolver el problema."></Alt>
+      </Item>
+      <Item ID="msgNewRemoteHeads">
+        <Alt ID="sp" Value="No se pudo rescatar los cambios, porque la unificación falló, dando noticia de que se creyaron nuevas “heads” en la estructura. Si se repite esto, por favor nos informas en http://OurWordSoftware.org como defecto lógico en OurWord."></Alt>
+      </Item>
+      <Item ID="msgPushFailed">
+        <Alt ID="sp" Value="Falló el devolver cambios al repositorio de Internet. Posiblemente se debe a una mala conexión con Internet. Favor de seguir intentando."></Alt>
+      </Item>
+      <Item ID="msgClusterAlreadyExists">
+        <Alt ID="sp" Value="No se puede descargar este clúster porque ya existe. El descargarlo sobrescribiría todo lo que ya tienes. Favor de hacer un respaldo de todo lo que quieres que permanezca, y después borra el clúster y seguir intentando."></Alt>
+      </Item>
+      <Item ID="msgCloneFailed">
+        <Alt ID="sp" Value="VozNuestra no pudo recuperar los datos del repositorio Internet."></Alt>
+      </Item>
+      <Item ID="msgNoMercurial">
+      </Item>
+    </Group>
   </Group>
   <Group ID="Messages">
     <Item ID="msgBookIsLocked">
@@ -668,6 +738,12 @@
     </Item>
     <Item ID="msgNoAvailableBooksInFront">
       <Alt ID="sp" Value="La Traducción Fuente no tiene definidos los libros que Vd. quiere Crear o Importar a la Traducción Meta. Primero hay que definir el libro dentro de la Traducción Fuente. Después puede Crear o Importar el libro deseado en la Traducción Meta."></Alt>
+    </Item>
+    <Item ID="msgNoInternetConnection">
+      <Alt ID="sp" Value="VozNuestra no puede comunicarse a Internet. {n}{n}Verifica que tienes una conexión activa con Internet, y sigue intentando."></Alt>
+    </Item>
+    <Item ID="msgUnableToPull">
+      <Alt ID="sp" Value="VozNuestra no puede recuperar los cambios ya instalados en Internet. Sea que el equipo remoto no esté funcionando, sea que hayas errado al entrar el nombre de usuario o la contraseña – por favor sigue intentando."></Alt>
     </Item>
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs">
@@ -1160,6 +1236,10 @@
     <Item ID="fJobNaturalness_Description">
       <Alt ID="sp" Value="Presentación en que se ve sólo la Traducción Meta, con el find de leerla enfocándose en su nivel de naturaleza, sin influencias de la Traducción Fuente."></Alt>
     </Item>
+    <Item ID="fJobConsultantPreparation_CheckBox">
+    </Item>
+    <Item ID="fJobConsultantPreparation_Description">
+    </Item>
     <Item ID="fProject_CheckBox">
       <Alt ID="sp" Value="Proyecto Nuevo / Abrir / etc."></Alt>
     </Item>
@@ -1190,12 +1270,6 @@
     <Item ID="fRestoreBackup_Description">
       <Alt ID="sp" Value="Los archivos de respaldo deben guardarse en una tarjeta flash o memoria externa (a través de Herramientas-Opciones). Activando la restauración, el menú Herramientas añade un diálogo mediante el cual puede substituir el contenido de un archivo de respaldo por el archivo en vigor."></Alt>
     </Item>
-    <Item ID="fCopyBTfromFront_CheckBox">
-      <Alt ID="sp" Value="Iniciar la Traducción Inversa, basándola en la Traducción Fuente en el caso de que las lenguas sean semejantes."></Alt>
-    </Item>
-    <Item ID="fCopyBTfromFront_Description">
-      <Alt ID="sp" Value="Copia la Traducción Inversa de la Traducción Fuente a la Meta. Esto puede facilitar la construcción de una Traducción Inversa para revisar y editar cuidadosamente, para refleje los detalles de la Traducción Meta."></Alt>
-    </Item>
     <Item ID="fFilter_CheckBox">
       <Alt ID="sp" Value="Mostrar únicamente Secciones con (Filtro)"></Alt>
     </Item>
@@ -1219,6 +1293,10 @@
     </Item>
     <Item ID="fStructuralEditing_Description">
       <Alt ID="sp" Value="Permite al traductor partir y unir párrafos, o asignar estilos diferentes a un párrafo. Esto crea diferencias de la estructura de los párrafos de la Traducción Fuente."></Alt>
+    </Item>
+    <Item ID="fExport_CheckBox">
+    </Item>
+    <Item ID="fExport_Description">
     </Item>
     <Item ID="fCanDeleteNotes_CheckBox">
       <Alt ID="sp" Value="¿Puede Remover Notas?"></Alt>
@@ -1246,12 +1324,6 @@
     </Item>
     <Item ID="fGoTo_FirstLast_CheckBox">
       <Alt ID="sp" Value="Botones para Primera y Última &amp;Sección"></Alt>
-    </Item>
-    <Item ID="fConfigurationDialog_CheckBox">
-      <Alt ID="sp" Value="Diálogo de Configuración"></Alt>
-    </Item>
-    <Item ID="fUndoRedo_CheckBox">
-      <Alt ID="sp" Value="Deshacer"></Alt>
     </Item>
   </Group>
   <Group ID="DialogPasswordProtect">
@@ -1922,9 +1994,6 @@
       <Item ID="propDictData">
         <Alt ID="sp" Value="Ruta al Diccionario LIFT" Tip="La ruta completa a los datos del diccionario manejado por la aplicación WeSay, en un archivo de formato LIFT."></Alt>
       </Item>
-      <Item ID="propNCLineNumbebrColor">
-        <Alt ID="sp" Value="Color de Números de Línea" Tip="Color de los números de línea en la Prueba de Nivel Natural. Escoja un color que es visible con relación al color del fondo, pero que al mismo tiempo no divierte la atención del lector del pasaje bíblico."></Alt>
-      </Item>
     </Group>
     <Group ID="DialogProperties_Page_Notes">
       <Item ID="Show_kGeneral">
@@ -2292,5 +2361,69 @@
         <Alt ID="sp" Value="Resumen"></Alt>
       </Item>
     </Group>
+  </Group>
+  <Group ID="WizInitializeFromRepository">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_btnFinish">
+    </Item>
+    <Item ID="m_btnPrev">
+    </Item>
+    <Item ID="m_btnNext">
+    </Item>
+    <Group ID="WizInitializeFromRepository_WizRepo_Introduction">
+      <Item ID="m_lblDescription2">
+      </Item>
+      <Item ID="m_lblDescription1">
+      </Item>
+      <Item ID="m_lblClickNextToStart">
+      </Item>
+      <Item ID="strIntroduction">
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetRepoInfo">
+      <Item ID="m_labelPassword">
+      </Item>
+      <Item ID="label1">
+      </Item>
+      <Item ID="m_labelUserName">
+      </Item>
+      <Item ID="m_descrURL">
+      </Item>
+      <Item ID="m_labelUrl">
+      </Item>
+      <Item ID="strRepositoryInfo">
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetClusterName">
+      <Item ID="m_descrClusterName">
+      </Item>
+      <Item ID="m_labelClusterName">
+      </Item>
+      <Item ID="strClusterName">
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetLocation">
+      <Item ID="m_labelInstruction">
+      </Item>
+      <Item ID="strLocation">
+      </Item>
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_Summary">
+      <Item ID="m_labelClickToStart">
+      </Item>
+      <Item ID="m_labelMoreInfo">
+      </Item>
+      <Item ID="m_labelReady">
+      </Item>
+      <Item ID="strSummary">
+      </Item>
+    </Group>
+  </Group>
+  <Group ID="DlgPassword">
+    <Item ID="Title">
+    </Item>
+    <Item ID="m_labelEnterPassword">
+    </Item>
   </Group>
 </LocDB>

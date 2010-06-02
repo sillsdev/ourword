@@ -535,7 +535,7 @@ namespace OurWord.Dialogs
 		private void cmdLoad(object sender, System.EventArgs e)
 		{
 			// Localization
-            Control[] vExclude = { };
+            Control[] vExclude = { m_comboQualifies };
             LocDB.Localize(this, vExclude);
 
 			// Set up the combo box

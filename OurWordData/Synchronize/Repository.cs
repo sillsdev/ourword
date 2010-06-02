@@ -1162,7 +1162,7 @@ namespace OurWordData.Synchronize
             if (Directory.Exists(m_LocalRepository.FullPathToRepositoryRoot))
             {
                 throw new SynchException("msgClusterAlreadyExists",
-                    "We cannot download this cluster because it already exists. Downloading " +
+                    "OurWord cannot download this cluster because it already exists. Downloading " +
                     "would overwrite everything you already have. Please backup anything " +
                     "you wish to save, then delete the cluster, then try again.");
             }

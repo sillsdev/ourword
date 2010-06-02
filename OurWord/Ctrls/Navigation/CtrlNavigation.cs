@@ -249,7 +249,16 @@ namespace OurWord.Ctrls.Navigation
         private bool m_bFilterIsActive;
         private void cmdFilter(object sender, EventArgs e)
         {
-            
+            // Display the Filter dialog
+
+
+            // Calc Sections
+
+
+
+            // OnGoToSection if current doesn't match the filter
+
+
         }
 
 
