@@ -527,7 +527,7 @@ namespace OurWordData.Synchronize
                 // are stored.
             {
                 ".otrans", ".owp", ".owt", ".oxes", ".stylesheet", ".user",
-                ".tif", ".pcx", ".jpg"
+                ".tif", ".pcx", ".jpg", ".png", ".gif"
             };
 
 
