@@ -19,6 +19,7 @@ using System.Threading;
 
 using JWTools;
 using OurWord.Ctrls;
+using OurWord.Ctrls.Navigation;
 using OurWord.Dialogs.Membership;
 using OurWord.Edit.Blocks;
 using OurWord.Printing;
@@ -83,7 +84,7 @@ namespace OurWord
         }
         #endregion
 
-        private ToolStripMenuItem checkForUpdatesToolStripMenuItem;
+        private ToolStripMenuItem checkForUpdates;
         private ViewBar m_ViewBar;
         #region VAttr{g}: Layout CurrentLayout
         public WLayout CurrentLayout
@@ -220,11 +221,11 @@ namespace OurWord
         // Toolbar, MenuBar, Taskbar & StatusBar ---------------------------------------------
         #region Toolbar, Taskbar & StatusBar
         #region Menu/Toolbar attributes
-        private ToolStripMenuItem m_menuInitializeFromAnInternetRepositoryToolStripMenuItem;
-        private ToolStripMenuItem m_menuCreateANewProjectOnThisComputerToolStripMenuItem;
+        private ToolStripMenuItem m_menuInitializeFromAnInternetRepository;
+        private ToolStripMenuItem m_menuCreateANewProjectOnThisComputer;
         private ToolStripButton m_btnHistory;
         private ToolStripMenuItem m_menuCopyBTFromFrontTranslation;
-        private ToolStripMenuItem m_menuConsultantPreparationToolStripMenuItem;
+        private ToolStripMenuItem m_menuConsultantPreparation;
         private ToolStripDropDownButton m_btnChapter;
         private ToolStripMenuItem m_menuUndo;
         private ToolStripMenuItem m_menuRedo;
@@ -510,7 +511,7 @@ namespace OurWord
                 Users.Current.CanDoConsultantPreparation;
             m_menuDrafting.Visible = bShowMainWindowSection;
             m_menuBackTranslation.Visible = (bShowMainWindowSection && Users.Current.CanDoBackTranslation);
-            m_menuConsultantPreparationToolStripMenuItem.Visible =
+            m_menuConsultantPreparation.Visible =
                 (bShowMainWindowSection && Users.Current.CanDoConsultantPreparation);
             m_menuNaturalnessCheck.Visible = (bShowMainWindowSection && Users.Current.CanDoNaturalnessCheck);
             // Separate Zoom from switch-task if both are present
@@ -683,8 +684,8 @@ namespace OurWord
             this.m_btnProjectSave = new System.Windows.Forms.ToolStripButton();
             this.m_btnProject = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_menuNewProject = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuInitializeFromAnInternetRepository = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuCreateANewProjectOnThisComputer = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOpenProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSaveProject = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuExportProject = new System.Windows.Forms.ToolStripMenuItem();
@@ -720,7 +721,7 @@ namespace OurWord
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuOnlyShowSectionsThat = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
-            this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkForUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Synchronize = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorDebug = new System.Windows.Forms.ToolStripSeparator();
@@ -732,7 +733,7 @@ namespace OurWord
             this.m_menuDrafting = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuNaturalnessCheck = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuBackTranslation = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_menuConsultantPreparationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuConsultantPreparation = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorWindow = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuZoom = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separator4 = new System.Windows.Forms.ToolStripSeparator();
@@ -792,7 +793,8 @@ namespace OurWord
             this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
             this.m_ToolStrip.Location = new System.Drawing.Point(3, 25);
             this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(943, 38);
+            this.m_ToolStrip.Size = new System.Drawing.Size(942, 38);
+            this.m_ToolStrip.Stretch = true;
             this.m_ToolStrip.TabIndex = 1;
             // 
             // m_btnExit
@@ -836,27 +838,27 @@ namespace OurWord
             // m_menuNewProject
             // 
             this.m_menuNewProject.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem,
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem});
+            this.m_menuInitializeFromAnInternetRepository,
+            this.m_menuCreateANewProjectOnThisComputer});
             this.m_menuNewProject.Image = ((System.Drawing.Image)(resources.GetObject("m_menuNewProject.Image")));
             this.m_menuNewProject.Name = "m_menuNewProject";
             this.m_menuNewProject.Size = new System.Drawing.Size(146, 22);
             this.m_menuNewProject.Text = "&New";
             this.m_menuNewProject.ToolTipText = "Create a brand new project.";
             // 
-            // m_menuInitializeFromAnInternetRepositoryToolStripMenuItem
+            // m_menuInitializeFromAnInternetRepository
             // 
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Name = "m_menuInitializeFromAnInternetRepositoryToolStripMenuItem";
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Text = "Initialize from an Internet Repository...";
-            this.m_menuInitializeFromAnInternetRepositoryToolStripMenuItem.Click += new System.EventHandler(this.cmdDownloadRepository);
+            this.m_menuInitializeFromAnInternetRepository.Name = "m_menuInitializeFromAnInternetRepository";
+            this.m_menuInitializeFromAnInternetRepository.Size = new System.Drawing.Size(287, 22);
+            this.m_menuInitializeFromAnInternetRepository.Text = "Initialize from an Internet Repository...";
+            this.m_menuInitializeFromAnInternetRepository.Click += new System.EventHandler(this.cmdDownloadRepository);
             // 
-            // m_menuCreateANewProjectOnThisComputerToolStripMenuItem
+            // m_menuCreateANewProjectOnThisComputer
             // 
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Name = "m_menuCreateANewProjectOnThisComputerToolStripMenuItem";
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Text = "Create a New Project on this computer...";
-            this.m_menuCreateANewProjectOnThisComputerToolStripMenuItem.Click += new System.EventHandler(this.cmdNewProject);
+            this.m_menuCreateANewProjectOnThisComputer.Name = "m_menuCreateANewProjectOnThisComputer";
+            this.m_menuCreateANewProjectOnThisComputer.Size = new System.Drawing.Size(287, 22);
+            this.m_menuCreateANewProjectOnThisComputer.Text = "Create a New Project on this computer...";
+            this.m_menuCreateANewProjectOnThisComputer.Click += new System.EventHandler(this.cmdNewProject);
             // 
             // m_menuOpenProject
             // 
@@ -1157,7 +1159,7 @@ namespace OurWord
             this.m_menuRestoreFromBackup,
             this.m_menuOnlyShowSectionsThat,
             this.m_menuConfigure,
-            this.checkForUpdatesToolStripMenuItem,
+            this.checkForUpdates,
             this.m_Synchronize,
             this.m_menuLocalizerTool,
             this.m_separatorDebug,
@@ -1206,12 +1208,12 @@ namespace OurWord
             this.m_menuConfigure.ToolTipText = "Edit the settings for OurWord and for the current project.";
             this.m_menuConfigure.Click += new System.EventHandler(this.cmdConfigure);
             // 
-            // checkForUpdatesToolStripMenuItem
+            // checkForUpdates
             // 
-            this.checkForUpdatesToolStripMenuItem.Name = "checkForUpdatesToolStripMenuItem";
-            this.checkForUpdatesToolStripMenuItem.Size = new System.Drawing.Size(211, 22);
-            this.checkForUpdatesToolStripMenuItem.Text = "Check for &Updates...";
-            this.checkForUpdatesToolStripMenuItem.Click += new System.EventHandler(this.cmdCheckForUpdates);
+            this.checkForUpdates.Name = "checkForUpdates";
+            this.checkForUpdates.Size = new System.Drawing.Size(211, 22);
+            this.checkForUpdates.Text = "Check for &Updates...";
+            this.checkForUpdates.Click += new System.EventHandler(this.cmdCheckForUpdates);
             // 
             // m_Synchronize
             // 
@@ -1278,7 +1280,7 @@ namespace OurWord
             this.m_menuDrafting,
             this.m_menuNaturalnessCheck,
             this.m_menuBackTranslation,
-            this.m_menuConsultantPreparationToolStripMenuItem,
+            this.m_menuConsultantPreparation,
             this.m_separatorWindow,
             this.m_menuZoom});
             this.m_btnWindow.Image = ((System.Drawing.Image)(resources.GetObject("m_btnWindow.Image")));
@@ -1321,14 +1323,14 @@ namespace OurWord
             this.m_menuBackTranslation.ToolTipText = "Set the main window to work on the Back Translation.";
             this.m_menuBackTranslation.Click += new System.EventHandler(this.cmdJobBackTranslation);
             // 
-            // m_menuConsultantPreparationToolStripMenuItem
+            // m_menuConsultantPreparation
             // 
-            this.m_menuConsultantPreparationToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("m_menuConsultantPreparationToolStripMenuItem.Image")));
-            this.m_menuConsultantPreparationToolStripMenuItem.Name = "m_menuConsultantPreparationToolStripMenuItem";
-            this.m_menuConsultantPreparationToolStripMenuItem.Size = new System.Drawing.Size(196, 22);
-            this.m_menuConsultantPreparationToolStripMenuItem.Tag = "ConsultantPreparation";
-            this.m_menuConsultantPreparationToolStripMenuItem.Text = "Consultant &Preparation";
-            this.m_menuConsultantPreparationToolStripMenuItem.Click += new System.EventHandler(this.cmdJobConsultantPreparation);
+            this.m_menuConsultantPreparation.Image = ((System.Drawing.Image)(resources.GetObject("m_menuConsultantPreparation.Image")));
+            this.m_menuConsultantPreparation.Name = "m_menuConsultantPreparation";
+            this.m_menuConsultantPreparation.Size = new System.Drawing.Size(196, 22);
+            this.m_menuConsultantPreparation.Tag = "ConsultantPreparation";
+            this.m_menuConsultantPreparation.Text = "Consultant &Preparation";
+            this.m_menuConsultantPreparation.Click += new System.EventHandler(this.cmdJobConsultantPreparation);
             // 
             // m_separatorWindow
             // 
@@ -1387,17 +1389,17 @@ namespace OurWord
             // 
             this.m_toolStripContainer.ContentPanel.AutoScroll = true;
             this.m_toolStripContainer.ContentPanel.Controls.Add(this.m_panelContents);
-            this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(946, 441);
+            this.m_toolStripContainer.ContentPanel.Size = new System.Drawing.Size(945, 441);
             this.m_toolStripContainer.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_toolStripContainer.LeftToolStripPanelVisible = false;
             this.m_toolStripContainer.Location = new System.Drawing.Point(0, 0);
             this.m_toolStripContainer.Name = "m_toolStripContainer";
             this.m_toolStripContainer.RightToolStripPanelVisible = false;
-            this.m_toolStripContainer.Size = new System.Drawing.Size(946, 526);
+            this.m_toolStripContainer.Size = new System.Drawing.Size(945, 526);
             this.m_toolStripContainer.TabIndex = 2;
             this.m_toolStripContainer.Text = "toolStripContainer1";
             // 
-            // m_toolStripContainer.TopToolStripPanel
+            // m_toolStripContainer.Top
             // 
             this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ViewBar);
             this.m_toolStripContainer.TopToolStripPanel.Controls.Add(this.m_ToolStrip);
@@ -1411,7 +1413,7 @@ namespace OurWord
             this.m_StatusMessage2});
             this.m_StatusStrip.Location = new System.Drawing.Point(0, 0);
             this.m_StatusStrip.Name = "m_StatusStrip";
-            this.m_StatusStrip.Size = new System.Drawing.Size(946, 22);
+            this.m_StatusStrip.Size = new System.Drawing.Size(945, 22);
             this.m_StatusStrip.SizingGrip = false;
             this.m_StatusStrip.TabIndex = 0;
             // 
@@ -1439,7 +1441,7 @@ namespace OurWord
             this.m_panelContents.Dock = System.Windows.Forms.DockStyle.Fill;
             this.m_panelContents.Location = new System.Drawing.Point(0, 0);
             this.m_panelContents.Name = "m_panelContents";
-            this.m_panelContents.Size = new System.Drawing.Size(946, 441);
+            this.m_panelContents.Size = new System.Drawing.Size(945, 441);
             this.m_panelContents.TabIndex = 0;
             // 
             // m_ViewBar
@@ -1449,7 +1451,7 @@ namespace OurWord
             this.m_ViewBar.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
             this.m_ViewBar.Location = new System.Drawing.Point(0, 0);
             this.m_ViewBar.Name = "m_ViewBar";
-            this.m_ViewBar.Size = new System.Drawing.Size(946, 25);
+            this.m_ViewBar.Size = new System.Drawing.Size(945, 25);
             this.m_ViewBar.Stretch = true;
             this.m_ViewBar.TabIndex = 1;
             this.m_ViewBar.Text = "viewBar1";
@@ -1458,7 +1460,7 @@ namespace OurWord
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(946, 526);
+            this.ClientSize = new System.Drawing.Size(945, 526);
             this.Controls.Add(this.m_toolStripContainer);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "OurWordMain";
@@ -1733,8 +1735,8 @@ namespace OurWord
 		#region Cmd: cmdPrint
         private void cmdPrint(Object sender, EventArgs e)
 		{
-     //       var test = new TestDlg();
-     //       test.ShowDialog();
+            var test = new TestDlg();
+            test.ShowDialog();
             /////////////////////////////////////////////////////////////
 
             Dim();;
@@ -2044,10 +2046,15 @@ namespace OurWord
                 if (!book.Loaded)
                     continue;
 
+                /*
                 // BEGIN HUICHOL FIX *******************************************************
-            //    book.OneOffForHuichol_StripOutOldTranslatorNotes();
-            //    book.DeclareDirty();
-            //    book.WriteBook(G.CreateProgressIndicator());
+                if (book.BookAbbrev == "EXO")
+                {
+                    book.OneOffForHuichol_StripOutOldTranslatorNotes();
+                    book.DeclareDirty();
+                    book.WriteBook(G.CreateProgressIndicator());
+                }
+                */
                 // END HUICHOL FIX *********************************************************
 
                 // Compute the file name

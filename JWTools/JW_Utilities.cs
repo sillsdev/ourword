@@ -156,9 +156,9 @@ namespace JWTools
             if (null == ExecutingAssembly)
                 return new Bitmap(16, 16);
 
-			string sResourcePath = ResourceLocation + sResourceFile;
+			var sResourcePath = ResourceLocation + sResourceFile;
 
-			Stream stream = ExecutingAssembly.GetManifestResourceStream(sResourcePath);
+			var stream = ExecutingAssembly.GetManifestResourceStream(sResourcePath);
 			Debug.Assert(null != stream, "Resource " + sResourceFile + " not found.");
 
 			return new Bitmap(stream);
@@ -174,9 +174,9 @@ namespace JWTools
 		{
 			var ExecutingAssembly = Assembly.GetEntryAssembly();
 
-			string sResourcePath = ResourceLocation + sResourceFile;
+			var sResourcePath = ResourceLocation + sResourceFile;
 
-			Stream stream = ExecutingAssembly.GetManifestResourceStream(sResourcePath);
+			var stream = ExecutingAssembly.GetManifestResourceStream(sResourcePath);
 
 			return new Icon(stream);
 		}

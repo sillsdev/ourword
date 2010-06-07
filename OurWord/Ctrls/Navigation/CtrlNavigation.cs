@@ -13,10 +13,12 @@ namespace OurWord.Ctrls.Navigation
     public delegate void GoToBookHandler(string sBookAbbrev);
     public delegate void GoToChapterHandler(int nChapterNumber);
     public delegate void GoToSectionHandler(DSection section);
+    public delegate void FindText(string sSearchText, bool bFindNext);
 
     public partial class CtrlNavigation : UserControl
     {
         // Scaffolding -----------------------------------------------------------------------
+        private CtrlFindText m_FindTextMenuItem;
         #region Constructor()
         public CtrlNavigation()
         {
@@ -28,6 +30,27 @@ namespace OurWord.Ctrls.Navigation
         private void cmdLoad(object sender, EventArgs e)
         {
             Height = TopTools.Height + BottomTools.Height;
+
+            m_FindTextMenuItem = new CtrlFindText();
+            m_FindTextMenuItem.Click += cmdFindText;
+            m_FindTextMenuItem.OnFindTextChanged += cmdFindTextChanged;
+            m_Find.DropDownItems.Insert(0, m_FindTextMenuItem);
+
+            SetMenuEnabling(false);
+        }
+        #endregion
+        #region method: void SetMenuEnabling(bEnable)
+        void SetMenuEnabling(bool bEnable)
+        {
+            m_FindNext.Enabled = bEnable;
+            m_SetAsFilter.Enabled = bEnable;
+        }
+        #endregion
+        #region cmd: cmdFindTextChanged(sNewText)
+        void cmdFindTextChanged(string sNewText)
+        {
+            var bEnableMenuItems = !string.IsNullOrEmpty(sNewText);
+            SetMenuEnabling(bEnableMenuItems);
         }
         #endregion
 
@@ -266,6 +289,7 @@ namespace OurWord.Ctrls.Navigation
         public GoToBookHandler OnGoToBook;
         public GoToChapterHandler OnGoToChapter;
         public GoToSectionHandler OnGoToSection;
+        public FindText OnFindText;
 
         #region Cmd: cmdGoToBook
         private void cmdGoToBook(object sender, EventArgs e)
@@ -384,5 +408,26 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
 
+        #region cmd: cmdFindText
+        void cmdFindText(object sender, EventArgs e)
+        {
+            if (null == OnFindText) 
+                return;
+
+            var sSearchText = m_FindTextMenuItem.SearchText;
+            OnFindText(sSearchText, false);
+        }
+        #endregion
+        #region cmd: cmdFindNext
+        private void cmdFindNext(object sender, EventArgs e)
+        {
+              if (null == OnFindText) 
+                return;
+
+            var sSearchText = m_FindTextMenuItem.SearchText;
+            OnFindText(sSearchText, true);
+       
+        }
+        #endregion
     }
 }

@@ -191,7 +191,9 @@
   <ItemGroup>
     <Content Include="App.ico" />
     <Content Include="ChangesHistory.html" />
-    <EmbeddedResource Include="Ctrls\Navigation\Images\Filter.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\CtrlCommands.resx">
+      <DependentUpon>CtrlCommands.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirst.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirstFiltered.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoLast.ico" />
@@ -200,6 +202,31 @@
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoNextFiltered.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoPrevious.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoPreviousFiltered.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\Filter16.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\Search.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Configuration.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Edit.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Exit.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\History.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\InsertNote.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Italic.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Print.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Project.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Save.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutBT16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutConsultantPreparation16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutDrafting16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutNaturalness16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\FileNew16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\FileOpen16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\FileSave16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditCopy16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditCut16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditPaste16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditRedo16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditUndo16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\FootnoteDelete16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\FootnoteInsert16.ico" />
     <Content Include="OurWord.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\CtrlNavigation.resx">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
@@ -413,6 +440,15 @@
     <EmbeddedResource Include="Res\WizImportFile.gif" />
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Commands\CtrlCommands.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Commands\CtrlCommands.Designer.cs">
+      <DependentUpon>CtrlCommands.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\CtrlFindText.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Ctrls\Navigation\CtrlNavigation.cs">
       <SubType>UserControl</SubType>
