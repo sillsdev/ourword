@@ -433,7 +433,7 @@ namespace OurWordData.DataModel
             {
                 if (null != m_Translation)
                 {
-                    int i = FindBookAbbrevIndex(BookAbbrev);
+                    var i = FindBookAbbrevIndex(BookAbbrev);
                     return Translation.BookNamesTable[i];
                 }
                 return base.DisplayName;
@@ -2247,6 +2247,21 @@ namespace OurWordData.DataModel
 			return rgParas;
 		}
 		****/
+        #endregion
+        #region Method: DSection GetSectionContainingChapter(nChapterNumber)
+        public DSection GetSectionContainingChapter(int nChapterNumber)
+        {
+            foreach(DSection section in Sections)
+            {
+                if (section.ReferenceSpan.Start.Chapter >= nChapterNumber &&
+                    section.ReferenceSpan.End.Chapter <= nChapterNumber)
+                {
+                    return section;
+                }
+            }
+
+            return null;
+        }
         #endregion
 
         // I/O -------------------------------------------------------------------------------

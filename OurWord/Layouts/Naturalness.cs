@@ -132,7 +132,7 @@ namespace OurWord.Layouts
         protected override void OnGotFocus(EventArgs e)
         {
             base.OnGotFocus(e);
-            G.App.EnableMenusAndToolbars();
+            G.App.EnableItalicsButton();
         }
         #endregion
         #region Attr{g}: override string WindowName

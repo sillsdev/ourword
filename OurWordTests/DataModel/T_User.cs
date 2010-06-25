@@ -102,7 +102,7 @@ namespace OurWordTests.DataModel
                 "collaborationUserName=\"Larry\" " +
                 "collaborationPassword=\"Cucumber\" " +
                 "canEditStructure=\"true\" " +
-                "canUndoRedo=\"true\" canNavChapter=\"true\" canNavFirstLast=\"true\" " +
+                "canUndoRedo=\"true\" canNavFirstLast=\"true\" " +
                 "canDoBackTranslation=\"true\" canDoNaturalnessCheck=\"true\" canDoConsultantPreparation=\"true\" " +
                 "canZoom=\"true\" canCreateProject=\"true\" canOpenProject=\"true\" " +
                 "canExportProject=\"true\" canPrint=\"true\" canFilter=\"true\" canLocalize=\"true\" " +
@@ -137,7 +137,6 @@ namespace OurWordTests.DataModel
                 CollaborationPassword = "Cucumber",
                 CanEditStructure = true, 
                 CanUndoRedo = true,
-                CanNavigateChapter = true,
                 CanNavigateFirstLast = true,
                 CanDoBackTranslation = true,
                 CanDoNaturalnessCheck = true,

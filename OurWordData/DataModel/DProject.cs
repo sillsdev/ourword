@@ -955,8 +955,6 @@ namespace OurWordData.DataModel
         #region Method: void Save(IProgressIndicator)
         public void Save(IProgressIndicator progress)
         {
-            Users.Save();
-
             // Nothing to do if we don't have anything to save
             if (!HasContent)
                 return;
@@ -965,6 +963,8 @@ namespace OurWordData.DataModel
             // we don't save those, because they are obsolete remnants
             if (string.IsNullOrEmpty(TeamSettings.DisplayName))
                 return;
+
+            Users.Save();
 
             // The JObjectOnDemand does the writing
             WriteToFile(progress);

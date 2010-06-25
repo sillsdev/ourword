@@ -293,24 +293,6 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Attr{g}: virtual string PassageName
-        public virtual string PassageName
-        {
-            get
-            {
-                if (!DB.IsValidProject)
-                    return "";
-                if (null == DB.TargetTranslation)
-                    return "";
-                if (null == DB.FrontTranslation)
-                    return "";
-                if (null == DB.TargetSection)
-                    return "";
-
-                return DB.TargetSection.ReferenceName;
-            }
-        }
-        #endregion
 
         // Placing Data Content into the window ----------------------------------------------
         #region Attr{g}: ERoot Contents

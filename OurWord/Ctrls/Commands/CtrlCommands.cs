@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
+using JWTools;
+using OurWord.Edit;
 using OurWord.Layouts;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
+using OurWordData.Styles;
 
 namespace OurWord.Ctrls.Commands
 {
@@ -13,6 +16,7 @@ namespace OurWord.Ctrls.Commands
     public delegate void ChangeZoomPercentHandler(int nNewZoomPercent);
     public delegate void OpenProjectHandler(string sPathToProjectFile);
     public delegate void ChangeUserHandler(User newUser);
+    public delegate void ChangeParagraphStyleHandler(ParagraphStyle newStyle);
 
     public partial class CtrlCommands : UserControl
     {
@@ -41,18 +45,40 @@ namespace OurWord.Ctrls.Commands
             }
         }
         #endregion
-        #region Method: void SetVisibility()
-        public void SetVisibility()
+        #region Method: void Setup()
+        public void Setup()
         {
-            SetLayoutVisibility();
-            SetProjectBisibility();
-            m_PrintBook.Available = Users.Current.CanPrint;
+            SetupLayout();
+            SetupProject();
+            SetupPrint();
+            SetupEdit();
+            SetupUser();
+            SetupNotes();
+
+            // On TopTools, just localize the Layout item
+            LocDB.Localize(m_Layout);
+
+            // Localize all of the BottomTools item
+            LocDB.Localize(BottomTools);
+        }
+        #endregion
+        #region Method: UndoRedoStack SetupUndoRedoStack()
+        public UndoRedoStack SetupUndoRedoStack()
+        {
+            const int c_nUndoRedoMaxDepth = 15;
+            return new UndoRedoStack(c_nUndoRedoMaxDepth, m_menuUndo, m_menuRedo);
+        }
+        #endregion
+        #region Method: void EnableItalics(bool bEnabled)
+        public void EnableItalics(bool bEnabled)
+        {
+            m_Italic.Enabled = bEnabled;
         }
         #endregion
 
         // Visibility / Enabling -------------------------------------------------------------
-        #region method: void SetLayoutVisibility()
-        void SetLayoutVisibility()
+        #region method: void SetupLayout()
+        void SetupLayout()
         {
             var user = Users.Current;
 
@@ -74,8 +100,8 @@ namespace OurWord.Ctrls.Commands
             m_LayoutSeparator.Available = (m_Zoom.Available && bMultipleLayoutsAvailable);
         }
         #endregion
-        #region method: void SetProjectBisibility()
-        void SetProjectBisibility()
+        #region method: void SetupProject()
+        void SetupProject()
         {
             var user = Users.Current;
             var bIsValidProject = DB.IsValidProject;
@@ -88,6 +114,9 @@ namespace OurWord.Ctrls.Commands
                 user.CanCreateProject ||
                 !Users.HasAdministrator;
 
+            m_Save.Available = bIsValidProject;
+            m_menuSave.Available = bIsValidProject;
+
             m_Export.Available = bIsValidProject && 
                 DB.TargetTranslation.BookList.Count > 0 &&
                 user.CanExportProject;
@@ -97,7 +126,79 @@ namespace OurWord.Ctrls.Commands
                 m_Export.Available;
         }
         #endregion
+        #region method: void SetupPrint()
+        void SetupPrint()
+        {
+            m_PrintBook.Available = Users.Current.CanPrint;
 
+            m_PrintBook.Enabled = DB.IsValidProject &&
+                null != DB.FrontSection && 
+                null != DB.TargetSection;
+        }
+        #endregion
+        #region method: void SetupEdit()
+        void SetupEdit()
+        {
+            // Structural editing includes adding/deleting footnotes and changing paragraph styles
+            var bCanEditStructure = Users.Current.CanEditStructure &&
+                WLayout.CurrentLayoutIs(WndDrafting.c_sName);
+            m_menuInsertFootnote.Available = bCanEditStructure;
+            m_menuDeleteFootnote.Available = bCanEditStructure;
+            m_menuChangeParagraphStyle.Available = bCanEditStructure;
+
+            // Undo / Redo
+            m_menuUndo.Available = Users.Current.CanUndoRedo;
+            m_menuRedo.Available = Users.Current.CanUndoRedo;
+
+            // Don't show the Edit menu if there isn't anything there of signifcance the user can do
+            m_Edit.Available = (bCanEditStructure || Users.Current.CanUndoRedo);
+
+            // The Cut/Copy/Paste toolbar buttons are not shown if the Edit dropdown is shown
+            m_Cut.Available = !m_Edit.Available;
+            m_Copy.Available = !m_Edit.Available;
+            m_Paste.Available = !m_Edit.Available;
+
+            // A special feature requested by Timor, but normally disabled for most people
+            m_menuCopyBTFromFront.Available = (
+                 Users.Current.CanDoConsultantPreparation &&
+                 WLayout.CurrentLayoutIs(new[] {
+                     WndConsultantPreparation.c_sName, 
+                     WndBackTranslation.c_sName })
+                 );
+
+            // Enabling
+            var bCannotEdit = (null == WLayout.CurrentLayout ||
+                !WLayout.CurrentLayout.Focused || 
+                OurWordMain.TargetIsLocked);
+
+            m_Cut.Enabled = !bCannotEdit;
+            m_Copy.Enabled = !bCannotEdit;
+            m_Paste.Enabled = !bCannotEdit;
+
+            m_menuCut.Enabled = !bCannotEdit;
+            m_menuCopy.Enabled = !bCannotEdit;
+            m_menuPaste.Enabled = !bCannotEdit;           
+        }
+        #endregion
+        #region method: void SetupUser()
+        void SetupUser()
+        {
+            if (null == Users.Current)
+                return;
+
+            m_User.Text = Users.Current.UserName;
+        }
+        #endregion
+        #region method: void SetupNotes()
+        void SetupNotes()
+        {
+            m_InsertNote.Available = Users.Current.CanMakeNotes;
+
+            m_InsertNote.Enabled = DB.IsValidProject &&
+                null != DB.FrontSection &&
+                null != DB.TargetSection;
+        }
+        #endregion
 
         // Infrastructure handlers -----------------------------------------------------------
         #region cmd: cmdLoad
@@ -110,7 +211,7 @@ namespace OurWord.Ctrls.Commands
             m_NaturalnessCheck.Tag = WndNaturalness.c_sName;
             m_ConsultantPreparation.Tag = WndConsultantPreparation.c_sName;
 
-            SetVisibility();
+            Setup();
         }
         #endregion
         #region cmd: cmdLayoutDropDownOpening
@@ -202,17 +303,126 @@ namespace OurWord.Ctrls.Commands
             }
         }
         #endregion
+        #region cmd: cmdEditDropDownOpening
+        #region method: void PopulateChangeStyleDropDown()
+        void PopulateChangeStyleDropDown()
+        {
+            // If not visible, nothing to do
+            if (m_menuChangeParagraphStyle.Available == false)
+                return;
+
+            // Clear out any previous subitems
+            m_menuChangeParagraphStyle.DropDownItems.Clear();
+
+            // Get the currently-selected paragraph
+            OWWindow wnd = WLayout.CurrentLayout;
+            if (null == wnd || !wnd.Focused)
+                return;
+            var selection = wnd.Selection;
+            if (null == selection)
+                return;
+            var p = selection.DBT.Paragraph;
+            if (null == p)
+                return;
+
+            // Get the paragraph's possible styles
+            var vPossibileStyles = p.CanChangeParagraphStyleTo;
+
+            // Create menu items for each of these
+            foreach (var style in vPossibileStyles)
+            {
+                var mi = new ToolStripMenuItem(
+                    style.StyleName,
+                    null,
+                    cmdChangeParagraphStyle,
+                    @"changeParagraphStyle_" + style.StyleName) 
+                    {
+                        Tag = style
+                    };
+
+                if (style == p.Style)
+                    mi.Checked = true;
+
+                m_menuChangeParagraphStyle.DropDownItems.Add(mi);
+            }
+        }
+        #endregion
+        #region method:  void SetFootnoteEnabling()
+        void SetFootnoteEnabling()
+        {
+            var wnd = WLayout.CurrentLayout;
+            var bCanEdit = (null != wnd && wnd.Focused && !OurWordMain.TargetIsLocked);
+
+            m_menuInsertFootnote.Enabled = (bCanEdit && wnd.canInsertFootnote);
+            m_menuDeleteFootnote.Enabled = (bCanEdit && wnd.canDeleteFootnote);
+        }
+        #endregion
+
         void cmdEditDropDownOpening(object sender, EventArgs e)
         {
-            
+            PopulateChangeStyleDropDown();
+            SetFootnoteEnabling();
         }
+        #endregion
+        #region cmd: cmdUserDropDownOpening
+        private void cmdUserDropDownOpening(object sender, EventArgs e)
+        {
+            var current = Users.Current;
+            Debug.Assert(null != current);
+
+            m_User.DropDownItems.Clear();
+
+            var allUsers = new List<User>();
+            allUsers.AddRange(Users.Members);
+            allUsers.Add(Users.Observer);
+
+            foreach (var user in allUsers)
+            {
+                var item = new ToolStripMenuItem(user.UserName, null, cmdChangeUser)
+                {
+                    Tag = user
+                };
+                if (user == current)
+                    item.Checked = true;
+                m_User.DropDownItems.Add(item);
+            }
+
+            if (current.IsAdministrator || !Users.HasAdministrator)
+            {
+                m_User.DropDownItems.Add(new ToolStripSeparator());
+                m_User.DropDownItems.Add(
+                    new ToolStripMenuItem("Add new user...", null, cmdAddNewUser));
+            }
+        }
+        #endregion
+        #region cmd: cmdToolsDropDownOpening
+        private void cmdToolsDropDownOpening(object sender, EventArgs e)
+        {
+            // Synchronize: Only if synch information is set up
+            m_menuSendReceive.Available = Users.Current.CanSendReceive;
+
+            // Dependent on current user permissions
+            m_menuRestoreFromBackup.Available = Users.Current.CanRestoreBackups;
+            m_menuLocalizerTool.Available = Users.Current.CanLocalize;
+
+            // Dependent on loaded data
+            m_menuIncrementBookStatus.Available = DB.IsValidProject &&
+                null != DB.Project.STarget;
+
+            // Display the separator for these three?
+            var bLowerToolsAvailable = m_menuRestoreFromBackup.Available ||
+                m_menuLocalizerTool.Available ||
+                m_menuIncrementBookStatus.Available;
+            m_separatorTools.Available = bLowerToolsAvailable;          
+        }
+        #endregion
 
         // Misc ------------------------------------------------------------------------------
         #region smethod: string GetLayoutButtonText(sMenuItemText)
         static string GetLayoutButtonText(string sMenuItemText)
         {
             var s = sMenuItemText.Replace("&", "");
-            return s.ToUpperInvariant();
+            return s;
         }
         #endregion
         #region method: void SetLayoutDropDown(ToolStripItem item)
@@ -226,27 +436,39 @@ namespace OurWord.Ctrls.Commands
 
         // Handlers --------------------------------------------------------------------------
         public SimpleHandler OnExit;
-        public SimpleHandler OnSave;
+        public SimpleHandler OnSaveProject;
         public SimpleHandler OnPrintBook;
-        public SimpleHandler OnExport;
+        public SimpleHandler OnExportProject;
         public SimpleHandler OnDownloadRepositoryFromInternet;
         public SimpleHandler OnCreateProject;
         public SimpleHandler OnHistory;
-        public SimpleHandler OnInsertNote;
         public SimpleHandler OnAddNewUser;
+        public SimpleHandler OnInsertNote;
 
         public SimpleHandler OnUndo;
         public SimpleHandler OnRedo;
         public SimpleHandler OnCut;
         public SimpleHandler OnCopy;
         public SimpleHandler OnPaste;
+        public SimpleHandler OnItalic;
         public SimpleHandler OnInsertFootnote;
         public SimpleHandler OnDeleteFootnote;
+        public SimpleHandler OnCopyBtFromFront;
+
+        public SimpleHandler OnSendReceive;
+        public SimpleHandler OnCheckForUpdates;
+        public SimpleHandler OnConfigure;
+        public SimpleHandler OnIncrementBookStatus;
+        public SimpleHandler OnRestoreFromBackup;
+        public SimpleHandler OnLocalizerTool;
+        public SimpleHandler OnHelpTopics;
+        public SimpleHandler OnAbout;
 
         public SwitchLayoutHandler OnSwitchLayout;
         public ChangeZoomPercentHandler OnChangeZoomPercent;
         public OpenProjectHandler OnOpenProject;
         public ChangeUserHandler OnChangeUser;
+        public ChangeParagraphStyleHandler OnChangeParagraphStyle;
 
         // Simple Handlers
         #region cmd: cmdExit
@@ -259,8 +481,8 @@ namespace OurWord.Ctrls.Commands
         #region cmd: cmdSave
         void cmdSave(object sender, EventArgs e)
         {
-            if (null != OnSave)
-                OnSave();
+            if (null != OnSaveProject)
+                OnSaveProject();
         }
         #endregion
         #region cmd: cmdPrintBook
@@ -273,8 +495,8 @@ namespace OurWord.Ctrls.Commands
         #region cmd: cmdExport
         private void cmdExport(object sender, EventArgs e)
         {
-            if (null != OnExport)
-                OnExport();
+            if (null != OnExportProject)
+                OnExportProject();
         }
         #endregion
         #region cmd: cmdDownloadRepositoryFromInternet
@@ -342,6 +564,13 @@ namespace OurWord.Ctrls.Commands
                 OnPaste();
         }
         #endregion
+        #region cmd: cmdOnItalic
+        void cmdOnItalic(Object sender, EventArgs e)
+        {
+            if (null != OnItalic)
+                OnItalic();
+        }
+        #endregion
         #region cmd: cmdInsertFootnote
         private void cmdInsertFootnote(object sender, EventArgs e)
         {
@@ -354,6 +583,71 @@ namespace OurWord.Ctrls.Commands
         {
             if (null != OnDeleteFootnote)
                 OnDeleteFootnote();
+        }
+        #endregion
+        #region cmd: cmdCopyBtFromFront
+        private void cmdCopyBtFromFront(object sender, EventArgs e)
+        {
+            if (null != OnCopyBtFromFront)
+                OnCopyBtFromFront();
+        }
+        #endregion
+
+        // Simple Handlers: Tools Menu
+        #region cmd: cmdSendReceive
+        private void cmdSendReceive(object sender, EventArgs e)
+        {
+            if (null != OnSendReceive)
+                OnSendReceive();
+        }
+        #endregion
+        #region cmd: cmdCheckForUpdates
+        private void cmdCheckForUpdates(object sender, EventArgs e)
+        {
+            if (null != OnCheckForUpdates)
+                OnCheckForUpdates();
+        }
+        #endregion
+        #region cmd: cmdConfigure
+        private void cmdConfigure(object sender, EventArgs e)
+        {
+            if (null != OnConfigure)
+                OnConfigure();
+        }
+        #endregion
+        #region cmd: cmdIncrementBookStatus
+        private void cmdIncrementBookStatus(object sender, EventArgs e)
+        {
+            if (null != OnIncrementBookStatus)
+                OnIncrementBookStatus();
+        }
+        #endregion
+        #region cmd: cmdRestoreFromBackup
+        private void cmdRestoreFromBackup(object sender, EventArgs e)
+        {
+            if (null != OnRestoreFromBackup)
+                OnRestoreFromBackup();
+        }
+        #endregion
+        #region cmd: cmdLocalizerTool
+        private void cmdLocalizerTool(object sender, EventArgs e)
+        {
+            if (null != OnLocalizerTool)
+                OnLocalizerTool();
+        }
+        #endregion
+        #region cmd: cmdHelpTopics
+        private void cmdHelpTopics(object sender, EventArgs e)
+        {
+            if (null != OnHelpTopics)
+                OnHelpTopics();
+        }
+        #endregion
+        #region cmd: cmdAbout
+        private void cmdAbout(object sender, EventArgs e)
+        {
+            if (null != OnAbout)
+                OnAbout();
         }
         #endregion
 
@@ -393,7 +687,6 @@ namespace OurWord.Ctrls.Commands
                 OnChangeZoomPercent(nNewZoomPercent);
         }
         #endregion
-
         #region cmd: cmdOpenProject
         void cmdOpenProject(object sender, EventArgs e)
         {
@@ -409,9 +702,29 @@ namespace OurWord.Ctrls.Commands
                 OnOpenProject(sPathToProjectFile);
         }
         #endregion
+        #region cmd: cmdChangeParagraphStyle
+        void cmdChangeParagraphStyle(object sender, EventArgs e)
+        {
+            var item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
 
+            var newStyle = item.Tag as ParagraphStyle;
+            if (null == newStyle)
+                return;
+
+            if (null != OnChangeParagraphStyle)
+                OnChangeParagraphStyle(newStyle);
+        }
+        #endregion
+
+        // Users
+        #region cmd: cmdChangeUser
         void cmdChangeUser(object sender, EventArgs e)
         {
+            if (null == OnChangeUser)
+                return;
+
             var item = sender as ToolStripMenuItem;
             if (null == item)
                 return;
@@ -423,45 +736,25 @@ namespace OurWord.Ctrls.Commands
             if (user == Users.Current)
                 return;
 
-            if (null != OnChangeUser)
-                OnChangeUser(user);
+            OnChangeUser(user);
+
+            // If sucessful, we'll have a new user now
+            SetupUser();
         }
+        #endregion
+        #region cmd: cmdAddNewUser
         void cmdAddNewUser(object sender, EventArgs e)
         {
-            if (null != OnAddNewUser)
-                OnAddNewUser();
+            if (null == OnAddNewUser)
+                return;
+
+            OnAddNewUser();
+
+            // If sucessful, we'll have a new user now
+            SetupUser();
         }
-        private void cmdUserDropDownOpening(object sender, EventArgs e)
-        {
-            var current = Users.Current;
-            Debug.Assert(null != current);
+        #endregion
 
-            m_User.DropDownItems.Clear();
-
-            var allUsers = new List<User>();
-            allUsers.AddRange(Users.Members);
-            allUsers.Add(Users.Observer);
-
-            foreach (var user in allUsers)
-            {
-                var item = new ToolStripMenuItem(user.UserName, null, cmdChangeUser)
-                {
-                    Tag = user
-                };
-                if (user == current)
-                    item.Checked = true;
-                m_User.DropDownItems.Add(item);
-            }
-
-            if (current.IsAdministrator || !Users.HasAdministrator)
-            {
-                m_User.DropDownItems.Add(new ToolStripSeparator());
-                m_User.DropDownItems.Add(
-                    new ToolStripMenuItem("Add new user...", null, cmdAddNewUser));
-            }
-
-            m_User.Text = current.UserName;
-        }
 
 
     }

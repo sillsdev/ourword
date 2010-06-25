@@ -433,7 +433,6 @@ namespace OurWord.Layouts
 
             // Place it in the window correctly
             layout.Hide();
-            layout.Dock = DockStyle.Fill;
             parent.Controls.Add(layout);
         }
         #endregion

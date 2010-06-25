@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
 
@@ -43,7 +44,7 @@ namespace OurWord.Ctrls.Navigation
         void SetMenuEnabling(bool bEnable)
         {
             m_FindNext.Enabled = bEnable;
-            m_SetAsFilter.Enabled = bEnable;
+            m_Filter.Enabled = bEnable;
         }
         #endregion
         #region cmd: cmdFindTextChanged(sNewText)
@@ -58,7 +59,16 @@ namespace OurWord.Ctrls.Navigation
         #region Method: void Setup(DSection)
         public void Setup(DSection currentSection)
         {
+            Debug.Assert(currentSection.IsTargetSection);
+
             m_CurrentSection = currentSection;
+
+            // Temporary: Disable the Find button until we implement it
+            m_Find.Available = false;
+            m_Separator.Available = false;
+
+            // Localize prior to setting up the dropdowns
+            Localize();
 
             SetupBookCtrl();
             SetupChapterCtrl();
@@ -66,10 +76,21 @@ namespace OurWord.Ctrls.Navigation
             SetupSections();
             SetupEnabling();
             SetupIcons();
+            SetupLocked();
         }
         #endregion
 
         // Setup -----------------------------------------------------------------------------
+        #region method: void Localize()
+        void Localize()
+        {
+            // Clear out any dropdown section titles so that we don't attempt to localize them
+            m_Previous.DropDownItems.Clear();
+            m_Next.DropDownItems.Clear();
+
+            LocDB.Localize(BottomTools);
+        }
+        #endregion
         #region method: void SetupBookCtrl()
         void SetupBookCtrl()
         {
@@ -82,6 +103,9 @@ namespace OurWord.Ctrls.Navigation
 
             // Dropdown
             DBookGrouping.PopulateGotoBook(m_Book, cmdGoToBook);
+
+            // Enabling
+            m_Book.Enabled = DB.IsValidProject;
         }
         #endregion
         #region method: void SetupChapterCtrl()
@@ -89,6 +113,8 @@ namespace OurWord.Ctrls.Navigation
         {
             var sChapter = CurrentSection.ReferenceSpan.Start.Chapter.ToString();
             m_Chapter.Text = sChapter + @":";
+
+            m_Chapter.Enabled = DB.IsValidProject;
         }
         #endregion
         #region method: void SetupVerse()
@@ -117,16 +143,36 @@ namespace OurWord.Ctrls.Navigation
         #region method: void SetupIcons()
         void SetupIcons()
         {
-            const int iIconFirst = 0;
-            const int iIconPrevious = 1;
-            const int iIconNext = 2;
-            const int iIconLast = 3;
+            const int c_iIconFirst = 0;
+            const int c_iIconPrevious = 1;
+            const int c_iIconNext = 2;
+            const int c_iIconLast = 3;
             var imageList = (m_bFilterIsActive) ? FilteredNavigation : UnfilteredNavigation;
 
-            m_First.Image = imageList.Images[iIconFirst];
-            m_Previous.Image = imageList.Images[iIconPrevious];
-            m_Next.Image = imageList.Images[iIconNext];
-            m_Last.Image = imageList.Images[iIconLast];
+            m_First.Image = imageList.Images[c_iIconFirst];
+            m_Previous.Image = imageList.Images[c_iIconPrevious];
+            m_Next.Image = imageList.Images[c_iIconNext];
+            m_Last.Image = imageList.Images[c_iIconLast];
+        }
+        #endregion
+        #region method: void SetupLocked()
+        void SetupLocked()
+        {
+            var bIsDisplayableProject = (null != DB.Project && DB.Project.HasDataToDisplay);
+
+            if (!bIsDisplayableProject)
+            {
+                m_Locked.Available = false;
+                return;
+            }
+
+            m_Locked.Available = OurWordMain.TargetIsLocked;
+        }
+        #endregion
+        #region cmd: cmdFindDropDownOpening
+        private void cmdFindDropDownOpening(object sender, EventArgs e)
+        {
+
         }
         #endregion
 
@@ -162,8 +208,13 @@ namespace OurWord.Ctrls.Navigation
             var vAllSectionsInBook = CurrentSection.Book.Sections;
             foreach (DSection section in vAllSectionsInBook)
             {
-                // ToDo: If doesn't match filter, continue
-
+                if (m_bFilterIsActive)
+                {
+                    var bPassed = G.App.FilterTest(m_dlgFilter, section);
+                    if (!bPassed)
+                        continue;
+                }
+                
                 Sections.Add(section);
             }
 
@@ -177,27 +228,27 @@ namespace OurWord.Ctrls.Navigation
         {
             m_Previous.DropDownItems.Clear();
 
-            if (IndexOfCurrentSection > 0)
-            {
-                var nBefore = IndexOfCurrentSection;
-                var vSections = Sections.GetRange(0, nBefore);
-                var vItems = CreateDropDownItems(vSections);
-                m_Previous.DropDownItems.AddRange(vItems.ToArray());
-            }
+            if (IndexOfCurrentSection <= 0) 
+                return;
+
+            var nBefore = IndexOfCurrentSection;
+            var vSections = Sections.GetRange(0, nBefore);
+            var vItems = CreateDropDownItems(vSections);
+            m_Previous.DropDownItems.AddRange(vItems.ToArray());
         }
         #endregion
         #region method: void SetupNextDropDown()
         void SetupNextDropDown()
         {
-            m_Next.DropDownItems.Clear(); 
+            m_Next.DropDownItems.Clear();
 
-            if (IndexOfCurrentSection < Sections.Count - 1)
-            {
-                var nAfter = Sections.Count - IndexOfCurrentSection - 1;
-                var vSections = Sections.GetRange(IndexOfCurrentSection + 1, nAfter);
-                var vItems = CreateDropDownItems(vSections);
-                m_Next.DropDownItems.AddRange(vItems.ToArray());
-            }
+            if (IndexOfCurrentSection >= Sections.Count - 1) 
+                return;
+
+            var nAfter = Sections.Count - IndexOfCurrentSection - 1;
+            var vSections = Sections.GetRange(IndexOfCurrentSection + 1, nAfter);
+            var vItems = CreateDropDownItems(vSections);
+            m_Next.DropDownItems.AddRange(vItems.ToArray());
         }
         #endregion
         #region method: List<ToolStripMenuItem> CreateDropDownItems(vSections)
@@ -270,12 +321,30 @@ namespace OurWord.Ctrls.Navigation
 
         // Filters ---------------------------------------------------------------------------
         private bool m_bFilterIsActive;
+
+        //The dialog is a member variable so its settings persist throughout the OW session. 
+        static DialogFilter m_dlgFilter;
+
         private void cmdFilter(object sender, EventArgs e)
         {
-            // Display the Filter dialog
+            // Get the user's pleasure
+            if (null == m_dlgFilter)
+                m_dlgFilter = new DialogFilter();
+            var result = m_dlgFilter.ShowDialog(this);
 
+            // If the user Canceled out, then we remove any existing filter
+			if (result == DialogResult.Cancel || m_dlgFilter.NothingIsChecked)
+			{
+			    m_bFilterIsActive = false;
+			}
+			else
+			{
+			    m_bFilterIsActive = true;
+			}
 
-            // Calc Sections
+            // Calc Filtered Sections
+            SetupSections();
+            SetupIcons();
 
 
 
@@ -429,5 +498,6 @@ namespace OurWord.Ctrls.Navigation
        
         }
         #endregion
+
     }
 }

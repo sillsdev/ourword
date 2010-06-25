@@ -106,7 +106,6 @@ namespace OurWordData.DataModel.Membership
 
             MaximizeWindowOnStartup = false,
 
-            CanNavigateChapter = true,
             CanNavigateFirstLast = true,
             CanDoBackTranslation = true,
             CanDoNaturalnessCheck = true,
@@ -131,7 +130,6 @@ namespace OurWordData.DataModel.Membership
 
             MaximizeWindowOnStartup = false,           
 
-            CanNavigateChapter = true,
             CanNavigateFirstLast = true,
             CanDoNaturalnessCheck = true,
             CanDoConsultantPreparation = true,
@@ -154,7 +152,6 @@ namespace OurWordData.DataModel.Membership
 
             CanEditStructure = true,
             CanUndoRedo = true,
-            CanNavigateChapter = true,
             CanNavigateFirstLast = true,
             CanDoBackTranslation = true,
             CanDoNaturalnessCheck = true,

@@ -204,7 +204,6 @@
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoPreviousFiltered.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\Filter16.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\Search.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\Configuration.ico" />
     <EmbeddedResource Include="Ctrls\Commands\Images\Edit.ico" />
     <EmbeddedResource Include="Ctrls\Commands\Images\Exit.ico" />
     <EmbeddedResource Include="Ctrls\Commands\Images\History.ico" />
@@ -213,26 +212,31 @@
     <EmbeddedResource Include="Ctrls\Commands\Images\Print.ico" />
     <EmbeddedResource Include="Ctrls\Commands\Images\Project.ico" />
     <EmbeddedResource Include="Ctrls\Commands\Images\Save.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutBT16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutConsultantPreparation16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutDrafting16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\LayoutNaturalness16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\FileNew16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\FileOpen16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\FileSave16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\EditCopy16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\EditCut16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\EditPaste16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\EditRedo16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\EditUndo16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\FootnoteDelete16.ico" />
-    <EmbeddedResource Include="Ctrls\Commands\Images\FootnoteInsert16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\LayoutBT16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\LayoutConsultantPreparation16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\LayoutDrafting16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\LayoutNaturalness16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\FileNew16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\FileOpen16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\FileSave16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\EditCopy16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\EditCut16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\EditPaste16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\EditRedo16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\EditUndo16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\FootnoteDelete16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\FootnoteInsert16.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditCopy.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditCut.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\EditPaste.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\Tools.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\Configure.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\SendReceive.ico" />
+    <EmbeddedResource Include="Ctrls\Commands\Images\16\CheckForUpdates.ico" />
+    <EmbeddedResource Include="Ctrls\Navigation\Images\Padlock16.ico" />
     <Content Include="OurWord.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\CtrlNavigation.resx">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Ctrls\TestDlg.resx">
-      <DependentUpon>TestDlg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DlgExportProgress.resx">
       <DependentUpon>DlgExportProgress.cs</DependentUpon>
@@ -455,12 +459,6 @@
     </Compile>
     <Compile Include="Ctrls\Navigation\CtrlNavigation.Designer.cs">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Ctrls\TestDlg.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Ctrls\TestDlg.Designer.cs">
-      <DependentUpon>TestDlg.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DlgExportProgress.cs">
       <SubType>Form</SubType>
@@ -789,9 +787,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Test.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="ToolTips\EditableNoteTip.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -839,9 +834,6 @@
       <DependentUpon>ShadowedBalloon.cs</DependentUpon>
     </Compile>
     <Compile Include="Utilities\Shortcut.cs" />
-    <Compile Include="Utilities\ViewBar.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <EmbeddedResource Include="Dialogs\DlgBookProperties.resx">
       <DependentUpon>DlgBookProperties.cs</DependentUpon>
       <SubType>Designer</SubType>

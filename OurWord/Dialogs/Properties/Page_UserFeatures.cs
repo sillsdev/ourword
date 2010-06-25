@@ -68,7 +68,6 @@ namespace OurWord.Dialogs.Properties
         private const string c_sUndoRedo = "propUndoRedo";
 
         private const string c_sGroupNavigation = "Navigation";
-        private const string c_sChapter = "propChapter";
         private const string c_sFirstLast = "propFirstLast";
         
         private const string c_sGroupWindows = "Available Windows / Tasks";
@@ -101,9 +100,6 @@ namespace OurWord.Dialogs.Properties
                     YesNoPropertySpec.Put(e, Users.Current.CanUndoRedo);
                     break;
 
-                case c_sChapter:
-                    YesNoPropertySpec.Put(e, Users.Current.CanNavigateChapter);
-                    break;
                 case c_sFirstLast:
                     YesNoPropertySpec.Put(e, Users.Current.CanNavigateFirstLast);
                     break;
@@ -159,9 +155,6 @@ namespace OurWord.Dialogs.Properties
                     Users.Current.CanUndoRedo = YesNoPropertySpec.Pull(e);
                     break;
 
-                case c_sChapter:
-                    Users.Current.CanNavigateChapter = YesNoPropertySpec.Pull(e);
-                    break;
                 case c_sFirstLast:
                     Users.Current.CanNavigateFirstLast = YesNoPropertySpec.Pull(e);
                     break;
@@ -233,17 +226,6 @@ namespace OurWord.Dialogs.Properties
                 ));
             #endregion
 
-            #region Go To Chapter
-            m_bag.Properties.Add(new YesNoPropertySpec(
-                c_sChapter,
-                "Show Chapter button in toolbar",
-                c_sGroupNavigation,
-                "Makes the Chapter button visible, by which you can navigate directly to " +
-                        "the first section in the desired chapter. Experienced users may want " +
-                        "to have this button visible for easier movement around the book.",
-                true
-                ));
-            #endregion
             #region Go To First/Last
             m_bag.Properties.Add(new YesNoPropertySpec(
                 c_sFirstLast,

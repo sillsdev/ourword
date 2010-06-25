@@ -50,7 +50,6 @@ namespace OurWordData.DataModel.Membership
         // Atrrs: Features On/Off
         public bool CanEditStructure { get; set; }
         public bool CanUndoRedo { get; set; }
-        public bool CanNavigateChapter { get; set; }
         public bool CanNavigateFirstLast { get; set; }
         public bool CanDoBackTranslation { get; set; }
         public bool CanDoNaturalnessCheck { get; set; }
@@ -401,7 +400,6 @@ namespace OurWordData.DataModel.Membership
         // Features
         private const string c_sAttrCanEditStructure = "canEditStructure";
         private const string c_sAttrCanUndoRedo = "canUndoRedo";
-        private const string c_sAttrCanNavChapter = "canNavChapter";
         private const string c_sAttrCanNavFirstLast = "canNavFirstLast";
         private const string c_sAttrCanDoBackTranslation = "canDoBackTranslation";
         private const string c_sAttrCanDoNaturalnessCheck = "canDoNaturalnessCheck";
@@ -453,7 +451,6 @@ namespace OurWordData.DataModel.Membership
             // Features
             doc.AddAttr(node, c_sAttrCanEditStructure, CanEditStructure);
             doc.AddAttr(node, c_sAttrCanUndoRedo, CanUndoRedo);
-            doc.AddAttr(node, c_sAttrCanNavChapter, CanNavigateChapter);
             doc.AddAttr(node, c_sAttrCanNavFirstLast, CanNavigateFirstLast);
             doc.AddAttr(node, c_sAttrCanDoBackTranslation, CanDoBackTranslation);
             doc.AddAttr(node, c_sAttrCanDoNaturalnessCheck, CanDoNaturalnessCheck);
@@ -531,7 +528,6 @@ namespace OurWordData.DataModel.Membership
                 // Features
                 CanEditStructure = XmlDoc.GetAttrValue(node, c_sAttrCanEditStructure, false),
                 CanUndoRedo = XmlDoc.GetAttrValue(node, c_sAttrCanUndoRedo, false),
-                CanNavigateChapter = XmlDoc.GetAttrValue(node, c_sAttrCanNavChapter, false),
                 CanNavigateFirstLast = XmlDoc.GetAttrValue(node, c_sAttrCanNavFirstLast, false),
                 CanDoBackTranslation = XmlDoc.GetAttrValue(node, c_sAttrCanDoBackTranslation, false),
                 CanDoNaturalnessCheck = XmlDoc.GetAttrValue(node, c_sAttrCanDoNaturalnessCheck, false),
@@ -610,7 +606,6 @@ namespace OurWordData.DataModel.Membership
             // Features
             CanEditStructure = Merger.Merge(CanEditStructure, parent.CanEditStructure, theirs.CanEditStructure);
             CanUndoRedo = Merger.Merge(CanUndoRedo, parent.CanUndoRedo, theirs.CanUndoRedo);
-            CanNavigateChapter = Merger.Merge(CanNavigateChapter, parent.CanNavigateChapter, theirs.CanNavigateChapter);
             CanNavigateFirstLast = Merger.Merge(CanNavigateFirstLast, parent.CanNavigateFirstLast, theirs.CanNavigateFirstLast);
             CanDoBackTranslation = Merger.Merge(CanDoBackTranslation, parent.CanDoBackTranslation, theirs.CanDoBackTranslation);
             CanDoNaturalnessCheck = Merger.Merge(CanDoNaturalnessCheck, parent.CanDoNaturalnessCheck, theirs.CanDoNaturalnessCheck);

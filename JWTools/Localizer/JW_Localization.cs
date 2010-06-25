@@ -1529,6 +1529,15 @@ namespace JWTools
             Debug.Assert(null != s_LocDB);
         }
         #endregion
+        #region SAttr{g}: bool IsInitialized
+        static bool IsInitialized
+        {
+            get
+            {
+                return (null != s_LocDB);
+            }
+        }
+        #endregion
         #region SAttr{g}: LocDB DB
         static public LocDB DB
         {
@@ -1747,17 +1756,21 @@ namespace JWTools
         #region SMethod: void Localize(ToolStripItem)
         static public void Localize(ToolStripItem tsi)
         {
+            // Visual Studio Designer chokes otherwise
+            if (!IsInitialized)
+                return;
+
             // Certain controls are not localized
             if (tsi as ToolStripSeparator != null)
                 return;
 
             // The ID is the name of the item
-            string sItemID = tsi.Name;
+            var sItemID = tsi.Name;
             if (string.IsNullOrEmpty(sItemID))
                 return;
 
             // Calculate/retrieve the group ID
-            string[] vGroupID = _GetGroupID(tsi);
+            var vGroupID = _GetGroupID(tsi);
 
             // Get the ToolStripItem's text value
             tsi.Text = GetValue(
