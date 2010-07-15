@@ -438,7 +438,7 @@ namespace OurWord.Ctrls.Commands
         public SimpleHandler OnExit;
         public SimpleHandler OnSaveProject;
         public SimpleHandler OnPrintBook;
-        public SimpleHandler OnExportProject;
+        public SimpleHandler OnExportTranslation;
         public SimpleHandler OnDownloadRepositoryFromInternet;
         public SimpleHandler OnCreateProject;
         public SimpleHandler OnHistory;
@@ -495,8 +495,8 @@ namespace OurWord.Ctrls.Commands
         #region cmd: cmdExport
         private void cmdExport(object sender, EventArgs e)
         {
-            if (null != OnExportProject)
-                OnExportProject();
+            if (null != OnExportTranslation)
+                OnExportTranslation();
         }
         #endregion
         #region cmd: cmdDownloadRepositoryFromInternet

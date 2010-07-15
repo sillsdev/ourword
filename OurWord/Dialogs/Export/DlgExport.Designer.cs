@@ -34,15 +34,15 @@ namespace OurWord.Dialogs
             this.m_radioParatext = new System.Windows.Forms.RadioButton();
             this.m_labelParatextInfo = new System.Windows.Forms.Label();
             this.m_groupExportTo = new System.Windows.Forms.GroupBox();
+            this.m_comboWhatToExport = new System.Windows.Forms.ComboBox();
+            this.m_labelWord = new System.Windows.Forms.Label();
+            this.m_radioWord = new System.Windows.Forms.RadioButton();
             this.m_labelToolbox = new System.Windows.Forms.Label();
             this.m_radioToolbox = new System.Windows.Forms.RadioButton();
             this.m_labelGoBibleCreatorInfo = new System.Windows.Forms.Label();
             this.m_radioGoBible = new System.Windows.Forms.RadioButton();
             this.m_labelFolder = new System.Windows.Forms.Label();
             this.m_labelLocation = new System.Windows.Forms.Label();
-            this.m_radioWord = new System.Windows.Forms.RadioButton();
-            this.m_labelWord = new System.Windows.Forms.Label();
-            this.m_comboWhatToExport = new System.Windows.Forms.ComboBox();
             this.m_groupExportTo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -104,6 +104,41 @@ namespace OurWord.Dialogs
             this.m_groupExportTo.TabStop = false;
             this.m_groupExportTo.Text = "Export all of your project\'s books to:";
             // 
+            // m_comboWhatToExport
+            // 
+            this.m_comboWhatToExport.FormattingEnabled = true;
+            this.m_comboWhatToExport.Items.AddRange(new object[] {
+            "Vernacular",
+            "Back Translation"});
+            this.m_comboWhatToExport.Location = new System.Drawing.Point(213, 217);
+            this.m_comboWhatToExport.Name = "m_comboWhatToExport";
+            this.m_comboWhatToExport.Size = new System.Drawing.Size(121, 21);
+            this.m_comboWhatToExport.TabIndex = 33;
+            this.m_comboWhatToExport.Text = "Vernacular";
+            this.m_comboWhatToExport.SelectedIndexChanged += new System.EventHandler(this.cmdWhatToExportChanged);
+            // 
+            // m_labelWord
+            // 
+            this.m_labelWord.Location = new System.Drawing.Point(50, 237);
+            this.m_labelWord.Name = "m_labelWord";
+            this.m_labelWord.Size = new System.Drawing.Size(399, 36);
+            this.m_labelWord.TabIndex = 37;
+            this.m_labelWord.Text = "The word document will include pictures. Non-closed notes are exported as comment" +
+                "s.";
+            // 
+            // m_radioWord
+            // 
+            this.m_radioWord.AutoSize = true;
+            this.m_radioWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.m_radioWord.Location = new System.Drawing.Point(21, 217);
+            this.m_radioWord.Name = "m_radioWord";
+            this.m_radioWord.Size = new System.Drawing.Size(186, 17);
+            this.m_radioWord.TabIndex = 36;
+            this.m_radioWord.TabStop = true;
+            this.m_radioWord.Text = "Microsoft Word 2007 (docx):";
+            this.m_radioWord.UseVisualStyleBackColor = true;
+            this.m_radioWord.CheckedChanged += new System.EventHandler(this.cmdUpdateLocation);
+            // 
             // m_labelToolbox
             // 
             this.m_labelToolbox.Location = new System.Drawing.Point(50, 163);
@@ -123,6 +158,7 @@ namespace OurWord.Dialogs
             this.m_radioToolbox.TabStop = true;
             this.m_radioToolbox.Text = "Toolbox (DB) files";
             this.m_radioToolbox.UseVisualStyleBackColor = true;
+            this.m_radioToolbox.CheckedChanged += new System.EventHandler(this.cmdUpdateLocation);
             // 
             // m_labelGoBibleCreatorInfo
             // 
@@ -164,39 +200,6 @@ namespace OurWord.Dialogs
             this.m_labelLocation.TabIndex = 32;
             this.m_labelLocation.Text = "The files will be placed here:";
             this.m_labelLocation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // m_radioWord
-            // 
-            this.m_radioWord.AutoSize = true;
-            this.m_radioWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_radioWord.Location = new System.Drawing.Point(21, 217);
-            this.m_radioWord.Name = "m_radioWord";
-            this.m_radioWord.Size = new System.Drawing.Size(186, 17);
-            this.m_radioWord.TabIndex = 36;
-            this.m_radioWord.TabStop = true;
-            this.m_radioWord.Text = "Microsoft Word 2007 (docx):";
-            this.m_radioWord.UseVisualStyleBackColor = true;
-            // 
-            // m_labelWord
-            // 
-            this.m_labelWord.Location = new System.Drawing.Point(50, 237);
-            this.m_labelWord.Name = "m_labelWord";
-            this.m_labelWord.Size = new System.Drawing.Size(399, 36);
-            this.m_labelWord.TabIndex = 37;
-            this.m_labelWord.Text = "The word document will include pictures. Non-closed notes are exported as comment" +
-                "s.";
-            // 
-            // m_comboWhatToExport
-            // 
-            this.m_comboWhatToExport.FormattingEnabled = true;
-            this.m_comboWhatToExport.Items.AddRange(new object[] {
-            "Vernacular",
-            "Back Translation"});
-            this.m_comboWhatToExport.Location = new System.Drawing.Point(213, 217);
-            this.m_comboWhatToExport.Name = "m_comboWhatToExport";
-            this.m_comboWhatToExport.Size = new System.Drawing.Size(121, 21);
-            this.m_comboWhatToExport.TabIndex = 33;
-            this.m_comboWhatToExport.Text = "Vernacular";
             // 
             // DialogExport
             // 

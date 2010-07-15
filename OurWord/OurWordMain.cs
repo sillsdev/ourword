@@ -10,16 +10,14 @@
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 
 using JWTools;
-using OurWord.Ctrls;
 using OurWord.Ctrls.Navigation;
+using OurWord.Dialogs.Export;
 using OurWord.Dialogs.Membership;
 using OurWord.Edit.Blocks;
 using OurWord.Printing;
@@ -33,7 +31,6 @@ using OurWord.Edit;
 using OurWord.Layouts;
 using OurWord.Dialogs;
 using OurWord.Dialogs.History;
-using OurWord.Utilities;
 using OurWordData.Synchronize;
 using Shortcut=OurWord.Utilities.Shortcut;
 
@@ -260,7 +257,7 @@ namespace OurWord
 		    m_Commands.OnDownloadRepositoryFromInternet += cmdDownloadRepository;
             m_Commands.OnCreateProject += cmdCreateProject;
             m_Commands.OnOpenProject += cmdOpenProject;
-		    m_Commands.OnExportProject += cmdExportProject;
+		    m_Commands.OnExportTranslation += cmdExportTranslation;
 		    m_Commands.OnHistory += cmdHistory;
 		    m_Commands.OnSwitchLayout += cmdSwitchLayout;
 		    m_Commands.OnChangeZoomPercent += cmdChangeZoomPercent;
@@ -883,103 +880,18 @@ namespace OurWord
             DB.Project.Save(G.CreateProgressIndicator());
         }
         #endregion
-        #region cmd: cmdExportProject
-        private void cmdExportProject()
+        #region cmd: cmdExportTranslation
+        private void cmdExportTranslation()
         {
-            // If we don't have an active project, with at least one book in
-            // the target translation, then abort
-            if (!DB.IsValidProject)
+            var method = new ExportTranslation(DB.TargetTranslation);
+            if (!method.CanExportTranslation)
                 return;
-            if (DB.TargetTranslation.BookList.Count == 0)
-                return;
+
             Dim();
 
-            // Get the user's desires (or cancel)
-            var dlgDesires = new DialogExport(DB.TargetTranslation);
-            if (DialogResult.OK != dlgDesires.ShowDialog(this))
-                goto done;
+            method.Do(this);
 
-            // Create and display the progress dialog
-            DlgExportProgress.Start();
-            DlgExportProgress.SetCurrentBook("Setting up...");
-
-            // Loop through the books of the requested translation
-            foreach (var book in DB.TargetTranslation.BookList)
-            {
-                // Does the user wish to cancel?
-                if (DlgExportProgress.UserSaysCancel)
-                    break;
-
-                // Upload the status dialog with the correct book
-                DlgExportProgress.SetCurrentBook(DB.TargetTranslation.DisplayName + " - " +
-                    book.DisplayName);
-
-                // Load the book if not already in memory
-                var bIsLoaded = book.Loaded;
-                book.LoadBook(G.CreateProgressIndicator());
-                if (!book.Loaded)
-                    continue;
-
-                /*
-                // BEGIN HUICHOL FIX *******************************************************
-                if (book.BookAbbrev == "EXO")
-                {
-                    book.OneOffForHuichol_StripOutOldTranslatorNotes();
-                    book.DeclareDirty();
-                    book.WriteBook(G.CreateProgressIndicator());
-                }
-                */
-                // END HUICHOL FIX *********************************************************
-
-                // Compute the file name
-                var sExportPath = JWU.GetMyDocumentsFolder(dlgDesires.ExportSubFolderName);
-                sExportPath += book.BaseName;
-
-                // Export it to paratext if requested
-                if (dlgDesires.ExportToParatext)
-                {
-                    book.ExportToParatext(sExportPath + ".ptx", G.CreateProgressIndicator());
-                }
-
-                // Export it to GoBibleCreator if requested
-                if (dlgDesires.ExportToGoBibleCreator)
-                {
-                    book.ExportToGoBible(sExportPath + ".GoBible.Ptx", G.CreateProgressIndicator());
-                }
-
-                // Toolbox
-                if (dlgDesires.ExportToToolbox)
-                {
-                    book.ExportToToolbox(sExportPath + ".db", G.CreateProgressIndicator());
-                }
-
-                // Word 2007
-                if (dlgDesires.ExportToWord)
-                {
-                    var whatToExport = (dlgDesires.ExportBackTranslation) ?
-                            WordExport.Target.BackTranslation :
-                            WordExport.Target.Vernacular;
-
-                    if (whatToExport == WordExport.Target.BackTranslation)
-                        sExportPath += ".bt";
-                    sExportPath += ".docx";
-
-                    using (var export = new WordExport(book, sExportPath, whatToExport))
-                        export.Do();
-                }
-
-                // Unload the book if it was previously unloaded, so that we don't clog
-                // up memory
-                if (!bIsLoaded)
-                    book.Unload(new NullProgress());
-            }
-
-            // Done with the progress dialog
-            DlgExportProgress.Stop();
-
-        done:
             UnDim();
-
         }
         #endregion
 

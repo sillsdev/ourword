@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Threading;
 
 using JWTools;
+using OurWord.Dialogs.Export;
 using OurWordData.DataModel;
 using OurWord;
 using OurWord.Dialogs;
@@ -37,44 +38,28 @@ namespace OurWord.Dialogs
     public partial class DialogExport : Form
     {
         // Attrs -----------------------------------------------------------------------------
-        #region VAttr{g}: bool ExportToToolbox
-        public bool ExportToToolbox
+        #region Attr{g}: ExportMethod CurrentExportMethod
+        public ExportMethod CurrentExportMethod
         {
             get
             {
-                return m_radioToolbox.Checked;
+                foreach (var ctrl in m_groupExportTo.Controls)
+                {
+                    var radio = ctrl as RadioButton;
+                    if (null == radio || !radio.Checked)
+                        continue;
+
+                    var method = radio.Tag as ExportMethod;
+                    if (null != method)
+                        return method;
+                }
+
+                return null;
             }
         }
         #endregion
-        #region VAttr{g}: bool ExportToParatext
-        public bool ExportToParatext
-        {
-            get
-            {
-                return m_radioParatext.Checked;
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool ExportToGoBibleCreator
-        public bool ExportToGoBibleCreator
-        {
-            get
-            {
-                return m_radioGoBible.Checked;
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool ExportToWord
-        public bool ExportToWord
-        {
-            get
-            {
-                return m_radioWord.Checked;
-            }
-        }
-        #endregion
-        #region VAttr{g}: bool ExportBackTranslation
-        public bool ExportBackTranslation
+        #region vattr{g}: bool ExportBackTranslation
+        private bool ExportBackTranslation
         {
             get
             {
@@ -94,38 +79,19 @@ namespace OurWord.Dialogs
         }
         DTranslation m_Translation;
         #endregion
-        #region VAttr{g}: string ExportSubFolderName
-        public string ExportSubFolderName
-        {
-            get
-            {
-                var sSubFolder = "OurWordExport" + Path.DirectorySeparatorChar;
-
-                sSubFolder += Translation.DisplayName + Path.DirectorySeparatorChar;
-
-                if (ExportToParatext)
-                    sSubFolder += "Paratext" + Path.DirectorySeparatorChar;
-
-                if (ExportToGoBibleCreator)
-                    sSubFolder += "GoBibleCreator" + Path.DirectorySeparatorChar;
-
-                if (ExportToToolbox)
-                    sSubFolder += "Toolbox" + Path.DirectorySeparatorChar;
-
-                if (ExportToWord)
-                    sSubFolder += "Word 2007" + Path.DirectorySeparatorChar;
-
-                return sSubFolder;
-            }
-        }
-        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DTranslation)
         public DialogExport(DTranslation translation)
         {
             m_Translation = translation;
+
             InitializeComponent();
+
+            m_radioParatext.Tag = new ExportToParatext(translation);
+            m_radioGoBible.Tag = new ExportToGoBible(translation);
+            m_radioToolbox.Tag = new ExportToToolbox(translation);
+            m_radioWord.Tag = new ExportToWord(translation);
         }
         #endregion
 
@@ -171,7 +137,30 @@ namespace OurWord.Dialogs
             if (sMyDocs.Length > 0 && sMyDocs[sMyDocs.Length - 1] != Path.DirectorySeparatorChar)
                 sMyDocs += Path.DirectorySeparatorChar;
 
-            m_labelFolder.Text = sMyDocs + ExportSubFolderName;
+            var method = CurrentExportMethod;
+            if (null != method)
+                m_labelFolder.Text = string.Format("{0}{1}*.{2}",
+                    Path.Combine(sMyDocs, method.GetSubFolder()),
+                    Path.DirectorySeparatorChar,
+                    method.FileExtension);
+            else
+                m_labelFolder.Text = sMyDocs;
+        }
+        #endregion
+        #region Cmd: cmdWhatToExportChanged
+        private void cmdWhatToExportChanged(object sender, EventArgs e)
+        {
+            m_radioWord.Checked = true;
+
+            var method = CurrentExportMethod;
+            Debug.Assert(null != method);
+
+            var wordMethod = method as ExportToWord;
+            Debug.Assert(null != wordMethod);
+
+            wordMethod.ExportBackTranslation = ExportBackTranslation;
+
+            cmdUpdateLocation(null, null);
         }
         #endregion
     }

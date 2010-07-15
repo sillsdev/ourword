@@ -91,6 +91,7 @@
     <Compile Include="DataModel\T_TeamSettings.cs" />
     <Compile Include="DataModel\T_User.cs" />
     <Compile Include="Dialogs\T_BookNames.cs" />
+    <Compile Include="Dialogs\T_ExportProject.cs" />
     <Compile Include="Edit\EditTestsCommon.cs">
       <SubType>Component</SubType>
     </Compile>

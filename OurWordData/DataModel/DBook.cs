@@ -1321,20 +1321,20 @@ namespace OurWordData.DataModel
             #endregion
         } // End: Embedded Class IO
         #endregion
-        #region Method: void ExportToParatext(sPathName, IProgressIndicator)
-        public void ExportToParatext(string sPathName, IProgressIndicator progress)
+        #region Method: void ExportToParatext(sPathName)
+        public void ExportToParatext(string sPathName)
         {
             (new IO(this)).ExportToParatext(sPathName);
         }
         #endregion
-        #region Method: void ExportToGoBible(sPathName, IProgressIndicator)
-        public void ExportToGoBible(string sPathName, IProgressIndicator progress)
+        #region Method: void ExportToGoBible(sPathName)
+        public void ExportToGoBible(string sPathName)
         {
             (new IO(this)).ExportToGoBible(sPathName);
         }
         #endregion
-        #region Method: void ExportToToolbox(sPathName, IProgressIndicator)
-        public void ExportToToolbox(string sPathName, IProgressIndicator progress)
+        #region Method: void ExportToToolbox(sPathName)
+        public void ExportToToolbox(string sPathName)
         {
             (new IO(this)).ExportToToolbox(sPathName);
         }

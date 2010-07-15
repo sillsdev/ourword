@@ -238,7 +238,7 @@
     <EmbeddedResource Include="Ctrls\Navigation\CtrlNavigation.resx">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgExportProgress.resx">
+    <EmbeddedResource Include="Dialogs\Export\DlgExportProgress.resx">
       <DependentUpon>DlgExportProgress.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -425,7 +425,7 @@
     <EmbeddedResource Include="Res\SectionFirst.ico" />
     <EmbeddedResource Include="Res\SectionLast.ico" />
     <EmbeddedResource Include="Res\Properties.ico" />
-    <EmbeddedResource Include="Dialogs\DlgExport.resx">
+    <EmbeddedResource Include="Dialogs\Export\DlgExport.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DlgExport.cs</DependentUpon>
     </EmbeddedResource>
@@ -460,10 +460,10 @@
     <Compile Include="Ctrls\Navigation\CtrlNavigation.Designer.cs">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgExportProgress.cs">
+    <Compile Include="Dialogs\Export\DlgExportProgress.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\DlgExportProgress.Designer.cs">
+    <Compile Include="Dialogs\Export\DlgExportProgress.Designer.cs">
       <DependentUpon>DlgExportProgress.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DlgRawFileEdit.cs">
@@ -472,6 +472,8 @@
     <Compile Include="Dialogs\DlgRawFileEdit.Designer.cs">
       <DependentUpon>DlgRawFileEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\Export\ExportMethods.cs" />
+    <Compile Include="Dialogs\Export\ExportTranslation.cs" />
     <Compile Include="Dialogs\History\DlgHistory.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -568,10 +570,10 @@
     <Compile Include="Dialogs\DlgDebug.Designer.cs">
       <DependentUpon>DlgDebug.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgExport.cs">
+    <Compile Include="Dialogs\Export\DlgExport.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\DlgExport.Designer.cs">
+    <Compile Include="Dialogs\Export\DlgExport.Designer.cs">
       <DependentUpon>DlgExport.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DlgFilter.cs">

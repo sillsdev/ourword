@@ -52,7 +52,7 @@ namespace OurWordTests
         #endregion
 
         #region Method: DTranslation CreateHierarchyThroughTargetTranslation()
-        public DTranslation CreateHierarchyThroughTargetTranslation()
+        public static DTranslation CreateHierarchyThroughTargetTranslation()
         {
             DB.Project = new DProject();
             DB.Project.TeamSettings = new DTeamSettings(JWU.NUnit_ClusterFolderName);
@@ -64,7 +64,7 @@ namespace OurWordTests
         }
         #endregion
         #region Method: DBook CreateHierarchyThroughTargetBook(sBookAbbrev)
-        public DBook CreateHierarchyThroughTargetBook(string sBookAbbrev)
+        public static DBook CreateHierarchyThroughTargetBook(string sBookAbbrev)
         {
             var translation = CreateHierarchyThroughTargetTranslation();
             var book = new DBook(sBookAbbrev);

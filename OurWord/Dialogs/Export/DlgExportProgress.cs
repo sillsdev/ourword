@@ -7,38 +7,18 @@
  * Purpose: Progress dialog, allowing cancelation, for the Export process
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Header: Using, etc.
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Resources;
-using System.Text;
 using System.Windows.Forms;
-using System.IO;
-using System.Reflection;
 using System.Threading;
-
-using JWTools;
-using OurWordData.DataModel;
-using OurWord;
-using OurWord.Dialogs;
-using OurWord.Layouts;
-#endregion
 #endregion
 
-namespace OurWord.Dialogs
+namespace OurWord.Dialogs.Export
 {
     public partial class DlgExportProgress : Form
     {
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public DlgExportProgress()
+        #region constructor()
+        private DlgExportProgress()
         {
             InitializeComponent();
         }
@@ -54,46 +34,79 @@ namespace OurWord.Dialogs
                 return m_bUserSaysCancel;
             }
         }
-        static bool m_bUserSaysCancel = false;
+        static bool m_bUserSaysCancel;
         #endregion
 
-        // Current Book ----------------------------------------------------------------------
+        // Current Activity ------------------------------------------------------------------
         delegate void cbSetCurrentBook(string sText);
         #region Method: void SetCurrentBook(string sText)
-        static public void SetCurrentBook(string sText)
+        static public void SetCurrentActivity(string sText)
         {
             if (null == s_Dlg)
                 return;
 
             if (s_Dlg.InvokeRequired)
             {
-                var d = new cbSetCurrentBook(SetCurrentBook);
+                var d = new cbSetCurrentBook(SetCurrentActivity);
                 s_Dlg.Invoke(d, new object[] { sText });
             }
             else
             {
-                s_Dlg.m_labelBookName.Text = sText;
+                s_Dlg.m_labelCurrentActivity.Text = sText;
+            }
+        }
+        #endregion
+
+        // Progress Bar ----------------------------------------------------------------------
+        delegate void cbSetProgressValue(int n);
+        #region SMethod: void SetProgressMax(cMaxValue)
+        static public void SetProgressMax(int cMaxValue)
+        {
+            // Give the Starter thread time to get this dialog lauched
+            while(null == s_Dlg)
+                Thread.Sleep(100);
+
+            if (s_Dlg.InvokeRequired)
+            {
+                var d = new cbSetProgressValue(SetProgressMax);
+                s_Dlg.Invoke(d, new object[] { cMaxValue });
+            }
+            else
+            {
+                s_Dlg.m_ProgressBar.Minimum = 0;
+                s_Dlg.m_ProgressBar.Maximum = cMaxValue;
+                s_Dlg.m_ProgressBar.Value = 0;
+            }
+        }
+        #endregion
+        #region SMethod: void IncrementProgressValue(int nAmout)
+        static public void IncrementProgressValue(int nAmout)
+        {
+            if (null == s_Dlg)
+                return;
+
+            if (s_Dlg.InvokeRequired)
+            {
+                var d = new cbSetProgressValue(IncrementProgressValue);
+                s_Dlg.Invoke(d, new object[] { nAmout });
+            }
+            else
+            {
+                s_Dlg.m_ProgressBar.Value += nAmout;
             }
         }
         #endregion
 
         // Start/Stop the dialog -------------------------------------------------------------
-        #region SAttr{g}: bool IsCreated
-        static public bool IsCreated
-        {
-            get
-            {
-                return (null != s_Dlg);
-            }
-        }
-        static public bool IsShowing = false;
-        #endregion
         #region SMethod: public void Start()
         static public void Start()
         {
-            Thread t = new Thread(new ThreadStart(DlgExportProgress.StartDialog));
-            t.IsBackground = true;
-            t.Name = "Export Progress";
+            m_bUserSaysCancel = false;
+            var t = new Thread(new ThreadStart(DlgExportProgress.StartDialog))
+                {
+                    IsBackground = true,
+                    Name = "Export Progress"
+                };
             //t.SetApartmentState(ApartmentState.STA);
             t.Start();
         }
@@ -115,6 +128,7 @@ namespace OurWord.Dialogs
             else
             {
                 s_Dlg.Close();
+                s_Dlg = null;
             }
         }
         #endregion
@@ -127,4 +141,6 @@ namespace OurWord.Dialogs
         }
         #endregion
     }
+
+
 }
