@@ -138,6 +138,7 @@ namespace OurWord.Dialogs
             AddPage(groupUser, new Page_UserOptions(this), c_iImageOptions);
             AddPage(groupUser, new Page_UserFeatures(this), c_iImageFeaturesOnOff);
             AddPage(groupUser, new Page_Notes(this), c_iImageNotes);
+            AddPage(groupUser, new Page_UserEditPermissions(this), c_iImageUserEditPermissions);
 
             // Entire Cluster Settings
             var groupCluster = NavList.AddGroup("Cluster");
@@ -169,6 +170,7 @@ namespace OurWord.Dialogs
         private const int c_iImageStyleSheet = 6;
         private const int c_iImageClusters = 7;
         private const int c_iImageFeaturesOnOff = 8;
+        private const int c_iImageUserEditPermissions = 9;
 
 		// Scaffolding -----------------------------------------------------------------------
         #region Constructor()

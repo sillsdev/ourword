@@ -128,7 +128,6 @@
     <Compile Include="DataModel\ClusterInfo.cs" />
     <Compile Include="DataModel\DB.cs" />
     <Compile Include="DataModel\DBook.cs" />
-    <Compile Include="DataModel\DBookGrouping.cs" />
     <Compile Include="DataModel\DFootnote.cs" />
     <Compile Include="DataModel\DParagraph.cs" />
     <Compile Include="DataModel\DPicture.cs" />

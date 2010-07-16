@@ -206,9 +206,10 @@ namespace OurWord.Dialogs
 
             // Loop through all possible books
             var vPlanned = DB.Project.PlannedBooks;
-            for(int i=0; i<BookInfoList.Books.Count; i++)
+            var vBookInfos = G.BookGroups.AllBookInfos;
+            for (var i = 0; i < vBookInfos.Count; i++)
             {
-                var info = BookInfoList.Books[i];
+                var info = vBookInfos[i];
 
                 // If the book is one we've started, add it
                 var book = Translation.FindBook(info.Abbrev);
@@ -450,12 +451,12 @@ namespace OurWord.Dialogs
         {
             get
             {
-                double cBookVerses = Info.VersesCount;
+                double cBookVerses = Info.VerseCount;
 
-                double cMaxVerses = BookInfoList.MaxVerses;
-                double cMinVerses = BookInfoList.MinVerses;
+                double cMaxVerses = G.BookGroups.MaxVerses;
+                double cMinVerses = G.BookGroups.MinVerses;
 
-                double factor = (cBookVerses - cMinVerses) /
+                var factor = (cBookVerses - cMinVerses) /
                     (cMaxVerses - cMinVerses);
 
                 return factor;
@@ -529,7 +530,7 @@ namespace OurWord.Dialogs
         {
             m_Book = book;
             m_sBookDisplayName = book.DisplayName;
-            m_BookInfo = BookInfoList.FindBook(book);
+            m_BookInfo = G.BookGroups.FindBook(book.BookAbbrev);
         }
         #endregion
         #region Constructor(sBookDisplayName, BookInfo)

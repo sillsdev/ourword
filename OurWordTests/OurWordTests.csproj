@@ -73,7 +73,7 @@
     <Compile Include="Cellar\T_StdFmtTransform.cs" />
     <Compile Include="Cellar\T_StyleSheet.cs" />
     <Compile Include="DataModel\T_DB.cs" />
-    <Compile Include="DataModel\T_DBookGrouping.cs" />
+    <Compile Include="DataModel\T_BookGroup.cs" />
     <Compile Include="DataModel\T_DBasicText.cs" />
     <Compile Include="DataModel\T_DBook.cs" />
     <Compile Include="DataModel\T_DFootnote.cs" />

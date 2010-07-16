@@ -207,6 +207,7 @@ namespace OurWord.Dialogs
             m_checkCreateFrontNotes.Enabled = bEnabled;
         }
         #endregion
+
     }
 
 

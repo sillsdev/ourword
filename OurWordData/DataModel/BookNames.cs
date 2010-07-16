@@ -42,7 +42,7 @@ namespace OurWordData.DataModel
         #endregion
 
         // Retrieve a single name, according to the current language preferences
-        #region Method: string GetName(int index)
+        #region SMethod: string GetName(int index)
         static public string GetName(int index)
         {
             Debug.Assert(index >= 0 && index < 66);
@@ -67,7 +67,7 @@ namespace OurWordData.DataModel
 
         // Retrieve a table of Book Names ----------------------------------------------------
         const int c_cTableSize = 66;      // Number of books in the Bible
-        #region Method: string[] GetTable(LanguageResources.Languages lang)
+        #region SMethod: string[] GetTable(LanguageResources.Languages lang)
         static public string[] GetTable(LanguageResources.Languages lang)
         {
             // Retrieve the name of the language
@@ -77,7 +77,7 @@ namespace OurWordData.DataModel
             return GetTable(sLanguageName);
         }
         #endregion
-        #region Method: string[] GetTable(string sLanguageName)
+        #region SMethod: string[] GetTable(string sLanguageName)
         static public string[] GetTable(string sLanguageName)
         // Return a vector of strings for the 66 books, corresponding to the
         // requested language name.
@@ -112,7 +112,7 @@ namespace OurWordData.DataModel
         #endregion
 
         // Localized list of booknames -------------------------------------------------------
-        #region Attr{g} string[] English - if we can't find a language, we always have English here
+        #region SAttr{g} string[] English - if we can't find a language, we always have English here
         static public string[] English = 
 	    { 
 		    "Genesis", "Exodus", "Leviticus", "Numbers", "Deuteronomy", "Joshua",

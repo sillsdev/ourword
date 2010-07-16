@@ -34,6 +34,7 @@
             this.m_Book = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_Chapter = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_Verse = new System.Windows.Forms.ToolStripLabel();
+            this.m_Locked = new System.Windows.Forms.ToolStripButton();
             this.BottomTools = new System.Windows.Forms.ToolStrip();
             this.m_First = new System.Windows.Forms.ToolStripButton();
             this.m_Previous = new System.Windows.Forms.ToolStripSplitButton();
@@ -48,7 +49,6 @@
             this.createConcordanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FilteredNavigation = new System.Windows.Forms.ImageList(this.components);
             this.UnfilteredNavigation = new System.Windows.Forms.ImageList(this.components);
-            this.m_Locked = new System.Windows.Forms.ToolStripButton();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -94,6 +94,17 @@
             this.m_Verse.Name = "m_Verse";
             this.m_Verse.Size = new System.Drawing.Size(53, 29);
             this.m_Verse.Text = "5-25";
+            // 
+            // m_Locked
+            // 
+            this.m_Locked.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
+            this.m_Locked.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.m_Locked.Image = ((System.Drawing.Image)(resources.GetObject("m_Locked.Image")));
+            this.m_Locked.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.m_Locked.Name = "m_Locked";
+            this.m_Locked.Size = new System.Drawing.Size(23, 29);
+            this.m_Locked.Text = "Locked";
+            this.m_Locked.ToolTipText = "This book is locked and cannot be edited.";
             // 
             // BottomTools
             // 
@@ -232,17 +243,6 @@
             this.UnfilteredNavigation.Images.SetKeyName(2, "GoNext.ico");
             this.UnfilteredNavigation.Images.SetKeyName(3, "GoLast.ico");
             // 
-            // m_Locked
-            // 
-            this.m_Locked.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.m_Locked.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.m_Locked.Image = ((System.Drawing.Image)(resources.GetObject("m_Locked.Image")));
-            this.m_Locked.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_Locked.Name = "m_Locked";
-            this.m_Locked.Size = new System.Drawing.Size(23, 29);
-            this.m_Locked.Text = "Locked";
-            this.m_Locked.ToolTipText = "This book is locked and cannot be edited.";
-            // 
             // CtrlNavigation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -267,7 +267,6 @@
 
         private System.Windows.Forms.ToolStrip TopTools;
         private System.Windows.Forms.ToolStrip BottomTools;
-        private System.Windows.Forms.ToolStripDropDownButton m_Book;
         private System.Windows.Forms.ToolStripButton m_First;
         private System.Windows.Forms.ToolStripButton m_Last;
         private System.Windows.Forms.ImageList FilteredNavigation;
@@ -284,5 +283,6 @@
         private System.Windows.Forms.ToolStripSplitButton m_Previous;
         private System.Windows.Forms.ToolStripSplitButton m_Next;
         private System.Windows.Forms.ToolStripButton m_Locked;
+        public System.Windows.Forms.ToolStripDropDownButton m_Book;
     }
 }

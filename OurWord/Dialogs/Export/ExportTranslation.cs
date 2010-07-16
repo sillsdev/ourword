@@ -48,9 +48,9 @@ namespace OurWord.Dialogs.Export
         #region smethod: int GetChapterCount(DBook book)
         static int GetChapterCount(DBook book)
         {
-            var bookInfo = BookInfoList.FindBook(book.BookAbbrev);
+            var bookInfo = G.BookGroups.FindBook(book.BookAbbrev);
             Debug.Assert(null != bookInfo);
-            return bookInfo.ChaptersCount;
+            return bookInfo.ChapterCount;
         }
         #endregion
 

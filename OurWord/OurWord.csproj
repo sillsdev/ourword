@@ -280,6 +280,9 @@
     <EmbeddedResource Include="Dialogs\Properties\Page_Translations.resx">
       <DependentUpon>Page_Translations.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\Properties\Page_UserEditPermissions.resx">
+      <DependentUpon>Page_UserEditPermissions.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\Page_UserFeatures.resx">
       <DependentUpon>Page_UserFeatures.cs</DependentUpon>
     </EmbeddedResource>
@@ -419,6 +422,7 @@
     <Content Include="Res\ProgressIndicatorBackground.jpg" />
     <EmbeddedResource Include="Res\Synchronize.ico" />
     <Content Include="Res\TurnFeaturesOnOff.ico" />
+    <EmbeddedResource Include="Res\UserEditPermissions.ico" />
     <EmbeddedResource Include="Res\ThisProject.ico" />
     <EmbeddedResource Include="Res\ThisCluster.ico" />
     <EmbeddedResource Include="Res\Project.ico" />
@@ -533,6 +537,12 @@
     </Compile>
     <Compile Include="Dialogs\Properties\Page_Translations.Designer.cs">
       <DependentUpon>Page_Translations.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_UserEditPermissions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Dialogs\Properties\Page_UserEditPermissions.Designer.cs">
+      <DependentUpon>Page_UserEditPermissions.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\Page_UserFeatures.cs">
       <SubType>UserControl</SubType>

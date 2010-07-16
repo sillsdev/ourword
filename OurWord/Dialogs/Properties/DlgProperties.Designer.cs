@@ -60,6 +60,7 @@ namespace OurWord.Dialogs
             this.m_Images.Images.SetKeyName(6, "Italic.ico");
             this.m_Images.Images.SetKeyName(7, "Note_Hint.ico");
             this.m_Images.Images.SetKeyName(8, "TurnFeaturesOnOff.ico");
+            this.m_Images.Images.SetKeyName(9, "UserEditPermissions.ico");
             // 
             // m_btnHelp
             // 

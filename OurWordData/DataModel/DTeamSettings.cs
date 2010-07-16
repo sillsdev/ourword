@@ -239,20 +239,6 @@ namespace OurWordData.DataModel
 		}
 		private JOwn<DSFMapping> j_SFMapping = null;
 		#endregion
-        #region JAttr{g}: JOwnSeq BookGroupings
-        public JOwnSeq<DBookGrouping> BookGroupings
-        {
-            get
-            {
-                if(null == m_BookGroupings)
-                    m_BookGroupings = new JOwnSeq<DBookGrouping>("BookGroupings", this);
-                if (m_BookGroupings.Count == 0)
-                    DBookGrouping.InitializeGroupings(m_BookGroupings);
-                return m_BookGroupings;
-            }
-        }
-        private JOwnSeq<DBookGrouping> m_BookGroupings = null;
-        #endregion
 
         // Stages ----------------------------------------------------------------------------
         #region Attr{g}: StageList Stages
@@ -278,10 +264,6 @@ namespace OurWordData.DataModel
 
             // Stages
             m_Stages = new StageList();
-
-            // Book Groupings
-            m_BookGroupings = new JOwnSeq<DBookGrouping>("BookGroupings", this);
-            DBookGrouping.InitializeGroupings(m_BookGroupings);
 
 			// Standard Format conversion mapping
 			j_SFMapping = new JOwn<DSFMapping>("SFMapping", this);
@@ -351,12 +333,13 @@ namespace OurWordData.DataModel
 		#region Method: void TemporaryFixes()
 		public void TemporaryFixes()
 		{
-			int nCurrentSettingsVersion = 1;
+            // Version Values
+            // 1 - Initial
+            // 2 - Got rid of BookGroupings as a user-modifyable property
+			const int nCurrentSettingsVersion = 2;
 
 			if (SettingsVersion < nCurrentSettingsVersion)
 			{
-				// Fix Hebrews being associated with the wrong grouping
-				DBookGrouping.InitializeGroupings(DB.TeamSettings.BookGroupings);
 			}
 
 			SettingsVersion = nCurrentSettingsVersion;

@@ -1423,6 +1423,9 @@ namespace OurWord
             }
         }
         #endregion
+        #region SAttr{g}: BookGroups BookGroups
+        static public readonly BookGroups BookGroups = new BookGroups();
+        #endregion
 
         // LocDB strings - access to various Groups in the LocDB -----------------------------
         #region SMethod: string GetLoc_String(sItemID, sEnglish) -        "Strings" 

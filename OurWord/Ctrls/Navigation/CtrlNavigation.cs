@@ -101,8 +101,9 @@ namespace OurWord.Ctrls.Navigation
                 sTitle = sTitle.Substring(0, c_nMaxLength - 2) + "...";
             m_Book.Text = sTitle;
 
-            // Dropdown
-            DBookGrouping.PopulateGotoBook(m_Book, cmdGoToBook);
+            // Populate Dropdown
+            var vBooks = DB.Project.Nav.PotentialTargetBooks;
+            SetupGotoBookDropDown(vBooks);
 
             // Enabling
             m_Book.Enabled = DB.IsValidProject;
@@ -173,6 +174,113 @@ namespace OurWord.Ctrls.Navigation
         private void cmdFindDropDownOpening(object sender, EventArgs e)
         {
 
+        }
+        #endregion
+
+        // Book Dropdown ---------------------------------------------------------------------
+        #region method: ToolStripMenuItem CreateBookMenuItem(DBook)
+        ToolStripMenuItem CreateBookMenuItem(DBook book)
+        {
+            // Create the menu item, showing the book's DisplayName
+            var item = new ToolStripMenuItem(book.DisplayName, null, cmdGoToBook)
+            {
+                Name = "menu" + book.BookAbbrev,
+                Tag = book.BookAbbrev,
+                Font = SystemFonts.DialogFont
+            };
+
+            // For a locked book, write its text as Red color
+            if (book.Locked)
+                item.ForeColor = Color.Red;
+
+            return item;
+        }
+        #endregion
+        #region method: void SetupGotoBookDropDown_Flat(vBooks)
+        void SetupGotoBookDropDown_Flat(IEnumerable<DBook> vBooks)
+        {
+            m_Book.DropDownItems.Clear();
+
+            foreach (var book in vBooks)
+            {
+                var item = CreateBookMenuItem(book);
+                m_Book.DropDownItems.Add(item);
+            }
+        }
+        #endregion
+        #region smethod: int CountTargetBooksInThisGrouping(vBooks, BookGroup group)
+        static int CountTargetBooksInThisGrouping(IEnumerable<DBook> vBooks, BookGroup group)
+        {
+            var c = 0;
+            foreach (var book in vBooks)
+            {
+                var bookInfo = G.BookGroups.FindBook(book.BookAbbrev);
+                if (bookInfo.Group == group)
+                    c++;
+            }
+            return c;
+        }
+        #endregion
+        #region method: ToolStripMenuItem FindOrAddBookGroupNode(BookGroup)
+        ToolStripMenuItem FindOrAddBookGroupNode(BookGroup group)
+        {
+            foreach(ToolStripMenuItem item in m_Book.DropDownItems)
+            {
+                if (group.LocalizedName == item.Text)
+                    return item;
+            }
+
+            // If here, we  must create it
+            var itemGrouping = new ToolStripMenuItem(group.LocalizedName)
+            {
+                Name = "menu" + group.EnglishName,
+                Font = SystemFonts.DialogFont
+            };
+            m_Book.DropDownItems.Add(itemGrouping);
+            return itemGrouping;
+        }
+        #endregion
+        #region method: void SetupGotoBookDropDown_Hierarchical(vBooks)
+        private void SetupGotoBookDropDown_Hierarchical(IEnumerable<DBook> vBooks)
+        {
+            m_Book.DropDownItems.Clear();
+
+            foreach (var book in vBooks)
+            {
+                // Create the menu item
+                var item = CreateBookMenuItem(book);
+
+                // Retrieve the hierchical information about the book
+                var bookInfo = G.BookGroups.FindBook(book.BookAbbrev);
+
+                // If the book is in a group of one (e.g., Acts), or
+                // If there are two or less target books in the group,
+                // then add it to the top level
+                if (bookInfo.Group.Count == 1 || 
+                    CountTargetBooksInThisGrouping(vBooks, bookInfo.Group) < 3)
+                {
+                    m_Book.DropDownItems.Add(item);
+                    continue;
+                }
+
+                // Find or Create a node for this group
+                var parentItem = FindOrAddBookGroupNode(bookInfo.Group);
+                parentItem.DropDownItems.Add(item);
+            }
+        }
+        #endregion
+        #region method: void SetupGotoBookDropDown(vBooks)
+        public void SetupGotoBookDropDown(ICollection<DBook> vBooks)
+            // This is Public so we can test it.
+            //
+            // How many books do we have? (If too few, we will not want to nest with subitems)
+        {
+            const int cMinBooksRequiredToActivitateGroupings = 12;
+
+            if (vBooks.Count < cMinBooksRequiredToActivitateGroupings)
+                SetupGotoBookDropDown_Flat(vBooks);
+            else
+                SetupGotoBookDropDown_Hierarchical(vBooks);
         }
         #endregion
 
