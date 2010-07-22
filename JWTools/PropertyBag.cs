@@ -532,7 +532,7 @@ namespace JWTools
         #region Method: int GetEnumNumberFor(string sValue)
         public int GetEnumNumberFor(string sValue)
         {
-            for (int i = 0; i < EnumValues.Length; i++)
+            for (var i = 0; i < EnumValues.Length; i++)
             {
                 if (EnumValues[i] == sValue)
                     return EnumNumbers[i];
@@ -543,10 +543,10 @@ namespace JWTools
         #region Method: string GetEnumValueFor(int nEnumNumber)
         public string GetEnumValueFor(int nEnumNumber)
         {
-            for (int i = 0; i < EnumNumbers.Length; i++)
+            for (var i = 0; i < EnumNumbers.Length; i++)
             {
                 if (EnumNumbers[i] == nEnumNumber)
-                    return (string)EnumValues[i];
+                    return EnumValues[i];
             }
             return "";
         }
@@ -1401,7 +1401,7 @@ namespace JWTools
 				// Have the property bag raise an event to set the current value
 				// of the property.
 
-				PropertySpecEventArgs e = new PropertySpecEventArgs(item, value);
+				var e = new PropertySpecEventArgs(item, value);
 				bag.OnSetValue(e);
             }
             #endregion
@@ -1430,7 +1430,6 @@ namespace JWTools
             return null;
         }
         #endregion
-
 
         #region Constructor() - Initializes a new instance of the PropertyBag class.
         public PropertyBag()

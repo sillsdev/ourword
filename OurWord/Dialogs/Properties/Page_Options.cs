@@ -53,7 +53,6 @@ namespace OurWord.Dialogs
         #region BAG CONSTANTS
         const string c_sBackupPath = "propBackupPath";
         const string c_sMakeBackups = "propMakeBackups";
-        const string c_sProjectAccess = "propProjectAccess";
 
         private const string c_sGroupBackTranlation = "BackTranslation";
         private const string c_sCanEditTargetInBackTransView = "propCanEditTargetInBackTransView";
@@ -90,10 +89,6 @@ namespace OurWord.Dialogs
 
                 case c_sBackupPath:
                     e.Value = BackupSystem.RegistryBackupFolder;
-                    break;
-
-                case c_sProjectAccess:
-                    e.Value = ClusterList.UserCanAccessAllProjectsFriendly;
                     break;
 
                 // Back Translation View
@@ -153,10 +148,6 @@ namespace OurWord.Dialogs
                     BackupSystem.RegistryBackupFolder = (string)e.Value;
                     break;
 
-
-                case c_sProjectAccess:
-                    break;
-
                 // Back Translation view
                 case c_sCanEditTargetInBackTransView:
                     WndBackTranslation.CanEditTarget = InterpretYesNo(e);
@@ -211,17 +202,6 @@ namespace OurWord.Dialogs
                 "Choose a folder in which OurWord will automatically make backups of your files.",
                 "",
                 typeof(BackupFolderBrowseTypeEditor),
-                null));
-
-            // Project Access
-            Bag.Properties.Add(new PropertySpec(
-                c_sProjectAccess,
-                "Projects that this user can access",
-                typeof(string),
-                "",
-                "In a large cluster with numerous projects, you can limit the user of this computer to only a few of them.",
-                "All",
-                typeof(CheckTreeEditor),
                 null));
 
             #endregion
@@ -379,64 +359,5 @@ namespace OurWord.Dialogs
         #endregion
     }
     #endregion
-
-
-    // DlgCheckTree
-    public class CheckTreeEditor : UITypeEditor
-    {
-        #region Method: void CreateCheckTreeItems(DlgCheckTree dlg)
-        void CreateCheckTreeItems(DlgCheckTree dlg)
-        {
-            foreach (var ci in ClusterList.Clusters)
-            {
-                var ciItem = new CheckTreeItem(ci.Name, false, ci);
-                dlg.Items.Add(ciItem);
-
-                foreach (var sProject in ci.GetClusterLanguageList(true))
-                {
-                    var item = new CheckTreeItem(sProject, ci.GetUserCanAccess(sProject), sProject);
-                    ciItem.SubItems.Add(item);
-                }
-            }
-        }
-        #endregion
-        #region Method: void HarvestCheckTreeItems(DlgCheckTree dlg)
-        void HarvestCheckTreeItems(DlgCheckTree dlg)
-        {
-            foreach (var ctiCluster in dlg.Items)
-            {
-                var ci = ClusterList.FindClusterInfo(ctiCluster.Name);
-                if (null == ci)
-                    continue;
-
-                foreach (var ctiProject in ctiCluster.SubItems)
-                {
-                    ci.SetUserCanAccess(ctiProject.Name, ctiProject.Checked);
-                }
-            }
-        }
-        #endregion
-
-        #region OMethod: UITypeEditorEditStyle GetEditStyle(context)
-        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
-        {
-            return UITypeEditorEditStyle.Modal;
-        }
-        #endregion
-        #region OMethod: object EditValue(...)
-        public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value)
-        {
-            // Set up the dialog
-            var dlg = new DlgCheckTree();
-            dlg.Label_Instruction = "Place a check beside the projects this user can access; or uncheck them all if they can access any project.";
-            CreateCheckTreeItems(dlg);
-
-            // Perform the dialog
-            if (dlg.ShowDialog() == DialogResult.OK)
-                HarvestCheckTreeItems(dlg);
-            return ClusterList.UserCanAccessAllProjectsFriendly; ;
-        }
-        #endregion
-    }
 
 }

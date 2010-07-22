@@ -59,29 +59,44 @@ namespace OurWordTests.DataModel
             var user = new User();
 
             // Since he is not a member of the Amarasi team, he can't edit the books
-            Assert.IsFalse(user.GetCanEdit(c_sTranslationName, "MRK"));
-            Assert.IsFalse(user.GetCanEdit(c_sTranslationName, "JHN"));
-            Assert.IsFalse(user.GetCanEdit(c_sTranslationName, "ACT"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sTranslationName, "MRK"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sTranslationName, "JHN"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sTranslationName, "ACT"));
 
             // Make him a member. Now, by default he can edit the books, because users are 
             // able to edit projects for which they are a member.
             user.AddMembershipTo(c_sTranslationName);
-            Assert.IsTrue(user.GetCanEdit(c_sTranslationName, "MRK"));
-            Assert.IsTrue(user.GetCanEdit(c_sTranslationName, "JHN"));
-            Assert.IsTrue(user.GetCanEdit(c_sTranslationName, "ACT"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sTranslationName, "MRK"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sTranslationName, "JHN"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sTranslationName, "ACT"));
 
-            // Set two of them to being locked
-            user.PreventEditing(c_sTranslationName, "JHN");
-            user.PreventEditing(c_sTranslationName, "ACT");
+            // Set two of them to being ReadOnly
+            user.SetEditability(c_sTranslationName, "JHN", 
+                User.TranslationSettings.Editability.ReadOnly);
+            user.SetEditability(c_sTranslationName, "ACT",
+                User.TranslationSettings.Editability.ReadOnly);
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sTranslationName, "MRK"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sTranslationName, "JHN"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sTranslationName, "ACT"));
 
-            Assert.IsTrue(user.GetCanEdit(c_sTranslationName, "MRK"));
-            Assert.IsFalse(user.GetCanEdit(c_sTranslationName, "JHN"));
-            Assert.IsFalse(user.GetCanEdit(c_sTranslationName, "ACT"));
-
-            // Set one of them back to being editable
-            user.AllowEditing(c_sTranslationName, "JHN");
-
-            Assert.IsTrue(user.GetCanEdit(c_sTranslationName, "JHN"));
+            // Set one of them to being Notes
+            user.SetEditability(c_sTranslationName, "JHN",
+                User.TranslationSettings.Editability.Notes);
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sTranslationName, "MRK"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Notes,
+                user.GetEditability(c_sTranslationName, "JHN"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sTranslationName, "ACT"));
         }
         #endregion
 
@@ -116,7 +131,7 @@ namespace OurWordTests.DataModel
                 "canAuthorInformationNotes=\"true\" " +
                 "canAssignNoteToConsultant=\"true\" " +
                 "canCreateFrontTranslationNotes=\"true\">" +
-                    "<TranslationSettings name=\"Amarasi\" lockedBooks=\"JHN ROM\" />" +
+                    "<TranslationSettings name=\"Amarasi\" Notes=\"1PE 2PE\" ReadOnly=\"JHN ROM\" />" +
                 "</User>";
 
             // Create a user with some meaningful settings
@@ -159,9 +174,16 @@ namespace OurWordTests.DataModel
                 CanAssignNoteToConsultant = true,
                 CanCreateFrontTranslationNotes = true
             };
-            user.AddMembershipTo("Amarasi");
-            user.PreventEditing("Amarasi", "JHN");
-            user.PreventEditing("Amarasi", "ROM");
+            const string c_sAmarasi = "Amarasi";
+            user.AddMembershipTo(c_sAmarasi);
+            user.SetEditability(c_sAmarasi, "JHN",
+                User.TranslationSettings.Editability.ReadOnly);
+            user.SetEditability(c_sAmarasi, "ROM",
+                User.TranslationSettings.Editability.ReadOnly);
+            user.SetEditability(c_sAmarasi, "1PE",
+                User.TranslationSettings.Editability.Notes);
+            user.SetEditability(c_sAmarasi, "2PE",
+                User.TranslationSettings.Editability.Notes);
 
             // Save and see if we get what we expect
             var doc = new XmlDoc();
@@ -174,9 +196,19 @@ namespace OurWordTests.DataModel
             Assert.IsTrue(user.ContentEquals(userNew));
             Assert.AreEqual(userNew.UserName, "Bob");
             Assert.IsTrue(userNew.IsMemberOf("Amarasi"));
-            Assert.IsTrue(userNew.GetCanEdit("Amarasi", "MRK"));
-            Assert.IsFalse(userNew.GetCanEdit("Amarasi", "JHN"));
-            Assert.IsFalse(userNew.GetCanEdit("Amarasi", "ROM"));
+
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sAmarasi, "MRK"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Full,
+                user.GetEditability(c_sAmarasi, "EXO"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sAmarasi, "JHN"));
+            Assert.AreEqual(User.TranslationSettings.Editability.ReadOnly,
+                user.GetEditability(c_sAmarasi, "ROM"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Notes,
+                user.GetEditability(c_sAmarasi, "1PE"));
+            Assert.AreEqual(User.TranslationSettings.Editability.Notes,
+                user.GetEditability(c_sAmarasi, "2PE"));
         }
         #endregion
         #region Test: Merge
@@ -186,30 +218,30 @@ namespace OurWordTests.DataModel
                 "<User username=\"Bob\" zoom=\"100\" primaryUi=\"English\" secondaryUi=\"Spanish\" " +
                 "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                 "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                    "<TranslationSettings name=\"Amarasi\" lockedBooks=\"JHN ROM\" />" +
+                    "<TranslationSettings name=\"Amarasi\" ReadOnly=\"JHN ROM\" />" +
                 "</User>";
             const string c_sOurs =
                "<User username=\"Bob\" zoom=\"120\" primaryUi=\"English\" secondaryUi=\"Spanish\" " +
                "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                   "<TranslationSettings name=\"Amarasi\" lockedBooks=\"JHN ROM\" />" +
-                   "<TranslationSettings name=\"Helong\" lockedBooks=\"MAT\" />" +
+                   "<TranslationSettings name=\"Amarasi\" ReadOnly=\"JHN ROM\" />" +
+                   "<TranslationSettings name=\"Helong\" ReadOnly=\"MAT\" />" +
                "</User>";
             const string c_sTheirs =
                "<User username=\"Bob\" zoom=\"100\" primaryUi=\"English\" secondaryUi=\"English\" " +
                "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                   "<TranslationSettings name=\"Amarasi\" lockedBooks=\"ROM 1CO\" />" +
-                   "<TranslationSettings name=\"Rikou\" lockedBooks=\"MRK\" />" +
+                   "<TranslationSettings name=\"Amarasi\" ReadOnly=\"ROM 1CO\" />" +
+                   "<TranslationSettings name=\"Rikou\" ReadOnly=\"MRK\" />" +
                "</User>";
 
             const string c_sExpected =
                 "<User username=\"Bob\" zoom=\"120\" primaryUi=\"English\" secondaryUi=\"English\" " +
                 "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                 "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                    "<TranslationSettings name=\"Amarasi\" lockedBooks=\"ROM 1CO\" />" +
-                    "<TranslationSettings name=\"Helong\" lockedBooks=\"MAT\" />" +
-                    "<TranslationSettings name=\"Rikou\" lockedBooks=\"MRK\" />" +
+                    "<TranslationSettings name=\"Amarasi\" ReadOnly=\"ROM 1CO\" />" +
+                    "<TranslationSettings name=\"Helong\" ReadOnly=\"MAT\" />" +
+                    "<TranslationSettings name=\"Rikou\" ReadOnly=\"MRK\" />" +
                 "</User>";
 
             var userParent = CreateFromXml(c_sParent);

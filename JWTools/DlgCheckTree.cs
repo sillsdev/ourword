@@ -7,18 +7,11 @@
  * Purpose: Provides a generic dialog (and underlying mechanism) for turning features on/off.
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.Win32;
 #endregion
-#endregion
-
 
 namespace JWTools
 {
@@ -34,7 +27,7 @@ namespace JWTools
                 return m_vItems;
             }
         }
-        List<CheckTreeItem> m_vItems;
+        readonly List<CheckTreeItem> m_vItems;
         #endregion
 
         // Dialog controls -------------------------------------------------------------------
@@ -73,10 +66,10 @@ namespace JWTools
         #endregion
 
         // Populate the Tree -----------------------------------------------------------------
-        #region Method: AddNodeAlphabetic(TreeNodeCollection, TreeNode) - adds in sorted order
-        public void AddNodeAlphabetic(TreeNodeCollection nodes, TreeNode node)
+        #region smethod: AddNodeAlphabetic(TreeNodeCollection, TreeNode) - adds in sorted order
+        private static void AddNodeAlphabetic(TreeNodeCollection nodes, TreeNode node)
         {
-            for (int i = 0; i < nodes.Count; i++)
+            for (var i = 0; i < nodes.Count; i++)
             {
                 if (node.Text.CompareTo(nodes[i].Text) < 0)
                 {
@@ -97,7 +90,7 @@ namespace JWTools
                     continue;
 
                 // Find out if all of its children nodes are checked
-                bool bAllChecked = true;
+                var bAllChecked = true;
                 foreach (TreeNode n in node.Nodes)
                 {
                     if (!n.Checked)
@@ -113,9 +106,10 @@ namespace JWTools
         #region Method: void AddItem(CheckTreeItem, TreeNodeCollection)
         void AddItem(CheckTreeItem item, TreeNodeCollection parent)
         {
-            var node = new TreeNode(item.Name);
-            node.Checked = item.Checked;
-            node.Tag = item;
+            var node = new TreeNode(item.Name) {
+                Checked = item.Checked, 
+                Tag = item
+            };
             AddNodeAlphabetic(parent, node);
 
             foreach (CheckTreeItem cti in item.SubItems)
@@ -153,7 +147,7 @@ namespace JWTools
         }
         #endregion
         #region Cmd: cmdItemChecked
-        static bool bDontRecurse = false;
+        static bool bDontRecurse;
         private void cmdItemChecked(object sender, TreeViewEventArgs e)
         {
             if (bDontRecurse)
@@ -161,7 +155,7 @@ namespace JWTools
             bDontRecurse = true;
 
             // Get the selected node
-            TreeNode node = e.Node;
+            var node = e.Node;
             if (null == node)
                 goto end;
 
@@ -249,7 +243,7 @@ namespace JWTools
                 return m_vSubItems;
             }
         }
-        List<CheckTreeItem> m_vSubItems;
+        readonly List<CheckTreeItem> m_vSubItems;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -263,8 +257,6 @@ namespace JWTools
             m_vSubItems = new List<CheckTreeItem>();
         }
         #endregion
-
     }
-
 
 }

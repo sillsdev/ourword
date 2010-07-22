@@ -239,7 +239,7 @@ namespace OurWord.Ctrls.Commands
             var vsUserAllowedProjects = new List<string>();
             foreach(var sProjectName in vsAllProjects)
             {
-                if (ClusterList.GetUserCanAccessProject(ci.Name, sProjectName))
+                if (Users.Current.IsMemberOf(sProjectName))
                     vsUserAllowedProjects.Add(sProjectName);
             }
 

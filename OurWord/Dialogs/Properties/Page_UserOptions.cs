@@ -1,5 +1,9 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Drawing.Design;
+using System.Windows.Forms;
 using JWTools;
+using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
 
 namespace OurWord.Dialogs.Properties
@@ -60,6 +64,7 @@ namespace OurWord.Dialogs.Properties
         private const string c_sGroupBehavior = "Behavior";
         private const string c_sMaximizeOnStartup = "propMaximizeOnStartup";
         private const string c_sZoomPercent = "propZoomPercent";
+        private const string c_sProjectAccess = "propProjectAccess";
 
         private const string c_sGroupUILanguage = "Language of the User Interface";
         private const string c_sPrimaryLanguage = "propPrimaryLanguage";
@@ -86,6 +91,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sZoomPercent:
                     ZoomPropertySpec.Put(e, Users.Current.ZoomPercent);
+                    break;
+                case c_sProjectAccess:
+                    e.Value = Users.Current.MemberProjects;
                     break;
 
                 // UI Languages
@@ -131,6 +139,8 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sZoomPercent:
                     Users.Current.ZoomPercent = ZoomPropertySpec.Pull(e);
+                    break;
+                case c_sProjectAccess:
                     break;
 
                 // UI Languages
@@ -192,6 +202,18 @@ namespace OurWord.Dialogs.Properties
                 new[] { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 },
                 100
                 ) {DontLocalizeEnums = true});
+            #endregion
+            #region Project Access
+            m_bag.Properties.Add(new PropertySpec(
+                c_sProjectAccess,
+                "Projects that this user can access",
+                typeof(string),
+                c_sGroupBehavior,
+                "In a large cluster with numerous projects, you can limit this user to only " +
+                    "a subset of them.",
+                "",
+                typeof(ProjectAccessEditor),
+                 null));
             #endregion
 
             #region Primary UI Language
@@ -270,4 +292,73 @@ namespace OurWord.Dialogs.Properties
         }
         #endregion
     }
+
+
+    // DlgCheckTree
+    public class ProjectAccessEditor : UITypeEditor
+    {
+        #region smethod: void CreateCheckTreeItems(DlgCheckTree dlg)
+        static void CreateCheckTreeItems(DlgCheckTree dlg)
+        {
+            foreach (var ci in ClusterList.Clusters)
+            {
+                var ciItem = new CheckTreeItem(ci.Name, false, ci);
+                dlg.Items.Add(ciItem);
+
+                foreach (var sProject in ci.GetClusterLanguageList(true))
+                {
+                    var bChecked = Users.Current.IsMemberOf(sProject);
+                    var item = new CheckTreeItem(sProject, bChecked, sProject);
+                    ciItem.SubItems.Add(item);
+                }
+            }
+        }
+        #endregion
+        #region smethod: void HarvestCheckTreeItems(DlgCheckTree dlg)
+        static void HarvestCheckTreeItems(DlgCheckTree dlg)
+        {
+            foreach (var ctiCluster in dlg.Items)
+            {
+                var ci = ClusterList.FindClusterInfo(ctiCluster.Name);
+                if (null == ci)
+                    continue;
+
+                foreach (var ctiProject in ctiCluster.SubItems)
+                {
+                    if (ctiProject.Checked)
+                        Users.Current.AddMembershipTo(ctiProject.Name);
+                    else
+                        Users.Current.RemoveMembershipFrom(ctiProject.Name);
+                }
+            }
+        }
+        #endregion
+
+        #region OMethod: UITypeEditorEditStyle GetEditStyle(context)
+        public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context)
+        {
+            return UITypeEditorEditStyle.Modal;
+        }
+        #endregion
+        #region OMethod: object EditValue(...)
+        public override object EditValue(ITypeDescriptorContext context,
+            IServiceProvider provider, object value)
+        {
+            // Set up the dialog
+            var dlg = new DlgCheckTree
+            {
+                Label_Instruction = "Place a check beside the projects this user can access; " +
+                    "or uncheck them all if they can access any project."
+            };
+            CreateCheckTreeItems(dlg);
+
+            // Perform the dialog
+            if (dlg.ShowDialog() == DialogResult.OK)
+                HarvestCheckTreeItems(dlg);
+            return Users.Current.MemberProjects;
+        }
+        #endregion
+    }
+
+
 }

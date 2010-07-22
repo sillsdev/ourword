@@ -91,40 +91,53 @@ namespace OurWordData.DataModel.Membership
 
         // Settings specific to an individual translation ------------------------------------
         #region CLASS: TranslationSettings
-        private class TranslationSettings
+        public class TranslationSettings
         {
             // Books that can be edited by this user -----------------------------------------
-            #region Method: bool GetCanEdit(sBookAbbrev)
-            public bool GetCanEdit(string sBookAbbrev)
+            public enum Editability { Full, Notes, ReadOnly };
+            #region Method: Editability GetEditability(string sBookAbbrev)
+            public Editability GetEditability(string sBookAbbrev)
             {
-                return !m_vLockedFromEditingBooks.Contains(sBookAbbrev);
+                Editability value;
+                if (m_BookEditability.TryGetValue(sBookAbbrev, out value))
+                    return value;
+                throw new Exception("BookAbbrev not in dictionary.");
             }
             #endregion
-            #region Method: bool PreventEditing(sBookAbbrev)
-            public void PreventEditing(string sBookAbbrev)
+            #region Method: void SetEditability(string sBookAbbrev, Editability value)
+            public void SetEditability(string sBookAbbrev, Editability value)
             {
-                if (!m_vLockedFromEditingBooks.Contains(sBookAbbrev))
-                    m_vLockedFromEditingBooks.Add(sBookAbbrev);
+                m_BookEditability[sBookAbbrev] = value;
             }
             #endregion
-            #region Method: bool AllowEditing(sBookAbbrev)
-            public void AllowEditing(string sBookAbbrev)
+            // Private methods/etc.
+            private Dictionary<string, Editability> m_BookEditability;
+            #region method: void InitializeEditability()
+            private void InitializeEditability()
             {
-                if (m_vLockedFromEditingBooks.Contains(sBookAbbrev))
-                    m_vLockedFromEditingBooks.Remove(sBookAbbrev);
+                m_BookEditability = new Dictionary<string, Editability>();
+                foreach(var sBookAbbrev in DBook.BookAbbrevs)
+                    m_BookEditability.Add(sBookAbbrev, Editability.Full);
             }
-            #endregion
-            private readonly List<string> m_vLockedFromEditingBooks;
-            #region Attr{g}: string LockedBooksAsString
-            string LockedBooksAsString
+            #endregion]
+            #region method: string GetListOfBooks(Editability)
+            string GetListOfBooks(Editability editability)
             {
-                get
+                var s = "";
+                foreach(var sBookAbbrev in DBook.BookAbbrevs)
                 {
-                    var sLocked = "";
-                    foreach (var s in m_vLockedFromEditingBooks)
-                        sLocked += (s + " ");
-                    return sLocked.Trim();
+                    if (GetEditability(sBookAbbrev) == editability)
+                        s += sBookAbbrev + " ";
                 }
+                return s.Trim();
+            }
+            #endregion
+            #region method: void SetListOfBooks(s, Editability)
+            void SetListOfBooks(string s, Editability editability)
+            {
+                var vsBookAbbrevs = s.Split(new char[] {' '});
+                foreach(string sBookAbbrev in vsBookAbbrevs)
+                    SetEditability(sBookAbbrev, editability);
             }
             #endregion
 
@@ -147,18 +160,15 @@ namespace OurWordData.DataModel.Membership
             public TranslationSettings(string sTranslationName)
             {
                 m_sTranslationName = sTranslationName;
-                m_vLockedFromEditingBooks = new List<string>();
+                InitializeEditability();
             }
             #endregion
             #region Query: bool ContentEquals(other)
             public bool ContentEquals(TranslationSettings other)
             {
-                if (m_vLockedFromEditingBooks.Count != other.m_vLockedFromEditingBooks.Count)
-                    return false;
-
-                foreach(var sBookAbbrev in m_vLockedFromEditingBooks)
+                foreach(var sBookAbbrev in DBook.BookAbbrevs)
                 {
-                    if (!other.m_vLockedFromEditingBooks.Contains(sBookAbbrev))
+                    if (GetEditability(sBookAbbrev) != other.GetEditability(sBookAbbrev))
                         return false;
                 }
 
@@ -176,8 +186,10 @@ namespace OurWordData.DataModel.Membership
                     CanCreateGeneralNotes = CanCreateGeneralNotes
                 };
 
-                foreach(var sBookAbbrev in m_vLockedFromEditingBooks)
-                    ts.PreventEditing(sBookAbbrev);
+                foreach(var sBookAbbrev in DBook.BookAbbrevs)
+                {
+                    ts.SetEditability(sBookAbbrev, GetEditability(sBookAbbrev));
+                }
 
                 return ts;
             }
@@ -187,7 +199,6 @@ namespace OurWordData.DataModel.Membership
             #region Constants
             private const string c_sTag = "TranslationSettings";
             private const string c_sAttrTranslationName = "name";
-            private const string c_sAttrLockedBooks = "lockedBooks";
             private const string c_sAttrCanCreateGeneralNotes = "generalNotes";
             #endregion
             #region Method: XmlNode Save(XmlDoc, nodeParent)
@@ -197,9 +208,15 @@ namespace OurWordData.DataModel.Membership
 
                 doc.AddAttr(node, c_sAttrTranslationName, m_sTranslationName);
 
-                doc.AddAttr(node, c_sAttrLockedBooks, LockedBooksAsString);
-
                 doc.AddAttr(node, c_sAttrCanCreateGeneralNotes, CanCreateGeneralNotes);
+
+                foreach (var sEditability in Enum.GetNames(typeof(Editability)))
+                {
+                    var editability = (Editability)Enum.Parse(typeof(Editability), sEditability);
+                    if (editability == Editability.Full)
+                        continue;
+                    doc.AddAttr(node, sEditability, GetListOfBooks(editability));
+                }
 
                 return node;
             }
@@ -219,11 +236,15 @@ namespace OurWordData.DataModel.Membership
                     CanCreateGeneralNotes = XmlDoc.GetAttrValue(node, c_sAttrCanCreateGeneralNotes, false)
                 };
 
-                var sLockedBooks = XmlDoc.GetAttrValue(node, c_sAttrLockedBooks, "");
-                var vsBooks = sLockedBooks.Split(new[] {' '});
-                ts.m_vLockedFromEditingBooks.Clear();
-                foreach(var sBook in vsBooks)
-                    ts.m_vLockedFromEditingBooks.Add(sBook);
+                foreach(var sEditability in Enum.GetNames(typeof(Editability)))
+                {
+                    var editability = (Editability)Enum.Parse(typeof(Editability), sEditability);
+                    if (editability == Editability.Full)
+                        continue;
+
+                    var sBooks = XmlDoc.GetAttrValue(node, sEditability, "").Trim();
+                    ts.SetListOfBooks(sBooks, editability);
+                }
 
                 return ts;
             }
@@ -242,12 +263,14 @@ namespace OurWordData.DataModel.Membership
                     CanCreateGeneralNotes = theirs.CanCreateGeneralNotes;
                 }
 
-                if (LockedBooksAsString != theirs.LockedBooksAsString &&
-                    LockedBooksAsString == parent.LockedBooksAsString)
+                foreach(var sBookAbbrev in DBook.BookAbbrevs)
                 {
-                    m_vLockedFromEditingBooks.Clear();
-                    foreach(var s in theirs.m_vLockedFromEditingBooks)
-                        m_vLockedFromEditingBooks.Add(s);
+                    var eParent = parent.GetEditability(sBookAbbrev);
+                    var eTheirs = theirs.GetEditability(sBookAbbrev);
+                    var eMine = this.GetEditability(sBookAbbrev);
+
+                    if (eMine != eTheirs && eMine == eParent)
+                        SetEditability(sBookAbbrev, eTheirs);
                 }
             }
             #endregion
@@ -287,21 +310,35 @@ namespace OurWordData.DataModel.Membership
             m_vTranslationSettings.Remove(sTranslationName);
         }
         #endregion
+        public string MemberProjects
+        {
+            get
+            {
+                var s = "";
+                foreach (var sProjectName in m_vTranslationSettings.Keys)
+                    s += sProjectName + ", ";
+                if (s.EndsWith(", "))
+                    s = s.Remove(s.Length - 2);
+                return s;
+            }
+        }
 
-        // Editable (vs locked) books --------------------------------------------------------
-        #region Method: bool GetCanEdit(sTranslationName, sBookName)
-        public bool GetCanEdit(string sTranslationName, string sBookAbbrev)
+        // Editable (vs locked, etc.) books --------------------------------------------------
+        #region Method: bool GetEditability(sTranslationName, sBookName)
+        public TranslationSettings.Editability GetEditability(string sTranslationName, 
+            string sBookAbbrev)
         {
             if (!IsMemberOf(sTranslationName))
-                return false;
+                return TranslationSettings.Editability.ReadOnly;
 
             var settings = FindTranslationSettings(sTranslationName);
             Debug.Assert(null != settings);
-            return settings.GetCanEdit(sBookAbbrev);
+            return settings.GetEditability(sBookAbbrev);
         }
         #endregion
-        #region Method: bool PreventEditing(sTranslationName, sBookName)
-        public void PreventEditing(string sTranslationName, string sBookAbbrev)
+        #region Method: bool SetEditability(sTranslationName, sBookName, editability)
+        public void SetEditability(string sTranslationName, string sBookAbbrev, 
+            TranslationSettings.Editability editability)
         {
             var settings = FindTranslationSettings(sTranslationName);
 
@@ -310,20 +347,7 @@ namespace OurWordData.DataModel.Membership
             if (null == settings)
                 throw new ArgumentException("This user is not a member of the team: " + sTranslationName);
 
-            settings.PreventEditing(sBookAbbrev);
-        }
-        #endregion
-        #region Method: bool AllowEditing(sTranslationName, sBookName)
-        public void AllowEditing(string sTranslationName, string sBookAbbrev)
-        {
-            var settings = FindTranslationSettings(sTranslationName);
-
-            // We want to be explicitly setting team membership in the caller, rather than just
-            // automatically doing it here
-            if (null == settings)
-                throw new ArgumentException("This user is not a member of the team: " + sTranslationName);
-
-            settings.AllowEditing(sBookAbbrev);
+            settings.SetEditability(sBookAbbrev, editability);
         }
         #endregion
 
