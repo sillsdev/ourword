@@ -4,27 +4,20 @@
  * Author:  John Wimbish
  * Created: 14 May 2004
  * Purpose: Allows an import file's encoding to be specified (and thus converted to UTF8)
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Text;
 using System.IO;
 using JWTools;
-using OurWordData;
-using OurWord.Dialogs;
-using OurWord.Layouts;
-using OurWord.Edit;
 #endregion
 
-namespace OurWord.Dialogs
+namespace OurWord.Dialogs.WizImportBook
 {
     public partial class DlgSpecifyEncoding : Form
     {
@@ -37,26 +30,21 @@ namespace OurWord.Dialogs
                 return m_sPathName;
             }
         }
-        string m_sPathName;
+        readonly string m_sPathName;
         #endregion
         #region Attr{g} Encoding Encoding
-        public Encoding Encoding
-        {
-            get
-            {
-                return m_Encoding;
-            }
-        }
-        Encoding m_Encoding;
+        private Encoding Encoding { get; set; }
         #endregion
-        #region VAttr{g}: string[] FileLines
-        public string[] FileLines
+        #region VAttr{g}: List<string> FileLines
+        public List<string> FileLines
         {
             get
             {
-                return m_rtbFile.Lines;
+                Debug.Assert(null != m_vFileLines);
+                return m_vFileLines;
             }
         }
+        private readonly List<string> m_vFileLines;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -66,24 +54,17 @@ namespace OurWord.Dialogs
             Debug.Assert(!string.IsNullOrEmpty(sPathName));
             m_sPathName = sPathName;
 
-            m_Encoding = Encoding.UTF8;
+            m_vFileLines = new List<string>();
+
+            Encoding = Encoding.UTF8;
 
             InitializeComponent();
         }
         #endregion
-        #region Attr{g}: Control[] vExclude
-        public Control[] vExclude
-        {
-            get
-            {
-                return new Control[] { m_comboEncodings };
-            }
-        }
-        #endregion
 
         // Misc Methods ----------------------------------------------------------------------
-        #region SMethod: string GenerateEncodingDisplayString(Encoding enc)
-        static public string GenerateEncodingDisplayString(Encoding enc)
+        #region smethod: string GenerateEncodingDisplayString(Encoding enc)
+        private static string GenerateEncodingDisplayString(Encoding enc)
         {
             return (enc.CodePage + " - " + enc.EncodingName);
         }
@@ -92,30 +73,33 @@ namespace OurWord.Dialogs
         void LoadFileUsingCurrentEncoding()
         {
             // Change to the wait cursor
-            Cursor cursor = Cursor.Current;
+            var cursor = Cursor.Current;
             Cursor.Current = Cursors.WaitCursor;
 
-            // Open the file and read it into an array of strings
-            ArrayList a = new ArrayList();
-            StreamReader sr = new StreamReader(PathName, Encoding);
-            TextReader r = TextReader.Synchronized(sr);
+            // Read the file into a list of strings
+            FileLines.Clear();
+            var sr = new StreamReader(PathName, Encoding);
+            var r = TextReader.Synchronized(sr);
             do
             {
-                string s = r.ReadLine();
+                var s = r.ReadLine();
                 if (s == null)
                     break;
-                a.Add(s);
+                FileLines.Add(s);
             } while (true);
             r.Close();
 
-            // Convert to a vector of strings
-            string[] v = new string[a.Count];
-            for (int i = 0; i < a.Count; i++)
-                v[i] = a[i] as string;
+            // IMPORTANT: We keep what we read in separate from the RTF box. For some reason,
+            // we ran into a problem in Huichol data that a emdash was being converted to
+            // hyphen upon szve. It is probably due to assigning the "Arial Unicode MS" font
+            // to the RTF box? The Repair dialog does not have a problem saving. So if we
+            // ever decide to permit editing within this dialog, we need to do everything
+            // the way the RepairImport dialog does, from whatever control it uses to
+            // the font it uses.
 
             // Place it into the RTF box
             m_rtbFile.Clear();
-            m_rtbFile.Lines = v;
+            m_rtbFile.Lines = FileLines.ToArray();
 
             // Set a large Unicode font so that it is easy to see if the letters appear
             // correctly
@@ -130,12 +114,12 @@ namespace OurWord.Dialogs
         #region Cmd: cmdNewEncodingChosen
         private void cmdNewEncodingChosen(object sender, EventArgs e)
         {
-            EncodingInfo[] vInfo = Encoding.GetEncodings();
-            foreach (EncodingInfo Info in vInfo)
+            var vInfo = Encoding.GetEncodings();
+            foreach (var info in vInfo)
             {
-                if (GenerateEncodingDisplayString(Info.GetEncoding()) == m_comboEncodings.Text)
+                if (GenerateEncodingDisplayString(info.GetEncoding()) == m_comboEncodings.Text)
                 {
-                    m_Encoding = Info.GetEncoding();
+                    Encoding = info.GetEncoding();
                     LoadFileUsingCurrentEncoding();
                     break;
                 }
@@ -146,12 +130,12 @@ namespace OurWord.Dialogs
         private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
-            LocDB.Localize(this, vExclude);
+            LocDB.Localize(this, new Control[] { m_comboEncodings });
 
             // Populate the list of encodings
-            EncodingInfo[] vInfo = Encoding.GetEncodings();
-            foreach (EncodingInfo Info in vInfo)
-                m_comboEncodings.Items.Add(GenerateEncodingDisplayString(Info.GetEncoding()));
+            var vInfo = Encoding.GetEncodings();
+            foreach (var info in vInfo)
+                m_comboEncodings.Items.Add(GenerateEncodingDisplayString(info.GetEncoding()));
 
             // Select UTF8
             m_comboEncodings.Text = GenerateEncodingDisplayString(Encoding.UTF8);

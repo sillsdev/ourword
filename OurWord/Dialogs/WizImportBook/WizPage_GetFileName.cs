@@ -443,19 +443,19 @@ namespace OurWord.Dialogs.WizImportBook
         private void cmdSpecifyEncoding(object sender, EventArgs e)
         {
             // Run the dialog to let the user figure out the encoding
-            DlgSpecifyEncoding dlg = new DlgSpecifyEncoding(PathName);
+            var dlg = new DlgSpecifyEncoding(PathName);
             if (DialogResult.OK != dlg.ShowDialog())
                 return;
 
             // Create the new path name
-            string sPathNew = PathName + ".utf8";
+            var sPathNew = PathName + ".utf8";
 
             // The properly interpreted file currently exists in the dialog
-            string[] vLines = dlg.FileLines;
+            var vLines = dlg.FileLines;
 
             // Write out the new UTF8 file
-            TextWriter w = JW_Util.GetTextWriter(sPathNew);
-            foreach (string s in vLines)
+            var w = JW_Util.GetTextWriter(sPathNew);
+            foreach (var s in vLines)
                 w.WriteLine(s);
             w.Close();
 

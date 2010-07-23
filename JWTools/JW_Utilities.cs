@@ -628,8 +628,8 @@ namespace JWTools
             }
 
             // Create a new file to write to
-			StreamWriter w = new StreamWriter(sPath, false, Encoding.UTF8);
-			TextWriter tw = TextWriter.Synchronized(w);
+			var w = new StreamWriter(sPath, false, Encoding.UTF8);
+			var tw = TextWriter.Synchronized(w);
 			return tw;
 		}
 		#endregion

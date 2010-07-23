@@ -308,7 +308,7 @@
       <SubType>Designer</SubType>
       <DependentUpon>DlgDebug.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgSpecifyEncoding.resx">
+    <EmbeddedResource Include="Dialogs\WizImportBook\DlgSpecifyEncoding.resx">
       <SubType>Designer</SubType>
       <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
     </EmbeddedResource>
@@ -598,10 +598,10 @@
     <Compile Include="Dialogs\DlgFilter.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\DlgSpecifyEncoding.cs">
+    <Compile Include="Dialogs\WizImportBook\DlgSpecifyEncoding.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\DlgSpecifyEncoding.Designer.cs">
+    <Compile Include="Dialogs\WizImportBook\DlgSpecifyEncoding.Designer.cs">
       <DependentUpon>DlgSpecifyEncoding.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\IncrementBookStatus.cs">
