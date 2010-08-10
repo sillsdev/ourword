@@ -93,6 +93,20 @@ namespace OurWordData.DataModel.Membership
         #region CLASS: TranslationSettings
         public class TranslationSettings
         {
+            static readonly Color ReadOnlyColor = Color.Red;
+            static readonly Color NotesOnlyColor = Color.Blue;
+            static readonly Color FullEditColor = Color.Black;
+            #region SMethod: Color GetUiColor(Editability editability)
+            static public Color GetUiColor(Editability editability)
+            {
+                if (editability == Editability.ReadOnly)
+                    return ReadOnlyColor;
+                if (editability == Editability.Notes)
+                    return NotesOnlyColor;
+                return FullEditColor;
+            }
+            #endregion
+
             // Books that can be edited by this user -----------------------------------------
             public enum Editability { Full, Notes, ReadOnly };
             #region Method: Editability GetEditability(string sBookAbbrev)
@@ -110,6 +124,7 @@ namespace OurWordData.DataModel.Membership
                 m_BookEditability[sBookAbbrev] = value;
             }
             #endregion
+
             // Private methods/etc.
             private Dictionary<string, Editability> m_BookEditability;
             #region method: void InitializeEditability()
@@ -336,6 +351,12 @@ namespace OurWordData.DataModel.Membership
             return settings.GetEditability(sBookAbbrev);
         }
         #endregion
+        public TranslationSettings.Editability GetEditability(DBook book)
+        {
+            return GetEditability(book.Translation.DisplayName, book.BookAbbrev);
+        }
+
+
         #region Method: bool SetEditability(sTranslationName, sBookName, editability)
         public void SetEditability(string sTranslationName, string sBookAbbrev, 
             TranslationSettings.Editability editability)

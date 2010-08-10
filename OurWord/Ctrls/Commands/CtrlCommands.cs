@@ -55,8 +55,10 @@ namespace OurWord.Ctrls.Commands
             SetupUser();
             SetupNotes();
 
-            // On TopTools, just localize the Layout item
-            LocDB.Localize(m_Layout);
+            // On TopTools, just localize the Layout's dropdown items. We can't localize 
+            // m_Layout.Text directly, as the LocDB makes that into "Drafting" every time.
+            foreach(ToolStripItem item in m_Layout.DropDownItems)
+                LocDB.Localize(item);
 
             // Localize all of the BottomTools item
             LocDB.Localize(BottomTools);
@@ -169,7 +171,7 @@ namespace OurWord.Ctrls.Commands
             // Enabling
             var bCannotEdit = (null == WLayout.CurrentLayout ||
                 !WLayout.CurrentLayout.Focused || 
-                OurWordMain.TargetIsLocked);
+                Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
 
             m_Cut.Enabled = !bCannotEdit;
             m_Copy.Enabled = !bCannotEdit;
@@ -192,7 +194,10 @@ namespace OurWord.Ctrls.Commands
         #region method: void SetupNotes()
         void SetupNotes()
         {
-            m_InsertNote.Available = Users.Current.CanMakeNotes;
+            m_InsertNote.Available = Users.Current.CanMakeNotes &&
+                DB.IsValidProject &&
+                DB.TargetBook != null &&
+                Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.ReadOnly;
 
             m_InsertNote.Enabled = DB.IsValidProject &&
                 null != DB.FrontSection &&
@@ -351,7 +356,9 @@ namespace OurWord.Ctrls.Commands
         void SetFootnoteEnabling()
         {
             var wnd = WLayout.CurrentLayout;
-            var bCanEdit = (null != wnd && wnd.Focused && !OurWordMain.TargetIsLocked);
+            var bCanEdit = (null != wnd && 
+                wnd.Focused && 
+                Users.Current.GetEditability(DB.TargetBook) == User.TranslationSettings.Editability.Full);
 
             m_menuInsertFootnote.Enabled = (bCanEdit && wnd.canInsertFootnote);
             m_menuDeleteFootnote.Enabled = (bCanEdit && wnd.canDeleteFootnote);

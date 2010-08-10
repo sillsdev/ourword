@@ -147,18 +147,7 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region SAttr{g}: bool TargetBookIsLocked
-        static public bool TargetBookIsLocked
-        {
-            get
-            {
-                if (null == TargetBook)
-                    return false;
-                return TargetBook.Locked;
-            }
-        }
-        #endregion
-
+ 
         // Misc Shorthand --------------------------------------------------------------------
         #region SAttr{g}: string Today - returns today's date as "2005-08-21" format.
         static public string Today

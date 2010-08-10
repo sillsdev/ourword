@@ -91,20 +91,6 @@ namespace OurWordData.DataModel
         }
         private string m_sVersion = c_sVersionDefault;
         #endregion
-        #region BAttr{g/s}: bool Locked - T if user is not allowed to edit.
-        public bool Locked
-        {
-            get
-            {
-                return m_bLocked;
-            }
-            set
-            {
-                SetValue(ref m_bLocked, value);
-            }
-        }
-        private bool m_bLocked = false;
-        #endregion
         #region BAttr{g/s}: string Copyright - Available to print in the footnote
         public string Copyright
         {
@@ -127,7 +113,6 @@ namespace OurWordData.DataModel
             DefineAttr("ID", ref m_sID);
             DefineAttr("Comment", ref m_sComment);
             DefineAttr("Version", ref m_sVersion);
-            DefineAttr("Locked", ref m_bLocked);
             DefineAttr("Copyright", ref m_sCopyright);
         }
         #endregion
@@ -1442,7 +1427,6 @@ namespace OurWordData.DataModel
                 oxes.AddAttr(nodeBook, c_sAttrID, BookAbbrev);
                 oxes.AddAttr(nodeBook, c_sAttrStage, Stage.EnglishAbbrev);
                 oxes.AddAttr(nodeBook, c_sAttrVersion, Version);
-                oxes.AddAttr(nodeBook, c_sAttrLocked, Locked);
                 oxes.AddAttr(nodeBook, c_sAttrCopyright, Copyright);
                 oxes.AddAttr(nodeBook, c_sAttrComment, Comment);
 
@@ -1498,7 +1482,6 @@ namespace OurWordData.DataModel
                     var xmlBook = xml.FirstChild;
 
                     // Interpret the basic attrs
-                    Locked = XmlDoc.GetAttrValue(xmlBook, c_sAttrLocked, false);
                     string sStage = XmlDoc.GetAttrValue(xmlBook, c_sAttrStage, Stage.c_sDraft);
                     Stage = DB.TeamSettings.Stages.FromOxesAttr(sStage);
 
@@ -1584,10 +1567,9 @@ namespace OurWordData.DataModel
                 }
 
                 // Read the Book's attributes
-                string sStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, Stage.c_sDraft);
+                var sStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, Stage.c_sDraft);
                 Stage = DB.TeamSettings.Stages.FromOxesAttr(sStage);
                 Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
-                Locked = XmlDoc.GetAttrValue(nodeBook, c_sAttrLocked, false);
                 Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
                 Comment = XmlDoc.GetAttrValue(nodeBook, c_sAttrComment, "");
 
@@ -2445,9 +2427,6 @@ namespace OurWordData.DataModel
 
             if (ourBook.Copyright == parentBook.Copyright)
                 ourBook.Copyright = theirBook.Copyright;
-
-            if (ourBook.Locked == parentBook.Locked)
-                ourBook.Locked = theirBook.Locked;
 
             if (ourBook.ID == parentBook.ID)
                 ourBook.ID = theirBook.ID;

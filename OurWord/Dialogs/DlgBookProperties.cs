@@ -85,7 +85,6 @@ namespace OurWord.Dialogs
         #endregion
         StringChoiceSetting m_Stage;
         EditTextSetting m_Version;
-        YesNoSetting    m_LockedForEditing;
         EditTextSetting m_Copyright;
    		#region Method: BuildLsWindow()
         void BuildLsWindow()
@@ -125,21 +124,6 @@ namespace OurWord.Dialogs
                 "Give an optional version for this book, e.g., It could be Revision \"B\", " +
                 "where \"B\"B is the version letter.",
                 Book.Version);
-
-
-            // Locked from Editing
-            LS.AddInformation("Bp500", StyleSheet.LiterateParagraph,
-                "If you lock a book from editing on this machine, then the user will not " +
-                "be able to make any changes to the text. He can still enter notes, " +
-                "however. The Collaboration feature makes this Locked feature less of " +
-                "a need than it was in previous versions of _OurWord,_ but you may still " +
-                "find it useful if you do not wish to deal with merging Scripture text.");
-            m_LockedForEditing = LS.AddYesNo(
-                "BpLockForEditing",
-                "Lock For Editing?",
-                "If Yes, the book cannot be edited by the user. Only Translator Notes can " +
-                    "be entered.",
-                Book.Locked);
 
             // Copyright
             LS.AddInformation("Bp600", StyleSheet.LiterateParagraph,
@@ -377,7 +361,6 @@ namespace OurWord.Dialogs
 
 			// If we've made it this far, then we are happy to accept all the changes.
 			// So set the attributes to the main DBook object.
-			Book.Locked = m_LockedForEditing.Value;
             Book.Copyright = m_Copyright.Value;
 			Book.Version = m_Version.Value;
 			Book.Comment = m_textComment.Text;

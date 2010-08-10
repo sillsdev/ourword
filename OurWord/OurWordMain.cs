@@ -55,7 +55,7 @@ namespace OurWord
 				if (null == book)
 					return false;
 
-				return book.Locked;
+                return (Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
 			}
 		}
 		#endregion

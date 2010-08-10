@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Membership;
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -167,7 +168,8 @@ namespace OurWord.Ctrls.Navigation
                 return;
             }
 
-            m_Locked.Available = OurWordMain.TargetIsLocked;
+            m_Locked.Available = Users.Current.GetEditability(DB.TargetBook) != 
+                User.TranslationSettings.Editability.Full;
         }
         #endregion
         #region cmd: cmdFindDropDownOpening
@@ -189,9 +191,9 @@ namespace OurWord.Ctrls.Navigation
                 Font = SystemFonts.DialogFont
             };
 
-            // For a locked book, write its text as Red color
-            if (book.Locked)
-                item.ForeColor = Color.Red;
+            // For a restricted book, write its text as a different color
+            var editability = Users.Current.GetEditability(book);
+            item.ForeColor = User.TranslationSettings.GetUiColor(editability);
 
             return item;
         }

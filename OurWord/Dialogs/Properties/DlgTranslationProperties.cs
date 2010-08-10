@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 using JWTools;
 using OurWord.Edit;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 
 namespace OurWord.Dialogs.Properties
@@ -294,10 +294,12 @@ namespace OurWord.Dialogs.Properties
 
             // Locked books, set to red text
             var book = Translation.FindBook(sAbbrev);
-            if (null != book && book.Locked)
+            if (null != book)
             {
+                var editability = Users.Current.GetEditability(book);
+                var color = User.TranslationSettings.GetUiColor(editability);
                 foreach (DataGridViewCell cell in row.Cells)
-                    cell.Style.ForeColor = Color.Red;
+                    cell.Style.ForeColor = color;
             }
 
             return row;
