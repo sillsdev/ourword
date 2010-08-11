@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
+using JWTools;
 using OurWordData.DataModel.Membership;
 
 namespace OurWord.Dialogs.Membership
@@ -29,6 +30,19 @@ namespace OurWord.Dialogs.Membership
         private void cmdLoad(object sender, EventArgs e)
         {
             PopulateAdministratorComboItems();
+
+            // Did we store the last administrator in the registry?
+            var sLastAdministrator = JW_Registry.GetValue(c_RegGroup, c_RegRememberAdministrator, "");
+            if (!string.IsNullOrEmpty(sLastAdministrator))
+            {
+                var user = Users.Find(sLastAdministrator);
+                if (null != user && user.IsAdministrator)
+                {
+                    m_comboAdministrators.Text = user.UserName;
+                    return;
+                }
+            }
+
             if (m_comboAdministrators.Items.Count > 0)
                 m_comboAdministrators.Text = (string)m_comboAdministrators.Items[0];
         }
@@ -50,8 +64,11 @@ namespace OurWord.Dialogs.Membership
             var user = Users.Find(m_comboAdministrators.Text);
             Debug.Assert(null != user);
 
+            // Let's remember this administrator for next time as a convenience
+            JW_Registry.SetValue(c_RegGroup, c_RegRememberAdministrator, user.UserName);
+
             // Password didn't match. Offer to let the user try again; if he chooses
-            // not to then pass "Abort" back to the caller.
+            // not to then pass "Abort" back to the caller.);
             if (user.Password != m_textPassword.Text)
             {
                 if (Messages.TryPasswordAgain())
@@ -61,6 +78,9 @@ namespace OurWord.Dialogs.Membership
             }
         }
         #endregion
+
+        private const string c_RegGroup = "User";
+        private const string c_RegRememberAdministrator = "LastAdministrator";
 
     }
 }
