@@ -520,8 +520,8 @@ namespace OurWord
             DB.Project.Dispose();
 		}
 		#endregion
-		#region Method: void OnEnterProject()
-	    internal void OnEnterProject()
+		#region method: void OnEnterProject()
+	    private void OnEnterProject()
 		{
             // If we aren't already navigated to a book, then attempt to find one.
 			DB.Project.Nav.GoToReasonableBook(G.CreateProgressIndicator());

@@ -52,6 +52,15 @@ namespace OurWordData.DataModel.Membership
             Members.Add(user);
         }
         #endregion
+        #region SMethod: void Delete(User user)
+        public static void Delete(User user)
+        {
+            Members.Remove(user);
+
+            // The Save command automatically removes files for users we've deleted
+            Save();
+        }
+        #endregion
 
         // I/O -------------------------------------------------------------------------------
         private static DTeamSettings s_TeamSettings;

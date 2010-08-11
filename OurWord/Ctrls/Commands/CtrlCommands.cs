@@ -394,13 +394,49 @@ namespace OurWord.Ctrls.Commands
                 m_User.DropDownItems.Add(item);
             }
 
+            // Administrator can add a new user
             if (current.IsAdministrator || !Users.HasAdministrator)
             {
                 m_User.DropDownItems.Add(new ToolStripSeparator());
                 m_User.DropDownItems.Add(
-                    new ToolStripMenuItem("Add new user...", null, cmdAddNewUser));
+                    new ToolStripMenuItem("Add New User...", null, cmdAddNewUser));
+            }
+
+            // Administrator can delete an existing user
+            AddDeleteUserMenuItem();
+        }
+        #region method:  void AddDeleteUserMenuItem()
+        private void AddDeleteUserMenuItem()
+        {
+            // The Administrator cannot delete himself; too messy to manage.
+            if (!Users.Current.IsAdministrator)
+                return;
+
+            // Get a list of the people this Administrator is permitted to delete
+            var deletableUsers = new List<User>();
+            foreach(var user in Users.Members)
+            {
+                if (user != Users.Current)
+                    deletableUsers.Add(user);
+            }
+            if (deletableUsers.Count == 0)
+                return;
+
+            // Add the top-level menu item
+            var item = new ToolStripMenuItem("Delete User");
+            m_User.DropDownItems.Add(item);
+
+            // Add the users that can be deleted
+            foreach (var user in deletableUsers)
+            {
+                var itemUser = new ToolStripMenuItem(user.UserName, null, cmdDeleteUser) 
+                { 
+                    Tag = user
+                };
+                item.DropDownItems.Add(itemUser);
             }
         }
+        #endregion
         #endregion
         #region cmd: cmdToolsDropDownOpening
         private void cmdToolsDropDownOpening(object sender, EventArgs e)
@@ -761,8 +797,29 @@ namespace OurWord.Ctrls.Commands
             SetupUser();
         }
         #endregion
+        #region cmd: cmdDeleteUser
+        static void cmdDeleteUser(object sender, EventArgs e)
+        {
+            // Retrieve the user
+            var item = sender as ToolStripMenuItem;
+            if (null == item)
+                return;
+            var user = item.Tag as User;
+            if (null == user)
+                return;
 
+            // Get confirmation
+            var bProceed = LocDB.Message("kConfirmDeleteUser",
+                          "Do you wish to delete {0}?",
+                          new string[] {user.UserName},
+                          LocDB.MessageTypes.YN);
+            if (!bProceed)
+                return;
 
+            // Remove the user (and his file)
+            Users.Delete(user);
+        }
+        #endregion
 
     }
 }

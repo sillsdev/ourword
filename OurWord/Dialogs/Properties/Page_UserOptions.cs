@@ -65,6 +65,7 @@ namespace OurWord.Dialogs.Properties
         private const string c_sMaximizeOnStartup = "propMaximizeOnStartup";
         private const string c_sZoomPercent = "propZoomPercent";
         private const string c_sProjectAccess = "propProjectAccess";
+        private const string c_sUserPassword = "propUserPassword";
 
         private const string c_sGroupUILanguage = "Language of the User Interface";
         private const string c_sPrimaryLanguage = "propPrimaryLanguage";
@@ -94,6 +95,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sProjectAccess:
                     e.Value = Users.Current.MemberProjects;
+                    break;
+                case c_sUserPassword:
+                    e.Value = Users.Current.Password;
                     break;
 
                 // UI Languages
@@ -141,6 +145,9 @@ namespace OurWord.Dialogs.Properties
                     Users.Current.ZoomPercent = ZoomPropertySpec.Pull(e);
                     break;
                 case c_sProjectAccess:
+                    break;
+                case c_sUserPassword:
+                    Users.Current.Password = (string) e.Value;
                     break;
 
                 // UI Languages
@@ -215,6 +222,15 @@ namespace OurWord.Dialogs.Properties
                 typeof(ProjectAccessEditor),
                  null));
             #endregion
+            #region OurWord User Password
+            m_bag.Properties.Add(new PropertySpec(
+                c_sUserPassword,
+                "OurWord User Password",
+                typeof(string),
+                c_sGroupBehavior,
+                "The password used to get into this Configuration Dialog.",
+                ""));
+            #endregion
 
             #region Primary UI Language
             m_bag.Properties.Add(new PropertySpec(
@@ -247,7 +263,7 @@ namespace OurWord.Dialogs.Properties
             #region Send/Receive Password
             m_bag.Properties.Add(new PropertySpec(
                 c_sPaassword,
-                "Password",
+                "Send/Receive Password",
                 typeof(string),
                 c_sGroupSendReceive,
                 "The password used to access LanguageDepot.org data; supplied by the LanguageDepot administrator.",
