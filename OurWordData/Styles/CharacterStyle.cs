@@ -352,7 +352,8 @@ namespace OurWordData.Styles
                 var factory = FontFactory.Create(child);
                 if (null == factory)
                     continue;
-
+                if (null != FindFontFactory(factory.WritingSystemName))
+                    continue;
                 FontFactories.Add(factory);
             }
         }
