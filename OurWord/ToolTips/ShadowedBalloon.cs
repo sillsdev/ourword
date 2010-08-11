@@ -66,7 +66,11 @@ namespace OurWord.ToolTips
         protected ShadowedBalloon()
         {
             InitializeComponent();
+            m_bComponentIsInitialized = true;
         }
+        // For non-default DPI (Chuck's), prevents cmdResize from laying out controls
+        // that have not yet been created.
+        readonly bool m_bComponentIsInitialized;
         #endregion
         #region Method: void Launch(Point ptTipInScreenCoords)
         public void Launch(Point ptTipInScreenCoords)
@@ -444,7 +448,8 @@ namespace OurWord.ToolTips
         #region Cmd: cmdResize
         private void cmdResize(object sender, EventArgs e)
         {
-            OnLayoutControls();
+            if (m_bComponentIsInitialized)
+                OnLayoutControls();
         }
         #endregion
     }
