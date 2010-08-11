@@ -75,10 +75,10 @@
             this.m_menuCheckForUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.m_SeparatorSendReceive = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuConfigure = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_separatorTools = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
-            this.m_separatorTools = new System.Windows.Forms.ToolStripSeparator();
             this.m_separatorHelp = new System.Windows.Forms.ToolStripSeparator();
             this.helpTopicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutOurWordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -96,7 +96,7 @@
             this.m_User});
             this.TopTools.Location = new System.Drawing.Point(0, 0);
             this.TopTools.Name = "TopTools";
-            this.TopTools.Size = new System.Drawing.Size(676, 32);
+            this.TopTools.Size = new System.Drawing.Size(576, 30);
             this.TopTools.TabIndex = 0;
             // 
             // m_Layout
@@ -108,10 +108,11 @@
             this.m_ConsultantPreparation,
             this.m_LayoutSeparator,
             this.m_Zoom});
+            this.m_Layout.Font = new System.Drawing.Font("Segoe UI", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Layout.Image = ((System.Drawing.Image)(resources.GetObject("m_Layout.Image")));
             this.m_Layout.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_Layout.Name = "m_Layout";
-            this.m_Layout.Size = new System.Drawing.Size(116, 29);
+            this.m_Layout.Size = new System.Drawing.Size(108, 27);
             this.m_Layout.Text = "Drafting";
             this.m_Layout.DropDownOpening += new System.EventHandler(this.cmdLayoutDropDownOpening);
             // 
@@ -120,7 +121,7 @@
             this.m_Drafting.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Drafting.Image = ((System.Drawing.Image)(resources.GetObject("m_Drafting.Image")));
             this.m_Drafting.Name = "m_Drafting";
-            this.m_Drafting.Size = new System.Drawing.Size(201, 22);
+            this.m_Drafting.Size = new System.Drawing.Size(199, 22);
             this.m_Drafting.Text = "&Drafting";
             this.m_Drafting.Click += new System.EventHandler(this.cmdSwitchLayout);
             // 
@@ -129,7 +130,7 @@
             this.m_NaturalnessCheck.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_NaturalnessCheck.Image = ((System.Drawing.Image)(resources.GetObject("m_NaturalnessCheck.Image")));
             this.m_NaturalnessCheck.Name = "m_NaturalnessCheck";
-            this.m_NaturalnessCheck.Size = new System.Drawing.Size(201, 22);
+            this.m_NaturalnessCheck.Size = new System.Drawing.Size(199, 22);
             this.m_NaturalnessCheck.Text = "&Naturalness Check";
             this.m_NaturalnessCheck.Click += new System.EventHandler(this.cmdSwitchLayout);
             // 
@@ -138,7 +139,7 @@
             this.m_BackTranslation.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_BackTranslation.Image = ((System.Drawing.Image)(resources.GetObject("m_BackTranslation.Image")));
             this.m_BackTranslation.Name = "m_BackTranslation";
-            this.m_BackTranslation.Size = new System.Drawing.Size(201, 22);
+            this.m_BackTranslation.Size = new System.Drawing.Size(199, 22);
             this.m_BackTranslation.Text = "&Back Translation";
             this.m_BackTranslation.Click += new System.EventHandler(this.cmdSwitchLayout);
             // 
@@ -147,20 +148,20 @@
             this.m_ConsultantPreparation.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_ConsultantPreparation.Image = ((System.Drawing.Image)(resources.GetObject("m_ConsultantPreparation.Image")));
             this.m_ConsultantPreparation.Name = "m_ConsultantPreparation";
-            this.m_ConsultantPreparation.Size = new System.Drawing.Size(201, 22);
+            this.m_ConsultantPreparation.Size = new System.Drawing.Size(199, 22);
             this.m_ConsultantPreparation.Text = "Consultant &Preparation";
             this.m_ConsultantPreparation.Click += new System.EventHandler(this.cmdSwitchLayout);
             // 
             // m_LayoutSeparator
             // 
             this.m_LayoutSeparator.Name = "m_LayoutSeparator";
-            this.m_LayoutSeparator.Size = new System.Drawing.Size(198, 6);
+            this.m_LayoutSeparator.Size = new System.Drawing.Size(196, 6);
             // 
             // m_Zoom
             // 
             this.m_Zoom.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Zoom.Name = "m_Zoom";
-            this.m_Zoom.Size = new System.Drawing.Size(201, 22);
+            this.m_Zoom.Size = new System.Drawing.Size(199, 22);
             this.m_Zoom.Text = "Zoom";
             // 
             // m_User
@@ -172,7 +173,7 @@
             this.m_User.Image = ((System.Drawing.Image)(resources.GetObject("m_User.Image")));
             this.m_User.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_User.Name = "m_User";
-            this.m_User.Size = new System.Drawing.Size(59, 29);
+            this.m_User.Size = new System.Drawing.Size(59, 27);
             this.m_User.Text = "<User>";
             this.m_User.DropDownOpening += new System.EventHandler(this.cmdUserDropDownOpening);
             // 
@@ -194,9 +195,9 @@
             this.m_InsertNote,
             this.m_History,
             this.m_Tools});
-            this.BottomTools.Location = new System.Drawing.Point(0, 32);
+            this.BottomTools.Location = new System.Drawing.Point(0, 30);
             this.BottomTools.Name = "BottomTools";
-            this.BottomTools.Size = new System.Drawing.Size(676, 46);
+            this.BottomTools.Size = new System.Drawing.Size(576, 46);
             this.BottomTools.TabIndex = 1;
             // 
             // m_Exit
@@ -545,6 +546,11 @@
                 "";
             this.m_menuConfigure.Click += new System.EventHandler(this.cmdConfigure);
             // 
+            // m_separatorTools
+            // 
+            this.m_separatorTools.Name = "m_separatorTools";
+            this.m_separatorTools.Size = new System.Drawing.Size(199, 6);
+            // 
             // m_menuIncrementBookStatus
             // 
             this.m_menuIncrementBookStatus.Name = "m_menuIncrementBookStatus";
@@ -568,11 +574,6 @@
             this.m_menuLocalizerTool.Text = "&Localizer Tool...";
             this.m_menuLocalizerTool.ToolTipText = "Create a version of OurWord in another language.";
             this.m_menuLocalizerTool.Click += new System.EventHandler(this.cmdLocalizerTool);
-            // 
-            // m_separatorTools
-            // 
-            this.m_separatorTools.Name = "m_separatorTools";
-            this.m_separatorTools.Size = new System.Drawing.Size(199, 6);
             // 
             // m_separatorHelp
             // 
@@ -602,7 +603,7 @@
             this.Controls.Add(this.BottomTools);
             this.Controls.Add(this.TopTools);
             this.Name = "CtrlCommands";
-            this.Size = new System.Drawing.Size(676, 86);
+            this.Size = new System.Drawing.Size(576, 86);
             this.Load += new System.EventHandler(this.cmdLoad);
             this.TopTools.ResumeLayout(false);
             this.TopTools.PerformLayout();

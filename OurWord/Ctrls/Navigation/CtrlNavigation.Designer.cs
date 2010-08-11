@@ -65,34 +65,37 @@
             this.m_Locked});
             this.TopTools.Location = new System.Drawing.Point(0, 0);
             this.TopTools.Name = "TopTools";
-            this.TopTools.Size = new System.Drawing.Size(349, 32);
+            this.TopTools.Size = new System.Drawing.Size(449, 30);
             this.TopTools.TabIndex = 0;
             // 
             // m_Book
             // 
             this.m_Book.BackColor = System.Drawing.Color.Transparent;
             this.m_Book.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_Book.Font = new System.Drawing.Font("Segoe UI", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Book.Image = ((System.Drawing.Image)(resources.GetObject("m_Book.Image")));
             this.m_Book.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_Book.Name = "m_Book";
-            this.m_Book.Size = new System.Drawing.Size(92, 29);
+            this.m_Book.Size = new System.Drawing.Size(82, 27);
             this.m_Book.Text = "Genesis";
             // 
             // m_Chapter
             // 
             this.m_Chapter.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_Chapter.Font = new System.Drawing.Font("Segoe UI", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Chapter.Image = ((System.Drawing.Image)(resources.GetObject("m_Chapter.Image")));
             this.m_Chapter.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_Chapter.Name = "m_Chapter";
-            this.m_Chapter.Size = new System.Drawing.Size(47, 29);
+            this.m_Chapter.Size = new System.Drawing.Size(43, 27);
             this.m_Chapter.Text = "24";
             this.m_Chapter.Click += new System.EventHandler(this.cmdGoToChapter);
             // 
             // m_Verse
             // 
             this.m_Verse.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.m_Verse.Font = new System.Drawing.Font("Segoe UI", 12.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_Verse.Name = "m_Verse";
-            this.m_Verse.Size = new System.Drawing.Size(53, 29);
+            this.m_Verse.Size = new System.Drawing.Size(47, 27);
             this.m_Verse.Text = "5-25";
             // 
             // m_Locked
@@ -102,7 +105,7 @@
             this.m_Locked.Image = ((System.Drawing.Image)(resources.GetObject("m_Locked.Image")));
             this.m_Locked.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.m_Locked.Name = "m_Locked";
-            this.m_Locked.Size = new System.Drawing.Size(23, 29);
+            this.m_Locked.Size = new System.Drawing.Size(23, 27);
             this.m_Locked.Text = "Locked";
             this.m_Locked.ToolTipText = "This book is locked and cannot be edited.";
             // 
@@ -117,9 +120,9 @@
             this.m_Last,
             this.m_Separator,
             this.m_Find});
-            this.BottomTools.Location = new System.Drawing.Point(0, 32);
+            this.BottomTools.Location = new System.Drawing.Point(0, 30);
             this.BottomTools.Name = "BottomTools";
-            this.BottomTools.Size = new System.Drawing.Size(349, 46);
+            this.BottomTools.Size = new System.Drawing.Size(449, 46);
             this.BottomTools.TabIndex = 1;
             // 
             // m_First
@@ -252,7 +255,7 @@
             this.Controls.Add(this.BottomTools);
             this.Controls.Add(this.TopTools);
             this.Name = "CtrlNavigation";
-            this.Size = new System.Drawing.Size(349, 88);
+            this.Size = new System.Drawing.Size(449, 88);
             this.Load += new System.EventHandler(this.cmdLoad);
             this.TopTools.ResumeLayout(false);
             this.TopTools.PerformLayout();

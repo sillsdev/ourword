@@ -96,11 +96,14 @@ namespace OurWord.Ctrls.Navigation
         void SetupBookCtrl()
         {
             // Title
-            const int c_nMaxLength = 14;
+            const int c_nMaxLength = 23;
             var sTitle = CurrentSection.Book.DisplayName;
             if (sTitle.Length > c_nMaxLength)
                 sTitle = sTitle.Substring(0, c_nMaxLength - 2) + "...";
             m_Book.Text = sTitle;
+
+            // Tool Tip Text
+            m_Book.ToolTipText = CurrentSection.Book.DisplayName;
 
             // Populate Dropdown
             var vBooks = DB.Project.Nav.PotentialTargetBooks;

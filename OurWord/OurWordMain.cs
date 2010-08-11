@@ -359,7 +359,7 @@ namespace OurWord
             this.m_Commands.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.m_Commands.Location = new System.Drawing.Point(0, 0);
             this.m_Commands.Name = "m_Commands";
-            this.m_Commands.Size = new System.Drawing.Size(499, 78);
+            this.m_Commands.Size = new System.Drawing.Size(413, 78);
             this.m_Commands.TabIndex = 4;
             // 
             // m_Navigation
@@ -367,9 +367,9 @@ namespace OurWord
             this.m_Navigation.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.m_Navigation.BackColor = System.Drawing.Color.DarkGray;
             this.m_Navigation.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.m_Navigation.Location = new System.Drawing.Point(496, 0);
+            this.m_Navigation.Location = new System.Drawing.Point(409, 0);
             this.m_Navigation.Name = "m_Navigation";
-            this.m_Navigation.Size = new System.Drawing.Size(246, 78);
+            this.m_Navigation.Size = new System.Drawing.Size(333, 78);
             this.m_Navigation.TabIndex = 3;
             // 
             // OurWordMain
