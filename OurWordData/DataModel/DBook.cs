@@ -2236,7 +2236,7 @@ namespace OurWordData.DataModel
             foreach(DSection section in Sections)
             {
                 if (section.ReferenceSpan.Start.Chapter >= nChapterNumber &&
-                    section.ReferenceSpan.End.Chapter <= nChapterNumber)
+                    nChapterNumber <= section.ReferenceSpan.End.Chapter)
                 {
                     return section;
                 }
