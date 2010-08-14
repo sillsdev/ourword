@@ -109,11 +109,12 @@ namespace OurWord.Ctrls.Commands
             var bIsValidProject = DB.IsValidProject;
 
             m_New.Available = !bIsValidProject || 
-                user.CanCreateProject || 
+                user.CanCreateProject ||
                 !Users.HasAdministrator;
 
             m_Open.Available = !bIsValidProject ||
-                user.CanCreateProject ||
+                user.MemberProjects.Length > 1 || 
+                user == Users.Observer ||
                 !Users.HasAdministrator;
 
             m_Save.Available = bIsValidProject;

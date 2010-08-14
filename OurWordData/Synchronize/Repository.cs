@@ -367,7 +367,7 @@ namespace OurWordData.Synchronize
             if (!Exists)
             {
                 throw new SynchException("msgRepositoryCorruptedNoBackup",
-                    "We're sorry....your repository is corrupted, and there is no backup available.\n" +
+                    "We're sorry....your repository is corrupted, and there is no backup available. " +
                     "(But more than likely your data is ok.) Please contact us for help.");
             }
 
