@@ -31,7 +31,7 @@ namespace OurWordData.DataModel.Membership
         {
             get
             {
-                return ((float)ZoomPercent /100.0F);
+                return (ZoomPercent /100.0F);
             }
         }
         #endregion
@@ -325,6 +325,7 @@ namespace OurWordData.DataModel.Membership
             m_vTranslationSettings.Remove(sTranslationName);
         }
         #endregion
+        #region Attr{g}: string MemberProjects
         public string MemberProjects
         {
             get
@@ -337,6 +338,7 @@ namespace OurWordData.DataModel.Membership
                 return s;
             }
         }
+        #endregion
 
         // Editable (vs locked, etc.) books --------------------------------------------------
         #region Method: bool GetEditability(sTranslationName, sBookName)
@@ -351,12 +353,12 @@ namespace OurWordData.DataModel.Membership
             return settings.GetEditability(sBookAbbrev);
         }
         #endregion
+        #region Method: Editability GetEditability(DBook)
         public TranslationSettings.Editability GetEditability(DBook book)
         {
             return GetEditability(book.Translation.DisplayName, book.BookAbbrev);
         }
-
-
+        #endregion
         #region Method: bool SetEditability(sTranslationName, sBookName, editability)
         public void SetEditability(string sTranslationName, string sBookAbbrev, 
             TranslationSettings.Editability editability)
@@ -552,8 +554,7 @@ namespace OurWordData.DataModel.Membership
             if (string.IsNullOrEmpty(sUser))
                 return null;
 
-            var user = new User() 
-            {
+            var user = new User {
                 UserName = sUser,
                 Password = XmlDoc.GetAttrValue(node, c_sAttrPassword, ""),
                 IsAdministrator = XmlDoc.GetAttrValue(node, c_sAttrAdministrator, false),

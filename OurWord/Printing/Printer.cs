@@ -279,8 +279,8 @@ namespace OurWord.Printing
             return vDisplayParagraphs;
         }
         #endregion
-        #region SMethod: List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
-        static List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
+        #region Method: List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
+        List<OWPara> CollectAndNumberFootnotes(IEnumerable<OWPara> vDisplayParagraphs)
         {
             var n = 0;
 
@@ -300,6 +300,7 @@ namespace OurWord.Printing
 
                     var owfn = new OWFootnotePara(footnote, Color.White, OWPara.Flags.None);
                     vFootnotes.Add(owfn);
+                    MakeQuoteReplacements(owfn);
 
                     var label = owfn.SubItems[0] as EFootnoteLabel;
                     if (null != label)
