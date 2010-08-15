@@ -178,5 +178,11 @@ namespace OurWord.Edit.Blocks
             tip.Launch(ptScreenLocation);
         }
         #endregion
+        #region OMethod: void cmdLeftMouseClick(PointF)
+        public override void cmdLeftMouseClick(PointF pt)
+        {
+            ToolTipLauncher.LaunchNow(this);
+        }
+        #endregion
     }
 }

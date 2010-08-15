@@ -197,7 +197,7 @@ namespace OurWord.ToolTips
                     if (chapter.ChapterNo == nChapter)
                         bChapterFound = true;
                     else
-                        break;
+                        continue;
                 }
 
                 // Find the target verse
