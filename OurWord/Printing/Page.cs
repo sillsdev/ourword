@@ -117,10 +117,12 @@ namespace OurWord.Printing
                     bFootnoteFound = true;
                 }
 
-                // Subtract this group's height from the height available on the page.6
+                // Subtract this group's height from the height available on the page.
                 // For the initial group on the page, we want to eat the SpaceBefore, as we don't
                 // need for the paragraph to appear lower when its at the top of the page.
-                var fGroupHeight = (Groups.Count == 1) ? group.BodyHeight : group.TotalHeight;
+                var fGroupHeight = (Groups.Count == 1) ? 
+                    group.TotalHeight - group.SpaceBefore : 
+                    group.TotalHeight;
                 fHeightRemaining -= fGroupHeight;
 
                 // Remove the group we've just added from the queue

@@ -72,14 +72,22 @@ namespace OurWord.Printing
             // Update if we encounter a number within our body lines
             foreach(var line in BodyLines)
             {
+                if (line.Chapter != null)
+                {
+                    ChapterNumber = line.Chapter.Number;
+                    VerseNumber = 1;
+                }
+
                 foreach (var item in line.SubItems) 
                 {
+                    /*
                     var chapter = item as EChapter;
                     if (null != chapter)
                     {
                         ChapterNumber = chapter.Number;
                         VerseNumber = 1;
                     }
+                    */
 
                     var verse = item as EVerse;
                     if (null != verse)
@@ -170,7 +178,7 @@ namespace OurWord.Printing
             }
         }
         #endregion
-        #region Attr{g}: bool KeepWithNex
+        #region Attr{g}: bool KeepWithNext
         public bool KeepWithNext
         {
             get
@@ -245,7 +253,7 @@ namespace OurWord.Printing
                 line.SetYs(line.Position.Y + yDifference);
 
             if (null != Picture)
-                Picture.SetY(TopY + SpaceAfter);
+                Picture.SetY(TopY); // + SpaceAfter);
         }
         #endregion
         #region Method: void HandleLineSpacing(float fMultiplier)

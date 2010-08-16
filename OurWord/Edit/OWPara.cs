@@ -344,7 +344,7 @@ namespace OurWord.Edit
                         InitializeNoteIcons(r as DText, DisplayBT);
                         break;
                     default:
-                        Console.WriteLine("Unknown type in OWPara.Initialize...Name=" + 
+                        Console.WriteLine(@"Unknown type in OWPara.Initialize...Name=" + 
                             r.GetType().Name);
                         Debug.Assert(false);
                         break;
@@ -1900,7 +1900,7 @@ namespace OurWord.Edit
         #region Constructor(DFootnote, colorBackground, options)
         public OWFootnotePara(DFootnote footnote, Color clrEditableBackground, Flags options)
             : base(GetWritingSystem(footnote, options),            
-                StyleSheet.Footnote, footnote, clrEditableBackground, options)
+                   StyleSheet.Footnote, footnote, clrEditableBackground, options)
         {
             ConstructFootnoteReference(footnote, options);
             ConstructFootnoteLetter(footnote);

@@ -439,8 +439,8 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region VAttr{g}: List<DRun> AllRuns
-        public List<DRun> AllRuns
+        #region VAttr{g}: IEnumerable<DRun> AllRuns
+        public IEnumerable<DRun> AllRuns
         {
             get
             {
@@ -448,6 +448,21 @@ namespace OurWordData.DataModel
 
                 foreach(DSection section in Sections)
                     v.AddRange(section.AllRuns);
+
+                return v;
+            }
+        }
+        #endregion
+        #region VAttr{g}: IEnumerable<DParagraph> AllParagraphs
+        public IEnumerable<DParagraph> AllParagraphs
+        {
+            get
+            {
+                var v = new List<DParagraph>();
+
+                foreach(DSection section in Sections)
+                    foreach(DParagraph p in section.Paragraphs)
+                        v.Add(p);
 
                 return v;
             }

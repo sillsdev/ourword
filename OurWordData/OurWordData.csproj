@@ -137,6 +137,7 @@
     <Compile Include="DataModel\DSection.cs" />
     <Compile Include="DataModel\DTeamSettings.cs" />
     <Compile Include="DataModel\DTranslation.cs" />
+    <Compile Include="DataModel\Membership\TemporaryZoomPercent.cs" />
     <Compile Include="DataModel\Runs\DPhrase.cs" />
     <Compile Include="DataModel\Runs\DPhraseGroup.cs" />
     <Compile Include="DataModel\Runs\DPhraseList.cs" />

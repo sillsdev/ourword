@@ -18,6 +18,7 @@ namespace OurWord.Edit.Blocks
 {
     public class EFoot : EBlock
     {
+        // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: DFoot Foot
         DFoot Foot
         {
@@ -40,6 +41,7 @@ namespace OurWord.Edit.Blocks
         }
         #endregion
 
+        // Scaffolding -----------------------------------------------------------------------
         #region Constructor(font, DFoot)
         public EFoot(Font font, DFoot foot)
             : base(font, foot.Text)
@@ -49,6 +51,7 @@ namespace OurWord.Edit.Blocks
         }
         #endregion
 
+        // Layout and Drawing ----------------------------------------------------------------
         #region Method: override void Draw(IDraw)
         public override void Draw(IDraw draw)
         {

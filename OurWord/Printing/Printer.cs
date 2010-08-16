@@ -19,6 +19,7 @@ using OurWord.Edit.Blocks;
 using OurWord.Layouts;
 using OurWordData;
 using OurWordData.DataModel;
+using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
 
 #endregion
@@ -125,9 +126,12 @@ namespace OurWord.Printing
             };
             EnumeratedStepsProgressDlg.Start("Printing", vsProgressSteps);
             
-            // Layout & send to printer
-            Layout();
-            DoPrint();
+            // Layout & send to printer, at 100% zoom
+            using (new TemporaryZoomPercent(100))
+            {
+                Layout();
+                DoPrint();
+            }
 
             EnumeratedStepsProgressDlg.Stop();
         }
@@ -214,19 +218,37 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.ClearAppend();
         }
         #endregion
-        #region Method: List<DParagraph> GetParagraphsToPrint()
+        #region Method: ICollection<DParagraph> GetParagraphsToPrint()
         ICollection<DParagraph> GetParagraphsToPrint()
         {
             var vParagraphs = new List<DParagraph>();
 
-            var vSectionsToPrint = DetermineSectionsToPrint();
-            if (null == vSectionsToPrint || vSectionsToPrint.Count == 0)
-                return vParagraphs;
-
-            foreach (var section in vSectionsToPrint)
+            if (UserSettings.CurrentSection)
             {
-                foreach (DParagraph paragraph in section.Paragraphs)
-                    vParagraphs.Add(paragraph);
+                foreach(DParagraph p in CurrentSection.Paragraphs)
+                    vParagraphs.Add(p);
+            }
+
+            else if (UserSettings.EntireBook)
+            {
+                vParagraphs.AddRange(BookToPrint.AllParagraphs);
+            }
+
+            else if (UserSettings.Chapters)
+            {
+                var nStartAtChapter = UserSettings.StartChapter;
+                var nEndAtChapter = Math.Max(UserSettings.EndChapter, nStartAtChapter);
+
+                var vAllParagraphs = BookToPrint.AllParagraphs;
+                foreach (var p in vAllParagraphs)
+                {
+                    if (p.ReferenceSpan.Start.Chapter < nStartAtChapter)
+                        continue;
+                    if (p.ReferenceSpan.Start.Chapter > nEndAtChapter)
+                        break;
+
+                    vParagraphs.Add(p);
+                }                              
             }
 
             return vParagraphs;
@@ -433,40 +455,6 @@ namespace OurWord.Printing
         #endregion
 
         // Implementation --------------------------------------------------------------------
-        #region Method: List<DSection> DetermineSectionsToPrint()
-        List<DSection> DetermineSectionsToPrint()
-        {
-            if (UserSettings.CurrentSection)
-                return new List<DSection> {CurrentSection};
-
-            if (UserSettings.EntireBook)
-            {
-                var v = new List<DSection>();
-                foreach(DSection section in BookToPrint.Sections)
-                    v.Add(section);
-                return v;
-            }
-
-            if (UserSettings.Chapters)
-            {
-                var nStartAtChapter = UserSettings.StartChapter;
-                var nEndAtChapter = Math.Max(UserSettings.EndChapter, nStartAtChapter);
-
-                var v = new List<DSection>();
-                foreach(DSection section in BookToPrint.Sections)
-                {
-                    if (section.ReferenceSpan.End.Chapter >= nStartAtChapter)
-                        v.Add(section);
-                    if (section.ReferenceSpan.Start.Chapter > nEndAtChapter)
-                        break;
-                }
-                return v;
-            }
-
-            Debug.Assert(false);
-            return null;
-        }
-        #endregion
         private int m_nCurrentPrintPage;
         #region Method: void DoPrint()
         void DoPrint()
