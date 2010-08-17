@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using JWTools;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
@@ -13,11 +12,7 @@ namespace OurWord.Dialogs.Properties
         public Page_UserEditPermissions(DialogProperties parentDlg)
             : base(parentDlg)
         {
-            InitializeComponent();
-
-            m_UserIsNotProjectMember.OnGrantMembership = cmdGrantMembership;
-            m_UserIsNotProjectMember.Hide();
-        }
+            InitializeComponent();        }
         #endregion
         #region method: void SetEnabling(bEnabled)
         void SetEnabling(bool bEnabled)
@@ -93,29 +88,154 @@ namespace OurWord.Dialogs.Properties
         }
         #endregion
 
+        // Membership Combo -----------------------------------------------------------------
+        #region sattr{g}: string NotAMember
+        static string NotAMember
+        {
+            get
+            {
+                return Loc.GetString("kUserNotAMember", "Not a member of this project");
+            }
+        }
+        #endregion
+        #region sattr{g}: string FullEditing
+        static string FullEditing
+        {
+            get
+            {
+                return Loc.GetString("kUserFullEditing", "Full Editing Priviledges");
+            }
+        }
+        #endregion
+        #region sattr{g}: string CanMakeNotes
+        static string CanMakeNotes
+        {
+            get
+            {
+                return Loc.GetString("kUserCanMakeNotes", "Can Only Make Notes");
+            }
+        }
+        #endregion
+        #region sattr{g}: string ReadOnly
+        static string ReadOnly
+        {
+            get
+            {
+                return Loc.GetString("kUserReadOnly", "Read Only");
+            }
+        }
+        #endregion
+        #region sattr{g}: string CustomBookByBook
+        static string CustomBookByBook
+        {
+            get
+            {
+                return Loc.GetString("kUserBookByBook", "Customize Book By Book");
+            }
+        }
+        #endregion
+        #region cmd: cmdGlobalEditingChanged
+        private void cmdGlobalEditingChanged(object sender, System.EventArgs e)
+        {
+            // Not a Member
+            if (NotAMember == m_comboMembership.Text)
+            {
+                Users.Current.RemoveMembershipFrom(DB.TargetTranslation.DisplayName);
+                SetEnabling(false);
+                SetupPropertyGrid();
+                return;
+            }
+
+            // Otherwise, make sure he's a member
+            if (!Users.Current.IsMemberOf(DB.TargetTranslation.DisplayName))
+                Users.Current.AddMembershipTo(DB.TargetTranslation.DisplayName);
+            var settings = Users.Current.FindTranslationSettings(
+                DB.TargetTranslation.DisplayName);
+
+            // Full Editing
+            if (FullEditing == m_comboMembership.Text)
+            {
+                settings.GlobalEditability = User.TranslationSettings.GEditability.Full;
+                SetEnabling(false);
+                SetupPropertyGrid();
+                return;
+            }
+
+            // Read Only
+            if (ReadOnly == m_comboMembership.Text)
+            {
+                settings.GlobalEditability = User.TranslationSettings.GEditability.ReadOnly;
+                SetEnabling(false);
+                SetupPropertyGrid();
+                return;
+            }
+
+            // Can Make Notes
+            if (CanMakeNotes == m_comboMembership.Text)
+            {
+                settings.GlobalEditability = User.TranslationSettings.GEditability.Notes;
+                SetEnabling(false);
+                SetupPropertyGrid();
+                return;
+            }
+
+            // Custom
+            if (CustomBookByBook == m_comboMembership.Text)
+            {
+                settings.GlobalEditability = User.TranslationSettings.GEditability.Custom;
+                SetEnabling(true);
+                SetupPropertyGrid();
+                return;
+            }
+        }
+        #endregion
+
         // Other Command Handlers ------------------------------------------------------------
         #region cmd: cmdLoad
         private void cmdLoad(object sender, System.EventArgs e)
         {
-            if (Users.Current.IsMemberOf(DB.TargetTranslation.DisplayName))
+            SetEnabling(false);
+
+            m_comboMembership.Items.Add(NotAMember);
+            m_comboMembership.Items.Add(FullEditing);
+            m_comboMembership.Items.Add(CanMakeNotes);
+            m_comboMembership.Items.Add(ReadOnly);
+            m_comboMembership.Items.Add(CustomBookByBook);
+
+            var translationSettings = Users.Current.FindTranslationSettings(
+                DB.TargetTranslation.DisplayName);
+
+            if (null == translationSettings)
             {
-                m_UserIsNotProjectMember.Hide();
+                m_comboMembership.Text = NotAMember;
             }
-            else
+            else 
             {
-                m_UserIsNotProjectMember.Show();
-                SetEnabling(false);
+                switch (translationSettings.GlobalEditability)
+                {
+                    case User.TranslationSettings.GEditability.Full:
+                        m_comboMembership.Text = FullEditing;
+                        break;
+
+                    case User.TranslationSettings.GEditability.Notes:
+                        m_comboMembership.Text = CanMakeNotes;
+                        break;
+
+                    case User.TranslationSettings.GEditability.ReadOnly:
+                        m_comboMembership.Text = ReadOnly;
+                        break;
+
+                    case User.TranslationSettings.GEditability.Custom:
+                        m_comboMembership.Text = CustomBookByBook;
+                        SetEnabling(true);
+                        break;
+
+                    default:
+                        Debug.Assert(false, "Unknown editability");
+                        break;
+                }
             }
 
-            SetupPropertyGrid();
-        }
-        #endregion
-        #region cmd: cmdGrantMembership
-        private void cmdGrantMembership()
-        {
-            Users.Current.AddMembershipTo(DB.TargetTranslation.DisplayName);
-            m_UserIsNotProjectMember.Hide();
-            SetEnabling(true);
             SetupPropertyGrid();
         }
         #endregion

@@ -624,7 +624,8 @@ namespace OurWordData.Synchronize
         // 3 - new Style implementation, Pictures
         // 4 - Version 1.7 - Users
         // 5 - TeamSettings.CheckForUpdates option
-        public const int c_nCurrentVersionNo = 5;
+        // 6 - GlobalEditability in users        
+        public const int c_nCurrentVersionNo = 6;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {

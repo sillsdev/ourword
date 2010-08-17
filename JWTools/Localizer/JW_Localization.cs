@@ -1530,7 +1530,7 @@ namespace JWTools
         }
         #endregion
         #region SAttr{g}: bool IsInitialized
-        static bool IsInitialized
+        static public bool IsInitialized
         {
             get
             {

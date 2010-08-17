@@ -138,7 +138,7 @@ namespace OurWordData.Styles
         private bool m_bBulleted;
         #endregion
         public enum Align { Left = 0, Right, Centered, Justified };
-        #region Attr{g/s}: AlignType Alignment
+        #region Attr{g/s}: Align Alignment
         public Align Alignment
         {
             get

@@ -266,9 +266,6 @@
     <EmbeddedResource Include="Dialogs\Properties\CtrlPageContent.resx">
       <DependentUpon>CtrlPageContent.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Properties\Ctrl_UserIsNotProjectMember.resx">
-      <DependentUpon>Ctrl_UserIsNotProjectMember.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Properties\DlgMoveCluster.resx">
       <DependentUpon>DlgMoveCluster.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -516,12 +513,6 @@
     </Compile>
     <Compile Include="Dialogs\Properties\CtrlPageContent.Designer.cs">
       <DependentUpon>CtrlPageContent.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Ctrl_UserIsNotProjectMember.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Dialogs\Properties\Ctrl_UserIsNotProjectMember.Designer.cs">
-      <DependentUpon>Ctrl_UserIsNotProjectMember.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Properties\DlgMoveCluster.cs">
       <SubType>Form</SubType>

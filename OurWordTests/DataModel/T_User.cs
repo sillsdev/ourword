@@ -131,7 +131,7 @@ namespace OurWordTests.DataModel
                 "canAuthorInformationNotes=\"true\" " +
                 "canAssignNoteToConsultant=\"true\" " +
                 "canCreateFrontTranslationNotes=\"true\">" +
-                    "<TranslationSettings name=\"Amarasi\" Notes=\"1PE 2PE\" ReadOnly=\"JHN ROM\" />" +
+                    "<TranslationSettings name=\"Amarasi\" globalEditability=\"Custom\" Notes=\"1PE 2PE\" ReadOnly=\"JHN ROM\" />" +
                 "</User>";
 
             // Create a user with some meaningful settings
@@ -218,30 +218,30 @@ namespace OurWordTests.DataModel
                 "<User username=\"Bob\" zoom=\"100\" primaryUi=\"English\" secondaryUi=\"Spanish\" " +
                 "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                 "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                    "<TranslationSettings name=\"Amarasi\" ReadOnly=\"JHN ROM\" />" +
+                    "<TranslationSettings name=\"Amarasi\" globalEditability=\"Custom\" ReadOnly=\"JHN ROM\" />" +
                 "</User>";
             const string c_sOurs =
                "<User username=\"Bob\" zoom=\"120\" primaryUi=\"English\" secondaryUi=\"Spanish\" " +
                "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                   "<TranslationSettings name=\"Amarasi\" ReadOnly=\"JHN ROM\" />" +
-                   "<TranslationSettings name=\"Helong\" ReadOnly=\"MAT\" />" +
+                   "<TranslationSettings name=\"Amarasi\" globalEditability=\"Custom\" ReadOnly=\"JHN ROM\" />" +
+                   "<TranslationSettings name=\"Helong\" globalEditability=\"Custom\" ReadOnly=\"MAT\" />" +
                "</User>";
             const string c_sTheirs =
                "<User username=\"Bob\" zoom=\"100\" primaryUi=\"English\" secondaryUi=\"English\" " +
                "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                   "<TranslationSettings name=\"Amarasi\" ReadOnly=\"ROM 1CO\" />" +
-                   "<TranslationSettings name=\"Rikou\" ReadOnly=\"MRK\" />" +
+                   "<TranslationSettings name=\"Amarasi\" globalEditability=\"Custom\" ReadOnly=\"ROM 1CO\" />" +
+                   "<TranslationSettings name=\"Rikou\" globalEditability=\"Custom\" ReadOnly=\"MRK\" />" +
                "</User>";
 
             const string c_sExpected =
                 "<User username=\"Bob\" zoom=\"120\" primaryUi=\"English\" secondaryUi=\"English\" " +
                 "DraftingBg=\"Wheat\" BackTranslationBg=\"Linen\" NaturalnessBg=\"Wheat\" " +
                 "ConsultantBg=\"Wheat\" noteAuthor=\"Bob\">" +
-                    "<TranslationSettings name=\"Amarasi\" ReadOnly=\"ROM 1CO\" />" +
-                    "<TranslationSettings name=\"Helong\" ReadOnly=\"MAT\" />" +
-                    "<TranslationSettings name=\"Rikou\" ReadOnly=\"MRK\" />" +
+                    "<TranslationSettings name=\"Amarasi\" globalEditability=\"Custom\" ReadOnly=\"ROM 1CO\" />" +
+                    "<TranslationSettings name=\"Helong\" globalEditability=\"Custom\" ReadOnly=\"MAT\" />" +
+                    "<TranslationSettings name=\"Rikou\" globalEditability=\"Custom\" ReadOnly=\"MRK\" />" +
                 "</User>";
 
             var userParent = CreateFromXml(c_sParent);

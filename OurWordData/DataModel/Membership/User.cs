@@ -112,6 +112,13 @@ namespace OurWordData.DataModel.Membership
             #region Method: Editability GetEditability(string sBookAbbrev)
             public Editability GetEditability(string sBookAbbrev)
             {
+                if (GlobalEditability == GEditability.Full)
+                    return Editability.Full;
+                if (GlobalEditability == GEditability.Notes)
+                    return Editability.Notes;
+                if (GlobalEditability == GEditability.ReadOnly)
+                    return Editability.ReadOnly;
+
                 Editability value;
                 if (m_BookEditability.TryGetValue(sBookAbbrev, out value))
                     return value;
@@ -124,6 +131,9 @@ namespace OurWordData.DataModel.Membership
                 m_BookEditability[sBookAbbrev] = value;
             }
             #endregion
+
+            public enum GEditability { Full, Notes, ReadOnly, Custom };
+            public GEditability GlobalEditability = GEditability.Full;
 
             // Private methods/etc.
             private Dictionary<string, Editability> m_BookEditability;
@@ -189,6 +199,8 @@ namespace OurWordData.DataModel.Membership
 
                 if (CanCreateGeneralNotes != other.CanCreateGeneralNotes)
                     return false;
+                if (GlobalEditability != other.GlobalEditability)
+                    return false;
 
                 return true;
             }
@@ -198,7 +210,8 @@ namespace OurWordData.DataModel.Membership
             {
                 var ts = new TranslationSettings(TranslationName)
                 {
-                    CanCreateGeneralNotes = CanCreateGeneralNotes
+                    CanCreateGeneralNotes = CanCreateGeneralNotes,
+                    GlobalEditability = GlobalEditability,
                 };
 
                 foreach(var sBookAbbrev in DBook.BookAbbrevs)
@@ -215,6 +228,7 @@ namespace OurWordData.DataModel.Membership
             private const string c_sTag = "TranslationSettings";
             private const string c_sAttrTranslationName = "name";
             private const string c_sAttrCanCreateGeneralNotes = "generalNotes";
+            private const string c_sAttrGlobalEditability = "globalEditability";
             #endregion
             #region Method: XmlNode Save(XmlDoc, nodeParent)
             public XmlNode Save(XmlDoc doc, XmlNode nodeParent)
@@ -222,8 +236,8 @@ namespace OurWordData.DataModel.Membership
                 var node = doc.AddNode(nodeParent, c_sTag);
 
                 doc.AddAttr(node, c_sAttrTranslationName, m_sTranslationName);
-
                 doc.AddAttr(node, c_sAttrCanCreateGeneralNotes, CanCreateGeneralNotes);
+                doc.AddAttr(node, c_sAttrGlobalEditability, GlobalEditability.ToString());
 
                 foreach (var sEditability in Enum.GetNames(typeof(Editability)))
                 {
@@ -248,7 +262,11 @@ namespace OurWordData.DataModel.Membership
 
                 var ts = new TranslationSettings(sName)
                 { 
-                    CanCreateGeneralNotes = XmlDoc.GetAttrValue(node, c_sAttrCanCreateGeneralNotes, false)
+                    CanCreateGeneralNotes = XmlDoc.GetAttrValue(node, c_sAttrCanCreateGeneralNotes, false),
+                    GlobalEditability = (GEditability)Enum.Parse(
+                        typeof(GEditability),
+                        XmlDoc.GetAttrValue(node, c_sAttrGlobalEditability, GEditability.Full.ToString()),
+                        true),
                 };
 
                 foreach(var sEditability in Enum.GetNames(typeof(Editability)))
@@ -278,14 +296,26 @@ namespace OurWordData.DataModel.Membership
                     CanCreateGeneralNotes = theirs.CanCreateGeneralNotes;
                 }
 
+                if (GlobalEditability != theirs.GlobalEditability &&
+                    GlobalEditability == parent.GlobalEditability)
+                {
+                    GlobalEditability = theirs.GlobalEditability;
+                }
+
                 foreach(var sBookAbbrev in DBook.BookAbbrevs)
                 {
                     var eParent = parent.GetEditability(sBookAbbrev);
                     var eTheirs = theirs.GetEditability(sBookAbbrev);
-                    var eMine = this.GetEditability(sBookAbbrev);
+                    var eMine = GetEditability(sBookAbbrev);
 
                     if (eMine != eTheirs && eMine == eParent)
                         SetEditability(sBookAbbrev, eTheirs);
+
+                    // If even one book is not fully editable, then no matter how
+                    // we set GlobalEditability earlier; we must leave it as
+                    // Custom here, or else the book's editability will be ignored.
+                    if (GetEditability(sBookAbbrev) != Editability.Full)
+                        GlobalEditability = GEditability.Custom;
                 }
             }
             #endregion
@@ -293,7 +323,7 @@ namespace OurWordData.DataModel.Membership
         #endregion
         private readonly Dictionary<string, TranslationSettings> m_vTranslationSettings;
         #region Method: TranslationSettings FindTranslationSettings(sTranslationName)
-        TranslationSettings FindTranslationSettings(string sTranslationName)
+        public TranslationSettings FindTranslationSettings(string sTranslationName)
         {
             TranslationSettings settings;
             m_vTranslationSettings.TryGetValue(sTranslationName, out settings);
@@ -370,6 +400,7 @@ namespace OurWordData.DataModel.Membership
             if (null == settings)
                 throw new ArgumentException("This user is not a member of the team: " + sTranslationName);
 
+            settings.GlobalEditability = TranslationSettings.GEditability.Custom;
             settings.SetEditability(sBookAbbrev, editability);
         }
         #endregion
