@@ -34,7 +34,7 @@ namespace OurWordTests.Styles
             "<WritingSystem Name=\"Amharic\" IdeaGraph=\"true\" Punct=\"&lt;&gt;?!()[]\" " +
             "EndPunct=\"()\" Keyboard=\"Ethiopic\" Consonants=\"dfghjk\" " +
             "UseAutoHyph=\"true\" AutoHyphCV=\"V-VC\" AutoHyphMinSplit=\"5\" " +
-            "AutoReplaceSource=\"2 {^a} {^A}\" " +
+            "HyphBrkChars=\"-\\/\" AutoReplaceSource=\"2 {^a} {^A}\" " +
             "AutoReplaceResult=\"2 {á} {Á}\" />";
         #region Test: TSave
         [Test] public void TSave()
@@ -106,7 +106,7 @@ namespace OurWordTests.Styles
             const string sExpected = "<WritingSystem Name=\"Amharic\" Punct=\"&lt;&gt;?!()[]\" " +
                 "EndPunct=\"()\" Keyboard=\"International\" Consonants=\"DFGHJKdfghjk\" " +
                 "UseAutoHyph=\"true\" AutoHyphCV=\"V-VC\" AutoHyphMinSplit=\"12\" " +
-                "AutoReplaceSource=\"2 {^a} {^A}\" " +
+                "HyphBrkChars=\"-\\/\" AutoReplaceSource=\"2 {^a} {^A}\" " +
                 "AutoReplaceResult=\"2 {áá} {Áá}\" />";
 
             var parent = CreateFromXml(sParent);

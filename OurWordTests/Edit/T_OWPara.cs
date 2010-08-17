@@ -1133,6 +1133,7 @@ namespace OurWordTests.Edit
 
             // Set up the hyphenation
             WSVernacular.UseAutomatedHyphenation = true;
+            WSVernacular.HyphenationBreakCharacters = "";
 
             // Create a paragraph with big Huchol words.
             m_p = CreateParagraph_LongHuicholWords();
@@ -1183,8 +1184,8 @@ namespace OurWordTests.Edit
             Assert.IsTrue(wL.Hyphenated, "2-First word should be hyphenated");
             Assert.IsFalse(wR.Hyphenated, "2-Second word should not be hyphenated");
 
-            Assert.AreEqual("Mepücate", wL.Text);
-            Assert.AreEqual("maicai ", wR.Text);
+            Assert.AreEqual("Mepücatemai", wL.Text);
+            Assert.AreEqual("cai ", wR.Text);
         }
         #endregion
         #region Test: void RemoveHyphenation()
@@ -1225,7 +1226,7 @@ namespace OurWordTests.Edit
 
             // Because we hyphenated, we should have an extra block
             Assert.IsTrue(m_op.SubItems.Length > cBlocks, "Hyphenation created new blocks");
-            Assert.AreEqual("Mepücate", (m_op.SubItems[1] as EWord).Text);
+            Assert.AreEqual("Mepücatemai", (m_op.SubItems[1] as EWord).Text);
 
             // Now remove them
             m_op.RemoveHyphenation();
