@@ -121,5 +121,23 @@ namespace OurWordTests.Styles
         }
         #endregion
 
+        // Hyphenation -----------------------------------------------------------------------
+        #region Test: THyphenationBreakCharacters
+        [Test]
+        public void THyphenationBreakCharacters()
+        {
+            var ws = new WritingSystem {
+                HyphenationBreakCharacters = "-\\/",
+                MinHyphenSplit = 3,
+            };
+
+            Assert.IsTrue(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 5));
+            Assert.IsFalse(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 4));
+            Assert.IsFalse(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 3));
+
+            Assert.IsTrue(IsHyphenBreak_AtHypehBreakCharacter("good/faithful/just", 5));
+        }
+        #endregion
+
     }
 }

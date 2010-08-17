@@ -177,6 +177,35 @@ namespace OurWordData.Styles
         private int m_nMinHyphenSplit = c_DefaultMinHiphenSplit;
         private const int c_DefaultMinHiphenSplit = 3;
         #endregion
+        #region Attr{g/s}: string HyphenationBreakCharacters - Characters such as - or \ where a word can be split
+        public string HyphenationBreakCharacters
+        {
+            get
+            {
+                return m_sHyphenationBreakCharacters;
+            }
+            set
+            {
+                if (m_sHyphenationBreakCharacters == value)
+                    return;
+                m_sHyphenationBreakCharacters = value;
+                StyleSheet.DeclareDirty();
+            }
+        }
+        private string m_sHyphenationBreakCharacters = c_sDefaultHyphenationBreakCharacters;
+        const string c_sDefaultHyphenationBreakCharacters = "-\\/";
+        #endregion
+        #region Method: bool IsHyphenationBreakCharacter(char chTest)
+        public bool IsHyphenationBreakCharacter(char chTest)
+        {
+            foreach (var ch in HyphenationBreakCharacters)
+            {
+                if (ch == chTest)
+                    return true;
+            }
+            return false;
+        }
+        #endregion
 
         // AutoReplace -----------------------------------------------------------------------
         #region Attr{g}: BStringArray AutoReplaceSource
@@ -285,6 +314,20 @@ namespace OurWordData.Styles
             return char.IsWhiteSpace(chWhitespace) && !char.IsWhiteSpace(chNonWhitespace);
         }
         #endregion
+        #region method: bool IsHyphenBreak_AtHypehBreakCharacter(sWord, iPosWithinWord)
+        protected bool IsHyphenBreak_AtHypehBreakCharacter(string s, int iPos)
+        {
+            // We don't want to be too closoe to the end of a word
+            if (iPos < MinHyphenSplit || iPos < 2)
+                return false;
+            if (iPos > s.Length - MinHyphenSplit)
+                return false;
+
+            // See if the character we're following is one of our hyphen characters
+            var chBreakCharacter = s[iPos - 1];
+            return IsHyphenationBreakCharacter(chBreakCharacter);
+        }
+        #endregion
         #region Method: bool IsHyphenBreak(sWord, iPosWithinWord)
         public bool IsHyphenBreak(string s, int iPos)
         /* OK, this is quick-and-dirty, to see if I can get a simple hyphenation
@@ -304,6 +347,9 @@ namespace OurWordData.Styles
          * plus enumerating the consonants is sufficient for Huichol.
          */
         {
+            if (IsHyphenBreak_AtHypehBreakCharacter(s, iPos))
+                return true;
+
             // Don't bother if automated hyphenation is not turned on
             if (UseAutomatedHyphenation == false)
                 return false;
@@ -405,6 +451,7 @@ namespace OurWordData.Styles
         private const string c_sAttrUseAutoHyphenation = "UseAutoHyph";
         private const string c_sAttrAutoHyphenationCVPattern = "AutoHyphCV";
         private const string c_sAttrAutoHyphenationMinSplit = "AutoHyphMinSplit";
+        private const string c_sAttrHyphenationBreakChars = "HyphBrkChars";
 
         private const string c_sAttrAutoReplaceSource = "AutoReplaceSource";
         private const string c_sAttrAutoReplaceResult = "AutoReplaceResult";
@@ -424,6 +471,7 @@ namespace OurWordData.Styles
             doc.AddAttr(nodeFont, c_sAttrUseAutoHyphenation, UseAutomatedHyphenation);
             doc.AddAttr(nodeFont, c_sAttrAutoHyphenationCVPattern, HyphenationCVPattern);
             doc.AddAttr(nodeFont, c_sAttrAutoHyphenationMinSplit, MinHyphenSplit);
+            doc.AddAttr(nodeFont, c_sAttrHyphenationBreakChars, HyphenationBreakCharacters);
 
             doc.AddAttr(nodeFont, c_sAttrAutoReplaceSource, AutoReplaceSource.SaveLine);
             doc.AddAttr(nodeFont, c_sAttrAutoReplaceResult, AutoReplaceResult.SaveLine);
@@ -453,7 +501,9 @@ namespace OurWordData.Styles
                 HyphenationCVPattern = XmlDoc.GetAttrValue(node, c_sAttrAutoHyphenationCVPattern,
                     c_sHyphenationCVPattern),
                 MinHyphenSplit = XmlDoc.GetAttrValue(node, c_sAttrAutoHyphenationMinSplit, 
-                    c_DefaultMinHiphenSplit)
+                    c_DefaultMinHiphenSplit),
+                HyphenationBreakCharacters = XmlDoc.GetAttrValue(node, 
+                    c_sAttrHyphenationBreakChars, c_sDefaultHyphenationBreakCharacters),
             };
 
             var sSource = XmlDoc.GetAttrValue(node, c_sAttrAutoReplaceSource, "");
@@ -500,6 +550,10 @@ namespace OurWordData.Styles
 
             if (MinHyphenSplit != theirs.MinHyphenSplit && MinHyphenSplit == parent.MinHyphenSplit)
                 MinHyphenSplit = theirs.MinHyphenSplit;
+
+            if (HyphenationBreakCharacters != theirs.HyphenationBreakCharacters &&
+                HyphenationBreakCharacters == parent.HyphenationBreakCharacters)
+                HyphenationBreakCharacters = theirs.HyphenationBreakCharacters;
 
             if (AutoReplaceSource.SaveLine != theirs.AutoReplaceSource.SaveLine &&
                 AutoReplaceSource.SaveLine == parent.AutoReplaceSource.SaveLine)

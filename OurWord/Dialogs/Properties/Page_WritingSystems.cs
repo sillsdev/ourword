@@ -57,7 +57,8 @@ namespace OurWord.Dialogs.Properties
 		EditTextSetting m_HyphenationCVPattern;
 		EditTextSetting m_HyphenationConsonants;
 		IntSetting m_HyphenationMinSplitSize;
-		#region Method: BuildHyphenationWindow()
+        EditTextSetting m_HyphenationBreakCharacters;
+        #region Method: BuildHyphenationWindow()
 		void BuildHyphenationWindow()
 		{
             m_LiterateSettingsWnd.Name = "AutomaticHyphenation";
@@ -116,6 +117,16 @@ namespace OurWord.Dialogs.Properties
 				"Minimum Split Size:",
 				"Hyphenation will not result in a word-part that is smaller than this value.",
 				WritingSystem.MinHyphenSplit, 1);
+
+		    LS.AddInformation("ah245", StyleSheet.LiterateParagraph,
+                "*5. Not part of the automatic system,* but if you have letters within a word that can " +
+                "serve as word-break characters, such as '-', you can specify them here and OurWord will " +
+                "break words there.");
+		    m_HyphenationBreakCharacters = LS.AddEditText("ahBC",
+		                                                  "Break Characters",
+		                                                  "These are letters within a word, such as the hyphen \"pagi-pagi\", where it is OK for " +
+		                                                  "OurWord to make a word break.",
+		                                                  WritingSystem.HyphenationBreakCharacters);
 
             LS.AddInformation("ah250", StyleSheet.LiterateParagraph, 
 				"That should cover it. You can now go to the main drafting screen and see how words " +
@@ -216,6 +227,7 @@ namespace OurWord.Dialogs.Properties
 			catch (Exception)
 			{
 			}
+            WritingSystem.HyphenationBreakCharacters = m_HyphenationBreakCharacters.Value;
 
             // Need to make certain the renamed Writing System Name is propogated, e.g.,
             // to the combo box in the Translation Settings page.

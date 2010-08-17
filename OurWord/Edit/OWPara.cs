@@ -12,7 +12,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Windows.Forms;
 using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
@@ -684,14 +683,7 @@ namespace OurWord.Edit
             }
             #endregion
             #region Attr{g}: bool ForcedHyphen - If T, we hyphened regardless of writing system
-            public bool ForcedHyphen
-            {
-                get
-                {
-                    return m_bForcedHyphen;
-                }
-            }
-            bool m_bForcedHyphen;
+            private readonly bool ForcedHyphen;
             #endregion
 
             // Helper Methods
@@ -832,9 +824,6 @@ namespace OurWord.Edit
                 var iPos = Para.Find(word);
                 Para.InsertAt(iPos + 1, wordNew);
 
-                // We now have a hyphenated word
-                word.Hyphenated = true;
-
                 // The next word now has the glue setting; the current word is no longer glued.
                 wordNew.GlueToNext = word.GlueToNext;
                 word.GlueToNext = false;
@@ -843,9 +832,9 @@ namespace OurWord.Edit
             #region Method: void MoveTextIntoOverflowWord()
             void MoveTextIntoOverflowWord()
             {
-                EWord wordHyphen = HyphenedWord;
+                var wordHyphen = HyphenedWord;
                 Debug.Assert(null != wordHyphen);
-                EWord wordOverflow = OverflowWord;
+                var wordOverflow = OverflowWord;
                 Debug.Assert(null != wordOverflow);
 
                 wordHyphen.Text = OriginalTextToHyphen.Substring(0, iHyphenPos);
@@ -863,7 +852,7 @@ namespace OurWord.Edit
             {
                 m_bTooLarge = true;
 
-                EWord word = HyphenedWord;
+                var word = HyphenedWord;
                 if (null == word)
                     return;
 
@@ -873,11 +862,11 @@ namespace OurWord.Edit
                 if (word.Text == OriginalTextToHyphen)
                     return;
 
-                EWord wordOverflow = OverflowWord;
+                var wordOverflow = OverflowWord;
                 Debug.Assert(null != wordOverflow);
 
                 word.Text += wordOverflow.Text;
-                word.Hyphenated = wordOverflow.Hyphenated;
+                word.DeclareHyphenated(wordOverflow.Hyphenated, Para.WritingSystem);
                 word.CalculateWidth();
 
                 Para.Remove(wordOverflow);
@@ -934,10 +923,10 @@ namespace OurWord.Edit
                         // but haven't actually tried yet (m_bForcedHyphen==false), 
                         // then this is our last-ditch effort. Here, we just
                         // carve off letters until the resultant word fits the line
-                        if (bMustForceHyphen && m_bForcedHyphen == false)
+                        if (bMustForceHyphen && ForcedHyphen == false)
                         {
                             RemoveAnyHyphenation();
-                            m_bForcedHyphen = true;
+                            ForcedHyphen = true;
                             iHyphenPos = HyphenedWord.Text.Length - 1;
                             continue;
                         }
@@ -954,6 +943,8 @@ namespace OurWord.Edit
 
                     // Move the hyphenated text from left to right
                     MoveTextIntoOverflowWord();
+                    HyphenedWord.DeclareHyphenated(true, Para.WritingSystem);
+
                 }
             }
             #endregion
@@ -962,27 +953,27 @@ namespace OurWord.Edit
         #region Method: void RemoveHyphenation()
         public void RemoveHyphenation()
         {
-            for (int i = 0; i < SubItems.Length - 1; )
+            for (var i = 0; i < SubItems.Length - 1; )
             {
                 // Is this a hyphenated word?
-                EWord word = SubItems[i] as EWord;
+                var word = SubItems[i] as EWord;
                 if (null == word)
                     goto loop;
                 if (!word.Hyphenated)
                     goto loop;
 
                 // Is the next item a word?
-                EWord wordNext = SubItems[i + 1] as EWord;
+                var wordNext = SubItems[i + 1] as EWord;
                 if (null == wordNext)
                 {
-                    word.Hyphenated = false;
+                    word.DeclareHyphenated(false, WritingSystem);
                     goto loop;
                 }
 
                 // If yes, combine the two (but don't loop, because we may
                 // be continuing a hyphenation into even the next word.)
                 word.Text = word.Text + wordNext.Text;
-                word.Hyphenated = wordNext.Hyphenated;
+                word.DeclareHyphenated(wordNext.Hyphenated, WritingSystem);
                 word.CalculateWidth();
                 RemoveAt(i+1);
                 continue;

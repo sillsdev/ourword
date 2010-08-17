@@ -11,11 +11,12 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWord.Edit.Blocks
 {
-    #region CLASS: EWord : EBlock
     public class EWord : EBlock
     {
         // Attrs -----------------------------------------------------------------------------
@@ -33,11 +34,25 @@ namespace OurWord.Edit.Blocks
 
         // Hyphenation
         #region Attr{g/s}: bool Hyphenated
-        public bool Hyphenated { get; set; }
+        public bool Hyphenated { get; private set; }
         #endregion
         #region Attr{g/s}: float HyphenWidth
         private float HyphenWidth { get; set; }
         #endregion
+        #region Method: void DeclareHyphenated(bIsHyphenated, WritingSystem)
+        public void DeclareHyphenated(bool bIsHyphenated, WritingSystem ws)
+        {
+            Hyphenated = bIsHyphenated;
+
+            EndsWithHyphenationCharacter = false;
+            if (!string.IsNullOrEmpty(Text) && Hyphenated)
+            {
+                var chLast = Text[Text.Length - 1];
+                EndsWithHyphenationCharacter = ws.IsHyphenationBreakCharacter(chLast);
+            }
+        }
+        #endregion
+        private bool EndsWithHyphenationCharacter;
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(font, DPhrase, sText)
@@ -89,7 +104,7 @@ namespace OurWord.Edit.Blocks
 
             draw.DrawString(Text, m_Font, GetBrush(), Position);
 
-            if (Hyphenated)
+            if (Hyphenated && !EndsWithHyphenationCharacter)
             {
                 var ptHyphenPosition = new PointF(Position.X + Width - HyphenWidth, Position.Y);
                 draw.DrawString("-", m_Font, GetBrush(), ptHyphenPosition);
@@ -375,8 +390,11 @@ namespace OurWord.Edit.Blocks
             {
                 Width = Context.Measure(Text, m_Font);
 
-                HyphenWidth = Context.Measure("-", m_Font);
-                Width += HyphenWidth;
+                if (!EndsWithHyphenationCharacter)
+                {
+                    HyphenWidth = Context.Measure("-", m_Font);
+                    Width += HyphenWidth;
+                }
             }
             else
             {
@@ -385,6 +403,5 @@ namespace OurWord.Edit.Blocks
         }
         #endregion
     }
-    #endregion
 
 }
