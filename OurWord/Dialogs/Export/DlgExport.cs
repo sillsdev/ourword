@@ -67,6 +67,15 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
+        #region Attr{g}: bool ExportCurrentBookOnly
+        public bool ExportCurrentBookOnly
+        {
+            get
+            {
+                return (m_comboScope.Text == DB.TargetBook.DisplayName);
+            }
+        }
+        #endregion
 
         #region Attr{g}: DTranslation Translation
         DTranslation Translation
@@ -100,13 +109,18 @@ namespace OurWord.Dialogs
         private void cmdLoad(object sender, EventArgs e)
         {
             // Label text in the appropriate language
-            Control[] vExclude = { m_comboWhatToExport };
+            Control[] vExclude = { m_comboWhatToExport, m_comboScope };
             LocDB.Localize(this, vExclude);
 
             m_comboWhatToExport.Items.Clear();
             m_comboWhatToExport.Items.Add(Loc.GetString("Vernacular", "Vernacular"));
             m_comboWhatToExport.Items.Add(Loc.GetString("BackTranslation", "Back Translation"));
             m_comboWhatToExport.Text = Loc.GetString("Vernacular", "Vernacular");
+
+            m_comboScope.Items.Clear();
+            m_comboScope.Items.Add(Loc.GetString("AllBooks", "All Books"));
+            m_comboScope.Items.Add(DB.TargetBook.DisplayName);
+            m_comboScope.Text = DB.TargetBook.DisplayName;
 
             // Default to Paratext
             m_radioParatext.Checked = true;

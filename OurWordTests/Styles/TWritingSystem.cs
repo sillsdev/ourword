@@ -9,7 +9,6 @@
  *********************************************************************************************/
 using JWTools;
 using NUnit.Framework;
-using OurWordData;
 using OurWordData.Styles;
 #endregion
 
@@ -92,24 +91,24 @@ namespace OurWordTests.Styles
         #region Test: TMerge
         [Test] public void TMerge()
         {
-            const string sParent = c_sXmlForIoTest;
+            const string c_sParent = c_sXmlForIoTest;
 
-            var sOurs = sParent;
+            var sOurs = c_sParent;
             sOurs = sOurs.Replace("Ethiopic", "International");
             sOurs = sOurs.Replace("2 {á} {Á}", "2 {áá} {Áá}");
             sOurs = sOurs.Replace("dfghjk", "DFGHJKdfghjk");
 
-            var sTheirs = sParent;
+            var sTheirs = c_sParent;
             sTheirs = sTheirs.Replace("IdeaGraph=\"true\"", "");
             sTheirs = sTheirs.Replace("5", "12");
 
-            const string sExpected = "<WritingSystem Name=\"Amharic\" Punct=\"&lt;&gt;?!()[]\" " +
+            const string c_sExpected = "<WritingSystem Name=\"Amharic\" Punct=\"&lt;&gt;?!()[]\" " +
                 "EndPunct=\"()\" Keyboard=\"International\" Consonants=\"DFGHJKdfghjk\" " +
                 "UseAutoHyph=\"true\" AutoHyphCV=\"V-VC\" AutoHyphMinSplit=\"12\" " +
                 "HyphBrkChars=\"-\\/\" AutoReplaceSource=\"2 {^a} {^A}\" " +
                 "AutoReplaceResult=\"2 {áá} {Áá}\" />";
 
-            var parent = CreateFromXml(sParent);
+            var parent = CreateFromXml(c_sParent);
             var ours = CreateFromXml(sOurs);
             var theirs = CreateFromXml(sTheirs);
 
@@ -117,7 +116,7 @@ namespace OurWordTests.Styles
 
             var sActual = ours.Save(new XmlDoc(), null).OuterXml;
 
-            Assert.AreEqual(sExpected, sActual);
+            Assert.AreEqual(c_sExpected, sActual);
         }
         #endregion
 
@@ -126,11 +125,6 @@ namespace OurWordTests.Styles
         [Test]
         public void THyphenationBreakCharacters()
         {
-            var ws = new WritingSystem {
-                HyphenationBreakCharacters = "-\\/",
-                MinHyphenSplit = 3,
-            };
-
             Assert.IsTrue(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 5));
             Assert.IsFalse(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 4));
             Assert.IsFalse(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 3));

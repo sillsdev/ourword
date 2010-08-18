@@ -12,8 +12,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using DocumentFormat.OpenXml.Validation;
-using DocumentFormat.OpenXml.Vml.Office;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Runs;
@@ -26,8 +24,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using a = DocumentFormat.OpenXml.Drawing;
 using pic = DocumentFormat.OpenXml.Drawing.Pictures;
 using wp = DocumentFormat.OpenXml.Drawing.Wordprocessing;
-using v = DocumentFormat.OpenXml.Vml;
-
 using Color = DocumentFormat.OpenXml.Wordprocessing.Color;
 using FontSize = DocumentFormat.OpenXml.Wordprocessing.FontSize;
 using Paragraph = DocumentFormat.OpenXml.Wordprocessing.Paragraph;
@@ -35,7 +31,6 @@ using ParagraphProperties = DocumentFormat.OpenXml.Wordprocessing.ParagraphPrope
 using Position = DocumentFormat.OpenXml.Wordprocessing.Position;
 using Run = DocumentFormat.OpenXml.Wordprocessing.Run;
 using RunProperties = DocumentFormat.OpenXml.Wordprocessing.RunProperties;
-using Shape = DocumentFormat.OpenXml.Drawing.Shape;
 using Text = DocumentFormat.OpenXml.Wordprocessing.Text;
 using TextWrappingValues = DocumentFormat.OpenXml.Wordprocessing.TextWrappingValues;
 using Underline = DocumentFormat.OpenXml.Wordprocessing.Underline;

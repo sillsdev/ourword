@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using JWTools;
 using OurWord.Printing;
 using OurWordData.DataModel;
@@ -32,6 +33,13 @@ namespace OurWord.Dialogs.Export
         virtual public void DoExport(DBook book)
         {
             throw new NotImplementedException();
+        }
+        #endregion
+        #region VirtMethod: bool Setup()
+        virtual public bool Setup()
+            // E.g., the Word2007 export loads a DLL
+        {
+            return true;
         }
         #endregion
 
@@ -179,6 +187,41 @@ namespace OurWord.Dialogs.Export
     {
         public bool ExportBackTranslation;
 
+        #region smethod: bool LoadWordXmlAssembly()
+        static bool LoadWordXmlAssembly()
+            // Returns T if the assembly is loaded, F otherwise
+            //
+            // We explicitly load it, because otherwise DotNet may load a different
+            // version (if such is installed on the user's machine) and then crash.
+        {
+            if (m_bWordXmlIsLoaded)
+                return true;
+
+            try
+            {
+                const string c_sDllName = "DocumentFormat.OpenXml.dll";
+                var sOurWordPath = Assembly.GetAssembly(typeof (ExportToWord)).Location;
+                var sFolder = Path.GetDirectoryName(sOurWordPath);
+                var sWordXmlPath = Path.Combine(sFolder, c_sDllName);
+
+                Assembly.LoadFrom(sWordXmlPath);
+
+                m_bWordXmlIsLoaded = true;
+                return true;
+            }
+            catch (Exception)
+            {
+                LocDB.Message("msgMissingOpenXmlDll",
+                              "Unable to load DocumentFormat.OpenXml.dll; it looks like you have " +
+                                "a bad installation.", 
+                                null,
+                              LocDB.MessageTypes.Error);
+                return false;
+            }
+        }
+        private static bool m_bWordXmlIsLoaded;
+        #endregion
+
         #region OAttr{g}: string Name
         protected override string Name
         {
@@ -208,6 +251,12 @@ namespace OurWord.Dialogs.Export
 
             using (var export = new WordExport(book, sPath, whatToExport))
                 export.Do();
+        }
+        #endregion
+        #region OMethod: bool Setup()
+        public override bool Setup()
+        {
+            return LoadWordXmlAssembly();
         }
         #endregion
 

@@ -44,6 +44,8 @@ namespace OurWord.Dialogs
             this.m_labelFolder = new System.Windows.Forms.Label();
             this.m_labelLocation = new System.Windows.Forms.Label();
             this.m_labelCaution = new System.Windows.Forms.Label();
+            this.m_lWhat = new System.Windows.Forms.Label();
+            this.m_comboScope = new System.Windows.Forms.ComboBox();
             this.m_groupExportTo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -51,7 +53,7 @@ namespace OurWord.Dialogs
             // 
             this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(251, 432);
+            this.m_btnCancel.Location = new System.Drawing.Point(251, 468);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 17;
@@ -61,7 +63,7 @@ namespace OurWord.Dialogs
             // 
             this.m_btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(163, 432);
+            this.m_btnOK.Location = new System.Drawing.Point(163, 468);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 16;
@@ -100,7 +102,7 @@ namespace OurWord.Dialogs
             this.m_groupExportTo.Controls.Add(this.m_radioGoBible);
             this.m_groupExportTo.Controls.Add(this.m_radioParatext);
             this.m_groupExportTo.Controls.Add(this.m_labelParatextInfo);
-            this.m_groupExportTo.Location = new System.Drawing.Point(15, 12);
+            this.m_groupExportTo.Location = new System.Drawing.Point(15, 48);
             this.m_groupExportTo.Name = "m_groupExportTo";
             this.m_groupExportTo.Size = new System.Drawing.Size(466, 258);
             this.m_groupExportTo.TabIndex = 30;
@@ -189,7 +191,7 @@ namespace OurWord.Dialogs
             // m_labelFolder
             // 
             this.m_labelFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_labelFolder.Location = new System.Drawing.Point(15, 310);
+            this.m_labelFolder.Location = new System.Drawing.Point(15, 346);
             this.m_labelFolder.Name = "m_labelFolder";
             this.m_labelFolder.Size = new System.Drawing.Size(466, 23);
             this.m_labelFolder.TabIndex = 31;
@@ -198,7 +200,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelLocation
             // 
-            this.m_labelLocation.Location = new System.Drawing.Point(12, 287);
+            this.m_labelLocation.Location = new System.Drawing.Point(12, 323);
             this.m_labelLocation.Name = "m_labelLocation";
             this.m_labelLocation.Size = new System.Drawing.Size(469, 23);
             this.m_labelLocation.TabIndex = 32;
@@ -208,11 +210,30 @@ namespace OurWord.Dialogs
             // m_labelCaution
             // 
             this.m_labelCaution.ForeColor = System.Drawing.Color.Red;
-            this.m_labelCaution.Location = new System.Drawing.Point(12, 355);
+            this.m_labelCaution.Location = new System.Drawing.Point(12, 391);
             this.m_labelCaution.Name = "m_labelCaution";
             this.m_labelCaution.Size = new System.Drawing.Size(469, 74);
             this.m_labelCaution.TabIndex = 33;
             this.m_labelCaution.Text = resources.GetString("m_labelCaution.Text");
+            // 
+            // m_lWhat
+            // 
+            this.m_lWhat.Location = new System.Drawing.Point(12, 9);
+            this.m_lWhat.Name = "m_lWhat";
+            this.m_lWhat.Size = new System.Drawing.Size(100, 23);
+            this.m_lWhat.TabIndex = 34;
+            this.m_lWhat.Text = "What to Export:";
+            this.m_lWhat.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // m_comboScope
+            // 
+            this.m_comboScope.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_comboScope.FormattingEnabled = true;
+            this.m_comboScope.Location = new System.Drawing.Point(101, 9);
+            this.m_comboScope.Name = "m_comboScope";
+            this.m_comboScope.Size = new System.Drawing.Size(374, 21);
+            this.m_comboScope.TabIndex = 35;
             // 
             // DialogExport
             // 
@@ -221,8 +242,10 @@ namespace OurWord.Dialogs
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.AutoSize = true;
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(493, 467);
+            this.ClientSize = new System.Drawing.Size(493, 503);
             this.ControlBox = false;
+            this.Controls.Add(this.m_comboScope);
+            this.Controls.Add(this.m_lWhat);
             this.Controls.Add(this.m_labelCaution);
             this.Controls.Add(this.m_labelLocation);
             this.Controls.Add(this.m_labelFolder);
@@ -235,7 +258,7 @@ namespace OurWord.Dialogs
             this.Name = "DialogExport";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Export Book";
+            this.Text = "Export";
             this.Load += new System.EventHandler(this.cmdLoad);
             this.m_groupExportTo.ResumeLayout(false);
             this.m_groupExportTo.PerformLayout();
@@ -260,5 +283,7 @@ namespace OurWord.Dialogs
         private System.Windows.Forms.RadioButton m_radioWord;
         private System.Windows.Forms.ComboBox m_comboWhatToExport;
         private System.Windows.Forms.Label m_labelCaution;
+        private System.Windows.Forms.Label m_lWhat;
+        private System.Windows.Forms.ComboBox m_comboScope;
     }
 }

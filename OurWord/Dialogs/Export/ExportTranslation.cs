@@ -105,12 +105,21 @@ namespace OurWord.Dialogs.Export
             DlgExportProgress.SetCurrentActivity(Loc.GetString("kExportSettingUp", "Setting up..."));
             DlgExportProgress.SetProgressMax(TotalChapterCount);
 
+            if (!dlgDesires.CurrentExportMethod.Setup())
+            {
+                DlgExportProgress.Stop();
+                return;
+            }
+
             // Loop through all of the translation's books
             foreach(var book in m_Translation.BookList)
             {
                 if (DlgExportProgress.UserSaysCancel)
                     break;
                 UpdateProgress(book.DisplayName);
+
+                if (dlgDesires.ExportCurrentBookOnly && book.DisplayName != DB.TargetBook.DisplayName)
+                    continue;
 
                 using (new LoadedBook(book))
                 {
