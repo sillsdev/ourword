@@ -41,9 +41,10 @@
             // m_labelUpdateIsAvailable
             // 
             this.m_labelUpdateIsAvailable.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_labelUpdateIsAvailable.Location = new System.Drawing.Point(15, 9);
+            this.m_labelUpdateIsAvailable.Location = new System.Drawing.Point(20, 11);
+            this.m_labelUpdateIsAvailable.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.m_labelUpdateIsAvailable.Name = "m_labelUpdateIsAvailable";
-            this.m_labelUpdateIsAvailable.Size = new System.Drawing.Size(309, 23);
+            this.m_labelUpdateIsAvailable.Size = new System.Drawing.Size(412, 28);
             this.m_labelUpdateIsAvailable.TabIndex = 0;
             this.m_labelUpdateIsAvailable.Text = "A newer version of OurWord is available.";
             this.m_labelUpdateIsAvailable.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -52,9 +53,10 @@
             // 
             this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(175, 170);
+            this.m_btnCancel.Location = new System.Drawing.Point(233, 209);
+            this.m_btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.m_btnCancel.Name = "m_btnCancel";
-            this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
+            this.m_btnCancel.Size = new System.Drawing.Size(100, 28);
             this.m_btnCancel.TabIndex = 19;
             this.m_btnCancel.Text = "Cancel";
             // 
@@ -63,26 +65,29 @@
             this.m_btnYes.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnYes.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.m_btnYes.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_btnYes.Location = new System.Drawing.Point(87, 170);
+            this.m_btnYes.Location = new System.Drawing.Point(116, 209);
+            this.m_btnYes.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.m_btnYes.Name = "m_btnYes";
-            this.m_btnYes.Size = new System.Drawing.Size(75, 23);
+            this.m_btnYes.Size = new System.Drawing.Size(100, 28);
             this.m_btnYes.TabIndex = 18;
             this.m_btnYes.Text = "Update";
             // 
             // m_labelYoursIs
             // 
-            this.m_labelYoursIs.Location = new System.Drawing.Point(15, 58);
+            this.m_labelYoursIs.Location = new System.Drawing.Point(20, 71);
+            this.m_labelYoursIs.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.m_labelYoursIs.Name = "m_labelYoursIs";
-            this.m_labelYoursIs.Size = new System.Drawing.Size(151, 23);
+            this.m_labelYoursIs.Size = new System.Drawing.Size(201, 28);
             this.m_labelYoursIs.TabIndex = 20;
             this.m_labelYoursIs.Text = "Your version is:";
             this.m_labelYoursIs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             // 
             // m_labelRemoteIs
             // 
-            this.m_labelRemoteIs.Location = new System.Drawing.Point(18, 92);
+            this.m_labelRemoteIs.Location = new System.Drawing.Point(24, 113);
+            this.m_labelRemoteIs.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.m_labelRemoteIs.Name = "m_labelRemoteIs";
-            this.m_labelRemoteIs.Size = new System.Drawing.Size(148, 23);
+            this.m_labelRemoteIs.Size = new System.Drawing.Size(197, 28);
             this.m_labelRemoteIs.TabIndex = 21;
             this.m_labelRemoteIs.Text = "The new version is:";
             this.m_labelRemoteIs.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -90,9 +95,10 @@
             // m_labelYourVersion
             // 
             this.m_labelYourVersion.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_labelYourVersion.Location = new System.Drawing.Point(168, 58);
+            this.m_labelYourVersion.Location = new System.Drawing.Point(224, 71);
+            this.m_labelYourVersion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.m_labelYourVersion.Name = "m_labelYourVersion";
-            this.m_labelYourVersion.Size = new System.Drawing.Size(68, 23);
+            this.m_labelYourVersion.Size = new System.Drawing.Size(91, 28);
             this.m_labelYourVersion.TabIndex = 22;
             this.m_labelYourVersion.Text = "1.0";
             this.m_labelYourVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -100,9 +106,10 @@
             // m_labelRemoteVersion
             // 
             this.m_labelRemoteVersion.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_labelRemoteVersion.Location = new System.Drawing.Point(168, 92);
+            this.m_labelRemoteVersion.Location = new System.Drawing.Point(224, 113);
+            this.m_labelRemoteVersion.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.m_labelRemoteVersion.Name = "m_labelRemoteVersion";
-            this.m_labelRemoteVersion.Size = new System.Drawing.Size(68, 23);
+            this.m_labelRemoteVersion.Size = new System.Drawing.Size(91, 28);
             this.m_labelRemoteVersion.TabIndex = 23;
             this.m_labelRemoteVersion.Text = "1.0b";
             this.m_labelRemoteVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -110,18 +117,19 @@
             // m_labelShallWe
             // 
             this.m_labelShallWe.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_labelShallWe.Location = new System.Drawing.Point(18, 131);
+            this.m_labelShallWe.Location = new System.Drawing.Point(24, 161);
+            this.m_labelShallWe.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.m_labelShallWe.Name = "m_labelShallWe";
-            this.m_labelShallWe.Size = new System.Drawing.Size(306, 23);
+            this.m_labelShallWe.Size = new System.Drawing.Size(408, 28);
             this.m_labelShallWe.TabIndex = 24;
             this.m_labelShallWe.Text = "Do you wish to update?";
             this.m_labelShallWe.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // DlgDoYouWishToUpdate
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(336, 205);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.ClientSize = new System.Drawing.Size(448, 252);
             this.ControlBox = false;
             this.Controls.Add(this.m_labelShallWe);
             this.Controls.Add(this.m_labelRemoteVersion);
@@ -132,6 +140,7 @@
             this.Controls.Add(this.m_btnYes);
             this.Controls.Add(this.m_labelUpdateIsAvailable);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "DlgDoYouWishToUpdate";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
