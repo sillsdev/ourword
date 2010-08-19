@@ -512,6 +512,8 @@ namespace OurWordData.Styles
             var sResult = XmlDoc.GetAttrValue(node, c_sAttrAutoReplaceResult, "");
             ws.AutoReplaceResult.Read(sResult);
 
+            ws.BuildAutoReplace();
+
             return ws;
         }
         #endregion

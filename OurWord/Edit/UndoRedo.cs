@@ -1501,11 +1501,9 @@ namespace OurWord.Edit
             // if a match
             if (selection.IsInsertionIcon)
             {
-                int c = 0;
-                string sInsert = writingSystem.SearchAutoReplace(chKey.ToString(), ref c);
-                if (string.IsNullOrEmpty(sInsert))
-                    return null;
-                return sInsert;
+                var c = 0;
+                var sInsert = writingSystem.SearchAutoReplace(chKey.ToString(), ref c);
+                return string.IsNullOrEmpty(sInsert) ? null : sInsert;
             }
 
             // We are considering a content selection to be meaningless; thus from
@@ -1514,17 +1512,17 @@ namespace OurWord.Edit
                 return null;
 
             // Retrieve the string in this DBasicText up to the selection point
-            string sDBT = (selection.Paragraph.DisplayBT) ?
+            var sDBT = (selection.Paragraph.DisplayBT) ?
                 selection.DBT.ProseBTAsString :
                 selection.DBT.ContentsAsString;
-            string sSource = sDBT.Substring(0, selection.DBT_iCharFirst);
+            var sSource = sDBT.Substring(0, selection.DBT_iCharFirst);
 
             // AddParagraph what was just typed
             sSource += chKey;
 
             // Check for a match
-            int cSelectionCount = 0;
-            string sReplace = writingSystem.SearchAutoReplace(sSource, ref cSelectionCount);
+            var cSelectionCount = 0;
+            var sReplace = writingSystem.SearchAutoReplace(sSource, ref cSelectionCount);
             if (string.IsNullOrEmpty(sReplace))
                 return null;
             Debug.Assert(cSelectionCount > 0);
@@ -1536,9 +1534,9 @@ namespace OurWord.Edit
             // Make a selection so that we can delete the appropriate number of characters
             if (cSelectionCount > 0)
             {
-                int i2 = selection.DBT_iCharFirst;
-                int i1 = i2 - cSelectionCount;
-                OWWindow.Sel sel = OWWindow.Sel.CreateSel(op, selection.DBT, i1, i2);
+                var i2 = selection.DBT_iCharFirst;
+                var i1 = i2 - cSelectionCount;
+                var sel = OWWindow.Sel.CreateSel(op, selection.DBT, i1, i2);
                 if (null == sel)
                     return null;
                 Window.Selection = sel;
