@@ -133,12 +133,12 @@ namespace OurWord.Printing
             m_font = style.GetFont(DB.TargetTranslation.WritingSystemVernacular.Name, 100F);
 
             // Layout
-            m_FooterWidth = pdoc.DefaultPageSettings.Bounds.Width -
-                            pdoc.DefaultPageSettings.Margins.Left -
-                            pdoc.DefaultPageSettings.Margins.Right;
-            m_xFooter = pdoc.DefaultPageSettings.Margins.Left;
-            m_yFooter = pdoc.DefaultPageSettings.Bounds.Height -
-                        pdoc.DefaultPageSettings.Margins.Bottom -
+            m_FooterWidth = Page.PageSettings.Bounds.Width -
+                            Page.PageSettings.Margins.Left -
+                            Page.PageSettings.Margins.Right;
+            m_xFooter = Page.PageSettings.Margins.Left;
+            m_yFooter = Page.PageSettings.Bounds.Height -
+                        Page.PageSettings.Margins.Bottom -
                         Height;
 
             // Text in each column depends on even/odd page

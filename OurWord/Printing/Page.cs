@@ -32,9 +32,18 @@ namespace OurWord.Printing
         private readonly List<AssociatedLines> m_vGroups;
         #endregion
 
+        #region SAttr{g}: PageSettings PageSettings
+        static public PageSettings PageSettings
+        {
+            get
+            {
+                return DialogPrint.m_PageSettings;
+            }
+        }
+        #endregion
+
         private readonly RunningFooter m_runningFooter;
 
-        private readonly PageSettings m_PageSettings;
         private readonly float m_fTotalAvailableContentHeight;
         public string WaterMarkText { private get; set; }
         private readonly bool m_bAllowPicturesToFloatOnPage;
@@ -48,11 +57,10 @@ namespace OurWord.Printing
             string sRunningFooterText,
             bool bAllowPicturesToFloatOnPage)
         {
-            m_PageSettings = pdoc.PrinterSettings.DefaultPageSettings;
             m_bAllowPicturesToFloatOnPage = bAllowPicturesToFloatOnPage;
 
-            m_fTotalAvailableContentHeight = m_PageSettings.Bounds.Height
-                - m_PageSettings.Margins.Top - m_PageSettings.Margins.Bottom;
+            m_fTotalAvailableContentHeight = PageSettings.Bounds.Height
+                - PageSettings.Margins.Top - PageSettings.Margins.Bottom;
 
             // Setup and measure the running footer
             m_runningFooter = new RunningFooter(nPageNumber, 
@@ -153,7 +161,7 @@ namespace OurWord.Printing
         void Layout()
         {
             // 1. BODY LINES
-            float yTopBody = m_PageSettings.Bounds.Top + m_PageSettings.Margins.Top;
+            float yTopBody = PageSettings.Bounds.Top + PageSettings.Margins.Top;
 
             // Since we're at the top of the page, we eat the SpaceBefore
             var firstGroup = Groups[0];
@@ -166,7 +174,7 @@ namespace OurWord.Printing
             }
 
             // 2. FOOTNOTE LINES
-            var yPrintAreaBottom = m_PageSettings.Bounds.Bottom - m_PageSettings.Margins.Bottom;
+            var yPrintAreaBottom = PageSettings.Bounds.Bottom - PageSettings.Margins.Bottom;
             var yTopFootnotes = yPrintAreaBottom - 
                 m_runningFooter.Height -
                 c_nMarginAboveRunningFooter -
@@ -184,79 +192,84 @@ namespace OurWord.Printing
         #endregion
 
         // Drawing ---------------------------------------------------------------------------
-        #region Method: void DrawWatermark(IDraw)
+        #region method: int GetWaterMarkFontSize(IDraw, fTextWidthMax)
+        int GetWaterMarkFontSize(IDraw draw, float fTextWidthMax)
+        {
+            // Start small, and work up until we're too big
+            var nSize = 19;
+
+            do
+            {
+                var font = new Font("Arial", nSize + 1, FontStyle.Bold);
+                var fWidth = draw.Graphics.MeasureString(WaterMarkText, font).Width;
+                if (fWidth > fTextWidthMax)
+                    return nSize;
+                nSize++;
+            } while (true);
+        }
+        #endregion
+        #region method: void DrawWatermark(IDraw)
         void DrawWatermark(IDraw draw)
         {
             // Don't proceed if the water mark isn't wanted
             if (string.IsNullOrEmpty(WaterMarkText))
                 return;
 
-            // Calculate the maximum length this text should appear (non-rotated). We'll
-            // assume a 30-degree angle. 
-            const float fAngle = 30;
-            const double fRadians = fAngle * Math.PI / 180.0;
-            var nPrintAreaWidth = m_PageSettings.PaperSize.Width - m_PageSettings.Margins.Left -
-                               m_PageSettings.Margins.Right;
-            var fTextWidthMax = nPrintAreaWidth / (float)Math.Cos(fRadians);
+            // Text Angle
+            const float c_fAngle = 30;
+            const double c_fRadians = c_fAngle * Math.PI / 180.0;
+
+            // Print Areas
+            var nPrintAreaWidth = PageSettings.Bounds.Width -
+                PageSettings.Margins.Left - PageSettings.Margins.Right;
+            var nPrintAreaHeight = PageSettings.Bounds.Height -
+                PageSettings.Margins.Top - PageSettings.Margins.Bottom;
+
+            // Center
+            var xCenter = PageSettings.Margins.Left + nPrintAreaWidth/2;
+            var yCenter = PageSettings.Margins.Top + nPrintAreaHeight/2;
+
+            // Calculate the maximum length this text should appear (non-rotated).
+            var fTextWidthMax = nPrintAreaWidth / (float)Math.Cos(c_fRadians);
             fTextWidthMax *= 0.90F; // Fudge down so we're sure to fit the margins.
 
-            // Find the largest font size that does not exceed this width
-            float fSize = 20;
-            var font = new Font("Arial", fSize, FontStyle.Bold);
-            do
-            {
-                var fWidth = draw.Graphics.MeasureString(WaterMarkText, font).Width;
-                if (fWidth > fTextWidthMax)
-                    break;
+            // Get the Font
+            var nFontSize = GetWaterMarkFontSize(draw, fTextWidthMax);
+            var font = new Font("Arial", nFontSize, FontStyle.Bold);
+            var szWaterMarkText = draw.Graphics.MeasureString(WaterMarkText, font);
 
-                fSize += 1;
-                font = new Font("Arial", fSize, FontStyle.Bold);
-            } while (true);
-
-            // We want a very light gray
-            const int nGray = 225;
-            Brush brush = new SolidBrush(Color.FromArgb(nGray, nGray, nGray));
-
-            // Figure out where to put the text
-            float x = m_PageSettings.Margins.Left;
-            var szText = draw.Graphics.MeasureString(WaterMarkText, font);
-
-            var yPageMiddle = (m_PageSettings.Bounds.Height -
-                m_PageSettings.Margins.Top - 
-                m_PageSettings.Margins.Bottom) / 2F;
-
-            var fHeightDueToFont = szText.Height * (float) Math.Cos(fRadians) / 2F;
-            var fHeightDueToRise = szText.Width * (float) Math.Sin(fRadians) / 2F;
-
-            var y = yPageMiddle + fHeightDueToRise + fHeightDueToFont;
+            // Brush: We want a very light gray
+            const int c_nGray = 225;
+            Brush brush = new SolidBrush(Color.FromArgb(c_nGray, c_nGray, c_nGray));
 
             // Draw the text
-            draw.Graphics.TranslateTransform(x, y);
-            draw.Graphics.RotateTransform(-fAngle);
-            draw.Graphics.DrawString(WaterMarkText, font, brush, 0, 0);
+            draw.Graphics.TranslateTransform(xCenter, yCenter);
+            draw.Graphics.RotateTransform(-c_fAngle);
+            draw.Graphics.DrawString(WaterMarkText, font, brush, 
+                -szWaterMarkText.Width/2, -szWaterMarkText.Height/2);
             draw.Graphics.ResetTransform();
         }
         #endregion
-        #region Method: void DrawFootnoteSeparator(IDraw draw)
+        #region Method: void DrawFootnoteSeparator(IDraw)
         void DrawFootnoteSeparator(IDraw draw)
         {
             if(HeightRequiredForFootnotes == 0)
                 return;
 
-            const int yPixelsAboveFootnotes = 2;
-            var x = m_PageSettings.Margins.Left;
-            var y = m_PageSettings.Bounds.Top + 
-                m_PageSettings.Margins.Top +
+            const int c_yPixelsAboveFootnotes = 2;
+            var x = PageSettings.Margins.Left;
+            var y = PageSettings.Bounds.Top + 
+                PageSettings.Margins.Top +
                 m_fTotalAvailableContentHeight -
                 HeightRequiredForFootnotes - 
-                yPixelsAboveFootnotes;
+                c_yPixelsAboveFootnotes;
 
-            const int xSeparatorLength = 100;
+            const int c_xSeparatorLength = 100;
 
-            draw.DrawLine(Pens.Black, x, y, x + xSeparatorLength, y);
+            draw.DrawLine(Pens.Black, x, y, x + c_xSeparatorLength, y);
         }
         #endregion
-        #region Method: void Draw(IDraw draw)
+        #region Method: void Draw(IDraw)
         public void Draw(IDraw draw)
         {
             DrawWatermark(draw);

@@ -205,7 +205,8 @@ namespace OurWord.Printing
             EnumeratedStepsProgressDlg.IncrementStep();
             while (vLineGroups.Count > 0)
             {
-                var page = new Page(PDoc, Pages.Count, vLineGroups, 
+                var nPageNumber = Pages.Count + 1;
+                var page = new Page(PDoc, nPageNumber, vLineGroups, 
                     m_sRunningFooterText, UserSettings.AllowPicturesToFloatOnPage)
                     {
                         WaterMarkText = (UserSettings.PrintWaterMark) ?
@@ -465,6 +466,7 @@ namespace OurWord.Printing
                 m_nCurrentPrintPage = 1;
 
                 PDoc.PrintPage += PrintPage;
+                PDoc.DefaultPageSettings = Page.PageSettings;
                 PDoc.Print();
 
                 EnumeratedStepsProgressDlg.ClearAppend();

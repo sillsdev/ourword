@@ -1,5 +1,6 @@
 ﻿using System.Drawing;
 using System.Drawing.Printing;
+using OurWord.Printing;
 
 namespace OurWord.Edit
 {
@@ -133,7 +134,7 @@ namespace OurWord.Edit
         public PrintContext(PrintDocument printDoc)
         {
             m_PrintDoc = printDoc;
-            m_PageSettings = printDoc.PrinterSettings.DefaultPageSettings;
+            m_PageSettings = Page.PageSettings;
 
             m_Graphics = m_PrintDoc.PrinterSettings.CreateMeasurementGraphics(m_PageSettings);
         }

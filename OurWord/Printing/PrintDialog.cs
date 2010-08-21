@@ -245,6 +245,7 @@ namespace OurWord.Printing
         }
         #endregion
 
+        public static readonly PageSettings m_PageSettings = new PageSettings();
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(PrintDocument)
@@ -285,6 +286,7 @@ namespace OurWord.Printing
         private GroupBox m_groupWhat;
         private TextBox m_textWatermark;
         private CheckBox m_checkAllowPictureFloat;
+        private Button m_bSetup;
 
         private System.ComponentModel.Container components = null;
         #endregion
@@ -326,13 +328,14 @@ namespace OurWord.Printing
             this.m_labelLineSpacing = new System.Windows.Forms.Label();
             this.m_comboLineSpacing = new System.Windows.Forms.ComboBox();
             this.m_groupOptions = new System.Windows.Forms.GroupBox();
+            this.m_checkAllowPictureFloat = new System.Windows.Forms.CheckBox();
             this.m_textWatermark = new System.Windows.Forms.TextBox();
             this.m_checkPrintPictures = new System.Windows.Forms.CheckBox();
             this.m_checkReplacements = new System.Windows.Forms.CheckBox();
             this.m_radioVernacular = new System.Windows.Forms.RadioButton();
             this.m_radioBackTranslation = new System.Windows.Forms.RadioButton();
             this.m_groupWhat = new System.Windows.Forms.GroupBox();
-            this.m_checkAllowPictureFloat = new System.Windows.Forms.CheckBox();
+            this.m_bSetup = new System.Windows.Forms.Button();
             this.m_groupRange.SuspendLayout();
             this.m_groupOptions.SuspendLayout();
             this.SuspendLayout();
@@ -373,16 +376,16 @@ namespace OurWord.Printing
             // 
             this.m_lblPrinter.Location = new System.Drawing.Point(16, 16);
             this.m_lblPrinter.Name = "m_lblPrinter";
-            this.m_lblPrinter.Size = new System.Drawing.Size(80, 23);
+            this.m_lblPrinter.Size = new System.Drawing.Size(66, 23);
             this.m_lblPrinter.TabIndex = 15;
             this.m_lblPrinter.Text = "Printer:";
             this.m_lblPrinter.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // m_comboPrinter
             // 
-            this.m_comboPrinter.Location = new System.Drawing.Point(104, 16);
+            this.m_comboPrinter.Location = new System.Drawing.Point(88, 16);
             this.m_comboPrinter.Name = "m_comboPrinter";
-            this.m_comboPrinter.Size = new System.Drawing.Size(288, 21);
+            this.m_comboPrinter.Size = new System.Drawing.Size(207, 21);
             this.m_comboPrinter.TabIndex = 1;
             // 
             // m_radioEntireBook
@@ -494,6 +497,14 @@ namespace OurWord.Printing
             this.m_groupOptions.TabStop = false;
             this.m_groupOptions.Text = "Options";
             // 
+            // m_checkAllowPictureFloat
+            // 
+            this.m_checkAllowPictureFloat.Location = new System.Drawing.Point(16, 92);
+            this.m_checkAllowPictureFloat.Name = "m_checkAllowPictureFloat";
+            this.m_checkAllowPictureFloat.Size = new System.Drawing.Size(352, 24);
+            this.m_checkAllowPictureFloat.TabIndex = 24;
+            this.m_checkAllowPictureFloat.Text = "Allow pictures to move on page to save paper?";
+            // 
             // m_textWatermark
             // 
             this.m_textWatermark.Location = new System.Drawing.Point(204, 21);
@@ -548,13 +559,15 @@ namespace OurWord.Printing
             this.m_groupWhat.TabStop = false;
             this.m_groupWhat.Text = "What do you want to print?";
             // 
-            // m_checkAllowPictureFloat
+            // m_bSetup
             // 
-            this.m_checkAllowPictureFloat.Location = new System.Drawing.Point(16, 92);
-            this.m_checkAllowPictureFloat.Name = "m_checkAllowPictureFloat";
-            this.m_checkAllowPictureFloat.Size = new System.Drawing.Size(352, 24);
-            this.m_checkAllowPictureFloat.TabIndex = 24;
-            this.m_checkAllowPictureFloat.Text = "Allow pictures to move on page to save paper?";
+            this.m_bSetup.Location = new System.Drawing.Point(301, 14);
+            this.m_bSetup.Name = "m_bSetup";
+            this.m_bSetup.Size = new System.Drawing.Size(91, 23);
+            this.m_bSetup.TabIndex = 28;
+            this.m_bSetup.Text = "Page Setup...";
+            this.m_bSetup.UseVisualStyleBackColor = true;
+            this.m_bSetup.Click += new System.EventHandler(this.cmdPageSetup);
             // 
             // DialogPrint
             // 
@@ -562,6 +575,7 @@ namespace OurWord.Printing
             this.AutoScaleBaseSize = new System.Drawing.Size(5, 13);
             this.CancelButton = this.m_btnCancel;
             this.ClientSize = new System.Drawing.Size(410, 434);
+            this.Controls.Add(this.m_bSetup);
             this.Controls.Add(this.m_radioBackTranslation);
             this.Controls.Add(this.m_radioVernacular);
             this.Controls.Add(this.m_radioThisSection);
@@ -685,6 +699,17 @@ namespace OurWord.Printing
         private void cmdFromChapterChanged(object sender, EventArgs e)
         {
             Chapters = true;		
+        }
+        #endregion
+        #region cmd: cmdPageSetup
+        private void cmdPageSetup(object sender, EventArgs e)
+        {
+            var dlg = new PageSetupDialog {
+                Document = PDoc,
+                PrinterSettings = PDoc.PrinterSettings,
+                PageSettings = m_PageSettings,
+            };
+            dlg.ShowDialog(this);
         }
         #endregion
     }
