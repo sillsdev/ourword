@@ -849,13 +849,14 @@ namespace OurWord
             DB.Project.WriteToFile(G.CreateProgressIndicator());
             DB.TargetTranslation.WriteToFile(G.CreateProgressIndicator());
 
-            // Update the UI, views, etc
-            DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
-            OnEnterProject();
-
             // Edit properties?
             if (wiz.LaunchPropertiesDialogWhenDone)
                 cmdConfigure();
+
+            // Update the UI, views, etc
+            DB.Project.Nav.GoToFirstAvailableBook(G.CreateProgressIndicator());
+            if (DB.IsValidProject)
+                OnEnterProject();
 
         done:
             UnDim();
@@ -1176,6 +1177,13 @@ namespace OurWord
             newUser.UserName = dlg.FullName;
             newUser.Password = dlg.Password;
             newUser.NoteAuthorsName = dlg.FullName;
+
+            if (null != DB.TargetTranslation)
+            {
+                newUser.AddMembershipTo(DB.TargetTranslation.DisplayName);
+                var translationSettings = newUser.FindTranslationSettings(DB.TargetTranslation.DisplayName);
+                translationSettings.GlobalEditability = User.TranslationSettings.GEditability.Full;
+            }
 
             Users.Add(newUser);
 

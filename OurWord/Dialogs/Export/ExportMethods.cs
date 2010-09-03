@@ -209,7 +209,7 @@ namespace OurWord.Dialogs.Export
                 m_bWordXmlIsLoaded = true;
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
                 LocDB.Message("msgMissingOpenXmlDll",
                               "Unable to load DocumentFormat.OpenXml.dll; it looks like you have " +
