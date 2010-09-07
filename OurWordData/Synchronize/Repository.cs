@@ -879,7 +879,8 @@ namespace OurWordData.Synchronize
             {
                 throw new SynchException("msgNoMercurial",
                     "The external program Mercurial did not respond.\n\n" +
-                    "Either it is not installed (most likely), or else you have a corrupt repository.");
+                    "Possibilities include not having the latest version of Microsoft's DotNet,\n" +
+                    "a bad installation of OurWord/Mercurial, or a corrupt repository.");
             }
         }
         #endregion
