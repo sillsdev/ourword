@@ -42,11 +42,10 @@
             // m_progressBar
             // 
             this.m_progressBar.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.m_progressBar.Location = new System.Drawing.Point(15, 374);
-            this.m_progressBar.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_progressBar.Location = new System.Drawing.Point(12, 299);
             this.m_progressBar.MarqueeAnimationSpeed = 50;
             this.m_progressBar.Name = "m_progressBar";
-            this.m_progressBar.Size = new System.Drawing.Size(445, 29);
+            this.m_progressBar.Size = new System.Drawing.Size(356, 23);
             this.m_progressBar.Step = 1;
             this.m_progressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
             this.m_progressBar.TabIndex = 0;
@@ -56,10 +55,9 @@
             this.m_ProcessName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.m_ProcessName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_ProcessName.Location = new System.Drawing.Point(11, 11);
-            this.m_ProcessName.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_ProcessName.Location = new System.Drawing.Point(9, 9);
             this.m_ProcessName.Name = "m_ProcessName";
-            this.m_ProcessName.Size = new System.Drawing.Size(449, 29);
+            this.m_ProcessName.Size = new System.Drawing.Size(359, 23);
             this.m_ProcessName.TabIndex = 1;
             this.m_ProcessName.Text = "Working...";
             this.m_ProcessName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -67,10 +65,9 @@
             // m_bOK
             // 
             this.m_bOK.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_bOK.Location = new System.Drawing.Point(170, 204);
-            this.m_bOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_bOK.Location = new System.Drawing.Point(136, 163);
             this.m_bOK.Name = "m_bOK";
-            this.m_bOK.Size = new System.Drawing.Size(94, 29);
+            this.m_bOK.Size = new System.Drawing.Size(75, 23);
             this.m_bOK.TabIndex = 3;
             this.m_bOK.Text = "OK";
             this.m_bOK.UseVisualStyleBackColor = true;
@@ -82,19 +79,17 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.m_labelError.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.m_labelError.ForeColor = System.Drawing.Color.Red;
-            this.m_labelError.Location = new System.Drawing.Point(56, 4);
-            this.m_labelError.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelError.Location = new System.Drawing.Point(45, 3);
             this.m_labelError.Name = "m_labelError";
-            this.m_labelError.Size = new System.Drawing.Size(381, 112);
+            this.m_labelError.Size = new System.Drawing.Size(305, 90);
             this.m_labelError.TabIndex = 4;
             this.m_labelError.Text = "(Error)";
             // 
             // m_ErrorIcon
             // 
-            this.m_ErrorIcon.Location = new System.Drawing.Point(4, 4);
-            this.m_ErrorIcon.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_ErrorIcon.Location = new System.Drawing.Point(3, 3);
             this.m_ErrorIcon.Name = "m_ErrorIcon";
-            this.m_ErrorIcon.Size = new System.Drawing.Size(45, 45);
+            this.m_ErrorIcon.Size = new System.Drawing.Size(36, 36);
             this.m_ErrorIcon.TabIndex = 5;
             this.m_ErrorIcon.TabStop = false;
             // 
@@ -106,18 +101,16 @@
             this.m_ErrorPanel.Controls.Add(this.m_ErrorIcon);
             this.m_ErrorPanel.Controls.Add(this.m_labelError);
             this.m_ErrorPanel.ForeColor = System.Drawing.Color.Red;
-            this.m_ErrorPanel.Location = new System.Drawing.Point(15, 44);
-            this.m_ErrorPanel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_ErrorPanel.Location = new System.Drawing.Point(12, 35);
             this.m_ErrorPanel.Name = "m_ErrorPanel";
-            this.m_ErrorPanel.Size = new System.Drawing.Size(444, 152);
+            this.m_ErrorPanel.Size = new System.Drawing.Size(356, 122);
             this.m_ErrorPanel.TabIndex = 6;
             // 
             // EnumeratedStepsProgressDlg
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this.m_bOK;
-            this.ClientSize = new System.Drawing.Size(475, 418);
+            this.ClientSize = new System.Drawing.Size(380, 334);
             this.ControlBox = false;
             this.Controls.Add(this.m_ErrorPanel);
             this.Controls.Add(this.m_bOK);
@@ -125,7 +118,6 @@
             this.Controls.Add(this.m_progressBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "EnumeratedStepsProgressDlg";
