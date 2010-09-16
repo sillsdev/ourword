@@ -492,7 +492,7 @@ namespace OurWord
 		#region Method: void OnEnterSection()
 		private void OnEnterSection()
 		{
-		    m_Navigation.Setup(DB.TargetSection);
+            m_Navigation.Setup(DB.TargetSection);
 
             // Load the data into the individual windows on the screen
             ResetWindowContents();

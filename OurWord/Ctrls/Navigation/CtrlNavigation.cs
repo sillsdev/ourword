@@ -60,6 +60,9 @@ namespace OurWord.Ctrls.Navigation
         #region Method: void Setup(DSection)
         public void Setup(DSection currentSection)
         {
+            if (null == currentSection)
+                return;
+
             Debug.Assert(currentSection.IsTargetSection);
 
             m_CurrentSection = currentSection;

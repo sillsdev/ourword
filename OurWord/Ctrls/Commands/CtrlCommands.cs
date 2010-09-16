@@ -172,6 +172,7 @@ namespace OurWord.Ctrls.Commands
             // Enabling
             var bCannotEdit = (null == WLayout.CurrentLayout ||
                 !WLayout.CurrentLayout.Focused || 
+                null == DB.TargetBook ||
                 Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
 
             m_Cut.Enabled = !bCannotEdit;
