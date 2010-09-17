@@ -238,35 +238,18 @@ namespace OurWord.Ctrls.Commands
         }
         #endregion
         #region cmd: cmdProjectDropDownOpening
-        #region smethod: List<string> GetUserAllowedProjects(ClusterInfo)
-        static List<string> GetUserAllowedProjects(ClusterInfo ci)
-        {
-            var vsAllProjects = ci.GetClusterLanguageList(true);
-
-            var vsUserAllowedProjects = new List<string>();
-            foreach(var sProjectName in vsAllProjects)
-            {
-                if (Users.Current.IsMemberOf(sProjectName))
-                    vsUserAllowedProjects.Add(sProjectName);
-            }
-
-            vsUserAllowedProjects.Sort();
-
-            return vsUserAllowedProjects;
-        }
-        #endregion
         #region method: void BuildProjectsSubMenu(miParent, ClusterInfo)
         void BuildProjectsSubMenu(ToolStripDropDownItem miParent, ClusterInfo ci)
         {
-            var vsUserAllowedProjects = GetUserAllowedProjects(ci);
+            var vsAllProjects = ci.GetClusterLanguageList(true);
 
-            if (vsUserAllowedProjects.Count == 0)
+            if (vsAllProjects.Count == 0)
             {
                 miParent.DropDownItems.Add("(none)");
                 return;               
             }
 
-            foreach (var sProjectName in vsUserAllowedProjects)
+            foreach (var sProjectName in vsAllProjects)
             {
                 var mi = new ToolStripMenuItem(sProjectName, null, cmdOpenProject)
                 {
