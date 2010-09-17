@@ -291,7 +291,7 @@ namespace OurWord.Printing
                     continue;
 
                 var owp = new OWPara(writingSystem, paragraph.Style,
-                    paragraph, Color.White,flags);
+                    paragraph, Color.White, flags);
                 vDisplayParagraphs.Add(owp);
 
                 MakeQuoteReplacements(owp);
@@ -309,6 +309,10 @@ namespace OurWord.Printing
 
             var vFootnotes = new List<OWPara>();
 
+            var flags = (UserSettings.BackTranslation) ?
+                OWPara.Flags.ShowBackTranslation :
+                OWPara.Flags.None;
+
             foreach (var paragraph in vDisplayParagraphs)
             {
                 foreach (var item in paragraph.SubItems)
@@ -321,7 +325,7 @@ namespace OurWord.Printing
                     var sLetter = footnote.Foot.GetFootnoteLetterFor(n++);
                     footLetter.Text = sLetter;
 
-                    var owfn = new OWFootnotePara(footnote, Color.White, OWPara.Flags.None);
+                    var owfn = new OWFootnotePara(footnote, Color.White, flags);
                     vFootnotes.Add(owfn);
                     MakeQuoteReplacements(owfn);
 
