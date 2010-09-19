@@ -1178,7 +1178,7 @@ namespace OurWord
             newUser.Password = dlg.Password;
             newUser.NoteAuthorsName = dlg.FullName;
 
-            if (null != DB.TargetTranslation)
+            if (null != DB.TargetTranslation && Users.Observer != dlg.InitializeAs)
             {
                 newUser.AddMembershipTo(DB.TargetTranslation.DisplayName);
                 var translationSettings = newUser.FindTranslationSettings(DB.TargetTranslation.DisplayName);

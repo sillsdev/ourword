@@ -64,7 +64,6 @@ namespace OurWord.Dialogs.Properties
         private const string c_sGroupBehavior = "Behavior";
         private const string c_sMaximizeOnStartup = "propMaximizeOnStartup";
         private const string c_sZoomPercent = "propZoomPercent";
-        private const string c_sProjectAccess = "propProjectAccess";
         private const string c_sUserPassword = "propUserPassword";
 
         private const string c_sGroupUILanguage = "Language of the User Interface";
@@ -92,9 +91,6 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sZoomPercent:
                     ZoomPropertySpec.Put(e, Users.Current.ZoomPercent);
-                    break;
-                case c_sProjectAccess:
-                    e.Value = Users.Current.MemberProjects;
                     break;
                 case c_sUserPassword:
                     e.Value = Users.Current.Password;
@@ -143,8 +139,6 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sZoomPercent:
                     Users.Current.ZoomPercent = ZoomPropertySpec.Pull(e);
-                    break;
-                case c_sProjectAccess:
                     break;
                 case c_sUserPassword:
                     Users.Current.Password = (string) e.Value;
@@ -209,18 +203,6 @@ namespace OurWord.Dialogs.Properties
                 new[] { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 },
                 100
                 ) {DontLocalizeEnums = true});
-            #endregion
-            #region Project Access
-            m_bag.Properties.Add(new PropertySpec(
-                c_sProjectAccess,
-                "Projects that this user can access",
-                typeof(string),
-                c_sGroupBehavior,
-                "In a large cluster with numerous projects, you can limit this user to only " +
-                    "a subset of them.",
-                "",
-                typeof(ProjectAccessEditor),
-                 null));
             #endregion
             #region OurWord User Password
             m_bag.Properties.Add(new PropertySpec(
