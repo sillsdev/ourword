@@ -1182,7 +1182,7 @@ namespace OurWord
             {
                 newUser.AddMembershipTo(DB.TargetTranslation.DisplayName);
                 var translationSettings = newUser.FindTranslationSettings(DB.TargetTranslation.DisplayName);
-                translationSettings.GlobalEditability = User.TranslationSettings.GEditability.Full;
+                translationSettings.GlobalEditability = User.TranslationSettings.Editability.Full;
             }
 
             Users.Add(newUser);

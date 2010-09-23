@@ -96,7 +96,7 @@ namespace OurWordData.DataModel.Membership
             static readonly Color ReadOnlyColor = Color.Red;
             static readonly Color NotesOnlyColor = Color.Blue;
             static readonly Color FullEditColor = Color.Black;
-            #region SMethod: Color GetUiColor(Editability editability)
+            #region SMethod: Color GetUiColor(Editability)
             static public Color GetUiColor(Editability editability)
             {
                 if (editability == Editability.ReadOnly)
@@ -108,32 +108,35 @@ namespace OurWordData.DataModel.Membership
             #endregion
 
             // Books that can be edited by this user -----------------------------------------
-            public enum Editability { Full, Notes, ReadOnly };
-            #region Method: Editability GetEditability(string sBookAbbrev)
+            // "Custom" (BookByBook) is only permissible for GlobalEditability
+            public enum Editability { Full, Notes, ReadOnly, Custom };
+
+            #region Method: Editability GetEditability(sBookAbbrev)
             public Editability GetEditability(string sBookAbbrev)
             {
-                if (GlobalEditability == GEditability.Full)
-                    return Editability.Full;
-                if (GlobalEditability == GEditability.Notes)
-                    return Editability.Notes;
-                if (GlobalEditability == GEditability.ReadOnly)
-                    return Editability.ReadOnly;
+                if (GlobalEditability != Editability.Custom)
+                    return GlobalEditability;
 
-                Editability value;
-                if (m_BookEditability.TryGetValue(sBookAbbrev, out value))
-                    return value;
+                Editability editabilty;
+                if (m_BookEditability.TryGetValue(sBookAbbrev, out editabilty))
+                {
+                    Debug.Assert(editabilty != Editability.Custom);
+                    return editabilty;
+                }
+
                 throw new Exception("BookAbbrev not in dictionary.");
             }
             #endregion
-            #region Method: void SetEditability(string sBookAbbrev, Editability value)
-            public void SetEditability(string sBookAbbrev, Editability value)
+            #region Method: void SetEditability(sBookAbbrev, Editability)
+            public void SetEditability(string sBookAbbrev, Editability editabilty)
             {
-                m_BookEditability[sBookAbbrev] = value;
+                Debug.Assert(editabilty != Editability.Custom);
+                m_BookEditability[sBookAbbrev] = editabilty;
             }
             #endregion
 
-            public enum GEditability { Full, Notes, ReadOnly, Custom };
-            public GEditability GlobalEditability = GEditability.Full;
+            // Editability for the entire translation rather than book-by-book
+            public Editability GlobalEditability = Editability.Full;
 
             // Private methods/etc.
             private Dictionary<string, Editability> m_BookEditability;
@@ -263,16 +266,16 @@ namespace OurWordData.DataModel.Membership
                 var ts = new TranslationSettings(sName)
                 { 
                     CanCreateGeneralNotes = XmlDoc.GetAttrValue(node, c_sAttrCanCreateGeneralNotes, false),
-                    GlobalEditability = (GEditability)Enum.Parse(
-                        typeof(GEditability),
-                        XmlDoc.GetAttrValue(node, c_sAttrGlobalEditability, GEditability.Full.ToString()),
+                    GlobalEditability = (Editability)Enum.Parse(
+                        typeof(Editability),
+                        XmlDoc.GetAttrValue(node, c_sAttrGlobalEditability, Editability.Custom.ToString()),
                         true),
                 };
 
                 foreach(var sEditability in Enum.GetNames(typeof(Editability)))
                 {
                     var editability = (Editability)Enum.Parse(typeof(Editability), sEditability);
-                    if (editability == Editability.Full)
+                    if (editability == Editability.Full || editability == Editability.Custom)
                         continue;
 
                     var sBooks = XmlDoc.GetAttrValue(node, sEditability, "").Trim();
@@ -315,7 +318,7 @@ namespace OurWordData.DataModel.Membership
                     // we set GlobalEditability earlier; we must leave it as
                     // Custom here, or else the book's editability will be ignored.
                     if (GetEditability(sBookAbbrev) != Editability.Full)
-                        GlobalEditability = GEditability.Custom;
+                        GlobalEditability = Editability.Custom;
                 }
             }
             #endregion
@@ -400,7 +403,7 @@ namespace OurWordData.DataModel.Membership
             if (null == settings)
                 throw new ArgumentException("This user is not a member of the team: " + sTranslationName);
 
-            settings.GlobalEditability = TranslationSettings.GEditability.Custom;
+            settings.GlobalEditability = TranslationSettings.Editability.Custom;
             settings.SetEditability(sBookAbbrev, editability);
         }
         #endregion

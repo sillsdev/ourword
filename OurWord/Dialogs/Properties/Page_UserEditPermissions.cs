@@ -188,7 +188,7 @@ namespace OurWord.Dialogs.Properties
             // Full Editing
             if (FullEditing == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.GEditability.Full;
+                settings.GlobalEditability = User.TranslationSettings.Editability.Full;
                 SetEnabling(false);
                 SetupPropertyGrid();
                 return;
@@ -197,7 +197,7 @@ namespace OurWord.Dialogs.Properties
             // Read Only
             if (ReadOnly == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.GEditability.ReadOnly;
+                settings.GlobalEditability = User.TranslationSettings.Editability.ReadOnly;
                 SetEnabling(false);
                 SetupPropertyGrid();
                 return;
@@ -206,7 +206,7 @@ namespace OurWord.Dialogs.Properties
             // Can Make Notes
             if (CanMakeNotes == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.GEditability.Notes;
+                settings.GlobalEditability = User.TranslationSettings.Editability.Notes;
                 SetEnabling(false);
                 SetupPropertyGrid();
                 return;
@@ -215,7 +215,7 @@ namespace OurWord.Dialogs.Properties
             // Custom
             if (CustomBookByBook == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.GEditability.Custom;
+                settings.GlobalEditability = User.TranslationSettings.Editability.Custom;
                 SetEnabling(true);
                 SetupPropertyGrid();
                 return;
@@ -246,19 +246,19 @@ namespace OurWord.Dialogs.Properties
             {
                 switch (translationSettings.GlobalEditability)
                 {
-                    case User.TranslationSettings.GEditability.Full:
+                    case User.TranslationSettings.Editability.Full:
                         m_comboMembership.Text = FullEditing;
                         break;
 
-                    case User.TranslationSettings.GEditability.Notes:
+                    case User.TranslationSettings.Editability.Notes:
                         m_comboMembership.Text = CanMakeNotes;
                         break;
 
-                    case User.TranslationSettings.GEditability.ReadOnly:
+                    case User.TranslationSettings.Editability.ReadOnly:
                         m_comboMembership.Text = ReadOnly;
                         break;
 
-                    case User.TranslationSettings.GEditability.Custom:
+                    case User.TranslationSettings.Editability.Custom:
                         m_comboMembership.Text = CustomBookByBook;
                         SetEnabling(true);
                         break;
