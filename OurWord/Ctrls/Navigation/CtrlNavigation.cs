@@ -174,7 +174,7 @@ namespace OurWord.Ctrls.Navigation
                 return;
             }
 
-            m_Locked.Available = Users.Current.GetEditability(DB.TargetBook) != 
+            m_Locked.Available = Users.Current.GetBookEditability(DB.TargetBook) != 
                 User.TranslationSettings.Editability.Full;
         }
         #endregion
@@ -198,7 +198,7 @@ namespace OurWord.Ctrls.Navigation
             };
 
             // For a restricted book, write its text as a different color
-            var editability = Users.Current.GetEditability(book);
+            var editability = Users.Current.GetBookEditability(book);
             item.ForeColor = User.TranslationSettings.GetUiColor(editability);
 
             return item;

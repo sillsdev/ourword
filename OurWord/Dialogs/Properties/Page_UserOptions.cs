@@ -1,9 +1,5 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Drawing.Design;
-using System.Windows.Forms;
 using JWTools;
-using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
 
 namespace OurWord.Dialogs.Properties
@@ -65,6 +61,7 @@ namespace OurWord.Dialogs.Properties
         private const string c_sMaximizeOnStartup = "propMaximizeOnStartup";
         private const string c_sZoomPercent = "propZoomPercent";
         private const string c_sUserPassword = "propUserPassword";
+        private const string cUserType = "propUserType";
 
         private const string c_sGroupUILanguage = "Language of the User Interface";
         private const string c_sPrimaryLanguage = "propPrimaryLanguage";
@@ -94,6 +91,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sUserPassword:
                     e.Value = Users.Current.Password;
+                    break;
+                case cUserType:
+                    e.Value = Users.Current.Type.ToString();
                     break;
 
                 // UI Languages
@@ -142,6 +142,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sUserPassword:
                     Users.Current.Password = (string) e.Value;
+                    break;
+                case cUserType:
+                    Users.Current.Type = (User.UserType)Enum.Parse(typeof (User.UserType), (string)e.Value);
                     break;
 
                 // UI Languages
@@ -213,6 +216,27 @@ namespace OurWord.Dialogs.Properties
                 "The password used to get into this Configuration Dialog.",
                 ""));
             #endregion
+
+            m_bag.Properties.Add(new EnumPropertySpec(
+                cUserType,
+                "User Type",
+                c_sGroupBehavior,
+                "The user's type determines the default behavior for the editability of books.",
+                typeof(User.TranslationSettings.Editability),
+                new[] { 
+                    (int)User.UserType.Administrator, 
+                    (int)User.UserType.Translator,
+                    (int)User.UserType.Consultant,
+                    (int)User.UserType.Observer,
+                },
+                new[] { 
+                    "Administrator", 
+                    "Translator", 
+                    "Consultant", 
+                    "Observer", 
+                 },
+                "Observer"
+                ));
 
             #region Primary UI Language
             m_bag.Properties.Add(new PropertySpec(
@@ -293,6 +317,8 @@ namespace OurWord.Dialogs.Properties
 
 
     // DlgCheckTree
+    #region OBSOLETE
+    /*
     public class ProjectAccessEditor : UITypeEditor
     {
         #region smethod: void CreateCheckTreeItems(DlgCheckTree dlg)
@@ -357,6 +383,7 @@ namespace OurWord.Dialogs.Properties
         }
         #endregion
     }
-
+    */
+    #endregion
 
 }

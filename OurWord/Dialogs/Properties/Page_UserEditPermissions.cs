@@ -57,9 +57,9 @@ namespace OurWord.Dialogs.Properties
         }
         #endregion
 
-        // List of Translation Combo ---------------------------------------------------------
+        // List of Translations Combo --------------------------------------------------------
         private string m_CurrentTranslationName;
-
+        #region method: void SetupPermissionsForCombo()
         void SetupPermissionsForCombo()
         {
             m_cPermissionsFor.Items.Clear();
@@ -74,7 +74,8 @@ namespace OurWord.Dialogs.Properties
 
             m_cPermissionsFor.Text = m_CurrentTranslationName;
         }
-
+        #endregion
+        #region cmd: void cmdPermissionsForChanged(object sender, System.EventArgs e)
         private void cmdPermissionsForChanged(object sender, System.EventArgs e)
         {
             var sProjectName = m_cPermissionsFor.Text;
@@ -89,7 +90,7 @@ namespace OurWord.Dialogs.Properties
                 new[] {Users.Current.UserName, m_CurrentTranslationName});
 
         }
-
+        #endregion
 
         // Buttons to change editability for all books ---------------------------------------
         #region method: void MakeAll(Editability)
@@ -97,7 +98,7 @@ namespace OurWord.Dialogs.Properties
         {
             foreach(var sBookAbbrev in DBook.BookAbbrevs)
             {
-                Users.Current.SetEditability(m_CurrentTranslationName, sBookAbbrev, editability);
+                Users.Current.SetBookEditability(m_CurrentTranslationName, sBookAbbrev, editability);
             }
             SetupPropertyGrid();
         }
@@ -123,15 +124,6 @@ namespace OurWord.Dialogs.Properties
         #endregion
 
         // Membership Combo ------------------------------------------------------------------
-        #region sattr{g}: string NotAMember
-        static string NotAMember
-        {
-            get
-            {
-                return Loc.GetString("kUserNotAMember", "Not a member of this project");
-            }
-        }
-        #endregion
         #region sattr{g}: string FullEditing
         static string FullEditing
         {
@@ -171,104 +163,79 @@ namespace OurWord.Dialogs.Properties
         #region cmd: cmdGlobalEditingChanged
         private void cmdGlobalEditingChanged(object sender, System.EventArgs e)
         {
-            // Not a Member
-            if (NotAMember == m_comboMembership.Text)
-            {
-                Users.Current.RemoveMembershipFrom(m_CurrentTranslationName);
-                SetEnabling(false);
-                SetupPropertyGrid();
-                return;
-            }
-
-            // Otherwise, make sure he's a member
-            if (!Users.Current.IsMemberOf(m_CurrentTranslationName))
-                Users.Current.AddMembershipTo(m_CurrentTranslationName);
-            var settings = Users.Current.FindTranslationSettings(m_CurrentTranslationName);
-
             // Full Editing
             if (FullEditing == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.Editability.Full;
+                Users.Current.FindOrAdd(m_CurrentTranslationName).GlobalEditability = 
+                    User.TranslationSettings.Editability.Full;
                 SetEnabling(false);
-                SetupPropertyGrid();
-                return;
             }
 
             // Read Only
-            if (ReadOnly == m_comboMembership.Text)
+            else if (ReadOnly == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.Editability.ReadOnly;
+                Users.Current.FindOrAdd(m_CurrentTranslationName).GlobalEditability =
+                   User.TranslationSettings.Editability.ReadOnly;
                 SetEnabling(false);
-                SetupPropertyGrid();
-                return;
             }
 
             // Can Make Notes
-            if (CanMakeNotes == m_comboMembership.Text)
+            else if (CanMakeNotes == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.Editability.Notes;
+                Users.Current.FindOrAdd(m_CurrentTranslationName).GlobalEditability =
+                   User.TranslationSettings.Editability.Notes;
                 SetEnabling(false);
-                SetupPropertyGrid();
-                return;
             }
 
             // Custom
-            if (CustomBookByBook == m_comboMembership.Text)
+            else if (CustomBookByBook == m_comboMembership.Text)
             {
-                settings.GlobalEditability = User.TranslationSettings.Editability.Custom;
+                Users.Current.FindOrAdd(m_CurrentTranslationName).GlobalEditability =
+                   User.TranslationSettings.Editability.Custom;
                 SetEnabling(true);
-                SetupPropertyGrid();
-                return;
             }
+
+            SetupPropertyGrid();
         }
         #endregion
-
+        #region method: void SetupMembershipComboOptions()
         void SetupMembershipComboOptions()
         {
             m_comboMembership.Items.Clear();
-            m_comboMembership.Items.Add(NotAMember);
             m_comboMembership.Items.Add(FullEditing);
             m_comboMembership.Items.Add(CanMakeNotes);
             m_comboMembership.Items.Add(ReadOnly);
-            m_comboMembership.Items.Add(CustomBookByBook);           
+            m_comboMembership.Items.Add(CustomBookByBook);
         }
-
+        #endregion
+        #region method: void SetMembershipComboValue()
         void SetMembershipComboValue()
         {
-            var translationSettings = Users.Current.FindTranslationSettings(
-               m_CurrentTranslationName);
-
-            if (null == translationSettings)
+            switch (Users.Current.FindOrAdd(m_CurrentTranslationName).GlobalEditability)
             {
-                m_comboMembership.Text = NotAMember;
+                case User.TranslationSettings.Editability.Full:
+                    m_comboMembership.Text = FullEditing;
+                    break;
+
+                case User.TranslationSettings.Editability.Notes:
+                    m_comboMembership.Text = CanMakeNotes;
+                    break;
+
+                case User.TranslationSettings.Editability.ReadOnly:
+                    m_comboMembership.Text = ReadOnly;
+                    break;
+
+                case User.TranslationSettings.Editability.Custom:
+                    m_comboMembership.Text = CustomBookByBook;
+                    SetEnabling(true);
+                    break;
+
+                default:
+                    Debug.Assert(false, "Unknown editability");
+                    break;
             }
-            else
-            {
-                switch (translationSettings.GlobalEditability)
-                {
-                    case User.TranslationSettings.Editability.Full:
-                        m_comboMembership.Text = FullEditing;
-                        break;
-
-                    case User.TranslationSettings.Editability.Notes:
-                        m_comboMembership.Text = CanMakeNotes;
-                        break;
-
-                    case User.TranslationSettings.Editability.ReadOnly:
-                        m_comboMembership.Text = ReadOnly;
-                        break;
-
-                    case User.TranslationSettings.Editability.Custom:
-                        m_comboMembership.Text = CustomBookByBook;
-                        SetEnabling(true);
-                        break;
-
-                    default:
-                        Debug.Assert(false, "Unknown editability");
-                        break;
-                }
-            }           
         }
+        #endregion
 
         // Other Command Handlers ------------------------------------------------------------
         #region cmd: cmdLoad
@@ -306,7 +273,7 @@ namespace OurWord.Dialogs.Properties
         {
             // Look up the book's editability for the current user
             var sBookAbbrev = e.Property.ID;
-            var editability = Users.Current.GetEditability(m_CurrentTranslationName, sBookAbbrev);
+            var editability = Users.Current.GetBookEditability(m_CurrentTranslationName, sBookAbbrev);
 
             // Set the combo box to display it
             var ps = e.Property as EnumPropertySpec;
@@ -325,7 +292,7 @@ namespace OurWord.Dialogs.Properties
 
             // Assign it to the User's setting
             var sBookAbbrev = e.Property.ID;
-            Users.Current.SetEditability(m_CurrentTranslationName, sBookAbbrev, editability);
+            Users.Current.SetBookEditability(m_CurrentTranslationName, sBookAbbrev, editability);
         }
         #endregion
         #region method: void SetupPropertyGrid()
@@ -382,6 +349,5 @@ namespace OurWord.Dialogs.Properties
             m_gridBookByBook.SelectedObject = Bag;
         }
         #endregion
-
     }
 }

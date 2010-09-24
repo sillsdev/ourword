@@ -112,10 +112,9 @@ namespace OurWord.Ctrls.Commands
                 user.CanCreateProject ||
                 !Users.HasAdministrator;
 
-            m_Open.Available = !bIsValidProject ||
-                user.MemberProjects.Length > 1 || 
-                user == Users.Observer ||
-                !Users.HasAdministrator;
+            m_Open.Available = !bIsValidProject ||    // Not in a valid project
+                user == Users.Observer ||             // Observers can open anything
+                !Users.HasAdministrator;              // If no admin, need to open s.t. else
 
             m_Save.Available = bIsValidProject;
             m_menuSave.Available = bIsValidProject;
@@ -173,7 +172,7 @@ namespace OurWord.Ctrls.Commands
             var bCannotEdit = (null == WLayout.CurrentLayout ||
                 !WLayout.CurrentLayout.Focused || 
                 null == DB.TargetBook ||
-                Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
+                Users.Current.GetBookEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
 
             m_Cut.Enabled = !bCannotEdit;
             m_Copy.Enabled = !bCannotEdit;
@@ -199,7 +198,7 @@ namespace OurWord.Ctrls.Commands
             m_InsertNote.Available = Users.Current.CanMakeNotes &&
                 DB.IsValidProject &&
                 DB.TargetBook != null &&
-                Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.ReadOnly;
+                Users.Current.GetBookEditability(DB.TargetBook) != User.TranslationSettings.Editability.ReadOnly;
 
             m_InsertNote.Enabled = DB.IsValidProject &&
                 null != DB.FrontSection &&
@@ -343,7 +342,7 @@ namespace OurWord.Ctrls.Commands
             var wnd = WLayout.CurrentLayout;
             var bCanEdit = (null != wnd && 
                 wnd.Focused && 
-                Users.Current.GetEditability(DB.TargetBook) == User.TranslationSettings.Editability.Full);
+                Users.Current.GetBookEditability(DB.TargetBook) == User.TranslationSettings.Editability.Full);
 
             m_menuInsertFootnote.Enabled = (bCanEdit && wnd.canInsertFootnote);
             m_menuDeleteFootnote.Enabled = (bCanEdit && wnd.canDeleteFootnote);

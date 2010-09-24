@@ -18,10 +18,50 @@ namespace OurWordData.DataModel.Membership
 
     public class User
     {
+
         // Attrs -----------------------------------------------------------------------------
         public string UserName { get; set; }
         public string Password { get; set; }
-        public bool IsAdministrator { get; set; }
+
+        // User Type
+        public enum UserType { Administrator, Observer, Consultant, Translator };
+        public UserType Type { get; set; }
+        #region VAttr{g}: bool IsAdministrator
+        public bool IsAdministrator
+        {
+            get
+            {
+                return Type == UserType.Administrator;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsObserver
+        public bool IsObserver
+        {
+            get
+            {
+                return Type == UserType.Observer;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsConsultant
+        public bool IsConsultant
+        {
+            get
+            {
+                return Type == UserType.Consultant;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsTranslator
+        public bool IsTranslator
+        {
+            get
+            {
+                return Type == UserType.Translator;
+            }
+        }
+        #endregion
 
         // Attrs: General Options
         public bool MaximizeWindowOnStartup { get; set; }
@@ -93,24 +133,20 @@ namespace OurWordData.DataModel.Membership
         #region CLASS: TranslationSettings
         public class TranslationSettings
         {
-            static readonly Color ReadOnlyColor = Color.Red;
-            static readonly Color NotesOnlyColor = Color.Blue;
-            static readonly Color FullEditColor = Color.Black;
             #region SMethod: Color GetUiColor(Editability)
             static public Color GetUiColor(Editability editability)
             {
                 if (editability == Editability.ReadOnly)
-                    return ReadOnlyColor;
+                    return Color.Red;
                 if (editability == Editability.Notes)
-                    return NotesOnlyColor;
-                return FullEditColor;
+                    return Color.Blue;
+                return Color.Black;
             }
             #endregion
 
             // Books that can be edited by this user -----------------------------------------
             // "Custom" (BookByBook) is only permissible for GlobalEditability
             public enum Editability { Full, Notes, ReadOnly, Custom };
-
             #region Method: Editability GetEditability(sBookAbbrev)
             public Editability GetEditability(string sBookAbbrev)
             {
@@ -124,53 +160,57 @@ namespace OurWordData.DataModel.Membership
                     return editabilty;
                 }
 
-                throw new Exception("BookAbbrev not in dictionary.");
+                throw new Exception(string.Format("BookAbbrev {0} not in dictionary.", sBookAbbrev));
             }
             #endregion
             #region Method: void SetEditability(sBookAbbrev, Editability)
             public void SetEditability(string sBookAbbrev, Editability editabilty)
             {
+                // The custom value is for Global, not for individual books
                 Debug.Assert(editabilty != Editability.Custom);
-                m_BookEditability[sBookAbbrev] = editabilty;
+
+                // If we're setting something different from the Global setting, then
+                // we have a Custom book-by-book situation
+                if (GlobalEditability != editabilty)
+                    GlobalEditability = Editability.Custom;
+
+                if (!m_BookEditability.ContainsKey(sBookAbbrev))
+                    m_BookEditability.Add(sBookAbbrev, editabilty);
+                else
+                    m_BookEditability[sBookAbbrev] = editabilty;
             }
             #endregion
 
-            // Editability for the entire translation rather than book-by-book
-            public Editability GlobalEditability = Editability.Full;
+            // Editability for the entire translation rather than book-by-book. Default is
+            // Full, which we'll want to certainly override for, e.g., Obervers, etc.
+            #region VAttr{g}: Editability GlobalEditability
+            public Editability GlobalEditability
+            {
+                get
+                {
+                    return m_GlobalEditability;
+                }
+                set
+                {
+                    if (value == m_GlobalEditability)
+                        return;
+
+                    if (value == Editability.Custom)
+                    {
+                        // Before we set it to Custom, initialize the book abbreviations 
+                        // to whatever the value was previously
+                        foreach(var sBookAbbrev in DBook.BookAbbrevs)
+                            SetEditability(sBookAbbrev, m_GlobalEditability);
+                    }
+
+                    m_GlobalEditability = value;
+                }
+            }
+            private Editability m_GlobalEditability = Editability.Full;
+            #endregion
 
             // Private methods/etc.
-            private Dictionary<string, Editability> m_BookEditability;
-            #region method: void InitializeEditability()
-            private void InitializeEditability()
-            {
-                m_BookEditability = new Dictionary<string, Editability>();
-                foreach(var sBookAbbrev in DBook.BookAbbrevs)
-                    m_BookEditability.Add(sBookAbbrev, Editability.Full);
-            }
-            #endregion]
-            #region method: string GetListOfBooks(Editability)
-            string GetListOfBooks(Editability editability)
-            {
-                var s = "";
-                foreach(var sBookAbbrev in DBook.BookAbbrevs)
-                {
-                    if (GetEditability(sBookAbbrev) == editability)
-                        s += sBookAbbrev + " ";
-                }
-                return s.Trim();
-            }
-            #endregion
-            #region method: void SetListOfBooks(s, Editability)
-            void SetListOfBooks(string s, Editability editability)
-            {
-                var vsBookAbbrevs = s.Split(new char[] {' '});
-                foreach(string sBookAbbrev in vsBookAbbrevs)
-                    SetEditability(sBookAbbrev, editability);
-            }
-            #endregion
-
-            // Permissions -------------------------------------------------------------------
-            public bool CanCreateGeneralNotes { get; set; }
+            private readonly Dictionary<string, Editability> m_BookEditability;
 
             // Scaffolding -------------------------------------------------------------------
             #region public string TranslationName
@@ -185,41 +225,23 @@ namespace OurWordData.DataModel.Membership
             private readonly string m_sTranslationName;
             #endregion
             #region Constructor(sTranslationName)
-            public TranslationSettings(string sTranslationName)
+            public TranslationSettings(string sTranslationName, Editability globalEditability)
             {
                 m_sTranslationName = sTranslationName;
-                InitializeEditability();
-            }
-            #endregion
-            #region Query: bool ContentEquals(other)
-            public bool ContentEquals(TranslationSettings other)
-            {
-                foreach(var sBookAbbrev in DBook.BookAbbrevs)
-                {
-                    if (GetEditability(sBookAbbrev) != other.GetEditability(sBookAbbrev))
-                        return false;
-                }
 
-                if (CanCreateGeneralNotes != other.CanCreateGeneralNotes)
-                    return false;
-                if (GlobalEditability != other.GlobalEditability)
-                    return false;
-
-                return true;
+                m_BookEditability = new Dictionary<string, Editability>();
+                GlobalEditability = globalEditability;
             }
             #endregion
             #region Method: TranslationSettings Clone()
             public TranslationSettings Clone()
             {
-                var ts = new TranslationSettings(TranslationName)
-                {
-                    CanCreateGeneralNotes = CanCreateGeneralNotes,
-                    GlobalEditability = GlobalEditability,
-                };
+                var ts = new TranslationSettings(TranslationName, GlobalEditability);
 
-                foreach(var sBookAbbrev in DBook.BookAbbrevs)
+                if (Editability.Custom == GlobalEditability)
                 {
-                    ts.SetEditability(sBookAbbrev, GetEditability(sBookAbbrev));
+                    foreach (var sBookAbbrev in DBook.BookAbbrevs)
+                        ts.SetEditability(sBookAbbrev, GetEditability(sBookAbbrev));
                 }
 
                 return ts;
@@ -230,8 +252,27 @@ namespace OurWordData.DataModel.Membership
             #region Constants
             private const string c_sTag = "TranslationSettings";
             private const string c_sAttrTranslationName = "name";
-            private const string c_sAttrCanCreateGeneralNotes = "generalNotes";
             private const string c_sAttrGlobalEditability = "globalEditability";
+            #endregion
+            #region method: string GetListOfBooks(editability)
+            string GetListOfBooks(Editability editability)
+            {
+                var s = "";
+                foreach(var sBookAbbrev in DBook.BookAbbrevs)
+                {
+                    if (GetEditability(sBookAbbrev) == editability)
+                        s += sBookAbbrev + " ";
+                }
+                return s.Trim();
+            }
+            #endregion
+            #region method: void SetListOfBooks(s, editability)
+            void SetListOfBooks(string s, Editability editability)
+            {
+                var vsBookAbbrevs = s.Split(new char[] {' '});
+                foreach(var sBookAbbrev in vsBookAbbrevs)
+                    SetEditability(sBookAbbrev, editability);
+            }
             #endregion
             #region Method: XmlNode Save(XmlDoc, nodeParent)
             public XmlNode Save(XmlDoc doc, XmlNode nodeParent)
@@ -239,17 +280,18 @@ namespace OurWordData.DataModel.Membership
                 var node = doc.AddNode(nodeParent, c_sTag);
 
                 doc.AddAttr(node, c_sAttrTranslationName, m_sTranslationName);
-                doc.AddAttr(node, c_sAttrCanCreateGeneralNotes, CanCreateGeneralNotes);
                 doc.AddAttr(node, c_sAttrGlobalEditability, GlobalEditability.ToString());
 
-                foreach (var sEditability in Enum.GetNames(typeof(Editability)))
+                if (GlobalEditability == Editability.Custom)
                 {
-                    var editability = (Editability)Enum.Parse(typeof(Editability), sEditability);
-                    if (editability == Editability.Full)
-                        continue;
-                    doc.AddAttr(node, sEditability, GetListOfBooks(editability));
+                    foreach (var sEditability in Enum.GetNames(typeof(Editability)))
+                    {
+                        var editability = (Editability)Enum.Parse(typeof(Editability), sEditability);
+                        if (editability == Editability.Full)
+                            continue;
+                        doc.AddAttr(node, sEditability, GetListOfBooks(editability));
+                    }
                 }
-
                 return node;
             }
             #endregion
@@ -259,27 +301,28 @@ namespace OurWordData.DataModel.Membership
                 if (node.Name != c_sTag)
                     return null;
 
-                var sName = XmlDoc.GetAttrValue(node, c_sAttrTranslationName, "");
-                if (string.IsNullOrEmpty(sName))
+                var sTranslationName = XmlDoc.GetAttrValue(node, c_sAttrTranslationName, "");
+                if (string.IsNullOrEmpty(sTranslationName))
                     return null;
 
-                var ts = new TranslationSettings(sName)
-                { 
-                    CanCreateGeneralNotes = XmlDoc.GetAttrValue(node, c_sAttrCanCreateGeneralNotes, false),
-                    GlobalEditability = (Editability)Enum.Parse(
-                        typeof(Editability),
-                        XmlDoc.GetAttrValue(node, c_sAttrGlobalEditability, Editability.Custom.ToString()),
-                        true),
-                };
+                var globalEditability = (Editability) Enum.Parse(
+                    typeof (Editability),
+                    XmlDoc.GetAttrValue(node, c_sAttrGlobalEditability, Editability.Custom.ToString()),
+                    true);
 
-                foreach(var sEditability in Enum.GetNames(typeof(Editability)))
+                var ts = new TranslationSettings(sTranslationName, globalEditability);
+
+                if (ts.GlobalEditability == Editability.Custom)
                 {
-                    var editability = (Editability)Enum.Parse(typeof(Editability), sEditability);
-                    if (editability == Editability.Full || editability == Editability.Custom)
-                        continue;
+                    foreach (var sEditability in Enum.GetNames(typeof (Editability)))
+                    {
+                        var editability = (Editability) Enum.Parse(typeof (Editability), sEditability);
+                        if (editability == Editability.Full || editability == Editability.Custom)
+                            continue;
 
-                    var sBooks = XmlDoc.GetAttrValue(node, sEditability, "").Trim();
-                    ts.SetListOfBooks(sBooks, editability);
+                        var sBooks = XmlDoc.GetAttrValue(node, sEditability, "").Trim();
+                        ts.SetListOfBooks(sBooks, editability);
+                    }
                 }
 
                 return ts;
@@ -292,12 +335,6 @@ namespace OurWordData.DataModel.Membership
             {
                 Debug.Assert(parent != null);
                 Debug.Assert(theirs != null);
-
-                if (CanCreateGeneralNotes != theirs.CanCreateGeneralNotes &&
-                    CanCreateGeneralNotes == parent.CanCreateGeneralNotes)
-                {
-                    CanCreateGeneralNotes = theirs.CanCreateGeneralNotes;
-                }
 
                 if (GlobalEditability != theirs.GlobalEditability &&
                     GlobalEditability == parent.GlobalEditability)
@@ -324,87 +361,67 @@ namespace OurWordData.DataModel.Membership
             #endregion
         }
         #endregion
+        #region method: TranslationSettings.Editability GetDefaultEditability()
+        TranslationSettings.Editability GetDefaultEditability()
+        {
+            switch (Type)
+            {
+                case UserType.Observer:
+                    return TranslationSettings.Editability.ReadOnly;
+                case UserType.Consultant:
+                    return TranslationSettings.Editability.Notes;
+                case UserType.Administrator:
+                    return TranslationSettings.Editability.Full;
+                case UserType.Translator:
+                    return TranslationSettings.Editability.Notes;
+                default:
+                    Debug.Assert(false, "Uninown UserType");
+                    return TranslationSettings.Editability.ReadOnly;
+            }
+        }
+        #endregion
         private readonly Dictionary<string, TranslationSettings> m_vTranslationSettings;
-        #region Method: TranslationSettings FindTranslationSettings(sTranslationName)
-        public TranslationSettings FindTranslationSettings(string sTranslationName)
+        #region method: TranslationSettings Find(sTranslationName)
+        private TranslationSettings Find(string sTranslationName)
         {
             TranslationSettings settings;
             m_vTranslationSettings.TryGetValue(sTranslationName, out settings);
             return settings;
         }
         #endregion
-        #region Query: bool IsMemberOf(sTranslationName)
-        public bool IsMemberOf(string sTranslationName)
+        #region Method: TranslationSettings FindOrAdd(string sTranslationName)
+        public TranslationSettings FindOrAdd(string sTranslationName)
         {
-            return (null != FindTranslationSettings(sTranslationName));
-        }
-        #endregion
-        #region Method: void AddMembershipTo(sTranslationName)
-        public void AddMembershipTo(string sTranslationName)
-        {
-            if (IsMemberOf(sTranslationName))
-                return;
+            var settings = Find(sTranslationName);
 
-            var settings = new TranslationSettings(sTranslationName);
-            m_vTranslationSettings.Add(sTranslationName, settings);
-        }
-        #endregion
-        #region Method: void RemoveMembershipFrom(sTranslationName)
-        public void RemoveMembershipFrom(string sTranslationName)
-        {
-            if (!IsMemberOf(sTranslationName))
-                return;
-
-            m_vTranslationSettings.Remove(sTranslationName);
-        }
-        #endregion
-        #region Attr{g}: string MemberProjects
-        public string MemberProjects
-        {
-            get
+            if (null == settings)
             {
-                var s = "";
-                foreach (var sProjectName in m_vTranslationSettings.Keys)
-                    s += sProjectName + ", ";
-                if (s.EndsWith(", "))
-                    s = s.Remove(s.Length - 2);
-                return s;
+                settings = new TranslationSettings(sTranslationName, GetDefaultEditability());
+                m_vTranslationSettings.Add(sTranslationName, settings);
             }
+
+            return settings;
         }
         #endregion
 
         // Editable (vs locked, etc.) books --------------------------------------------------
-        #region Method: bool GetEditability(sTranslationName, sBookName)
-        public TranslationSettings.Editability GetEditability(string sTranslationName, 
-            string sBookAbbrev)
+        #region Method: bool GetBookEditability(sTranslationName, sBookName)
+        public TranslationSettings.Editability GetBookEditability(string sTranslationName, string sBookAbbrev)
         {
-            if (!IsMemberOf(sTranslationName))
-                return TranslationSettings.Editability.ReadOnly;
-
-            var settings = FindTranslationSettings(sTranslationName);
-            Debug.Assert(null != settings);
-            return settings.GetEditability(sBookAbbrev);
+            return FindOrAdd(sTranslationName).GetEditability(sBookAbbrev);
         }
         #endregion
-        #region Method: Editability GetEditability(DBook)
-        public TranslationSettings.Editability GetEditability(DBook book)
+        #region Method: Editability GetBookEditability(DBook)
+        public TranslationSettings.Editability GetBookEditability(DBook book)
         {
-            return GetEditability(book.Translation.DisplayName, book.BookAbbrev);
+            return GetBookEditability(book.Translation.DisplayName, book.BookAbbrev);
         }
         #endregion
-        #region Method: bool SetEditability(sTranslationName, sBookName, editability)
-        public void SetEditability(string sTranslationName, string sBookAbbrev, 
+        #region Method: bool SetBookEditability(sTranslationName, sBookName, editability)
+        public void SetBookEditability(string sTranslationName, string sBookAbbrev, 
             TranslationSettings.Editability editability)
         {
-            var settings = FindTranslationSettings(sTranslationName);
-
-            // We want to be explicitly setting team membership in the caller, rather than just
-            // automatically doing it here
-            if (null == settings)
-                throw new ArgumentException("This user is not a member of the team: " + sTranslationName);
-
-            settings.GlobalEditability = TranslationSettings.Editability.Custom;
-            settings.SetEditability(sBookAbbrev, editability);
+            FindOrAdd(sTranslationName).SetEditability(sBookAbbrev, editability);
         }
         #endregion
 
@@ -464,7 +481,7 @@ namespace OurWordData.DataModel.Membership
         private const string c_sTag = "User";
         private const string c_sAttrUserName = "username";
         private const string c_sAttrPassword = "password";
-        private const string c_sAttrAdministrator = "administrator";
+        private const string cUserType = "usertype";
 
         // General options
         private const string c_sAttrMaximizeWindowOnStartup = "maxWin";
@@ -515,7 +532,7 @@ namespace OurWordData.DataModel.Membership
 
             doc.AddAttr(node, c_sAttrUserName, UserName);
             doc.AddAttr(node, c_sAttrPassword, Password);
-            doc.AddAttr(node, c_sAttrAdministrator, IsAdministrator);
+            doc.AddAttr(node, cUserType, Type.ToString());
 
             // General Options
             doc.AddAttr(node, c_sAttrMaximizeWindowOnStartup, MaximizeWindowOnStartup);
@@ -591,7 +608,9 @@ namespace OurWordData.DataModel.Membership
             var user = new User {
                 UserName = sUser,
                 Password = XmlDoc.GetAttrValue(node, c_sAttrPassword, ""),
-                IsAdministrator = XmlDoc.GetAttrValue(node, c_sAttrAdministrator, false),
+                Type = (UserType)Enum.Parse(typeof(UserType), 
+                    XmlDoc.GetAttrValue(node, cUserType, UserType.Translator.ToString()), 
+                    true),
 
                 // General Options
                 MaximizeWindowOnStartup = XmlDoc.GetAttrValue(node, c_sAttrMaximizeWindowOnStartup, false),
@@ -640,6 +659,11 @@ namespace OurWordData.DataModel.Membership
                     user.m_vTranslationSettings.Add(ts.TranslationName, ts);
             }
 
+            // Upgrade from 1.8h version of settings
+            var bIsAdministrator = XmlDoc.GetAttrValue(node, "administrator", false);
+            if (bIsAdministrator)
+                user.Type = UserType.Administrator;
+
             return user;
         }
         #endregion
@@ -668,8 +692,8 @@ namespace OurWordData.DataModel.Membership
             Debug.Assert(UserName == theirs.UserName);
 
             // Simple Attributes
-            IsAdministrator = Merger.Merge(IsAdministrator, parent.IsAdministrator, theirs.IsAdministrator);
             Password = Merger.Merge(Password, parent.Password, theirs.Password);
+            Type = (UserType) Merger.Merge((int)Type, (int)parent.Type, (int)theirs.Type);
 
             // General Options
             MaximizeWindowOnStartup = Merger.Merge(MaximizeWindowOnStartup, parent.MaximizeWindowOnStartup, theirs.MaximizeWindowOnStartup);
@@ -713,8 +737,8 @@ namespace OurWordData.DataModel.Membership
             // Merge any translation settings that exist in all three)))
             foreach(var ourTS in m_vTranslationSettings.Values)
             {
-                var parentTS = parent.FindTranslationSettings(ourTS.TranslationName);
-                var theirTS = theirs.FindTranslationSettings(ourTS.TranslationName);
+                var parentTS = parent.Find(ourTS.TranslationName);
+                var theirTS = theirs.Find(ourTS.TranslationName);
                 if (null != parentTS && null != theirTS)
                     ourTS.Merge(parentTS, theirTS);
             }
@@ -722,8 +746,8 @@ namespace OurWordData.DataModel.Membership
             // Add any new TSs that only exist in theirs
             foreach(var theirTS in theirs.m_vTranslationSettings.Values)
             {
-                var ourTS = FindTranslationSettings(theirTS.TranslationName);
-                var parentTS = parent.FindTranslationSettings(theirTS.TranslationName);
+                var ourTS = Find(theirTS.TranslationName);
+                var parentTS = parent.Find(theirTS.TranslationName);
                 if (null == parentTS && null == ourTS)
                     m_vTranslationSettings.Add(theirTS.TranslationName, theirTS.Clone());
             }
