@@ -112,10 +112,6 @@ namespace OurWord.Ctrls.Commands
                 user.CanCreateProject ||
                 !Users.HasAdministrator;
 
-            m_Open.Available = !bIsValidProject ||    // Not in a valid project
-                user == Users.Observer ||             // Observers can open anything
-                !Users.HasAdministrator;              // If no admin, need to open s.t. else
-
             m_Save.Available = bIsValidProject;
             m_menuSave.Available = bIsValidProject;
 
@@ -273,6 +269,7 @@ namespace OurWord.Ctrls.Commands
                 m_Open.Available = false;
                 return;
             }
+            m_Open.Available = true;
 
             m_Open.DropDownItems.Clear();
 
