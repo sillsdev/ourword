@@ -333,7 +333,7 @@ namespace OurWord.Dialogs
 			// Position it on the proper monitor. This will be the primary monitor
 			// unless we find in the registry that it was previously on another monitor
 			// (and of course, if that monitor currently exists.)
-			Screen scr = JW_WindowState.GetLastScreen();
+			Screen scr = JW_WindowState.GetLastScreen( JW_WindowState.DefaultRegistrySubKey);
 			Rectangle ScreenBounds = scr.Bounds;
 			int xCenter = ScreenBounds.Left + ScreenBounds.Width / 2;
 			int yCenter = ScreenBounds.Top + ScreenBounds.Height / 2;

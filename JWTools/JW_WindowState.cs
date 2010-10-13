@@ -1,16 +1,14 @@
+#region *** JW_WindowState.cs ***
 /**********************************************************************************************
  * Dll:     JWTools
  * File:    JW_WindowState.cs
  * Author:  John Wimbish
  * Created: 03 Oct 2003
  * Purpose: Saves / restores the window position and state upon app shutdown / startup.
- * Legal:   Copyright (c) 2005-07, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-
-#region Using
 using System;
 using System.Diagnostics;
-using System.Drawing;
 using System.Windows.Forms;
 #endregion
 
@@ -19,18 +17,19 @@ namespace JWTools
 	public class JW_WindowState
 	{
 		// Attributes ------------------------------------------------------------------------
-		const string c_sSubKeyState = "WindowState";
-		private Form m_form = null;
+        public const string DefaultRegistrySubKey = "WindowState";
+        public string WindowStateRegistrySubKey = DefaultRegistrySubKey;
+		private Form m_form;
 		#region Attr{g/s}: bool StartMaximized - if T, maximize no matter what is in the Registry
 		public bool StartMaximized
 		{
 			get 
-			{ 
-				return JW_Registry.GetValue(c_sSubKeyState, "StartMax", true);
+			{
+                return JW_Registry.GetValue(WindowStateRegistrySubKey, "StartMax", true);
 			}
 			set 
 			{
-				JW_Registry.SetValue(c_sSubKeyState, "StartMax", value);
+                JW_Registry.SetValue(WindowStateRegistrySubKey, "StartMax", value);
 			}
 		}
 		#endregion
@@ -38,12 +37,12 @@ namespace JWTools
 		public bool StateSaved
 		{
 			get 
-			{ 
-				return ( "State Saved" == JW_Registry.GetValue(c_sSubKeyState, "", "") );
+			{
+                return ("State Saved" == JW_Registry.GetValue(WindowStateRegistrySubKey, "", ""));
 			}
 			set 
 			{
-				JW_Registry.SetValue(c_sSubKeyState, "", (value ? "State Saved" : "") );
+                JW_Registry.SetValue(WindowStateRegistrySubKey, "", (value ? "State Saved" : ""));
 			}
 		}
 		#endregion
@@ -53,17 +52,16 @@ namespace JWTools
 		{
 			get
 			{
-				Screen scr = Screen.FromRectangle( 	
+				var scr = Screen.FromRectangle( 	
 					m_form.RectangleToScreen( m_form.DisplayRectangle ) );
-				if (null != scr)
-				{
-					foreach(char ch in scr.DeviceName)
-					{
-						if (Char.IsNumber(ch))
-							return ch.ToString();
-					}
-				}
-				return "";
+
+                foreach (var ch in scr.DeviceName)
+                {
+                    if (Char.IsNumber(ch))
+                        return ch.ToString();
+                }
+
+			    return "";
 			}
 		}
 		#endregion
@@ -88,12 +86,12 @@ namespace JWTools
 		public void SaveWindowState()
 		{
 			Debug.Assert(null != m_form);
-			JW_Registry.SetValue(c_sSubKeyState, "Left",   m_form.Left);
-			JW_Registry.SetValue(c_sSubKeyState, "Top",    m_form.Top);
-			JW_Registry.SetValue(c_sSubKeyState, "Height", m_form.Height);
-			JW_Registry.SetValue(c_sSubKeyState, "Width",  m_form.Width);
-			JW_Registry.SetValue(c_sSubKeyState, "State",  (int)m_form.WindowState);
-			JW_Registry.SetValue(c_sSubKeyState, "Screen", ScreenNumber);
+            JW_Registry.SetValue(WindowStateRegistrySubKey, "Left", m_form.Left);
+            JW_Registry.SetValue(WindowStateRegistrySubKey, "Top", m_form.Top);
+            JW_Registry.SetValue(WindowStateRegistrySubKey, "Height", m_form.Height);
+            JW_Registry.SetValue(WindowStateRegistrySubKey, "Width", m_form.Width);
+            JW_Registry.SetValue(WindowStateRegistrySubKey, "State", (int)m_form.WindowState);
+            JW_Registry.SetValue(WindowStateRegistrySubKey, "Screen", ScreenNumber);
 			StateSaved = true;
 		}
 		#endregion
@@ -113,16 +111,16 @@ namespace JWTools
 			}
 
 			// Retrieve the position and size values
-			m_form.Left   = JW_Registry.GetValue(c_sSubKeyState, "Left",   m_form.Left);
-			m_form.Top    = JW_Registry.GetValue(c_sSubKeyState, "Top",    m_form.Top);
-			m_form.Height = JW_Registry.GetValue(c_sSubKeyState, "Height", m_form.Height);
-			m_form.Width  = JW_Registry.GetValue(c_sSubKeyState, "Width",  m_form.Width);
+            m_form.Left = JW_Registry.GetValue(WindowStateRegistrySubKey, "Left", m_form.Left);
+            m_form.Top = JW_Registry.GetValue(WindowStateRegistrySubKey, "Top", m_form.Top);
+            m_form.Height = JW_Registry.GetValue(WindowStateRegistrySubKey, "Height", m_form.Height);
+            m_form.Width = JW_Registry.GetValue(WindowStateRegistrySubKey, "Width", m_form.Width);
 
 			// Retrieve the Maximized/Minimized value.
 			// - If it was Minimized, then change it to Normal (we don't want to start up
 			//     with a minimized window.)
 			// - If it was Maximized, then we'll leave it that way. 
-			m_form.WindowState = (FormWindowState)JW_Registry.GetValue(c_sSubKeyState, 
+            m_form.WindowState = (FormWindowState)JW_Registry.GetValue(WindowStateRegistrySubKey, 
 				"State", (int)m_form.WindowState);
 			if (m_form.WindowState == FormWindowState.Minimized)
 				m_form.WindowState = FormWindowState.Normal;
@@ -146,31 +144,36 @@ namespace JWTools
 		}
 		#endregion
 
-		#region static Method: Screen GetLastScreen() - retrieve which monitor the form will load in
-		static public Screen GetLastScreen()
+		#region Method: Screen GetLastScreen() - retrieve which monitor the form will load in
+		public Screen GetLastScreen()
 		{
-			string sScreenName = JW_Registry.GetValue(c_sSubKeyState, "Screen", "");
-
-			if (sScreenName.Length > 0)
-			{
-				foreach(Screen scr in Screen.AllScreens)
-				{
-					foreach(char ch in scr.DeviceName)
-					{
-						if (Char.IsNumber(ch))
-						{
-							if (ch.ToString() == sScreenName)
-								return scr;
-							else
-								break;
-						}
-					}
-				}
-			}
-
-			return Screen.PrimaryScreen;
+		    return GetLastScreen(WindowStateRegistrySubKey);
 		}
 		#endregion
+        #region static Method: Screen GetLastScreen() - retrieve which monitor the form will load in
+        static public Screen GetLastScreen(string sWindowStateRegistrySubKey)
+        {
+            var sScreenName = JW_Registry.GetValue(sWindowStateRegistrySubKey, "Screen", "");
+
+            if (sScreenName.Length > 0)
+            {
+                foreach (var scr in Screen.AllScreens)
+                {
+                    foreach (var ch in scr.DeviceName)
+                    {
+                        if (Char.IsNumber(ch))
+                        {
+                            if (ch.ToString() == sScreenName)
+                                return scr;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return Screen.PrimaryScreen;
+        }
+        #endregion
 	}
 
 	// Testing -------------------------------------------------------------------------------

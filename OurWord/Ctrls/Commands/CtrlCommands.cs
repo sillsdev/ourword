@@ -1,4 +1,5 @@
-﻿using System;
+﻿#region *** CtrlCommands.cs ***
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -8,6 +9,7 @@ using OurWord.Layouts;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
 using OurWordData.Styles;
+#endregion
 
 namespace OurWord.Ctrls.Commands
 {
@@ -475,6 +477,7 @@ namespace OurWord.Ctrls.Commands
         public SimpleHandler OnCopy;
         public SimpleHandler OnPaste;
         public SimpleHandler OnItalic;
+        public SimpleHandler OnFind;
         public SimpleHandler OnInsertFootnote;
         public SimpleHandler OnDeleteFootnote;
         public SimpleHandler OnCopyBtFromFront;
@@ -614,6 +617,13 @@ namespace OurWord.Ctrls.Commands
         {
             if (null != OnCopyBtFromFront)
                 OnCopyBtFromFront();
+        }
+        #endregion
+        #region cmd: cmdFind
+        private void cmdFind(object sender, EventArgs e)
+        {
+            if (null != OnFind)
+                OnFind();
         }
         #endregion
 
@@ -801,6 +811,7 @@ namespace OurWord.Ctrls.Commands
             Users.Delete(user);
         }
         #endregion
+
 
     }
 }

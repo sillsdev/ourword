@@ -238,6 +238,9 @@
     <EmbeddedResource Include="Ctrls\Navigation\CtrlNavigation.resx">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\DlgFind.resx">
+      <DependentUpon>DlgFind.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\Export\DlgExportProgress.resx">
       <DependentUpon>DlgExportProgress.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -373,6 +376,7 @@
     <EmbeddedResource Include="Res\AnnotationChecked.bmp" />
     <EmbeddedResource Include="Res\Category.ico" />
     <EmbeddedResource Include="Res\EntireCluster.ico" />
+    <EmbeddedResource Include="Res\Find.ico" />
     <Content Include="Res\Increment.ico" />
     <EmbeddedResource Include="Dialogs\Properties\Ctrl_AutoReplace.resx">
       <SubType>Designer</SubType>
@@ -463,6 +467,12 @@
     </Compile>
     <Compile Include="Ctrls\Navigation\CtrlNavigation.Designer.cs">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DlgFind.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\DlgFind.Designer.cs">
+      <DependentUpon>DlgFind.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\Export\DlgExportProgress.cs">
       <SubType>Form</SubType>

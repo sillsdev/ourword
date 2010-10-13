@@ -203,11 +203,6 @@ namespace OurWord
 
         // Toolbar, MenuBar, Taskbar & StatusBar ---------------------------------------------
         #region Toolbar, Taskbar & StatusBar
-        #region Menu/Toolbar attributes
-
-
-        // Taskbar
-        #endregion
         #region Method: void EnableItalicsButton() - unique function for faster speed
         public void EnableItalicsButton()
         {
@@ -217,7 +212,6 @@ namespace OurWord
             m_Commands.EnableItalics(bCanItalic);
         }
         #endregion
- 
         #region Method: void SetupMenusAndToolbarsVisibility()
         void SetupMenusAndToolbarsVisibility()
             // Turn features on/off according to settings and environment
@@ -269,6 +263,7 @@ namespace OurWord
 		    m_Commands.OnCopy += cmdCopy;
 		    m_Commands.OnPaste += cmdPaste;
 		    m_Commands.OnItalic += cmdItalic;
+		    m_Commands.OnFind += cmdFind;
 		    m_Commands.OnChangeParagraphStyle += cmdChangeParagraphStyle;
 		    m_Commands.OnInsertFootnote += cmdInsertFootnote;
 		    m_Commands.OnDeleteFootnote += cmdDeleteFootnote;
@@ -943,6 +938,25 @@ namespace OurWord
                 wnd.cmdToggleItalics();
 		}
 		#endregion
+        #region Cmd: cmdFind
+        private void cmdFind()
+            // Launch the Find dialog
+        {
+            var dlg = new DlgFind {OnFindNext = cmdFindNext};
+            dlg.Show();
+        }
+        private void cmdFindNext(DlgFind dlg)
+            // Respond to the Find dialog's "FindNext"button
+        {
+            var selection = CurrentLayout.Selection;
+            if (null != selection)
+            {
+                selection = CurrentLayout.Contents.FindNext(selection, dlg.SearchText);
+                if (null != selection)
+                    CurrentLayout.Selection = selection;
+            }
+        }
+        #endregion
         #region Cmd: cmdChangeParagraphStyle
         private void cmdChangeParagraphStyle(ParagraphStyle newStyle)
         {

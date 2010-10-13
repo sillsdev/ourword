@@ -266,8 +266,9 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 
-		// Derived Attrs ---------------------------------------------------------------------
-	    public List<DText> Texts
+        // Derived Attrs ---------------------------------------------------------------------
+        #region Attr{g}: List<DText> Texts
+        public List<DText> Texts
 	    {
 	        get
 	        {
@@ -282,10 +283,10 @@ namespace OurWordData.DataModel
 
 	            return vText;
 	        }
-	    }
-
-		#region Attr{g}: DPhrase[] Phrases - flattens the list to just return phrases
-		DPhrase[] Phrases
+        }
+        #endregion
+        #region Attr{g}: DPhrase[] Phrases - flattens the list to just return phrases
+        DPhrase[] Phrases
 		{
 			get
 			{
@@ -1386,7 +1387,6 @@ namespace OurWordData.DataModel
 			return true;
 		}
 		#endregion
-
 
         // Oxes ------------------------------------------------------------------------------
         const string c_sTagParagraph = "p";

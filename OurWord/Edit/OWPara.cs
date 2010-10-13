@@ -1893,12 +1893,12 @@ namespace OurWord.Edit
 
                 foreach(var word in vWords)
                 {
-                    if (word == selection.End.Word)
+                    if (word == selection.Last.Word)
                         break;
                     i += word.Text.Length;
                 }
 
-                i += selection.End.iChar;
+                i += selection.Last.iChar;
 
                 return i;
             }
@@ -1906,6 +1906,9 @@ namespace OurWord.Edit
             #region method: Sel FindNext(iStartAfter, sSearchFor)
             OWWindow.Sel FindNext(int iStartAfter, string sSearchFor)
             {
+                if (!m_OWParagraph.IsEditable)
+                    return null;
+
                 var vTexts = m_DParagraph.Texts;
                 var iFoundPosition = 0;
                 var iStartAt = iStartAfter + 1;

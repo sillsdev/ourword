@@ -61,6 +61,7 @@
             this.m_menuCopy = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuPaste = new System.Windows.Forms.ToolStripMenuItem();
             this.m_EditSeparatorPaste = new System.Windows.Forms.ToolStripSeparator();
+            this.findToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuChangeParagraphStyle = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuInsertFootnote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuDeleteFootnote = new System.Windows.Forms.ToolStripMenuItem();
@@ -346,6 +347,7 @@
             this.m_menuCopy,
             this.m_menuPaste,
             this.m_EditSeparatorPaste,
+            this.findToolStripMenuItem,
             this.m_menuChangeParagraphStyle,
             this.m_menuInsertFootnote,
             this.m_menuDeleteFootnote,
@@ -414,6 +416,14 @@
             // 
             this.m_EditSeparatorPaste.Name = "m_EditSeparatorPaste";
             this.m_EditSeparatorPaste.Size = new System.Drawing.Size(186, 6);
+            // 
+            // findToolStripMenuItem
+            // 
+            this.findToolStripMenuItem.Name = "findToolStripMenuItem";
+            this.findToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+            this.findToolStripMenuItem.Size = new System.Drawing.Size(189, 22);
+            this.findToolStripMenuItem.Text = "&Find...";
+            this.findToolStripMenuItem.Click += new System.EventHandler(this.cmdFind);
             // 
             // m_menuChangeParagraphStyle
             // 
@@ -669,5 +679,6 @@
         private System.Windows.Forms.ToolStripSeparator m_separatorHelp;
         private System.Windows.Forms.ToolStripMenuItem helpTopicsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutOurWordToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem findToolStripMenuItem;
     }
 }
