@@ -624,8 +624,9 @@ namespace OurWordData.Synchronize
         // 3 - new Style implementation, Pictures
         // 4 - Version 1.7 - Users
         // 5 - TeamSettings.CheckForUpdates option
-        // 6 - GlobalEditability in users, HypehBreakChars in WritingSystem      
-        public const int c_nCurrentVersionNo = 6;
+        // 6 - GlobalEditability in users, HypehBreakChars in WritingSystem  
+        // 7 - User.UserType enumeration
+        public const int c_nCurrentVersionNo = 7;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {

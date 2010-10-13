@@ -296,7 +296,7 @@ namespace OurWord.Dialogs.Properties
             var book = Translation.FindBook(sAbbrev);
             if (null != book)
             {
-                var editability = Users.Current.GetEditability(book);
+                var editability = Users.Current.GetBookEditability(book);
                 var color = User.TranslationSettings.GetUiColor(editability);
                 foreach (DataGridViewCell cell in row.Cells)
                     cell.Style.ForeColor = color;

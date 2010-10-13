@@ -112,6 +112,7 @@ namespace OurWordData.DataModel.Membership
         public static readonly User Observer = new User
         {
             UserName = "Observer",
+            Type = User.UserType.Observer,
 
             MaximizeWindowOnStartup = false,
 
@@ -125,6 +126,7 @@ namespace OurWordData.DataModel.Membership
         public static readonly User Translator = new User()
         {
             UserName = "Translator",
+            Type = User.UserType.Translator,
             MaximizeWindowOnStartup = true,           
             CanDoNaturalnessCheck = true,
             CanZoom = true,
@@ -136,6 +138,7 @@ namespace OurWordData.DataModel.Membership
         public static readonly User Consultant = new User()
         {
             UserName = "Consultant",
+            Type = User.UserType.Consultant,
 
             MaximizeWindowOnStartup = false,           
 
@@ -155,7 +158,7 @@ namespace OurWordData.DataModel.Membership
         public static readonly User Administrator = new User()
         {
             UserName = "Administrator",
-            IsAdministrator = true,
+            Type = User.UserType.Administrator,
 
             MaximizeWindowOnStartup = false,           
 

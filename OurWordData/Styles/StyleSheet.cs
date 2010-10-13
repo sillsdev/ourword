@@ -740,6 +740,10 @@ namespace OurWordData.Styles
             // from a previously loaded project.
             s_WritingSystems = null;
 
+            // This gets rid of any Fonts that might have been created, e.g., if we previously
+            // had a different cluster loaded.
+            ResetStylesToOriginal();
+
             // Attenpt to load and read the Xml stylesheet (an empty path is ignored)
             ReadStyleSheet(sPath);
 

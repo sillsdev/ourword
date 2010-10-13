@@ -55,7 +55,7 @@ namespace OurWord
 				if (null == book)
 					return false;
 
-                return (Users.Current.GetEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
+                return (Users.Current.GetBookEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
 			}
 		}
 		#endregion
@@ -1178,14 +1178,15 @@ namespace OurWord
             newUser.Password = dlg.Password;
             newUser.NoteAuthorsName = dlg.FullName;
 
-            if (null != DB.TargetTranslation && Users.Observer != dlg.InitializeAs)
-            {
-                newUser.AddMembershipTo(DB.TargetTranslation.DisplayName);
-                var translationSettings = newUser.FindTranslationSettings(DB.TargetTranslation.DisplayName);
-                translationSettings.GlobalEditability = User.TranslationSettings.GEditability.Full;
-            }
-
             Users.Add(newUser);
+
+            // Give the Translator user editing rights to the current translation; he'll
+            // default to Notes for all of the other ones.
+            if (null != DB.TargetTranslation && newUser.Type == User.UserType.Translator)
+            {
+                newUser.FindOrAdd(DB.TargetTranslation.DisplayName).GlobalEditability =
+                    User.TranslationSettings.Editability.Full;
+            }
 
             Users.Current = newUser;
 
@@ -1265,7 +1266,6 @@ namespace OurWord
             OnEnterSection();
         }
         #endregion
-
 
 
         // FILTERS need to rework --------------

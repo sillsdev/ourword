@@ -567,9 +567,9 @@ namespace JWTools
         {
             // Come up the the Enum IDs (that is, the names of the enums)
             Debug.Assert(eNumbers.IsEnum);
-            ArrayList a = new ArrayList();
-            MemberInfo[] vmi = eNumbers.GetMembers();
-            foreach (MemberInfo mi in vmi)
+            var a = new ArrayList();
+            var vmi = eNumbers.GetMembers();
+            foreach (var mi in vmi)
             {
                 // Exclude the stuff that is not an enum
                 if (mi.DeclaringType.Name == "Enum" || mi.DeclaringType.Name == "Object")
@@ -580,7 +580,7 @@ namespace JWTools
                 a.Add(mi);
             }
             m_vsEnumIDs = new string[a.Count];
-            for (int i = 0; i < a.Count; i++)
+            for (var i = 0; i < a.Count; i++)
                 m_vsEnumIDs[i] = (a[i] as MemberInfo).Name;
 
             // The English Values
@@ -592,7 +592,11 @@ namespace JWTools
             m_nEnumNumbers = vnNumbers;
 
             Debug.Assert(vsValues.Length == m_nEnumNumbers.Length);
-            Debug.Assert(m_vsEnumIDs.Length == m_nEnumNumbers.Length);
+
+            // 24sep10 - Removed this assert, to allow for the possibility that the caller
+            // might not desire to show every enumeration value. E.g., an enumeration's
+            // last value might be "Last".
+            // Debug.Assert(m_vsEnumIDs.Length == m_nEnumNumbers.Length);
         }
         #endregion
     }

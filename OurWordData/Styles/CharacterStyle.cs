@@ -100,13 +100,6 @@ namespace OurWordData.Styles
         }
         private readonly List<FontFactory> m_FontFactories;
         #endregion
-        #region Method: void ResetFonts()
-        public void ResetFonts()
-        {
-            foreach (var factory in FontFactories)
-                factory.ResetFonts();
-        }
-        #endregion
         #region Method: FontFactory FindFontFactory(sWritingSystemName)
         public FontFactory FindFontFactory(string sWritingSystemName)
         {
@@ -188,6 +181,8 @@ namespace OurWordData.Styles
             DefaultFontSize = OriginalStyle.m_DefaultFont.FontSize;
             DefaultFontStyle = OriginalStyle.m_DefaultFont.FontStyle;
             VerticalPosition = OriginalStyle.VerticalPosition;
+
+            FontFactories.Clear();
 
             StyleSheet.DeclareDirty();
         }
