@@ -108,16 +108,16 @@ namespace OurWordTests.Edit
         void _SplitParagraphTest(int iSplitPos, string sRight)
         {
             // Benchmark: Make sure we're starting where we think we are
-            int cParagraphs = EditTest.Section.Paragraphs.Count;
+            var cParagraphs = EditTest.Section.Paragraphs.Count;
             Assert.AreEqual(8, cParagraphs, "Benchmark: Initial paragraph count");
-            int iPara = 5;
-            DParagraph p = EditTest.Section.Paragraphs[iPara] as DParagraph;
+            var iPara = 5;
+            var p = EditTest.Section.Paragraphs[iPara] as DParagraph;
             Assert.AreEqual(c_sBenchmark, p.DebugString, "Benchmark: Paragraph contents");
-            DBasicText DBT = p.Runs[1] as DBasicText;
+            var DBT = p.Runs[1] as DBasicText;
             Assert.IsNotNull(DBT, "DBT Found");
 
             // We'll use the OWBookmark code to locate its OWPara
-            OWPara op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
+            var op = EditTest.Wnd.Contents.FindParagraph(p, OWPara.Flags.None);
 
             // Set the cursor position
             EditTest.Wnd.Selection = OWWindow.Sel.CreateSel(op, DBT, iSplitPos);
@@ -290,6 +290,41 @@ namespace OurWordTests.Edit
             Assert.IsTrue(EditTest.Wnd.Selection.IsInsertionPoint, "Should be a point, not a content selection");
             Assert.AreEqual(1, EditTest.Wnd.Selection.DBT_iCharFirst);
             Assert.AreEqual(" te, ", EditTest.Wnd.Selection.DBT.AsString.Substring(0, 5));
+        }
+        #endregion
+
+        #region Test: Find
+        [Test] public void Find()
+        {
+            const string sSearchFor = "nes";
+
+            var root = EditTest.Wnd.Contents;
+
+            // \s ... in nesan an-ana'
+            var selection = root.FindFirst(sSearchFor);
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(sSearchFor, selection.SelectionString);
+            Assert.AreEqual("Usif Jesus naleta' neu fini le' in nesan an-ana' neis", 
+                selection.Anchor.BasicText.AsString);
+
+            // \vt (31) ... in nesan an-ana'
+            selection = root.FindNext(selection, sSearchFor);
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(sSearchFor, selection.SelectionString);
+            Assert.AreEqual("Nane namnees onle' fini le' in nesan an-ana' neis.",
+                selection.Anchor.BasicText.AsString);
+
+            // \vt (32) ... in nesan an-ana'
+            selection = root.FindNext(selection, sSearchFor);
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(sSearchFor, selection.SelectionString);
+            Assert.AreEqual("Kalu hit tseen nesaf nane, in lofa nmoin jael hau 'naek. Ma lof " +
+                    "kolo neem namin mafo', ma nmo'en kuna' neu ne.>>",
+                selection.Anchor.BasicText.AsString);
+
+            // No more this section
+            selection = root.FindNext(selection, sSearchFor);
+            Assert.IsNull(selection);
         }
         #endregion
     }

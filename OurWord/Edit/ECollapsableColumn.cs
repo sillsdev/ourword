@@ -103,7 +103,8 @@ namespace OurWord.Edit
         }
         #endregion
         #region OMethod: bool Select_NextWord_Begin(aiStack)
-        public override bool Select_NextWord_Begin(ArrayList aiStack)
+
+        protected override bool Select_NextWord_Begin(ArrayList aiStack)
         {
             if (IsCollapsed)
                 return false;
@@ -112,7 +113,8 @@ namespace OurWord.Edit
         }
         #endregion
         #region OMethod: bool Select_PrevWord(aiStack, bSelectAtEndOfWord)
-        public override bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
+
+        protected override bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
         {
             if (IsCollapsed)
                 return false;
@@ -295,7 +297,7 @@ namespace OurWord.Edit
             {
                 return m_xyDimension;
             }
-            set
+            protected set
             {
                 Debug.Assert(false, "Can't set the height of an ECollapsableIcon");
             }
@@ -308,7 +310,7 @@ namespace OurWord.Edit
             {
                 return m_xyDimension;
             }
-            set
+            protected set
             {
                 Debug.Assert(false, "Can't set the weight of an ECollapsableIcon");
             }

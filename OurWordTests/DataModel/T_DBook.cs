@@ -353,10 +353,6 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
-        [Test] public void PercentDrafted()
-        {
-
-        }
 
 
     }

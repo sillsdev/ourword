@@ -186,7 +186,7 @@ namespace OurWord.Edit
                 return m_objDataSource;
             }
         }
-        JObject m_objDataSource = null;
+        JObject m_objDataSource;
         #endregion
 
         // Initialize to a paragraph's contents ----------------------------------------------
@@ -1828,6 +1828,145 @@ namespace OurWord.Edit
             }
 
             return false;
+        }
+        #endregion
+
+        // Find ------------------------------------------------------------------------------
+        #region Class: FindMethod
+        class FindMethod
+        {
+            private readonly OWPara m_OWParagraph;
+            private readonly DParagraph m_DParagraph;
+
+            // Helper methods ----------------------------------------------------------------
+            #region attr{g}: List<EWord> GetWords()
+            List<EWord> GetWords()
+            {
+                var v = new List<EWord>();
+
+                foreach(var run in m_OWParagraph)
+                {
+                    var word = run as EWord;
+                    if (null != word)
+                        v.Add(word);
+                }
+
+                return v;
+            }
+            #endregion
+            #region method: Sel MakeSelection(iTextPosition, iLength)
+            OWWindow.Sel MakeSelection(int iTextPosition, int iLength)
+            {
+                var vWords = GetWords();
+                foreach (var word in vWords)
+                {
+                    // Skip words until we get to the first one of our selection
+                    if (word.Text.Length <= iTextPosition)
+                    {
+                        iTextPosition -= word.Text.Length;
+                        continue;
+                    }
+
+                    // Make the anchor of the selection
+                    var iBlock = m_OWParagraph.Find(word);
+                    var iChar = iTextPosition;
+                    var selection = new OWWindow.Sel(m_OWParagraph, iBlock, iChar);
+
+                    // Extend the selection for the proper length
+                    for (var k = 0; k < iLength; k++)
+                        selection = m_OWParagraph.ExtendSelection_CharRight(selection);
+
+                    return selection;
+                }
+
+                return null;
+            }
+            #endregion
+            #region method: int GetStartPosition(selection)
+            int GetStartPosition(OWWindow.Sel selection)
+                // Returns the number of characters into the total paragraph that
+                // the selection's "End" point is.
+            {
+                var i = 0;
+
+                var vWords = GetWords();
+
+                foreach(var word in vWords)
+                {
+                    if (word == selection.End.Word)
+                        break;
+                    i += word.Text.Length;
+                }
+
+                i += selection.End.iChar;
+
+                return i;
+            }
+            #endregion
+            #region method: Sel FindNext(iStartAfter, sSearchFor)
+            OWWindow.Sel FindNext(int iStartAfter, string sSearchFor)
+            {
+                var vTexts = m_DParagraph.Texts;
+                var iFoundPosition = 0;
+                var iStartAt = iStartAfter + 1;
+                foreach (var text in vTexts)
+                {
+                    var sText = (m_OWParagraph.DisplayBT) ?
+                        text.PhrasesBT.AsString :
+                        text.Phrases.AsString;
+
+                    if (iStartAt <= sText.Length - sSearchFor.Length)
+                    {
+                        var iPos = sText.IndexOf(sSearchFor, iStartAt);
+                        if (-1 != iPos)
+                            return MakeSelection(iFoundPosition + iPos, sSearchFor.Length);
+                    }
+
+                    iFoundPosition += sText.Length;
+                    iStartAt = Math.Max(iStartAt - sText.Length, 0);
+                }
+
+                return null;
+            }
+            #endregion
+
+            #region Constructor(owp)
+            public FindMethod(OWPara owp)
+            {
+                m_OWParagraph = owp;
+                m_DParagraph = owp.DataSource as DParagraph;
+            }
+            #endregion
+
+            // Public Operations -------------------------------------------------------------
+            #region Method: Sel FindFirst(sSearchFor)
+            public OWWindow.Sel FindFirst(string sSearchFor)
+            {
+                return FindNext(-1, sSearchFor);
+            }
+            #endregion
+            #region Method: Sel FindNext(Sel current, sSearchFor)
+            public OWWindow.Sel FindNext(OWWindow.Sel current, string sSearchFor)
+            {
+                if (null == current)
+                    return FindFirst(sSearchFor);
+
+                var i = GetStartPosition(current);
+                return FindNext(i, sSearchFor);
+            }
+            #endregion
+        }
+        #endregion
+        #region Method: OWWindow.Sel FindFirst(sSearchFor)
+        public override OWWindow.Sel FindFirst(string sSearchFor)
+        {
+            return (new FindMethod(this)).FindFirst(sSearchFor);
+        }
+        #endregion
+        #region Method: OWWindow.Sel FindNext(Sel current, sSearchFor)
+        public OWWindow.Sel FindNext(OWWindow.Sel current, string sSearchFor)
+        {
+            return (new FindMethod(this)).FindNext(current, sSearchFor);
         }
         #endregion
 

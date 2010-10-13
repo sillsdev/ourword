@@ -43,7 +43,7 @@ namespace OurWord.Edit.Blocks
                     return 0;
                 return Bmp.Width;
             }
-            set
+            protected set
             {
                 // Can't be set; its the nature of the bitmap
             }

@@ -27,7 +27,7 @@ namespace OurWord.Edit.Blocks
                 // A chapter number takes up two lines
                 return Para.LineHeight * 2;
             }
-            set
+            protected set
             {
                 Debug.Assert(false, "Can't set the line height of an EBlock");
             }

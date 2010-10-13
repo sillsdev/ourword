@@ -48,7 +48,7 @@ namespace OurWord.Edit
                     f += item.Width;
                 return f;
             }
-            set
+            protected set
             {
             }
         }
@@ -60,7 +60,7 @@ namespace OurWord.Edit
             {
                 return (Count == 0) ? 0 : SubItems[0].Height;
             }
-            set
+            protected set
             {                
             }
         }

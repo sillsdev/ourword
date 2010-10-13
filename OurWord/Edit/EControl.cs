@@ -49,7 +49,7 @@ namespace OurWord.Edit
             {
                 return Control.Height + c_nTopMargin;
             }
-            set
+            protected set
             {
                 Control.Height = (int)value - c_nTopMargin;
             }
@@ -62,7 +62,7 @@ namespace OurWord.Edit
             {
                 return Control.Width;
             }
-            set
+            protected set
             {
                 Control.Width = (int)value;
             }
@@ -161,7 +161,7 @@ namespace OurWord.Edit
             {
                 return Control.Height;
             }
-            set
+            protected set
             {
                 Control.Height = (int)value;
             }

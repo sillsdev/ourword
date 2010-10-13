@@ -46,7 +46,7 @@ namespace OurWord.Edit.Blocks
                 // be using different fonts.
                 return Para.LineHeight;
             }
-            set
+            protected set
             {
                 Debug.Assert(false, "Can't set the line height of an EBlock");
             }

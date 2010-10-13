@@ -7,23 +7,15 @@
  * Purpose: The various classes holding editor layout
  * Legal:   Copyright (c) 2004-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
-using JWTools;
 using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
-
-#endregion
 #endregion
 
 // TODO: Implement Left and Right Borders
@@ -35,18 +27,7 @@ namespace OurWord.Edit
     {
         // Ownership Hierarchy ---------------------------------------------------------------
         #region Attr{g/s}: EContainer Owner
-        public EContainer Owner
-        {
-            get
-            {
-                return m_Owner;
-            }
-            set
-            {
-                m_Owner = value;
-            }
-        }
-        private EContainer m_Owner;
+        public EContainer Owner { get; set; }
         #endregion
         #region VirtVAttr{g}: ERoot Root - top container of the entire hierarchy; owns All others
         virtual public ERoot Root
@@ -67,7 +48,7 @@ namespace OurWord.Edit
 
                 if (null != Owner as ERoot)
                 {
-                    EContainer container = this as EContainer;
+                    var container = this as EContainer;
                     Debug.Assert(null != container);
                     return container;
                 }
@@ -85,46 +66,13 @@ namespace OurWord.Edit
 
         // Screen Region ---------------------------------------------------------------------
         #region Attr{g/s}: PointF Position - top,left coord
-        virtual public PointF Position
-        {
-            get
-            {
-                return m_ptPosition;
-            }
-            set
-            {
-                m_ptPosition = value;
-            }
-        }
-        private PointF m_ptPosition;
+        public PointF Position { get; set; }
         #endregion
         #region VirtAttr{g/s}: float Height - pixel height of this item
-        virtual public float Height
-        {
-            get
-            {
-                return m_fHeight;
-            }
-            set
-            {
-                m_fHeight = value;
-            }
-        }
-        float m_fHeight;
+        public virtual float Height { get; protected set; }
         #endregion
         #region VirtAttr{g/s}: float Width - pixel width of this item
-        virtual public float Width
-        {
-            get
-            {
-                return m_fWidth;
-            }
-            set
-            {
-                m_fWidth = value;
-            }
-        }
-        float m_fWidth = 0;
+        public virtual float Width { get; protected set; }
         #endregion
         #region VAttr{g}: RectangleF Rectangle
         public RectangleF Rectangle
@@ -136,14 +84,14 @@ namespace OurWord.Edit
         }
         #endregion
         #region VAttr{g}: Rectangle IntRectangle
-        public Rectangle IntRectangle
+        protected Rectangle IntRectangle
         {
             get
             {
-                int x = (int)Position.X;
-                int y = (int)Position.Y;
-                int w = (int)Width;
-                int h = (int)Height;
+                var x = (int)Position.X;
+                var y = (int)Position.Y;
+                var w = (int)Width;
+                var h = (int)Height;
                 return new Rectangle(x, y, w, h);
             }
         }
@@ -157,12 +105,11 @@ namespace OurWord.Edit
         #region VirtMethod: EBlock GetBlockAt(PointF)
         public virtual EBlock GetBlockAt(PointF pt)
         {
-            Debug.Assert(false, "Subclasses need to implement this.");
-            return null;
+            throw new Exception("Subclasses need to implement this.");
         }
         #endregion
-        #region Attr{g}: Point Middle
-        public Point Middle
+        #region attr{g}: Point Middle
+        protected Point Middle
         {
             get
             {
@@ -179,24 +126,12 @@ namespace OurWord.Edit
             {
                 return true;
             }
+            // ReSharper disable ValueParameterNotUsed
             set
             {
             }
+            // ReSharper restore ValueParameterNotUsed
         }
-        #endregion
-        #region Attr{g/s}: object Tag - Like Microsoft does in their controls
-        public object Tag
-        {
-            get
-            {
-                return m_Tag;
-            }
-            set
-            {
-                m_Tag = value;
-            }
-        }
-        object m_Tag;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
@@ -276,60 +211,16 @@ namespace OurWord.Edit
             public class RectOffset
             {
                 #region Attr{g/s}: int Top
-                public int Top
-                {
-                    get
-                    {
-                        return m_nTop;
-                    }
-                    set
-                    {
-                        m_nTop = value;
-                    }
-                }
-                int m_nTop;
+                public int Top { get; set; }
                 #endregion
                 #region Attr{g/s}: int Bottom
-                public int Bottom
-                {
-                    get
-                    {
-                        return m_nBottom;
-                    }
-                    set
-                    {
-                        m_nBottom = value;
-                    }
-                }
-                int m_nBottom;
+                public int Bottom { get; set; }
                 #endregion
                 #region Attr{g/s}: int Left
-                public int Left
-                {
-                    get
-                    {
-                        return m_nLeft;
-                    }
-                    set
-                    {
-                        m_nLeft = value;
-                    }
-                }
-                int m_nLeft;
+                public int Left { get; set; }
                 #endregion
                 #region Attr{g/s}: int Right
-                public int Right
-                {
-                    get
-                    {
-                        return m_nRight;
-                    }
-                    set
-                    {
-                        m_nRight = value;
-                    }
-                }
-                int m_nRight;
+                public int Right { get; set; }
                 #endregion
 
                 #region Constructor()
@@ -374,7 +265,7 @@ namespace OurWord.Edit
             {
                 get
                 {
-                    RectangleF r = new RectangleF(LeftBorder, TopBorder,
+                    var r = new RectangleF(LeftBorder, TopBorder,
                         RightBorder - LeftBorder + 1, BottomBorder - TopBorder + 1);
                     return r;
                 }
@@ -495,6 +386,7 @@ namespace OurWord.Edit
 
             // Which Sides to Display --------------------------------------------------------
             #region Enum: BorderSides - Top, Bottom, All, None, etc.
+            [Flags]
             public enum BorderSides
             {
                 Top = 1,
@@ -683,7 +575,7 @@ namespace OurWord.Edit
                     m_SeparatorWidth = value;
                 }
             }
-            float m_SeparatorWidth = 0;
+            float m_SeparatorWidth;
             #endregion
 
             #region Constructor(EItem)
@@ -758,7 +650,7 @@ namespace OurWord.Edit
                 Border = new SquareBorder(this)
                     {
                         BorderPlacement = BorderBase.BorderSides.TopAndBottom,
-                        Margin = new BorderBase.RectOffset() {Bottom = 5}
+                        Margin = new BorderBase.RectOffset {Bottom = 5}
                     };
             }
         }
@@ -838,7 +730,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: IEnumerator.GetEnumerator() - initializes the enumeration
-        public virtual IEnumerator GetEnumerator()
+        public IEnumerator GetEnumerator()
         {
             m_bEnumeratorValid = true;
             Reset();
@@ -852,7 +744,7 @@ namespace OurWord.Edit
         private int m_iEnumeratorPos = -1;
         #endregion
         #region Private: bool m_bEnumeratorValid - lets us know if [] has been modified
-        private bool m_bEnumeratorValid = false;
+        private bool m_bEnumeratorValid;
         #endregion
         #region Private Method: InvalidateEnumerator() - signals that the enumerator is invalid now
         private void InvalidateEnumerator()
@@ -914,19 +806,19 @@ namespace OurWord.Edit
             InvalidateEnumerator();
         }
         #endregion
-        #region Method: void InsertAt(iPos, EItem[] vInsert)
-        public void InsertAt(int iPos, EItem[] vInsert)
+        #region method: void InsertAt(iPos, EItem[] vInsert)
+        protected void InsertAt(int iPos, EItem[] vInsert)
         {
             // Create a new vector that will hold the entirety
-            EItem[] v = new EItem[SubItems.Length + vInsert.Length];
+            var v = new EItem[SubItems.Length + vInsert.Length];
 
             // Copy over all of the items prior to position iPos
-            int i = 0;
+            var i = 0;
             for (; i < iPos; i++)
                 v[i] = SubItems[i];
 
             // Copy in the new items we are inserting
-            for (int k = 0; k < vInsert.Length; k++)
+            for (var k = 0; k < vInsert.Length; k++)
             {
                 v[i + k] = vInsert[k];
                 vInsert[k].Owner = this;
@@ -940,15 +832,15 @@ namespace OurWord.Edit
             m_vSubItems = v;
         }
         #endregion
-        #region Method: void RemoveAt(iPos)
-        public void RemoveAt(int iPos)
+        #region method: void RemoveAt(iPos)
+        protected void RemoveAt(int iPos)
         {
-            EItem[] v = new EItem[SubItems.Length - 1];
+            var v = new EItem[SubItems.Length - 1];
 
-            for (int i = 0; i < iPos; i++)
+            for (var i = 0; i < iPos; i++)
                 v[i] = SubItems[i];
 
-            for (int i = iPos; i < SubItems.Length - 1; i++)
+            for (var i = iPos; i < SubItems.Length - 1; i++)
                 v[i] = SubItems[i + 1];
 
             m_vSubItems = v;
@@ -956,16 +848,16 @@ namespace OurWord.Edit
             InvalidateEnumerator();
         }
         #endregion
-        #region Method: void RemoveAt(iPos, count)
-        public void RemoveAt(int iPos, int count)
+        #region method: void RemoveAt(iPos, count)
+        protected void RemoveAt(int iPos, int count)
         {
             Debug.Assert(SubItems.Length >= count);
 
             // Create a new array to hold our answer
-            EItem[] v = new EItem[SubItems.Length - count];
+            var v = new EItem[SubItems.Length - count];
 
             // Copy over the blocks prior to the position iPos
-            int i = 0;
+            var i = 0;
             for (; i < iPos; i++)
                 v[i] = SubItems[i];
 
@@ -977,10 +869,10 @@ namespace OurWord.Edit
             m_vSubItems = v;
         }
         #endregion
-        #region Method: void Remove(EItem)
-        public void Remove(EItem item)
+        #region method: void Remove(EItem)
+        protected void Remove(EItem item)
         {
-            int iPos = Find(item);
+            var iPos = Find(item);
             if (-1 != iPos)
             {
                 RemoveAt(iPos);
@@ -1002,7 +894,7 @@ namespace OurWord.Edit
         #region Method: void Replace(itemOld, itemNew)
         public void Replace(EItem itemOld, EItem itemNew)
         {
-            int iPos = Find(itemOld);
+            var iPos = Find(itemOld);
             if (iPos != -1)
                 SubItems[iPos] = itemNew;
         }
@@ -1019,16 +911,16 @@ namespace OurWord.Edit
         #region Method: EContainer FindContainerOfDataSource(JObject obj)
         public EContainer FindContainerOfDataSource(JObject obj)
         {
-            OWPara para = this as OWPara;
+            var para = this as OWPara;
             if (null != para && para.DataSource == obj)
                 return this;
 
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
-                    EContainer answer = container.FindContainerOfDataSource(obj);
+                    var answer = container.FindContainerOfDataSource(obj);
                     if (null != answer)
                         return answer;
                 }
@@ -1061,12 +953,12 @@ namespace OurWord.Edit
             if (item == this)
                 return true;
 
-            foreach (EItem i in SubItems)
+            foreach (var i in SubItems)
             {
                 if (i == item)
                     return true;
 
-                EContainer container = i as EContainer;
+                var container = i as EContainer;
                 if (null != container && container.Contains(item))
                     return true;
             }
@@ -1084,8 +976,8 @@ namespace OurWord.Edit
             }
         }
         #endregion
-        #region Attr{g}: List<OWPara> AllParagraphs
-        public List<OWPara> AllParagraphs
+        #region Attr{g}: IEnumerable<OWPara> AllParagraphs
+        public IEnumerable<OWPara> AllParagraphs
         {
             get
             {
@@ -1114,9 +1006,8 @@ namespace OurWord.Edit
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public EContainer()
-            : base()
+        #region constructor()
+        protected EContainer()
         {
             m_vSubItems = new EItem[0];
 
@@ -1205,28 +1096,28 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
-        #region VMethod: bool Select_NextWord_Begin(aiStack)
-        public virtual bool Select_NextWord_Begin(ArrayList aiStack)
+        #region vmethod: bool Select_NextWord_Begin(aiStack)
+        protected virtual bool Select_NextWord_Begin(ArrayList aiStack)
         {
             // Loop through the appropriate subitems
-            for (int i = PopSelectionStack(aiStack, true); i < Count; i++)
+            for (var i = PopSelectionStack(aiStack, true); i < Count; i++)
             {
-                EItem item = SubItems[i] as EItem;
+                var item = SubItems[i];
 
                 // If uneditable, skip it
                 if (!item.IsEditable)
                     continue;
 
                 // If we've found the word, we're arrived at our destination
-                EWord word = item as EWord;
+                var word = item as EWord;
                 if (null != word)
                 {
-                    Window.Selection = new OWWindow.Sel(this as OWPara, this.Find(word), 0);
+                    Window.Selection = new OWWindow.Sel(this as OWPara, Find(word), 0);
                     return true;
                 }
 
                 // If we're at a container, we keep working downwards
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
                     if (container.Select_NextWord_Begin(aiStack))
@@ -1238,7 +1129,7 @@ namespace OurWord.Edit
             return false;
         }
         #endregion
-        #region VMethod: bool Select_PrevWord(aiStack, bSelectAtEndOfWord)
+        #region vmethod: bool Select_PrevWord(aiStack, bSelectAtEndOfWord)
         /// <summary>
         /// Places the selection into the previous word.
         /// </summary>
@@ -1246,28 +1137,28 @@ namespace OurWord.Edit
         /// <param name="bSelectAtEndOfWord">If false, places the selection at the beginning of
         /// the word; if true, the selection goes at the end of the word.</param>
         /// <returns></returns>
-        public virtual bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
+        protected virtual bool Select_PrevWord(ArrayList aiStack, bool bSelectAtEndOfWord)
         {
             // Loop through the appropriate subitems
-            for (int i = PopSelectionStack(aiStack, false); i >= 0; i--)
+            for (var i = PopSelectionStack(aiStack, false); i >= 0; i--)
             {
-                EItem item = SubItems[i] as EItem;
+                var item = SubItems[i];
 
                 // If uneditable, skip it
                 if (!item.IsEditable)
                     continue;
 
                 // If we've found the word, we're arrived at our destination
-                EWord word = item as EWord;
+                var word = item as EWord;
                 if (null != word)
                 {
-                    int iChar = (bSelectAtEndOfWord) ? word.Text.Length : 0;
-                    Window.Selection = new OWWindow.Sel(this as OWPara, this.Find(word), iChar);
+                    var iChar = (bSelectAtEndOfWord) ? word.Text.Length : 0;
+                    Window.Selection = new OWWindow.Sel(this as OWPara, Find(word), iChar);
                     return true;
                 }
 
                 // If we're at a container, we keep working downwards
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
                     if (container.Select_PrevWord(aiStack, bSelectAtEndOfWord))
@@ -1285,16 +1176,16 @@ namespace OurWord.Edit
             if (!IsEditable)
                 return false;
 
-            for(int i=0; i < Count; i++)
+            for(var i=0; i < Count; i++)
             {
-                EWord word = SubItems[i] as EWord;
+                var word = SubItems[i] as EWord;
                 if (null != word)
                 {
                     Window.Selection = new OWWindow.Sel(this as OWPara, i, 0);
                     return true;
                 }
 
-                EContainer container = SubItems[i] as EContainer;
+                var container = SubItems[i] as EContainer;
                 if (null != container)
                 {
                     if (container.Select_FirstWord())
@@ -1313,14 +1204,14 @@ namespace OurWord.Edit
 
             for (int i = Count -1; i >= 0; i--)
             {
-                EWord word = SubItems[i] as EWord;
+                var word = SubItems[i] as EWord;
                 if (null != word)
                 {
                     Window.Selection = new OWWindow.Sel(this as OWPara, i, word.Text.Length);
                     return true;
                 }
 
-                EContainer container = SubItems[i] as EContainer;
+                var container = SubItems[i] as EContainer;
                 if (null != container)
                 {
                     if (container.Select_LastWord_End())
@@ -1355,14 +1246,14 @@ namespace OurWord.Edit
                 }
 
                 // Do we have a selectable word? If so, we want to remember it, so that
-                // it points to the word most adjacent to the note icon.
+                // it points to the word most adjacent to the annotation icon.
                 var word = item as EWord;
                 if (null != word)
                     wordToSelect = word;
 
                 var bSelectionFound = false;
 
-                // Do we have a Translator Note?
+                // Do we have a TranslatorNote?
                 var n = item as ENote;
                 if (n != null && note != null && n.Note == note)
                     bSelectionFound = true;
@@ -1415,32 +1306,32 @@ namespace OurWord.Edit
         }
         #endregion
         #region Method: OWPara FindParagraph(JObject objDataSource, OWPara.Flags)
-        public OWPara FindParagraph(JObject objDataSource, OWPara.Flags Flags)
+        public OWPara FindParagraph(JObject objDataSource, OWPara.Flags flags)
         {
             // We want most of the flags to be the same; though we don't care if
             // CanItalics is different.
-            Flags |= OWPara.Flags.CanItalic;
+            flags |= OWPara.Flags.CanItalic;
 
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
                 // Recurse to lower levels of the hierarchy
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                 {
-                    OWPara para = container.FindParagraph(objDataSource, Flags);
+                    var para = container.FindParagraph(objDataSource, flags);
                     if (null != para)
                         return para;
                 }
 
                 // Test this item
-                OWPara paragraph = item as OWPara;
+                var paragraph = item as OWPara;
                 if (null == paragraph)
                     continue;
                 if (paragraph.DataSource == objDataSource)
                 {
-                    if (Flags == (paragraph.Options | OWPara.Flags.CanItalic))
+                    if (flags == (paragraph.Options | OWPara.Flags.CanItalic))
                         return paragraph;
-                    else if (Flags == OWPara.Flags.CanItalic) // E.g., for where None was passed in
+                    if (flags == OWPara.Flags.CanItalic) // E.g., for where None was passed in
                         return paragraph;
                 }
             }
@@ -1462,6 +1353,53 @@ namespace OurWord.Edit
 
                 return false;
             }
+        }
+        #endregion
+
+        // Find ------------------------------------------------------------------------------
+        #region vmethod: Sel FindFirst(sSearchFor)
+        virtual public OWWindow.Sel FindFirst(string sSearchFor)
+            // At this level, we don't expect to encounter words; but if we do, we don't
+            // include them in the search.
+        {
+            foreach(var item in this)
+            {
+                var container = item as EContainer;
+                if (null != container)
+                {
+                    var selection = container.FindFirst(sSearchFor);
+                    if (null != selection)
+                        return selection;
+                }
+            }
+
+            return null;
+        }
+        #endregion
+        #region method: Sel FindNext(aiStack, Sel current, sSearchFor)
+        protected OWWindow.Sel FindNext(ArrayList aiStack, OWWindow.Sel current, string sSearchFor)
+        {
+            for (var i = PopSelectionStack(aiStack, true); i < Count; i++)
+            {
+                var item = SubItems[i];
+
+                var paragraph = item as OWPara;
+                if (null != paragraph && paragraph != current.Paragraph)
+                {
+                    var selection = paragraph.FindFirst(sSearchFor);
+                    if (null != selection)
+                        return selection;
+                }
+
+                var container = item as EContainer;
+                if (null != container)
+                {
+                    var selection = container.FindNext(aiStack, current, sSearchFor);
+                    if (null != selection)
+                        return selection;
+                }            
+            }
+            return null;
         }
         #endregion
 
@@ -1532,9 +1470,9 @@ namespace OurWord.Edit
         #region VirtMethod: void CalculateLineNumbers(ref nLineNo)
         virtual protected void CalculateLineNumbers(ref int nLineNo)
         {
-            foreach (EItem item in SubItems)
+            foreach (var item in SubItems)
             {
-                EContainer container = item as EContainer;
+                var container = item as EContainer;
                 if (null != container)
                     container.CalculateLineNumbers(ref nLineNo);
             }
@@ -1585,8 +1523,8 @@ namespace OurWord.Edit
     public class ERowOfColumns : EContainer
     {
         // Attrs -----------------------------------------------------------------------------
-        #region Attr{g}: int ColumnsCount
-        public int ColumnsCount
+        #region attr{g}: int ColumnsCount
+        private int ColumnsCount
         {
             get
             {
@@ -1594,13 +1532,12 @@ namespace OurWord.Edit
                 return m_cColumnsCount;
             }
         }
-        int m_cColumnsCount;
+        readonly int m_cColumnsCount;
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(cColumnsCount)
         public ERowOfColumns(int cColumnsCount)
-            : base()
         {
             m_cColumnsCount = cColumnsCount;
         }
@@ -1694,13 +1631,6 @@ namespace OurWord.Edit
     public class EColumn : EContainer
     {
         // Scaffolding -----------------------------------------------------------------------
-        #region Constructor()
-        public EColumn()
-            : base()
-        {
-        }
-        #endregion
-
         #region Attr{g}: int PositionWithinOwningRow
         int PositionWithinOwningRow
         {
@@ -1792,7 +1722,7 @@ namespace OurWord.Edit
                 return m_wndWindow;
             }
         }
-        readonly OWWindow m_wndWindow = null;
+        readonly OWWindow m_wndWindow;
         #endregion
         #region Atrr{g}: IDrawingContext Context
         override public IDrawingContext Context
@@ -1809,7 +1739,6 @@ namespace OurWord.Edit
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(IDrawingContext, OWWindow)
         public ERoot(OWWindow window, IDrawingContext context)
-            : base()
         {
             m_wndWindow = window;
             m_Context = context;
@@ -1823,7 +1752,7 @@ namespace OurWord.Edit
             // Retrieve the selection's stack
             if (null == selection)
                 return false;
-            ArrayList aiStack = selection.ContainerIndicesStack;
+            var aiStack = selection.ContainerIndicesStack;
             if (aiStack.Count == 0)
                 return false;
 
@@ -1832,9 +1761,7 @@ namespace OurWord.Edit
             aiStack.Add(selection.Last.iBlock + 1);
 
             // Find and select the next word
-            if (Select_NextWord_Begin(aiStack))
-                return true;
-            return false;
+            return Select_NextWord_Begin(aiStack);
         }
         #endregion
         #region Method: bool Select_PrevWord_Begin(sel)
@@ -1843,7 +1770,7 @@ namespace OurWord.Edit
             // Retrieve the selection's stack
             if (null == selection)
                 return false;
-            ArrayList aiStack = selection.ContainerIndicesStack;
+            var aiStack = selection.ContainerIndicesStack;
             if (aiStack.Count == 0)
                 return false;
 
@@ -1852,9 +1779,7 @@ namespace OurWord.Edit
             aiStack.Add(selection.Anchor.iBlock - 1);
 
             // Find and select the previous word
-            if (Select_PrevWord(aiStack, false))
-                return true;
-            return false;
+            return Select_PrevWord(aiStack, false);
         }
         #endregion
         #region Method: bool Select_PrevWord_End(sel)
@@ -1863,7 +1788,7 @@ namespace OurWord.Edit
             // Retrieve the selection's stack
             if (null == selection)
                 return false;
-            ArrayList aiStack = selection.ContainerIndicesStack;
+            var aiStack = selection.ContainerIndicesStack;
             if (aiStack.Count == 0)
                 return false;
 
@@ -1872,9 +1797,7 @@ namespace OurWord.Edit
             aiStack.Add(selection.Anchor.iBlock - 1);
 
             // Find and select the previous word
-            if (Select_PrevWord(aiStack, true))
-                return true;
-            return false;
+            return Select_PrevWord(aiStack, true);
         }
         #endregion
         #region Method: bool Select_NextPara_Begin(sel)
@@ -1883,13 +1806,13 @@ namespace OurWord.Edit
             // Retrieve the selection's stack
             if (null == selection)
                 return false;
-            ArrayList aiStack = selection.ContainerIndicesStack;
+            var aiStack = selection.ContainerIndicesStack;
             if (aiStack.Count == 0)
                 return false;
 
             // Locate the level of the owning paragraph
-            int iParaLevel = aiStack.Count - 1;
-            EContainer container = selection.Anchor.Word.Owner;
+            var iParaLevel = aiStack.Count - 1;
+            var container = selection.Anchor.Word.Owner;
             while (container as OWPara == null && iParaLevel > 0)
             {
                 container = container.Owner;
@@ -1904,13 +1827,30 @@ namespace OurWord.Edit
 
             // Increment our starting point so we'll move to the next selectable entity (which
             // we are assuming is owned in a paragraph.)
-            int iPara = (int)aiStack[iParaLevel];
+            var iPara = (int)aiStack[iParaLevel];
             aiStack[iParaLevel] = iPara + 1;
 
             // Find and select the next word
-            if (Select_NextWord_Begin(aiStack))
-                return true;
-            return false;
+            return Select_NextWord_Begin(aiStack);
+        }
+        #endregion
+        #region Method: Sel FindNext(Sel current, sSearchFor)
+        public OWWindow.Sel FindNext(OWWindow.Sel current, string sSearchFor)
+        {
+            if (null == current)
+                return FindFirst(sSearchFor);
+
+            // A selection is at a paragraph level; see if there is another in this paragraph
+            var selection = current.Paragraph.FindNext(current, sSearchFor);
+            if (null != selection)
+                return selection;
+
+            // If we're here, we must go through the container hierarchy 
+            var aiStack = current.ContainerIndicesStack;
+            if (aiStack.Count == 0)
+                return null;
+
+            return FindNext(aiStack, current, sSearchFor);
         }
         #endregion
 

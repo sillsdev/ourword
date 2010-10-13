@@ -267,6 +267,23 @@ namespace OurWordData.DataModel
 		#endregion
 
 		// Derived Attrs ---------------------------------------------------------------------
+	    public List<DText> Texts
+	    {
+	        get
+	        {
+	            var vText = new List<DText>();
+
+                foreach(DRun run in Runs)
+                {
+                    var text = run as DText;
+                    if (null != text)
+                        vText.Add(text);
+                }
+
+	            return vText;
+	        }
+	    }
+
 		#region Attr{g}: DPhrase[] Phrases - flattens the list to just return phrases
 		DPhrase[] Phrases
 		{
@@ -421,9 +438,9 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				string s = "";
+				var s = "";
 
-				foreach(DRun run in this.Runs)
+				foreach(DRun run in Runs)
 				{
 					s += run.AsString;
 				}

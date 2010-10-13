@@ -42,14 +42,14 @@ namespace OurWord.Edit.Blocks
             {
                 return Bmp.Width;
             }
-            set
+            protected set
             {
                 // Can't be set; its the nature of the bitmap
             }
         }
         #endregion
-        #region Attr{g/s}: string IconResource
-        public string IconResource
+        #region attr{g/s}: string IconResource
+        private string IconResource
         {
             get
             {

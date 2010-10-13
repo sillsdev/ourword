@@ -186,8 +186,7 @@ namespace OurWordTests.Edit
             s_Window = new TestWindow(s_section);
 
             // Set up a Form
-            s_Form = new Form();
-            s_Form.Name = "TestForm";
+            s_Form = new Form {Name = "TestForm"};
             s_Form.Controls.Add(s_Window);
 
             // Load the window

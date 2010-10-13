@@ -152,7 +152,7 @@ namespace OurWordTests.Edit
             DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
-            DBook book = new DBook("MRK");
+            var book = new DBook("MRK");
             DB.Project.TargetTranslation.AddBook(book);
             G.URStack.Clear();
 
@@ -295,8 +295,8 @@ namespace OurWordTests.Edit
         [Test] public void Select_NextWord()
         {
             // Make a selection in the middle of "lo|ved"
-            int iBlock = 5;
-            OWWindow.Sel selection = new OWWindow.Sel(m_op, iBlock, 2);
+            var iBlock = 5;
+            var selection = new OWWindow.Sel(m_op, iBlock, 2);
             m_Window.Contents.Select_NextWord_Begin(selection);
             Assert.AreEqual(6, m_Window.Selection.Anchor.iBlock);
             Assert.AreEqual(0, m_Window.Selection.Anchor.iChar);
@@ -1236,5 +1236,97 @@ namespace OurWordTests.Edit
             Assert.AreEqual("Mepücatemaicai ", (m_op.SubItems[1] as EWord).Text);
         }
         #endregion
+
+        // Find ------------------------------------------------------------------------------
+        #region Test: TFindFirst_AtMiddle
+        [Test] public void TFindFirst_AtMiddle()
+        {
+            const string sSearchFor = "so love";
+
+            var selection = m_op.FindFirst(sSearchFor);
+
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(sSearchFor, selection.SelectionString);
+            Assert.AreEqual(4, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+            Assert.AreEqual(5, selection.End.iBlock);
+            Assert.AreEqual(4, selection.End.iChar);
+        }
+        #endregion
+        #region Test: TFindFirst_AtBeginning
+        [Test] public void TFindFirst_AtBeginning()
+        {
+            const string sSearchFor = "For ";
+
+            var selection = m_op.FindFirst(sSearchFor);
+
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(sSearchFor, selection.SelectionString);
+            Assert.AreEqual(2, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+            Assert.AreEqual(3, selection.End.iBlock);
+            Assert.AreEqual(0, selection.End.iChar);
+        }
+        #endregion
+        #region Test: TFindFirst_AtEnd
+        [Test] public void TFindFirst_AtEnd()
+        {
+            const string sSearchFor = "life.";
+
+            var selection = m_op.FindFirst(sSearchFor);
+
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(sSearchFor, selection.SelectionString);
+            Assert.AreEqual(28, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+            Assert.AreEqual(28, selection.End.iBlock);
+            Assert.AreEqual(5, selection.End.iChar);
+        }
+        #endregion
+        #region Test: TFindFirst_NotFound
+        [Test] public void TFindFirst_NotFound()
+        {
+            const string sSearchFor = "pizza";
+
+            var selection = m_op.FindFirst(sSearchFor);
+
+            Assert.IsNull(selection);
+        }
+        #endregion
+        #region Test: TFindNext
+        [Test] public void TFindNext()
+        {
+            const string sSearchFor = "so";
+
+            // "For God *so* loved"
+            var selection = m_op.FindNext(null, sSearchFor);
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(4, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+            Assert.AreEqual(4, selection.End.iBlock);
+            Assert.AreEqual(2, selection.End.iChar);
+
+            // "one and only *so*n"
+            selection = m_op.FindNext(selection, sSearchFor);
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(15, selection.Anchor.iBlock);
+            Assert.AreEqual(0, selection.Anchor.iChar);
+            Assert.AreEqual(15, selection.End.iBlock);
+            Assert.AreEqual(2, selection.End.iChar);
+
+            // "who*so*ever"
+            selection = m_op.FindNext(selection, sSearchFor);
+            Assert.IsNotNull(selection);
+            Assert.AreEqual(18, selection.Anchor.iBlock);
+            Assert.AreEqual(3, selection.Anchor.iChar);
+            Assert.AreEqual(18, selection.End.iBlock);
+            Assert.AreEqual(5, selection.End.iChar);
+
+            // Not found
+            selection = m_op.FindNext(selection, sSearchFor);
+            Assert.IsNull(selection);
+        }
+        #endregion
+
     }
 }
