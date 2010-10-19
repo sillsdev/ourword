@@ -53,10 +53,9 @@ namespace OurWord.Dialogs
             // 
             this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(314, 585);
-            this.m_btnCancel.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_btnCancel.Location = new System.Drawing.Point(251, 468);
             this.m_btnCancel.Name = "m_btnCancel";
-            this.m_btnCancel.Size = new System.Drawing.Size(94, 29);
+            this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 17;
             this.m_btnCancel.Text = "Cancel";
             // 
@@ -64,10 +63,9 @@ namespace OurWord.Dialogs
             // 
             this.m_btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(204, 585);
-            this.m_btnOK.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_btnOK.Location = new System.Drawing.Point(163, 468);
             this.m_btnOK.Name = "m_btnOK";
-            this.m_btnOK.Size = new System.Drawing.Size(94, 29);
+            this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 16;
             this.m_btnOK.Text = "Export";
             // 
@@ -75,10 +73,9 @@ namespace OurWord.Dialogs
             // 
             this.m_radioParatext.AutoSize = true;
             this.m_radioParatext.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_radioParatext.Location = new System.Drawing.Point(26, 24);
-            this.m_radioParatext.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_radioParatext.Location = new System.Drawing.Point(21, 19);
             this.m_radioParatext.Name = "m_radioParatext";
-            this.m_radioParatext.Size = new System.Drawing.Size(171, 21);
+            this.m_radioParatext.Size = new System.Drawing.Size(135, 17);
             this.m_radioParatext.TabIndex = 27;
             this.m_radioParatext.TabStop = true;
             this.m_radioParatext.Text = "Paratext (PTX) files";
@@ -87,10 +84,9 @@ namespace OurWord.Dialogs
             // 
             // m_labelParatextInfo
             // 
-            this.m_labelParatextInfo.Location = new System.Drawing.Point(55, 46);
-            this.m_labelParatextInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelParatextInfo.Location = new System.Drawing.Point(44, 37);
             this.m_labelParatextInfo.Name = "m_labelParatextInfo";
-            this.m_labelParatextInfo.Size = new System.Drawing.Size(520, 49);
+            this.m_labelParatextInfo.Size = new System.Drawing.Size(416, 39);
             this.m_labelParatextInfo.TabIndex = 28;
             this.m_labelParatextInfo.Text = "This will only export the vernacular; any back translations or notes will not be " +
                 "exported.";
@@ -106,11 +102,9 @@ namespace OurWord.Dialogs
             this.m_groupExportTo.Controls.Add(this.m_radioGoBible);
             this.m_groupExportTo.Controls.Add(this.m_radioParatext);
             this.m_groupExportTo.Controls.Add(this.m_labelParatextInfo);
-            this.m_groupExportTo.Location = new System.Drawing.Point(19, 60);
-            this.m_groupExportTo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_groupExportTo.Location = new System.Drawing.Point(15, 48);
             this.m_groupExportTo.Name = "m_groupExportTo";
-            this.m_groupExportTo.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.m_groupExportTo.Size = new System.Drawing.Size(582, 322);
+            this.m_groupExportTo.Size = new System.Drawing.Size(466, 258);
             this.m_groupExportTo.TabIndex = 30;
             this.m_groupExportTo.TabStop = false;
             this.m_groupExportTo.Text = "Export all of your project\'s books to:";
@@ -121,20 +115,18 @@ namespace OurWord.Dialogs
             this.m_comboWhatToExport.Items.AddRange(new object[] {
             "Vernacular",
             "Back Translation"});
-            this.m_comboWhatToExport.Location = new System.Drawing.Point(266, 252);
-            this.m_comboWhatToExport.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_comboWhatToExport.Location = new System.Drawing.Point(213, 202);
             this.m_comboWhatToExport.Name = "m_comboWhatToExport";
-            this.m_comboWhatToExport.Size = new System.Drawing.Size(150, 24);
+            this.m_comboWhatToExport.Size = new System.Drawing.Size(121, 21);
             this.m_comboWhatToExport.TabIndex = 33;
             this.m_comboWhatToExport.Text = "Vernacular";
             this.m_comboWhatToExport.SelectedIndexChanged += new System.EventHandler(this.cmdWhatToExportChanged);
             // 
             // m_labelWord
             // 
-            this.m_labelWord.Location = new System.Drawing.Point(59, 278);
-            this.m_labelWord.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelWord.Location = new System.Drawing.Point(47, 222);
             this.m_labelWord.Name = "m_labelWord";
-            this.m_labelWord.Size = new System.Drawing.Size(516, 41);
+            this.m_labelWord.Size = new System.Drawing.Size(413, 33);
             this.m_labelWord.TabIndex = 37;
             this.m_labelWord.Text = "The word document will include pictures. Non-closed notes are exported as comment" +
                 "s.";
@@ -143,10 +135,9 @@ namespace OurWord.Dialogs
             // 
             this.m_radioWord.AutoSize = true;
             this.m_radioWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_radioWord.Location = new System.Drawing.Point(26, 252);
-            this.m_radioWord.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_radioWord.Location = new System.Drawing.Point(21, 202);
             this.m_radioWord.Name = "m_radioWord";
-            this.m_radioWord.Size = new System.Drawing.Size(234, 21);
+            this.m_radioWord.Size = new System.Drawing.Size(186, 17);
             this.m_radioWord.TabIndex = 36;
             this.m_radioWord.TabStop = true;
             this.m_radioWord.Text = "Microsoft Word 2007 (docx):";
@@ -155,22 +146,20 @@ namespace OurWord.Dialogs
             // 
             // m_labelToolbox
             // 
-            this.m_labelToolbox.Location = new System.Drawing.Point(55, 189);
-            this.m_labelToolbox.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelToolbox.Location = new System.Drawing.Point(44, 151);
             this.m_labelToolbox.Name = "m_labelToolbox";
-            this.m_labelToolbox.Size = new System.Drawing.Size(520, 41);
+            this.m_labelToolbox.Size = new System.Drawing.Size(416, 33);
             this.m_labelToolbox.TabIndex = 36;
-            this.m_labelToolbox.Text = "These are Standard Format files in a format which includes the bach translation a" +
+            this.m_labelToolbox.Text = "These are Standard Format files in a format which includes the back translation a" +
                 "nd notes; they cannot be read in Paratext.";
             // 
             // m_radioToolbox
             // 
             this.m_radioToolbox.AutoSize = true;
             this.m_radioToolbox.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_radioToolbox.Location = new System.Drawing.Point(26, 166);
-            this.m_radioToolbox.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_radioToolbox.Location = new System.Drawing.Point(21, 133);
             this.m_radioToolbox.Name = "m_radioToolbox";
-            this.m_radioToolbox.Size = new System.Drawing.Size(159, 21);
+            this.m_radioToolbox.Size = new System.Drawing.Size(126, 17);
             this.m_radioToolbox.TabIndex = 35;
             this.m_radioToolbox.TabStop = true;
             this.m_radioToolbox.Text = "Toolbox (DB) files";
@@ -179,10 +168,9 @@ namespace OurWord.Dialogs
             // 
             // m_labelGoBibleCreatorInfo
             // 
-            this.m_labelGoBibleCreatorInfo.Location = new System.Drawing.Point(55, 111);
-            this.m_labelGoBibleCreatorInfo.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelGoBibleCreatorInfo.Location = new System.Drawing.Point(44, 89);
             this.m_labelGoBibleCreatorInfo.Name = "m_labelGoBibleCreatorInfo";
-            this.m_labelGoBibleCreatorInfo.Size = new System.Drawing.Size(520, 49);
+            this.m_labelGoBibleCreatorInfo.Size = new System.Drawing.Size(416, 39);
             this.m_labelGoBibleCreatorInfo.TabIndex = 34;
             this.m_labelGoBibleCreatorInfo.Text = "Go Bible is a viewer for Java mobile phones. GoBibleCreator\'s SFM files are a sub" +
                 "set of USFM.";
@@ -191,10 +179,9 @@ namespace OurWord.Dialogs
             // 
             this.m_radioGoBible.AutoSize = true;
             this.m_radioGoBible.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_radioGoBible.Location = new System.Drawing.Point(26, 89);
-            this.m_radioGoBible.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_radioGoBible.Location = new System.Drawing.Point(21, 71);
             this.m_radioGoBible.Name = "m_radioGoBible";
-            this.m_radioGoBible.Size = new System.Drawing.Size(216, 21);
+            this.m_radioGoBible.Size = new System.Drawing.Size(169, 17);
             this.m_radioGoBible.TabIndex = 33;
             this.m_radioGoBible.TabStop = true;
             this.m_radioGoBible.Text = "GoBibleCreator input files";
@@ -204,20 +191,18 @@ namespace OurWord.Dialogs
             // m_labelFolder
             // 
             this.m_labelFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_labelFolder.Location = new System.Drawing.Point(19, 432);
-            this.m_labelFolder.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelFolder.Location = new System.Drawing.Point(15, 346);
             this.m_labelFolder.Name = "m_labelFolder";
-            this.m_labelFolder.Size = new System.Drawing.Size(582, 29);
+            this.m_labelFolder.Size = new System.Drawing.Size(466, 23);
             this.m_labelFolder.TabIndex = 31;
             this.m_labelFolder.Text = "(folder location)";
             this.m_labelFolder.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // m_labelLocation
             // 
-            this.m_labelLocation.Location = new System.Drawing.Point(15, 404);
-            this.m_labelLocation.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelLocation.Location = new System.Drawing.Point(12, 323);
             this.m_labelLocation.Name = "m_labelLocation";
-            this.m_labelLocation.Size = new System.Drawing.Size(586, 29);
+            this.m_labelLocation.Size = new System.Drawing.Size(469, 23);
             this.m_labelLocation.TabIndex = 32;
             this.m_labelLocation.Text = "The files will be placed here:";
             this.m_labelLocation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -225,19 +210,17 @@ namespace OurWord.Dialogs
             // m_labelCaution
             // 
             this.m_labelCaution.ForeColor = System.Drawing.Color.Red;
-            this.m_labelCaution.Location = new System.Drawing.Point(15, 489);
-            this.m_labelCaution.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_labelCaution.Location = new System.Drawing.Point(12, 391);
             this.m_labelCaution.Name = "m_labelCaution";
-            this.m_labelCaution.Size = new System.Drawing.Size(586, 92);
+            this.m_labelCaution.Size = new System.Drawing.Size(469, 74);
             this.m_labelCaution.TabIndex = 33;
             this.m_labelCaution.Text = resources.GetString("m_labelCaution.Text");
             // 
             // m_lWhat
             // 
-            this.m_lWhat.Location = new System.Drawing.Point(15, 11);
-            this.m_lWhat.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.m_lWhat.Location = new System.Drawing.Point(12, 9);
             this.m_lWhat.Name = "m_lWhat";
-            this.m_lWhat.Size = new System.Drawing.Size(125, 29);
+            this.m_lWhat.Size = new System.Drawing.Size(100, 23);
             this.m_lWhat.TabIndex = 34;
             this.m_lWhat.Text = "What to Export:";
             this.m_lWhat.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -247,19 +230,18 @@ namespace OurWord.Dialogs
             this.m_comboScope.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.m_comboScope.FormattingEnabled = true;
-            this.m_comboScope.Location = new System.Drawing.Point(126, 11);
-            this.m_comboScope.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.m_comboScope.Location = new System.Drawing.Point(101, 9);
             this.m_comboScope.Name = "m_comboScope";
-            this.m_comboScope.Size = new System.Drawing.Size(466, 24);
+            this.m_comboScope.Size = new System.Drawing.Size(374, 21);
             this.m_comboScope.TabIndex = 35;
             // 
             // DialogExport
             // 
             this.AcceptButton = this.m_btnOK;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(616, 629);
+            this.ClientSize = new System.Drawing.Size(493, 503);
             this.ControlBox = false;
             this.Controls.Add(this.m_comboScope);
             this.Controls.Add(this.m_lWhat);
@@ -270,7 +252,6 @@ namespace OurWord.Dialogs
             this.Controls.Add(this.m_btnOK);
             this.Controls.Add(this.m_groupExportTo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "DialogExport";
