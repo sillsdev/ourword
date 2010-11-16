@@ -375,7 +375,7 @@ namespace OurWordData.DataModel.Membership
                 case UserType.Translator:
                     return TranslationSettings.Editability.Notes;
                 default:
-                    Debug.Assert(false, "Uninown UserType");
+                    Debug.Assert(false, "Unknown UserType");
                     return TranslationSettings.Editability.ReadOnly;
             }
         }
@@ -396,7 +396,18 @@ namespace OurWordData.DataModel.Membership
 
             if (null == settings)
             {
-                settings = new TranslationSettings(sTranslationName, GetDefaultEditability());
+                var editability = GetDefaultEditability();
+
+                // 16 Nov 2010
+                //    If the user is a Translator, and if this is the first TranslationSettings for him,
+                // we'll give him editability. This way, for people who are upgrading to 1.8i, hopefully
+                // Translators who previously were allowed to edit will still be able to. 
+                //    Once everyone has upgraded, we should remove this, and just create the new
+                // TranslationSettings object with the default editability.
+                if (Type != UserType.Observer && m_vTranslationSettings.Count == 0)
+                    editability = TranslationSettings.Editability.Full;
+
+                settings = new TranslationSettings(sTranslationName, editability);
                 m_vTranslationSettings.Add(sTranslationName, settings);
             }
 
