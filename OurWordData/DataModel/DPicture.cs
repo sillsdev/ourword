@@ -90,7 +90,18 @@ namespace OurWordData.DataModel
 	    {
 	        get
 	        {
-                return Path.Combine(DB.TeamSettings.PicturesFolder, RelativePathName);
+                // If the FileInfo constructor fails, it means we have an ill-formed pathname
+	            try
+	            {
+                    new FileInfo(RelativePathName);
+                    var sFullPathName = Path.Combine(DB.TeamSettings.PicturesFolder, RelativePathName);
+                    new FileInfo(sFullPathName);
+                    return sFullPathName;
+                }
+	            catch (Exception)
+	            {
+	                return null;
+	            }
 	        }
         }
         #endregion
