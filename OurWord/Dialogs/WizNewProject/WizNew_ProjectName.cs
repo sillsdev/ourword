@@ -4,26 +4,14 @@
  * Author:  John Wimbish
  * Created: 26 Jan 2008
  * Purpose: Obtains the name of the project
- * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-11, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using System.Windows.Forms;
-using System.IO;
-using Microsoft.Win32;
 using JWTools;
-using OurWordData;
-using OurWordData.DataModel;
 #endregion
 
 namespace OurWord.Dialogs.WizNewProject
@@ -56,7 +44,7 @@ namespace OurWord.Dialogs.WizNewProject
         public WizNew_ProjectName()
         {
             InitializeComponent();
-            m_vLanguages = new List<string>();
+            m_vLanguageProjects = new List<string>();
         }
         #endregion
 
@@ -68,7 +56,7 @@ namespace OurWord.Dialogs.WizNewProject
 			// have to access the disk every time the user types (the cmdProjectNameChanged
 			// command handler.
             if (null != Wizard.ChosenCluster)
-                m_vLanguages = Wizard.ChosenCluster.GetClusterLanguageList(false);
+                m_vLanguageProjects = Wizard.ChosenCluster.GetClusterLanguageList(true);
 
 			// Default to the error not being visible.
 			m_lblError.Visible = false;
@@ -98,25 +86,25 @@ namespace OurWord.Dialogs.WizNewProject
         #endregion
 
 		// Implementation -------------------------------------------------------------------
-		#region Attr{g}: List<string> Languages
-		List<string> Languages
+		#region Attr{g}: List<string> LanguageProjects
+		List<string> LanguageProjects
 		{
 			get
 			{
-				Debug.Assert(null != m_vLanguages);
-				return m_vLanguages;
+				Debug.Assert(null != m_vLanguageProjects);
+				return m_vLanguageProjects;
 			}
 		}
-		List<string> m_vLanguages;
+		List<string> m_vLanguageProjects;
 		#endregion
 		#region VAttr{g}: bool NameAlreadyExists
 		bool NameAlreadyExists
 		{
 			get
 			{
-				string sProposedLanguage = m_textProjectName.Text;
+				var sProposedLanguageProjectName = m_textProjectName.Text;
 
-				if (Languages.IndexOf(sProposedLanguage) != -1)
+				if (LanguageProjects.IndexOf(sProposedLanguageProjectName) != -1)
 					return true;
 
 				return false;
