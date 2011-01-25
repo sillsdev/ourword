@@ -167,8 +167,8 @@ namespace OurWord.Ctrls.Commands
                  );
 
             // Enabling
+            // Cannot incorporate WindowIsFocused into this, as the window typically doesn't exist yet.
             var bCannotEdit = (null == WLayout.CurrentLayout ||
-                !WLayout.CurrentLayout.Focused || 
                 null == DB.TargetBook ||
                 Users.Current.GetBookEditability(DB.TargetBook) != User.TranslationSettings.Editability.Full);
 
@@ -459,6 +459,28 @@ namespace OurWord.Ctrls.Commands
             m_Layout.Tag = item.Tag;
         }
         #endregion
+        #region sattr{g}: bool CanCutAndPaste
+        static bool CanCutAndPaste
+        {
+            get
+            {
+                return ((null != WLayout.CurrentLayout && 
+                    WLayout.CurrentLayout.Focused) && 
+                    null != DB.TargetBook) && 
+                    Users.Current.GetBookEditability(DB.TargetBook) == User.TranslationSettings.Editability.Full;
+            }
+        }
+        #endregion
+        #region sattr{g}: bool CanCopy
+        static bool CanCopy
+        {
+            get
+            {
+                return (null != WLayout.CurrentLayout &&
+                         WLayout.CurrentLayout.Focused);
+            }
+        }
+        #endregion
 
         // Handlers --------------------------------------------------------------------------
         public SimpleHandler OnExit;
@@ -573,21 +595,21 @@ namespace OurWord.Ctrls.Commands
         #region cmd: cmdCut
         private void cmdCut(object sender, EventArgs e)
         {
-            if (null != OnCut)
+            if (null != OnCut && CanCutAndPaste)
                 OnCut();
         }
         #endregion
         #region cmd: cmdCopy
         private void cmdCopy(object sender, EventArgs e)
         {
-            if (null != OnCopy)
+            if (null != OnCopy && CanCopy)
                 OnCopy();
         }
         #endregion
         #region cmd: cmdPaste
         private void cmdPaste(object sender, EventArgs e)
         {
-            if (null != OnPaste)
+            if (null != OnPaste && CanCutAndPaste)
                 OnPaste();
         }
         #endregion
@@ -811,7 +833,5 @@ namespace OurWord.Ctrls.Commands
             Users.Delete(user);
         }
         #endregion
-
-
     }
 }
