@@ -9,13 +9,8 @@
  *********************************************************************************************/
 #region Header: Using, etc.
 using System;
-using System.Collections;
 using System.Diagnostics;
-using System.Windows.Forms;
 using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading;
 using JWTools;
 #endregion
 #endregion
@@ -157,7 +152,7 @@ namespace OurWordData
 				return m_bIsLoaded;
 			}
 		}
-		protected bool m_bIsLoaded = false;
+		protected bool m_bIsLoaded;
 		#endregion
 
         #region Method: void LoadFromFile(ref sPath, IProgressIndicator)
@@ -277,19 +272,19 @@ namespace OurWordData
                 return;
 
 			// Create a backup file by copying this one, if it exists
-            string sExtension = Path.GetExtension(StoragePath);
-			string sBackupExtension = sExtension + "bak";
-			string sBackupPath = JW_Util.CreateBackup(StoragePath, sBackupExtension);
+            var sExtension = Path.GetExtension(StoragePath);
+			var sBackupExtension = sExtension + "bak";
+			var sBackupPath = JW_Util.CreateBackup(StoragePath, sBackupExtension);
 
             // Perform JObject built-in XML write
 			TextWriter W = null;
 			try
 			{
                 // Create an Xml representation of the object
-                XElement x = ToXml(true);
+                var x = ToXml(true);
 
 				// Create the directory if it doesn't exist
-				string sFolder = Path.GetDirectoryName(StoragePath);
+				var sFolder = Path.GetDirectoryName(StoragePath);
 				if (!Directory.Exists(sFolder))
 					Directory.CreateDirectory(sFolder);
 
@@ -339,8 +334,8 @@ namespace OurWordData
         }
         #endregion
 
-        #region VAttr{g}: virtual string DefaultFileExtension - e.g., ".owp"
-        public virtual string DefaultFileExtension
+        #region vattr{g}: virtual string DefaultFileExtension - e.g., ".owp"
+	    protected virtual string DefaultFileExtension
         {
             get
             {

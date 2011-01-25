@@ -13,15 +13,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Xml;
 using JWTools;
 #endregion
 
 namespace OurWordData.Styles
 {
-    public class StyleSheet
+    static public class StyleSheet
     {
         // Style Declarations ----------------------------------------------------------------
         #region DOC - Default settings
@@ -632,7 +630,7 @@ namespace OurWordData.Styles
         #region SMethod: void Save(sPath)
         static public void Save(string sPath)
         {
-            // Force a save, even if not dirty, if the file does noto already exist
+            // Force a save, even if not dirty, if the file does not already exist
             if (!string.IsNullOrEmpty(sPath) && !File.Exists(sPath))
                 DeclareDirty();
 
@@ -730,7 +728,7 @@ namespace OurWordData.Styles
             }
             catch (Exception e)
             {
-                Console.WriteLine("Error on reading stylesheet: " + e.Message);
+                Console.WriteLine(@"Error on reading stylesheet: " + e.Message);
             }
         }
         #endregion
@@ -762,13 +760,9 @@ namespace OurWordData.Styles
         {
             get
             {
-                if (null == s_LargeDialogFont)
-                {
-                    s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
-                        SystemFonts.DialogFont.Size * 1.2F,
-                        FontStyle.Regular);
-                }
-                return s_LargeDialogFont;
+                return s_LargeDialogFont ?? 
+                    (s_LargeDialogFont = new Font(SystemFonts.DialogFont.FontFamily,
+                        SystemFonts.DialogFont.Size*1.2F, FontStyle.Regular));
             }
         }
         private static Font s_LargeDialogFont;

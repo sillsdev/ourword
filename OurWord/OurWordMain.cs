@@ -826,9 +826,9 @@ namespace OurWord
             // otherwise create the new cluster
             DTeamSettings.EnsureInitialized();
             project.TeamSettings.InitialCreation(G.CreateProgressIndicator());
-            StyleSheet.Initialize(null);
+            StyleSheet.Initialize(DB.TeamSettings.StyleSheetStoragePath);
 
-            // Create the front translation. If the settings file exists, load it; otherwise
+            // Create the front translation. If the OTRANS settings file exists, load it; otherwise
             // create its folder, settings file, etc.
             project.FrontTranslation = new DTranslation(wiz.FrontName);
             project.FrontTranslation.Initialize();

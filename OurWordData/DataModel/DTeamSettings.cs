@@ -23,7 +23,6 @@ using OurWordData.Synchronize;
 
 namespace OurWordData.DataModel
 {
-	#region CLASS DTeamSettings
 	public class DTeamSettings : JObjectOnDemand
 	{
         // BAttrs ----------------------------------------------------------------------------
@@ -357,7 +356,8 @@ namespace OurWordData.DataModel
 		}
 		#endregion
         #region OAttr{g}: override string DefaultFileExtension
-        public override string DefaultFileExtension
+
+	    protected override string DefaultFileExtension
         {
             get
             {
@@ -509,6 +509,4 @@ namespace OurWordData.DataModel
         }
         #endregion
 	}
-	#endregion
-
 }

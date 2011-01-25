@@ -1670,9 +1670,8 @@ namespace OurWord.Edit
 
             // CTRL + n
             if (e.Modifiers == Keys.Control)
-                // Note that Ctrl-C, Ctrl-X, Ctrl-V are passed via DotNetBar in the
-                // UserCommandHandler method in OurWordMain, and thus we don't do
-                // them here. (If we do them here, then they will be called twice.)
+                // Ctrl-C, Ctrl-X, Ctrl-V are handled in the Commands UI control and should
+                // not be done here.
             {
                 e.Handled = true;
 

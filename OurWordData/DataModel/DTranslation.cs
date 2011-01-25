@@ -395,7 +395,8 @@ namespace OurWordData.DataModel
 		}
 		#endregion
 		#region VAttr{g}: override string DefaultFileExtension
-		public override string DefaultFileExtension
+
+	    protected override string DefaultFileExtension
         {
             get
             {
