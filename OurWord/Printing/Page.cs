@@ -37,7 +37,7 @@ namespace OurWord.Printing
         {
             get
             {
-                return DialogPrint.m_PageSettings;
+                return DialogPrint.s_PageSettings;
             }
         }
         #endregion

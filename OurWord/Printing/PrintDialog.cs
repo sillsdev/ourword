@@ -245,7 +245,7 @@ namespace OurWord.Printing
         }
         #endregion
 
-        public static readonly PageSettings m_PageSettings = new PageSettings();
+        public static PageSettings s_PageSettings;
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(PrintDocument)
@@ -254,6 +254,9 @@ namespace OurWord.Printing
             InitializeComponent();
 
             m_pdoc = pdoc;
+
+            if (null == s_PageSettings)
+                s_PageSettings = pdoc.DefaultPageSettings;
 
             if (DB.IsValidProject)
                 m_textWatermark.Text = DB.TargetBook.Stage.LocalizedName;
@@ -707,7 +710,7 @@ namespace OurWord.Printing
             var dlg = new PageSetupDialog {
                 Document = PDoc,
                 PrinterSettings = PDoc.PrinterSettings,
-                PageSettings = m_PageSettings,
+                PageSettings = s_PageSettings,
             };
             dlg.ShowDialog(this);
         }
