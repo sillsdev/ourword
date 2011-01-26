@@ -47,31 +47,29 @@
             this.m_tabs.Controls.Add(this.m_tabSection);
             this.m_tabs.Controls.Add(this.m_tabBook);
             this.m_tabs.Controls.Add(this.m_tabChart);
-            this.m_tabs.Location = new System.Drawing.Point(8, 9);
-            this.m_tabs.Margin = new System.Windows.Forms.Padding(4);
+            this.m_tabs.Location = new System.Drawing.Point(6, 7);
             this.m_tabs.Name = "m_tabs";
             this.m_tabs.SelectedIndex = 0;
-            this.m_tabs.Size = new System.Drawing.Size(845, 607);
+            this.m_tabs.Size = new System.Drawing.Size(676, 486);
             this.m_tabs.TabIndex = 0;
+            this.m_tabs.SelectedIndexChanged += new System.EventHandler(this.cmdTabChanged);
             // 
             // m_tabSection
             // 
-            this.m_tabSection.Location = new System.Drawing.Point(4, 25);
-            this.m_tabSection.Margin = new System.Windows.Forms.Padding(4);
+            this.m_tabSection.Location = new System.Drawing.Point(4, 22);
             this.m_tabSection.Name = "m_tabSection";
-            this.m_tabSection.Padding = new System.Windows.Forms.Padding(4);
-            this.m_tabSection.Size = new System.Drawing.Size(837, 578);
+            this.m_tabSection.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.m_tabSection.Size = new System.Drawing.Size(668, 460);
             this.m_tabSection.TabIndex = 0;
             this.m_tabSection.Text = "This Section";
             this.m_tabSection.UseVisualStyleBackColor = true;
             // 
             // m_tabBook
             // 
-            this.m_tabBook.Location = new System.Drawing.Point(4, 25);
-            this.m_tabBook.Margin = new System.Windows.Forms.Padding(4);
+            this.m_tabBook.Location = new System.Drawing.Point(4, 22);
             this.m_tabBook.Name = "m_tabBook";
-            this.m_tabBook.Padding = new System.Windows.Forms.Padding(4);
-            this.m_tabBook.Size = new System.Drawing.Size(837, 578);
+            this.m_tabBook.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.m_tabBook.Size = new System.Drawing.Size(668, 460);
             this.m_tabBook.TabIndex = 1;
             this.m_tabBook.Text = "Entire Book";
             this.m_tabBook.UseVisualStyleBackColor = true;
@@ -79,30 +77,28 @@
             // m_tabChart
             // 
             this.m_tabChart.Controls.Add(this.m_ctrlTranslationProgress);
-            this.m_tabChart.Location = new System.Drawing.Point(4, 25);
-            this.m_tabChart.Margin = new System.Windows.Forms.Padding(4);
+            this.m_tabChart.Location = new System.Drawing.Point(4, 22);
             this.m_tabChart.Name = "m_tabChart";
-            this.m_tabChart.Size = new System.Drawing.Size(837, 578);
+            this.m_tabChart.Size = new System.Drawing.Size(668, 460);
             this.m_tabChart.TabIndex = 2;
             this.m_tabChart.Text = "Chart";
             this.m_tabChart.UseVisualStyleBackColor = true;
             // 
             // m_ctrlTranslationProgress
             // 
-            this.m_ctrlTranslationProgress.Location = new System.Drawing.Point(-4, 0);
-            this.m_ctrlTranslationProgress.Margin = new System.Windows.Forms.Padding(5);
+            this.m_ctrlTranslationProgress.Location = new System.Drawing.Point(-3, 0);
+            this.m_ctrlTranslationProgress.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.m_ctrlTranslationProgress.Name = "m_ctrlTranslationProgress";
-            this.m_ctrlTranslationProgress.Size = new System.Drawing.Size(712, 515);
+            this.m_ctrlTranslationProgress.Size = new System.Drawing.Size(570, 412);
             this.m_ctrlTranslationProgress.TabIndex = 1;
             // 
             // m_btnClose
             // 
             this.m_btnClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnClose.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnClose.Location = new System.Drawing.Point(384, 624);
-            this.m_btnClose.Margin = new System.Windows.Forms.Padding(4);
+            this.m_btnClose.Location = new System.Drawing.Point(307, 499);
             this.m_btnClose.Name = "m_btnClose";
-            this.m_btnClose.Size = new System.Drawing.Size(94, 29);
+            this.m_btnClose.Size = new System.Drawing.Size(75, 23);
             this.m_btnClose.TabIndex = 1;
             this.m_btnClose.Text = "Close";
             this.m_btnClose.UseVisualStyleBackColor = true;
@@ -110,16 +106,15 @@
             // DlgHistory
             // 
             this.AcceptButton = this.m_btnClose;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(120F, 120F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(866, 662);
+            this.ClientSize = new System.Drawing.Size(693, 530);
             this.Controls.Add(this.m_btnClose);
             this.Controls.Add(this.m_tabs);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(808, 552);
+            this.MinimumSize = new System.Drawing.Size(650, 449);
             this.Name = "DlgHistory";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

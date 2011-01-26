@@ -11,6 +11,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using JWTools;
 using OurWordData.DataModel;
 using OurWord.Edit;
 using OurWordData.DataModel.Annotations;
@@ -18,7 +19,6 @@ using OurWordData.DataModel.Annotations;
 
 namespace OurWord.Dialogs.History
 {
-    #region Class: DlgHistory
     public partial class DlgHistory : Form
     {
         readonly WndHistory m_wndEntireBook;
@@ -40,6 +40,8 @@ namespace OurWord.Dialogs.History
         }
         #endregion
 
+        private const string c_sHistoryTab = "HistoryTab";
+
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
@@ -51,6 +53,10 @@ namespace OurWord.Dialogs.History
 
             // Initial setting of width, height to tab control
             cmdSizeChanged(null, null);
+
+            // Come up on the same tab as last time, as, e.g., Timor is only interested in the chart
+            var iTab = JW_Registry.GetValue(c_sHistoryTab, 0);
+            m_tabs.SelectedIndex = (iTab < m_tabs.TabPages.Count) ? iTab : 0;
         }
         #endregion
         #region Cmd: cmdSizeChanged
@@ -63,9 +69,13 @@ namespace OurWord.Dialogs.History
             m_ctrlTranslationProgress.Size = clientSize;
         }
         #endregion
-
+        #region Cmd: cmdTabChanged
+        private void cmdTabChanged(object sender, EventArgs e)
+        {
+            JW_Registry.SetValue(c_sHistoryTab, m_tabs.SelectedIndex);
+        }
+        #endregion
     }
-    #endregion
 
     public class WndHistory : OWWindow
     {

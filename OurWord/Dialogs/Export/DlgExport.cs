@@ -180,7 +180,7 @@ namespace OurWord.Dialogs
             cmdUpdateLocation(null, null);
         }
         #endregion
-
+        #region Cmd: cmdExportPicturesChanged
         private void cmdExportPicturesChanged(object sender, EventArgs e)
         {
             m_radioWord.Checked = true;
@@ -195,5 +195,6 @@ namespace OurWord.Dialogs
 
             cmdUpdateLocation(null, null);
         }
+        #endregion
     }
 }
