@@ -1204,12 +1204,13 @@ namespace OurWordData.DataModel
             }
 
             // Create an empty footnote, insert it into the section
-            DFootnote footnote = new DFootnote(nChapter, nVerse, 
+            var footnote = new DFootnote(nChapter, nVerse, 
                 DFootnote.Types.kExplanatory);
             footnote.SimpleText = "";         // Insert some text so we have a place to type
+            footnote.SimpleTextBT = "";
 
             // Create the footletter for it to go into, and insert it
-            DFoot foot = new DFoot(footnote);
+            var foot = new DFoot(footnote);
             Runs.InsertAt(iInsertPosition, foot);
 
             return foot;
