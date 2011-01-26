@@ -691,9 +691,6 @@
     <Item ID="msgTranslationNeedsName">
       <Alt ID="sp" Value="Favor de dar el nombre de la traducción que va a hacer, como «Huichol»"></Alt>
     </Item>
-    <Item ID="msgUnableToSaveFile">
-      <Alt ID="sp" Value="No se puede guardar el archivo: '{0}.'"></Alt>
-    </Item>
     <Item ID="msgVerifyRemoveBook">
       <Alt ID="sp" Value="¿Desea remover este libro de la traducción? (Remover aquí no borra el archivo que está en el disco. Pero VozNuestra ya no se dará cuenta de que existe.)"></Alt>
     </Item>

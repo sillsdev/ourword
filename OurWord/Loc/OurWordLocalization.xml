@@ -817,7 +817,7 @@
       <English>Please enter a name for the translation, e.g., 'Spanish.'</English>
     </Item>
     <Item ID="msgUnableToSaveFile">
-      <English>Unable to save the file: '{0}.'</English>
+      <English>Unable to save the file: '{0},' is it open in some other program?</English>
     </Item>
     <Item ID="msgVerifyRemoveBook">
       <English>Do you want to remove this book from the translation? (This will not delete the file from the disk; it only removes OurWord's awareness that the book exists.)</English>

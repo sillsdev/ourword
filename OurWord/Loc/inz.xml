@@ -573,9 +573,6 @@
     <Item ID="msgTranslationNeedsName">
       <Alt ID="inz" Value="Tolong masukkan nama bahasa untuk terjemahan ini, misalnya, ‘Sawila’."></Alt>
     </Item>
-    <Item ID="msgUnableToSaveFile">
-      <Alt ID="inz" Value="Gagal simpan file: '{0}.'"></Alt>
-    </Item>
     <Item ID="msgVerifyRemoveBook">
       <Alt ID="inz" Value="Apakah buku ini ingin disembunyikan dari kumpulan terjemahan ini? (File tidak akan dihapus dari komputer; hanya disembunyikan agar Sabda Kita tidak lagi melihat buku itu.)"></Alt>
     </Item>
