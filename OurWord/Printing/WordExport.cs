@@ -76,6 +76,8 @@ namespace OurWord.Printing
         private readonly Target m_WhatToExport = Target.Vernacular;
         #endregion
 
+        public bool ExportPictures = true;
+
         #region VAttr{g}: WritingSystem WritingSystem
         WritingSystem WritingSystem
         {
@@ -136,7 +138,14 @@ namespace OurWord.Printing
 
             var vParagraphs = GetAllParagraphs();
             foreach (var paragraph in vParagraphs)
+            {
+                // Skip pictures if we're supposed to not export them
+                var bIsPicture = (null != paragraph as DPicture);
+                if (!ExportPictures && bIsPicture)
+                    continue;
+
                 CompileParagraph(paragraph);
+            }
 
             // Uncomment these to check for xml errors using the debugger
             // var validator = new OpenXmlValidator();

@@ -124,6 +124,9 @@ namespace OurWord.Dialogs
 
             // Default to Paratext
             m_radioParatext.Checked = true;
+
+            // Default to exporting pictures
+            m_checkExportPictures.Checked = true;
         }
         #endregion
         #region Cmd: cmdUpdateLocation
@@ -177,5 +180,20 @@ namespace OurWord.Dialogs
             cmdUpdateLocation(null, null);
         }
         #endregion
+
+        private void cmdExportPicturesChanged(object sender, EventArgs e)
+        {
+            m_radioWord.Checked = true;
+
+            var method = CurrentExportMethod;
+            Debug.Assert(null != method);
+
+            var wordMethod = method as ExportToWord;
+            Debug.Assert(null != wordMethod);
+
+            wordMethod.ExportPictures = m_checkExportPictures.Checked;
+
+            cmdUpdateLocation(null, null);
+        }
     }
 }

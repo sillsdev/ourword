@@ -186,6 +186,7 @@ namespace OurWord.Dialogs.Export
     public class ExportToWord : ExportMethod
     {
         public bool ExportBackTranslation;
+        public bool ExportPictures;
 
         #region smethod: bool LoadWordXmlAssembly()
         static bool LoadWordXmlAssembly()
@@ -249,8 +250,12 @@ namespace OurWord.Dialogs.Export
                 WordExport.Target.BackTranslation :
                 WordExport.Target.Vernacular;
 
-            using (var export = new WordExport(book, sPath, whatToExport))
+            using (var export = new WordExport(book, sPath, whatToExport) {
+                ExportPictures = ExportPictures
+            })
+            {
                 export.Do();
+            }
         }
         #endregion
         #region OMethod: bool Setup()

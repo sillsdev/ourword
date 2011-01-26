@@ -46,6 +46,7 @@ namespace OurWord.Dialogs
             this.m_labelCaution = new System.Windows.Forms.Label();
             this.m_lWhat = new System.Windows.Forms.Label();
             this.m_comboScope = new System.Windows.Forms.ComboBox();
+            this.m_checkExportPictures = new System.Windows.Forms.CheckBox();
             this.m_groupExportTo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,6 +94,7 @@ namespace OurWord.Dialogs
             // 
             // m_groupExportTo
             // 
+            this.m_groupExportTo.Controls.Add(this.m_checkExportPictures);
             this.m_groupExportTo.Controls.Add(this.m_comboWhatToExport);
             this.m_groupExportTo.Controls.Add(this.m_labelWord);
             this.m_groupExportTo.Controls.Add(this.m_radioWord);
@@ -126,10 +128,9 @@ namespace OurWord.Dialogs
             // 
             this.m_labelWord.Location = new System.Drawing.Point(47, 222);
             this.m_labelWord.Name = "m_labelWord";
-            this.m_labelWord.Size = new System.Drawing.Size(413, 33);
+            this.m_labelWord.Size = new System.Drawing.Size(413, 21);
             this.m_labelWord.TabIndex = 37;
-            this.m_labelWord.Text = "The word document will include pictures. Non-closed notes are exported as comment" +
-                "s.";
+            this.m_labelWord.Text = "Open notes are exported as comments.";
             // 
             // m_radioWord
             // 
@@ -235,6 +236,17 @@ namespace OurWord.Dialogs
             this.m_comboScope.Size = new System.Drawing.Size(374, 21);
             this.m_comboScope.TabIndex = 35;
             // 
+            // m_checkExportPictures
+            // 
+            this.m_checkExportPictures.AutoSize = true;
+            this.m_checkExportPictures.Location = new System.Drawing.Point(347, 204);
+            this.m_checkExportPictures.Name = "m_checkExportPictures";
+            this.m_checkExportPictures.Size = new System.Drawing.Size(102, 17);
+            this.m_checkExportPictures.TabIndex = 38;
+            this.m_checkExportPictures.Text = "Export pictures?";
+            this.m_checkExportPictures.UseVisualStyleBackColor = true;
+            this.m_checkExportPictures.CheckedChanged += new System.EventHandler(this.cmdExportPicturesChanged);
+            // 
             // DialogExport
             // 
             this.AcceptButton = this.m_btnOK;
@@ -284,5 +296,6 @@ namespace OurWord.Dialogs
         private System.Windows.Forms.Label m_labelCaution;
         private System.Windows.Forms.Label m_lWhat;
         private System.Windows.Forms.ComboBox m_comboScope;
+        private System.Windows.Forms.CheckBox m_checkExportPictures;
     }
 }
