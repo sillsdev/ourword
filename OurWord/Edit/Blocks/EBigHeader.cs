@@ -19,7 +19,16 @@ namespace OurWord.Edit.Blocks
         public EBigHeader(Font font, string sText)
             : base(font, sText + " ")
         {
-            TextColor = StyleSheet.BigHeader.FontColor;
+        }
+        #endregion
+
+        #region oattr{g}: Color TextColor
+        protected override Color TextColor
+        {
+            get
+            {
+                return StyleSheet.BigHeader.FontColor;
+            }
         }
         #endregion
 

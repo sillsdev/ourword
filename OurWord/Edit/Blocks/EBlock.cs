@@ -110,18 +110,13 @@ namespace OurWord.Edit.Blocks
         // Painting ----------------------------------------------------------------------
         protected readonly Font m_Font;
         #region Attr{g/s}: Color TextColor
-        protected Color TextColor
+        protected virtual Color TextColor
         {
             get
             {
-                return m_TextColor;
-            }
-            set
-            {
-                m_TextColor = value;
+                return Color.Black;
             }
         }
-        private Color m_TextColor = Color.Black;
         #endregion
         #region Method: Brush GetBrush()
         protected Brush GetBrush()

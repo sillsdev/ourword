@@ -69,9 +69,16 @@ namespace OurWord.Edit.Blocks
         {
             m_Verse = verse;
             NeedsExtraLeadingSpace = false;
-            TextColor = StyleSheet.VerseNumber.FontColor;
         }
-
+        #endregion
+        #region oattr{g}: Color TextColor
+        protected override Color TextColor
+        {
+            get
+            {
+                return StyleSheet.VerseNumber.FontColor;
+            }
+        }
         #endregion
 
         // Layout and Drawing ----------------------------------------------------------------

@@ -7,17 +7,10 @@
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 #region Using
-using System;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.IO;
-using JWTools;
-using OurWordData;
 using OurWordData.DataModel.Annotations;
-
 #endregion
 
 namespace OurWordData.DataModel
@@ -1189,40 +1182,8 @@ namespace OurWordData.DataModel
 			return false;
 		}
 		#endregion
-		#region Attr{g}: bool IsTitleStyle(string sStyleAbbrev)
-		public bool IsTitleStyle(string sStyleAbbrev)
-		{
-			if (sStyleAbbrev == StyleMainTitle)
-				return true;
-			if (sStyleAbbrev == StyleSubTitle)
-				return true;
-			return false;
-		}
-		#endregion
-		#region Attr{g}: bool IsHeaderStyle(string sStyleAbbrev)
-		public bool IsHeaderStyle(string sStyleAbbrev)
-		{
-			if (sStyleAbbrev == StyleHeader)
-				return true;
-			return false;
-		}
-		#endregion
-		#region Attr{g}: bool IsFootnoteParaStyle(string sStyleAbbrev)
-		public bool IsFootnoteParaStyle(string sStyleAbbrev)
-		{
-			if (sStyleAbbrev == StyleFootnotePara)
-				return true;
-			return false;
-		}
-		#endregion
-		#region Attr{g}: bool IsSeeAlsoFootnoteParaStyle(string sStyleAbbrev)
-		public bool IsSeeAlsoFootnoteParaStyle(string sStyleAbbrev)
-		{
-			if (sStyleAbbrev == StyleSeeAlsoPara)
-				return true;
-			return false;
-		}
-		#endregion
+ 
+
 		#region Attr{g}: bool IsSectionEmptyReferenceStyle(string sStyleAbbrev)
 		public bool IsSectionEmptyReferenceStyle(string sStyleAbbrev)
 		{
@@ -1264,13 +1225,15 @@ namespace OurWordData.DataModel
 			// TODO: Need to persist these array values
 
 			// Markers that signal fields that we'll discard
-			m_rgDiscardMrks = new ArrayList();
-			m_rgDiscardMrks.Add("e");   // End of file
-			m_rgDiscardMrks.Add("bk");  // Tomohon's "Bahasa Kupang" (Kupang translation)
-			m_rgDiscardMrks.Add("tb");  // Tomohon's "Terjemahan Baru" (Indonesian translation)
-			m_rgDiscardMrks.Add("bis"); // Tomohon's Indonesian translation
-			m_rgDiscardMrks.Add("bm");  // Tomohon's Bahasa Manado field
-		}
+			m_rgDiscardMrks = new ArrayList {
+                "e",      // End of file
+                "bk",     // Tomohon's "Bahasa Kupang" (Kupang translation)
+                "tb",     // Tomohon's "Terjemahan Baru" (Indonesian translation)
+                "bis",    // Tomohon's Indonesian translation
+                "bm"      // Tomohon's Bahasa Manado field
+            };
+
+        }
 		#endregion
 	}
 }

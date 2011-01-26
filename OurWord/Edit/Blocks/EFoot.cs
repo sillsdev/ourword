@@ -47,7 +47,15 @@ namespace OurWord.Edit.Blocks
             : base(font, foot.Text)
         {
             m_Foot = foot;
-            TextColor = StyleSheet.FootnoteLetter.FontColor;
+        }
+        #endregion
+        #region oattr{g}: Color TextColor
+        protected override Color TextColor
+        {
+            get
+            {
+                return StyleSheet.FootnoteLetter.FontColor;
+            }
         }
         #endregion
 

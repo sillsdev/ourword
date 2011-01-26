@@ -10,6 +10,8 @@
 using System.Drawing;
 using System.Windows.Forms;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
+
 #endregion
 
 namespace OurWord.Edit.Blocks
@@ -18,15 +20,15 @@ namespace OurWord.Edit.Blocks
     // As a literal of EWord, hyphenation is possible.
     {
         #region Constructor(font, DPhrase, sText)
-        public ELiteral(Font font, DPhrase phrase, string sText)
-            : base(font, phrase, sText)
+        public ELiteral(Font font, DPhrase phrase, string sText, Color textColor)
+            : base(font, phrase, sText, textColor)
         {
         }
         #endregion
         #region OMethod: EWord Clone()
         public override EWord Clone()
         {
-            return new ELiteral(m_Font, Phrase, Text);
+            return new ELiteral(m_Font, Phrase, Text, TextColor);
         }
         #endregion
         #region OMethod: Cursor MouseOverCursor

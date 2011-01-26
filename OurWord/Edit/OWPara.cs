@@ -219,7 +219,7 @@ namespace OurWord.Edit
                     {
                         var fontZoomed = fontFactory.GetFont(phrase.FontToggles, 
                             Users.Current.ZoomPercent);
-                        vWords.Add(new EWord(fontZoomed, phrase, sWord));
+                        vWords.Add(new EWord(fontZoomed, phrase, sWord, style.FontColor));
                         sWord = "";
                     }
 
@@ -233,7 +233,7 @@ namespace OurWord.Edit
                 {
                     var fontZoomed = fontFactory.GetFont(phrase.FontToggles, 
                         Users.Current.ZoomPercent);
-                    vWords.Add(new EWord(fontZoomed, phrase, sWord));
+                    vWords.Add(new EWord(fontZoomed, phrase, sWord, style.FontColor));
                 }
             }
 
@@ -241,7 +241,7 @@ namespace OurWord.Edit
             if (vWords.Count == 0)
             {
                 var fontZoomed = fontFactory.GetFont(Users.Current.ZoomPercent);
-                vWords.Add(EWord.CreateAsInsertionIcon(fontZoomed, phrases[0]));
+                vWords.Add(EWord.CreateAsInsertionIcon(fontZoomed, phrases[0], style.FontColor));
             }
 
             return vWords;
@@ -534,7 +534,7 @@ namespace OurWord.Edit
                         vs[i] = vs[i] + " ";
 
                     // Add the literal
-                    Append(new ELiteral(font, phrase, vs[i]));
+                    Append(new ELiteral(font, phrase, vs[i], style.FontColor));
                 }
             }
         }

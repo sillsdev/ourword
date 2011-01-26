@@ -42,8 +42,15 @@ namespace OurWord.Edit.Blocks
             // Add a little space to the end so that it appears a bit nicer in the 
             // display. It is uneditable, so this only affects the display.
             m_sText = Text + "\u00A0";
-
-            TextColor = StyleSheet.ChapterNumber.FontColor;
+        }
+        #endregion
+        #region oattr{g}: Color TextColor
+        protected override Color TextColor
+        {
+            get
+            {
+                return StyleSheet.ChapterNumber.FontColor;
+            }
         }
         #endregion
 

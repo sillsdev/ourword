@@ -56,24 +56,37 @@ namespace OurWord.Edit.Blocks
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(font, DPhrase, sText)
-        public EWord(Font font, DPhrase phrase, string sText)
+        public EWord(Font font, DPhrase phrase, string sText, Color textColor)
             : base(font, sText)
         {
             Debug.Assert(null != phrase);
             m_Phrase = phrase;
+            m_TextColor = textColor;
         }
         #endregion
         #region Method: EWord Clone()
         public virtual EWord Clone()
         {
-            var word = new EWord(m_Font, Phrase, Text);
+            var word = new EWord(m_Font, Phrase, Text, TextColor);
             return word;
         }
         #endregion
-        #region static EWord CreateAsInsertionIcon(font, DPhrase)
-        static public EWord CreateAsInsertionIcon(Font font, DPhrase phrase)
+        #region oattr{g}: Color TextColor
+        protected override Color TextColor
         {
-            var word = new EWord(font, phrase, c_chInsertionSpace.ToString());
+            get
+            {
+                return m_TextColor;
+            }
+        }
+        // Set on construction from the owning paragraph's style
+        private readonly Color m_TextColor = Color.Black;
+        #endregion
+
+        #region static EWord CreateAsInsertionIcon(font, DPhrase)
+        static public EWord CreateAsInsertionIcon(Font font, DPhrase phrase, Color textColor)
+        {
+            var word = new EWord(font, phrase, c_chInsertionSpace.ToString(), textColor);
             return word;
         }
         #endregion

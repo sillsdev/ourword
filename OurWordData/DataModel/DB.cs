@@ -9,16 +9,9 @@
 #region Using
 using System;
 using System.Diagnostics;
-using System.Drawing;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Reflection;
-using System.Windows.Forms;
 using System.IO;
 using JWTools;
-using OurWordData;
 #endregion
 
 
@@ -147,7 +140,8 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
- 
+
+
         // Misc Shorthand --------------------------------------------------------------------
         #region SAttr{g}: string Today - returns today's date as "2005-08-21" format.
         static public string Today

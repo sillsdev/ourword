@@ -35,7 +35,15 @@ namespace OurWord.Edit.Blocks
             : base(font, footnote.Letter + " ")
         {
             m_Footnote = footnote;
-            TextColor = StyleSheet.FootnoteLetter.FontColor;
+        }
+        #endregion
+        #region oattr{g}: Color TextColor
+        protected override Color TextColor
+        {
+            get
+            {
+                return StyleSheet.FootnoteLetter.FontColor;
+            }
         }
         #endregion
 
