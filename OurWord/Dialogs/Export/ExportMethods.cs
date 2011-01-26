@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Security.Policy;
 using JWTools;
 using OurWord.Printing;
 using OurWordData.DataModel;
@@ -205,7 +206,12 @@ namespace OurWord.Dialogs.Export
                 var sFolder = Path.GetDirectoryName(sOurWordPath);
                 var sWordXmlPath = Path.Combine(sFolder, c_sDllName);
 
-                Assembly.LoadFrom(sWordXmlPath);
+                var evidence = new Evidence();
+                evidence.AddAssembly(new Version(2,0,5022,0));
+                Assembly.LoadFile(sWordXmlPath, evidence);
+
+                // 26Jan11: This still didn't work for Timor:
+                // Assembly.LoadFrom(sWordXmlPath);
 
                 m_bWordXmlIsLoaded = true;
                 return true;
