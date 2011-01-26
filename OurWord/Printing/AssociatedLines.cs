@@ -80,15 +80,6 @@ namespace OurWord.Printing
 
                 foreach (var item in line.SubItems) 
                 {
-                    /*
-                    var chapter = item as EChapter;
-                    if (null != chapter)
-                    {
-                        ChapterNumber = chapter.Number;
-                        VerseNumber = 1;
-                    }
-                    */
-
                     var verse = item as EVerse;
                     if (null != verse)
                     {

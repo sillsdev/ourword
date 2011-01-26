@@ -81,6 +81,9 @@ namespace OurWord.Printing
         }
         #endregion
 
+        private int m_nStartChapter = 1;
+        private int m_nStartVerse = 1;
+
         private string m_sRunningFooterText;
 
         // Public Interface ------------------------------------------------------------------
@@ -252,6 +255,12 @@ namespace OurWord.Printing
                 }                              
             }
 
+            if (vParagraphs.Count > 0)
+            {
+                m_nStartChapter = vParagraphs[0].ReferenceSpan.Start.Chapter;
+                m_nStartVerse = vParagraphs[0].ReferenceSpan.Start.Verse;
+            }
+
             return vParagraphs;
         }
         #endregion
@@ -410,10 +419,10 @@ namespace OurWord.Printing
         }
         #endregion
         #region SMethod: void SetScriptureReferences(vGroups)
-        static void SetScriptureReferences(IEnumerable<AssociatedLines> vGroups)
+        void SetScriptureReferences(IEnumerable<AssociatedLines> vGroups)
         {
-            var nChapter = 1;
-            var nVerse = 1;
+            var nChapter = m_nStartChapter;
+            var nVerse = m_nStartVerse;
 
             foreach(var group in vGroups)
                 group.SetScriptureReferences(ref nChapter, ref nVerse);

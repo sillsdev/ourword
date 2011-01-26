@@ -453,8 +453,8 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
-        #region VAttr{g}: IEnumerable<DParagraph> AllParagraphs
-        public IEnumerable<DParagraph> AllParagraphs
+        #region VAttr{g}: List<DParagraph> AllParagraphs
+        public List<DParagraph> AllParagraphs
         {
             get
             {
