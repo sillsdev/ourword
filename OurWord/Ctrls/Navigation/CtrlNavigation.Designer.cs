@@ -198,6 +198,7 @@
             // m_FindNext
             // 
             this.m_FindNext.Name = "m_FindNext";
+            this.m_FindNext.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.m_FindNext.Size = new System.Drawing.Size(191, 22);
             this.m_FindNext.Text = "Find Next";
             this.m_FindNext.Click += new System.EventHandler(this.cmdFindNext);
@@ -227,6 +228,7 @@
             this.createConcordanceToolStripMenuItem.Name = "createConcordanceToolStripMenuItem";
             this.createConcordanceToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
             this.createConcordanceToolStripMenuItem.Text = "Create Concordance...";
+            this.createConcordanceToolStripMenuItem.Click += new System.EventHandler(this.cmdConcordance);
             // 
             // FilteredNavigation
             // 

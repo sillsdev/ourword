@@ -1855,7 +1855,7 @@ namespace OurWord.Edit
             }
             #endregion
             #region method: Sel MakeSelection(iTextPosition, iLength)
-            OWWindow.Sel MakeSelection(int iTextPosition, int iLength)
+            public OWWindow.Sel MakeSelection(int iTextPosition, int iLength)
             {
                 var vWords = GetWords();
                 foreach (var word in vWords)
@@ -1970,6 +1970,12 @@ namespace OurWord.Edit
         public OWWindow.Sel FindNext(OWWindow.Sel current, string sSearchFor)
         {
             return (new FindMethod(this)).FindNext(current, sSearchFor);
+        }
+        #endregion
+        #region Method: OWWindow.Sel MakeSelection(iTextPosition, iLength)
+        public OWWindow.Sel MakeSelection(int iTextPosition, int iLength)
+        {
+            return (new FindMethod(this)).MakeSelection(iTextPosition, iLength);
         }
         #endregion
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Windows.Forms;
-using OurWordData;
 using OurWordData.DataModel;
 
 namespace OurWord.Dialogs.Export
@@ -16,35 +15,10 @@ namespace OurWord.Dialogs.Export
         {
             var sBase = Loc.GetString("kExportStatus", "Exporting {0} - {1}...");
             var sStatus = string.Format(sBase, m_Translation.DisplayName, sBookName);
-            DlgExportProgress.SetCurrentActivity(sStatus);
+            DlgProgress.SetCurrentActivity(sStatus);
         }
         #endregion
-        #region Class: LoadedBook : IDisposable
-        class LoadedBook : IDisposable
-            // The Dispose method takes care of unloading the book if it were not
-            // already in memory; thus preventing Export from clogging up memory
-            // because of loading all books in a Bible.
-        {
-            private readonly bool m_bAlreadyLoaded;
-            private readonly DBook m_Book;
-            #region Constructor(DBook)
-            public LoadedBook(DBook book)
-            {
-                m_Book = book;
-                m_bAlreadyLoaded = book.Loaded;
-                book.LoadBook(G.CreateProgressIndicator());
-                Debug.Assert(book.Loaded);
-            }
-            #endregion
-            #region Method: void Dispose()
-            public void Dispose()
-            {
-                if (!m_bAlreadyLoaded)
-                    m_Book.Unload(new NullProgress());
-            }
-            #endregion
-        }
-        #endregion
+
         #region smethod: int GetChapterCount(DBook book)
         static int GetChapterCount(DBook book)
         {
@@ -101,20 +75,20 @@ namespace OurWord.Dialogs.Export
                 return;
            
             // Create and display the progress dialog
-            DlgExportProgress.Start();
-            DlgExportProgress.SetCurrentActivity(Loc.GetString("kExportSettingUp", "Setting up..."));
-            DlgExportProgress.SetProgressMax(TotalChapterCount);
+            DlgProgress.Start();
+            DlgProgress.SetCurrentActivity(Loc.GetString("kExportSettingUp", "Setting up..."));
+            DlgProgress.SetProgressMax(TotalChapterCount);
 
             if (!dlgDesires.CurrentExportMethod.Setup())
             {
-                DlgExportProgress.Stop();
+                DlgProgress.Stop();
                 return;
             }
 
             // Loop through all of the translation's books
             foreach(var book in m_Translation.BookList)
             {
-                if (DlgExportProgress.UserSaysCancel)
+                if (DlgProgress.UserSaysCancel)
                     break;
                 UpdateProgress(book.DisplayName);
 
@@ -124,12 +98,12 @@ namespace OurWord.Dialogs.Export
                 using (new LoadedBook(book))
                 {
                     dlgDesires.CurrentExportMethod.DoExport(book);
-                    DlgExportProgress.IncrementProgressValue(GetChapterCount(book));
+                    DlgProgress.IncrementProgressValue(GetChapterCount(book));
                 }
             }
 
             // Done with the progress dialog
-            DlgExportProgress.Stop();
+            DlgProgress.Stop();
         }
         #endregion
     }

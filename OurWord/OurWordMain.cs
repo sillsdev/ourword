@@ -25,6 +25,7 @@ using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
 using OurWordData.DataModel.Membership;
+using OurWordData.DataModel.Runs;
 using OurWordData.Styles;
 
 using OurWord.Edit;
@@ -263,7 +264,6 @@ namespace OurWord
 		    m_Commands.OnCopy += cmdCopy;
 		    m_Commands.OnPaste += cmdPaste;
 		    m_Commands.OnItalic += cmdItalic;
-		    m_Commands.OnFind += cmdFind;
 		    m_Commands.OnChangeParagraphStyle += cmdChangeParagraphStyle;
 		    m_Commands.OnInsertFootnote += cmdInsertFootnote;
 		    m_Commands.OnDeleteFootnote += cmdDeleteFootnote;
@@ -280,11 +280,12 @@ namespace OurWord
             // User commands
 		    m_Commands.OnAddNewUser += cmdAddNewUser;
 		    m_Commands.OnChangeUser += cmdChangeUser;
-
-            // Register Navigation
+            // Navigation
 		    m_Navigation.OnGoToChapter += cmdGoToChapter;
             m_Navigation.OnGoToBook += cmdGoToBook;
 		    m_Navigation.OnGoToSection += cmdGoToSection;
+		    m_Navigation.OnFindText += cmdFindText;
+		    m_Navigation.OnGoToConcordanceItem += cmdGoToConcordanceItem;  
 
 
             // Suspend the layout while we create the windows. We create them here in order
@@ -938,25 +939,6 @@ namespace OurWord
                 wnd.cmdToggleItalics();
 		}
 		#endregion
-        #region Cmd: cmdFind
-        private void cmdFind()
-            // Launch the Find dialog
-        {
-            var dlg = new DlgFind {OnFindNext = cmdFindNext};
-            dlg.Show();
-        }
-        private void cmdFindNext(DlgFind dlg)
-            // Respond to the Find dialog's "FindNext"button
-        {
-            var selection = CurrentLayout.Selection;
-            if (null != selection)
-            {
-                selection = CurrentLayout.Contents.FindNext(selection, dlg.SearchText);
-                if (null != selection)
-                    CurrentLayout.Selection = selection;
-            }
-        }
-        #endregion
         #region Cmd: cmdChangeParagraphStyle
         private void cmdChangeParagraphStyle(ParagraphStyle newStyle)
         {
@@ -1280,32 +1262,77 @@ namespace OurWord
             OnEnterSection();
         }
         #endregion
+        #region cmd: cmdFindText(sText)
+        void cmdFindText(string sText)
+        {
+            var selection = CurrentLayout.Selection;
+            if (null == selection) 
+                return;
 
+            selection = CurrentLayout.Contents.FindNext(selection, sText);
+            if (null != selection)
+                CurrentLayout.Selection = selection;
+        }
+        #endregion
+        #region cmd: bool cmdGoToConcordanceItem(ConcordanceInfo)
+        bool cmdGoToConcordanceItem(ConcordanceInfo ci)
+        {
+            // Go to the correct book if we're not there already
+            if (ci.BookAbbrev != DB.TargetBook.BookAbbrev)
+                cmdGoToBook(ci.BookAbbrev);
 
-        // FILTERS need to rework --------------
+            // Go to the correct section if we're not there already
+            cmdGoToSection(DB.TargetBook.Sections[ci.SectionNo]);
 
-		// We make the dialog static, so that its settings persist throughout the OW
-		// session. (We don't want to save them beyond, thus we don't write them
-		// to the registry or anywhere.)
-		static DialogFilter m_dlgFilter = null;
+            // Determine the target paragraph
+            if (ci.ParagraphNo >= DB.TargetSection.Paragraphs.Count)
+                return false;
+            var paragraph = DB.TargetSection.Paragraphs[ci.ParagraphNo];
 
+            // Determine the target DText
+            if (ci.RunNo >= paragraph.Runs.Count)
+                return false;
+            var text = paragraph.Runs[ci.RunNo] as DText;
+            if (null == text)
+                return false;
+
+            // Select the desired text
+            var selection = CurrentLayout.Contents.MakeSelection(text, ci.IndexIntoParagraph, 
+                ci.SelectionLength);
+            if (null == selection)
+                return false;
+
+            // Check that the selection is what we expected
+            var sExpected = ci.Text.Substring(ci.IndexIntoText, ci.SelectionLength);
+            if (selection.SelectionString.CompareTo(sExpected) != 0)
+                return false;
+
+            // Make the selection
+            CurrentLayout.Selection = selection;
+            return true;
+        }
+        #endregion
+
+        // Filters
+        private DialogFilter m_dlgFilter;
 		#region Method: bool FilterTest(DSection section) - perform the test on a given section
 		public bool FilterTest(DialogFilter dlg, DSection section)
 		{
-			if (null == m_dlgFilter)
+            if (null == dlg)
 				return false;
+		    m_dlgFilter = dlg;
 
-			return section.FilterTest( 
-				m_dlgFilter.OneOnly, 
-				m_dlgFilter.Filter_VernacularText, m_dlgFilter.Filter_VernacularSearchString,
-				m_dlgFilter.Filter_FrontText,      m_dlgFilter.Filter_FrontSearchString,
-				m_dlgFilter.Filter_VernacularBT,   m_dlgFilter.Filter_VernacularBTSearchString,
-				m_dlgFilter.Filter_UntranslatedText,
-				m_dlgFilter.Filter_MismatchedQuotes,
-				m_dlgFilter.Filter_PictureWithCaption, 
-				m_dlgFilter.Filter_ParagraphHasQuote,
-				m_dlgFilter.Filter_PunctuationProblem,
-				m_dlgFilter.Filter_PictureCannotBeLocatedOnDisk);
+			return section.FilterTest(
+                dlg.OneOnly,
+                dlg.Filter_VernacularText, dlg.Filter_VernacularSearchString,
+                dlg.Filter_FrontText, dlg.Filter_FrontSearchString,
+                dlg.Filter_VernacularBT, dlg.Filter_VernacularBTSearchString,
+                dlg.Filter_UntranslatedText,
+                dlg.Filter_MismatchedQuotes,
+                dlg.Filter_PictureWithCaption,
+                dlg.Filter_ParagraphHasQuote,
+                dlg.Filter_PunctuationProblem,
+                dlg.Filter_PictureCannotBeLocatedOnDisk);
 		}
 		#endregion
 		#region Method: void UpdateFilterForCurrentSection()
@@ -1318,6 +1345,8 @@ namespace OurWord
 				return;
 			if (!DB.TargetSection.MatchesFilter)
 				return;
+            if (null == m_dlgFilter)
+                return;
 
 			// Run the test on the current section to update it.
 			DB.Project.STarget.MatchesFilter = FilterTest(m_dlgFilter, DB.Project.STarget);
@@ -1344,8 +1373,6 @@ namespace OurWord
             SetupMenusAndToolbarsVisibility();
 		}
 		#endregion
-
-
     }
 
 	#region CLASS G - Globals for convenient access

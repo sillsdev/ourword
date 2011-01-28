@@ -194,6 +194,9 @@
     <EmbeddedResource Include="Ctrls\Commands\CtrlCommands.resx">
       <DependentUpon>CtrlCommands.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Ctrls\Navigation\DlgConcordance.resx">
+      <DependentUpon>DlgConcordance.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirst.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirstFiltered.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoLast.ico" />
@@ -238,11 +241,8 @@
     <EmbeddedResource Include="Ctrls\Navigation\CtrlNavigation.resx">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\DlgFind.resx">
-      <DependentUpon>DlgFind.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Dialogs\Export\DlgExportProgress.resx">
-      <DependentUpon>DlgExportProgress.cs</DependentUpon>
+    <EmbeddedResource Include="Dialogs\DlgProgress.resx">
+      <DependentUpon>DlgProgress.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\DlgRawFileEdit.resx">
@@ -459,6 +459,7 @@
     <Compile Include="Ctrls\Commands\CtrlCommands.Designer.cs">
       <DependentUpon>CtrlCommands.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ctrls\Navigation\ConcordanceInfo.cs" />
     <Compile Include="Ctrls\Navigation\CtrlFindText.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -468,17 +469,17 @@
     <Compile Include="Ctrls\Navigation\CtrlNavigation.Designer.cs">
       <DependentUpon>CtrlNavigation.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\DlgFind.cs">
+    <Compile Include="Ctrls\Navigation\DlgConcordance.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\DlgFind.Designer.cs">
-      <DependentUpon>DlgFind.cs</DependentUpon>
+    <Compile Include="Ctrls\Navigation\DlgConcordance.Designer.cs">
+      <DependentUpon>DlgConcordance.cs</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\Export\DlgExportProgress.cs">
+    <Compile Include="Dialogs\DlgProgress.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Dialogs\Export\DlgExportProgress.Designer.cs">
-      <DependentUpon>DlgExportProgress.cs</DependentUpon>
+    <Compile Include="Dialogs\DlgProgress.Designer.cs">
+      <DependentUpon>DlgProgress.cs</DependentUpon>
     </Compile>
     <Compile Include="Dialogs\DlgRawFileEdit.cs">
       <SubType>Form</SubType>

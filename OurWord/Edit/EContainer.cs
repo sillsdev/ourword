@@ -16,6 +16,8 @@ using OurWord.Edit.Blocks;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Annotations;
+using OurWordData.DataModel.Runs;
+
 #endregion
 
 // TODO: Implement Left and Right Borders
@@ -1851,6 +1853,16 @@ namespace OurWord.Edit
                 return null;
 
             return FindNext(aiStack, current, sSearchFor);
+        }
+        #endregion
+        #region Sel MakeSelection(DText, iOffsetIntoParagraph, iLength)
+        public OWWindow.Sel MakeSelection(DText text, int iOffsetIntoParagraph, int iLength)
+        {
+            // Locate the containing OWPara
+            var owp = FindParagraph(text.Paragraph, OWPara.Flags.None);
+            return (null == owp) ? 
+                null :
+                owp.MakeSelection(iOffsetIntoParagraph, iLength);
         }
         #endregion
 

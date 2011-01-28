@@ -2526,4 +2526,31 @@ namespace OurWordData.DataModel
                     }
         }
     }
+
+
+    public class LoadedBook : IDisposable
+        // The Dispose method takes care of unloading the book if it were not
+        // already in memory; thus preventing Export from clogging up memory
+        // because of loading all books in a Bible.
+    {
+        private readonly bool m_bAlreadyLoaded;
+        private readonly DBook m_Book;
+        #region Constructor(DBook)
+        public LoadedBook(DBook book)
+        {
+            m_Book = book;
+            m_bAlreadyLoaded = book.Loaded;
+            book.LoadBook(new NullProgress());
+            Debug.Assert(book.Loaded);
+        }
+        #endregion
+        #region Method: void Dispose()
+        public void Dispose()
+        {
+            if (!m_bAlreadyLoaded)
+                m_Book.Unload(new NullProgress());
+        }
+        #endregion
+    }
+
 }

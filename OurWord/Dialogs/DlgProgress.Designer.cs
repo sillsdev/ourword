@@ -1,6 +1,6 @@
-﻿namespace OurWord.Dialogs.Export
+﻿namespace OurWord.Dialogs
 {
-    partial class DlgExportProgress
+    partial class DlgProgress
     {
         /// <summary>
         /// Required designer variable.
@@ -75,7 +75,7 @@
             this.m_ProgressBar.Step = 1;
             this.m_ProgressBar.TabIndex = 33;
             // 
-            // DlgExportProgress
+            // DlgProgress
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -89,7 +89,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "DlgExportProgress";
+            this.Name = "DlgProgress";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Export";

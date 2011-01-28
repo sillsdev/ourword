@@ -499,7 +499,6 @@ namespace OurWord.Ctrls.Commands
         public SimpleHandler OnCopy;
         public SimpleHandler OnPaste;
         public SimpleHandler OnItalic;
-        public SimpleHandler OnFind;
         public SimpleHandler OnInsertFootnote;
         public SimpleHandler OnDeleteFootnote;
         public SimpleHandler OnCopyBtFromFront;
@@ -639,13 +638,6 @@ namespace OurWord.Ctrls.Commands
         {
             if (null != OnCopyBtFromFront)
                 OnCopyBtFromFront();
-        }
-        #endregion
-        #region cmd: cmdFind
-        private void cmdFind(object sender, EventArgs e)
-        {
-            if (null != OnFind)
-                OnFind();
         }
         #endregion
 

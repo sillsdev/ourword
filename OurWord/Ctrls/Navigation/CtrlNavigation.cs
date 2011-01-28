@@ -10,12 +10,11 @@ using OurWordData.DataModel.Membership;
 
 namespace OurWord.Ctrls.Navigation
 {
-    // TODO: Turn off Filters on GoToBook / GoToChapter
-
     public delegate void GoToBookHandler(string sBookAbbrev);
     public delegate void GoToChapterHandler(int nChapterNumber);
     public delegate void GoToSectionHandler(DSection section);
-    public delegate void FindText(string sSearchText, bool bFindNext);
+    public delegate void FindText(string sSearchText);
+    public delegate bool GoToConcordanceItem(ConcordanceInfo info);
 
     public partial class CtrlNavigation : UserControl
     {
@@ -38,21 +37,16 @@ namespace OurWord.Ctrls.Navigation
             m_FindTextMenuItem.OnFindTextChanged += cmdFindTextChanged;
             m_Find.DropDownItems.Insert(0, m_FindTextMenuItem);
 
-            SetMenuEnabling(false);
-        }
-        #endregion
-        #region method: void SetMenuEnabling(bEnable)
-        void SetMenuEnabling(bool bEnable)
-        {
-            m_FindNext.Enabled = bEnable;
-            m_Filter.Enabled = bEnable;
+            m_FindNext.Enabled = false;
+
+            // TODO: Temporary: Disable stuff we haven't implemented yet
+            m_AdvancedFind.Available = false;            
         }
         #endregion
         #region cmd: cmdFindTextChanged(sNewText)
         void cmdFindTextChanged(string sNewText)
         {
-            var bEnableMenuItems = !string.IsNullOrEmpty(sNewText);
-            SetMenuEnabling(bEnableMenuItems);
+            m_FindNext.Enabled = false;
         }
         #endregion
 
@@ -67,10 +61,6 @@ namespace OurWord.Ctrls.Navigation
 
             m_CurrentSection = currentSection;
 
-            // Temporary: Disable the Find button until we implement it
-            m_Find.Available = false;
-            m_Separator.Available = false;
-
             // Localize prior to setting up the dropdowns
             Localize();
 
@@ -81,6 +71,7 @@ namespace OurWord.Ctrls.Navigation
             SetupEnabling();
             SetupIcons();
             SetupLocked();
+            SetupFeatureAvailability();
         }
         #endregion
 
@@ -181,7 +172,17 @@ namespace OurWord.Ctrls.Navigation
         #region cmd: cmdFindDropDownOpening
         private void cmdFindDropDownOpening(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(m_FindTextMenuItem.SearchText))
+                m_FindNext.Enabled = false;
+        }
+        #endregion
+        #region method: SetupFeatureAvailability
+        void SetupFeatureAvailability()
+        {
+            m_Filter.Available = Users.Current.CanFilter;
 
+            // TODO: Add Concordance (which requires a repositiory tag increment.
+            // Note that if Filters AND COncordance are turned off, menu separator must be off, too.
         }
         #endregion
 
@@ -440,7 +441,7 @@ namespace OurWord.Ctrls.Navigation
 
         //The dialog is a member variable so its settings persist throughout the OW session. 
         static DialogFilter m_dlgFilter;
-
+        #region Cmd: cmdFilter
         private void cmdFilter(object sender, EventArgs e)
         {
             // Get the user's pleasure
@@ -450,35 +451,46 @@ namespace OurWord.Ctrls.Navigation
 
             // If the user Canceled out, then we remove any existing filter
 			if (result == DialogResult.Cancel || m_dlgFilter.NothingIsChecked)
-			{
-			    m_bFilterIsActive = false;
-			}
-			else
-			{
-			    m_bFilterIsActive = true;
-			}
+                TurnOffFilter();
+            else
+			    TurnOnFilter();
+        }
+        #endregion
+        #region method: void TurnOffFilter()
+        void TurnOffFilter()
+        {
+            if (!m_bFilterIsActive)
+                return;
 
-            // Calc Filtered Sections
+            m_bFilterIsActive = false;
             SetupSections();
             SetupIcons();
-
-
-
-            // OnGoToSection if current doesn't match the filter
-
-
         }
-
+        #endregion
+        #region method: void TurnOnFilter()
+        void TurnOnFilter()
+        {
+            m_bFilterIsActive = true;
+            SetupSections();
+            SetupIcons();
+           
+            // Position at the first matching section
+            cmdGoToFirstSection(null,null);
+        }
+        #endregion
 
         // Handlers --------------------------------------------------------------------------
         public GoToBookHandler OnGoToBook;
         public GoToChapterHandler OnGoToChapter;
         public GoToSectionHandler OnGoToSection;
         public FindText OnFindText;
+        public GoToConcordanceItem OnGoToConcordanceItem;
 
         #region Cmd: cmdGoToBook
         private void cmdGoToBook(object sender, EventArgs e)
         {
+            TurnOffFilter();
+
             // Retrieve the target book from the menu item's text
             var item = (sender as ToolStripMenuItem);
             if (null == item)
@@ -495,6 +507,8 @@ namespace OurWord.Ctrls.Navigation
         #region Cmd: cmdGoToChapter
         private void cmdGoToChapter(object sender, EventArgs e)
         {
+            TurnOffFilter();
+
             // Retrieve the Chapter button
             var btn = sender as ToolStripDropDownButton;
             if (null == btn)
@@ -600,7 +614,12 @@ namespace OurWord.Ctrls.Navigation
                 return;
 
             var sSearchText = m_FindTextMenuItem.SearchText;
-            OnFindText(sSearchText, false);
+            if (string.IsNullOrEmpty(sSearchText))
+                return;
+
+            OnFindText(sSearchText);
+
+            m_FindNext.Enabled = true;
         }
         #endregion
         #region cmd: cmdFindNext
@@ -610,10 +629,19 @@ namespace OurWord.Ctrls.Navigation
                 return;
 
             var sSearchText = m_FindTextMenuItem.SearchText;
-            OnFindText(sSearchText, true);
-       
+            if (string.IsNullOrEmpty(sSearchText))
+                return;
+
+            OnFindText(sSearchText);
         }
         #endregion
-
+        #region cmd: cmdConcordance
+        readonly DlgConcordance m_DlgConcordance = new DlgConcordance();
+        private void cmdConcordance(object sender, EventArgs e)
+        {
+            m_DlgConcordance.OnGoToConcordanceItem = OnGoToConcordanceItem;
+            m_DlgConcordance.Show();
+        }
+        #endregion
     }
 }

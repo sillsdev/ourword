@@ -1,29 +1,29 @@
-﻿#region ***** DlgExportProgress.cs *****
+﻿#region ***** DlgProgress.cs *****
 /**********************************************************************************************
  * Project: Our Word!
- * File:    DlgExportProgress.cs
+ * File:    DlgProgress.cs
  * Author:  John Wimbish
  * Created: 26 July 2007
  * Purpose: Progress dialog, allowing cancelation, for the Export process
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-11, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 using System;
 using System.Windows.Forms;
 using System.Threading;
 #endregion
 
-namespace OurWord.Dialogs.Export
+namespace OurWord.Dialogs
 {
-    public partial class DlgExportProgress : Form
+    public partial class DlgProgress : Form
     {
         // Scaffolding -----------------------------------------------------------------------
         #region constructor()
-        private DlgExportProgress()
+        private DlgProgress()
         {
             InitializeComponent();
         }
         #endregion
-        static DlgExportProgress s_Dlg;
+        static DlgProgress s_Dlg;
 
         // Attrs -----------------------------------------------------------------------------
         #region Attr{g}: bool UserSaysCancel
@@ -35,6 +35,44 @@ namespace OurWord.Dialogs.Export
             }
         }
         static bool m_bUserSaysCancel;
+        #endregion
+
+        // Dialog Attrs / Text ---------------------------------------------------------------
+        #region smethod: void SetTitle(sTitle)
+        delegate void cbSetTitle(string sTitle);
+        static public void SetTitle(string sTitle)
+        {
+            if (null == s_Dlg)
+                return;
+
+            if (s_Dlg.InvokeRequired)
+            {
+                var d = new cbSetTitle(SetTitle);
+                s_Dlg.Invoke(d, new object[] { sTitle });
+            }
+            else
+            {
+                s_Dlg.Text = sTitle;
+            }
+        }
+        #endregion
+        #region smethod: void SetExplanation(sExplanation)
+        delegate void cbSetExplanation(string sExplanation);
+        static public void SetExplanation(string sExplanation)
+        {
+            if (null == s_Dlg)
+                return;
+
+            if (s_Dlg.InvokeRequired)
+            {
+                var d = new cbSetExplanation(SetExplanation);
+                s_Dlg.Invoke(d, new object[] { sExplanation });
+            }
+            else
+            {
+                s_Dlg.m_labelHeader.Text = sExplanation;
+            }
+        }
         #endregion
 
         // Current Activity ------------------------------------------------------------------
@@ -102,17 +140,20 @@ namespace OurWord.Dialogs.Export
         static public void Start()
         {
             m_bUserSaysCancel = false;
-            var t = new Thread(new ThreadStart(DlgExportProgress.StartDialog))
+            var t = new Thread(new ThreadStart(DlgProgress.StartDialog))
                 {
                     IsBackground = true,
-                    Name = "Export Progress"
+                    Name = "Progress"
                 };
-            //t.SetApartmentState(ApartmentState.STA);
             t.Start();
+
+            // Give the Starter thread time to get this dialog lauched
+            while (null == s_Dlg)
+                Thread.Sleep(100);
         }
         static private void StartDialog()
         {
-            s_Dlg = new DlgExportProgress();
+            s_Dlg = new DlgProgress();
             Application.Run(s_Dlg);
         }
         #endregion

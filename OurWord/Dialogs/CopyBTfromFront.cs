@@ -440,14 +440,14 @@ namespace OurWord
 
             // Check for identical section structures
             Debug.Assert(SFront.SectionStructure == STarget.SectionStructure);
-            int cSectionStructureParts = STarget.SectionStructure.Length;
+            var cSectionStructureParts = STarget.SectionStructure.Length;
 
-            // This will become false if we encoutner any problems, in which case
+            // This will become false if we encounter any problems, in which case
             // we'll inform the user
-            bool bSuccess = true;
+            var bSuccess = true;
 
             // Go through the major parts, dividing into chunks
-            for (int n = 0; n < cSectionStructureParts; n++)
+            for (var n = 0; n < cSectionStructureParts; n++)
             {
                 var vFrontParas = GetParagraphsFromPart(SFront, n);
                 var vTargetParas = GetParagraphsFromPart(STarget, n);
@@ -459,7 +459,7 @@ namespace OurWord
                     continue;
                 }
 
-                for (int i = 0; i < vFrontParas.Count; i++)
+                for (var i = 0; i < vFrontParas.Count; i++)
                 {
                     if (!CopyBT(vFrontParas[i], vTargetParas[i]))
                         bSuccess = false;
@@ -474,7 +474,7 @@ namespace OurWord
             if (!bSuccess)
             {
                 // If we're not in Consultant Preparation window, we'll want to switch to it
-                bool bMustSwitch = !WLayout.CurrentLayoutIs(WndConsultantPreparation.c_sName);
+                var bMustSwitch = !WLayout.CurrentLayoutIs(WndConsultantPreparation.c_sName);
 
                 if (bMustSwitch)
                 {
