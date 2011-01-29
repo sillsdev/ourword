@@ -459,6 +459,7 @@
     <Compile Include="Ctrls\Commands\CtrlCommands.Designer.cs">
       <DependentUpon>CtrlCommands.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ctrls\Navigation\Bookmark.cs" />
     <Compile Include="Ctrls\Navigation\ConcordanceInfo.cs" />
     <Compile Include="Ctrls\Navigation\CtrlFindText.cs">
       <SubType>Component</SubType>

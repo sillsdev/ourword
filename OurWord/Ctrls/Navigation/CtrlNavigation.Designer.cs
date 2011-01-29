@@ -49,6 +49,9 @@
             this.createConcordanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.FilteredNavigation = new System.Windows.Forms.ImageList(this.components);
             this.UnfilteredNavigation = new System.Windows.Forms.ImageList(this.components);
+            this.m_separatorBookmarks = new System.Windows.Forms.ToolStripSeparator();
+            this.m_SetBookmark = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_GoToBookmark = new System.Windows.Forms.ToolStripMenuItem();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -185,7 +188,10 @@
             this.m_AdvancedFind,
             this.toolStripSeparator1,
             this.m_Filter,
-            this.createConcordanceToolStripMenuItem});
+            this.createConcordanceToolStripMenuItem,
+            this.m_separatorBookmarks,
+            this.m_SetBookmark,
+            this.m_GoToBookmark});
             this.m_Find.Image = ((System.Drawing.Image)(resources.GetObject("m_Find.Image")));
             this.m_Find.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.m_Find.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -200,14 +206,14 @@
             this.m_FindNext.Name = "m_FindNext";
             this.m_FindNext.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
             this.m_FindNext.Size = new System.Drawing.Size(191, 22);
-            this.m_FindNext.Text = "Find Next";
+            this.m_FindNext.Text = "Find &Next";
             this.m_FindNext.Click += new System.EventHandler(this.cmdFindNext);
             // 
             // m_AdvancedFind
             // 
             this.m_AdvancedFind.Name = "m_AdvancedFind";
             this.m_AdvancedFind.Size = new System.Drawing.Size(191, 22);
-            this.m_AdvancedFind.Text = "Advanced Find...";
+            this.m_AdvancedFind.Text = "&Advanced Find...";
             // 
             // toolStripSeparator1
             // 
@@ -219,7 +225,7 @@
             this.m_Filter.Image = ((System.Drawing.Image)(resources.GetObject("m_Filter.Image")));
             this.m_Filter.Name = "m_Filter";
             this.m_Filter.Size = new System.Drawing.Size(191, 22);
-            this.m_Filter.Text = "Set Filter...";
+            this.m_Filter.Text = "Set Fi&lter...";
             this.m_Filter.ToolTipText = "Filter out the sections which do not conform to a criteria.";
             this.m_Filter.Click += new System.EventHandler(this.cmdFilter);
             // 
@@ -227,7 +233,7 @@
             // 
             this.createConcordanceToolStripMenuItem.Name = "createConcordanceToolStripMenuItem";
             this.createConcordanceToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.createConcordanceToolStripMenuItem.Text = "Create Concordance...";
+            this.createConcordanceToolStripMenuItem.Text = "Create &Concordance...";
             this.createConcordanceToolStripMenuItem.Click += new System.EventHandler(this.cmdConcordance);
             // 
             // FilteredNavigation
@@ -247,6 +253,24 @@
             this.UnfilteredNavigation.Images.SetKeyName(1, "GoPrevious.ico");
             this.UnfilteredNavigation.Images.SetKeyName(2, "GoNext.ico");
             this.UnfilteredNavigation.Images.SetKeyName(3, "GoLast.ico");
+            // 
+            // m_separatorBookmarks
+            // 
+            this.m_separatorBookmarks.Name = "m_separatorBookmarks";
+            this.m_separatorBookmarks.Size = new System.Drawing.Size(188, 6);
+            // 
+            // m_SetBookmark
+            // 
+            this.m_SetBookmark.Name = "m_SetBookmark";
+            this.m_SetBookmark.Size = new System.Drawing.Size(191, 22);
+            this.m_SetBookmark.Text = "Set &Bookmark here";
+            this.m_SetBookmark.Click += new System.EventHandler(this.cmdSetBookmark);
+            // 
+            // m_GoToBookmark
+            // 
+            this.m_GoToBookmark.Name = "m_GoToBookmark";
+            this.m_GoToBookmark.Size = new System.Drawing.Size(191, 22);
+            this.m_GoToBookmark.Text = "Go To Boo&kmark";
             // 
             // CtrlNavigation
             // 
@@ -289,5 +313,8 @@
         private System.Windows.Forms.ToolStripSplitButton m_Next;
         private System.Windows.Forms.ToolStripButton m_Locked;
         public System.Windows.Forms.ToolStripDropDownButton m_Book;
+        private System.Windows.Forms.ToolStripSeparator m_separatorBookmarks;
+        private System.Windows.Forms.ToolStripMenuItem m_SetBookmark;
+        private System.Windows.Forms.ToolStripMenuItem m_GoToBookmark;
     }
 }

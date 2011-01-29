@@ -34,6 +34,7 @@ namespace OurWord.Dialogs
             this.m_radioParatext = new System.Windows.Forms.RadioButton();
             this.m_labelParatextInfo = new System.Windows.Forms.Label();
             this.m_groupExportTo = new System.Windows.Forms.GroupBox();
+            this.m_checkExportPictures = new System.Windows.Forms.CheckBox();
             this.m_comboWhatToExport = new System.Windows.Forms.ComboBox();
             this.m_labelWord = new System.Windows.Forms.Label();
             this.m_radioWord = new System.Windows.Forms.RadioButton();
@@ -46,7 +47,6 @@ namespace OurWord.Dialogs
             this.m_labelCaution = new System.Windows.Forms.Label();
             this.m_lWhat = new System.Windows.Forms.Label();
             this.m_comboScope = new System.Windows.Forms.ComboBox();
-            this.m_checkExportPictures = new System.Windows.Forms.CheckBox();
             this.m_groupExportTo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -54,7 +54,7 @@ namespace OurWord.Dialogs
             // 
             this.m_btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnCancel.Location = new System.Drawing.Point(251, 468);
+            this.m_btnCancel.Location = new System.Drawing.Point(251, 424);
             this.m_btnCancel.Name = "m_btnCancel";
             this.m_btnCancel.Size = new System.Drawing.Size(75, 23);
             this.m_btnCancel.TabIndex = 17;
@@ -64,7 +64,7 @@ namespace OurWord.Dialogs
             // 
             this.m_btnOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.m_btnOK.Location = new System.Drawing.Point(163, 468);
+            this.m_btnOK.Location = new System.Drawing.Point(163, 424);
             this.m_btnOK.Name = "m_btnOK";
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 16;
@@ -104,12 +104,23 @@ namespace OurWord.Dialogs
             this.m_groupExportTo.Controls.Add(this.m_radioGoBible);
             this.m_groupExportTo.Controls.Add(this.m_radioParatext);
             this.m_groupExportTo.Controls.Add(this.m_labelParatextInfo);
-            this.m_groupExportTo.Location = new System.Drawing.Point(15, 48);
+            this.m_groupExportTo.Location = new System.Drawing.Point(15, 45);
             this.m_groupExportTo.Name = "m_groupExportTo";
-            this.m_groupExportTo.Size = new System.Drawing.Size(466, 258);
+            this.m_groupExportTo.Size = new System.Drawing.Size(466, 245);
             this.m_groupExportTo.TabIndex = 30;
             this.m_groupExportTo.TabStop = false;
             this.m_groupExportTo.Text = "Export all of your project\'s books to:";
+            // 
+            // m_checkExportPictures
+            // 
+            this.m_checkExportPictures.AutoSize = true;
+            this.m_checkExportPictures.Location = new System.Drawing.Point(347, 200);
+            this.m_checkExportPictures.Name = "m_checkExportPictures";
+            this.m_checkExportPictures.Size = new System.Drawing.Size(102, 17);
+            this.m_checkExportPictures.TabIndex = 38;
+            this.m_checkExportPictures.Text = "Export pictures?";
+            this.m_checkExportPictures.UseVisualStyleBackColor = true;
+            this.m_checkExportPictures.CheckedChanged += new System.EventHandler(this.cmdExportPicturesChanged);
             // 
             // m_comboWhatToExport
             // 
@@ -117,7 +128,7 @@ namespace OurWord.Dialogs
             this.m_comboWhatToExport.Items.AddRange(new object[] {
             "Vernacular",
             "Back Translation"});
-            this.m_comboWhatToExport.Location = new System.Drawing.Point(213, 202);
+            this.m_comboWhatToExport.Location = new System.Drawing.Point(213, 198);
             this.m_comboWhatToExport.Name = "m_comboWhatToExport";
             this.m_comboWhatToExport.Size = new System.Drawing.Size(121, 21);
             this.m_comboWhatToExport.TabIndex = 33;
@@ -126,7 +137,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelWord
             // 
-            this.m_labelWord.Location = new System.Drawing.Point(47, 222);
+            this.m_labelWord.Location = new System.Drawing.Point(47, 218);
             this.m_labelWord.Name = "m_labelWord";
             this.m_labelWord.Size = new System.Drawing.Size(413, 21);
             this.m_labelWord.TabIndex = 37;
@@ -136,7 +147,7 @@ namespace OurWord.Dialogs
             // 
             this.m_radioWord.AutoSize = true;
             this.m_radioWord.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.m_radioWord.Location = new System.Drawing.Point(21, 202);
+            this.m_radioWord.Location = new System.Drawing.Point(21, 198);
             this.m_radioWord.Name = "m_radioWord";
             this.m_radioWord.Size = new System.Drawing.Size(186, 17);
             this.m_radioWord.TabIndex = 36;
@@ -171,7 +182,7 @@ namespace OurWord.Dialogs
             // 
             this.m_labelGoBibleCreatorInfo.Location = new System.Drawing.Point(44, 89);
             this.m_labelGoBibleCreatorInfo.Name = "m_labelGoBibleCreatorInfo";
-            this.m_labelGoBibleCreatorInfo.Size = new System.Drawing.Size(416, 39);
+            this.m_labelGoBibleCreatorInfo.Size = new System.Drawing.Size(416, 41);
             this.m_labelGoBibleCreatorInfo.TabIndex = 34;
             this.m_labelGoBibleCreatorInfo.Text = "Go Bible is a viewer for Java mobile phones. GoBibleCreator\'s SFM files are a sub" +
                 "set of USFM.";
@@ -192,7 +203,7 @@ namespace OurWord.Dialogs
             // m_labelFolder
             // 
             this.m_labelFolder.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.m_labelFolder.Location = new System.Drawing.Point(15, 346);
+            this.m_labelFolder.Location = new System.Drawing.Point(15, 323);
             this.m_labelFolder.Name = "m_labelFolder";
             this.m_labelFolder.Size = new System.Drawing.Size(466, 23);
             this.m_labelFolder.TabIndex = 31;
@@ -201,7 +212,7 @@ namespace OurWord.Dialogs
             // 
             // m_labelLocation
             // 
-            this.m_labelLocation.Location = new System.Drawing.Point(12, 323);
+            this.m_labelLocation.Location = new System.Drawing.Point(12, 300);
             this.m_labelLocation.Name = "m_labelLocation";
             this.m_labelLocation.Size = new System.Drawing.Size(469, 23);
             this.m_labelLocation.TabIndex = 32;
@@ -211,9 +222,9 @@ namespace OurWord.Dialogs
             // m_labelCaution
             // 
             this.m_labelCaution.ForeColor = System.Drawing.Color.Red;
-            this.m_labelCaution.Location = new System.Drawing.Point(12, 391);
+            this.m_labelCaution.Location = new System.Drawing.Point(12, 355);
             this.m_labelCaution.Name = "m_labelCaution";
-            this.m_labelCaution.Size = new System.Drawing.Size(469, 74);
+            this.m_labelCaution.Size = new System.Drawing.Size(469, 67);
             this.m_labelCaution.TabIndex = 33;
             this.m_labelCaution.Text = resources.GetString("m_labelCaution.Text");
             // 
@@ -236,24 +247,13 @@ namespace OurWord.Dialogs
             this.m_comboScope.Size = new System.Drawing.Size(374, 21);
             this.m_comboScope.TabIndex = 35;
             // 
-            // m_checkExportPictures
-            // 
-            this.m_checkExportPictures.AutoSize = true;
-            this.m_checkExportPictures.Location = new System.Drawing.Point(347, 204);
-            this.m_checkExportPictures.Name = "m_checkExportPictures";
-            this.m_checkExportPictures.Size = new System.Drawing.Size(102, 17);
-            this.m_checkExportPictures.TabIndex = 38;
-            this.m_checkExportPictures.Text = "Export pictures?";
-            this.m_checkExportPictures.UseVisualStyleBackColor = true;
-            this.m_checkExportPictures.CheckedChanged += new System.EventHandler(this.cmdExportPicturesChanged);
-            // 
             // DialogExport
             // 
             this.AcceptButton = this.m_btnOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
             this.CancelButton = this.m_btnCancel;
-            this.ClientSize = new System.Drawing.Size(493, 503);
+            this.ClientSize = new System.Drawing.Size(493, 456);
             this.ControlBox = false;
             this.Controls.Add(this.m_comboScope);
             this.Controls.Add(this.m_lWhat);

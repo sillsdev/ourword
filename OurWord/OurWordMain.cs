@@ -285,8 +285,9 @@ namespace OurWord
             m_Navigation.OnGoToBook += cmdGoToBook;
 		    m_Navigation.OnGoToSection += cmdGoToSection;
 		    m_Navigation.OnFindText += cmdFindText;
-		    m_Navigation.OnGoToConcordanceItem += cmdGoToConcordanceItem;  
-
+		    m_Navigation.OnGoToConcordanceItem += cmdGoToConcordanceItem;
+		    m_Navigation.OnCreateBookmark += CreateBookmark;
+		    m_Navigation.OnGoToBookmark += cmdGoToBookmark;
 
             // Suspend the layout while we create the windows. We create them here in order
             // to get the propert z-order
@@ -1277,6 +1278,13 @@ namespace OurWord
         #region cmd: bool cmdGoToConcordanceItem(ConcordanceInfo)
         bool cmdGoToConcordanceItem(ConcordanceInfo ci)
         {
+            // Must be in a layout that shows the vernacular
+            if (WLayout.CurrentLayoutIs(WndBackTranslation.c_sName))
+            {
+                cmdSwitchLayout(WndDrafting.c_sName);
+                m_Commands.SetLayout(WndDrafting.c_sName);
+            }
+
             // Go to the correct book if we're not there already
             if (ci.BookAbbrev != DB.TargetBook.BookAbbrev)
                 cmdGoToBook(ci.BookAbbrev);
@@ -1312,6 +1320,44 @@ namespace OurWord
             return true;
         }
         #endregion
+
+        // Bookmarks
+        Bookmark CreateBookmark()
+        {
+            return new Bookmark(DB.Project.DisplayName,
+                DB.Project.StoragePath, 
+                CurrentLayout.Name,
+                DB.TargetBook.BookAbbrev, 
+                DB.TargetBook.Sections.FindObj(DB.TargetSection),
+                DB.TargetSection.ReferenceSpan.Start.FullName);
+        }
+        void cmdGoToBookmark(Bookmark bookmark)
+        {
+            // Go to the requested project
+            if (bookmark.ProjectPath != DB.Project.StoragePath)
+                cmdOpenProject(bookmark.ProjectPath);
+            if (bookmark.ProjectPath != DB.Project.StoragePath)
+                throw new Exception("Unable to go to the bookmarked project");
+
+            // Go to the requested book
+            if (bookmark.BookAbbrev != DB.TargetBook.BookAbbrev)
+                cmdGoToBook(bookmark.BookAbbrev);
+            if (bookmark.BookAbbrev != DB.TargetBook.BookAbbrev)
+                throw new Exception("Unable to go to the bookmarked book");
+
+            // Go to the requested section
+            if (bookmark.SectionNo >= DB.TargetBook.Sections.Count)
+                throw new Exception("Unable to go to the bookmarked section");
+            var section = DB.TargetBook.Sections[bookmark.SectionNo] as DSection;
+            cmdGoToSection(section);
+
+            // Go to the requested layout
+            if (CurrentLayout.Name != bookmark.LayoutName)
+            {
+                cmdSwitchLayout(bookmark.LayoutName);
+                m_Commands.SetLayout(bookmark.LayoutName);
+            }
+        }
 
         // Filters
         private DialogFilter m_dlgFilter;

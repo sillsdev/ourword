@@ -15,6 +15,8 @@ namespace OurWord.Ctrls.Navigation
     public delegate void GoToSectionHandler(DSection section);
     public delegate void FindText(string sSearchText);
     public delegate bool GoToConcordanceItem(ConcordanceInfo info);
+    public delegate Bookmark CreateBookmarkHandler();
+    public delegate void GoToBookmarkHandler(Bookmark bookmark);
 
     public partial class CtrlNavigation : UserControl
     {
@@ -174,6 +176,8 @@ namespace OurWord.Ctrls.Navigation
         {
             if (string.IsNullOrEmpty(m_FindTextMenuItem.SearchText))
                 m_FindNext.Enabled = false;
+
+            SetupBookmarksMenu();
         }
         #endregion
         #region method: SetupFeatureAvailability
@@ -479,12 +483,92 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
 
+        // Bookmarks -------------------------------------------------------------------------
+        private readonly Bookmarks m_Bookmarks = new Bookmarks();
+        private const int MaxBookmarks = 12;
+        #region method:  void SetupBookmarksMenu()
+        private void SetupBookmarksMenu()
+        {
+            // First time through, make sure we've read them in
+            if (m_Bookmarks.Count == 0)
+                m_Bookmarks.Read();
+
+            // Enable the menu item based on whether or not there are any bookmarks
+            m_GoToBookmark.Enabled = (m_Bookmarks.Count > 0);
+
+            // Build the cascading menu
+            m_GoToBookmark.DropDownItems.Clear();
+            var i = 1;
+            foreach(var bookmark in m_Bookmarks)
+            {
+                var item = new ToolStripMenuItem(bookmark.MenuText, null,
+                    cmdGoToBookmark, "Bookmark" + i++) 
+                    {
+                        Tag = bookmark
+                    };
+                m_GoToBookmark.DropDownItems.Add(item);
+            }
+        }
+        #endregion
+        #region Cmd: cmdSetBookmark
+        private void cmdSetBookmark(object sender, EventArgs e)
+        {
+            if (null == OnCreateBookmark) 
+                return;
+            var bookmark = OnCreateBookmark();
+
+            m_Bookmarks.Insert(0, bookmark);
+
+            if (m_Bookmarks.Count > MaxBookmarks)
+                m_Bookmarks.RemoveAt(m_Bookmarks.Count - 1);
+
+            m_Bookmarks.Save();
+        }
+        #endregion
+        #region cmd: cmdGoToBookmark
+        private void cmdGoToBookmark(object sender, EventArgs e)
+        {
+            var menuitem = (sender as ToolStripMenuItem);
+            if (null == menuitem)
+                return;
+
+            var bookmark = menuitem.Tag as Bookmark;
+            if (null == bookmark)
+                return;
+
+            if (null != OnGoToBookmark)
+            {
+                try
+                {
+                    OnGoToBookmark(bookmark);
+                }
+                catch (Exception)
+                {
+                    LocDB.Message("kUnableToGoToBookmark", 
+                        "OurWord was unable to go to the bookmark. The project may have moved\n" +
+                        "or been removed; or the book may have been removed or restructured.", 
+                        null, LocDB.MessageTypes.Warning);
+                    m_Bookmarks.Remove(bookmark);
+                    m_Bookmarks.Save();
+                    return;
+                }
+            }
+
+            // Move this bookmark to the top of the list
+            m_Bookmarks.Remove(bookmark);
+            m_Bookmarks.Insert(0, bookmark);
+            m_Bookmarks.Save();
+        }
+        #endregion
+
         // Handlers --------------------------------------------------------------------------
         public GoToBookHandler OnGoToBook;
         public GoToChapterHandler OnGoToChapter;
         public GoToSectionHandler OnGoToSection;
         public FindText OnFindText;
         public GoToConcordanceItem OnGoToConcordanceItem;
+        public CreateBookmarkHandler OnCreateBookmark;
+        public GoToBookmarkHandler OnGoToBookmark;
 
         #region Cmd: cmdGoToBook
         private void cmdGoToBook(object sender, EventArgs e)
@@ -643,5 +727,6 @@ namespace OurWord.Ctrls.Navigation
             m_DlgConcordance.Show();
         }
         #endregion
+
     }
 }
