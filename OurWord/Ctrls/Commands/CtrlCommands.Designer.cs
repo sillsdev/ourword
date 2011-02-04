@@ -82,6 +82,7 @@
             this.m_separatorHelp = new System.Windows.Forms.ToolStripSeparator();
             this.helpTopicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutOurWordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tSCQuarterlyReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -500,6 +501,7 @@
             this.m_separatorTools,
             this.m_menuIncrementBookStatus,
             this.m_menuRestoreFromBackup,
+            this.tSCQuarterlyReportToolStripMenuItem,
             this.m_menuLocalizerTool,
             this.m_separatorHelp,
             this.helpTopicsToolStripMenuItem,
@@ -594,6 +596,13 @@
             this.aboutOurWordToolStripMenuItem.Text = "About OurWord...";
             this.aboutOurWordToolStripMenuItem.Click += new System.EventHandler(this.cmdAbout);
             // 
+            // tSCQuarterlyReportToolStripMenuItem
+            // 
+            this.tSCQuarterlyReportToolStripMenuItem.Name = "tSCQuarterlyReportToolStripMenuItem";
+            this.tSCQuarterlyReportToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.tSCQuarterlyReportToolStripMenuItem.Text = "TSC Quarterly Report...";
+            this.tSCQuarterlyReportToolStripMenuItem.Click += new System.EventHandler(this.cmdTscQuarterlyReport);
+            // 
             // CtrlCommands
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -669,5 +678,6 @@
         private System.Windows.Forms.ToolStripSeparator m_separatorHelp;
         private System.Windows.Forms.ToolStripMenuItem helpTopicsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutOurWordToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem tSCQuarterlyReportToolStripMenuItem;
     }
 }

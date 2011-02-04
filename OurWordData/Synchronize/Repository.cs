@@ -526,7 +526,7 @@ namespace OurWordData.Synchronize
                 // Extensions need to specified as all lower case, no matter how they 
                 // are stored.
             {
-                ".otrans", ".owp", ".owt", ".oxes", ".stylesheet", ".user",
+                ".otrans", ".owp", ".owt", ".oxes", ".stylesheet", ".user", ".tsc",
                 ".tif", ".pcx", ".jpg", ".png", ".gif"
             };
 
@@ -626,7 +626,8 @@ namespace OurWordData.Synchronize
         // 5 - TeamSettings.CheckForUpdates option
         // 6 - GlobalEditability in users, HypehBreakChars in WritingSystem  
         // 7 - User.UserType enumeration
-        public const int c_nCurrentVersionNo = 7;
+        // 8 - (1.8k) TscReport.tsc
+        public const int c_nCurrentVersionNo = 8;
         #region SAttr{g}: string TagContents
         public static string TagContents
         {

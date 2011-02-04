@@ -19,6 +19,7 @@ using JWTools;
 using OurWord.Ctrls.Navigation;
 using OurWord.Dialogs.Export;
 using OurWord.Dialogs.Membership;
+using OurWord.Dialogs.TscReport;
 using OurWord.Edit.Blocks;
 using OurWord.Printing;
 using OurWordData;
@@ -274,6 +275,7 @@ namespace OurWord
 		    m_Commands.OnConfigure += cmdConfigure;
 		    m_Commands.OnIncrementBookStatus += cmdIncrementBookStatus;
 		    m_Commands.OnRestoreFromBackup += cmdRestoreBackup;
+		    m_Commands.OnTscQuarterlyReport += cmdTscQuarterlyReport;
 		    m_Commands.OnLocalizerTool += cmdLocalizer;
 		    m_Commands.OnHelpTopics += cmdHelpTopics;
 		    m_Commands.OnAbout += cmdAbout;
@@ -1132,6 +1134,13 @@ namespace OurWord
             UnDim();
 		}
 		#endregion
+        #region Cmd: cmdTscQuarterlyReport
+        void cmdTscQuarterlyReport()
+        {
+            var dlg = new DlgTscReport();
+            dlg.ShowDialog(this);
+        }
+        #endregion
         #region Cmd: cmdLocalizer
         private void cmdLocalizer()
         {
@@ -1322,6 +1331,7 @@ namespace OurWord
         #endregion
 
         // Bookmarks
+        #region method: Bookmark CreateBookmark()
         Bookmark CreateBookmark()
         {
             return new Bookmark(DB.Project.DisplayName,
@@ -1331,6 +1341,8 @@ namespace OurWord
                 DB.TargetBook.Sections.FindObj(DB.TargetSection),
                 DB.TargetSection.ReferenceSpan.Start.FullName);
         }
+        #endregion
+        #region cmd: cmdGoToBookmark
         void cmdGoToBookmark(Bookmark bookmark)
         {
             // Go to the requested project
@@ -1358,6 +1370,7 @@ namespace OurWord
                 m_Commands.SetLayout(bookmark.LayoutName);
             }
         }
+        #endregion
 
         // Filters
         private DialogFilter m_dlgFilter;

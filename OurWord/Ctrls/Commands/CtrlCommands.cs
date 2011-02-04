@@ -509,6 +509,7 @@ namespace OurWord.Ctrls.Commands
         public SimpleHandler OnIncrementBookStatus;
         public SimpleHandler OnRestoreFromBackup;
         public SimpleHandler OnLocalizerTool;
+        public SimpleHandler OnTscQuarterlyReport;
         public SimpleHandler OnHelpTopics;
         public SimpleHandler OnAbout;
 
@@ -677,6 +678,13 @@ namespace OurWord.Ctrls.Commands
                 OnRestoreFromBackup();
         }
         #endregion
+        #region cmd: cmdTscQuarterlyReport
+        private void cmdTscQuarterlyReport(object sender, EventArgs e)
+        {
+            if (null != OnTscQuarterlyReport)
+                OnTscQuarterlyReport();
+        }
+        #endregion
         #region cmd: cmdLocalizerTool
         private void cmdLocalizerTool(object sender, EventArgs e)
         {
@@ -825,5 +833,6 @@ namespace OurWord.Ctrls.Commands
             Users.Delete(user);
         }
         #endregion
+
     }
 }

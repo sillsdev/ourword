@@ -27,6 +27,7 @@ namespace OurWordData.Synchronize
         private const string OurWordSettingsFileExtension = ".owt";
         private const string OurWordUsers = ".user";
         private const string OurWordStyleSheet = ".StyleSheet";
+        private const string OurWordTscReport = ".tsc";
 
         private static readonly List<string> s_OurWordFileExtensions = new List<string>
         {
@@ -35,7 +36,8 @@ namespace OurWordData.Synchronize
             OurWordProjectFileExtension,
             OurWordSettingsFileExtension,
             OurWordUsers,
-            OurWordStyleSheet
+            OurWordStyleSheet,
+            OurWordTscReport
         };
 
         #region static IEnumerable<string> GetExtensionsOfKnownTextFileTypes()
@@ -96,6 +98,9 @@ namespace OurWordData.Synchronize
                         // TODO
                         break;
 
+                    case OurWordTscReport:
+                        // TODO
+                        break;
                 }
 
             }

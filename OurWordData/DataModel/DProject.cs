@@ -7,6 +7,7 @@
  * Purpose: The entire group of translations currently being viewed / edited.
  * Legal:   Copyright (c) 2005-10, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
+using System;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
@@ -63,7 +64,6 @@ namespace OurWordData.DataModel
         }
         string m_sPlannedBooks = "";
         #endregion
-
         #region BAttr{g}:   BStringArray People
         public BStringArray People
         {
@@ -89,7 +89,6 @@ namespace OurWordData.DataModel
 		}
 		int m_nVersion = 0;
 		#endregion
-
 		#region Method void DeclareAttrs()
 		protected override void DeclareAttrs()
 		{
@@ -97,7 +96,6 @@ namespace OurWordData.DataModel
 
 			DefineAttr("Comment", ref m_sComment);
             DefineAttr("Planned", ref m_sPlannedBooks);
-
             DefineAttr("Persons", ref m_bsaPeople);
 			DefineAttr("Version", ref m_nVersion);
         }
