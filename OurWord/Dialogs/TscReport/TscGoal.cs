@@ -189,6 +189,27 @@ namespace OurWord.Dialogs.TscReport
         }
         #endregion
 
+        // Generator helper methods ----------------------------------------------------------
+        #region Method: string CreateStatusText(sThisQuarterDateString)
+        public string CreateStatusText(string sThisQuarterDateString)
+        {
+            if (DoneThisQuarter == Activity.Completed)
+                return string.Format("Done {0}", sThisQuarterDateString);
+
+            if (DoneThisQuarter == Activity.PartyDone)
+            {
+                var sStatus = string.Format("Begun {0}", sThisQuarterDateString);
+                if (PlannedNextQuarter)
+                    sStatus += ", Continues Next Qtr";
+                return sStatus;
+            }
+            
+            return PlannedNextQuarter ? 
+                "Planned Next Qtr" : 
+                "";
+        }
+        #endregion
+
         // I/O -------------------------------------------------------------------------------
         #region Constants
         private const string c_sTag = "Goal";

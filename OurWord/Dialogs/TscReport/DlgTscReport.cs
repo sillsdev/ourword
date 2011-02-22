@@ -19,6 +19,8 @@ namespace OurWord.Dialogs.TscReport
     public partial class DlgTscReport : Form
     {
         readonly TscGoals m_Goals = new TscGoals();
+        private const string sDone = "√";
+        private const string sBlank = " ";
 
         #region Constructor()
         public DlgTscReport()
@@ -71,15 +73,14 @@ namespace OurWord.Dialogs.TscReport
                 var sVerses = info.VerseCount.ToString();
 
                 // Default to blanks
-                var sFirstDraft = " ";
-                var sTeamCheck = " ";
-                var sCommunityCheck = " ";
-                var sBackTranslation = " ";
-                var sConsultantCheck = " ";
-                var sPublish = " ";
+                var sFirstDraft = sBlank;
+                var sTeamCheck = sBlank;
+                var sCommunityCheck = sBlank;
+                var sBackTranslation = sBlank;
+                var sConsultantCheck = sBlank;
+                var sPublish = sBlank;
 
                 // Add checkmarks according to the OurWord understanding of what's been done
-                const string sDone = "√";
                 foreach(var stage in DB.TeamSettings.Stages)
                 {
                     if (stage.ID == Stage.c_idDraft)
@@ -106,30 +107,20 @@ namespace OurWord.Dialogs.TscReport
                     var stage = DB.TeamSettings.Stages.Find(StageList.FindBy.EnglishName, 
                         goal.EnglishStage);
 
-                    var sGoal = "";
-                    if (goal.DoneThisQuarter == TscGoal.Activity.Completed)
-                        sGoal = "Done This Qtr";
-                    else if (goal.DoneThisQuarter == TscGoal.Activity.PartyDone)
-                    {
-                        sGoal = "Begun This Qtr";
-                        if (goal.PlannedNextQuarter)
-                            sGoal += ", Continues Next Qtr";
-                    }
-                    else if (goal.PlannedNextQuarter)
-                        sGoal = "Planned Next Qtr";
+                    var sStatus = goal.CreateStatusText(Current.ToShortString());
 
                     if (stage.ID == Stage.c_idDraft)
-                        sFirstDraft = sGoal;
+                        sFirstDraft = AddStatus(sFirstDraft, sStatus);
                     else if (stage.ID == Stage.c_idTeamCheck)
-                        sTeamCheck = sGoal;
+                        sTeamCheck = AddStatus(sTeamCheck, sStatus);
                     else if (stage.ID == Stage.c_idCommunityCheck)
-                        sCommunityCheck = sGoal;
+                        sCommunityCheck = AddStatus(sCommunityCheck, sStatus);
                     else if (stage.ID == Stage.c_idBackTranslation)
-                        sBackTranslation = sGoal;
+                        sBackTranslation = AddStatus(sBackTranslation, sStatus);
                     else if (stage.ID == Stage.c_idConsultantCheck)
-                        sConsultantCheck = sGoal;
+                        sConsultantCheck = AddStatus(sConsultantCheck, sStatus);
                     else if (stage.ID == Stage.c_idFinalForPrinting)
-                        sPublish = sGoal;
+                        sPublish = AddStatus(sPublish, sStatus);
                 }
 
                 table.Rows.Add(new[] { sEnglishName, sVerses, sFirstDraft, sTeamCheck, 
@@ -140,6 +131,17 @@ namespace OurWord.Dialogs.TscReport
             return table;
         }
         #endregion
+        #region smethod: string AddStatus(sDestination, sStatus)
+        static string AddStatus(string sDestination, string sStatus)
+        {
+            if (string.IsNullOrEmpty(sDestination) || sDestination == sBlank || sDestination == sDone)
+                sDestination = sStatus;
+            else
+                sDestination += ", " + sStatus;
+            return sDestination;
+        }
+        #endregion
+
         #region Method: DataTable FillInOutcomes()
         DataTable FillInOutcomes()
         {
@@ -335,6 +337,18 @@ namespace OurWord.Dialogs.TscReport
             public override string ToString()
             {
                 return string.Format("{0} to {1} {2}", StartMonth, EndMonth, Year);
+            }
+            #endregion
+            #region Method: string ToShortString()
+            public string ToShortString()
+            {
+                switch (EndMonth)
+                {
+                    case "Mar": return "Q1 " + Year;
+                    case "Jun": return "Q2 " + Year;
+                    case "Sep": return "Q3 " + Year;
+                    default: return "Q4 " + Year;
+                }
             }
             #endregion
 
