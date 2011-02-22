@@ -176,6 +176,7 @@ namespace OurWordData.DataModel.Membership
             CanFilter = true,
             CanLocalize = true,
             CanRestoreBackups = true,
+            CanDoTscReport = true,
 
             CanMakeNotes = true,
             CloseNotesWindowWhenMouseLeaves = false,

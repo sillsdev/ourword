@@ -78,11 +78,11 @@
             this.m_separatorTools = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuIncrementBookStatus = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuRestoreFromBackup = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_menuTscReport = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorHelp = new System.Windows.Forms.ToolStripSeparator();
             this.helpTopicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutOurWordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tSCQuarterlyReportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -501,7 +501,7 @@
             this.m_separatorTools,
             this.m_menuIncrementBookStatus,
             this.m_menuRestoreFromBackup,
-            this.tSCQuarterlyReportToolStripMenuItem,
+            this.m_menuTscReport,
             this.m_menuLocalizerTool,
             this.m_separatorHelp,
             this.helpTopicsToolStripMenuItem,
@@ -569,6 +569,13 @@
             this.m_menuRestoreFromBackup.ToolTipText = "Restore to a former version of the book.";
             this.m_menuRestoreFromBackup.Click += new System.EventHandler(this.cmdRestoreFromBackup);
             // 
+            // m_menuTscReport
+            // 
+            this.m_menuTscReport.Name = "m_menuTscReport";
+            this.m_menuTscReport.Size = new System.Drawing.Size(202, 22);
+            this.m_menuTscReport.Text = "TSC Quarterly Report...";
+            this.m_menuTscReport.Click += new System.EventHandler(this.cmdTscQuarterlyReport);
+            // 
             // m_menuLocalizerTool
             // 
             this.m_menuLocalizerTool.Name = "m_menuLocalizerTool";
@@ -595,13 +602,6 @@
             this.aboutOurWordToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.aboutOurWordToolStripMenuItem.Text = "About OurWord...";
             this.aboutOurWordToolStripMenuItem.Click += new System.EventHandler(this.cmdAbout);
-            // 
-            // tSCQuarterlyReportToolStripMenuItem
-            // 
-            this.tSCQuarterlyReportToolStripMenuItem.Name = "tSCQuarterlyReportToolStripMenuItem";
-            this.tSCQuarterlyReportToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.tSCQuarterlyReportToolStripMenuItem.Text = "TSC Quarterly Report...";
-            this.tSCQuarterlyReportToolStripMenuItem.Click += new System.EventHandler(this.cmdTscQuarterlyReport);
             // 
             // CtrlCommands
             // 
@@ -678,6 +678,6 @@
         private System.Windows.Forms.ToolStripSeparator m_separatorHelp;
         private System.Windows.Forms.ToolStripMenuItem helpTopicsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutOurWordToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem tSCQuarterlyReportToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem m_menuTscReport;
     }
 }

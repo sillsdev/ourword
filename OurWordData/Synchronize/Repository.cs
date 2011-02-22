@@ -856,7 +856,7 @@ namespace OurWordData.Synchronize
 
         // Helper Methods --------------------------------------------------------------------
         #region SMethod: bool CanPingGoogle()
-        static public bool CanPingGoogle()
+        private static bool CanPingGoogle()
             // We'll just ping on Google, since they're up most of the time.
         {
             try
@@ -976,8 +976,7 @@ namespace OurWordData.Synchronize
         #region Method: void CheckForUpdates()
         static void CheckForUpdates()
         {
-            var checkForUpdateMethod = new InvokeCheckForUpdates()
-            {
+            var checkForUpdateMethod = new InvokeCheckForUpdates {
                 QuietMode = true
             };
             var result = checkForUpdateMethod.Do(null);
@@ -1141,7 +1140,7 @@ namespace OurWordData.Synchronize
                 if (result.StandardOutput.Contains("abort: push creates new remote heads"))
                     throw new SynchException("msgNewRemoteHeads",
                         "Unable to save changes, because merge did not succeed (with the " +
-                        "ccmplaint of having created new \"heads\") If this continues, " +
+                        "complaint of having created new \"heads\") If this continues, " +
                         "please report it as a bug.");
 
                 throw new SynchException("msgPushFailed",

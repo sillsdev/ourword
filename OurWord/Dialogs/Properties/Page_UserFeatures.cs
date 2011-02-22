@@ -86,6 +86,7 @@ namespace OurWord.Dialogs.Properties
         private const string c_sFilters = "propFilters";
         private const string c_sLocalization = "propLocalization";
         private const string c_sRestoreBackups = "propRestoreBackups";
+        private const string c_sTscReport = "propTscReport";
 
         #endregion
         #region Cmd: bag_Get
@@ -138,6 +139,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sRestoreBackups:
                     YesNoPropertySpec.Put(e, Users.Current.CanRestoreBackups);
+                    break;
+                case c_sTscReport:
+                    YesNoPropertySpec.Put(e, Users.Current.CanDoTscReport);
                     break;
 
             }
@@ -193,6 +197,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sRestoreBackups:
                     Users.Current.CanRestoreBackups = YesNoPropertySpec.Pull(e);
+                    break;
+                case c_sTscReport:
+                    Users.Current.CanDoTscReport = YesNoPropertySpec.Pull(e);
                     break;
             }
         }
@@ -350,6 +357,17 @@ namespace OurWord.Dialogs.Properties
                         "to a flash card or other storage device. If you turn on this Restore " +
                         "feature, the Tools menu will provide access to a dialog by which the " +
                         "current file can be replaced by a previously stored backup.",
+                true
+                ));
+            #endregion
+            #region TscReport
+            m_bag.Properties.Add(new YesNoPropertySpec(
+                c_sTscReport,
+                "TSC Quarterly Report",
+                c_sGroupTools,
+                "Enables a dialog by which you can generate the Seed Company report " +
+                    "(you'll still have to edit it once OurWord is done as additional " +
+                    "information is required that OurWord cannot supply.)",
                 true
                 ));
             #endregion

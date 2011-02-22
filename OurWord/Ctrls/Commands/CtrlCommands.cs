@@ -430,6 +430,7 @@ namespace OurWord.Ctrls.Commands
             // Dependent on current user permissions
             m_menuRestoreFromBackup.Available = Users.Current.CanRestoreBackups;
             m_menuLocalizerTool.Available = Users.Current.CanLocalize;
+            m_menuTscReport.Available = Users.Current.CanDoTscReport;
 
             // Dependent on loaded data
             m_menuIncrementBookStatus.Available = DB.IsValidProject &&

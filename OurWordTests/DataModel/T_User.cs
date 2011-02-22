@@ -98,6 +98,7 @@ namespace OurWordTests.DataModel
                 "canZoom=\"true\" canCreateProject=\"true\" canOpenProject=\"true\" " +
                 "canExportProject=\"true\" canPrint=\"true\" canFilter=\"true\" canLocalize=\"true\" " +
                 "canRestoreBackups=\"true\" " +
+                "canDoTscReport=\"true\" " +
                 "canMakeNotes=\"true\" " +
                 "noteAuthor=\"Robert\" " +
                 "closeNoteWindowWhenMouseLeaves=\"true\" " +
@@ -132,6 +133,7 @@ namespace OurWordTests.DataModel
                 CanDoBackTranslation = true,
                 CanDoNaturalnessCheck = true,
                 CanDoConsultantPreparation = true,
+                CanDoTscReport = true,
                 CanZoom = true,
                 CanCreateProject = true,
                 CanOpenProject = true,

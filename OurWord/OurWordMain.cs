@@ -1019,8 +1019,7 @@ namespace OurWord
             OnLeaveProject();
 
             // Invoke
-            var checkForUpdateMethod = new InvokeCheckForUpdates
-            {
+            var checkForUpdateMethod = new InvokeCheckForUpdates {
                 QuietMode = false
             };
             
