@@ -1101,7 +1101,7 @@ namespace OurWordData.Synchronize
                 m_LocalRepository.DoCommand("merge");
             }
 
-            // If there were unresolved files, it means the merge waas unsuccessful. 
+            // If there were unresolved files, it means the merge was unsuccessful. 
             // We don't want to leave the repository in this state, so we roll it back
             if (m_LocalRepository.CheckHasUnresolvedFiles())
             {
@@ -1115,7 +1115,8 @@ namespace OurWordData.Synchronize
 
             // Store the results of the merge
             var result = m_LocalRepository.CommitResultsOfMerge(m_UserNameForCommits);
-            if (0 != result.ExitCode)
+            var bWasStrangeError = (1 == result.ExitCode && !string.IsNullOrEmpty(result.StandardError));
+            if (-1 == result.ExitCode || bWasStrangeError)
             {
                 throw new SynchException("msgUnableToCommitMerge",
                     "OurWord was unable to store the results of the merge. \n\n" +
