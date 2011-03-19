@@ -537,6 +537,9 @@ namespace OurWordData.DataModel
                 vPossibilities.Add(StyleSheet.Line1);
                 vPossibilities.Add(StyleSheet.Line2);
                 vPossibilities.Add(StyleSheet.Line3);
+                vPossibilities.Add(StyleSheet.ListItem1);
+                vPossibilities.Add(StyleSheet.ListItem2);
+                vPossibilities.Add(StyleSheet.ListItem3);
 
                 // Is Scripture (rather than, e.g., a Translator Note)
                 var bIsScripture = (Owner == Section);
