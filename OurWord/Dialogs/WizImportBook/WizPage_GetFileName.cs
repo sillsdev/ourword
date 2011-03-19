@@ -307,7 +307,7 @@ namespace OurWord.Dialogs.WizImportBook
             {
                 if (sUnrecognizedMarkers.Length > 0)
                     sUnrecognizedMarkers += ", ";
-                if (sUnrecognizedMarkers.Length > 20)
+                if (sUnrecognizedMarkers.Length > 30)
                 {
                     sUnrecognizedMarkers += LocDB.GetValue(this, "strMore", "(more)", null);
                     break;

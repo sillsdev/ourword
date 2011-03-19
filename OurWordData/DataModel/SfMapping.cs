@@ -1191,7 +1191,7 @@ namespace OurWordData.DataModel
 				return true;
 			if (sStyleAbbrev == StyleSection2)
 				return true;
-			if (sStyleAbbrev == this.StyleCrossRef)
+			if (sStyleAbbrev == StyleCrossRef)
 				return true;
 			return false;
 		}
@@ -1200,7 +1200,6 @@ namespace OurWordData.DataModel
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
         public DSFMapping()
-			: base()
 		{
             m_vStyleMappings = new List<StyleMapping>();
             StyleMappings.Add(new StyleMapping("h", "h", "Header", false));
@@ -1214,6 +1213,9 @@ namespace OurWordData.DataModel
             StyleMappings.Add(new StyleMapping("q", "q1", "Line 1", true));
             StyleMappings.Add(new StyleMapping("q2", "q2", "Line 2", true));
             StyleMappings.Add(new StyleMapping("q3", "q3", "Line 3", true));
+            StyleMappings.Add(new StyleMapping("li", "li1", "List Item 1", true));
+            StyleMappings.Add(new StyleMapping("li2", "li2", "List Item 2", true));
+            StyleMappings.Add(new StyleMapping("li3", "li3", "List Item 3", true));
             StyleMappings.Add(new StyleMapping("qc", "qc", "Line Centered", true));
             StyleMappings.Add(new StyleMapping("cap", "fig", "Caption", false));
             StyleMappings.Add(new StyleMapping("ms", "ms", "Major Section Head", false));

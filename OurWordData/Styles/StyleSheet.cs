@@ -287,6 +287,46 @@ namespace OurWordData.Styles
                 UsfmMarker = "q3",
             };
         #endregion
+        #region ParagraphStyle ListItem1
+        public static readonly ParagraphStyle ListItem1 =
+            new ParagraphStyle("List Item 1")
+            {
+                OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
+                {
+                    Alignment = ParagraphStyle.Align.Justified,
+                    LeftMarginInches = 0.2
+                },
+                Uses = CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "li1",
+                ToolboxMarker = "li"
+            };
+        #endregion
+        #region ParagraphStyle ListItem2
+        public static readonly ParagraphStyle ListItem2 =
+            new ParagraphStyle("List Item 2")
+            {
+                OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
+                {
+                    Alignment = ParagraphStyle.Align.Justified,
+                    LeftMarginInches = 0.4
+                },
+                Uses = CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "li2",
+            };
+        #endregion
+        #region ParagraphStyle ListItem3
+        public static readonly ParagraphStyle ListItem3 =
+            new ParagraphStyle("List Item 3")
+            {
+                OriginalStyle = new ParagraphStyle(CharacterStyle.c_sOriginalStyle)
+                {
+                    Alignment = ParagraphStyle.Align.Justified,
+                    LeftMarginInches = 0.6
+                },
+                Uses = CharacterStyle.Usage.IsCannonicalScriptureText,
+                UsfmMarker = "li3",
+            };
+        #endregion
         #region ParagraphStyle LineCentered
         public static readonly ParagraphStyle LineCentered =
             new ParagraphStyle("Line Centered")
