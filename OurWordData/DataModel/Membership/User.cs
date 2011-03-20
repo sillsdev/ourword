@@ -77,7 +77,7 @@ namespace OurWordData.DataModel.Membership
         #endregion
 
         public static readonly int[] PossibleZoomPercents = 
-            { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250 };
+            { 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 175, 200, 225, 250, 275, 300 };
         public string PrimaryUiLanguage { get; set; }
         public string SecondaryUiLanguage { get; set; }
         public string DraftingWindowBackground { get; set; }
