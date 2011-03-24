@@ -151,7 +151,7 @@ namespace OurWordData.DataModel.Membership
             CanFilter = true,
             ShowExpandedNotesIcon = true,
             CanMakeNotes = true,
-            CanAssignNoteToConsultant = true
+            CanAssignNoteToConsultant = true,
         };
         #endregion
         #region Administrator
@@ -177,6 +177,7 @@ namespace OurWordData.DataModel.Membership
             CanLocalize = true,
             CanRestoreBackups = true,
             CanDoTscReport = true,
+            CanFindAndReplace = true,
 
             CanMakeNotes = true,
             CloseNotesWindowWhenMouseLeaves = false,

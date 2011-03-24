@@ -1856,7 +1856,7 @@ namespace OurWord.Edit
         }
         #endregion
         #region Sel MakeSelection(DText, iOffsetIntoParagraph, iLength)
-        public OWWindow.Sel MakeSelection(DText text, int iOffsetIntoParagraph, int iLength)
+        public OWWindow.Sel MakeSelection(DBasicText text, int iOffsetIntoParagraph, int iLength)
         {
             // Locate the containing OWPara
             var owp = FindParagraph(text.Paragraph, OWPara.Flags.None);

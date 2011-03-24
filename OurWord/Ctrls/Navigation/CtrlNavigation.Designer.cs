@@ -47,11 +47,12 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.m_Filter = new System.Windows.Forms.ToolStripMenuItem();
             this.createConcordanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.FilteredNavigation = new System.Windows.Forms.ImageList(this.components);
-            this.UnfilteredNavigation = new System.Windows.Forms.ImageList(this.components);
             this.m_separatorBookmarks = new System.Windows.Forms.ToolStripSeparator();
             this.m_SetBookmark = new System.Windows.Forms.ToolStripMenuItem();
             this.m_GoToBookmark = new System.Windows.Forms.ToolStripMenuItem();
+            this.FilteredNavigation = new System.Windows.Forms.ImageList(this.components);
+            this.UnfilteredNavigation = new System.Windows.Forms.ImageList(this.components);
+            this.m_FindAndReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -186,6 +187,7 @@
             this.m_Find.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.m_FindNext,
             this.m_AdvancedFind,
+            this.m_FindAndReplace,
             this.toolStripSeparator1,
             this.m_Filter,
             this.createConcordanceToolStripMenuItem,
@@ -236,6 +238,24 @@
             this.createConcordanceToolStripMenuItem.Text = "Create &Concordance...";
             this.createConcordanceToolStripMenuItem.Click += new System.EventHandler(this.cmdConcordance);
             // 
+            // m_separatorBookmarks
+            // 
+            this.m_separatorBookmarks.Name = "m_separatorBookmarks";
+            this.m_separatorBookmarks.Size = new System.Drawing.Size(188, 6);
+            // 
+            // m_SetBookmark
+            // 
+            this.m_SetBookmark.Name = "m_SetBookmark";
+            this.m_SetBookmark.Size = new System.Drawing.Size(191, 22);
+            this.m_SetBookmark.Text = "Set &Bookmark here";
+            this.m_SetBookmark.Click += new System.EventHandler(this.cmdSetBookmark);
+            // 
+            // m_GoToBookmark
+            // 
+            this.m_GoToBookmark.Name = "m_GoToBookmark";
+            this.m_GoToBookmark.Size = new System.Drawing.Size(191, 22);
+            this.m_GoToBookmark.Text = "Go To Boo&kmark";
+            // 
             // FilteredNavigation
             // 
             this.FilteredNavigation.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("FilteredNavigation.ImageStream")));
@@ -254,23 +274,12 @@
             this.UnfilteredNavigation.Images.SetKeyName(2, "GoNext.ico");
             this.UnfilteredNavigation.Images.SetKeyName(3, "GoLast.ico");
             // 
-            // m_separatorBookmarks
+            // m_FindAndReplace
             // 
-            this.m_separatorBookmarks.Name = "m_separatorBookmarks";
-            this.m_separatorBookmarks.Size = new System.Drawing.Size(188, 6);
-            // 
-            // m_SetBookmark
-            // 
-            this.m_SetBookmark.Name = "m_SetBookmark";
-            this.m_SetBookmark.Size = new System.Drawing.Size(191, 22);
-            this.m_SetBookmark.Text = "Set &Bookmark here";
-            this.m_SetBookmark.Click += new System.EventHandler(this.cmdSetBookmark);
-            // 
-            // m_GoToBookmark
-            // 
-            this.m_GoToBookmark.Name = "m_GoToBookmark";
-            this.m_GoToBookmark.Size = new System.Drawing.Size(191, 22);
-            this.m_GoToBookmark.Text = "Go To Boo&kmark";
+            this.m_FindAndReplace.Name = "m_FindAndReplace";
+            this.m_FindAndReplace.Size = new System.Drawing.Size(191, 22);
+            this.m_FindAndReplace.Text = "Find and &Replace...";
+            this.m_FindAndReplace.Click += new System.EventHandler(this.cmdFindAndReplace);
             // 
             // CtrlNavigation
             // 
@@ -316,5 +325,6 @@
         private System.Windows.Forms.ToolStripSeparator m_separatorBookmarks;
         private System.Windows.Forms.ToolStripMenuItem m_SetBookmark;
         private System.Windows.Forms.ToolStripMenuItem m_GoToBookmark;
+        private System.Windows.Forms.ToolStripMenuItem m_FindAndReplace;
     }
 }

@@ -103,6 +103,7 @@ namespace OurWordData.DataModel.Membership
         public bool CanLocalize { get; set; }
         public bool CanRestoreBackups { get; set; }
         public bool CanDoTscReport { get; set; }
+        public bool CanFindAndReplace { get; set; }
 
         // Attrs: Notes
         public bool CanMakeNotes { get; set; }
@@ -523,6 +524,7 @@ namespace OurWordData.DataModel.Membership
         private const string c_sAttrCanLocalize = "canLocalize";
         private const string c_sAttrCanRestoreBackups = "canRestoreBackups";
         private const string c_sAttrCanDoTscReport = "canDoTscReport";
+        private const string c_sAttrCanFindAndReplace = "canFindAndReplace";
 
         // Notes
         private const string c_sAttrCanMakeNotes = "canMakeNotes";
@@ -575,6 +577,7 @@ namespace OurWordData.DataModel.Membership
             doc.AddAttr(node, c_sAttrCanLocalize, CanLocalize);
             doc.AddAttr(node, c_sAttrCanRestoreBackups, CanRestoreBackups);
             doc.AddAttr(node, c_sAttrCanDoTscReport, CanDoTscReport);
+            doc.AddAttr(node, c_sAttrCanFindAndReplace, CanFindAndReplace);
 
             // Notes
             doc.AddAttr(node, c_sAttrCanMakeNotes, CanMakeNotes);
@@ -654,6 +657,7 @@ namespace OurWordData.DataModel.Membership
                 CanLocalize = XmlDoc.GetAttrValue(node, c_sAttrCanLocalize, false),
                 CanRestoreBackups = XmlDoc.GetAttrValue(node, c_sAttrCanRestoreBackups, false),
                 CanDoTscReport = XmlDoc.GetAttrValue(node, c_sAttrCanDoTscReport, false),
+                CanFindAndReplace = XmlDoc.GetAttrValue(node, c_sAttrCanFindAndReplace, false),
 
                 // Notes
                 CanMakeNotes = XmlDoc.GetAttrValue(node, c_sAttrCanMakeNotes, false),
@@ -738,6 +742,7 @@ namespace OurWordData.DataModel.Membership
             CanLocalize = Merger.Merge(CanLocalize, parent.CanLocalize, theirs.CanLocalize);
             CanRestoreBackups = Merger.Merge(CanRestoreBackups, parent.CanRestoreBackups, theirs.CanRestoreBackups);
             CanDoTscReport = Merger.Merge(CanDoTscReport, parent.CanDoTscReport, theirs.CanDoTscReport);
+            CanFindAndReplace = Merger.Merge(CanFindAndReplace, parent.CanFindAndReplace, theirs.CanFindAndReplace);
 
             // Simple Attrs: Notes
             CanMakeNotes = Merger.Merge(CanMakeNotes, parent.CanMakeNotes, theirs.CanMakeNotes);

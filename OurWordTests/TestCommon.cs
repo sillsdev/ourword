@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Text;
 using JWTools;
 using OurWord;
+using OurWordData;
 using OurWordData.DataModel;
 using OurWordData.Styles;
 
@@ -89,6 +90,18 @@ namespace OurWordTests
             section.Paragraphs.Append(paragraph);
             paragraph.SimpleText = sSimpleText;
             return paragraph;
+        }
+        #endregion
+
+        #region SMethod: DBook CreateFromOxes(string sBookAbbrev, string sOxesXml)
+        static public DBook CreateFromOxes(string sBookAbbrev, string sOxesXml)
+        {
+            var doc = new XmlDoc();
+            doc.LoadXml(sOxesXml);
+            var nodeBook = XmlDoc.FindNode(doc, "book");
+            var book = CreateHierarchyThroughTargetBook(sBookAbbrev);
+            book.LoadFromOxes(nodeBook, new NullProgress());
+            return book;
         }
         #endregion
     }

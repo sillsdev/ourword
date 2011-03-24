@@ -87,6 +87,7 @@ namespace OurWord.Dialogs.Properties
         private const string c_sLocalization = "propLocalization";
         private const string c_sRestoreBackups = "propRestoreBackups";
         private const string c_sTscReport = "propTscReport";
+        private const string c_sFindAndReplace = "propFindAndReplace";
 
         #endregion
         #region Cmd: bag_Get
@@ -142,6 +143,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sTscReport:
                     YesNoPropertySpec.Put(e, Users.Current.CanDoTscReport);
+                    break;
+                case c_sFindAndReplace:
+                    YesNoPropertySpec.Put(e, Users.Current.CanFindAndReplace);
                     break;
 
             }
@@ -200,6 +204,9 @@ namespace OurWord.Dialogs.Properties
                     break;
                 case c_sTscReport:
                     Users.Current.CanDoTscReport = YesNoPropertySpec.Pull(e);
+                    break;
+                case c_sFindAndReplace:
+                    Users.Current.CanFindAndReplace = YesNoPropertySpec.Pull(e);
                     break;
             }
         }
@@ -368,6 +375,16 @@ namespace OurWord.Dialogs.Properties
                 "Enables a dialog by which you can generate the Seed Company report " +
                     "(you'll still have to edit it once OurWord is done as additional " +
                     "information is required that OurWord cannot supply.)",
+                true
+                ));
+            #endregion
+            #region TscReport
+            m_bag.Properties.Add(new YesNoPropertySpec(
+                c_sFindAndReplace,
+                "Find and Replace",
+                c_sGroupTools,
+                "Enables the Find And Replace Dialog, by which you can make global " +
+                    "changes throughout your entire translation.",
                 true
                 ));
             #endregion

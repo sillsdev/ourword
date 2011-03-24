@@ -35,6 +35,9 @@ using Palaso.UI.WindowsForms.Keyboarding;
 
 namespace OurWord.Edit
 {
+    public delegate void SelectionChangedHandler(OWWindow.Sel selection);
+
+
     public class OWWindow : Panel
     {
         // Attrs -----------------------------------------------------------------------------
@@ -83,6 +86,7 @@ namespace OurWord.Edit
 
         // Delegates -------------------------------------------------------------------------
         private EventHandler OnLayoutFinished;
+        public SelectionChangedHandler OnSelectionChanged;
 
         // Interaction with OurWord Main -----------------------------------------------------
         bool m_bLoaded;
@@ -1342,6 +1346,17 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+            #region Attr{g}: DSection Section
+            public DSection Section
+            {
+                get
+                {
+                    if (null == DBT || null == DBT.Paragraph)
+                        return null;
+                    return DBT.Paragraph.Section;
+                }
+            }
+            #endregion
 
             // Timer -------------------------------------------------------------------------
             // TODO: MSDN says Windows.Form.Timer is in the same thread as the Form, and thus
@@ -1598,6 +1613,9 @@ namespace OurWord.Edit
                 ScrollSelectionIntoView();
 
                 G.App.EnableItalicsButton();
+
+                if (null != OnSelectionChanged)
+                    OnSelectionChanged(m_Selection);
             }
         }
         Sel m_Selection = null;

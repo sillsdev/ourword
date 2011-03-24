@@ -38,6 +38,26 @@ namespace OurWordData.DataModel.Runs
         }
         #endregion
 
+        // Derived Attrs ---------------------------------------------------------------------
+        #region VAttr{g}: DBasicText Text
+        public DBasicText Text
+        {
+            get
+            {
+                return Owner as DBasicText;
+            }
+        }
+        #endregion
+        #region VAttr{g}: bool IsBackTranslation
+        public bool IsBackTranslation
+        {
+            get
+            {
+                return null != Text && Text.PhrasesBT.Equals(this);
+            }
+        }
+        #endregion
+
         // Conversions -----------------------------------------------------------------------
         #region VAttr{g}: string AsString
         public string AsString
@@ -166,7 +186,7 @@ namespace OurWordData.DataModel.Runs
         // caller should instead use the general-purpose Delete() method below.
         {
             if (iStart < 0)
-                throw new ArgumentOutOfRangeException("iStart", "In DBasicText.DeleteChar");
+                throw new ArgumentOutOfRangeException("iStart", @"In DBasicText.DeleteChar");
 
             // Locate the phrase and the position with it where the deletion is to start
             var iPhrase = 0;
@@ -176,7 +196,7 @@ namespace OurWordData.DataModel.Runs
                 iStart -= phrase.Text.Length;
                 iPhrase++;
                 if (iPhrase == Count)
-                    throw new ArgumentOutOfRangeException("iStart", "Too long in DBasicText.DeleteChar");
+                    throw new ArgumentOutOfRangeException("iStart", @"Too long in DBasicText.DeleteChar");
                 phrase = this[iPhrase];
             }
 
@@ -401,6 +421,48 @@ namespace OurWordData.DataModel.Runs
                     Append(phrase);
                 }
             }
+        }
+        #endregion
+        #region Method: int Replace(iPosition, iCount, sReplaceWith)
+        public int Replace(int iPosition, int iCount, string sReplaceWith)
+        {
+            // Insert at the position
+            var phrase = GetPhraseAt(iPosition);
+            var iPosInPhrase = GetPosInPhrase(iPosition);
+            phrase.Insert(iPosInPhrase, sReplaceWith);
+
+            // Do the requested deletion of iCount characters
+            var iDeletePosition = iPosition + sReplaceWith.Length;
+            while (iCount > 0)
+            {
+                _DeleteChar(iDeletePosition);
+                iCount--;
+            }
+
+            // Clean up
+            var cLenBeforeCleanup = AsString.Length;
+            EliminateSpuriousSpaces();
+            var cLenAfterCleanup = AsString.Length;
+
+            // Return the position following the insertion
+            var iPosAfterInsertion = iPosition + sReplaceWith.Length;
+            var cLengthChange = (cLenAfterCleanup - cLenBeforeCleanup);
+            return iPosAfterInsertion + cLengthChange;
+        }
+        #endregion
+        #region Method: int ReplaceAll(sOld, sNew)
+        public int ReplaceAll(string sOld, string sNew)
+        {
+            var count = 0;
+            var iStartAt = 0;
+            var iFindWhat = AsString.IndexOf(sOld, iStartAt);
+            while (iFindWhat != -1)
+            {
+                iStartAt = Replace(iFindWhat, sOld.Length, sNew);
+                iFindWhat = AsString.IndexOf(sOld, iStartAt);
+                count++;
+            }
+            return count;
         }
         #endregion
 

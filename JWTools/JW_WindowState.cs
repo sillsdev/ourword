@@ -18,27 +18,29 @@ namespace JWTools
 	{
 		// Attributes ------------------------------------------------------------------------
         public const string DefaultRegistrySubKey = "WindowState";
-        public string WindowStateRegistrySubKey = DefaultRegistrySubKey;
-		private Form m_form;
+        private readonly string WindowStateRegistrySubKey = DefaultRegistrySubKey;
+		private readonly Form m_form;
 		#region Attr{g/s}: bool StartMaximized - if T, maximize no matter what is in the Registry
 		public bool StartMaximized
 		{
-			get 
+		    private get 
 			{
                 return JW_Registry.GetValue(WindowStateRegistrySubKey, "StartMax", true);
 			}
 			set 
 			{
-                JW_Registry.SetValue(WindowStateRegistrySubKey, "StartMax", value);
+                if (JW_Registry.HasValidRootKey)
+                    JW_Registry.SetValue(WindowStateRegistrySubKey, "StartMax", value);
 			}
 		}
 		#endregion
-		#region Attr{g/s}: bool StateSaved - if T, we've saved the state in the Registry
-		public bool StateSaved
+		#region attr{g/s}: bool StateSaved - if T, we've saved the state in the Registry
+	    private bool StateSaved
 		{
 			get 
 			{
-                return ("State Saved" == JW_Registry.GetValue(WindowStateRegistrySubKey, "", ""));
+			    var s = JW_Registry.GetValue(WindowStateRegistrySubKey, "", "");
+                return ("State Saved" == s);
 			}
 			set 
 			{
@@ -66,17 +68,22 @@ namespace JWTools
 		}
 		#endregion
 
-		// Constructors ----------------------------------------------------------------------
-		#region Constructor(form, bStartMaximized)
-		public JW_WindowState(Form form, bool bStartMaximized)
+        // Constructors ----------------------------------------------------------------------
+        #region Constructor(form, bStartMaximized, sRegistrySubKey)
+        public JW_WindowState(Form form, bool bStartMaximized, string sRegistrySubKey)
 		{
 			Debug.Assert(null != form);
 			m_form = form;
 
+            // Calculate where to store the settings
+            WindowStateRegistrySubKey = (!string.IsNullOrEmpty(sRegistrySubKey)) ?
+                string.Format("{0}\\{1}", DefaultRegistrySubKey, sRegistrySubKey) :
+                DefaultRegistrySubKey;               
+
 			// If we don't already have a preference in the Registry, then whether or not the
 			// window starts up maximized is determined by the value passed into the
 			// constructor.
-			if ( !StateSaved )
+			if (!JW_Registry.HasValidRootKey || !StateSaved )
 				StartMaximized = bStartMaximized;
 		}
 		#endregion
@@ -85,6 +92,9 @@ namespace JWTools
 		#region Method: SaveWindowState()
 		public void SaveWindowState()
 		{
+            if (!JW_Registry.HasValidRootKey)
+                return;
+
 			Debug.Assert(null != m_form);
             JW_Registry.SetValue(WindowStateRegistrySubKey, "Left", m_form.Left);
             JW_Registry.SetValue(WindowStateRegistrySubKey, "Top", m_form.Top);
@@ -98,6 +108,9 @@ namespace JWTools
 		#region Method: RestoreWindowState()
 		public void RestoreWindowState()
 		{
+            if (!JW_Registry.HasValidRootKey)
+                return;
+
 			Debug.Assert(null != m_form);
 
 			// If we've stored Maximize, then we want to start Maximized. This can either

@@ -177,6 +177,7 @@
             this.MinimumSize = new System.Drawing.Size(425, 350);
             this.Name = "DlgConcordance";
             this.Text = "Concordance";
+            this.TopMost = true;
             this.Load += new System.EventHandler(this.cmdLoad);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdFormClosing);
             this.ResumeLayout(false);

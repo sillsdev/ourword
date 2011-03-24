@@ -193,6 +193,9 @@
     <EmbeddedResource Include="Ctrls\Navigation\DlgConcordance.resx">
       <DependentUpon>DlgConcordance.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Ctrls\Navigation\DlgFindAndReplace.resx">
+      <DependentUpon>DlgFindAndReplace.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirst.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoFirstFiltered.ico" />
     <EmbeddedResource Include="Ctrls\Navigation\Images\GoLast.ico" />
@@ -459,7 +462,7 @@
       <DependentUpon>CtrlCommands.cs</DependentUpon>
     </Compile>
     <Compile Include="Ctrls\Navigation\Bookmark.cs" />
-    <Compile Include="Ctrls\Navigation\ConcordanceInfo.cs" />
+    <Compile Include="Ctrls\Navigation\LookupInfo.cs" />
     <Compile Include="Ctrls\Navigation\CtrlFindText.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -475,6 +478,13 @@
     <Compile Include="Ctrls\Navigation\DlgConcordance.Designer.cs">
       <DependentUpon>DlgConcordance.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ctrls\Navigation\DlgFindAndReplace.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\DlgFindAndReplace.Designer.cs">
+      <DependentUpon>DlgFindAndReplace.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\Scanner.cs" />
     <Compile Include="Dialogs\DlgProgress.cs">
       <SubType>Form</SubType>
     </Compile>

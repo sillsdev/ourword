@@ -116,6 +116,17 @@ namespace OurWordData.DataModel
             }
         }
         #endregion
+        #region VAttr{g}: DParagraph OwningParagraph
+        public DParagraph OwningParagraph
+	    {
+	        get
+	        {
+	            var paragraph = Foot.Owner as DParagraph;
+                Debug.Assert(null != paragraph);
+                return paragraph;
+	        }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region private Constructor()

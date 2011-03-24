@@ -1527,9 +1527,7 @@ namespace OurWordData.DataModel
                 ;
         }
 
-        public bool _LoadFromOxes(string sPath, IProgressIndicator progress)
-        // Returns true if the user wishes to try again following making corrections in the
-        // Repair dialog, false otherwise.
+        private bool _LoadFromOxes(string sPath, IProgressIndicator progress)
         {
             m_bIsLoaded = false;
             var oxes = new XmlDoc();
@@ -1537,9 +1535,8 @@ namespace OurWordData.DataModel
             try
             {
                 // Read in the xml file via the dotnet system
-                Clear();
                 oxes.Load(sPath);
-
+                
                 // Find the Bible node (If well-formed Oxes, shouldn't be a problem.)
                 var nodeBible = XmlDoc.FindNode(oxes, c_sTagBible);
                 if (null == nodeBible)
@@ -1551,7 +1548,7 @@ namespace OurWordData.DataModel
                 }
 
                 // Make sure it is a version of Oxes that we handle
-                string sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
+                var sOxes = XmlDoc.GetAttrValue(nodeBible, c_sAttrOxes, "");
                 if (sOxes != "2.0")
                 {
                     LocDB.Message("kUnsupportedOxes",
@@ -1571,70 +1568,12 @@ namespace OurWordData.DataModel
                         HelpSystem.Topic.kImportBook, 0);
                 }
 
-                // Verify the Book's three-letter ID is what we expect
-                string sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
-                if (string.IsNullOrEmpty(sBookID) || sBookID != BookAbbrev)
-                {
-                    string sBase = Loc.GetString("msgOxesImportBadAbbrev",
-                        "Either the Book's Abbreviation attribute is missing, \n" +
-                        "or it is not {0} as was expected.");
-                    string sMessage = LocDB.Insert(sBase, new string[] { BookAbbrev });
-                    throw new eBookReadException(sMessage, HelpSystem.Topic.kImportBook, 0);
-                }
-
-                // Read the Book's attributes
-                var sStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, Stage.c_sDraft);
-                Stage = DB.TeamSettings.Stages.FromOxesAttr(sStage);
-                Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
-                Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
-                Comment = XmlDoc.GetAttrValue(nodeBook, c_sAttrComment, "");
-
-                // Read in the paragraphs
-                progress.Start("Reading", nodeBook.ChildNodes.Count);
-                DSection section = null;
-                foreach (XmlNode child in nodeBook.ChildNodes)
-                {
-                    progress.Step();
-
-                    // The first child node, if a HistoryNote, would be the History for the entire
-                    // book. (There will be no "section" defined yet. Otherwise, any History we
-                    // encounter goes with the most recently defined section. (The only notes
-                    // we should see at this level are History notes.)
-                    var history = TranslatorNote.Create(child);
-                    if (null != history)
-                    {
-                        if (history.Behavior != TranslatorNote.History)
-                        {
-                            throw new XmlDocException(child,
-                                "A non-History Annotation was encountered at the top level of the book.");
-                        }
-                        if (null == section)
-                            History = history;
-                        else
-                            section.History = history;
-                        continue;
-                    }
-
-                    // Create the paragraph or picture
-                    DParagraph paragraph = DPicture.CreatePicture(child);
-                    if (null == paragraph)
-                        paragraph = DParagraph.CreateParagraph(child);
-
-                    // A section for it to go into
-                    if (null == section || paragraph.Style == StyleSheet.Section)
-                    {
-                        section = new DSection();
-                        Sections.Append(section);
-                    }
-
-                    // Add the paragraph
-                    section.Paragraphs.Append(paragraph);
-                }
+                // Process the Xml data
+                LoadFromOxes(nodeBook, progress);
 
                 // Final post processing
                 _LoadPostProcessing(sPath);
             }
-
             #region Handle Exceptions
             // Error in the raw xml   
             catch (XmlException eXml)
@@ -1653,7 +1592,7 @@ namespace OurWordData.DataModel
             catch (XmlDocException eDocXml)
             {
                 progress.End();
-                int iLine = eDocXml.GetProblemLineNo(sPath, oxes);
+                var iLine = eDocXml.GetProblemLineNo(sPath, oxes);
                 var bre = new eBookReadException(
                     "There is a problem in the oxes file: " + eDocXml.Message,
                     HelpSystem.Topic.kImportBook,
@@ -1667,7 +1606,7 @@ namespace OurWordData.DataModel
             catch (eBookReadException bre)
             {
                 progress.End();
-                DialogRepairImportBook dlgRepair = (bre.NeedToShowFront) ?
+                var dlgRepair = (bre.NeedToShowFront) ?
                     new RepairImportBookStructure(FrontBook, this, sPath, bre) :
                     new DialogRepairImportBook(this, sPath, bre);
                 var result = dlgRepair.ShowDialog();
@@ -1686,11 +1625,78 @@ namespace OurWordData.DataModel
             }
             #endregion
 
+
             // Successful
             progress.End();
             m_bIsLoaded = true;
             IsDirty = false;
             return false;
+        }
+        #endregion
+        #region Method: void LoadFromOxes(nodeBook, IProgressIndicator)
+        public void LoadFromOxes(XmlNode nodeBook, IProgressIndicator progress)
+        {
+            Clear();
+
+            // Verify the Book's three-letter ID is what we expect
+            var sBookID = XmlDoc.GetAttrValue(nodeBook, c_sAttrID, "");
+            if (string.IsNullOrEmpty(sBookID) || sBookID != BookAbbrev)
+            {
+                var sBase = Loc.GetString("msgOxesImportBadAbbrev",
+                    "Either the Book's Abbreviation attribute is missing, \n" +
+                    "or it is not {0} as was expected.");
+                var sMessage = LocDB.Insert(sBase, new[] { BookAbbrev });
+                throw new eBookReadException(sMessage, HelpSystem.Topic.kImportBook, 0);
+            }
+
+            // Read the Book's attributes
+            var sStage = XmlDoc.GetAttrValue(nodeBook, c_sAttrStage, Stage.c_sDraft);
+            Stage = DB.TeamSettings.Stages.FromOxesAttr(sStage);
+            Version = XmlDoc.GetAttrValue(nodeBook, c_sAttrVersion, c_sVersionDefault);
+            Copyright = XmlDoc.GetAttrValue(nodeBook, c_sAttrCopyright, "");
+            Comment = XmlDoc.GetAttrValue(nodeBook, c_sAttrComment, "");
+
+            // Read in the paragraphs
+            progress.Start("Reading", nodeBook.ChildNodes.Count);
+            DSection section = null;
+            foreach (XmlNode child in nodeBook.ChildNodes)
+            {
+                progress.Step();
+
+                // The first child node, if a HistoryNote, would be the History for the entire
+                // book. (There will be no "section" defined yet. Otherwise, any History we
+                // encounter goes with the most recently defined section. (The only notes
+                // we should see at this level are History notes.)
+                var history = TranslatorNote.Create(child);
+                if (null != history)
+                {
+                    if (history.Behavior != TranslatorNote.History)
+                    {
+                        throw new XmlDocException(child,
+                            "A non-History Annotation was encountered at the top level of the book.");
+                    }
+                    if (null == section)
+                        History = history;
+                    else
+                        section.History = history;
+                    continue;
+                }
+
+                // Create the paragraph or picture
+                DParagraph paragraph = DPicture.CreatePicture(child);
+                if (null == paragraph)
+                    paragraph = DParagraph.CreateParagraph(child);
+
+                // A section for it to go into
+                if (null == section || paragraph.Style == StyleSheet.Section)
+                {
+                    section = new DSection();
+                    Sections.Append(section);
+                }
+
+                // Add the paragraph
+                section.Paragraphs.Append(paragraph);
+            }
         }
         #endregion
 

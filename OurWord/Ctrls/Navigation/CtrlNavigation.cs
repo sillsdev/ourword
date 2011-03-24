@@ -14,7 +14,7 @@ namespace OurWord.Ctrls.Navigation
     public delegate void GoToChapterHandler(int nChapterNumber);
     public delegate void GoToSectionHandler(DSection section);
     public delegate void FindText(string sSearchText);
-    public delegate bool GoToConcordanceItem(ConcordanceInfo info);
+    public delegate bool GoToLookupItem(LookupInfo info);
     public delegate Bookmark CreateBookmarkHandler();
     public delegate void GoToBookmarkHandler(Bookmark bookmark);
 
@@ -176,6 +176,8 @@ namespace OurWord.Ctrls.Navigation
         {
             if (string.IsNullOrEmpty(m_FindTextMenuItem.SearchText))
                 m_FindNext.Enabled = false;
+
+            m_FindAndReplace.Available = Users.Current.CanFindAndReplace;
 
             SetupBookmarksMenu();
         }
@@ -566,7 +568,7 @@ namespace OurWord.Ctrls.Navigation
         public GoToChapterHandler OnGoToChapter;
         public GoToSectionHandler OnGoToSection;
         public FindText OnFindText;
-        public GoToConcordanceItem OnGoToConcordanceItem;
+        public GoToLookupItem OnGoToLookupItem;
         public CreateBookmarkHandler OnCreateBookmark;
         public GoToBookmarkHandler OnGoToBookmark;
 
@@ -723,8 +725,41 @@ namespace OurWord.Ctrls.Navigation
         readonly DlgConcordance m_DlgConcordance = new DlgConcordance();
         private void cmdConcordance(object sender, EventArgs e)
         {
-            m_DlgConcordance.OnGoToConcordanceItem = OnGoToConcordanceItem;
+            m_DlgConcordance.OnGoToLookupItem = OnGoToLookupItem;
             m_DlgConcordance.Show();
+        }
+        #endregion
+        #region cmd: cmdFindAndReplace
+        readonly DlgFindAndReplace m_DlgFindAndReplace = new DlgFindAndReplace();
+        private void cmdFindAndReplace(object sender, EventArgs e)
+        {
+            if (!ShowBetaWarning())
+                return;
+
+            m_DlgFindAndReplace.OnGoToLookupItem = OnGoToLookupItem;
+            m_DlgFindAndReplace.Show();
+        }
+        #endregion
+
+        #region method: bool ShowBetaWarning()
+        private bool m_WarningShown;
+        private bool ShowBetaWarning()
+        {
+            if (!m_WarningShown)
+            {
+                var bProceed = LocDB.Message("kBetaTestFeature",
+                      "This feature is new and not thoroughly tested yet. Please use with \n" +
+                      "care, or feel free to wait for a later version and let others work \n" +
+                      "the bugs out. Please report any problems you encounter.\n\n" +
+                      "Do you wish to proceed?",
+                      null,
+                      LocDB.MessageTypes.YN);
+                if (false == bProceed)
+                    return false;
+                m_WarningShown = true;
+            }
+
+            return true;
         }
         #endregion
 

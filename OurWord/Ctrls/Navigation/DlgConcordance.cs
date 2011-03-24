@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
-using OurWordData.DataModel.Runs;
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -48,7 +47,7 @@ namespace OurWord.Ctrls.Navigation
             }
         }
         #endregion
-        public GoToConcordanceItem OnGoToConcordanceItem;
+        public GoToLookupItem OnGoToLookupItem;
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -117,7 +116,7 @@ namespace OurWord.Ctrls.Navigation
 
         // Building the concordance ----------------------------------------------------------
         #region CLASS: ConcordanceGroup
-        class ConcordanceGroup : List<ConcordanceInfo>
+        class ConcordanceGroup : List<LookupInfo>
         {
             readonly string BookAbbev;
             readonly string BookDisplayName;
@@ -137,7 +136,7 @@ namespace OurWord.Ctrls.Navigation
                 lv.Groups.Add(group);
 
                 // Create the individual items
-                var v = new ListViewItem[this.Count];
+                var v = new ListViewItem[Count];
                 for (var i = 0; i < Count; i++)
                     v[i] = this[i].ToListViewItem(group);
 
@@ -147,34 +146,7 @@ namespace OurWord.Ctrls.Navigation
             #endregion
         }
         #endregion
-        #region smethod: IEnumerable<int> GetIndexesOf(sSource, sSearchFor)
-        IEnumerable<int> GetIndexesOf(string sSource, string sSearchFor)
-        {
-            var rules = (IgnoreCase) ? StringComparison.InvariantCultureIgnoreCase :
-                StringComparison.InvariantCulture;
 
-            var v = new List<int>();
-
-            var iOffset = 0;
-            int iPos;
-            while ((iPos = sSource.IndexOf(sSearchFor, rules)) != -1)
-            {
-                v.Add(iOffset + iPos);
-                sSource = sSource.Substring(iPos + sSearchFor.Length);
-                iOffset += (iPos + sSearchFor.Length);
-            }
-
-            return v;
-        }
-        #endregion
-        #region smethod: int GetChapterCount(DBook book)
-        static int GetChapterCount(DBook book)
-        {
-            var bookInfo = G.BookGroups.FindBook(book.BookAbbrev);
-            Debug.Assert(null != bookInfo);
-            return bookInfo.ChapterCount;
-        }
-        #endregion
         #region smethod: void StartProgressDialog()
         static void StartProgressDialog()
         {
@@ -182,17 +154,10 @@ namespace OurWord.Ctrls.Navigation
                 "Building Concordance");
             var sExplanation = Loc.GetString("kBuildConcordanceProgress_Explanation",
                 "Please wait while OurWord scans the books in your translation.");
-
-            // Calculate the total number of chapters (for speed, we just use the
-            // cannonical chapters rather than the ones actually drafted.)
-            var nTotalChapters = 0;
-            foreach(var book in DB.TargetTranslation.BookList)
-                nTotalChapters += GetChapterCount(book);
-
             DlgProgress.Start();
             DlgProgress.SetTitle(sTitle);
             DlgProgress.SetExplanation(sExplanation);
-            DlgProgress.SetProgressMax(nTotalChapters);
+            DlgProgress.SetProgressMax(Scanner.GetChapterCount());
         }
         #endregion
         #region smethod: void UpdateProgressMessage(sDisplayName)
@@ -204,35 +169,7 @@ namespace OurWord.Ctrls.Navigation
             DlgProgress.SetCurrentActivity(sStatus);
         }
         #endregion
-        #region method: void ScanBook(DBook book)
-        int ScanBook(DBook book)
-        {
-            var group = new ConcordanceGroup(book);
-            var vParagraphs = book.AllParagraphs;
 
-            foreach(var paragraph in vParagraphs)
-            {
-                foreach(var run in paragraph.Runs)
-                {
-                    var text = run as DText;
-                    if (null == text)
-                        continue;
-
-                    var sText = text.ContentsAsString;
-                    var vIndexes = GetIndexesOf(sText, ConcordOnText);
-                    foreach (var iPosition in vIndexes)
-                    {
-                        group.Add(new ConcordanceInfo(text, iPosition, ConcordOnText.Length));
-                    }
-                }
-            }
-
-            if (group.Count > 0)
-                group.AddToListView(m_List);
-
-            return group.Count;
-        }
-        #endregion
         #region method: void cmdBuildConcordance(object sender, EventArgs e)
         private void cmdBuildConcordance(object sender, EventArgs e)
         {
@@ -243,6 +180,10 @@ namespace OurWord.Ctrls.Navigation
             m_List.Groups.Clear();
             m_List.Enabled = false;
             ResetOccurrences();
+
+            var context = new Scanner.SearchContext(ConcordOnText, null) {
+                IgnoreCase = IgnoreCase
+            };
 
             // Count how many books had hits
             var cBooks = 0;
@@ -262,9 +203,17 @@ namespace OurWord.Ctrls.Navigation
                 // Scan the book
                 using (new LoadedBook(book))
                 {
-                    if (ScanBook(book) > 0)
+                    var vHits = Scanner.ScanBook(context, book);
+
+                    if (vHits.Count > 0)
+                    {
                         cBooks++;
-                    DlgProgress.IncrementProgressValue(GetChapterCount(book));
+                        var group = new ConcordanceGroup(book);
+                        group.AddRange(vHits);
+                        group.AddToListView(m_List);
+                    }
+
+                    DlgProgress.IncrementProgressValue(Scanner.GetChapterCount(book));
                 }
             }
 
@@ -297,7 +246,7 @@ namespace OurWord.Ctrls.Navigation
                 e.Graphics.FillRectangle(new SolidBrush(colorBackground), e.Bounds);
 
             // Get the Info for what we want to draw
-            var info = e.Item.Tag as ConcordanceInfo;
+            var info = e.Item.Tag as LookupInfo;
             Debug.Assert(null != info);
 
             // Get the before and after
@@ -359,20 +308,20 @@ namespace OurWord.Ctrls.Navigation
                 return;
             var item = m_List.SelectedItems[0];
 
-            var info = item.Tag as ConcordanceInfo;
+            var info = item.Tag as LookupInfo;
             if (null == info)
                 return;
 
-            if (null == OnGoToConcordanceItem) 
+            if (null == OnGoToLookupItem) 
                 return;
 
-            var bSelectionSucessfullyMade = OnGoToConcordanceItem(info);
+            var bSelectionSucessfullyMade = OnGoToLookupItem(info);
             if (!bSelectionSucessfullyMade)
                 DisplayNotFoundMessage(info);
         }
         #endregion
-        #region smethod:  void DisplayNotFoundMessage(ConcordanceInfo)
-        static void DisplayNotFoundMessage(ConcordanceInfo ci)
+        #region smethod:  void DisplayNotFoundMessage(LookupInfo)
+        static void DisplayNotFoundMessage(LookupInfo ci)
         {
             LocDB.Message("kBuildConcordanceProgress_NotFoundMessage", 
                 "OurWord could not make the selection at {0}:{1},\n" +

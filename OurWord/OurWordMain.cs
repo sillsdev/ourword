@@ -183,8 +183,8 @@ namespace OurWord
 			// We'll have an autosave every 10 minutes
 			const int c_AutoSaveMinutes = 10;
 
-			m_AutoSaveTimer = new System.Windows.Forms.Timer(this.components);
-			m_AutoSaveTimer.Tick += new System.EventHandler(OnTimerAutoSave);
+			m_AutoSaveTimer = new System.Windows.Forms.Timer(components);
+			m_AutoSaveTimer.Tick += OnTimerAutoSave;
 			m_AutoSaveTimer.Interval = c_AutoSaveMinutes * 60 * 1000;
 
 			m_AutoSaveTimer.Start();
@@ -287,7 +287,7 @@ namespace OurWord
             m_Navigation.OnGoToBook += cmdGoToBook;
 		    m_Navigation.OnGoToSection += cmdGoToSection;
 		    m_Navigation.OnFindText += cmdFindText;
-		    m_Navigation.OnGoToConcordanceItem += cmdGoToConcordanceItem;
+		    m_Navigation.OnGoToLookupItem += cmdGoToLookupItem;
 		    m_Navigation.OnCreateBookmark += CreateBookmark;
 		    m_Navigation.OnGoToBookmark += cmdGoToBookmark;
 
@@ -307,7 +307,7 @@ namespace OurWord
 
 			// Initialize the window state mechanism. We'll default to a full screen
 			// the first time we are launched.
-			m_WindowState = new JW_WindowState(this, true);
+			m_WindowState = new JW_WindowState(this, true, null);
 
             // Create the Undo/Redo Stack
             m_URStack = m_Commands.SetupUndoRedoStack();
@@ -400,7 +400,7 @@ namespace OurWord
                 s_App = value;
             }
 		}
-		private static OurWordMain s_App = null;
+		private static OurWordMain s_App;
 		#endregion
         #region SMethod: bool _GrabTokenForThisInstance() - only run OurWord one-at-a-time
         private static Mutex s_EnsureOneInstanceOnlyMutex;
@@ -409,16 +409,11 @@ namespace OurWord
         {
             bool bMutexCreated;
 
-            string sMutexID = "OneInstanceOnlyAllowedForOurWord";
+            const string sMutexID = "OneInstanceOnlyAllowedForOurWord";
 
             s_EnsureOneInstanceOnlyMutex = new Mutex(true, sMutexID, out bMutexCreated);
 
-            if (!bMutexCreated)
-            {
-                return false;
-            }
-
-            return true;
+            return bMutexCreated;
         }
         #endregion
         #region Method: static void Main() - main entry point for the application
@@ -455,7 +450,7 @@ namespace OurWord
             SplashScreen.Additional = G.GetLoc_Splash("sOptionalAdditional", "-");
             SplashScreen.StatusMessage = G.GetLoc_Splash("sLoadingOurWord", "Loading Our Word...");
             SplashScreen.Version = G.GetLoc_DialogCommon("m_lblVersion", "Version {0}", 
-                new string[] { G.Version });
+                new[] { G.Version });
             SplashScreen.ProgramName = G.GetLoc_DialogCommon("m_lblProgramName", "Our Word!", null);
             SplashScreen.StatusBase = G.GetLoc_Splash("sLoading", "Loading {0}...");
             SplashScreen.Start();
@@ -469,7 +464,7 @@ namespace OurWord
             JW_Registry.SetValue(sShortcutCreated, true);
 
             // Now start loading & run the program
-            OurWordMain.s_App = new OurWordMain();
+            s_App = new OurWordMain();
             Application.EnableVisualStyles();
             Application.Run(s_App);
 
@@ -481,7 +476,7 @@ namespace OurWord
 
 		// Misc Methods ---------------------------------------------------------------------
 		#region Method: void OnLeaveSection()
-		private void OnLeaveSection()
+		public void OnLeaveSection()
 		{
             // Update the filter (if a filter is active) in case this section no
             // longer matches it.
@@ -489,7 +484,7 @@ namespace OurWord
 		}
 		#endregion
 		#region Method: void OnEnterSection()
-		private void OnEnterSection()
+		public void OnEnterSection()
 		{
             m_Navigation.Setup(DB.TargetSection);
 
@@ -532,7 +527,7 @@ namespace OurWord
 
         // Event Handlers --------------------------------------------------------------------
         #region Event: cmdLoad
-        private void cmdLoad(object sender, System.EventArgs e)
+        private void cmdLoad(object sender, EventArgs e)
 		{
             // Init the Help system
             HelpSystem.Initialize(this, "OurWordHelp.chm");
@@ -571,7 +566,7 @@ namespace OurWord
 				if (SplashScreen.Wnd.InvokeRequired)
 				{
 					var d = new SplashScreen.StopSplashScreen_Callback(SplashScreen.Wnd.Stop);
-					this.Invoke(d, new object[] { this });
+					Invoke(d, new object[] { this });
 				}
 				else
 				{
@@ -584,7 +579,6 @@ namespace OurWord
             CurrentLayout.Focus();
         }
 		#endregion
-
         #region Event: cmdClosing - save window state, data, etc.
         private void cmdClosing(object sender, FormClosingEventArgs e)
         {
@@ -652,7 +646,7 @@ namespace OurWord
         #region cmd: cmdPrintBook
         private void cmdPrintBook()
 		{
-            Dim();;
+            Dim();
 			OnLeaveSection();
 
             var p = new Printer(DB.TargetSection);
@@ -677,8 +671,7 @@ namespace OurWord
 
             // To make life easier in case things fail, we'll remember what the user
             // entered in case he has to try again.
-            var wiz = new WizInitializeFromRepository() 
-            {
+            var wiz = new WizInitializeFromRepository {
                 InitialUserName = m_sUserName,
                 InitialPassword = m_sPassword,
                 InitialClusterName = m_sClusterName
@@ -1278,13 +1271,25 @@ namespace OurWord
             if (null == selection) 
                 return;
 
-            selection = CurrentLayout.Contents.FindNext(selection, sText);
-            if (null != selection)
-                CurrentLayout.Selection = selection;
+            // Find the next match
+            var context = new Scanner.SearchContext(sText, selection);
+            var lookupInfo = Scanner.ScanBook(context, DB.TargetBook, Scanner.ScanOption.After, selection);
+            if (null != lookupInfo)
+            {
+                cmdGoToLookupItem(lookupInfo);
+            }
+            else
+            {
+                LocDB.Message("kFind_NoMoreMatches",
+                    "There are no more occurrences of '{0}' in {1}.",
+                    new[] { sText, DB.TargetBook.DisplayName },
+                    LocDB.MessageTypes.Info);
+            }
+
         }
         #endregion
-        #region cmd: bool cmdGoToConcordanceItem(ConcordanceInfo)
-        bool cmdGoToConcordanceItem(ConcordanceInfo ci)
+        #region cmd: bool cmdGoToLookupItem(LookupInfo)
+        bool cmdGoToLookupItem(LookupInfo ci)
         {
             // Must be in a layout that shows the vernacular
             if (WLayout.CurrentLayoutIs(WndBackTranslation.c_sName))
@@ -1297,24 +1302,41 @@ namespace OurWord
             if (ci.BookAbbrev != DB.TargetBook.BookAbbrev)
                 cmdGoToBook(ci.BookAbbrev);
 
-            // Go to the correct section if we're not there already
-            cmdGoToSection(DB.TargetBook.Sections[ci.SectionNo]);
+            // Determine the target section
+            var section = DB.TargetBook.Sections[ci.SectionNo];
 
             // Determine the target paragraph
-            if (ci.ParagraphNo >= DB.TargetSection.Paragraphs.Count)
+            if (ci.ParagraphNo >= section.Paragraphs.Count)
                 return false;
-            var paragraph = DB.TargetSection.Paragraphs[ci.ParagraphNo];
+            var paragraph = section.Paragraphs[ci.ParagraphNo];
 
-            // Determine the target DText
+            // Determine the target run
             if (ci.RunNo >= paragraph.Runs.Count)
                 return false;
-            var text = paragraph.Runs[ci.RunNo] as DText;
+            var run = paragraph.GetRunFromNonEmptyRunNo(ci.RunNo);
+
+            // Default as a DBasicText 
+            var text = run as DBasicText;
+
+            // If a Footnote, drop down a level
+            var foot = run as DFoot;
+            if (null != foot && ci.FootnoteRunNo != -1)
+            {
+                paragraph = foot.Footnote;
+                text = paragraph.GetRunFromNonEmptyRunNo(ci.FootnoteRunNo) as DBasicText;
+            }
+
+            // By now, we should have a text referenced
             if (null == text)
                 return false;
 
-            // Select the desired text
-            var selection = CurrentLayout.Contents.MakeSelection(text, ci.IndexIntoParagraph, 
-                ci.SelectionLength);
+            // Go to the correct section if we're not there already
+            cmdGoToSection(section);
+
+            // Select the text
+            var owp = CurrentLayout.Contents.FindParagraph(paragraph, OWPara.Flags.None);
+            var selection = OWWindow.Sel.CreateSel(owp, text, ci.IndexIntoText, 
+                ci.IndexIntoText + ci.SelectionLength);
             if (null == selection)
                 return false;
 
@@ -1359,7 +1381,7 @@ namespace OurWord
             // Go to the requested section
             if (bookmark.SectionNo >= DB.TargetBook.Sections.Count)
                 throw new Exception("Unable to go to the bookmarked section");
-            var section = DB.TargetBook.Sections[bookmark.SectionNo] as DSection;
+            var section = DB.TargetBook.Sections[bookmark.SectionNo];
             cmdGoToSection(section);
 
             // Go to the requested layout

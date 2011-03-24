@@ -72,7 +72,7 @@ namespace OurWordTests.Edit
             // Load the window
             foreach (DParagraph p in Section.Paragraphs)
             {
-                OWPara op = new OWPara( 
+                var op = new OWPara( 
                     WSVernacular, 
                     p.Style, 
                     p, 
@@ -142,8 +142,9 @@ namespace OurWordTests.Edit
         {
             // Application and Project initialization
             OurWordMain.App = new OurWordMain();
-            DB.Project = new DProject();
-            DB.Project.TeamSettings = new DTeamSettings();
+            DB.Project = new DProject {
+                TeamSettings = new DTeamSettings()
+            };
             DTeamSettings.EnsureInitialized();
             DB.Project.DisplayName = "Project";
             DB.Project.TargetTranslation = new DTranslation("Test Translation", "Latin", "Latin");
@@ -193,11 +194,34 @@ namespace OurWordTests.Edit
             s_Window.LoadData();
         }
         #endregion
+        #region SMethod: void Setup(DSection section)
+        static public void Setup(DSection section)
+        {
+            TestCommon.GlobalTestSetup();
+
+            // Set up the app, project, translation, etc
+            _PreliminarySetup();
+            s_section = section;
+            s_book = section.Book;
+
+            // Set up an OWWindow
+            s_Window = new TestWindow(s_section);
+
+            // Set up a Form
+            s_Form = new Form { Name = "TestForm" };
+            s_Form.Controls.Add(s_Window);
+
+            // Load the window
+            s_Window.LoadData();
+        }
+        #endregion
+
         #region SMethod: void TearDown()
         static public void TearDown()
         {
             DB.Project = null;
-            s_Form.Dispose();
+            if (null != s_Form)
+                s_Form.Dispose();
             s_Form = null;
         }
         #endregion

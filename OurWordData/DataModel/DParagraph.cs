@@ -268,15 +268,15 @@ namespace OurWordData.DataModel
 
         // Derived Attrs ---------------------------------------------------------------------
         #region Attr{g}: List<DText> Texts
-        public List<DText> Texts
+        public List<DBasicText> Texts
 	    {
 	        get
 	        {
-	            var vText = new List<DText>();
+	            var vText = new List<DBasicText>();
 
                 foreach(DRun run in Runs)
                 {
-                    var text = run as DText;
+                    var text = run as DBasicText;
                     if (null != text)
                         vText.Add(text);
                 }
@@ -754,24 +754,24 @@ namespace OurWordData.DataModel
 			}
 
 			// Add DTexts to the target as needed
-			int iTarget = 0;
-			for(int i = 0; i < pModel.Runs.Count; i++, iTarget++)
+			var iTarget = 0;
+			for(var i = 0; i < pModel.Runs.Count; i++, iTarget++)
 			{
 				// Retrieve the Model's run
-				DRun runModel = pModel.Runs[i] as DRun;
+				var runModel = pModel.Runs[i];
 
 				// Retrieve the target's run (if any)
 				DRun runTarget = null;
 				if (iTarget < Runs.Count)
-					runTarget = Runs[iTarget] as DRun;
+					runTarget = Runs[iTarget];
 
 				// If the model is a DText, but if the Target isn't, then we need to
 				// insert a DText into the Target.
-				bool bModelIsDText = (null != runModel as DText);
-				bool bTargetIsNot  = (null == runTarget || null == runTarget as DText);
+				var bModelIsDText = (null != runModel as DText);
+				var bTargetIsNot  = (null == runTarget || null == runTarget as DText);
 				// The previous run should not be a DText, else we are merely inserting
 				// one adjacent to another, which is not necessary.
-				bool bTargetPrevIsDText = true;
+				var bTargetPrevIsDText = true;
 				if (iTarget == 0 || 
 					null == Runs[iTarget-1] || 
 					null == Runs[iTarget-1] as DText)
@@ -780,7 +780,7 @@ namespace OurWordData.DataModel
 				}
 				if (bModelIsDText && bTargetIsNot && !bTargetPrevIsDText)
 				{
-					DText text = DText.CreateSimple();
+					var text = DText.CreateSimple();
 					Runs.InsertAt(iTarget, text, true);
 				}
 			}
@@ -813,9 +813,9 @@ namespace OurWordData.DataModel
 		{
 			// If we have any DFootLetter's or DSeeAlso's that do not have a DFootnote
 			// attached to them, then we remove them from the paragraph.
-			for(int i=0; i < Runs.Count; )
+			for(var i=0; i < Runs.Count; )
 			{
-				DFoot foot = Runs[i] as DFoot;
+				var foot = Runs[i] as DFoot;
 
                 if (null != foot && null == foot.Footnote)
                     Runs.RemoveAt(i);
@@ -844,12 +844,63 @@ namespace OurWordData.DataModel
             // Make sure that all DTexts have phrases
             foreach (DRun run in Runs)
             {
-                DBasicText text = run as DBasicText;
+                var text = run as DBasicText;
                 if (null != text)
                     text.Cleanup();
             }
 		}
 		#endregion
+
+        // Run Access ------------------------------------------------------------------------
+        // This method pair is not affected by insertion icons we've added at runtime
+        #region Method: int GetNonEmptyRunNo(DRun runTarget)
+        public int GetNonEmptyRunNo(DRun runTarget)
+        {
+            var c = 0;
+
+            foreach(var run in Runs)
+            {
+                // Skip any empty texts
+                var text = run as DBasicText;
+                if (null != text &&
+                    string.IsNullOrEmpty(text.Phrases.AsString) &&
+                    string.IsNullOrEmpty(text.PhrasesBT.AsString))
+                {
+                    continue;
+                }
+
+                if (run == runTarget)
+                    return c;
+                c++;
+            }
+
+            return -1;
+        }
+        #endregion
+        #region Method: DRun GetRunFromNonEmptyRunNo(nRunNo)
+        public DRun GetRunFromNonEmptyRunNo(int nRunNo)
+        {
+            foreach (DRun run in Runs)
+            {
+                // Skip any empty texts
+                var text = run as DBasicText;
+                if (null != text &&
+                    string.IsNullOrEmpty(text.Phrases.AsString) &&
+                    string.IsNullOrEmpty(text.PhrasesBT.AsString))
+                {
+                    continue;
+                }
+
+                if (nRunNo == 0)
+                    return run;
+
+                nRunNo--;
+
+            }
+
+            return null;
+        }
+        #endregion
 
         // Methods involving splitting -------------------------------------------------------
         #region Method: DBasicText SplitText(DBasicText dbtToSplit, int iTextSplitPos)
@@ -1412,7 +1463,7 @@ namespace OurWordData.DataModel
         }
         #endregion
         #region Method:  void ReadOxes(nodeParagraph)
-        protected void ReadOxes(XmlNode nodeParagraph)
+        public void ReadOxes(XmlNode nodeParagraph)
             // Note that DPicture.CreatePicture calls this, too.
         {
             // Style attribute
