@@ -9,9 +9,10 @@
  *********************************************************************************************/
 using System;
 using System.Diagnostics;
-using System.Text;
+using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
+using System.Xml;
 #endregion
 
 namespace JWTools
@@ -59,6 +60,21 @@ namespace JWTools
         }
         string m_sToolTip = "";
         #endregion
+        #region VAttr{g}: bool HasData
+        public bool HasData
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(Value))
+                    return true;
+                if (!string.IsNullOrEmpty(ShortcutKey))
+                    return true;
+                if (!string.IsNullOrEmpty(ToolTip))
+                    return true;
+                return false;
+            }
+        }
+        #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sValue, sKey, sTip)
@@ -72,87 +88,54 @@ namespace JWTools
 
         // I/O -------------------------------------------------------------------------------
         #region CONSTANTS
-        public const string c_sTag = "Alt";
-        public const string c_sID = "ID";
-        public const string c_sValue = "Value";
-        public const string c_sKey = "Key";
-        public const string c_sTip = "Tip";
+        private const string c_sValue = "Value";
+        private const string c_sKey = "Key";
+        private const string c_sTip = "Tip";
         #endregion
-        #region Method: void WriteXML(XmlField xmlParent, string sLanguageID)
-        public void WriteXML(XmlField xmlParent, string sLanguageID)
+        #region Method: void SaveLanguageData(doc, nodeItem)
+        public void SaveLanguageData(XmlDoc doc, XmlNode nodeItem)
         {
-            // Nothing to write if completely empty
-            bool bHasValue = !string.IsNullOrEmpty(Value);
-            bool bHasKey = !string.IsNullOrEmpty(ShortcutKey);
-            bool bHasTip = !string.IsNullOrEmpty(ToolTip);
-            if (!bHasValue && !bHasKey && !bHasTip)
-                return;
-
-            // Beginning tag <Item> contains the ID
-            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-
-            // The ID for the language, e.g., "sp", "inz"
-            string s = XmlField.BuildAttrString(c_sID, sLanguageID);
-
-            // The value
-            if (bHasValue)
-                s += XmlField.BuildAttrString(c_sValue, Value);
-
-            // Shortcut if present
-            if (bHasKey)
-                s += XmlField.BuildAttrString(c_sKey, ShortcutKey);
-
-            // Tooltip if present
-            if (bHasTip)
-                s += XmlField.BuildAttrString(c_sTip, ToolTip);
-
-            // Write it out
-            xml.OneLiner(s, "");
+            doc.AddAttr(nodeItem, c_sValue, Value);
+            doc.AddAttr(nodeItem, c_sKey, ShortcutKey);
+            doc.AddAttr(nodeItem, c_sTip, ToolTip);
         }
         #endregion
-        #region SMethod: LocAlternate ReadXML(XmlRead xml)
-        static public LocAlternate ReadXML(XmlRead xml)
+        #region SMethod: LocAlternate Create(XmlNode node)
+        static public LocAlternate Create(XmlNode node)
         {
-            // Collect the parts
-            string sValue = xml.GetValue(c_sValue);
-            string sShortcutKey = xml.GetValue(c_sKey);
-            string sToolTip = xml.GetValue(c_sTip);
-
-            // Create and return the class
-            LocAlternate alt = new LocAlternate(sValue, sShortcutKey, sToolTip);
-            return alt;
+            return new LocAlternate(
+                XmlDoc.GetAttrValue(node, c_sValue),
+                XmlDoc.GetAttrValue(node, c_sKey),
+                XmlDoc.GetAttrValue(node, c_sTip));
         }
         #endregion
 
         // Determine if Needs Attention ------------------------------------------------------
-        #region Method: bool EndsWithColon(s)
-        bool EndsWithColon(string s)
+        #region smethod: bool EndsWithColon(s)
+        static bool EndsWithColon(string s)
         {
             return s.Length > 0 && s[s.Length - 1] == ':';
         }
         #endregion
-        #region Method: bool EndsWithEllipsis(s)
-        bool EndsWithEllipsis(string s)
+        #region smethod: bool EndsWithEllipsis(s)
+        static bool EndsWithEllipsis(string s)
         {
             if (s.Length < 3)
                 return false;
 
-            if (s.Substring(s.Length - 3) == "...")
-                return true;
-
-            return false;
+            return s.Substring(s.Length - 3) == "...";
         }
         #endregion
-        #region Method: int ParameterCount(s)
-        int ParameterCount(string s)
+        #region smethod: int ParameterCount(s)
+        static int ParameterCount(string s)
         {
-            int c = 0;
+            var c = 0;
 
-            for (int i = 0; i < s.Length - 2; i++)
+            for (var i = 0; i < s.Length - 2; i++)
             {
-                char ch1 = s[i];
-                char ch2 = s[i + 1];
-                char ch3 = s[i + 2];
+                var ch1 = s[i];
+                var ch2 = s[i + 1];
+                var ch3 = s[i + 2];
                 if (ch1 == '{' && Char.IsDigit(ch2) && ch3 == '}')
                     c++;
             }
@@ -160,13 +143,12 @@ namespace JWTools
             return c;
         }
         #endregion
-        #region Method: bool HasAmpersand(string s)
-        bool HasAmpersand(string s)
+        #region smethod: bool HasAmpersand(string s)
+        static bool HasAmpersand(string s)
         {
-            if (s.IndexOf('&') != -1)
-                return true;
-            return false;
+            return s.IndexOf('&') != -1;
         }
+
         #endregion
         #region Method: string NeedsAttention(LocItem item)
         public string NeedsAttention(LocItem item)
@@ -253,18 +235,7 @@ namespace JWTools
         string m_sInformation = "";
         #endregion
         #region Attr{g/s}: bool CanHaveShortcutKey
-        public bool CanHaveShortcutKey
-        {
-            get
-            {
-                return m_bCanHaveShortcutKey;
-            }
-            set
-            {
-                m_bCanHaveShortcutKey = value;
-            }
-        }
-        bool m_bCanHaveShortcutKey = false;
+        public bool CanHaveShortcutKey { get; private set; }
         #endregion
         #region Attr{g/s}: string ShortcutKey - the string in English, always available
         public string ShortcutKey
@@ -285,17 +256,14 @@ namespace JWTools
         {
             get
             {
-                if (!string.IsNullOrEmpty(ToolTip))
-                    return true;
-
-                return m_bCanHaveToolTip;
+                return !string.IsNullOrEmpty(ToolTip) || m_bCanHaveToolTip;
             }
-            set
+            private set
             {
                 m_bCanHaveToolTip = value;
             }
         }
-        bool m_bCanHaveToolTip = false;
+        bool m_bCanHaveToolTip;
         #endregion
         #region Attr{g/s}: string ToolTip
         public string ToolTip
@@ -362,26 +330,18 @@ namespace JWTools
                 // If the primary language is null, then English was intended
                 if (null == LocDB.DB.PrimaryLanguage)
                     return English;
-
                 // Otherwise, go for one of our localized languages
-                if (null != LocDB.DB.PrimaryLanguage)
-                {
-                    LocAlternate alt = GetAlternate(LocDB.DB.PrimaryLanguage.Index);
-                    if (null != alt)
-                        return alt.Value;
-                }
+                var altPrimary = GetAlternate(LocDB.DB.PrimaryLanguage.Index);
+                if (null != altPrimary)
+                    return altPrimary.Value;
 
                 // If the secondary language is null, then English was intended
                 if (null == LocDB.DB.SecondaryLanguage)
                     return English;
-
                 // Otherwise, go for one of our localized languages
-                if (null != LocDB.DB.SecondaryLanguage)
-                {
-                    LocAlternate alt = GetAlternate(LocDB.DB.SecondaryLanguage.Index);
-                    if (null != alt)
-                        return alt.Value;
-                }
+                var altSecondary = GetAlternate(LocDB.DB.SecondaryLanguage.Index);
+                if (null != altSecondary)
+                    return altSecondary.Value;
 
                 // If here, then the localization did not exist for either Primary or Secondary
                 return English;
@@ -396,26 +356,18 @@ namespace JWTools
                 // If the primary language is null, then English was intended
                 if (null == LocDB.DB.PrimaryLanguage)
                     return ShortcutKey;
-
                 // Otherwise, go for one of our localized languages
-                if (null != LocDB.DB.PrimaryLanguage)
-                {
-                    LocAlternate alt = GetAlternate(LocDB.DB.PrimaryLanguage.Index);
-                    if (null != alt && !string.IsNullOrEmpty(alt.ShortcutKey))
-                        return alt.ShortcutKey;
-                }
+                var altPrimary = GetAlternate(LocDB.DB.PrimaryLanguage.Index);
+                if (null != altPrimary && !string.IsNullOrEmpty(altPrimary.ShortcutKey))
+                     return altPrimary.ShortcutKey;
 
                 // If the secondary language is null, then English was intended
                 if (null == LocDB.DB.SecondaryLanguage)
                     return ShortcutKey;
-
                 // Otherwise, go for one of our localized languages
-                if (null != LocDB.DB.SecondaryLanguage)
-                {
-                    LocAlternate alt = GetAlternate(LocDB.DB.SecondaryLanguage.Index);
-                    if (null != alt && !string.IsNullOrEmpty(alt.ShortcutKey))
-                        return alt.ShortcutKey;
-                }
+                var altSecondary = GetAlternate(LocDB.DB.SecondaryLanguage.Index);
+                if (null != altSecondary && !string.IsNullOrEmpty(altSecondary.ShortcutKey))
+                     return altSecondary.ShortcutKey;
 
                 // If here, then the localization did not exist for either Primary or Secondary
                 return ShortcutKey;
@@ -430,26 +382,18 @@ namespace JWTools
                 // If the primary language is null, then English was intended
                 if (null == LocDB.DB.PrimaryLanguage)
                     return ToolTip;
-
                 // Otherwise, go for one of our localized languages
-                if (null != LocDB.DB.PrimaryLanguage)
-                {
-                    LocAlternate alt = GetAlternate(LocDB.DB.PrimaryLanguage.Index);
-                    if (null != alt && !string.IsNullOrEmpty(alt.ToolTip))
-                        return alt.ToolTip;
-                }
+                var altPrimary = GetAlternate(LocDB.DB.PrimaryLanguage.Index);
+                if (null != altPrimary && !string.IsNullOrEmpty(altPrimary.ToolTip))
+                    return altPrimary.ToolTip;
 
                 // If the secondary language is null, then English was intended
                 if (null == LocDB.DB.SecondaryLanguage)
                     return ToolTip;
-
                 // Otherwise, go for one of our localized languages
-                if (null != LocDB.DB.SecondaryLanguage)
-                {
-                    LocAlternate alt = GetAlternate(LocDB.DB.SecondaryLanguage.Index);
-                    if (null != alt && !string.IsNullOrEmpty(alt.ToolTip))
-                        return alt.ToolTip;
-                }
+                var altSecondary = GetAlternate(LocDB.DB.SecondaryLanguage.Index);
+                if (null != altSecondary && !string.IsNullOrEmpty(altSecondary.ToolTip))
+                    return altSecondary.ToolTip;
 
                 // If here, then the localization did not exist for either Primary or Secondary
                 return ToolTip;
@@ -458,133 +402,76 @@ namespace JWTools
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        #region DOC
-        /* XML Format (eventually I want the Alts in their own file)
-         * 
-         * <Item ID="m_menuNew" Key="true" Tip="true">
-         *    <Info>"Menu command to create a new project."</Info>
-         *    <En>"&Amp;New..."</En>
-         *    <Key>Ctrl+N</Key>
-         *    <Tip Title="New Project">Create a blank, new project</Tip>
-         *    <Alt lang="inz" Value="&amp;Baru..." Key="Ctrl+B" TipTitle="Proyek Baru" TipText="Cipta proyeck yang baru"></Alt>
-         *    <Alt lang="sp" Value="&amp;Nuevo..." Key="Ctrl+N"></Alt>
-         *    <Alt lang="swh" Value="&amp;Mpya..."></Alt>
-         * </Item>
-         */
-        #endregion
         #region CONSTANTS
         public const string c_sTag = "Item";
         public const string c_sID = "ID";
         public const string c_sEnglish = "English";
-        public const string c_sInformation = "Info";
-        public const string c_sTip = "Tip";
-        public const string c_sKey = "Key";
+        private const string c_sInformation = "Info";
+        private const string c_sTip = "Tip";
+        private const string c_sKey = "Key";
+        private const string c_sCanHaveShortcutKey = "CanKey";
+        private const string c_sCanHaveTooltip = "CanTip";
         #endregion
-        #region Method: void WriteXML(XmlField xmlParent)
-        public void WriteXML(XmlField xmlParent)
+        #region Method: void ReadLanguageData(nodeItem, LocLanguage)
+        public void ReadLanguageData(XmlNode nodeItem, LocLanguage language)
         {
-            // Beginning tag <Item> contains the ID
-            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-            string s = XmlField.BuildAttrString(c_sID, ID);
-            if (CanHaveShortcutKey)
-                s += XmlField.BuildAttrString(c_sKey, "true");
-            if (CanHaveToolTip)
-                s += XmlField.BuildAttrString(c_sTip, "true");
-            xml.Begin(s);
-
-            // Add the English
-            xml.GetDaughterXmlField(c_sEnglish, true).OneLiner(English);
-
-            // Add the Information, if any
-            if (!string.IsNullOrEmpty(Information))
-                xml.GetDaughterXmlField(c_sInformation, true).OneLiner(Information);
-
-            // Add the shortcut key, if any
-            if (!string.IsNullOrEmpty(ShortcutKey))
-                xml.GetDaughterXmlField(c_sKey, true).OneLiner(ShortcutKey);
-
-            // Add the Tooltip, if any
-            if (!string.IsNullOrEmpty(ToolTip))
-                xml.GetDaughterXmlField(c_sTip, true).OneLiner(ToolTip);
-
-            // End Tag </Item>
-            xml.End();
+            var alt = LocAlternate.Create(nodeItem);
+            if (null != alt)
+                AddAlternate(language.Index, alt);
         }
         #endregion
-        #region SMethod: LocItem ReadXML(XmlRead xml)
-        static public LocItem ReadXML(XmlRead xml)
+        #region Method: void Save(doc, nodeGroup)
+        public void Save(XmlDoc doc, XmlNode nodeGroup)
         {
-            // Collect the ID from the Tag line, and create an item from it
-            string sID = xml.GetValue(c_sID);
-            LocItem item = new LocItem(sID);
+            var nodeItem = doc.AddNode(nodeGroup, c_sTag);
 
-            string sCanHaveKey = xml.GetValue(c_sKey);
-            if (!string.IsNullOrEmpty(sCanHaveKey) && sCanHaveKey == "true")
-                item.CanHaveShortcutKey = true;
+            doc.AddAttr(nodeItem, c_sID, ID);
+            doc.AddAttr(nodeItem, c_sEnglish, English);
+            doc.AddAttr(nodeItem, c_sCanHaveShortcutKey, CanHaveShortcutKey);
+            doc.AddAttr(nodeItem, c_sKey, ShortcutKey);
+            doc.AddAttr(nodeItem, c_sCanHaveTooltip, CanHaveToolTip);
+            doc.AddAttr(nodeItem, c_sTip, ToolTip);
+            doc.AddAttr(nodeItem, c_sInformation, Information);
+        }
+        #endregion
+        #region Method: void SaveLanguageData(XmlField xmlParent, LocLanguage)
+        public void SaveLanguageData(XmlDoc doc, XmlNode nodeParent, LocLanguage lang)
+        {
+            var alt = GetAlternate(lang.Index);
+            if (null == alt || !alt.HasData)
+                return;
 
-            string sCanHaveTip = xml.GetValue(c_sTip);
-            if (!string.IsNullOrEmpty(sCanHaveTip) && sCanHaveTip == "true")
-                item.CanHaveToolTip = true;
+            var nodeItem = doc.AddNode(nodeParent, c_sTag);
+            doc.AddAttr(nodeItem, c_sID, ID);
 
-            // Loop through the other lines for the remaining data
-            while (xml.ReadNextLineUntilEndTag(c_sTag))
-            {
-                if (xml.IsTag(c_sInformation))
-                    item.Information = xml.GetOneLinerData();
+            alt.SaveLanguageData(doc, nodeItem);
+        }
+        #endregion
+        #region SMethod: LocItem Create(nodeItem)
+        static public LocItem Create(XmlNode nodeItem)
+        {
+            if (!XmlDoc.IsNode(nodeItem, c_sTag))
+                return null;
 
-                if (xml.IsTag(c_sEnglish))
-                    item.English = xml.GetOneLinerData();
-
-                if (xml.IsTag(c_sKey))
-                    item.ShortcutKey = xml.GetOneLinerData();
-
-                if (xml.IsTag(c_sTip))
-                    item.ToolTip = xml.GetOneLinerData();
-            }
+            var item = new LocItem(XmlDoc.GetAttrValue(nodeItem, c_sID)) {
+                English = XmlDoc.GetAttrValue(nodeItem, c_sEnglish),
+                CanHaveShortcutKey = XmlDoc.GetAttrValue(nodeItem, c_sCanHaveShortcutKey, false),
+                ShortcutKey = XmlDoc.GetAttrValue(nodeItem, c_sKey),
+                CanHaveToolTip = XmlDoc.GetAttrValue(nodeItem, c_sCanHaveTooltip, false),
+                ToolTip = XmlDoc.GetAttrValue(nodeItem, c_sTip),
+                Information = XmlDoc.GetAttrValue(nodeItem, c_sInformation),
+            };
 
             return item;
-        }
-        #endregion
-        #region Method: void WriteLanguageData(XmlField xmlParent, LocLanguage)
-        public void WriteLanguageData(XmlField xmlParent, LocLanguage lang)
-        {
-            // Initialize the Item field
-            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-            string s = XmlField.BuildAttrString(c_sID, ID);
-            xml.Begin(s);
-
-            // Write the languge data
-            LocAlternate alt = GetAlternate(lang.Index);
-            if (null != alt)
-                alt.WriteXML(xml, lang.ID);
-
-            // Done
-            xml.End();
-        }
-        #endregion
-        #region Method: void ReadLanguageData(XmlRead, LocLanguage)
-        public void ReadLanguageData(XmlRead xml, LocLanguage lang)
-        {
-            while (xml.ReadNextLineUntilEndTag(c_sTag))
-            {
-                if (xml.IsTag(LocAlternate.c_sTag))
-                {
-                    string sLanguageID = xml.GetValue(LocAlternate.c_sID);
-                    if (sLanguageID != lang.ID)
-                        return;
-
-                    LocAlternate alt = LocAlternate.ReadXML(xml);
-                    AddAlternate(lang.Index, alt);
-                }
-            }
         }
         #endregion
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sID)
-        public LocItem(string _sID)
+        public LocItem(string sId)
         {
-            m_sID = _sID;
+            CanHaveShortcutKey = false;
+            m_sID = sId;
 
             m_vAlternates = new LocAlternate[0];
         }
@@ -601,11 +488,11 @@ namespace JWTools
         {
             get
             {
-                Debug.Assert(null != m_sID && m_sID.Length > 0);
+                Debug.Assert(!string.IsNullOrEmpty(m_sID));
                 return m_sID;
             }
         }
-        string m_sID;
+        readonly string m_sID;
         #endregion
         #region Attr{g/s}: string Description - a description for the Group
         public string Description
@@ -626,25 +513,14 @@ namespace JWTools
         {
             get
             {
-                Debug.Assert(null != m_sTitle && m_sTitle.Length > 0);
+                Debug.Assert(!string.IsNullOrEmpty(m_sTitle));
                 return m_sTitle;
             }
         }
-        string m_sTitle;
+        readonly string m_sTitle;
         #endregion
         #region Attr{g/s}: bool TranslatorAudience - If F, Advisor is the primary audience for these terms
-        public bool TranslatorAudience
-        {
-            get
-            {
-                return m_bTranslatorAudience;
-            }
-            set
-            {
-                m_bTranslatorAudience = value;
-            }
-        }
-        bool m_bTranslatorAudience;
+        public bool TranslatorAudience { get; private set; }
         #endregion
 
         // Items -----------------------------------------------------------------------------
@@ -775,108 +651,106 @@ namespace JWTools
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        public const string c_sTag = "Group";
+        #region Constants
+        private const string c_sTag = "Group";
         public const string c_sID = "ID";
-        public const string c_sTitle = "Title";
-        public const string c_sDescription = "Des";
-        public const string c_sTranslatorAudience = "Translator";
-        #region Method: void WriteXML(XmlField xmlParent)
-        public void WriteXML(XmlField xmlParent)
+        private const string c_sTitle = "Title";
+        private const string c_sDescription = "Des";
+        private const string c_sTranslatorAudience = "Translator";
+        #endregion
+        #region Method: void Save(doc, nodeParent)
+        public void Save(XmlDoc doc, XmlNode nodeParent)
         {
-            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
+            var nodeGroup = doc.AddNode(nodeParent, c_sTag);
 
-            string s = XmlField.BuildAttrString(c_sID, ID);
+            doc.AddAttr(nodeGroup, c_sID, ID);
+            doc.AddAttr(nodeGroup, c_sTitle, Title);
+            doc.AddAttr(nodeGroup, c_sDescription, Description);
+            doc.AddAttr(nodeGroup, c_sTranslatorAudience, TranslatorAudience);
 
-            s += XmlField.BuildAttrString(c_sTitle, Title);
+            foreach (var item in Items)
+                item.Save(doc, nodeGroup);
 
-            if (!string.IsNullOrEmpty(Description))
-                s += XmlField.BuildAttrString(c_sDescription, Description);
-
-            s += XmlField.BuildAttrString(c_sTranslatorAudience,
-                (TranslatorAudience) ? "true" : "false");
-
-            xml.Begin(s);
-
-            foreach (LocItem item in Items)
-                item.WriteXML(xml);
-
-            foreach (LocGroup sub in Groups)
-                sub.WriteXML(xml);
-
-            xml.End();
+            foreach(var subGroup in Groups)
+                subGroup.Save(doc, nodeGroup);
         }
         #endregion
-        #region SMethod: LocGroup ReadXML(LocDB db, XmlRead xml)
-        static public LocGroup ReadXML(LocDB db, XmlRead xml)
+        #region Method: void SaveLanguageData(doc, nodeParent, LocLanguage)
+        public void SaveLanguageData(XmlDoc doc, XmlNode nodeParent, LocLanguage language)
         {
-            string sID = xml.GetValue(c_sID);
-            string sTitle = xml.GetValue(c_sTitle);
-            string sDescription = xml.GetValue(c_sDescription);
-            string sTranslatorAudience = xml.GetValue(c_sTranslatorAudience);
+            var nodeGroup = doc.AddNode(nodeParent, c_sTag);
 
-            LocGroup group = new LocGroup(sID, sTitle);
-            group.Description = sDescription;
-            group.TranslatorAudience = (sTranslatorAudience == "true") ? true : false;
+            doc.AddAttr(nodeGroup, c_sID, ID);
 
-            while (xml.ReadNextLineUntilEndTag(c_sTag))
+            foreach (var item in Items)
+                item.SaveLanguageData(doc, nodeGroup, language);
+
+            foreach (var subGroup in Groups)
+                subGroup.SaveLanguageData(doc, nodeGroup, language);
+
+            // If nothing was ever added, then remove this group so we don't save anything;
+            // makes the data files more compact and easier to see what's actually be localized.
+            if (nodeGroup.ChildNodes.Count == 0)
+                nodeParent.RemoveChild(nodeGroup);
+        }
+        #endregion
+        #region SMethod: LocGroup Create(nodeGroup)
+        public static LocGroup Create(XmlNode nodeGroup)
+        {
+            if (!XmlDoc.IsNode(nodeGroup, c_sTag))
+                return null;
+
+            var group = new LocGroup(
+                XmlDoc.GetAttrValue(nodeGroup, c_sID),
+                XmlDoc.GetAttrValue(nodeGroup, c_sTitle)) 
             {
-                if (xml.IsTag(LocItem.c_sTag))
+                Description = XmlDoc.GetAttrValue(nodeGroup, c_sDescription),
+                TranslatorAudience = XmlDoc.GetAttrValue(nodeGroup, c_sTranslatorAudience, false)
+            };
+
+            foreach(XmlNode child in nodeGroup.ChildNodes)
+            {
+                var item = LocItem.Create(child);
+                if (null != item)
                 {
-                    LocItem item = LocItem.ReadXML(xml);
                     group.AppendItem(item);
+                    continue;
                 }
 
-                if (xml.IsTag(LocGroup.c_sTag))
-                {
-                    LocGroup sub = LocGroup.ReadXML(db, xml);
-                    group._AppendGroup(sub);
-                }
+                var subGroup = Create(child);
+                if (null != subGroup)
+                    group._AppendGroup(subGroup);
             }
 
             return group;
         }
         #endregion
-        #region Method: void WriteLanguageData(xmlParent, LocLanguage)
-        public void WriteLanguageData(XmlField xmlParent, LocLanguage lang)
+        #region Method: void ReadLanguageData(nodeGroup, LocLanguage)
+        public void ReadLanguageData(XmlNode nodeGroup, LocLanguage language)
         {
-            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-
-            string s = XmlField.BuildAttrString(c_sID, ID);
-
-            xml.Begin(s);
-
-            foreach (LocItem item in Items)
-                item.WriteLanguageData(xml, lang);
-
-            foreach (LocGroup sub in Groups)
-                sub.WriteLanguageData(xml, lang);
-
-            xml.End();
-        }
-        #endregion
-        #region Method: void ReadLanguageData(XmlRead, LocLanguage)
-        public void ReadLanguageData(XmlRead xml, LocLanguage lang)
-        {
-            while (xml.ReadNextLineUntilEndTag(c_sTag))
+            foreach (XmlNode child in nodeGroup)
             {
-                if (xml.IsTag(LocItem.c_sTag))
+                if (XmlDoc.IsNode(child, LocItem.c_sTag))
                 {
-                    string sItemID = xml.GetValue(LocItem.c_sID);
-                    LocItem item = Find(sItemID);
-                    if (null != item)
-                        item.ReadLanguageData(xml, lang);
+                    var id = XmlDoc.GetAttrValue(child, LocItem.c_sID);
+                    var item = Find(id);
+                    if (null == item)
+                        continue;
+                    item.ReadLanguageData(child, language);
                 }
 
-                if (xml.IsTag(LocGroup.c_sTag))
+                else if (XmlDoc.IsNode(child, c_sTag))
                 {
-                    string sGroupID = xml.GetValue(LocGroup.c_sID);
-                    LocGroup group = FindGroup(sGroupID);
-                    if (null != group)
-                        group.ReadLanguageData(xml, lang);
+                    var idGroup = XmlDoc.GetAttrValue(child, c_sID);
+                    var group = FindGroup(idGroup);
+                    if (null == group)
+                        continue;
+                    group.ReadLanguageData(child, language);
                 }
             }
         }
         #endregion
+
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(sID, sTitle)
@@ -960,63 +834,44 @@ namespace JWTools
         #region Constructor(sID, sName, iIndex)
         public LocLanguage(string _sID, string _sName, int _iIndex)
         {
+            Debug.Assert(null != _sID);
             m_sID = _sID;
+
+            Debug.Assert(null != _sName);
             m_sName = _sName;
+
             m_iIndex = _iIndex;
         }
         #endregion
 
         // I/O -------------------------------------------------------------------------------
-        public const string c_sTag = "Language";
-        public const string c_sID = "ID";
-        public const string c_sName = "Name";
-        public const string c_sFontName = "Font";
-        public const string c_sFontSize = "Size";
-        #region Method: void WriteXML(XmlField xmlParent)
-        public void WriteXML(XmlField xmlParent)
+        #region Constants
+        private const string c_sID = "ID";
+        private const string c_sName = "Name";
+        private const string c_sFontName = "Font";
+        private const string c_sFontSize = "Size";
+        #endregion
+        #region SMethod: LocLanguage Create(node, iIndex)
+        static public LocLanguage Create(XmlNode node, int iIndex)
         {
-            XmlField xml = xmlParent.GetDaughterXmlField(c_sTag, true);
-
-            string s = XmlField.BuildAttrString(c_sID, ID);
-            s += XmlField.BuildAttrString(c_sName, Name);
-
-            if (!string.IsNullOrEmpty(FontName))
-                s += XmlField.BuildAttrString(c_sFontName, FontName);
-
-            if (0 != FontSize)
-                s += XmlField.BuildAttrString(c_sFontSize, FontSize.ToString());
-
-            xml.OneLiner(s, "");
+            var language = new LocLanguage(
+                XmlDoc.GetAttrValue(node, c_sID),
+                XmlDoc.GetAttrValue(node, c_sName),
+                iIndex) 
+                {
+                    FontName = XmlDoc.GetAttrValue(node, c_sFontName, SystemFonts.DialogFont.Name),
+                    FontSize = XmlDoc.GetAttrValue(node, c_sFontSize, (int)SystemFonts.DialogFont.Size)
+                };
+            return language;
         }
         #endregion
-        #region SMethod: LocLanguage ReadXML(iIndex, XmlRead xml)
-        static public LocLanguage ReadXML(int iIndex, XmlRead xml)
+        #region Method: void Save(doc, node)
+        public void Save(XmlDoc doc, XmlNode node)
         {
-            string sID = xml.GetValue(c_sID);
-            string sName = xml.GetValue(c_sName);
-
-            LocLanguage language = new LocLanguage(sID, sName, iIndex);
-
-            string sFontName = xml.GetValue(c_sFontName);
-            if (!string.IsNullOrEmpty(sFontName))
-                language.FontName = sFontName;
-
-            string sFontSize = xml.GetValue(c_sFontSize);
-            if (!string.IsNullOrEmpty(sFontSize))
-            {
-                try
-                {
-                    int n = Convert.ToInt16(sFontSize);
-                    if (n != 0)
-                        language.FontSize = n;
-                }
-                catch (Exception)
-                {
-                }
-            }
-
-
-            return language;
+            doc.AddAttr(node, c_sID, ID);
+            doc.AddAttr(node, c_sName, Name);
+            doc.AddAttr(node, c_sFontName, FontName);
+            doc.AddAttr(node, c_sFontSize, FontSize);
         }
         #endregion
     }
@@ -1370,108 +1225,63 @@ namespace JWTools
         }
         #endregion
 
-
-        // I/O -------------------------------------------------------------------------------
-        #region Attr{g}: string BasePath - the file containing the basic information
-        string BasePath
+        // Xml I/O --------------------------------------------------------------------------
+        #region attr{g}: string MasterFilePath - the file containing the basic information
+        static private string MasterFilePath
         {
             get
             {
-                Debug.Assert(!string.IsNullOrEmpty(s_sBasePath));
-                return s_sBasePath;
+                Debug.Assert(!string.IsNullOrEmpty(s_sMasterFilePath));
+                return s_sMasterFilePath;
             }
         }
-        static string s_sBasePath;
+        static string s_sMasterFilePath;
         #endregion
-        #region Attr{g}: string DataFolder - the folder containing all of the loc files
-        string DataFolder
+        #region Attr{g}: string LanguagesFolder - the folder containing all of the loc files
+        string LanguagesFolder
         {
             get
             {
-                Debug.Assert(!string.IsNullOrEmpty(s_sDataFolder));
-                return s_sDataFolder;
+                Debug.Assert(!string.IsNullOrEmpty(s_sLanguagesFolder));
+                return s_sLanguagesFolder;
             }
         }
-        readonly string s_sDataFolder;
+        readonly string s_sLanguagesFolder;
         #endregion
         const string c_sTag = "LocDB";
-        #region Method: void WriteXML(XmlField xmlParent)
-        public void WriteXML()
+        #region Method: void Save()
+        public void Save()
         {
-            // Open a Text Writer to save to
-            var writer = JW_Util.GetTextWriter(BasePath);
+            // Save the Master File
+            var doc = new XmlDoc();
+            doc.AddXmlDeclaration();
+            var node = doc.AddNode(doc, c_sTag);
+            foreach(var group in Groups)
+                group.Save(doc, node);
+            doc.Write(MasterFilePath);
 
-            var xml = new XmlField(writer, c_sTag);
-            xml.Begin();
-
-            foreach (var group in Groups)
-                group.WriteXML(xml);
-
-            xml.End();
-
-            // Done
-            writer.Close();
-
-            // Write the language alternatives
+            // Save the Language-Specific Files
             foreach (var lang in Languages)
-                WriteLanguageData(lang);
+                SaveLanguageData(lang);
         }
         #endregion
-        #region Method: void ReadXML()
-        public void ReadXML()
-        {
-            // First, read in the Base data
-            string sPathName = BasePath;
-            TextReader reader = JW_Util.OpenStreamReader(ref sPathName, "*.xml");
-            XmlRead xml = new XmlRead(reader);
-
-            while (xml.ReadNextLineUntilEndTag(c_sTag))
-            {
-                // LocGroup
-                if (xml.IsTag(LocGroup.c_sTag))
-                {
-                    LocGroup group = LocGroup.ReadXML(this, xml);
-                    AppendGroup(group);
-                }
-            }
-
-            reader.Close();
-
-            // Now, read in the languages in the localization folder
-            string[] sPaths = Directory.GetFiles(this.DataFolder, "*.xml", SearchOption.TopDirectoryOnly);
-            foreach (string s in sPaths)
-            {
-                if (s == BasePath)
-                    continue;
-                ReadLanguageData(s);
-            }
-
-        }
-        #endregion
-        #region Method: void WriteLanguageData(LocLanguage lang)
-        void WriteLanguageData(LocLanguage lang)
+        #region method: void SaveLanguageData(LocLanguage lang)
+        void SaveLanguageData(LocLanguage lang)
         {
             // Build the language name
-            var sPath = DataFolder + Path.DirectorySeparatorChar + lang.ID + ".xml";
+            var sPath = LanguagesFolder + Path.DirectorySeparatorChar + lang.ID + ".xml";
 
             // Save a backup in the current folder (See Bug0282.)
             JW_Util.CreateBackup(sPath, ".bak");
 
-            // Open the xml writer
-            var w = JW_Util.GetTextWriter(sPath);
-            var xml = new XmlField(w, c_sTag);
-            xml.Begin();
-
-            // Write out the language information
-            lang.WriteXML(xml);
-
-            // Write out the group's data
-            foreach (var group in Groups)
-                group.WriteLanguageData(xml, lang);
-
-            // Done
-            xml.End();
-            w.Close();
+            // Create and write the xml doc
+            var doc = new XmlDoc();
+            doc.AddXmlDeclaration();
+            var node = doc.AddNode(doc, c_sTag);
+            lang.Save(doc, node);
+            foreach(var group in Groups)
+                group.SaveLanguageData(doc, node, lang);
+            doc.Write(sPath);
 
             // Make a backup to the remote device if enabled. We have to create a file with the
             // date in it so that the BackupSystem has something to copy; we then delete that
@@ -1489,34 +1299,52 @@ namespace JWTools
             }
         }
         #endregion
+        #region method: void Read()
+        private void Read()
+        {
+            // Read the Master File
+            var doc = new XmlDoc();
+            doc.Load(MasterFilePath);
+            var node = XmlDoc.FindNode(doc, c_sTag);
+            foreach(XmlNode child in node.ChildNodes)
+            {
+                var group = LocGroup.Create(child);
+                if (null != group)
+                    AppendGroup(group);
+            }
+
+            // Read the Language-Specific Files
+            var sPaths = Directory.GetFiles(LanguagesFolder, "*.xml", SearchOption.TopDirectoryOnly);
+            foreach (var s in sPaths)
+            {
+                if (s == MasterFilePath)
+                    continue;
+                ReadLanguageData(s);
+            }
+        }
+        #endregion
         #region Method: void ReadLanguageData(string sPath)
         void ReadLanguageData(string sPath)
         {
-            StreamReader r = new StreamReader(sPath, Encoding.UTF8);
-            TextReader tr = TextReader.Synchronized(r);
-            XmlRead xml = new XmlRead(tr);
+            var doc = new XmlDoc();
+            doc.Load(sPath);
+            var node = XmlDoc.FindNode(doc, c_sTag);
 
-            LocLanguage language = null;
+            // Get which language we're reading
+            var language = LocLanguage.Create(node, Languages.Length);
+            if (null == language)
+                return;
+            AppendLanguage(language);
 
-            while (xml.ReadNextLineUntilEndTag(c_sTag))
+            // Get the data
+            foreach(XmlNode nodeGroup in node.ChildNodes)
             {
-                if (xml.IsTag(LocLanguage.c_sTag))
-                {
-                    language = LocLanguage.ReadXML(Languages.Length, xml);
-                    AppendLanguage(language);
-                }
-
-                // LocGroup
-                if (null != language && xml.IsTag(LocGroup.c_sTag))
-                {
-                    string sGroupID = xml.GetValue(LocGroup.c_sID);
-                    LocGroup group = FindGroup(sGroupID);
-                    if (null != group)
-                        group.ReadLanguageData(xml, language);
-                }
-
+                var idGroup = XmlDoc.GetAttrValue(nodeGroup, LocGroup.c_sID);
+                var group = FindGroup(idGroup);
+                if (null == group)
+                    continue;
+                group.ReadLanguageData(nodeGroup, language);
             }
-            tr.Close();
         }
         #endregion
 
@@ -1561,11 +1389,11 @@ namespace JWTools
                 Directory.CreateDirectory(sFolderContainingLocalizationFiles);
 
             // The main localization file
-            s_sDataFolder = sFolderContainingLocalizationFiles;
-            s_sBasePath = Path.Combine(DataFolder, "OurWordLocalization.xml");
+            s_sLanguagesFolder = sFolderContainingLocalizationFiles;
+            s_sMasterFilePath = Path.Combine(LanguagesFolder, "OurWordLocalization.xml");
 
             // Read in the file
-            ReadXML();
+            Read();
         }
         #endregion
 

@@ -790,7 +790,7 @@ namespace JWTools
 
             if (result == DialogResult.Yes)
             {
-                LocDB.DB.WriteXML();
+                LocDB.DB.Save();
                 DialogResult = DialogResult.OK;
             }
             else
@@ -807,7 +807,7 @@ namespace JWTools
         private void cmdSave(object sender, EventArgs e)
         {
             HarvestChanges();
-            LocDB.DB.WriteXML();
+            LocDB.DB.Save();
         }
         #endregion
         #region Cmd: cmdNewLanguage - add a new language to the LocDB

@@ -39,11 +39,15 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
         #region attr{g}: string ConcordOnText
-        string ConcordOnText
+        public string ConcordOnText
         {
             get
             {
                 return m_tConcordOn.Text;
+            }
+            set
+            {
+                m_tConcordOn.Text = value;
             }
         }
         #endregion

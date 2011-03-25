@@ -43,8 +43,8 @@
             this.m_Save = new System.Windows.Forms.ToolStripButton();
             this.m_Project = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_New = new System.Windows.Forms.ToolStripMenuItem();
-            this.initializeFromAnInternetRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.createANewProjectOnThisComputerToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_initializeFromAnInternetRepository = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_createANewProjectOnThisComputer = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Open = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuSave = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Export = new System.Windows.Forms.ToolStripMenuItem();
@@ -81,8 +81,8 @@
             this.m_menuTscReport = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuLocalizerTool = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorHelp = new System.Windows.Forms.ToolStripSeparator();
-            this.helpTopicsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutOurWordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_helpTopics = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_aboutOurWord = new System.Windows.Forms.ToolStripMenuItem();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -242,33 +242,33 @@
             // m_New
             // 
             this.m_New.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.initializeFromAnInternetRepositoryToolStripMenuItem,
-            this.createANewProjectOnThisComputerToolStripMenuItem});
+            this.m_initializeFromAnInternetRepository,
+            this.m_createANewProjectOnThisComputer});
             this.m_New.Image = ((System.Drawing.Image)(resources.GetObject("m_New.Image")));
             this.m_New.Name = "m_New";
-            this.m_New.Size = new System.Drawing.Size(138, 22);
+            this.m_New.Size = new System.Drawing.Size(152, 22);
             this.m_New.Text = "&New";
             this.m_New.Click += new System.EventHandler(this.cmdDownloadRepositoryFromInternet);
             // 
-            // initializeFromAnInternetRepositoryToolStripMenuItem
+            // m_initializeFromAnInternetRepository
             // 
-            this.initializeFromAnInternetRepositoryToolStripMenuItem.Name = "initializeFromAnInternetRepositoryToolStripMenuItem";
-            this.initializeFromAnInternetRepositoryToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.initializeFromAnInternetRepositoryToolStripMenuItem.Text = "Initialize from an Internet Repository...";
-            this.initializeFromAnInternetRepositoryToolStripMenuItem.Click += new System.EventHandler(this.cmdDownloadRepositoryFromInternet);
+            this.m_initializeFromAnInternetRepository.Name = "m_initializeFromAnInternetRepository";
+            this.m_initializeFromAnInternetRepository.Size = new System.Drawing.Size(287, 22);
+            this.m_initializeFromAnInternetRepository.Text = "Initialize from an Internet Repository...";
+            this.m_initializeFromAnInternetRepository.Click += new System.EventHandler(this.cmdDownloadRepositoryFromInternet);
             // 
-            // createANewProjectOnThisComputerToolStripMenuItem
+            // m_createANewProjectOnThisComputer
             // 
-            this.createANewProjectOnThisComputerToolStripMenuItem.Name = "createANewProjectOnThisComputerToolStripMenuItem";
-            this.createANewProjectOnThisComputerToolStripMenuItem.Size = new System.Drawing.Size(287, 22);
-            this.createANewProjectOnThisComputerToolStripMenuItem.Text = "Create a New Project on this computer...";
-            this.createANewProjectOnThisComputerToolStripMenuItem.Click += new System.EventHandler(this.cmdCreateProject);
+            this.m_createANewProjectOnThisComputer.Name = "m_createANewProjectOnThisComputer";
+            this.m_createANewProjectOnThisComputer.Size = new System.Drawing.Size(287, 22);
+            this.m_createANewProjectOnThisComputer.Text = "Create a New Project on this computer...";
+            this.m_createANewProjectOnThisComputer.Click += new System.EventHandler(this.cmdCreateProject);
             // 
             // m_Open
             // 
             this.m_Open.Image = ((System.Drawing.Image)(resources.GetObject("m_Open.Image")));
             this.m_Open.Name = "m_Open";
-            this.m_Open.Size = new System.Drawing.Size(138, 22);
+            this.m_Open.Size = new System.Drawing.Size(152, 22);
             this.m_Open.Text = "&Open";
             // 
             // m_menuSave
@@ -276,14 +276,14 @@
             this.m_menuSave.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSave.Image")));
             this.m_menuSave.Name = "m_menuSave";
             this.m_menuSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSave.Size = new System.Drawing.Size(138, 22);
+            this.m_menuSave.Size = new System.Drawing.Size(152, 22);
             this.m_menuSave.Text = "&Save";
             this.m_menuSave.Click += new System.EventHandler(this.cmdSave);
             // 
             // m_Export
             // 
             this.m_Export.Name = "m_Export";
-            this.m_Export.Size = new System.Drawing.Size(138, 22);
+            this.m_Export.Size = new System.Drawing.Size(152, 22);
             this.m_Export.Text = "E&xport...";
             this.m_Export.Click += new System.EventHandler(this.cmdExport);
             // 
@@ -504,8 +504,8 @@
             this.m_menuTscReport,
             this.m_menuLocalizerTool,
             this.m_separatorHelp,
-            this.helpTopicsToolStripMenuItem,
-            this.aboutOurWordToolStripMenuItem});
+            this.m_helpTopics,
+            this.m_aboutOurWord});
             this.m_Tools.Image = ((System.Drawing.Image)(resources.GetObject("m_Tools.Image")));
             this.m_Tools.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.m_Tools.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -589,19 +589,19 @@
             this.m_separatorHelp.Name = "m_separatorHelp";
             this.m_separatorHelp.Size = new System.Drawing.Size(199, 6);
             // 
-            // helpTopicsToolStripMenuItem
+            // m_helpTopics
             // 
-            this.helpTopicsToolStripMenuItem.Name = "helpTopicsToolStripMenuItem";
-            this.helpTopicsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.helpTopicsToolStripMenuItem.Text = "Help Topics...";
-            this.helpTopicsToolStripMenuItem.Click += new System.EventHandler(this.cmdHelpTopics);
+            this.m_helpTopics.Name = "m_helpTopics";
+            this.m_helpTopics.Size = new System.Drawing.Size(202, 22);
+            this.m_helpTopics.Text = "Help Topics...";
+            this.m_helpTopics.Click += new System.EventHandler(this.cmdHelpTopics);
             // 
-            // aboutOurWordToolStripMenuItem
+            // m_aboutOurWord
             // 
-            this.aboutOurWordToolStripMenuItem.Name = "aboutOurWordToolStripMenuItem";
-            this.aboutOurWordToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.aboutOurWordToolStripMenuItem.Text = "About OurWord...";
-            this.aboutOurWordToolStripMenuItem.Click += new System.EventHandler(this.cmdAbout);
+            this.m_aboutOurWord.Name = "m_aboutOurWord";
+            this.m_aboutOurWord.Size = new System.Drawing.Size(202, 22);
+            this.m_aboutOurWord.Text = "About OurWord...";
+            this.m_aboutOurWord.Click += new System.EventHandler(this.cmdAbout);
             // 
             // CtrlCommands
             // 
@@ -646,8 +646,8 @@
         private System.Windows.Forms.ToolStripMenuItem m_Open;
         private System.Windows.Forms.ToolStripMenuItem m_menuSave;
         private System.Windows.Forms.ToolStripMenuItem m_Export;
-        private System.Windows.Forms.ToolStripMenuItem initializeFromAnInternetRepositoryToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem createANewProjectOnThisComputerToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem m_initializeFromAnInternetRepository;
+        private System.Windows.Forms.ToolStripMenuItem m_createANewProjectOnThisComputer;
         private System.Windows.Forms.ToolStripMenuItem m_menuUndo;
         private System.Windows.Forms.ToolStripMenuItem m_menuRedo;
         private System.Windows.Forms.ToolStripSeparator m_EditSeparatorUndo;
@@ -676,8 +676,8 @@
         private System.Windows.Forms.ToolStripSeparator m_separatorTools;
         private System.Windows.Forms.ToolStripMenuItem m_menuLocalizerTool;
         private System.Windows.Forms.ToolStripSeparator m_separatorHelp;
-        private System.Windows.Forms.ToolStripMenuItem helpTopicsToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutOurWordToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem m_helpTopics;
+        private System.Windows.Forms.ToolStripMenuItem m_aboutOurWord;
         private System.Windows.Forms.ToolStripMenuItem m_menuTscReport;
     }
 }

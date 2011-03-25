@@ -51,6 +51,15 @@ namespace OurWord.Ctrls.Navigation
             m_FindNext.Enabled = false;
         }
         #endregion
+        #region smethod: string GetCurrentlySelectedText()
+        static private string GetCurrentlySelectedText()
+        {
+            var selection = G.App.CurrentLayout.Selection;
+            if (null != selection && selection.IsContentSelection)
+                return selection.SelectionString;
+            return null;
+        }
+        #endregion
 
         // Public Interface ------------------------------------------------------------------
         #region Method: void Setup(DSection)
@@ -177,8 +186,6 @@ namespace OurWord.Ctrls.Navigation
             if (string.IsNullOrEmpty(m_FindTextMenuItem.SearchText))
                 m_FindNext.Enabled = false;
 
-            m_FindAndReplace.Available = Users.Current.CanFindAndReplace;
-
             SetupBookmarksMenu();
         }
         #endregion
@@ -186,6 +193,7 @@ namespace OurWord.Ctrls.Navigation
         void SetupFeatureAvailability()
         {
             m_Filter.Available = Users.Current.CanFilter;
+            m_FindAndReplace.Available = Users.Current.CanFindAndReplace;
 
             // TODO: Add Concordance (which requires a repositiory tag increment.
             // Note that if Filters AND COncordance are turned off, menu separator must be off, too.
@@ -726,6 +734,11 @@ namespace OurWord.Ctrls.Navigation
         private void cmdConcordance(object sender, EventArgs e)
         {
             m_DlgConcordance.OnGoToLookupItem = OnGoToLookupItem;
+
+            var sText = GetCurrentlySelectedText();
+            if (!string.IsNullOrEmpty(sText))
+                m_DlgConcordance.ConcordOnText = sText;
+            
             m_DlgConcordance.Show();
         }
         #endregion
@@ -737,6 +750,11 @@ namespace OurWord.Ctrls.Navigation
                 return;
 
             m_DlgFindAndReplace.OnGoToLookupItem = OnGoToLookupItem;
+
+            var sText = GetCurrentlySelectedText();
+            if (!string.IsNullOrEmpty(sText))
+                m_DlgFindAndReplace.FindWhat = sText;
+
             m_DlgFindAndReplace.Show();
         }
         #endregion

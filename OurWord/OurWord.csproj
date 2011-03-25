@@ -484,6 +484,7 @@
     <Compile Include="Ctrls\Navigation\DlgFindAndReplace.Designer.cs">
       <DependentUpon>DlgFindAndReplace.cs</DependentUpon>
     </Compile>
+    <Compile Include="Ctrls\Navigation\NavBookmark.cs" />
     <Compile Include="Ctrls\Navigation\Scanner.cs" />
     <Compile Include="Dialogs\DlgProgress.cs">
       <SubType>Form</SubType>

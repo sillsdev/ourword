@@ -22,11 +22,15 @@ namespace OurWord.Ctrls.Navigation
     {
         // Dialog Attrs ----------------------------------------------------------------------
         #region attr{g}: string FindWhat
-        string FindWhat
+        public string FindWhat
         {
             get
             {
                 return m_textFindWhat.Text;
+            }
+            set
+            {
+                m_textFindWhat.Text = value;
             }
         }
         #endregion

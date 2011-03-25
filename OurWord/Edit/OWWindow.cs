@@ -1357,6 +1357,15 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+            public DPhraseList<DPhrase> Phrases
+            {
+                get
+                {
+                    return (Paragraph.DisplayBT) ?
+                        DBT.PhrasesBT :
+                        DBT.Phrases;
+                }
+            }
 
             // Timer -------------------------------------------------------------------------
             // TODO: MSDN says Windows.Form.Timer is in the same thread as the Form, and thus

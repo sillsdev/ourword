@@ -320,6 +320,12 @@ namespace JWTools
         }
         #endregion
 
+        #region SMethod: string GetAttrValue(node, sAttrName)
+        static public string GetAttrValue(XmlNode node, string sAttrName)
+        {
+            return GetAttrValue(node, sAttrName, "");
+        }
+        #endregion
         #region SMethod: string GetAttrValue(node, attr, sDefaultValue)
         static public string GetAttrValue(XmlNode node, string sAttrName, string sDefaultValue)
         {

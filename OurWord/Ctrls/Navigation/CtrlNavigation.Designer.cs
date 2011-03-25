@@ -44,15 +44,15 @@
             this.m_Find = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_FindNext = new System.Windows.Forms.ToolStripMenuItem();
             this.m_AdvancedFind = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_FindAndReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.m_Filter = new System.Windows.Forms.ToolStripMenuItem();
-            this.createConcordanceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.m_createConcordance = new System.Windows.Forms.ToolStripMenuItem();
             this.m_separatorBookmarks = new System.Windows.Forms.ToolStripSeparator();
             this.m_SetBookmark = new System.Windows.Forms.ToolStripMenuItem();
             this.m_GoToBookmark = new System.Windows.Forms.ToolStripMenuItem();
             this.FilteredNavigation = new System.Windows.Forms.ImageList(this.components);
             this.UnfilteredNavigation = new System.Windows.Forms.ImageList(this.components);
-            this.m_FindAndReplace = new System.Windows.Forms.ToolStripMenuItem();
             this.TopTools.SuspendLayout();
             this.BottomTools.SuspendLayout();
             this.SuspendLayout();
@@ -190,7 +190,7 @@
             this.m_FindAndReplace,
             this.toolStripSeparator1,
             this.m_Filter,
-            this.createConcordanceToolStripMenuItem,
+            this.m_createConcordance,
             this.m_separatorBookmarks,
             this.m_SetBookmark,
             this.m_GoToBookmark});
@@ -217,6 +217,13 @@
             this.m_AdvancedFind.Size = new System.Drawing.Size(191, 22);
             this.m_AdvancedFind.Text = "&Advanced Find...";
             // 
+            // m_FindAndReplace
+            // 
+            this.m_FindAndReplace.Name = "m_FindAndReplace";
+            this.m_FindAndReplace.Size = new System.Drawing.Size(191, 22);
+            this.m_FindAndReplace.Text = "Find and &Replace...";
+            this.m_FindAndReplace.Click += new System.EventHandler(this.cmdFindAndReplace);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -231,12 +238,12 @@
             this.m_Filter.ToolTipText = "Filter out the sections which do not conform to a criteria.";
             this.m_Filter.Click += new System.EventHandler(this.cmdFilter);
             // 
-            // createConcordanceToolStripMenuItem
+            // m_createConcordance
             // 
-            this.createConcordanceToolStripMenuItem.Name = "createConcordanceToolStripMenuItem";
-            this.createConcordanceToolStripMenuItem.Size = new System.Drawing.Size(191, 22);
-            this.createConcordanceToolStripMenuItem.Text = "Create &Concordance...";
-            this.createConcordanceToolStripMenuItem.Click += new System.EventHandler(this.cmdConcordance);
+            this.m_createConcordance.Name = "m_createConcordance";
+            this.m_createConcordance.Size = new System.Drawing.Size(191, 22);
+            this.m_createConcordance.Text = "Create &Concordance...";
+            this.m_createConcordance.Click += new System.EventHandler(this.cmdConcordance);
             // 
             // m_separatorBookmarks
             // 
@@ -274,13 +281,6 @@
             this.UnfilteredNavigation.Images.SetKeyName(2, "GoNext.ico");
             this.UnfilteredNavigation.Images.SetKeyName(3, "GoLast.ico");
             // 
-            // m_FindAndReplace
-            // 
-            this.m_FindAndReplace.Name = "m_FindAndReplace";
-            this.m_FindAndReplace.Size = new System.Drawing.Size(191, 22);
-            this.m_FindAndReplace.Text = "Find and &Replace...";
-            this.m_FindAndReplace.Click += new System.EventHandler(this.cmdFindAndReplace);
-            // 
             // CtrlNavigation
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
@@ -317,7 +317,7 @@
         private System.Windows.Forms.ToolStripMenuItem m_Filter;
         private System.Windows.Forms.ToolStripMenuItem m_FindNext;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem createConcordanceToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem m_createConcordance;
         private System.Windows.Forms.ToolStripSplitButton m_Previous;
         private System.Windows.Forms.ToolStripSplitButton m_Next;
         private System.Windows.Forms.ToolStripButton m_Locked;
