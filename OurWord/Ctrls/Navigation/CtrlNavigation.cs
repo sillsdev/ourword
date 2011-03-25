@@ -735,11 +735,13 @@ namespace OurWord.Ctrls.Navigation
         {
             m_DlgConcordance.OnGoToLookupItem = OnGoToLookupItem;
 
+            m_DlgConcordance.Show();
+
+            // Do this after "show", so that the "Build" button enabling will behave properly
             var sText = GetCurrentlySelectedText();
             if (!string.IsNullOrEmpty(sText))
                 m_DlgConcordance.ConcordOnText = sText;
             
-            m_DlgConcordance.Show();
         }
         #endregion
         #region cmd: cmdFindAndReplace

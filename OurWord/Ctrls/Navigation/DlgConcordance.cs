@@ -41,7 +41,7 @@ namespace OurWord.Ctrls.Navigation
         #region attr{g}: string ConcordOnText
         public string ConcordOnText
         {
-            get
+            private get
             {
                 return m_tConcordOn.Text;
             }
@@ -185,8 +185,8 @@ namespace OurWord.Ctrls.Navigation
             m_List.Enabled = false;
             ResetOccurrences();
 
-            var context = new Scanner.SearchContext(ConcordOnText, null) {
-                IgnoreCase = IgnoreCase
+            var context = new Scanner.SearchContext(ConcordOnText, G.App.CurrentLayout.Selection) {
+                IgnoreCase = IgnoreCase,
             };
 
             // Count how many books had hits

@@ -38,10 +38,12 @@ namespace OurWord.Ctrls.Navigation
             var vLookupInfo = new List<LookupInfo>();
             foreach (var text in vTexts)
             {
-                var sText = text.ContentsAsString;
+                var phrases = (context.IsBackTranslation) ?
+                    text.PhrasesBT : text.Phrases;
+                var sText = phrases.AsString;
                 var vIndexes = GetIndexesOf(sText, context.SearchFor, context.IgnoreCase);
                 foreach (var iPosition in vIndexes)
-                    vLookupInfo.Add(new LookupInfo(text.Phrases, iPosition, context.SearchFor.Length));
+                    vLookupInfo.Add(new LookupInfo(phrases, iPosition, context.SearchFor.Length));
             }
 
             return vLookupInfo;
@@ -70,7 +72,7 @@ namespace OurWord.Ctrls.Navigation
         public class SearchContext
         {
             public readonly string SearchFor;
-            public readonly OWWindow.Sel OriginalSelection;
+            private readonly OWWindow.Sel OriginalSelection;
             public bool IgnoreCase;
 
             #region Constructor(sSearchFod, originalSelection)
@@ -279,7 +281,5 @@ namespace OurWord.Ctrls.Navigation
             return ScanBook(context, context.OriginalBook, ScanOption.PriorTo, originalSelection);
         }
         #endregion
-
-
     }
 }

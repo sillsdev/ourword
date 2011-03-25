@@ -1290,13 +1290,6 @@ namespace OurWord
         #region cmd: bool cmdGoToLookupItem(LookupInfo)
         bool cmdGoToLookupItem(LookupInfo ci)
         {
-            // Must be in a layout that shows the vernacular
- //           if (WLayout.CurrentLayoutIs(WndBackTranslation.c_sName))
- //           {
- //               cmdSwitchLayout(WndDrafting.c_sName);
- //               m_Commands.SetLayout(WndDrafting.c_sName);
- //           }
-
             // Go to the correct book if we're not there already
             if (ci.BookAbbrev != DB.TargetBook.BookAbbrev)
                 cmdGoToBook(ci.BookAbbrev);
@@ -1333,7 +1326,9 @@ namespace OurWord
             cmdGoToSection(section);
 
             // Select the text
-            var owp = CurrentLayout.Contents.FindParagraph(paragraph, OWPara.Flags.None);
+            var owp = CurrentLayout.Contents.FindParagraph(paragraph,ci.IsBackTranslation);
+            if (null == owp)
+                return false;
             var selection = OWWindow.Sel.CreateSel(owp, text, ci.IndexIntoText, 
                 ci.IndexIntoText + ci.SelectionLength);
             if (null == selection)

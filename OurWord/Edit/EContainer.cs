@@ -1341,6 +1341,34 @@ namespace OurWord.Edit
             return null;
         }
         #endregion
+        #region Method: OWPara FindParagraph(JObject objDataSource, bBackTranslation)
+        public OWPara FindParagraph(JObject objDataSource, bool bBackTranslation)
+        {
+            foreach (var item in SubItems)
+            {
+                // Recurse to lower levels of the hierarchy
+                var container = item as EContainer;
+                if (null != container)
+                {
+                    var para = container.FindParagraph(objDataSource, bBackTranslation);
+                    if (null != para)
+                        return para;
+                }
+
+                // Test this item
+                var owp = item as OWPara;
+                if (null == owp)
+                    continue;
+                if (owp.DataSource == objDataSource)
+                {
+                    if (bBackTranslation == owp.DisplayBT)
+                        return owp;
+                }
+            }
+
+            return null;
+        }
+        #endregion
         #region Attr{g}:  bool ContainsSelection
         public bool ContainsSelection
         {

@@ -165,10 +165,6 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // RoadMap ---------------------------------------------------------------------------
-        // [ ] ToDo: Vernacular vs BackTranslation
-        //      NEXT--> Failing: OWPara.MakeSelection isn't doing the trick. May need to
-        //      just disable for BT and Consultant views for this release.
-        //      But need it for Bookmark rework I've just done!
         // [ ] ToDo: IterateCurrent must deal with the (a) end of book, (b) end of Bible
         // [ ] Bug: Move cursor, do FindNext, its skipping (at least, for Footnote it is, probably
         //      because FN is defined later.

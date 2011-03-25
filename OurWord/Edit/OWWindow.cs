@@ -1290,8 +1290,8 @@ namespace OurWord.Edit
             // Create a SelectionPoint given the DBasicText and a position in it. We assume
             // that the EWords are already in the paragraph.
             {
-                // We''ll keep track of the EWord we're working on here
-                int iBlock = 0;
+                // We'll keep track of the EWord we're working on here
+                var iBlock = 0;
                 EWord word = null;
 
                 // Scan for the first EWord for the DBT
@@ -1357,6 +1357,7 @@ namespace OurWord.Edit
                 }
             }
             #endregion
+            #region VAttr{g}: DPhraseList<DPhrase> Phrases
             public DPhraseList<DPhrase> Phrases
             {
                 get
@@ -1366,6 +1367,7 @@ namespace OurWord.Edit
                         DBT.Phrases;
                 }
             }
+            #endregion
 
             // Timer -------------------------------------------------------------------------
             // TODO: MSDN says Windows.Form.Timer is in the same thread as the Form, and thus
