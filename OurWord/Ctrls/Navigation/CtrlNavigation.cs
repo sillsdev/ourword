@@ -15,8 +15,8 @@ namespace OurWord.Ctrls.Navigation
     public delegate void GoToSectionHandler(DSection section);
     public delegate void FindText(string sSearchText);
     public delegate bool GoToLookupItem(LookupInfo info);
-    public delegate Bookmark CreateBookmarkHandler();
-    public delegate void GoToBookmarkHandler(Bookmark bookmark);
+    public delegate NavBookmark CreateBookmarkHandler();
+    public delegate void GoToBookmarkHandler(NavBookmark bookmark);
 
     public partial class CtrlNavigation : UserControl
     {
@@ -494,7 +494,7 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // Bookmarks -------------------------------------------------------------------------
-        private readonly Bookmarks m_Bookmarks = new Bookmarks();
+        private readonly BookmarkList m_Bookmarks = new BookmarkList();
         private const int MaxBookmarks = 12;
         #region method:  void SetupBookmarksMenu()
         private void SetupBookmarksMenu()
@@ -542,7 +542,7 @@ namespace OurWord.Ctrls.Navigation
             if (null == menuitem)
                 return;
 
-            var bookmark = menuitem.Tag as Bookmark;
+            var bookmark = menuitem.Tag as NavBookmark;
             if (null == bookmark)
                 return;
 

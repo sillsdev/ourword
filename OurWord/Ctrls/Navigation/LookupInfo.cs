@@ -1,5 +1,6 @@
-﻿using System.Diagnostics;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
+using System.Xml;
+using JWTools;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
 
@@ -9,11 +10,11 @@ namespace OurWord.Ctrls.Navigation
     {
         // Attrs -----------------------------------------------------------------------------
         // Attrs: Hierarchy
-        public readonly string BookAbbrev;
-        public readonly int SectionNo;
-        public readonly int ParagraphNo;
-        public readonly int RunNo;
-        public readonly int FootnoteRunNo = -1;  // By default, not a footnote
+        public string BookAbbrev;
+        public int SectionNo;
+        public int ParagraphNo;
+        public int RunNo;
+        public int FootnoteRunNo = -1;  // By default, not a footnote
         #region VAttr{g}: bool IsFootnote
         public bool IsFootnote
         {
@@ -25,14 +26,14 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // Attrs: Reference
-        public readonly int Chapter;
-        public readonly int Verse;
+        public int Chapter;
+        public int Verse;
 
         // Attrs: Selection
-        public readonly string Text;
-        public readonly int IndexIntoText;
-        public readonly int SelectionLength;
-        public readonly bool IsBackTranslation;
+        public string Text;
+        public int IndexIntoText;
+        public int SelectionLength;
+        public bool IsBackTranslation;
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor(DText, iIndexIntoText, cSelectionLength)
@@ -92,6 +93,11 @@ namespace OurWord.Ctrls.Navigation
             }
         }
         #endregion
+        #region constructor()
+        protected LookupInfo()
+        {
+        }
+        #endregion
 
         // Methods ---------------------------------------------------------------------------
         #region Method: ListViewItem ToListViewItem(ListViewGroup group)
@@ -103,5 +109,57 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
 
+        // I/O -------------------------------------------------------------------------------
+        #region Constants
+        private const string c_sBookAbbrev = "book";
+        private const string c_sSectionNo = "section";
+        private const string c_sParagraphNo = "para";
+        private const string c_sRunNo = "run";
+        private const string c_sFootnoteRunNo = "foot";
+
+        private const string c_sChapter = "c";
+        private const string c_sVerse = "v";
+
+        private const string c_sText = "text";
+        private const string c_sIndex = "index";
+        private const string c_sLength = "length";
+        private const string c_sBT = "bt";
+        #endregion
+        #region method: void Save(doc, node)
+        protected void Save(XmlDoc doc, XmlNode node)
+        {
+            doc.AddAttr(node, c_sBookAbbrev, BookAbbrev);
+            doc.AddAttr(node, c_sSectionNo, SectionNo);
+            doc.AddAttr(node, c_sParagraphNo, ParagraphNo);
+            doc.AddAttr(node, c_sRunNo, RunNo);
+            doc.AddAttr(node, c_sFootnoteRunNo, FootnoteRunNo);
+
+            doc.AddAttr(node, c_sChapter, Chapter);
+            doc.AddAttr(node, c_sVerse, Verse);
+
+            doc.AddAttr(node, c_sText, Text);
+            doc.AddAttr(node, c_sIndex, IndexIntoText);
+            doc.AddAttr(node, c_sLength, SelectionLength);
+            doc.AddAttr(node, c_sBT, IsBackTranslation);
+        }
+        #endregion
+        #region method: void Read(node)
+        protected void Read(XmlNode node)
+        {
+            BookAbbrev = XmlDoc.GetAttrValue(node, c_sBookAbbrev);
+            SectionNo = XmlDoc.GetAttrValue(node, c_sSectionNo, 0);
+            ParagraphNo = XmlDoc.GetAttrValue(node, c_sParagraphNo, 0);
+            RunNo = XmlDoc.GetAttrValue(node, c_sRunNo, 0);
+            FootnoteRunNo = XmlDoc.GetAttrValue(node, c_sFootnoteRunNo, -1);
+
+            Chapter = XmlDoc.GetAttrValue(node, c_sChapter, 0);
+            Verse = XmlDoc.GetAttrValue(node, c_sVerse, 0);
+
+            Text = XmlDoc.GetAttrValue(node, c_sText);
+            IndexIntoText = XmlDoc.GetAttrValue(node, c_sIndex, 0);
+            SelectionLength = XmlDoc.GetAttrValue(node, c_sLength, 0);
+            IsBackTranslation = XmlDoc.GetAttrValue(node, c_sBT, false);
+        }
+        #endregion
     }
 }

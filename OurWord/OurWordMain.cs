@@ -228,6 +228,7 @@ namespace OurWord
             LocDB.DB.SetSecondary(Users.Current.SecondaryUiLanguage);
 
             m_Commands.Setup();
+            m_Navigation.Setup(DB.TargetSection);
 
             EnableItalicsButton();
         }
@@ -486,8 +487,6 @@ namespace OurWord
 		#region Method: void OnEnterSection()
 		public void OnEnterSection()
 		{
-            m_Navigation.Setup(DB.TargetSection);
-
             // Load the data into the individual windows on the screen
             ResetWindowContents();
 
@@ -1292,11 +1291,11 @@ namespace OurWord
         bool cmdGoToLookupItem(LookupInfo ci)
         {
             // Must be in a layout that shows the vernacular
-            if (WLayout.CurrentLayoutIs(WndBackTranslation.c_sName))
-            {
-                cmdSwitchLayout(WndDrafting.c_sName);
-                m_Commands.SetLayout(WndDrafting.c_sName);
-            }
+ //           if (WLayout.CurrentLayoutIs(WndBackTranslation.c_sName))
+ //           {
+ //               cmdSwitchLayout(WndDrafting.c_sName);
+ //               m_Commands.SetLayout(WndDrafting.c_sName);
+ //           }
 
             // Go to the correct book if we're not there already
             if (ci.BookAbbrev != DB.TargetBook.BookAbbrev)
@@ -1352,19 +1351,14 @@ namespace OurWord
         #endregion
 
         // Bookmarks
-        #region method: Bookmark CreateBookmark()
-        Bookmark CreateBookmark()
+        #region Cmd: CreateBookmark
+        NavBookmark CreateBookmark()
         {
-            return new Bookmark(DB.Project.DisplayName,
-                DB.Project.StoragePath, 
-                CurrentLayout.Name,
-                DB.TargetBook.BookAbbrev, 
-                DB.TargetBook.Sections.FindObj(DB.TargetSection),
-                DB.TargetSection.ReferenceSpan.Start.FullName);
+            return new NavBookmark(CurrentLayout.Selection);
         }
         #endregion
-        #region cmd: cmdGoToBookmark
-        void cmdGoToBookmark(Bookmark bookmark)
+        #region Cmd: cmdGoToBookmark
+        void cmdGoToBookmark(NavBookmark bookmark)
         {
             // Go to the requested project
             if (bookmark.ProjectPath != DB.Project.StoragePath)
@@ -1390,6 +1384,9 @@ namespace OurWord
                 cmdSwitchLayout(bookmark.LayoutName);
                 m_Commands.SetLayout(bookmark.LayoutName);
             }
+
+            // Go to the selection if possible
+            cmdGoToLookupItem(bookmark);
         }
         #endregion
 
