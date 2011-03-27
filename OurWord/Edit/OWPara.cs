@@ -2076,8 +2076,8 @@ namespace OurWord.Edit
         static WritingSystem GetWritingSystem(DParagraph p, Flags options)
         {
             return ((options & Flags.ShowBackTranslation) == Flags.ShowBackTranslation) ?
-                p.Translation.WritingSystemVernacular :
-                p.Translation.WritingSystemConsultant;
+                p.Translation.WritingSystemConsultant :
+                p.Translation.WritingSystemVernacular;
         }
         #endregion
     }
