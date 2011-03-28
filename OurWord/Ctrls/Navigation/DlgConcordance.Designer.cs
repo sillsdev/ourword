@@ -64,7 +64,7 @@
             // m_checkIgnoreCase
             // 
             this.m_checkIgnoreCase.AutoSize = true;
-            this.m_checkIgnoreCase.Location = new System.Drawing.Point(26, 43);
+            this.m_checkIgnoreCase.Location = new System.Drawing.Point(26, 45);
             this.m_checkIgnoreCase.Name = "m_checkIgnoreCase";
             this.m_checkIgnoreCase.Size = new System.Drawing.Size(89, 17);
             this.m_checkIgnoreCase.TabIndex = 2;
@@ -107,7 +107,7 @@
             // m_checkCurrentBookOnly
             // 
             this.m_checkCurrentBookOnly.AutoSize = true;
-            this.m_checkCurrentBookOnly.Location = new System.Drawing.Point(134, 44);
+            this.m_checkCurrentBookOnly.Location = new System.Drawing.Point(134, 46);
             this.m_checkCurrentBookOnly.Name = "m_checkCurrentBookOnly";
             this.m_checkCurrentBookOnly.Size = new System.Drawing.Size(181, 17);
             this.m_checkCurrentBookOnly.TabIndex = 4;

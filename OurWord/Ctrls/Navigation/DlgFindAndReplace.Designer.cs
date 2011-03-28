@@ -43,7 +43,7 @@
             // 
             this.m_btnClose.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.m_btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.m_btnClose.Location = new System.Drawing.Point(285, 67);
+            this.m_btnClose.Location = new System.Drawing.Point(285, 77);
             this.m_btnClose.Name = "m_btnClose";
             this.m_btnClose.Size = new System.Drawing.Size(75, 23);
             this.m_btnClose.TabIndex = 13;
@@ -53,7 +53,7 @@
             // m_btnReplace
             // 
             this.m_btnReplace.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.m_btnReplace.Location = new System.Drawing.Point(42, 67);
+            this.m_btnReplace.Location = new System.Drawing.Point(42, 77);
             this.m_btnReplace.Name = "m_btnReplace";
             this.m_btnReplace.Size = new System.Drawing.Size(75, 23);
             this.m_btnReplace.TabIndex = 10;
@@ -79,7 +79,7 @@
             // 
             // m_textReplaceWith
             // 
-            this.m_textReplaceWith.Location = new System.Drawing.Point(98, 32);
+            this.m_textReplaceWith.Location = new System.Drawing.Point(98, 37);
             this.m_textReplaceWith.Name = "m_textReplaceWith";
             this.m_textReplaceWith.Size = new System.Drawing.Size(297, 20);
             this.m_textReplaceWith.TabIndex = 2;
@@ -88,7 +88,7 @@
             // m_lReplaceWith
             // 
             this.m_lReplaceWith.AutoSize = true;
-            this.m_lReplaceWith.Location = new System.Drawing.Point(12, 35);
+            this.m_lReplaceWith.Location = new System.Drawing.Point(12, 40);
             this.m_lReplaceWith.Name = "m_lReplaceWith";
             this.m_lReplaceWith.Size = new System.Drawing.Size(75, 13);
             this.m_lReplaceWith.TabIndex = 22;
@@ -97,7 +97,7 @@
             // m_btnReplaceAll
             // 
             this.m_btnReplaceAll.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.m_btnReplaceAll.Location = new System.Drawing.Point(123, 67);
+            this.m_btnReplaceAll.Location = new System.Drawing.Point(123, 77);
             this.m_btnReplaceAll.Name = "m_btnReplaceAll";
             this.m_btnReplaceAll.Size = new System.Drawing.Size(75, 23);
             this.m_btnReplaceAll.TabIndex = 11;
@@ -107,7 +107,7 @@
             // m_btnFindNext
             // 
             this.m_btnFindNext.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.m_btnFindNext.Location = new System.Drawing.Point(204, 67);
+            this.m_btnFindNext.Location = new System.Drawing.Point(204, 77);
             this.m_btnFindNext.Name = "m_btnFindNext";
             this.m_btnFindNext.Size = new System.Drawing.Size(75, 23);
             this.m_btnFindNext.TabIndex = 12;
@@ -119,7 +119,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.m_btnClose;
-            this.ClientSize = new System.Drawing.Size(407, 99);
+            this.ClientSize = new System.Drawing.Size(407, 109);
             this.Controls.Add(this.m_btnFindNext);
             this.Controls.Add(this.m_btnReplaceAll);
             this.Controls.Add(this.m_textReplaceWith);

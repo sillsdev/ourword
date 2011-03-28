@@ -16,6 +16,9 @@ using OurWordData.DataModel;
 
 */
 
+// [ ] Bug: Move cursor, do FindNext, its skipping (at least, for Footnote it is, probably 
+//     because FN is defined later.
+
 namespace OurWord.Ctrls.Navigation
 {
     public partial class DlgFindAndReplace : Form
@@ -24,7 +27,7 @@ namespace OurWord.Ctrls.Navigation
         #region attr{g}: string FindWhat
         public string FindWhat
         {
-            get
+            private get
             {
                 return m_textFindWhat.Text;
             }
@@ -81,6 +84,10 @@ namespace OurWord.Ctrls.Navigation
         private void onLoad(object sender, EventArgs e)
         {
             m_WindowState.RestoreWindowState();
+
+            var font = CtrlNavigation.GetFont();
+            m_textFindWhat.Font = font;
+            m_textReplaceWith.Font = font;
         }
         #endregion
         #region event: onFormClosing
@@ -163,11 +170,6 @@ namespace OurWord.Ctrls.Navigation
             m_btnReplaceAll.Enabled = false;
         }
         #endregion
-
-        // RoadMap ---------------------------------------------------------------------------
-        // [ ] ToDo: IterateCurrent must deal with the (a) end of book, (b) end of Bible
-        // [ ] Bug: Move cursor, do FindNext, its skipping (at least, for Footnote it is, probably
-        //      because FN is defined later.
 
         // Button Clicks ---------------------------------------------------------------------
         #region cmd: cmdClose

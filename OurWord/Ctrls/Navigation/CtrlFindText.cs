@@ -49,6 +49,13 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
 
+        #region Method: void SetTextFont(font)
+        public void SetTextFont(Font font)
+        {
+            m_TextBox.Font = font;
+        }
+        #endregion
+
         #region cmd: cmdTextBoxKeyDown
         void cmdTextBoxKeyDown(object sender, KeyEventArgs e)
             // When <Enter> is pressed in the textbox, close the menu item and 

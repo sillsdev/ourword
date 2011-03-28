@@ -206,34 +206,35 @@
             // m_FindNext
             // 
             this.m_FindNext.Name = "m_FindNext";
-            this.m_FindNext.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.m_FindNext.Size = new System.Drawing.Size(191, 22);
+            this.m_FindNext.ShortcutKeys = System.Windows.Forms.Keys.F3;
+            this.m_FindNext.Size = new System.Drawing.Size(216, 22);
             this.m_FindNext.Text = "Find &Next";
             this.m_FindNext.Click += new System.EventHandler(this.cmdFindNext);
             // 
             // m_AdvancedFind
             // 
             this.m_AdvancedFind.Name = "m_AdvancedFind";
-            this.m_AdvancedFind.Size = new System.Drawing.Size(191, 22);
+            this.m_AdvancedFind.Size = new System.Drawing.Size(216, 22);
             this.m_AdvancedFind.Text = "&Advanced Find...";
             // 
             // m_FindAndReplace
             // 
             this.m_FindAndReplace.Name = "m_FindAndReplace";
-            this.m_FindAndReplace.Size = new System.Drawing.Size(191, 22);
+            this.m_FindAndReplace.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
+            this.m_FindAndReplace.Size = new System.Drawing.Size(216, 22);
             this.m_FindAndReplace.Text = "Find and &Replace...";
             this.m_FindAndReplace.Click += new System.EventHandler(this.cmdFindAndReplace);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(188, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(213, 6);
             // 
             // m_Filter
             // 
             this.m_Filter.Image = ((System.Drawing.Image)(resources.GetObject("m_Filter.Image")));
             this.m_Filter.Name = "m_Filter";
-            this.m_Filter.Size = new System.Drawing.Size(191, 22);
+            this.m_Filter.Size = new System.Drawing.Size(216, 22);
             this.m_Filter.Text = "Set Fi&lter...";
             this.m_Filter.ToolTipText = "Filter out the sections which do not conform to a criteria.";
             this.m_Filter.Click += new System.EventHandler(this.cmdFilter);
@@ -241,26 +242,26 @@
             // m_createConcordance
             // 
             this.m_createConcordance.Name = "m_createConcordance";
-            this.m_createConcordance.Size = new System.Drawing.Size(191, 22);
+            this.m_createConcordance.Size = new System.Drawing.Size(216, 22);
             this.m_createConcordance.Text = "Create &Concordance...";
             this.m_createConcordance.Click += new System.EventHandler(this.cmdConcordance);
             // 
             // m_separatorBookmarks
             // 
             this.m_separatorBookmarks.Name = "m_separatorBookmarks";
-            this.m_separatorBookmarks.Size = new System.Drawing.Size(188, 6);
+            this.m_separatorBookmarks.Size = new System.Drawing.Size(213, 6);
             // 
             // m_SetBookmark
             // 
             this.m_SetBookmark.Name = "m_SetBookmark";
-            this.m_SetBookmark.Size = new System.Drawing.Size(191, 22);
+            this.m_SetBookmark.Size = new System.Drawing.Size(216, 22);
             this.m_SetBookmark.Text = "Set &Bookmark here";
             this.m_SetBookmark.Click += new System.EventHandler(this.cmdSetBookmark);
             // 
             // m_GoToBookmark
             // 
             this.m_GoToBookmark.Name = "m_GoToBookmark";
-            this.m_GoToBookmark.Size = new System.Drawing.Size(191, 22);
+            this.m_GoToBookmark.Size = new System.Drawing.Size(216, 22);
             this.m_GoToBookmark.Text = "Go To Boo&kmark";
             // 
             // FilteredNavigation

@@ -7,6 +7,7 @@ using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
+using OurWordData.Styles;
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -183,6 +184,8 @@ namespace OurWord.Ctrls.Navigation
         #region cmd: cmdFindDropDownOpening
         private void cmdFindDropDownOpening(object sender, EventArgs e)
         {
+            m_FindTextMenuItem.SetTextFont(GetFont());
+
             if (string.IsNullOrEmpty(m_FindTextMenuItem.SearchText))
                 m_FindNext.Enabled = false;
 
@@ -196,7 +199,20 @@ namespace OurWord.Ctrls.Navigation
             m_FindAndReplace.Available = Users.Current.CanFindAndReplace;
 
             // TODO: Add Concordance (which requires a repositiory tag increment.
-            // Note that if Filters AND COncordance are turned off, menu separator must be off, too.
+            // Note that if Filters AND Concordance are turned off, menu separator must be off, too.
+        }
+        #endregion
+        #region SMethod: Font GetFont()
+        static public Font GetFont()
+        {
+            var selection = G.App.CurrentLayout.Selection;
+            if (null != selection)
+            {
+                var ws = selection.Paragraph.WritingSystem;
+                var font = StyleSheet.Paragraph.GetFont(ws.Name, 100);
+                return font;
+            }
+            return SystemFonts.DialogFont;
         }
         #endregion
 

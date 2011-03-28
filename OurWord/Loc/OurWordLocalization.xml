@@ -49,7 +49,7 @@
     <Item ID="m_Next" English="Next" CanTip="true" Tip="Go to the Next section in the book." />
     <Item ID="m_Last" English="Last" CanTip="true" Tip="Go to the final section in the book." />
     <Item ID="m_Find" English="Find" CanTip="true" Tip="Find" />
-    <Item ID="m_FindNext" English="Find &amp;Next" Key="Ctrl+F" />
+    <Item ID="m_FindNext" English="Find &amp;Next" Key="F3" />
     <Item ID="m_AdvancedFind" English="&amp;Advanced Find..." />
     <Item ID="m_FindAndReplace" English="Find and &amp;Replace..." />
     <Item ID="m_Filter" English="Set Fi&amp;lter..." CanTip="true" Tip="Filter out the sections which do not conform to a criteria." />

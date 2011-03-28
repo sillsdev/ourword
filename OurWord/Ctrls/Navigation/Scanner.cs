@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Windows.Forms;
 using OurWord.Edit;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
@@ -68,6 +69,8 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // Scan Book for Search String -------------------------------------------------------
+        private static bool s_bContinueToNextBook;
+        private static bool s_bDontAskAgain;
         #region Class: SearchContext
         public class SearchContext
         {
@@ -267,12 +270,26 @@ namespace OurWord.Ctrls.Navigation
                     vBooks.Insert(iInsertPoint++, book);
             }
 
+            // Ask if the user wishes to continue to other books
+            if (vBooks.Count > 0 && !s_bDontAskAgain)
+            {
+                var dlg = new DlgContinueToNextBook();
+                var result = dlg.ShowDialog(G.App);
+                s_bContinueToNextBook = (result == DialogResult.Yes);
+                s_bDontAskAgain = dlg.DontAskAgain;
+            }
+            if (!s_bContinueToNextBook)
+                return null;
+
             // If not found, scan the remaining books
             foreach(var book in vBooks)
             {
                 if (book == context.OriginalBook)
                     break;
-                lookupInfo = ScanBook(context, book, ScanOption.All, null);
+                using (new LoadedBook(book))
+                {
+                    lookupInfo = ScanBook(context, book, ScanOption.All, null);                    
+                }
                 if (null != lookupInfo)
                     return lookupInfo;
             }

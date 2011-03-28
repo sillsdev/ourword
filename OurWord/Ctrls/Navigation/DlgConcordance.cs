@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
+using OurWordData.Styles;
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -52,6 +53,7 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
         public GoToLookupItem OnGoToLookupItem;
+        private Font m_Font;
 
         // Scaffolding -----------------------------------------------------------------------
         #region Constructor()
@@ -76,6 +78,10 @@ namespace OurWord.Ctrls.Navigation
 
             // Resize the final column to fill up all available width
             cmdListViewSizeChanged(null, null);
+
+            // Set Font to the stylesheet
+            m_Font = CtrlNavigation.GetFont();
+            m_tConcordOn.Font = m_Font;
         }
         #endregion
         #region Cmd: cmdListViewSizeChanged - resize final column
@@ -261,24 +267,24 @@ namespace OurWord.Ctrls.Navigation
                 info.Text.Substring(info.IndexIntoText + ConcordOnText.Length) : "";
 
             // Measure the target string
-            var nMiddleWidth = JWU.MeasureTextDisplayWidth(ConcordOnText, e.Graphics, Font);
+            var nMiddleWidth = JWU.MeasureTextDisplayWidth(ConcordOnText, e.Graphics, m_Font);
 
             // How much width for Left and Right?
             var nTotalWidth = e.Bounds.Width;
             var nWidthSide = (nTotalWidth - nMiddleWidth) / 2;
 
             // Chop off Left until it fits
-            while (JWU.MeasureTextDisplayWidth(sLeft, e.Graphics, Font) > nWidthSide)
+            while (JWU.MeasureTextDisplayWidth(sLeft, e.Graphics, m_Font) > nWidthSide)
                 sLeft = sLeft.Substring(1);
 
             // Draw
-            var x = e.Bounds.X + nWidthSide - JWU.MeasureTextDisplayWidth(sLeft, e.Graphics, Font);
+            var x = e.Bounds.X + nWidthSide - JWU.MeasureTextDisplayWidth(sLeft, e.Graphics, m_Font);
             var y = e.Bounds.Y;
-            e.Graphics.DrawString(sLeft, Font, new SolidBrush(colorText), x, y);
-            x += JWU.MeasureTextDisplayWidth(sLeft, e.Graphics, Font);
-            e.Graphics.DrawString(sMiddle, Font, new SolidBrush(colorConcordOn), x, y);
-            x += JWU.MeasureTextDisplayWidth(sMiddle, e.Graphics, Font);
-            e.Graphics.DrawString(sRight, Font, new SolidBrush(colorText), x, y);
+            e.Graphics.DrawString(sLeft, m_Font, new SolidBrush(colorText), x, y);
+            x += JWU.MeasureTextDisplayWidth(sLeft, e.Graphics, m_Font);
+            e.Graphics.DrawString(sMiddle, m_Font, new SolidBrush(colorConcordOn), x, y);
+            x += JWU.MeasureTextDisplayWidth(sMiddle, e.Graphics, m_Font);
+            e.Graphics.DrawString(sRight, m_Font, new SolidBrush(colorText), x, y);
 
             e.DrawDefault = false;
         }
