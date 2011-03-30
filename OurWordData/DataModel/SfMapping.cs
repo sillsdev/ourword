@@ -1107,6 +1107,7 @@ namespace OurWordData.DataModel
             if (IsPicture(sMarker)) return true;
             if (IsSeeAlso(sMarker)) return true;
             if (IsFootnote(sMarker)) return true;
+            if (sMarker == "fig") return true;
 
             // Didn't find it in our list
             return false;

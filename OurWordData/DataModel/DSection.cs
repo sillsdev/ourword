@@ -1966,9 +1966,9 @@ namespace OurWordData.DataModel
 				if (p.GetType() != typeof(DPicture))
 					return false;
 
-				DPicture pict = p as DPicture;
+				var pict = p as DPicture;
 
-                SfField fPath = new SfField(DSFMapping.c_sMkrPicturePath, pict.FullPathName);
+                var fPath = new SfField(DSFMapping.c_sMkrPicturePath, pict.FullPathName);
 				SDB.Append(fPath);
 
 				SDB.Append( new SfField(DSFMapping.c_sMkrPictureWordRtf,pict.WordRtfInfo));
