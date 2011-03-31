@@ -1,4 +1,6 @@
 ﻿#region *** TScanner.cs ***
+
+using System;
 using System.Linq;
 using NUnit.Framework;
 using OurWord.Ctrls.Navigation;
@@ -38,22 +40,22 @@ namespace OurWordTests.Ctrls
             const string csSource = "For God so loved the world he gave his one and only son, " + 
                 "that whosoever believes in him should not perish but have eternal life.";
 
-            var vShouldNotFind = Scanner.GetIndexesOf(csSource, "Not in there", false);
+            var vShouldNotFind = Scanner.ScanString(csSource, "Not in there", StringComparison.InvariantCulture);
             Assert.AreEqual(0, vShouldNotFind.Count());
 
-            var vShouldFindFirst = Scanner.GetIndexesOf(csSource, "For", false);
+            var vShouldFindFirst = Scanner.ScanString(csSource, "For", StringComparison.InvariantCulture);
             Assert.AreEqual(1, vShouldFindFirst.Count());
             Assert.AreEqual(0, vShouldFindFirst[0]);
 
-            var vShouldFindLast = Scanner.GetIndexesOf(csSource, "life.", false);
+            var vShouldFindLast = Scanner.ScanString(csSource, "life.", StringComparison.InvariantCulture);
             Assert.AreEqual(1, vShouldFindLast.Count());
             Assert.AreEqual(123, vShouldFindLast[0]);
 
-            var vShouldFindMiddle = Scanner.GetIndexesOf(csSource, "God", false);
+            var vShouldFindMiddle = Scanner.ScanString(csSource, "God", StringComparison.InvariantCulture);
             Assert.AreEqual(1, vShouldFindMiddle.Count());
             Assert.AreEqual(4, vShouldFindMiddle[0]);
 
-            var vShouldFindMultiple = Scanner.GetIndexesOf(csSource, "so", false);
+            var vShouldFindMultiple = Scanner.ScanString(csSource, "so", StringComparison.InvariantCulture);
             Assert.AreEqual(3, vShouldFindMultiple.Count());
             Assert.AreEqual(8, vShouldFindMultiple[0]);
             Assert.AreEqual(52, vShouldFindMultiple[1]);
@@ -66,10 +68,13 @@ namespace OurWordTests.Ctrls
             // Create test book
             TestCommon.GlobalTestSetup();
             var book = TestCommon.CreateFromOxes("EPH", sOxesXml);
+            var dbt = book.Sections[0].Paragraphs[0].Runs[0] as DBasicText;
+            Assert.IsNotNull(dbt);
 
             // Multiple times
-            var context = new Scanner.SearchContext("Jesus", null);
-            var vHits = Scanner.ScanBook(context, book);
+            var context = new Scanner.SearchContext("Jesus", book, dbt.GetPathFromRoot(), 0);
+            var vTexts = Scanner.GetTexts(book);
+            var vHits = Scanner.ScanTexts(context, vTexts);
             Assert.AreEqual(6, vHits.Count);
 
             Assert.AreEqual("EPH", vHits[0].BookAbbrev);
@@ -94,7 +99,7 @@ namespace OurWordTests.Ctrls
             var book = TestCommon.CreateFromOxes("EPH", sOxesXml);
 
             // Do the scan
-            var v = Scanner.GetTextsToScan(book, Scanner.ScanOption.All, null);
+            var v = Scanner.GetTexts(book);
 
             // Test
             Assert.AreEqual(10, v.Count);
@@ -115,12 +120,12 @@ namespace OurWordTests.Ctrls
             Assert.IsTrue(target.ContentsAsString.StartsWith("To the saints"));
 
             // Do the scan
-            var v = Scanner.GetTextsToScan(book, Scanner.ScanOption.PriorTo, target);
+            var v = Scanner.GetTextsPrior(target);
 
             // Test
-            Assert.AreEqual(3, v.Count);
+            Assert.AreEqual(2, v.Count);
             Assert.AreEqual("Greeting", v[0].ContentsAsString);
-            Assert.IsTrue(v[2].ContentsAsString.StartsWith("To the saints"));
+            Assert.IsTrue(v[1].ContentsAsString.StartsWith("Paul, an apostle"));
         }
         #endregion
         #region Test: TGetTextsToScan_After
@@ -136,11 +141,11 @@ namespace OurWordTests.Ctrls
             Assert.IsTrue(target.ContentsAsString.StartsWith("To the saints"));
 
             // Do the scan
-            var v = Scanner.GetTextsToScan(book, Scanner.ScanOption.After, target);
+            var v = Scanner.GetTextsAfter(target);
 
             // Test
-            Assert.AreEqual(8, v.Count);
-            Assert.IsTrue(v[0].ContentsAsString.StartsWith("To the saints"));
+            Assert.AreEqual(7, v.Count);
+            Assert.IsTrue(v[0].ContentsAsString.StartsWith("Grace and peace"));
         }
         #endregion
 
@@ -150,17 +155,21 @@ namespace OurWordTests.Ctrls
             // Create test book
             TestCommon.GlobalTestSetup();
             var book = TestCommon.CreateFromOxes("EPH", sOxesXml);
+            var dbt = book.Sections[0].Paragraphs[0].Runs[0] as DBasicText;
+            Assert.IsNotNull(dbt);
 
             // Scan
-            var context = new Scanner.SearchContext("Greeting", null);
-            var lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.All, null);
+            var vTexts = Scanner.GetTexts(book);
+            var context = new Scanner.SearchContext("Greeting", book, dbt.GetPathFromRoot(), 0);
+            var vLookup = Scanner.ScanTexts(context, vTexts);
 
             // Test
-            Assert.IsNotNull(lookupInfo);
-            Assert.AreEqual(0, lookupInfo.SectionNo);
-            Assert.AreEqual(0, lookupInfo.ParagraphNo);
-            Assert.AreEqual(0, lookupInfo.RunNo);
-            Assert.AreEqual(0, lookupInfo.IndexIntoText);
+            Assert.IsNotNull(vLookup);
+            Assert.AreEqual(1, vLookup.Count);
+            Assert.AreEqual(0, vLookup[0].SectionNo);
+            Assert.AreEqual(0, vLookup[0].ParagraphNo);
+            Assert.AreEqual(0, vLookup[0].RunNo);
+            Assert.AreEqual(0, vLookup[0].IndexIntoText);
         }
         #endregion
         #region Test: TScanBook_firstOccurrence
@@ -169,17 +178,21 @@ namespace OurWordTests.Ctrls
             // Create test book
             TestCommon.GlobalTestSetup();
             var book = TestCommon.CreateFromOxes("EPH", sOxesXml);
+            var dbt = book.Sections[0].Paragraphs[0].Runs[0] as DBasicText;
+            Assert.IsNotNull(dbt);
 
             // Scan
-            var context = new Scanner.SearchContext("faithful", null);
-            var lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.All, null);
+            var vTexts = Scanner.GetTexts(book);
+            var context = new Scanner.SearchContext("faithful", book, dbt.GetPathFromRoot(), 0);
+            var vLookup = Scanner.ScanTexts(context, vTexts);
 
             // Test
-            Assert.IsNotNull(lookupInfo);
-            Assert.AreEqual(0, lookupInfo.SectionNo);
-            Assert.AreEqual(2, lookupInfo.ParagraphNo);
-            Assert.AreEqual(0, lookupInfo.RunNo);
-            Assert.AreEqual(30, lookupInfo.IndexIntoText);
+            Assert.IsNotNull(vLookup);
+            Assert.AreEqual(1, vLookup.Count);
+            Assert.AreEqual(0, vLookup[0].SectionNo);
+            Assert.AreEqual(2, vLookup[0].ParagraphNo);
+            Assert.AreEqual(0, vLookup[0].RunNo);
+            Assert.AreEqual(30, vLookup[0].IndexIntoText);
         }
         #endregion
         #region Test: TScanBook_finalOccurrence
@@ -188,17 +201,21 @@ namespace OurWordTests.Ctrls
             // Create test book
             TestCommon.GlobalTestSetup();
             var book = TestCommon.CreateFromOxes("EPH", sOxesXml);
+            var dbt = book.Sections[0].Paragraphs[0].Runs[0] as DBasicText;
+            Assert.IsNotNull(dbt);
 
             // Scan
-            var context = new Scanner.SearchContext("loves.", null);
-            var lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.All, null);
+            var vTexts = Scanner.GetTexts(book);
+            var context = new Scanner.SearchContext("loves.", book, dbt.GetPathFromRoot(), 0);
+            var vLookup = Scanner.ScanTexts(context, vTexts);
 
             // Test
-            Assert.IsNotNull(lookupInfo);
-            Assert.AreEqual(1, lookupInfo.SectionNo);
-            Assert.AreEqual(4, lookupInfo.ParagraphNo);
-            Assert.AreEqual(0, lookupInfo.RunNo);
-            Assert.AreEqual(80, lookupInfo.IndexIntoText);
+            Assert.IsNotNull(vLookup);
+            Assert.AreEqual(1, vLookup.Count);
+            Assert.AreEqual(1, vLookup[0].SectionNo);
+            Assert.AreEqual(4, vLookup[0].ParagraphNo);
+            Assert.AreEqual(0, vLookup[0].RunNo);
+            Assert.AreEqual(80, vLookup[0].IndexIntoText);
         }
         #endregion
         #region Test: TScanBook_priorAndAfter
@@ -214,19 +231,26 @@ namespace OurWordTests.Ctrls
             var owp = EditTest.Wnd.Contents.SubItems[2] as OWPara;
             var selection = new OWWindow.Sel(owp, 3, 0);
 
-            // Should not find 'adopted' before; but yes to after
-            var context = new Scanner.SearchContext("adopted", selection);
-            var lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.PriorTo, selection);
-            Assert.IsNull(lookupInfo);
-            lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.After, selection);
-            Assert.IsNotNull(lookupInfo);
+            // Should not find 'accordance' before; but yes to after
+            var context = new Scanner.SearchContext("accordance", selection);
+            var lookupInfo = Scanner.ScanTexts(context, Scanner.GetTextsPrior(context.OriginalDbt));
+            Assert.AreEqual(0, lookupInfo.Count);
+            lookupInfo = Scanner.ScanTexts(context, Scanner.GetTextsAfter(context.OriginalDbt));
+            Assert.AreEqual(1, lookupInfo.Count);
 
-            // Prior should not find the word we're sitting on; but After should
+            // Should not find "Ephesus" after, but yes to before
+            context = new Scanner.SearchContext("Ephesus,", selection);
+            lookupInfo = Scanner.ScanTexts(context, Scanner.GetTextsPrior(context.OriginalDbt));
+            Assert.AreEqual(1, lookupInfo.Count);
+            lookupInfo = Scanner.ScanTexts(context, Scanner.GetTextsAfter(context.OriginalDbt));
+            Assert.AreEqual(0, lookupInfo.Count);
+
+            // Neither should find the word we're sitting on
             context = new Scanner.SearchContext("predestined", selection);
-            lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.PriorTo, selection);
-            Assert.IsNull(lookupInfo);
-            lookupInfo = Scanner.ScanBook(context, book, Scanner.ScanOption.After, selection);
-            Assert.IsNotNull(lookupInfo);
+            lookupInfo = Scanner.ScanTexts(context, Scanner.GetTextsPrior(context.OriginalDbt));
+            Assert.AreEqual(0, lookupInfo.Count);
+            lookupInfo = Scanner.ScanTexts(context, Scanner.GetTextsAfter(context.OriginalDbt));
+            Assert.AreEqual(0, lookupInfo.Count);
         }
         #endregion
 
@@ -238,19 +262,20 @@ namespace OurWordTests.Ctrls
                 "<p class=\"Paragraph\" usfm=\"p\"><c n=\"1\" /><v n=\"1\" />Paul, an apostle" +
                     " <note reference=\"1:1\" class=\"Note General Paragraph\" usfm=\"f\">Had special authority, and had seen Jesus.</note>" +
                     " of Christ Jesus by the will of God,</p>" +
+                "<p class=\"Paragraph\" usfm=\"p\">Praise be!</p>" +
                 "</book>";
 
             // Create the test book
             TestCommon.GlobalTestSetup();
             var book = TestCommon.CreateFromOxes("EPH", sXml);
 
-            // Scan the target paragraph
-            var paragraph = book.Sections[0].Paragraphs[1];
-            var vTexts = Scanner.GetTextsAndFootnotes(paragraph);
+            // Collect the texts
+            var vTexts = Scanner.GetTexts(book);
 
             // Test
-            Assert.AreEqual(3, vTexts.Count);
-            Assert.AreEqual("Had special authority, and had seen Jesus.", vTexts[1].AsString);
+            Assert.AreEqual(5, vTexts.Count);
+            // The footnote should be the last one in the section (screen order)
+            Assert.AreEqual("Had special authority, and had seen Jesus.", vTexts[4].AsString);
         }
         #endregion
     }

@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<LocDB ID="sp" Name="Español" Font="Tahoma">
+<LocDB ID="sp" Name="Español" Font="Tahoma" Size="8">
   <Group ID="TopTools">
-    <Item ID="m_Drafting" Value="&amp;Borrador" Tip="Borrador en la ventana principal" />
-    <Item ID="m_NaturalnessCheck" Value="&amp;Prueba de Naturaleza" Tip="Prueba de nivel natural en la ventana principal, sin traducción fuente" />
+    <Item ID="m_Drafting" Value="&amp;Borrador" />
+    <Item ID="m_NaturalnessCheck" Value="&amp;Prueba de Naturaleza" />
     <Item ID="m_BackTranslation" Value="&amp;Traducción Inversa" Tip="Traducción Inversa en la ventana principal" />
     <Item ID="m_ConsultantPreparation" Value="&amp;Preparar para Consulta" />
     <Item ID="m_Zoom" Value="Hacer Zoom al Texto" />
@@ -26,31 +26,46 @@
     <Item ID="m_menuRedo" Value="&amp;Rehacer" />
     <Item ID="m_menuCut" Value="Cor&amp;tar" Tip="Remueve el texto seleccionado y lo coloca en el portapapeles." />
     <Item ID="m_menuCopy" Value="&amp;Copiar" Tip="Copia el texo seleccionado en el portapapeles." />
-    <Item ID="m_menuPaste" Value="&amp;Pegar" Tip="Pega el texto que esté en el portapapeles en el sitio indicado por el cursor." />
-    <Item ID="m_Italic" Value="Cursivas" Tip="Cambia el texto seleccionado a letras cursivas, si se ha activado Cursivas para el contexto en vigor." />
+    <Item ID="m_menuPaste" Value="&amp;Pegar" />
     <Item ID="m_menuChangeParagraphStyle" Value="C&amp;ambiar Estilo Párrafo" Tip="Cambie el estilo del párrafo seleccionado por otro estilo." />
+    <Item ID="m_menuInsertFootnote" Value="Insertar Nota de Pie" />
+    <Item ID="m_menuDeleteFootnote" Value="Borrar Nota de Pie" />
+    <Item ID="m_menuCopyBTFromFront" Value="&amp;Copiar Traducción Inversa de la Fuente..." Tip="Copie la Traducción Fuente para que sirva de borrador para la Traducción Inversa." />
+    <Item ID="m_Italic" Value="Cursivas" Tip="Cambia el texto seleccionado a letras cursivas, si se ha activado Cursivas para el contexto en vigor." />
+    <Item ID="m_InsertNote" Value="Nota" Tip="Insertar Nota del Traductor" />
+    <Item ID="m_History" Value="Historia" Tip="Historia" />
+    <Item ID="m_Tools" Value="Herramientas" Tip="Abre el menú que muestra las herramients disponibles." />
+    <Item ID="m_menuSendReceive" Value="En&amp;viar y Recibir...&#xD;" Tip="Sincronizar todos los cambios en este clúster a Internet." />
+    <Item ID="m_menuCheckForUpdates" Value="Averiguar si hay &amp;Actualización..." />
+    <Item ID="m_menuConfigure" Value="&amp;Configurar..." Tip="Edite las elecciones para VozNuestra en general, y para el proyecto en vigor." />
+    <Item ID="m_menuIncrementBookStatus" Value="&amp;Incrementar Estado del Libro..." Tip="Cambie el estado de desarrollo del libra al próximo estado en el proceso de la traducción." />
+    <Item ID="m_menuRestoreFromBackup" Value="&amp;Recuperar de la Copia de Seguridad..." Tip="Recupere una versión anterior del libro." />
+    <Item ID="m_menuTscReport" Value="Informe Trimestral TSC..." />
+    <Item ID="m_menuLocalizerTool" Value="Herramienta de &amp;Localización..." Tip="Cree una versión de VozNuestra con menúes, botones y mensajes en otra lengua." />
+    <Item ID="m_helpTopics" Value="&amp;Tópicos de Ayuda" Tip="Muestre la Ventana de Tópicos de Ayuda." />
+    <Item ID="m_aboutOurWord" Value="&amp;Acerca de VozNuestra" Tip="Muestre informaciones acerca de esta versión de VozNuestra." />
     <Item ID="m_First" Value="Inicial" Tip="Vaya a la sección Inicial del libro." />
     <Item ID="m_Previous" Value="Anterior" Tip="Vaya a la seccion Anterior del libro." />
     <Item ID="m_Next" Value="Próxima" Tip="Vaya a la sección Próxima del libro." />
     <Item ID="m_Last" Value="Última" Tip="Vaya a la sección Última del libro." />
-    <Item ID="m_Tools"  Value="Herramientas" Tip="Abre el menú que muestra las herramients disponibles." />
-    <Item ID="m_menuIncrementBookStatus" Value="&amp;Incrementar Estado del Libro..." Tip="Cambie el estado de desarrollo del libra al próximo estado en el proceso de la traducción." />
-    <Item ID="m_menuRestoreFromBackup" Value="&amp;Recuperar de la Copia de Seguridad..." Tip="Recupere una versión anterior del libro." />
-    <Item ID="m_aboutOurWord" Value="&amp;Acerca de VozNuestra" Tip="Muestre informaciones acerca de esta versión de VozNuestra." />
-    <Item ID="m_menuCopyBTFromFront" Value="&amp;Copiar Traducción Inversa de la Fuente" Tip="Copie la Traducción Fuente para que sirva de borrador para la Traducción Inversa." />
-    <Item ID="m_menuConfigure" Value="&amp;Configurar..." Tip="Edite las elecciones para VozNuestra en general, y para el proyecto en vigor." />
-    <Item ID="m_menuLocalizerTool" Value="Herramienta de &amp;Localización..." Tip="Cree una versión de VozNuestra con menúes, botones y mensajes en otra lengua." />
-    <Item ID="m_helpTopics" Value="&amp;Tópicos de Ayuda" Tip="Muestre la Ventana de Tópicos de Ayuda." />
-    <Item ID="m_menuUndo" Value="&amp;Deshacer" />
-    <Item ID="m_menuRedo" Value="&amp;Rehacer" />
-    <Item ID="m_Export" Value="Exportar..." />
-    <Item ID="m_menuInsertFootnote" Value="Insertar Nota de Pie" />
-    <Item ID="m_menuDeleteFootnote" Value="Borrar Nota de Pie" />
-    <Item ID="m_InsertNote" Value="Insertarns" Tip="Insertar Nota del Traductor" />
-    <Item ID="m_History" Value="Historia" Tip="Historia" />
-    <Item ID="m_menuCheckForUpdates" Value="Averiguar si hay &amp;Actualización..." />
-    <Item ID="m_menuSendReceive" Value="Enviar / &amp;Recibir" />
-    
+    <Item ID="m_Find" Value="Buscar" />
+    <Item ID="m_FindNext" Value="Buscar &amp;Próxima" />
+    <Item ID="m_AdvancedFind" Value="Búsqueda &amp;Avanzada..." />
+    <Item ID="m_FindAndReplace" Value="Buscar y &amp;Reemplacer..." />
+    <Item ID="m_Filter" Value="Definir Fi&amp;ltro..." Tip="Filtrar las secciones que no satisfacen un criterio." />
+    <Item ID="m_createConcordance" Value="Crear &amp;Concordancia..." />
+    <Item ID="m_SetBookmark" Value="&amp;Marcar Esta Página" />
+    <Item ID="m_GoToBookmark" Value="Ir al Marca&amp;dor" />
+    <Item ID="changeParagraphStyle_Paragraph" Value="Párrafo" />
+    <Item ID="changeParagraphStyle_Line 1" Value="Renglón 1" />
+    <Item ID="changeParagraphStyle_Line 2" Value="Renglón 2" />
+    <Item ID="changeParagraphStyle_Line 3" Value="Renglón 3" />
+    <Item ID="changeParagraphStyle_List Item 1" Value="Elemento 1 de Lista" />
+    <Item ID="changeParagraphStyle_List Item 2" Value="Elemento 2 de Lista" />
+    <Item ID="changeParagraphStyle_List Item 3" Value="Elemento 3 de Lista" />
+    <Item ID="changeParagraphStyle_Major Section Head" Value="Encabezado de Sección Mayor" />
+    <Item ID="changeParagraphStyle_Section Head" Value="Encabezado de Sección" />
+    <Item ID="changeParagraphStyle_Section Head 2" Value="Encabezado de Sección 2" />
   </Group>
   <Group ID="Strings">
     <Item ID="kYes" Value="Sí" />
@@ -81,6 +96,15 @@
     <Item ID="kUserCanMakeNotes" Value="Se Permite Escribir Solamente Notas" />
     <Item ID="kUserReadOnly" Value="Sólo Lectura" />
     <Item ID="kUserBookByBook" Value="Elegir Opciones Libro Por Libro" />
+    <Item ID="kWritingSystems" Value="Sistemas Ortográficos" />
+    <Item ID="kFootnotes" Value="Notas de Pie" />
+    <Item ID="kFootnoteCustom" Value="Hecho de Encargo" />
+    <Item ID="kCopyBookNamesFrom" Value="...de {0}" />
+    <Item ID="Vernacular" Value="Vernáculo" />
+    <Item ID="BackTranslation" Value="Traducción Inversa" />
+    <Item ID="AllBooks" Value="Todos los Libros" />
+    <Item ID="ReferenceTranslationBase" Value="Cómo otros tradujeron versículo {0}" />
+    <Item ID="hpTitle" Value="{0} Marcha de la Traducción" />
     <Group ID="GeneralUI">
       <Item ID="DraftingWindowName" Value="Borrador" />
       <Item ID="DraftingReference" Value="{0} a {1}" />
@@ -95,6 +119,7 @@
       <Item ID="TranslationsWindowName" Value="Traducciones " />
       <Item ID="NoDataToDisplay" Value="(No existen datos para presentar. Use Herramientas-Configurar-Propiedades Esenciales en el menú para definir la Traducción Fuente y la Traducción Meta.)" />
       <Item ID="BrowseForBackupFolderDescr" Value="Seleccione la carpeta en donde quiere guardar sus archivos de respaldo. De preferencia, no los guarde en el mismo almacén permanente, sino en una tarjeta flash o una unidad floppy." />
+      <Item ID="NoDataToDisplayMsg" Value="(No hay datos para mostrar. Use el menú Proyecto para crear un proyecto nuevo o abrir un proyecto ya existente; o use Herramientas-Configurar para configurar las traducciones Fuente y Meta.)" />
     </Group>
     <Group ID="NoteDefs">
       <Item ID="kGeneral" Value="General" />
@@ -119,6 +144,24 @@
       <Item ID="GreekDefault" Value="Griego:" />
       <Item ID="HebrewDefault" Value="Hebreo:" />
       <Item ID="ExegesisDefault" Value="Exégesis:" />
+      <Item ID="AddEvent" Value="Añadir Nuevo" />
+      <Item ID="AddEvent_tip" Value="Añadir otro evento a esta historia." />
+      <Item ID="DeleteEvent" Value="Borrar..." />
+      <Item ID="DeleteEvent_tip" Value="Borrar el evento más reciente." />
+      <Item ID="kAnyone" Value="Cualquier" />
+      <Item ID="kTranslator" Value="Traductor" />
+      <Item ID="kConsultant" Value="Consultor" />
+      <Item ID="kAdvisor" Value="Coordinador" />
+      <Item ID="kClosed" Value="Cerrada" />
+      <Item ID="kDaughterTeam" Value="Equipo Derivado" />
+      <Item ID="kInformation" Value="Información" />
+      <Item ID="tipAnyone" Value="Esta nota requiere atención. Haz clic aquí para asignarla&#xA;a alguien, o para cerrarla porque está completada." />
+      <Item ID="Delete" Value="Borrar..." />
+      <Item ID="DeleteNote_tip" Value="Borrar esta nota o mensaje.&#xA;(Desactivado si hay mensajes en esta nota&#xA;de que no eres el autor.)" />
+      <Item ID="tipClickOnTitle" Value="Haz clic en el Título para editarlo" />
+      <Item ID="tipCloseWindow" Value="Cerrar esta ventana" />
+      <Item ID="tipExpand" Value="Cambiar este bocadillo que aparece de repente en un diálogo que te permite ajustar el tamaño." />
+      <Item ID="tipDaughterTeam" Value="Asignar al Equipo Derivado" />
     </Group>
     <Group ID="Files">
       <Item ID="ProjectFileFilter" Value="Archivos de Proyecto VozNuestra (*.owp)|*.owp" />
@@ -173,6 +216,7 @@
       <Item ID="RedoJoinParagraph" Value="&amp;Rehacer Unificación de Párrafos" />
       <Item ID="UndoChangeParagraphStyle_what" Value="&amp;Deshacer Cambio de Estilo de Párrafo '{0}'" />
       <Item ID="RedoChangeParagraphStyle_what" Value="&amp;Rehacer Cambio de Estilo de Párrafo '{0}'" />
+      <Item ID="UndoDeleteTranslatorNote" Value="&amp;Deshacer el evento &quot;Borrar Nota del Traductor&quot;" />
     </Group>
     <Group ID="ProgressSteps">
       <Item ID="PerformingSend/Receive..." Value="Ejecutando “Enviar / Recibir”..." />
@@ -250,7 +294,11 @@
     <Item ID="msgNoAvailableBooksInFront" Value="La Traducción Fuente no tiene definidos los libros que Vd. quiere Crear o Importar a la Traducción Meta. Primero hay que definir el libro dentro de la Traducción Fuente. Después puede Crear o Importar el libro deseado en la Traducción Meta." />
     <Item ID="msgNoInternetConnection" Value="VozNuestra no puede comunicarse a Internet. &#xA;&#xA;Verifica que tienes una conexión activa con Internet, y sigue intentando." />
     <Item ID="msgUnableToPull" Value="VozNuestra no puede recuperar los cambios ya instalados en Internet. Sea que el equipo remoto no esté funcionando, sea que hayas errado al entrar el nombre de usuario o la contraseña – por favor sigue intentando." />
+    <Item ID="msgVerifyDeleteBook" Value="Quiere borrar este libro de la traducción?&#xA;&#xA;(CUIDADO: Esta acción quitará el archivo correspondiente al libro del disco;&#xA;y si usted sincroniza con otros, también lo removerá de las computadoras de ellos.)" />
     <Item ID="kConfirmDeleteCluster" Value="Estás seguro de que quieres eliminar el clúster &quot;{0}&quot;?&#xA;&#xA;Esto removerá permanentemente de tu disco, todos los datos lingüísticos del clúster, y no existe opción de deshacer." />
+    <Item ID="kConfirmDeleteCluster2" Value="Disculpe esta segunda pregunta; pero queremos estar seguros en absoluto!&#xA;&#xA;Está usted segurísimo de que quiere remover el clúster &quot;{0}&quot; y todos los datos que le corresponden. " />
+    <Item ID="kFind_NoMoreMatches" Value="'{0}' no ocurre más en {1}." />
+    <Item ID="kConfirmDeleteUser" Value="¿Quiere borrar {0}?" />
     <Group ID="FileStructureMessages">
       <Item ID="paragraphs" Value="Párrafo(s)" />
       <Item ID="picture" Value="Dibujo" />
@@ -356,6 +404,12 @@
     <Item ID="ConsultantCheck" Value="Examen por Consultor" />
     <Item ID="FinalForPrinting" Value="Examen Final para Publicar" />
     <Item ID="FinalRevisions" Value="Redacción Final" />
+  </Group>
+  <Group ID="SplashScreen">
+    <Item ID="Title" Value="Pantalla de Inicio" />
+    <Item ID="sLoadingOurWord" Value="Cargando VozNuestra..." />
+    <Item ID="sOptionalAdditional" Value="-" />
+    <Item ID="sLoading" Value="Cargando {0}..." />
   </Group>
   <Group ID="DialogRestoreFromBackup">
     <Item ID="Title" Value="Restaurar del Archivo de Respaldo" />
@@ -512,6 +566,67 @@
     <Item ID="m_btnCancel" Value="Desactivar" />
     <Item ID="m_comboQualifies" Value="Cualquier de Éstos Sirve" />
   </Group>
+  <Group ID="DlgPassword">
+    <Item ID="Title" Value="Entrar Contraseña" />
+    <Item ID="m_labelEnterPassword" Value="Favor de entrar la contraseña para &quot;{0}&quot;:" />
+  </Group>
+  <Group ID="DlgTranslationProperties">
+    <Item ID="Title" Value="Propiedades de la Traducción" />
+    <Item ID="m_bOK" Value="Aceptar" />
+    <Item ID="m_radioStartedBooks" Value="Libros Ya Iniciados" />
+    <Item ID="m_radioOldTestament" Value="Antiguo Testamento" />
+    <Item ID="m_radioNewTestament" Value="Nuevo Testamento" />
+    <Item ID="m_radioAll" Value="Todos" />
+    <Item ID="m_tabBooks" Value="Libros" />
+    <Item ID="m_lblLanguageName" Value="Nombre del Idioma:" />
+    <Item ID="m_editLanguageName" Value="Nombre de la Traducción" />
+    <Item ID="m_tabOther" Value="Otro" />
+    <Group ID="DlgTranslationProperties_m_LiterateSettings">
+      <Item ID="trVernacular" Value="Vernáculo" Tip="El sistema ortográfico con que se escribe esta traducción." />
+      <Item ID="Writing Systems" Value="Sistemas Ortográficos" />
+      <Item ID="trVernacular_0" Value="Inglés" />
+      <Item ID="trVernacular_1" Value="Latín" />
+      <Item ID="trAdvisor" Value="Coordinador" Tip="El sistema ortográfico de la Traducción Inversa y otros materiales que el coordinador o consultoruse." />
+      <Item ID="trAdvisor_0" Value="Inglés" />
+      <Item ID="trAdvisor_1" Value="Latín" />
+      <Item ID="trFootnoteLetterType" Value="Secuencia de Letras" Tip="Definir la secuencia de letras que identifican las notas de pie en una sección. Puede escoger una de las secuencies predefinidas en VozNuestra, o escoger 'de encargo' para definir su propia secuencia." />
+      <Item ID="Footnotes" Value="Notas de Pie" />
+      <Item ID="trFootnoteLetterType_2" Value="De Encargo" />
+      <Item ID="trFootnoteCustom" Value="Secuencia de Encargo" Tip="Si quiere definir una secuencia de encargo, escoja 'De Encargo' como su Secuencia de Letras, y defina su secuancia aquí, utilizando espacios para separar las letras." />
+    </Group>
+  </Group>
+  <Group ID="DBookProperties">
+    <Group ID="DBookProperties_BookProperties">
+      <Item ID="BpStage" Value="Etapa de la Traducción" Tip="Entrar la etapa de la traducción de este libro, i.e. Borrador, Examen por Equipo, Examen por Consultor" />
+      <Item ID="BpStage_0" Value="Borrador" />
+      <Item ID="BpStage_1" Value="Examen por Equipo" />
+      <Item ID="BpStage_2" Value="Examen por Coordinador" />
+      <Item ID="BpStage_3" Value="Examen por Comunidad" />
+      <Item ID="BpStage_4" Value="Traducción Inversa" />
+      <Item ID="BpStage_5" Value="Examen por Consultor" />
+      <Item ID="BpStage_6" Value="Finalizado para Publicar" />
+      <Item ID="BpStage_7" Value="Revisiones Finales" />
+      <Item ID="BpVersion" Value="Versión:" />
+      <Item ID="BpCopyright" Value="Texto de Copyright:" Tip="Escriba un texto opcional de copyright (derechos de reproducción) para este libro, para utilizar cuando se imprime." />
+    </Group>
+  </Group>
+  <Group ID="DialogExport">
+    <Item ID="Title" Value="Exportar" />
+    <Item ID="m_lWhat" Value="Qué Va a Exportar:" />
+    <Item ID="m_labelCaution" Value="PRECAUCIÓN: No es práctico exportar un libro a otro programa, editarlo allí, e importarlo otra vez a VozNuestra. Los otros programas todos carecen de la riqueza de estructuración de datos que se encuentra en VozNuestra; así que es probable que usted pierda datos al hacer el &quot;viaje redondo.&quot; Sí, puede utilizar el otro programa para buscar cosas, pero no haga ningún cambio si no en VozNuestra." />
+    <Item ID="m_labelLocation" Value="Los archivos se guardarán aquí:" />
+    <Item ID="m_labelFolder" Value="(ubicación de la carpeta)" />
+    <Item ID="m_checkExportPictures" Value="¿Exportar dibujos?" />
+    <Item ID="m_labelWord" Value="Notas abiertas se exportan como si fueran comentarios." />
+    <Item ID="m_radioWord" Value="Microsoft Word 2007 (docx):" />
+    <Item ID="m_labelToolbox" Value="Éstos son archivos de Formato Estándar que incluyen la Traducción Inversa y Notas. No pueden ser leídos por Paratext." />
+    <Item ID="m_radioToolbox" Value="Archivos (DB) de Toolbox" />
+    <Item ID="m_labelGoBibleCreatorInfo" Value="Go Bible presenta el texto bíblico an teléfonos celulares que usan Java. Los archivos SFM de GoBibleCreator son un subconjunto de los códigos USFM." />
+    <Item ID="m_radioGoBible" Value="Archivos de entrada para GoBibleCreator" />
+    <Item ID="m_radioParatext" Value="Archivos Paratext (PTX)" />
+    <Item ID="m_labelParatextInfo" Value="Esto exporta únicamente el vernáculo, sin traducción inversa o notas." />
+    <Item ID="m_groupExportTo" Value="Exportar todos los libros de su proyecto a:" />
+  </Group>
   <Group ID="DialogProperties">
     <Item ID="Title" Value="Propiedades del Proyecto" />
     <Item ID="strTitleWithLanguageName" Value="{0} Propiedades del Proyecto" />
@@ -561,6 +676,7 @@
       <Item ID="propPunctuation" Value="Puntuación" Tip="Lista de los signos que sirven para puntuación en este sistema ortográfico." />
       <Item ID="propEndPunctuation" Value="Puntuación Final" Tip="Lista de signos que indican el fin de una oración." />
       <Item ID="propKeyboard" Value="Nombre del Teclado" Tip="Nombre del teclado que se usa para mecanografiar en este sistema ortográfico (Windows IME, Keyman, etc.)" />
+      <Item ID="m_tabWSHyphenation" Value="División de Palabras a Final de Línea" />
     </Group>
     <Group ID="DialogProperties_Page_AdvancedPrintOptions">
       <Item ID="m_labelTitle" Value="Opciones Avanzadas para Imprimir" />
@@ -664,6 +780,12 @@
       <Item ID="propDictionary" Value="Diccionario WeSay" />
       <Item ID="propDictApp" Value="Ruta a la Aplicación WeSay" Tip="La ruta completa a la aplicación que maneja el diccionario. En este momento, WeSay.App.Exe es la única ruta apoyada." />
       <Item ID="propDictData" Value="Ruta al Diccionario LIFT" Tip="La ruta completa a los datos del diccionario manejado por la aplicación WeSay, en un archivo de formato LIFT." />
+      <Item ID="propCanEditTargetInBackTransView" Value="¿Se puede editar el Borrador en presentación de Traducción Inversa?" Tip="Si es Sí, puede editar el vernáculo en la ventana de Traducción Inversa, sin brincar a la ventana del Borrador." />
+      <Item ID="BackTranslation" Value="TraducciónInversa" />
+      <Item ID="propNCLineNumbebrColor" Value="Color Números de Línea" Tip="El color de los números de línea en Prueba de Naturaleza. Escoja un color que es visible contra el color del fonda, pero que no  detrae de le lectura del text de la Escritura." />
+      <Item ID="propUpdates" Value="¿Averiguar si hay Actualización antes de Enviar/Recibir?" Tip="Si es Sí, VozNuestra buscará la actualización entes de hacer Enviar/Recibir. Si es No, Enviar/Recibir mostrará un mensaje si se requiere aveiguación, y usted puede proceder a averiguarlo manualmente.r" />
+      <Item ID="SendReceive" Value="EnviarRecibir" />
+      <Item ID="propRepoUrl" Value="URL del Repositorio Central" Tip="URL de acceso al repositorio central remoto del proyecto." />
     </Group>
     <Group ID="DialogProperties_Page_Notes">
       <Item ID="Show_kGeneral" Value="¿Mostrar?" Tip="Si es sí, las Notas Generales estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto." />
@@ -687,6 +809,79 @@
       <Item ID="Color_kBT" Value="Color del Fondo" Tip="Color para el fondo de la Nota de Traducción Inversa en el Pánel de Notas." />
       <Item ID="Show_kExegesis" Value="¿Mostrar?" Tip="Si es sí, las Notas Exegéticas estarán visibles cuando el Pánel de Notas se active, con el contenido an el Pánel de Notas y el icono correspondiente en el texto." />
       <Item ID="Color_kExegesis" Value="Color del Fondo" Tip="Color para el fondo de la Nota Exegética en el Pánel de Notas." />
+      <Item ID="propPeople" Value="Personajes de la Historia" Tip="Provea una lista de las personas integrantes del proyecto a quienes quiere hacer referencia al escribir la Historia." />
+      <Item ID="People" Value="Personas" />
+    </Group>
+    <Group ID="DialogProperties_PageContent">
+      <Item ID="m_NavTitle" Value="Título de Navegación" />
+    </Group>
+    <Group ID="DialogProperties_Page_Translations">
+      <Item ID="m_btnCreate" Value="Crear Nuevo..." />
+      <Item ID="m_lOther" Value="Ponga palomita al lado de las otras traducciones a que quiere referirse cuando traduce. Ellas aparecen de repente cuando el cursor flote sobre un número de versículo." />
+      <Item ID="m_lSource" Value="Ésta es la Traducción Fuente que usted utiliza como modelo para producir la Traducción Meta." />
+      <Item ID="m_lTargetDefinition" Value="Ésta es la traducción al vernáculo que usted está produciendo." />
+      <Item ID="m_lReference" Value="Traducciones de Referencia" />
+      <Item ID="m_lTargetAndSource" Value="Traducciones Meta y Fuente" />
+    </Group>
+    <Group ID="DialogProperties_Page_UserOptions">
+      <Item ID="propMaximizeOnStartup" Value="¿Llenar Pantalla al Iniciarse?" Tip="Si es Sí, VozNuestra llena la pantalla al iniciarse. Puede ser útil para que los usuarios nuevos tengan una presentación de tamaño suficiente ancha para trabajar." />
+      <Item ID="Behavior" Value="Comportamiento" />
+      <Item ID="propZoomPercent" Value="Porcentaje de Zoom" Tip="El texto de las ventanas puede hacerse más grande o más chico de acuerdo con el porcentaje que used escoja. (También puede esco escogerlo an el menú desplegable de la ventana.)" />
+      <Item ID="propUserPassword" Value="Contraseña del Usuario de VozNuestra" Tip="La contraseña que le permite entrar en el Diálogo de Configuración." />
+      <Item ID="propUserType" Value="Tipo de Usuario" Tip="El Tipo de Usuario determina el comportamiento de defecto para poder editar libros." />
+      <Item ID="option_Full" Value="Administrador" />
+      <Item ID="option_Notes" Value="Traductor" />
+      <Item ID="option_ReadOnly" Value="Consultor" />
+      <Item ID="option_Custom" Value="Observador" />
+      <Item ID="propPrimaryLanguage" Value="Preferido (primario)" Tip="Utilícise este idioma en el Interfaz de Usuario." />
+      <Item ID="Language of the User Interface" Value="Idioma del Interfaz de Usuario" />
+      <Item ID="propSecondaryLanguage" Value="Idioma Alternativo (secundario)" />
+      <Item ID="propUserName" Value="Nombre del Usuario" Tip="El nombre de usuario que fué asignado por el administrador de Language&#xD;&#xA;depot; usado únicamente para dar acceso a LanguageDepot.org." />
+      <Item ID="Send / Receive" Value="Enviar/Recibir" />
+      <Item ID="propPassword" Value="Contraseña para Enviar/Recibir" Tip="Contraseña que fué asignado por el administrador de Language&#xD;&#xA;depot; usado únicamente para dar acceso a LanguageDepot.org." />
+      <Item ID="propDrafting" Value="Fondo de Borrador" Tip="El color del fondo de la ventana del Borrador." />
+      <Item ID="Window Background Colors" Value="Colores para Fondos de Ventanas" />
+      <Item ID="propBackTranslation" Value="Traducción Inversa" Tip="El color de fondo para la ventana de la Traducción Inversa." />
+      <Item ID="propConsultant" Value="Preparación para Consulta" Tip="El color de fondo para la ventana de Preparación para Consulta." />
+      <Item ID="propNaturalness" Value="Prueba de Nivel Natural" Tip="El color de fondo de la ventana de Preparación para Consulta." />
+    </Group>
+    <Group ID="DialogProperties_Page_UserFeatures">
+      <Item ID="propStructuralChanges" Value="Cambios Estructurales" Tip="Permite al traductor partir o juntar párrafos, o asignar diferentes estilos a un párrafo. CUIDDADO: Eso hace que la traducción difiera de la estructur de los parrafos de la Traducción Fuente." />
+      <Item ID="Editing" Value="Edición" />
+      <Item ID="propUndoRedo" Value="Deshacer y Rehacer" />
+      <Item ID="propFirstLast" Value="Muestre Botones &quot;Inicial&quot; y &quot;'Ultima&quot; en la Barra de Herramientas" Tip="Hace visibles los botones &quot;Inicial&quot; y &quot;'Ultima,&quot; que le llevan a las secciones primera y últime del libro. Usuarios con mayor experiencia con la aplicación pueden hacer uso de éstos para tener más flexibilidad en mover en el libro," />
+      <Item ID="Navigation" Value="Navegación" />
+      <Item ID="propNaturalness" Value="Prueba de Nivel Natural" Tip="Una presentación en la cual únicamente la traducción es visible, con el fin de que los lectores pueden averguar el nivel de naturaleza del text, sin influencias de la Traducción Fuente." />
+      <Item ID="Available Windows / Tasks" Value="Ventanas o Tareas Disponibles" />
+      <Item ID="propBackTranslation" Value="Traducción Inversa" Tip="Una presentación en que puedes hacer una traducción al revés; es, decir, alguien hace una traducción de la traducción del proyecto a un idioma que en consultor entiende biewn." />
+      <Item ID="propConsultantPreparation" Value="Preparación para el Consultor" Tip="Muestra tanto la Traducción Fuente como la Meta, esta última con el vernáculo y su Traducción Inversa. Úsese para preparar para la visita del Consultor (e.g., notas exegéticas)." />
+      <Item ID="propZoom" Value="¿Se Puede Agrandar el Texto?" Tip="Te permite ajustar el tamaño del texto en tu pantalla, e.g., magnificarlo a 300% si es necesario para el lector o proyectándolo para un grupo." />
+      <Item ID="propCreateNewProject" Value="Puede crear un Nuevo Proyecto" Tip="Crear un proyecto nuevo dentro de este clustro, o dentro de un clustro nuevo." />
+      <Item ID="Project" Value="Proyecto" />
+      <Item ID="propOpenExistingProject" Value="Puede abrir un proyecto ya existente" Tip="El usuario puede abrir otros proyectos incorporados en el clustro del cual es miembro." />
+      <Item ID="propExportProject" Value="Exportar" />
+      <Item ID="propPrinting" Value="Imprimir" />
+      <Item ID="Tools" Value="Herramientas" />
+      <Item ID="propFilters" Value="Filtros (muestran únicamente secciones que satisfacen los mismos criterios de búsqueda)" Tip="El menú &quot;Go To&quot; (e.g., Próximo, Previo) va únicamente a las secciones que satisfacen ciertos criterios; p.ejj., que cotienen cierta palabra. También que tienen que teer tener commillas noo balanzadas. Esto puede ayudar a localizar errores, o Notas A Hacer." />
+      <Item ID="propLocalization" Value="Herramienta de Localización" Tip="Este diálogo del menú Herramientas, te permite traducir el interfaz del usuario de VozNuestra en otro idioma." />
+      <Item ID="propRestoreBackups" Value="Restaurar Copias de Seguridad" />
+      <Item ID="propTscReport" Value="Informe Trimestral para TSC" Tip="Presenta un diálogo en que puedes generar el informe  para TSC. Al terminarlo, todavía tendraás qe editarlo en un procesorprocesador de textos, porque requiere otras informaciones the VozNuestra no capta." />
+      <Item ID="propFindAndReplace" Value="Buscar y Reemplacer" Tip="Presenta el diálogo Buscar y Reemplacer, que te permite hacer cambios globales que afectan la traducción entera." />
+    </Group>
+    <Group ID="DialogProperties_Page_Cluster">
+      <Item ID="m_btnMoveCluster" Value="Mover Clúster..." />
+      <Item ID="m_lblChoose" Value="Clústeres activados en esta computadora:" />
+      <Item ID="m_btnDeleteCluster" Value="Borrar Clúster..." />
+      <Item ID="m_btnRenameCluster" Value="Renombrar Clúster" />
+      <Item ID="m_btnCreateNewCluster" Value="Crear Nuevo Clúster..." />
+      <Item ID="m_labelDescription" Value="Proyectos se organizan en clústeres, porque en la mayoría de los casos los idiomas en el clúster queren compartir configuraciones (p.ej. hoja de estilo, etapa de la tradicción, configuración de la impresora, etc.). El numbre de defecto para un clúster es &quot;VozNuestra&quot;, que probablemente vas a cambiar en algo de mayor claridad. Si quieres, puedes crear clústeres adicionales." />
+    </Group>
+    <Group ID="DialogProperties_AutomaticHyphenation">
+      <Item ID="ahTurnOn" Value="¿Activar División Automática de Palabras a Final de Línea?" Tip="Si es Sí, palabras largas serán divididas automáticamente al editar. Los guiones no son insertados en los datos; solament aparecen en la pantalla." />
+      <Item ID="ahCV" Value="Patrón CV:" Tip="Indicar dónd va el guión, e.g., V-C o VC-CV." />
+      <Item ID="ahCon" Value="Consonantes" Tip="Haz una lista de las consonantes de este sistema ortográfico. Todo símbolo que no sea consonante o puntuación se considera ser vocal." />
+      <Item ID="ahMinSize" Value="Tamaño Mínimo para División de Palabras:" Tip="Dividir una palabra con guión no puede resultar en un fragmento de menos letras que este número." />
+      <Item ID="ahBC" Value="Letras de División" Tip="Éstas son signos dentro de una palabra, como el guión en &quot;pagi-pagi&quot;, que permiten que VozNuestra divida una palabra." />
     </Group>
   </Group>
   <Group ID="WizImportBook">
@@ -706,6 +901,7 @@
       <Item ID="strUnknownMarkers" Value="Señales Desconocidos: {0}" />
       <Item ID="strFileStats" Value="Archivo: {0}&#xA;Formato: {1}&#xA;{2}" />
       <Item ID="strOpenDialogTitle" Value="Escoja el archivo que desea importar" />
+      <Item ID="m_btnSpecifyEncoding" Value="Codificación..." />
     </Group>
     <Group ID="WizImportBook_WizPage_GetAbbreviation">
       <Item ID="strNavTitle" Value="Identificar el Libro" />
@@ -736,12 +932,6 @@
       <Item ID="m_labelReady" Value="VozNuestra ya está lista para importar:" />
       <Item ID="m_labelClickFinish" Value="Haga clic en el botón Terminar para importar este libro en VozNuestra. Para hacer cambios, haga clic en el botón Anterior." />
     </Group>
-  </Group>
-  <Group ID="SplashScreen">
-    <Item ID="Title" Value="Pantalla de Inicio" />
-    <Item ID="sLoadingOurWord" Value="Cargando VozNuestra..." />
-    <Item ID="sOptionalAdditional" Value="-" />
-    <Item ID="sLoading" Value="Cargando {0}..." />
   </Group>
   <Group ID="WizNewProject">
     <Item ID="Title" Value="Crear Nuevo Proyecto" />
@@ -807,5 +997,45 @@
       <Item ID="m_labelReady" Value="Ahora está lista VozNuestra para crear el nuevo proyecto:" />
       <Item ID="strSummaryh" Value="Resumen" />
     </Group>
+  </Group>
+  <Group ID="WizInitializeFromRepository">
+    <Item ID="Title" Value="Iniciar un Clúster descargándolo de internet" />
+    <Item ID="m_btnFinish" Value="Terminar" />
+    <Item ID="m_btnPrev" Value="Anterior" />
+    <Item ID="m_btnNext" Value="Próxima" />
+    <Group ID="WizInitializeFromRepository_WizRepo_Introduction">
+      <Item ID="m_lblDescription2" Value="Damos por entendido que el clúster ya fue creado en otra máquina, así que el repositorio ya existe en Internet, y que tú tienes conexión abierta en Internet. Vas a necesitar el URL del repositorio, el nombre de usuario que te fue asignado, y la contrasenã que te dieron. Es la persona que hizo tu repositorio la que debe poder facilitarte esta información." />
+      <Item ID="m_lblDescription1" Value="Este asistente de configuración te guiará en el proceso de descargar el repositorio para un clúster ya existente en Internet, para incorporarlo en tu máquina." />
+      <Item ID="m_lblClickNextToStart" Value="Haz clic en 'Próximo' para iniciar..." />
+      <Item ID="strIntroduction" Value="Introducción" />
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetRepoInfo">
+      <Item ID="m_labelPassword" Value="Tu Contraseña:" />
+      <Item ID="label1" Value="El administrador de tu proyecto debe proveerte con Nombre de Usuario y Contraseña únicos, necesarios para tener acceso al repositorio. Sin ellos, no podrás ni enviar datos al repositorio ni recibir datos de él." />
+      <Item ID="m_labelUserName" Value="Tu Nombre de Usuario:" />
+      <Item ID="m_descrURL" Value="Ubicación en Internet de la máquina host donce reside el repositorio. No entrar &quot;http://&quot;. Por ejemplo, &quot;hg-public.languagedepot.org&quot;." />
+      <Item ID="m_labelUrl" Value="Servidor de Repositorio:" />
+      <Item ID="strRepositoryInfo" Value="Información acerca del Repositorio" />
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetClusterName">
+      <Item ID="m_descrClusterName" Value="Entrar el nombre del clúster, p.ej. &quot;Timor&quot; o &quot;Lenguas Sureñas.&quot; (Si quieres, puedes cambiar el nombre después en el Diálogo de Configuración.)" />
+      <Item ID="m_labelClusterName" Value="Nombre del Clúster:" />
+      <Item ID="strClusterName" Value="Nombre del Clúster" />
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_GetLocation">
+      <Item ID="m_labelInstruction" Value="Escoja la ubicación de este clúster en su computadora:" />
+      <Item ID="strLocation" Value="Ubicación" />
+    </Group>
+    <Group ID="WizInitializeFromRepository_WizRepo_Summary">
+      <Item ID="m_labelClickToStart" Value="Haz clic en &quot;Terminar&quot; para iniciar el proceso." />
+      <Item ID="m_labelMoreInfo" Value="Este proceso puede durar varios minutos. Depende de la velocidad de tu conexión Internet. Si falla el proceso" />
+      <Item ID="m_labelReady" Value="VozNuestra está lista para descargar el repositorio en tu computadora." />
+      <Item ID="strSummary" Value="Resumen" />
+    </Group>
+  </Group>
+  <Group ID="m_ToolStrip">
+    <Item ID="m_menuCut" Value="Cor&amp;tar" />
+    <Item ID="m_menuCopy" Value="&amp;Copiar" />
+    <Item ID="m_menuPaste" Value="&amp;Pegar" />
   </Group>
 </LocDB>

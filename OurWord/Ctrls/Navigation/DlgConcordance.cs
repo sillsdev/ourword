@@ -213,7 +213,8 @@ namespace OurWord.Ctrls.Navigation
                 // Scan the book
                 using (new LoadedBook(book))
                 {
-                    var vHits = Scanner.ScanBook(context, book);
+                    var vTexts = Scanner.GetTexts(book);
+                    var vHits = Scanner.ScanTexts(context, vTexts);
 
                     if (vHits.Count > 0)
                     {

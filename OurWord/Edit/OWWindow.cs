@@ -1189,11 +1189,11 @@ namespace OurWord.Edit
             #region Method: int DBT_iChar(SelPoint sp)
             public int DBT_iChar(SelPoint sp)
             {
-                int iPos = 0;
+                var iPos = 0;
 
-                for (int i = DBT_iBlockFirst; i < sp.iBlock; i++)
+                for (var i = DBT_iBlockFirst; i < sp.iBlock; i++)
                 {
-                    EWord word = Paragraph.SubItems[i] as EWord;
+                    var word = Paragraph.SubItems[i] as EWord;
                     Debug.Assert(null != word);
                     iPos += word.Text.Length;
                 }

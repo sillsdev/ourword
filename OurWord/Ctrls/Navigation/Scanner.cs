@@ -10,46 +10,7 @@ namespace OurWord.Ctrls.Navigation
 {
     static public class Scanner
     {
-        #region smethod: List<int> GetIndexesOf(sSource, sSearchFor, bIgnoreCase)
-        static public List<int> GetIndexesOf(string sSource, string sSearchFor, bool bIgnoreCase)
-        {
-            var rules = (bIgnoreCase) ? StringComparison.InvariantCultureIgnoreCase :
-                StringComparison.InvariantCulture;
-
-            var v = new List<int>();
-
-            var iOffset = 0;
-            int iPos;
-            while ((iPos = sSource.IndexOf(sSearchFor, rules)) != -1)
-            {
-                v.Add(iOffset + iPos);
-                sSource = sSource.Substring(iPos + sSearchFor.Length);
-                iOffset += (iPos + sSearchFor.Length);
-            }
-
-            return v;
-        }
-        #endregion
-        #region SMethod: List<LookupInfo> ScanBook(SearchContext, DBook)
-        public static List<LookupInfo> ScanBook(SearchContext context, DBook book)
-        {
-            var vTexts = GetTextsToScan(book, ScanOption.All, null);
-
-            // Scan the DTexts for the search string
-            var vLookupInfo = new List<LookupInfo>();
-            foreach (var text in vTexts)
-            {
-                var phrases = (context.IsBackTranslation) ?
-                    text.PhrasesBT : text.Phrases;
-                var sText = phrases.AsString;
-                var vIndexes = GetIndexesOf(sText, context.SearchFor, context.IgnoreCase);
-                foreach (var iPosition in vIndexes)
-                    vLookupInfo.Add(new LookupInfo(phrases, iPosition, context.SearchFor.Length));
-            }
-
-            return vLookupInfo;
-        }
-        #endregion
+        // Chapter count ---------------------------------------------------------------------
         #region SMethod: int GetChapterCount(DBook book)
         static public int GetChapterCount(DBook book)
         {
@@ -68,197 +29,191 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
 
-        // Scan Book for Search String -------------------------------------------------------
+        // Attrs -----------------------------------------------------------------------------
         private static bool s_bContinueToNextBook;
         private static bool s_bDontAskAgain;
         #region Class: SearchContext
         public class SearchContext
         {
+            // Directly supplied by caller
             public readonly string SearchFor;
-            private readonly OWWindow.Sel OriginalSelection;
             public bool IgnoreCase;
+            public bool IsBackTranslation;
+            public readonly DBook OriginalBook;
+            private readonly string PathToOriginalDbt;
+            public readonly int IndexIntoText;
 
-            #region Constructor(sSearchFod, originalSelection)
+            #region vattr{g}: DBasicText OriginalDbt
+            public DBasicText OriginalDbt
+            {
+                get
+                {
+                    Debug.Assert(OriginalBook.Loaded);
+                    return OriginalBook.GetObjectFromPath(PathToOriginalDbt) as DBasicText;
+                }
+            }
+            #endregion
+            #region vattr{g}: StringComparison ComparisonOption
+            public StringComparison ComparisonOption
+            {
+                get
+                {
+                    return (IgnoreCase) ?
+                        StringComparison.InvariantCultureIgnoreCase :
+                        StringComparison.InvariantCulture;
+                }
+            }
+            #endregion
+
+            #region Constructor(sSearchFor, selection)
             public SearchContext(string sSearchFor, OWWindow.Sel selection)
+                : this(sSearchFor, selection.Book, selection.DBT.GetPathFromRoot(), 
+                    selection.DBT_iCharFirst)
+            {
+                IsBackTranslation = selection.Paragraph.DisplayBT;
+            }
+            #endregion
+            #region Constructor(sSearchFor, book, sPathToDbt, IndexIntoText)
+            public SearchContext(string sSearchFor, DBook book, string sPathToDbt, int iIndexIntoText)
             {
                 SearchFor = sSearchFor;
-                OriginalSelection = selection;
-            }
-            #endregion
-
-            #region VAttr{g}: bool IsBackTranslation
-            public bool IsBackTranslation
-            {
-                get
-                {
-                    if (null == OriginalSelection)
-                        return false;
-                    return OriginalSelection.Paragraph.DisplayBT; 
-                }
-            }
-            #endregion
-            #region VAttr{g}: DBook OriginalBook
-            public DBook OriginalBook
-            {
-                get
-                {
-                    return null == OriginalSelection ? null : OriginalSelection.Book;
-                }
+                OriginalBook = book;
+                PathToOriginalDbt = sPathToDbt;
+                IndexIntoText = iIndexIntoText;
             }
             #endregion
         }
         #endregion
-        public enum ScanOption { PriorTo, After, All };
-        #region smethod: List<DBasicText> GetTextsAndFootnotes(DParagraph paragraph)
-        static public List<DBasicText> GetTextsAndFootnotes(DParagraph paragraph)
+
+        // Scan and Search -------------------------------------------------------------------
+        #region smethod: List<DBasicText> GetTexts(book)
+        static public List<DBasicText> GetTexts(DBook book)
         {
+            Debug.Assert(book.Loaded);
+
             var v = new List<DBasicText>();
 
-            foreach(var run in paragraph.Runs)
+            foreach (DSection section in book.Sections)
             {
-                // Paragraph text
-                var text = run as DBasicText;
-                if (null != text)
-                    v.Add(text);
+                var vMain = new List<DBasicText>();
+                var vFootnotes = new List<DBasicText>();
 
-                // Footnotes
-                var foot = run as DFoot;
-                if (null != foot)
+                foreach (DParagraph paragraph in section.Paragraphs)
                 {
-                    foreach(var footRun in foot.Footnote.Runs)
+                    foreach (DRun run in paragraph.Runs)
                     {
-                        if (null != footRun as DBasicText)
-                            v.Add(footRun as DBasicText);
+                        if (null != run as DBasicText)
+                            vMain.Add(run as DBasicText);
+
+                        if (null != run as DFoot)
+                            vFootnotes.AddRange((run as DFoot).Footnote.Texts);
                     }
                 }
+
+                v.AddRange(vMain);
+                v.AddRange(vFootnotes);
             }
 
             return v;
         }
         #endregion
-        #region smethod: List<DBasicText> GetTextsToScan(DBook, ScanOption, DBasicText target)
-        static public List<DBasicText> GetTextsToScan(DBook book, ScanOption option, DBasicText target)
-            // Collect all of the DTexts within a book that we want to scan for the search
-            // string, with options for All, or for either before or after a target text.
+        #region smethod: List<DBasicText> GetTextsAfter(dbtTarget)
+        static public List<DBasicText> GetTextsAfter(DBasicText dbtTarget)
         {
-            var bFound = false;
+            var book = dbtTarget.Paragraph.Book;
 
-            var v = new List<DBasicText>();
+            var vAllTexts = GetTexts(book);
 
-            var vParagraphs = book.AllParagraphs;
-            foreach(var paragraph in vParagraphs)
+            for (var i = 0; i < vAllTexts.Count; i++)
             {
-                if (!paragraph.IsUserEditable)
-                    continue;
-                var vTexts = GetTextsAndFootnotes(paragraph);
-
-                foreach (var text in vTexts)
+                if (vAllTexts[i] == dbtTarget)
                 {
-                    switch (option)
-                    {
-                        case ScanOption.PriorTo:
-                            v.Add(text);
-                            if (text == target)
-                                return v;
-                            break;
-
-                        case ScanOption.All:
-                            v.Add(text);
-                            break;
-
-                        case ScanOption.After:
-                            if (text == target)
-                                bFound = true;
-                            if (bFound)
-                                v.Add(text);
-                            break;
-                    }
+                    const int iFirstOneToRemove = 0;    // Remove from the beginning
+                    var cAmountToRemove = i + 1;
+                    vAllTexts.RemoveRange(iFirstOneToRemove, cAmountToRemove);
+                    break;
                 }
+            }
+
+            return vAllTexts;
+        }
+        #endregion
+        #region smethod: List<DBasicText> GetTextsPrior(dbtTarget)
+        static public List<DBasicText> GetTextsPrior(DBasicText dbtTarget)
+        {
+            var book = dbtTarget.Paragraph.Book;
+
+            var vAllTexts = GetTexts(book);
+
+            for (var i = 0; i < vAllTexts.Count; i++)
+            {
+                if (vAllTexts[i] == dbtTarget)
+                {
+                    var iFirstOneToRemove = i;    // Remove the target (and all after)
+                    var cAmountToRemove = vAllTexts.Count - iFirstOneToRemove;
+                    vAllTexts.RemoveRange(iFirstOneToRemove, cAmountToRemove);
+                    break;
+                }
+            }
+
+            return vAllTexts;
+        }
+        #endregion
+        #region smethod: List<LookupInfo> ScanTexts(context, vTexts)
+        static public List<LookupInfo> ScanTexts(SearchContext context, IEnumerable<DBasicText> vTexts)
+        {
+            var vAllTexts = new List<LookupInfo>();
+
+            foreach (var dbt in vTexts)
+            {
+                var vThisDbt = ScanText(context, dbt);
+                foreach (var li in vThisDbt)
+                    vAllTexts.Add(li);
+            }
+
+            return vAllTexts;
+        }
+        #endregion
+        #region smethod: List<int> ScanString(sSource, sSearchFor, StringComparison)
+        static public List<int> ScanString(string sSource, string sSearchFor, StringComparison option)
+        {
+            var v = new List<int>();
+
+            var i = 0;
+            while ((i = sSource.IndexOf(sSearchFor, i, option)) != -1)
+            {
+                v.Add(i);
+                i += sSearchFor.Length;
             }
 
             return v;
         }
         #endregion
-        #region smethod: LookupInfo ScanBook(SearchContext, DBook, anOption, selection)
-        static public LookupInfo ScanBook(SearchContext context, DBook book, ScanOption option, 
-            OWWindow.Sel selection)
-            // selection - starting/ending point for the search, depending on the
-            //   ScanOption. Ignored if the ScanOption is 'All'.
+        #region smethod: List<LookupInfo> ScanText(SearchContext context, DBasicText dbt)
+        static IEnumerable<LookupInfo> ScanText(SearchContext context, DBasicText dbt)
         {
-            // If we have text selected, move to its end
-            if (null != selection && selection.IsContentSelection)
-            {
-                selection = (ScanOption.PriorTo == option) ? 
-                    new OWWindow.Sel(selection.Paragraph, selection.First) : 
-                    new OWWindow.Sel(selection.Paragraph, selection.Last);
-            }
+            var phrases = (context.IsBackTranslation) ? dbt.PhrasesBT : dbt.Phrases;
+            var sSource = phrases.AsString;
 
-            // Get the candidate texts
-            var vTexts = GetTextsToScan(book, option, 
-                (null == selection ? null : selection.DBT));
+            var v = new List<LookupInfo>();
 
-            // The first text, we use the selection to determine where we start at, so that
-            // we scan for more hits in the current text; afterwards we can reset to zero
-            // as we'll be moving to later texts.
-            var iStartAt = (null == selection || ScanOption.After != option) ? 
-                0 : 
-                selection.DBT_iCharFirst;
+            var vi = ScanString(sSource, context.SearchFor, context.ComparisonOption);
+            foreach(var i in vi)
+                v.Add(new LookupInfo(phrases, i, context.SearchFor.Length));
 
-            // The final text, we again use the selection to determine where to stop at,
-            // so that we don't bother the user again with something we've already given him.
-            var iEndAt = (null == selection || ScanOption.PriorTo != option) ?
-                -1 :
-                selection.DBT_iCharFirst;
-
-            var comparisonOption = (context.IgnoreCase) ?
-                StringComparison.InvariantCultureIgnoreCase :
-                StringComparison.InvariantCulture;
-
-            // Scan the texts
-            foreach(var text in vTexts)
-            {
-                var phrases = (context.IsBackTranslation) ?
-                    text.PhrasesBT : text.Phrases;
-
-                var sText = phrases.AsString;
-
-                // If the final text, don't search past iEndAt
-                if (text == vTexts[vTexts.Count - 1] && -1 != iEndAt)
-                    sText = sText.Substring(0, iEndAt);
-
-                var i = sText.IndexOf(context.SearchFor, iStartAt, comparisonOption);
-                if (-1 != i)
-                    return new LookupInfo(phrases, i, context.SearchFor.Length);
-
-                iStartAt = 0;
-            }
-
-            return null;
+            return v;
         }
         #endregion
-        #region SMethod: LookupInfo ScanForNext(sSearchFor, OWWindow.Sel selectionStopAt)
-        static public LookupInfo ScanForNext(string sSearchFor, OWWindow.Sel originalSelection)
+        #region smethod: List<DBook> BuildBookScanList(DBook bookExclude)
+        static List<DBook> BuildBookScanList(DBook bookExclude)
         {
-            // Get our current context
-            var currentSelection = G.App.CurrentLayout.Selection;
-            if (null == currentSelection)
-                return null;
-            var currentBook = currentSelection.Book;
-
-            var context = new SearchContext(sSearchFor, originalSelection);
-
-            // First scan the remainder of this current book
-            var lookupInfo = ScanBook(context, currentBook, ScanOption.After, currentSelection);
-            if (null != lookupInfo)
-                return lookupInfo;
-
-            // Build the list of books in the order we'll scan them
             var bBookFound = false;
             var iInsertPoint = 0;
             var vBooks = new List<DBook>();
-            foreach(var book in DB.TargetTranslation.BookList)
+
+            foreach (var book in DB.TargetTranslation.BookList)
             {
-                if (book == currentBook)
+                if (book == bookExclude)
                 {
                     bBookFound = true;
                     continue;
@@ -270,7 +225,38 @@ namespace OurWord.Ctrls.Navigation
                     vBooks.Insert(iInsertPoint++, book);
             }
 
+            return vBooks;
+        }
+        #endregion
+        #region smethod: LookupInfo ScanForNext(SearchContext context)
+        static public LookupInfo ScanForNext(SearchContext context)
+        {
+            // Get the current selection (move to the end if a content selection)
+            var selection = G.App.CurrentLayout.Selection;
+            if (null == selection)
+                return null;
+            if (selection.IsContentSelection)
+                selection = new OWWindow.Sel(selection.Paragraph, selection.Last);
+            var dbtTarget = selection.DBT;
+            var bookTarget = dbtTarget.Paragraph.Book;
+            var indexTarget = selection.DBT_iCharFirst;
+
+            // Scan the remainder of the current text
+            var vLookupCurrentText = ScanText(context, dbtTarget);
+            foreach (var lookupInfo in vLookupCurrentText)
+            {
+                if (lookupInfo.IndexIntoText > indexTarget)
+                    return lookupInfo;
+            }
+
+            // Scan the remainder of the current book
+            var vAfter = GetTextsAfter(selection.DBT);
+            var vLookup = ScanTexts(context, vAfter);
+            if (vLookup.Count > 0)
+                return vLookup[0];
+
             // Ask if the user wishes to continue to other books
+            var vBooks = BuildBookScanList(bookTarget);
             if (vBooks.Count > 0 && !s_bDontAskAgain)
             {
                 var dlg = new DlgContinueToNextBook();
@@ -281,21 +267,33 @@ namespace OurWord.Ctrls.Navigation
             if (!s_bContinueToNextBook)
                 return null;
 
-            // If not found, scan the remaining books
-            foreach(var book in vBooks)
+            // Scan the remaining books
+            foreach (var book in vBooks)
             {
-                if (book == context.OriginalBook)
-                    break;
                 using (new LoadedBook(book))
                 {
-                    lookupInfo = ScanBook(context, book, ScanOption.All, null);                    
+                    var vTexts = (book == context.OriginalBook) ?
+                        GetTextsPrior(context.OriginalDbt) :
+                        GetTexts(book);
+                    vLookup = ScanTexts(context, vTexts);
+                    if (vLookup.Count > 0)
+                        return vLookup[0];
                 }
-                if (null != lookupInfo)
-                    return lookupInfo;
             }
 
-            // If not found, scan the end book prior to the end selection
-            return ScanBook(context, context.OriginalBook, ScanOption.PriorTo, originalSelection);
+            // Scan the beginning of this book
+            var vBefore = GetTextsPrior(dbtTarget);
+            vLookup = ScanTexts(context, vBefore);
+            if (vLookup.Count > 0)
+                return vLookup[0];
+
+            // Scan the beginning of this text
+            foreach (var lookupInfo in vLookupCurrentText)
+            {
+                if (lookupInfo.IndexIntoText < context.IndexIntoText)
+                    return lookupInfo;
+            }
+            return null;
         }
         #endregion
     }

@@ -1271,7 +1271,8 @@ namespace OurWord
                 return;
 
             // Find the next match
-            var lookupInfo = Scanner.ScanForNext(sText, selection);
+            var context = new Scanner.SearchContext(sText, selection);
+            var lookupInfo = Scanner.ScanForNext(context);
             if (null != lookupInfo)
             {
                 cmdGoToLookupItem(lookupInfo);

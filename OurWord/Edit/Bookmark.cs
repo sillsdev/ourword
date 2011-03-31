@@ -105,7 +105,7 @@ namespace OurWord.Edit
                 return m_sPathToDBTFromRoot;
             }
         }
-        string m_sPathToDBTFromRoot;
+        readonly string m_sPathToDBTFromRoot;
         #endregion
         #region Attr{g}: JObject Root
         JObject Root
@@ -133,7 +133,7 @@ namespace OurWord.Edit
             m_bHasSelection = Window.HasSelection;
             if (!HasSelection)
                 return;
-            OWWindow.Sel selection = Window.Selection;
+            var selection = Window.Selection;
 
             // Paragraph editing flags
             m_ParagraphFlags = selection.Paragraph.Options;

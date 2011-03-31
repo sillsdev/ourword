@@ -1697,6 +1697,8 @@ namespace OurWordData.DataModel
                 // Add the paragraph
                 section.Paragraphs.Append(paragraph);
             }
+
+            m_bIsLoaded = true;
         }
         #endregion
 

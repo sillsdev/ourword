@@ -60,7 +60,8 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // Methods ---------------------------------------------------------------------------
-        private OWWindow.Sel m_StartingSelection;
+        private Scanner.SearchContext m_Context;
+//        private OWWindow.Sel m_StartingSelection;
         private bool m_bWasFound;
         #region attr{g}: OWWindow.Sel CurrentSelection
         static OWWindow.Sel CurrentSelection
@@ -114,7 +115,7 @@ namespace OurWord.Ctrls.Navigation
         private void onFindWhatChanged(object sender, EventArgs e)
         {
             // Reset the starting point to our current position, with no items found or replaced
-            m_StartingSelection = CurrentSelection;
+            m_Context = new Scanner.SearchContext(FindWhat, CurrentSelection);
             m_bWasFound = false;
 
             // Replace Buttons are now disabled, as we have to rebuild the list before
@@ -186,7 +187,7 @@ namespace OurWord.Ctrls.Navigation
             //   if there are any.
         {
             // Find the next match
-            var lookupInfo = Scanner.ScanForNext(FindWhat, m_StartingSelection);
+            var lookupInfo = Scanner.ScanForNext(m_Context);
 
             // No match, tell the user and we're done
             if (null == lookupInfo)
@@ -210,7 +211,7 @@ namespace OurWord.Ctrls.Navigation
                 m_btnReplaceAll.Enabled = false;
                 // So that the next search will start from the current selection, which
                 // might have a different result.
-                m_StartingSelection = CurrentSelection;
+                m_Context = new Scanner.SearchContext(FindWhat, CurrentSelection);
                 return;
             }
 
@@ -242,7 +243,7 @@ namespace OurWord.Ctrls.Navigation
             // Get the user's confirmation
             var bProceed = LocDB.Message("kFindAndReplace_ConfirmReplaceAll",
                 "Warning: This CANNOT be undone!\n\n" +
-                "You are about to replace ALL occurrences of '{0}' with {1}\n" +
+                "You are about to replace ALL occurrences of '{0}' with '{1}'\n" +
                     "throughout your entire translation.\n\n" +
                 "Are you absolutely certain you wish to proceed?",
                 new[] { FindWhat, ReplaceWith },
@@ -276,7 +277,7 @@ namespace OurWord.Ctrls.Navigation
                 using (new LoadedBook(book))
                 {
                     var countReplacementsThisBook = 0;
-                    var vTexts = Scanner.GetTextsToScan(book, Scanner.ScanOption.All, null);
+                    var vTexts = Scanner.GetTexts(book);
                     foreach(var text in vTexts)
                     {
                         var phrases = (bIsBackTranslation) ? text.PhrasesBT : text.Phrases;
