@@ -6,43 +6,16 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
-using OurWordData.Styles;
 
 namespace OurWord.Ctrls.Navigation
 {
     public partial class DlgConcordance : Form
     {
         // Attrs -----------------------------------------------------------------------------
-        #region attr{g/s}: bool IgnoreCase
-        bool IgnoreCase
+        #region attr{g/s}: string ConcordOnText
+        private string ConcordOnText
         {
             get
-            {
-                return m_checkIgnoreCase.Checked;
-            }
-            set
-            {
-                m_checkIgnoreCase.Checked = value;
-            }
-        }
-        #endregion
-        #region attr{g/s}: bool CurrentBookOnly
-        bool CurrentBookOnly
-        {
-            get
-            {
-                return m_checkCurrentBookOnly.Checked;
-            }
-            set
-            {
-                m_checkCurrentBookOnly.Checked = value;
-            }
-        }
-        #endregion
-        #region attr{g}: string ConcordOnText
-        public string ConcordOnText
-        {
-            private get
             {
                 return m_tConcordOn.Text;
             }
@@ -52,25 +25,58 @@ namespace OurWord.Ctrls.Navigation
             }
         }
         #endregion
+        #region attr{g}: CtrlFindOptions Options
+        CtrlFindOptions Options
+        {
+            get
+            {
+                return m_ctrlFindOptions;
+            }
+        }
+        #endregion
         public GoToLookupItem OnGoToLookupItem;
         private Font m_Font;
 
         // Scaffolding -----------------------------------------------------------------------
+        private readonly JW_WindowState m_WindowState;
         #region Constructor()
         public DlgConcordance()
         {
             InitializeComponent();
+            m_WindowState = new JW_WindowState(this, false, "FindAndReplace");
         }
         #endregion
+        #region Method: void SetAndSelectConcordOnTextIfEmpty(s)
+        public void SetAndSelectConcordOnTextIfEmpty(string s)
+        {
+            if (string.IsNullOrEmpty(ConcordOnText) || m_List.Items.Count == 0)
+                ConcordOnText = s;
+
+            m_tConcordOn.SelectAll();
+        }
+        #endregion
+
+        // Events ----------------------------------------------------------------------------
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
+            // Restore the window to its location; but don't let the WindowState place its size
+            // to some stale value in the registry.
+            var sz = new Size(Width, Height);
+            m_WindowState.RestoreWindowState();
+            Width = sz.Width;
+            Height = sz.Height;
+
+            // Localization
+            LocDB.Localize(this, null);
+            m_ctrlFindOptions.LocalizeAndInitialize();
+
             // Our first launch, no concordance exists, so disable the control
             m_List.Enabled = false;
 
             // Default options
-            IgnoreCase = true;
-            CurrentBookOnly = false;
+            Options.IgnoreCase = true;
+            Options.OnlyScanCurrentBook = false;
             ResetOccurrences();
 
             // Unless there is text to concord on, disable the button
@@ -112,6 +118,7 @@ namespace OurWord.Ctrls.Navigation
         #region Cmd: cmdClose
         private void cmdClose(object sender, EventArgs e)
         {
+            m_WindowState.SaveWindowState();
             Hide();
         }
         #endregion
@@ -119,6 +126,11 @@ namespace OurWord.Ctrls.Navigation
         private void cmdFormClosing(object sender, FormClosingEventArgs e)
             // Don't close, just hide.
         {
+            // If we're closing because the parent (OurWord main window) is closing, then
+            // go ahead and do a normal close.
+            if (e.CloseReason == CloseReason.FormOwnerClosing)
+                return;
+            // Otherwise, just hide the form so that we keep the options and data intact.
             e.Cancel = true;
             Hide();
         }
@@ -192,7 +204,9 @@ namespace OurWord.Ctrls.Navigation
             ResetOccurrences();
 
             var context = new Scanner.SearchContext(ConcordOnText, G.App.CurrentLayout.Selection) {
-                IgnoreCase = IgnoreCase,
+                IgnoreCase = Options.IgnoreCase,
+                CurrentBookOnly = Options.OnlyScanCurrentBook,
+                Type = Options.Type
             };
 
             // Count how many books had hits
@@ -207,7 +221,7 @@ namespace OurWord.Ctrls.Navigation
                 UpdateProgressMessage(book.DisplayName);
 
                 // Skip other books if user only wants the current book
-                if (CurrentBookOnly && book.DisplayName != DB.TargetBook.DisplayName)
+                if (Options.OnlyScanCurrentBook && book.DisplayName != DB.TargetBook.DisplayName)
                     continue;
 
                 // Scan the book
@@ -237,28 +251,33 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // Displaying the concordance --------------------------------------------------------
-        #region Cmd: cmdDrawSubItem
-        private void cmdDrawSubItem(object sender, DrawListViewSubItemEventArgs e)
+        #region smethod: void DrawSubItemBackground(e)
+        private static void DrawSubItemBackground(DrawListViewSubItemEventArgs e)
         {
-            // Only interested in the Scripture subitem
-            if (e.ColumnIndex != 1)
-            {
-                e.DrawDefault = true;
-                return;
-            }
+            var colorBackground = (e.Item.Selected) ? SystemColors.Highlight : SystemColors.Window;
+            e.Graphics.FillRectangle(new SolidBrush(colorBackground), e.Bounds);
+        }
+        #endregion
+        #region smethod: void DrawReferenceColumn(e)
+        static void DrawReferenceColumn(DrawListViewSubItemEventArgs e)
+        {
+            var brush = (e.Item.Selected) ? new SolidBrush(Color.White) : new SolidBrush(Color.Navy);
 
+            var x = e.Bounds.X;
+            var y = e.Bounds.Y;
+            var sText = e.Item.Text;
+
+            e.Graphics.DrawString(sText, SystemFonts.DialogFont, brush, x, y);
+
+            e.DrawDefault = false;
+        }
+        #endregion
+        #region method: void DrawScriptureTextColumn(LookupInfo, e)
+        private void DrawScriptureTextColumn(LookupInfo info, DrawListViewSubItemEventArgs e)
+        {
             // Colors
             var colorText = (e.Item.Selected) ? SystemColors.HighlightText : SystemColors.MenuText;
             var colorConcordOn = (e.Item.Selected) ? Color.Pink : Color.Red;
-            var colorBackground = (e.Item.Selected) ? SystemColors.Highlight : SystemColors.Window;
-
-            // Selection
-            if (e.Item.Selected)
-                e.Graphics.FillRectangle(new SolidBrush(colorBackground), e.Bounds);
-
-            // Get the Info for what we want to draw
-            var info = e.Item.Tag as LookupInfo;
-            Debug.Assert(null != info);
 
             // Get the before and after
             var sLeft = (info.IndexIntoText > 0) ?
@@ -288,6 +307,25 @@ namespace OurWord.Ctrls.Navigation
             e.Graphics.DrawString(sRight, m_Font, new SolidBrush(colorText), x, y);
 
             e.DrawDefault = false;
+        }
+        #endregion
+        #region Cmd: cmdDrawSubItem
+        private void cmdDrawSubItem(object sender, DrawListViewSubItemEventArgs e)
+        {
+            // Get the Info for what we want to draw
+            var info = e.Item.Tag as LookupInfo;
+            Debug.Assert(null != info);
+
+            // Background
+            DrawSubItemBackground(e);
+
+            // Reference
+            if (e.ColumnIndex == 0)
+                DrawReferenceColumn(e);
+
+            // Scripture Text
+            if (e.ColumnIndex == 1)
+                DrawScriptureTextColumn(info, e);
         }
         #endregion
         #region Cmd: cmdDrawColumnHeader
@@ -342,6 +380,7 @@ namespace OurWord.Ctrls.Navigation
                 LocDB.MessageTypes.Info);
         }
         #endregion
+
     }
 
 }

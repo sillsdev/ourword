@@ -41,9 +41,6 @@ namespace OurWord.Ctrls.Navigation
             m_Find.DropDownItems.Insert(0, m_FindTextMenuItem);
 
             m_FindNext.Enabled = false;
-
-            // TODO: Temporary: Disable stuff we haven't implemented yet
-            m_AdvancedFind.Available = false;            
         }
         #endregion
         #region cmd: cmdFindTextChanged(sNewText)
@@ -732,6 +729,19 @@ namespace OurWord.Ctrls.Navigation
             m_FindNext.Enabled = true;
         }
         #endregion
+        #region cmd: cmdAdvancedFind
+        readonly DlgAdvancedFind m_DlgAdvancedFind = new DlgAdvancedFind();
+        private void cmdAdvancedFind(object sender, EventArgs e)
+        {
+            m_DlgAdvancedFind.OnGoToLookupItem = OnGoToLookupItem;
+
+            var sText = GetCurrentlySelectedText();
+            if (!string.IsNullOrEmpty(sText))
+                m_DlgAdvancedFind.FindWhat = sText;
+
+            m_DlgAdvancedFind.Show(G.App);
+        }
+        #endregion
         #region cmd: cmdFindNext
         private void cmdFindNext(object sender, EventArgs e)
         {
@@ -751,13 +761,12 @@ namespace OurWord.Ctrls.Navigation
         {
             m_DlgConcordance.OnGoToLookupItem = OnGoToLookupItem;
 
-            m_DlgConcordance.Show();
+            m_DlgConcordance.Show(G.App);
 
             // Do this after "show", so that the "Build" button enabling will behave properly
             var sText = GetCurrentlySelectedText();
             if (!string.IsNullOrEmpty(sText))
-                m_DlgConcordance.ConcordOnText = sText;
-            
+                m_DlgConcordance.SetAndSelectConcordOnTextIfEmpty(sText);           
         }
         #endregion
         #region cmd: cmdFindAndReplace
@@ -773,7 +782,7 @@ namespace OurWord.Ctrls.Navigation
             if (!string.IsNullOrEmpty(sText))
                 m_DlgFindAndReplace.FindWhat = sText;
 
-            m_DlgFindAndReplace.Show();
+            m_DlgFindAndReplace.Show(G.App);
         }
         #endregion
 
@@ -798,6 +807,7 @@ namespace OurWord.Ctrls.Navigation
             return true;
         }
         #endregion
+
 
     }
 }

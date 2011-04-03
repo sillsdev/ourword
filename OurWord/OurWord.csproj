@@ -190,6 +190,12 @@
     <EmbeddedResource Include="Ctrls\Commands\CtrlCommands.resx">
       <DependentUpon>CtrlCommands.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Ctrls\Navigation\DlgAdvancedFind.resx">
+      <DependentUpon>DlgAdvancedFind.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Ctrls\Navigation\CtrlFindOptions.resx">
+      <DependentUpon>CtrlFindOptions.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Ctrls\Navigation\DlgConcordance.resx">
       <DependentUpon>DlgConcordance.cs</DependentUpon>
     </EmbeddedResource>
@@ -431,6 +437,7 @@
     <Content Include="Res\ProgressIndicatorBackground.jpg" />
     <EmbeddedResource Include="Res\Synchronize.ico" />
     <Content Include="Res\TurnFeaturesOnOff.ico" />
+    <Content Include="RoadMap.txt" />
     <EmbeddedResource Include="Res\UserEditPermissions.ico" />
     <EmbeddedResource Include="Res\ThisProject.ico" />
     <EmbeddedResource Include="Res\ThisCluster.ico" />
@@ -463,6 +470,18 @@
     </Compile>
     <Compile Include="Ctrls\Commands\CtrlCommands.Designer.cs">
       <DependentUpon>CtrlCommands.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\DlgAdvancedFind.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\DlgAdvancedFind.Designer.cs">
+      <DependentUpon>DlgAdvancedFind.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\CtrlFindOptions.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Ctrls\Navigation\CtrlFindOptions.Designer.cs">
+      <DependentUpon>CtrlFindOptions.cs</DependentUpon>
     </Compile>
     <Compile Include="Ctrls\Navigation\DlgContinueToNextBook.cs">
       <SubType>Form</SubType>

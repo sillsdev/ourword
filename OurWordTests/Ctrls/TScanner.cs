@@ -1,13 +1,10 @@
 ﻿#region *** TScanner.cs ***
-
-using System;
 using System.Linq;
 using NUnit.Framework;
 using OurWord.Ctrls.Navigation;
 using OurWord.Edit;
 using OurWordData.DataModel.Runs;
 using OurWordTests.Edit;
-
 #endregion
 
 namespace OurWordTests.Ctrls
@@ -34,28 +31,33 @@ namespace OurWordTests.Ctrls
             "<p class=\"Paragraph\" usfm=\"p\">to the praise of his glorious grace, which he has freely given us in the one he loves.</p>" +
             "</book>";
 
-        #region Test: TGetIndexesOf
-        [Test] public void TGetIndexesOf()
+        #region Test: TScanString
+        [Test] public void TScanString()
         {
             const string csSource = "For God so loved the world he gave his one and only son, " + 
                 "that whosoever believes in him should not perish but have eternal life.";
 
-            var vShouldNotFind = Scanner.ScanString(csSource, "Not in there", StringComparison.InvariantCulture);
+            var context = new Scanner.SearchContext("Not in there", null, null, 0);
+            var vShouldNotFind = Scanner.ScanString(context, csSource);
             Assert.AreEqual(0, vShouldNotFind.Count());
 
-            var vShouldFindFirst = Scanner.ScanString(csSource, "For", StringComparison.InvariantCulture);
+            context = new Scanner.SearchContext("For", null, null, 0);
+            var vShouldFindFirst = Scanner.ScanString(context, csSource);
             Assert.AreEqual(1, vShouldFindFirst.Count());
             Assert.AreEqual(0, vShouldFindFirst[0]);
 
-            var vShouldFindLast = Scanner.ScanString(csSource, "life.", StringComparison.InvariantCulture);
+            context = new Scanner.SearchContext("life.", null, null, 0);
+            var vShouldFindLast = Scanner.ScanString(context, csSource);
             Assert.AreEqual(1, vShouldFindLast.Count());
             Assert.AreEqual(123, vShouldFindLast[0]);
 
-            var vShouldFindMiddle = Scanner.ScanString(csSource, "God", StringComparison.InvariantCulture);
+            context = new Scanner.SearchContext("God", null, null, 0);
+            var vShouldFindMiddle = Scanner.ScanString(context, csSource);
             Assert.AreEqual(1, vShouldFindMiddle.Count());
             Assert.AreEqual(4, vShouldFindMiddle[0]);
 
-            var vShouldFindMultiple = Scanner.ScanString(csSource, "so", StringComparison.InvariantCulture);
+            context = new Scanner.SearchContext("so", null, null, 0);
+            var vShouldFindMultiple = Scanner.ScanString(context, csSource);
             Assert.AreEqual(3, vShouldFindMultiple.Count());
             Assert.AreEqual(8, vShouldFindMultiple[0]);
             Assert.AreEqual(52, vShouldFindMultiple[1]);
@@ -276,6 +278,85 @@ namespace OurWordTests.Ctrls
             Assert.AreEqual(5, vTexts.Count);
             // The footnote should be the last one in the section (screen order)
             Assert.AreEqual("Had special authority, and had seen Jesus.", vTexts[4].AsString);
+        }
+        #endregion
+
+        #region Test: TIsAtWordBeginning
+        [Test] public void TIsAtWordBeginning()
+        {
+            TestCommon.GlobalTestSetup();
+            TestCommon.CreateHierarchyThroughTargetTranslation();
+            var context = new Scanner.SearchContext("blah", null, null, 0);
+
+            Assert.IsTrue(Scanner.IsAtWordBeginning(context, "What do you think?", 0));  // What
+            Assert.IsTrue(Scanner.IsAtWordBeginning(context, "What do you think?", 5));  // do
+            Assert.IsTrue(Scanner.IsAtWordBeginning(context, "What do you think?", 12));  // think
+
+            Assert.IsFalse(Scanner.IsAtWordBeginning(context, "What do you think?", 1)); // W[h]at
+            Assert.IsFalse(Scanner.IsAtWordBeginning(context, "What do you think?", 13)); // t[h]ink
+            Assert.IsFalse(Scanner.IsAtWordBeginning(context, "What do you think?", 17)); // think[?]
+        }
+        #endregion
+        #region Test: TIsAtWordEnding
+        [Test] public void TIsAtWordEnding()
+        {
+            TestCommon.GlobalTestSetup();
+            TestCommon.CreateHierarchyThroughTargetTranslation();
+
+            var context = new Scanner.SearchContext("What", null, null, 0);
+            Assert.IsTrue(Scanner.IsAtWordEnding(context, "What do you think?", 0));
+
+            context = new Scanner.SearchContext("do", null, null, 0);
+            Assert.IsTrue(Scanner.IsAtWordEnding(context, "What do you think?", 5));
+
+            context = new Scanner.SearchContext("o", null, null, 0);
+            Assert.IsTrue(Scanner.IsAtWordEnding(context, "What do you think?", 6));
+
+            context = new Scanner.SearchContext("k", null, null, 0);
+            Assert.IsTrue(Scanner.IsAtWordEnding(context, "What do you think?", 16));
+
+            context = new Scanner.SearchContext("a", null, null, 0);
+            Assert.IsFalse(Scanner.IsAtWordEnding(context, "What do you think?", 2));
+
+            context = new Scanner.SearchContext("n", null, null, 0);
+            Assert.IsFalse(Scanner.IsAtWordEnding(context, "What do you think?", 15));
+        }
+        #endregion
+        #region Test: TMatchesSearchType_Whole
+        [Test] public void TMatchesSearchType_Whole()
+        {
+            TestCommon.GlobalTestSetup();
+            TestCommon.CreateHierarchyThroughTargetTranslation();
+
+            var context = new Scanner.SearchContext("What", null, null, 0) {
+                Type = Scanner.SearchType.Whole
+            };
+            Assert.IsTrue(Scanner.MatchesSearchType(context, "What do you think?", 0));
+
+            context = new Scanner.SearchContext("think", null, null, 0) {
+                Type = Scanner.SearchType.Whole
+            };
+            Assert.IsTrue(Scanner.MatchesSearchType(context, "What do you think?", 12));
+
+            context = new Scanner.SearchContext("do", null, null, 0) {
+                Type = Scanner.SearchType.Whole
+            };
+            Assert.IsTrue(Scanner.MatchesSearchType(context, "What do you think?", 5));
+
+            context = new Scanner.SearchContext("d", null, null, 0) {
+                Type = Scanner.SearchType.Whole
+            };
+            Assert.IsFalse(Scanner.MatchesSearchType(context, "What do you think?", 5));
+
+            context = new Scanner.SearchContext("Wh", null, null, 0) {
+                Type = Scanner.SearchType.Whole
+            };
+            Assert.IsFalse(Scanner.MatchesSearchType(context, "What do you think?", 0));
+
+            context = new Scanner.SearchContext("hink", null, null, 0) {
+                Type = Scanner.SearchType.Whole
+            };
+            Assert.IsFalse(Scanner.MatchesSearchType(context, "What do you think?", 12));
         }
         #endregion
     }

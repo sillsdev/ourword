@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Windows.Forms;
 using OurWord.Edit;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Runs;
+using OurWordData.Styles;
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -30,18 +30,18 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
         // Attrs -----------------------------------------------------------------------------
-        private static bool s_bContinueToNextBook;
-        private static bool s_bDontAskAgain;
         #region Class: SearchContext
         public class SearchContext
         {
             // Directly supplied by caller
             public readonly string SearchFor;
             public bool IgnoreCase;
-            public bool IsBackTranslation;
+            public readonly bool IsBackTranslation;
+            public bool CurrentBookOnly;
             public readonly DBook OriginalBook;
             private readonly string PathToOriginalDbt;
             public readonly int IndexIntoText;
+            public SearchType Type = SearchType.Anywhere;
 
             #region vattr{g}: DBasicText OriginalDbt
             public DBasicText OriginalDbt
@@ -64,6 +64,17 @@ namespace OurWord.Ctrls.Navigation
                 }
             }
             #endregion
+            #region vattr{g}: ritingSystem WritingSystem
+            public WritingSystem WritingSystem
+            {
+                get
+                {
+                    return (IsBackTranslation) ? 
+                        DB.TargetTranslation.WritingSystemConsultant :
+                        DB.TargetTranslation.WritingSystemVernacular;
+                }
+            }
+            #endregion
 
             #region Constructor(sSearchFor, selection)
             public SearchContext(string sSearchFor, OWWindow.Sel selection)
@@ -82,6 +93,76 @@ namespace OurWord.Ctrls.Navigation
                 IndexIntoText = iIndexIntoText;
             }
             #endregion
+        }
+        #endregion
+
+        // String Scan -----------------------------------------------------------------------
+        public enum SearchType { Whole, Beginning, End, Anywhere };
+        #region smethod: bool IsAtWordBeginning(context, sSource, iPos)
+        static public bool IsAtWordBeginning(SearchContext context, string sSource, int iPos)
+        {
+            // If at beginning of string
+            if (iPos == 0)
+                return true;
+
+            // If preceeded by whitespace or punctuation
+            var chBefore = sSource[iPos - 1];
+            if (char.IsWhiteSpace(chBefore))
+                return true;
+            return context.WritingSystem.IsPunctuation(chBefore);
+        }
+        #endregion
+        #region smethod:  bool IsAtWordEnding(context, sSource, iPos)
+        static public bool IsAtWordEnding(SearchContext context, string sSource, int iPos)
+        {
+            // If at end of the string
+            var iPosEnd = iPos + context.SearchFor.Length;
+            if (sSource.Length == iPosEnd)
+                return true;
+
+            // If followed by whitespace or punctuation
+            var chAfter = sSource[iPosEnd];
+            if (char.IsWhiteSpace(chAfter))
+                return true;
+            return context.WritingSystem.IsEndPunctuation(chAfter);
+        }
+        #endregion
+        #region smethod: bool MatchesSearchType(context, sSource, iPos)
+        static public bool MatchesSearchType(SearchContext context, string sSource, int iPos)
+        {
+            switch (context.Type)
+            {
+                case SearchType.Anywhere:
+                    return true;
+                case SearchType.Beginning:
+                    return IsAtWordBeginning(context, sSource, iPos);
+                case SearchType.End:
+                    return IsAtWordEnding(context, sSource, iPos);
+                case SearchType.Whole:
+                    {
+                        var bBegin = IsAtWordBeginning(context, sSource, iPos);
+                        var bEnd = IsAtWordEnding(context, sSource, iPos);
+                        return bBegin && bEnd;
+                    }
+                default:
+                    throw new Exception("Unrecognized SearthType");
+            }
+        }
+        #endregion
+        #region smethod: List<int> ScanString(context, sSource)
+        static public List<int> ScanString(SearchContext context, string sSource)
+        {
+            var v = new List<int>();
+
+            var i = 0;
+            while ((i = sSource.IndexOf(context.SearchFor, i, context.ComparisonOption)) != -1)
+            {
+                if (MatchesSearchType(context, sSource, i))
+                    v.Add(i);
+                i += context.SearchFor.Length;
+            }
+
+            return v;
         }
         #endregion
 
@@ -174,21 +255,6 @@ namespace OurWord.Ctrls.Navigation
             return vAllTexts;
         }
         #endregion
-        #region smethod: List<int> ScanString(sSource, sSearchFor, StringComparison)
-        static public List<int> ScanString(string sSource, string sSearchFor, StringComparison option)
-        {
-            var v = new List<int>();
-
-            var i = 0;
-            while ((i = sSource.IndexOf(sSearchFor, i, option)) != -1)
-            {
-                v.Add(i);
-                i += sSearchFor.Length;
-            }
-
-            return v;
-        }
-        #endregion
         #region smethod: List<LookupInfo> ScanText(SearchContext context, DBasicText dbt)
         static IEnumerable<LookupInfo> ScanText(SearchContext context, DBasicText dbt)
         {
@@ -197,7 +263,7 @@ namespace OurWord.Ctrls.Navigation
 
             var v = new List<LookupInfo>();
 
-            var vi = ScanString(sSource, context.SearchFor, context.ComparisonOption);
+            var vi = ScanString(context, sSource);
             foreach(var i in vi)
                 v.Add(new LookupInfo(phrases, i, context.SearchFor.Length));
 
@@ -255,29 +321,21 @@ namespace OurWord.Ctrls.Navigation
             if (vLookup.Count > 0)
                 return vLookup[0];
 
-            // Ask if the user wishes to continue to other books
-            var vBooks = BuildBookScanList(bookTarget);
-            if (vBooks.Count > 0 && !s_bDontAskAgain)
-            {
-                var dlg = new DlgContinueToNextBook();
-                var result = dlg.ShowDialog(G.App);
-                s_bContinueToNextBook = (result == DialogResult.Yes);
-                s_bDontAskAgain = dlg.DontAskAgain;
-            }
-            if (!s_bContinueToNextBook)
-                return null;
-
             // Scan the remaining books
-            foreach (var book in vBooks)
+            if(!context.CurrentBookOnly)
             {
-                using (new LoadedBook(book))
+                var vBooks = BuildBookScanList(bookTarget);               
+                foreach (var book in vBooks)
                 {
-                    var vTexts = (book == context.OriginalBook) ?
-                        GetTextsPrior(context.OriginalDbt) :
-                        GetTexts(book);
-                    vLookup = ScanTexts(context, vTexts);
-                    if (vLookup.Count > 0)
-                        return vLookup[0];
+                    using (new LoadedBook(book))
+                    {
+                        var vTexts = (book == context.OriginalBook) ?
+                            GetTextsPrior(context.OriginalDbt) :
+                            GetTexts(book);
+                        vLookup = ScanTexts(context, vTexts);
+                        if (vLookup.Count > 0)
+                            return vLookup[0];
+                    }
                 }
             }
 

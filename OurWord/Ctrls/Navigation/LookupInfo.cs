@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Drawing;
+using System.Windows.Forms;
 using System.Xml;
 using JWTools;
 using OurWordData.DataModel;
@@ -104,7 +105,6 @@ namespace OurWord.Ctrls.Navigation
         public ListViewItem ToListViewItem(ListViewGroup group)
         {
             var sReference = string.Format("{0} {1}:{2}", BookAbbrev, Chapter, Verse);
-
             return new ListViewItem(new[] { sReference, Text }, group) { Tag = this };
         }
         #endregion

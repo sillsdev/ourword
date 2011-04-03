@@ -1,5 +1,6 @@
 ﻿#region *** DlgFindAndReplace ***
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 using JWTools;
 using OurWord.Dialogs;
@@ -15,9 +16,6 @@ using OurWordData.DataModel;
  *     to enable them again.
 
 */
-
-// [ ] Bug: Move cursor, do FindNext, its skipping (at least, for Footnote it is, probably 
-//     because FN is defined later.
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -37,6 +35,16 @@ namespace OurWord.Ctrls.Navigation
             }
         }
         #endregion
+        #region attr{g}: CtrlFindOptions Options
+        CtrlFindOptions Options
+        {
+            get
+            {
+                return m_ctrlFindOptions;
+            }
+        }
+        #endregion
+
         #region attr{g}: string ReplaceWith
         string ReplaceWith
         {
@@ -54,6 +62,7 @@ namespace OurWord.Ctrls.Navigation
         public DlgFindAndReplace()
         {
             InitializeComponent();
+            m_ctrlFindOptions.OnOptionsChanged += CreateSearchContext;
 
             m_WindowState = new JW_WindowState(this, false, "FindAndReplace");
         }
@@ -61,7 +70,16 @@ namespace OurWord.Ctrls.Navigation
 
         // Methods ---------------------------------------------------------------------------
         private Scanner.SearchContext m_Context;
-//        private OWWindow.Sel m_StartingSelection;
+        #region method: CreateSearchContext()
+        void CreateSearchContext()
+        {
+            m_Context = new Scanner.SearchContext(FindWhat, CurrentSelection) {
+                IgnoreCase = Options.IgnoreCase,
+                CurrentBookOnly = Options.OnlyScanCurrentBook,
+                Type = Options.Type
+            };
+        }
+        #endregion
         private bool m_bWasFound;
         #region attr{g}: OWWindow.Sel CurrentSelection
         static OWWindow.Sel CurrentSelection
@@ -84,11 +102,19 @@ namespace OurWord.Ctrls.Navigation
         #region event: onLoad
         private void onLoad(object sender, EventArgs e)
         {
+            // Restore the window to its location; but don't let the WindowState place its size
+            // to some stale value in the registry.
+            var sz = new Size(Width, Height);
             m_WindowState.RestoreWindowState();
+            Width = sz.Width;
+            Height = sz.Height;
 
             var font = CtrlNavigation.GetFont();
             m_textFindWhat.Font = font;
             m_textReplaceWith.Font = font;
+
+            LocDB.Localize(this, null);
+            m_ctrlFindOptions.LocalizeAndInitialize();
         }
         #endregion
         #region event: onFormClosing
@@ -98,7 +124,12 @@ namespace OurWord.Ctrls.Navigation
 
             G.App.CurrentLayout.OnSelectionChanged -= OnMainWindowSelectionChanged;
 
-            // Hide the form, don't close it (which results in a Dispose) so we can
+            // If we're closing because the parent (OurWord main window) is closing, then
+            // go ahead and do a normal close.
+            if (e.CloseReason == CloseReason.FormOwnerClosing)
+                return;
+
+            // Otherwise, hide the form, don't close it (which results in a Dispose) so we can
             // reuse it later.
             Hide();
             e.Cancel = true;
@@ -115,7 +146,7 @@ namespace OurWord.Ctrls.Navigation
         private void onFindWhatChanged(object sender, EventArgs e)
         {
             // Reset the starting point to our current position, with no items found or replaced
-            m_Context = new Scanner.SearchContext(FindWhat, CurrentSelection);
+            CreateSearchContext();
             m_bWasFound = false;
 
             // Replace Buttons are now disabled, as we have to rebuild the list before
@@ -211,12 +242,13 @@ namespace OurWord.Ctrls.Navigation
                 m_btnReplaceAll.Enabled = false;
                 // So that the next search will start from the current selection, which
                 // might have a different result.
-                m_Context = new Scanner.SearchContext(FindWhat, CurrentSelection);
+                CreateSearchContext();
                 return;
             }
 
             // Go to the selection
             m_bProcessSelectionChanged = false;
+            m_bWasFound = true;
             OnGoToLookupItem(lookupInfo);
             m_bProcessSelectionChanged = true;
 
