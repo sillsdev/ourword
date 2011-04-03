@@ -142,12 +142,22 @@ namespace OurWord.Ctrls.Navigation
         }
         #endregion
 
+        private bool m_bPreventRecursion;
+
         #region event: onFindWhatChanged
         private void onFindWhatChanged(object sender, EventArgs e)
         {
+            if (m_bPreventRecursion)
+                return;
+
             // Reset the starting point to our current position, with no items found or replaced
             CreateSearchContext();
             m_bWasFound = false;
+
+            // Process autoreplace
+            m_bPreventRecursion = true;
+            m_Context.WritingSystem.ProcessAutoReplace(m_textFindWhat);
+            m_bPreventRecursion = false;
 
             // Replace Buttons are now disabled, as we have to rebuild the list before
             // it would be valid to Replace again.
@@ -162,22 +172,25 @@ namespace OurWord.Ctrls.Navigation
         private string sPreviousReplaceWith;
         private int iPreviousSelectionStart;
         private int cPreviousSelectionLength;
-        private bool bIsUndoing;
 
         private void onReplaceWithChanged(object sender, EventArgs e)
         {
-            // Prevent recursion
-            if (bIsUndoing)
+            if (m_bPreventRecursion)
                 return;
+
+            // Process autoreplace
+            m_bPreventRecursion = true;
+            m_Context.WritingSystem.ProcessAutoReplace(m_textReplaceWith);
+            m_bPreventRecursion = false;
 
             // Don't allow double spaces anywhere
             if (m_textReplaceWith.Text.IndexOf("  ") != -1)
             {
-                bIsUndoing = true;
+                m_bPreventRecursion = true;
                 m_textReplaceWith.Text = sPreviousReplaceWith;
                 m_textReplaceWith.SelectionStart = iPreviousSelectionStart;
                 m_textReplaceWith.SelectionLength = cPreviousSelectionLength;
-                bIsUndoing = false;
+                m_bPreventRecursion = false;
             }
             sPreviousReplaceWith = m_textReplaceWith.Text;
             iPreviousSelectionStart = m_textReplaceWith.SelectionStart;

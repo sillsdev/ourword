@@ -132,8 +132,8 @@ namespace OurWordData
 		}
 		#endregion
 
-		protected bool m_bCanEndHere = false;
-		protected string m_sResult   = "";
+	    private bool m_bCanEndHere = false;
+	    private string m_sResult   = "";
 
 		#region Method: void Add(string sSource, string sResult)
 		public void Add(string sSource, string sResult)

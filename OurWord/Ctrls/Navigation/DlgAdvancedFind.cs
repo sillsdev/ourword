@@ -112,12 +112,21 @@ namespace OurWord.Ctrls.Navigation
             e.Cancel = true;
         }
         #endregion
+        private bool m_bPreventRecursion;
         #region event: onFindWhatChanged
         private void onFindWhatChanged(object sender, EventArgs e)
         {
+            if (m_bPreventRecursion)
+                return;
+
             // Reset the starting point to our current position, with no items found or replaced
             CreateSearchContext();
             m_bWasFound = false;
+
+            // Process autoreplace
+            m_bPreventRecursion = true;
+            m_Context.WritingSystem.ProcessAutoReplace(m_textFindWhat);
+            m_bPreventRecursion = false;
 
             SetNextButtonEnabling();
         }

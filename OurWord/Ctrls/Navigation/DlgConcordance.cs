@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using JWTools;
 using OurWord.Dialogs;
 using OurWordData.DataModel;
+using OurWordData.Styles;
 
 namespace OurWord.Ctrls.Navigation
 {
@@ -44,6 +45,7 @@ namespace OurWord.Ctrls.Navigation
         {
             InitializeComponent();
             m_WindowState = new JW_WindowState(this, false, "FindAndReplace");
+
         }
         #endregion
         #region Method: void SetAndSelectConcordOnTextIfEmpty(s)
@@ -53,6 +55,18 @@ namespace OurWord.Ctrls.Navigation
                 ConcordOnText = s;
 
             m_tConcordOn.SelectAll();
+        }
+        #endregion
+        #region method: void RowHeightHack(context)
+        void RowHeightHack(Scanner.SearchContext context)
+            // Add a dummy image list to force the rows to draw at a height that will show
+            // the font; this is a hack because Windows does not supply a means of setting
+            // a ListView's row height.
+        {
+            var font = StyleSheet.Paragraph.GetFont(context.WritingSystem.Name, 100);
+            m_List.SmallImageList = new ImageList() { ImageSize = new Size(1, font.Height) };
+            var bmp = new Bitmap(1, font.Height);
+            m_List.SmallImageList.Images.Add(bmp);
         }
         #endregion
 
@@ -106,9 +120,22 @@ namespace OurWord.Ctrls.Navigation
             colFinal.Width = nFinalColumnWidth;
         }
         #endregion
+        private bool m_bPreventRecursion;
         #region Cmd: cmdConcordOnTextChanged - Enable 'Build' button
         private void cmdConcordOnTextChanged(object sender, EventArgs e)
         {
+            if (m_bPreventRecursion)
+                return;
+
+            // Process autoreplace
+            var selection = G.App.CurrentLayout.Selection;
+            if (null != selection)
+            {
+                m_bPreventRecursion = true;
+                selection.Paragraph.WritingSystem.ProcessAutoReplace(m_tConcordOn);
+                m_bPreventRecursion = false;
+            }
+
             // Enable the Build button if there is text to concord upon
             m_btnBuildConcordance.Enabled = !string.IsNullOrEmpty(m_tConcordOn.Text);
 
@@ -208,6 +235,9 @@ namespace OurWord.Ctrls.Navigation
                 CurrentBookOnly = Options.OnlyScanCurrentBook,
                 Type = Options.Type
             };
+
+            // So that the row height will account for the height of the font.
+            RowHeightHack(context);
 
             // Count how many books had hits
             var cBooks = 0;

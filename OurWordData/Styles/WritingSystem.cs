@@ -8,6 +8,7 @@
  * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
 using System.Diagnostics;
+using System.Windows.Forms;
 using System.Xml;
 using JWTools;
 #endregion
@@ -256,7 +257,35 @@ namespace OurWordData.Styles
         {
             if (null == m_AutoReplace)
                 BuildAutoReplace();
+            Debug.Assert(null != m_AutoReplace);
             return m_AutoReplace.Search(sSource, ref cSourceLen);
+        }
+        #endregion
+        #region Method: void ProcessAutoReplace(TextBox box)
+        public void ProcessAutoReplace(TextBox box)
+        {
+            // We expect a zero-length selection; that is, that typing has just happened
+            if (box.SelectionLength != 0)
+                return;
+
+            // We require at least a one-character string; otherwise there's nothing to replace
+            var iStart = box.SelectionStart;
+            if (iStart == 0)
+                return;
+
+            // Retrieve the text up to the selection
+            var sSource = box.Text.Substring(0, box.SelectionStart);
+
+            // Get the replacement string, if any
+            var cReplacementSize = 0;
+            var sReplace = SearchAutoReplace(sSource, ref cReplacementSize);
+            if (string.IsNullOrEmpty(sReplace))
+                return;
+
+            // Make the replacement
+            box.Text = box.Text.Remove(iStart - cReplacementSize, cReplacementSize);
+            box.Text = box.Text.Insert(iStart - cReplacementSize, sReplace);
+            box.SelectionStart = iStart - cReplacementSize + sReplace.Length;
         }
         #endregion
 

@@ -105,7 +105,10 @@ namespace OurWord.Ctrls.Navigation
         public ListViewItem ToListViewItem(ListViewGroup group)
         {
             var sReference = string.Format("{0} {1}:{2}", BookAbbrev, Chapter, Verse);
-            return new ListViewItem(new[] { sReference, Text }, group) { Tag = this };
+            return new ListViewItem(new[] { sReference, Text }, group) { 
+                Tag = this, 
+                ImageIndex = 0  // See Row Height Hack in DlgConcordance
+            };
         }
         #endregion
 

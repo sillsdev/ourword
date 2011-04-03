@@ -73,6 +73,10 @@ namespace OurWord.Ctrls.Navigation
         #region cmd: cmdFindTextChanged
         void cmdFindTextChanged(object sender, EventArgs e)
         {
+            var selection = G.App.CurrentLayout.Selection;
+            if (null != selection)
+                selection.Paragraph.WritingSystem.ProcessAutoReplace(m_TextBox.TextBox);
+
             if (null != OnFindTextChanged)
                 OnFindTextChanged(SearchText);
         }
@@ -87,6 +91,5 @@ namespace OurWord.Ctrls.Navigation
             }
         }
         #endregion
-
     }
 }

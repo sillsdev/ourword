@@ -5,8 +5,9 @@
  * Author:  John Wimbish
  * Created: 12 Dec 2009
  * Purpose: Tests class WritingSystem
- * Legal:   Copyright (c) 2005-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2005-11, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
+using System.Windows.Forms;
 using JWTools;
 using NUnit.Framework;
 using OurWordData.Styles;
@@ -130,6 +131,38 @@ namespace OurWordTests.Styles
             Assert.IsFalse(IsHyphenBreak_AtHypehBreakCharacter("pagi-pagi", 3));
 
             Assert.IsTrue(IsHyphenBreak_AtHypehBreakCharacter("good/faithful/just", 5));
+        }
+        #endregion
+
+        // AutoReplace -----------------------------------------------------------------------
+        #region Test: TProcessAutoReplace_TextBox
+        [Test] public void TProcessAutoReplace_TextBox()
+        {
+            var ws = new WritingSystem();
+            ws.AutoReplaceSource.Clear();
+            ws.AutoReplaceResult.Clear();
+            ws.AutoReplaceSource.Append("^a");
+            ws.AutoReplaceResult.Append("á");
+            ws.AutoReplaceSource.Append("^A");
+            ws.AutoReplaceResult.Append("Á");
+            ws.AutoReplaceSource.Append("NCSU");
+            ws.AutoReplaceResult.Append("N. C. State University");
+            ws.BuildAutoReplace();
+
+            // At start
+            var box = new TextBox {Text = @"^abc", SelectionStart = 2};
+            ws.ProcessAutoReplace(box);
+            Assert.AreEqual("ábc", box.Text);
+
+            // At end
+            box = new TextBox { Text = @"abc^A", SelectionStart = 5 };
+            ws.ProcessAutoReplace(box);
+            Assert.AreEqual("abcÁ", box.Text);
+
+            // At middle / long text
+            box = new TextBox { Text = @"ab NCSU cd", SelectionStart = 7 };
+            ws.ProcessAutoReplace(box);
+            Assert.AreEqual("ab N. C. State University cd", box.Text);
         }
         #endregion
 

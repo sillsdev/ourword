@@ -609,6 +609,7 @@ namespace JWTools
             return width;
         }
         #endregion
+
     }
 
     #region CLASS: JW_Util
