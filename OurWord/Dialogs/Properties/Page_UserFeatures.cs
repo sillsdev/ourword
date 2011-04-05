@@ -41,7 +41,7 @@ namespace OurWord.Dialogs.Properties
         {
             get
             {
-                return "Features On/Off";
+                return GetLocalizedTitle("Features On/Off");
             }
         }
         #endregion

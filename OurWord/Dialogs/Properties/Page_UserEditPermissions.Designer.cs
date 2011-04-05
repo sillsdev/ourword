@@ -35,7 +35,7 @@
             this.m_btnReadOnly = new System.Windows.Forms.Button();
             this.m_comboMembership = new System.Windows.Forms.ComboBox();
             this.m_group = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
+            this.m_lBookByBook = new System.Windows.Forms.Label();
             this.m_lGlobal = new System.Windows.Forms.Label();
             this.m_lPermissionsFor = new System.Windows.Forms.Label();
             this.m_cPermissionsFor = new System.Windows.Forms.ComboBox();
@@ -114,7 +114,7 @@
             this.m_group.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_group.Controls.Add(this.label1);
+            this.m_group.Controls.Add(this.m_lBookByBook);
             this.m_group.Controls.Add(this.m_lGlobal);
             this.m_group.Controls.Add(this.m_labelMakeAll);
             this.m_group.Controls.Add(this.m_gridBookByBook);
@@ -129,14 +129,14 @@
             this.m_group.TabStop = false;
             this.m_group.Text = "This User\'s Permission for This Language:";
             // 
-            // label1
+            // m_lBookByBook
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 60);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(111, 13);
-            this.label1.TabIndex = 56;
-            this.label1.Text = "Or Set Book By Book:";
+            this.m_lBookByBook.AutoSize = true;
+            this.m_lBookByBook.Location = new System.Drawing.Point(9, 60);
+            this.m_lBookByBook.Name = "m_lBookByBook";
+            this.m_lBookByBook.Size = new System.Drawing.Size(111, 13);
+            this.m_lBookByBook.TabIndex = 56;
+            this.m_lBookByBook.Text = "Or Set Book By Book:";
             // 
             // m_lGlobal
             // 
@@ -195,7 +195,7 @@
         private System.Windows.Forms.GroupBox m_group;
         private System.Windows.Forms.Label m_lPermissionsFor;
         private System.Windows.Forms.ComboBox m_cPermissionsFor;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label m_lBookByBook;
         private System.Windows.Forms.Label m_lGlobal;
     }
 }

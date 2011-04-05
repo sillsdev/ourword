@@ -297,7 +297,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return "General Options";
+                return GetLocalizedTitle("General Options");
             }
         }
         #endregion

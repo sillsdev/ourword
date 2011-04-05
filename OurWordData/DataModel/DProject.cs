@@ -218,29 +218,21 @@ namespace OurWordData.DataModel
 			}
 		}
 		#endregion
-        #region Attr{g}: DTranslation[] AllTranslations
-        public DTranslation[] AllTranslations
+        #region Attr{g}: List<DTranslation>  AllTranslations
+        public List<DTranslation> AllTranslations
         {
             get
             {
-                int c = 0;
-                if (FrontTranslation != null)
-                    c++;
-                if (TargetTranslation != null)
-                    c++;
-                c += OtherTranslations.Count;
+                var v = new List<DTranslation>();
 
-                DTranslation[] v = new DTranslation[c];
+                if (null != FrontTranslation)
+                    v.Add(FrontTranslation);
 
-                c = 0;
+                if (null != TargetTranslation)
+                    v.Add(TargetTranslation);
 
-                if (FrontTranslation != null)
-                    v[c++] = FrontTranslation;
-                if (TargetTranslation != null)
-                    v[c++] = TargetTranslation;
-
-                foreach (DTranslation t in OtherTranslations)
-                    v[c++] = t;
+                foreach(DTranslation t in OtherTranslations)
+                    v.Add(t);
 
                 return v;
             }

@@ -7,20 +7,13 @@
  * Purpose: Dialog for creating a new cluster.
  * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
+using JWTools;
 using OurWordData.DataModel;
-using OurWord.Utilities;
-#endregion
 #endregion
 
-namespace OurWord.Dialogs
+namespace OurWord.Dialogs.Properties
 {
     public partial class DlgNewCluster : Form
     {
@@ -52,26 +45,33 @@ namespace OurWord.Dialogs
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
+            LocDB.Localize(this, new Control[] { });
+
             m_ClusterLocation.IsInMyDocuments = true;
         }
         #endregion
         #region Cmd: cmdFormClosing
         private void cmdFormClosing(object sender, FormClosingEventArgs e)
         {
+            if (DialogResult != DialogResult.OK)
+                return;
+
             // Make sure we have a non-zero name
             if (string.IsNullOrEmpty(NewClusterName))
             {
-                m_labelError.Text = "Please enter a name for your new cluster.";
+                m_labelError.Text = LocDB.GetValue(this, "kNeedClusterName", 
+                    "Please enter a name for your new cluster.");
                 e.Cancel = true;
                 return;
             }
 
             // Make sure we have a unique name
-            foreach (ClusterInfo ci in ClusterList.Clusters)
+            foreach (var ci in ClusterList.Clusters)
             {
                 if (ci.Name == NewClusterName)
                 {
-                    m_labelError.Text = "There is already a cluster with this name on your computer.";
+                    m_labelError.Text = LocDB.GetValue(this, "kAlreadyExists",
+                        "There is already a cluster with this name on your computer.");
                     e.Cancel = true;
                     return;
                 }

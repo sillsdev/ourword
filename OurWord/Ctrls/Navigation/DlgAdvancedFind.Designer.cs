@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DlgFindAndReplace));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DlgAdvancedFind));
             this.m_btnClose = new System.Windows.Forms.Button();
             this.m_lFindWhat = new System.Windows.Forms.Label();
             this.m_textFindWhat = new System.Windows.Forms.TextBox();
@@ -85,7 +85,7 @@
             this.m_ctrlFindOptions.Size = new System.Drawing.Size(297, 91);
             this.m_ctrlFindOptions.TabIndex = 23;
             // 
-            // DlgFindAndReplace
+            // DlgAdvancedFind
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -101,10 +101,10 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "DlgFindAndReplace";
+            this.Name = "DlgAdvancedFind";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
-            this.Text = "Find and Replace";
+            this.Text = "Find";
             this.Load += new System.EventHandler(this.onLoad);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.onFormClosing);
             this.ResumeLayout(false);

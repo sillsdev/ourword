@@ -113,7 +113,7 @@ namespace OurWord.Ctrls.Navigation
             m_textFindWhat.Font = font;
             m_textReplaceWith.Font = font;
 
-            LocDB.Localize(this, null);
+            LocDB.Localize(this, new Control[] {});
             m_ctrlFindOptions.LocalizeAndInitialize();
         }
         #endregion

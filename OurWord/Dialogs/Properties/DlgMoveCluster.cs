@@ -5,22 +5,14 @@
  * Author:  John Wimbish
  * Created: 15 May 2009
  * Purpose: Dialog for specifying where to move the cluster to
- * Legal:   Copyright (c) 2003-09, John S. Wimbish. All Rights Reserved.  
+ * Legal:   Copyright (c) 2003-11, John S. Wimbish. All Rights Reserved.  
  *********************************************************************************************/
-#region Using
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
-using OurWordData.DataModel;
-using OurWord.Utilities;
-#endregion
+using JWTools;
 #endregion
 
-namespace OurWord.Dialogs
+namespace OurWord.Dialogs.Properties
 {
     public partial class DlgMoveCluster : Form
     {
@@ -42,6 +34,13 @@ namespace OurWord.Dialogs
         public DlgMoveCluster()
         {
             InitializeComponent();
+        }
+        #endregion
+
+        #region cmd: cmdLoad
+        private void cmdLoad(object sender, EventArgs e)
+        {
+            LocDB.Localize(this, new Control[] {});
         }
         #endregion
     }

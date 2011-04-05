@@ -35,7 +35,7 @@ namespace OurWord.Dialogs.Properties
         {
             get
             {
-                return "User Options";
+                return GetLocalizedTitle("User Options");
             }
         }
         #endregion

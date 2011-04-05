@@ -34,7 +34,7 @@
     <Item ID="m_Italic" English="Italic" CanTip="true" Tip="Changes the selected text to Italic; this is only enabled if Italic is allowed in the current context." />
     <Item ID="m_InsertNote" English="Note" CanTip="true" Tip="Insert a Translator Note" />
     <Item ID="m_History" English="History" CanTip="true" Tip="History" />
-    <Item ID="m_Tools" English="Tools"  CanTip="true" Tip="Opens the menu showing the different tools that are available." />
+    <Item ID="m_Tools" English="Tools" CanTip="true" Tip="Opens the menu showing the different tools that are available." />
     <Item ID="m_menuSendReceive" English="Send &amp; Receive..." CanTip="true" Tip="Synchronize all of the changes in this cluster to the Internet." />
     <Item ID="m_menuCheckForUpdates" English="Check for &amp;Updates..." CanTip="true" Tip="Check to see if a later version of OurWord exists on the Internet." />
     <Item ID="m_menuConfigure" English="&amp;Configure..." CanTip="true" Tip="Edit the settings for OurWord and for the current project, translation, and user." />
@@ -50,12 +50,18 @@
     <Item ID="m_Last" English="Last" CanTip="true" Tip="Go to the final section in the book." />
     <Item ID="m_Find" English="Find" CanTip="true" Tip="Find" />
     <Item ID="m_FindNext" English="Find &amp;Next" Key="F3" />
-    <Item ID="m_AdvancedFind" English="&amp;Advanced Find..." />
-    <Item ID="m_FindAndReplace" English="Find and &amp;Replace..." />
+    <Item ID="m_AdvancedFind" English="&amp;Advanced Find..." Key="Ctrl+F" />
+    <Item ID="m_FindAndReplace" English="Find and &amp;Replace..." Key="Ctrl+H" />
     <Item ID="m_Filter" English="Set Fi&amp;lter..." CanTip="true" Tip="Filter out the sections which do not conform to a criteria." />
-    <Item ID="m_createConcordance" English="Create &amp;Concordance..." />
+    <Item ID="m_createConcordance" English="Create &amp;Concordance..." Key="Ctrl+L" />
     <Item ID="m_SetBookmark" English="Set &amp;Bookmark here" />
     <Item ID="m_GoToBookmark" English="Go To Boo&amp;kmark" />
+    <Item ID="Bookmark1" English="Huichol JDG 1:1 (Draft)" />
+    <Item ID="Bookmark2" English="Dela MRK 11:2 (Naturalness)" />
+    <Item ID="Bookmark3" English="Huichol OBA 1:2 (Draft)" />
+    <Item ID="Bookmark4" English="Dela 2TI 1:12 (BT)" />
+    <Item ID="Bookmark5" English="Huichol ECC 10:1 (Draft)" />
+    <Item ID="Bookmark6" English="Dela 2TH 3:4 (Draft)" />
   </Group>
   <Group ID="Strings" Title="003 - Strings" Translator="true">
     <Item ID="kYes" English="Yes" Info="A boolean answer to a Yes/No question, e.g., in the Paragraph Settings, there is the property: 'Keep with Next Paragraph', and the answer is 'Yes' or 'No'" />
@@ -93,6 +99,9 @@
     <Item ID="Vernacular" English="Vernacular" />
     <Item ID="BackTranslation" English="Back Translation" />
     <Item ID="AllBooks" English="All Books" />
+    <Item ID="kWholeWord" English="Entire Word" />
+    <Item ID="kWordBegin" English="At Beginning of Word" />
+    <Item ID="kWordEnd" English="At End of Word" />
     <Group ID="GeneralUI" Title="Strings: General UI" Des="These are elements that appear in the main window of the user interface, such as the names of windows." Translator="true">
       <Item ID="DraftingWindowName" English="Drafting" Info="The title of the Drafting window pane, so that the user knows which task he is doing." />
       <Item ID="DraftingReference" English="{0} to {1}" Info="The Scripture Reference that appears in the Drafting window pane titlebar.  Usually it will appear along the lines of 'Spanish to English' In the string, {0} refers to the name of the source translation (e.g., 'Spanish') and {1} refers to the vernacular translation (e.g., 'English'.) Thus you must make certain that your translation has both the {0} and the {1}. " />
@@ -135,6 +144,20 @@
       <Item ID="AddEvent_tip" English="Add another event to this history." />
       <Item ID="DeleteEvent" English="Delete..." />
       <Item ID="DeleteEvent_tip" English="Delete the most recent event." />
+      <Item ID="kAnyone" English="Anyone" />
+      <Item ID="kTranslator" English="Translator" />
+      <Item ID="kConsultant" English="Consultant" />
+      <Item ID="kAdvisor" English="Advisor" />
+      <Item ID="kClosed" English="Closed" />
+      <Item ID="kDaughterTeam" English="Daughter Team" />
+      <Item ID="kInformation" English="Information" />
+      <Item ID="tipInformation" English="This note is general-purpose information. It does not &#xA;contain replies." />
+      <Item ID="Delete" English="Delete..." />
+      <Item ID="DeleteNote_tip" English="Delete this note or message.&#xA;(Disabled if there are messages in this&#xA;note that you did not author.)" />
+      <Item ID="tipClickOnTitle" English="Click on the Title to edit it" />
+      <Item ID="tipCloseWindow" English="Close this window" />
+      <Item ID="tipExpand" English="Change this balloon popup into a dialog that you can resize" />
+      <Item ID="tipAnyone" English="This note needs attention. Click here to assign it&#xA;to someone, or to close it out as being finished." />
     </Group>
     <Group ID="Files" Title="File Filters and File Operations" Des="These are elements that have to do with opening, browsing, and saving files.">
       <Item ID="ProjectFileFilter" English="Our Word! Project Files (*.owp)|*.owp" Info="This text is used in the Windows Save As dialog, to choose the type of file to save. OurWord always saves Project with the OWP extension. It is very important that you only change the English words, leave the rest of the text alone." />
@@ -189,6 +212,7 @@
       <Item ID="RedoJoinParagraph" English="&amp;Redo Join Paragraph" />
       <Item ID="UndoChangeParagraphStyle_what" English="&amp;Undo Change Paragraph Style '{0}'" />
       <Item ID="RedoChangeParagraphStyle_what" English="&amp;Redo Change Paragraph Style '{0}'" />
+      <Item ID="UndoInsertTranslatorNote" English="&amp;Undo Insert Translator Note" />
     </Group>
     <Group ID="ProgressSteps" Title="ProgressSteps">
       <Item ID="PerformingSend/Receive..." English="Performing Send / Receive..." />
@@ -269,6 +293,8 @@
     <Item ID="msgVerifyDeleteBook" English="Do you want to delete this book from the translation?&#xA;&#xA;(This will delete the file from the disk; and if you synchronize with others&#xA;it will remove it from their computers as well.)" />
     <Item ID="kConfirmDeleteCluster" English="Are you certain you want to delete cluster &quot;{0}&quot;?&#xA;&#xA;This will remove all of the cluster's language data from your disk permanently; the action cannot be undone." />
     <Item ID="kConfirmDeleteCluster2" English="Excuse this second query, but we want to make absolutely sure!&#xA;&#xA;Are you certain you want to delete cluster &quot;{0}&quot; and all data that goes with it?" />
+    <Item ID="msgNeedTextSelectionForInsertNote" English="Please select the text for which your note will be about." />
+    <Item ID="kBetaTestFeature" English="This feature is new and not thoroughly tested yet. Please use with &#xA;care, or feel free to wait for a later version and let others work &#xA;the bugs out. Please report any problems you encounter.&#xA;&#xA;Do you wish to proceed?" />
     <Group ID="FileStructureMessages" Title="005 - File Structure Messages">
       <Item ID="paragraphs" English="Paragraph(s)" />
       <Item ID="picture" English="Picture" />
@@ -449,7 +475,6 @@
     <Item ID="sOptionalAdditional" English="-" />
     <Item ID="sLoading" English="Loading {0}..." />
   </Group>
-  
   <Group ID="DialogRestoreFromBackup" Title="101 - Dialog: Restore From Backup" Des="Guides the user through the task of restoring a file that was previously backed up under the AutoBackup feature. The user is prompted to supply the name of the file to be backed up, and is given a final 'Are You Sure?' chance to cancel. Invoked via 'Tools-Restore From Backup'" Translator="true">
     <Item ID="Title" English="Restore From Backup" Info="Serves both as the (1) Dialog Title and (2) as the Tools menu command that invokes the dialog." />
     <Item ID="m_lblExplanation" English="This will restore a previous version of the book, replacing the current version. It will overwrite the current version, you will no longer have it on your computer." Info="Serves as an explanation of what this command will do. We want to make certain that the user realizes that he will be replacing if more recent work with older work." />
@@ -537,6 +562,16 @@
     <Item ID="m_checkPrintPictures" English="Print Pictures?" />
     <Item ID="m_labelLineSpacing" English="Line Spacing:" />
     <Item ID="m_btnOK" English="Print" Info="The Print button" />
+    <Item ID="m_bSetup" English="Page Setup..." />
+    <Item ID="m_radioBackTranslation" English="Back Translation" />
+    <Item ID="m_radioVernacular" English="Vernacular" />
+    <Item ID="m_checkAllowPictureFloat" English="Allow pictures to move on page to save paper?" />
+    <Item ID="m_textWatermark" English="Examen Final para Publicar" />
+    <Item ID="m_comboLineSpacing" English="Single" />
+    <Item ID="m_groupWhat" English="What do you want to print?" />
+    <Item ID="strSingle" English="Single" />
+    <Item ID="strMedium" English="1.5" />
+    <Item ID="strDouble" English="Double" />
   </Group>
   <Group ID="DialogOpenTranslation" Title="107 - Dialog: OpenTranslation">
     <Item ID="Title" English="Open Translation" />
@@ -620,6 +655,12 @@
     <Item ID="m_lblLanguageName" English="Language Name:" />
     <Item ID="m_editLanguageName" English="Translation Name" />
     <Item ID="m_tabOther" English="Other" />
+    <Item ID="m_btnCopyNames" English="Copy Names..." />
+    <Item ID="m_btnEditRawFile" English="Edit Raw File..." />
+    <Item ID="m_btnProperties" English="Properties..." />
+    <Item ID="m_btnRemove" English="Delete..." />
+    <Item ID="m_btnImport" English="Import..." />
+    <Item ID="m_btnCreate" English="Create..." />
     <Group ID="DlgTranslationProperties_m_LiterateSettings" Title="DlgTranslationProperties_m_LiterateSettings">
       <Item ID="trVernacular" English="Vernacular" CanTip="true" Tip="The writing system that this translation is being drafted in." />
       <Item ID="Writing Systems" English="Writing Systems" />
@@ -634,6 +675,8 @@
       <Item ID="trFootnoteLetterType_1" English="i, ii, iii, iv, ..." />
       <Item ID="trFootnoteLetterType_2" English="Custom" />
       <Item ID="trFootnoteCustom" English="Custom Sequence" CanTip="true" Tip="If you want to use a custom sequence, set the Letter Sequence to 'custom', then define you sequence here, using spaces as separators." />
+      <Item ID="Sistemas Ortográficos" English="Sistemas Ortográficos" />
+      <Item ID="Notas de Pie" English="Notas de Pie" />
     </Group>
   </Group>
   <Group ID="DBookProperties" Title="115 - Dialog: BookProperties">
@@ -668,7 +711,68 @@
     <Item ID="m_labelParatextInfo" English="This will only export the vernacular; any back translations or notes will not be exported." />
     <Item ID="m_groupExportTo" English="Export all of your project's books to:" />
   </Group>
-  
+  <Group ID="DlgCopyBookNames" Title="117 - Dialog: Copy Book Names">
+    <Item ID="Title" English="Copy Book Names" />
+    <Item ID="m_labelInstructions" English="Replace the book names in your translation with those from::" />
+  </Group>
+  <Group ID="DlgHistory" Title="118 - Dialog: History">
+    <Item ID="Title" English="History" />
+    <Item ID="m_tabSection" English="This Section" />
+    <Item ID="m_tabBook" English="Entire Book" />
+    <Item ID="m_tabChart" English="Chart" />
+  </Group>
+  <Group ID="DlgMoveCluster" Title="119 - Dialog: Move Cluster">
+    <Item ID="Title" English="Move Cluster" />
+    <Item ID="m_groupLocation" English="Where do you want the cluster to be located?" />
+  </Group>
+  <Group ID="DlgNewCluster" Title="120 - Dialog: New Cluster">
+    <Item ID="Title" English="Create New Cluster" />
+    <Item ID="m_labelName" English="If you are working on a single language, you can just use the name of that language; otherwise, choose a name that represents all of the languages in the cluster. For example, &quot;Halmahera Cluster&quot;, or &quot;Timor Languages&quot;." />
+    <Item ID="m_groupName" English="Cluster Name" />
+    <Item ID="m_groupLocation" English="Folder Location" />
+    <Item ID="kNeedClusterName" English="Please enter a name for your new cluster." />
+    <Item ID="kAlreadyExists" English="There is already a cluster with this name on your computer." />
+  </Group>
+  <Group ID="DlgFindAndReplace" Title="121 - Dialog: Find And Replace">
+    <Item ID="Title" English="Find and Replace" />
+    <Item ID="m_btnFindNext" English="Find Next" />
+    <Item ID="m_lFindWhat" English="Find What:" />
+    <Item ID="m_btnReplaceAll" English="Replace All" />
+    <Item ID="m_lReplaceWith" English="Replace With:" />
+    <Item ID="m_btnReplace" English="Replace" />
+    <Group ID="DlgFindAndReplace_m_ctrlFindOptions" Title="DlgFindAndReplace_m_ctrlFindOptions">
+      <Item ID="m_comboSearchType" English="Entire Word" />
+      <Item ID="m_checkMustBe" English="Must be:" />
+      <Item ID="m_checkCurrentBookOnly" English="Only scan through current book?" />
+      <Item ID="m_checkIgnoreCase" English="Ignore Case?" />
+      <Item ID="m_groupOptions" English="Options:" />
+    </Group>
+  </Group>
+  <Group ID="DlgConcordance" Title="122 - Dialog: Concordance">
+    <Item ID="Title" English="Concordance" />
+    <Item ID="m_labelOccurences" English="(stats)" />
+    <Item ID="m_btnBuildConcordance" English="Build" />
+    <Item ID="m_lConcordOn" English="Concord On:" />
+    <Group ID="DlgConcordance_m_ctrlFindOptions" Title="DlgConcordance_m_ctrlFindOptions">
+      <Item ID="m_comboSearchType" English="Entire Word" />
+      <Item ID="m_checkMustBe" English="Must be:" />
+      <Item ID="m_checkCurrentBookOnly" English="Only scan through current book?" />
+      <Item ID="m_checkIgnoreCase" English="Ignore Case?" />
+      <Item ID="m_groupOptions" English="Options:" />
+    </Group>
+  </Group>
+  <Group ID="DlgAdvancedFind" Title="123 - Dialog: Advanced Find">
+    <Item ID="Title" English="Find" />
+    <Item ID="m_btnFindNext" English="Find Next" />
+    <Item ID="m_lFindWhat" English="Find What:" />
+    <Group ID="DlgAdvancedFind_m_ctrlFindOptions" Title="DlgAdvancedFind_m_ctrlFindOptions">
+      <Item ID="m_comboSearchType" English="Entire Word" />
+      <Item ID="m_checkMustBe" English="Must be:" />
+      <Item ID="m_checkCurrentBookOnly" English="Only scan through current book?" />
+      <Item ID="m_checkIgnoreCase" English="Ignore Case?" />
+      <Item ID="m_groupOptions" English="Options:" />
+    </Group>
+  </Group>
   <Group ID="DialogProperties" Title="200 - Dialog: Properties">
     <Item ID="Title" English="Project Properties" />
     <Item ID="strTitleWithLanguageName" English="{0} Project Properties" />
@@ -828,31 +932,21 @@
       <Item ID="propUpdates" English="Check for Updates before Send/Receive?" CanTip="true" Tip="If Yes, OurWord will check for updates prior to doing a Send/Receive. If No, Send/Receive will display a message if a check is required, and you canthen do it manually." />
       <Item ID="SendReceive" English="SendReceive" />
       <Item ID="propRepoUrl" English="Central Repository URL" CanTip="true" Tip="The Url for accessing the remote, central respository." />
+      <Item ID="pageTitle" English="General Options" />
     </Group>
     <Group ID="DialogProperties_Page_Notes" Title="DialogProperties_Page_Notes">
-      <Item ID="Show_kGeneral" English="Show?" CanTip="true" Tip="If yes, the General Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kGeneral" English="Background Color" CanTip="true" Tip="The color for the background of the General Note in the Notes Pane." />
-      <Item ID="Show_kHintForDaughter" English="Show?" CanTip="true" Tip="If yes, the Drafting Help Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kHintForDaughter" English="Background Color" CanTip="true" Tip="The color for the background of the Drafting Help Note in the Notes Pane." />
-      <Item ID="ShowNotesFromFront" English="Show Hints from the Front Translation?" CanTip="true" Tip="If yes, any Hint For Daughter notes that were defined in the Front Translation will be visible." />
-      <Item ID="Show_kToDo" English="Show?" CanTip="true" Tip="If yes, the To Do Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kToDo" English="Background Color" CanTip="true" Tip="The color for the background of the To Do Note in the Notes Pane." />
-      <Item ID="Show_kAskUns" English="Show?" CanTip="true" Tip="If yes, the Ask UNS Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kAskUns" English="Background Color" CanTip="true" Tip="The color for the background of the Ask UNS Note in the Notes Pane." />
-      <Item ID="Show_kReason" English="Show?" CanTip="true" Tip="If yes, the Reason Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kReason" English="Background Color" CanTip="true" Tip="The color for the background of the Reason Note in the Notes Pane." />
-      <Item ID="Show_kFront" English="Show?" CanTip="true" Tip="If yes, the Front Issues Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kFront" English="Background Color" CanTip="true" Tip="The color for the background of the Front Issues Note in the Notes Pane." />
-      <Item ID="Show_kDefinition" English="Show?" CanTip="true" Tip="If yes, the Definitions Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kDefinition" English="Background Color" CanTip="true" Tip="The color for the background of the Definitions Note in the Notes Pane." />
-      <Item ID="Show_kOldVersion" English="Show?" CanTip="true" Tip="If yes, the Old Versions Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kOldVersion" English="Background Color" CanTip="true" Tip="The color for the background of the Old Versions Note in the Notes Pane." />
-      <Item ID="Show_kBT" English="Show?" CanTip="true" Tip="If yes, the Back Translation Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kBT" English="Background Color" CanTip="true" Tip="The color for the background of the Back Translation Note in the Notes Pane." />
-      <Item ID="Show_kExegesis" English="Show?" CanTip="true" Tip="If yes, the Exegesis Note will be visible when the Notes Pane is active; it will show up both in the Notes Pane and as icons in the text." />
-      <Item ID="Color_kExegesis" English="Background Color" CanTip="true" Tip="The color for the background of the Exegesis Note in the Notes Pane." />
-      <Item ID="propPeople" English="People for History" CanTip="true" Tip="Provide a list of the people in this project whom you wish to reference when filling out the History." />
-      <Item ID="People" English="People" />
+      <Item ID="pageTitle" English="Notes" />
+      <Item ID="m_checkTurnOnNotes" English="Turn On Notes for this User?" />
+      <Item ID="m_checkCreateFrontNotes" English="Can create notes in the Front Translation?" />
+      <Item ID="m_checkCanAssignToConsultant" English="Can assign notes to a Consultant?" />
+      <Item ID="m_checkCanCreateInformationNotes" English="Can author &quot;Information&quot; notes?" />
+      <Item ID="m_checkCanCreateHintForDaughterNotes" English="Can author &quot;Hint for Daughter&quot; notes?" />
+      <Item ID="m_checkCanDeleteNotes" English="Can delete Notes and Messages that were authored by other people?" />
+      <Item ID="m_checkShowTitleBesideIcon" English="Show an expanded icon which includes part of the note's title?" />
+      <Item ID="m_checkCloseWindowWhemMouseLeaves" English="Automatically close the Notes Window when the mouse moves outside of it?" />
+      <Item ID="m_labelAuthorName" English="Note Author's Name:" />
+      <Item ID="m_labelPermissions" English="Permissions" />
+      <Item ID="m_labelBehavior" English="Behavior" />
     </Group>
     <Group ID="DialogProperties_PageContent" Title="DialogProperties_PageContent">
       <Item ID="m_NavTitle" English="Navigation Title" />
@@ -864,6 +958,7 @@
       <Item ID="m_lTargetDefinition" English="This is the vernacular translation that you are producing. " />
       <Item ID="m_lReference" English="Reference Translations" />
       <Item ID="m_lTargetAndSource" English="Target And Source Translations" />
+      <Item ID="pageTitle" English="Translations" />
     </Group>
     <Group ID="DialogProperties_Page_UserOptions" Title="DialogProperties_Page_UserOptions">
       <Item ID="propMaximizeOnStartup" English="Maxmimize Window on Startup?" CanTip="true" Tip="If Yes, OurWord starts up maximized. This may help newer users to have sufficient size on the screen for doing work." />
@@ -886,6 +981,7 @@
       <Item ID="propBackTranslation" English="Back Translation" CanTip="true" Tip="The color of the Back Translation window background." />
       <Item ID="propConsultant" English="Consultant Preparation" CanTip="true" Tip="The color of the Consultant Preparation window background." />
       <Item ID="propNaturalness" English="Naturalness Check" CanTip="true" Tip="The color of the Naturalness Check window background." />
+      <Item ID="pageTitle" English="User Options" />
     </Group>
     <Group ID="DialogProperties_Page_UserFeatures" Title="DialogProperties_Page_UserFeatures">
       <Item ID="propStructuralChanges" English="Structural Changes" CanTip="true" Tip="Enables the translator to split and join paragraphs, or to assign different styles to a paragraph. By doing this the translation will depart from the paragraph structure of the front translation." />
@@ -909,6 +1005,7 @@
       <Item ID="propRestoreBackups" English="Restore Backups" CanTip="true" Tip="Files can be automatically backed up to a flash card or other storage device. If you turn on this Restore feature, the Tools menu will provide access to a dialog by which the current file can be replaced by a previously stored backup." />
       <Item ID="propTscReport" English="TSC Quarterly Report" CanTip="true" Tip="Enables a dialog by which you can generate the Seed Company report (you'll still have to edit it once OurWord is done as additional information is required that OurWord cannot supply.)" />
       <Item ID="propFindAndReplace" English="Find and Replace" CanTip="true" Tip="Enables the Find And Replace Dialog, by which you can make global changes throughout your entire translation." />
+      <Item ID="pageTitle" English="Features On/Off" />
     </Group>
     <Group ID="DialogProperties_Page_Cluster" Title="DialogProperties_Page_Cluster">
       <Item ID="m_btnMoveCluster" English="Move Cluster..." />
@@ -917,6 +1014,7 @@
       <Item ID="m_btnRenameCluster" English="Rename Cluster" />
       <Item ID="m_btnCreateNewCluster" English="Create New Cluster..." />
       <Item ID="m_labelDescription" English="Projects are organized by clusters, because in most situations the languages within a cluster will want to share their settings (such as the styleSheet, translation stages, printer settings, etc.) The default cluster name is &quot;OurWord&quot;, which you'll very likely want to rename into something more meaningful. You can also create additional clusters if you wish." />
+      <Item ID="pageTitle" English="Clusters" />
     </Group>
     <Group ID="DialogProperties_AutomaticHyphenation" Title="DialogProperties_AutomaticHyphenation">
       <Item ID="ahTurnOn" English="Turn on Automatic Hyphenation?" CanTip="true" Tip="If Yes, long words will be automatically hyphenated during editing. Hyphens are not physically placed in the data; they merely appear on screen." />
@@ -925,8 +1023,18 @@
       <Item ID="ahMinSize" English="Minimum Split Size:" CanTip="true" Tip="Hyphenation will not result in a word-part that is smaller than this value." />
       <Item ID="ahBC" English="Break Characters" CanTip="true" Tip="These are letters within a word, such as the hyphen &quot;pagi-pagi&quot;, where it is OK for OurWord to make a word break." />
     </Group>
+    <Group ID="DialogProperties_Page_UserEditPermissions" Title="DialogProperties_Page_UserEditPermissions">
+      <Item ID="pageTitle" English="Editing Permissions" />
+      <Item ID="m_lPermissionsFor" English="Set Permissions For:" />
+      <Item ID="m_lBookByBook" English="Or Set Book By Book:" />
+      <Item ID="m_lGlobal" English="Set for Entire Translation:" />
+      <Item ID="m_labelMakeAll" English="Make all:" />
+      <Item ID="m_btnFullEditing" English="Full Editing" />
+      <Item ID="m_btnReadOnly" English="Read Only" />
+      <Item ID="m_btnNotesOnly" English="Notes Only" />
+      <Item ID="m_group" English="This User's Permission for This Language:" />
+    </Group>
   </Group>
-  
   <Group ID="WizImportBook" Title="300 - Wizard: Import a Book">
     <Item ID="Title" English="Import a Scripture Book" />
     <Item ID="m_btnFinish" English="Finish" />
@@ -1076,6 +1184,10 @@
       <Item ID="strSummary" English="Summary" />
     </Group>
   </Group>
-  
-  
+  <Group ID="m_ToolStrip" Title="m_ToolStrip">
+    <Item ID="m_menuCut" English="Cu&amp;t" Key="Ctrl+X" />
+    <Item ID="m_menuCopy" English="&amp;Copy" Key="Ctrl+C" />
+    <Item ID="m_menuPaste" English="&amp;Paste" Key="Ctrl+V" />
+    <Item ID="m_ToolStrip" English="ToolStrip" />
+  </Group>
 </LocDB>

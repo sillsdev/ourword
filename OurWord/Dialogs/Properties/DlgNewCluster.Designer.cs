@@ -1,4 +1,4 @@
-﻿namespace OurWord.Dialogs
+﻿namespace OurWord.Dialogs.Properties
 {
     partial class DlgNewCluster
     {
@@ -34,9 +34,9 @@
             this.m_groupName = new System.Windows.Forms.GroupBox();
             this.m_labelError = new System.Windows.Forms.Label();
             this.m_groupLocation = new System.Windows.Forms.GroupBox();
+            this.m_ClusterLocation = new OurWord.Utilities.ClusterLocation();
             this.m_btnCancel = new System.Windows.Forms.Button();
             this.m_btnOK = new System.Windows.Forms.Button();
-            this.m_ClusterLocation = new OurWord.Utilities.ClusterLocation();
             this.m_groupName.SuspendLayout();
             this.m_groupLocation.SuspendLayout();
             this.SuspendLayout();
@@ -74,7 +74,7 @@
             // 
             this.m_labelError.AutoSize = true;
             this.m_labelError.ForeColor = System.Drawing.Color.Red;
-            this.m_labelError.Location = new System.Drawing.Point(13, 74);
+            this.m_labelError.Location = new System.Drawing.Point(13, 91);
             this.m_labelError.Name = "m_labelError";
             this.m_labelError.Size = new System.Drawing.Size(0, 13);
             this.m_labelError.TabIndex = 2;
@@ -89,6 +89,15 @@
             this.m_groupLocation.TabIndex = 7;
             this.m_groupLocation.TabStop = false;
             this.m_groupLocation.Text = "Folder Location";
+            // 
+            // m_ClusterLocation
+            // 
+            this.m_ClusterLocation.IsInAppData = true;
+            this.m_ClusterLocation.IsInMyDocuments = false;
+            this.m_ClusterLocation.Location = new System.Drawing.Point(16, 19);
+            this.m_ClusterLocation.Name = "m_ClusterLocation";
+            this.m_ClusterLocation.Size = new System.Drawing.Size(410, 176);
+            this.m_ClusterLocation.TabIndex = 0;
             // 
             // m_btnCancel
             // 
@@ -109,15 +118,6 @@
             this.m_btnOK.Size = new System.Drawing.Size(75, 23);
             this.m_btnOK.TabIndex = 8;
             this.m_btnOK.Text = "OK";
-            // 
-            // m_ClusterLocation
-            // 
-            this.m_ClusterLocation.IsInAppData = false;
-            this.m_ClusterLocation.IsInMyDocuments = false;
-            this.m_ClusterLocation.Location = new System.Drawing.Point(16, 19);
-            this.m_ClusterLocation.Name = "m_ClusterLocation";
-            this.m_ClusterLocation.Size = new System.Drawing.Size(410, 176);
-            this.m_ClusterLocation.TabIndex = 0;
             // 
             // DlgNewCluster
             // 

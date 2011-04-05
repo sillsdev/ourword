@@ -450,99 +450,44 @@ namespace OurWord.Dialogs.Properties
         }
         #endregion
 
-        // Copy Book Names -------------------------------------------------------------------
-        #region Method: void AddDropDownItem(sLanguageName)
-        void AddDropDownItem(string sLanguageName)
-        {
-            // Valid item?
-            if (string.IsNullOrEmpty(sLanguageName))
-                return;
-
-            // If it is already there, don't add it
-            foreach (ToolStripItem item in m_bCopyNames.DropDownItems)
-            {
-                if ((string)item.Tag == sLanguageName)
-                    return;
-            }
-
-            // Item text
-            var sBase = Loc.GetString("kCopyBookNamesFrom", "...from {0}");
-            var sText = LocDB.Insert(sBase, new[] { sLanguageName });
-
-            // Add the item
-            var newItem = m_bCopyNames.DropDownItems.Add(sText);
-            newItem.Tag = sLanguageName;
-            newItem.Click += cmdCopyBookNames;
-        }
-        #endregion
-        #region Method: void PopulateCopyNamesPossibilities()
-        void PopulateCopyNamesPossibilities()
-        {
-            // Start with an empty dropdown so we don't double things
-            m_bCopyNames.DropDownItems.Clear();
-
-            // Put in English, as a language we always have
-            AddDropDownItem("English");
-
-            // UI Languages
-            if (null != LocDB.DB.PrimaryLanguage)
-                AddDropDownItem(LocDB.DB.PrimaryLanguage.Name);
-            if (null != LocDB.DB.SecondaryLanguage)
-                AddDropDownItem(LocDB.DB.SecondaryLanguage.Name);
-
-            // Put in the Front Translation (if this isn't the Front)
-            if (null != DB.Project.FrontTranslation && DB.Project.FrontTranslation != Translation)
-                AddDropDownItem(DB.Project.FrontTranslation.DisplayName);
-
-            // Put in the Target Translation (if this isn't the Target) 
-            if (null != DB.Project.TargetTranslation && DB.Project.TargetTranslation != Translation)
-                AddDropDownItem(DB.Project.TargetTranslation.DisplayName);
-
-            // Put in any other translations
-            foreach (DTranslation t in DB.Project.OtherTranslations)
-                AddDropDownItem(t.DisplayName);
-        }
-        #endregion
-        #region Cmd: cmdCopyBookNames
+        // Command Handlers ------------------------------------------------------------------
+        #region cmd: cmdCopyBookNames
         private void cmdCopyBookNames(object sender, EventArgs e)
         {
-            // Language Desired
-            var item = sender as ToolStripItem;
-            Debug.Assert(null != item);
-            var sLanguage = (string)item.Tag;
-            if (string.IsNullOrEmpty(sLanguage))
+            var dlg = new DlgCopyBookNames(Translation);
+            if (DialogResult.Yes != dlg.ShowDialog(this))
                 return;
 
             // We will put the source table here
             string[] vsBookNamesSource = null;
 
-            // Locate the source BookNames table: DTranslations as source
-            if (null != DB.Project.FrontTranslation && DB.Project.FrontTranslation.DisplayName == sLanguage)
-                vsBookNamesSource = DB.Project.FrontTranslation.BookNamesTable.GetCopy();
-            if (null != DB.Project.TargetTranslation && DB.Project.TargetTranslation.DisplayName == sLanguage)
-                vsBookNamesSource = DB.Project.TargetTranslation.BookNamesTable.GetCopy();
-            foreach (DTranslation t in DB.Project.OtherTranslations)
+            // DTranslation as source?
+            var sourceTranslation = dlg.SourceTranslation;
+            if (null != sourceTranslation)
+                vsBookNamesSource = sourceTranslation.BookNamesTable.GetCopy();
+
+            // UI Language as source?
+            if (null == vsBookNamesSource)
             {
-                if (t.DisplayName == sLanguage)
-                    vsBookNamesSource = t.BookNamesTable.GetCopy();
+                foreach (var language in LocDB.DB.Languages)
+                {
+                    if (dlg.SourceName != language.Name)
+                        continue;
+                    vsBookNamesSource = BookNames.GetTable(dlg.SourceName);
+                }
             }
 
-            // Locate the source BookNames table: UI Languages as source
-            foreach (var language in LocDB.DB.Languages)
+            // English?
+            if (null == vsBookNamesSource)
             {
-                if (sLanguage != language.Name)
-                    continue;
-
-                vsBookNamesSource = BookNames.GetTable(sLanguage);
+                if (dlg.SourceName == "English")
+                    vsBookNamesSource = BookNames.English;
             }
-
-            // English
-            if (sLanguage == "English")
-                vsBookNamesSource = BookNames.English;
 
             // Give up if still not found
             if (null == vsBookNamesSource)
                 return;
+
 
             // Populate the translation
             Translation.BookNamesTable.ReplaceAll(vsBookNamesSource);
@@ -550,7 +495,7 @@ namespace OurWord.Dialogs.Properties
             // Update the cross references in the loaded book
             if (null != DB.Project.FrontTranslation &&
                 null != DB.Project.TargetTranslation &&
-                DB.Project.FrontTranslation.DisplayName == sLanguage &&
+                DB.Project.FrontTranslation.DisplayName == dlg.SourceName &&
                 Translation == DB.Project.TargetTranslation)
             {
                 DB.Project.TargetTranslation.UpdateFromFront();
@@ -560,8 +505,6 @@ namespace OurWord.Dialogs.Properties
             PopulateGrid(SelectedBookAbbrev, false);
         }
         #endregion
-
-        // Command Handlers ------------------------------------------------------------------
         #region Cmd: cmdLoad - Populate the controls
         private void cmdLoad(object sender, EventArgs e)
         {
@@ -595,11 +538,7 @@ namespace OurWord.Dialogs.Properties
 
             // Hide the CreateBook button if requested (Front books cannot be created,
             // they can only be imported. Move the other buttons up.
-            if (SuppressCreateBook)
-                m_bCreate.Visible = false;
-
-            // Combo Box Possibilities
-            PopulateCopyNamesPossibilities();
+            m_btnCreate.Visible = !SuppressCreateBook; 
         }
         #endregion
         #region Cmd: cmdFormClosing
@@ -666,9 +605,9 @@ namespace OurWord.Dialogs.Properties
             var book = Translation.FindBook(SelectedBookAbbrev);
 
             // Disable/Enable buttons accordingly
-            m_bCreate.Enabled = (book == null);
-            m_bRemove.Enabled = (book != null);
-            m_bProperties.Enabled = (book != null);
+            m_btnCreate.Enabled = (book == null);
+            m_btnRemove.Enabled = (book != null);
+            m_btnProperties.Enabled = (book != null);
         }
         #endregion
 

@@ -45,6 +45,8 @@ namespace OurWord.Dialogs.History
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
+            LocDB.Localize(this, new Control[] { });
+
             m_wndEntireBook.LoadData();
             m_wndThisSection.LoadData();
 
@@ -188,6 +190,7 @@ namespace OurWord.Dialogs.History
 
             // Position at the top
             ScrollBarPosition = 0;
+
         }
         #endregion
     }

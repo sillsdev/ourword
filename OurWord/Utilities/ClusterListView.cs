@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
 using JWTools;
+using OurWord.Dialogs.Properties;
 using OurWordData;
 using OurWordData.DataModel;
 using OurWord.Dialogs;

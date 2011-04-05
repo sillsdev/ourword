@@ -108,5 +108,12 @@ namespace OurWord.Ctrls.Navigation
             cmdOptionChanged(sender, e);
         }
         #endregion
+        #region event: cmdLoad
+        private void cmdLoad(object sender, EventArgs e)
+        {
+            if (LocDB.IsInitialized)
+                LocDB.Localize(this, new Control[] { });
+        }
+        #endregion
     }
 }

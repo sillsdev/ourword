@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Windows.Forms;
 using JWTools;
 using OurWordData.DataModel;
 using OurWordData.DataModel.Membership;
@@ -46,7 +47,7 @@ namespace OurWord.Dialogs.Properties
         {
             get
             {
-                return "Editing Permissions";
+                return GetLocalizedTitle("Editing Permissions");
             }
         }
         #endregion
@@ -241,6 +242,8 @@ namespace OurWord.Dialogs.Properties
         #region cmd: cmdLoad
         private void cmdLoad(object sender, System.EventArgs e)
         {
+            LocDB.Localize(this, new Control[] { m_comboMembership });
+
             SetEnabling(false);
 
             // Combo: Which project we're doing the permissions for

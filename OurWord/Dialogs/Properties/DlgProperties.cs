@@ -317,6 +317,17 @@ namespace OurWord.Dialogs
             }
         }
         #endregion
+
+        // Methods ---------------------------------------------------------------------------
+        #region method: string GetLocalizedTitle(string sTitleEnglish)
+        protected string GetLocalizedTitle(string sTitleEnglish)
+        {
+            return LocDB.GetValue(new[] { ParentDlg.Name, ParentDlg.Name + "_" + Name },
+                "pageTitle",
+                sTitleEnglish,
+                null, null);
+        }
+        #endregion
     }
     #endregion
 

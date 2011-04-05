@@ -82,7 +82,7 @@ namespace OurWord.Ctrls.Navigation
             Height = sz.Height;
 
             // Localization
-            LocDB.Localize(this, null);
+            LocDB.Localize(this, new Control[] { });
             m_ctrlFindOptions.LocalizeAndInitialize();
 
             // Our first launch, no concordance exists, so disable the control
@@ -412,5 +412,6 @@ namespace OurWord.Ctrls.Navigation
         #endregion
 
     }
+
 
 }

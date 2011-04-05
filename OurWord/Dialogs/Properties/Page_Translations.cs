@@ -34,12 +34,12 @@ namespace OurWord.Dialogs.Properties
             HelpSystem.ShowTopic(HelpSystem.Topic.kReferenceTranslations);
         }
         #endregion
-        #region Attr{g}: string TabText
+        #region Attr{g}: string Title
         public override string Title
         {
             get
             {
-                return "Translations";
+                return GetLocalizedTitle("Translations");
             }
         }
         #endregion

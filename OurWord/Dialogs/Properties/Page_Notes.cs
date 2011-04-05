@@ -137,7 +137,7 @@ namespace OurWord.Dialogs
         {
             get
             {
-                return "Notes";
+                return GetLocalizedTitle("Notes");
             }
         }
         #endregion
@@ -164,6 +164,8 @@ namespace OurWord.Dialogs
         #region Cmd: cmdLoad
         private void cmdLoad(object sender, EventArgs e)
         {
+            LocDB.Localize(this, new Control[] {});
+
             // Property Grid
             SetupPropertyGrid();
 

@@ -105,6 +105,7 @@
             this.Controls.Add(this.m_groupOptions);
             this.Name = "CtrlFindOptions";
             this.Size = new System.Drawing.Size(306, 89);
+            this.Load += new System.EventHandler(this.cmdLoad);
             this.ResumeLayout(false);
             this.PerformLayout();
 

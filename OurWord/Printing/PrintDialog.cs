@@ -426,7 +426,7 @@ namespace OurWord.Printing
             // 
             // m_editEndChapter
             // 
-            this.m_editEndChapter.Location = new System.Drawing.Point(161, 60);
+            this.m_editEndChapter.Location = new System.Drawing.Point(178, 60);
             this.m_editEndChapter.Name = "m_editEndChapter";
             this.m_editEndChapter.Size = new System.Drawing.Size(40, 20);
             this.m_editEndChapter.TabIndex = 6;
@@ -434,7 +434,7 @@ namespace OurWord.Printing
             // 
             // m_labelToChapter
             // 
-            this.m_labelToChapter.Location = new System.Drawing.Point(129, 59);
+            this.m_labelToChapter.Location = new System.Drawing.Point(141, 59);
             this.m_labelToChapter.Name = "m_labelToChapter";
             this.m_labelToChapter.Size = new System.Drawing.Size(32, 23);
             this.m_labelToChapter.TabIndex = 28;
@@ -445,7 +445,7 @@ namespace OurWord.Printing
             // 
             this.m_radioChapters.Location = new System.Drawing.Point(16, 59);
             this.m_radioChapters.Name = "m_radioChapters";
-            this.m_radioChapters.Size = new System.Drawing.Size(72, 24);
+            this.m_radioChapters.Size = new System.Drawing.Size(86, 24);
             this.m_radioChapters.TabIndex = 4;
             this.m_radioChapters.TabStop = true;
             this.m_radioChapters.Text = "Chapters:";
@@ -453,7 +453,7 @@ namespace OurWord.Printing
             // 
             // m_editStartChapter
             // 
-            this.m_editStartChapter.Location = new System.Drawing.Point(89, 60);
+            this.m_editStartChapter.Location = new System.Drawing.Point(100, 60);
             this.m_editStartChapter.Name = "m_editStartChapter";
             this.m_editStartChapter.Size = new System.Drawing.Size(40, 20);
             this.m_editStartChapter.TabIndex = 5;
@@ -471,14 +471,14 @@ namespace OurWord.Printing
             // 
             this.m_labelLineSpacing.Location = new System.Drawing.Point(13, 118);
             this.m_labelLineSpacing.Name = "m_labelLineSpacing";
-            this.m_labelLineSpacing.Size = new System.Drawing.Size(100, 23);
+            this.m_labelLineSpacing.Size = new System.Drawing.Size(110, 23);
             this.m_labelLineSpacing.TabIndex = 22;
             this.m_labelLineSpacing.Text = "Line Spacing:";
             this.m_labelLineSpacing.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // m_comboLineSpacing
             // 
-            this.m_comboLineSpacing.Location = new System.Drawing.Point(117, 118);
+            this.m_comboLineSpacing.Location = new System.Drawing.Point(122, 118);
             this.m_comboLineSpacing.Name = "m_comboLineSpacing";
             this.m_comboLineSpacing.Size = new System.Drawing.Size(128, 21);
             this.m_comboLineSpacing.TabIndex = 12;

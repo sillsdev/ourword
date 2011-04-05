@@ -92,8 +92,11 @@ namespace OurWord.Ctrls.Navigation
             var font = CtrlNavigation.GetFont();
             m_textFindWhat.Font = font;
 
-            LocDB.Localize(this, null);
-            m_ctrlFindOptions.LocalizeAndInitialize();
+            if (LocDB.IsInitialized)
+            {
+                LocDB.Localize(this, new Control[] {});
+                m_ctrlFindOptions.LocalizeAndInitialize();
+            }
         }
         #endregion
         #region event: onFormClosing

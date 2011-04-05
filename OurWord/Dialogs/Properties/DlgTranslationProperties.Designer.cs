@@ -28,20 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DlgTranslationProperties));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DlgTranslationProperties));
             this.m_tabctrlTranslation = new System.Windows.Forms.TabControl();
             this.m_tabBooks = new System.Windows.Forms.TabPage();
-            this.m_ToolStrip = new System.Windows.Forms.ToolStrip();
-            this.m_bCreate = new System.Windows.Forms.ToolStripButton();
-            this.m_bImport = new System.Windows.Forms.ToolStripButton();
-            this.m_bRemove = new System.Windows.Forms.ToolStripButton();
-            this.m_bProperties = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_bEditRawFile = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.m_bCopyNames = new System.Windows.Forms.ToolStripDropDownButton();
             this.m_radioStartedBooks = new System.Windows.Forms.RadioButton();
             this.m_radioOldTestament = new System.Windows.Forms.RadioButton();
             this.m_radioNewTestament = new System.Windows.Forms.RadioButton();
@@ -54,10 +45,15 @@
             this.m_lblLanguageName = new System.Windows.Forms.Label();
             this.m_editLanguageName = new System.Windows.Forms.TextBox();
             this.m_bOK = new System.Windows.Forms.Button();
+            this.m_btnCreate = new System.Windows.Forms.Button();
+            this.m_btnImport = new System.Windows.Forms.Button();
+            this.m_btnRemove = new System.Windows.Forms.Button();
+            this.m_btnProperties = new System.Windows.Forms.Button();
+            this.m_btnEditRawFile = new System.Windows.Forms.Button();
+            this.m_btnCopyNames = new System.Windows.Forms.Button();
             this.m_LiterateSettings = new OurWord.Edit.LiterateSettingsWnd();
             this.m_tabctrlTranslation.SuspendLayout();
             this.m_tabBooks.SuspendLayout();
-            this.m_ToolStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).BeginInit();
             this.m_tabOther.SuspendLayout();
             this.SuspendLayout();
@@ -77,7 +73,12 @@
             // 
             // m_tabBooks
             // 
-            this.m_tabBooks.Controls.Add(this.m_ToolStrip);
+            this.m_tabBooks.Controls.Add(this.m_btnCopyNames);
+            this.m_tabBooks.Controls.Add(this.m_btnEditRawFile);
+            this.m_tabBooks.Controls.Add(this.m_btnProperties);
+            this.m_tabBooks.Controls.Add(this.m_btnRemove);
+            this.m_tabBooks.Controls.Add(this.m_btnImport);
+            this.m_tabBooks.Controls.Add(this.m_btnCreate);
             this.m_tabBooks.Controls.Add(this.m_radioStartedBooks);
             this.m_tabBooks.Controls.Add(this.m_radioOldTestament);
             this.m_tabBooks.Controls.Add(this.m_radioNewTestament);
@@ -91,103 +92,10 @@
             this.m_tabBooks.Text = "Books";
             this.m_tabBooks.UseVisualStyleBackColor = true;
             // 
-            // m_ToolStrip
-            // 
-            this.m_ToolStrip.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_ToolStrip.AutoSize = false;
-            this.m_ToolStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.m_ToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.m_ToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.m_bCreate,
-            this.m_bImport,
-            this.m_bRemove,
-            this.m_bProperties,
-            this.toolStripSeparator1,
-            this.m_bEditRawFile,
-            this.toolStripSeparator2,
-            this.m_bCopyNames});
-            this.m_ToolStrip.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.VerticalStackWithOverflow;
-            this.m_ToolStrip.Location = new System.Drawing.Point(350, 4);
-            this.m_ToolStrip.Name = "m_ToolStrip";
-            this.m_ToolStrip.Size = new System.Drawing.Size(111, 184);
-            this.m_ToolStrip.TabIndex = 113;
-            this.m_ToolStrip.Text = "ToolStrip";
-            // 
-            // m_bCreate
-            // 
-            this.m_bCreate.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bCreate.Image = ((System.Drawing.Image)(resources.GetObject("m_bCreate.Image")));
-            this.m_bCreate.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bCreate.Name = "m_bCreate";
-            this.m_bCreate.Size = new System.Drawing.Size(109, 19);
-            this.m_bCreate.Text = "Create....";
-            this.m_bCreate.Click += new System.EventHandler(this.cmdCreateBook);
-            // 
-            // m_bImport
-            // 
-            this.m_bImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bImport.Image = ((System.Drawing.Image)(resources.GetObject("m_bImport.Image")));
-            this.m_bImport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bImport.Name = "m_bImport";
-            this.m_bImport.Size = new System.Drawing.Size(109, 19);
-            this.m_bImport.Text = "Import...";
-            this.m_bImport.Click += new System.EventHandler(this.cmdImportBook);
-            // 
-            // m_bRemove
-            // 
-            this.m_bRemove.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bRemove.Image = ((System.Drawing.Image)(resources.GetObject("m_bRemove.Image")));
-            this.m_bRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bRemove.Name = "m_bRemove";
-            this.m_bRemove.Size = new System.Drawing.Size(109, 19);
-            this.m_bRemove.Text = "Delete...";
-            this.m_bRemove.Click += new System.EventHandler(this.cmdRemoveBook);
-            // 
-            // m_bProperties
-            // 
-            this.m_bProperties.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bProperties.Image = ((System.Drawing.Image)(resources.GetObject("m_bProperties.Image")));
-            this.m_bProperties.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bProperties.Name = "m_bProperties";
-            this.m_bProperties.Size = new System.Drawing.Size(109, 19);
-            this.m_bProperties.Text = "Properties...";
-            this.m_bProperties.Click += new System.EventHandler(this.cmdBookProperties);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(109, 6);
-            // 
-            // m_bEditRawFile
-            // 
-            this.m_bEditRawFile.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bEditRawFile.Image = ((System.Drawing.Image)(resources.GetObject("m_bEditRawFile.Image")));
-            this.m_bEditRawFile.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bEditRawFile.Name = "m_bEditRawFile";
-            this.m_bEditRawFile.Size = new System.Drawing.Size(109, 19);
-            this.m_bEditRawFile.Text = "Edit Raw File...";
-            this.m_bEditRawFile.Click += new System.EventHandler(this.cmdEditRawFile);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(109, 6);
-            // 
-            // m_bCopyNames
-            // 
-            this.m_bCopyNames.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.m_bCopyNames.Image = ((System.Drawing.Image)(resources.GetObject("m_bCopyNames.Image")));
-            this.m_bCopyNames.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.m_bCopyNames.Name = "m_bCopyNames";
-            this.m_bCopyNames.Size = new System.Drawing.Size(109, 19);
-            this.m_bCopyNames.Text = "Copy Names";
-            this.m_bCopyNames.ToolTipText = "Copy book names from  another language (the dropdown shows the possible choices);" +
-                " this is a short cut over having to enter each of the 66 names one-at-a-time.";
-            // 
             // m_radioStartedBooks
             // 
             this.m_radioStartedBooks.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioStartedBooks.Location = new System.Drawing.Point(350, 265);
+            this.m_radioStartedBooks.Location = new System.Drawing.Point(350, 240);
             this.m_radioStartedBooks.Name = "m_radioStartedBooks";
             this.m_radioStartedBooks.Size = new System.Drawing.Size(111, 17);
             this.m_radioStartedBooks.TabIndex = 112;
@@ -199,7 +107,7 @@
             // m_radioOldTestament
             // 
             this.m_radioOldTestament.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioOldTestament.Location = new System.Drawing.Point(350, 247);
+            this.m_radioOldTestament.Location = new System.Drawing.Point(350, 222);
             this.m_radioOldTestament.Name = "m_radioOldTestament";
             this.m_radioOldTestament.Size = new System.Drawing.Size(111, 17);
             this.m_radioOldTestament.TabIndex = 111;
@@ -211,7 +119,7 @@
             // m_radioNewTestament
             // 
             this.m_radioNewTestament.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioNewTestament.Location = new System.Drawing.Point(350, 229);
+            this.m_radioNewTestament.Location = new System.Drawing.Point(350, 204);
             this.m_radioNewTestament.Name = "m_radioNewTestament";
             this.m_radioNewTestament.Size = new System.Drawing.Size(111, 17);
             this.m_radioNewTestament.TabIndex = 110;
@@ -223,7 +131,7 @@
             // m_radioAll
             // 
             this.m_radioAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.m_radioAll.Location = new System.Drawing.Point(350, 211);
+            this.m_radioAll.Location = new System.Drawing.Point(350, 186);
             this.m_radioAll.Name = "m_radioAll";
             this.m_radioAll.Size = new System.Drawing.Size(111, 17);
             this.m_radioAll.TabIndex = 109;
@@ -336,6 +244,96 @@
             this.m_bOK.Text = "OK";
             this.m_bOK.UseVisualStyleBackColor = true;
             // 
+            // m_btnCreate
+            // 
+            this.m_btnCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnCreate.FlatAppearance.BorderSize = 0;
+            this.m_btnCreate.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.m_btnCreate.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.m_btnCreate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnCreate.Location = new System.Drawing.Point(350, 8);
+            this.m_btnCreate.Name = "m_btnCreate";
+            this.m_btnCreate.Size = new System.Drawing.Size(111, 20);
+            this.m_btnCreate.TabIndex = 114;
+            this.m_btnCreate.Text = "Create...";
+            this.m_btnCreate.UseVisualStyleBackColor = true;
+            this.m_btnCreate.Click += new System.EventHandler(this.cmdCreateBook);
+            // 
+            // m_btnImport
+            // 
+            this.m_btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnImport.FlatAppearance.BorderSize = 0;
+            this.m_btnImport.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.m_btnImport.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.m_btnImport.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnImport.Location = new System.Drawing.Point(350, 34);
+            this.m_btnImport.Name = "m_btnImport";
+            this.m_btnImport.Size = new System.Drawing.Size(111, 20);
+            this.m_btnImport.TabIndex = 115;
+            this.m_btnImport.Text = "Import...";
+            this.m_btnImport.UseVisualStyleBackColor = true;
+            this.m_btnImport.Click += new System.EventHandler(this.cmdImportBook);
+            // 
+            // m_btnRemove
+            // 
+            this.m_btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnRemove.FlatAppearance.BorderSize = 0;
+            this.m_btnRemove.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.m_btnRemove.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.m_btnRemove.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnRemove.Location = new System.Drawing.Point(350, 60);
+            this.m_btnRemove.Name = "m_btnRemove";
+            this.m_btnRemove.Size = new System.Drawing.Size(111, 20);
+            this.m_btnRemove.TabIndex = 116;
+            this.m_btnRemove.Text = "Delete...";
+            this.m_btnRemove.UseVisualStyleBackColor = true;
+            this.m_btnRemove.Click += new System.EventHandler(this.cmdRemoveBook);
+            // 
+            // m_btnProperties
+            // 
+            this.m_btnProperties.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnProperties.FlatAppearance.BorderSize = 0;
+            this.m_btnProperties.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.m_btnProperties.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.m_btnProperties.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnProperties.Location = new System.Drawing.Point(350, 86);
+            this.m_btnProperties.Name = "m_btnProperties";
+            this.m_btnProperties.Size = new System.Drawing.Size(111, 20);
+            this.m_btnProperties.TabIndex = 117;
+            this.m_btnProperties.Text = "Properties...";
+            this.m_btnProperties.UseVisualStyleBackColor = true;
+            this.m_btnProperties.Click += new System.EventHandler(this.cmdBookProperties);
+            // 
+            // m_btnEditRawFile
+            // 
+            this.m_btnEditRawFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnEditRawFile.FlatAppearance.BorderSize = 0;
+            this.m_btnEditRawFile.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.m_btnEditRawFile.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.m_btnEditRawFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnEditRawFile.Location = new System.Drawing.Point(350, 112);
+            this.m_btnEditRawFile.Name = "m_btnEditRawFile";
+            this.m_btnEditRawFile.Size = new System.Drawing.Size(111, 20);
+            this.m_btnEditRawFile.TabIndex = 118;
+            this.m_btnEditRawFile.Text = "Edit Raw File...";
+            this.m_btnEditRawFile.UseVisualStyleBackColor = true;
+            this.m_btnEditRawFile.Click += new System.EventHandler(this.cmdEditRawFile);
+            // 
+            // m_btnCopyNames
+            // 
+            this.m_btnCopyNames.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.m_btnCopyNames.FlatAppearance.BorderSize = 0;
+            this.m_btnCopyNames.FlatAppearance.MouseDownBackColor = System.Drawing.SystemColors.MenuHighlight;
+            this.m_btnCopyNames.FlatAppearance.MouseOverBackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.m_btnCopyNames.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.m_btnCopyNames.Location = new System.Drawing.Point(350, 138);
+            this.m_btnCopyNames.Name = "m_btnCopyNames";
+            this.m_btnCopyNames.Size = new System.Drawing.Size(111, 20);
+            this.m_btnCopyNames.TabIndex = 119;
+            this.m_btnCopyNames.Text = "Copy Names...";
+            this.m_btnCopyNames.UseVisualStyleBackColor = true;
+            this.m_btnCopyNames.Click += new System.EventHandler(this.cmdCopyBookNames);
+            // 
             // m_LiterateSettings
             // 
             this.m_LiterateSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -367,8 +365,6 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.cmdFormClosing);
             this.m_tabctrlTranslation.ResumeLayout(false);
             this.m_tabBooks.ResumeLayout(false);
-            this.m_ToolStrip.ResumeLayout(false);
-            this.m_ToolStrip.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.m_gridBooks)).EndInit();
             this.m_tabOther.ResumeLayout(false);
             this.m_tabOther.PerformLayout();
@@ -380,15 +376,6 @@
 
         private System.Windows.Forms.TabControl m_tabctrlTranslation;
         private System.Windows.Forms.TabPage m_tabBooks;
-        private System.Windows.Forms.ToolStrip m_ToolStrip;
-        private System.Windows.Forms.ToolStripButton m_bCreate;
-        private System.Windows.Forms.ToolStripButton m_bImport;
-        private System.Windows.Forms.ToolStripButton m_bRemove;
-        private System.Windows.Forms.ToolStripButton m_bProperties;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.ToolStripButton m_bEditRawFile;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
-        private System.Windows.Forms.ToolStripDropDownButton m_bCopyNames;
         private System.Windows.Forms.RadioButton m_radioStartedBooks;
         private System.Windows.Forms.RadioButton m_radioOldTestament;
         private System.Windows.Forms.RadioButton m_radioNewTestament;
@@ -402,5 +389,11 @@
         private System.Windows.Forms.Label m_lblLanguageName;
         private System.Windows.Forms.TextBox m_editLanguageName;
         private System.Windows.Forms.Button m_bOK;
+        private System.Windows.Forms.Button m_btnCreate;
+        private System.Windows.Forms.Button m_btnImport;
+        private System.Windows.Forms.Button m_btnRemove;
+        private System.Windows.Forms.Button m_btnProperties;
+        private System.Windows.Forms.Button m_btnEditRawFile;
+        private System.Windows.Forms.Button m_btnCopyNames;
     }
 }
