@@ -139,32 +139,43 @@ namespace OurWord.Ctrls.Commands
         #region method: void SetupEdit()
         void SetupEdit()
         {
-            // Structural editing includes adding/deleting footnotes and changing paragraph styles
+            // Don't show the Edit menu if there isn't anything there of signifcance the user can do
             var bCanEditStructure = Users.Current.CanEditStructure &&
                 WLayout.CurrentLayoutIs(WndDrafting.c_sName);
-            m_menuInsertFootnote.Available = bCanEditStructure;
-            m_menuDeleteFootnote.Available = bCanEditStructure;
-            m_menuChangeParagraphStyle.Available = bCanEditStructure;
+            var bCanCopyBtFromFront = (
+                 Users.Current.CanDoConsultantPreparation &&
+                 WLayout.CurrentLayoutIs(new[] {
+                     WndConsultantPreparation.c_sName, 
+                     WndBackTranslation.c_sName })
+                 );
+            m_Edit.Available = (bCanEditStructure || 
+                Users.Current.CanUndoRedo ||
+                bCanCopyBtFromFront);
 
             // Undo / Redo
             m_menuUndo.Available = Users.Current.CanUndoRedo;
             m_menuRedo.Available = Users.Current.CanUndoRedo;
-
-            // Don't show the Edit menu if there isn't anything there of signifcance the user can do
-            m_Edit.Available = (bCanEditStructure || Users.Current.CanUndoRedo);
+            m_EditSeparatorUndo.Available = Users.Current.CanUndoRedo;
 
             // The Cut/Copy/Paste toolbar buttons are not shown if the Edit dropdown is shown
             m_Cut.Available = !m_Edit.Available;
             m_Copy.Available = !m_Edit.Available;
             m_Paste.Available = !m_Edit.Available;
 
+            // Cut/Copy/Paste separator is available if there is something following it
+            m_EditSeparatorPaste.Available = m_Edit.Available && 
+                (bCanEditStructure || bCanCopyBtFromFront);
+
+            // Structural Editing
+            m_menuInsertFootnote.Available = bCanEditStructure;
+            m_menuDeleteFootnote.Available = bCanEditStructure;
+            m_menuChangeParagraphStyle.Available = bCanEditStructure;
+
+            // Structural/CopyBT separator is available if both of these sections are present
+            m_EditSeparatorFootnote.Available = bCanEditStructure && bCanCopyBtFromFront;
+
             // A special feature requested by Timor, but normally disabled for most people
-            m_menuCopyBTFromFront.Available = (
-                 Users.Current.CanDoConsultantPreparation &&
-                 WLayout.CurrentLayoutIs(new[] {
-                     WndConsultantPreparation.c_sName, 
-                     WndBackTranslation.c_sName })
-                 );
+            m_menuCopyBTFromFront.Available = bCanCopyBtFromFront;
 
             // Enabling
             // Cannot incorporate WindowIsFocused into this, as the window typically doesn't exist yet.

@@ -186,7 +186,7 @@ namespace OurWordData.DataModel
 
 		// Methods ---------------------------------------------------------------------------
 		#region Method: virtual void CopyBackTranslationsFromFront(DRun RFront)
-		public virtual void CopyBackTranslationsFromFront(DRun RFront, bool bReplaceTarget)
+		public virtual void CopyBackTranslationsFromFront(DRun runFront, bool bReplaceTarget)
 		{
 		}
 		#endregion

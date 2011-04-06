@@ -404,7 +404,7 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				string sText = Start.FullName + "-";
+				var sText = Start.FullName + "-";
 				if (Start.Chapter != End.Chapter)
 					sText += (End.Chapter.ToString() + ":");
 				sText += End.Verse.ToString();

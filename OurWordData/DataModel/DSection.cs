@@ -390,13 +390,13 @@ namespace OurWordData.DataModel
 		{
 			get
 			{
-				string s = "";
-				char chLast = '\0';
+				var s = "";
+				var chLast = '\0';
 
 				foreach(DParagraph p in Paragraphs)
 				{
                     // Get the type (either a "Text" or a "Picture")
-                    char ch = c_Text;
+                    var ch = c_Text;
                     if (p as DPicture != null)
                         ch = c_Pict;
 

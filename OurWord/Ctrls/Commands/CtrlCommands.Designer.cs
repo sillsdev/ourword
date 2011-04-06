@@ -64,7 +64,7 @@
             this.m_menuChangeParagraphStyle = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuInsertFootnote = new System.Windows.Forms.ToolStripMenuItem();
             this.m_menuDeleteFootnote = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.m_EditSeparatorFootnote = new System.Windows.Forms.ToolStripSeparator();
             this.m_menuCopyBTFromFront = new System.Windows.Forms.ToolStripMenuItem();
             this.m_Italic = new System.Windows.Forms.ToolStripButton();
             this.m_SeparatorAfterEdit = new System.Windows.Forms.ToolStripSeparator();
@@ -246,7 +246,7 @@
             this.m_createANewProjectOnThisComputer});
             this.m_New.Image = ((System.Drawing.Image)(resources.GetObject("m_New.Image")));
             this.m_New.Name = "m_New";
-            this.m_New.Size = new System.Drawing.Size(152, 22);
+            this.m_New.Size = new System.Drawing.Size(138, 22);
             this.m_New.Text = "&New";
             this.m_New.Click += new System.EventHandler(this.cmdDownloadRepositoryFromInternet);
             // 
@@ -268,7 +268,7 @@
             // 
             this.m_Open.Image = ((System.Drawing.Image)(resources.GetObject("m_Open.Image")));
             this.m_Open.Name = "m_Open";
-            this.m_Open.Size = new System.Drawing.Size(152, 22);
+            this.m_Open.Size = new System.Drawing.Size(138, 22);
             this.m_Open.Text = "&Open";
             // 
             // m_menuSave
@@ -276,14 +276,14 @@
             this.m_menuSave.Image = ((System.Drawing.Image)(resources.GetObject("m_menuSave.Image")));
             this.m_menuSave.Name = "m_menuSave";
             this.m_menuSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.m_menuSave.Size = new System.Drawing.Size(152, 22);
+            this.m_menuSave.Size = new System.Drawing.Size(138, 22);
             this.m_menuSave.Text = "&Save";
             this.m_menuSave.Click += new System.EventHandler(this.cmdSave);
             // 
             // m_Export
             // 
             this.m_Export.Name = "m_Export";
-            this.m_Export.Size = new System.Drawing.Size(152, 22);
+            this.m_Export.Size = new System.Drawing.Size(138, 22);
             this.m_Export.Text = "E&xport...";
             this.m_Export.Click += new System.EventHandler(this.cmdExport);
             // 
@@ -350,7 +350,7 @@
             this.m_menuChangeParagraphStyle,
             this.m_menuInsertFootnote,
             this.m_menuDeleteFootnote,
-            this.toolStripSeparator1,
+            this.m_EditSeparatorFootnote,
             this.m_menuCopyBTFromFront});
             this.m_Edit.Image = ((System.Drawing.Image)(resources.GetObject("m_Edit.Image")));
             this.m_Edit.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
@@ -438,10 +438,10 @@
             this.m_menuDeleteFootnote.Text = "Delete Footnote";
             this.m_menuDeleteFootnote.Click += new System.EventHandler(this.cmdDeleteFootnote);
             // 
-            // toolStripSeparator1
+            // m_EditSeparatorFootnote
             // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(186, 6);
+            this.m_EditSeparatorFootnote.Name = "m_EditSeparatorFootnote";
+            this.m_EditSeparatorFootnote.Size = new System.Drawing.Size(186, 6);
             // 
             // m_menuCopyBTFromFront
             // 
@@ -664,7 +664,7 @@
         private System.Windows.Forms.ToolStripButton m_Paste;
         private System.Windows.Forms.ToolStripSeparator m_SeparatorBeforeEdit;
         private System.Windows.Forms.ToolStripSeparator m_SeparatorAfterEdit;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator m_EditSeparatorFootnote;
         private System.Windows.Forms.ToolStripMenuItem m_menuCopyBTFromFront;
         private System.Windows.Forms.ToolStripDropDownButton m_Tools;
         private System.Windows.Forms.ToolStripMenuItem m_menuConfigure;

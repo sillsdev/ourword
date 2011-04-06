@@ -739,7 +739,7 @@ namespace OurWord
         }
         #endregion
         #region cmd: cmdSwitchLayout
-        void cmdSwitchLayout(string sNewLayoutName)
+        public void cmdSwitchLayout(string sNewLayoutName)
         {
             SetCurrentLayout(sNewLayoutName);
             G.URStack.Clear();
@@ -971,7 +971,7 @@ namespace OurWord
 
             OnLeaveSection();
 
-            (new CopyBtFromFrontMethod()).Run();
+            (new CopyBtFromFrontMethod(DB.FrontSection, DB.TargetSection)).Run();
 
             OnEnterSection();
         }

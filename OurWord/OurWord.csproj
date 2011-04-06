@@ -507,6 +507,9 @@
     </Compile>
     <Compile Include="Ctrls\Navigation\NavBookmark.cs" />
     <Compile Include="Ctrls\Navigation\Scanner.cs" />
+    <Compile Include="Dialogs\CopyBTfromFront.Designer.cs">
+      <DependentUpon>CopyBTfromFront.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\DlgProgress.cs">
       <SubType>Form</SubType>
     </Compile>

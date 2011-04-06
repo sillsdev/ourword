@@ -465,8 +465,8 @@
   <data name="m_menuSendReceive.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOuwAA
-        DrsBx/jUNgAAAfxJREFUOE+1k91P0mEYhv0b6qyjWp30cVKbc7bVyrVpSR9olmtE0iabMnGogFk2IEQL
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOugAA
+        DroBFb820gAAAfxJREFUOE+1k91P0mEYhv0b6qyjWp30cVKbc7bVyrVpSR9olmtE0iabMnGogFk2IEQL
         DQOF+GlgBAINGBFBCUsqND8ma5W5vg/aWv/FVbEFW0MbB73bvT3b89zXe+/d+1RU/O+jm27CndJR1j3h
         rA1jQMJljxh/xkR47iamoIzP399sDJpbjaOdPM6DeStr3zJ8/bHEyqcwyx+CpFZcaCfqSef8pSEv3yYQ
         4hoW16JkV6eIL5qIzl8t6F7qEhpBRO79bGlA9/hRHi3YiC0MEshosIQuoBWOcSsiY+T+efqEhvXjhzN2
@@ -480,8 +480,8 @@
   <data name="m_menuCheckForUpdates.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOuwAA
-        DrsBx/jUNgAAARBJREFUOE/Nk71qg3AUxa9v0TVvEPoEHbNkylw61kEURAOiFNxczBjwATIX7JihY6FI
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOugAA
+        DroBFb820gAAARBJREFUOE/Nk71qg3AUxa9v0TVvEPoEHbNkylw61kEURAOiFNxczBjwATIX7JihY6FI
         wMUIFjGgHXRpIftprxIx/dJkqvCD+7+ec7wXlehfXhcPAn5i8LBsXu8J9+8NXHPvpIDVG2FZNnDdG3D9
         PD0ae1ER7vIGrrsrsfbbNCyYv9IRty8E5mv/12n4xs2OWmYRgen2eldhweTzqczVRqg5nHvNh71YeLkl
         jJ+EGq4Hm7sho0cBzMnmbsggs+/7OIf2VXqehyAIEIYh4jhGmqbI8xxVVaEsSxRFgSzLkCQJoiiqdexp
@@ -492,8 +492,8 @@
   <data name="m_menuConfigure.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOuwAA
-        DrsBx/jUNgAAAINJREFUOE/dk9ENwCAIRF2QNV3IgWzPegYR9Kf9qYmJRnjcSUjpyyUi1duoKZLvt1zD
+        YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAAAlwSFlzAAAOugAA
+        DroBFb820gAAAINJREFUOE/dk9ENwCAIRF2QNV3IgWzPegYR9Kf9qYmJRnjcSUjpyyUi1duoKZLvt1zD
         +kgspbj7gW4ATN5DOsCTiMonyFCAQC6bFEEmCwToYAA9GNVOn6gBWo2F8K5/vXXBJg0//WAtLm07ATQQ
         sSGA/ijVdsez0GA/URANTTRIrw7wBX/o7MOXspOMAAAAAElFTkSuQmCC
 </value>

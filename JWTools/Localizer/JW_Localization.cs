@@ -1420,7 +1420,7 @@ namespace JWTools
             return sReturn;
         }
         #endregion
-        public enum MessageTypes { Warning, WarningYN, YN, Info, Error };
+        public enum MessageTypes { Warning, WarningYN, YN, Info, Error};
         #region SMethod: bool Message(sID, sDefaultEnglish, vsInsertions, MessageType)
         static public bool Message(
             string sID, 
@@ -1438,14 +1438,14 @@ namespace JWTools
                 item.English = sDefaultEnglish;
                 DB.Messages.AppendItem(item);
             }
-            string sMessageText = item.AltValue;
+            var sMessageText = item.AltValue;
 
             // Perform the insertions
             sMessageText = Insert(sMessageText, vsInsertions);
 
             // Decide which button(s) and which icon to show in the message box
-            MessageBoxButtons buttons = MessageBoxButtons.OK;
-            MessageBoxIcon icon = MessageBoxIcon.Warning;
+            var buttons = MessageBoxButtons.OK;
+            var icon = MessageBoxIcon.Warning;
             switch (MessageType)
             {
                 case MessageTypes.Warning:
@@ -1472,14 +1472,14 @@ namespace JWTools
 
             // Retrieve the application's title (localized)
             // TODO
-            string sAppTitle = "Our Word";
+            var sAppTitle = "Our Word";
 
             // Finally, we can show the message
             // Note: We don't give a parent window, because some messages can happen
             // during loading, before a window is available, in which case we get an
             // error, because Form.ActiveForm would return the splash screen, which is
             // running in a different process.
-            DialogResult result = MessageBox.Show(null, sMessageText, sAppTitle, buttons, icon);
+            var result = MessageBox.Show(null, sMessageText, sAppTitle, buttons, icon);
             return (result == DialogResult.Yes);
         }
         #endregion

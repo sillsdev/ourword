@@ -413,33 +413,28 @@ namespace OurWordData.DataModel.Runs
         }
         #endregion
         #region Method: override void CopyBackTranslationsFromFront(DRun RFront)
-        public override void CopyBackTranslationsFromFront(DRun RFront, bool bReplaceTarget)
+        public override void CopyBackTranslationsFromFront(DRun runFront, bool bReplaceTarget)
         {
-            DBasicText FrontText = RFront as DBasicText;
+            var textFront = runFront as DBasicText;
+            if (null == textFront)
+                return;
 
             // Replace Mode means we get rid of existing BT phrases
             if (bReplaceTarget)
                 PhrasesBT.Clear();
 
-            // Clear everything if it is blank anyway, and if we're sure we have something to copy
-            // (otherwise, we can get stuck with a empty DPhrase at the beginning)
-            // Reference Bug0256.
-            // QUITE POSSIBILY OBSOLETE due to changes made to EliminateSpuriousSpaces
-            //           if (string.IsNullOrEmpty(ProseBTAsString) && !string.IsNullOrEmpty(FrontText.ProseBTAsString))
-            //               PhrasesBT.Clear();
-
             // If we have a phrase still in the target (which means we're in kAppendToTarget mode),
             // then add a space to it.
             if (PhrasesBT.Count > 0)
             {
-                DPhrase phr = PhrasesBT[PhrasesBT.Count - 1];
+                var phr = PhrasesBT[PhrasesBT.Count - 1];
                 phr.Text += " ";
             }
 
             // Add the Front phrases
-            foreach (DPhrase phraseFront in FrontText.PhrasesBT)
+            foreach (DPhrase phraseFront in textFront.PhrasesBT)
             {
-                DPhrase phraseTarget = new DPhrase(phraseFront);
+                var phraseTarget = new DPhrase(phraseFront);
                 PhrasesBT.Append(phraseTarget);
             }
 
