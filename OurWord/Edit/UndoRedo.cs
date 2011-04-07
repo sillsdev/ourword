@@ -679,26 +679,28 @@ namespace OurWord.Edit
         protected bool JoinToPrevious()
         {
             // Bookmark the "Before" selection so we can Undo back to it
-            OWWindow.Sel selection = Window.Selection;
+            var selection = Window.Selection;
             m_bookmark_BeforeJoin = Window.CreateBookmark();
 
             // Retrieve the underlying paragraph
-            DParagraph p = selection.Paragraph.DataSource as DParagraph;
-            if (null == p)
+            var p = selection.Paragraph.DataSource as DParagraph;
+            if (null == p || !p.IsUserEditable)
                 return false;
             FollowingParagraphStyle = p.Style;
 
             // Retrieve the paragraph previous to it
-            JOwnSeq<DParagraph> seq = p.GetMyOwningAttr() as JOwnSeq<DParagraph>;
+            var seq = p.GetMyOwningAttr() as JOwnSeq<DParagraph>;
             Debug.Assert(null != seq);
-            int i = seq.FindObj(p) - 1;
+            var i = seq.FindObj(p) - 1;
             if (i < 0)
                 return false;
             p = seq[i] as DParagraph;
+            if (!p.IsUserEditable)
+                return false;
 
             // We need to move the Window selection left, so that we have something valid to bookmark
             Window.cmdMoveCharLeft();
-            OWBookmark bm = Window.CreateBookmark();
+            var bm = Window.CreateBookmark();
 
             // Join the paragraphs in the underlying data
             p.JoinToNext();
