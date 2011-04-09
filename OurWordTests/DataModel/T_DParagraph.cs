@@ -629,6 +629,140 @@ namespace OurWordTests.DataModel
         }
         #endregion
 
+        // Inserting Texts Insertion Points --------------------------------------------------
+        #region smethod: DParagraph CreateModelParagraph()
+        static DParagraph CreateModelParagraph()
+        {
+            return new TParagraph("<p class=\"Paragraph\" usfm=\"p\">" +
+                "<c n=\"28\" />" +
+                "<v n=\"1\" />" +
+                "Lantas, Isak pange sang Yakob, ju dia kasi berkat deng nasiat, bilang, &lt;&lt;" +
+                    "Dengar bae-bae! Lu jang kawin deng nona Kana'an.<bt>Then Isak summoned Yakob, " +
+                    "and geve him blessing with advice, saying, &lt;&lt;Listen well! You must not " +
+                    "marry a young-woman of Kanaan.</bt>" +
+                "<v n=\"2\" />" +
+                "Ma lu pi di Padan Aram, di ba'i Betuel pung ruma. Lu pi kawin deng to'o Laban " +
+                    "pung ana parampuan satu.<bt>But you must go to Padan Aram, to grandfather " +
+                    "Betuel's house. Go marry one of mother's-brother Laban's daughters.</bt>" +
+                "<note reference=\"28:2\" class=\"Note General Paragraph\" usfm=\"f\">Padan Aram " +
+                    "tu, andia Mesopotamia, di negara Siria pung sablá utara, deka-deka deng Irak. " +
+                    "Haran tu, kota di Padan Aram.<bt>That Padan Aram, is Mesopotamia, in the " +
+                    "north part of the country of Siria, very close to Iraq. That Haran, is a " +
+                    "city in Padan Aram.</bt></note>" +
+                "<v n=\"3\" />" +
+                "Biar Tuhan Allah yang Paling Kuasa kasi berkat sang lu, ko lu pung ana-cucu " +
+                    "tamba banya, deng lu pung turunan jadi banya bangsa yang hebat.<bt>May Lord " +
+                    "God who is Most Powerful give you blessing, to your children-grandchildren " +
+                    "increase in number, and your descendants become many impressive races/peoples.</bt>" +
+                "<v n=\"4\" />" +
+                "Biar Tuhan pung janji sang Abraham jato pi di lu, deng lu pung turunan. Biar lu " +
+                    "soa ini tana yang Tuhan Allah su janji kasi sang Abraham.&gt;&gt;<bt>May the " +
+                    "Lord's promise to Abraham fall to you, and your descendants. May you possess" +
+                    "/take possession of this land which Lord God has promised to give to " +
+                    "Abraham.&gt;&gt;</bt>" +
+                "<note reference=\"28:3-4\" class=\"Note Cross Reference Paragraph\" usfm=\"x\">" +
+                    "Utusan dong pung Carita 3:25; Galatia 3:8</note>" +
+                "<v n=\"5\" />" +
+                "Omong abis bagitu, ju Isak lapás sang Yakob pi di Padan Aram, di dia pung to'o " +
+                    "Laban deng ba'i Betuel pung ruma.<bt>After speaking that way, Isak released " +
+                    "Yakob to go to Padan Aram, to his mother's-brother Laban and grandfather " +
+                    "Betuel's house.</bt>" +
+                "</p>");
+        }
+        #endregion
+        #region Test: TSynchRunsToModel_SimilarParagraphs_CompletelyEmpty
+        [Test] public void TSynchRunsToModel_SimilarParagraphs_CompletelyEmpty()
+        {
+            var pModel = CreateModelParagraph();
+
+            var pTarget = new TParagraph("<p class=\"Paragraph\" usfm=\"p\">" +
+                "<c n=\"28\" />" +
+                "<v n=\"1\" />" +
+                "<v n=\"2\" />" +
+                "<note reference=\"28:2\" class=\"Note General Paragraph\" usfm=\"f\" />" + 
+                "<v n=\"3\" />" +
+                "<v n=\"4\" />" +
+                "<note reference=\"28:3-4\" class=\"Note Cross Reference Paragraph\" usfm=\"x\" />" +
+                "<v n=\"5\" />" +
+                "</p>");
+            var cRuns = pTarget.Runs.Count;
+
+            pTarget.SynchRunsToModelParagraph(pModel);
+
+            Assert.AreEqual(cRuns + 5, pTarget.Runs.Count);  // Should have inserted 5 DBasicTexts
+
+            // At these positions
+            Assert.IsTrue(null != pTarget.Runs[2] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[4] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[7] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[9] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[12] as DBasicText);
+        }
+        #endregion
+        #region Test: TSynchRunsToModel_SimilarParagraphs_SomewhatEmpty
+        [Test] public void TSynchRunsToModel_SimilarParagraphs_SomewhatEmpty()
+        {
+            var pModel = CreateModelParagraph();
+
+            var pTarget = new TParagraph("<p class=\"Paragraph\" usfm=\"p\">" +
+                "<c n=\"28\" />" +
+                "<v n=\"1\" />" +
+                "Lantas, Isak pange sang Yakob" +
+                "<v n=\"2\" />" +
+                "Ma lu pi di Padan Aram" +
+                "<note reference=\"28:2\" class=\"Note General Paragraph\" usfm=\"f\" />" +
+                "<v n=\"3\" />" +
+                "<v n=\"4\" />" +
+                "Biar Tuhan pung janji" +
+                "<note reference=\"28:3-4\" class=\"Note Cross Reference Paragraph\" usfm=\"x\" />" +
+                "<v n=\"5\" />" +
+                "</p>");
+            var cRuns = pTarget.Runs.Count;
+
+            pTarget.SynchRunsToModelParagraph(pModel);
+
+            Assert.AreEqual(cRuns + 2, pTarget.Runs.Count);  // Should have inserted 2 DBasicTexts
+
+            // At these positions
+            Assert.IsTrue(null != pTarget.Runs[2] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[4] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[7] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[9] as DBasicText);
+            Assert.IsTrue(null != pTarget.Runs[12] as DBasicText);
+        }
+        #endregion
+        #region Test: TSynchRunsToModel_SimilarParagraphs_AdrianaGen28
+        [Test] public void TSynchRunsToModel_SimilarParagraphs_AdrianaGen28()
+            // Here, the Model has the note in v2 at the end of the verse, but Adriana's
+            // translation had the note in the middle of the verse. The bug resulted in
+            // an extraneous text being inserted in v4.
+        {
+            var pModel = CreateModelParagraph();
+
+            var pTarget = new TParagraph("<p class=\"Paragraph\" usfm=\"p\">" +
+                "<c n=\"28\" />" +
+                "<v n=\"1\" />" +
+                "Lalu Ishak memanggil Yakub...." +
+                "<v n=\"2\" />" +
+                "Tapi pergi ke Padan Aram,..." +
+                "<note reference=\"28:2\" class=\"Note General Paragraph\" usfm=\"f\" >Padan Aram itu Mesopotamia,...</note>" +
+                "ke rumah Betuel. ..." +                
+                "<v n=\"3\" />" +
+                "emoga Tuhan yang Mahakuasa..." +
+                "<v n=\"4\" />" +
+                "Semoga janji Tuhan kepada ..." +
+                "<note reference=\"28:3-4\" class=\"Note Cross Reference Paragraph\" usfm=\"x\">Kisah Para Rasul 3:25; Galatia 3:8</note>" +
+                "<v n=\"5\" />" +
+                "Setelah berkata begitu, " +                
+                "</p>");
+            var cRuns = pTarget.Runs.Count;
+
+            pTarget.SynchRunsToModelParagraph(pModel);
+
+            Assert.AreEqual(cRuns, pTarget.Runs.Count);  // Should not insert anything
+        }
+        #endregion
+
         // I/O -------------------------------------------------------------------------------
         #region Test: oxesIO
         [Test] public void oxesIO()
@@ -724,6 +858,7 @@ namespace OurWordTests.DataModel
         #endregion
     }
 
+
     public class TParagraph : DParagraph
     {
         public TParagraph(string oxesXml)
@@ -741,8 +876,6 @@ namespace OurWordTests.DataModel
             {
                 Assert.Fail("TParagraph(oxesXml): " + e.Message);
             }
-
-        }
-        
+        }       
     }
 }

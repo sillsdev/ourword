@@ -747,12 +747,53 @@ namespace OurWordData.DataModel
 		{
 			// If the structures are different, then we have incompatable paragraphs, and
 			// there is nothing further to do here.
-			if (StructureCodes != pModel.StructureCodes)
+            if (StructureCodes != pModel.StructureCodes)
 			{
 				BestGuessAtInsertingTextPositions();
 				return;
 			}
 
+		    SynchRunsToModel_SimilarParagraphs(pModel);
+		}
+		#endregion
+        #region method: SynchRunsToModel_SimilarParagraphs(pModel)
+        void SynchRunsToModel_SimilarParagraphs(DParagraph pModel)
+        {
+            var iModel = 0;
+            var iTarget = 0;
+
+            while (iModel < pModel.Runs.Count)
+            {
+                // Retrieve the two runs
+                var runModel = pModel.Runs[iModel];
+                var runTarget = (iTarget < Runs.Count) ? Runs[iTarget] : null;
+
+                // Attempt to convert to text
+                var textModel = runModel as DBasicText;
+                var textTarget = runTarget as DBasicText;
+
+                // If the model is a text, but the target isn't, then we need to insert a text
+                if (textModel != null && textTarget == null)
+                    Runs.InsertAt(iTarget, DText.CreateSimple(), true);
+
+                // Synch the two so that they are both on a non-text run
+                while (textModel == null && null != runTarget &&  runTarget.TypeCode != runModel.TypeCode)
+                {
+                    iTarget++;
+                    runTarget = (iTarget < Runs.Count) ? Runs[iTarget] : null;
+                }
+
+                // Advance both to the next one               
+                iModel++;
+                if (iTarget < Runs.Count)
+                    iTarget++;
+            }
+        }
+        // Bug: B1.8.58 - Better algorithm for guessing at text insertion places
+        // 9 April 2011 - version 1.8n, keep around for a few releases until we
+        // are sure the replacment method is better.
+        void SynchRunsToModel_SimilarParagraphs_Old(DParagraph pModel)
+        {
 			// Add DTexts to the target as needed
 			var iTarget = 0;
 			for(var i = 0; i < pModel.Runs.Count; i++, iTarget++)
@@ -761,9 +802,7 @@ namespace OurWordData.DataModel
 				var runModel = pModel.Runs[i];
 
 				// Retrieve the target's run (if any)
-				DRun runTarget = null;
-				if (iTarget < Runs.Count)
-					runTarget = Runs[iTarget];
+                var runTarget = (iTarget < Runs.Count) ? Runs[iTarget] : null;
 
 				// If the model is a DText, but if the Target isn't, then we need to
 				// insert a DText into the Target.
@@ -784,11 +823,12 @@ namespace OurWordData.DataModel
 					Runs.InsertAt(iTarget, text, true);
 				}
 			}
-		}
-		#endregion
+        }
+        #endregion
 
-		#region Method: void CombineAdjacentDTexts()
-		public void CombineAdjacentDTexts(bool bInsertSpacesBetweenPhrases)
+
+        #region Method: void CombineAdjacentDTexts()
+        public void CombineAdjacentDTexts(bool bInsertSpacesBetweenPhrases)
 			// Combine any adjacent DTexts. These can arise, e.g., when there are 
 			// multiple \vt fields following a single \v field (which can easily happen
 			// in Toolbox when the user combines verses into a verse bridge.
