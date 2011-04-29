@@ -576,6 +576,9 @@ namespace OurWord
             // Leave everything in a state where the main window has focus, so that the
             // Text Selection will be appropriately flashing its readiness
             CurrentLayout.Focus();
+
+            // VERY TEMPORARY!!!!
+            // TermsDb.OnOffAnalysisForHiDef();
         }
 		#endregion
         #region Event: cmdClosing - save window state, data, etc.

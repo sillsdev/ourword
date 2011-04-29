@@ -1746,6 +1746,7 @@ namespace OurWordData.DataModel
         public void LoadBook(IProgressIndicator progress)
         {
             LoadBook(StoragePath, progress);
+//            OneOffForHuichol_StripOutOldTranslatorNotes();
         }
         #endregion
 
