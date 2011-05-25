@@ -118,6 +118,7 @@ namespace OurWord.Dialogs.Properties
                 "The writing system that this translation is being drafted in.",
                 Translation.VernacularWritingSystemName,
                 vsWritingSystems);
+            m_WSVernacular.DontLocalizePossibilities = true;
             m_WSVernacular.Group = sGroupWritingSystems;
 
             m_WSAdvisor = LS.AddAtringChoice(
@@ -126,6 +127,7 @@ namespace OurWord.Dialogs.Properties
                 "The writing system for the back translation and other materials the advisor or consultant might use.",
                 Translation.ConsultantWritingSystemName,
                 vsWritingSystems);
+            m_WSAdvisor.DontLocalizePossibilities = true;
             m_WSAdvisor.Group = sGroupWritingSystems;
 
             // Footnotes

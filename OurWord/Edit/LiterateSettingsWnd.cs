@@ -191,7 +191,7 @@ namespace OurWord.Edit
 				return m_vSettings;
 			}
 		}
-		List<Setting> m_vSettings = new List<Setting>();
+	    readonly List<Setting> m_vSettings = new List<Setting>();
 		#endregion
         public void Reset()
         {
@@ -229,7 +229,7 @@ namespace OurWord.Edit
         public StringChoiceSetting AddAtringChoice(string sID, string sLabel, 
             string sDescription, string sInitialValue, string[] vPossiblities)
         {
-            StringChoiceSetting setting = new StringChoiceSetting(
+            var setting = new StringChoiceSetting(
                 this, sID, sLabel, sDescription, null, sInitialValue, vPossiblities);
 
             return AddSetting(setting) as StringChoiceSetting;
@@ -288,7 +288,7 @@ namespace OurWord.Edit
 		{
             // By default, we start by showing the verbose documentation, as
             // currently indicated in the combo box
-            bool bShowVerbose = ShowDocumentation;
+            var bShowVerbose = ShowDocumentation;
 
             // If the programmer has indicated to not allow the property grid, then
             // Verbose is on, regardless of registry, user decision, etc.
@@ -954,6 +954,7 @@ namespace OurWord.Edit
         }
         string[] m_vPossilibities;
         #endregion
+        public bool DontLocalizePossibilities;
 
         // Scaffolding -----------------------------------------------------------------------
         #region Attr{g/s}: string Value
@@ -993,24 +994,25 @@ namespace OurWord.Edit
         #region OMethod: void BuildVerbose()
         public override void BuildVerbose()
         {
-            ToolStrip strip = AddToolStrip();
+            var strip = AddToolStrip();
 
             // Add the label
-            ToolStripLabel label = new ToolStripLabel(LabelText);
-            label.Width = AlignmentColumn;
-            label.AutoSize = false;
-            label.TextAlign = ContentAlignment.MiddleRight;
+            var label = new ToolStripLabel(LabelText) {
+                Width = AlignmentColumn,
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleRight
+            };
             strip.Items.Add(label);
 
             // Create and initialize the combo box
-            ComboBox cb = new ComboBox();
-            foreach (string s in Possibilities)
+            var cb = new ComboBox();
+            foreach (var s in Possibilities)
                 cb.Items.Add(s);
             cb.Text = Value;
-            cb.SelectionChangeCommitted += new EventHandler(cmdVerboseControlChanged);
+            cb.SelectionChangeCommitted += cmdVerboseControlChanged;
 
             // Add it to the toolstrip (we must use a host object)
-            ToolStripControlHost host = new ToolStripControlHost(cb);
+            var host = new ToolStripControlHost(cb);
             strip.Items.Add(host);
         }
         #endregion
@@ -1019,13 +1021,16 @@ namespace OurWord.Edit
         #region OMethod: void BuildTerse()
         public override void BuildTerse()
         {
-            PropertySpec ps = new PropertySpec(
+            var ps = new PropertySpec(
                ID,
                LabelText,
                Group,
                Description,
                m_vPossilibities,
-               Value);
+               Value) 
+               {
+                   DontLocalizeEnums = DontLocalizePossibilities,
+               };
             Terse.Properties.Add(ps);
         }
         #endregion
