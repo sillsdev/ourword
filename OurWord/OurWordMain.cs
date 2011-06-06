@@ -117,10 +117,21 @@ namespace OurWord
 			Text = LanguageResources.AppTitle;
 
             // If a project exists, then display its name
-			if (null != DB.Project)
-				Text += (@" - " + DB.Project.DisplayName);
+            if (null != DB.Project)
+            {
+                if (null != DB.FrontTranslation && null != DB.TargetTranslation)
+                {
+                    Text += string.Format(@" - {0} to {1}",
+                        DB.FrontTranslation.DisplayName,
+                        DB.TargetTranslation.DisplayName.ToUpper());
+                }
+                else
+                {
+                    Text += (@" - " + DB.Project.DisplayName);
+                }
+            }
 
-            // If a book is loaded, then display its name
+		    // If a book is loaded, then display its name
             if (null != DB.Project && null != DB.TargetBook)
             {
                 Text += (@" - " + DB.TargetBook.DisplayName);
@@ -204,7 +215,6 @@ namespace OurWord
 		#endregion
 
         // Toolbar, MenuBar, Taskbar & StatusBar ---------------------------------------------
-        #region Toolbar, Taskbar & StatusBar
         #region Method: void EnableItalicsButton() - unique function for faster speed
         public void EnableItalicsButton()
         {
@@ -232,7 +242,6 @@ namespace OurWord
 
             EnableItalicsButton();
         }
-        #endregion
         #endregion
 
         // Private attributes ----------------------------------------------------------------
